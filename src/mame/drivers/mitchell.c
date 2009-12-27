@@ -74,7 +74,7 @@ mw-9.rom = ST M27C1001 / GFX
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "includes/cps1.h"	// needed for decoding functions only
 #include "includes/mitchell.h"
 #include "sound/okim6295.h"

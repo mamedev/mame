@@ -147,7 +147,7 @@ REF. 970429
 #include "includes/gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/dmadac.h"
 
 #define	LOG				0

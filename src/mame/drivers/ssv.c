@@ -183,7 +183,7 @@ Notes:
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/es5506.h"
 #include "includes/seta.h"
 

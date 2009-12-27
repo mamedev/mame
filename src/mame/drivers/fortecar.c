@@ -26,7 +26,7 @@ dip 1X8
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 #include "video/mc6845.h"

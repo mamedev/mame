@@ -16,7 +16,7 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 #include "includes/kaneko16.h"
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 
 #define CALC3_VERBOSE_OUTPUT 0

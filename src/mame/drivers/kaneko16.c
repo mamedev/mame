@@ -87,7 +87,7 @@ Dip locations verified from manual for:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "includes/kaneko16.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"

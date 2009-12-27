@@ -25,7 +25,7 @@
 #include "debugvw.h"
 #include "debugger.h"
 #include "uiinput.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include <ctype.h>
 
 

@@ -231,7 +231,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "includes/deco32.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"

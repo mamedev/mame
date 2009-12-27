@@ -50,7 +50,7 @@
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "includes/konamigx.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/am53cf96.h"
 #include "harddisk.h"
 #include "sound/k054539.h"

@@ -24,7 +24,7 @@ Year + Game         PCB             Notes
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "includes/unico.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"

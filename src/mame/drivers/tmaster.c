@@ -105,7 +105,7 @@ To Do:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
 

@@ -14,7 +14,7 @@
 #include "driver.h"
 #include "includes/decocrpt.h"
 #include "includes/deco32.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"

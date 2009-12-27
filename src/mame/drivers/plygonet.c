@@ -85,7 +85,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/dsp56k/dsp56k.h"
 #include "sound/k054539.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 VIDEO_START( polygonet );
 VIDEO_UPDATE( polygonet );

@@ -139,7 +139,7 @@ Current Problem(s) - in order of priority
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "machine/seicop.h"
 #include "includes/raiden2.h"

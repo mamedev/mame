@@ -54,7 +54,7 @@
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 READ32_HANDLER(eolith_vram_r);
 WRITE32_HANDLER(eolith_vram_w);

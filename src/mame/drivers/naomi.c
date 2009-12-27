@@ -1047,7 +1047,7 @@ Notes:
 #include "driver.h"
 #include "cpu/arm7/arm7.h"
 #include "video/generic.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/intelfsh.h"
 #include "includes/naomibd.h"
 #include "includes/naomi.h"

@@ -89,7 +89,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 
 extern UINT16 *pirates_tx_tileram, *pirates_spriteram;

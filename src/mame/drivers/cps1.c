@@ -233,7 +233,7 @@ Stephh's log (2006.09.20) :
 #include "cpu/z80/z80.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"

@@ -586,7 +586,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h" // gigamn2 bootleg

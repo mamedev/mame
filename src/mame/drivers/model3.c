@@ -601,7 +601,7 @@ ALL VROM ROMs are 16M MASK
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/53c810.h"
 #include "sound/scsp.h"
 #include "includes/model3.h"

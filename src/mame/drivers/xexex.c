@@ -66,7 +66,7 @@ Unresolved Issues:
 #include "deprecat.h"
 #include "video/konicdev.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "sound/2151intf.h"
 #include "sound/flt_vol.h"

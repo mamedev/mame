@@ -90,7 +90,7 @@ Note
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 static UINT8 *spool99_main;
 static tilemap *sc0_tilemap;

@@ -86,7 +86,7 @@ driver modified by Eisuke Watanabe
 #include "cpu/m68000/m68000.h"
 #include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "video/konicdev.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"

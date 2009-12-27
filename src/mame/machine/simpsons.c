@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "video/konicdev.h"
 #include "cpu/konami/konami.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
 

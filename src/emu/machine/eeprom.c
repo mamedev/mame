@@ -4,7 +4,7 @@
  */
 
 #include "driver.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

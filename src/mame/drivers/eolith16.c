@@ -12,7 +12,7 @@
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "includes/eolithsp.h"
 

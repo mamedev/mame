@@ -171,7 +171,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/mb87078.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"

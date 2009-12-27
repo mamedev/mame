@@ -48,7 +48,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 #define MIDAS_DEBUG	0
 

@@ -190,7 +190,7 @@ Board contains only 29 ROMs and not much else.
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"

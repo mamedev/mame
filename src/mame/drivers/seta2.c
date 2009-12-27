@@ -533,7 +533,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
 #include "cpu/h83002/h8.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/x1_010.h"
 #include "includes/seta.h"
 

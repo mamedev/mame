@@ -52,7 +52,7 @@ Notes:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 static UINT16 *gms_vidram;
 static UINT16 *gms_vidram2;

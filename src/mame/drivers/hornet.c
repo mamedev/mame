@@ -311,7 +311,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/konppc.h"
 #include "video/voodoo.h"
 #include "machine/timekpr.h"

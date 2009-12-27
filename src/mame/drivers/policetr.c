@@ -85,7 +85,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 #include "driver.h"
 #include "cpu/mips/r3000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "includes/policetr.h"
 #include "sound/bsmt2000.h"
 

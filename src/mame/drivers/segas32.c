@@ -320,7 +320,7 @@ MIB.42
 #include "cpu/nec/nec.h"
 #include "rendlay.h"
 #include "includes/segas32.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "sound/multipcm.h"

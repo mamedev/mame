@@ -116,7 +116,7 @@ Notes:
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/intelfsh.h"
 #include "machine/am53cf96.h"
 #include "sound/psx.h"

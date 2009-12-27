@@ -355,7 +355,7 @@ Notes:
 #include "includes/taito_f3.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "audio/taito_en.h"
 
 extern UINT32 *f3_shared_ram;

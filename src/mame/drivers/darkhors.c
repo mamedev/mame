@@ -57,7 +57,7 @@ To do:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/st0016.h"
 #include "includes/st0016.h"

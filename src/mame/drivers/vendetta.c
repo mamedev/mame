@@ -90,7 +90,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"

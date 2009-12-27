@@ -171,7 +171,7 @@ Check gticlub.c for details on the bottom board.
 #include "machine/konppc.h"
 #include "machine/adc083x.h"
 #include "machine/k056230.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "video/konicdev.h"
 #include "video/gticlub.h"
 #include "sound/k056800.h"

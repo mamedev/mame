@@ -22,7 +22,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"

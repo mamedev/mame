@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/cps1.h"	// needed for decoding functions only
 #include "includes/cbasebal.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 

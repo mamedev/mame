@@ -12,7 +12,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/k054539.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/konppc.h"
 #include "sound/k056800.h"
 

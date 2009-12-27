@@ -737,7 +737,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/i386/i386.h"
 #include "machine/ds2404.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/intelfsh.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"

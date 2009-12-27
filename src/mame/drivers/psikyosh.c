@@ -272,7 +272,7 @@ Notes:
 #include "driver.h"
 
 #include "cpu/sh2/sh2.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/ymf278b.h"
 
 #include "includes/psikyosh.h"

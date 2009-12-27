@@ -97,7 +97,7 @@
 
 #include "driver.h"
 #include "includes/decocrpt.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/ymz280b.h"
 #include "includes/decoprot.h"
 #include "cpu/arm/arm.h"

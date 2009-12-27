@@ -169,7 +169,7 @@ maybe some priority issues / sprite placement issues..
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/k054539.h"
 
 #define MAIN_CLOCK		XTAL_24MHz

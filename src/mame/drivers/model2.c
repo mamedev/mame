@@ -50,7 +50,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
