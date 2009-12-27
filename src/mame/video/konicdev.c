@@ -2677,7 +2677,7 @@ static DEVICE_START( k052109 )
 	k052109->tilemap[1] = tilemap_create_device(device, k052109_get_tile_info1, tilemap_scan_rows, 8, 8, 64, 32);
 	k052109->tilemap[2] = tilemap_create_device(device, k052109_get_tile_info2, tilemap_scan_rows, 8, 8, 64, 32);
 
-	k052109->ram = auto_alloc_array(machine, UINT8, 0x6000);
+	k052109->ram = auto_alloc_array_clear(machine, UINT8, 0x6000);
 
 	k052109->colorram_F = &k052109->ram[0x0000];
 	k052109->colorram_A = &k052109->ram[0x0800];
