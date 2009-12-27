@@ -132,7 +132,6 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ds1302.o \
 	$(EMUMACHINE)/ds2401.o \
 	$(EMUMACHINE)/ds2404.o \
-	$(EMUMACHINE)/eeprom.o \
 	$(EMUMACHINE)/eepromdev.o \
 	$(EMUMACHINE)/f3853.o \
 	$(EMUMACHINE)/generic.o \
