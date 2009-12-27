@@ -389,6 +389,7 @@ typedef struct josvolly_8741_struct {
 	UINT8 connect;
 
 	UINT8 rst;
+	UINT8 mux_io;
 
 	const char *initReadPort;
 }JV8741;
@@ -419,6 +420,9 @@ void josvolly_8741_reset(void)
 	i8741[1].initReadPort = "DSW2";  /* DSW2 */
 	i8741[2].initReadPort = "DSW1";  /* DUMMY */
 	i8741[3].initReadPort = "DSW2";  /* DUMMY */
+
+	i8741[0].mux_io = 0;
+	i8741[1].mux_io = 0;
 }
 
 /* transmit data finish callback */
@@ -550,6 +554,7 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 		case 0:
 			mcu->txd = data ^ 0x40;
 			mcu->sts |= 0x02;
+			mcu->rst = 0;
 			break;
 		case 1:
 			/*
@@ -564,21 +569,21 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 			*/
 			mcu->txd = 0 ^ 0x40;
 			mcu->sts |= 0x02;
-#if 1
 			/* ?? */
 			mcu->rxd = 0;  /* SBSTS ( DIAG ) , killed */
 			mcu->sts |= 0x01; /* RD ready */
-#endif
+			mcu->rst = 0;
 			break;
 		case 2:
-#if 1
-			mcu->rxd = input_port_read(space->machine, "DSW2");
+			mcu->rxd = (input_port_read(space->machine, "DSW2") & 0x1f) << 2;
 			mcu->sts |= 0x01; /* RD ready */
-#endif
+			mcu->rst = 0;
 			break;
 		case 3: /* normal mode ? */
-			mcu->rxd = input_port_read(space->machine, "DSW1");
+			//mcu->rxd = input_port_read(space->machine, "DSW1");
 			mcu->sts |= 0x01; /* RD ready */
+			mcu->rst = 1;
+			mcu->mux_io = 0;
 			break;
 
 		case 0xf0: /* clear main sts ? */
@@ -618,7 +623,12 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 	{
 		if(mcu->rst)
 		{
-			mcu->rxd = input_port_read(space->machine, mcu->initReadPort); /* port in */
+			static const char *const ports[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5" };
+			mcu->rxd = input_port_read(space->machine, ports[mcu->mux_io]); /* port in */
+			//printf("%02x\n",mcu->mux_io);
+			mcu->mux_io++;
+			if(mcu->mux_io > 5)
+				mcu->mux_io = 0;
 		}
 		ret = mcu->sts;
 		LOG(("%s:8741[%d]       SR %02X\n",cpuexec_describe_context(space->machine),num,ret));
@@ -629,7 +639,7 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 		mcu->sts &= ~0x01; /* RD ready */
 		ret = mcu->rxd;
 		LOG(("%s:8741[%d]       DR %02X\n",cpuexec_describe_context(space->machine),num,ret));
-		mcu->rst = 0;
+		//mcu->rst = 0;
 	}
 	return ret;
 }
