@@ -145,6 +145,7 @@ some kind of zoom table?
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+#include "machine/taitoio.h"
 #include "video/taitoic.h"
 #include "sound/2610intf.h"
 
@@ -199,7 +200,8 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8	port = TC0220IOC_port_r(space,0);	/* read port number */
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	UINT8	port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
 
 	switch( port )
 	{
@@ -240,7 +242,7 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 				return 0x00;
 
 		default:
-			return TC0220IOC_portreg_r( space,offset );
+			return tc0220ioc_portreg_r(tc0220ioc, offset);
 	}
 }
 
@@ -268,8 +270,8 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( syvalion_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(&taitoh_68000_mainram)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(syvalion_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
@@ -279,8 +281,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( recordbr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(&taitoh_68000_mainram)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r, TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
@@ -290,7 +292,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleague_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(&taitoh_68000_mainram)
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
@@ -544,6 +546,12 @@ static MACHINE_START( taitoh )
 }
 
 
+static const tc0220ioc_interface taitoh_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( syvalion )
 
 	/* basic machine hardware */
@@ -558,6 +566,8 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_MACHINE_RESET(taitoh)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoh_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -599,6 +609,8 @@ static MACHINE_DRIVER_START( recordbr )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoh_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -638,6 +650,8 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_MACHINE_RESET(taitoh)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoh_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

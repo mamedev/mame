@@ -236,6 +236,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromdev.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -299,18 +300,6 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-static const UINT8 default_eeprom[128]=
-{
-	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
-	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
-	0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x01,0x40,0x00,0x00,0x00,0xf0,0x00,
-	0x00,0x01,0x42,0x85,0x00,0x00,0xf1,0xe3,0x00,0x01,0x40,0x00,0x00,0x00,0xf0,0x00,
-	0x00,0x01,0x42,0x85,0x00,0x00,0xf1,0xe3,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-};
-
 static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
@@ -322,9 +311,10 @@ static const eeprom_interface eeprom_intf =
 	"0100111111" 	/* unlock command */
 };
 
-static WRITE16_HANDLER( othunder_TC0220IOC_w )
+static WRITE16_HANDLER( othunder_tc0220ioc_w )
 {
 	const device_config *device;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -353,7 +343,8 @@ if (data & 4)
 				break;
 
 			default:
-				TC0220IOC_w(space,offset,data & 0xff);
+				device = devtag_get_device(space->machine, "tc0220ioc");
+				tc0220ioc_w(device, offset, data & 0xff);
 		}
 	}
 }
@@ -363,9 +354,10 @@ if (data & 4)
             GAME INPUTS
 **********************************************************/
 
-static READ16_HANDLER( othunder_TC0220IOC_r )
+static READ16_HANDLER( othunder_tc0220ioc_r )
 {
 	const device_config *device;
+
 	switch (offset)
 	{
 		case 0x03:
@@ -373,7 +365,8 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 			return (eepromdev_read_bit(device) & 1) << 7;
 
 		default:
-			return TC0220IOC_r( space, offset );
+			device = devtag_get_device(space->machine, "tc0220ioc");
+			return tc0220ioc_r(device, offset);
 	}
 }
 
@@ -482,7 +475,7 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
 static ADDRESS_MAP_START( othunder_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_TC0220IOC_r, othunder_TC0220IOC_w)
+	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
 //  AM_RANGE(0x090006, 0x090007) AM_WRITE(eeprom_w)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
 	AM_RANGE(0x100000, 0x100007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_rbswap_word_w)	/* palette */
@@ -670,6 +663,12 @@ static const ym2610_interface ym2610_config =
                  MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0220ioc_interface othunder_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( othunder )
 
 	/* basic machine hardware */
@@ -685,6 +684,8 @@ static MACHINE_DRIVER_START( othunder )
 
 	MDRV_MACHINE_START(othunder)
 	MDRV_MACHINE_RESET(othunder)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

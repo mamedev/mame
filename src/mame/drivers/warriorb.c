@@ -149,6 +149,7 @@ Colscroll effects?
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -225,7 +226,7 @@ static ADDRESS_MAP_START( darius2d_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)		/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
 ADDRESS_MAP_END
@@ -240,7 +241,7 @@ static ADDRESS_MAP_START( warriorb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)		/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
 ADDRESS_MAP_END
@@ -444,6 +445,18 @@ static DEVICE_GET_INFO( subwoofer )
                        MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0220ioc_interface darius2d_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
+static const tc0510nio_interface warriorb_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( darius2d )
 
 	/* basic machine hardware */
@@ -456,6 +469,8 @@ static MACHINE_DRIVER_START( darius2d )
 
 	MDRV_MACHINE_START( warriorb )
 	MDRV_MACHINE_RESET( taito_dualscreen )
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", darius2d_io_intf)
 
 	/* video hardware */
 	MDRV_GFXDECODE(warriorb)
@@ -514,6 +529,8 @@ static MACHINE_DRIVER_START( warriorb )
 
 	MDRV_MACHINE_START( warriorb )
 	MDRV_MACHINE_RESET( taito_dualscreen )
+
+	MDRV_TC0510NIO_ADD("tc0510nio", warriorb_io_intf)
 
 	/* video hardware */
 	MDRV_GFXDECODE(warriorb)

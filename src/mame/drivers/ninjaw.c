@@ -315,6 +315,7 @@ rumbling on a subwoofer in the cabinet.)
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -407,8 +408,8 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
 static ADDRESS_MAP_START( ninjaw_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM														/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
@@ -430,8 +431,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ninjaw_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM	/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
@@ -443,8 +444,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius2_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM							/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
@@ -463,8 +464,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius2_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM														/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
@@ -681,6 +682,12 @@ to the scrolling background.
 Darius2: arbitrary interleaving of 10 to keep cpus synced.
 *************************************************************/
 
+static const tc0220ioc_interface ninjaw_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
@@ -699,6 +706,8 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	MDRV_MACHINE_START(ninjaw)
 	MDRV_MACHINE_RESET(ninjaw)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
 	MDRV_GFXDECODE(ninjaw)
@@ -772,6 +781,8 @@ static MACHINE_DRIVER_START( darius2 )
 
 	MDRV_MACHINE_START(ninjaw)
 	MDRV_MACHINE_RESET(ninjaw)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
 	MDRV_GFXDECODE(ninjaw)
@@ -1015,4 +1026,3 @@ static MACHINE_RESET( ninjaw )
 GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,   0,  ROT0, "Taito Corporation Japan", "The Ninja Warriors (World)", 0 )
 GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj,  0,  ROT0, "Taito Corporation", "The Ninja Warriors (Japan)", 0 )
 GAME( 1989, darius2,  0,      darius2, darius2,  0,  ROT0, "Taito Corporation", "Darius II (Japan)", 0 )
-

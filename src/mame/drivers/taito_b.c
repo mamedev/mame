@@ -171,9 +171,9 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
 #include "machine/eepromdev.h"
 #include "machine/mb87078.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -339,7 +339,7 @@ static WRITE16_HANDLER( gain_control_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		if (offset==0)
+		if (offset == 0)
 		{
 			MB87078_data_w(space->machine, 0, data>>8, 0);
             //logerror("MB87078 dsel=0 data=%4x\n",data);
@@ -428,13 +428,14 @@ static WRITE16_HANDLER( player_34_coin_ctrl_w )
 
 static READ16_HANDLER( pbobble_input_bypass_r )
 {
+	const device_config *tc0640fio = devtag_get_device(space->machine, "tc0640fio");
 	switch (offset)
 	{
 		case 0x01:
-			return input_port_read(space->machine, "DSWB") << 8;
+			return input_port_read(space->machine, "COIN") << 8;
 
 		default:
-			return TC0640FIO_r(space, offset) << 8;
+			return tc0640fio_r(tc0640fio, offset) << 8;
 	}
 }
 
@@ -456,13 +457,13 @@ static ADDRESS_MAP_START( rastsag2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x800002, 0x800003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( crimec_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -476,7 +477,7 @@ static ADDRESS_MAP_START( tetrist_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -485,8 +486,8 @@ static ADDRESS_MAP_START( tetrista_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x600001) AM_READWRITE8(TC0220IOC_portreg_r, TC0220IOC_portreg_w, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -496,7 +497,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hitice_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x610000, 0x610001) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -514,7 +515,7 @@ static ADDRESS_MAP_START( rambo3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x600010, 0x600011) AM_READ(tracky1_lo_r) /*player 1*/
 	AM_RANGE(0x600012, 0x600013) AM_READ(tracky1_hi_r)
 	AM_RANGE(0x600014, 0x600015) AM_READ(trackx1_lo_r)
@@ -531,11 +532,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbobble_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READWRITE(pbobble_input_bypass_r, TC0640FIO_halfword_byteswap_w)
-	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("IN3")		/* shown in service mode, game omits to read it */
+	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")		/* shown in service mode, game omits to read it */
 	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
-	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("IN4")		/* shown in service mode, game omits to read it */
+	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("P3_P4_B")		/* shown in service mode, game omits to read it */
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -547,11 +548,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spacedx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READWRITE(pbobble_input_bypass_r, TC0640FIO_halfword_byteswap_w)
-	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("IN3")
+	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")
 	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
-	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("IN4")
+	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("P3_P4_B")
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -564,7 +565,7 @@ static ADDRESS_MAP_START( spacedxo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
@@ -576,11 +577,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzshowby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(pbobble_input_bypass_r, TC0640FIO_halfword_byteswap_w)
-	AM_RANGE(0x200024, 0x200025) AM_READ_PORT("IN3")	/* player 3,4 start */
+	AM_RANGE(0x200000, 0x20000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x200024, 0x200025) AM_READ_PORT("P3_P4_A")	/* player 3,4 start */
 	AM_RANGE(0x200026, 0x200027) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200028, 0x200029) AM_READWRITE(player_34_coin_ctrl_r, player_34_coin_ctrl_w)
-	AM_RANGE(0x20002e, 0x20002f) AM_READ_PORT("IN4")	/* player 3,4 buttons */
+	AM_RANGE(0x20002e, 0x20002f) AM_READ_PORT("P3_P4_B")	/* player 3,4 buttons */
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -596,7 +597,7 @@ static ADDRESS_MAP_START( viofight_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
 
@@ -606,8 +607,8 @@ static ADDRESS_MAP_START( masterw_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x800000, 0x800001) AM_READWRITE8(TC0220IOC_portreg_r, TC0220IOC_portreg_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -619,7 +620,7 @@ static ADDRESS_MAP_START( silentd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 //  AM_RANGE(0x10001a, 0x10001b) AM_READNOP // ??? read at $1e344
 //  AM_RANGE(0x10001c, 0x10001d) AM_READNOP // ??? read at $1e356
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
@@ -636,8 +637,8 @@ static ADDRESS_MAP_START( selfeena_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x200000 )
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00)
-	AM_RANGE(0x410000, 0x41000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0xff00) /* mirror address - seems to be only used for coin control */
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x410000, 0x41000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00) /* mirror address - seems to be only used for coin control */
 	AM_RANGE(0x500000, 0x500001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x500002, 0x500003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -647,7 +648,7 @@ static ADDRESS_MAP_START( sbm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* Main RAM */
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0510NIO_halfword_wordswap_r, TC0510NIO_halfword_wordswap_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x900000 )
@@ -1189,7 +1190,7 @@ static INPUT_PORTS_START( hitice )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("P3_P4")      /* IN5 IN6 */
+	PORT_START("P3_P4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -1325,9 +1326,8 @@ INPUT_PORTS_END
 
 /* Helps document the input ports. */
 
-/* Tags below are the ones expected by TC0640FIO_r */
 static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
-	PORT_START("DSWA")
+	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
@@ -1337,7 +1337,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) /*ok*/
 
-	PORT_START("DSWB")
+	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1347,7 +1347,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) /*ok*/
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) /*ok*/
 
-	PORT_START("IN0")
+	PORT_START("START")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -1357,7 +1357,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START("IN1")
+	PORT_START("P1_P2_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -1367,7 +1367,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 
-	PORT_START("IN2")
+	PORT_START("P1_P2_B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1377,7 +1377,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("IN3")
+	PORT_START("P3_P4_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -1387,7 +1387,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 
-	PORT_START("IN4")
+	PORT_START("P3_P4_B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -1488,9 +1488,8 @@ static INPUT_PORTS_START( spacedxo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-/* Tags below are the ones expected by TC0640FIO_r */
 static INPUT_PORTS_START( qzshowby )
-	PORT_START("DSWA")
+	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
@@ -1500,7 +1499,7 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /*unused in test mode*/
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) /*ok*/
 
-	PORT_START("DSWB")
+	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1510,7 +1509,7 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) /*ok*/
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) /*ok*/
 
-	PORT_START("IN0")      /* IN0 */ /*all OK*/
+	PORT_START("START")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -1520,17 +1519,17 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START("IN1")		/* IN 1 */ /*all OK*/
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  ) /* IPT_START1 in test mode */
+	PORT_START("P1_P2_A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* IPT_START1 in test mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  ) /* IPT_START2 in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* IPT_START2 in test mode */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")      /* IN2 */ /*all OK*/
+	PORT_START("P1_P2_B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -1540,7 +1539,7 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START("IN3")
+	PORT_START("P3_P4_A")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN  ) /* IPT_START3 in test mode */
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1550,7 +1549,7 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")
+	PORT_START("P3_P4_B")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
@@ -1914,7 +1913,7 @@ static INPUT_PORTS_START( ryujin )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbm )
-	PORT_START("DSWA") /* DSW A *///+-ok
+	PORT_START("DSWA") //+-ok
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -1937,7 +1936,7 @@ static INPUT_PORTS_START( sbm )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB") /* DSW B */ //+-ok
+	PORT_START("DSWB") //+-ok
 	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -1958,7 +1957,7 @@ static INPUT_PORTS_START( sbm )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN0")
+	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)//sound select UP
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)//sound select DOWN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)//ok (object test)
@@ -1968,7 +1967,7 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)//BEN IN (ticket dispenser)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)//LADY ????
 
-	PORT_START("IN1")
+	PORT_START("START")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )//select; ok (1P in object test)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )//start ; ok (2P in object test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1978,7 +1977,7 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("PHOTOSENSOR")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )       //ok
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )	//ok
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)   //ok
@@ -2122,6 +2121,25 @@ static MACHINE_RESET( mb87078 )
 }
 
 
+static const tc0220ioc_interface taitob_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
+static const tc0640fio_interface pbobble_io_intf =
+{
+	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COIN"), 
+	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("P1_P2_A"), DEVCB_INPUT_PORT("P1_P2_B")	/* port read handlers */
+};
+
+static const tc0510nio_interface sbm_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("JOY"), DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("PHOTOSENSOR")	/* port read handlers */
+};
+
+
 static MACHINE_DRIVER_START( rastsag2 )
 
 	/* basic machine hardware */
@@ -2133,6 +2151,8 @@ static MACHINE_DRIVER_START( rastsag2 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2172,6 +2192,8 @@ static MACHINE_DRIVER_START( ashura )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2209,6 +2231,8 @@ static MACHINE_DRIVER_START( crimec )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2248,6 +2272,8 @@ static MACHINE_DRIVER_START( tetrist )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2284,6 +2310,8 @@ static MACHINE_DRIVER_START( tetrista )
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2322,6 +2350,8 @@ static MACHINE_DRIVER_START( hitice )
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2367,6 +2397,8 @@ static MACHINE_DRIVER_START( rambo3 )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2405,6 +2437,8 @@ static MACHINE_DRIVER_START( rambo3a )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2430,7 +2464,6 @@ static MACHINE_DRIVER_START( rambo3a )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( pbobble )
 
 	/* basic machine hardware */
@@ -2445,6 +2478,8 @@ static MACHINE_DRIVER_START( pbobble )
 
 	MDRV_MACHINE_RESET(mb87078)
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+
+	MDRV_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2487,6 +2522,8 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_MACHINE_RESET(mb87078)
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
+	MDRV_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2524,6 +2561,8 @@ static MACHINE_DRIVER_START( spacedxo )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2566,6 +2605,8 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_MACHINE_RESET(mb87078)
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
+	MDRV_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2603,6 +2644,8 @@ static MACHINE_DRIVER_START( viofight )
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2646,6 +2689,8 @@ static MACHINE_DRIVER_START( masterw )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2685,6 +2730,8 @@ static MACHINE_DRIVER_START( silentd )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2722,6 +2769,8 @@ static MACHINE_DRIVER_START( selfeena )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2770,6 +2819,8 @@ static MACHINE_DRIVER_START( ryujin )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2814,6 +2865,8 @@ static MACHINE_DRIVER_START( sbm )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0510NIO_ADD("tc0510nio", sbm_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3602,9 +3655,9 @@ GAME( 1992, silentdu, silentd, silentd,  silentdj, taito_b, ROT0,   "Taito Ameri
 GAME( 1993, ryujin,   0,       ryujin,   ryujin,   taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1993, qzshowby, 0,       qzshowby, qzshowby, taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1994, pbobble,  0,       pbobble,  pbobble,  taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", GAME_SUPPORTS_SAVE )
-GAME( 1994, spacedx,  0,       spacedx,  pbobble,  taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US) v2.1", GAME_SUPPORTS_SAVE )
-GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,  taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan) v2.1", GAME_SUPPORTS_SAVE )
-GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan) v2.0", GAME_SUPPORTS_SAVE )
+GAME( 1994, spacedx,  0,       spacedx,  pbobble,  taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,  taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", GAME_SUPPORTS_SAVE )
 /*
     Sonic Blast Man is a ticket dispensing game.
     (Japanese version however does not dispense them, only US does - try the "sbm_patch" in the machine_config).

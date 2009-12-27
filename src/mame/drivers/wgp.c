@@ -397,6 +397,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/taitoio.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -657,7 +658,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main CPUA ram */
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE8(TC0220IOC_r,TC0220IOC_w, 0xff00)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_word_0_w)			/* tilemaps */
@@ -940,7 +941,7 @@ static MACHINE_RESET( wgp )
 {
 	banknum = -1;
 	cpua_ctrl = 0xff;
-	port_sel=0;
+	port_sel = 0;
 }
 
 static MACHINE_START( wgp )
@@ -949,6 +950,12 @@ static MACHINE_START( wgp )
 	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, wgp_postload, NULL);
 }
+
+static const tc0220ioc_interface wgp_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
 
 static MACHINE_DRIVER_START( wgp )
 
@@ -968,6 +975,8 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_MACHINE_RESET(wgp)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", wgp_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

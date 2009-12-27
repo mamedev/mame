@@ -217,6 +217,7 @@ DIP locations verified for:
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
@@ -348,7 +349,7 @@ static ADDRESS_MAP_START( asuka_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0xc10000, 0xc103ff) AM_WRITENOP	/* error in Asuka init code */
 	AM_RANGE(0xc20000, 0xc2000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
@@ -362,7 +363,7 @@ static ADDRESS_MAP_START( cadash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM	/* network ram */
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_4bpg_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -373,8 +374,8 @@ static ADDRESS_MAP_START( eto_map, ADDRESS_SPACE_PROGRAM, 16 )	/* N.B. tc100scn 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
-	AM_RANGE(0x400000, 0x40000f) AM_READ8(TC0220IOC_r, 0x00ff)	/* service mode mirror */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_r, 0x00ff)	/* service mode mirror */
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x4e0002, 0x4e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
@@ -787,6 +788,12 @@ static VIDEO_EOF( asuka )
 	PC090OJ_eof_callback();
 }
 
+static const tc0220ioc_interface asuka_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 
 static MACHINE_DRIVER_START( bonzeadv )
 
@@ -839,6 +846,8 @@ static MACHINE_DRIVER_START( asuka )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -881,6 +890,8 @@ static MACHINE_DRIVER_START( cadash )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -918,6 +929,8 @@ static MACHINE_DRIVER_START( mofflott )
 	MDRV_CPU_PROGRAM_MAP(z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -961,6 +974,8 @@ static MACHINE_DRIVER_START( galmedes )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -998,6 +1013,8 @@ static MACHINE_DRIVER_START( eto )
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -298,6 +298,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
+#include "machine/taitoio.h"
 #include "includes/taito_f2.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -695,7 +696,7 @@ static ADDRESS_MAP_START( finalb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_word_w)	/* palette */
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -709,7 +710,7 @@ static ADDRESS_MAP_START( dondokod_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -724,7 +725,7 @@ static ADDRESS_MAP_START( megab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
-	AM_RANGE(0x120000, 0x12000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x120000, 0x12000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_BASE(&cchip2_ram)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
@@ -738,7 +739,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( thundfox_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x220000, 0x220001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x220002, 0x220003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
@@ -754,7 +755,7 @@ static ADDRESS_MAP_START( cameltry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x300018, 0x30001f) AM_READ(cameltry_paddle_r)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -770,7 +771,7 @@ static ADDRESS_MAP_START( qtorimon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_word_w)	/* palette */
-	AM_RANGE(0x500000, 0x50000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x500000, 0x50000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -783,7 +784,7 @@ static ADDRESS_MAP_START( liquidk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* I/O */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -815,7 +816,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE8(taitosound_port_w, 0xff00)
@@ -830,7 +831,7 @@ static ADDRESS_MAP_START( gunfront_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0510NIO_halfword_wordswap_r, TC0510NIO_halfword_wordswap_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -907,7 +908,7 @@ static ADDRESS_MAP_START( koshien_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -919,7 +920,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yuyugogo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
@@ -970,7 +971,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzquest_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -994,7 +995,7 @@ static ADDRESS_MAP_START( pulirula_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x82000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa00000, 0xa0001f) AM_WRITE8(TC0360PRI_w, 0xff00)
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metalb_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1006,7 +1007,7 @@ static ADDRESS_MAP_START( metalb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x530000, 0x53002f) AM_READWRITE(TC0480SCP_ctrl_word_r, TC0480SCP_ctrl_word_w)
 	AM_RANGE(0x600000, 0x60001f) AM_WRITE8(TC0360PRI_w, 0x00ff)
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(TC0510NIO_halfword_wordswap_r, TC0510NIO_halfword_wordswap_w)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
 //  AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP   /* ??? */
@@ -1014,7 +1015,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzchikyu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -1066,7 +1067,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dinorex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM
@@ -1091,7 +1092,7 @@ static ADDRESS_MAP_START( qjinsei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x82000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa00000, 0xa0001f) AM_WRITE8(TC0360PRI_w, 0x00ff)	/* ?? */
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qcrayon_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1106,7 +1107,7 @@ static ADDRESS_MAP_START( qcrayon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00000, 0xb0001f) AM_WRITE8(TC0360PRI_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -1118,7 +1119,7 @@ static ADDRESS_MAP_START( qcrayon2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x50ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("extra", 0)   /* extra data rom */
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0x700000, 0x70000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x900000, 0x90001f) AM_WRITE8(TC0360PRI_w, 0x00ff)	/* ?? */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
@@ -1137,7 +1138,7 @@ static ADDRESS_MAP_START( driftout_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x82000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa00000, 0xa0001f) AM_WRITE8(TC0360PRI_w, 0xff00)
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00018, 0xb00019) AM_READ_PORT("PADDLE1")
 	AM_RANGE(0xb0001a, 0xb0001b) AM_READ_PORT("PADDLE2")
 ADDRESS_MAP_END
@@ -1154,7 +1155,7 @@ static ADDRESS_MAP_START( driveout_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x82000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa00000, 0xa0001f) AM_WRITE8(TC0360PRI_w, 0xff00)
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00018, 0xb00019) AM_READ_PORT("PADDLE1")
 	AM_RANGE(0xb0001a, 0xb0001b) AM_READ_PORT("PADDLE2")
 ADDRESS_MAP_END
@@ -3161,6 +3162,19 @@ static const ym2203_interface ym2203_config =
                       MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0220ioc_interface taitof2_io220_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
+static const tc0510nio_interface taitof2_io510_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
+
 static MACHINE_START( f2 )
 {
 	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
@@ -3204,11 +3218,27 @@ static MACHINE_DRIVER_START( taito_f2 )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( taito_f2_tc0220ioc )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(taito_f2)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( taito_f2_tc0510nio )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(taito_f2)
+
+	MDRV_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( finalb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(finalb_map)
 
@@ -3222,7 +3252,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dondokod )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dondokod_map)
 
@@ -3237,7 +3267,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( megab )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(megab_map)
 
@@ -3250,7 +3280,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thundfox )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(thundfox_map)
 
@@ -3265,7 +3295,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cameltry )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cameltry_map)
 
@@ -3279,7 +3309,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qtorimon )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qtorimon_map)
 
@@ -3292,7 +3322,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( liquidk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0220ioc)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(liquidk_map)
 
@@ -3319,7 +3349,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ssi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ssi_map)
 
@@ -3333,7 +3363,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gunfront )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gunfront_map)
 
@@ -3401,7 +3431,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( koshien )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(koshien_map)
 
@@ -3414,7 +3444,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( yuyugogo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(yuyugogo_map)
 
@@ -3454,7 +3484,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qzquest )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qzquest_map)
 
@@ -3466,7 +3496,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pulirula )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pulirula_map)
 
@@ -3480,7 +3510,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( metalb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(metalb_map)
 
@@ -3495,7 +3525,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qzchikyu )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qzchikyu_map)
 
@@ -3550,7 +3580,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dinorex )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dinorex_map)
 
@@ -3563,7 +3593,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qjinsei )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qjinsei_map)
 
@@ -3576,7 +3606,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qcrayon )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qcrayon_map)
 
@@ -3589,7 +3619,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qcrayon2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qcrayon2_map)
 
@@ -3602,7 +3632,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( driftout )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(taito_f2)
+	MDRV_IMPORT_FROM(taito_f2_tc0510nio)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(driftout_map)
 
@@ -3622,6 +3652,8 @@ static MACHINE_DRIVER_START( cameltrya )
 
 	MDRV_CPU_ADD("audiocpu", Z80,24000000/4)	/* verifed on pcb */
 	MDRV_CPU_PROGRAM_MAP(cameltrya_sound_map)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3663,6 +3695,8 @@ static MACHINE_DRIVER_START( driveout )
 
 	MDRV_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_sound_map)
+
+	MDRV_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

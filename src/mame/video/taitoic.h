@@ -193,33 +193,3 @@ WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w );	/* only 4 bits per color gun */
 
 void TC0360PRI_vh_start(running_machine *machine);	/* must be called to ensure regs saved in state.c */
 WRITE8_HANDLER( TC0360PRI_w );
-
-
-/***************************************************************************/
-
-/* I/O chips, all extremely similar. The TC0220IOC was sometimes addressed
-   through a port, typically on earlier games. */
-
-READ8_HANDLER ( TC0220IOC_r );
-WRITE8_HANDLER( TC0220IOC_w );
-READ8_HANDLER ( TC0220IOC_port_r );
-WRITE8_HANDLER( TC0220IOC_port_w );
-READ8_HANDLER ( TC0220IOC_portreg_r );
-WRITE8_HANDLER( TC0220IOC_portreg_w );
-
-READ8_HANDLER ( TC0510NIO_r );
-WRITE8_HANDLER( TC0510NIO_w );
-
-READ16_HANDLER ( TC0510NIO_halfword_r );
-WRITE16_HANDLER( TC0510NIO_halfword_w );
-READ16_HANDLER ( TC0510NIO_halfword_wordswap_r );
-WRITE16_HANDLER( TC0510NIO_halfword_wordswap_w );
-
-READ8_HANDLER ( TC0640FIO_r );
-WRITE8_HANDLER( TC0640FIO_w );
-
-READ16_HANDLER ( TC0640FIO_halfword_r );
-WRITE16_HANDLER( TC0640FIO_halfword_w );
-READ16_HANDLER ( TC0640FIO_halfword_byteswap_r );
-WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w );
-

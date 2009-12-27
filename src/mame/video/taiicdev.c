@@ -490,46 +490,6 @@ The data bus is 16 bits wide.
 004  W unknown, often written to
 
 
-TC0220IOC
----------
-A simple I/O interface with integrated watchdog.
-It has four address inputs, which would suggest 16 bytes of addressing space,
-but only the first 8 seem to be used.
-
-000 R  IN00-07 (DSA)
-000  W watchdog reset
-001 R  IN08-15 (DSB)
-002 R  IN16-23 (1P)
-002  W unknown. Usually written on startup: initialize?
-003 R  IN24-31 (2P)
-004 RW coin counters and lockout
-005  W unknown
-006  W unknown
-007 R  INB0-7 (coin)
-
-
-TC0510NIO
----------
-Newer version of the I/O chip
-
-000 R  DSWA
-000  W watchdog reset
-001 R  DSWB
-001  W unknown (ssi)
-002 R  1P
-003 R  2P
-003  W unknown (yuyugogo, qzquest and qzchikyu use it a lot)
-004 RW coin counters and lockout
-005  W unknown
-006  W unknown (koshien and pulirula use it a lot)
-007 R  coin
-
-
-TC0640FIO
----------
-Newer version of the I/O chip ?
-
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -1065,8 +1025,6 @@ static DEVICE_START( pc080sn )
 	state_save_register_postload(device->machine, pc080sn_restore_scroll, pc080sn);
 }
 
-
-/***************************************************************************/
 
 /***************************************************************************/
 /*                                                                         */
@@ -1840,6 +1798,67 @@ void tc0080vco_tilemap_draw( const device_config *device, bitmap_t *bitmap, cons
 			tilemap_draw(bitmap, cliprect, tc0080vco->tilemap[2], flags, priority);
 			break;
 	}
+}
+
+/* FIXME: these could replace the external uses of RAM regions... completely untested! */
+READ16_DEVICE_HANDLER( tc0080vco_cram_0_r )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	return tc0080vco->chain_ram_0[offset];
+}
+
+READ16_DEVICE_HANDLER( tc0080vco_cram_1_r )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	return tc0080vco->chain_ram_1[offset];
+}
+
+READ16_DEVICE_HANDLER( tc0080vco_sprram_r )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	return tc0080vco->spriteram[offset];
+}
+
+READ16_DEVICE_HANDLER( tc0080vco_scrram_r )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	return tc0080vco->scroll_ram[offset];
+}
+
+READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	return tc0080vco->flipscreen;
+}
+
+WRITE16_DEVICE_HANDLER( tc0080vco_cram_0_w )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	COMBINE_DATA(&tc0080vco->chain_ram_0[offset]);
+}
+
+WRITE16_DEVICE_HANDLER( tc0080vco_cram_1_w )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	COMBINE_DATA(&tc0080vco->chain_ram_1[offset]);
+}
+
+WRITE16_DEVICE_HANDLER( tc0080vco_sprram_w )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	COMBINE_DATA(&tc0080vco->spriteram[offset]);
+}
+
+WRITE16_DEVICE_HANDLER( tc0080vco_scrram_w )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	COMBINE_DATA(&tc0080vco->scroll_ram[offset]);
+}
+
+WRITE_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_w )
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	tc0080vco->flipscreen = state;
 }
 
 
@@ -4772,440 +4791,284 @@ static DEVICE_RESET( tc0110pcr )
 
 /***************************************************************************/
 /*                                                                         */
-/*                              TC0220IOC                                  */
+/*                                TC0180VCU                                */
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0220ioc_state tc0220ioc_state;
-struct _tc0220ioc_state
+typedef struct _tc0180vcu_state tc0180vcu_state;
+struct _tc0180vcu_state
 {
-	UINT8      regs[8];
-	UINT8      port;
+	UINT16         ctrl[0x10];
 
-	devcb_resolved_read8	read_0;
-	devcb_resolved_read8	read_1;
-	devcb_resolved_read8	read_2;
-	devcb_resolved_read8	read_3;
-	devcb_resolved_read8	read_7;
+	UINT16 *       ram;
+	UINT16 *       scrollram;
+
+	tilemap        *tilemap[3];
+
+	UINT16         bg_rambank[2], fg_rambank[2], tx_rambank;
+	UINT8          framebuffer_page;
+	UINT8          video_control;
+
+	int            bg_color_base;
+	int            fg_color_base;
+	int            tx_color_base;
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0220ioc_state *tc0220ioc_get_safe_token( const device_config *device )
+INLINE tc0180vcu_state *tc0180vcu_get_safe_token( const device_config *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == TC0220IOC);
+	assert(device->type == TC0180VCU);
 
-	return (tc0220ioc_state *)device->token;
+	return (tc0180vcu_state *)device->token;
 }
 
-INLINE const tc0220ioc_interface *tc0220ioc_get_interface( const device_config *device )
+INLINE const tc0180vcu_interface *tc0180vcu_get_interface( const device_config *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0220IOC));
-	return (const tc0220ioc_interface *) device->static_config;
+	assert((device->type == TC0180VCU));
+	return (const tc0180vcu_interface *) device->static_config;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_DEVICE_HANDLER( tc0220ioc_r )
+/* TC0180VCU control registers:
+* offset:
+* 0 - -----xxx bg ram page 0 (tile codes)
+*     -xxx---- bg ram page 1 (attributes)
+* 1 - -----xxx fg ram page 0 (tile codes)
+*     -xxx---- fg ram page 1 (attributes)
+* 2 - xxxxxxxx number of independent foreground scrolling blocks (see below)
+* 3 - xxxxxxxx number of independent background scrolling blocks
+* 4 - --xxxxxx text tile bank 0
+* 5 - --xxxxxx text tile bank 1
+* 6 - ----xxxx text ram page
+* 7 - xxxxxxxx video control: pixelram page and enable, screen flip, sprite to foreground priority (see below)
+* 8 to f - unused (always zero)
+*
+******************************************************************************************
+*
+* offset 6 - text video page register:
+*            This location controls which page of video text ram to view
+* hitice:
+*     0x08 (00001000) - show game text: credits XX, player1 score
+*     0x09 (00001001) - show FBI logo
+* rambo3:
+*     0x08 (00001000) - show game text
+*     0x09 (00001001) - show taito logo
+*     0x0a (00001010) - used in pair with 0x09 to smooth screen transitions (attract mode)
+*
+* Is bit 3 (0x08) video text enable/disable ?
+*
+******************************************************************************************
+*
+* offset 7 - video control register:
+*            bit 0 (0x01) 1 = don't erase sprite frame buffer "after the beam"
+*            bit 3 (0x08) sprite to foreground priority
+*                         1 = bg, fg, obj, tx
+*                         0 = bg, obj1, fg, obj0, tx (obj0/obj1 selected by bit 0 of color code)
+*            bit 4 (0x10) screen flip (active HI) (this one is for sure)
+*            bit 5 (0x20) could be global video enable switch (Hit the Ice clears this
+*                         bit, clears videoram portions and sets this bit)
+*            bit 6 (0x40) frame buffer page to show when bit 7 is set
+*            bit 7 (0x80) don't flip frame buffer every vblank, use the page selected by bit 6
+*
+*/
+
+READ8_DEVICE_HANDLER( tc0180vcu_fb_page_r )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	return tc0180vcu->framebuffer_page;
+}
 
-	switch (offset)
+static void tc0180vcu_video_control( const device_config *device, UINT8 data )
+{
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+#if 0
+	if (data != tc0180vcu->video_control)
+		popmessage("video control = %02x", data);
+#endif
+
+	tc0180vcu->video_control = data;
+
+	if (tc0180vcu->video_control & 0x80)
+		tc0180vcu->framebuffer_page = (~tc0180vcu->video_control & 0x40) >> 6;
+
+	tilemap_set_flip_all(device->machine, (tc0180vcu->video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
+}
+
+READ16_DEVICE_HANDLER( tc0180vcu_ctrl_r )
+{
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	return tc0180vcu->ctrl[offset];
+}
+
+WRITE16_DEVICE_HANDLER( tc0180vcu_ctrl_w )
+{
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	UINT16 oldword = tc0180vcu->ctrl[offset];
+
+	COMBINE_DATA (&tc0180vcu->ctrl[offset]);
+
+	if (oldword != tc0180vcu->ctrl[offset])
 	{
-		case 0x00:
-			return devcb_call_read8(&tc0220ioc->read_0, 0);
-
-		case 0x01:
-			return devcb_call_read8(&tc0220ioc->read_1, 0);
-
-		case 0x02:
-			return devcb_call_read8(&tc0220ioc->read_2, 0);
-
-		case 0x03:
-			return devcb_call_read8(&tc0220ioc->read_3, 0);
-
-		case 0x04:	/* coin counters and lockout */
-			return tc0220ioc->regs[4];
-
-		case 0x07:
-			return devcb_call_read8(&tc0220ioc->read_7, 0);
-
-		default:
-//logerror("PC %06x: warning - read TC0220IOC address %02x\n",cpu_get_pc(space->cpu),offset);
-			return 0xff;
+		if (ACCESSING_BITS_8_15)
+		{
+			switch(offset)
+			{
+			case 0:
+				tilemap_mark_all_tiles_dirty(tc0180vcu->tilemap[1]);
+				tc0180vcu->fg_rambank[0] = (((tc0180vcu->ctrl[offset] >> 8) & 0x0f) << 12);
+				tc0180vcu->fg_rambank[1] = (((tc0180vcu->ctrl[offset] >> 12) & 0x0f) << 12);
+				break;
+			case 1:
+				tilemap_mark_all_tiles_dirty(tc0180vcu->tilemap[0]);
+				tc0180vcu->bg_rambank[0] = (((tc0180vcu->ctrl[offset] >> 8) & 0x0f) << 12);
+				tc0180vcu->bg_rambank[1] = (((tc0180vcu->ctrl[offset] >> 12) & 0x0f) << 12);
+				break;
+			case 4:
+			case 5:
+				tilemap_mark_all_tiles_dirty(tc0180vcu->tilemap[2]);
+				break;
+			case 6:
+				tilemap_mark_all_tiles_dirty(tc0180vcu->tilemap[2]);
+				tc0180vcu->tx_rambank = (((tc0180vcu->ctrl[offset] >> 8) & 0x0f) << 11);
+				break;
+			case 7:
+				tc0180vcu_video_control(device, (tc0180vcu->ctrl[offset] >> 8) & 0xff);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }
 
-WRITE8_DEVICE_HANDLER( tc0220ioc_w )
+static TILE_GET_INFO_DEVICE( get_bg_tile_info )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	int tile  = tc0180vcu->ram[tile_index + tc0180vcu->bg_rambank[0]];
+	int color = tc0180vcu->ram[tile_index + tc0180vcu->bg_rambank[1]];
 
-	tc0220ioc->regs[offset] = data;
-
-	switch (offset)
-	{
-		case 0x00:
-			watchdog_reset(device->machine);
-			break;
-
-		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
-			coin_lockout_w(device->machine, 0, ~data & 0x01);
-			coin_lockout_w(device->machine, 1, ~data & 0x02);
-			coin_counter_w(device->machine, 0, data & 0x04);
-			coin_counter_w(device->machine, 1, data & 0x08);
-
-//if (data & 0xf0)
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",cpu_get_pc(space->cpu),data,offset);
-
-			break;
-
-		default:
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",cpu_get_pc(space->cpu),data,offset);
-			break;
-	}
+	SET_TILE_INFO_DEVICE(
+		1,
+		tile,
+		tc0180vcu->bg_color_base + (color & 0x3f),
+		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
-READ8_DEVICE_HANDLER( tc0220ioc_port_r )
+static TILE_GET_INFO_DEVICE( get_fg_tile_info )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	return tc0220ioc->port;
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	int tile  = tc0180vcu->ram[tile_index + tc0180vcu->fg_rambank[0]];
+	int color = tc0180vcu->ram[tile_index + tc0180vcu->fg_rambank[1]];
+
+	SET_TILE_INFO_DEVICE(
+		1,
+		tile,
+		tc0180vcu->fg_color_base + (color & 0x3f),
+		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
-WRITE8_DEVICE_HANDLER( tc0220ioc_port_w )
+static TILE_GET_INFO_DEVICE( get_tx_tile_info )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	tc0220ioc->port = data;
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	int tile = tc0180vcu->ram[tile_index + tc0180vcu->tx_rambank];
+
+	SET_TILE_INFO_DEVICE(
+		0,
+		(tile & 0x07ff) | ((tc0180vcu->ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
+		tc0180vcu->tx_color_base + ((tile >> 12) & 0x0f),
+		0);
 }
 
-READ8_DEVICE_HANDLER( tc0220ioc_portreg_r )
+READ16_DEVICE_HANDLER( tc0180vcu_scroll_r )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	return tc0220ioc_r(device, tc0220ioc->port);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	return tc0180vcu->scrollram[offset];
 }
 
-WRITE8_DEVICE_HANDLER( tc0220ioc_portreg_w )
+WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	tc0220ioc_w(device, tc0220ioc->port, data);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	COMBINE_DATA(&tc0180vcu->scrollram[offset]);
 }
 
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( tc0220ioc )
+READ16_DEVICE_HANDLER( tc0180vcu_word_r )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	const tc0220ioc_interface *intf = tc0220ioc_get_interface(device);
-
-	devcb_resolve_read8(&tc0220ioc->read_0, &intf->read_0, device);
-	devcb_resolve_read8(&tc0220ioc->read_1, &intf->read_1, device);
-	devcb_resolve_read8(&tc0220ioc->read_2, &intf->read_2, device);
-	devcb_resolve_read8(&tc0220ioc->read_3, &intf->read_3, device);
-	devcb_resolve_read8(&tc0220ioc->read_7, &intf->read_7, device);
-
-	state_save_register_device_item_array(device, 0, tc0220ioc->regs);
-	state_save_register_device_item(device, 0, tc0220ioc->port);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	return tc0180vcu->ram[offset];
 }
 
-static DEVICE_RESET( tc0220ioc )
+WRITE16_DEVICE_HANDLER( tc0180vcu_word_w )
 {
-	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	int i;
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	COMBINE_DATA(&tc0180vcu->ram[offset]);
 
-	tc0220ioc->port = 0;
+	if ((offset & 0x7000) == tc0180vcu->fg_rambank[0] || (offset & 0x7000) == tc0180vcu->fg_rambank[1])
+		tilemap_mark_tile_dirty(tc0180vcu->tilemap[1], offset & 0x0fff);
 
-	for (i = 0; i < 8; i++)
-		tc0220ioc->regs[i] = 0;
+	if ((offset & 0x7000) == tc0180vcu->bg_rambank[0] || (offset & 0x7000) == tc0180vcu->bg_rambank[1])
+		tilemap_mark_tile_dirty(tc0180vcu->tilemap[0], offset & 0x0fff);
+
+	if ((offset & 0x7800) == tc0180vcu->tx_rambank)
+		tilemap_mark_tile_dirty(tc0180vcu->tilemap[2], offset & 0x7ff);
 }
 
-
-/***************************************************************************/
-/*                                                                         */
-/*                              TC0510NIO                                  */
-/*                                                                         */
-/***************************************************************************/
-
-typedef struct _tc0510nio_state tc0510nio_state;
-struct _tc0510nio_state
+void tc0180vcu_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, int plane )
 {
-	UINT8   regs[8];
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
 
-	devcb_resolved_read8	read_0;
-	devcb_resolved_read8	read_1;
-	devcb_resolved_read8	read_2;
-	devcb_resolved_read8	read_3;
-	devcb_resolved_read8	read_7;
-};
+	assert(tmap_num < 3);
 
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE tc0510nio_state *tc0510nio_get_safe_token( const device_config *device )
-{
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0510NIO);
-
-	return (tc0510nio_state *)device->token;
-}
-
-INLINE const tc0510nio_interface *tc0510nio_get_interface( const device_config *device )
-{
-	assert(device != NULL);
-	assert((device->type == TC0510NIO));
-	return (const tc0510nio_interface *) device->static_config;
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-READ8_DEVICE_HANDLER( tc0510nio_r )
-{
-	tc0510nio_state *tc0510nio = tc0510nio_get_safe_token(device);
-
-	switch (offset)
-	{
-		case 0x00:
-			return devcb_call_read8(&tc0510nio->read_0, 0);
-
-		case 0x01:
-			return devcb_call_read8(&tc0510nio->read_1, 0);
-
-		case 0x02:
-			return devcb_call_read8(&tc0510nio->read_2, 0);
-
-		case 0x03:
-			return devcb_call_read8(&tc0510nio->read_3, 0);
-
-		case 0x04:	/* coin counters and lockout */
-			return tc0510nio->regs[4];
-
-		case 0x07:
-			return devcb_call_read8(&tc0510nio->read_7, 0);
-
-		default:
-//logerror("PC %06x: warning - read TC0510NIO address %02x\n",cpu_get_pc(space->cpu),offset);
-			return 0xff;
-	}
-}
-
-WRITE8_DEVICE_HANDLER( tc0510nio_w )
-{
-	tc0510nio_state *tc0510nio = tc0510nio_get_safe_token(device);
-
-	tc0510nio->regs[offset] = data;
-
-	switch (offset)
-	{
-		case 0x00:
-			watchdog_reset(device->machine);
-			break;
-
-		case 0x04:	/* coin counters and lockout */
-			coin_lockout_w(device->machine, 0, ~data & 0x01);
-			coin_lockout_w(device->machine, 1, ~data & 0x02);
-			coin_counter_w(device->machine, 0, data & 0x04);
-			coin_counter_w(device->machine, 1, data & 0x08);
-			break;
-
-		default:
-//logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",cpu_get_pc(space->cpu),data,offset);
-			break;
-	}
-}
-
-READ16_DEVICE_HANDLER( tc0510nio_halfword_r )
-{
-	return tc0510nio_r(device, offset);
-}
-
-WRITE16_DEVICE_HANDLER( tc0510nio_halfword_w )
-{
-	if (ACCESSING_BITS_0_7)
-		tc0510nio_w(device, offset, data & 0xff);
+	if (tmap_num == 2)
+		tilemap_draw(bitmap, cliprect, tc0180vcu->tilemap[2], 0, 0);	/* not much to do for tx_tilemap */
 	else
 	{
-		/* driftout writes the coin counters here - bug? */
-//logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",cpu_get_pc(space->cpu),offset);
-		tc0510nio_w(device, offset, (data >> 8) & 0xff);
-	}
-}
+		/*plane = 0 fg tilemap*/
+		/*plane = 1 bg tilemap*/
+		rectangle my_clip;
+		int i;
+		int scrollx, scrolly;
+		int lines_per_block;	/* number of lines scrolled by the same amount (per one scroll value) */
+		int number_of_blocks;	/* number of such blocks per _screen_ (256 lines) */
 
-READ16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_r )
-{
-	return tc0510nio_halfword_r(device, offset ^ 1, mem_mask);
-}
+		lines_per_block = 256 - (tc0180vcu->ctrl[2 + plane] >> 8);
+		number_of_blocks = 256 / lines_per_block;
 
-WRITE16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_w )
-{
-	tc0510nio_halfword_w(device, offset ^ 1,data, mem_mask);
-}
+		my_clip.min_x = cliprect->min_x;
+		my_clip.max_x = cliprect->max_x;
 
+		for (i = 0; i < number_of_blocks; i++)
+		{
+			scrollx = tc0180vcu->scrollram[plane * 0x200 + i * 2 * lines_per_block];
+			scrolly = tc0180vcu->scrollram[plane * 0x200 + i * 2 * lines_per_block + 1];
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
+			my_clip.min_y = i * lines_per_block;
+			my_clip.max_y = (i + 1) * lines_per_block - 1;
 
-static DEVICE_START( tc0510nio )
-{
-	tc0510nio_state *tc0510nio =  tc0510nio_get_safe_token(device);
-	const tc0510nio_interface *intf = tc0510nio_get_interface(device);
+			if (tc0180vcu->video_control & 0x10)   /*flip screen*/
+			{
+				my_clip.min_y = bitmap->height - 1 - (i + 1) * lines_per_block - 1;
+				my_clip.max_y = bitmap->height - 1 - i * lines_per_block;
+			}
 
-	devcb_resolve_read8(&tc0510nio->read_0, &intf->read_0, device);
-	devcb_resolve_read8(&tc0510nio->read_1, &intf->read_1, device);
-	devcb_resolve_read8(&tc0510nio->read_2, &intf->read_2, device);
-	devcb_resolve_read8(&tc0510nio->read_3, &intf->read_3, device);
-	devcb_resolve_read8(&tc0510nio->read_7, &intf->read_7, device);
+			sect_rect(&my_clip, cliprect);
 
-	state_save_register_device_item_array(device, 0, tc0510nio->regs);
-}
-
-static DEVICE_RESET( tc0510nio )
-{
-	tc0510nio_state *tc0510nio =  tc0510nio_get_safe_token(device);
-	int i;
-
-	for (i = 0; i < 8; i++)
-		tc0510nio->regs[i] = 0;
-}
-
-/***************************************************************************/
-/*                                                                         */
-/*                              TC0640FIO                                  */
-/*                                                                         */
-/***************************************************************************/
-
-typedef struct _tc0640fio_state tc0640fio_state;
-struct _tc0640fio_state
-{
-	UINT8   regs[8];
-
-	devcb_resolved_read8	read_0;
-	devcb_resolved_read8	read_1;
-	devcb_resolved_read8	read_2;
-	devcb_resolved_read8	read_3;
-	devcb_resolved_read8	read_7;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE tc0640fio_state *tc0640fio_get_safe_token( const device_config *device )
-{
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0640FIO);
-
-	return (tc0640fio_state *)device->token;
-}
-
-INLINE const tc0640fio_interface *tc0640fio_get_interface( const device_config *device )
-{
-	assert(device != NULL);
-	assert((device->type == TC0640FIO));
-	return (const tc0640fio_interface *) device->static_config;
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-READ8_DEVICE_HANDLER( tc0640fio_r )
-{
-	tc0640fio_state *tc0640fio = tc0640fio_get_safe_token(device);
-
-	switch (offset)
-	{
-		case 0x00:
-			return devcb_call_read8(&tc0640fio->read_0, 0);
-
-		case 0x01:
-			return devcb_call_read8(&tc0640fio->read_1, 0);
-
-		case 0x02:
-			return devcb_call_read8(&tc0640fio->read_2, 0);
-
-		case 0x03:
-			return devcb_call_read8(&tc0640fio->read_3, 0);
-
-		case 0x04:	/* coin counters and lockout */
-			return tc0640fio->regs[4];
-
-		case 0x07:
-			return devcb_call_read8(&tc0640fio->read_7, 0);
-
-		default:
-//logerror("PC %06x: warning - read TC0640FIO address %02x\n",cpu_get_pc(space->cpu),offset);
-			return 0xff;
-	}
-}
-
-WRITE8_DEVICE_HANDLER( tc0640fio_w )
-{
-	tc0640fio_state *tc0640fio = tc0640fio_get_safe_token(device);
-
-	tc0640fio->regs[offset] = data;
-
-	switch (offset)
-	{
-		case 0x00:
-			watchdog_reset(device->machine);
-			break;
-
-		case 0x04:	/* coin counters and lockout */
-			coin_lockout_w(device->machine, 0, ~data & 0x01);
-			coin_lockout_w(device->machine, 1, ~data & 0x02);
-			coin_counter_w(device->machine, 0, data & 0x04);
-			coin_counter_w(device->machine, 1, data & 0x08);
-			break;
-
-		default:
-//logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",cpu_get_pc(space->cpu),data,offset);
-			break;
-	}
-}
-
-READ16_DEVICE_HANDLER( tc0640fio_halfword_r )
-{
-	return tc0640fio_r(device, offset);
-}
-
-WRITE16_DEVICE_HANDLER( tc0640fio_halfword_w )
-{
-	if (ACCESSING_BITS_0_7)
-		tc0640fio_w(device, offset, data & 0xff);
-	else
-	{
-		tc0640fio_w(device, offset, (data >> 8) & 0xff);
-//logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",cpu_get_pc(space->cpu),offset);
-	}
-}
-
-READ16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_r )
-{
-	return tc0640fio_halfword_r(device, offset, mem_mask) << 8;
-}
-
-WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w )
-{
-	if (ACCESSING_BITS_8_15)
-		tc0640fio_w(device, offset, (data >> 8) & 0xff);
-	else
-	{
-		tc0640fio_w(device, offset, data & 0xff);
-//logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",cpu_get_pc(space->cpu),offset);
+			if (my_clip.min_y <= my_clip.max_y)
+			{
+				tilemap_set_scrollx(tc0180vcu->tilemap[tmap_num], 0, -scrollx);
+				tilemap_set_scrolly(tc0180vcu->tilemap[tmap_num], 0, -scrolly);
+				tilemap_draw(bitmap, &my_clip, tc0180vcu->tilemap[tmap_num], 0, 0);
+			}
+		}
 	}
 }
 
@@ -5213,27 +5076,58 @@ WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w )
     DEVICE INTERFACE
 *****************************************************************************/
 
-static DEVICE_START( tc0640fio )
+static DEVICE_START( tc0180vcu )
 {
-	tc0640fio_state *tc0640fio =  tc0640fio_get_safe_token(device);
-	const tc0640fio_interface *intf = tc0640fio_get_interface(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	const tc0180vcu_interface *intf = tc0180vcu_get_interface(device);
 
-	devcb_resolve_read8(&tc0640fio->read_0, &intf->read_0, device);
-	devcb_resolve_read8(&tc0640fio->read_1, &intf->read_1, device);
-	devcb_resolve_read8(&tc0640fio->read_2, &intf->read_2, device);
-	devcb_resolve_read8(&tc0640fio->read_3, &intf->read_3, device);
-	devcb_resolve_read8(&tc0640fio->read_7, &intf->read_7, device);
+	tc0180vcu->bg_color_base = intf->bg_color_base;
+	tc0180vcu->fg_color_base = intf->fg_color_base;
+	tc0180vcu->tx_color_base = intf->tx_color_base;
 
-	state_save_register_device_item_array(device, 0, tc0640fio->regs);
+	tc0180vcu->tilemap[0] = tilemap_create_device(device, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	tc0180vcu->tilemap[1] = tilemap_create_device(device, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	tc0180vcu->tilemap[2] = tilemap_create_device(device, get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+
+	tilemap_set_transparent_pen(tc0180vcu->tilemap[1], 0);
+	tilemap_set_transparent_pen(tc0180vcu->tilemap[2], 0);
+
+	tilemap_set_scrolldx(tc0180vcu->tilemap[0], 0, 24 * 8);
+	tilemap_set_scrolldx(tc0180vcu->tilemap[1], 0, 24 * 8);
+	tilemap_set_scrolldx(tc0180vcu->tilemap[2], 0, 24 * 8);
+
+	state_save_register_device_item_array(device, 0, tc0180vcu->bg_rambank);
+	state_save_register_device_item_array(device, 0, tc0180vcu->fg_rambank);
+	state_save_register_device_item(device, 0, tc0180vcu->tx_rambank);
+
+	state_save_register_device_item(device, 0, tc0180vcu->framebuffer_page);
+
+	state_save_register_device_item(device, 0, tc0180vcu->video_control);
+	state_save_register_device_item_array(device, 0, tc0180vcu->ctrl);
+
+//	tc0180vcu->ram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
+//	tc0180vcu->scrollram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
+
+//	state_save_register_device_item_pointer(device, 0, tc0180vcu->ram, PC090OJ_RAM_SIZE / 2);
+//	state_save_register_device_item_pointer(device, 0, tc0180vcu->scrollram, PC090OJ_RAM_SIZE / 2);
 }
 
-static DEVICE_RESET( tc0640fio )
+static DEVICE_RESET( tc0180vcu )
 {
-	tc0640fio_state *tc0640fio =  tc0640fio_get_safe_token(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
 	int i;
 
-	for (i = 0; i < 8; i++)
-		tc0640fio->regs[i] = 0;
+	for (i = 0; i < 0x10; i++)
+		tc0180vcu->ctrl[i] = 0;
+
+	tc0180vcu->bg_rambank[0] = 0;
+	tc0180vcu->bg_rambank[1] = 0;
+	tc0180vcu->fg_rambank[0] = 0;
+	tc0180vcu->fg_rambank[1] = 0;
+	tc0180vcu->tx_rambank = 0;
+
+	tc0180vcu->framebuffer_page = 0;
+	tc0180vcu->video_control = 0;
 }
 
 
@@ -5441,65 +5335,21 @@ DEVICE_GET_INFO( tc0150rod )
 	}
 }
 
-DEVICE_GET_INFO( tc0220ioc )
+DEVICE_GET_INFO( tc0180vcu )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0220ioc_state);					break;
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0180vcu_state);					break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0220ioc);		break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0180vcu);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(tc0220ioc);		break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(tc0180vcu);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Taito TC0220IOC");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Taito Video IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
-	}
-}
-
-DEVICE_GET_INFO( tc0510nio )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0510nio_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0510nio);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(tc0510nio);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Taito TC0510NIO");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Taito Video IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
-	}
-}
-
-DEVICE_GET_INFO( tc0640fio )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0640fio_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0640fio);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(tc0640fio);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Taito TC0640FIO");				break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Taito TC0180VCU");				break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Taito Video IC");					break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;

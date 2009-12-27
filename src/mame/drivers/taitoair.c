@@ -221,6 +221,7 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "cpu/tms32025/tms32025.h"
 #include "sound/2610intf.h"
 
@@ -387,7 +388,7 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE(&dsp_ram)	/* "dsp common ram" (TMS320C25) */
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
-	AM_RANGE(0xa00200, 0xa0020f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* other I/O */
+	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)	/* other I/O */
 	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0xa80002, 0xa80003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM						/* "power common ram" (mecha drive) */
@@ -595,6 +596,12 @@ static const ym2610_interface airsys_ym2610_interface =
                 MACHINE DRIVERS
 ************************************************************/
 
+static const tc0220ioc_interface airsys_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( airsys )
 
 	/* basic machine hardware */
@@ -613,6 +620,8 @@ static MACHINE_DRIVER_START( airsys )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(taitoair)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", airsys_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

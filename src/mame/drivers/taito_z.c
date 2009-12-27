@@ -884,6 +884,7 @@ J1100256A VIDEO PCB
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
+#include "machine/taitoio.h"
 
 #include "contcirc.lh"
 #include "dblaxle.lh"
@@ -1049,6 +1050,7 @@ static READ16_HANDLER( eep_latch_r )
 
 static WRITE16_HANDLER( spacegun_output_bypass_w )
 {
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
 	switch (offset)
 	{
 		case 0x03:
@@ -1064,7 +1066,7 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
 			break;
 
 		default:
-			TC0220IOC_w(space, offset, data);	/* might be a 510NIO ! */
+			tc0220ioc_w(tc0220ioc, offset, data);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1077,7 +1079,8 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8 port = TC0220IOC_port_r(space, 0);	/* read port number */
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	UINT8 port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int fake = input_port_read(space->machine, "FAKE");
 
@@ -1108,7 +1111,7 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r(space, offset);
+			return tc0220ioc_portreg_r(tc0220ioc, offset);
 	}
 }
 
@@ -1117,7 +1120,8 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	UINT8 port = TC0220IOC_port_r(space, 0);	/* read port number */
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	UINT8 port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int fake = input_port_read(space->machine, "FAKE");
 
@@ -1159,7 +1163,7 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r(space, offset);
+			return tc0220ioc_portreg_r(tc0220ioc, offset);
 	}
 }
 
@@ -1261,6 +1265,7 @@ static READ16_HANDLER( sci_steer_input_r )
 static READ16_HANDLER( spacegun_input_bypass_r )
 {
 	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
 
 	switch (offset)
 	{
@@ -1268,7 +1273,7 @@ static READ16_HANDLER( spacegun_input_bypass_r )
 			return eepromdev_read_bit(eeprom) << 7;
 
 		default:
-			return TC0220IOC_r(space, offset);	/* might be a 510NIO ! */
+			return tc0220ioc_r(tc0220ioc, offset);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1516,8 +1521,8 @@ static ADDRESS_MAP_START( contcirc_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE8(contcirc_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff) /* (actually game uses TC040IOC) */
+	AM_RANGE(0x100000, 0x100001) AM_READ8(contcirc_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff) /* (actually game uses TC040IOC) */
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 ADDRESS_MAP_END
 
@@ -1527,8 +1532,8 @@ static ADDRESS_MAP_START( chasehq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_READWRITE8(chasehq_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x400002, 0x400003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)	/* palette */
@@ -1563,8 +1568,8 @@ static ADDRESS_MAP_START( enforce_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x300000, 0x300001) AM_READWRITE8(TC0220IOC_portreg_r, TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1572,7 +1577,7 @@ static ADDRESS_MAP_START( bshark_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1599,7 +1604,7 @@ static ADDRESS_MAP_START( sci_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(cpua_ctrl_w)  // ?? doesn't seem to fit what's written
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
@@ -1622,7 +1627,7 @@ static ADDRESS_MAP_START( nightstr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)	/* palette */
@@ -1659,7 +1664,7 @@ static ADDRESS_MAP_START( aquajack_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0x800800, 0x80083f) AM_READ(aquajack_unknown_r) // Read regularly after write to 800800...
 //  AM_RANGE(0x800800, 0x800801) AM_WRITE(taitoz_unknown_w)
@@ -1695,7 +1700,7 @@ static ADDRESS_MAP_START( dblaxle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE(TC0510NIO_halfword_wordswap_r, TC0510NIO_halfword_wordswap_w)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)	/* could this be causing int6 ? */
 	AM_RANGE(0x620000, 0x620003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
@@ -1720,7 +1725,7 @@ static ADDRESS_MAP_START( racingb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0510NIO_halfword_wordswap_r, TC0510NIO_halfword_wordswap_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x300010, 0x30001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x500002, 0x500003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x520000, 0x520003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
@@ -2022,7 +2027,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( contcirc )
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit" )	// analogue accelerator pedal
@@ -2033,7 +2038,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" ) PORT_DIPLOCATION("SW B:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -2053,7 +2058,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -2063,7 +2068,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
 
-	PORT_START("IN1")	/* IN1: b3 not mapped: standardized on holding b4=lo gear */
+	PORT_START("IN1")	/* b3 not mapped: standardized on holding b4=lo gear */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
@@ -2073,13 +2078,13 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
 
-	PORT_START("IN2")	/* IN2, unused */
+	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STEER")	/* IN3, "handle" i.e. steering */
+	PORT_START("STEER")	/* "handle" i.e. steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("FAKE")	/* IN4, fake allowing digital steer */
+	PORT_START("FAKE")	/* fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
@@ -2095,7 +2100,7 @@ static INPUT_PORTS_START( contcrcu )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1,2")	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
 	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )
 	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )
@@ -2107,7 +2112,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
@@ -2127,7 +2132,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -2137,7 +2142,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2147,10 +2152,10 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* IN2, unused */
+	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("UNK1")	/* IN3, ??? */
+	PORT_START("UNK1")	/* ??? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2160,7 +2165,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("UNK2")	/* IN4, ??? */
+	PORT_START("UNK2")	/* ??? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2170,7 +2175,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("UNK3")	/* IN5, ??? */
+	PORT_START("UNK3")	/* ??? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2180,7 +2185,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("UNK4")	/* IN6, ??? */
+	PORT_START("UNK4")	/* ??? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2190,10 +2195,10 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("STEER")	/* IN7, steering */
+	PORT_START("STEER")	/* steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START("FAKE")	/* IN8, fake allowing digital steer */
+	PORT_START("FAKE")	/* fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
@@ -2209,7 +2214,7 @@ static INPUT_PORTS_START( chasehqj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( enforce )
-	PORT_START("DSWA")	/* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
@@ -2218,7 +2223,7 @@ static INPUT_PORTS_START( enforce )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )		// Says SHIFT LO in test mode !?
 	TAITO_COINAGE_JAPAN_OLD_LOC(SW A)
 
-	PORT_START("DSWB")	/* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW B:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW B:4" )
@@ -2229,7 +2234,7 @@ static INPUT_PORTS_START( enforce )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -2239,7 +2244,7 @@ static INPUT_PORTS_START( enforce )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* Bomb */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* Laser */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
@@ -2249,12 +2254,12 @@ static INPUT_PORTS_START( enforce )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("IN2")	/* IN2, unused */
+	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bshark )
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "Mirror screen" ) PORT_DIPLOCATION("SW A:1")	// manual says it must be off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2265,7 +2270,7 @@ static INPUT_PORTS_START( bshark )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_US_LOC(SW A)
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPNAME( 0x0c, 0x04, "Speed of Sight" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x0c, "Slow" )
@@ -2277,7 +2282,7 @@ static INPUT_PORTS_START( bshark )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -2287,10 +2292,10 @@ static INPUT_PORTS_START( bshark )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1, unused */
+	PORT_START("IN1")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")	/* IN2, b2-5 affect sound num in service mode but otherwise useless (?) */
+	PORT_START("IN2")	/* b2-5 affect sound num in service mode but otherwise useless (?) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -2321,7 +2326,7 @@ static INPUT_PORTS_START( bsharkj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sci )
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -2332,7 +2337,7 @@ static INPUT_PORTS_START( sci )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
@@ -2352,7 +2357,7 @@ static INPUT_PORTS_START( sci )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* fire */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2362,7 +2367,7 @@ static INPUT_PORTS_START( sci )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* turbo */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
@@ -2372,13 +2377,13 @@ static INPUT_PORTS_START( sci )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* IN2, unused */
+	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STEER")	/* IN3, steering */
+	PORT_START("STEER")	/* steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START("FAKE")	/* IN4, fake allowing digital steer */
+	PORT_START("FAKE")	/* fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
@@ -2401,7 +2406,7 @@ static INPUT_PORTS_START( scij )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nightstr )
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -2412,7 +2417,7 @@ static INPUT_PORTS_START( nightstr )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Shields" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "3" )
@@ -2431,7 +2436,7 @@ static INPUT_PORTS_START( nightstr )
 	PORT_DIPSETTING(    0x80, "7 Shots / Second" )
 	PORT_DIPSETTING(    0x00, "10 Shots / Second" )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2441,10 +2446,10 @@ static INPUT_PORTS_START( nightstr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
-	PORT_START("IN1")	/* IN1, unused */
+	PORT_START("IN1")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -2482,7 +2487,7 @@ static INPUT_PORTS_START( nghtstru )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajack )
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x80, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -2502,7 +2507,7 @@ static INPUT_PORTS_START( aquajack )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )	/* 2 Coins to Continue */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	/* 3 Coins to Continue */
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
@@ -2528,7 +2533,7 @@ static INPUT_PORTS_START( aquajack )
 	/* PORT_DIPSETTING(    0x01, "Normal Game" ) */
 	/* PORT_DIPSETTING(    0x00, "Endless Game" ) */
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2538,7 +2543,7 @@ static INPUT_PORTS_START( aquajack )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -2548,7 +2553,7 @@ static INPUT_PORTS_START( aquajack )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* IN2, what is it ??? */
+	PORT_START("IN2")	/* what is it ??? */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -2569,7 +2574,7 @@ static INPUT_PORTS_START( aquajckj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacegun )
-	PORT_START("DSWA")	/* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )	// Manual says Always Off
 	PORT_DIPNAME( 0x02, 0x02, "Always have gunsight power up" ) PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -2580,7 +2585,7 @@ static INPUT_PORTS_START( spacegun )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
-	PORT_START("DSWB")	/* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW B:3" )	// Manual lists dips 3 through 6 and 8 as Always off
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW B:4" )
@@ -2593,7 +2598,7 @@ static INPUT_PORTS_START( spacegun )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2603,10 +2608,10 @@ static INPUT_PORTS_START( spacegun )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2)
 
-	PORT_START("IN1")	/* IN1, unused */
+	PORT_START("IN1")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -2635,7 +2640,7 @@ static INPUT_PORTS_START( spacegun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dblaxle )
-	PORT_START("DSWA") /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
 	PORT_DIPNAME( 0x02, 0x02, "Gear shift" ) PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -2646,7 +2651,7 @@ static INPUT_PORTS_START( dblaxle )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_US_LOC(SW A)
 
-	PORT_START("DSWB") /* DSW B */
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
 	PORT_DIPNAME( 0x04, 0x00, "Multi-machine hookup ?" ) PORT_DIPLOCATION("SW B:3")	// doesn't boot if on
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2661,7 +2666,7 @@ static INPUT_PORTS_START( dblaxle )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* shift */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2671,7 +2676,7 @@ static INPUT_PORTS_START( dblaxle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* "back" */
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* nitro */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
@@ -2681,13 +2686,13 @@ static INPUT_PORTS_START( dblaxle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* IN2, unused */
+	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STEER")	/* IN3, steering */
+	PORT_START("STEER")	/* steering */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("FAKE")	/* IN4, fake allowing digital steer */
+	PORT_START("FAKE")	/* fake allowing digital steer */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
@@ -2868,6 +2873,20 @@ Contcirc road glitchiness in attract?
 
 ***********************************************************/
 
+
+static const tc0220ioc_interface taitoz_io220_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
+static const tc0510nio_interface taitoz_io510_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
+
 /* Contcirc vis area seems narrower than the other games... */
 
 static MACHINE_DRIVER_START( contcirc )
@@ -2885,6 +2904,8 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2942,6 +2963,8 @@ static MACHINE_DRIVER_START( chasehq )
 
 	MDRV_MACHINE_START(taitoz)
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2998,6 +3021,8 @@ static MACHINE_DRIVER_START( enforce )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -3051,6 +3076,8 @@ static MACHINE_DRIVER_START( bshark )
 	MDRV_MACHINE_START(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3107,6 +3134,8 @@ static MACHINE_DRIVER_START( sci )
 
 	MDRV_QUANTUM_TIME(HZ(3000))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -3161,6 +3190,8 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_MACHINE_START(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3218,6 +3249,8 @@ static MACHINE_DRIVER_START( aquajack )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -3270,6 +3303,8 @@ static MACHINE_DRIVER_START( spacegun )
 
 	MDRV_EEPROM_ADD("eeprom", spacegun_eeprom_intf)
 	MDRV_EEPROM_DATA(spacegun_default_eeprom, 128)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3326,6 +3361,8 @@ static MACHINE_DRIVER_START( dblaxle )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_TC0510NIO_ADD("tc0510nio", taitoz_io510_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -3379,6 +3416,8 @@ static MACHINE_DRIVER_START( racingb )
 
 	MDRV_MACHINE_START(taitoz)
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_TC0510NIO_ADD("tc0510nio", taitoz_io510_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
