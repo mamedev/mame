@@ -22,7 +22,7 @@ To Do:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 
@@ -35,24 +35,24 @@ To Do:
 ***************************************************************************/
 
 static UINT16 eeprom_word;
-static READ16_HANDLER(galpani2_eeprom_r)
+static READ16_DEVICE_HANDLER(galpani2_eeprom_r)
 {
-	return (eeprom_word & ~1) | (eeprom_read_bit() & 1);
+	return (eeprom_word & ~1) | (eepromdev_read_bit(device) & 1);
 }
 
-static WRITE16_HANDLER(galpani2_eeprom_w)
+static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
 {
 	COMBINE_DATA( &eeprom_word );
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x02);
+		eepromdev_write_bit(device, data & 0x02);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( galpani2_mem1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP										// ? hblank effect ?
 	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE(galpani2_palette_0_w) AM_BASE(&galpani2_palette_0	)	// ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP										// ? flip backgrounds ?
-	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
+	AM_RANGE(0x318000, 0x318001) AM_DEVREADWRITE("eeprom", galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM												// Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram	)	// Palette
 	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP										// ? at startup of service mode
@@ -586,7 +586,7 @@ static MACHINE_DRIVER_START( galpani2 )
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
 	MDRV_MACHINE_RESET(galpani2)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

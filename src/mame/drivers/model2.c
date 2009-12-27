@@ -50,7 +50,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
@@ -243,8 +243,6 @@ static void copro_fifoout_push(const device_config *device, UINT32 data)
 
 static NVRAM_HANDLER( model2 )
 {
-	NVRAM_HANDLER_CALL(93C46);
-
 	if (read_or_write)
 	{
 		mame_fwrite(file, model2_backup1, 0x3fff);
@@ -410,10 +408,11 @@ static WRITE32_HANDLER( ctrl0_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
+		const device_config *device = devtag_get_device(space->machine, "eeprom");
 		model2_ctrlmode = data & 0x01;
-		eeprom_write_bit(data & 0x20);
-		eeprom_set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_write_bit(device, data & 0x20);
+		eepromdev_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -452,7 +451,7 @@ static CUSTOM_INPUT( _1c00000_r )
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (eeprom_read_bit() << 5);
+		return ret | 0x00d0 | (eepromdev_read_bit(devtag_get_device(field->port->machine, "eeprom")) << 5);
 	}
 }
 
@@ -1842,6 +1841,8 @@ static MACHINE_DRIVER_START( model2o )
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
 
 	MDRV_MACHINE_RESET(model2o)
+	
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_NVRAM_HANDLER( model2 )
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
@@ -1896,6 +1897,8 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
 
 	MDRV_MACHINE_RESET(model2)
+
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_NVRAM_HANDLER( model2 )
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
@@ -1955,6 +1958,8 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_QUANTUM_TIME(HZ(18000))
 
 	MDRV_MACHINE_RESET(model2b)
+
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_NVRAM_HANDLER( model2 )
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
@@ -1998,6 +2003,8 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_CPU_PROGRAM_MAP(model2_snd)
 
 	MDRV_MACHINE_RESET(model2c)
+
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_NVRAM_HANDLER( model2 )
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)

@@ -73,7 +73,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 
 static UINT16 *bitmap0, *bitmap1, *wram;
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( pasha2 )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(pasha2)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -14,7 +14,7 @@
 #include "driver.h"
 #include "includes/decocrpt.h"
 #include "includes/deco32.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
@@ -224,37 +224,37 @@ static VIDEO_UPDATE(backfire)
 
 
 
-static READ32_HANDLER(backfire_eeprom_r)
+static READ32_DEVICE_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
-	int backfire_screen = mame_rand(space->machine) & 1;
-	return ((eeprom_read_bit() << 24) | input_port_read(space->machine, "IN0")
-			| ((input_port_read(space->machine, "IN2") & 0xbf) << 16)
-			| ((input_port_read(space->machine, "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
+	int backfire_screen = mame_rand(device->machine) & 1;
+	return ((eepromdev_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
+			| ((input_port_read(device->machine, "IN2") & 0xbf) << 16)
+			| ((input_port_read(device->machine, "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
 static READ32_HANDLER(backfire_control2_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
-	return (eeprom_read_bit() << 24) | input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN1") << 16);
+	return (eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 24) | input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN1") << 16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
-	return (eeprom_read_bit() << 24) | input_port_read(space->machine, "IN2") | (input_port_read(space->machine, "IN2") << 16);
+	return (eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 24) | input_port_read(space->machine, "IN2") | (input_port_read(space->machine, "IN2") << 16);
 }
 #endif
 
 
-static WRITE32_HANDLER(backfire_eeprom_w)
+static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 {
-	logerror("%08x:write eprom %08x (%08x) %08x\n",cpu_get_pc(space->cpu),offset<<1,mem_mask,data);
+	logerror("%s:write eprom %08x (%08x) %08x\n",cpuexec_describe_context(device->machine),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7) {
-		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x1);
-		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, data & 0x1);
+		eepromdev_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -326,9 +326,9 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x184000, 0x185fff) AM_RAM AM_BASE( &backfire_spriteram32_1 )
 	AM_RANGE(0x18c000, 0x18dfff) AM_RAM AM_BASE( &backfire_spriteram32_2 )
-	AM_RANGE(0x190000, 0x190003) AM_READ(backfire_eeprom_r)
+	AM_RANGE(0x190000, 0x190003) AM_DEVREAD("eeprom", backfire_eeprom_r)
 	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
-	AM_RANGE(0x1a4000, 0x1a4003) AM_WRITE(backfire_eeprom_w)
+	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE("eeprom", backfire_eeprom_w)
 
 	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE(&backfire_left_priority)
 	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE(&backfire_right_priority)
@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( backfire )
 	MDRV_CPU_PROGRAM_MAP(backfire_map)
 	MDRV_CPU_VBLANK_INT("lscreen", deco32_vbl_interrupt)	/* or is it "rscreen?" */
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(2048)

@@ -16,7 +16,7 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 #include "includes/kaneko16.h"
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 
 #define CALC3_VERBOSE_OUTPUT 0
@@ -1817,7 +1817,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 						UINT32 length, size;
 						UINT8 *dat;
 
-						dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
+						dat = (UINT8 *)eepromdev_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
 
 						for (i=0;i<0x80;i++)
 						{
@@ -2167,7 +2167,7 @@ void calc3_mcu_run(running_machine *machine)
 				UINT32 length, size;
 				UINT8 *dat;
 
-				dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
+				dat = (UINT8 *)eepromdev_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
 
 				for (i=0;i<0x80;i++)
 				{

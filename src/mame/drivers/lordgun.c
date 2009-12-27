@@ -30,7 +30,7 @@ To do:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/8255ppi.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/lordgun.h"
@@ -90,6 +90,7 @@ static WRITE8_DEVICE_HANDLER(fake2_w)
 
 static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
+	const device_config *eeprom = devtag_get_device(device->machine, "eeprom");
 	static UINT8 old;
 	int i;
 
@@ -107,13 +108,13 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 			lordgun_update_gun(device->machine, i);
 
 	// latch the bit
-	eeprom_write_bit(data & 0x40);
+	eepromdev_write_bit(eeprom, data & 0x40);
 
 	// reset line asserted: reset.
-	eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
+	eepromdev_set_cs_line(eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	eepromdev_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	lordgun_whitescreen = data & 0x80;
 
@@ -317,7 +318,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )
@@ -421,7 +422,7 @@ static MACHINE_DRIVER_START( lordgun )
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_GFXDECODE(lordgun)
 

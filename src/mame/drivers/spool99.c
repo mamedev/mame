@@ -90,7 +90,7 @@ Note
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 static UINT8 *spool99_main;
 static tilemap *sc0_tilemap;
@@ -157,7 +157,7 @@ static READ8_HANDLER( spool99_io_r )
 			case 0xafe4: return input_port_read(space->machine,"SERVICE2");//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
-			case 0xafe7: return eeprom_read_bit();
+			case 0xafe7: return eepromdev_read_bit(devtag_get_device(space->machine,"eeprom"));
 			case 0xaff8: return okim6295_r(devtag_get_device(space->machine, "oki"),0);
 		}
 	}
@@ -166,30 +166,30 @@ static READ8_HANDLER( spool99_io_r )
 	return ROM[0xaf00+offset];
 }
 
-static WRITE8_HANDLER( eeprom_resetline_w )
+static WRITE8_DEVICE_HANDLER( eeprom_resetline_w )
 {
 	// reset line asserted: reset.
-	eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-static WRITE8_HANDLER( eeprom_clockline_w )
+static WRITE8_DEVICE_HANDLER( eeprom_clockline_w )
 {
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE8_HANDLER( eeprom_dataline_w )
+static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 {
 	// latch the bit
-	eeprom_write_bit(data & 0x01);
+	eepromdev_write_bit(device, data & 0x01);
 }
 
 static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xaeff) AM_RAM AM_BASE(&spool99_main)
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
-	AM_RANGE(0xafed, 0xafed) AM_WRITE(eeprom_resetline_w )
-	AM_RANGE(0xafee, 0xafee) AM_WRITE(eeprom_clockline_w )
-	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
+	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
+	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
+	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE("eeprom", eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
 
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram) // palette
@@ -282,7 +282,7 @@ static MACHINE_DRIVER_START( spool99 )
 
 	MDRV_PALETTE_LENGTH(0x200)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_VIDEO_START(spool99)
 	MDRV_VIDEO_UPDATE(spool99)

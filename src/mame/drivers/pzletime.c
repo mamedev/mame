@@ -17,7 +17,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 static UINT16 *bg_videoram, *mid_videoram, *txt_videoram, *tilemap_regs, *video_regs;
 static tilemap *mid_tilemap, *txt_tilemap;
@@ -127,13 +127,13 @@ static WRITE16_HANDLER( txt_videoram_w )
 	tilemap_mark_tile_dirty(txt_tilemap,offset);
 }
 
-static WRITE16_HANDLER( eeprom_w )
+static WRITE16_DEVICE_HANDLER( eeprom_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_write_bit(device, data & 0x01);
+		eepromdev_set_cs_line(device, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_clock_line(device, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( pzletime_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_BASE(&mid_videoram)
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_BASE(&txt_videoram)
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_WRITE(eeprom_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
 	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE("oki", oki_bank_w)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
@@ -208,7 +208,7 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) /* eeprom */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit) /* eeprom */
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_status_r, NULL) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( pzletime )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(pzletime)
 	MDRV_PALETTE_LENGTH(0x300 + 32768)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_PALETTE_INIT(pzletime)
 	MDRV_VIDEO_START(pzletime)

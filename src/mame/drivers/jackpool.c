@@ -18,7 +18,7 @@ TODO:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 
 static UINT16 *jackpool_vram;
@@ -100,8 +100,8 @@ static READ16_HANDLER( jackpool_io_r )
 		case 0x1c: return input_port_read(space->machine,"BET");
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-     	case 0x2c: return eeprom_read_bit();
-     	case 0x2e: return eeprom_read_bit();
+     	case 0x2c: return eepromdev_read_bit(devtag_get_device(space->machine,"eeprom"));
+     	case 0x2e: return eepromdev_read_bit(devtag_get_device(space->machine,"eeprom"));
 //      default: printf("R %02x\n",offset*2); break;
 	}
 
@@ -128,11 +128,11 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
 		case 0x4e: map_vreg = data & 1;        break;
-		case 0x50: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-		case 0x52: eeprom_set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x54: eeprom_write_bit(data & 1); break;
-//      case 0x5a: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-//      case 0x5c: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x50: eepromdev_set_cs_line(devtag_get_device(space->machine,"eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x52: eepromdev_set_clock_line(devtag_get_device(space->machine,"eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x54: eepromdev_write_bit(devtag_get_device(space->machine,"eeprom"), data & 1); break;
+//      case 0x5a: eepromdev_set_cs_line(devtag_get_device(space->machine,"eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+//      case 0x5c: eepromdev_set_cs_line(devtag_get_device(space->machine,"eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x60: break;
 //      default: printf("[%02x] <- %02x W\n",offset*2,data);      break;
 	}
@@ -141,17 +141,17 @@ static WRITE16_HANDLER( jackpool_io_w )
 	if(offset*2 == 0x54)
 	{
 		printf("Write bit %02x\n",data);
-		eeprom_write_bit(data & 1);
+		eepromdev_write_bit(devtag_get_device(space->machine,"eeprom"), data & 1);
 	}
 	if(offset*2 == 0x52)
 	{
 		printf("Clock bit %02x\n",data);
-		eeprom_set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(devtag_get_device(space->machine,"eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	if(offset*2 == 0x50)
 	{
 		printf("chip select bit %02x\n",data);
-		eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(devtag_get_device(space->machine,"eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE );
 	}
 	#endif
 }
@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( jackpool )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_PALETTE_LENGTH(0x200)
 

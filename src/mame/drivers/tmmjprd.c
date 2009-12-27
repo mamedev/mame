@@ -32,7 +32,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "rendlay.h"
 
 
@@ -460,7 +460,7 @@ static WRITE32_HANDLER( tmmjprd_blitter_w )
 
 static UINT8 mux_data;
 
-static WRITE32_HANDLER( tmmjprd_eeprom_write )
+static WRITE32_DEVICE_HANDLER( tmmjprd_eeprom_write )
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
@@ -470,13 +470,13 @@ static WRITE32_HANDLER( tmmjprd_eeprom_write )
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x01000000);
+		eepromdev_write_bit(device, data & 0x01000000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(device, (data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Right Screen Coin B") // might actually be service 1
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// CHECK!
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	// CHECK!
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -667,7 +667,7 @@ static ADDRESS_MAP_START( tmmjprd_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_BASE(&tmmjprd_spriteram)
 	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_WRITE(tmmjprd_eeprom_write)
+	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_DEVWRITE("eeprom", tmmjprd_eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( tmmjprd )
 	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(tmmjprd_map)
 	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_GFXDECODE(tmmjprd)
 

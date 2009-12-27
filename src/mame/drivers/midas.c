@@ -48,7 +48,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 #define MIDAS_DEBUG	0
 
@@ -178,18 +178,18 @@ static VIDEO_UPDATE( livequiz )
 	return 0;
 }
 
-static WRITE16_HANDLER( livequiz_eeprom_w )
+static WRITE16_DEVICE_HANDLER( livequiz_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x04);
+		eepromdev_write_bit(device, data & 0x04);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("IN1")
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE( livequiz_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE( "eeprom", livequiz_eeprom_w )
 
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( livequiz_gfxregs_w ) AM_BASE( &livequiz_gfxregs )
 
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	// EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -437,7 +437,7 @@ static MACHINE_DRIVER_START( livequiz )
 	MDRV_CPU_PROGRAM_MAP(mem_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

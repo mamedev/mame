@@ -183,7 +183,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "includes/tecmosys.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
@@ -359,19 +359,19 @@ static READ16_HANDLER( unk880000_r )
 }
 
 
-static READ16_HANDLER( eeprom_r )
+static READ16_DEVICE_HANDLER( eeprom_r )
 {
-	 return ((eeprom_read_bit() & 0x01) << 11);
+	 return ((eepromdev_read_bit(device) & 0x01) << 11);
 }
 
 
-static WRITE16_HANDLER( eeprom_w )
+static WRITE16_DEVICE_HANDLER( eeprom_w )
 {
 	if ( ACCESSING_BITS_8_15 )
 	{
-		eeprom_write_bit(data & 0x0800);
-		eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom_set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		eepromdev_write_bit(device, data & 0x0800);
+		eepromdev_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_clock_line(device, (data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
 
 	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE(&tecmosys_880000regs)	// 10 byte dta@88000c, 880022=watchdog?
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("eeprom", eeprom_w	)
 	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_BASE(&tecmosys_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_BASE(&tecmosys_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
 	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(tecmosys_prot_status_r, tecmosys_prot_status_w)
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_BASE(&tecmosys_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
-	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
+	AM_RANGE(0xd80000, 0xd80001) AM_DEVREAD("eeprom", eeprom_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(tecmosys_prot_data_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
@@ -888,7 +888,7 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_GFXDECODE(tecmosys)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 

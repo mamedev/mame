@@ -79,7 +79,7 @@ Custom: Imagetek 15000 (2ch video & 2ch sound)
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 #define VERBOSE_AUDIO_LOG (0)	// enable to show audio writes (very noisy when music is playing)
 
@@ -688,20 +688,20 @@ static WRITE32_HANDLER( rabbit_blitter_w )
 	}
 }
 
-static WRITE32_HANDLER( rabbit_eeprom_write )
+static WRITE32_DEVICE_HANDLER( rabbit_eeprom_write )
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x01000000);
+		eepromdev_write_bit(device, data & 0x01000000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(device, (data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -711,7 +711,7 @@ static ADDRESS_MAP_START( rabbit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000024, 0x000027) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x00719c, 0x00719f) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_WRITE(rabbit_eeprom_write)
+	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_DEVWRITE("eeprom", rabbit_eeprom_write)
 	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
 	AM_RANGE(0x400980, 0x400983) AM_READ(randomrabbits) // sound chip status?
 	AM_RANGE(0x400984, 0x400987) AM_READ(randomrabbits) // sound chip status?
@@ -745,7 +745,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	// as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
@@ -933,7 +933,7 @@ static MACHINE_DRIVER_START( rabbit )
 	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(rabbit_map)
 	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_GFXDECODE(rabbit)
 
