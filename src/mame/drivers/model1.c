@@ -627,7 +627,6 @@ Notes:
 #include "driver.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
 #include "includes/system16.h"
 #include "video/segaic24.h"
 #include "cpu/m68000/m68000.h"

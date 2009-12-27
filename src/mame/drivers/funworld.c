@@ -1056,7 +1056,6 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
-#include "machine/eeprom.h"
 #include "funworld.lh"
 
 /* from video */

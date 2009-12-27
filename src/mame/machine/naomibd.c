@@ -173,7 +173,6 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #include "driver.h"
 #include "eminline.h"
 #include "profiler.h"
-#include "machine/eeprom.h"
 #include "machine/x76f100.h"
 #include "cdrom.h"
 #include "includes/naomi.h"

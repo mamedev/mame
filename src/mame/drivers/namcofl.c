@@ -157,7 +157,6 @@ OSC3: 48.384MHz
 
 #include "driver.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
 #include "includes/namconb1.h"
 #include "includes/namcos2.h"
 #include "includes/namcoic.h"
