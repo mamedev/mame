@@ -5152,7 +5152,7 @@ READ8_DEVICE_HANDLER( tc0640fio_r )
 	}
 }
 
-WRITE8_DEVICE_HANDLER( TC0640FIO_w )
+WRITE8_DEVICE_HANDLER( tc0640fio_w )
 {
 	tc0640fio_state *tc0640fio = tc0640fio_get_safe_token(device);
 
