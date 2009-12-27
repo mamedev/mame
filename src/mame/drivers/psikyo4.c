@@ -129,7 +129,7 @@ ROMs -
 #include "driver.h"
 
 #include "cpu/sh2/sh2.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/ymf278b.h"
 #include "rendlay.h"
 #include "includes/psikyo4.h"
@@ -165,37 +165,13 @@ static const eeprom_interface eeprom_interface_93C56 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-static NVRAM_HANDLER(93C56)
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C56);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else	// these games want the eeprom all zeros by default
-		{
-			UINT32 length, size;
-			UINT8 *dat;
-
-			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
-			memset(dat, 0, length * size);
-		}
-	}
-}
-
-static WRITE32_HANDLER( ps4_eeprom_w )
+static WRITE32_DEVICE_HANDLER( ps4_eeprom_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		eeprom_write_bit((data & 0x00200000) ? 1 : 0);
-		eeprom_set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, (data & 0x00200000) ? 1 : 0);
+		eepromdev_set_cs_line(device, (data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -203,11 +179,11 @@ static WRITE32_HANDLER( ps4_eeprom_w )
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-static READ32_HANDLER( ps4_eeprom_r )
+static READ32_DEVICE_HANDLER( ps4_eeprom_r )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return input_port_read(space->machine, "JP4");
+		return input_port_read(device->machine, "JP4");
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -402,7 +378,7 @@ static ADDRESS_MAP_START( ps4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo4_state, spriteram, spriteram_size)
-	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
+	AM_RANGE(0x03003fe0, 0x03003fe3) AM_DEVREADWRITE("eeprom", ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
 	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_BASE_MEMBER(psikyo4_state, vidregs) // vid regs?
@@ -439,7 +415,7 @@ static INPUT_PORTS_START( hotgmck )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 
 	PORT_START("SYSTEM")	/* system inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// Screen 1
@@ -622,7 +598,7 @@ static INPUT_PORTS_START( loderndf )
 	PORT_DIPSETTING(	      0x00000000, "Japan (Shows Version Number)" )
 	PORT_DIPSETTING(	      0x00010000, "World (Does Not Show Version Number)" )
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 /* unused inputs also act as duplicate buttons */
@@ -705,7 +681,7 @@ static INPUT_PORTS_START( hotdebut )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 
@@ -760,7 +736,8 @@ static MACHINE_DRIVER_START( ps4big )
 	MDRV_MACHINE_START(psikyo4)
 	MDRV_MACHINE_RESET(psikyo4)
 
-	MDRV_NVRAM_HANDLER(93C56)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C56)
+	MDRV_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(ps4)

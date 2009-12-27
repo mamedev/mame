@@ -89,7 +89,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 
 extern UINT16 *pirates_tx_tileram, *pirates_spriteram;
@@ -115,24 +115,16 @@ static const eeprom_interface eeprom_intf =
 	"*10011xxxx"	/* unlock command */
 };
 
-static NVRAM_HANDLER( pirates )
-{
-	if (read_or_write) eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-		if (file) eeprom_load(file);
-	}
-}
-
 static WRITE16_HANDLER( pirates_out_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+		
 		/* bits 0-2 control EEPROM */
-		eeprom_write_bit(data & 0x04);
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(eeprom, data & 0x04);
+		eepromdev_set_cs_line(eeprom, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x40) ? 0x40000 : 0x00000);
@@ -226,7 +218,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	// EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)		// protection
@@ -282,7 +274,7 @@ static MACHINE_DRIVER_START( pirates )
 	MDRV_CPU_PROGRAM_MAP(pirates_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_NVRAM_HANDLER(pirates)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MDRV_GFXDECODE(pirates)
 

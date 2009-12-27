@@ -122,7 +122,7 @@ CN1 standard DB15 VGA connector (15KHz)
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 
 static const eeprom_interface eeprom_intf =
@@ -136,36 +136,15 @@ static const eeprom_interface eeprom_intf =
 	"*10011xxxx" 	/* unlock command */
 };
 
-static NVRAM_HANDLER( pntnpuzl )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-			eeprom_load(file);
-		else
-		{
-			UINT32 length, size;
-			UINT8 *dat;
-
-			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
-			memset(dat, 0, length * size);
-		}
-	}
-}
-
 static UINT16 pntnpuzl_eeprom;
 
-static READ16_HANDLER( pntnpuzl_eeprom_r )
+static READ16_DEVICE_HANDLER( pntnpuzl_eeprom_r )
 {
 	/* bit 11 is EEPROM data */
-	return (pntnpuzl_eeprom & 0xf4ff) | (eeprom_read_bit()<<11) | (input_port_read(space->machine, "IN1") & 0x0300);
+	return (pntnpuzl_eeprom & 0xf4ff) | (eepromdev_read_bit(device)<<11) | (input_port_read(device->machine, "IN1") & 0x0300);
 }
 
-static WRITE16_HANDLER( pntnpuzl_eeprom_w )
+static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
 {
 	pntnpuzl_eeprom = data;
 
@@ -173,9 +152,9 @@ static WRITE16_HANDLER( pntnpuzl_eeprom_w )
 	/* bit 13 is clock (active high) */
 	/* bit 14 is cs (active high) */
 
-	eeprom_write_bit(data & 0x1000);
-	eeprom_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_write_bit(device, data & 0x1000);
+	eepromdev_set_cs_line(device, (data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -388,9 +367,9 @@ static ADDRESS_MAP_START( pntnpuzl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100001) AM_READNOP	//| irq lines clear
 	AM_RANGE(0x180000, 0x180001) AM_READNOP //|
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ(pntnpuzl_eeprom_r)
+	AM_RANGE(0x280000, 0x280001) AM_DEVREAD("eeprom", pntnpuzl_eeprom_r)
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN2")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(pntnpuzl_eeprom_w)
+	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("eeprom", pntnpuzl_eeprom_w)
 	AM_RANGE(0x280008, 0x280009) AM_WRITENOP
 	AM_RANGE(0x28000a, 0x28000b) AM_WRITENOP
 	AM_RANGE(0x280010, 0x280011) AM_WRITENOP
@@ -458,7 +437,7 @@ static MACHINE_DRIVER_START( pntnpuzl )
 	MDRV_CPU_PROGRAM_MAP(pntnpuzl_map)
 	MDRV_CPU_VBLANK_INT("screen", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin
 
-	MDRV_NVRAM_HANDLER(pntnpuzl)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)

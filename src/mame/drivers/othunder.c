@@ -234,7 +234,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -322,29 +322,9 @@ static const eeprom_interface eeprom_intf =
 	"0100111111" 	/* unlock command */
 };
 
-static NVRAM_HANDLER( othunder )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
-
-static int eeprom_r(void)
-{
-	return (eeprom_read_bit() & 0x01)<<7;
-}
-
-
 static WRITE16_HANDLER( othunder_TC0220IOC_w )
 {
+	const device_config *device;
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -366,9 +346,10 @@ static WRITE16_HANDLER( othunder_TC0220IOC_w )
 if (data & 4)
 	popmessage("OBPRI SET!");
 
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				device = devtag_get_device(space->machine, "eeprom");
+				eepromdev_write_bit(device, data & 0x40);
+				eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eepromdev_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			default:
@@ -384,10 +365,12 @@ if (data & 4)
 
 static READ16_HANDLER( othunder_TC0220IOC_r )
 {
+	const device_config *device;
 	switch (offset)
 	{
 		case 0x03:
-			return eeprom_r();
+			device = devtag_get_device(space->machine, "eeprom");
+			return (eepromdev_read_bit(device) & 1) << 7;
 
 		default:
 			return TC0220IOC_r( space, offset );
@@ -698,7 +681,8 @@ static MACHINE_DRIVER_START( othunder )
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MDRV_NVRAM_HANDLER(othunder)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+
 	MDRV_MACHINE_START(othunder)
 	MDRV_MACHINE_RESET(othunder)
 
@@ -782,6 +766,9 @@ ROM_START( othunder )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderu )
@@ -818,6 +805,9 @@ ROM_START( othunderu )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderuo )
@@ -854,6 +844,9 @@ ROM_START( othunderuo )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderj )
@@ -890,6 +883,9 @@ ROM_START( othunderj )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 

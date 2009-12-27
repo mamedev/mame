@@ -41,7 +41,7 @@ TODO:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 #include "includes/playmark.h"
@@ -84,31 +84,12 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (otherwise wbeachvl will hang when saving settings) */
 };
 
-static NVRAM_HANDLER( wbeachvl )
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-			eeprom_load(file);
-		else
-		{
-			UINT8 init[128];
-			memset(init,0,128);
-			eeprom_set_data(init,128);
-		}
-	}
-}
-
 static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+		
 		/* bits 0-3 are coin counters? (only 0 used?) */
 		coin_counter_w(space->machine, 0,data & 0x01);
 		coin_counter_w(space->machine, 1,data & 0x02);
@@ -116,9 +97,9 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 		coin_counter_w(space->machine, 3,data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(data & 0x80);
-		eeprom_set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_cs_line(eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_write_bit(eeprom, data & 0x80);
+		eepromdev_set_clock_line(eeprom, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -126,11 +107,12 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 		coin_counter_w(space->machine, 0,data & 0x20);
 
-		eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(data & 4);
-		eeprom_set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_cs_line(eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_write_bit(eeprom, data & 4);
+		eepromdev_set_clock_line(eeprom, (data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -457,7 +439,7 @@ static INPUT_PORTS_START( wbeachvl )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_LOW)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* ?? see code at 746a. sound status? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -623,7 +605,7 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
@@ -962,7 +944,8 @@ static MACHINE_DRIVER_START( wbeachvl )
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map)
 
-	MDRV_NVRAM_HANDLER(wbeachvl)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1030,7 +1013,8 @@ static MACHINE_DRIVER_START( hotmind )
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map)
 
-	MDRV_NVRAM_HANDLER(wbeachvl)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
