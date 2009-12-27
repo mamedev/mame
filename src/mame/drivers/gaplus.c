@@ -313,64 +313,56 @@ static ADDRESS_MAP_START( cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
 
-
-
 static INPUT_PORTS_START( gaplus )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START("IN0")	/* 56XX #0 pins 22-29 */
+	PORT_START("P1")	/* 56XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("IN1")	/* 56XX #0 pins 30-33 and 38-41 */
+	PORT_START("P2")	/* 56XX #0 pins 22-29 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("BUTTONS")	/* 56XX #0 pins 30-33 and 38-41 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START("DSW0")	/* 58XX #1 pins 30-33 and 38-41 */
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" ) /* Listed as "Unused" */
+	PORT_START("COINS")	/* 56XX #0 pins 30-33 and 38-41 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("DSWA_LOW")	/* 58XX #1 pins 30-33 and 38-41 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" ) /* Listed as "Unused" */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* 58XX #1 pins 22-29 */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:2,3,4")
-	PORT_DIPSETTING(    0x70, "0 - Standard" )
-	PORT_DIPSETTING(    0x60, "1 - Easiest" )
-	PORT_DIPSETTING(    0x50, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPSETTING(    0x30, "4" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x00, "7 - Hardest" )
+	PORT_START("DSWA_HIGH")	/* 58XX #1 pins 30-33 and 38-41 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_START("DSWB_LOW")	/* 58XX #1 pins 22-29 */
 	PORT_DIPNAME( 0x08, 0x08, "Round Advance" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -383,6 +375,20 @@ static INPUT_PORTS_START( gaplus )
 	PORT_DIPSETTING(    0x07, "50k 150k and every 150k" )
 	PORT_DIPSETTING(    0x05, "50k 150k and every 300k" )
 	PORT_DIPSETTING(    0x06, "50k 150k" )
+
+	PORT_START("DSWB_HIGH")	/* 58XX #1 pins 22-29 */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:2,3,4")
+	PORT_DIPSETTING(    0x07, "0 - Standard" )
+	PORT_DIPSETTING(    0x06, "1 - Easiest" )
+	PORT_DIPSETTING(    0x05, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "6" )
+	PORT_DIPSETTING(    0x00, "7 - Hardest" )
 
 	PORT_START("IN2")	/* 62XX #2 pins 24-27 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -397,8 +403,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gapluso )
 	PORT_INCLUDE( gaplus )
 
-	PORT_MODIFY("DSW1")
-	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_MODIFY("DSWB_HIGH")
+	PORT_SERVICE_DIPLOC(  0x08, IP_ACTIVE_LOW, "SW2:1" )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// doesn't seem to be used
@@ -408,7 +414,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( galaga3a )
 	PORT_INCLUDE( gaplus )
 
-	PORT_MODIFY("DSW1")
+	PORT_MODIFY("DSWB_LOW")
 	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x02, "30k 80k and every 100k" )
 	PORT_DIPSETTING(    0x03, "30k 100k and every 100k" )
@@ -424,7 +430,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( galaga3m )
 	PORT_INCLUDE( gaplus )
 
-	PORT_MODIFY("DSW1")
+	PORT_MODIFY("DSWB_LOW")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, "30k 150k and every 600k" )
 	PORT_DIPSETTING(    0x01, "50k 150k and every 300k" )
@@ -494,15 +500,6 @@ static const samples_interface gaplus_samples_interface =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( in0_l )	{ return input_port_read(device->machine, "IN0"); }			// P1 joystick
-static READ8_DEVICE_HANDLER( in0_h )	{ return input_port_read(device->machine, "IN0") >> 4; }	// P2 joystick
-static READ8_DEVICE_HANDLER( in1_l )	{ return input_port_read(device->machine, "IN1"); }			// fire and start buttons
-static READ8_DEVICE_HANDLER( in1_h )	{ return input_port_read(device->machine, "IN1") >> 4; }	// coins
-static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine, "DSW0"); }		// dips A
-static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine, "DSW0") >> 4; }	// dips A
-static READ8_DEVICE_HANDLER( dipB_l )	{ return input_port_read(device->machine, "DSW1"); }		// dips B
-static READ8_DEVICE_HANDLER( dipB_h )	{ return input_port_read(device->machine, "DSW1") >> 4; }	// dips B
-
 static WRITE8_DEVICE_HANDLER( out_lamps0 )
 {
 	set_led_status(device->machine, 0, data & 1);
@@ -519,14 +516,14 @@ static WRITE8_DEVICE_HANDLER( out_lamps1 )
 /* chip #0: player inputs, buttons, coins */
 static const namcoio_interface intf0 =
 {
-	{ DEVCB_HANDLER(in1_h), DEVCB_HANDLER(in0_l), DEVCB_HANDLER(in0_h), DEVCB_HANDLER(in1_l) },	/* port read handlers */
+	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
 	{ DEVCB_NULL, DEVCB_NULL },		/* port write handlers */
 	NULL	/* device */
 };
 
 static const namcoio_interface intf0_lamps =
 {
-	{ DEVCB_HANDLER(in1_h), DEVCB_HANDLER(in0_l), DEVCB_HANDLER(in0_h), DEVCB_HANDLER(in1_l) },	/* port read handlers */
+	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
 	{ DEVCB_HANDLER(out_lamps0), DEVCB_HANDLER(out_lamps1) },		/* port write handlers */
 	NULL	/* device */
 };
@@ -534,7 +531,7 @@ static const namcoio_interface intf0_lamps =
 /* chip #1: dip switches */
 static const namcoio_interface intf1 =
 {
-	{ DEVCB_HANDLER(dipA_h), DEVCB_HANDLER(dipB_l), DEVCB_HANDLER(dipB_h), DEVCB_HANDLER(dipA_l) },	/* port read handlers */
+	{ DEVCB_INPUT_PORT("DSWA_HIGH"), DEVCB_INPUT_PORT("DSWB_LOW"), DEVCB_INPUT_PORT("DSWB_HIGH"), DEVCB_INPUT_PORT("DSWA_LOW") },	/* port read handlers */
 	{ DEVCB_NULL, DEVCB_NULL },		/* port write handlers */
 	NULL	/* device */
 };

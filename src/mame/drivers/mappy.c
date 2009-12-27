@@ -946,37 +946,40 @@ ADDRESS_MAP_END
 
 
 #define NAMCO_56IN0\
-	PORT_START("IN0")	/* 56XX #0 pins 22-29 */\
+	PORT_START("P1")	/* 56XX #0 pins 22-29 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_START("P2")	/* 56XX #0 pins 22-29 */\
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL\
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL\
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL\
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
 #define NAMCO_5XIN0\
-	PORT_START("IN0") /* 56XX #0 pins 22-29 */\
+	PORT_START("P1") /* 56XX #0 pins 22-29 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_START("P2") /* 56XX #0 pins 22-29 */\
+	PORT_BIT( 0x0, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL\
+	PORT_BIT( 0x0, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL\
+	PORT_BIT( 0x0, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL\
+	PORT_BIT( 0x0, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 #define NAMCO_56IN1\
-	PORT_START("IN1")	/* 56XX #0 pins 30-33 and 38-41 */\
+	PORT_START("BUTTONS")	/* 56XX #0 pins 30-33 and 38-41 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_START("COINS")	/* 56XX #0 pins 30-33 and 38-41 */\
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )\
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )\
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 #define NAMCO_56DSW0\
 	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */\
@@ -988,9 +991,9 @@ ADDRESS_MAP_END
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 
 static INPUT_PORTS_START( superpac )
-NAMCO_56IN0
-NAMCO_56IN1
-NAMCO_56DSW0
+	NAMCO_56IN0
+	NAMCO_56IN1
+	NAMCO_56DSW0
 
 	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -1057,9 +1060,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( pacnpal )
-NAMCO_56IN0
-NAMCO_56IN1
-NAMCO_56DSW0
+	NAMCO_56IN0
+	NAMCO_56IN1
+	NAMCO_56DSW0
 
 	PORT_START("DSW1")	/* ???? #1 pins ??-?? */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
@@ -1112,8 +1115,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( grobda )
-NAMCO_5XIN0
-NAMCO_56IN1
+	NAMCO_5XIN0
+	NAMCO_56IN1
 
 	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -1173,9 +1176,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( phozon )
-NAMCO_5XIN0
-NAMCO_56IN1
-NAMCO_56DSW0
+	NAMCO_5XIN0
+	NAMCO_56IN1
+	NAMCO_56DSW0
 
 	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
@@ -1239,18 +1242,20 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mappy )
-	PORT_START("IN0")	/* 58XX #0 pins 22-29 */
+	PORT_START("P1")	/* 58XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 
-NAMCO_56IN1
-NAMCO_56DSW0
+	PORT_START("P2")	/* 58XX #0 pins 22-29 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+
+	NAMCO_56IN1
+	NAMCO_56DSW0
 
 	PORT_START("DSW1")	/* 58XX #1 pins 22-29 */
 /* According to the manual, 0x04, 0x08 and 0x10 should always be off, but... */
@@ -1313,8 +1318,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( todruaga )
-NAMCO_56IN0
-NAMCO_56IN1
+	NAMCO_56IN0
+	NAMCO_56IN1
 
 	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1358,8 +1363,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( digdug2 )
-NAMCO_56IN0
-NAMCO_56IN1
+	NAMCO_56IN0
+	NAMCO_56IN1
 
 	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -1404,8 +1409,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( motos )
-NAMCO_5XIN0
-NAMCO_56IN1
+	NAMCO_5XIN0
+	NAMCO_56IN1
 
 	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -1541,11 +1546,6 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( in0_l )	{ return input_port_read(device->machine, "IN0"); }		// P1 joystick
-static READ8_DEVICE_HANDLER( in0_h )	{ return input_port_read(device->machine, "IN0") >> 4; }	// P2 joystick
-static READ8_DEVICE_HANDLER( in1_l )	{ return input_port_read(device->machine, "IN1"); }		// fire and start buttons
-static READ8_DEVICE_HANDLER( in1_h )	{ return input_port_read(device->machine, "IN1") >> 4; }	// coins
-static READ8_DEVICE_HANDLER( in2 )		{ return input_port_read(device->machine, "DSW0"); }		// test, cocktail, optional buttons
 static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine, "DSW1"); }		// dips A
 static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine, "DSW1") >> 4; }	// dips A
 
@@ -1553,7 +1553,7 @@ static READ8_DEVICE_HANDLER( dipB_mux )	// dips B
 {
 	mappy_state *state = (mappy_state *)device->machine->driver_data;
 
-	return input_port_read(device->machine, "DSW2") >> (4*state->mux);
+	return input_port_read(device->machine, "DSW2") >> (4 * state->mux);
 }
 
 static READ8_DEVICE_HANDLER( dipB_muxi )	// dips B
@@ -1561,7 +1561,7 @@ static READ8_DEVICE_HANDLER( dipB_muxi )	// dips B
 	mappy_state *state = (mappy_state *)device->machine->driver_data;
 
 	// bits are interleaved in Phozon
-	return BITSWAP8(input_port_read(device->machine, "DSW2"),6,4,2,0,7,5,3,1) >> (4*state->mux);
+	return BITSWAP8(input_port_read(device->machine, "DSW2"),6,4,2,0,7,5,3,1) >> (4 * state->mux);
 }
 
 static WRITE8_DEVICE_HANDLER( out_mux )
@@ -1582,14 +1582,14 @@ static WRITE8_DEVICE_HANDLER( out_lamps )
 /* chip #0: player inputs, buttons, coins */
 static const namcoio_interface intf0 =
 {
-	{ DEVCB_HANDLER(in1_h), DEVCB_HANDLER(in0_l), DEVCB_HANDLER(in0_h), DEVCB_HANDLER(in1_l) },	/* port read handlers */
+	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
 	{ DEVCB_NULL, DEVCB_NULL },					/* port write handlers */
 	NULL
 };
 
 static const namcoio_interface intf0_lamps =
 {
-	{ DEVCB_HANDLER(in1_h), DEVCB_HANDLER(in0_l), DEVCB_HANDLER(in0_h), DEVCB_HANDLER(in1_l) },	/* port read handlers */
+	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
 	{ DEVCB_HANDLER(out_lamps), DEVCB_NULL },					/* port write handlers */
 	NULL
 };
@@ -1597,14 +1597,14 @@ static const namcoio_interface intf0_lamps =
 /* chip #1: dip switches, test/cocktail, optional buttons */
 static const namcoio_interface intf1 =
 {
-	{ DEVCB_HANDLER(dipB_mux), DEVCB_HANDLER(dipA_l), DEVCB_HANDLER(dipA_h), DEVCB_HANDLER(in2) },	/* port read handlers */
+	{ DEVCB_HANDLER(dipB_mux), DEVCB_HANDLER(dipA_l), DEVCB_HANDLER(dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
 	{ DEVCB_HANDLER(out_mux), DEVCB_NULL },					/* port write handlers */
 	NULL
 };
 
 static const namcoio_interface intf1_interleave =
 {
-	{ DEVCB_HANDLER(dipB_muxi), DEVCB_HANDLER(dipA_l), DEVCB_HANDLER(dipA_h), DEVCB_HANDLER(in2) },	/* port read handlers */
+	{ DEVCB_HANDLER(dipB_muxi), DEVCB_HANDLER(dipA_l), DEVCB_HANDLER(dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
 	{ DEVCB_HANDLER(out_mux), DEVCB_NULL },					/* port write handlers */
 	NULL
 };
