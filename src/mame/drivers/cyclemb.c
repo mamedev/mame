@@ -265,6 +265,12 @@ static ADDRESS_MAP_START( cyclemb_sound_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
+static MACHINE_RESET( cyclemb )
+{
+	josvolly_8741_reset();
+}
+
+
 static INPUT_PORTS_START( cyclemb )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
@@ -538,6 +544,8 @@ static MACHINE_DRIVER_START( cyclemb )
 
 	MDRV_VIDEO_START(cyclemb)
 	MDRV_VIDEO_UPDATE(cyclemb)
+
+	MDRV_MACHINE_RESET(cyclemb)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -389,7 +389,6 @@ typedef struct josvolly_8741_struct {
 	UINT8 connect;
 
 	UINT8 rst;
-	UINT8 mux_io;
 
 	const char *initReadPort;
 }JV8741;
@@ -421,8 +420,6 @@ void josvolly_8741_reset(void)
 	i8741[2].initReadPort = "DSW1";  /* DUMMY */
 	i8741[3].initReadPort = "DSW2";  /* DUMMY */
 
-	i8741[0].mux_io = 0;
-	i8741[1].mux_io = 0;
 }
 
 /* transmit data finish callback */
@@ -567,10 +564,10 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 			0x01 sub NG RAM
 			0x00 ok
 			*/
-			mcu->txd = 0 ^ 0x40;
+			mcu->rxd = 0 ^ 0x40;
 			mcu->sts |= 0x02;
 			/* ?? */
-			mcu->rxd = 0;  /* SBSTS ( DIAG ) , killed */
+			//mcu->rxd = 0;  /* SBSTS ( DIAG ) , killed */
 			mcu->sts |= 0x01; /* RD ready */
 			mcu->rst = 0;
 			break;
@@ -583,7 +580,6 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 			//mcu->rxd = input_port_read(space->machine, "DSW1");
 			mcu->sts |= 0x01; /* RD ready */
 			mcu->rst = 1;
-			mcu->mux_io = 0;
 			break;
 
 		case 0xf0: /* clear main sts ? */
@@ -597,8 +593,8 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 		/* data */
 		LOG(("%s:8741[%d] DW %02X\n", cpuexec_describe_context(space->machine), num, data));
 
-		mcu->txd = data ^ 0x40; /* parity reverce ? */
-		mcu->sts |= 0x02;     /* TXD busy         */
+		mcu->txd = data;
+		mcu->sts |= 0x02;    /* TXD busy         */
 #if 1
 		/* interrupt ? */
 		if(num == 0)
@@ -623,12 +619,15 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 	{
 		if(mcu->rst)
 		{
-			static const char *const ports[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5" };
-			mcu->rxd = input_port_read(space->machine, ports[mcu->mux_io]); /* port in */
-			//printf("%02x\n",mcu->mux_io);
-			mcu->mux_io++;
-			if(mcu->mux_io > 5)
-				mcu->mux_io = 0;
+			//printf("%02x\n",mcu->txd);
+			switch(mcu->txd)
+			{
+				case 0x00: mcu->rxd = input_port_read(space->machine, "IN0"); //dip-sw1
+				case 0x40: mcu->rxd = input_port_read(space->machine, "IN1"); //dip-sw3
+				case 0x41: mcu->rxd = input_port_read(space->machine, "IN2"); //dip-sw3
+				case 0x84: mcu->rxd = input_port_read(space->machine, "IN3"); //dip-sw3
+				case 0x11: mcu->rxd = input_port_read(space->machine, "IN4"); //dip-sw3
+			}
 		}
 		ret = mcu->sts;
 		LOG(("%s:8741[%d]       SR %02X\n",cpuexec_describe_context(space->machine),num,ret));
