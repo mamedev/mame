@@ -337,17 +337,18 @@ static READ16_HANDLER( trackx2_lo_r )
 
 static WRITE16_HANDLER( gain_control_w )
 {
+	const device_config *mb87078 = devtag_get_device(space->machine, "mb87078");
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset == 0)
 		{
-			MB87078_data_w(space->machine, 0, data>>8, 0);
-            //logerror("MB87078 dsel=0 data=%4x\n",data);
+			mb87078_data_w(mb87078, data >> 8, 0);
+      	      //logerror("MB87078 dsel=0 data=%4x\n", data);
 		}
 		else
 		{
-			MB87078_data_w(space->machine, 0, data>>8, 1);
-            //logerror("MB87078 dsel=1 data=%4x\n",data);
+			mb87078_data_w(mb87078, data >> 8, 1);
+ 	           //logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
 }
@@ -2090,36 +2091,22 @@ static const ym2203_interface ym2203_config =
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-static void mb87078_gain_changed(running_machine *machine, int channel, int percent)
+static void mb87078_gain_changed( running_machine *machine, int channel, int percent )
 {
-	if (channel==1)
+	if (channel == 1)
 	{
 		const device_config *ym = devtag_get_device(machine, "ymsnd");
 		sound_set_output_gain(ym, 0, percent / 100.0);
 		sound_set_output_gain(ym, 1, percent / 100.0);
 		sound_set_output_gain(ym, 2, percent / 100.0);
-		//popmessage("MB87078 gain ch#%i percent=%i",channel,percent);
+		//popmessage("MB87078 gain ch#%i percent=%i", channel, percent);
 	}
 }
 
-static const struct MB87078interface mb87078_interface =
+static const mb87078_interface taitob_mb87078_intf =
 {
 	mb87078_gain_changed	/*callback function for gain change*/
 };
-
-
-static MACHINE_RESET( mb87078 )
-{
-	MB87078_start(machine, 0, &mb87078_interface); /*chip #0*/
-/*
-    {
-        int i;
-        for (i=0; i<6; i++)
-            logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );
-    }
-*/
-}
-
 
 static const tc0220ioc_interface taitob_io_intf =
 {
@@ -2476,10 +2463,11 @@ static MACHINE_DRIVER_START( pbobble )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(mb87078)
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	MDRV_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+
+	MDRV_MB87078_ADD("mb87078", taitob_mb87078_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2519,10 +2507,11 @@ static MACHINE_DRIVER_START( spacedx )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(mb87078)
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	MDRV_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+
+	MDRV_MB87078_ADD("mb87078", taitob_mb87078_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2602,10 +2591,11 @@ static MACHINE_DRIVER_START( qzshowby )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(mb87078)
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	MDRV_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+
+	MDRV_MB87078_ADD("mb87078", taitob_mb87078_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
