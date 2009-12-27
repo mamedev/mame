@@ -112,6 +112,7 @@ static VIDEO_UPDATE( cyclemb )
 {
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
+	UINT8 flip_screen = flip_screen_get(screen->machine);
 
 	count = 0;
 
@@ -123,11 +124,21 @@ static VIDEO_UPDATE( cyclemb )
 			int tile = (cyclemb_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
+//			int sx_offs = flip_screen ? 512 : 0
 			int scrollx = ((cyclemb_vram[(y/2)+odd_line]) + (cyclemb_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8));
-			/* wrap-around */
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+			if(flip_screen)
+			{
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
+				/* wrap-around */
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
+			}
+			else
+			{
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8));
+				/* wrap-around */
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+			}
 
 			count++;
 		}
@@ -175,8 +186,14 @@ static VIDEO_UPDATE( cyclemb )
 				x+=256;
 			//if(cyclemb_obj3_ram[i+1] & 2)
 //				x-=256;
-			fx = cyclemb_obj3_ram[i+0] & 4;
-			fy = cyclemb_obj3_ram[i+0] & 8;
+			fx = (cyclemb_obj3_ram[i+0] & 4) >> 2;
+			fy = (cyclemb_obj3_ram[i+0] & 8) >> 3;
+
+			if(flip_screen)
+			{
+				fx = !fx;
+				fy = !fy;
+			}
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],spr_offs,col,fx,fy,x,y,0);
 		}
 	}
@@ -211,6 +228,13 @@ static WRITE8_HANDLER( sound_cmd_w ) //actually ciom
 }
 #endif
 
+static WRITE8_HANDLER( cyclemb_flip_w )
+{
+	flip_screen_set(space->machine, data & 1);
+
+	// a bunch of other things are setted here
+}
+
 static ADDRESS_MAP_START( cyclemb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
@@ -226,7 +250,7 @@ static ADDRESS_MAP_START( cyclemb_io, ADDRESS_SPACE_IO, 8 )
 //	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(cyclemb_8741_0_r, cyclemb_8741_0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITENOP //flip screen
+	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
