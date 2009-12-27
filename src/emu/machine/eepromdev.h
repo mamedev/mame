@@ -31,10 +31,10 @@ struct _eeprom_config
 };
 
 /* 93C46 */
-extern const eeprom_interface eepromdev_interface_93C46;
+extern const eeprom_interface eeprom_interface_93C46;
 
 /* 93C66B */
-extern const eeprom_interface eepromdev_interface_93C66B;
+extern const eeprom_interface eeprom_interface_93C66B;
 
 #define EEPROM DEVICE_GET_INFO_NAME(eeprom)
 DEVICE_GET_INFO(eeprom);
@@ -44,10 +44,10 @@ DEVICE_GET_INFO(eeprom);
 	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, pinterface, &_interface)
 
 #define MDRV_EEPROM_93C46_ADD(_tag) \
-	MDRV_EEPROM_ADD(_tag, eepromdev_interface_93C46)
+	MDRV_EEPROM_ADD(_tag, eeprom_interface_93C46)
 
 #define MDRV_EEPROM_93C66B_ADD(_tag) \
-	MDRV_EEPROM_ADD(_tag, eepromdev_interface_93C66B)
+	MDRV_EEPROM_ADD(_tag, eeprom_interface_93C66B)
 
 #define MDRV_EEPROM_DATA(_data, _size) \
 	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, default_data, &_data) \
@@ -56,12 +56,12 @@ DEVICE_GET_INFO(eeprom);
 #define MDRV_EEPROM_DEFAULT_VALUE(_value) \
 	MDRV_DEVICE_CONFIG_DATA32(eeprom_config, default_value, 0x10000 | ((_value) & 0xffff))
 
-WRITE_LINE_DEVICE_HANDLER( eepromdev_write_bit );
-READ_LINE_DEVICE_HANDLER( eepromdev_read_bit );
-WRITE_LINE_DEVICE_HANDLER( eepromdev_set_cs_line );
-WRITE_LINE_DEVICE_HANDLER( eepromdev_set_clock_line );
+WRITE_LINE_DEVICE_HANDLER( eeprom_write_bit );
+READ_LINE_DEVICE_HANDLER( eeprom_read_bit );
+WRITE_LINE_DEVICE_HANDLER( eeprom_set_cs_line );
+WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line );
 
-void eepromdev_set_data( const device_config *device, const UINT8 *data, int length );
-void *eepromdev_get_data_pointer( const device_config *device, UINT32 *length, UINT32 *size );
+void eeprom_set_data( const device_config *device, const UINT8 *data, int length );
+void *eeprom_get_data_pointer( const device_config *device, UINT32 *length, UINT32 *size );
 
 #endif

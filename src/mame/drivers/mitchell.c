@@ -123,7 +123,7 @@ static READ8_HANDLER( pang_port5_r )
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	int bit;
 
-	bit = eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
+	bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler. */
 	/* Maybe they are vblank related, but I'm not sure. */
@@ -143,17 +143,17 @@ static READ8_HANDLER( pang_port5_r )
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
 {
-	eepromdev_set_cs_line(device, data ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_cs_line(device, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_clock_w )
 {
-	eepromdev_set_clock_line(device, data ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line(device, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
 {
-	eepromdev_write_bit(device, data);
+	eeprom_write_bit(device, data);
 }
 
 

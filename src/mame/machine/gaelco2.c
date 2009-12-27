@@ -267,19 +267,19 @@ WRITE16_HANDLER( wrally2_adc_cs )
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w )
 {
 	/* bit 0 is CS (active low) */
-	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w )
 {
 	/* bit 0 is SK (active high) */
-	eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w )
 {
 	/* bit 0 is EEPROM data (DIN) */
-	eepromdev_write_bit(device, data & 0x01);
+	eeprom_write_bit(device, data & 0x01);
 }
 
 /***************************************************************************

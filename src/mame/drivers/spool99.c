@@ -157,7 +157,7 @@ static READ8_HANDLER( spool99_io_r )
 			case 0xafe4: return input_port_read(space->machine,"SERVICE2");//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
-			case 0xafe7: return eepromdev_read_bit(devtag_get_device(space->machine,"eeprom"));
+			case 0xafe7: return eeprom_read_bit(devtag_get_device(space->machine,"eeprom"));
 			case 0xaff8: return okim6295_r(devtag_get_device(space->machine, "oki"),0);
 		}
 	}
@@ -169,19 +169,19 @@ static READ8_HANDLER( spool99_io_r )
 static WRITE8_DEVICE_HANDLER( eeprom_resetline_w )
 {
 	// reset line asserted: reset.
-	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_clockline_w )
 {
 	// clock line asserted: write latch or select next bit to read
-	eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 {
 	// latch the bit
-	eepromdev_write_bit(device, data & 0x01);
+	eeprom_write_bit(device, data & 0x01);
 }
 
 static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -872,9 +872,9 @@ WRITE8_DEVICE_HANDLER( ataxx_eeprom_w )
 {
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", cpuexec_describe_context(device->machine),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	eepromdev_write_bit     (device, (data & 0x10) >> 4);
-	eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	eepromdev_set_cs_line   (device, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit     (device, (data & 0x10) >> 4);
+	eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line   (device, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1188,9 +1188,9 @@ WRITE8_HANDLER( leland_master_output_w )
 			eeprom = devtag_get_device(space->machine, "eeprom");
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(space->cpu),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			eepromdev_write_bit     (eeprom, (data & 0x10) >> 4);
-			eepromdev_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			eepromdev_set_cs_line   (eeprom, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_write_bit     (eeprom, (data & 0x10) >> 4);
+			eeprom_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line   (eeprom, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 0x0a:	/* /OGIA */

@@ -410,9 +410,9 @@ static WRITE32_HANDLER( ctrl0_w )
 	{
 		const device_config *device = devtag_get_device(space->machine, "eeprom");
 		model2_ctrlmode = data & 0x01;
-		eepromdev_write_bit(device, data & 0x20);
-		eepromdev_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(device, data & 0x20);
+		eeprom_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -451,7 +451,7 @@ static CUSTOM_INPUT( _1c00000_r )
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (eepromdev_read_bit(devtag_get_device(field->port->machine, "eeprom")) << 5);
+		return ret | 0x00d0 | (eeprom_read_bit(devtag_get_device(field->port->machine, "eeprom")) << 5);
 	}
 }
 

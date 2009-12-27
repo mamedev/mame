@@ -1271,7 +1271,7 @@ static READ16_HANDLER( gakusai_input_r )
 
 static READ16_DEVICE_HANDLER( gakusai_eeprom_r )
 {
-	return eepromdev_read_bit(device) & 1;
+	return eeprom_read_bit(device) & 1;
 }
 
 static WRITE16_DEVICE_HANDLER( gakusai_eeprom_w )
@@ -1279,13 +1279,13 @@ static WRITE16_DEVICE_HANDLER( gakusai_eeprom_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x01);
+		eeprom_write_bit(device, data & 0x01);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -1367,10 +1367,10 @@ ADDRESS_MAP_END
 static READ16_DEVICE_HANDLER( dokyusp_eeprom_r )
 {
 	// clock line asserted: write latch or select next bit to read
-	eepromdev_set_clock_line(device, CLEAR_LINE);
-	eepromdev_set_clock_line(device, ASSERT_LINE);
+	eeprom_set_clock_line(device, CLEAR_LINE);
+	eeprom_set_clock_line(device, ASSERT_LINE);
 
-	return eepromdev_read_bit(device) & 1;
+	return eeprom_read_bit(device) & 1;
 }
 
 static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
@@ -1378,11 +1378,11 @@ static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x01);
+		eeprom_write_bit(device, data & 0x01);
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, CLEAR_LINE);
-		eepromdev_set_clock_line(device, ASSERT_LINE);
+		eeprom_set_clock_line(device, CLEAR_LINE);
+		eeprom_set_clock_line(device, ASSERT_LINE);
 	}
 }
 
@@ -1391,7 +1391,7 @@ static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_reset_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

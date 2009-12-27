@@ -345,7 +345,7 @@ static READ8_HANDLER( sysreg_r )
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (eepromdev_read_bit(eeprom) << 1);
+			UINT32 eeprom_bit = (eeprom_read_bit(eeprom) << 1);
 			UINT32 adc_bit = (adc1038_do_read(adc1038) << 2);
 			return (eeprom_bit | adc_bit);
 		}
@@ -373,9 +373,9 @@ static WRITE8_HANDLER( sysreg_w )
 			break;
 
 		case 3:
-			eepromdev_write_bit(eeprom, (data & 0x01) ? 1 : 0);
-			eepromdev_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eepromdev_set_cs_line(eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom_write_bit(eeprom, (data & 0x01) ? 1 : 0);
+			eeprom_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line(eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 4:

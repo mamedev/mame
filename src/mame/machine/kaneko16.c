@@ -1817,7 +1817,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 						UINT32 length, size;
 						UINT8 *dat;
 
-						dat = (UINT8 *)eepromdev_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
+						dat = (UINT8 *)eeprom_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
 
 						for (i=0;i<0x80;i++)
 						{
@@ -2167,7 +2167,7 @@ void calc3_mcu_run(running_machine *machine)
 				UINT32 length, size;
 				UINT8 *dat;
 
-				dat = (UINT8 *)eepromdev_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
+				dat = (UINT8 *)eeprom_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
 
 				for (i=0;i<0x80;i++)
 				{

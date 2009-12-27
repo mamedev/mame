@@ -465,7 +465,7 @@ static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 {
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine, gunnames[gdfs_lightgun_select])) | (eepromdev_read_bit(device) << 8);
+	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit(device) << 8);
 }
 
 static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
@@ -481,13 +481,13 @@ static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 //      data & 0x0001 ?
 
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x4000);
+		eeprom_write_bit(device, data & 0x4000);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
 		if (!(data_old & 0x0800) && (data & 0x0800))	// rising clock
 			gdfs_lightgun_select = (data & 0x0300) >> 8;

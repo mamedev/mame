@@ -134,7 +134,7 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( simpl156_inputs_read )
 {
-	int eep = eepromdev_read_bit(devtag_get_device(space->machine, "eeprom"));
+	int eep = eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
 	UINT32 returndata;
 
 	returndata = input_port_read(space->machine, "IN0") ^ 0xffff0000;
@@ -182,9 +182,9 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 	okim6295_set_bank_base(devtag_get_device(space->machine, "okimusic"), 0x40000 * (data & 0x7) );
 
-	eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	eepromdev_write_bit(device, data & 0x10);
-	eepromdev_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(device, data & 0x10);
+	eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

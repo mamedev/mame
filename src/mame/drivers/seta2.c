@@ -602,14 +602,14 @@ ADDRESS_MAP_END
 
 static READ16_DEVICE_HANDLER( gundamex_eeprom_r )
 {
-	return ((eepromdev_read_bit(device) & 1)) << 3;
+	return ((eeprom_read_bit(device) & 1)) << 3;
 }
 
 static WRITE16_DEVICE_HANDLER( gundamex_eeprom_w )
 {
-		eepromdev_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_write_bit(device, data & 0x1);
-		eepromdev_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x1);
+		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )

@@ -136,9 +136,9 @@ static UINT32 btc_trackball_data[ 4 ];
 
 static WRITE32_DEVICE_HANDLER( eeprom_w )
 {
-	eepromdev_write_bit(device, (data&0x01) ? 1 : 0);
-	eepromdev_set_clock_line(device, (data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-	eepromdev_set_cs_line(device, (data&0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_write_bit(device, (data&0x01) ? 1 : 0);
+	eeprom_set_clock_line(device, (data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line(device, (data&0x02) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( mb89371_w )
@@ -380,7 +380,7 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE( "eeprom", eepromdev_read_bit )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE( "eeprom", eeprom_read_bit )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )

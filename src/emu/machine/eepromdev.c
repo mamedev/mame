@@ -99,7 +99,7 @@ static int eeprom_command_match(const char *buf, const char *cmd, int len)
 }
 
 
-const eeprom_interface eepromdev_interface_93C46 =
+const eeprom_interface eeprom_interface_93C46 =
 {
 	6,				// address bits 6
 	16,				// data bits    16
@@ -113,7 +113,7 @@ const eeprom_interface eepromdev_interface_93C46 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-const eeprom_interface eepromdev_interface_93C66B =
+const eeprom_interface eeprom_interface_93C66B =
 {
 	8,				/* address bits */
 	16,				/* data bits */
@@ -244,7 +244,7 @@ static void eeprom_reset(eeprom_state *eestate)
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( eepromdev_write_bit )
+WRITE_LINE_DEVICE_HANDLER( eeprom_write_bit )
 {
 	eeprom_state *eestate = get_safe_token(device);
 
@@ -252,7 +252,7 @@ WRITE_LINE_DEVICE_HANDLER( eepromdev_write_bit )
 	eestate->latch = state;
 }
 
-READ_LINE_DEVICE_HANDLER( eepromdev_read_bit )
+READ_LINE_DEVICE_HANDLER( eeprom_read_bit )
 {
 	eeprom_state *eestate = get_safe_token(device);
 	int res;
@@ -276,7 +276,7 @@ READ_LINE_DEVICE_HANDLER( eepromdev_read_bit )
 	return res;
 }
 
-WRITE_LINE_DEVICE_HANDLER( eepromdev_set_cs_line )
+WRITE_LINE_DEVICE_HANDLER( eeprom_set_cs_line )
 {
 	eeprom_state *eestate = get_safe_token(device);
 
@@ -287,7 +287,7 @@ WRITE_LINE_DEVICE_HANDLER( eepromdev_set_cs_line )
 		eeprom_reset(eestate);
 }
 
-WRITE_LINE_DEVICE_HANDLER( eepromdev_set_clock_line )
+WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line )
 {
 	eeprom_state *eestate = get_safe_token(device);
 
@@ -320,7 +320,7 @@ logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read
 }
 
 
-void eepromdev_set_data(const device_config *device, const UINT8 *data, int length)
+void eeprom_set_data(const device_config *device, const UINT8 *data, int length)
 {
 	eeprom_state *eestate = get_safe_token(device);
 
@@ -338,7 +338,7 @@ void eepromdev_set_data(const device_config *device, const UINT8 *data, int leng
 }
 }
 
-void *eepromdev_get_data_pointer(const device_config *device, UINT32 *length, UINT32 *size)
+void *eeprom_get_data_pointer(const device_config *device, UINT32 *length, UINT32 *size)
 {
 	eeprom_state *eestate = get_safe_token(device);
 

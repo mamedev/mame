@@ -108,13 +108,13 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 			lordgun_update_gun(device->machine, i);
 
 	// latch the bit
-	eepromdev_write_bit(eeprom, data & 0x40);
+	eeprom_write_bit(eeprom, data & 0x40);
 
 	// reset line asserted: reset.
-	eepromdev_set_cs_line(eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_cs_line(eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	eepromdev_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	lordgun_whitescreen = data & 0x80;
 
@@ -318,7 +318,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )

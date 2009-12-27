@@ -547,7 +547,7 @@ static READ16_HANDLER( galgames_eeprom_r )
 {
 	const device_config *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
 
-	return eepromdev_read_bit(eeprom) ? 0x80 : 0x00;
+	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
 }
 
 static WRITE16_HANDLER( galgames_eeprom_w )
@@ -560,10 +560,10 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 		const device_config *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
 
 		// latch the bit
-		eepromdev_write_bit(eeprom, data & 0x0001);
+		eeprom_write_bit(eeprom, data & 0x0001);
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(eeprom, (data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(eeprom, (data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -633,7 +633,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		{
 			case 0x07:		// 7 resets the eeprom
 				for (i = 0; i < 5; i++)
-					eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[i]), ASSERT_LINE);
+					eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[i]), ASSERT_LINE);
 				break;
 
 			case 0x00:
@@ -641,12 +641,12 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			case 0x02:
 			case 0x03:
 			case 0x04:
-				eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
+				eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
 				galgames_update_rombank(space->machine, data & 0xff);
 				break;
 
 			default:
-				eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[0]), CLEAR_LINE);
+				eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[0]), CLEAR_LINE);
 				galgames_update_rombank(space->machine, 0);
 				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(space->cpu), data);
 				break;

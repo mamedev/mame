@@ -337,9 +337,9 @@ if (data & 4)
 	popmessage("OBPRI SET!");
 
 				device = devtag_get_device(space->machine, "eeprom");
-				eepromdev_write_bit(device, data & 0x40);
-				eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eepromdev_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_write_bit(device, data & 0x40);
+				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			default:
@@ -362,7 +362,7 @@ static READ16_HANDLER( othunder_tc0220ioc_r )
 	{
 		case 0x03:
 			device = devtag_get_device(space->machine, "eeprom");
-			return (eepromdev_read_bit(device) & 1) << 7;
+			return (eeprom_read_bit(device) & 1) << 7;
 
 		default:
 			device = devtag_get_device(space->machine, "tc0220ioc");

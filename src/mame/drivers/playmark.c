@@ -97,9 +97,9 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 		coin_counter_w(space->machine, 3,data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		eepromdev_set_cs_line(eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		eepromdev_write_bit(eeprom, data & 0x80);
-		eepromdev_set_clock_line(eeprom, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(eeprom, data & 0x80);
+		eeprom_set_clock_line(eeprom, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -110,9 +110,9 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 		coin_counter_w(space->machine, 0,data & 0x20);
 
-		eepromdev_set_cs_line(eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		eepromdev_write_bit(eeprom, data & 4);
-		eepromdev_set_clock_line(eeprom, (data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_cs_line(eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(eeprom, data & 4);
+		eeprom_set_clock_line(eeprom, (data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -439,7 +439,7 @@ static INPUT_PORTS_START( wbeachvl )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_LOW)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* ?? see code at 746a. sound status? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM data */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -605,7 +605,7 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM data */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )

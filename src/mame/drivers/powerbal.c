@@ -46,9 +46,9 @@ static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
 	{
 		coin_counter_w(device->machine, 0,data & 0x20);
 
-		eepromdev_set_cs_line(device, (data & 8) ? CLEAR_LINE : ASSERT_LINE);
-		eepromdev_write_bit(device, data & 2);
-		eepromdev_set_clock_line(device, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(device, (data & 8) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(device, data & 2);
+		eeprom_set_clock_line(device, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -224,7 +224,7 @@ static INPUT_PORTS_START( magicstk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( hotminda )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )

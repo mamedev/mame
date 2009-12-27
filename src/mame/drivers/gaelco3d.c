@@ -271,7 +271,7 @@ static WRITE16_HANDLER( irq_ack_w )
 static READ16_DEVICE_HANDLER( eeprom_data_r )
 {
 	UINT16 result = 0xffff;
-	if (eepromdev_read_bit(device))
+	if (eeprom_read_bit(device))
 		result ^= 0x0004;
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
@@ -282,21 +282,21 @@ static READ16_DEVICE_HANDLER( eeprom_data_r )
 static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eepromdev_write_bit(device, data & 0x01);
+		eeprom_write_bit(device, data & 0x01);
 }
 
 
 static WRITE16_DEVICE_HANDLER( eeprom_clock_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE16_DEVICE_HANDLER( eeprom_cs_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

@@ -895,9 +895,9 @@ static WRITE32_DEVICE_HANDLER( eeprom_w )
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);
-		eepromdev_write_bit(device, (data & 0x800000) ? 1 : 0);
-		eepromdev_set_clock_line(device, (data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_set_cs_line(device, (data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(device, (data & 0x800000) ? 1 : 0);
+		eeprom_set_clock_line(device, (data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_cs_line(device, (data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// oki banking
@@ -1123,9 +1123,9 @@ static void irqhandler(const device_config *device, int state)
 
 static WRITE32_DEVICE_HANDLER(sys386f2_eeprom_w)
 {
-	eepromdev_write_bit(device, (data & 0x80) ? 1 : 0);
-	eepromdev_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	eepromdev_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_write_bit(device, (data & 0x80) ? 1 : 0);
+	eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static const ymf271_interface ymf271_config =
@@ -1213,7 +1213,7 @@ static INPUT_PORTS_START( spi_2button )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000004, IP_ACTIVE_LOW) /* Test Button */
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x000000b0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1265,7 +1265,7 @@ static INPUT_PORTS_START( seibu386_2button )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1414,7 +1414,7 @@ static INPUT_PORTS_START( spi_ejsakura )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END

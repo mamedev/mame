@@ -748,7 +748,7 @@ static READ32_HANDLER( pxa255_gpio_r )
 	{
 		case PXA255_GPLR0:
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs.gplr0 | (1 << 1), mem_mask );
-			return gpio_regs.gplr0 | (1 << 1) | (eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 5); // Must be on.  Probably a DIP switch.
+			return gpio_regs.gplr0 | (1 << 1) | (eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 5); // Must be on.  Probably a DIP switch.
 		case PXA255_GPLR1:
 			verboselog( space->machine, 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs.gplr1, mem_mask );
 			return 0xff9fffff;
@@ -869,15 +869,15 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 			device = devtag_get_device(space->machine, "eeprom");
 			if(data & 0x00000004)
 			{
-				eepromdev_set_cs_line(device, CLEAR_LINE);
+				eeprom_set_cs_line(device, CLEAR_LINE);
 			}
 			if(data & 0x00000008)
 			{
-				eepromdev_set_clock_line(device, ASSERT_LINE);
+				eeprom_set_clock_line(device, ASSERT_LINE);
 			}
 			if(data & 0x00000010)
 			{
-				eepromdev_write_bit(device, 1);
+				eeprom_write_bit(device, 1);
 			}
 			break;
 		case PXA255_GPSR1:
@@ -894,15 +894,15 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 			device = devtag_get_device(space->machine, "eeprom");
 			if(data & 0x00000004)
 			{
-				eepromdev_set_cs_line(device, ASSERT_LINE);
+				eeprom_set_cs_line(device, ASSERT_LINE);
 			}
 			if(data & 0x00000008)
 			{
-				eepromdev_set_clock_line(device, CLEAR_LINE);
+				eeprom_set_clock_line(device, CLEAR_LINE);
 			}
 			if(data & 0x00000010)
 			{
-				eepromdev_write_bit(device, 0);
+				eeprom_write_bit(device, 0);
 			}
 			break;
 		case PXA255_GPCR1:

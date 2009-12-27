@@ -228,7 +228,7 @@ static READ32_DEVICE_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
 	int backfire_screen = mame_rand(device->machine) & 1;
-	return ((eepromdev_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
+	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
 			| ((input_port_read(device->machine, "IN2") & 0xbf) << 16)
 			| ((input_port_read(device->machine, "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
@@ -236,14 +236,14 @@ static READ32_DEVICE_HANDLER(backfire_eeprom_r)
 static READ32_HANDLER(backfire_control2_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
-	return (eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 24) | input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN1") << 16);
+	return (eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 24) | input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN1") << 16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
-	return (eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 24) | input_port_read(space->machine, "IN2") | (input_port_read(space->machine, "IN2") << 16);
+	return (eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 24) | input_port_read(space->machine, "IN2") | (input_port_read(space->machine, "IN2") << 16);
 }
 #endif
 
@@ -252,9 +252,9 @@ static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 {
 	logerror("%s:write eprom %08x (%08x) %08x\n",cpuexec_describe_context(device->machine),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7) {
-		eepromdev_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_write_bit(device, data & 0x1);
-		eepromdev_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x1);
+		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

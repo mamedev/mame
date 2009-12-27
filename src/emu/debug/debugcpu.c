@@ -2642,7 +2642,7 @@ static UINT64 expression_read_eeprom(const device_config *device, offs_t address
 	void *base;
 
 	/* make sure we get a valid base before proceeding */
-	base = eepromdev_get_data_pointer(device, &eelength, &eesize);
+	base = eeprom_get_data_pointer(device, &eelength, &eesize);
 	if (base != NULL && address < eelength)
 	{
 		/* switch off the size */
@@ -2853,7 +2853,7 @@ static void expression_write_eeprom(const device_config *device, offs_t address,
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	UINT32 eelength, eesize;
-	void *vbase = eepromdev_get_data_pointer(device, &eelength, &eesize);
+	void *vbase = eeprom_get_data_pointer(device, &eelength, &eesize);
 
 	/* make sure we get a valid base before proceeding */
 	if (vbase != NULL && address < eelength)

@@ -1179,7 +1179,7 @@ static READ64_DEVICE_HANDLER( eeprom_93c46a_r )
 	int res;
 
 	/* bit 3 is EEPROM data */
-	res = eepromdev_read_bit(device) << 4;
+	res = eeprom_read_bit(device) << 4;
 	return res;
 }
 
@@ -1188,9 +1188,9 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
 	/* bit 4 is data */
 	/* bit 2 is clock */
 	/* bit 5 is cs */
-	eepromdev_write_bit(device, data & 0x8);
-	eepromdev_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	eepromdev_set_clock_line(device, (data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(device, data & 0x8);
+	eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line(device, (data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Dreamcast MAP

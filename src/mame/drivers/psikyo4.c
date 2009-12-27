@@ -169,9 +169,9 @@ static WRITE32_DEVICE_HANDLER( ps4_eeprom_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		eepromdev_write_bit(device, (data & 0x00200000) ? 1 : 0);
-		eepromdev_set_cs_line(device, (data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
-		eepromdev_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, (data & 0x00200000) ? 1 : 0);
+		eeprom_set_cs_line(device, (data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( hotgmck )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START("SYSTEM")	/* system inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// Screen 1
@@ -598,7 +598,7 @@ static INPUT_PORTS_START( loderndf )
 	PORT_DIPSETTING(	      0x00000000, "Japan (Shows Version Number)" )
 	PORT_DIPSETTING(	      0x00010000, "World (Does Not Show Version Number)" )
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 INPUT_PORTS_END
 
 /* unused inputs also act as duplicate buttons */
@@ -681,7 +681,7 @@ static INPUT_PORTS_START( hotdebut )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 INPUT_PORTS_END
 
 

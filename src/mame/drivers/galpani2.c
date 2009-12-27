@@ -37,7 +37,7 @@ To Do:
 static UINT16 eeprom_word;
 static READ16_DEVICE_HANDLER(galpani2_eeprom_r)
 {
-	return (eeprom_word & ~1) | (eepromdev_read_bit(device) & 1);
+	return (eeprom_word & ~1) | (eeprom_read_bit(device) & 1);
 }
 
 static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
@@ -46,13 +46,13 @@ static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x02);
+		eeprom_write_bit(device, data & 0x02);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

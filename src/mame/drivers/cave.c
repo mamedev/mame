@@ -292,13 +292,13 @@ static WRITE16_DEVICE_HANDLER( cave_eeprom_msb_w )
 		coin_counter_w(device->machine, 0, data & 0x1000);
 
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x0800);
+		eeprom_write_bit(device, data & 0x0800);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -313,13 +313,13 @@ static WRITE16_DEVICE_HANDLER( hotdogst_eeprom_msb_w )
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x0800);
+		eeprom_write_bit(device, data & 0x0800);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		eeprom_set_clock_line(device, (data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 
@@ -336,13 +336,13 @@ static WRITE16_DEVICE_HANDLER( cave_eeprom_lsb_w )
 		coin_counter_w(device->machine, 0, data & 0x0001);
 
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x80);
+		eeprom_write_bit(device, data & 0x80);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -371,13 +371,13 @@ static WRITE16_DEVICE_HANDLER( metmqstr_eeprom_msb_w )
 		if (~data & 0x0100)
 		{
 			// latch the bit
-			eepromdev_write_bit(device, data & 0x0800);
+			eeprom_write_bit(device, data & 0x0800);
 
 			// reset line asserted: reset.
-			eepromdev_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+			eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
 
 			// clock line asserted: write latch or select next bit to read
-			eepromdev_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
+			eeprom_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
 		}
 	}
 }
@@ -672,13 +672,13 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 		hopper = data & 0x0100;	// ???
 
 		// latch the bit
-		eepromdev_write_bit(device, data & 0x4000);
+		eeprom_write_bit(device, data & 0x4000);
 
 		// reset line asserted: reset.
-		eepromdev_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -773,7 +773,7 @@ ADDRESS_MAP_END
 
 static READ16_DEVICE_HANDLER( pwrinst2_eeprom_r )
 {
-	return ~8 + ((eepromdev_read_bit(device) & 1) ? 8 : 0);
+	return ~8 + ((eeprom_read_bit(device) & 1) ? 8 : 0);
 }
 
 INLINE void vctrl_w(UINT16 *VCTRL, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
@@ -1171,7 +1171,7 @@ static INPUT_PORTS_START( cave )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1347,7 +1347,7 @@ static INPUT_PORTS_START( guwange )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1391,7 +1391,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1623,7 +1623,7 @@ static MACHINE_RESET( cave )
 	/* modify the eeprom on a reset with the desired region for the games that have the
        region factory set in eeprom */
 	if (cave_region_byte >= 0)
-		((UINT8 *)eepromdev_get_data_pointer(devtag_get_device(machine, "eeprom"),NULL,NULL))[cave_region_byte] =  input_port_read(machine, "EEPROM");
+		((UINT8 *)eeprom_get_data_pointer(devtag_get_device(machine, "eeprom"),NULL,NULL))[cave_region_byte] =  input_port_read(machine, "EEPROM");
 }
 
 static const ymz280b_interface ymz280b_intf =

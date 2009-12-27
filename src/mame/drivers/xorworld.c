@@ -57,19 +57,19 @@ extern VIDEO_UPDATE( xorworld );
 static WRITE16_DEVICE_HANDLER( eeprom_chip_select_w )
 {
 	/* bit 0 is CS (active low) */
-	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_serial_clock_w )
 {
 	/* bit 0 is SK (active high) */
-	eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	/* bit 0 is EEPROM data (DIN) */
-	eepromdev_write_bit(device, data & 0x01);
+	eeprom_write_bit(device, data & 0x01);
 }
 
 
@@ -105,7 +105,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )

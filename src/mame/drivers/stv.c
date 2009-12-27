@@ -474,7 +474,7 @@ static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
 		return_data = input_port_read(space->machine, "DSW1");
 
 	if (offset == 0x77)//PDR2 read
-		return_data=  (0xfe | eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")));
+		return_data=  (0xfe | eeprom_read_bit(devtag_get_device(space->machine, "eeprom")));
 
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read(machine, "FAKE");
@@ -499,9 +499,9 @@ static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 	if(offset == 0x75)
 	{
 		const device_config *device = devtag_get_device(space->machine, "eeprom");
-		eepromdev_set_clock_line(device, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_write_bit(device, data & 0x10);
-		eepromdev_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x10);
+		eeprom_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 
 //      if (data & 0x01)
