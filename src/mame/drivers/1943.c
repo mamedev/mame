@@ -471,10 +471,10 @@ ROM_END
 static DRIVER_INIT( 1943 )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x1000);
-	memory_configure_bank(machine, "bank2", 0, 28, &ROM[0x11000], 0x1000);
-	memory_configure_bank(machine, "bank3", 0, 28, &ROM[0x12000], 0x1000);
-	memory_configure_bank(machine, "bank4", 0, 28, &ROM[0x13000], 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 29, &ROM[0x10000], 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 29, &ROM[0x11000], 0x1000);
+	memory_configure_bank(machine, "bank3", 0, 29, &ROM[0x12000], 0x1000);
+	memory_configure_bank(machine, "bank4", 0, 29, &ROM[0x13000], 0x1000);
 }
 
 /* Game Drivers */
