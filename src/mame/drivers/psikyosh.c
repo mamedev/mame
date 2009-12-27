@@ -272,21 +272,12 @@ Notes:
 #include "driver.h"
 
 #include "cpu/sh2/sh2.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/ymf278b.h"
 
 #include "includes/psikyosh.h"
 
 #define ROMTEST 1 /* Does necessary stuff to perform rom test, uses RAM as it doesn't dispose of GFX after decoding */
-
-static const UINT8 factory_eeprom[16]  = { 0x00,0x02,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00 };
-static const UINT8 daraku_eeprom[16]   = { 0x03,0x02,0x00,0x48,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 };
-static const UINT8 s1945iii_eeprom[16] = { 0x00,0x00,0x00,0x00,0x00,0x01,0x11,0x70,0x25,0x25,0x25,0x00,0x01,0x00,0x11,0xe0 };
-static const UINT8 dragnblz_eeprom[16] = { 0x00,0x01,0x11,0x70,0x25,0x25,0x25,0x00,0x01,0x00,0x11,0xe0,0x00,0x00,0x00,0x00 };
-static const UINT8 gnbarich_eeprom[16] = { 0x00,0x0f,0x42,0x40,0x08,0x0a,0x00,0x00,0x01,0x06,0x42,0x59,0x00,0x00,0x00,0x00 };
-static const UINT8 mjgtaste_eeprom[16] = { 0x00,0x00,0x00,0x01,0x01,0x00,0x01,0x01,0x00,0x00,0x00,0x04,0x00,0x00,0x00,0x00 };
-
-static int use_factory_eeprom;
 
 static const gfx_layout layout_16x16x4 =
 {
@@ -328,80 +319,13 @@ static const eeprom_interface eeprom_interface_93C56 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-static NVRAM_HANDLER(93C56)
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C56);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else	// these games want the eeprom all zeros by default
-		{
-			UINT32 length, size;
-			UINT8 *dat;
-
-			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
-			memset(dat, 0, length * size);
-
- 			if (use_factory_eeprom!=eeprom_0) /* Set the EEPROM to Factory Defaults for games needing them*/
- 			{
-				UINT8 eeprom_data[0x100];
-				int i;
-
-				for(i=0; i<0x100; i++) eeprom_data[i] = 0;
-
-				memcpy(eeprom_data, factory_eeprom, 0x10);
-
-  				if (use_factory_eeprom==eeprom_DARAKU) /* Daraku, replace top 10 bytes with defaults (different to other games) */
- 					memcpy(eeprom_data, daraku_eeprom, 0x10);
-
-				if (use_factory_eeprom==eeprom_S1945III) /* S1945iii suffers from corruption on highscore unless properly initialised at the end of the eeprom */
- 					memcpy(eeprom_data+0xf0, s1945iii_eeprom, 0x10);
-
- 				if (use_factory_eeprom==eeprom_DRAGNBLZ) /* Dragnblz too */
- 					memcpy(eeprom_data+0xf0, dragnblz_eeprom, 0x10);
-
- 				if (use_factory_eeprom==eeprom_GNBARICH) /* Might as well do Gnbarich as well, otherwise the highscore is incorrect */
- 					memcpy(eeprom_data+0xf0, gnbarich_eeprom, 0x10);
-
-				if (use_factory_eeprom==eeprom_USER1) /* load a default eeprom for TGM2 / TGM2+ as it requires more data initalized */
-					memcpy(eeprom_data, memory_region(machine, "user1"), 0x100);
-
- 				if (use_factory_eeprom==eeprom_MJGTASTE) /* We don't emulate the Mahjong panel yet, so default it to joystick */
-				{
- 					memcpy(eeprom_data+0x00, mjgtaste_eeprom, 0x10);
-					memcpy(eeprom_data+0xf0, mjgtaste_eeprom, 0x10);
-				}
-
-
-
-				eeprom_set_data(eeprom_data,0x100);
-			}
-			else if (memory_region(machine,"user1")) /* if there is an eeprom in the romdef, use that */
- 			{
-				UINT8 eeprom_data[0x100];
- 				printf("user1\n");
- 				memcpy(eeprom_data, memory_region(machine,"user1"), 0x100);
- 				eeprom_set_data(eeprom_data,0x100);
-
-			}
-		}
-	}
-}
-
-static WRITE32_HANDLER( psh_eeprom_w )
+static WRITE32_DEVICE_HANDLER( psh_eeprom_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		eeprom_write_bit((data & 0x20000000) ? 1 : 0);
-		eeprom_set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, (data & 0x20000000) ? 1 : 0);
+		eepromdev_set_cs_line(device, (data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -409,11 +333,11 @@ static WRITE32_HANDLER( psh_eeprom_w )
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-static READ32_HANDLER( psh_eeprom_r )
+static READ32_DEVICE_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return input_port_read(space->machine, "JP4");
+		return input_port_read(device->machine, "JP4");
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -487,7 +411,7 @@ static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x05800004, 0x05800007) AM_READWRITE(psh_eeprom_r, psh_eeprom_w)
+	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram) // main RAM (1 meg)
 
 #if ROMTEST
@@ -500,7 +424,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4") AM_WRITE(psh_eeprom_w)
+	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4") AM_DEVWRITE("eeprom", psh_eeprom_w)
 	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -570,7 +494,7 @@ static INPUT_PORTS_START( s1945ii )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( soldivid )
@@ -580,7 +504,7 @@ static INPUT_PORTS_START( soldivid )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daraku )
@@ -598,7 +522,7 @@ static INPUT_PORTS_START( daraku )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) ) /* Title screen is different, English is default now */
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbomberb )
@@ -613,7 +537,7 @@ static INPUT_PORTS_START( sbomberb )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunbird2 ) /* Different Region */
@@ -625,7 +549,7 @@ static INPUT_PORTS_START( gunbird2 ) /* Different Region */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, "International Ver A." )
 	PORT_DIPSETTING(          0x02000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945iii ) /* Different Region again */
@@ -637,7 +561,7 @@ static INPUT_PORTS_START( s1945iii ) /* Different Region again */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x02000000, "International Ver A." )
 	PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
@@ -653,7 +577,7 @@ static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x02000000, "International Ver A." )
 	PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button */
@@ -665,7 +589,7 @@ static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button 
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x02000000, "International Ver A." )
 	PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tgm2 )
@@ -676,7 +600,7 @@ static INPUT_PORTS_START( tgm2 )
 //  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(          0x02000000, "International Ver A." )
 //  PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
@@ -687,7 +611,7 @@ static INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
 //  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(          0x02000000, "International Ver A." )
 //  PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 INPUT_PORTS_END
 
 
@@ -730,7 +654,8 @@ static MACHINE_DRIVER_START( psikyo3v1 )
 
 	MDRV_MACHINE_START(psikyosh)
 
-	MDRV_NVRAM_HANDLER(93C56)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C56)
+	MDRV_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM ) /* If using alpha */
@@ -819,6 +744,9 @@ ROM_START( s1945ii )
 	ROM_RELOAD ( 0x400000, 0x400000 )
 	/* 0x400000 - 0x7fffff allocated but left blank, it randomly reads from here on the
         Iron Casket level causing a crash otherwise, not sure why, bug in the sound emulation? */
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-s1945ii.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
 ROM_END
 
 ROM_START( daraku )
@@ -846,6 +774,9 @@ ROM_START( daraku )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(ef2c781d) SHA1(1313f082f6dbe4da0efaf261226085eb7325667f) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-daraku.bin", 0x0000, 0x0100, CRC(a9715297) SHA1(fcd32b936e0d05bad4ba4969ddec24aae7768cea) )
 ROM_END
 
 ROM_START( sbomberb )
@@ -867,6 +798,9 @@ ROM_START( sbomberb )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(85cbff69) SHA1(34c7f4d337111de2064f84214294b6bdc37bf16c) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-sbomberb.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
 ROM_END
 
 /* PS5 */
@@ -889,6 +823,9 @@ ROM_START( gunbird2 )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "sound.u9", 0x000000, 0x400000, CRC(f19796ab) SHA1(b978f0550ebd675e8ce9d9edcfcc3f6214e49e8b) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-gunbird2.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
 ROM_END
 
 ROM_START( s1945iii )
@@ -910,6 +847,9 @@ ROM_START( s1945iii )
 	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "sound.u9", 0x000000, 0x400000, CRC(c5374beb) SHA1(d13e12cbd249246d953c45bb3bfa576a0ec75595) )
 	ROM_RELOAD ( 0x400000, 0x400000 )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-s1945iii.bin", 0x0000, 0x0100, CRC(b39f3604) SHA1(d7c66210598096fcafb20adac2f0b293755f4926) )
 ROM_END
 
 /* PS5v2 */
@@ -943,6 +883,9 @@ ROM_START( dragnblz )
 
 	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7fd1b225) SHA1(6aa61021ada51393bbb34fd1aea00b8feccc8197) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-dragnblz.bin", 0x0000, 0x0100, CRC(70a8a3a6) SHA1(80ded1fce090b87b8c8b56f4fb74ef4e751b51d2) )
 ROM_END
 
 /*
@@ -984,6 +927,9 @@ ROM_START( gnbarich )
 
 	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7b10436b) SHA1(c731fcce024e286a677ca10a91761c1ee06094a5) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-gnbarich.bin", 0x0000, 0x0100, CRC(0f5bf42f) SHA1(ad9d724327a2321f8ae256002d847213e6486b7b) )
 ROM_END
 
 ROM_START( mjgtaste )
@@ -1015,6 +961,9 @@ ROM_START( mjgtaste )
 
 	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x400000, CRC(0179f018) SHA1(16ae63e021230356777342ed902e02407a1a1b82) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-mjgtaste.bin", 0x0000, 0x0100, CRC(ce898661) SHA1(00c02de89f5d185905fffd1268ace84fe8b522ec) )
 ROM_END
 
 ROM_START( tgm2 )
@@ -1044,7 +993,7 @@ ROM_START( tgm2 )
 	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "97ts_snd.u52", 0x000000, 0x400000, CRC(9155eca6) SHA1(f0b4f68462d8a465c39815d3b7fd9818788132ae) )
 
-	ROM_REGION( 0x100, "user1", 0 ) /* Default Eeprom (contains scores etc.) */
+	ROM_REGION( 0x100, "eeprom", 0 ) /* Default Eeprom (contains scores etc.) */
 	// might need byteswapping to reprogram actual chip
 	ROM_LOAD( "tgm2.default.nv", 0x000, 0x100, CRC(50e2348c) SHA1(d17d2739c97a1d93a95dcc9f11feb1f6f228729e) )
 ROM_END
@@ -1076,7 +1025,7 @@ ROM_START( tgm2p )
 	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "97ts_snd.u52", 0x000000, 0x400000, CRC(9155eca6) SHA1(f0b4f68462d8a465c39815d3b7fd9818788132ae) )
 
-	ROM_REGION( 0x100, "user1", 0 ) /* Default Eeprom (contains scores etc.) */
+	ROM_REGION( 0x100, "eeprom", 0 ) /* Default Eeprom (contains scores etc.) */
 	// might need byteswapping to reprogram actual chip
 	ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
@@ -1085,13 +1034,11 @@ ROM_END
 static DRIVER_INIT( soldivid )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( daraku )
@@ -1099,13 +1046,11 @@ static DRIVER_INIT( daraku )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( gunbird2 )
@@ -1113,7 +1058,6 @@ static DRIVER_INIT( gunbird2 )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( s1945iii )
@@ -1121,31 +1065,26 @@ static DRIVER_INIT( s1945iii )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( tgm2 )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_USER1;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom = eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }
 
