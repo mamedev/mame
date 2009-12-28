@@ -195,6 +195,14 @@ int main(int argc, char *argv[])
 		{
 			int spaces = 4 - col % 4;
 
+			/* Remove invisible spaces */
+			while ((spaces & 3) != 0 && dst > 0 && modified[dst-1] == ' ')
+			{
+				removed_spaces++;
+				spaces++;
+				col--;
+				dst--;
+			}
 			col += spaces;
 
 			/* if inside a comment, expand it */
