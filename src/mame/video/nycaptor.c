@@ -180,8 +180,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				        pal,
 				        flipx,flipy,
 					      sx,sy,15);
-					}
-				}
+			}
 		}
 	}
 }
