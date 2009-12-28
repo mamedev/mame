@@ -1,11 +1,11 @@
 /***************************************************************************
 
-    mips3.h
+    rsp.h
 
     Interface file for the universal machine language-based
     Reality Signal Processor (RSP) emulator.
 
-    Copyright the MESS etam
+    Copyright the MESS team
     Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -113,10 +113,10 @@ void rspdrc_add_dmem(const device_config *device, void *base);
 #define FSREG			((op >> 11) & 31)
 #define FDREG			((op >> 6) & 31)
 
-#define IS_SINGLE(o)	(((o) & (1 << 21)) == 0)
-#define IS_DOUBLE(o)	(((o) & (1 << 21)) != 0)
+#define IS_SINGLE(o) 	(((o) & (1 << 21)) == 0)
+#define IS_DOUBLE(o) 	(((o) & (1 << 21)) != 0)
 #define IS_FLOAT(o) 	(((o) & (1 << 23)) == 0)
-#define IS_INTEGRAL(o)	(((o) & (1 << 23)) != 0)
+#define IS_INTEGRAL(o) 	(((o) & (1 << 23)) != 0)
 
 #define SIMMVAL			((INT16)op)
 #define UIMMVAL			((UINT16)op)
@@ -164,6 +164,11 @@ typedef struct
 			INT16 mid;
 			INT16 high;
 		} h;
+		struct
+		{
+			INT32 zl;
+			INT32 mh;
+		} w;
 #else
 		struct
 		{
@@ -172,6 +177,11 @@ typedef struct
 			INT16 low;
 			INT16 z;
 		} h;
+		struct
+		{
+			INT32 mh;
+			INT32 zl;
+		} w;
 #endif
 	};
 } ACCUMULATOR;

@@ -2,8 +2,8 @@
 
     rspdrc.c
 
-    Universal machine language-based Nintendo/SGI RSP emulator.
-    Written by Harmony of the MESS team.
+	Universal machine language-based Nintendo/SGI RSP emulator.
+	Written by Harmony of the MESS team.
 
     Copyright the MESS team.
     Released for general non-commercial use under the MAME license
@@ -42,6 +42,30 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
 
+#define DRC_LSV							(1)
+#define DRC_LLV							(1)
+#define DRC_LDV							(1)
+#define DRC_LQV							(1)
+#define DRC_LPV							(1)
+#define DRC_LUV							(1)
+
+#define DRC_SSV							(1)
+#define DRC_SLV							(1)
+#define DRC_SDV							(1)
+#define DRC_SQV							(1)
+
+#define DRC_VMUDL						(0)
+#define DRC_VMUDM						(0)
+#define DRC_VMADM						(0)
+#define DRC_VMADN						(0)
+#define DRC_VMADH						(0)
+#define DRC_VADD						(0)
+#define DRC_VAND						(0)
+#define DRC_VNAND						(0)
+#define DRC_VOR							(0)
+#define DRC_VNOR						(0)
+#define DRC_VXOR						(0)
+#define DRC_VNXOR						(0)
 
 
 /***************************************************************************
@@ -74,6 +98,20 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 ***************************************************************************/
 
 #define R32(reg)				rsp->impstate->regmap[reg].type, rsp->impstate->regmap[reg].value
+#define VB(reg, el)				rsp->impstate->regmap[16*reg+(15-el)+34].type, rsp->impstate->regmap[16*reg+(15-el)+34].value
+#define VS(reg, el)				rsp->impstate->regmap[8*reg+(7-el)+546].type, rsp->impstate->regmap[8*reg+(7-el)+546].value
+#define VSX(reg, el)			rsp->impstate->regmap[8*reg+el+546].type, rsp->impstate->regmap[8*reg+el+546].value
+#define VL(reg, el)				rsp->impstate->regmap[4*reg+(3-el)+802].type, rsp->impstate->regmap[4*reg+(3-el)+802].value
+#define VLX(reg, el)			rsp->impstate->regmap[4*reg+el+802].type, rsp->impstate->regmap[4*reg+el+802].value
+#define VFLAG(reg)				rsp->impstate->regmap[930+reg].type, rsp->impstate->regmap[930+reg].value
+#define VACCUML(reg)			rsp->impstate->regmap[934+reg].type, rsp->impstate->regmap[934+reg].value
+#define VACCUMHH(reg)			rsp->impstate->regmap[942+reg].type, rsp->impstate->regmap[942+reg].value
+#define VACCUMHM(reg)			rsp->impstate->regmap[950+reg].type, rsp->impstate->regmap[950+reg].value
+#define VACCUMHL(reg)			rsp->impstate->regmap[958+reg].type, rsp->impstate->regmap[958+reg].value
+#define VACCUMHZ(reg)			rsp->impstate->regmap[966+reg].type, rsp->impstate->regmap[966+reg].value
+#define VACCUMWMH(reg)			rsp->impstate->regmap[974+reg].type, rsp->impstate->regmap[974+reg].value
+#define VACCUMWZL(reg)			rsp->impstate->regmap[982+reg].type, rsp->impstate->regmap[982+reg].value
+#define VRES(reg)				rsp->impstate->regmap[990+reg].type, rsp->impstate->regmap[990+reg].value
 
 
 
@@ -119,9 +157,11 @@ struct _rspimp_state
 	const char *		format;						/* format string for print_debug */
 	UINT32				arg0;						/* print_debug argument 1 */
 	UINT32				arg1;						/* print_debug argument 2 */
+	UINT64				arg64;						/* print_debug 64-bit argument */
+	UINT32				vres[8];					/* used for temporary vector results */
 
 	/* register mappings */
-	drcuml_parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
+	drcuml_parameter	regmap[998];				/* parameter to register mappings for all 32 integer registers, vector registers, flags, accumulators and temps */
 
 	/* subroutines */
 	drcuml_codehandle *	entry;						/* entry point */
@@ -153,16 +193,102 @@ static void cfunc_mfc2(void *param);
 static void cfunc_cfc2(void *param);
 static void cfunc_mtc2(void *param);
 static void cfunc_ctc2(void *param);
-static void cfunc_swc2(void *param);
-static void cfunc_lwc2(void *param);
-static void cfunc_handle_vector_ops(void *param);
+//static void cfunc_swc2(void *param);
+//static void cfunc_lwc2(void *param);
 static void cfunc_sp_set_status_cb(void *param);
+
+static void cfunc_rsp_lbv(void *param);
+#if !(DRC_LSV)
+static void cfunc_rsp_lsv(void *param);
+#endif
+#if !(DRC_LLV)
+static void cfunc_rsp_llv(void *param);
+#endif
+#if !(DRC_LDV)
+static void cfunc_rsp_ldv(void *param);
+#endif
+#if !(DRC_LQV)
+static void cfunc_rsp_lqv(void *param);
+#endif
+static void cfunc_rsp_lrv(void *param);
+#if !(DRC_LPV)
+static void cfunc_rsp_lpv(void *param);
+#endif
+#if !(DRC_LUV)
+static void cfunc_rsp_luv(void *param);
+#endif
+static void cfunc_rsp_lhv(void *param);
+static void cfunc_rsp_lfv(void *param);
+static void cfunc_rsp_lwv(void *param);
+static void cfunc_rsp_ltv(void *param);
+
+static void cfunc_rsp_sbv(void *param);
+#if !(DRC_SSV)
+static void cfunc_rsp_ssv(void *param);
+#endif
+#if !(DRC_SLV)
+static void cfunc_rsp_slv(void *param);
+#endif
+#if !(DRC_SDV)
+static void cfunc_rsp_sdv(void *param);
+#endif
+#if !(DRC_SQV)
+static void cfunc_rsp_sqv(void *param);
+#endif
+static void cfunc_rsp_srv(void *param);
+static void cfunc_rsp_spv(void *param);
+static void cfunc_rsp_suv(void *param);
+static void cfunc_rsp_shv(void *param);
+static void cfunc_rsp_sfv(void *param);
+static void cfunc_rsp_swv(void *param);
+static void cfunc_rsp_stv(void *param);
 
 static void static_generate_entry_point(rsp_state *rsp);
 static void static_generate_nocode_handler(rsp_state *rsp);
 static void static_generate_out_of_cycles(rsp_state *rsp);
 static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrite, const char *name, drcuml_codehandle **handleptr);
 
+#if (DRC_VMADN)
+static void generate_saturate_accum_unsigned(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int accum);
+#endif
+#if (DRC_VMADH) || (DRC_VMADM)
+static void generate_saturate_accum_signed(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int accum);
+#endif
+#if (DRC_VMUDL)
+static int generate_vmudl(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vmudl
+#endif
+#if (DRC_VMADM)
+static int generate_vmadm(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vmadm
+#endif
+#if (DRC_VMADN)
+static int generate_vmadn(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vmadn
+#endif
+#if (DRC_VMADH)
+static int generate_vmadh(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vmadh
+#endif
+#if (DRC_VADD)
+static int generate_vadd(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vadd
+#endif
+#if (DRC_VAND)
+static int generate_vand(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vand
+#endif
+#if (DRC_VNAND)
+static int generate_vnand(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vand
+#endif
+#if (DRC_VOR)
+static int generate_vor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vand
+#endif
+#if (DRC_VNOR)
+static int generate_vnor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vand
+#endif
+#if (DRC_VXOR)
+static int generate_vxor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vand
+#endif
+#if (DRC_VNXOR)
+static int generate_vnxor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	// vand
+#endif
+static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 static void generate_update_cycles(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception);
 static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
@@ -186,11 +312,13 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 
 #define R_VREG_B(reg, offset)		rsp->v[(reg)].b[15 - (offset)]
 #define R_VREG_S(reg, offset)		(INT16)rsp->v[(reg)].s[7 - (offset)]
+#define R_VREG_S_X(reg, offset)		(INT16)rsp->v[reg].s[offset]
 #define R_VREG_L(reg, offset)		rsp->v[(reg)].l[3 - (offset)]
 #define R_VREG_D(reg, offset)		rsp->v[(reg)].d[1 - (offset)]
 
 #define W_VREG_B(reg, offset, val)	(rsp->v[(reg)].b[15 - (offset)] = val)
 #define W_VREG_S(reg, offset, val)	(rsp->v[(reg)].s[7 - (offset)] = val)
+#define W_VREG_S_X(reg, offset, val) (rsp->v[reg].s[offset] = val)
 #define W_VREG_L(reg, offset, val)	(rsp->v[(reg)].l[3 - (offset)] = val)
 #define W_VREG_D(reg, offset, val)	(rsp->v[(reg)].d[1 - (offset)] = val)
 
@@ -418,14 +546,25 @@ void rspdrc_add_dmem(const device_config *device, void *base)
     debugging
 -------------------------------------------------*/
 
-#ifndef LSB_FIRST
 static void cfunc_printf_debug(void *param)
 {
 	rsp_state *rsp = (rsp_state *)param;
 	printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
 	logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
 }
-#endif
+
+
+/*-------------------------------------------------
+    cfunc_printf_debug64 - generic printf for
+    debugging 64-bit values
+-------------------------------------------------*/
+
+//static void cfunc_printf_debug64(void *param)
+//{
+//	rsp_state *rsp = (rsp_state *)param;
+//	printf(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
+//	logerror(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
+//}
 
 
 static void cfunc_get_cop0_reg(void *param)
@@ -472,6 +611,20 @@ static void cfunc_set_cop0_reg(void *param)
 	{
 		fatalerror("RSP: set_cop0_reg: %d, %08X\n", reg, data);
 	}
+}
+
+static void cfunc_unimplemented_opcode(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	if ((rsp->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	{
+		char string[200];
+		rsp_dasm_one(string, rsp->ppc, op);
+		mame_printf_debug("%08X: %s\n", rsp->ppc, string);
+	}
+
+	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", op >> 26, op, rsp->ppc);
 }
 
 static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
@@ -583,6 +736,7 @@ static CPU_INIT( rsp )
 	drccache *cache;
 	UINT32 flags = 0;
 	int regnum;
+	int elnum;
 
 	/* allocate enough space for the cache and the core */
 	cache = (drccache *)drccache_alloc(CACHE_SIZE + sizeof(*rsp));
@@ -632,6 +786,7 @@ static CPU_INIT( rsp )
 	}
 	drcuml_symbol_add(rsp->impstate->drcuml, &rsp->impstate->arg0, sizeof(rsp->impstate->arg0), "arg0");
 	drcuml_symbol_add(rsp->impstate->drcuml, &rsp->impstate->arg1, sizeof(rsp->impstate->arg1), "arg1");
+	drcuml_symbol_add(rsp->impstate->drcuml, &rsp->impstate->arg64, sizeof(rsp->impstate->arg1), "arg64");
 	drcuml_symbol_add(rsp->impstate->drcuml, &rsp->impstate->numcycles, sizeof(rsp->impstate->numcycles), "numcycles");
 
 	/* initialize the front-end helper */
@@ -646,6 +801,48 @@ static CPU_INIT( rsp )
 	{
 		rsp->impstate->regmap[regnum].type = (regnum == 0) ? DRCUML_PTYPE_IMMEDIATE : DRCUML_PTYPE_MEMORY;
 		rsp->impstate->regmap[regnum].value = (regnum == 0) ? 0 : (FPTR)&rsp->r[regnum];
+	}
+	for (regnum = 0; regnum < 32; regnum++)
+	{
+		for(elnum = 0; elnum < 16; elnum++)
+		{
+			rsp->impstate->regmap[16*regnum+elnum+34].type = DRCUML_PTYPE_MEMORY;
+			rsp->impstate->regmap[16*regnum+elnum+34].value = (FPTR)&rsp->v[regnum].b[15-elnum];
+		}
+		for(elnum = 0; elnum < 8; elnum++)
+		{
+			rsp->impstate->regmap[8*regnum+elnum+546].type = DRCUML_PTYPE_MEMORY;
+			rsp->impstate->regmap[8*regnum+elnum+546].value = (FPTR)&rsp->v[regnum].s[7-elnum];
+		}
+		for(elnum = 0; elnum < 4; elnum++)
+		{
+			rsp->impstate->regmap[4*regnum+elnum+802].type = DRCUML_PTYPE_MEMORY;
+			rsp->impstate->regmap[4*regnum+elnum+802].value = (FPTR)&rsp->v[regnum].l[3-elnum];
+		}
+	}
+	for (regnum = 0; regnum < 4; regnum++)
+	{
+		rsp->impstate->regmap[930+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[930+regnum].value = (FPTR)&rsp->flag[regnum];
+	}
+	for (regnum = 0; regnum < 8; regnum++)
+	{
+		rsp->impstate->regmap[934+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[934+regnum].value = (FPTR)&rsp->accum[regnum].l;
+		rsp->impstate->regmap[942+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[942+regnum].value = (FPTR)&rsp->accum[regnum].h.high;
+		rsp->impstate->regmap[950+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[950+regnum].value = (FPTR)&rsp->accum[regnum].h.mid;
+		rsp->impstate->regmap[958+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[958+regnum].value = (FPTR)&rsp->accum[regnum].h.low;
+		rsp->impstate->regmap[966+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[966+regnum].value = (FPTR)&rsp->accum[regnum].h.z;
+		rsp->impstate->regmap[974+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[974+regnum].value = (FPTR)&rsp->accum[regnum].w.mh;
+		rsp->impstate->regmap[982+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[982+regnum].value = (FPTR)&rsp->accum[regnum].w.zl;
+		rsp->impstate->regmap[990+regnum].type = DRCUML_PTYPE_MEMORY;
+		rsp->impstate->regmap[990+regnum].value = (FPTR)&rsp->impstate->vres[regnum];
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
@@ -669,17 +866,412 @@ static CPU_RESET( rsp )
 	rsp->nextpc = ~0;
 }
 
-static void cfunc_lwc2(void *param)
+
+static void cfunc_rsp_lbv(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
-	int i;
-	int end;
-	UINT32 ea;
+	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00000 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Load 1 byte to vector byte index
+
+	ea = (base) ? rsp->r[base] + offset : offset;
+	W_VREG_B(dest, index, READ8(rsp, ea));
+}
+
+#if !(DRC_LSV)
+static void cfunc_rsp_lsv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00001 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads 2 bytes starting from vector byte index
+
+	ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
+
+	W_VREG_S(dest, index >> 1, READ16(rsp, ea));
+}
+#endif
+
+#if !(DRC_LLV)
+static void cfunc_rsp_llv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00010 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads 4 bytes starting from vector byte index
+
+	ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
+
+	W_VREG_L(dest, index >> 2, READ32(rsp, ea));
+}
+#endif
+
+#if !(DRC_LDV)
+static void cfunc_rsp_ldv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00011 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads 8 bytes starting from vector byte index
+
+	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
+	index >>= 2;
+	W_VREG_L(dest, index, READ32(rsp, ea));
+	W_VREG_L(dest, index + 1, READ32(rsp, ea + 4));
+}
+#endif
+
+#if !(DRC_LQV)
+static void cfunc_rsp_lqv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	int end = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00100 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads up to 16 bytes starting from vector byte index
+
+	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	end = index + (16 - (ea & 0xf));
+	if (end > 16) end = 16;
+
+	for (i=index; i < end; i++)
+	{
+		W_VREG_B(dest, i, READ8(rsp, ea));
+		ea++;
+	}
+}
+#endif
+
+static void cfunc_rsp_lrv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	int end = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00101 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Stores up to 16 bytes starting from right side until 16-byte boundary
+
+	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	index = 16 - ((ea & 0xf) - index);
+	end = 16;
+	ea &= ~0xf;
+
+	for (i=index; i < end; i++)
+	{
+		W_VREG_B(dest, i, READ8(rsp, ea));
+		ea++;
+	}
+}
+
+#if !(DRC_LPV)
+static void cfunc_rsp_lpv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00110 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads a byte as the upper 8 bits of each element
+
+	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
+	for (i=0; i < 8; i++)
+	{
+		printf("%08x ", READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
+		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
+	}
+	printf("\n");
+}
+#endif
+
+#if !(DRC_LUV)
+static void cfunc_rsp_luv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 00111 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads a byte as the bits 14-7 of each element
+
+	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
+	for (i=0; i < 8; i++)
+	{
+		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
+	}
+}
+#endif
+
+static void cfunc_rsp_lhv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 01000 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads a byte as the bits 14-7 of each element, with 2-byte stride
+
+	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	for (i=0; i < 8; i++)
+	{
+		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7);
+	}
+}
+
+static void cfunc_rsp_lfv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	int end = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 01001 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
+
+	fatalerror("RSP: LFV\n");
+
+	if (index & 0x7)	fatalerror("RSP: LFV: index = %d at %08X\n", index, rsp->ppc);
+
+	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	// not sure what happens if 16-byte boundary is crossed...
+	if ((ea & 0xf) > 0)	fatalerror("RSP: LFV: 16-byte boundary crossing at %08X, recheck this!\n", rsp->ppc);
+
+	end = (index >> 1) + 4;
+
+	for (i=index >> 1; i < end; i++)
+	{
+		W_VREG_S(dest, i, READ8(rsp, ea) << 7);
+		ea += 4;
+	}
+}
+
+static void cfunc_rsp_lwv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	int end = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 01010 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
+	// after byte index 15
+
+	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	// not sure what happens if 16-byte boundary is crossed...
+	if ((ea & 0xf) > 0) fatalerror("RSP: LWV: 16-byte boundary crossing at %08X, recheck this!\n", rsp->ppc);
+
+	end = (16 - index) + 16;
+
+	for (i=(16 - index); i < end; i++)
+	{
+		W_VREG_B(dest, i & 0xf, READ8(rsp, ea));
+		ea += 4;
+	}
+}
+
+static void cfunc_rsp_ltv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int i = 0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+
+	// 31       25      20      15      10     6        0
+	// --------------------------------------------------
+	// | 110010 | BBBBB | TTTTT | 01011 | IIII | Offset |
+	// --------------------------------------------------
+	//
+	// Loads one element to maximum of 8 vectors, while incrementing element index
+
+	// FIXME: has a small problem with odd indices
+
+	int element;
+	int vs = dest;
+	int ve = dest + 8;
+	if (ve > 32)
+		ve = 32;
+
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	element = 7 - (index >> 1);
+
+	if (index & 1)	fatalerror("RSP: LTV: index = %d\n", index);
+
+	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	ea = ((ea + 8) & ~0xf) + (index & 1);
+	for (i=vs; i < ve; i++)
+	{
+		element = ((8 - (index >> 1) + (i-vs)) << 1);
+		W_VREG_B(i, (element & 0xf), READ8(rsp, ea));
+		W_VREG_B(i, ((element+1) & 0xf), READ8(rsp, ea+1));
+
+		ea += 2;
+	}
+}
+
+static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	int loopdest;
+	UINT32 op = desc->opptr.l[0];
+	int dest = (op >> 16) & 0x1f;
+	//int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	//int skip;
 	if (offset & 0x40)
 	{
 		offset |= 0xffffffc0;
@@ -688,260 +1280,282 @@ static void cfunc_lwc2(void *param)
 	switch ((op >> 11) & 0x1f)
 	{
 		case 0x00:		/* LBV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00000 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Load 1 byte to vector byte index
-
-			ea = (base) ? rsp->r[base] + offset : offset;
-			W_VREG_B(dest, index, READ8(rsp, ea));
-			break;
-		}
+			//UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lbv, rsp);
+			return TRUE;
 		case 0x01:		/* LSV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00001 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads 2 bytes starting from vector byte index
+#if (DRC_LSV)
+			offset <<= 1;
+			index >>= 1;
 
-			ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
-
-			W_VREG_S(dest, index >> 1, READ16(rsp, ea));
-			break;
-		}
+			index = 7 - index;
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD);			// load    i0,dmem,i0,word
+			UML_STORE(block, &rsp->v[dest].s[index], IMM(0), IREG(0), WORD);		// store   v[dest][index],i0,word
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lsv, rsp);
+			return TRUE;
+#endif
 		case 0x02:		/* LLV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00010 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads 4 bytes starting from vector byte index
-
-			ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
-
-			W_VREG_L(dest, index >> 2, READ32(rsp, ea));
-			break;
-		}
-		case 0x03:		/* LDV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00011 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads 8 bytes starting from vector byte index
-
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
-
+#if (DRC_LLV)
+			offset <<= 2;
 			index >>= 2;
-			W_VREG_L(dest, index, READ32(rsp, ea));
-			W_VREG_L(dest, index + 1, READ32(rsp, ea + 4));
-			break;
-		}
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
+			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest]index].i0
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_llv, rsp);
+			return TRUE;
+#endif
+		case 0x03:		/* LDV */
+#if (DRC_LDV)
+			offset <<= 3;
+			index >>= 2;
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
+			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest][index-1],i0
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_ADD(block, IREG(0), IREG(0), IMM(4));								// add     i0,i0,4
+			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
+			UML_MOV(block, VLX(dest, index+1), IREG(0));								// mov     v[dest][index],i0
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_ldv, rsp);
+			return TRUE;
+#endif
 		case 0x04:		/* LQV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00100 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads up to 16 bytes starting from vector byte index
+#if (DRC_LQV)
+			offset <<= 4;
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			UML_ADD(block, MEM(&rsp->impstate->arg0), R32(RSREG), IMM(offset));		// mov     arg0,<rsreg>,offset
+			UML_MOV(block, IREG(3), IMM(index));									// mov     i3,index
+			UML_MOV(block, IREG(2), MEM(&rsp->impstate->arg0));						// mov     i2,arg0
+			UML_AND(block, IREG(2), IREG(2), IMM(0x0000000f));						// and     i2,i2,0x0000000f
+			UML_SUB(block, IREG(2), IMM(16), IREG(2));								// sub     i2,16,i2
+			UML_ADD(block, IREG(2), IREG(2), IREG(3));								// add     i2,i2,i3
+			UML_CMP(block, IREG(2), IMM(16));										// cmp     i2,16
+			UML_TEST(block, IREG(2), IMM(0xfffffff0));								// test    i2,0xfffffff0
+			UML_MOVc(block, IF_NZ, IREG(2), IMM(16));								// mov     NZ,i2,16
 
-			end = index + (16 - (ea & 0xf));
-			if (end > 16) end = 16;
+		UML_LABEL(block, loopdest = compiler->labelnum++);							// loopdest:
+			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));						// mov     i0,arg0
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SUB(block, IREG(1), IMM(15), IREG(3));								// sub     i1,15,i3
+			UML_STORE(block, &rsp->v[dest].b[0], IREG(1), IREG(0), BYTE);			// store   v[dest][0]+i1,i0
 
-			for (i=index; i < end; i++)
-			{
-				W_VREG_B(dest, i, READ8(rsp, ea));
-				ea++;
-			}
-			break;
-		}
+			UML_ADD(block, MEM(&rsp->impstate->arg0), MEM(&rsp->impstate->arg0), IMM(1));
+			UML_AND(block, MEM(&rsp->impstate->arg0), MEM(&rsp->impstate->arg0), IMM(0x00000fff));
+			UML_ADD(block, IREG(3), IREG(3), IMM(1));								// add     i3,i3,1
+			UML_CMP(block, IREG(3), IREG(2));										// cmp     i3,i2
+			UML_JMPc(block, IF_L, loopdest);										// jmp     L,loopdest
+			return TRUE;
+
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lqv, rsp);
+			return TRUE;
+#endif
 		case 0x05:		/* LRV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00101 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Stores up to 16 bytes starting from right side until 16-byte boundary
-
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
-
-			index = 16 - ((ea & 0xf) - index);
-			end = 16;
-			ea &= ~0xf;
-
-			for (i=index; i < end; i++)
-			{
-				W_VREG_B(dest, i, READ8(rsp, ea));
-				ea++;
-			}
-			break;
-		}
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lrv, rsp);
+			return TRUE;
 		case 0x06:		/* LPV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00110 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads a byte as the upper 8 bits of each element
+#if (DRC_LPV)
+			offset <<= 3;
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			UML_ADD(block, IREG(2), R32(RSREG), IMM(offset));						// add     i2,<rsreg>,offset
+			UML_SUB(block, IREG(3), IMM(16), IMM(index));							// sub     i3,16,index
 
-			for (i=0; i < 8; i++)
-			{
-				W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
-			}
-			break;
-		}
+			UML_AND(block, IREG(1), IREG(3), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[7], IMM(0), IREG(0), WORD);			// store   v[dest][7],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(1));								// add     i1,i3,1
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[6], IMM(0), IREG(0), WORD);			// store   v[dest][6],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(2));								// add     i1,i3,2
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[5], IMM(0), IREG(0), WORD);			// store   v[dest][5],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(3));								// add     i1,i3,3
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[4], IMM(0), IREG(0), WORD);			// store   v[dest][4],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(4));								// add     i1,i3,4
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[3], IMM(0), IREG(0), WORD);			// store   v[dest][3],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(5));								// add     i1,i3,5
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[2], IMM(0), IREG(0), WORD);			// store   v[dest][2],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(6));								// add     i1,i3,6
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[1], IMM(0), IREG(0), WORD);			// store   v[dest][1],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(7));								// add     i1,i3,7
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));						// and     i0,i0,0x00000fff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
+			UML_SHL(block, IREG(0), IREG(0), IMM(8));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[0], IMM(0), IREG(0), WORD);			// store   v[dest][0],i0,word
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lpv, rsp);
+			return TRUE;
+#endif
 		case 0x07:		/* LUV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 00111 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads a byte as the bits 14-7 of each element
+#if (DRC_LUV)
+	/*
+	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+	for (i=0; i < 8; i++)
+	{
+		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
+	}
+	*/
+			offset <<= 3;
 
-			for (i=0; i < 8; i++)
-			{
-				W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
-			}
-			break;
-		}
+			UML_ADD(block, IREG(2), R32(RSREG), IMM(offset));						// add     i2,<rsreg>,offset
+			UML_SUB(block, IREG(3), IMM(16), IMM(index));							// sub     i3,16,index
+
+			UML_AND(block, IREG(1), IREG(3), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[7], IMM(0), IREG(0), WORD);			// store   v[dest][7],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(1));								// add     i1,i3,1
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[6], IMM(0), IREG(0), WORD);			// store   v[dest][6],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(2));								// add     i1,i3,2
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[5], IMM(0), IREG(0), WORD);			// store   v[dest][5],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(3));								// add     i1,i3,3
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[4], IMM(0), IREG(0), WORD);			// store   v[dest][4],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(4));								// add     i1,i3,4
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[3], IMM(0), IREG(0), WORD);			// store   v[dest][3],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(5));								// add     i1,i3,5
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[2], IMM(0), IREG(0), WORD);			// store   v[dest][2],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(6));								// add     i1,i3,6
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[1], IMM(0), IREG(0), WORD);			// store   v[dest][1],i0,word
+
+			UML_ADD(block, IREG(1), IREG(3), IMM(7));								// add     i1,i3,7
+			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
+			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
+			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
+			UML_STORE(block, &rsp->v[dest].s[0], IMM(0), IREG(0), WORD);			// store   v[dest][0],i0,word
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_luv, rsp);
+			return TRUE;
+#endif
 		case 0x08:		/* LHV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 01000 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads a byte as the bits 14-7 of each element, with 2-byte stride
-
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
-
-			for (i=0; i < 8; i++)
-			{
-				W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7);
-			}
-			break;
-		}
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lhv, rsp);
+			return TRUE;
 		case 0x09:		/* LFV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 01001 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
-
-			fatalerror("RSP: LFV\n");
-
-			if (index & 0x7)	fatalerror("RSP: LFV: index = %d at %08X\n", index, rsp->ppc);
-
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
-
-			// not sure what happens if 16-byte boundary is crossed...
-			if ((ea & 0xf) > 0)	fatalerror("RSP: LFV: 16-byte boundary crossing at %08X, recheck this!\n", rsp->ppc);
-
-			end = (index >> 1) + 4;
-
-			for (i=index >> 1; i < end; i++)
-			{
-				W_VREG_S(dest, i, READ8(rsp, ea) << 7);
-				ea += 4;
-			}
-			break;
-		}
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lfv, rsp);
+			return TRUE;
 		case 0x0a:		/* LWV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 01010 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
-			// after byte index 15
-
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
-
-			// not sure what happens if 16-byte boundary is crossed...
-			if ((ea & 0xf) > 0) fatalerror("RSP: LWV: 16-byte boundary crossing at %08X, recheck this!\n", rsp->ppc);
-
-			end = (16 - index) + 16;
-
-			for (i=(16 - index); i < end; i++)
-			{
-				//printf("%d",i);
-				W_VREG_B(dest, i & 0xf, READ8(rsp, ea));
-				ea += 4;
-			}
-			//printf("\n");
-			break;
-		}
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lwv, rsp);
+			return TRUE;
 		case 0x0b:		/* LTV */
-		{
-			// 31       25      20      15      10     6        0
-			// --------------------------------------------------
-			// | 110010 | BBBBB | TTTTT | 01011 | IIII | Offset |
-			// --------------------------------------------------
-			//
-			// Loads one element to maximum of 8 vectors, while incrementing element index
-
-			// FIXME: has a small problem with odd indices
-
-			int element;
-			int vs = dest;
-			int ve = dest + 8;
-			if (ve > 32)
-				ve = 32;
-
-			element = 7 - (index >> 1);
-
-			if (index & 1)	fatalerror("RSP: LTV: index = %d\n", index);
-
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
-
-			ea = ((ea + 8) & ~0xf) + (index & 1);
-			for (i=vs; i < ve; i++)
-			{
-				element = ((8 - (index >> 1) + (i-vs)) << 1);
-				W_VREG_B(i, (element & 0xf), READ8(rsp, ea));
-				W_VREG_B(i, ((element+1) & 0xf), READ8(rsp, ea+1));
-
-				ea += 2;
-			}
-			break;
-		}
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_ltv, rsp);
+			return TRUE;
 
 		default:
-		{
-			unimplemented_opcode(rsp, op);
-			break;
-		}
+			return FALSE;
 	}
 }
 
-static void cfunc_swc2(void *param)
+static void cfunc_rsp_sbv(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
-	int i;
-	int end;
-	int eaoffset;
-	UINT32 ea;
+	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -950,11 +1564,6 @@ static void cfunc_swc2(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-
-	switch ((op >> 11) & 0x1f)
-	{
-		case 0x00:		/* SBV */
-		{
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00000 | IIII | Offset |
@@ -964,10 +1573,22 @@ static void cfunc_swc2(void *param)
 
 			ea = (base) ? rsp->r[base] + offset : offset;
 			WRITE8(rsp, ea, R_VREG_B(dest, index));
-			break;
-		}
-		case 0x01:		/* SSV */
-		{
+}
+
+#if !(DRC_SSV)
+static void cfunc_rsp_ssv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00001 | IIII | Offset |
@@ -978,10 +1599,23 @@ static void cfunc_swc2(void *param)
 			ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
 
 			WRITE16(rsp, ea, R_VREG_S(dest, index >> 1));
-			break;
-		}
-		case 0x02:		/* SLV */
-		{
+}
+#endif
+
+#if !(DRC_SLV)
+static void cfunc_rsp_slv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00010 | IIII | Offset |
@@ -992,10 +1626,24 @@ static void cfunc_swc2(void *param)
 			ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
 
 			WRITE32(rsp, ea, R_VREG_L(dest, index >> 2));
-			break;
-		}
-		case 0x03:		/* SDV */
-		{
+}
+#endif
+
+#if !(DRC_SDV)
+static void cfunc_rsp_sdv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int end = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00011 | IIII | Offset |
@@ -1009,10 +1657,25 @@ static void cfunc_swc2(void *param)
 			index >>= 2;
 			WRITE32(rsp, ea, R_VREG_L(dest, index));
 			WRITE32(rsp, ea + 4, R_VREG_L(dest, index + 1));
-			break;
-		}
-		case 0x04:		/* SQV */
-		{
+}
+#endif
+
+#if !(DRC_SQV)
+static void cfunc_rsp_sqv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int end = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00100 | IIII | Offset |
@@ -1029,10 +1692,25 @@ static void cfunc_swc2(void *param)
 				WRITE8(rsp, ea, R_VREG_B(dest, i & 0xf));
 				ea++;
 			}
-			break;
-		}
-		case 0x05:		/* SRV */
-		{
+}
+#endif
+
+static void cfunc_rsp_srv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int o;
+	int i = 0;
+	int end = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00101 | IIII | Offset |
@@ -1040,7 +1718,6 @@ static void cfunc_swc2(void *param)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
-			int o;
 			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
 			end = index + (ea & 0xf);
@@ -1052,10 +1729,23 @@ static void cfunc_swc2(void *param)
 				WRITE8(rsp, ea, R_VREG_B(dest, ((i + o) & 0xf)));
 				ea++;
 			}
-			break;
-		}
-		case 0x06:		/* SPV */
-		{
+}
+
+static void cfunc_rsp_spv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int end = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00110 | IIII | Offset |
@@ -1078,10 +1768,23 @@ static void cfunc_swc2(void *param)
 				}
 				ea++;
 			}
-			break;
-		}
-		case 0x07:		/* SUV */
-		{
+}
+
+static void cfunc_rsp_suv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int end = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 00111 | IIII | Offset |
@@ -1104,10 +1807,22 @@ static void cfunc_swc2(void *param)
 				}
 				ea++;
 			}
-			break;
-		}
-		case 0x08:		/* SHV */
-		{
+}
+
+static void cfunc_rsp_shv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 01000 | IIII | Offset |
@@ -1125,10 +1840,24 @@ static void cfunc_swc2(void *param)
 				WRITE8(rsp, ea, d);
 				ea += 2;
 			}
-			break;
-		}
-		case 0x09:		/* SFV */
-		{
+}
+
+static void cfunc_rsp_sfv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int end = 0;
+	int eaoffset = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 01001 | IIII | Offset |
@@ -1152,10 +1881,24 @@ static void cfunc_swc2(void *param)
 				WRITE8(rsp, ea + (eaoffset & 0xf), R_VREG_S(dest, i) >> 7);
 				eaoffset += 4;
 			}
-			break;
-		}
-		case 0x0a:		/* SWV */
-		{
+}
+
+static void cfunc_rsp_swv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int end = 0;
+	int eaoffset = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 01010 | IIII | Offset |
@@ -1176,22 +1919,35 @@ static void cfunc_swc2(void *param)
 				WRITE8(rsp, ea + (eaoffset & 0xf), R_VREG_B(dest, i & 0xf));
 				eaoffset++;
 			}
-			break;
-		}
-		case 0x0b:		/* STV */
-		{
+}
+
+static void cfunc_rsp_stv(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int i = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	int element;
+	int eaoffset = 0;
+	int vs = dest;
+	int ve = dest + 8;
+	if (ve > 32)
+		ve = 32;
+
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 			// 31       25      20      15      10     6        0
 			// --------------------------------------------------
 			// | 111010 | BBBBB | TTTTT | 01011 | IIII | Offset |
 			// --------------------------------------------------
 			//
 			// Stores one element from maximum of 8 vectors, while incrementing element index
-
-			int element;
-			int vs = dest;
-			int ve = dest + 8;
-			if (ve > 32)
-				ve = 32;
 
 			element = 8 - (index >> 1);
 			if (index & 0x1)	fatalerror("RSP: STV: index = %d at %08X\n", index, rsp->ppc);
@@ -1209,139 +1965,228 @@ static void cfunc_swc2(void *param)
 				eaoffset += 2;
 				element++;
 			}
-			break;
-		}
+}
+
+static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	int loopdest;
+	UINT32 op = desc->opptr.l[0];
+	int dest = (op >> 16) & 0x1f;
+	//int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	//int skip;
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	switch ((op >> 11) & 0x1f)
+	{
+		case 0x00:		/* SBV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sbv, rsp);
+			return TRUE;
+		case 0x01:		/* SSV */
+#if (DRC_SSV)
+			offset <<= 1;
+			index >>= 1;
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));					// xor     i0,i0,byte4xor
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), VSX(dest, index), WORD);	// store   dmem,i0,v[dest].s[index],word
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_ssv, rsp);
+			return TRUE;
+#endif
+		case 0x02:		/* SLV */
+#if (DRC_SLV)
+			offset <<= 2;
+			index >>= 2;
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_MOV(block, IREG(1), VLX(dest, index));								// mov     i1,<rtreg>
+			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_slv, rsp);
+			return TRUE;
+#endif
+		case 0x03:		/* SDV */
+#if (DRC_SDV)
+			offset <<= 3;
+			index >>= 2;
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_MOV(block, IREG(1), VLX(dest, index));								// mov     i1,<rtreg>
+			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
+
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
+			UML_ADD(block, IREG(0), IREG(0), IMM(4));								// add     i0,i0,4
+			UML_MOV(block, IREG(1), VLX(dest, index+1));								// mov     i1,<rtreg>
+			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sdv, rsp);
+			return TRUE;
+#endif
+		case 0x04:		/* SQV */
+#if (DRC_SQV)
+			offset <<= 4;
+
+			UML_ADD(block, MEM(&rsp->impstate->arg0), R32(RSREG), IMM(offset));		// mov     arg0,<rsreg>,offset
+			UML_MOV(block, IREG(3), IMM(index));									// mov     i3,index
+			UML_MOV(block, IREG(2), MEM(&rsp->impstate->arg0));						// mov     i2,arg0
+			UML_AND(block, IREG(2), IREG(2), IMM(0x0000000f));						// and     i2,i2,0x0000000f
+			UML_SUB(block, IREG(2), IMM(16), IREG(2));								// sub     i2,16,i2
+			UML_ADD(block, IREG(2), IREG(2), IREG(3));								// add     i2,i2,i3
+			UML_CMP(block, IREG(2), IMM(16));										// cmp     i2,16
+			UML_TEST(block, IREG(2), IMM(0xfffffff0));								// test    i2,0xfffffff0
+			UML_MOVc(block, IF_NZ, IREG(2), IMM(16));								// mov     NZ,i2,16
+
+		UML_LABEL(block, loopdest = compiler->labelnum++);							// loopdest:
+			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));						// mov     i0,arg0
+			UML_SUB(block, IREG(1), IMM(15), IREG(3));								// sub     i1,15,i3
+			UML_LOAD(block, IREG(1), &rsp->v[dest].b[0], IREG(1), BYTE);			// load    i1,v[dest].b[0],i1,byte
+			UML_CALLH(block, rsp->impstate->write8);								// callh   read8
+
+			UML_ADD(block, MEM(&rsp->impstate->arg0), MEM(&rsp->impstate->arg0), IMM(1));
+			UML_ADD(block, IREG(3), IREG(3), IMM(1));								// add     i3,i3,1
+			UML_CMP(block, IREG(3), IREG(2));										// cmp     i3,i2
+			UML_JMPc(block, IF_L, loopdest);										// jmp     L,loopdest
+			return TRUE;
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sqv, rsp);
+#endif
+			return TRUE;
+		case 0x05:		/* SRV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_srv, rsp);
+			return TRUE;
+		case 0x06:		/* SPV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_spv, rsp);
+			return TRUE;
+		case 0x07:		/* SUV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_suv, rsp);
+			return TRUE;
+		case 0x08:		/* SHV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_shv, rsp);
+			return TRUE;
+		case 0x09:		/* SFV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sfv, rsp);
+			return TRUE;
+		case 0x0a:		/* SWV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_swv, rsp);
+			return TRUE;
+		case 0x0b:		/* STV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_stv, rsp);
+			return TRUE;
 
 		default:
-		{
 			unimplemented_opcode(rsp, op);
-			break;
-		}
+			return FALSE;
 	}
+
+	return TRUE;
 }
 
-INLINE UINT16 SATURATE_ACCUM_SIGNED(rsp_state *rsp, int accum, int slice)
+#if (DRC_VMADN)
+static void generate_saturate_accum_unsigned(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int accum)
 {
-	if (ACCUM(accum).h.high < 0)
+	int skip, skip2;
+
+	UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
+	UML_JMPc(block, IF_GE, skip = compiler->labelnum++);
+	UML_MOV(block, IREG(0), IMM(0));
+	UML_JMP(block, skip2 = compiler->labelnum++);
+
+	UML_LABEL(block, skip);
+	UML_CMP(block, VACCUMWMH(accum), IMM(32767));
+	UML_JMPc(block, IF_L, skip = compiler->labelnum++);
+	UML_MOV(block, IREG(0), IMM(0x0000ffff));
+	UML_JMP(block, skip2);
+
+	UML_LABEL(block, skip);
+	UML_SEXT(block, IREG(0), VACCUMHL(accum), WORD);
+	UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
+	UML_LABEL(block, skip2);
+}
+#endif
+
+INLINE UINT16 SATURATE_ACCUM_UNSIGNED(rsp_state *rsp, int accum)
+{
+	if (ACCUM(accum).w.mh < -32768)
 	{
-		if ((UINT16)ACCUM(accum).h.high != 0xffff)
-		{
-			return 0x8000;
-		}
-		else
-		{
-			if (ACCUM(accum).h.mid >= 0)
-			{
-				return 0x8000;
-			}
-			else
-			{
-				if (slice == 0)
-				{
-					return ACCUM(accum).h.low;
-				}
-				else if (slice == 1)
-				{
-					return ACCUM(accum).h.mid;
-				}
-			}
-		}
+		return 0;
+	}
+	else if(ACCUM(accum).w.mh > 32767)
+	{
+		return 0xffff;
 	}
 	else
 	{
-		if ((UINT16)ACCUM(accum).h.high != 0)
-		{
-			return 0x7fff;
-		}
-		else
-		{
-			if (ACCUM(accum).h.mid < 0)
-			{
-				return 0x7fff;
-			}
-			else
-			{
-				if (slice == 0)
-				{
-					return ACCUM(accum).h.low;
-				}
-				else
-				{
-					return ACCUM(accum).h.mid;
-				}
-			}
-		}
+		return ACCUM(accum).h.low;
 	}
-
-	return 0;
 }
 
-INLINE UINT16 SATURATE_ACCUM_UNSIGNED(rsp_state *rsp, int accum, int slice)
+#if (DRC_VMADH) || (DRC_VMADM)
+static void generate_saturate_accum_signed(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int accum)
 {
-	if (ACCUM(accum).h.high < 0)
-	{
-		if ((UINT16)ACCUM(accum).h.high != 0xffff)
-		{
-			return 0;
-		}
-		else
-		{
-			if (ACCUM(accum).h.mid >= 0)
-			{
-				return 0;
-			}
-			else
-			{
-				if (slice == 0)
-				{
-					return ACCUM(accum).h.low;
-				}
-				else if (slice == 1)
-				{
-					return ACCUM(accum).h.mid;
-				}
-			}
-		}
-	}
-	else
-	{
-		if ((UINT16)ACCUM(accum).h.high != 0)
-		{
-			return 0xffff;
-		}
-		else
-		{
-			if (ACCUM(accum).h.mid < 0)
-			{
-				return 0xffff;
-			}
-			else
-			{
-				if (slice == 0)
-				{
-					return ACCUM(accum).h.low;
-				}
-				else
-				{
-					return ACCUM(accum).h.mid;
-				}
-			}
-		}
-	}
+	int skip, skip2;
 
-	return 0;
+	UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
+	UML_JMPc(block, IF_GE, skip = compiler->labelnum++);
+	UML_MOV(block, IREG(0), IMM(0x00008000));
+	UML_JMP(block, skip2 = compiler->labelnum++);
+
+	UML_LABEL(block, skip);
+	UML_CMP(block, VACCUMWMH(accum), IMM(32767));
+	UML_JMPc(block, IF_L, skip = compiler->labelnum++);
+	UML_MOV(block, IREG(0), IMM(0x00007fff));
+	UML_JMP(block, skip2);
+
+	UML_LABEL(block, skip);
+	UML_SEXT(block, IREG(0), VACCUMHM(accum), WORD);
+	UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
+	UML_LABEL(block, skip2);
+}
+#endif
+
+INLINE UINT16 SATURATE_ACCUM_SIGNED(rsp_state *rsp, int accum)
+{
+	if (ACCUM(accum).w.mh < -32768)
+	{
+		return 0x8000;
+	}
+	if(ACCUM(accum).w.mh > 32767)
+	{
+		return 0x7fff;
+	}
+	return ACCUM(accum).h.mid;
 }
 
-#define WRITEBACK_RESULT()					\
+#define WRITEBACK_RESULT() 					\
 	do {									\
-		W_VREG_S(VDREG, 0, vres[0]);			\
-		W_VREG_S(VDREG, 1, vres[1]);			\
-		W_VREG_S(VDREG, 2, vres[2]);			\
-		W_VREG_S(VDREG, 3, vres[3]);			\
-		W_VREG_S(VDREG, 4, vres[4]);			\
-		W_VREG_S(VDREG, 5, vres[5]);			\
-		W_VREG_S(VDREG, 6, vres[6]);			\
-		W_VREG_S(VDREG, 7, vres[7]);			\
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
 	} while(0)
 
 #if 0
@@ -1362,9 +2207,41 @@ static float float_round(float input)
 }
 #endif
 
-INLINE void rsp_vmulf(rsp_state *rsp, UINT32 op, INT16 *vres)
+#define RSP_VMULF(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		INT16 v1, v2; \
+		v1 = R_VREG_S_X(VS1REG, I0); v2 = R_VREG_S_X(VS2REG, E20); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E10).l = 0x0000800080000000LL; vres[E10] = 0x7fff; } \
+		else { ACCUM(E10).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E10] = ACCUM(E10).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I1); v2 = R_VREG_S_X(VS2REG, E21); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E11).l = 0x0000800080000000LL; vres[E11] = 0x7fff; } \
+		else { ACCUM(E11).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E11] = ACCUM(E11).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I2); v2 = R_VREG_S_X(VS2REG, E22); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E12).l = 0x0000800080000000LL; vres[E12] = 0x7fff; } \
+		else { ACCUM(E12).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E12] = ACCUM(E12).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I3); v2 = R_VREG_S_X(VS2REG, E23); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E13).l = 0x0000800080000000LL; vres[E13] = 0x7fff; } \
+		else { ACCUM(E13).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E13] = ACCUM(E13).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I4); v2 = R_VREG_S_X(VS2REG, E24); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E14).l = 0x0000800080000000LL; vres[E14] = 0x7fff; } \
+		else { ACCUM(E14).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E14] = ACCUM(E14).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I5); v2 = R_VREG_S_X(VS2REG, E25); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E15).l = 0x0000800080000000LL; vres[E15] = 0x7fff; } \
+		else { ACCUM(E15).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E15] = ACCUM(E15).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I6); v2 = R_VREG_S_X(VS2REG, E26); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E16).l = 0x0000800080000000LL; vres[E16] = 0x7fff; } \
+		else { ACCUM(E16).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E16] = ACCUM(E16).h.mid; } \
+		v1 = R_VREG_S_X(VS1REG, I7); v2 = R_VREG_S_X(VS2REG, E27); \
+		if (v1 == -32768 && v2 == -32768) { ACCUM(E17).l = 0x0000800080000000LL; vres[E17] = 0x7fff; } \
+		else { ACCUM(E17).l = ((INT64)((INT32)v1 * (INT32)v2) * 0x20000 + 0x80000000); vres[E17] = ACCUM(E17).h.mid; } \
+	}
+
+INLINE void cfunc_rsp_vmulf(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
+	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000000 |
@@ -1372,37 +2249,66 @@ INLINE void rsp_vmulf(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Multiplies signed integer by signed integer * 2
 
-	for (i=0; i < 8; i++)
+	switch(EL)
 	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
-		INT32 s2 = (INT32)(INT16)R_VREG_S(VS2REG, sel);
-		if (s1 == -32768 && s2 == -32768)
-		{
-			// overflow
-			ACCUM(del).l = 0x0000800080000000LL;
-			//W_ACCUM_H(del, 0);
-			//W_ACCUM_M(del, -32768);
-			//W_ACCUM_L(del, -32768);
-			vres[del] = 0x7fff;
-		}
-		else
-		{
-			INT64 r =  s1 * s2 * 2;
-			r += 0x8000;	// rounding ?
-			W_ACCUM_H(del, (r < 0) ? 0xffff : 0);		// sign-extend to 48-bit
-			W_ACCUM_M(del, (INT16)(r >> 16));
-			W_ACCUM_L(del, (UINT16)(r));
-			vres[del] = ACCUM(del).h.mid;
-		}
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMULF(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMULF(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMULF(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMULF(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMULF(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMULF(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMULF(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMULF(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMULF(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMULF(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMULF(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMULF(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMULF(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
 	}
-	WRITEBACK_RESULT();
 
+	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vmulu(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vmulu(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1416,12 +2322,10 @@ INLINE void rsp_vmulu(rsp_state *rsp, UINT32 op, INT16 *vres)
 		int sel = VEC_EL_2(EL, del);
 		INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
 		INT32 s2 = (INT32)(INT16)R_VREG_S(VS2REG, sel);
-		INT64 r = s1 * s2 * 2;
-		r += 0x8000;	// rounding ?
+		INT64 r = s1 * s2;
+		r += 0x4000;	// rounding ?
 
-		W_ACCUM_H(del, (UINT16)(r >> 32));
-		W_ACCUM_M(del, (UINT16)(r >> 16));
-		W_ACCUM_L(del, (UINT16)(r));
+		ACCUM(del).l = r << 17;
 
 		if (r < 0)
 		{
@@ -1430,6 +2334,7 @@ INLINE void rsp_vmulu(rsp_state *rsp, UINT32 op, INT16 *vres)
 		else if ((ACCUM(del).h.high ^ ACCUM(del).h.mid) < 0)
 		{
 			vres[del] = -1;
+
 		}
 		else
 		{
@@ -1439,38 +2344,448 @@ INLINE void rsp_vmulu(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vmudl(rsp_state *rsp, UINT32 op, INT16 *vres)
+#if (DRC_VMUDL)
+/*------------------------------------------------------------------
+    generate_vmudl
+------------------------------------------------------------------*/
+
+#define RSP_VMUDL_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E10), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E11), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E12), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E13), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E14), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E15), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E16), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
+		UML_DMOV(block, VACCUML(E17), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E10), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E11), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E12), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E13), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E14), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E15), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E16), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHL(E17), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vmudl(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmudl
 {
-	int i;
+	UINT32 op = desc->opptr.l[0];
+
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000100 |
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
 	// ------------------------------------------------------
 	//
-	// Multiplies unsigned fraction by unsigned fraction
-	// Stores the higher 16 bits of the 32-bit result to accumulator
-	// The low slice of accumulator is stored into destination element
-
-	for (i=0; i < 8; i++)
+	// Multiplies signed integer by unsigned fraction
+	// The result is added into accumulator
+	// The middle slice of accumulator is stored into destination element
+	switch(EL)
 	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		UINT32 s1 = (UINT32)(UINT16)R_VREG_S(VS1REG, del);
-		UINT32 s2 = (UINT32)(UINT16)R_VREG_S(VS2REG, sel);
-		UINT32 r = s1 * s2;
-
-		W_ACCUM_H(del, 0);
-		W_ACCUM_M(del, 0);
-		W_ACCUM_L(del, (UINT16)(r >> 16));
-
-		vres[del] = ACCUM(del).h.low;
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMUDL_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMUDL_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMUDL_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMUDL_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMUDL_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMUDL_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMUDL_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMUDL_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMUDL_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMUDL_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMUDL_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
 	}
-	WRITEBACK_RESULT();
-}
 
-INLINE void rsp_vmudm(rsp_state *rsp, UINT32 op, INT16 *vres)
+	return TRUE;
+}
+#else
+#define RSP_VMUDL(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
+	{ \
+		ACCUM(E10).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E10) * (UINT32)(UINT16)R_VREG_S(VS2REG, E20)) & 0xffff0000); \
+		ACCUM(E11).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E11) * (UINT32)(UINT16)R_VREG_S(VS2REG, E21)) & 0xffff0000); \
+		ACCUM(E12).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E12) * (UINT32)(UINT16)R_VREG_S(VS2REG, E22)) & 0xffff0000); \
+		ACCUM(E13).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E13) * (UINT32)(UINT16)R_VREG_S(VS2REG, E23)) & 0xffff0000); \
+		ACCUM(E14).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E14) * (UINT32)(UINT16)R_VREG_S(VS2REG, E24)) & 0xffff0000); \
+		ACCUM(E15).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E15) * (UINT32)(UINT16)R_VREG_S(VS2REG, E25)) & 0xffff0000); \
+		ACCUM(E16).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E16) * (UINT32)(UINT16)R_VREG_S(VS2REG, E26)) & 0xffff0000); \
+		ACCUM(E17).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E17) * (UINT32)(UINT16)R_VREG_S(VS2REG, E27)) & 0xffff0000); \
+		vres[E10] = ACCUM(E10).h.low; \
+		vres[E11] = ACCUM(E11).h.low; \
+		vres[E12] = ACCUM(E12).h.low; \
+		vres[E13] = ACCUM(E13).h.low; \
+		vres[E14] = ACCUM(E14).h.low; \
+		vres[E15] = ACCUM(E15).h.low; \
+		vres[E16] = ACCUM(E16).h.low; \
+		vres[E17] = ACCUM(E17).h.low; \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vmudl(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001101 |
+	// ------------------------------------------------------
+	//
+	// Multiplies signed integer by unsigned fraction
+	// The result is added into accumulator
+	// The middle slice of accumulator is stored into destination element
+
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMUDL(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMUDL(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMUDL(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMUDL(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMUDL(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMUDL(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMUDL(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMUDL(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMUDL(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMUDL(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMUDL(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMUDL(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+	}
+}
+#endif
+
+#if (DRC_VMUDM)
+/*------------------------------------------------------------------
+    generate_vmudm
+------------------------------------------------------------------*/
+
+#define RSP_VMUDM_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E10), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E11), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E12), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E13), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E14), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E15), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E16), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+ 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DMOV(block, VACCUML(E17), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E10), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E11), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E12), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E13), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E14), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E15), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E16), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+ 		UML_SEXT(block, IREG(0), VACCUMHM(E17), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vmudm(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmudl
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
+	// ------------------------------------------------------
+	//
+	// Multiplies signed integer by unsigned fraction
+	// The result is stored into accumulator
+	// The middle slice of accumulator is stored into destination element
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMUDM_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMUDM_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMUDM_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMUDM_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMUDM_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMUDM_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMUDM_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMUDM_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMUDM_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMUDM_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMUDM_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+	}
+
+	return TRUE;
+}
+#else
+#define RSP_VMUDM(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		ACCUM(E10).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I0) * (UINT16)R_VREG_S_X(VS2REG, E20)) << 16; \
+		ACCUM(E11).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I1) * (UINT16)R_VREG_S_X(VS2REG, E21)) << 16; \
+		ACCUM(E12).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I2) * (UINT16)R_VREG_S_X(VS2REG, E22)) << 16; \
+		ACCUM(E13).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I3) * (UINT16)R_VREG_S_X(VS2REG, E23)) << 16; \
+		ACCUM(E14).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I4) * (UINT16)R_VREG_S_X(VS2REG, E24)) << 16; \
+		ACCUM(E15).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I5) * (UINT16)R_VREG_S_X(VS2REG, E25)) << 16; \
+		ACCUM(E16).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I6) * (UINT16)R_VREG_S_X(VS2REG, E26)) << 16; \
+		ACCUM(E17).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I7) * (UINT16)R_VREG_S_X(VS2REG, E27)) << 16; \
+		vres[E10] = ACCUM(E10).h.mid; \
+		vres[E11] = ACCUM(E11).h.mid; \
+		vres[E12] = ACCUM(E12).h.mid; \
+		vres[E13] = ACCUM(E13).h.mid; \
+		vres[E14] = ACCUM(E14).h.mid; \
+		vres[E15] = ACCUM(E15).h.mid; \
+		vres[E16] = ACCUM(E16).h.mid; \
+		vres[E17] = ACCUM(E17).h.mid; \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vmudm(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
+	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000101 |
@@ -1480,6 +2795,59 @@ INLINE void rsp_vmudm(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// The result is stored into accumulator
 	// The middle slice of accumulator is stored into destination element
 
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMUDM(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMUDM(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMUDM(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMUDM(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMUDM(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMUDM(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMUDM(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMUDM(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMUDM(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMUDM(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMUDM(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMUDM(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+	}
+
+	/*
 	for (i=0; i < 8; i++)
 	{
 		int del = VEC_EL_1(EL, i);
@@ -1495,12 +2863,34 @@ INLINE void rsp_vmudm(rsp_state *rsp, UINT32 op, INT16 *vres)
 		vres[del] = ACCUM(del).h.mid;
 	}
 	WRITEBACK_RESULT();
-
+	*/
 }
+#endif
 
-INLINE void rsp_vmudn(rsp_state *rsp, UINT32 op, INT16 *vres)
+#define RSP_VMUDN(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
+	{ \
+		ACCUM(E10).l = ((UINT16)R_VREG_S(VS1REG, E10) * (INT64)(INT16)R_VREG_S(VS2REG, E20)) << 16; \
+		ACCUM(E11).l = ((UINT16)R_VREG_S(VS1REG, E11) * (INT64)(INT16)R_VREG_S(VS2REG, E21)) << 16; \
+		ACCUM(E12).l = ((UINT16)R_VREG_S(VS1REG, E12) * (INT64)(INT16)R_VREG_S(VS2REG, E22)) << 16; \
+		ACCUM(E13).l = ((UINT16)R_VREG_S(VS1REG, E13) * (INT64)(INT16)R_VREG_S(VS2REG, E23)) << 16; \
+		ACCUM(E14).l = ((UINT16)R_VREG_S(VS1REG, E14) * (INT64)(INT16)R_VREG_S(VS2REG, E24)) << 16; \
+		ACCUM(E15).l = ((UINT16)R_VREG_S(VS1REG, E15) * (INT64)(INT16)R_VREG_S(VS2REG, E25)) << 16; \
+		ACCUM(E16).l = ((UINT16)R_VREG_S(VS1REG, E16) * (INT64)(INT16)R_VREG_S(VS2REG, E26)) << 16; \
+		ACCUM(E17).l = ((UINT16)R_VREG_S(VS1REG, E17) * (INT64)(INT16)R_VREG_S(VS2REG, E27)) << 16; \
+		W_VREG_S(VDREG, E10, ACCUM(E10).h.low);			\
+		W_VREG_S(VDREG, E11, ACCUM(E11).h.low);			\
+		W_VREG_S(VDREG, E12, ACCUM(E12).h.low);			\
+		W_VREG_S(VDREG, E13, ACCUM(E13).h.low);			\
+		W_VREG_S(VDREG, E14, ACCUM(E14).h.low);			\
+		W_VREG_S(VDREG, E15, ACCUM(E15).h.low);			\
+		W_VREG_S(VDREG, E16, ACCUM(E16).h.low);			\
+		W_VREG_S(VDREG, E17, ACCUM(E17).h.low);			\
+	}
+
+INLINE void cfunc_rsp_vmudn(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000110 |
@@ -1510,25 +2900,64 @@ INLINE void rsp_vmudn(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// The result is stored into accumulator
 	// The low slice of accumulator is stored into destination element
 
-	for (i=0; i < 8; i++)
+	switch(EL)
 	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		INT32 s1 = (UINT16)R_VREG_S(VS1REG, del);		// not sign-extended
-		INT32 s2 = (INT32)(INT16)R_VREG_S(VS2REG, sel);
-		INT32 r = s1 * s2;
-
-		W_ACCUM_H(del, (r < 0) ? 0xffff : 0);		// sign-extend to 48-bit
-		W_ACCUM_M(del, (INT16)(r >> 16));
-		W_ACCUM_L(del, (UINT16)(r));
-
-		vres[del] = ACCUM(del).h.low;
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMUDN(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMUDN(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMUDN(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMUDN(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMUDN(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMUDN(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMUDN(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMUDN(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMUDN(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMUDN(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMUDN(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMUDN(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
 	}
-	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vmudh(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vmudh(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1558,9 +2987,40 @@ INLINE void rsp_vmudh(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vmacf(rsp_state *rsp, UINT32 op, INT16 *vres)
+#define RSP_VMACF(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
+	{ \
+		ACCUM(E10).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E10) * (INT32)(INT16)R_VREG_S(VS2REG, E20)) << 17; \
+		ACCUM(E11).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E11) * (INT32)(INT16)R_VREG_S(VS2REG, E21)) << 17; \
+		ACCUM(E12).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E12) * (INT32)(INT16)R_VREG_S(VS2REG, E22)) << 17; \
+		ACCUM(E13).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E13) * (INT32)(INT16)R_VREG_S(VS2REG, E23)) << 17; \
+		ACCUM(E14).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E14) * (INT32)(INT16)R_VREG_S(VS2REG, E24)) << 17; \
+		ACCUM(E15).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E15) * (INT32)(INT16)R_VREG_S(VS2REG, E25)) << 17; \
+		ACCUM(E16).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E16) * (INT32)(INT16)R_VREG_S(VS2REG, E26)) << 17; \
+		ACCUM(E17).l += (INT64)((INT32)(INT16)R_VREG_S(VS1REG, E17) * (INT32)(INT16)R_VREG_S(VS2REG, E27)) << 17; \
+		vres[E10] = SATURATE_ACCUM_SIGNED(rsp, E10); \
+		vres[E11] = SATURATE_ACCUM_SIGNED(rsp, E11); \
+		vres[E12] = SATURATE_ACCUM_SIGNED(rsp, E12); \
+		vres[E13] = SATURATE_ACCUM_SIGNED(rsp, E13); \
+		vres[E14] = SATURATE_ACCUM_SIGNED(rsp, E14); \
+		vres[E15] = SATURATE_ACCUM_SIGNED(rsp, E15); \
+		vres[E16] = SATURATE_ACCUM_SIGNED(rsp, E16); \
+		vres[E17] = SATURATE_ACCUM_SIGNED(rsp, E17); \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vmacf(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
+	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001000 |
@@ -1569,6 +3029,58 @@ INLINE void rsp_vmacf(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// Multiplies signed integer by signed integer * 2
 	// The result is added to accumulator
 
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMACF(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMACF(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMACF(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMACF(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMACF(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMACF(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMACF(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMACF(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMACF(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMACF(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMACF(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMACF(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMACF(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+	}
+#if 0
 	for (i=0; i < 8; i++)
 	{
 		UINT16 res;
@@ -1579,16 +3091,19 @@ INLINE void rsp_vmacf(rsp_state *rsp, UINT32 op, INT16 *vres)
 		INT32 r = s1 * s2;
 
 		ACCUM(del).l += (INT64)(r) << 17;
-		//ACCUM(del) += (INT64)(r) << 17;
-		res = SATURATE_ACCUM_SIGNED(rsp, del, 1);
+		res = SATURATE_ACCUM_SIGNED(rsp, del);
 
 		vres[del] = res;
 	}
 	WRITEBACK_RESULT();
+#endif
 }
 
-INLINE void rsp_vmacu(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vmacu(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1611,7 +3126,6 @@ INLINE void rsp_vmacu(rsp_state *rsp, UINT32 op, INT16 *vres)
 		W_ACCUM_M(del, (UINT16)(r3));
 		W_ACCUM_H(del, (UINT16)ACCUM(del).h.high + (UINT16)(r3 >> 16) + (UINT16)(r1 >> 31));
 
-		//res = SATURATE_ACCUM(rsp, del, 1, 0x0000, 0xffff);
 		if (ACCUM(del).h.high < 0)
 		{
 			res = 0;
@@ -1640,8 +3154,11 @@ INLINE void rsp_vmacu(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vmadl(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vmadl(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1667,16 +3184,202 @@ INLINE void rsp_vmadl(rsp_state *rsp, UINT32 op, INT16 *vres)
 		W_ACCUM_M(del, (UINT16)(r3));
 		W_ACCUM_H(del, ACCUM(del).h.high + (INT16)(r3 >> 16));
 
-		res = SATURATE_ACCUM_UNSIGNED(rsp, del, 0);
+		res = SATURATE_ACCUM_UNSIGNED(rsp, del);
 
 		vres[del] = res;
 	}
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vmadm(rsp_state *rsp, UINT32 op, INT16 *vres)
+#if (DRC_VMADM)
+/*------------------------------------------------------------------
+    generate_vmadm
+------------------------------------------------------------------*/
+
+#define RSP_VMADM_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E10), VACCUML(E10), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E11), VACCUML(E11), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E12), VACCUML(E12), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E13), VACCUML(E13), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E14), VACCUML(E14), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E15), VACCUML(E15), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E16), VACCUML(E16), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+ 		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E17), VACCUML(E17), IREG(0)); \
+ \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E10); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E11); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E12); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E13); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E14); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E15); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E16); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E17); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vmadm(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmadm
 {
-	int i;
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
+	// ------------------------------------------------------
+	//
+	// Multiplies signed integer by unsigned fraction
+	// The result is added into accumulator
+	// The middle slice of accumulator is stored into destination element
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMADM_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMADM_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMADM_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMADM_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMADM_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMADM_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMADM_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMADM_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMADM_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMADM_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMADM_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+	}
+
+	return TRUE;
+}
+#else
+#define RSP_VMADM(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
+	{ \
+		ACCUM(E10).l += ((INT64)(INT16)R_VREG_S(VS1REG, E10) * (UINT16)R_VREG_S(VS2REG, E20)) << 16; \
+		ACCUM(E11).l += ((INT64)(INT16)R_VREG_S(VS1REG, E11) * (UINT16)R_VREG_S(VS2REG, E21)) << 16; \
+		ACCUM(E12).l += ((INT64)(INT16)R_VREG_S(VS1REG, E12) * (UINT16)R_VREG_S(VS2REG, E22)) << 16; \
+		ACCUM(E13).l += ((INT64)(INT16)R_VREG_S(VS1REG, E13) * (UINT16)R_VREG_S(VS2REG, E23)) << 16; \
+		ACCUM(E14).l += ((INT64)(INT16)R_VREG_S(VS1REG, E14) * (UINT16)R_VREG_S(VS2REG, E24)) << 16; \
+		ACCUM(E15).l += ((INT64)(INT16)R_VREG_S(VS1REG, E15) * (UINT16)R_VREG_S(VS2REG, E25)) << 16; \
+		ACCUM(E16).l += ((INT64)(INT16)R_VREG_S(VS1REG, E16) * (UINT16)R_VREG_S(VS2REG, E26)) << 16; \
+		ACCUM(E17).l += ((INT64)(INT16)R_VREG_S(VS1REG, E17) * (UINT16)R_VREG_S(VS2REG, E27)) << 16; \
+		vres[E10] = SATURATE_ACCUM_SIGNED(rsp, E10); \
+		vres[E11] = SATURATE_ACCUM_SIGNED(rsp, E11); \
+		vres[E12] = SATURATE_ACCUM_SIGNED(rsp, E12); \
+		vres[E13] = SATURATE_ACCUM_SIGNED(rsp, E13); \
+		vres[E14] = SATURATE_ACCUM_SIGNED(rsp, E14); \
+		vres[E15] = SATURATE_ACCUM_SIGNED(rsp, E15); \
+		vres[E16] = SATURATE_ACCUM_SIGNED(rsp, E16); \
+		vres[E17] = SATURATE_ACCUM_SIGNED(rsp, E17); \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vmadm(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001101 |
@@ -1686,33 +3389,153 @@ INLINE void rsp_vmadm(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// The result is added into accumulator
 	// The middle slice of accumulator is stored into destination element
 
-	for (i=0; i < 8; i++)
+	switch(EL)
 	{
-		UINT16 res;
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		UINT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
-		UINT32 s2 = (UINT16)R_VREG_S(VS2REG, sel);	// not sign-extended
-		UINT32 r1 = s1 * s2;
-		UINT32 r2 = (UINT16)ACCUM(del).h.low + (UINT16)(r1);
-		UINT32 r3 = (UINT16)ACCUM(del).h.mid + (r1 >> 16) + (r2 >> 16);
-
-		W_ACCUM_L(del, (UINT16)(r2));
-		W_ACCUM_M(del, (UINT16)(r3));
-		W_ACCUM_H(del, (UINT16)ACCUM(del).h.high + (UINT16)(r3 >> 16));
-		if ((INT32)(r1) < 0)
-			W_ACCUM_H(del, (UINT16)ACCUM(del).h.high - 1);
-
-		res = SATURATE_ACCUM_SIGNED(rsp, del, 1);
-
-		vres[del] = res;
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMADM(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMADM(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMADM(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMADM(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMADM(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMADM(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMADM(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMADM(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMADM(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMADM(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMADM(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMADM(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMADM(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
 	}
-	WRITEBACK_RESULT();
 }
+#endif
 
-INLINE void rsp_vmadn(rsp_state *rsp, UINT32 op, INT16 *vres)
+#if (DRC_VMADN)
+/*------------------------------------------------------------------
+    generate_vmadn
+------------------------------------------------------------------*/
+
+#define RSP_VMADN_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E10), VACCUML(E10), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E11), VACCUML(E11), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E12), VACCUML(E12), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E13), VACCUML(E13), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E14), VACCUML(E14), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E15), VACCUML(E15), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E16), VACCUML(E16), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+ 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
+		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
+		UML_DADD(block, VACCUML(E17), VACCUML(E17), IREG(0)); \
+ \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E10); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E11); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E12); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E13); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E14); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E15); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E16); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E17); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vmadn(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmadn
 {
-	int i;
+	UINT32 op = desc->opptr.l[0];
+
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
@@ -1721,31 +3544,321 @@ INLINE void rsp_vmadn(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// Multiplies unsigned fraction by signed integer
 	// The result is added into accumulator
 	// The low slice of accumulator is stored into destination element
-
-	for (i=0; i < 8; i++)
+	switch(EL)
 	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		INT32 s1 = (UINT16)R_VREG_S(VS1REG, del);		// not sign-extended
-		INT32 s2 = (INT32)(INT16)R_VREG_S(VS2REG, sel);
-		UINT32 r1 = s1 * s2;
-		UINT32 r2 = (UINT16)ACCUM(del).h.low + (UINT16)(r1);
-		UINT32 r3 = (UINT16)ACCUM(del).h.mid + (r1 >> 16) + (r2 >> 16);
-
-		W_ACCUM_L(del, (UINT16)(r2));
-		W_ACCUM_M(del, (UINT16)(r3));
-		W_ACCUM_H(del, (UINT16)ACCUM(del).h.high + (UINT16)(r3 >> 16));
-		if ((INT32)(r1) < 0)
-			W_ACCUM_H(del, (UINT16)ACCUM(del).h.high - 1);
-
-		vres[del] = SATURATE_ACCUM_UNSIGNED(rsp, del, 0);
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMADN_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMADN_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMADN_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMADN_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMADN_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMADN_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMADN_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMADN_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMADN_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMADN_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMADN_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
 	}
-	WRITEBACK_RESULT();
-}
 
-INLINE void rsp_vmadh(rsp_state *rsp, UINT32 op, INT16 *vres)
+	return TRUE;
+}
+#else
+#define RSP_VMADN(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		ACCUM(E10).l += ((UINT16)R_VREG_S_X(VS1REG, I0) * (INT64)R_VREG_S_X(VS2REG, E20)) << 16; \
+		ACCUM(E11).l += ((UINT16)R_VREG_S_X(VS1REG, I1) * (INT64)R_VREG_S_X(VS2REG, E21)) << 16; \
+		ACCUM(E12).l += ((UINT16)R_VREG_S_X(VS1REG, I2) * (INT64)R_VREG_S_X(VS2REG, E22)) << 16; \
+		ACCUM(E13).l += ((UINT16)R_VREG_S_X(VS1REG, I3) * (INT64)R_VREG_S_X(VS2REG, E23)) << 16; \
+		ACCUM(E14).l += ((UINT16)R_VREG_S_X(VS1REG, I4) * (INT64)R_VREG_S_X(VS2REG, E24)) << 16; \
+		ACCUM(E15).l += ((UINT16)R_VREG_S_X(VS1REG, I5) * (INT64)R_VREG_S_X(VS2REG, E25)) << 16; \
+		ACCUM(E16).l += ((UINT16)R_VREG_S_X(VS1REG, I6) * (INT64)R_VREG_S_X(VS2REG, E26)) << 16; \
+		ACCUM(E17).l += ((UINT16)R_VREG_S_X(VS1REG, I7) * (INT64)R_VREG_S_X(VS2REG, E27)) << 16; \
+		vres[E10] = SATURATE_ACCUM_UNSIGNED(rsp, E10); \
+		vres[E11] = SATURATE_ACCUM_UNSIGNED(rsp, E11); \
+		vres[E12] = SATURATE_ACCUM_UNSIGNED(rsp, E12); \
+		vres[E13] = SATURATE_ACCUM_UNSIGNED(rsp, E13); \
+		vres[E14] = SATURATE_ACCUM_UNSIGNED(rsp, E14); \
+		vres[E15] = SATURATE_ACCUM_UNSIGNED(rsp, E15); \
+		vres[E16] = SATURATE_ACCUM_UNSIGNED(rsp, E16); \
+		vres[E17] = SATURATE_ACCUM_UNSIGNED(rsp, E17); \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vmadn(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
+	// ------------------------------------------------------
+	//
+	// Multiplies unsigned fraction by signed integer
+	// The result is added into accumulator
+	// The low slice of accumulator is stored into destination element
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMADN(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMADN(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMADN(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMADN(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMADN(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMADN(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMADN(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMADN(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMADN(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMADN(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMADN(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMADN(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMADN(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+	}
+}
+#endif
+
+#if (DRC_VMADH)
+/*------------------------------------------------------------------
+    generate_vmadh
+------------------------------------------------------------------*/
+
+#define RSP_VMADH_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E10), VACCUMWMH(E10), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E11), VACCUMWMH(E11), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E12), VACCUMWMH(E12), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E13), VACCUMWMH(E13), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E14), VACCUMWMH(E14), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E15), VACCUMWMH(E15), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E16), VACCUMWMH(E16), IREG(0)); \
+ \
+ 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+ 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
+		UML_ADD(block, VACCUMWMH(E17), VACCUMWMH(E17), IREG(0)); \
+ \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E10); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E11); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E12); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E13); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E14); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E15); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E16); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+ 		generate_saturate_accum_signed(rsp, block, compiler, desc, E17); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vmadh(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmadh
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
+	// ------------------------------------------------------
+	//
+	// Multiplies unsigned fraction by signed integer
+	// The result is added into accumulator
+	// The low slice of accumulator is stored into destination element
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMADH_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMADH_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMADH_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMADH_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMADH_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMADH_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMADH_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMADH_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMADH_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMADH_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMADH_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+	}
+
+	return TRUE;
+}
+#else
+#define RSP_VMADH(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		ACCUM(E10).w.mh += (INT32)R_VREG_S_X(VS1REG, I0) * (INT32)R_VREG_S_X(VS2REG, E20); \
+		ACCUM(E11).w.mh += (INT32)R_VREG_S_X(VS1REG, I1) * (INT32)R_VREG_S_X(VS2REG, E21); \
+		ACCUM(E12).w.mh += (INT32)R_VREG_S_X(VS1REG, I2) * (INT32)R_VREG_S_X(VS2REG, E22); \
+		ACCUM(E13).w.mh += (INT32)R_VREG_S_X(VS1REG, I3) * (INT32)R_VREG_S_X(VS2REG, E23); \
+		ACCUM(E14).w.mh += (INT32)R_VREG_S_X(VS1REG, I4) * (INT32)R_VREG_S_X(VS2REG, E24); \
+		ACCUM(E15).w.mh += (INT32)R_VREG_S_X(VS1REG, I5) * (INT32)R_VREG_S_X(VS2REG, E25); \
+		ACCUM(E16).w.mh += (INT32)R_VREG_S_X(VS1REG, I6) * (INT32)R_VREG_S_X(VS2REG, E26); \
+		ACCUM(E17).w.mh += (INT32)R_VREG_S_X(VS1REG, I7) * (INT32)R_VREG_S_X(VS2REG, E27); \
+		vres[E10] = SATURATE_ACCUM_SIGNED(rsp, E10); \
+		vres[E11] = SATURATE_ACCUM_SIGNED(rsp, E11); \
+		vres[E12] = SATURATE_ACCUM_SIGNED(rsp, E12); \
+		vres[E13] = SATURATE_ACCUM_SIGNED(rsp, E13); \
+		vres[E14] = SATURATE_ACCUM_SIGNED(rsp, E14); \
+		vres[E15] = SATURATE_ACCUM_SIGNED(rsp, E15); \
+		vres[E16] = SATURATE_ACCUM_SIGNED(rsp, E16); \
+		vres[E17] = SATURATE_ACCUM_SIGNED(rsp, E17); \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vmadh(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001111 |
@@ -1755,27 +3868,397 @@ INLINE void rsp_vmadh(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// The result is added into highest 32 bits of accumulator, the low slice is zero
 	// The highest 32 bits of accumulator is saturated into destination element
 
-	for (i=0; i < 8; i++)
+	switch(EL)
 	{
-		UINT16 res;
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
-		INT32 s2 = (INT32)(INT16)R_VREG_S(VS2REG, sel);
-		INT64 r = s1 * s2;
-
-		ACCUM(del).l += (INT64)(r) << 32;
-
-		res = SATURATE_ACCUM_SIGNED(rsp, del, 1);
-
-		vres[del] = res;
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMADH(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMADH(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMADH(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMADH(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMADH(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMADH(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMADH(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMADH(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMADH(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMADH(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMADH(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMADH(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMADH(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
 	}
-	WRITEBACK_RESULT();
 }
+#endif
 
-INLINE void rsp_vadd(rsp_state *rsp, UINT32 op, INT16 *vres)
+#if (DRC_VADD)
+/*------------------------------------------------------------------
+    generate_vadd
+------------------------------------------------------------------*/
+
+#define RSP_VADD_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		int inrange, outofrange; \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E10)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E10)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_G, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E10), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E11)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E11)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E11), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E12)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E12)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E12), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E13)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E13)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E13), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E14)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E14)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E14), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E15)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E15)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E15), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E16)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E16)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E16), IREG(0)); \
+ \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_SEXT(block, IREG(1), VFLAG(0), WORD); \
+		UML_SHL(block, IREG(2), IMM(1), IMM(E17)); \
+		UML_AND(block, IREG(1), IREG(1), IREG(2)); \
+		UML_SHR(block, IREG(1), IREG(1), IMM(E17)); \
+		UML_ADD(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+		UML_CMP(block, IREG(0), IMM(32767)); \
+		UML_JMPc(block, IF_LE, inrange = compiler->labelnum++); \
+ \
+		UML_MOV(block, IREG(0), IMM(32767)); \
+		UML_JMP(block, outofrange = compiler->labelnum++); \
+ \
+	UML_LABEL(block, inrange); \
+ \
+		UML_CMP(block, IREG(0), IMM(-32768)); \
+		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
+ \
+ 		UML_MOV(block, IREG(0), IMM(-32768)); \
+ \
+	UML_LABEL(block, inrange); \
+	UML_LABEL(block, outofrange); \
+ \
+ 		UML_MOV(block, VRES(E17), IREG(0)); \
+ \
+ \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), VRES(E10), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), VRES(E11), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), VRES(E12), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), VRES(E13), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), VRES(E14), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), VRES(E15), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), VRES(E16), WORD); \
+ 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), VRES(E17), WORD); \
+	}
+
+static int generate_vadd(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vadd
 {
-	int i;
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001110 |
+	// ------------------------------------------------------
+	//
+	// Multiplies unsigned fraction by signed integer
+	// The result is added into accumulator
+	// The low slice of accumulator is stored into destination element
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VADD_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VADD_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VADD_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VADD_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VADD_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VADD_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VADD_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VADD_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VADD_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VADD_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VADD_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VADD_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+	}
+
+	return TRUE;
+}
+#else
+#define RSP_VADD(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{																						\
+		INT32 r;																			\
+		ACCUM(E10).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I0) + (INT32)R_VREG_S_X(VS2REG, E20) + ((rsp->flag[0] & (1 << E10)) >> E10)); \
+		vres[E10] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E10).h.low);		\
+		ACCUM(E11).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I1) + (INT32)R_VREG_S_X(VS2REG, E21) + ((rsp->flag[0] & (1 << E11)) >> E11)); \
+		vres[E11] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E11).h.low);		\
+		ACCUM(E12).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I2) + (INT32)R_VREG_S_X(VS2REG, E22) + ((rsp->flag[0] & (1 << E12)) >> E12)); \
+		vres[E12] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E12).h.low);		\
+		ACCUM(E13).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I3) + (INT32)R_VREG_S_X(VS2REG, E23) + ((rsp->flag[0] & (1 << E13)) >> E13)); \
+		vres[E13] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E13).h.low);		\
+		ACCUM(E14).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I4) + (INT32)R_VREG_S_X(VS2REG, E24) + ((rsp->flag[0] & (1 << E14)) >> E14)); \
+		vres[E14] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E14).h.low);		\
+		ACCUM(E15).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I5) + (INT32)R_VREG_S_X(VS2REG, E25) + ((rsp->flag[0] & (1 << E15)) >> E15)); \
+		vres[E15] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E15).h.low);		\
+		ACCUM(E16).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I6) + (INT32)R_VREG_S_X(VS2REG, E26) + ((rsp->flag[0] & (1 << E16)) >> E16)); \
+		vres[E16] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E16).h.low);		\
+		ACCUM(E17).h.low = (INT16)(r = (INT32)R_VREG_S_X(VS1REG, I7) + (INT32)R_VREG_S_X(VS2REG, E27) + ((rsp->flag[0] & (1 << E17)) >> E17)); \
+		vres[E17] = (r > 32767) ? 32767 : ((r < -32768) ? -32768 : ACCUM(E17).h.low);		\
+	}
+
+INLINE void cfunc_rsp_vadd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
+	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010000 |
@@ -1784,28 +4267,67 @@ INLINE void rsp_vadd(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// Adds two vector registers and carry flag, the result is saturated to 32767
 
 	// TODO: check VS2REG == VDREG
-
-	for (i=0; i < 8; i++)
-	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
-		INT32 s2 = (INT32)(INT16)R_VREG_S(VS2REG, sel);
-		INT32 r = s1 + s2 + CARRY_FLAG(del);
-
-		W_ACCUM_L(del, (INT16)(r));
-
-		if (r > 32767) r = 32767;
-		if (r < -32768) r = -32768;
-		vres[del] = (INT16)(r);
-	}
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+  	switch(EL)
+  	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VADD(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VADD(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VADD(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VADD(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VADD(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VADD(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VADD(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VADD(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VADD(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VADD(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VADD(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VADD(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VADD(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  	}
+	rsp->flag[0] = 0;
 	WRITEBACK_RESULT();
 }
+#endif
 
-INLINE void rsp_vsub(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vsub(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1831,13 +4353,15 @@ INLINE void rsp_vsub(rsp_state *rsp, UINT32 op, INT16 *vres)
 
 		vres[del] = (INT16)(r);
 	}
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vabs(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vabs(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1879,8 +4403,11 @@ INLINE void rsp_vabs(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vaddc(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vaddc(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1891,8 +4418,7 @@ INLINE void rsp_vaddc(rsp_state *rsp, UINT32 op, INT16 *vres)
 
 	// TODO: check VS2REG = VDREG
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 
 	for (i=0; i < 8; i++)
 	{
@@ -1913,8 +4439,11 @@ INLINE void rsp_vaddc(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vsubc(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vsubc(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -1925,8 +4454,7 @@ INLINE void rsp_vsubc(rsp_state *rsp, UINT32 op, INT16 *vres)
 
 	// TODO: check VS2REG = VDREG
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 
 	for (i=0; i < 8; i++)
 	{
@@ -1951,9 +4479,10 @@ INLINE void rsp_vsubc(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vsaw(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vsaw(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 011101 |
@@ -1965,35 +4494,177 @@ INLINE void rsp_vsaw(rsp_state *rsp, UINT32 op, INT16 *vres)
 	{
 		case 0x08:		// VSAWH
 		{
-			for (i=0; i < 8; i++)
-			{
-				W_VREG_S(VDREG, i, ACCUM(i).h.high);
-			}
+			W_VREG_S_X(VDREG, 7, ACCUM(0).h.high);
+			W_VREG_S_X(VDREG, 6, ACCUM(1).h.high);
+			W_VREG_S_X(VDREG, 5, ACCUM(2).h.high);
+			W_VREG_S_X(VDREG, 4, ACCUM(3).h.high);
+			W_VREG_S_X(VDREG, 3, ACCUM(4).h.high);
+			W_VREG_S_X(VDREG, 2, ACCUM(5).h.high);
+			W_VREG_S_X(VDREG, 1, ACCUM(6).h.high);
+			W_VREG_S_X(VDREG, 0, ACCUM(7).h.high);
 			break;
 		}
 		case 0x09:		// VSAWM
 		{
-			for (i=0; i < 8; i++)
-			{
-				W_VREG_S(VDREG, i, ACCUM(i).h.mid);
-			}
+			W_VREG_S_X(VDREG, 7, ACCUM(0).h.mid);
+			W_VREG_S_X(VDREG, 6, ACCUM(1).h.mid);
+			W_VREG_S_X(VDREG, 5, ACCUM(2).h.mid);
+			W_VREG_S_X(VDREG, 4, ACCUM(3).h.mid);
+			W_VREG_S_X(VDREG, 3, ACCUM(4).h.mid);
+			W_VREG_S_X(VDREG, 2, ACCUM(5).h.mid);
+			W_VREG_S_X(VDREG, 1, ACCUM(6).h.mid);
+			W_VREG_S_X(VDREG, 0, ACCUM(7).h.mid);
 			break;
 		}
 		case 0x0a:		// VSAWL
 		{
-			for (i=0; i < 8; i++)
-			{
-				W_VREG_S(VDREG, i, ACCUM(i).h.low);
-			}
+			W_VREG_S_X(VDREG, 7, ACCUM(0).h.low);
+			W_VREG_S_X(VDREG, 6, ACCUM(1).h.low);
+			W_VREG_S_X(VDREG, 5, ACCUM(2).h.low);
+			W_VREG_S_X(VDREG, 4, ACCUM(3).h.low);
+			W_VREG_S_X(VDREG, 3, ACCUM(4).h.low);
+			W_VREG_S_X(VDREG, 2, ACCUM(5).h.low);
+			W_VREG_S_X(VDREG, 1, ACCUM(6).h.low);
+			W_VREG_S_X(VDREG, 0, ACCUM(7).h.low);
 			break;
 		}
 		default:	fatalerror("RSP: VSAW: el = %d\n", EL);
 	}
 }
 
-INLINE void rsp_vlt(rsp_state *rsp, UINT32 op, INT16 *vres)
+#define RSP_VLT(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		rsp->flag[1] = 0; \
+ \
+		if (R_VREG_S_X(VS1REG, I0) > R_VREG_S_X(VS2REG, E20)) \
+		{ \
+			ACCUM(E16).h.low = vres[E10] = R_VREG_S_X(VS2REG, E20); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I0) < R_VREG_S_X(VS2REG, E20)) \
+		{ \
+			ACCUM(E10).h.low = vres[E10] = R_VREG_S_X(VS1REG, I0); \
+			SET_COMPARE_FLAG(E10); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I0) == R_VREG_S_X(VS2REG, E20)) \
+		{ \
+			ACCUM(E10).h.low = vres[E10] = R_VREG_S_X(VS1REG, I0); \
+			if (ZERO_FLAG(E10) && CARRY_FLAG(E10)) SET_COMPARE_FLAG(E10); \
+		} \
+		if (R_VREG_S_X(VS1REG, I1) > R_VREG_S_X(VS2REG, E21)) \
+		{ \
+			ACCUM(E16).h.low = vres[E11] = R_VREG_S_X(VS2REG, E21); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I1) < R_VREG_S_X(VS2REG, E21)) \
+		{ \
+			ACCUM(E11).h.low = vres[E11] = R_VREG_S_X(VS1REG, I1); \
+			SET_COMPARE_FLAG(E11); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I1) == R_VREG_S_X(VS2REG, E21)) \
+		{ \
+			ACCUM(E11).h.low = vres[E11] = R_VREG_S_X(VS1REG, I1); \
+			if (ZERO_FLAG(E11) && CARRY_FLAG(E11)) SET_COMPARE_FLAG(E11); \
+		} \
+		if (R_VREG_S_X(VS1REG, I2) > R_VREG_S_X(VS2REG, E22)) \
+		{ \
+			ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS2REG, E22); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I2) < R_VREG_S_X(VS2REG, E22)) \
+		{ \
+			ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS1REG, I2); \
+			SET_COMPARE_FLAG(E12); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I2) == R_VREG_S_X(VS2REG, E22)) \
+		{ \
+			ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS1REG, I2); \
+			if (ZERO_FLAG(E12) && CARRY_FLAG(E12)) SET_COMPARE_FLAG(E12); \
+		} \
+		if (R_VREG_S_X(VS1REG, I3) > R_VREG_S_X(VS2REG, E23)) \
+		{ \
+			ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS2REG, E23); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I3) < R_VREG_S_X(VS2REG, E23)) \
+		{ \
+			ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS1REG, I3); \
+			SET_COMPARE_FLAG(E13); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I3) == R_VREG_S_X(VS2REG, E23)) \
+		{ \
+			ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS1REG, I3); \
+			if (ZERO_FLAG(E10) && CARRY_FLAG(E13)) SET_COMPARE_FLAG(E13); \
+		} \
+		if (R_VREG_S_X(VS1REG, I4) > R_VREG_S_X(VS2REG, E24)) \
+		{ \
+			ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS2REG, E24); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I4) < R_VREG_S_X(VS2REG, E24)) \
+		{ \
+			ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS1REG, I4); \
+			SET_COMPARE_FLAG(E14); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I4) == R_VREG_S_X(VS2REG, E24)) \
+		{ \
+			ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS1REG, I4); \
+			if (ZERO_FLAG(E14) && CARRY_FLAG(E14)) SET_COMPARE_FLAG(E14); \
+		} \
+		if (R_VREG_S_X(VS1REG, I5) > R_VREG_S_X(VS2REG, E25)) \
+		{ \
+			ACCUM(E15).h.low = vres[5] = R_VREG_S_X(VS2REG, E25); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I5) < R_VREG_S_X(VS2REG, E25)) \
+		{ \
+			ACCUM(E15).h.low = vres[E15] = R_VREG_S_X(VS1REG, I5); \
+			SET_COMPARE_FLAG(E15); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I5) == R_VREG_S_X(VS2REG, E25)) \
+		{ \
+			ACCUM(E15).h.low = vres[E15] = R_VREG_S_X(VS1REG, I5); \
+			if (ZERO_FLAG(E15) && CARRY_FLAG(E15)) SET_COMPARE_FLAG(E15); \
+		} \
+		if (R_VREG_S_X(VS1REG, I6) > R_VREG_S_X(VS2REG, E26)) \
+		{ \
+			ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS2REG, E26); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I6) < R_VREG_S_X(VS2REG, E26)) \
+		{ \
+			ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS1REG, I6); \
+			SET_COMPARE_FLAG(E16); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I6) == R_VREG_S_X(VS2REG, E26)) \
+		{ \
+			ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS1REG, I6); \
+			if (ZERO_FLAG(E16) && CARRY_FLAG(E16)) SET_COMPARE_FLAG(E16); \
+		} \
+		if (R_VREG_S_X(VS1REG, I7) > R_VREG_S_X(VS2REG, E27)) \
+		{ \
+			ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS2REG, E27); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I7) < R_VREG_S_X(VS2REG, E27)) \
+		{ \
+			ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS1REG, I7); \
+			SET_COMPARE_FLAG(E17); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I7) == R_VREG_S_X(VS2REG, E27)) \
+		{ \
+			ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS1REG, I7); \
+			if (ZERO_FLAG(E17) && CARRY_FLAG(E17)) SET_COMPARE_FLAG(E17); \
+		} \
+		rsp->flag[0] = 0; \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vlt(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
+	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100000 |
@@ -2002,41 +4673,65 @@ INLINE void rsp_vlt(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// Sets compare flags if elements in VS1 are less than VS2
 	// Moves the element in VS2 to destination vector
 
-	rsp->flag[1] = 0;
-
-	for (i=0; i < 8; i++)
+	switch(EL)
 	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-
-		if (R_VREG_S(VS1REG, del) < R_VREG_S(VS2REG, sel))
-		{
-			vres[del] = R_VREG_S(VS1REG, del);
-			SET_COMPARE_FLAG(del);
-		}
-		else if (R_VREG_S(VS1REG, del) == R_VREG_S(VS2REG, sel))
-		{
-			vres[del] = R_VREG_S(VS1REG, del);
-			if (ZERO_FLAG(del) != 0 && CARRY_FLAG(del) != 0)
-			{
-				SET_COMPARE_FLAG(del);
-			}
-		}
-		else
-		{
-			vres[del] = R_VREG_S(VS2REG, sel);
-		}
-
-		W_ACCUM_L(del, vres[del]);
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VLT(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VLT(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VLT(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VLT(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VLT(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VLT(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VLT(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VLT(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VLT(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VLT(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VLT(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VLT(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VLT(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
 	}
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
-	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_veq(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_veq(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -2065,13 +4760,15 @@ INLINE void rsp_veq(rsp_state *rsp, UINT32 op, INT16 *vres)
 		}
 	}
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vne(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vne(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -2104,14 +4801,199 @@ INLINE void rsp_vne(rsp_state *rsp, UINT32 op, INT16 *vres)
 		}
 	}
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vge(rsp_state *rsp, UINT32 op, INT16 *vres)
+#define RSP_VGE(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		rsp->flag[1] = 0; \
+ \
+		if (R_VREG_S_X(VS1REG, I0) > R_VREG_S_X(VS2REG, E20)) \
+		{ \
+			ACCUM(E10).h.low = vres[E10] = R_VREG_S_X(VS1REG, I0); \
+			SET_COMPARE_FLAG(E10); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I0) == R_VREG_S_X(VS2REG, E20)) \
+		{ \
+			if (!ZERO_FLAG(E10) || !CARRY_FLAG(E10)) \
+			{ \
+				ACCUM(E10).h.low = vres[E10] = R_VREG_S_X(VS1REG, I0); \
+				SET_COMPARE_FLAG(E10); \
+			} \
+			else \
+			{ \
+				ACCUM(E10).h.low = vres[E10] = R_VREG_S_X(VS2REG, E20); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E10).h.low = vres[E10] = R_VREG_S_X(VS2REG, E20); \
+		} \
+		if (R_VREG_S_X(VS1REG, I1) > R_VREG_S_X(VS2REG, E21)) \
+		{ \
+			ACCUM(E11).h.low = vres[E11] = R_VREG_S_X(VS1REG, I1); \
+			SET_COMPARE_FLAG(E11); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I1) == R_VREG_S_X(VS2REG, E21)) \
+		{ \
+			if (!ZERO_FLAG(E11) || !CARRY_FLAG(E11)) \
+			{ \
+				ACCUM(E11).h.low = vres[E11] = R_VREG_S_X(VS1REG, I1); \
+				SET_COMPARE_FLAG(E11); \
+			} \
+			else \
+			{ \
+				ACCUM(E11).h.low = vres[E11] = R_VREG_S_X(VS2REG, E21); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E11).h.low = vres[E11] = R_VREG_S_X(VS2REG, E21); \
+		} \
+		if (R_VREG_S_X(VS1REG, I2) > R_VREG_S_X(VS2REG, E22)) \
+		{ \
+			ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS1REG, I2); \
+			SET_COMPARE_FLAG(E12); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I2) == R_VREG_S_X(VS2REG, E22)) \
+		{ \
+			if (!ZERO_FLAG(E12) || !CARRY_FLAG(E12)) \
+			{ \
+				ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS1REG, I2); \
+				SET_COMPARE_FLAG(E12); \
+			} \
+			else \
+			{ \
+				ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS2REG, E22); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E12).h.low = vres[E12] = R_VREG_S_X(VS2REG, E22); \
+		} \
+		if (R_VREG_S_X(VS1REG, I3) > R_VREG_S_X(VS2REG, E23)) \
+		{ \
+			ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS1REG, I3); \
+			SET_COMPARE_FLAG(E13); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I3) == R_VREG_S_X(VS2REG, E23)) \
+		{ \
+			if (!ZERO_FLAG(E13) || !CARRY_FLAG(E13)) \
+			{ \
+				ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS1REG, I3); \
+				SET_COMPARE_FLAG(E13); \
+			} \
+			else \
+			{ \
+				ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS2REG, E23); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E13).h.low = vres[E13] = R_VREG_S_X(VS2REG, E23); \
+		} \
+		if (R_VREG_S_X(VS1REG, I4) > R_VREG_S_X(VS2REG, E24)) \
+		{ \
+			ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS1REG, I4); \
+			SET_COMPARE_FLAG(E14); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I4) == R_VREG_S_X(VS2REG, E24)) \
+		{ \
+			if (!ZERO_FLAG(E14) || !CARRY_FLAG(E14)) \
+			{ \
+				ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS1REG, I4); \
+				SET_COMPARE_FLAG(E14); \
+			} \
+			else \
+			{ \
+				ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS2REG, E24); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E14).h.low = vres[E14] = R_VREG_S_X(VS2REG, E24); \
+		} \
+		if (R_VREG_S_X(VS1REG, I5) > R_VREG_S_X(VS2REG, E25)) \
+		{ \
+			ACCUM(E15).h.low = vres[E15] = R_VREG_S_X(VS1REG, I5); \
+			SET_COMPARE_FLAG(E15); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I5) == R_VREG_S_X(VS2REG, E25)) \
+		{ \
+			if (!ZERO_FLAG(E15) || !CARRY_FLAG(E15)) \
+			{ \
+				ACCUM(E15).h.low = vres[E15] = R_VREG_S_X(VS1REG, I5); \
+				SET_COMPARE_FLAG(E15); \
+			} \
+			else \
+			{ \
+				ACCUM(E15).h.low = vres[E15] = R_VREG_S_X(VS2REG, E25); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E15).h.low = vres[E15] = R_VREG_S_X(VS2REG, E25); \
+		} \
+		if (R_VREG_S_X(VS1REG, I6) > R_VREG_S_X(VS2REG, E26)) \
+		{ \
+			ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS1REG, I6); \
+			SET_COMPARE_FLAG(E16); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I6) == R_VREG_S_X(VS2REG, E26)) \
+		{ \
+			if (!ZERO_FLAG(E16) || !CARRY_FLAG(E16)) \
+			{ \
+				ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS1REG, I6); \
+				SET_COMPARE_FLAG(E16); \
+			} \
+			else \
+			{ \
+				ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS2REG, E26); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E16).h.low = vres[E16] = R_VREG_S_X(VS2REG, E26); \
+		} \
+		if (R_VREG_S_X(VS1REG, I7) > R_VREG_S_X(VS2REG, E27)) \
+		{ \
+			ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS1REG, I7); \
+			SET_COMPARE_FLAG(E17); \
+		} \
+		else if (R_VREG_S_X(VS1REG, I7) == R_VREG_S_X(VS2REG, E27)) \
+		{ \
+			if (!ZERO_FLAG(E17) || !CARRY_FLAG(E17)) \
+			{ \
+				ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS1REG, I7); \
+				SET_COMPARE_FLAG(E17); \
+			} \
+			else \
+			{ \
+				ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS2REG, E27); \
+			} \
+		} \
+		else \
+		{ \
+			ACCUM(E17).h.low = vres[E17] = R_VREG_S_X(VS2REG, E27); \
+		} \
+		rsp->flag[0] = 0; \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
+	}
+
+INLINE void cfunc_rsp_vge(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
+	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100011 |
@@ -2120,6 +5002,59 @@ INLINE void rsp_vge(rsp_state *rsp, UINT32 op, INT16 *vres)
 	// Sets compare flags if elements in VS1 are greater or equal with VS2
 	// Moves the element in VS2 to destination vector
 
+#if 1
+	switch(EL)
+	{
+  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VGE(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			break;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VGE(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			break;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VGE(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			break;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VGE(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			break;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VGE(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			break;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VGE(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			break;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VGE(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			break;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VGE(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			break;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VGE(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			break;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VGE(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			break;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VGE(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			break;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VGE(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			break;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VGE(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			break;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			break;
+	}
+#else
 	rsp->flag[1] = 0;
 
 	for (i=0; i < 8; i++)
@@ -2151,14 +5086,16 @@ INLINE void rsp_vge(rsp_state *rsp, UINT32 op, INT16 *vres)
 		W_ACCUM_L(del, vres[del]);
 	}
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 	WRITEBACK_RESULT();
-
+#endif
 }
 
-INLINE void rsp_vcl(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vcl(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -2247,14 +5184,16 @@ INLINE void rsp_vcl(rsp_state *rsp, UINT32 op, INT16 *vres)
 
 		vres[del] = ACCUM(del).h.low;
 	}
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 	rsp->flag[2] = 0;
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vch(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vch(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -2263,8 +5202,7 @@ INLINE void rsp_vch(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Vector clip high
 
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
+	rsp->flag[0] = 0;
 	rsp->flag[1] = 0;
 	rsp->flag[2] = 0;
 
@@ -2335,8 +5273,11 @@ INLINE void rsp_vch(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-INLINE void rsp_vcr(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vcr(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -2393,42 +5334,6 @@ INLINE void rsp_vcr(rsp_state *rsp, UINT32 op, INT16 *vres)
 	}
 	WRITEBACK_RESULT();
 }
-
-//  switch(EL)
-//  {
-//      case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */     /* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-//          break;
-//      case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */     /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-//          break;
-//      case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */     /* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-//          break;
-//      case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */     /* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-//          break;
-//      case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */     /* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-//          break;
-//      case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */     /* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-//          break;
-//      case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */     /* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-//          break;
-//      case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */     /* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-//          break;
-//      case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */     /*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-//          break;
-//      case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */     /*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-//          break;
-//      case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */     /*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-//          break;
-//      case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */     /*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-//          break;
-//      case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */     /*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-//          break;
-//      case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */     /*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-//          break;
-//      case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */     /*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-//          break;
-//      case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */     /*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-//          break;
-//  }
 
 #define RSP_VMRG(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	if (COMPARE_FLAG(E10))					\
@@ -2504,8 +5409,11 @@ INLINE void rsp_vcr(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);				\
 	W_ACCUM_L(E17, vres[E17]);				\
 
-INLINE void rsp_vmrg(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vmrg(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100111 |
@@ -2513,60 +5421,187 @@ INLINE void rsp_vmrg(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Merges two vectors according to compare flags
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VMRG(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VMRG(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VMRG(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VMRG(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VMRG(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VMRG(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VMRG(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VMRG(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VMRG(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VMRG(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VMRG(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VMRG(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VMRG(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VMRG(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VMRG(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VMRG(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VMRG(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VMRG(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VMRG(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VMRG(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VMRG(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VMRG(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VMRG(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VMRG(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VMRG(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VMRG(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
 
+#if (DRC_VAND)
+#define RSP_VAND_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_LOAD(block, IREG(0), &rsp->accum[E10].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E11].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E12].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E13].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E14].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E15].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E16].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E17].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vand(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+	// ------------------------------------------------------
+	//
+	// Bitwise AND of two vector registers
+
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VAND_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VAND_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VAND_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VAND_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VAND_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VAND_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VAND_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VAND_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VAND_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VAND_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VAND_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VAND_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  	}
+
+  	return TRUE;
+}
+#else
 #define RSP_VAND(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	vres[E10] = R_VREG_S(VS1REG, E10) & R_VREG_S(VS2REG, E20);	\
 	vres[E11] = R_VREG_S(VS1REG, E11) & R_VREG_S(VS2REG, E21);	\
@@ -2585,8 +5620,11 @@ INLINE void rsp_vmrg(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);				\
 	W_ACCUM_L(E17, vres[E17]);				\
 
-INLINE void rsp_vand(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vand(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
@@ -2594,60 +5632,196 @@ INLINE void rsp_vand(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Bitwise AND of two vector registers
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
+#endif
 
+#if (DRC_VNAND)
+#define RSP_VNAND_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_LOAD(block, IREG(0), &rsp->accum[E10].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E11].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E12].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E13].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E14].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E15].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E16].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E17].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vnand(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+	// ------------------------------------------------------
+	//
+	// Bitwise NOT AND of two vector registers
+
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VNAND_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VNAND_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VNAND_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VNAND_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VNAND_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VNAND_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VNAND_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VNAND_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VNAND_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VNAND_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VNAND_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  	}
+
+  	return TRUE;
+}
+#else
 #define RSP_VNAND(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	vres[E10] = ~(R_VREG_S(VS1REG, E10) & R_VREG_S(VS2REG, E20));	\
 	vres[E11] = ~(R_VREG_S(VS1REG, E11) & R_VREG_S(VS2REG, E21));	\
@@ -2666,8 +5840,11 @@ INLINE void rsp_vand(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);				\
 	W_ACCUM_L(E17, vres[E17]);				\
 
-INLINE void rsp_vnand(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vnand(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101001 |
@@ -2675,60 +5852,188 @@ INLINE void rsp_vnand(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Bitwise NOT AND of two vector registers
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VNAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VNAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VNAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VNAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VNAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VNAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VNAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VNAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VNAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VNAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VNAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VNAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VNAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VNAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VNAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VNAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VNAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VNAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VNAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VNAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VNAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VNAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VNAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VNAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VNAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VNAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
+#endif
 
+#if (DRC_VOR)
+#define RSP_VOR_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_LOAD(block, IREG(0), &rsp->accum[E10].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E11].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E12].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E13].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E14].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E15].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E16].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E17].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+	// ------------------------------------------------------
+	//
+	// Bitwise OR of two vector registers
+
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  	}
+
+  	return TRUE;
+}
+#else
 #define RSP_VOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	vres[E10] = R_VREG_S(VS1REG, E10) | R_VREG_S(VS2REG, E20);	\
 	vres[E11] = R_VREG_S(VS1REG, E11) | R_VREG_S(VS2REG, E21);	\
@@ -2747,8 +6052,11 @@ INLINE void rsp_vnand(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);									\
 	W_ACCUM_L(E17, vres[E17]);									\
 
-INLINE void rsp_vor(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vor(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101010 |
@@ -2756,60 +6064,196 @@ INLINE void rsp_vor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Bitwise OR of two vector registers
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
+#endif
 
+#if (DRC_VNOR)
+#define RSP_VNOR_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_OR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_LOAD(block, IREG(0), &rsp->accum[E10].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E11].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E12].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E13].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E14].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E15].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E16].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E17].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vnor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+	// ------------------------------------------------------
+	//
+	// Bitwise NOT OR of two vector registers
+
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VNOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VNOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VNOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VNOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VNOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VNOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VNOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VNOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VNOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VNOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  	}
+
+  	return TRUE;
+}
+#else
 #define RSP_VNOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	vres[E10] = ~(R_VREG_S(VS1REG, E10) | R_VREG_S(VS2REG, E20));	\
 	vres[E11] = ~(R_VREG_S(VS1REG, E11) | R_VREG_S(VS2REG, E21));	\
@@ -2828,8 +6272,11 @@ INLINE void rsp_vor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);										\
 	W_ACCUM_L(E17, vres[E17]);										\
 
-INLINE void rsp_vnor(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vnor(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101011 |
@@ -2837,60 +6284,188 @@ INLINE void rsp_vnor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Bitwise NOT OR of two vector registers
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VNOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VNOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VNOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VNOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VNOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VNOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VNOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VNOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VNOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VNOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VNOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VNOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VNOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VNOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VNOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VNOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VNOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VNOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VNOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VNOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VNOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VNOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VNOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VNOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VNOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VNOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
+#endif
 
+#if (DRC_VXOR)
+#define RSP_VXOR_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_LOAD(block, IREG(0), &rsp->accum[E10].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E11].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E12].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E13].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E14].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E15].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E16].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E17].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vxor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+	// ------------------------------------------------------
+	//
+	// Bitwise XOR of two vector registers
+
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VXOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VXOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VXOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VXOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VXOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VXOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VXOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VXOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VXOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VXOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VXOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  	}
+
+  	return TRUE;
+}
+#else
 #define RSP_VXOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	vres[E10] = R_VREG_S(VS1REG, E10) ^ R_VREG_S(VS2REG, E20);	\
 	vres[E11] = R_VREG_S(VS1REG, E11) ^ R_VREG_S(VS2REG, E21);	\
@@ -2909,8 +6484,11 @@ INLINE void rsp_vnor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);									\
 	W_ACCUM_L(E17, vres[E17]);									\
 
-INLINE void rsp_vxor(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vxor(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101100 |
@@ -2918,60 +6496,196 @@ INLINE void rsp_vxor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Bitwise XOR of two vector registers
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
+#endif
 
+#if (DRC_VNXOR)
+#define RSP_VNXOR_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
+	{ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E10].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E11].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E12].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E13].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E14].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E15].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E16].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_XOR(block, IREG(0), IREG(0), IREG(1)); \
+		UML_XOR(block, IREG(0), IREG(0), IMM(0xffffffff)); \
+		UML_STORE(block, &rsp->accum[E17].h.low, IMM(0), IREG(0), WORD); \
+ \
+		UML_LOAD(block, IREG(0), &rsp->accum[E10].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E11].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E12].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E13].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E14].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E15].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E16].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_LOAD(block, IREG(0), &rsp->accum[E17].h.low, IMM(0), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+	}
+
+static int generate_vnxor(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+
+	// 31       25  24     20      15      10      5        0
+	// ------------------------------------------------------
+	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+	// ------------------------------------------------------
+	//
+	// Bitwise NOT XOR of two vector registers
+
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VNXOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+  			return TRUE;
+  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VNXOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+  			return TRUE;
+  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VNXOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+  			return TRUE;
+  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VNXOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+  			return TRUE;
+  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VNXOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+  			return TRUE;
+  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VNXOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+  			return TRUE;
+  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VNXOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+  			return TRUE;
+  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VNXOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+  			return TRUE;
+  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VNXOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+  			return TRUE;
+  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VNXOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+  			return TRUE;
+  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VNXOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+  			return TRUE;
+  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+  			return TRUE;
+  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+  			return TRUE;
+  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+  			return TRUE;
+  	}
+
+  	return TRUE;
+}
+#else
 #define RSP_VNXOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	vres[E10] = ~(R_VREG_S(VS1REG, E10) ^ R_VREG_S(VS2REG, E20));	\
 	vres[E11] = ~(R_VREG_S(VS1REG, E11) ^ R_VREG_S(VS2REG, E21));	\
@@ -2990,8 +6704,11 @@ INLINE void rsp_vxor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	W_ACCUM_L(E16, vres[E16]);										\
 	W_ACCUM_L(E17, vres[E17]);										\
 
-INLINE void rsp_vnxor(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vnxor(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101101 |
@@ -2999,62 +6716,65 @@ INLINE void rsp_vnxor(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Bitwise NOT XOR of two vector registers
 
-	switch(EL)
-	{
-		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-			break;
-		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-			RSP_VNXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 0, 2, 2, 4, 4, 6, 6);
-			break;
-		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-			RSP_VNXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 1, 3, 3, 5, 5, 7, 7);
-			break;
-		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-			RSP_VNXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4);
-			break;
-		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-			RSP_VNXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 1, 5, 5, 5, 5);
-			break;
-		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-			RSP_VNXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 2, 6, 6, 6, 6);
-			break;
-		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-			RSP_VNXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 3, 7, 7, 7, 7);
-			break;
-		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-			RSP_VNXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-			break;
-		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-			RSP_VNXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			break;
-		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-			RSP_VNXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-			break;
-		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-			RSP_VNXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-			break;
-		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-			RSP_VNXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-			break;
-		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-			RSP_VNXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-			break;
-		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-			RSP_VNXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-			break;
-		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-			break;
-	}
-	WRITEBACK_RESULT();
+  	switch(EL)
+  	{
+  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+  			break;
+  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+  			RSP_VNXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+  			break;
+  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+  			RSP_VNXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+  			break;
+  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+  			RSP_VNXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+  			break;
+  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+  			RSP_VNXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+  			break;
+  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+  			RSP_VNXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+  			break;
+  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+  			RSP_VNXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+  			break;
+  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+  			RSP_VNXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  			break;
+  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+  			RSP_VNXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  			break;
+  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+  			RSP_VNXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+  			break;
+  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+  			RSP_VNXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+  			break;
+  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+  			RSP_VNXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+  			break;
+  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+  			RSP_VNXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+  			break;
+  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+  			break;
+  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+  			break;
+  	}
+  	WRITEBACK_RESULT();
 }
+#endif
 
-INLINE void rsp_vrcp(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vrcp(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -3063,11 +6783,11 @@ INLINE void rsp_vrcp(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Calculates reciprocal
 
-	int del = (VS1REG & 7);
-	int sel = EL & 7;
+	int del = 7 - (VS1REG & 7);
+	int sel = 7 - (EL & 7);
 	INT32 rec;
 
-	rec = (INT16)(R_VREG_S(VS2REG, sel));
+	rec = (INT16)(R_VREG_S_X(VS2REG, sel));
 
 	if (rec == 0)
 	{
@@ -3135,16 +6855,18 @@ INLINE void rsp_vrcp(rsp_state *rsp, UINT32 op, INT16 *vres)
 	for (i=0; i < 8; i++)
 	{
 		int element = VEC_EL_2(EL, i);
-		W_ACCUM_L(i, R_VREG_S(VS2REG, element));
+		W_ACCUM_L(i, R_VREG_S_X(VS2REG, element));
 	}
 
 	rsp->reciprocal_res = rec;
 
-	W_VREG_S(VDREG, del, (UINT16)(rsp->reciprocal_res));			// store low part
+	W_VREG_S_X(VDREG, del, (UINT16)(rsp->reciprocal_res));			// store low part
 }
 
-INLINE void rsp_vrcpl(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vrcpl(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -3153,11 +6875,11 @@ INLINE void rsp_vrcpl(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Calculates reciprocal low part
 
-	int del = (VS1REG & 7);
-	int sel = VEC_EL_2(EL, del);
+	int del = 7 - (VS1REG & 7);
+	int sel = 7 - VEC_EL_2(EL, 7-del);
 	INT32 rec;
 
-	rec = ((UINT16)(R_VREG_S(VS2REG, sel)) | ((UINT32)(rsp->reciprocal_high) << 16));
+	rec = ((UINT16)(R_VREG_S_X(VS2REG, sel)) | ((UINT32)(rsp->reciprocal_high) << 16));
 
 	if (rec == 0)
 	{
@@ -3205,17 +6927,18 @@ INLINE void rsp_vrcpl(rsp_state *rsp, UINT32 op, INT16 *vres)
 	for (i=0; i < 8; i++)
 	{
 		int element = VEC_EL_2(EL, i);
-		W_ACCUM_L(i, R_VREG_S(VS2REG, element));
+		W_ACCUM_L(i, R_VREG_S_X(VS2REG, element));
 	}
 
 	rsp->reciprocal_res = rec;
 
-	W_VREG_S(VDREG, del, (UINT16)(rsp->reciprocal_res));			// store low part
+	W_VREG_S_X(VDREG, del, (UINT16)(rsp->reciprocal_res));			// store low part
 }
 
-INLINE void rsp_vrcph(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vrcph(void *param)
 {
-	int i;
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110010 |
@@ -3223,22 +6946,27 @@ INLINE void rsp_vrcph(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Calculates reciprocal high part
 
-	int del = (VS1REG & 7);
-	int sel = VEC_EL_2(EL, del);
+	int del = 7 - (VS1REG & 7);
+	int sel = 7 - VEC_EL_2(EL, 7-del);
 
-	rsp->reciprocal_high = R_VREG_S(VS2REG, sel);
+	rsp->reciprocal_high = R_VREG_S_X(VS2REG, sel);
 
-	for (i=0; i < 8; i++)
-	{
-		int element = VEC_EL_2(EL, i);
-		W_ACCUM_L(i, R_VREG_S(VS2REG, element));		// perhaps accumulator is used to store the intermediate values ?
-	}
+	W_ACCUM_L(0, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 0)));
+	W_ACCUM_L(1, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 1)));
+	W_ACCUM_L(2, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 2)));
+	W_ACCUM_L(3, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 3)));
+	W_ACCUM_L(4, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 4)));
+	W_ACCUM_L(5, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 5)));
+	W_ACCUM_L(6, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 6)));
+	W_ACCUM_L(7, R_VREG_S_X(VS2REG, VEC_EL_2(EL, 7)));
 
-	W_VREG_S(VDREG, del, (INT16)(rsp->reciprocal_res >> 16));	// store high part
+	W_VREG_S_X(VDREG, del, (INT16)(rsp->reciprocal_res >> 16));	// store high part
 }
 
-INLINE void rsp_vmov(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vmov(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110011 |
@@ -3246,12 +6974,14 @@ INLINE void rsp_vmov(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Moves element from vector to destination vector
 
-	int element = VS1REG & 7;
-	W_VREG_S(VDREG, element, R_VREG_S(VS2REG, VEC_EL_2(EL, 7-element)));
+	int element = 7 - (VS1REG & 7);
+	W_VREG_S_X(VDREG, element, R_VREG_S_X(VS2REG, 7 - VEC_EL_2(EL, element)));
 }
 
-INLINE void rsp_vrsql(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vrsql(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -3260,11 +6990,11 @@ INLINE void rsp_vrsql(rsp_state *rsp, UINT32 op, INT16 *vres)
 	//
 	// Calculates reciprocal square-root low part
 
-	int del = (VS1REG & 7);
-	int sel = VEC_EL_2(EL, del);
+	int del = 7 - (VS1REG & 7);
+	int sel = 7 - VEC_EL_2(EL, 7 - del);
 	INT32 sqr;
 
-	sqr = (UINT16)(R_VREG_S(VS2REG, sel)) | ((UINT32)(rsp->square_root_high) << 16);
+	sqr = (UINT16)(R_VREG_S_X(VS2REG, sel)) | ((UINT32)(rsp->square_root_high) << 16);
 
 	if (sqr == 0)
 	{
@@ -3314,19 +7044,24 @@ INLINE void rsp_vrsql(rsp_state *rsp, UINT32 op, INT16 *vres)
 		}
 	}
 
-	for (i=0; i < 8; i++)
-	{
-		int element = VEC_EL_2(EL, i);
-		W_ACCUM_L(i, R_VREG_S(VS2REG, element));
-	}
+	W_ACCUM_L(0, R_VREG_S(VS2REG, VEC_EL_2(EL, 0)));
+	W_ACCUM_L(1, R_VREG_S(VS2REG, VEC_EL_2(EL, 1)));
+	W_ACCUM_L(2, R_VREG_S(VS2REG, VEC_EL_2(EL, 2)));
+	W_ACCUM_L(3, R_VREG_S(VS2REG, VEC_EL_2(EL, 3)));
+	W_ACCUM_L(4, R_VREG_S(VS2REG, VEC_EL_2(EL, 4)));
+	W_ACCUM_L(5, R_VREG_S(VS2REG, VEC_EL_2(EL, 5)));
+	W_ACCUM_L(6, R_VREG_S(VS2REG, VEC_EL_2(EL, 6)));
+	W_ACCUM_L(7, R_VREG_S(VS2REG, VEC_EL_2(EL, 7)));
 
 	rsp->square_root_res = sqr;
 
-	W_VREG_S(VDREG, del, (UINT16)(rsp->square_root_res));			// store low part
+	W_VREG_S_X(VDREG, del, (UINT16)(rsp->square_root_res));			// store low part
 }
 
-INLINE void rsp_vrsqh(rsp_state *rsp, UINT32 op, INT16 *vres)
+INLINE void cfunc_rsp_vrsqh(void *param)
 {
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 	int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -3348,177 +7083,6 @@ INLINE void rsp_vrsqh(rsp_state *rsp, UINT32 op, INT16 *vres)
 
 	W_VREG_S(VDREG, del, (INT16)(rsp->square_root_res >> 16));	// store high part
 }
-
-static void cfunc_handle_vector_ops(void *param)
-{
-	rsp_state *rsp = (rsp_state*)param;
-	int op = rsp->impstate->arg0;
-	INT16 vres[8];
-
-	// Opcode legend:
-	//    E = VS2 element type
-	//    S = VS1, Source vector 1
-	//    T = VS2, Source vector 2
-	//    D = Destination vector
-
-	switch (op & 0x3f)
-	{
-		case 0x00:		/* VMULF */
-			rsp_vmulf(rsp, op, vres);
-			break;
-
-		case 0x01:		/* VMULU */
-			rsp_vmulu(rsp, op, vres);
-			break;
-
-		case 0x04:		/* VMUDL */
-			rsp_vmudl(rsp, op, vres);
-			break;
-
-		case 0x05:		/* VMUDM */
-			rsp_vmudm(rsp, op, vres);
-			break;
-
-		case 0x06:		/* VMUDN */
-			rsp_vmudn(rsp, op, vres);
-			break;
-
-		case 0x07:		/* VMUDH */
-			rsp_vmudh(rsp, op, vres);
-			break;
-
-		case 0x08:		/* VMACF */
-			rsp_vmacf(rsp, op, vres);
-			break;
-
-		case 0x09:		/* VMACU */
-			rsp_vmacu(rsp, op, vres);
-			break;
-
-		case 0x0c:		/* VMADL */
-			rsp_vmadl(rsp, op, vres);
-			break;
-
-		case 0x0d:		/* VMADM */
-			rsp_vmadm(rsp, op, vres);
-			break;
-
-		case 0x0e:		/* VMADN */
-			rsp_vmadn(rsp, op, vres);
-			break;
-
-		case 0x0f:		/* VMADH */
-			rsp_vmadh(rsp, op, vres);
-			break;
-
-		case 0x10:		/* VADD */
-			rsp_vadd(rsp, op, vres);
-			break;
-
-		case 0x11:		/* VSUB */
-			rsp_vsub(rsp, op, vres);
-			break;
-
-		case 0x13:		/* VABS */
-			rsp_vabs(rsp, op, vres);
-			break;
-
-		case 0x14:		/* VADDC */
-			rsp_vaddc(rsp, op, vres);
-			break;
-
-		case 0x15:		/* VSUBC */
-			rsp_vsubc(rsp, op, vres);
-			break;
-
-		case 0x1d:		/* VSAW */
-			rsp_vsaw(rsp, op, vres);
-			break;
-
-		case 0x20:		/* VLT */
-			rsp_vlt(rsp, op, vres);
-			break;
-
-		case 0x21:		/* VEQ */
-			rsp_veq(rsp, op, vres);
-			break;
-
-		case 0x22:		/* VNE */
-			rsp_vne(rsp, op, vres);
-			break;
-
-		case 0x23:		/* VGE */
-			rsp_vge(rsp, op, vres);
-			break;
-
-		case 0x24:		/* VCL */
-			rsp_vcl(rsp, op, vres);
-			break;
-
-		case 0x25:		/* VCH */
-			rsp_vch(rsp, op, vres);
-			break;
-
-		case 0x26:		/* VCR */
-			rsp_vcr(rsp, op, vres);
-			break;
-
-		case 0x27:		/* VMRG */
-			rsp_vmrg(rsp, op, vres);
-			break;
-
-		case 0x2a:		/* VOR */
-			rsp_vor(rsp, op, vres);
-			break;
-
-		case 0x28:		/* VAND */
-			rsp_vand(rsp, op, vres);
-			break;
-
-		case 0x29:		/* VNAND */
-			rsp_vnand(rsp, op, vres);
-			break;
-
-		case 0x2b:		/* VNOR */
-			rsp_vnor(rsp, op, vres);
-			break;
-
-		case 0x2d:		/* VNXOR */
-			rsp_vnxor(rsp, op, vres);
-			break;
-
-		case 0x2c:		/* VXOR */
-			rsp_vxor(rsp, op, vres);
-			break;
-
-		case 0x30:		/* VRCP */
-			rsp_vrcp(rsp, op, vres);
-			break;
-
-		case 0x31:		/* VRCPL */
-			rsp_vrcpl(rsp, op, vres);
-			break;
-
-		case 0x32:		/* VRCPH */
-			rsp_vrcph(rsp, op, vres);
-			break;
-
-		case 0x33:		/* VMOV */
-			rsp_vmov(rsp, op, vres);
-			break;
-
-		case 0x35:		/* VRSQL */
-			rsp_vrsql(rsp, op, vres);
-			break;
-
-		case 0x36:		/* VRSQH */
-			rsp_vrsqh(rsp, op, vres);
-			break;
-
-		default:	unimplemented_opcode(rsp, op); break;
-	}
-}
-
 static void cfunc_sp_set_status_cb(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
@@ -3623,7 +7187,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	drcuml_block *block;
 	jmp_buf errorbuf;
 
-	profiler_mark_start(PROFILER_DRC_COMPILE);
+	profiler_mark_start(PROFILER_DRC_COMPILER);
 
 	/* get a description of this sequence */
 	desclist = drcfe_describe_code(rsp->impstate->drcfe, pc);
@@ -3635,7 +7199,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	}
 
 	/* start the block */
-	block = drcuml_block_begin(drcuml, 4096, &errorbuf);
+	block = drcuml_block_begin(drcuml, 8192, &errorbuf);
 
 	/* loop until we get through all instruction sequences */
 	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
@@ -3728,12 +7292,10 @@ static void cfunc_unimplemented(void *param)
     cfunc_fatalerror - a generic fatalerror call
 -------------------------------------------------*/
 
-#ifndef LSB_FIRST
 static void cfunc_fatalerror(void *param)
 {
 	//fatalerror("fatalerror");
 }
-#endif
 
 
 /***************************************************************************
@@ -3741,7 +7303,7 @@ static void cfunc_fatalerror(void *param)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    static_generate_entry_point - generate a
+    ferate_entry_point - generate a
     static entry point
 -------------------------------------------------*/
 
@@ -3849,7 +7411,11 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	drcuml_state *drcuml = rsp->impstate->drcuml;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-	int unaligned_case = 1;
+	int unaligned_w2 = 1;
+	int aligned_w2 = 2;
+	int unaligned_w4 = 1;
+	int unaligned_r2 = 1;
+	int unaligned_r4 = 1;
 
 	/* if we get an error back, we're screwed */
 	if (setjmp(errorbuf) != 0)
@@ -3864,109 +7430,132 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	alloc_handle(drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);													// handle  *handleptr
 
+	UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));
 
 	// write:
 	if (iswrite)
 	{
 		if (size == 1)
 		{
-#ifdef LSB_FIRST
-			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);				// store   dmem,i0,i1,byte
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));			// xor     i0,i0,bytexor
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);	// store   dmem,i0,i1,byte
 		}
 		else if (size == 2)
 		{
-#ifdef LSB_FIRST
+			static const char text[] = "%08x: Unaligned word write to %08x\n";
 			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD_x1);			// store   dmem,i0,i1,word_x1
-			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_ROLAND(block, IREG(2), IREG(0), IMM(3), IMM(0x18));						// roland  i2,i0,3,0x18
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
-			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
-			UML_DAND(block, IREG(1), IREG(1), IMM(0xffff));								// dand    i1,i1,0xffff
-			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffffffff0000)));			// dand    i3,i3,~0xffff
-			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
-			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
-			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
-#endif
+			UML_JMPc(block, IF_NZ, unaligned_w2);										// jnz     <unaligned_w2>
+			UML_JMP(block, aligned_w2);													// jmp     <aligned_w2>
+
+			UML_LABEL(block, unaligned_w2);												// <unaligned_w2>:
+			UML_MOV(block, MEM(&rsp->impstate->format), IMM((FPTR)text));				// mov     [format],text
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(rsp->pc));					// mov     [arg0],rsp->pc
+			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
+			UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   printf_debug
+			UML_CALLC(block, cfunc_fatalerror, rsp);
+
+			UML_LABEL(block, aligned_w2);												// <aligned_w2>:
+			UML_SHR(block, IREG(0), IREG(0), IMM(1));									// shr     i0,i0,1
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));						// xor     i0,i0,bytexor
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD);				// store   dmem,i0,i1,word
 		}
 		else if (size == 4)
 		{
-#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_JMPc(block, IF_NZ, unaligned_w4);										// jnz     <unaligned_w4>
+
 			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), DWORD_x1);			// store   dmem,i0,i1,dword_x1
 			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_ROLAND(block, IREG(2), IREG(0), IMM(3), IMM(0x18));						// roland  i2,i0,3,0x18
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
-			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
-			UML_DAND(block, IREG(1), IREG(1), IMM(0xffffffff));							// dand    i1,i1,0xffffffff
-			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffff00000000)));			// dand    i3,i3,~0xffffffff
-			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
-			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
-			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
-#endif
+
+			UML_LABEL(block, unaligned_w4);
+			UML_ADD(block, IREG(0), IREG(0), IMM(3));
+
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
+
+			UML_SHR(block, IREG(1), IREG(1), IMM(8));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_SUB(block, IREG(0), IREG(0), IMM(1));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
+
+			UML_SHR(block, IREG(1), IREG(1), IMM(8));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_SUB(block, IREG(0), IREG(0), IMM(1));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
+
+			UML_SHR(block, IREG(1), IREG(1), IMM(8));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_SUB(block, IREG(0), IREG(0), IMM(1));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
 		}
 	}
 	else
 	{
 		if (size == 1)
 		{
-#ifdef LSB_FIRST
-			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));						// xor     i0,i0,bytexor
 			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);				// load    i0,dmem,i0,byte
 		}
 		else if (size == 2)
 		{
-#ifdef LSB_FIRST
-			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD_x1);			// load    i0,dmem,i0,word_x1
+			UML_TEST(block, IREG(0), IMM(1));											// test    i0,3
+			UML_JMPc(block, IF_NZ, unaligned_r2);										// jnz     <unaligned_r2>
+
+			UML_SHR(block, IREG(0), IREG(0), IMM(1));									// shr     i0,i0,1
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));						// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD);				// load    i0,dmem,i0,word
 			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_ROLAND(block, IREG(1), IREG(0), IMM(3), IMM(0x18));						// roland  i1,i0,3,0x18
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
-			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffff));								// and     i0,i0,0xffff
-#endif
+
+			UML_LABEL(block, unaligned_r2);
+			UML_MOV(block, IREG(2), IMM(0));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+
+			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), BYTE);
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_ADD(block, IREG(0), IREG(0), IMM(1));
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_OR(block, IREG(2), IREG(2), IREG(3));
+
+			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), BYTE);
+			UML_ADD(block, IREG(0), IREG(0), IMM(1));
+			UML_SHL(block, IREG(2), IREG(2), IMM(8));
+			UML_OR(block, IREG(2), IREG(2), IREG(3));
+
+			UML_MOV(block, IREG(0), IREG(2));
 		}
 		else if (size == 4)
 		{
-#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword_x1
+			UML_JMPc(block, IF_NZ, unaligned_r4);										// jnz     <unaligned_r4>
+
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword
 			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_ROLAND(block, IREG(1), IREG(0), IMM(3), IMM(0x18));						// roland  i1,i0,3,0x18
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
-			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
-#endif
+
+			UML_LABEL(block, unaligned_r4);
+
+			UML_XOR(block, IREG(1), IREG(0), IMM(BYTE4_XOR_BE(0)));
+			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
+			UML_SHL(block, IREG(2), IREG(3), IMM(24));
+
+			UML_ADD(block, IREG(1), IREG(0), IMM(1));
+			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
+			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
+			UML_SHL(block, IREG(3), IREG(3), IMM(16));
+			UML_OR(block, IREG(2), IREG(2), IREG(3));
+
+			UML_ADD(block, IREG(1), IREG(0), IMM(2));
+			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
+			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
+			UML_SHL(block, IREG(3), IREG(3), IMM(8));
+			UML_OR(block, IREG(2), IREG(2), IREG(3));
+
+			UML_ADD(block, IREG(1), IREG(0), IMM(3));
+			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
+			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
+			UML_OR(block, IREG(0), IREG(2), IREG(3));
 		}
 	}
 	UML_RET(block);
@@ -4076,9 +7665,9 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	/* if we hit an unmapped address, fatal error */
 	//if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	//{
-	//  UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));                               // mov     [pc],desc->pc
-	//  save_fast_iregs(rsp, block);
-	//  UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));                                // exit    EXECUTE_UNMAPPED_CODE
+	//	UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));								// mov     [pc],desc->pc
+	//	save_fast_iregs(rsp, block);
+	//	UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit    EXECUTE_UNMAPPED_CODE
 	//}
 
 	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
@@ -4094,7 +7683,6 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	}
 }
 
-
 /*------------------------------------------------------------------
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
@@ -4107,7 +7695,6 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
 	{
-		UML_MOV(block, MEM(&rsp->impstate->jmpdest), R32(RSREG));					// mov     [jmpdest],<rsreg>
 		UML_AND(block, MEM(&rsp->impstate->jmpdest), R32(RSREG), IMM(0x00000fff));
 		UML_OR(block, MEM(&rsp->impstate->jmpdest), MEM(&rsp->impstate->jmpdest), IMM(0x1000));
 	}
@@ -4115,7 +7702,7 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_MOV(block, R32(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
+		UML_MOV(block, R32(linkreg), IMM((INT32)(desc->pc + 8)));					// mov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
@@ -4157,6 +7744,262 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
     generate_opcode - generate code for a specific
     opcode
 -------------------------------------------------*/
+
+static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+	// Opcode legend:
+	//    E = VS2 element type
+	//    S = VS1, Source vector 1
+	//    T = VS2, Source vector 2
+	//    D = Destination vector
+
+	switch (op & 0x3f)
+	{
+		case 0x00:		/* VMULF */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmulf, rsp);
+			return TRUE;
+
+		case 0x01:		/* VMULU */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmulu, rsp);
+			return TRUE;
+
+		case 0x04:		/* VMUDL */
+#if (DRC_VMUDL)
+			return generate_vmudl(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudl, rsp);
+			return TRUE;
+#endif
+
+		case 0x05:		/* VMUDM */
+#if (DRC_VMUDM)
+			return generate_vmudm(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudm, rsp);
+			return TRUE;
+#endif
+
+		case 0x06:		/* VMUDN */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudn, rsp);
+			return TRUE;
+
+		case 0x07:		/* VMUDH */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudh, rsp);
+			return TRUE;
+
+		case 0x08:		/* VMACF */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmacf, rsp);
+			return TRUE;
+
+		case 0x09:		/* VMACU */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmacu, rsp);
+			return TRUE;
+
+		case 0x0c:		/* VMADL */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadl, rsp);
+			return TRUE;
+
+		case 0x0d:		/* VMADM */
+#if (DRC_VMADM)
+			return generate_vmadm(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadm, rsp);
+			return TRUE;
+#endif
+
+		case 0x0e:		/* VMADN */
+#if (DRC_VMADN)
+			return generate_vmadn(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadn, rsp);
+			return TRUE;
+#endif
+
+		case 0x0f:		/* VMADH */
+#if (DRC_VMADH)
+			return generate_vmadh(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadh, rsp);
+			return TRUE;
+#endif
+
+		case 0x10:		/* VADD */
+#if (DRC_VADD)
+			return generate_vadd(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vadd, rsp);
+			return TRUE;
+#endif
+
+		case 0x11:		/* VSUB */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vsub, rsp);
+			return TRUE;
+
+		case 0x13:		/* VABS */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vabs, rsp);
+			return TRUE;
+
+		case 0x14:		/* VADDC */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddc, rsp);
+			return TRUE;
+
+		case 0x15:		/* VSUBC */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vsubc, rsp);
+			return TRUE;
+
+		case 0x1d:		/* VSAW */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vsaw, rsp);
+			return TRUE;
+
+		case 0x20:		/* VLT */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vlt, rsp);
+			return TRUE;
+
+		case 0x21:		/* VEQ */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_veq, rsp);
+			return TRUE;
+
+		case 0x22:		/* VNE */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vne, rsp);
+			return TRUE;
+
+		case 0x23:		/* VGE */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vge, rsp);
+			return TRUE;
+
+		case 0x24:		/* VCL */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vcl, rsp);
+			return TRUE;
+
+		case 0x25:		/* VCH */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vch, rsp);
+			return TRUE;
+
+		case 0x26:		/* VCR */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vcr, rsp);
+			return TRUE;
+
+		case 0x27:		/* VMRG */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmrg, rsp);
+			return TRUE;
+
+		case 0x28:		/* VAND */
+#if (DRC_VAND)
+			return generate_vand(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vand, rsp);
+			return TRUE;
+#endif
+
+		case 0x29:		/* VNAND */
+#if (DRC_VNAND)
+			return generate_vnand(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vnand, rsp);
+			return TRUE;
+#endif
+
+		case 0x2a:		/* VOR */
+#if (DRC_VOR)
+			return generate_vor(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vor, rsp);
+			return TRUE;
+#endif
+
+		case 0x2b:		/* VNOR */
+#if (DRC_VNOR)
+			return generate_vnor(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vnor, rsp);
+			return TRUE;
+#endif
+
+		case 0x2c:		/* VXOR */
+#if (DRC_VXOR)
+			return generate_vxor(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vxor, rsp);
+			return TRUE;
+#endif
+
+		case 0x2d:		/* VNXOR */
+#if (DRC_VNXOR)
+			return generate_vnxor(rsp, block, compiler, desc);
+#else
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vnxor, rsp);
+			return TRUE;
+#endif
+
+		case 0x30:		/* VRCP */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrcp, rsp);
+			return TRUE;
+
+		case 0x31:		/* VRCPL */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrcpl, rsp);
+			return TRUE;
+
+		case 0x32:		/* VRCPH */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrcph, rsp);
+			return TRUE;
+
+		case 0x33:		/* VMOV */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmov, rsp);
+			return TRUE;
+
+		case 0x35:		/* VRSQL */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrsql, rsp);
+			return TRUE;
+
+		case 0x36:		/* VRSQH */
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrsqh, rsp);
+			return TRUE;
+
+		default:
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_unimplemented_opcode, rsp);
+			return FALSE;
+	}
+}
 
 static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
@@ -4230,7 +8073,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x09:	/* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMMVAL));			// add     i0,<rsreg>,SIMMVAL,V
+				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMMVAL));				// add     i0,<rsreg>,SIMMVAL,V
 			}
 			return TRUE;
 
@@ -4290,7 +8133,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
 			if (RTREG != 0)
-				UML_MOV(block, R32(RTREG), IREG(0));							// mov   <rtreg>,i0
+				UML_MOV(block, R32(RTREG), IREG(0));
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -4314,10 +8157,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x32:	/* LWC2 - MIPS I */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_lwc2, rsp);										// callc   cfunc_mfc2
-			return TRUE;
-			//return generate_lwc2(rsp, block, compiler, desc);
+			return generate_lwc2(rsp, block, compiler, desc);
 
 
 		/* ----- memory store operations ----- */
@@ -4347,9 +8187,10 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x3a:	/* SWC2 - MIPS I */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_swc2, rsp);										// callc   cfunc_mfc2
-			return TRUE;
+			return generate_swc2(rsp, block, compiler, desc);
+			//UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			//UML_CALLC(block, cfunc_swc2, rsp);										// callc   cfunc_mfc2
+			//return TRUE;
 
 		/* ----- coprocessor instructions ----- */
 
@@ -4389,72 +8230,60 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 		case 0x00:	/* SLL - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHL(block, R32(RDREG), R32(RTREG), IMM(SHIFT));					// shl     i0,<rtreg>,<shift>
+				UML_SHL(block, R32(RDREG), R32(RTREG), IMM(SHIFT));
 			}
 			return TRUE;
 
 		case 0x02:	/* SRL - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));					// shr     i0,<rtreg>,<shift>
+				UML_SHR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));
 			}
 			return TRUE;
 
 		case 0x03:	/* SRA - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SAR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));					// sar     i0,<rtreg>,<shift>
+				UML_SAR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));
 			}
 			return TRUE;
 
 		case 0x04:	/* SLLV - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHL(block, R32(RDREG), R32(RTREG), R32(RSREG));					// shl     i0,<rtreg>,<rsreg>
+				UML_SHL(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
 			return TRUE;
 
 		case 0x06:	/* SRLV - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHR(block, R32(RDREG), R32(RTREG), R32(RSREG));					// shr     i0,<rtreg>,<rsreg>
+				UML_SHR(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
 			return TRUE;
 
 		case 0x07:	/* SRAV - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SAR(block, R32(RDREG), R32(RTREG), R32(RSREG));					// sar     i0,<rtreg>,<rsreg>
+				UML_SAR(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
 			return TRUE;
 
 		/* ----- basic arithmetic ----- */
 
 		case 0x20:	/* ADD - MIPS I */
-			if (RDREG != 0)
-			{
-				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
-			}
-			return TRUE;
-
 		case 0x21:	/* ADDU - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
+				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));
 			}
 			return TRUE;
 
 		case 0x22:	/* SUB - MIPS I */
-			if (RDREG != 0)
-			{
-				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
-			}
-			return TRUE;
-
 		case 0x23:	/* SUBU - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
+				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));
 			}
 			return TRUE;
 
@@ -4462,17 +8291,23 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 
 		case 0x24:	/* AND - MIPS I */
 			if (RDREG != 0)
+			{
 				UML_AND(block, R32(RDREG), R32(RSREG), R32(RTREG));				// dand     <rdreg>,<rsreg>,<rtreg>
+			}
 			return TRUE;
 
 		case 0x25:	/* OR - MIPS I */
 			if (RDREG != 0)
+			{
 				UML_OR(block, R32(RDREG), R32(RSREG), R32(RTREG));					// dor      <rdreg>,<rsreg>,<rtreg>
+			}
 			return TRUE;
 
 		case 0x26:	/* XOR - MIPS I */
 			if (RDREG != 0)
+			{
 				UML_XOR(block, R32(RDREG), R32(RSREG), R32(RTREG));				// dxor     <rdreg>,<rsreg>,<rtreg>
+			}
 			return TRUE;
 
 		case 0x27:	/* NOR - MIPS I */
@@ -4526,6 +8361,8 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 	}
 	return FALSE;
 }
+
+
 
 /*-------------------------------------------------
     generate_regimm - compile opcodes in the
@@ -4587,7 +8424,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			{
 				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_mfc2, rsp);									// callc   cfunc_mfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -4596,7 +8433,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			{
 				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_cfc2, rsp);									// callc   cfunc_cfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -4612,9 +8449,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_handle_vector_ops, rsp);							// callc   cfunc_mfc2
-			return TRUE;
+			return generate_vector_opcode(rsp, block, compiler, desc);
 	}
 	return FALSE;
 }
@@ -4633,15 +8468,15 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 		case 0x00:	/* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));				// mov     [arg0],<rtreg>,dword
-				UML_MOV(block, MEM(&rsp->impstate->arg1), IMM(RTREG));				// mov     [arg1],<rdval>,dword
+				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));				// mov     [arg0],<rdreg>
+				UML_MOV(block, MEM(&rsp->impstate->arg1), IMM(RTREG));				// mov     [arg1],<rtreg>
 				UML_CALLC(block, cfunc_get_cop0_reg, rsp);							// callc   cfunc_get_cop0_reg
 			}
 			return TRUE;
 
 		case 0x04:	/* MTCz */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));					// mov     [arg0],<rtreg>,dword
-			UML_MOV(block, MEM(&rsp->impstate->arg1), R32(RTREG));					// mov     [arg1],<rdval>,dword
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));					// mov     [arg0],<rdreg>
+			UML_MOV(block, MEM(&rsp->impstate->arg1), R32(RTREG));					// mov     [arg1],rtreg
 			UML_CALLC(block, cfunc_set_cop0_reg, rsp);								// callc   cfunc_set_cop0_reg
 			return TRUE;
 	}
@@ -4783,11 +8618,11 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
