@@ -2084,6 +2084,10 @@ profiler_mark_start(PROFILER_INPUT);
 		mess_input_port_update_hook(machine, port, &port->state->digital);
 #endif /* MESS */
 
+		/* handle playback/record */
+		playback_port(port);
+		record_port(port);
+
 		/* call device line changed handlers */
 		newvalue = input_port_read_direct(port);
 		for (device_field = port->state->writedevicelist; device_field; device_field = device_field->next)
@@ -2099,13 +2103,6 @@ profiler_mark_start(PROFILER_INPUT);
 					device_field->oldval = newval;
 				}
 			}
-	}
-
-	/* handle playback/record */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
-	{
-		playback_port(port);
-		record_port(port);
 	}
 
 profiler_mark_end();
