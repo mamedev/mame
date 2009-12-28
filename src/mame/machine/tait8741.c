@@ -535,112 +535,85 @@ READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(space,0,offset); }
 WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(space,1,offset,data); }
 READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(space,1,offset); }
 
+static struct
+{
+	UINT8 rxd;
+	UINT8 txd;
+	UINT8 rst;
+}cyclemb_mcu;
+
+void cyclemb_8741_reset(running_machine *machine)
+{
+	cyclemb_mcu.txd = 0;
+	cyclemb_mcu.rst = 1;
+}
+
 static void cyclemb_8741_w(const address_space *space, int num, int offset, int data)
 {
-	JV8741 *mcu = &i8741[num];
-
-	if(offset==1)
+	if(offset == 1) //command port
 	{
-		LOG(("%s:8741[%d] CW %02X\n", cpuexec_describe_context(space->machine), num, data));
-
-		/* read pointer */
-		mcu->cmd = data;
-		/* CMD */
+		printf("%02x CMD PC=%04x\n",data,cpu_get_pc(space->cpu));
 		switch(data)
 		{
-		case 0:
-			mcu->txd = data ^ 0x40;
-			mcu->sts |= 0x02;
-			mcu->rst = 0;
-			break;
-		case 1:
-			/*
-			status codes:
-			0x06 sub NG IOX2
-			0x05 sub NG IOX1
-			0x04 sub NG CIOS
-			0x03 sub NG OPN
-			0x02 sub NG ROM
-			0x01 sub NG RAM
-			0x00 ok
-			*/
-			mcu->rxd = 0 ^ 0x40;
-			mcu->sts |= 0x02;
-			/* ?? */
-			//mcu->rxd = 0;  /* SBSTS ( DIAG ) , killed */
-			mcu->sts |= 0x01; /* RD ready */
-			mcu->rst = 0;
-			break;
-		case 2:
-			mcu->rxd = (input_port_read(space->machine, "DSW2") & 0x1f) << 2;
-			mcu->sts |= 0x01; /* RD ready */
-			mcu->rst = 0;
-			break;
-		case 3: /* normal mode ? */
-			//mcu->rxd = input_port_read(space->machine, "DSW1");
-			mcu->sts |= 0x01; /* RD ready */
-			mcu->rst = 1;
-			break;
-
-		case 0xf0: /* clear main sts ? */
-			mcu->txd = data ^ 0x40;
-			mcu->sts |= 0x02;
-			break;
+			case 0:
+				cyclemb_mcu.rxd = 0x40;
+				cyclemb_mcu.rst = 0;
+				break;
+			case 1:
+				/*
+				status codes:
+				0x06 sub NG IOX2
+				0x05 sub NG IOX1
+				0x04 sub NG CIOS
+				0x03 sub NG OPN
+				0x02 sub NG ROM
+				0x01 sub NG RAM
+				0x00 ok
+				*/
+				cyclemb_mcu.rxd = 0x40;
+				cyclemb_mcu.rst = 0;
+				break;
+			case 2:
+				cyclemb_mcu.rxd = (input_port_read(space->machine, "DSW2") & 0x1f) << 2;
+				cyclemb_mcu.rst = 0;
+				break;
+			case 3:
+				//cyclemb_mcu.rxd = input_port_read(space->machine, "DSW2");
+				cyclemb_mcu.rst = 1;
+				break;
 		}
 	}
-	else
+	else //data port
 	{
-		/* data */
-		LOG(("%s:8741[%d] DW %02X\n", cpuexec_describe_context(space->machine), num, data));
-
-		mcu->txd = data;
-		mcu->sts |= 0x02;    /* TXD busy         */
-#if 1
-		/* interrupt ? */
-		if(num == 0)
-		{
-			if(josvolly_nmi_enable)
-			{
-				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-				josvolly_nmi_enable = 0;
-			}
-		}
-#endif
+		printf("%02x DATA PC=%04x\n",data,cpu_get_pc(space->cpu));
+		cyclemb_mcu.txd = data;
 	}
-	josvolly_8741_do(space->machine, num);
 }
 
 static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 {
-	JV8741 *mcu = &i8741[num];
-	int ret;
-
-	if(offset==1)
+	if(offset == 1) //status port
 	{
-		if(mcu->rst)
+		printf("STATUS PC=%04x\n",cpu_get_pc(space->cpu));
+
+		return 1;
+	}
+	else //data port
+	{
+		printf("READ PC=%04x\n",cpu_get_pc(space->cpu));
+		if(cyclemb_mcu.rst)
 		{
-			//printf("%02x\n",mcu->txd);
-			switch(mcu->txd)
+			switch(cpu_get_pc(space->cpu))
 			{
-				case 0x00: mcu->rxd = input_port_read(space->machine, "IN0"); //dip-sw1
-				case 0x40: mcu->rxd = input_port_read(space->machine, "IN1"); //dip-sw3
-				case 0x41: mcu->rxd = input_port_read(space->machine, "IN2"); //dip-sw3
-				case 0x84: mcu->rxd = input_port_read(space->machine, "IN3"); //dip-sw3
-				case 0x11: mcu->rxd = input_port_read(space->machine, "IN4"); //dip-sw3
+				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW1") & 0x1f) << 2) | (mame_rand(space->machine) & 1); break;
+				case 0x35c: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0xff); break;
 			}
 		}
-		ret = mcu->sts;
-		LOG(("%s:8741[%d]       SR %02X\n",cpuexec_describe_context(space->machine),num,ret));
+
+		return cyclemb_mcu.rxd;
 	}
-	else
-	{
-		/* clear status port */
-		mcu->sts &= ~0x01; /* RD ready */
-		ret = mcu->rxd;
-		LOG(("%s:8741[%d]       DR %02X\n",cpuexec_describe_context(space->machine),num,ret));
-		//mcu->rst = 0;
-	}
-	return ret;
+
+	return 0;
 }
 
 
