@@ -1,8 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
-
-#define TC0100SCN_GFX_NUM 2
-#define TC0480SCP_GFX_NUM 1
+#include "video/taiicdev.h"
 
 UINT16 undrfire_rotate_ctrl[8];
 
@@ -26,11 +23,8 @@ VIDEO_START( undrfire )
 
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
-	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
-	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
-
-	for (i=0; i<16384; i++) /* Fix later - some weird colours in places */
-		palette_set_color(machine,i,MAKE_RGB(0,0,0));
+	for (i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
+		palette_set_color(machine, i, MAKE_RGB(0,0,0));
 }
 
 /***************************************************************
@@ -363,6 +357,8 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 
 VIDEO_UPDATE( undrfire )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -408,23 +404,23 @@ VIDEO_UPDATE( undrfire )
 	}
 #endif
 
-	TC0100SCN_tilemap_update(screen->machine);
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
+	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
-	layer[1] = (priority &0x0f00) >>  8;
-	layer[2] = (priority &0x00f0) >>  4;
-	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = TC0100SCN_bottomlayer(0);
-	pivlayer[1] = pivlayer[0]^1;
+	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -433,52 +429,52 @@ VIDEO_UPDATE( undrfire )
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],TILEMAP_DRAW_OPAQUE,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[3]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
 #ifdef MAME_DEBUG
 	if (dislayer[4]==0)
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((TC0480SCP_pri_reg &0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		if ((tc0480scp_pri_reg_r(tc0480scp, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
-			draw_sprites(screen->machine, bitmap,cliprect,primasks,44,-574);
+			draw_sprites(screen->machine, bitmap, cliprect, primasks, 44, -574);
 		}
 		else
 		{
 			static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-			draw_sprites(screen->machine, bitmap,cliprect,primasks,44,-574);
+			draw_sprites(screen->machine, bitmap, cliprect, primasks, 44, -574);
 		}
 	}
 
 #ifdef MAME_DEBUG
 	if (dislayer[5]==0)
 #endif
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);	/* piv text layer */
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */
 
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
@@ -507,6 +503,8 @@ VIDEO_UPDATE( undrfire )
 
 VIDEO_UPDATE( cbombers )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -552,23 +550,23 @@ VIDEO_UPDATE( cbombers )
 	}
 #endif
 
-	TC0100SCN_tilemap_update(screen->machine);
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
+	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
-	layer[1] = (priority &0x0f00) >>  8;
-	layer[2] = (priority &0x00f0) >>  4;
-	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = TC0100SCN_bottomlayer(0);
-	pivlayer[1] = pivlayer[0]^1;
+	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -577,52 +575,52 @@ VIDEO_UPDATE( cbombers )
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],TILEMAP_DRAW_OPAQUE,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[3]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
 #ifdef MAME_DEBUG
 	if (dislayer[4]==0)
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((TC0480SCP_pri_reg &0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		if ((tc0480scp_pri_reg_r(tc0480scp, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
-			draw_sprites_cbombers(screen->machine, bitmap,cliprect,primasks,80,-208);
+			draw_sprites_cbombers(screen->machine, bitmap, cliprect, primasks, 80, -208);
 		}
 		else
 		{
 			static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-			draw_sprites_cbombers(screen->machine, bitmap,cliprect,primasks,80,-208);
+			draw_sprites_cbombers(screen->machine, bitmap, cliprect, primasks, 80, -208);
 		}
 	}
 
 #ifdef MAME_DEBUG
 	if (dislayer[5]==0)
 #endif
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);	/* piv text layer */
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */
 
 /* Enable this to see rotation (?) control words */
 #if 0

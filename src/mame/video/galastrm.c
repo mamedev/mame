@@ -1,9 +1,7 @@
 #include "driver.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "video/poly.h"
 
-#define TC0100SCN_GFX_NUM 0
-#define TC0480SCP_GFX_NUM 1
 #define X_OFFSET 96
 #define Y_OFFSET 60
 
@@ -46,9 +44,6 @@ static void galastrm_exit(running_machine *machine)
 VIDEO_START( galastrm )
 {
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
-
-	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,48-X_OFFSET,4-Y_OFFSET,0,0,0,0,0);
-	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,56-X_OFFSET,-63+Y_OFFSET,0,0,0,0,0);
 
 	tmpbitmaps = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	polybitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
@@ -458,6 +453,8 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 
 VIDEO_UPDATE( galastrm )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -470,41 +467,41 @@ VIDEO_UPDATE( galastrm )
 	clip.max_x = video_screen_get_width(screen) -1;
 	clip.max_y = video_screen_get_height(screen) -1;
 
-	TC0100SCN_tilemap_update(screen->machine);
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
-	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
-	layer[1] = (priority &0x0f00) >>  8;
-	layer[2] = (priority &0x00f0) >>  4;
-	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	priority = tc0480scp_get_bg_priority(tc0480scp);
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = TC0100SCN_bottomlayer(0);
-	pivlayer[1] = pivlayer[0]^1;
+	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
 	bitmap_fill(bitmap, cliprect, 0);
 	bitmap_fill(priority_bitmap, &clip, 0);
 	bitmap_fill(tmpbitmaps, &clip, 0);
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],0,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], 0, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
 
 #if 0
 	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
 	{
-		if (!input_code_pressed(screen->machine, KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
-		if (!input_code_pressed(screen->machine, KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,4);
-		if (!input_code_pressed(screen->machine, KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
-		if (!input_code_pressed(screen->machine, KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,4);
+		if (!input_code_pressed(screen->machine, KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[0], 0, 1);
+		if (!input_code_pressed(screen->machine, KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[1], 0, 4);
+		if (!input_code_pressed(screen->machine, KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[2], 0, 4);
+		if (!input_code_pressed(screen->machine, KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[3], 0, 4);
 	}
 	else
 	{
-		if (!input_code_pressed(screen->machine, KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
-		if (!input_code_pressed(screen->machine, KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,2);
-		if (!input_code_pressed(screen->machine, KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
-		if (!input_code_pressed(screen->machine, KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,8);
+		if (!input_code_pressed(screen->machine, KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[0], 0, 1);
+		if (!input_code_pressed(screen->machine, KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[1], 0, 2);
+		if (!input_code_pressed(screen->machine, KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[2], 0, 4);
+		if (!input_code_pressed(screen->machine, KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[3], 0, 8);
 	}
 
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
@@ -533,24 +530,25 @@ VIDEO_UPDATE( galastrm )
 	bitmap_fill(priority_bitmap, cliprect, 0);
 	draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
 
-	if (!input_code_pressed(screen->machine, KEYCODE_B)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
-	if (!input_code_pressed(screen->machine, KEYCODE_M)) TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
+	if (!input_code_pressed(screen->machine, KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	if (!input_code_pressed(screen->machine, KEYCODE_M)) tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+
 
 
 #else
 	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
 	{
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,4);
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,4);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[0], 0, 1);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[1], 0, 4);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[2], 0, 4);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[3], 0, 4);
 	}
 	else
 	{
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,2);
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
-		TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,8);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[0], 0, 1);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[1], 0, 2);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[2], 0, 4);
+		tc0480scp_tilemap_draw(tc0480scp, tmpbitmaps, &clip, layer[3], 0, 8);
 	}
 
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
@@ -579,8 +577,8 @@ VIDEO_UPDATE( galastrm )
 	bitmap_fill(priority_bitmap, cliprect, 0);
 	draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
 #endif
 
 	return 0;

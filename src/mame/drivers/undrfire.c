@@ -188,7 +188,7 @@ Board contains only 29 ROMs and not much else.
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "audio/taitosnd.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
@@ -477,10 +477,10 @@ static ADDRESS_MAP_START( undrfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)		/* eerom etc. */
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE(unknown_hardware_r, unknown_int_req_w)	/* int request for unknown hardware */
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)		/* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)		/* piv tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
+	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM							/* single bytes, blending ??? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
@@ -496,10 +496,10 @@ static ADDRESS_MAP_START( cbombers_cpua_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE(cbombers_adc_r, cbombers_adc_w)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)		/* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)		/* piv tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
+	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
 	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
@@ -510,7 +510,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cbombers_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM	/* local ram */
-//  AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
+//  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
 //  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
@@ -695,9 +695,29 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( undrfire_interrupt )
 {
-	frame_counter^=1;
+	frame_counter ^= 1;
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
+
+static const tc0100scn_interface undrfire_tc0100scn_intf =
+{
+	"screen",
+	2, 3,		/* gfxnum, txnum */
+	50, 8,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0480scp_interface undrfire_tc0480scp_intf =
+{
+	1, 4,		/* gfxnum, txnum */
+	0, 		/* pixels */
+	0x24, 0,		/* x_offset, y_offset */
+	-1, 0,		/* text_xoff, text_yoff */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0		/* col_base */
+};
 
 static MACHINE_DRIVER_START( undrfire )
 
@@ -721,6 +741,9 @@ static MACHINE_DRIVER_START( undrfire )
 
 	MDRV_VIDEO_START(undrfire)
 	MDRV_VIDEO_UPDATE(undrfire)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
+	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
@@ -750,12 +773,14 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 
-
 	MDRV_GFXDECODE(cbombers)
 	MDRV_PALETTE_LENGTH(16384)
 
 	MDRV_VIDEO_START(undrfire)
 	MDRV_VIDEO_UPDATE(cbombers)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
+	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)

@@ -315,7 +315,7 @@ void tc0480scp_tilemap_draw(const device_config *device, bitmap_t *bitmap, const
 int tc0480scp_get_bg_priority(const device_config *device);
 
 /* Undrfire needs to read this for a sprite/tile priority hack */
-//extern int TC0480SCP_pri_reg;
+READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r );
 
 
 /** TC0150ROD **/

@@ -3541,6 +3541,13 @@ int tc0480scp_get_bg_priority( const device_config *device )
 	return tc0480scp_bg_pri_lookup[(tc0480scp->pri_reg & 0x1c) >> 2];
 }
 
+// undrfire.c also needs to directly access the priority reg
+READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r )
+{
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
+	return tc0480scp->pri_reg;
+}
+
 static STATE_POSTLOAD( tc0480scp_postload )
 {
 	tc0480scp_state *tc0480scp = (tc0480scp_state *)param;
