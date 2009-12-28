@@ -10,18 +10,18 @@ typedef struct _atarigx2_state atarigx2_state;
 struct _atarigx2_state
 {
 	atarigen_state	atarigen;
-	UINT16 			playfield_base;
-	UINT16 			motion_object_base;
-	UINT16 			motion_object_mask;
+	UINT16			playfield_base;
+	UINT16			motion_object_base;
+	UINT16			motion_object_mask;
 
 	UINT32 *		mo_command;
 	UINT32 *		protection_base;
 
-	UINT16 			current_control;
-	UINT8 			playfield_tile_bank;
-	UINT8 			playfield_color_bank;
-	UINT16 			playfield_xscroll;
-	UINT16 			playfield_yscroll;
+	UINT16			current_control;
+	UINT8			playfield_tile_bank;
+	UINT8			playfield_color_bank;
+	UINT16			playfield_xscroll;
+	UINT16			playfield_yscroll;
 };
 
 

@@ -22,8 +22,8 @@ static const discrete_comp_adder_table desc_hitme_adder =
 		0.100e-6,	// C19
 		0.022e-6,	// C18
 		0.033e-6,	// C17
-		0.010e-6, 	// C16
-		0.005e-6 	// C15
+		0.010e-6,	// C16
+		0.005e-6	// C15
 	}
 };
 
@@ -41,7 +41,7 @@ DISCRETE_SOUND_START(hitme)
 	DISCRETE_INPUT_DATA (HITME_ENABLE_VAL)
 	DISCRETE_INPUT_PULSE(HITME_OUT1, 0)
 
- 	/* This represents the resistor at R3, which controls the speed of the sound effects */
+	/* This represents the resistor at R3, which controls the speed of the sound effects */
 	DISCRETE_ADJUSTMENT(HITME_GAME_SPEED,0.0,25000.0,DISC_LINADJ,"R3")
 
 	/* The clock for the main downcounter is a "404", or LS123 retriggerable multivibrator.

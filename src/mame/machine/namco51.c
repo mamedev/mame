@@ -63,7 +63,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-#define READ_PORT(st,num) 			devcb_call_read8(&(st)->in[num], 0)
+#define READ_PORT(st,num)			devcb_call_read8(&(st)->in[num], 0)
 #define WRITE_PORT(st,num,data) 	devcb_call_write8(&(st)->out[num], 0, data)
 
 

@@ -15,25 +15,25 @@ typedef struct _atarigt_state atarigt_state;
 struct _atarigt_state
 {
 	atarigen_state	atarigen;
-	UINT8 			is_primrage;
+	UINT8			is_primrage;
 	UINT16 *		colorram;
 
 	bitmap_t *		pf_bitmap;
 	bitmap_t *		an_bitmap;
 
-	UINT8 			playfield_tile_bank;
-	UINT8 			playfield_color_bank;
-	UINT16 			playfield_xscroll;
-	UINT16 			playfield_yscroll;
+	UINT8			playfield_tile_bank;
+	UINT8			playfield_color_bank;
+	UINT16			playfield_xscroll;
+	UINT16			playfield_yscroll;
 
-	UINT32 			tram_checksum;
+	UINT32			tram_checksum;
 
-	UINT32 			expanded_mram[MRAM_ENTRIES * 3];
+	UINT32			expanded_mram[MRAM_ENTRIES * 3];
 
 	UINT32 *		mo_command;
 
-	void 			(*protection_w)(const address_space *space, offs_t offset, UINT16 data);
-	void 			(*protection_r)(const address_space *space, offs_t offset, UINT16 *data);
+	void			(*protection_w)(const address_space *space, offs_t offset, UINT16 data);
+	void			(*protection_r)(const address_space *space, offs_t offset, UINT16 *data);
 };
 
 

@@ -63,16 +63,16 @@ struct _atarigen_screen_timer
 typedef struct _atarigen_state atarigen_state;
 struct _atarigen_state
 {
-	UINT8 				scanline_int_state;
-	UINT8 				sound_int_state;
-	UINT8 				video_int_state;
+	UINT8				scanline_int_state;
+	UINT8				sound_int_state;
+	UINT8				video_int_state;
 
 	const UINT16 *		eeprom_default;
 	UINT16 *			eeprom;
-	size_t 				eeprom_size;
+	size_t				eeprom_size;
 
-	UINT8 				cpu_to_sound_ready;
-	UINT8 				sound_to_cpu_ready;
+	UINT8				cpu_to_sound_ready;
+	UINT8				sound_to_cpu_ready;
 
 	UINT16 *			playfield;
 	UINT16 *			playfield2;
@@ -92,12 +92,12 @@ struct _atarigen_state
 
 	UINT16 *			atarivc_data;
 	UINT16 *			atarivc_eof_data;
-	atarivc_state_desc 	atarivc_state;
+	atarivc_state_desc	atarivc_state;
 
 	/* internal state */
-	atarigen_int_func 		update_int_callback;
+	atarigen_int_func		update_int_callback;
 
-	UINT8 					eeprom_unlocked;
+	UINT8					eeprom_unlocked;
 
 	UINT8					slapstic_num;
 	UINT16 *				slapstic;
@@ -109,16 +109,16 @@ struct _atarigen_state
 	offs_t					slapstic_mirror;
 
 	const device_config *	sound_cpu;
-	UINT8 					cpu_to_sound;
-	UINT8 					sound_to_cpu;
-	UINT8 					timed_int;
-	UINT8 					ym2151_int;
+	UINT8					cpu_to_sound;
+	UINT8					sound_to_cpu;
+	UINT8					timed_int;
+	UINT8					ym2151_int;
 
-	atarigen_scanline_func 	scanline_callback;
-	UINT32 					scanlines_per_callback;
+	atarigen_scanline_func	scanline_callback;
+	UINT32					scanlines_per_callback;
 
-	UINT32 					actual_vc_latch0;
-	UINT32 					actual_vc_latch1;
+	UINT32					actual_vc_latch0;
+	UINT32					actual_vc_latch1;
 	UINT8					atarivc_playfields;
 
 	UINT32					playfield_latch;

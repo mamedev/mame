@@ -218,7 +218,7 @@ UINT32 *ROC10937_set_outputs(int id)
 		if ( ROC10937_get_segments(id)[val] & 0x0002 )	roc10937[id].outputs[cursor] |=  0x0002;
 		else                        					roc10937[id].outputs[cursor] &= ~0x0002;
 		if ( ROC10937_get_segments(id)[val] & 0x0004 )	roc10937[id].outputs[cursor] |=  0x0004;
-		else  	    	                  				roc10937[id].outputs[cursor] &= ~0x0004;
+		else	    	                				roc10937[id].outputs[cursor] &= ~0x0004;
 		if ( ROC10937_get_segments(id)[val] & 0x0008 )	roc10937[id].outputs[cursor] |=  0x0008;
 		else    	                    				roc10937[id].outputs[cursor] &= ~0x0008;
 		if ( ROC10937_get_segments(id)[val] & 0x0010 )	roc10937[id].outputs[cursor] |=  0x0010;
@@ -238,7 +238,7 @@ UINT32 *ROC10937_set_outputs(int id)
 		if ( ROC10937_get_segments(id)[val] & 0x1000 )	roc10937[id].outputs[cursor] |=  0x0800;
 		else                        					roc10937[id].outputs[cursor] &= ~0x0800;
 		if ( ROC10937_get_segments(id)[val] & 0x2000 )	roc10937[id].outputs[cursor] |=  0x1000;
-		else                  		      				roc10937[id].outputs[cursor] &= ~0x1000;
+		else                		    				roc10937[id].outputs[cursor] &= ~0x1000;
 		if ( ROC10937_get_segments(id)[val] & 0x8000 )	roc10937[id].outputs[cursor] |=  0x2000;
 		else                        					roc10937[id].outputs[cursor] &= ~0x2000;
 		if ( ROC10937_get_segments(id)[val] & 0x0200 )	roc10937[id].outputs[cursor] |=  0x4000;

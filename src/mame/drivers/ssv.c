@@ -413,7 +413,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM																/*          */	\
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r			)									/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY									/*  Scroll  */	\
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(&ssv_scroll)                 		/*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(&ssv_scroll)                		/*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")																\
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")																\
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")																	\
@@ -421,9 +421,9 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")																\
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE(ssv_lockout_w)								/*  Lockout */	\
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                        				\
-	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE(&ssv_irq_vectors)	          		    /*  IRQ Vec */ 	\
-	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 			/*  IRQ Ack */	\
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               			/*  IRQ En  */  \
+	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE(&ssv_irq_vectors)	        		    /*  IRQ Vec */	\
+	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                               			/*  IRQ Ack */	\
+	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                             			/*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
 	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)												\
 	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK("bank1")														/*  ROM     */	\
@@ -3561,17 +3561,17 @@ ROM_START( koikois2 )
 	ROM_RELOAD(                 0x300001, 0x080000             )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) /* Sprites */
- 	ROM_LOAD( "kk2-a0.bin", 0x0000000, 0x400000, CRC(b94b76c2) SHA1(07ce3e3946669c1bd2f022da9861164625be9c1b) )
- 	ROM_LOAD( "kk2-a1.bin", 0x0400000, 0x200000, CRC(a7c99f56) SHA1(de341e99f76446fab4d7f09c2d8a6f18554b5d2f) )
+	ROM_LOAD( "kk2-a0.bin", 0x0000000, 0x400000, CRC(b94b76c2) SHA1(07ce3e3946669c1bd2f022da9861164625be9c1b) )
+	ROM_LOAD( "kk2-a1.bin", 0x0400000, 0x200000, CRC(a7c99f56) SHA1(de341e99f76446fab4d7f09c2d8a6f18554b5d2f) )
 
- 	ROM_LOAD( "kk2-b0.bin", 0x0800000, 0x400000, CRC(4d028972) SHA1(732c874d3511c7bce006436d557ec24e54df0166) )
- 	ROM_LOAD( "kk2-b1.bin", 0x0c00000, 0x200000, CRC(778ec9fb) SHA1(5983f0292e274e3da098b461355e2c001f4881b3) )
+	ROM_LOAD( "kk2-b0.bin", 0x0800000, 0x400000, CRC(4d028972) SHA1(732c874d3511c7bce006436d557ec24e54df0166) )
+	ROM_LOAD( "kk2-b1.bin", 0x0c00000, 0x200000, CRC(778ec9fb) SHA1(5983f0292e274e3da098b461355e2c001f4881b3) )
 
- 	ROM_LOAD( "kk2-c0.bin", 0x1000000, 0x400000, CRC(34b699d9) SHA1(b5208d5f70f21725e54c9dc59de73f1a5646a72c) )
- 	ROM_LOAD( "kk2-c1.bin", 0x1400000, 0x200000, CRC(ab451e88) SHA1(0c4d6c0c758f2ab4210c201605dd573661b6c553) )
+	ROM_LOAD( "kk2-c0.bin", 0x1000000, 0x400000, CRC(34b699d9) SHA1(b5208d5f70f21725e54c9dc59de73f1a5646a72c) )
+	ROM_LOAD( "kk2-c1.bin", 0x1400000, 0x200000, CRC(ab451e88) SHA1(0c4d6c0c758f2ab4210c201605dd573661b6c553) )
 
- 	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
- 	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
+	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
+	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd0.bin", 0x000000, 0x200000, CRC(b27eaa94) SHA1(05baaef683a1fcd9eb8a7cfd5b280c05108e832f) )

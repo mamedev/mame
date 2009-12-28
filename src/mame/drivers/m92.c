@@ -959,7 +959,7 @@ static MACHINE_DRIVER_START( m92 )
 MACHINE_DRIVER_END
 
 
-static const nec_config gunforce_config ={ 	gunforce_decryption_table, };
+static const nec_config gunforce_config ={	gunforce_decryption_table, };
 static MACHINE_DRIVER_START( gunforce )
 	MDRV_IMPORT_FROM( m92 )
 	MDRV_CPU_MODIFY("soundcpu")

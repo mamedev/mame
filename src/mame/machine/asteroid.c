@@ -75,7 +75,7 @@ READ8_HANDLER( asteroid_IN1_r )
 	if (res & bitmask)
 		res = 0x80;
 	else
-	 	res = ~0x80;
+		res = ~0x80;
 
 	return res;
 }

@@ -10,7 +10,7 @@
 #include "machine/decocass.h"
 #include "sound/ay8910.h"
 
-#define MASTER_CLOCK 	XTAL_12MHz
+#define MASTER_CLOCK	XTAL_12MHz
 #define HCLK			(MASTER_CLOCK/2)
 #define HCLK1			(HCLK/2)
 #define HCLK2			(HCLK1/2)
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( decocass )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x30, 0x30, "Type of Tape" ) 		PORT_DIPLOCATION("SW1:5,6")   /* Used by the "bios" */
+	PORT_DIPNAME( 0x30, 0x30, "Type of Tape" )		PORT_DIPLOCATION("SW1:5,6")   /* Used by the "bios" */
 	PORT_DIPSETTING(    0x00, "MT (Big)" )			/* Was listed as "Board Type" with this being "OLD" */
 	PORT_DIPSETTING(    0x10, "invalid?" )
 	PORT_DIPSETTING(    0x20, "invalid?" )
@@ -565,7 +565,7 @@ static const gfx_layout objlayout =
 
 static GFXDECODE_START( decocass )
 	GFXDECODE_ENTRY( NULL, 0x6000, charlayout,		 0, 4 )  /* char set #1 */
-	GFXDECODE_ENTRY( NULL, 0x6000, spritelayout, 	 0, 4 )  /* sprites */
+	GFXDECODE_ENTRY( NULL, 0x6000, spritelayout,	 0, 4 )  /* sprites */
 	GFXDECODE_ENTRY( NULL, 0xd000, tilelayout,		32, 2 )  /* background tiles */
 	GFXDECODE_ENTRY( NULL, 0xd800, objlayout,		48, 4 )  /* object */
 GFXDECODE_END

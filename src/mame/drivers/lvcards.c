@@ -279,7 +279,7 @@ static INPUT_PORTS_START( lvcards )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lvpoker )
-  	PORT_START("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Analyzer") PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Memory Reset")
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( lvpoker )
 	PORT_DIPSETTING(    0x00, "Credit In/Coin Out")
 	PORT_DIPSETTING(    0x20, "Credit In/Credit Out")
 	PORT_DIPSETTING(    0x40, "Coin In/Coin Out")
-  	//PORT_DIPSETTING(    0x60, "Credit In/Coin Out") Again, clearly no Coin in, Credit out
+	//PORT_DIPSETTING(    0x60, "Credit In/Coin Out") Again, clearly no Coin in, Credit out
 	PORT_DIPNAME( 0x80, 0x80, "Memory Reset Switch" )
 	PORT_DIPSETTING(    0x80, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
@@ -407,7 +407,7 @@ static INPUT_PORTS_START( ponttehk )
 	PORT_DIPSETTING(    0x00, "Credit In/Coin Out" )
 	PORT_DIPSETTING(    0x20, "Coin In/Coin Out" )
 	PORT_DIPSETTING(    0x40, "Credit In/Credit Out" )
-  	//PORT_DIPSETTING(    0x60, "Credit In/Coin Out" ) Again, clearly no Coin in, Credit out
+	//PORT_DIPSETTING(    0x60, "Credit In/Coin Out" ) Again, clearly no Coin in, Credit out
 	PORT_DIPNAME( 0x80, 0x80, "Reset All Switch" )
 	PORT_DIPSETTING(    0x80, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
@@ -472,7 +472,7 @@ static const ay8910_interface lcay8910_interface =
 
 static MACHINE_DRIVER_START( lvcards )
 	// basic machine hardware
- 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
+	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
 
 	MDRV_CPU_PROGRAM_MAP(lvcards_map)
 	MDRV_CPU_IO_MAP(lvcards_io_map)
@@ -507,7 +507,7 @@ static MACHINE_DRIVER_START( lvpoker )
 
 	// basic machine hardware
 	MDRV_NVRAM_HANDLER(generic_1fill)
- 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lvpoker_map)
 	MDRV_MACHINE_START(lvpoker)
 	MDRV_MACHINE_RESET(lvpoker)
@@ -518,7 +518,7 @@ static MACHINE_DRIVER_START( ponttehk )
 
 	// basic machine hardware
 	MDRV_NVRAM_HANDLER(generic_1fill)
- 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ponttehk_map)
 	MDRV_MACHINE_RESET(lvpoker)
 
@@ -587,6 +587,6 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,  		0, lvcards,  lvcards,  0, ROT0, "Tehkan", "Lovely Cards", 0 )
+GAME( 1985, lvcards,		0, lvcards,  lvcards,  0, ROT0, "Tehkan", "Lovely Cards", 0 )
 GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
 GAME( 1985, ponttehk,		0, ponttehk, ponttehk, 0, ROT0, "Tehkan", "Pontoon (Tehkan)", 0 )

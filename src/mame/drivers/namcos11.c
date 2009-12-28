@@ -604,7 +604,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 	m_n_oldcoin = ~n_coin;
 
 	if( strcmp( device->machine->gamedrv->name, "pocketrc" ) == 0 )
- 	{
+	{
 		if( g_p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
 		{
 			g_p_n_psxram[ 0x12c74 / 4 ] = 0;

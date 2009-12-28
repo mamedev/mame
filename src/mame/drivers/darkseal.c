@@ -47,7 +47,7 @@ static WRITE16_HANDLER( darkseal_control_w )
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
     	return;
-  	case 0xa: /* IRQ Ack (VBL) */
+	case 0xa: /* IRQ Ack (VBL) */
 		return;
 	}
 }
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( darkseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
- 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(darkseal_pf3b_data_w) /* 2nd half of pf3, only used on last level */
+	AM_RANGE(0x200000, 0x200fff) AM_WRITE(darkseal_pf3b_data_w) /* 2nd half of pf3, only used on last level */
 	AM_RANGE(0x202000, 0x203fff) AM_WRITE(darkseal_pf3_data_w) AM_BASE(&darkseal_pf3_data)
 	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE(&darkseal_pf12_row)
 	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE(&darkseal_pf34_row)
@@ -425,7 +425,7 @@ ROM_START( gatedoom1 )
 	ROM_LOAD( "fz-02.rom",    0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
 	ROM_LOAD( "fz-03.rom",    0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
-  	/* the following four have not been verified on a real Gate of Doom */
+	/* the following four have not been verified on a real Gate of Doom */
 	/* board - might be different from Dark Seal! */
 
 	ROM_REGION( 0x080000, "gfx2", 0 )

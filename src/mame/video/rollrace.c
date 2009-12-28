@@ -13,8 +13,8 @@ static int ra_flipy = 0;
 static int ra_flipx = 0;
 static int ra_spritebank =0 ;
 
-#define	RA_FGCHAR_BASE 	0
-#define RA_BGCHAR_BASE 	4
+#define	RA_FGCHAR_BASE	0
+#define RA_BGCHAR_BASE	4
 #define RA_SP_BASE	5
 
 WRITE8_HANDLER( rollrace_charbank_w)

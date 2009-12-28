@@ -123,7 +123,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* Helps document the input ports. */
-#define IPT_SLAVEHALT 	IPT_SPECIAL
+#define IPT_SLAVEHALT	IPT_SPECIAL
 
 
 static INPUT_PORTS_START( cerberus )		/* complete, verified from code */

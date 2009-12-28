@@ -371,9 +371,9 @@ WRITE16_HANDLER( genesis_vdp_w )
 			{
 				data &= mem_mask;
 				 if (ACCESSING_BITS_8_15)
-				 	data |= data >> 8;
+					data |= data >> 8;
 				 else
-				 	data |= data << 8;
+					data |= data << 8;
 			}
 			vdp_data_w(space->machine, data);
 			break;
@@ -384,9 +384,9 @@ WRITE16_HANDLER( genesis_vdp_w )
 			{
 				data &= mem_mask;
 				 if (ACCESSING_BITS_8_15)
-				 	data |= data >> 8;
+					data |= data >> 8;
 				 else
-				 	data |= data << 8;
+					data |= data << 8;
 			}
 			vdp_control_w(space, data);
 			break;

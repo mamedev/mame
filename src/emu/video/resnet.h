@@ -87,9 +87,9 @@
 
 /* Some aliases */
 
-#define RES_NET_VIN_MB7052 			RES_NET_VIN_TTL_OUT
-#define RES_NET_VIN_MB7053 			RES_NET_VIN_TTL_OUT
-#define RES_NET_VIN_28S42 			RES_NET_VIN_TTL_OUT
+#define RES_NET_VIN_MB7052			RES_NET_VIN_TTL_OUT
+#define RES_NET_VIN_MB7053			RES_NET_VIN_TTL_OUT
+#define RES_NET_VIN_28S42			RES_NET_VIN_TTL_OUT
 
 /* Structures */
 
@@ -150,7 +150,7 @@ struct _res_net_decode_info {
 	int	end;
 	UINT16	offset[3 * RES_NET_MAX_COMP];
 	INT16	shift[3 * RES_NET_MAX_COMP];
-	UINT16 	mask[3 * RES_NET_MAX_COMP];
+	UINT16	mask[3 * RES_NET_MAX_COMP];
 };
 
 /* return a single value for one channel */

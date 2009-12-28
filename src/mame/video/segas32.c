@@ -1637,7 +1637,7 @@ static void sprite_swap_buffers(void)
 	/* only draw if onscreen, not 0 or 15 */								\
 	if (x >= clipin->min_x && x <= clipin->max_x && 						\
 		(!do_clipout || x < clipout->min_x || x > clipout->max_x) &&		\
-		pix != trans) 														\
+		pix != trans)														\
 	{																		\
 		if (!indirect)														\
 		{																	\
@@ -1666,7 +1666,7 @@ static void sprite_swap_buffers(void)
 	/* only draw if onscreen, not 0 or 15 */								\
 	if (x >= clipin->min_x && x <= clipin->max_x && 						\
 		(!do_clipout || x < clipout->min_x || x > clipout->max_x) &&		\
-		pix != trans) 														\
+		pix != trans)														\
 	{																		\
 		if (!indirect)														\
 		{																	\

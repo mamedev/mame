@@ -215,7 +215,7 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( prehisle )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) 	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(prehisle_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 

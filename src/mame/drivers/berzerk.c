@@ -20,7 +20,7 @@
 
 #define MASTER_CLOCK				(XTAL_10MHz)
 #define MAIN_CPU_CLOCK  			(MASTER_CLOCK / 4)
-#define PIXEL_CLOCK  				(MASTER_CLOCK / 2)
+#define PIXEL_CLOCK 				(MASTER_CLOCK / 2)
 #define S14001_CLOCK				(MASTER_CLOCK / 4)
 #define HTOTAL						(0x140)
 #define HBEND						(0x000)
@@ -311,8 +311,8 @@ static MACHINE_RESET( berzerk )
 
 #define NUM_PENS	(0x10)
 
-#define LS181_12C 	(0)
-#define LS181_10C 	(1)
+#define LS181_12C	(0)
+#define LS181_10C	(1)
 
 
 static VIDEO_START( berzerk )

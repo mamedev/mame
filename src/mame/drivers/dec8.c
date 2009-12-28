@@ -176,11 +176,11 @@ static WRITE8_HANDLER( srdarwin_i8751_w )
 	if (state->i8751_value == 0x3063) state->i8751_return = 0x9c;				/* Protection - Japanese version */
 	if (state->i8751_value == 0x306b) state->i8751_return = 0x94;				/* Protection - World version */
 	if ((state->i8751_value & 0xff00) == 0x4000) state->i8751_return = state->i8751_value;	/* Coinage settings */
- 	if (state->i8751_value == 0x5000) state->i8751_return = ((state->coin1 / 10) << 4) | (state->coin1 % 10);	/* Coin request */
- 	if (state->i8751_value == 0x6000) {state->i8751_value = -1; state->coin1--; }	/* Coin clear */
+	if (state->i8751_value == 0x5000) state->i8751_return = ((state->coin1 / 10) << 4) | (state->coin1 % 10);	/* Coin request */
+	if (state->i8751_value == 0x6000) {state->i8751_value = -1; state->coin1--; }	/* Coin clear */
 	/* Nb:  Command 0x4000 for setting coinage options is not supported */
- 	if ((input_port_read(space->machine, "FAKE") & 1) == 1) state->latch = 1;
- 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
+	if ((input_port_read(space->machine, "FAKE") & 1) == 1) state->latch = 1;
+	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
 
 	/* This next value is the index to a series of tables,
     each table controls the end of level bad guy, wrong values crash the
@@ -249,9 +249,9 @@ static WRITE8_HANDLER( gondo_i8751_w )
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if ((input_port_read(space->machine, "I8751") & 3) == 3) state->latch = 1;
- 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && state->latch) {state->coin1++; state->snd = 1; state->latch = 0;}
- 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && state->latch) {state->coin2++; state->snd = 1; state->latch = 0;}
+	if ((input_port_read(space->machine, "I8751") & 3) == 3) state->latch = 1;
+	if ((input_port_read(space->machine, "I8751") & 1) != 1 && state->latch) {state->coin1++; state->snd = 1; state->latch = 0;}
+	if ((input_port_read(space->machine, "I8751") & 2) != 2 && state->latch) {state->coin2++; state->snd = 1; state->latch = 0;}
 
 	/* Work out return values */
 	if (state->i8751_value == 0x0000) {state->i8751_return = 0; state->coin1 = state->coin2 = state->snd = 0;}
@@ -283,9 +283,9 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!state->latch) {state->latch = 1; state->coin1 = state->coin2 = 0;}
- 	if ((input_port_read(space->machine, "IN2") & 1) != 1 && state->latch)  {state->coin1 = 1; state->latch = 0;}
- 	if ((input_port_read(space->machine, "IN2") & 2) != 2 && state->latch)  {state->coin2 = 1; state->latch = 0;}
+	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!state->latch) {state->latch = 1; state->coin1 = state->coin2 = 0;}
+	if ((input_port_read(space->machine, "IN2") & 1) != 1 && state->latch)  {state->coin1 = 1; state->latch = 0;}
+	if ((input_port_read(space->machine, "IN2") & 2) != 2 && state->latch)  {state->coin2 = 1; state->latch = 0;}
 
 	if (state->i8751_value == 0x0050) state->i8751_return = 0; /* Breywood ID */
 	if (state->i8751_value == 0x0051) state->i8751_return = 0; /* Shackled ID */
@@ -314,8 +314,8 @@ static WRITE8_HANDLER( lastmiss_i8751_w )
 	if (offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
- 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !state->latch) state->latch = 1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x400; state->i8751_return = 0x400; return;}
+		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !state->latch) state->latch = 1;
+		if ((input_port_read(space->machine, "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x400; state->i8751_return = 0x400; return;}
 		if (state->i8751_value == 0x007a) state->i8751_return = 0x0185; /* Japan ID code */
 		if (state->i8751_value == 0x007b) state->i8751_return = 0x0184; /* USA ID code */
 		if (state->i8751_value == 0x0001) {state->coin1 = state->snd = 0;}//???
@@ -346,8 +346,8 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	if (offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
- 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !state->latch) state->latch = 1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x1200; state->i8751_return = 0x1200; return;}
+		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !state->latch) state->latch = 1;
+		if ((input_port_read(space->machine, "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x1200; state->i8751_return = 0x1200; return;}
 
 		if (state->i8751_value == 0x054a) {state->i8751_return = ~(0x4a); state->coin1 = 0; state->snd = 0;} /* Captain Silver (Japan) ID */
 		if (state->i8751_value == 0x054c) {state->i8751_return = ~(0x4c); state->coin1 = 0; state->snd = 0;} /* Captain Silver (World) ID */
@@ -373,9 +373,9 @@ static WRITE8_HANDLER( garyoret_i8751_w )
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if ((input_port_read(space->machine, "I8751") & 3) == 3) state->latch = 1;
- 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
- 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && state->latch) {state->coin2++; state->latch = 0;}
+	if ((input_port_read(space->machine, "I8751") & 3) == 3) state->latch = 1;
+	if ((input_port_read(space->machine, "I8751") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
+	if ((input_port_read(space->machine, "I8751") & 2) != 2 && state->latch) {state->coin2++; state->latch = 0;}
 
 	/* Work out return values */
 	if ((state->i8751_value >> 8) == 0x00) {state->i8751_return = 0; state->coin1 = state->coin2 = 0;}
@@ -425,7 +425,7 @@ static WRITE8_HANDLER( csilver_control_w )
 
 static WRITE8_HANDLER( dec8_sound_w )
 {
- 	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = (dec8_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data);
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -665,9 +665,9 @@ static ADDRESS_MAP_START( oscar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3c00, 0x3c1f) AM_WRITE(dec8_bac06_0_w)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(buffer_spriteram_w)	/* DMA */
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)   		/* BNKS */
+	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)  		/* BNKS */
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP	   		/* COINCL */
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP			/* COINCL */
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1190,11 +1190,11 @@ static INPUT_PORTS_START( gondo )
 	PLAYER1_JOYSTICK
 	/* Top 4 bits are rotary controller */
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	/* Top 4 bits are rotary controller */
 
- 	PORT_START("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1281,7 +1281,7 @@ static INPUT_PORTS_START( oscar )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -1354,7 +1354,7 @@ static INPUT_PORTS_START( oscaru )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -1427,7 +1427,7 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -1501,7 +1501,7 @@ static INPUT_PORTS_START( lastmsnj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -1575,7 +1575,7 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -1654,7 +1654,7 @@ static INPUT_PORTS_START( csilver )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -1728,7 +1728,7 @@ static INPUT_PORTS_START( garyoret )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PLAYER2_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -1842,7 +1842,7 @@ static const gfx_layout sr_sprites =
 	16,16,
 	2048,
 	3,
- 	{ 0x10000*8,0x20000*8,0x00000*8 },
+	{ 0x10000*8,0x20000*8,0x00000*8 },
 	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
 		0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
@@ -1867,7 +1867,7 @@ static const gfx_layout tiles =
 	16,16,
 	4096,
 	4,
- 	{ 0x60000*8,0x40000*8,0x20000*8,0x00000*8 },
+	{ 0x60000*8,0x40000*8,0x20000*8,0x00000*8 },
 	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
 		0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8},
@@ -1880,7 +1880,7 @@ static const gfx_layout tiles_r =
 	16,16,
 	2048,
 	4,
- 	{ 0x20000*8,0x00000*8,0x30000*8,0x10000*8 },
+	{ 0x20000*8,0x00000*8,0x30000*8,0x10000*8 },
 	{ 7,6,5,4,3,2,1,0,
 		7+(16*8), 6+(16*8), 5+(16*8), 4+(16*8), 3+(16*8), 2+(16*8), 1+(16*8), 0+(16*8) },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8},
@@ -1904,7 +1904,7 @@ static GFXDECODE_START( srdarwin )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout_16k,128, 4 ) /* Only 1 used so far :/ */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sr_sprites,	 64, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, srdarwin_tiles,  0, 8 )
-  	GFXDECODE_ENTRY( "gfx3", 0x10000, srdarwin_tiles,  0, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0x10000, srdarwin_tiles,  0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x20000, srdarwin_tiles,  0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x30000, srdarwin_tiles,  0, 8 )
 GFXDECODE_END

@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM  		/* space for diagnostic ROM */
+	AM_RANGE(0xe000, 0xffff) AM_ROM 		/* space for diagnostic ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -325,7 +325,7 @@ static const gfx_layout spritelayout =
 			24*8+0, 24*8+1, 24*8+2, 24*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-  	64*8
+	64*8
 };
 
 static GFXDECODE_START( retofinv )

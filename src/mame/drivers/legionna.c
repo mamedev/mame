@@ -1042,7 +1042,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( legionna )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,20000000/2) 	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(legionna_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
@@ -1074,7 +1074,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( heatbrl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,20000000/2) 	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(heatbrl_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
@@ -2116,7 +2116,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Ba
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,        ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, grainbow, 0,        grainbow, grainbow, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, grainbow, 0,        grainbow, grainbow, 0,		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk, ROT0, "Banpresto", "Denjin Makai", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

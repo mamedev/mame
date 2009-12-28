@@ -470,8 +470,8 @@ static CPU_SET_INFO( h8 )
 	h83xx_state *h8 = get_safe_token(device);
 
 	switch(state) {
-	case CPUINFO_INT_PC:			      		h8->pc = info->i; 								break;
-	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i; 								break;
+	case CPUINFO_INT_PC:			    		h8->pc = info->i;								break;
+	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i;								break;
 	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;
@@ -517,7 +517,7 @@ static READ8_HANDLER( h8330_itu_r )
 	case 0x8d:		// serial Rx 1
 		val = memory_read_byte(h8->io, H8_SERIAL_1);
 		break;
-	case 0x92:    		// FRC H
+	case 0x92:  		// FRC H
 		frc = cpu_get_total_cycles(h8->device) / divider[h8->per_regs[0x96]];
 		frc %= 65536;
 		return frc>>8;
@@ -527,10 +527,10 @@ static READ8_HANDLER( h8330_itu_r )
 		frc %= 65536;
 		return frc&0xff;
 		break;
-	case 0xb2:    		// port 1 data
+	case 0xb2:  		// port 1 data
 		val = memory_read_byte(h8->io, H8_PORT_1);
 		break;
-	case 0xb3:    		// port 2 data
+	case 0xb3:  		// port 2 data
 		val = memory_read_byte(h8->io, H8_PORT_2);
 		break;
 	case 0xb6:		// port 3 data
@@ -583,10 +583,10 @@ static WRITE8_HANDLER( h8330_itu_w )
 	case 0x8b:		// serial Tx 1
 		memory_write_byte(h8->io, H8_SERIAL_1, data);
 		break;
-	case 0xb2:    		// port 1 data
+	case 0xb2:  		// port 1 data
 		memory_write_byte(h8->io, H8_PORT_1, data);
 		break;
-	case 0xb3:    		// port 2 data
+	case 0xb3:  		// port 2 data
 		memory_write_byte(h8->io, H8_PORT_2, data);
 		break;
 	case 0xb6:		// port 3 data

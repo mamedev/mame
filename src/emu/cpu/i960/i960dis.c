@@ -144,7 +144,7 @@ static char *dis_decode_reg(unsigned long iCode, char* tmpStr,unsigned char cnt)
 		else		sprintf(src2,"%s,",regnames[SRC2]);
 	}
 	if(M3)		dst[0] = 0;
-	else 			sprintf(dst,"%s,",regnames[DST]);
+	else			sprintf(dst,"%s,",regnames[DST]);
 	if (cnt == 1)
 		sprintf(tmpStr,"%s%s",dst,src1);
 	else

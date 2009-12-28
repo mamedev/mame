@@ -11,12 +11,12 @@ struct _badlands_state
 {
 	atarigen_state	atarigen;
 
-	UINT8 			pedal_value[2];
+	UINT8			pedal_value[2];
 
 	UINT8 *			bank_base;
 	UINT8 *			bank_source_data;
 
-	UINT8 			playfield_tile_bank;
+	UINT8			playfield_tile_bank;
 };
 
 

@@ -57,7 +57,7 @@ static const UINT8 spc7110_evolution_table[53][4] =
 	{ 0x05, 31, 34, 0 },
 	{ 0x04, 33, 35, 0 },
 	{ 0x04, 33, 36, 0 },
-  	{ 0x03, 34, 37, 0 },
+	{ 0x03, 34, 37, 0 },
 	{ 0x02, 35, 38, 0 },
 	{ 0x02, 36,  5, 0 },
 
@@ -167,7 +167,7 @@ static SPC7110Decomp* SPC7110Decomp_ctor(running_machine *machine)
 	{
 		#define map(x, y) (((i >> x) & 1) << y)
 		//2x8-bit
- 		newclass->morton16[1][i] = map(7, 15) + map(6,  7) + map(5, 14) + map(4,  6)
+		newclass->morton16[1][i] = map(7, 15) + map(6,  7) + map(5, 14) + map(4,  6)
                                  + map(3, 13) + map(2,  5) + map(1, 12) + map(0,  4);
 		newclass->morton16[0][i] = map(7, 11) + map(6,  3) + map(5, 10) + map(4,  2)
                                  + map(3,  9) + map(2,  1) + map(1,  8) + map(0,  0);
@@ -846,7 +846,7 @@ typedef struct
 
 	UINT32 dx_offset;
 	UINT32 ex_offset;
-  	UINT32 fx_offset;
+	UINT32 fx_offset;
 
 	//====================
 	//real-time clock unit
@@ -883,7 +883,7 @@ static void spc7110_init(running_machine* machine)
 	snes_spc7110.r4813 = 0x00;
 	snes_spc7110.r4814 = 0x00;
 	snes_spc7110.r4815 = 0x00;
-  	snes_spc7110.r4816 = 0x00;
+	snes_spc7110.r4816 = 0x00;
 	snes_spc7110.r4817 = 0x00;
 	snes_spc7110.r4818 = 0x00;
 
@@ -1252,12 +1252,12 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 		case 0x4817: snes_spc7110.r4817 = data; break;
 		case 0x4818:
 		{
-      		if(snes_spc7110.r481x != 0x07) break;
+    		if(snes_spc7110.r481x != 0x07) break;
 
-      		snes_spc7110.r4818 = data;
-      		snes_spc7110.r4814_latch = snes_spc7110.r4815_latch = 0;
-      		break;
-      	}
+    		snes_spc7110.r4818 = data;
+    		snes_spc7110.r4814_latch = snes_spc7110.r4815_latch = 0;
+    		break;
+    	}
 
 		//=========
 		//math unit
@@ -1270,28 +1270,28 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 		case 0x4824: snes_spc7110.r4824 = data; break;
 		case 0x4825:
 		{
-      		snes_spc7110.r4825 = data;
+    		snes_spc7110.r4825 = data;
 
-      		if(snes_spc7110.r482e & 1) {
-      			//signed 16-bit x 16-bit multiplication
-      			INT16 r0 = (INT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
-      			INT16 r1 = (INT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
+    		if(snes_spc7110.r482e & 1) {
+    			//signed 16-bit x 16-bit multiplication
+    			INT16 r0 = (INT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
+    			INT16 r1 = (INT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
 
-      			INT32 result = r0 * r1;
-      			snes_spc7110.r4828 = result;
-      			snes_spc7110.r4829 = result >> 8;
-      			snes_spc7110.r482a = result >> 16;
-      			snes_spc7110.r482b = result >> 24;
+    			INT32 result = r0 * r1;
+    			snes_spc7110.r4828 = result;
+    			snes_spc7110.r4829 = result >> 8;
+    			snes_spc7110.r482a = result >> 16;
+    			snes_spc7110.r482b = result >> 24;
 			} else {
-      			//unsigned 16-bit x 16-bit multiplication
-      			UINT16 r0 = (UINT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
-      			UINT16 r1 = (UINT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
+    			//unsigned 16-bit x 16-bit multiplication
+    			UINT16 r0 = (UINT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
+    			UINT16 r1 = (UINT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
 
-      			UINT32 result = r0 * r1;
-      			snes_spc7110.r4828 = result;
-      			snes_spc7110.r4829 = result >> 8;
-      			snes_spc7110.r482a = result >> 16;
-      			snes_spc7110.r482b = result >> 24;
+    			UINT32 result = r0 * r1;
+    			snes_spc7110.r4828 = result;
+    			snes_spc7110.r4829 = result >> 8;
+    			snes_spc7110.r482a = result >> 16;
+    			snes_spc7110.r482b = result >> 24;
 			}
 
 			snes_spc7110.r482f = 0x80;
@@ -1389,7 +1389,7 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 			snes_spc7110.r4831 = data;
 			snes_spc7110.dx_offset = spc7110_datarom_addr((data & 7) * 0x100000);
 			break;
- 		}
+		}
 
 		case 0x4832:
 		{

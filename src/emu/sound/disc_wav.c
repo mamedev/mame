@@ -1690,7 +1690,7 @@ INLINE double dss_inverter_tftab(const node_description *node, double x)
 
 	x = x / info->vB;
 	if (x > 0)
-	 	return info->vB * exp(-context->tf_a * pow(x, context->tf_b));
+		return info->vB * exp(-context->tf_a * pow(x, context->tf_b));
 	else
 		return info->vB;
 }

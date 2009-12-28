@@ -43,7 +43,7 @@ struct _drcmap_state
 	drcmap_entry *		head;				/* head of the live list */
 	drcmap_entry **		tailptr;			/* pointer to tail of the live list */
 	UINT32				numvalues;			/* number of values  in the list */
-	UINT32 				mapvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0]; /* array of current values */
+	UINT32				mapvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0]; /* array of current values */
 };
 
 
@@ -60,7 +60,7 @@ struct _drclabel
 /* structure holding a live list of labels */
 struct _drclabel_list
 {
-	drccache *			cache; 				/* pointer to the cache */
+	drccache *			cache;				/* pointer to the cache */
 	drclabel *			head;				/* head of the live list */
 };
 

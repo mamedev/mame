@@ -70,7 +70,7 @@ void buffer_spriteram_2(running_machine *machine, UINT8 *ptr, int length);
 
 /* set global attributes */
 void flip_screen_set(running_machine *machine, int on);
-void flip_screen_set_no_update(running_machine *machine, int on); 	/* will not call update_flip */
+void flip_screen_set_no_update(running_machine *machine, int on);	/* will not call update_flip */
 void flip_screen_x_set(running_machine *machine, int on);
 void flip_screen_y_set(running_machine *machine, int on);
 int flip_screen_get(running_machine *machine);

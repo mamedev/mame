@@ -5310,10 +5310,10 @@ OP_HANDLER( pref10 )
 		case 0x35: orr(m68_state);			break;
 		case 0x36: eorr(m68_state);			break;
 		case 0x37: cmpr(m68_state);			break;
-		case 0x38: pshsw(m68_state); 		break;
-		case 0x39: pulsw(m68_state); 		break;
-		case 0x3a: pshuw(m68_state); 		break;
-		case 0x3b: puluw(m68_state); 		break;
+		case 0x38: pshsw(m68_state);		break;
+		case 0x39: pulsw(m68_state);		break;
+		case 0x3a: pshuw(m68_state);		break;
+		case 0x3b: puluw(m68_state);		break;
 		case 0x3f: swi2(m68_state);		    break;
 
 		case 0x40: negd(m68_state);			break;
@@ -5437,17 +5437,17 @@ OP_HANDLER( pref11 )
 	switch( ireg2 )
 	{
 		case 0x30: band(m68_state);			break;
-		case 0x31: biand(m68_state); 		break;
+		case 0x31: biand(m68_state);		break;
 		case 0x32: bor(m68_state);			break;
 		case 0x33: bior(m68_state);			break;
 		case 0x34: beor(m68_state);			break;
-		case 0x35: bieor(m68_state); 		break;
+		case 0x35: bieor(m68_state);		break;
 		case 0x36: ldbt(m68_state);			break;
 		case 0x37: stbt(m68_state);			break;
-		case 0x38: tfmpp(m68_state); 		break;	/* Timing for TFM is actually 6+3n.        */
-		case 0x39: tfmmm(m68_state); 		break;	/* To avoid saving the state, I decided    */
-		case 0x3a: tfmpc(m68_state); 		break;	/* to push the initial 6 cycles to the end */
-		case 0x3b: tfmcp(m68_state); 		break;  /* We will soon see how this fairs!        */
+		case 0x38: tfmpp(m68_state);		break;	/* Timing for TFM is actually 6+3n.        */
+		case 0x39: tfmmm(m68_state);		break;	/* To avoid saving the state, I decided    */
+		case 0x3a: tfmpc(m68_state);		break;	/* to push the initial 6 cycles to the end */
+		case 0x3b: tfmcp(m68_state);		break;  /* We will soon see how this fairs!        */
 		case 0x3c: bitmd_im(m68_state);		break;
 		case 0x3d: ldmd_im(m68_state);		break;
 		case 0x3f: swi3(m68_state);			break;

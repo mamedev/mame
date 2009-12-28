@@ -343,10 +343,10 @@ ADDRESS_MAP_END
 /* The first i860 - middle board */
 static ADDRESS_MAP_START( vid_0_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)		/* Shared framebuffer - half of the bits lost to 32-bit bus */
-	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6") 		/* M0<-P0 com 1 (0x440000 in 68k-land) */
+	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6")		/* M0<-P0 com 1 (0x440000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share7") 		/* M0->P0 com 2 (0x480000 in 68k-land) */
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP       				/* Dummy D$ flush page. */
+	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share7")		/* M0->P0 com 2 (0x480000 in 68k-land) */
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP     				/* Dummy D$ flush page. */
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("share2")			/* Shared RAM with main */
 ADDRESS_MAP_END
 
@@ -354,10 +354,10 @@ ADDRESS_MAP_END
 /* The second i860 - top board */
 static ADDRESS_MAP_START( vid_1_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v1_fb_w)		/* Half of the bits lost to 32-bit bus */
-	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8") 		/* M0->P1 com 1 (0x540000 in 68k-land) */
+	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8")		/* M0->P1 com 1 (0x540000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share9")			/* M0<-P1 com 2      (0x580000 in 68k-land) */
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP       				/* Dummy D$ flush page. */
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP     				/* Dummy D$ flush page. */
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("share3")			/* Shared RAM with main */
 ADDRESS_MAP_END
 

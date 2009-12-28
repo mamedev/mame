@@ -138,7 +138,7 @@ struct _machine_config
 	video_start_func		video_start;			/* one-time video start callback */
 	video_reset_func		video_reset;			/* video reset callback */
 	video_eof_func			video_eof;				/* end-of-frame video callback */
-	video_update_func 		video_update; 			/* video update callback */
+	video_update_func		video_update;			/* video update callback */
 
 	sound_start_func		sound_start;			/* one-time sound start callback */
 	sound_reset_func		sound_reset;			/* sound reset callback */

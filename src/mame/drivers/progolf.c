@@ -429,9 +429,9 @@ static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
- 	MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
 
-  	MDRV_CPU_ADD("audiocpu", M6502, 500000)
+	MDRV_CPU_ADD("audiocpu", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")

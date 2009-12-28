@@ -320,7 +320,7 @@ struct _dcs_state
 	UINT64		output_control_cycles;
 	UINT8		last_output_full;
 	UINT8		last_input_empty;
-	UINT16 		progflags;
+	UINT16		progflags;
 	void		(*output_full_cb)(running_machine *, int);
 	void		(*input_empty_cb)(running_machine *, int);
 	UINT16		(*fifo_data_r)(const device_config *device);
@@ -1593,7 +1593,7 @@ void dcs_data_w(int data)
 	if (dcs.sport_timer == NULL)
 		timer_call_after_resynch(dcs.cpu->machine, NULL, data, dcs_delayed_data_w_callback);
 	else
-	 	dcs_delayed_data_w(dcs.cpu->machine, data);
+		dcs_delayed_data_w(dcs.cpu->machine, data);
 }
 
 

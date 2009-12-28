@@ -130,7 +130,7 @@ extern profiler_state global_profiler;
 #define profiler_mark_end()		do { } while (0)
 #define profiler_start()		do { } while (0)
 #define profiler_stop()			do { } while (0)
-#define profiler_get_text(x,s) 	astring_reset(s)
+#define profiler_get_text(x,s)	astring_reset(s)
 
 #endif
 

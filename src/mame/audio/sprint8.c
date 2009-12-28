@@ -130,7 +130,7 @@ static const discrete_555_desc sprint8_motor_555m_desc =
 static const discrete_op_amp_filt_info sprint8_motor_filter =
 {
 	SPRINT8_R27, 0, SPRINT8_R28 + RES_2_PARALLEL(SPRINT8_R19, SPRINT8_R20), 0, SPRINT8_R29,	/* r1, r2, r3, r4, rF, */
-	SPRINT8_C18, SPRINT8_C19, 0, 									/* c1, c2, c3, */
+	SPRINT8_C18, SPRINT8_C19, 0,									/* c1, c2, c3, */
 	5.0 * RES_VOLTAGE_DIVIDER(SPRINT8_R19, SPRINT8_R20), 5, 0		/* vRef, vP, vN */
 };
 
@@ -158,7 +158,7 @@ static const discrete_mixer_desc sprint8_mixer =
  * we will just tell the monostable it was triggered once and ignore C17/R40.
  */
 #define SPRINT8_MOTOR_CIRCUIT(_car)                                                         	\
-DISCRETE_RCFILTER(NODE_RELATIVE(NODE_30, _car - 1), NODE_RELATIVE(SPRINT8_MOTOR1_EN, _car - 1), SPRINT8_R89, SPRINT8_C26) 	\
+DISCRETE_RCFILTER(NODE_RELATIVE(NODE_30, _car - 1), NODE_RELATIVE(SPRINT8_MOTOR1_EN, _car - 1), SPRINT8_R89, SPRINT8_C26)	\
 DISCRETE_ADDER2(NODE_RELATIVE(NODE_40, _car - 1), 1, NODE_RELATIVE(NODE_30, _car - 1), 0.7)	/* add Q21 shift */ 				\
 DISCRETE_555_ASTABLE_CV(NODE_RELATIVE(NODE_50, _car - 1), 1, SPRINT8_R39, 0, SPRINT8_C27, NODE_RELATIVE(NODE_40, _car - 1), &sprint8_motor_555a_desc) \
 DISCRETE_555_MSTABLE(NODE_RELATIVE(NODE_60, _car - 1), 1, NODE_RELATIVE(NODE_50, _car - 1), SPRINT8_R41, SPRINT8_C28, &sprint8_motor_555m_desc)       \

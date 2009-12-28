@@ -1108,7 +1108,7 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 						break;
 
 					case 0xa0:		/* ATAPI Packet */
-			 			atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRQ;
+						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRQ;
 						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
 						atapi_data_ptr = 0;
@@ -1754,7 +1754,7 @@ static INPUT_PORTS_START(ppp)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )			// Left
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )			// Right
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW) 			// Test
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW)			// Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )				// Coin
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )				// Start / Ok
@@ -1787,7 +1787,7 @@ static INPUT_PORTS_START(kbm)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )				// Start P1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )				// Start P2
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW) 			// Test
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW)			// Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )				// Coin
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1925,7 +1925,7 @@ static MACHINE_DRIVER_START(firebeat)
 
 	MDRV_RTC65271_ADD("rtc", NULL)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1965,7 +1965,7 @@ static MACHINE_DRIVER_START(firebeat2)
 
 	MDRV_RTC65271_ADD("rtc", NULL)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 

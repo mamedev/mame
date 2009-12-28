@@ -110,14 +110,14 @@ typedef struct _tms32010_opcode tms32010_opcode;
 struct _tms32010_opcode
 {
 	UINT8	cycles;
-	void 	(*function)(tms32010_state *);
+	void	(*function)(tms32010_state *);
 };
 /* opcode table entry (Opcode 7F has sub-opcodes) */
 typedef struct _tms32010_opcode_7F tms32010_opcode_7F;
 struct _tms32010_opcode_7F
 {
 	UINT8	cycles;
-	void 	(*function)(tms32010_state *);
+	void	(*function)(tms32010_state *);
 };
 
 
@@ -963,11 +963,11 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 12;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 5;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = -1;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 5;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = -1;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (cpustate->INTF & TMS32010_INT_PENDING) ? ASSERT_LINE : CLEAR_LINE;	break;
 
@@ -978,12 +978,12 @@ CPU_GET_INFO( tms32010 )
 		/* This is actually not a stack pointer, but the stack contents */
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + TMS32010_STK3:		info->i = cpustate->STACK[3];			break;
-		case CPUINFO_INT_REGISTER + TMS32010_ACC: 		info->i = cpustate->ACC.d;				break;
-		case CPUINFO_INT_REGISTER + TMS32010_STR: 		info->i = cpustate->STR;				break;
+		case CPUINFO_INT_REGISTER + TMS32010_ACC:		info->i = cpustate->ACC.d;				break;
+		case CPUINFO_INT_REGISTER + TMS32010_STR:		info->i = cpustate->STR;				break;
 		case CPUINFO_INT_REGISTER + TMS32010_PREG:		info->i = cpustate->Preg.d;				break;
 		case CPUINFO_INT_REGISTER + TMS32010_TREG:		info->i = cpustate->Treg;				break;
-		case CPUINFO_INT_REGISTER + TMS32010_AR0: 		info->i = cpustate->AR[0];				break;
-		case CPUINFO_INT_REGISTER + TMS32010_AR1: 		info->i = cpustate->AR[1];				break;
+		case CPUINFO_INT_REGISTER + TMS32010_AR0:		info->i = cpustate->AR[0];				break;
+		case CPUINFO_INT_REGISTER + TMS32010_AR1:		info->i = cpustate->AR[1];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32010);		break;
@@ -1023,17 +1023,17 @@ CPU_GET_INFO( tms32010 )
 				cpustate->STR & 0x0001 ? '1':'0');
 			break;
 
-		case CPUINFO_STR_REGISTER + TMS32010_PC:   	sprintf(info->s, "PC:%04X",   cpustate->PC); break;
-		case CPUINFO_STR_REGISTER + TMS32010_SP:   	sprintf(info->s, "SP:%X", 0); /* fake stack pointer */ break;
-		case CPUINFO_STR_REGISTER + TMS32010_STR:  	sprintf(info->s, "STR:%04X",  cpustate->STR); break;
-		case CPUINFO_STR_REGISTER + TMS32010_ACC:  	sprintf(info->s, "ACC:%08X",  cpustate->ACC.d); break;
-		case CPUINFO_STR_REGISTER + TMS32010_PREG: 	sprintf(info->s, "P:%08X",    cpustate->Preg.d); break;
-		case CPUINFO_STR_REGISTER + TMS32010_TREG: 	sprintf(info->s, "T:%04X",    cpustate->Treg); break;
-		case CPUINFO_STR_REGISTER + TMS32010_AR0:  	sprintf(info->s, "AR0:%04X",  cpustate->AR[0]); break;
-		case CPUINFO_STR_REGISTER + TMS32010_AR1:  	sprintf(info->s, "AR1:%04X",  cpustate->AR[1]); break;
-		case CPUINFO_STR_REGISTER + TMS32010_STK0: 	sprintf(info->s, "STK0:%04X", cpustate->STACK[0]); break;
-		case CPUINFO_STR_REGISTER + TMS32010_STK1: 	sprintf(info->s, "STK1:%04X", cpustate->STACK[1]); break;
-		case CPUINFO_STR_REGISTER + TMS32010_STK2: 	sprintf(info->s, "STK2:%04X", cpustate->STACK[2]); break;
-		case CPUINFO_STR_REGISTER + TMS32010_STK3: 	sprintf(info->s, "STK3:%04X", cpustate->STACK[3]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_PC:	sprintf(info->s, "PC:%04X",   cpustate->PC); break;
+		case CPUINFO_STR_REGISTER + TMS32010_SP:	sprintf(info->s, "SP:%X", 0); /* fake stack pointer */ break;
+		case CPUINFO_STR_REGISTER + TMS32010_STR:	sprintf(info->s, "STR:%04X",  cpustate->STR); break;
+		case CPUINFO_STR_REGISTER + TMS32010_ACC:	sprintf(info->s, "ACC:%08X",  cpustate->ACC.d); break;
+		case CPUINFO_STR_REGISTER + TMS32010_PREG:	sprintf(info->s, "P:%08X",    cpustate->Preg.d); break;
+		case CPUINFO_STR_REGISTER + TMS32010_TREG:	sprintf(info->s, "T:%04X",    cpustate->Treg); break;
+		case CPUINFO_STR_REGISTER + TMS32010_AR0:	sprintf(info->s, "AR0:%04X",  cpustate->AR[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_AR1:	sprintf(info->s, "AR1:%04X",  cpustate->AR[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK0:	sprintf(info->s, "STK0:%04X", cpustate->STACK[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK1:	sprintf(info->s, "STK1:%04X", cpustate->STACK[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK2:	sprintf(info->s, "STK2:%04X", cpustate->STACK[2]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK3:	sprintf(info->s, "STK3:%04X", cpustate->STACK[3]); break;
 	}
 }

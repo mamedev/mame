@@ -362,7 +362,7 @@ static const saa5050_interface malzac_saa5050_intf =
 	"screen",
 	1,	/* starting gfxnum */
 	42, 24, 64,  /* x, y, size */
-      1  	/* rev y order */
+      1 	/* rev y order */
 };
 
 

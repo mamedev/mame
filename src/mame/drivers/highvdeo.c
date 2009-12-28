@@ -263,12 +263,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_vcf_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
- 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
- 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ( read3_r )
- 	AM_RANGE(0x0010, 0x0015) AM_WRITE( tv_vcf_paletteram_w )
- 	AM_RANGE(0x0030, 0x0031) AM_WRITE( tv_vcf_bankselect_w ) AM_DEVREAD8( "oki", okim6376_r, 0x00ff )
+	AM_RANGE(0x0010, 0x0015) AM_WRITE( tv_vcf_paletteram_w )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE( tv_vcf_bankselect_w ) AM_DEVREAD8( "oki", okim6376_r, 0x00ff )
 ADDRESS_MAP_END
 
 
@@ -302,11 +302,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_ncf_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
- 	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE( "oki", tv_ncf_oki6395_w )
- 	AM_RANGE(0x000c, 0x000d) AM_READ( read1_r )
+	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE( "oki", tv_ncf_oki6395_w )
+	AM_RANGE(0x000c, 0x000d) AM_READ( read1_r )
 	AM_RANGE(0x0010, 0x0011) AM_READ( tv_ncf_read2_r )
 	AM_RANGE(0x0012, 0x0013) AM_READ( read3_r )
- 	AM_RANGE(0x0030, 0x0035) AM_WRITE( tv_vcf_paletteram_w )
+	AM_RANGE(0x0030, 0x0035) AM_WRITE( tv_vcf_paletteram_w )
 ADDRESS_MAP_END
 
 
@@ -346,8 +346,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_tcf_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
- 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
- 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x0030, 0x0031) AM_READ( read3_r ) AM_WRITE( tv_tcf_bankselect_w )
 ADDRESS_MAP_END
@@ -407,8 +407,8 @@ static ADDRESS_MAP_START( newmcard_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
 	AM_RANGE(0x0004, 0x0005) AM_WRITE( newmcard_vblank_w )
- 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
- 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ( newmcard_vblank_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
@@ -474,8 +474,8 @@ static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE( brasil_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
- 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
- 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE

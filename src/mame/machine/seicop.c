@@ -2028,10 +2028,10 @@ static void cop2_move2_prot(const address_space *space)
 		case 0x10:	xsrc++; break; //right
 		case 0x30:	xsrc--; break; //left
 		case 0x40:  ysrc--; break; //up
-		case 0x60: 	ysrc++; break; //down
+		case 0x60:	ysrc++; break; //down
 		case 0x08:  ysrc--; xsrc++; break; //up-right
 		case 0x38:	ysrc--; xsrc--; break; //up-left
-		case 0x28: 	ysrc++; xsrc--; break; //down-left
+		case 0x28:	ysrc++; xsrc--; break; //down-left
 		case 0x18:  ysrc++; xsrc++; break; //down-right
 	}
 
@@ -2246,7 +2246,7 @@ INLINE void cop_ram_w(cop_state *cop, UINT16 offset, UINT16 data)
 
 INLINE UINT32 r32(offs_t address)
 {
-	return 	(memory_read_word(space, address + 0) << 0) |
+	return	(memory_read_word(space, address + 0) << 0) |
 			(memory_read_word(space, address + 2) << 16);
 }
 

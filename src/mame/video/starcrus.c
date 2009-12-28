@@ -94,7 +94,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 
     s2_sprite = data&0x1f;
     set_led_status(space->machine, 2,~data & 0x80); 		/* game over lamp */
-    coin_counter_w(space->machine, 0, ((data&0x40)>>6)^0x01); 	/* coin counter */
+    coin_counter_w(space->machine, 0, ((data&0x40)>>6)^0x01);	/* coin counter */
     engine2_on = ((data&0x20)>>5)^0x01;
 
     if (engine1_on || engine2_on)
@@ -234,7 +234,7 @@ static int collision_check_s1s2(running_machine *machine)
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
         for (sx=0;sx<16;sx++)
-       		/* Condition 1 - ship 1 = ship 2 */
+    		/* Condition 1 - ship 1 = ship 2 */
         	if ((*BITMAP_ADDR16(ship1_vid, sy, sx)==1) && (*BITMAP_ADDR16(ship2_vid, sy, sx)==1))
                 return 1;
 
@@ -294,7 +294,7 @@ static int collision_check_p1p2(running_machine *machine)
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
         for (sx=0;sx<16;sx++)
-       		/* Condition 1 - proj 1 = proj 2 */
+    		/* Condition 1 - proj 1 = proj 2 */
         	if ((*BITMAP_ADDR16(proj1_vid, sy, sx)==1) && (*BITMAP_ADDR16(proj2_vid, sy, sx)==1))
                 return 1;
 
@@ -365,7 +365,7 @@ static int collision_check_s1p1p2(running_machine *machine)
     for (sy=0;sy<16;sy++)
         for (sx=0;sx<16;sx++)
         	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==1)
-           	{
+        	{
         		/* Condition 1 - ship 1 = proj 1 */
 				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==1)
                 	return 1;
@@ -441,7 +441,7 @@ static int collision_check_s2p1p2(running_machine *machine)
     for (sy=0;sy<16;sy++)
         for (sx=0;sx<16;sx++)
         	if (*BITMAP_ADDR16(ship2_vid, sy, sx)==1)
-           	{
+        	{
         		/* Condition 1 - ship 2 = proj 1 */
 				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==1)
                 	return 1;

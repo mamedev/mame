@@ -28,9 +28,9 @@ static const discrete_dac_r1_ladder bosco_54xx_dac =
 {
 	4,				/* number of DAC bits */
 					/* 54XX_0   54XX_1  54XX_2 */
-	{ RES_K(47),  	/* R28,     R32,    R46 */
-	  RES_K(22),  	/* R27,     R31,    R45 */
-	  RES_K(10),  	/* R26,     R30,    R44 */
+	{ RES_K(47),	/* R28,     R32,    R46 */
+	  RES_K(22),	/* R27,     R31,    R45 */
+	  RES_K(10),	/* R26,     R30,    R44 */
 	  RES_K(4.7)},	/* R25,     R29,    R43 */
 	0, 0, 0, 0		/* nothing extra */
 };
@@ -40,8 +40,8 @@ static const discrete_dac_r1_ladder bosco_52xx_dac =
 {
 	4,				/* number of DAC bits */
 	{ RES_K(100),	/* R14 */
-	  RES_K(47), 	/* R13 */
-	  RES_K(22), 	/* R12 */
+	  RES_K(47),	/* R13 */
+	  RES_K(22),	/* R12 */
 	  RES_K(10)},	/* R11 */
 	0, 0, 0, 0		/* nothing extra */
 };

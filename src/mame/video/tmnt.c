@@ -136,7 +136,7 @@ void punkshot_sprite_callback(running_machine *machine, int *code,int *color,int
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*code |= (*color & 0x10) << 9;
 	*color = sprite_colorbase + (*color & 0x0f);
@@ -148,7 +148,7 @@ void thndrx2_sprite_callback(running_machine *machine, int *code,int *color,int 
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*color = sprite_colorbase + (*color & 0x0f);
 }
@@ -166,7 +166,7 @@ void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*color = sprite_colorbase + (*color & 0x1f);
 }
@@ -182,7 +182,7 @@ if (input_code_pressed(machine, KEYCODE_E) && (*color & 0x80)) *color = rand();
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*color = sprite_colorbase + (*color & 0x1f);
 }
@@ -193,7 +193,7 @@ void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*code |= prmrsocr_sprite_bank << 14;
 

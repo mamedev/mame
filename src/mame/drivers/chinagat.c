@@ -377,7 +377,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8748_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugb1_mcu_command_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE("adpcm", saiyugb1_m5205_clk_w) 		/* Drives the clock on the m5205 at 1/8 of this frequency */
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE("adpcm", saiyugb1_m5205_clk_w)		/* Drives the clock on the m5205 at 1/8 of this frequency */
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugb1_m5205_irq_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugb1_adpcm_rom_addr_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("adpcm", saiyugb1_adpcm_control_w)

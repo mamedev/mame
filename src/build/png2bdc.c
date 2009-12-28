@@ -83,7 +83,7 @@ struct _render_font
 {
 	int					height;				/* height of the font, from ascent to descent */
 	int					yoffs;				/* y offset from baseline to descent */
-	render_font_char 	chars[65536];		/* array of characters */
+	render_font_char	chars[65536];		/* array of characters */
 };
 
 

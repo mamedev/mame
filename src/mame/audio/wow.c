@@ -123,7 +123,7 @@ READ8_HANDLER( wow_speech_r )
 //  logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	if(Phoneme==63) {
-   		sample_stop(samples, 0);
+		sample_stop(samples, 0);
 //              logerror("Clearing sample %s\n",totalword);
 				totalword[0] = 0;				   /* Clear the total word stack */
 				return data;

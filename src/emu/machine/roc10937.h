@@ -11,7 +11,7 @@
 #define MAX_ROCK_ALPHAS  3	  // max number of displays emulated
 
 #define ROCKWELL10937 0	// Rockwell 10937
-#define MSC1937 0 		// OKI MSC1937 clone of Rockwell 10937
+#define MSC1937 0		// OKI MSC1937 clone of Rockwell 10937
 #define ROCKWELL10957 1	// Rockwell 10957
 
 void	ROC10937_init(  int id, int type,int reversed );		// setup a display

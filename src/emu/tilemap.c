@@ -56,9 +56,9 @@ struct _blit_parameters
 {
 	bitmap_t *			bitmap;
 	rectangle			cliprect;
-	blitmask_func 		draw_masked;
+	blitmask_func		draw_masked;
 	blitopaque_func		draw_opaque;
-	UINT32 				tilemap_priority_code;
+	UINT32				tilemap_priority_code;
 	UINT8				mask;
 	UINT8				value;
 	UINT8				alpha;
@@ -107,9 +107,9 @@ struct _tilemap_t
 	UINT32						scrollcols;			/* number of independently scrolled colums */
 	INT32 *						rowscroll;			/* array of rowscroll values */
 	INT32 *						colscroll;			/* array of colscroll values */
-	INT32 						dx;					/* global horizontal scroll offset */
+	INT32						dx;					/* global horizontal scroll offset */
 	INT32						dx_flipped;			/* global horizontal scroll offset when flipped */
-	INT32 						dy;					/* global vertical scroll offset */
+	INT32						dy;					/* global vertical scroll offset */
 	INT32						dy_flipped;			/* global vertical scroll offset when flipped */
 
 	/* pixel data */
@@ -118,7 +118,7 @@ struct _tilemap_t
 	/* transparency mapping */
 	bitmap_t *					flagsmap;			/* per-pixel flags */
 	UINT8 *						tileflags;			/* per-tile flags */
-	UINT8 *						pen_to_flags; 		/* mapping of pens to flags */
+	UINT8 *						pen_to_flags;		/* mapping of pens to flags */
 };
 
 
@@ -900,7 +900,7 @@ profiler_mark_start(PROFILER_TILEMAP_DRAW);
 				if (effective_colscroll(tmap, nextcol, height) != scrolly)
 					break;
 
- 			/* skip if disabled */
+			/* skip if disabled */
 			if (scrolly == TILE_LINE_DISABLED)
 				continue;
 
@@ -1258,7 +1258,7 @@ static void pixmap_update(tilemap_t *tmap, const rectangle *cliprect)
 	int row, col;
 
 	/* if the graphics changed, we need to mark everything dirty */
- 	if (gfx_elements_changed(tmap))
+	if (gfx_elements_changed(tmap))
 		tilemap_mark_all_tiles_dirty(tmap);
 
 	/* if everything is clean, do nothing */

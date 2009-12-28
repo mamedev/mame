@@ -557,7 +557,7 @@ static VIDEO_UPDATE( laserbat )
 
 static const sn76477_interface laserbat_sn76477_interface =
 {
-	RES_K(47), 		/*  4 noise_res         R21    47K */
+	RES_K(47),		/*  4 noise_res         R21    47K */
 	0,				/*  5 filter_res (variable) */
 	CAP_P(1000),	/*  6 filter_cap        C21    1000 pF */
 	0,				/*  7 decay_res         */

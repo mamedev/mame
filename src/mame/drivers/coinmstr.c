@@ -83,7 +83,7 @@ static WRITE8_HANDLER( quizmstr_attr1_w )
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32 	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
+		UINT32	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
 		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
 
 		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32 	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
+		UINT32	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
 		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
 
 		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
@@ -261,11 +261,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( quizmstr )
 	PORT_START("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
- 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Bookkeeping") PORT_TOGGLE /* Button 2 for second page, Button 3 erases data */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Bookkeeping") PORT_TOGGLE /* Button 2 for second page, Button 3 erases data */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
- 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
@@ -356,8 +356,8 @@ static INPUT_PORTS_START( quizmstr )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	/* If 0x40 is HIGH the DIP Test Mode does work but bookkeeping shows always 0's */
 	/* If 0x40 is LOW Bookkeeping does work, but the second page (selected categories) is missing */
- 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
- 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PIA2.B")
 	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )

@@ -1714,7 +1714,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 		UINT8 *snd = memory_region(space->machine, "scsp");
 		if (data & 0x20)
 		{
-	  		memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
+			memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
 			memory_set_bankptr(space->machine, "bank5", snd + 0x600000);
 		}
 		else
@@ -1831,7 +1831,7 @@ static const mb86233_cpu_core tgp_config =
 static MACHINE_DRIVER_START( model2o )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2o_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(model1_snd)
@@ -1887,7 +1887,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model2a )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2a_crx_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd)
@@ -1942,7 +1942,7 @@ static const sharc_config sharc_cfg =
 static MACHINE_DRIVER_START( model2b )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2b_crx_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd)
@@ -1997,7 +1997,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model2c )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2c_crx_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd)

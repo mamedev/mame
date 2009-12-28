@@ -129,7 +129,7 @@ static READ8_HANDLER( dsw0_port_r )
 	// vblank replaces the cabinet dip
 
 	return ( ( input_port_read(space->machine, "DSW0") & 0x7F ) |		// dsw0
-   			 ( input_port_read(space->machine, "FAKE") & 0x80 ) );		// vblank
+			 ( input_port_read(space->machine, "FAKE") & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer

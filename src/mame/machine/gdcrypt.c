@@ -171,7 +171,7 @@ static void des_generate_subkeys(const UINT64 key, UINT32 *subkeys)
 		    (DES_RIGHTSWAP[(r >> 20) & 0xf] << 5) |
 		    (DES_RIGHTSWAP[(r >> 28) & 0xf] << 4);
 
-  	l &= 0x0fffffff;
+	l &= 0x0fffffff;
 	r &= 0x0fffffff;
 
 
@@ -204,7 +204,7 @@ static void des_generate_subkeys(const UINT64 key, UINT32 *subkeys)
 		    ((r >> 26) & DES_MASK_TABLE[20])|
 		    ((r >> 24) & DES_MASK_TABLE[21]);
 
-  		subkeys[round*2+1] =
+		subkeys[round*2+1] =
 		    ((l << 15) & DES_MASK_TABLE[22])|
 		    ((l << 17) & DES_MASK_TABLE[23])|
 		    ((l << 10) & DES_MASK_TABLE[24])|
@@ -261,7 +261,7 @@ static UINT64 des_encrypt_decrypt(int decrypt, UINT64 ret)
     	l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
- 		temp = ((r>>3) | (r<<29)) ^ des_subkeys[subkey];
+		temp = ((r>>3) | (r<<29)) ^ des_subkeys[subkey];
     	l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
     	l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
     	l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -274,9 +274,9 @@ static UINT64 des_encrypt_decrypt(int decrypt, UINT64 ret)
     	r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
     	r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
     	r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
-  		subkey++;
+		subkey++;
 
-  		temp = ((l>>3) | (l<<29)) ^ des_subkeys[subkey];
+		temp = ((l>>3) | (l<<29)) ^ des_subkeys[subkey];
     	r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
     	r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
     	r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -362,7 +362,7 @@ void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int
 		ret = rev64(ret);
 		ret = des_encrypt_decrypt(1, ret);
 		ret = rev64(ret);
-	 	write_from_qword(region+i, ret);
+		write_from_qword(region+i, ret);
 	}
 
 	#ifdef MAME_DEBUG

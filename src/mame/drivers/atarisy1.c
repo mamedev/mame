@@ -833,27 +833,27 @@ MACHINE_DRIVER_END
 
 #define MOTHERBOARD_BIOS											                                                           \
 	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
- 	ROM_LOAD16_BYTE_BIOS(0, "136032.205.l13", 0x00000, 0x04000, CRC(88d0be26) SHA1(d124045eccc562ff0423b23a240e27ad740fa0c9) ) \
+	ROM_LOAD16_BYTE_BIOS(0, "136032.205.l13", 0x00000, 0x04000, CRC(88d0be26) SHA1(d124045eccc562ff0423b23a240e27ad740fa0c9) ) \
 	ROM_LOAD16_BYTE_BIOS(0, "136032.206.l12", 0x00001, 0x04000, CRC(3c79ef05) SHA1(20fdca7131478e1ee12691bdafd2d5bb74cbd16f) ) \
 	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )                                                                    \
- 	ROM_LOAD16_BYTE_BIOS(1, "136032.105.l13", 0x00000, 0x04000, CRC(690b37d3) SHA1(547372f1044a3442aa52fcd2b3546540aba59344) ) \
+	ROM_LOAD16_BYTE_BIOS(1, "136032.105.l13", 0x00000, 0x04000, CRC(690b37d3) SHA1(547372f1044a3442aa52fcd2b3546540aba59344) ) \
 	ROM_LOAD16_BYTE_BIOS(1, "136032.106.l12", 0x00001, 0x04000, CRC(76ee86c4) SHA1(cbcd424510435a04e9041967a13781fd19b0f2c4) ) \
 	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )                                                                             \
- 	ROM_LOAD16_BYTE_BIOS(2, "136032.114.j11", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) \
+	ROM_LOAD16_BYTE_BIOS(2, "136032.114.j11", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) \
 	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) )
 
 #define MOTHERBOARD_ALPHA                                                                           				   \
- 	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
- 	ROM_LOAD_BIOS(1, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
- 	ROM_LOAD_BIOS(2, "136032.107.b2", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) )
+	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
+	ROM_LOAD_BIOS(1, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
+	ROM_LOAD_BIOS(2, "136032.107.b2", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) )
 
 #define MOTHERBOARD_PROMS                                                                                              \
- 	ROM_LOAD_BIOS(0, "136032.101.e3", 0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
- 	ROM_LOAD_BIOS(0, "136032.102.e5", 0x00000, 0x00100, CRC(ebf1e0ae) SHA1(2d327e78832edd67ca3909c25b8c8c839637a1ed) ) \
- 	ROM_LOAD_BIOS(0, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */                                        \
- 	ROM_LOAD_BIOS(1, "136032.101.e3", 0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
- 	ROM_LOAD_BIOS(1, "136032.102.e5", 0x00000, 0x00100, CRC(ebf1e0ae) SHA1(2d327e78832edd67ca3909c25b8c8c839637a1ed) ) \
- 	ROM_LOAD_BIOS(1, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */
+	ROM_LOAD_BIOS(0, "136032.101.e3", 0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
+	ROM_LOAD_BIOS(0, "136032.102.e5", 0x00000, 0x00100, CRC(ebf1e0ae) SHA1(2d327e78832edd67ca3909c25b8c8c839637a1ed) ) \
+	ROM_LOAD_BIOS(0, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */                                        \
+	ROM_LOAD_BIOS(1, "136032.101.e3", 0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
+	ROM_LOAD_BIOS(1, "136032.102.e5", 0x00000, 0x00100, CRC(ebf1e0ae) SHA1(2d327e78832edd67ca3909c25b8c8c839637a1ed) ) \
+	ROM_LOAD_BIOS(1, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */
 
 ROM_START( atarisy1 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -1060,7 +1060,7 @@ ROM_END
 
 
 ROM_START( marble5 ) /* LSI Cartridge */
- 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
+	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136033.201", 0x10000, 0x08000, CRC(9395804d) SHA1(7cca2cc85a9678199c7a60c0976f3e0362f8538f) ) /* Located at B10 */
 	ROM_LOAD16_BYTE( "136033.202", 0x10001, 0x08000, CRC(edd313f5) SHA1(f3ec6f5812287e187026446fe286f257b54c426e) ) /* Located at A10 */
@@ -1086,7 +1086,7 @@ ROM_START( marble5 ) /* LSI Cartridge */
 	ROM_LOAD(        "136033.116", 0x94000, 0x04000, CRC(84ee1c80) SHA1(5192c0a2887f46b616d130bdbfffbbd5e394e9a3) )  /* bank 2, plane 1 - located at B7 */
 	ROM_LOAD(        "136033.117", 0xa4000, 0x04000, CRC(daa02926) SHA1(33c7a38c66fb4d67a6ee88ef2da2bba091439e0c) )  /* bank 2, plane 2 - located at C7 */
 
- 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD(        "136033.118", 0x00000, 0x00200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap, located at A7 */
 	ROM_LOAD(        "136033.159", 0x00200, 0x00200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color, located at A5 */
 

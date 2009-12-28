@@ -41,7 +41,7 @@ typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
 	UINT8 *		texbase;
-	UINT16 		pixdata;
+	UINT16		pixdata;
 	UINT8		dither;
 };
 

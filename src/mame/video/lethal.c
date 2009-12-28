@@ -60,7 +60,7 @@ VIDEO_START(lethalen)
 	}
 	else
 	{ /* fixme */
- 		k056832_set_layer_offs(k056832, 0, 188, 0);
+		k056832_set_layer_offs(k056832, 0, 188, 0);
 		k056832_set_layer_offs(k056832, 1, 190, 0);
 		k056832_set_layer_offs(k056832, 2, 192, 0);
 		k056832_set_layer_offs(k056832, 3, 194, 0);

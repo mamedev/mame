@@ -638,7 +638,7 @@ INLINE void apu_update(nesapu_state *info, stream_sample_t *buffer16, int sample
 INLINE uint8 apu_read(nesapu_state *info,int address)
 {
 	if (address == 0x15) /*FIXED* Address $4015 has different behaviour*/
-  	{
+	{
 		int readval = 0;
 		if (info->APU.squ[0].vbl_length > 0)
 			readval |= 0x01;
@@ -652,10 +652,10 @@ INLINE uint8 apu_read(nesapu_state *info,int address)
 		if (info->APU.noi.vbl_length > 0)
 			readval |= 0x08;
 
-  		if (info->APU.dpcm.enabled == TRUE)
+		if (info->APU.dpcm.enabled == TRUE)
 			readval |= 0x10;
 
-  		if (info->APU.dpcm.irq_occurred == TRUE)
+		if (info->APU.dpcm.irq_occurred == TRUE)
 			readval |= 0x80;
 
 		return readval;

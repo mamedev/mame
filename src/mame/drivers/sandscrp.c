@@ -130,7 +130,7 @@ static VIDEO_EOF( sandscrp )
 /* Reads the cause of the interrupt */
 static READ16_HANDLER( sandscrp_irq_cause_r )
 {
-	return 	( sprite_irq  ?  0x08  : 0 ) |
+	return	( sprite_irq  ?  0x08  : 0 ) |
 			( unknown_irq ?  0x10  : 0 ) |
 			( vblank_irq  ?  0x20  : 0 ) ;
 }
@@ -434,7 +434,7 @@ static const ym2203_interface ym2203_intf_sandscrp =
 static const kaneko_pandora_interface sandscrp_pandora_config =
 {
 	"screen",	/* screen tag */
-	0, 	/* gfx_region */
+	0,	/* gfx_region */
 	0, 0	/* x_offs, y_offs */
 };
 

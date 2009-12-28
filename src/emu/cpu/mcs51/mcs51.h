@@ -51,7 +51,7 @@ enum
 
 enum
 {
-	MCS51_INT0_LINE = 0, 	/* P3.2: External Interrupt 0 */
+	MCS51_INT0_LINE = 0,	/* P3.2: External Interrupt 0 */
 	MCS51_INT1_LINE,		/* P3.3: External Interrupt 1 */
 	MCS51_RX_LINE,			/* P3.0: Serial Port Receive Line */
 	MCS51_T0_LINE,			/* P3,4: Timer 0 External Input */

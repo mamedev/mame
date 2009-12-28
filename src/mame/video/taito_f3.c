@@ -529,7 +529,7 @@ static TILE_GET_INFO( get_tile_info_vram )
 	int flags=0;
 
 	if (tile_index&1)
-	   	vram_tile = (machine->generic.videoram.u32[tile_index>>1]&0xffff);
+		vram_tile = (machine->generic.videoram.u32[tile_index>>1]&0xffff);
 	else
 		vram_tile = (machine->generic.videoram.u32[tile_index>>1]>>16);
 
@@ -557,7 +557,7 @@ static TILE_GET_INFO( get_tile_info_pixel )
 		col_off=((tile_index%32)*0x40)+((tile_index&0xfe0)>>5);
 
 	if (col_off&1)
-	   	vram_tile = (machine->generic.videoram.u32[col_off>>1]&0xffff);
+		vram_tile = (machine->generic.videoram.u32[col_off>>1]&0xffff);
 	else
 		vram_tile = (machine->generic.videoram.u32[col_off>>1]>>16);
 
@@ -856,11 +856,11 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
 	else if (f3_game==CLEOPATR) {
 		if (offset<0x100 || offset>0x1000) {
-		 	r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
+			r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
 			g = ((space->machine->generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
 			b = ((space->machine->generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
 		} else {
-		 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+			r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 			g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 			b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 		}
@@ -869,11 +869,11 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 	/* Another weird couple - perhaps this is alpha blending related? */
 	else if (f3_game==TWINQIX || f3_game==RECALH) {
 		if (offset>0x1c00) {
-		 	r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
+			r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
 			g = ((space->machine->generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
 			b = ((space->machine->generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
 		} else {
-		 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+			r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 			g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 			b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 		}
@@ -881,7 +881,7 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 
 	/* All other games - standard 24 bit palette */
 	else {
-	 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+		r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 		g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 		b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 	}
@@ -1979,7 +1979,7 @@ static void get_line_ram_info(running_machine *machine, tilemap_t *tmap, int sx,
 
 		if (!pri || (!flipscreen && y<24) || (flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
- 			line_enable=0;
+			line_enable=0;
 		else if(pri&0x4000)	//alpha1
 			line_enable=2;
 		else if(pri&0x8000)	//alpha2
@@ -2116,7 +2116,7 @@ static void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int
 
 		if (!pri || (!flipscreen && y<24) || (flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
- 			line_enable=0;
+			line_enable=0;
 		else if(pri&0x4000)	//alpha1
 			line_enable=2;
 		else if(pri&0x8000)	//alpha2
@@ -3139,7 +3139,7 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
 		}
 
 		/* These features are common to sprite and block parts */
-  		flipx = spritecont&0x1;
+		flipx = spritecont&0x1;
 		flipy = spritecont&0x2;
 		multi = spritecont&0x8;
 		last_x=x;

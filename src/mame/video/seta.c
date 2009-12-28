@@ -909,7 +909,7 @@ static VIDEO_UPDATE( seta_layers )
 	int layers_ctrl = -1;
 	int enab_0, enab_1, x_0, x_1, y_0, y_1;
 
-	int order	= 	0;
+	int order	=	0;
 	int flip	=	(screen->machine->generic.spriteram.u16[ 0x600/2 ] & 0x40) >> 6;
 
 	const rectangle *visarea = video_screen_get_visible_area(screen);

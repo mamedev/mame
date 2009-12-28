@@ -3453,22 +3453,22 @@
  *
  *************************************/
 
-#define DISCRETE_STEP_NAME( _func )  			_func ## _step
+#define DISCRETE_STEP_NAME( _func ) 			_func ## _step
 #define DISCRETE_RESET_NAME( _func )			_func ## _reset
-#define DISCRETE_START_NAME( _func ) 			_func ## _start
-#define DISCRETE_STOP_NAME( _func )  			_func ## _stop
+#define DISCRETE_START_NAME( _func )			_func ## _start
+#define DISCRETE_STOP_NAME( _func ) 			_func ## _stop
 
-#define DISCRETE_FUNC(_func) 					void _func (node_description *node)
+#define DISCRETE_FUNC(_func)					void _func (node_description *node)
 
-#define DISCRETE_STEP(_func)			 		DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
-#define DISCRETE_RESET(_func) 					DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
-#define DISCRETE_START(_func) 					DISCRETE_FUNC(DISCRETE_START_NAME(_func))
-#define DISCRETE_STOP(_func) 					DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
+#define DISCRETE_STEP(_func)					DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
+#define DISCRETE_RESET(_func)					DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
+#define DISCRETE_START(_func)					DISCRETE_FUNC(DISCRETE_START_NAME(_func))
+#define DISCRETE_STOP(_func)					DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
 
-#define DISCRETE_STEP_CALL(_func) 				DISCRETE_STEP_NAME(_func) (node)
-#define DISCRETE_RESET_CALL(_func) 				DISCRETE_RESET_NAME(_func) (node)
-#define DISCRETE_START_CALL(_func) 				DISCRETE_START_NAME(_func) (node)
-#define DISCRETE_STOP_CALL(_func) 				DISCRETE_STOP_NAME(_func) (node)
+#define DISCRETE_STEP_CALL(_func)				DISCRETE_STEP_NAME(_func) (node)
+#define DISCRETE_RESET_CALL(_func)				DISCRETE_RESET_NAME(_func) (node)
+#define DISCRETE_START_CALL(_func)				DISCRETE_START_NAME(_func) (node)
+#define DISCRETE_STOP_CALL(_func)				DISCRETE_STOP_NAME(_func) (node)
 
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
 	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
@@ -3483,7 +3483,7 @@
 
 #define DISCRETE_MAX_NODES					300
 #define DISCRETE_MAX_INPUTS					10
-#define DISCRETE_MAX_OUTPUTS			 	8
+#define DISCRETE_MAX_OUTPUTS				8
 #define DISCRETE_MAX_TASK_OUTPUTS			8
 #define DISCRETE_MAX_TASK_GROUPS			10
 
@@ -3566,7 +3566,7 @@
 /* Mixer types */
 #define DISC_MIXER_IS_RESISTOR				0
 #define DISC_MIXER_IS_OP_AMP				1
-#define DISC_MIXER_IS_OP_AMP_WITH_RI	 	2	/* Used only internally.  Use DISC_MIXER_IS_OP_AMP */
+#define DISC_MIXER_IS_OP_AMP_WITH_RI		2	/* Used only internally.  Use DISC_MIXER_IS_OP_AMP */
 
 /* Triggered Op Amp Functions */
 enum
@@ -3790,8 +3790,8 @@ struct _node_description
 typedef struct _linked_list_entry	linked_list_entry;
 struct _linked_list_entry
 {
-	linked_list_entry 	*next;
-	const void 			*ptr;
+	linked_list_entry	*next;
+	const void			*ptr;
 };
 
 typedef struct _discrete_task discrete_task;
@@ -3808,7 +3808,7 @@ struct _discrete_task
 	int						task_group;
 	int 					numbuffered;
 	double					*ptr[DISCRETE_MAX_TASK_OUTPUTS];
-	const double 			*source[DISCRETE_MAX_TASK_OUTPUTS];
+	const double			*source[DISCRETE_MAX_TASK_OUTPUTS];
 
 	double					*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	const node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
@@ -3845,23 +3845,23 @@ struct _discrete_info
 	linked_list_entry	 *task_list;		/* discrete_task_context * */
 
 	/* the input streams */
-	linked_list_entry 	 *input_list;
+	linked_list_entry	 *input_list;
 
 	/* output node tracking */
-	linked_list_entry 	 *output_list;
+	linked_list_entry	 *output_list;
 
 	/* the output stream */
-	sound_stream 		*discrete_stream;
+	sound_stream		*discrete_stream;
 
 	/* debugging statistics */
-	FILE 				*disclogfile;
+	FILE				*disclogfile;
 
 	/* parallel tasks */
-	osd_work_queue 		*queue;
+	osd_work_queue		*queue;
 
 	/* profiling */
-	UINT64 				total_samples;
-	UINT64 				total_stream_updates;
+	UINT64				total_samples;
+	UINT64				total_stream_updates;
 };
 
 
@@ -3912,7 +3912,7 @@ struct _discrete_op_amp_osc_info
 
 #define DEFAULT_7414_VALUES 	1.7, 0.9, 3.4
 
-#define DEFAULT_74LS14_VALUES 	1.6, 0.8, 3.4
+#define DEFAULT_74LS14_VALUES	1.6, 0.8, 3.4
 
 typedef struct _discrete_schmitt_osc_desc discrete_schmitt_osc_desc;
 struct _discrete_schmitt_osc_desc
@@ -4122,7 +4122,7 @@ struct _discrete_custom_info
 // Taken from the transfer characteristerics diagram in CD4049UB datasheet (TI)
 // There is no default trigger point and vI-vO is a continuous function
 
-#define DEFAULT_CD40XX_VALUES(_vB) 	(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.5,(_vB)/5.0*3.5, 0.1
+#define DEFAULT_CD40XX_VALUES(_vB)	(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.5,(_vB)/5.0*3.5, 0.1
 
 #define DISC_OSC_INVERTER_IS_TYPE1			0x00
 #define DISC_OSC_INVERTER_IS_TYPE2			0x01
@@ -4141,7 +4141,7 @@ struct _discrete_inverter_osc_desc
 	double	vOutHigh;
 	double	vInFall;	// voltage that triggers the gate input to go low (0V) on fall
 	double	vInRise;	// voltage that triggers the gate input to go high (vGate) on rise
-	double	clamp; 		// voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
+	double	clamp;		// voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
 	int		options;	// bitmaped options
 };
 

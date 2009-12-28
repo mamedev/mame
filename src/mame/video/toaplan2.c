@@ -1210,8 +1210,8 @@ static void toaplan2_log_vram(running_machine *machine)
 			sypos[1] = source_new0[sprite_voffs + 3];
 			logerror("SPoffs    Sprt Attr Xpos Ypos     Sprt Attr Xpos Ypos\n");
 			logerror("0:%03x now:%04x %04x %04x %04x new:%04x %04x %04x %04x\n",sprite_voffs,
-						 						schar[0], sattr[0],sxpos[0], sypos[0],
-						 						schar[1], sattr[1],sxpos[1], sypos[1]);
+												schar[0], sattr[0],sxpos[0], sypos[0],
+												schar[1], sattr[1],sxpos[1], sypos[1]);
 			if (vid_controllers == 2)
 			{
 				sattr[0] = source_now1[sprite_voffs];
@@ -1223,8 +1223,8 @@ static void toaplan2_log_vram(running_machine *machine)
 				sxpos[1] = source_new1[sprite_voffs + 2];
 				sypos[1] = source_new1[sprite_voffs + 3];
 				logerror("1:%03x now:%04x %04x %04x %04x new:%04x %04x %04x %04x\n",sprite_voffs,
-							 					schar[0], sattr[0],sxpos[0], sypos[0],
-							 					schar[1], sattr[1],sxpos[1], sypos[1]);
+												schar[0], sattr[0],sxpos[0], sypos[0],
+												schar[1], sattr[1],sxpos[1], sypos[1]);
 			}
 		}
 	}

@@ -159,7 +159,7 @@
 typedef struct _i8085_state i8085_state;
 struct _i8085_state
 {
-	i8085_config 		config;
+	i8085_config		config;
 
 	devcb_resolved_write8		out_status_func;
 	devcb_resolved_write_line	out_inte_func;
@@ -181,7 +181,7 @@ struct _i8085_state
 
 	UINT8				ietemp;			/* import/export temp space */
 
-	cpu_irq_callback 	irq_callback;
+	cpu_irq_callback	irq_callback;
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
@@ -1225,8 +1225,8 @@ CPU_GET_INFO( i8085 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 16;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i808x);				break;

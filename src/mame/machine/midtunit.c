@@ -30,16 +30,16 @@ static UINT8	chip_type;
 static UINT8	fake_sound_state;
 
 /* protection */
-static UINT8 	mk_prot_index;
-static UINT16 	mk2_prot_data;
+static UINT8	mk_prot_index;
+static UINT16	mk2_prot_data;
 
 static const UINT32 *nbajam_prot_table;
 static UINT16	nbajam_prot_queue[5];
 static UINT8	nbajam_prot_index;
 
 static const UINT8 *jdredd_prot_table;
-static UINT8 	jdredd_prot_index;
-static UINT8 	jdredd_prot_max;
+static UINT8	jdredd_prot_index;
+static UINT8	jdredd_prot_max;
 
 
 

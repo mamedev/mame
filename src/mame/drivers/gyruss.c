@@ -182,16 +182,16 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay2", ay8910_address_w)
-  	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay2", ay8910_r)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay3", ay8910_address_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay3", ay8910_r)
 	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay3", ay8910_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("ay4", ay8910_address_w)
-  	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("ay4", ay8910_r)
+	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("ay4", ay8910_r)
 	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("ay4", ay8910_data_w)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay5", ay8910_address_w)
-  	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay5", ay8910_r)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay5", ay8910_r)
 	AM_RANGE(0x12, 0x12) AM_DEVWRITE("ay5", ay8910_data_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
@@ -411,7 +411,7 @@ static const discrete_mixer_desc konami_right_mixer_desc =
 		{0,0,0,0,0,0},  /* no node capacitors      */
 		0, 200,
 		CAP_U(0.1),
-		CAP_U(1), 		/* DC - Removal, not in schematics */
+		CAP_U(1),		/* DC - Removal, not in schematics */
 		0, 1};
 
 static const discrete_mixer_desc konami_left_mixer_desc =
@@ -421,7 +421,7 @@ static const discrete_mixer_desc konami_left_mixer_desc =
 	{0,0,0,0,0,0},  /* no node capacitors      */
 	0, 200,
 	CAP_U(0.1),
-	CAP_U(1), 		/* DC - Removal, not in schematics */
+	CAP_U(1),		/* DC - Removal, not in schematics */
 	0, 1};
 
 static DISCRETE_SOUND_START( gyruss_sound )

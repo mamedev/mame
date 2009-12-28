@@ -59,7 +59,7 @@ CPU_DISASSEMBLE( v810 )
 		case 0x09: sprintf(buffer,"DIV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0a: sprintf(buffer,"MULU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0b: sprintf(buffer,"DIVU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0c: sprintf(buffer,"OR %s,%s",GET1s(opc),GET2s(opc)); 	size=2; break;
+		case 0x0c: sprintf(buffer,"OR %s,%s",GET1s(opc),GET2s(opc));	size=2; break;
 		case 0x0d: sprintf(buffer,"AND %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0e: sprintf(buffer,"XOR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0f: sprintf(buffer,"NOT %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
@@ -79,7 +79,7 @@ CPU_DISASSEMBLE( v810 )
 		case 0x1d: sprintf(buffer,"STSR %s,%s",GETRs(opc),GET2s(opc));size=2; break;
 		case 0x1e: sprintf(buffer,"DI"); size=2; break;
 		case 0x1f:
-				   	switch(opc&0x1f)
+					switch(opc&0x1f)
 						{
 							case 0x00:	sprintf(buffer,"SCH0BSU"); break;
 							case 0x01:	sprintf(buffer,"SCH0BSD"); break;
@@ -96,7 +96,7 @@ CPU_DISASSEMBLE( v810 )
 							case 0x0d:	sprintf(buffer,"ANDNBSU"); break;
 							case 0x0e:	sprintf(buffer,"XORNBSU"); break;
 							case 0x0f:	sprintf(buffer,"NOTBSU"); break;
-							default: 		sprintf(buffer,"UnkBS 0x%X",opc&0x1f); break;
+							default:		sprintf(buffer,"UnkBS 0x%X",opc&0x1f); break;
 						}
 					size=2;
 					break;
@@ -109,25 +109,25 @@ CPU_DISASSEMBLE( v810 )
 		case 0x26:
 		case 0x27: switch( (opc>>9) &0xf)
 							 {
-							 		case 0x0: sprintf(buffer,"BV %X",pc+D9(opc));  break;
-							 		case 0x1: sprintf(buffer,"BL %X",pc+D9(opc));  break;
-							 		case 0x2: sprintf(buffer,"BE %X",pc+D9(opc));  break;
-							 		case 0x3: sprintf(buffer,"BNH %X",pc+D9(opc)); break;
-							 		case 0x4: sprintf(buffer,"BN %X",pc+D9(opc));  break;
-							 		case 0x5: sprintf(buffer,"BR %X",pc+D9(opc));  break;
-							 		case 0x6: sprintf(buffer,"BLT %X",pc+D9(opc)); break;
-							 		case 0x7: sprintf(buffer,"BLE %X",pc+D9(opc)); break;
-							 		case 0x8: sprintf(buffer,"BNV %X",pc+D9(opc)); break;
-							 		case 0x9: sprintf(buffer,"BNL %X",pc+D9(opc)); break;
-							 		case 0xa: sprintf(buffer,"BNE %X",pc+D9(opc)); break;
-							 		case 0xb: sprintf(buffer,"BH %X",pc+D9(opc));  break;
-							 		case 0xc: sprintf(buffer,"BP %X",pc+D9(opc));  break;
-							 		case 0xd: sprintf(buffer,"NOP"); break;
-							 		case 0xe: sprintf(buffer,"BGE %X",pc+D9(opc)); break;
-							 		case 0xf: sprintf(buffer,"BGT %X",pc+D9(opc)); break;
-						 	 }
-						 	 size=2;
-						 	 break;
+									case 0x0: sprintf(buffer,"BV %X",pc+D9(opc));  break;
+									case 0x1: sprintf(buffer,"BL %X",pc+D9(opc));  break;
+									case 0x2: sprintf(buffer,"BE %X",pc+D9(opc));  break;
+									case 0x3: sprintf(buffer,"BNH %X",pc+D9(opc)); break;
+									case 0x4: sprintf(buffer,"BN %X",pc+D9(opc));  break;
+									case 0x5: sprintf(buffer,"BR %X",pc+D9(opc));  break;
+									case 0x6: sprintf(buffer,"BLT %X",pc+D9(opc)); break;
+									case 0x7: sprintf(buffer,"BLE %X",pc+D9(opc)); break;
+									case 0x8: sprintf(buffer,"BNV %X",pc+D9(opc)); break;
+									case 0x9: sprintf(buffer,"BNL %X",pc+D9(opc)); break;
+									case 0xa: sprintf(buffer,"BNE %X",pc+D9(opc)); break;
+									case 0xb: sprintf(buffer,"BH %X",pc+D9(opc));  break;
+									case 0xc: sprintf(buffer,"BP %X",pc+D9(opc));  break;
+									case 0xd: sprintf(buffer,"NOP"); break;
+									case 0xe: sprintf(buffer,"BGE %X",pc+D9(opc)); break;
+									case 0xf: sprintf(buffer,"BGT %X",pc+D9(opc)); break;
+							 }
+							 size=2;
+							 break;
 
 		case 0x28:	sprintf(buffer,"MOVEA %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 		case 0x29:	sprintf(buffer,"ADDI %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;

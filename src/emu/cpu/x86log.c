@@ -63,7 +63,7 @@ struct _x86log_context
 	log_comment 	comment_list[MAX_COMMENTS];		/* list of comments */
 	int				comment_count;					/* number of live comments */
 
-	char 			comment_pool[COMMENT_POOL_SIZE];/* string pool to hold comments */
+	char			comment_pool[COMMENT_POOL_SIZE];/* string pool to hold comments */
 	char *			comment_pool_next;				/* pointer to next string pool location */
 };
 
@@ -219,10 +219,10 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 			switch (curdata->size)
 			{
 				default:
-				case 1:		sprintf(buffer, "db      %02X", *cur); 				break;
-				case 2:		sprintf(buffer, "dw      %04X", *(UINT16 *)cur); 	break;
-				case 4:		sprintf(buffer, "dd      %08X", *(UINT32 *)cur); 	break;
-				case 8:		sprintf(buffer, "dq      %08X%08X", ((UINT32 *)cur)[1], ((UINT32 *)cur)[0]); 	break;
+				case 1:		sprintf(buffer, "db      %02X", *cur);				break;
+				case 2:		sprintf(buffer, "dw      %04X", *(UINT16 *)cur);	break;
+				case 4:		sprintf(buffer, "dd      %08X", *(UINT32 *)cur);	break;
+				case 8:		sprintf(buffer, "dq      %08X%08X", ((UINT32 *)cur)[1], ((UINT32 *)cur)[0]);	break;
 			}
 		}
 

@@ -605,7 +605,7 @@ static void leland_80186_reset(void)
 
 	/* reset the interrupt state */
 	i80186.intr.priority_mask	= 0x0007;
-	i80186.intr.timer 			= 0x000f;
+	i80186.intr.timer			= 0x000f;
 	i80186.intr.dma[0]			= 0x000f;
 	i80186.intr.dma[1]			= 0x000f;
 	i80186.intr.ext[0]			= 0x000f;
@@ -2110,7 +2110,7 @@ static WRITE16_HANDLER( peripheral_w )
 WRITE8_HANDLER( ataxx_80186_control_w )
 {
 	/* compute the bit-shuffled variants of the bits and then write them */
-	int modified = 	((data & 0x01) << 7) |
+	int modified =	((data & 0x01) << 7) |
 					((data & 0x02) << 5) |
 					((data & 0x04) << 3) |
 					((data & 0x08) << 1);

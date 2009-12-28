@@ -572,7 +572,7 @@ static const ym2151_interface ym2151_config =
 };
 
 static MACHINE_DRIVER_START( shadfrce )
-	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK) 			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", shadfrce_scanline, "screen", 0, 1)
 
@@ -593,13 +593,13 @@ static MACHINE_DRIVER_START( shadfrce )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) 		/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)		/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_13_4952MHz/8) 	/* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) 		/* verified on pcb, pin7 is at 2.4v */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_13_4952MHz/8)	/* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)		/* verified on pcb, pin7 is at 2.4v */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END

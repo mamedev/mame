@@ -109,13 +109,13 @@ static void pitnrun_spotlights(running_machine *machine)
 	 for(y=0;y<128;y++)
 	  for(x=0;x<16;x++)
 	  {
-	  	datapix=ROM[128*16*i+x+y*16];
-	  	for(b=0;b<8;b++)
-	  	{
+		datapix=ROM[128*16*i+x+y*16];
+		for(b=0;b<8;b++)
+		{
 			*BITMAP_ADDR16(tmp_bitmap[i], y, x*8+(7-b)) = (datapix&1);
 			datapix>>=1;
 		}
- 	  }
+	  }
 }
 
 
@@ -204,7 +204,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
- 			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
+			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,
 			sx,sy,0);

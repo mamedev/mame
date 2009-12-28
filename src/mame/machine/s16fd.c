@@ -217,7 +217,7 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 		fd1094_cacheregion[i] = auto_alloc_array(machine, UINT16, fd1094_cpuregionsize / 2);
 		fd1094_cached_states[i] = -1;
 	}
-  	fd1094_current_cacheposition = 0;
+	fd1094_current_cacheposition = 0;
 	fd1094_state = -1;
 
 	/* key debugging */

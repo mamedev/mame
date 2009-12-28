@@ -895,17 +895,17 @@ static void I386OP(arpl)(i386_state *cpustate)           // Opcode 0x63
 	UINT8 flag = 0;
 
      if( modrm >= 0xc0 ) {
-       	src = LOAD_REG16(modrm);
-       	dst = LOAD_RM16(modrm);
+    	src = LOAD_REG16(modrm);
+    	dst = LOAD_RM16(modrm);
 		if( (dst&0x3) < (src&0x3) ) {
 			dst = (dst&0xfffc) | (src&0x3);
 			flag = 1;
 			STORE_RM16(modrm, dst);
 		}
 	} else {
-       	UINT32 ea = GetEA(cpustate, modrm);
-       	src = LOAD_REG16(modrm);
-       	dst = READ16(cpustate, ea);
+    	UINT32 ea = GetEA(cpustate, modrm);
+    	src = LOAD_REG16(modrm);
+    	dst = READ16(cpustate, ea);
 		if( (dst&0x3) < (src&0x3) ) {
 			dst = (dst&0xfffc) | (src&0x3);
 			flag = 1;

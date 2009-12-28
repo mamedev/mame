@@ -930,7 +930,7 @@ static astring *warnings_string(running_machine *machine, astring *string)
 			/* find the parent of this driver */
 			clone_of = driver_get_clone(machine->gamedrv);
 			if (clone_of != NULL && !(clone_of->flags & GAME_IS_BIOS_ROOT))
- 				maindrv = clone_of;
+				maindrv = clone_of;
 			else
 				maindrv = machine->gamedrv;
 

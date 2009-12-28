@@ -64,7 +64,7 @@ typedef struct _options_data options_data;
 typedef union _options_range_parameter options_range_parameter;
 union _options_range_parameter
 {
-	float 					f;
+	float					f;
 	int 					i;
 };
 

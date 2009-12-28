@@ -21,8 +21,8 @@ struct _djboy_state
 	int        prot_busy_count;
 	UINT8      prot_output_buffer[PROT_OUTPUT_BUFFER_SIZE];
 	int        prot_available_data_count;
-	int        prot_offs; 		/* internal state */
-	UINT8      prot_ram[0x80]; 	/* internal RAM */
+	int        prot_offs;		/* internal state */
+	UINT8      prot_ram[0x80];	/* internal RAM */
 	UINT8      prot_param[8];
 	int        coin;
 	int        complete;

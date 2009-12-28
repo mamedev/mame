@@ -69,14 +69,14 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 
 static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")  	 				/* banked roms */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")  				/* shared with sound cpu */
 	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&mexico86_protection_ram)  /* shared with mcu */
 	AM_RANGE(0xe900, 0xefff) AM_RAM
 	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE(&mexico86_videoram) //AT: corrected size
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  	/* program and gfx ROM banks */
-	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    	  	/* cpu reset lines + other unknown stuff */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)	/* program and gfx ROM banks */
+	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)  		/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
 	AM_RANGE(0xf018, 0xf018) AM_WRITENOP						/* watchdog? */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")					/* communication ram - to connect 4 players's subboard */

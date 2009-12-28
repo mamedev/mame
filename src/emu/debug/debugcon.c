@@ -305,7 +305,7 @@ static CMDERR internal_parse_command(running_machine *machine, const char *origi
 					case ']':	if (parendex == 0 || parens[--parendex] != '[') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
 					case '}':	if (parendex == 0 || parens[--parendex] != '{') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
 					case ',':	if (parendex == 0) params[paramcount++] = p; break;
-					case ';': 	if (parendex == 0) foundend = TRUE; break;
+					case ';':	if (parendex == 0) foundend = TRUE; break;
 					case '-':	if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = TRUE; *p = c; break;
 					case '+':	if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
 					case '=':	if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;

@@ -380,7 +380,7 @@ ROM_START( tunhunt )
 	ROM_LOAD( "004.fh1",	0x6800, 0x800, CRC(4d6c920e) SHA1(2ef274356f4b8a0170a267cd6a3758b2bda693b5) )
 	ROM_LOAD( "005.ef1",	0x7000, 0x800, CRC(e17badf0) SHA1(6afbf517486340fe54b01fa26258877b2a8fc510) )
 	ROM_LOAD( "006.d1",		0x7800, 0x800, CRC(c3ae8519) SHA1(2b2e49065bc38429894ef29a29ffc60f96e64840) )
-	ROM_RELOAD( 		  	0xf800, 0x800 ) /* 6502 vectors  */
+	ROM_RELOAD( 			0xf800, 0x800 ) /* 6502 vectors  */
 
 	ROM_REGION( 0x400, "gfx1", 0 ) /* alphanumeric characters */
 	ROM_LOAD( "019.c10",	0x000, 0x400, CRC(d6fd45a9) SHA1(c86ea3790c29c554199af8ad6f3d563dcb7723c7) )
@@ -405,7 +405,7 @@ ROM_START( tunhuntc )
 	ROM_LOAD( "004.fh1",	0x6800, 0x800, CRC(4d6c920e) SHA1(2ef274356f4b8a0170a267cd6a3758b2bda693b5) )
 	ROM_LOAD( "005.ef1",	0x7000, 0x800, CRC(e17badf0) SHA1(6afbf517486340fe54b01fa26258877b2a8fc510) )
 	ROM_LOAD( "006.d1",		0x7800, 0x800, CRC(c3ae8519) SHA1(2b2e49065bc38429894ef29a29ffc60f96e64840) )
-	ROM_RELOAD( 		  	0xf800, 0x800 ) /* 6502 vectors  */
+	ROM_RELOAD( 			0xf800, 0x800 ) /* 6502 vectors  */
 
 	ROM_REGION( 0x400, "gfx1", 0 ) /* alphanumeric characters */
 	ROM_LOAD( "019.c10",	0x000, 0x400, CRC(d6fd45a9) SHA1(c86ea3790c29c554199af8ad6f3d563dcb7723c7) )

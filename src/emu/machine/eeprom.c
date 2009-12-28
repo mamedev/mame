@@ -88,7 +88,7 @@ static int eeprom_command_match(const char *buf, const char *cmd, int len)
 				{
 					case '0':
 					case '1':
-					  	if (b == c)	{	cmd++;			}
+						if (b == c)	{	cmd++;			}
 						else		{	buf++;	len--;	}
 						break;
 					default:	return 0;

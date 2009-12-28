@@ -145,7 +145,7 @@ WRITE16_HANDLER( powerins_vram_0_w )
 
 static TILEMAP_MAPPER( powerins_get_memory_offset_0 )
 {
-	return 	(col * TILES_PER_PAGE_Y) +
+	return	(col * TILES_PER_PAGE_Y) +
 
 			(row % TILES_PER_PAGE_Y) +
 			(row / TILES_PER_PAGE_Y) * (TILES_PER_PAGE * 16);

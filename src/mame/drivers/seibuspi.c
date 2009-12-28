@@ -1882,7 +1882,7 @@ static MACHINE_DRIVER_START( spi )
 
 	MDRV_DS2404_ADD("ds2404", 1995, 1, 1)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -2207,7 +2207,7 @@ static MACHINE_DRIVER_START( seibu386 )
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -2265,7 +2265,7 @@ static MACHINE_DRIVER_START( sys386f2 )
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

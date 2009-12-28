@@ -14,7 +14,7 @@
 #define VRAM_SIZE		(0x10000)
 #define QRAM_SIZE		(0x10000)
 
-#define VIDEO_WIDTH  	(320)
+#define VIDEO_WIDTH 	(320)
 
 
 /* debugging */

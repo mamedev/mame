@@ -275,7 +275,7 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op)
 						print("jalr   %s, %s", reg[rs], reg[rd]);
 					}
 					flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
- 					break;
+					break;
 				}
 				case 0x0d:	print("break"); flags = DASMFLAG_STEP_OVER;	break;
 				case 0x20:	print("add    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;

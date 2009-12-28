@@ -626,7 +626,7 @@ static INTERRUPT_GEN( magicard_irq )
 static MACHINE_DRIVER_START( magicard )
 	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(magicard_mem)
- 	MDRV_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
+	MDRV_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

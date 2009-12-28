@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( barline_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
 //  AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE) //not used
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
- 	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r) AM_WRITE(mjsikaku_scrolly_w)
+	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r) AM_WRITE(mjsikaku_scrolly_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
@@ -4075,19 +4075,19 @@ GAME( 1986, apparel,  0,        apparel,         apparel,  apparel,  ROT0, "Cent
 GAME( 1986, citylove, 0,        mbmj_h12bit,     citylove, citylove, ROT0, "Nichibutsu", "City Love (Japan 860908)", 0 )
 GAME( 1986, mcitylov, citylove, mbmj_h12bit,     mcitylov, mcitylov, ROT0, "Nichibutsu", "City Love [BET] (Japan 860904)", 0 )
 GAME( 1986, secolove, 0,        mbmj_h12bit,     secolove, secolove, ROT0, "Nichibutsu", "Second Love (Japan 861201)", 0 )
-GAME( 1986?,barline,  0,    	barline, 	 	 barline,  barline,  ROT180, "Nichibutsu", "Barline (Japan?)",  GAME_IMPERFECT_SOUND )
+GAME( 1986?,barline,  0,    	barline,		 barline,  barline,  ROT180, "Nichibutsu", "Barline (Japan?)",  GAME_IMPERFECT_SOUND )
 
 /* hybrid 16-bit palette */
-GAME( 1987, seiha,    0,        seiha,           seiha,    seiha,    ROT0, "Nichibutsu", 	 "Seiha (Japan 870725)", 0 )
-GAME( 1987, seiham,   seiha,    seiha,           seiham,   seiham,   ROT0, "Nichibutsu", 	 "Seiha [BET] (Japan 870723)", 0 )
+GAME( 1987, seiha,    0,        seiha,           seiha,    seiha,    ROT0, "Nichibutsu",	 "Seiha (Japan 870725)", 0 )
+GAME( 1987, seiham,   seiha,    seiha,           seiham,   seiham,   ROT0, "Nichibutsu",	 "Seiha [BET] (Japan 870723)", 0 )
 GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  ojousan,  ROT0, "Central Denshi", "Mahjong Gaiden [BET] (Japan 870803)", 0 )
-GAME( 1987, iemoto,   0,        iemoto,          iemoto,   iemoto,   ROT0, "Nichibutsu", 	 "Iemoto (Japan 871020)", 0 )
-GAME( 1987, iemotom,  iemoto,   ojousan,         iemotom,  iemotom,  ROT0, "Nichibutsu", 	 "Iemoto [BET] (Japan 871118)", 0 )
+GAME( 1987, iemoto,   0,        iemoto,          iemoto,   iemoto,   ROT0, "Nichibutsu",	 "Iemoto (Japan 871020)", 0 )
+GAME( 1987, iemotom,  iemoto,   ojousan,         iemotom,  iemotom,  ROT0, "Nichibutsu",	 "Iemoto [BET] (Japan 871118)", 0 )
 GAME( 1987, ryuuha,   iemoto,   ojousan,         ryuuha,   ryuuha,   ROT0, "Central Denshi", "Ryuuha [BET] (Japan 871027)", 0 )
-GAME( 1987, ojousan,  0,        ojousan,         ojousan,  ojousan,  ROT0, "Nichibutsu", 	 "Ojousan (Japan 871204)", 0 )
-GAME( 1987, ojousanm, ojousan,  ojousan,         ojousanm, ojousanm, ROT0, "Nichibutsu", 	 "Ojousan [BET] (Japan 870108)", 0 )
-GAME( 1988, korinai,  0,        ojousan,         korinai,  korinai,  ROT0, "Nichibutsu", 	 "Mahjong-zukino Korinai Menmen (Japan 880425)", 0 )
-GAME( 1988, korinaim, korinai,  ojousan,         korinaim, korinaim, ROT0, "Nichibutsu", 	 "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", 0 )
+GAME( 1987, ojousan,  0,        ojousan,         ojousan,  ojousan,  ROT0, "Nichibutsu",	 "Ojousan (Japan 871204)", 0 )
+GAME( 1987, ojousanm, ojousan,  ojousan,         ojousanm, ojousanm, ROT0, "Nichibutsu",	 "Ojousan [BET] (Japan 870108)", 0 )
+GAME( 1988, korinai,  0,        ojousan,         korinai,  korinai,  ROT0, "Nichibutsu",	 "Mahjong-zukino Korinai Menmen (Japan 880425)", 0 )
+GAME( 1988, korinaim, korinai,  ojousan,         korinaim, korinaim, ROT0, "Nichibutsu",	 "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", 0 )
 
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        mbmj_p16bit_LCD, housemnq, housemnq, ROT0, "Nichibutsu", "House Mannequin (Japan 870217)", 0 )

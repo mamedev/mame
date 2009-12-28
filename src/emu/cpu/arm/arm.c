@@ -911,7 +911,7 @@ static void HandleMul( ARM_REGS* cpustate, UINT32 insn)
 
 	/* Do the basic multiply of Rm and Rs */
 	r =	GetRegister( cpustate, insn&INSN_MUL_RM ) *
-	  	GetRegister( cpustate, (insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT );
+		GetRegister( cpustate, (insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT );
 
 	if (ARM_DEBUG_CORE && ((insn&INSN_MUL_RM)==0xf
 		|| ((insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT )==0xf
@@ -1194,7 +1194,7 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 		}
 		return k ? LSL(rm, k) : rm;
 
-	case 1:			       			/* LSR */
+	case 1:			    			/* LSR */
 		if (k == 0 || k == 32)
 		{
 			if (pCarry) *pCarry = rm & SIGN_BIT;
@@ -1455,11 +1455,11 @@ CPU_GET_INFO( arm )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 26;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:	info->i = cpustate->pendingIrq;			break;
 		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:	info->i = cpustate->pendingFiq;			break;

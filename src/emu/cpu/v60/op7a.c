@@ -579,7 +579,7 @@ static UINT32 opEXTBFZ(v60_state *cpustate) /* TRUSTED */
 
 static UINT32 opEXTBFS(v60_state *cpustate) /* TRUSTED */
 {
- 	F7bDecodeFirstOperand(cpustate, BitReadAM, 11);
+	F7bDecodeFirstOperand(cpustate, BitReadAM, 11);
 
 	F7BCREATEBITMASK(cpustate->lenop1);
 

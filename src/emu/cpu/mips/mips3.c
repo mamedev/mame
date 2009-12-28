@@ -1807,7 +1807,7 @@ CPU_EXECUTE( mips3 )
 					case 0x00:	/* BLTZ */		if ((INT64)RSVAL64 < 0) ADDPC(SIMMVAL);							break;
 					case 0x01:	/* BGEZ */		if ((INT64)RSVAL64 >= 0) ADDPC(SIMMVAL);						break;
 					case 0x02:	/* BLTZL */		if ((INT64)RSVAL64 < 0) ADDPC(SIMMVAL);	else mips3.core.pc += 4;		break;
-					case 0x03:	/* BGEZL */		if ((INT64)RSVAL64 >= 0) ADDPC(SIMMVAL); else mips3.core.pc += 4; 	break;
+					case 0x03:	/* BGEZL */		if ((INT64)RSVAL64 >= 0) ADDPC(SIMMVAL); else mips3.core.pc += 4;	break;
 					case 0x08:	/* TGEI */		if ((INT64)RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);	break;
 					case 0x09:	/* TGEIU */		if (RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);	break;
 					case 0x0a:	/* TLTI */		if ((INT64)RSVAL64 < SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);	break;
@@ -1861,7 +1861,7 @@ CPU_EXECUTE( mips3 )
 						RDVAL64 = (INT32)((INT32)RSVAL32 * (INT32)RTVAL32);
 						mips3.core.icount -= 3;
 						break;
-		 			default: invalid_instruction(op);
+					default: invalid_instruction(op);
 				}
 				break;
 			case 0x20:	/* LB */		if (RBYTE(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (INT8)temp;		break;
@@ -1873,7 +1873,7 @@ CPU_EXECUTE( mips3 )
 			case 0x26:	/* LWR */		(*mips3.lwr)(op);														break;
 			case 0x27:	/* LWU */		if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (UINT32)temp;		break;
 			case 0x28:	/* SB */		WBYTE(SIMMVAL+RSVAL32, RTVAL32);										break;
-			case 0x29:	/* SH */		WHALF(SIMMVAL+RSVAL32, RTVAL32); 										break;
+			case 0x29:	/* SH */		WHALF(SIMMVAL+RSVAL32, RTVAL32);										break;
 			case 0x2a:	/* SWL */		(*mips3.swl)(op);														break;
 			case 0x2b:	/* SW */		WWORD(SIMMVAL+RSVAL32, RTVAL32);										break;
 			case 0x2c:	/* SDL */		(*mips3.sdl)(op);														break;

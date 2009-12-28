@@ -90,7 +90,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (y>0x180) y -= 0x200;
 
 		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
-		  		 tilenum,
+				 tilenum,
 				 color,
 				 flipx,flipy,
 				 x,y,

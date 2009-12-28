@@ -380,7 +380,7 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 				case 0x0b:	sprintf(buffer, "movn   %s,%s,%s", reg[rd], reg[rs], reg[rt]);			break;
 				case 0x0c:	sprintf(buffer, "syscall");	flags = DASMFLAG_STEP_OVER;					break;
 				case 0x0d:	sprintf(buffer, "break"); flags = DASMFLAG_STEP_OVER;					break;
-				case 0x0f:	sprintf(buffer, "sync"); 												break;
+				case 0x0f:	sprintf(buffer, "sync");												break;
 				case 0x10:	sprintf(buffer, "mfhi   %s", reg[rd]);									break;
 				case 0x11:	sprintf(buffer, "mthi   %s", reg[rs]);									break;
 				case 0x12:	sprintf(buffer, "mflo   %s", reg[rd]);									break;
@@ -483,7 +483,7 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 				case 1: sprintf(buffer, "madu   %s,%s", reg[rs], reg[rt]); break;
 				case 2: sprintf(buffer, "mul    %s,%s,%s", reg[rs], reg[rt], reg[rd]); break;
 				case 4: sprintf(buffer, "msub   %s,%s", reg[rs], reg[rt]); break;
-	 			default:sprintf(buffer, "dc.l   $%08x [invalid]", op);	break;
+				default:sprintf(buffer, "dc.l   $%08x [invalid]", op);	break;
 			}
 			break;
 		case 0x20:	sprintf(buffer, "lb     %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);		break;

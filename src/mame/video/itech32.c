@@ -27,7 +27,7 @@
  *
  *************************************/
 
-#define VIDEO_UNKNOWN00			itech32_video[0x00/2] 	/* $0087 at startup */
+#define VIDEO_UNKNOWN00			itech32_video[0x00/2]	/* $0087 at startup */
 #define VIDEO_STATUS			itech32_video[0x00/2]
 #define VIDEO_INTSTATE			itech32_video[0x02/2]
 #define VIDEO_INTACK			itech32_video[0x02/2]

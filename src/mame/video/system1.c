@@ -520,7 +520,7 @@ static void video_update_common(const device_config *screen, bitmap_t *bitmap, c
 			UINT8 lookup_value;
 
 			/* using the sprite, background, and foreground pixels, look up the color behavior */
-			lookup_index = 	(((sprpix & 0xf) == 0) << 0) |
+			lookup_index =	(((sprpix & 0xf) == 0) << 0) |
 							(((fgpix & 7) == 0) << 1) |
 							(((fgpix >> 9) & 3) << 2) |
 							(((bgpix & 7) == 0) << 4) |

@@ -497,7 +497,7 @@ static const struct op6502_info opdeco16[256] =
 	{cli,imp},{eor,aby},{ill,non},{ill,non},
 	{ill,non},{eor,abx},{lsr,abx},{ill,non},
 	{rts,imp},{adc,idx},{ill,non},{ill,non},/* 60 */
-	{ill,non},{adc,zpg},{ror,zpg},{vbl,zpg},  		// MISH
+	{ill,non},{adc,zpg},{ror,zpg},{vbl,zpg},		// MISH
 	{pla,imp},{adc,imm},{ror,acc},{ill,non},
 	{jmp,ind},{adc,aba},{ror,aba},{ill,non},
 	{bvs,rel},{adc,idy},{ill,non},{ill,non},/* 70 */

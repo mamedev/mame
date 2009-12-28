@@ -63,7 +63,7 @@ struct _generic_token
 
 /* GCC and C99 compilers can use designated initializers for type safety */
 #if (defined(__GNUC__) && (__GNUC__ >= 3) && !defined(__cplusplus)) || (defined(_STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
-#define TOKEN_VALUE(field,a)   	{ .field = (a) }
+#define TOKEN_VALUE(field,a)	{ .field = (a) }
 #else
 #define TOKEN_VALUE(field,a)	{ (FPTR)(a) }
 #endif

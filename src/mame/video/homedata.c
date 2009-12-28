@@ -72,8 +72,8 @@ static void mrokumei_handleblit( const address_space *space, int rom_base )
          */
 		if( opcode == 0x00 )
 		{
- 			/* end-of-graphic */
- 			goto finish;
+			/* end-of-graphic */
+			goto finish;
 		}
 		data  = pBlitData[source_addr++];
 
@@ -256,8 +256,8 @@ static void pteacher_handleblit( const address_space *space, int rom_base )
          */
 		if (opcode == 0x00)
 		{
- 			/* end-of-graphic */
- 			goto finish;
+			/* end-of-graphic */
+			goto finish;
 		}
 		data  = pBlitData[source_addr++];
 

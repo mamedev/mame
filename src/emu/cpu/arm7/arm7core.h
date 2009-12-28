@@ -91,7 +91,7 @@ enum
 };
 
 /* Coprocessor-related macros */
-#define COPRO_TLB_BASE        	cpustate->tlbBase
+#define COPRO_TLB_BASE      	cpustate->tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
 #define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18

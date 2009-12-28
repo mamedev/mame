@@ -55,12 +55,12 @@ struct _i8279_state
 	UINT8		inhibit;
 	UINT8		clear;
 	UINT8		ram[16];
-	UINT8 		read_sensor;
-	UINT8 		write_display;
-	UINT8 		sense_address;
-	UINT8 		sense_auto_inc;
-	UINT8 		disp_address;
-	UINT8 		disp_auto_inc;
+	UINT8		read_sensor;
+	UINT8		write_display;
+	UINT8		sense_address;
+	UINT8		sense_auto_inc;
+	UINT8		disp_address;
+	UINT8		disp_auto_inc;
 };
 
 static i8279_state i8279[2];
@@ -155,7 +155,7 @@ static READ8_HANDLER( m1_8279_r )
 		{
 			result = input_port_read(space->machine,portnames[chip->sense_address]);
 //          break
-   		}
+		}
 		if ( chip->sense_auto_inc )
 		{
 			chip->sense_address = (chip->sense_address + 1 ) & 7;
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( m1_8279_w )
 			/* command 2: read FIFO/sensor RAM */
 			case 0x40:
 		        chip->sense_address = data & 0x07;
-   			    chip->sense_auto_inc = data & 0x10;
+			    chip->sense_auto_inc = data & 0x10;
         		chip->read_sensor = 1;
 				break;
 			/* command 3: read display RAM */
@@ -285,7 +285,7 @@ static WRITE8_HANDLER( m1_8279_w )
     chip->ram[chip->disp_address] = data;
     if ( chip->disp_auto_inc )
 	chip->disp_address ++;
- 	}
+	}
 }
 
 static READ8_HANDLER( m1_8279_2_r )
@@ -397,7 +397,7 @@ static WRITE8_HANDLER( m1_8279_2_w )
 			/* command 2: read FIFO/sensor RAM */
 			case 0x40:
 		        chip->sense_address = data & 0x07;
-   			    chip->sense_auto_inc = data & 0x10;
+			    chip->sense_auto_inc = data & 0x10;
         		chip->read_sensor = 1;
 				break;
 			/* command 3: read display RAM */
@@ -435,7 +435,7 @@ static WRITE8_HANDLER( m1_8279_2_w )
     chip->ram[chip->disp_address] = data;
     if ( chip->disp_auto_inc )
 	chip->disp_address ++;
- 	}
+	}
 
 }
 

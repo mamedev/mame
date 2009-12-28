@@ -400,7 +400,7 @@ WRITE16_HANDLER(ddd_053936_clip_w)
 
 	if (offset == 1)
 	{
- 		if (ACCESSING_BITS_8_15) K053936GP_clip_enable(0, data & 0x0100);
+		if (ACCESSING_BITS_8_15) K053936GP_clip_enable(0, data & 0x0100);
 	}
 	else
 	{

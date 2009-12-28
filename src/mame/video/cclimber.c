@@ -743,7 +743,7 @@ VIDEO_UPDATE( toprollr )
 
 	tilemap_set_scrollx(toproller_bg_tilemap, 0, toprollr_bg_videoram[0]);
 	tilemap_set_flip(toproller_bg_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-								 		   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+										   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	tilemap_mark_all_tiles_dirty(toproller_bg_tilemap);
 	tilemap_draw(bitmap, &scroll_area_clip, toproller_bg_tilemap, 0, 0);
 

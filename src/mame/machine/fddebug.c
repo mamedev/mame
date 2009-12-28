@@ -151,7 +151,7 @@
 #define OF_LONG				(SIZE_LONG << 0)	/* long size operation */
 
 /* immediate sizes */
-#define OF_ISIZEMASK 		(SIZE_MASK << 3)
+#define OF_ISIZEMASK		(SIZE_MASK << 3)
 #define OF_IMMB				(SIZE_BYTE << 3)	/* immediate byte follows */
 #define OF_IMMW				(SIZE_WORD << 3)	/* immediate word follows */
 #define OF_IMML				(SIZE_LONG << 3)	/* immediate long follows */
@@ -220,7 +220,7 @@ static UINT8 *				undobuff;
 
 /* array of possible instruction decodings */
 static fd1094_possibility	posslist[4*4*4*4*4];
-static int 					posscount;
+static int					posscount;
 
 /* array of possible seeds */
 static UINT32 *				possible_seed;
@@ -894,8 +894,8 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
 
 	/* support 0 or 1 parameters */
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
- 		offset = cpu_get_pc(cpu);
- 	keyaddr = addr_to_keyaddr(offset / 2);
+		offset = cpu_get_pc(cpu);
+	keyaddr = addr_to_keyaddr(offset / 2);
 
 	/* toggle the ignore PC status */
 	debug_console_printf(machine, "Unlocking PC %06X\n", (int)offset);
@@ -936,8 +936,8 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 		return;
 	}
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
- 		offset = cpu_get_pc(cpu);
- 	offset /= 2;
+		offset = cpu_get_pc(cpu);
+	offset /= 2;
 
 	/* toggle the ignore PC status */
 	ignorepc[offset] = !ignorepc[offset];
@@ -1035,13 +1035,13 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 
 	/* support 0 or 1 parameters */
 	if (!debug_command_parameter_number(machine, param[0], &newpc))
- 		newpc = cpu_get_pc(cpu);
+		newpc = cpu_get_pc(cpu);
 
- 	/* set the new PC */
- 	cpu_set_reg(cpu, REG_GENPC, newpc);
+	/* set the new PC */
+	cpu_set_reg(cpu, REG_GENPC, newpc);
 
- 	/* recompute around that */
- 	instruction_hook(cpu, newpc);
+	/* recompute around that */
+	instruction_hook(cpu, newpc);
 }
 
 

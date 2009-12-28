@@ -311,7 +311,7 @@ static const discrete_lfsr_desc mm5837_lfsr =
 	DISC_LFSR_NOT_IN0,	  /* F1 is inverted F0*/
 	DISC_LFSR_REPLACE,	  /* F2 replaces the shifted register contents */
 	0x000001,		      /* Everything is shifted into the first bit only */
-	0, 					  /* Flags */
+	0,					  /* Flags */
 	16			          /* Output bit */
 };
 

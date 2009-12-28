@@ -55,7 +55,7 @@ WRITE16_HANDLER( twin16_text_ram_w )
 }
 
 WRITE16_HANDLER( twin16_paletteram_word_w )
-{ 	// identical to tmnt_paletteram_w
+{	// identical to tmnt_paletteram_w
 	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
 	offset &= ~1;
 

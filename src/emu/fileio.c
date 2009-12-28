@@ -55,7 +55,7 @@ struct _mame_file
 #endif
 	astring *		filename;						/* full filename */
 	core_file *		file;							/* core file pointer */
-	path_iterator 	iterator;						/* iterator for paths */
+	path_iterator	iterator;						/* iterator for paths */
 	UINT32			openflags;						/* flags we used for the open */
 	char			hash[HASH_BUF_SIZE];			/* hash data for the file */
 	zip_file *		zipfile;						/* ZIP file pointer */

@@ -113,7 +113,7 @@ INLINE tms7000_state *get_safe_token(const device_config *device)
 #define SR_I	0x10		/* Interrupt */
 
 #define CLR_NZC 	pSR&=~(SR_N|SR_Z|SR_C)
-#define CLR_NZCI 	pSR&=~(SR_N|SR_Z|SR_C|SR_I)
+#define CLR_NZCI	pSR&=~(SR_N|SR_Z|SR_C|SR_I)
 #define SET_C8(a)	pSR|=((a&0x0100)>>1)
 #define SET_N8(a)	pSR|=((a&0x0080)>>1)
 #define SET_Z(a)	if(!a)pSR|=SR_Z

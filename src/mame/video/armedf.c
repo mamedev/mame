@@ -9,18 +9,18 @@
 ***************************************************************************/
 
 static TILEMAP_MAPPER( armedf_scan_type1 )
-{ 	/* col: 0..63; row: 0..31 */
+{	/* col: 0..63; row: 0..31 */
 	/* armed formation */
 	return col * 32 + row;
 }
 
 static TILEMAP_MAPPER( armedf_scan_type2 )
-{ 	/* col: 0..63; row: 0..31 */
+{	/* col: 0..63; row: 0..31 */
 	return 32 * (31 - row) + (col & 0x1f) + 0x800 * (col / 32);
 }
 
 static TILEMAP_MAPPER( armedf_scan_type3 )
-{ 	/* col: 0..63; row: 0..31 */
+{	/* col: 0..63; row: 0..31 */
 	/* legion & legiono */
 	return (col & 0x1f) * 32 + row + 0x800 * (col / 32);
 }
@@ -250,7 +250,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,
 				color,
- 				flipx,flipy,
+				flipx,flipy,
 				sx,sy,15);
 		}
 	}

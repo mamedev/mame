@@ -277,7 +277,7 @@ static const char *const ioc_regnames[] =
 	"(read) Keyboard receive (write) keyboard send",	// 1
 	"?",
 	"?",
-	"(read) IRQ status A",			   	// 4
+	"(read) IRQ status A",				// 4
 	"(read) IRQ request A (write) IRQ clear",	// 5
 	"(rw) IRQ mask A",				// 6
 	"?",

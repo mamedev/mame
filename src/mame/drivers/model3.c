@@ -4617,7 +4617,7 @@ static WRITE16_HANDLER( model3snd_ctrl )
 		UINT8 *snd = memory_region(space->machine, "scsp2");
 		if (data & 0x20)
 		{
-	  		memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
+			memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
 			memory_set_bankptr(space->machine, "bank5", snd + 0x600000);
 		}
 		else
@@ -4644,7 +4644,7 @@ static int scsp_last_line = 0;
 
 static void scsp_irq(const device_config *device, int irq)
 {
- 	if (irq > 0)
+	if (irq > 0)
 	{
 		scsp_last_line = irq;
 		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
@@ -4711,12 +4711,12 @@ static MACHINE_DRIVER_START( model3_10 )
 	MDRV_CPU_ADD("maincpu", PPC603E, 66000000)
 	MDRV_CPU_CONFIG(model3_10)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
 
- 	MDRV_QUANTUM_TIME(HZ(600))
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(model3_10)
 	MDRV_MACHINE_RESET(model3_10)
@@ -4753,7 +4753,7 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(model3_15)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
@@ -4793,7 +4793,7 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
@@ -4833,7 +4833,7 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)

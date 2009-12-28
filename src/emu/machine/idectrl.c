@@ -466,7 +466,7 @@ static void ide_generate_features(ide_state *ide)
 	ide->features[ 8*2+1] = 0;
 	ide->features[ 9*2+0] = 0;							/*  9: vendor-specific */
 	ide->features[ 9*2+1] = 0;
-	swap_strncpy(&ide->features[10*2+0], 				/* 10-19: serial number */
+	swap_strncpy(&ide->features[10*2+0],				/* 10-19: serial number */
 			"00000000000000000000", 10);
 	ide->features[20*2+0] = 0;							/* 20: vendor-specific */
 	ide->features[20*2+1] = 0;
@@ -474,9 +474,9 @@ static void ide_generate_features(ide_state *ide)
 	ide->features[21*2+1] = 0;
 	ide->features[22*2+0] = 4;							/* 22: # of vendor-specific bytes on read/write long commands */
 	ide->features[22*2+1] = 0;
-	swap_strncpy(&ide->features[23*2+0], 				/* 23-26: firmware revision */
+	swap_strncpy(&ide->features[23*2+0],				/* 23-26: firmware revision */
 			"1.0", 4);
-	swap_strncpy(&ide->features[27*2+0], 				/* 27-46: model number */
+	swap_strncpy(&ide->features[27*2+0],				/* 27-46: model number */
 			"MAME Compressed Hard Disk", 20);
 	ide->features[47*2+0] = 0x01;						/* 47: read/write multiple support */
 	ide->features[47*2+1] = 0x80;

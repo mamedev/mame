@@ -730,7 +730,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sexygal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( nightgal )
-  	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sexygal_map)
 	MDRV_CPU_IO_MAP(sexygal_io)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???

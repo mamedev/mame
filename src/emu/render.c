@@ -3009,8 +3009,8 @@ void render_container_add_char(render_container *container, float x0, float y0, 
 	texture = render_font_get_char_texture_and_bounds(font, height, aspect, ch, &bounds);
 
 	/* add it like a quad */
- 	item = render_container_item_add_generic(container, CONTAINER_ITEM_QUAD, bounds.x0, bounds.y0, bounds.x1, bounds.y1, argb);
- 	item->texture = texture;
+	item = render_container_item_add_generic(container, CONTAINER_ITEM_QUAD, bounds.x0, bounds.y0, bounds.x1, bounds.y1, argb);
+	item->texture = texture;
 	item->flags = PRIMFLAG_TEXORIENT(ROT0) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 	item->internal = INTERNAL_FLAG_CHAR;
 }

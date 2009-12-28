@@ -3751,7 +3751,7 @@ doProlog(XML_Parser parser,
 #endif /* XML_DTD */
       dtd->hasParamEntityRefs = XML_TRUE;
       if (startDoctypeDeclHandler) {
-      	XML_Char *tem;
+    	XML_Char *tem;
         if (!XmlIsPublicId(enc, s, next, eventPP))
           return XML_ERROR_PUBLICID;
         tem = poolStoreString(&tempPool, enc,

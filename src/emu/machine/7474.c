@@ -79,22 +79,22 @@ void ttl7474_update(const device_config *device)
 
 	if (!state->preset && state->clear)			  /* line 1 in truth table */
 	{
-		state->output 	 = 1;
+		state->output	 = 1;
 		state->output_comp = 0;
 	}
 	else if (state->preset && !state->clear)	  /* line 2 in truth table */
 	{
-		state->output 	 = 0;
+		state->output	 = 0;
 		state->output_comp = 1;
 	}
 	else if (!state->preset && !state->clear)	  /* line 3 in truth table */
 	{
-		state->output 	 = 1;
+		state->output	 = 1;
 		state->output_comp = 1;
 	}
 	else if (!state->last_clock && state->clock)  /* line 4 in truth table */
 	{
-		state->output 	 =  state->d;
+		state->output	 =  state->d;
 		state->output_comp = !state->d;
 	}
 

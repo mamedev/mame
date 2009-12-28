@@ -44,8 +44,8 @@ static ADDRESS_MAP_START( phoenix_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("discrete", phoenix_sound_control_a_w)
 	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("discrete", phoenix_sound_control_b_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")	 						/* IN0 or IN1 */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")	 						/* DSW */
+	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")							/* IN0 or IN1 */
+	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")							/* DSW */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pleiads_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -55,8 +55,8 @@ static ADDRESS_MAP_START( pleiads_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6000, 0x63ff) AM_WRITE(pleiads_sound_control_a_w)
 	AM_RANGE(0x6800, 0x6bff) AM_WRITE(pleiads_sound_control_b_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")	 						/* IN0 or IN1 + protection */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0") 							/* DSW */
+	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")							/* IN0 or IN1 + protection */
+	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")							/* DSW */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( survival_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( survival_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)				/* IN0 or IN1 */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0") 							/* DSW */
+	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")							/* DSW */
 ADDRESS_MAP_END
 
 

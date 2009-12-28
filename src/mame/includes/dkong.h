@@ -25,7 +25,7 @@
  * 256VF is not being used, so counting is from 248...255, 0...255, ....
  */
 
-#define MASTER_CLOCK		 	XTAL_61_44MHz
+#define MASTER_CLOCK			XTAL_61_44MHz
 #define CLOCK_1H				(MASTER_CLOCK / 5 / 4)
 #define CLOCK_16H				(CLOCK_1H / 16)
 #define CLOCK_1VF				((CLOCK_16H) / 12 / 2)
@@ -96,7 +96,7 @@ struct _dkong_state
 	bitmap_t *		bg_bits;
 	const UINT8 *	color_codes;
 	emu_timer *		scanline_timer;
-	INT8 			vidhw;			/* Selected video hardware RS Conversion / TKG04 */
+	INT8			vidhw;			/* Selected video hardware RS Conversion / TKG04 */
 
 	/* radar scope */
 
@@ -109,7 +109,7 @@ struct _dkong_state
 	UINT8	rflip_sig;
 	UINT8	star_ff;
 	UINT8	blue_level;
-	double 	cd4049_a;
+	double	cd4049_a;
 	double	cd4049_b;
 
 	/* Specific states */
@@ -127,7 +127,7 @@ struct _dkong_state
 	UINT16	grid_col;
 	UINT8	sprite_bank;
 	UINT8	dma_latch;
-	UINT8 	flip;
+	UINT8	flip;
 
 	/* reverse address lookup map - hunchbkd */
 	INT16 rev_map[0x200];

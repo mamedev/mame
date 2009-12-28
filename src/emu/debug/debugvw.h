@@ -112,7 +112,7 @@ struct _registers_subview_item
 	registers_subview_item *next;				/* link to next item */
 	int					index;					/* index of this item */
 	const device_config *device;				/* CPU to display */
-	char  				name[1];				/* name of the subview item */
+	char				name[1];				/* name of the subview item */
 };
 
 
@@ -123,7 +123,7 @@ struct _disasm_subview_item
 	disasm_subview_item *next;					/* link to next item */
 	int					index;					/* index of this item */
 	const address_space *space;					/* address space to display */
-	char  				name[1];				/* name of the subview item */
+	char				name[1];				/* name of the subview item */
 };
 
 
@@ -139,7 +139,7 @@ struct _memory_subview_item
 	offs_t				offsetxor;				/* XOR to apply to offsets */
 	UINT8				endianness;				/* endianness of memory */
 	UINT8				prefsize;				/* preferred bytes per chunk */
-	char  				name[1];				/* name of the subview item */
+	char				name[1];				/* name of the subview item */
 };
 
 

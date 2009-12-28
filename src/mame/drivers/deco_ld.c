@@ -75,8 +75,8 @@ static VIDEO_UPDATE( rblaster )
 #if 0
 static WRITE8_HANDLER( rblaster_sound_w )
 {
- 	soundlatch_w(space,0,data);
- 	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 #endif
 

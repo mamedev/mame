@@ -330,7 +330,7 @@ static SAMPLES_START( tmnt_decode_sample )
 		int val = source[2*i] + source[2*i+1] * 256;
 		int expo = val >> 13;
 
-	  	val = (val >> 3) & (0x3ff);	/* 10 bit, Max Amplitude 0x400 */
+		val = (val >> 3) & (0x3ff);	/* 10 bit, Max Amplitude 0x400 */
 		val -= 0x200;					/* Centralize value */
 
 		val <<= (expo-3);

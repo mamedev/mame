@@ -20,8 +20,8 @@ struct _hyprduel_state
 	UINT16 *  irq_enable;
 	UINT16 *  sharedram1;
 	UINT16 *  sharedram3;
-  	UINT16 *  spriteram;
-  	UINT16 *  paletteram;
+	UINT16 *  spriteram;
+	UINT16 *  paletteram;
 	size_t    tiletable_size;
 	size_t    spriteram_size;
 

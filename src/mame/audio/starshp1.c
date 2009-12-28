@@ -66,7 +66,7 @@
 #define STARSHP1_C78	CAP_U(0.1)
 
 /* Convert DAC value to voltage out at IC E10, pin 4 */
-#define STARSHP1_MC1408_GAIN  		MC1408_DAC(5.0, STARSHP1_R4, STARSHP1_R62)
+#define STARSHP1_MC1408_GAIN		MC1408_DAC(5.0, STARSHP1_R4, STARSHP1_R62)
 /* Gain at IC E10, pin 12 */
 #define STARSHP1_TONE_PITCH_GAIN	OP_AMP_NON_INVERT_GAIN(STARSHP1_R63, STARSHP1_R64)
 
@@ -163,7 +163,7 @@ DISCRETE_SOUND_START( starshp1 )
 	/************************************************
      * Noise
      ************************************************/
- 	DISCRETE_LFSR_NOISE(NODE_20,					/* IC B9, pin 13 */
+	DISCRETE_LFSR_NOISE(NODE_20,					/* IC B9, pin 13 */
 						1,							/* ENAB */
 						STARSHP1_KICKER,			/* IC B9 & C9, pin 9 */
 						STARSHP1_S1V,				/* IC B9 & C9, pin 8 */

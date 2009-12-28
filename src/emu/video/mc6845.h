@@ -16,9 +16,9 @@
 #define MC6845_1	DEVICE_GET_INFO_NAME(mc6845_1)
 #define R6545_1		DEVICE_GET_INFO_NAME(r6545_1)
 #define C6545_1 	DEVICE_GET_INFO_NAME(c6545_1)
-#define H46505	 	DEVICE_GET_INFO_NAME(h46505)
-#define HD6845 		DEVICE_GET_INFO_NAME(hd6845)
-#define SY6545_1 	DEVICE_GET_INFO_NAME(sy6545_1)
+#define H46505		DEVICE_GET_INFO_NAME(h46505)
+#define HD6845		DEVICE_GET_INFO_NAME(hd6845)
+#define SY6545_1	DEVICE_GET_INFO_NAME(sy6545_1)
 
 
 #define MDRV_MC6845_ADD(_tag, _variant, _clock, _config) \
@@ -31,11 +31,11 @@ typedef void * (*mc6845_begin_update_func)(const device_config *device, bitmap_t
 #define MC6845_BEGIN_UPDATE(name)	void *name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 
 typedef void (*mc6845_update_row_func)(const device_config *device, bitmap_t *bitmap,
-					   				   const rectangle *cliprect, UINT16 ma, UINT8 ra,
-					   				   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+									   const rectangle *cliprect, UINT16 ma, UINT8 ra,
+									   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 #define MC6845_UPDATE_ROW(name)		void name(const device_config *device, bitmap_t *bitmap,	\
-					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,	\
-					   						  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+											  const rectangle *cliprect, UINT16 ma, UINT8 ra,	\
+											  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
 typedef void (*mc6845_end_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param);
 #define MC6845_END_UPDATE(name)		void name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param)

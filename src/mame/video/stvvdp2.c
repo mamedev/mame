@@ -196,13 +196,13 @@ enum
        | LSMD1    | LSMD0    | VRESO1   | VRESO0   |    --    | HRESO2   | HRESO1   | HRESO0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_TVMD 	((stv_vdp2_regs[0x000/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_TVMD	((stv_vdp2_regs[0x000/4] >> 16)&0x0000ffff)
 
 	#define STV_VDP2_DISP   ((STV_VDP2_TVMD & 0x8000) >> 15)
 	#define STV_VDP2_BDCLMD	((STV_VDP2_TVMD & 0x0100) >> 8)
-	#define STV_VDP2_LSMD 	((STV_VDP2_TVMD & 0x00c0) >> 6)
-	#define STV_VDP2_VRES 	((STV_VDP2_TVMD & 0x0030) >> 4)
-	#define STV_VDP2_HRES 	((STV_VDP2_TVMD & 0x0007) >> 0)
+	#define STV_VDP2_LSMD	((STV_VDP2_TVMD & 0x00c0) >> 6)
+	#define STV_VDP2_VRES	((STV_VDP2_TVMD & 0x0030) >> 4)
+	#define STV_VDP2_HRES	((STV_VDP2_TVMD & 0x0007) >> 0)
 
 /* 180002 - r/w - EXTEN - External Signal Enable Register
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2242,7 +2242,7 @@ static void stv_vdp2_fill_rotation_parameter_table( running_machine *machine, UI
 			case 6:	popmessage( "cx = %x, cy = %x, cz = %x", RP.cx, RP.cy, RP.cz ); break;
 			case 7:	popmessage( "mx = %x, my = %x", RP.mx, RP.my ); break;
 			case 8:	popmessage( "kx = %x, ky = %x", RP.kx, RP.ky ); break;
-	 		case 9:	popmessage( "kast = %x, dkast = %x, dkax = %x", RP.kast, RP.dkast, RP.dkax ); break;
+			case 9:	popmessage( "kast = %x, dkast = %x, dkax = %x", RP.kast, RP.dkast, RP.dkax ); break;
 			case 10: break;
 		}
 	}
@@ -2677,12 +2677,12 @@ static void stv_vdp2_compute_color_offset_RGB555( int *r, int *g, int *b, int co
 		*g = (STV_VDP2_COBG & 0x100) ? (*g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + *g);
 		*b = (STV_VDP2_COBB & 0x100) ? (*b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + *b);
 	}
-	if(*r < 0) 		{ *r = 0; }
-	if(*r > 0xff) 	{ *r = 0xff; }
-	if(*g < 0) 		{ *g = 0; }
-	if(*g > 0xff) 	{ *g = 0xff; }
-	if(*b < 0) 		{ *b = 0; }
-	if(*b > 0xff) 	{ *b = 0xff; }
+	if(*r < 0)		{ *r = 0; }
+	if(*r > 0xff)	{ *r = 0xff; }
+	if(*g < 0)		{ *g = 0; }
+	if(*g > 0xff)	{ *g = 0xff; }
+	if(*b < 0)		{ *b = 0; }
+	if(*b > 0xff)	{ *b = 0xff; }
 	*r >>= 3;
 	*g >>= 3;
 	*b >>= 3;
@@ -2706,12 +2706,12 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(UINT16 *rgb, int cor)
 		_g = (STV_VDP2_COBG & 0x100) ? (_g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + _g);
 		_b = (STV_VDP2_COBB & 0x100) ? (_b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + _b);
 	}
-	if(_r < 0) 		{ _r = 0; }
-	if(_r > 0xff) 	{ _r = 0xff; }
-	if(_g < 0) 		{ _g = 0; }
-	if(_g > 0xff) 	{ _g = 0xff; }
-	if(_b < 0) 		{ _b = 0; }
-	if(_b > 0xff) 	{ _b = 0xff; }
+	if(_r < 0)		{ _r = 0; }
+	if(_r > 0xff)	{ _r = 0xff; }
+	if(_g < 0)		{ _g = 0; }
+	if(_g > 0xff)	{ _g = 0xff; }
+	if(_b < 0)		{ _b = 0; }
+	if(_b > 0xff)	{ _b = 0xff; }
 	_r >>= 3;
 	_g >>= 3;
 	_b >>= 3;
@@ -3135,7 +3135,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					}
 					/*Guess: myfairlady needs that the vertical resolution is doubled because it's using the double density mode.*/
 					if(STV_VDP2_LSMD == 3) { gfxdata += xlinesize*(yy>>16); }
-					else 				   { gfxdata += xlinesize; }
+					else				   { gfxdata += xlinesize; }
 					if ( gfxdata >= gfxdatahigh ) gfxdata = gfxdatalow + (gfxdata - gfxdatahigh);
 				}
 			}
@@ -5531,11 +5531,11 @@ static void	stv_vdp2_fade_effects(running_machine *machine)
 		t_g = (STV_VDP2_COAG & 0x100) ? (RGB_GREEN(color) - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + RGB_GREEN(color));
 		t_b = (STV_VDP2_COAB & 0x100) ? (RGB_BLUE(color) - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + RGB_BLUE(color));
 		if(t_r < 0) 	{ t_r = 0; }
-		if(t_r > 0xff) 	{ t_r = 0xff; }
+		if(t_r > 0xff)	{ t_r = 0xff; }
 		if(t_g < 0) 	{ t_g = 0; }
-		if(t_g > 0xff) 	{ t_g = 0xff; }
+		if(t_g > 0xff)	{ t_g = 0xff; }
 		if(t_b < 0) 	{ t_b = 0; }
-		if(t_b > 0xff) 	{ t_b = 0xff; }
+		if(t_b > 0xff)	{ t_b = 0xff; }
 		r = t_r;
 		g = t_g;
 		b = t_b;
@@ -5547,11 +5547,11 @@ static void	stv_vdp2_fade_effects(running_machine *machine)
 		t_g = (STV_VDP2_COBG & 0x100) ? (RGB_GREEN(color) - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + RGB_GREEN(color));
 		t_b = (STV_VDP2_COBB & 0x100) ? (RGB_BLUE(color) - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + RGB_BLUE(color));
 		if(t_r < 0) 	{ t_r = 0; }
-		if(t_r > 0xff) 	{ t_r = 0xff; }
+		if(t_r > 0xff)	{ t_r = 0xff; }
 		if(t_g < 0) 	{ t_g = 0; }
-		if(t_g > 0xff) 	{ t_g = 0xff; }
+		if(t_g > 0xff)	{ t_g = 0xff; }
 		if(t_b < 0) 	{ t_b = 0; }
-		if(t_b > 0xff) 	{ t_b = 0xff; }
+		if(t_b > 0xff)	{ t_b = 0xff; }
 		r = t_r;
 		g = t_g;
 		b = t_b;
@@ -5596,7 +5596,7 @@ Window Registers are hooked up like this ATM:
 static void stv_vdp2_get_window0_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y)
 {
 	/*W0*/
- 	switch(STV_VDP2_LSMD & 3)
+	switch(STV_VDP2_LSMD & 3)
 	{
 		case 0:
 		case 1:

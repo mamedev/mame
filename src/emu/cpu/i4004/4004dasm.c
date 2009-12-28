@@ -21,29 +21,29 @@ CPU_DISASSEMBLE( i4004 )
 	UINT16 page = PC & 0x0f00;
 	switch (op = OP(pc++))
 	{
-		case 0x00: 	sprintf (buffer,"nop");                           		break;
-		case 0x11: 	sprintf (buffer,"jnt $%03x",page | ARG(pc));	pc++;   break;
-		case 0x12: 	sprintf (buffer,"jc $%03x",page | ARG(pc));		pc++;   break;
-		case 0x14: 	sprintf (buffer,"jz $%03x",page | ARG(pc));		pc++;   break;
-		case 0x19: 	sprintf (buffer,"jt $%03x",page | ARG(pc));		pc++;   break;
-		case 0x1a: 	sprintf (buffer,"jnc $%03x",page | ARG(pc));	pc++;   break;
-		case 0x1c: 	sprintf (buffer,"jnz $%03x",page | ARG(pc));	pc++;   break;
+		case 0x00:	sprintf (buffer,"nop");                         		break;
+		case 0x11:	sprintf (buffer,"jnt $%03x",page | ARG(pc));	pc++;   break;
+		case 0x12:	sprintf (buffer,"jc $%03x",page | ARG(pc));		pc++;   break;
+		case 0x14:	sprintf (buffer,"jz $%03x",page | ARG(pc));		pc++;   break;
+		case 0x19:	sprintf (buffer,"jt $%03x",page | ARG(pc));		pc++;   break;
+		case 0x1a:	sprintf (buffer,"jnc $%03x",page | ARG(pc));	pc++;   break;
+		case 0x1c:	sprintf (buffer,"jnz $%03x",page | ARG(pc));	pc++;   break;
 		case 0x10: case 0x13: case 0x15: case 0x16:
 		case 0x17: case 0x18: case 0x1b: case 0x1d:
 		case 0x1e: case 0x1f:
-				   	sprintf (buffer,"jcn $%01x,$%03x",op & 0x0f,page | ARG(pc)); pc++; break;
+					sprintf (buffer,"jcn $%01x,$%03x",op & 0x0f,page | ARG(pc)); pc++; break;
 		case 0x20: case 0x22: case 0x24: case 0x26:
 		case 0x28: case 0x2a: case 0x2c: case 0x2e:
-				   	sprintf (buffer,"fim $%01x,$%02x",op & 0x0f,OP(pc)); pc++; break;
+					sprintf (buffer,"fim $%01x,$%02x",op & 0x0f,OP(pc)); pc++; break;
 		case 0x21: case 0x23: case 0x25: case 0x27:
 		case 0x29: case 0x2b: case 0x2d: case 0x2f:
-				   	sprintf (buffer,"src $%01x",(op & 0x0f)-1); break;
+					sprintf (buffer,"src $%01x",(op & 0x0f)-1); break;
 		case 0x30: case 0x32: case 0x34: case 0x36:
 		case 0x38: case 0x3a: case 0x3c: case 0x3e:
-				   	sprintf (buffer,"fin $%01x",op & 0x0f); break;
+					sprintf (buffer,"fin $%01x",op & 0x0f); break;
 		case 0x31: case 0x33: case 0x35: case 0x37:
 		case 0x39: case 0x3b: case 0x3d: case 0x3f:
-				   	sprintf (buffer,"jin $%01x",(op & 0x0f)-1); break;
+					sprintf (buffer,"jin $%01x",(op & 0x0f)-1); break;
 		case 0x40: case 0x41: case 0x42: case 0x43:
 		case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
@@ -95,37 +95,37 @@ CPU_DISASSEMBLE( i4004 )
 		case 0xdc: case 0xdd: case 0xde: case 0xdf:
 					sprintf (buffer,"ldm $%01x",op & 0x0f); break;
 
-		case 0xe0: 	sprintf (buffer,"wrm"); break;
-		case 0xe1: 	sprintf (buffer,"wmp"); break;
-		case 0xe2: 	sprintf (buffer,"wrr"); break;
-		case 0xe3: 	sprintf (buffer,"wpm"); break;
-		case 0xe4: 	sprintf (buffer,"wr0"); break;
-		case 0xe5: 	sprintf (buffer,"wr1"); break;
-		case 0xe6: 	sprintf (buffer,"wr2"); break;
-		case 0xe7: 	sprintf (buffer,"wr3"); break;
-		case 0xe8: 	sprintf (buffer,"sbm"); break;
-		case 0xe9: 	sprintf (buffer,"rdm"); break;
-		case 0xea: 	sprintf (buffer,"rdr"); break;
-		case 0xeb: 	sprintf (buffer,"adm"); break;
-		case 0xec: 	sprintf (buffer,"rd0"); break;
-		case 0xed: 	sprintf (buffer,"rd1"); break;
-		case 0xee: 	sprintf (buffer,"rd2"); break;
-		case 0xef: 	sprintf (buffer,"rd3"); break;
+		case 0xe0:	sprintf (buffer,"wrm"); break;
+		case 0xe1:	sprintf (buffer,"wmp"); break;
+		case 0xe2:	sprintf (buffer,"wrr"); break;
+		case 0xe3:	sprintf (buffer,"wpm"); break;
+		case 0xe4:	sprintf (buffer,"wr0"); break;
+		case 0xe5:	sprintf (buffer,"wr1"); break;
+		case 0xe6:	sprintf (buffer,"wr2"); break;
+		case 0xe7:	sprintf (buffer,"wr3"); break;
+		case 0xe8:	sprintf (buffer,"sbm"); break;
+		case 0xe9:	sprintf (buffer,"rdm"); break;
+		case 0xea:	sprintf (buffer,"rdr"); break;
+		case 0xeb:	sprintf (buffer,"adm"); break;
+		case 0xec:	sprintf (buffer,"rd0"); break;
+		case 0xed:	sprintf (buffer,"rd1"); break;
+		case 0xee:	sprintf (buffer,"rd2"); break;
+		case 0xef:	sprintf (buffer,"rd3"); break;
 
-		case 0xf0: 	sprintf (buffer,"clb"); break;
-		case 0xf1: 	sprintf (buffer,"clc"); break;
-		case 0xf2: 	sprintf (buffer,"iac"); break;
-		case 0xf3: 	sprintf (buffer,"cmc"); break;
-		case 0xf4: 	sprintf (buffer,"cma"); break;
-		case 0xf5: 	sprintf (buffer,"ral"); break;
-		case 0xf6: 	sprintf (buffer,"rar"); break;
-		case 0xf7: 	sprintf (buffer,"tcc"); break;
-		case 0xf8: 	sprintf (buffer,"dac"); break;
-		case 0xf9: 	sprintf (buffer,"tcs"); break;
-		case 0xfa: 	sprintf (buffer,"stc"); break;
-		case 0xfb: 	sprintf (buffer,"daa"); break;
-		case 0xfc: 	sprintf (buffer,"kbp"); break;
-		case 0xfd: 	sprintf (buffer,"dcl"); break;
+		case 0xf0:	sprintf (buffer,"clb"); break;
+		case 0xf1:	sprintf (buffer,"clc"); break;
+		case 0xf2:	sprintf (buffer,"iac"); break;
+		case 0xf3:	sprintf (buffer,"cmc"); break;
+		case 0xf4:	sprintf (buffer,"cma"); break;
+		case 0xf5:	sprintf (buffer,"ral"); break;
+		case 0xf6:	sprintf (buffer,"rar"); break;
+		case 0xf7:	sprintf (buffer,"tcc"); break;
+		case 0xf8:	sprintf (buffer,"dac"); break;
+		case 0xf9:	sprintf (buffer,"tcs"); break;
+		case 0xfa:	sprintf (buffer,"stc"); break;
+		case 0xfb:	sprintf (buffer,"daa"); break;
+		case 0xfc:	sprintf (buffer,"kbp"); break;
+		case 0xfd:	sprintf (buffer,"dcl"); break;
 
 		default : sprintf (buffer,"illegal"); break;
 	}

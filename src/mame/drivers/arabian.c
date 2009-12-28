@@ -173,7 +173,7 @@ static WRITE8_HANDLER( custom_cpu_w )
 {
 	arabian_state *state = (arabian_state *)space->machine->driver_data;
 
- 	state->custom_cpu_ram[0x7f0 + offset] = data;
+	state->custom_cpu_ram[0x7f0 + offset] = data;
 }
 
 

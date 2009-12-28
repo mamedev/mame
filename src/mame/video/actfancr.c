@@ -178,7 +178,7 @@ VIDEO_UPDATE( actfancr )
 		int x, y, sprite, colour, multi, fx, fy, inc, flash;
 
 		y = buffered_spriteram[offs] + (buffered_spriteram[offs + 1] << 8);
- 		if ((y & 0x8000) == 0)
+		if ((y & 0x8000) == 0)
 			continue;
 
 		x = buffered_spriteram[offs + 4] + (buffered_spriteram[offs + 5] << 8);
@@ -270,7 +270,7 @@ VIDEO_UPDATE( triothep )
 		int x, y, sprite, colour, multi, fx, fy, inc, flash;
 
 		y = buffered_spriteram[offs] + (buffered_spriteram[offs + 1] << 8);
- 		if ((y & 0x8000) == 0)
+		if ((y & 0x8000) == 0)
 			continue;
 
 		x = buffered_spriteram[offs + 4] + (buffered_spriteram[offs + 5] << 8);

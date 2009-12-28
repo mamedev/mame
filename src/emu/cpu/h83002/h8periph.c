@@ -364,10 +364,10 @@ UINT8 h8_register_read8(h83xx_state *h8, UINT32 address)
 		case 0xe8:		// adc status
 			val = 0x80;
 			break;
-		case 0xc7:    		// port 4 data
+		case 0xc7:  		// port 4 data
 			val = memory_read_byte(h8->io, H8_PORT_4);
 			break;
-		case 0xcb:    		// port 6 data
+		case 0xcb:  		// port 6 data
 			val = memory_read_byte(h8->io, H8_PORT_6);
 			break;
 		case 0xce:		// port 7 data
@@ -426,7 +426,7 @@ void h8_register_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 		case 0xc7:
 			memory_write_byte(h8->io, H8_PORT_4, val);
 			break;
-		case 0xcb:    		// port 6 data
+		case 0xcb:  		// port 6 data
 			memory_write_byte(h8->io, H8_PORT_6, val);
 			break;
 		case 0xce:		// port 7 data
@@ -661,10 +661,10 @@ UINT8 h8_3007_register_read8(h83xx_state *h8, UINT32 address)
 			val = 0x80;
 			break;
 
-		case 0xd3:    		// port 4 data
+		case 0xd3:  		// port 4 data
 			val = memory_read_byte(h8->io, H8_PORT_4);
 			break;
-		case 0xd5:    		// port 6 data
+		case 0xd5:  		// port 6 data
 			val = memory_read_byte(h8->io, H8_PORT_6);
 			break;
 		case 0xd6:		// port 7 data
@@ -745,7 +745,7 @@ UINT8 h8_3007_register1_read8(h83xx_state *h8, UINT32 address)
 	switch (address)
 	{
 		case 0xfee012:	return h8->per_regs[0xF2];	// SYSCR
-		case 0xfee016:	return h8_ISR_r(h8);	  	// ISR
+		case 0xfee016:	return h8_ISR_r(h8);		// ISR
 		case 0xfee018:	return h8->per_regs[0xF8];	// IPRA
 	}
 
@@ -758,7 +758,7 @@ void h8_3007_register1_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 	switch (address)
 	{
 		case 0xfee012:	h8->per_regs[0xF2] = val;	return;	// SYSCR
-		case 0xfee016:	h8_ISR_w(h8, val);	  	return;	// ISR
+		case 0xfee016:	h8_ISR_w(h8, val);		return;	// ISR
 		case 0xfee018:	h8->per_regs[0xF8] = val;	return;	// IPRA
 	}
 	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",h8->device->tag,h8->pc,address,val);

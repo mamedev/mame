@@ -342,7 +342,7 @@ static void gp2_ide_interrupt(const device_config *device, int state)
 
 static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&workram) 										/* work ram */
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */

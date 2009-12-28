@@ -1570,7 +1570,7 @@ static CPU_SET_INFO( mb86233 )
 	switch (state)
 	{
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + MB86233_PC:			GETPC() = info->i; 						break;
+		case CPUINFO_INT_REGISTER + MB86233_PC:			GETPC() = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB86233_A:			GETA().u = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB86233_B:			GETB().u = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB86233_P:			GETP().u = info->i;						break;
@@ -1626,11 +1626,11 @@ CPU_GET_INFO( mb86233 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -2;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
@@ -1645,7 +1645,7 @@ CPU_GET_INFO( mb86233 )
 		case CPUINFO_INT_REGISTER + MB86233_SP:			info->i = GETPCSP();					break;
 		case CPUINFO_INT_REGISTER + MB86233_EB:			info->i = GETEB();						break;
 		case CPUINFO_INT_REGISTER + MB86233_SHIFT:		info->i = GETSHIFT();					break;
-		case CPUINFO_INT_REGISTER + MB86233_FLAGS: 		info->i = GETSR();						break;
+		case CPUINFO_INT_REGISTER + MB86233_FLAGS:		info->i = GETSR();						break;
 		case CPUINFO_INT_REGISTER + MB86233_R0:			info->i = GETGPR(0);					break;
 		case CPUINFO_INT_REGISTER + MB86233_R1:			info->i = GETGPR(1);					break;
 		case CPUINFO_INT_REGISTER + MB86233_R2:			info->i = GETGPR(2);					break;

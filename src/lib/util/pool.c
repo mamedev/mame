@@ -76,7 +76,7 @@ struct _object_entry
 	object_entry *		globalprev;
 	objtype_entry *		type;
 	void *				object;
-	size_t 				size;
+	size_t				size;
 	const char *		file;
 	int					line;
 };
@@ -99,7 +99,7 @@ struct _object_pool
 	object_entry *		freelist;
 	object_entry_block *blocklist;
 	objtype_entry *		typelist;
-	void 				(*fail)(const char *message);
+	void				(*fail)(const char *message);
 };
 
 

@@ -23,7 +23,7 @@ bit 0 = ? (unused?)
 WRITE8_HANDLER( mexico86_f008_w )
 {
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
- 	if (cputag_get_cpu(space->machine, "mcu") != NULL)
+	if (cputag_get_cpu(space->machine, "mcu") != NULL)
 	{
 		// mexico 86, knight boy
 		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);

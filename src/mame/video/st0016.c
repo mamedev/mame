@@ -264,36 +264,36 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	for(i=0;i<ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK;i+=8)
 	{
 		x=st0016_spriteram[i+4]+((st0016_spriteram[i+5]&3)<<8);
-  	y=st0016_spriteram[i+6]+((st0016_spriteram[i+7]&3)<<8);
+	y=st0016_spriteram[i+6]+((st0016_spriteram[i+7]&3)<<8);
 
-  	scrollx=(st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+0x40]+256*st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+1+0x40])&0x3ff;
-  	scrolly=(st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+2+0x40]+256*st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+3+0x40])&0x3ff;
+	scrollx=(st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+0x40]+256*st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+1+0x40])&0x3ff;
+	scrolly=(st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+2+0x40]+256*st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+3+0x40])&0x3ff;
 
 	if(!ISMACS)
 	{
-	  	if (x & 0x200) x-= 0x400; //sign
-  		if (y & 0x200) y-= 0x400;
+		if (x & 0x200) x-= 0x400; //sign
+		if (y & 0x200) y-= 0x400;
 
-  		if (scrollx & 0x200) scrollx-= 0x400; //sign
-  		if (scrolly & 0x200) scrolly-= 0x400;
-  	}
+		if (scrollx & 0x200) scrollx-= 0x400; //sign
+		if (scrolly & 0x200) scrolly-= 0x400;
+	}
 
-  	if(ISMACS1)
+	if(ISMACS1)
 	{
-	  	if (x & 0x200) x-= 0x400; //sign
-  		if (y & 0x200) y-= 0x2b0;//0x400;
+		if (x & 0x200) x-= 0x400; //sign
+		if (y & 0x200) y-= 0x2b0;//0x400;
 
-  		if (scrollx & 0x200) scrollx-= 0x400; //sign
-  		if (scrolly & 0x200) scrolly-= 0x400;
-  	}
+		if (scrollx & 0x200) scrollx-= 0x400; //sign
+		if (scrolly & 0x200) scrolly-= 0x400;
+	}
 
-  	x+=scrollx;
-  	y+=scrolly;
+	x+=scrollx;
+	y+=scrolly;
 
-  	if(ISMACS)
-  	{
-  		y+=0x20;
-  	}
+	if(ISMACS)
+	{
+		y+=0x20;
+	}
 
 	if( st0016_spriteram[i+3]&0x80) /* end of list */
 		break;
@@ -347,7 +347,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					int x0,y0,i0=0;
 					for(x0=(flipx?((1<<lx)-1):0);x0!=(flipx?-1:(1<<lx));x0+=(flipx?-1:1))
 						for(y0=(flipy?((1<<ly)-1):0);y0!=(flipy?-1:(1<<ly));y0+=(flipy?-1:1))
-					 	{
+						{
 							/* custom draw */
 							UINT16 *destline;
 							int yloop,xloop;
@@ -408,7 +408,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 									gfxoffs++;
 								}
 							}
-					 	}
+						}
 				}
 				offset+=8;
 				if(offset>=ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
@@ -502,17 +502,17 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 			int x,y,code,color,flipx,flipy;
 			int i=st0016_vregs[j+1]*0x1000;
 			for(x=0;x<32*2;x++)
-	 			for(y=0;y<8*4;y++)
-	 			{
-				 	code=st0016_spriteram[i]+256*st0016_spriteram[i+1];
-	 				color=st0016_spriteram[i+2]&0x3f;
+				for(y=0;y<8*4;y++)
+				{
+					code=st0016_spriteram[i]+256*st0016_spriteram[i+1];
+					color=st0016_spriteram[i+2]&0x3f;
 
-	 				flipx=st0016_spriteram[i+3]&0x80;
+					flipx=st0016_spriteram[i+3]&0x80;
 					flipy=st0016_spriteram[i+3]&0x40;
 
-				 	if(priority)
-				 	{
-				 		drawgfx_transpen(bitmap,cliprect,gfx,
+					if(priority)
+					{
+						drawgfx_transpen(bitmap,cliprect,gfx,
 										code,
 										color,
 										flipx,flipy,
@@ -579,9 +579,9 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 								}
 							}
 						}
-	 			i+=4;
-	 			}
-	 	}
+				i+=4;
+				}
+		}
 	}
 }
 
@@ -607,10 +607,10 @@ VIDEO_UPDATE( st0016 )
 			fprintf(p,"VREG %.4x - %.4x\n",h,st0016_vregs[h]);
 		for(h=0;h<0x1000*ST0016_MAX_SPR_BANK;h+=8)
 		{
-		 	fprintf(p,"%.4x - %.4x - ",h,h>>3);
-		 	for(j=0;j<8;j++)
-		 	 	fprintf(p,"%.2x ",st0016_spriteram[h+j]);
-		 	 fprintf(p,"\n");
+			fprintf(p,"%.4x - %.4x - ",h,h>>3);
+			for(j=0;j<8;j++)
+				fprintf(p,"%.2x ",st0016_spriteram[h+j]);
+			 fprintf(p,"\n");
 		}
 		fclose(p);
 	}
@@ -635,7 +635,7 @@ VIDEO_UPDATE( st0016 )
 
 		//draw st0016 gfx to temporary bitmap (indexed 16)
 		draw_bgmap(screen->machine, speglsht_bitmap,cliprect,0);
- 		draw_sprites(screen->machine, speglsht_bitmap,cliprect);
+		draw_sprites(screen->machine, speglsht_bitmap,cliprect);
 		draw_bgmap(screen->machine, speglsht_bitmap,cliprect,1);
 
 		//copy temporary bitmap to rgb 32 bit bitmap
@@ -664,7 +664,7 @@ VIDEO_UPDATE( st0016 )
 
 		bitmap_fill(bitmap,cliprect,UNUSED_PEN);
 		draw_bgmap(screen->machine, bitmap,cliprect,0);
- 		draw_sprites(screen->machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		draw_bgmap(screen->machine, bitmap,cliprect,1);
 	}
 	return 0;

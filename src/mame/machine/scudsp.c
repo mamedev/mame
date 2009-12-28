@@ -84,9 +84,9 @@ typedef union {
 } SCUDSPREG16;
 
 static struct {
-	   UINT8 pc; 							           /*Program Counter*/
+	   UINT8 pc;							           /*Program Counter*/
 	   UINT8 delay;									   /* Delay */
-	   UINT8 top;							   		   /*Jump Command memory*/
+	   UINT8 top;									   /*Jump Command memory*/
 	   UINT16 lop;								       /*Counter Register*/	  /*12-bits*/
 	   UINT8  ct0,ct1,ct2,ct3;					       /*Index for RAM*/	  /*6-bits */
 	   UINT32 md0[0x40],md1[0x40],md2[0x40],md3[0x40]; /*RAM memory*/
@@ -623,9 +623,9 @@ static void dsp_dma( const address_space *space )
 		  case 2: add = 4; break;  /* 2 */
 		  case 3: add = 16; break; /* 4 */
 		  case 4: add = 16; break;  /* 8 */
-  		  case 5: add = 64; break; /* 16 */
-  		  case 6: add = 128; break; /* 32 */
-  		  case 7: add = 256; break; /* 64 */
+		  case 5: add = 64; break; /* 16 */
+		  case 6: add = 128; break; /* 32 */
+		  case 7: add = 256; break; /* 64 */
         }
 	}
 
@@ -796,7 +796,7 @@ void dsp_execute_program(const address_space *dmaspace)
     if ( log_file == NULL )
     {
     	log_file = fopen("dsp.log", "a");
-   	}
+	}
 	for ( i = 0; i < 0x100; i++ )
 	{
         dsp_dasm_opcode( dsp_reg.internal_prg[ i ], dasm_buffer );

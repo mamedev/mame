@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( tubep_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1") 								/* 6116 #1 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")								/* 6116 #1 */
 	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4") AM_BASE(&tubep_backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("share3")						/* sprites color lookup table */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")									/* program copies here part of shared ram ?? */
@@ -229,7 +229,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( tubep_soundlatch_r )
 {
- 	int res;
+	int res;
 
 	res = sound_latch;
 	sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
@@ -532,7 +532,7 @@ static MACHINE_RESET( rjammer )
 
 static READ8_HANDLER( rjammer_soundlatch_r )
 {
- 	int res = sound_latch;
+	int res = sound_latch;
 	return res;
 }
 

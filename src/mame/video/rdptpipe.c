@@ -1,6 +1,6 @@
 INLINE void TEXTURE_PIPELINE_BILINEAR_NMID(COLOR* TEX, INT32 SSS, INT32 SST, TILE* tex_tile)
 {
-#define RELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
+#define RELATIVE(x, y)	((((x) >> 3) - (y)) << 3) | (x & 7);
 	INT32 maxs, maxt;
 	COLOR t0, t1, t2, t3;
 	int sss1, sst1, sss2, sst2;
@@ -76,7 +76,7 @@ INLINE void TEXTURE_PIPELINE_BILINEAR_NMID(COLOR* TEX, INT32 SSS, INT32 SST, TIL
 
 INLINE void TEXTURE_PIPELINE_BILINEAR_MID(COLOR* TEX, INT32 SSS, INT32 SST, TILE* tex_tile)
 {
-#define RELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
+#define RELATIVE(x, y)	((((x) >> 3) - (y)) << 3) | (x & 7);
 	INT32 maxs, maxt;
 	COLOR t0, t1, t2, t3;
 	int sss1, sst1, sss2, sst2;
@@ -162,7 +162,7 @@ INLINE void TEXTURE_PIPELINE_BILINEAR_MID(COLOR* TEX, INT32 SSS, INT32 SST, TILE
 
 INLINE void TEXTURE_PIPELINE_NEAREST_NMID(COLOR* TEX, INT32 SSS, INT32 SST, TILE* tex_tile)
 {
-#define RELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
+#define RELATIVE(x, y)	((((x) >> 3) - (y)) << 3) | (x & 7);
 	INT32 maxs, maxt;
 	int sss1, sst1;
 	INT32 SFRAC, TFRAC;

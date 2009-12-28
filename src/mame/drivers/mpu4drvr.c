@@ -599,17 +599,17 @@ static void scn2674_write_init_regs(UINT8 data)
 			IR0_scn2674_sync_select = (data&0x04)>>2;
 			IR0_scn2674_buffer_mode_select = (data&0x03);
 
-		   	LOGSTUFF(("IR0 - Double Ht Wd %02x\n",IR0_scn2674_double_ht_wd));
-		   	LOGSTUFF(("IR0 - Scanlines per Character Row %02x\n",IR0_scn2674_scanline_per_char_row));
-		   	LOGSTUFF(("IR0 - Sync Select %02x\n",IR0_scn2674_sync_select));
-		   	LOGSTUFF(("IR0 - Buffer Mode Select %02x\n",IR0_scn2674_buffer_mode_select));
+			LOGSTUFF(("IR0 - Double Ht Wd %02x\n",IR0_scn2674_double_ht_wd));
+			LOGSTUFF(("IR0 - Scanlines per Character Row %02x\n",IR0_scn2674_scanline_per_char_row));
+			LOGSTUFF(("IR0 - Sync Select %02x\n",IR0_scn2674_sync_select));
+			LOGSTUFF(("IR0 - Buffer Mode Select %02x\n",IR0_scn2674_buffer_mode_select));
 			break;
 
 		case 1:
 			IR1_scn2674_interlace_enable = (data&0x80)>>7;
 			IR1_scn2674_equalizing_constant = (data&0x7f);
 
-		   	LOGSTUFF(("IR1 - Interlace Enable %02x\n",IR1_scn2674_interlace_enable));
+			LOGSTUFF(("IR1 - Interlace Enable %02x\n",IR1_scn2674_interlace_enable));
 			LOGSTUFF(("IR1 - Equalizing Constant %02x\n",IR1_scn2674_equalizing_constant));
 			break;
 
@@ -618,7 +618,7 @@ static void scn2674_write_init_regs(UINT8 data)
 			IR2_scn2674_horz_sync_width = (data&0x78)>>3;
 			IR2_scn2674_horz_back_porch = (data&0x07);
 
-		   	LOGSTUFF(("IR2 - Row Table %02x\n",IR2_scn2674_row_table));
+			LOGSTUFF(("IR2 - Row Table %02x\n",IR2_scn2674_row_table));
 			LOGSTUFF(("IR2 - Horizontal Sync Width %02x\n",IR2_scn2674_horz_sync_width));
 			LOGSTUFF(("IR2 - Horizontal Back Porch %02x\n",IR2_scn2674_horz_back_porch));
 			break;
@@ -627,24 +627,24 @@ static void scn2674_write_init_regs(UINT8 data)
 			IR3_scn2674_vert_front_porch = (data&0xe0)>>5;
 			IR3_scn2674_vert_back_porch = (data&0x1f)>>0;
 
-		   	LOGSTUFF(("IR3 - Vertical Front Porch %02x\n",IR3_scn2674_vert_front_porch));
-		   	LOGSTUFF(("IR3 - Vertical Back Porch %02x\n",IR3_scn2674_vert_back_porch));
+			LOGSTUFF(("IR3 - Vertical Front Porch %02x\n",IR3_scn2674_vert_front_porch));
+			LOGSTUFF(("IR3 - Vertical Back Porch %02x\n",IR3_scn2674_vert_back_porch));
 			break;
 
 		case 4:
-		   	IR4_scn2674_rows_per_screen = data&0x7f;
+			IR4_scn2674_rows_per_screen = data&0x7f;
 			IR4_scn2674_character_blink_rate = (data & 0x80)>>7;
 
-		   	LOGSTUFF(("IR4 - Rows Per Screen %02x\n",IR4_scn2674_rows_per_screen));
-		   	LOGSTUFF(("IR4 - Character Blink Rate %02x\n",IR4_scn2674_character_blink_rate));
+			LOGSTUFF(("IR4 - Rows Per Screen %02x\n",IR4_scn2674_rows_per_screen));
+			LOGSTUFF(("IR4 - Character Blink Rate %02x\n",IR4_scn2674_character_blink_rate));
 			break;
 
 		case 5:
 		   /* IR5 - Active Characters Per Row
              cccc cccc
              c = Characters Per Row */
-		   	IR5_scn2674_character_per_row = data;
-		   	LOGSTUFF(("IR5 - Active Characters Per Row %02x\n",IR5_scn2674_character_per_row));
+			IR5_scn2674_character_per_row = data;
+			LOGSTUFF(("IR5 - Active Characters Per Row %02x\n",IR5_scn2674_character_per_row));
 			break;
 
 		case 6:
@@ -655,38 +655,38 @@ static void scn2674_write_init_regs(UINT8 data)
 
 		case 8:
 			IR8_scn2674_display_buffer_first_address_LSB = data;
-		   	LOGSTUFF(("IR8 - Display Buffer First Address LSB %02x\n",IR8_scn2674_display_buffer_first_address_LSB));
+			LOGSTUFF(("IR8 - Display Buffer First Address LSB %02x\n",IR8_scn2674_display_buffer_first_address_LSB));
 			break;
 
 		case 9:
 			IR9_scn2674_display_buffer_first_address_MSB = data & 0x0f;
 			IR9_scn2674_display_buffer_last_address = (data & 0xf0)>>4;
-		   	LOGSTUFF(("IR9 - Display Buffer First Address MSB %02x\n",IR9_scn2674_display_buffer_first_address_MSB));
-		   	LOGSTUFF(("IR9 - Display Buffer Last Address %02x\n",IR9_scn2674_display_buffer_last_address));
+			LOGSTUFF(("IR9 - Display Buffer First Address MSB %02x\n",IR9_scn2674_display_buffer_first_address_MSB));
+			LOGSTUFF(("IR9 - Display Buffer Last Address %02x\n",IR9_scn2674_display_buffer_last_address));
 			break;
 
 		case 10:
 			IR10_scn2674_display_pointer_address_lower = data;
-		   	LOGSTUFF(("IR10 - Display Pointer Address Lower %02x\n",IR10_scn2674_display_pointer_address_lower));
+			LOGSTUFF(("IR10 - Display Pointer Address Lower %02x\n",IR10_scn2674_display_pointer_address_lower));
 			break;
 
 		case 11:
 			IR11_scn2674_display_pointer_address_upper= data&0x3f;
-		   	LOGSTUFF(("IR11 - Display Pointer Address Lower %02x\n",IR11_scn2674_display_pointer_address_upper));
+			LOGSTUFF(("IR11 - Display Pointer Address Lower %02x\n",IR11_scn2674_display_pointer_address_upper));
 			break;
 
 		case 12:
 			IR12_scn2674_scroll_start = (data & 0x80)>>7;
 			IR12_scn2674_split_register_1 = (data & 0x7f);
-		   	LOGSTUFF(("IR12 - Scroll Start %02x\n",IR12_scn2674_scroll_start));
-		   	LOGSTUFF(("IR12 - Split Register 1 %02x\n",IR12_scn2674_split_register_1));
+			LOGSTUFF(("IR12 - Scroll Start %02x\n",IR12_scn2674_scroll_start));
+			LOGSTUFF(("IR12 - Split Register 1 %02x\n",IR12_scn2674_split_register_1));
 			break;
 
 		case 13:
 			IR13_scn2674_scroll_end = (data & 0x80)>>7;
 			IR13_scn2674_split_register_2 = (data & 0x7f);
-		   	LOGSTUFF(("IR13 - Scroll End %02x\n",IR13_scn2674_scroll_end));
-		   	LOGSTUFF(("IR13 - Split Register 2 %02x\n",IR13_scn2674_split_register_2));
+			LOGSTUFF(("IR13 - Scroll End %02x\n",IR13_scn2674_scroll_end));
+			LOGSTUFF(("IR13 - Split Register 2 %02x\n",IR13_scn2674_split_register_2));
 			break;
 
 		case 14:
@@ -1024,7 +1024,7 @@ static VIDEO_START( mpu4_vid )
 
 	memset(mpu4_vid_vidram,0,0x20000);
 
- 	/* find first empty slot to decode gfx */
+	/* find first empty slot to decode gfx */
 	for (mpu4_gfx_index = 0; mpu4_gfx_index < MAX_GFX_ELEMENTS; mpu4_gfx_index++)
 		if (machine->gfx[mpu4_gfx_index] == 0)
 			break;
@@ -1483,9 +1483,9 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
 	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
@@ -1669,9 +1669,9 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
 	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
@@ -1790,7 +1790,7 @@ static DRIVER_INIT (crmaze)
 {
 	int x;
 	static const UINT8 chr_table[72]={0x00,0x84,0x94,0x3C,0xEC,0x5C,0xEC,0x50,
-							 		  0x2C,0x68,0x60,0xAC,0x74,0x00,0xAC,0x58,
+									  0x2C,0x68,0x60,0xAC,0x74,0x00,0xAC,0x58,
 									  0xEC,0x7C,0xEC,0x58,0xE0,0x90,0x18,0xEC,
 									  0x54,0x28,0x68,0x44,0x84,0xB4,0x10,0x20,
 									  0x84,0xBC,0xE8,0x70,0x24,0x84,0xB8,0xE0,
@@ -2065,21 +2065,21 @@ and reel assembly with this kit and a supplied monitor.
 The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 A further different release was made in 2000, running on the Barcrest MPU4 Video, rather than this one. */
 
-GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit, v7.0)",								GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone",		"Deal 'Em (MPU4 Conversion Kit, v7.0)",								GAME_IMPERFECT_GRAPHICS )
 
-GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
+GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest",		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
-GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD Version)",									GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The New Crystal Maze Featuring Ocean Zone (AMLD Version)",			GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
-GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
-GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
-GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Time Machine (v2.0)",												GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
-GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, matinga, mating,  mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest",		"The Crystal Maze Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest",		"The Crystal Maze (AMLD Version)",									GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (AMLD Version)",			GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
+GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest",		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
+GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest",		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
+GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest",		"Time Machine (v2.0)",												GAME_NOT_WORKING|GAME_NO_SOUND ) /* unprotected? */
+GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest",		"The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, matinga, mating,  mpu4_vid, mpu4,     mating,ROT0,   "Barcrest",		"The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, vgpoker, 0,		  vgpoker,	mpu4,     0,	 ROT0,   "BwB",				"Vegas Poker (Prototype)",											GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,"Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
-GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest", 		"MPU4 Unit Test (Program 4)",										0 )
-GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest", 		"MPU4 Unit Test (Program 2)",										0 )
-GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,"Barcrest", 		"MPU4 Meter Clear ROM",												0 )
+GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest",		"MPU4 Unit Test (Program 4)",										0 )
+GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest",		"MPU4 Unit Test (Program 2)",										0 )
+GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,"Barcrest",		"MPU4 Meter Clear ROM",												0 )

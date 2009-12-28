@@ -1446,7 +1446,7 @@ INLINE UINT16 *cps1_base( running_machine *machine, int offset, int boundary )
     Mask out the irrelevant bits.
     */
 	base &= ~(boundary - 1);
- 	return &state->gfxram[(base & 0x3ffff) / 2];
+	return &state->gfxram[(base & 0x3ffff) / 2];
 }
 
 

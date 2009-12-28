@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( fromanc2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)			// SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r 	)			// SUB CPU READ
+	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r	)			// SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)			// GFXBANK (1P)
 	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)			// GFXBANK (2P)
 	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromanc2_eeprom_w)			// EEPROM DATA

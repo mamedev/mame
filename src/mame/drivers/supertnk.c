@@ -366,7 +366,7 @@ static INPUT_PORTS_START( supertnk )
 	PORT_DIPSETTING(	0x00, "at 15,000 points" )
 	PORT_DIPSETTING(	0x10, "at 10,000 points" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING( 	0x00, "3" )
+	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x20, "5" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
@@ -461,7 +461,7 @@ ROM_START( supertnk )
 	ROM_REGION( 0x0060, "proms", 0 )
 	 /* color PROM */
 	ROM_LOAD( "supertnk.clr",  0x0000, 0x0020, CRC(9ae1faee) SHA1(19de4bb8bc389d98c8f8e35c755fad96e1a6a0cd) )
- 	/* unknown - sync? */
+	/* unknown - sync? */
 	ROM_LOAD( "supertnk.s",	   0x0020, 0x0020, CRC(91722fcf) SHA1(f77386014b459cc151d2990ac823b91c04e8d319) )
 	/* unknown - sync? */
 	ROM_LOAD( "supertnk.t",	   0x0040, 0x0020, CRC(154390bd) SHA1(4dc0fd7bd8999d2670c8d93aaada835d2a84d4db) )

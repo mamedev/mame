@@ -49,18 +49,18 @@ struct _tms34010_state
 	void (*pixel_write)(tms34010_state *tms, offs_t offset, UINT32 data);
 	UINT32 (*pixel_read)(tms34010_state *tms, offs_t offset);
 	UINT32 (*raster_op)(tms34010_state *tms, UINT32 newpix, UINT32 oldpix);
-	UINT32 				convsp;
-	UINT32 				convdp;
-	UINT32 				convmp;
+	UINT32				convsp;
+	UINT32				convdp;
+	UINT32				convmp;
 	UINT16 *			shiftreg;
-	INT32 				gfxcycles;
-	UINT8 				pixelshift;
-	UINT8 				is_34020;
-	UINT8 				reset_deferred;
-	UINT8 				hblank_stable;
+	INT32				gfxcycles;
+	UINT8				pixelshift;
+	UINT8				is_34020;
+	UINT8				reset_deferred;
+	UINT8				hblank_stable;
 	UINT8				external_host_access;
 	UINT8				executing;
-	cpu_irq_callback 	irq_callback;
+	cpu_irq_callback	irq_callback;
 	const device_config *device;
 	const address_space *program;
 	const tms34010_config *config;
@@ -357,7 +357,7 @@ INLINE INT32 POP(tms34010_state *tms)
     PIXEL READS
 ***************************************************************************/
 
-#define RP(T,m1,m2)  											\
+#define RP(T,m1,m2) 											\
 	/* TODO: Plane masking */								\
 	return (TMS34010_RDMEM_WORD(T, TOBYTE(offset & 0xfffffff0)) >> (offset & m1)) & m2;
 
@@ -393,7 +393,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 ***************************************************************************/
 
 /* No Raster Op + No Transparency */
-#define WP(T,m1,m2)  																		\
+#define WP(T,m1,m2) 																		\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
 	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
@@ -404,7 +404,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 	TMS34010_WRMEM_WORD(T, a, pix);															\
 
 /* No Raster Op + Transparency */
-#define WP_T(T,m1,m2)  																		\
+#define WP_T(T,m1,m2)																		\
 	/* TODO: plane masking */																\
 	data &= m2;																				\
 	if (data)																				\
@@ -416,10 +416,10 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 		/* TODO: plane masking */															\
 		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);							\
 		TMS34010_WRMEM_WORD(T, a, pix);														\
-	}						  																\
+	}																						\
 
 /* Raster Op + No Transparency */
-#define WP_R(T,m1,m2)  																		\
+#define WP_R(T,m1,m2)																		\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
 	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
@@ -430,7 +430,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 	TMS34010_WRMEM_WORD(T, a, pix);															\
 
 /* Raster Op + Transparency */
-#define WP_R_T(T,m1,m2)  																	\
+#define WP_R_T(T,m1,m2) 																	\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
 	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
@@ -441,7 +441,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 	{																						\
 		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);							\
 		TMS34010_WRMEM_WORD(T, a, pix);														\
-	}						  																\
+	}																						\
 
 
 /* No Raster Op + No Transparency */

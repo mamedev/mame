@@ -41,7 +41,7 @@ static MACHINE_DRIVER_START( tokyocop )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
 	MDRV_CPU_PROGRAM_MAP(tokyocop_map)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)

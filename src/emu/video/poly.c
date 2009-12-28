@@ -74,8 +74,8 @@ struct _poly_edge
 	int					index;					/* index of this edge */
 	const poly_vertex *	v1;						/* pointer to first vertex */
 	const poly_vertex *	v2;						/* pointer to second vertex */
-	float 				dxdy;					/* dx/dy along the edge */
-	float 				dpdy[MAX_VERTEX_PARAMS];/* per-parameter dp/dy values */
+	float				dxdy;					/* dx/dy along the edge */
+	float				dpdy[MAX_VERTEX_PARAMS];/* per-parameter dp/dy values */
 };
 
 
@@ -85,7 +85,7 @@ struct _poly_section
 {
 	const poly_edge *	ledge;					/* pointer to left edge */
 	const poly_edge *	redge;					/* pointer to right edge */
-	float 				ybottom;				/* bottom of this section */
+	float				ybottom;				/* bottom of this section */
 };
 
 

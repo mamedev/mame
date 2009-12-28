@@ -97,7 +97,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			cury = sy + y_offs;
 
 			if (curx > 900) curx -= 1024;
- 			if (cury > 400) cury -= 512;
+			if (cury > 400) cury -= 512;
 
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
@@ -134,7 +134,7 @@ VIDEO_UPDATE( darius )
 	PC080SN_tilemap_update();
 
 	// draw bottom layer(always active)
- 	PC080SN_tilemap_draw_offset(bitmap,cliprect,0,0,TILEMAP_DRAW_OPAQUE,0,-xoffs,0);
+	PC080SN_tilemap_draw_offset(bitmap,cliprect,0,0,TILEMAP_DRAW_OPAQUE,0,-xoffs,0);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(screen->machine,bitmap,cliprect,0,xoffs,-8); // draw sprites with priority 0 which are under the mid layer

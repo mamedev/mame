@@ -380,8 +380,8 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_BASE(&taitoh_68000_mainram)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w)	/* Pause the TMS32025 */
-	AM_RANGE(0x180000, 0x183fff) AM_RAM              		/* "gradiation ram (0)" */
-	AM_RANGE(0x184000, 0x187fff) AM_RAM            			/* "gradiation ram (1)" */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM             		/* "gradiation ram (0)" */
+	AM_RANGE(0x184000, 0x187fff) AM_RAM         			/* "gradiation ram (1)" */
 	AM_RANGE(0x188000, 0x18bfff) AM_RAM_WRITE(airsys_paletteram16_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x820fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE(&taitoair_line_ram)	/* "line ram" */
@@ -405,8 +405,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP		/* pan control */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP 		/* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP 		/* ? */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP		/* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP		/* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

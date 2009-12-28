@@ -173,7 +173,7 @@ Stephh's log (2007.11.28) :
 #include "pe_keno.lh"
 #include "pe_slots.lh"
 
-#define MASTER_CLOCK 		XTAL_20MHz
+#define MASTER_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
 #define MC6845_CLOCK		((MASTER_CLOCK)/8/3)
 #define SOUND_CLOCK			((MASTER_CLOCK)/12)

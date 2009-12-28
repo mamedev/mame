@@ -200,10 +200,10 @@ enum
 #define devtype_get_addrbus_width(type,space)				devtype_get_info_int(type, DEVINFO_INT_ADDRBUS_WIDTH + (space))
 #define devtype_get_addrbus_shift(type,space)				devtype_get_info_int(type, DEVINFO_INT_ADDRBUS_SHIFT + (space))
 #define devtype_get_name(type)								devtype_get_info_string(type, DEVINFO_STR_NAME)
-#define devtype_get_family(type) 							devtype_get_info_string(type, DEVINFO_STR_FAMILY)
-#define devtype_get_version(type) 							devtype_get_info_string(type, DEVINFO_STR_VERSION)
-#define devtype_get_source_file(type) 						devtype_get_info_string(type, DEVINFO_STR_SOURCE_FILE)
-#define devtype_get_credits(type) 							devtype_get_info_string(type, DEVINFO_STR_CREDITS)
+#define devtype_get_family(type)							devtype_get_info_string(type, DEVINFO_STR_FAMILY)
+#define devtype_get_version(type)							devtype_get_info_string(type, DEVINFO_STR_VERSION)
+#define devtype_get_source_file(type)						devtype_get_info_string(type, DEVINFO_STR_SOURCE_FILE)
+#define devtype_get_credits(type)							devtype_get_info_string(type, DEVINFO_STR_CREDITS)
 
 
 /* shorthand for getting standard data about devices */
@@ -212,7 +212,7 @@ enum
 #define device_get_addrbus_width(dev,space)					device_get_info_int(dev, DEVINFO_INT_ADDRBUS_WIDTH + (space))
 #define device_get_addrbus_shift(dev,space)					device_get_info_int(dev, DEVINFO_INT_ADDRBUS_SHIFT + (space))
 #define device_get_name(dev)								device_get_info_string(dev, DEVINFO_STR_NAME)
-#define device_get_family(dev) 								device_get_info_string(dev, DEVINFO_STR_FAMILY)
+#define device_get_family(dev)								device_get_info_string(dev, DEVINFO_STR_FAMILY)
 #define device_get_version(dev) 							device_get_info_string(dev, DEVINFO_STR_VERSION)
 #define device_get_source_file(dev)							device_get_info_string(dev, DEVINFO_STR_SOURCE_FILE)
 #define device_get_credits(dev) 							device_get_info_string(dev, DEVINFO_STR_CREDITS)
@@ -225,9 +225,9 @@ enum
 #define devtag_get_addrbus_shift(mach,tag,space)			devtag_get_info_int(mach, tag, DEVINFO_INT_ADDRBUS_SHIFT + (space))
 #define devtag_get_name(mach,tag)							devtag_get_info_string(mach, tag, DEVINFO_STR_NAME)
 #define devtag_get_family(mach,tag) 						devtag_get_info_string(mach, tag, DEVINFO_STR_FAMILY)
-#define devtag_get_version(mach,tag) 						devtag_get_info_string(mach, tag, DEVINFO_STR_VERSION)
+#define devtag_get_version(mach,tag)						devtag_get_info_string(mach, tag, DEVINFO_STR_VERSION)
 #define devtag_get_source_file(mach,tag)					devtag_get_info_string(mach, tag, DEVINFO_STR_SOURCE_FILE)
-#define devtag_get_credits(mach,tag) 						devtag_get_info_string(mach, tag, DEVINFO_STR_CREDITS)
+#define devtag_get_credits(mach,tag)						devtag_get_info_string(mach, tag, DEVINFO_STR_CREDITS)
 
 
 

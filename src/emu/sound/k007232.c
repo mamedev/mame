@@ -41,15 +41,15 @@ typedef struct kdacApcm
 	UINT32			bank[KDAC_A_PCM_MAX];
 	int				play[KDAC_A_PCM_MAX];
 
-	UINT8 			wreg[0x10];	/* write data */
+	UINT8			wreg[0x10];	/* write data */
 	UINT8 *			pcmbuf[2];	/* Channel A & B pointers */
 
 	UINT32  		clock;          /* chip clock */
 	UINT32  		pcmlimit;
 
-	sound_stream * 	stream;
+	sound_stream *	stream;
 	const k007232_interface *intf;
-	UINT32 			fncode[0x200];
+	UINT32			fncode[0x200];
 } KDAC_A_PCM;
 
 

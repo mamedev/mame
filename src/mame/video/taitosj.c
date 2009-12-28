@@ -11,10 +11,10 @@
 #include "includes/taitosj.h"
 
 
-#define GLOBAL_FLIP_X		 	(*taitosj_video_mode & 0x01)
-#define GLOBAL_FLIP_Y		 	(*taitosj_video_mode & 0x02)
+#define GLOBAL_FLIP_X			(*taitosj_video_mode & 0x01)
+#define GLOBAL_FLIP_Y			(*taitosj_video_mode & 0x02)
 #define SPRITE_RAM_PAGE_OFFSET	((*taitosj_video_mode & 0x04) ? 0x80 : 0x00)
-#define SPRITES_ON			 	(*taitosj_video_mode & 0x80)
+#define SPRITES_ON				(*taitosj_video_mode & 0x80)
 #define TRANSPARENT_PEN			(0x40)
 
 
@@ -738,8 +738,8 @@ static void check_collision(running_machine *machine, int *sprites_on, rectangle
 static int video_update_common(running_machine *machine, bitmap_t *bitmap,
 							   const rectangle *cliprect, copy_layer_func_t copy_layer_func)
 {
-	int sprites_on[0x20]; 			/* 1 if sprite is active */
-	rectangle sprite_areas[0x20]; 	/* areas on bitmap (sprite locations) */
+	int sprites_on[0x20];			/* 1 if sprite is active */
+	rectangle sprite_areas[0x20];	/* areas on bitmap (sprite locations) */
 
 	set_pens(machine);
 

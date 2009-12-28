@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( hedpanic_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00004, 0xb00007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, scroll_1)									//
 	AM_RANGE(0xb00008, 0xb00009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_x)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_y)
-	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP 																// ??
-	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize) 								// ??
+	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP																// ??
+	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize)								// ??
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP // IRQ Ack
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
@@ -182,9 +182,9 @@ static ADDRESS_MAP_START( mchampdx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, scroll_1)									//
 	AM_RANGE(0x700008, 0x700009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_x) 							// not used in mchampdx?
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_y) 							// not used in mchampdx?
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP 																// ??
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize) 								// ??
-	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) 												// not used in mchampdx?
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP																// ??
+	AM_RANGE(0x70000e, 0x70000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize)								// ??
+	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)												// not used in mchampdx?
 ADDRESS_MAP_END
 
 /* Tang Tang - like the others but again with different addresses */
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( tangtang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, scroll_1)									//
 	AM_RANGE(0x400008, 0x400009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_x) 							// not used in mchampdx?
 	AM_RANGE(0x40000a, 0x40000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_y) 							// not used in mchampdx?
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP 																// ??
+	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP																// ??
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize)									// ??
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")

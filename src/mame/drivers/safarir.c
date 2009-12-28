@@ -321,7 +321,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
 	AM_RANGE(0x2c00, 0x2cff) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_BASE(&bg_scroll)
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)	/* goes to SN76477 */
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP 	/* cleared at the beginning */
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP	/* cleared at the beginning */
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS") AM_WRITENOP
 	AM_RANGE(0x3c00, 0x3cff) AM_MIRROR(0x03ff) AM_READ_PORT("DSW") AM_WRITENOP
 ADDRESS_MAP_END
@@ -377,7 +377,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( safarir )
 
- 	/* basic machine hardware */
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8085A, 18000000/8)	/* 2.25 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 

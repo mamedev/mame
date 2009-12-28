@@ -401,7 +401,7 @@ static CPU_SET_INFO( h6280 )
 		case CPUINFO_INT_REGISTER + H6280_X:		X = info->i;									break;
 		case CPUINFO_INT_REGISTER + H6280_Y:		Y = info->i;									break;
 		case CPUINFO_INT_REGISTER + H6280_IRQ_MASK: cpustate->irq_mask = info->i; CHECK_IRQ_LINES;	break;
-		case CPUINFO_INT_REGISTER + H6280_TIMER_STATE: cpustate->timer_status = info->i; 			break;
+		case CPUINFO_INT_REGISTER + H6280_TIMER_STATE: cpustate->timer_status = info->i;			break;
 		case CPUINFO_INT_REGISTER + H6280_NMI_STATE: set_irq_line( cpustate, INPUT_LINE_NMI, info->i );	break;
 		case CPUINFO_INT_REGISTER + H6280_IRQ1_STATE: set_irq_line( cpustate, 0, info->i ); 		break;
 		case CPUINFO_INT_REGISTER + H6280_IRQ2_STATE: set_irq_line( cpustate, 1, info->i ); 		break;
@@ -446,16 +446,16 @@ CPU_GET_INFO( h6280 )
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 2;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 2;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_state[0];		break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = cpustate->irq_state[1];		break;
 		case CPUINFO_INT_INPUT_STATE + 2:				info->i = cpustate->irq_state[2];		break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state; 			break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;			break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.d;				break;
 

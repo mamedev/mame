@@ -1138,7 +1138,7 @@ static MACHINE_DRIVER_START( hornet )
 
 	MDRV_K033906_ADD("k033906_1", hornet_k033906_intf_0)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

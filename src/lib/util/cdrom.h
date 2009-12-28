@@ -75,7 +75,7 @@ enum
 
 enum
 {
-	CD_SUB_NORMAL = 0, 			/* "cooked" 96 bytes per sector */
+	CD_SUB_NORMAL = 0,			/* "cooked" 96 bytes per sector */
 	CD_SUB_RAW,					/* raw uninterleaved 96 bytes per sector */
 	CD_SUB_NONE					/* no subcode data stored */
 };

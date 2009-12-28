@@ -394,9 +394,9 @@ VIDEO_UPDATE( tms9928a )
     INT32 BackColour = tms.Regs[7] & 15;
     rgb_t oldcolor = palette_get_color(screen->machine, 0);
 
- 	if (!BackColour) BackColour=1;
- 	/* note we preserve the alpha here; this is so that it can be controlled independently */
- 	/* see cliffhgr.c for an example */
+	if (!BackColour) BackColour=1;
+	/* note we preserve the alpha here; this is so that it can be controlled independently */
+	/* see cliffhgr.c for an example */
     palette_set_color(screen->machine, 0, (TMS9928A_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
 
 	if (! (tms.Regs[1] & 0x40))

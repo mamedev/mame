@@ -486,7 +486,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
-   	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
+	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
 	timer_set(machine, attotime_mul(LASERDISC_CLOCK, 10), NULL, 0, laserdisc_bit_off_callback);
 
 	/* determine how long for the next command; there is a 555 timer with a
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000) 	/* or ROM */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000)	/* or ROM */
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE_GENERIC(spriteram)							/* FRSEL */
 	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_GENERIC(videoram)		/* BRSEL */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)				/* BOJRSEL1 */
@@ -1897,7 +1897,7 @@ static const char *const qbert_sample_names[] =
 
 static const samples_interface qbert_samples_interface =
 {
- 	1,	/* one channel */
+	1,	/* one channel */
 	qbert_sample_names
 };
 

@@ -622,9 +622,9 @@ static void decode(t90_Regs *cpustate)
 				case 0x6c:																				// AND (vw),n
 				case 0x6d:																				// XOR (vw),n
 				case 0x6e:																				// OR  (vw),n
-					OP( ADD+b3-0x68,14 )	MI16( 1, imm16 )		I8( 2, READ8(cpustate) ) 		return;
+					OP( ADD+b3-0x68,14 )	MI16( 1, imm16 )		I8( 2, READ8(cpustate) )		return;
 				case 0x6f:																				// CP  (vw),n
-					OP( ADD+b3-0x68,12 )	MI16( 1, imm16 )		I8( 2, READ8(cpustate) ) 		return;
+					OP( ADD+b3-0x68,12 )	MI16( 1, imm16 )		I8( 2, READ8(cpustate) )		return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -650,9 +650,9 @@ static void decode(t90_Regs *cpustate)
 				case 0x6c:																				// AND ($FF00+w),n
 				case 0x6d:																				// XOR ($FF00+w),n
 				case 0x6e:																				// OR  ($FF00+w),n
-					OP( ADD+b2-0x68,12 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8(cpustate) ) 		return;
+					OP( ADD+b2-0x68,12 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8(cpustate) )		return;
 				case 0x6f:																				// CP  ($FF00+w),n
-					OP( ADD+b2-0x68,10 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8(cpustate) ) 		return;
+					OP( ADD+b2-0x68,10 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8(cpustate) )		return;
 			}	break;
 
 		case 0xf0:	case 0xf1:	case 0xf2:
@@ -822,9 +822,9 @@ static void decode(t90_Regs *cpustate)
 				case 0x6c:																				// AND (ix+d),n
 				case 0x6d:																				// XOR (ix+d),n
 				case 0x6e:																				// OR  (ix+d),n
-					OP( ADD+b2-0x68,14)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) ) 	return;
+					OP( ADD+b2-0x68,14)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) )	return;
 				case 0x6f:																				// CP  (ix+d),n
-					OP( ADD+b2-0x68,12)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) ) 	return;
+					OP( ADD+b2-0x68,12)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) )	return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -855,9 +855,9 @@ static void decode(t90_Regs *cpustate)
 				case 0x6c:																				// AND (HL+A),n
 				case 0x6d:																				// XOR (HL+A),n
 				case 0x6e:																				// OR  (HL+A),n
-					OP( ADD+b1-0x68,18)	MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) ) 			return;
+					OP( ADD+b1-0x68,18)	MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) )			return;
 				case 0x6f:																				// CP  (HL+A),n
-					OP( ADD+b1-0x68,16)	MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) ) 			return;
+					OP( ADD+b1-0x68,16)	MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) )			return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -912,7 +912,7 @@ static void decode(t90_Regs *cpustate)
 				case 0x6d:																				// XOR g,n
 				case 0x6e:																				// OR  g,n
 				case 0x6f:																				// CP  g,n
-					OP( ADD+b1-0x68,6 )	R8( 1, b0 - 0xf8 )		I8( 2, READ8(cpustate) ) 			return;
+					OP( ADD+b1-0x68,6 )	R8( 1, b0 - 0xf8 )		I8( 2, READ8(cpustate) )			return;
 
 				case 0x70:																				// ADD HL,gg
 				case 0x71:																				// ADC HL,gg
@@ -1168,7 +1168,7 @@ INLINE void Write##N##_8( t90_Regs *cpustate, UINT8 value )	{ \
 				case IX:	WX8(cpustate, cpustate->ix.w.l,value,cpustate->ixbase);	return; \
 				case IY:	WX8(cpustate, cpustate->iy.w.l,value,cpustate->iybase);	return; \
 			} \
-		 	WM8(cpustate, r16(cpustate, cpustate->r##N), value);	return; \
+			WM8(cpustate, r16(cpustate, cpustate->r##N), value);	return; \
 		case MODE_MR16D8: \
 			switch( cpustate->r##N ) { \
 				case IX:	WX8(cpustate, (UINT16)(cpustate->ix.w.l + (INT8)cpustate->r##N##b),value,cpustate->ixbase);	return; \
@@ -1190,7 +1190,7 @@ INLINE void Write##N##_16( t90_Regs *cpustate, UINT16 value ) \
 				case IX:	WX16(cpustate, cpustate->ix.w.l,value,cpustate->ixbase);	return; \
 				case IY:	WX16(cpustate, cpustate->iy.w.l,value,cpustate->iybase);	return; \
 			} \
-		 	WM16(cpustate, r16(cpustate, cpustate->r##N), value);	return; \
+			WM16(cpustate, r16(cpustate, cpustate->r##N), value);	return; \
 		case MODE_MR16D8: \
 			switch( cpustate->r##N ) { \
 				case IX:	WX16(cpustate, (UINT16)(cpustate->ix.w.l + (INT8)cpustate->r##N##b),value,cpustate->ixbase);	return; \

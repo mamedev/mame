@@ -263,8 +263,8 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 			coldat = (rpunch_bitmapram[count]>>8 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
 			coldat = (rpunch_bitmapram[count]>>4 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
 			coldat = (rpunch_bitmapram[count]>>0 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
-  	 		count++;
-  		}
+			count++;
+		}
 	}
 }
 

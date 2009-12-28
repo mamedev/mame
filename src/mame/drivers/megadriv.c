@@ -436,7 +436,7 @@ static void write_cram_value(running_machine *machine, int offset, int data)
 	if (genvdp_use_cram)
 	{
 		int r,g,b;
-	  	r = ((data >> 1)&0x07);
+		r = ((data >> 1)&0x07);
 		g = ((data >> 5)&0x07);
 		b = ((data >> 9)&0x07);
 		palette_set_color_rgb(machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
@@ -518,8 +518,8 @@ static void megadriv_vdp_data_port_w(running_machine *machine, int data)
 	else
 	{
 
- 		switch (megadrive_vdp_code & 0x000f)
-	 	{
+		switch (megadrive_vdp_code & 0x000f)
+		{
 			case 0x0000:
 				logerror("Attempting to WRITE to DATA PORT in VRAM READ MODE\n");
 				break;
@@ -1016,8 +1016,8 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 	megadrive_vdp_command_pending = 0;
 
- 	switch (megadrive_vdp_code & 0x000f)
- 	{
+	switch (megadrive_vdp_code & 0x000f)
+	{
 		case 0x0000:
 			retdata = vdp_vram_r();
 			megadrive_vdp_address+=MEGADRIVE_REG0F_AUTO_INC;

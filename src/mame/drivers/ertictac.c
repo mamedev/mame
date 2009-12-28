@@ -348,10 +348,10 @@ static VIDEO_START( ertictac )
 
 	for (color = 0; color < NUM_PENS; color++)
 	{
- 		UINT8 i = color & 0x03;
- 		UINT8 r = ((color & 0x04) >> 0) | ((color & 0x10) >> 1) | i;
- 		UINT8 g = ((color & 0x20) >> 3) | ((color & 0x40) >> 3) | i;
- 		UINT8 b = ((color & 0x08) >> 1) | ((color & 0x80) >> 4) | i;
+		UINT8 i = color & 0x03;
+		UINT8 r = ((color & 0x04) >> 0) | ((color & 0x10) >> 1) | i;
+		UINT8 g = ((color & 0x20) >> 3) | ((color & 0x40) >> 3) | i;
+		UINT8 b = ((color & 0x08) >> 1) | ((color & 0x80) >> 4) | i;
 
 		pens[color] = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
 	}

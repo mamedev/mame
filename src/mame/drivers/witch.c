@@ -385,12 +385,12 @@ static READ8_HANDLER(prot_read_700x)
 
   switch(cpu_get_pc(space->cpu))
   {
-  	case 0x23f:
-  	case 0x246:
-  	case 0x24c:
-  	case 0x252:
-  	case 0x258:
-  	case 0x25e:
+	case 0x23f:
+	case 0x246:
+	case 0x24c:
+	case 0x252:
+	case 0x258:
+	case 0x25e:
 		return offset;//enough to pass...
    }
   return memory_region(space->machine, "sub")[0x7000+offset];
@@ -549,7 +549,7 @@ F180 kkkbbppp ; Read onPORT 0xA005
  kkk  = KEY IN  | 1-10 ; 1-20 ; 1-40 ; 1-50 ; 1-100 ; 1-200 ; 1-250 ; 1-500
 */
 	PORT_START("A005")	/* DSW */
- 	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )
+	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )
 	PORT_DIPSETTING(    0x07, "60" )
 	PORT_DIPSETTING(    0x06, "65" )
 	PORT_DIPSETTING(    0x05, "70" )
@@ -839,7 +839,7 @@ ROM_END
 
 static DRIVER_INIT(witch)
 {
- 	UINT8 *ROM = (UINT8 *)memory_region(machine, "maincpu");
+	UINT8 *ROM = (UINT8 *)memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);

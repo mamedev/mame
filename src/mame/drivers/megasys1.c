@@ -3519,7 +3519,7 @@ void phantasm_rom_decode(running_machine *machine, const char *region)
 		else if	(i < 0x10000/2)	{ y = BITSWAP_2; }
 		else if	(i < 0x18000/2)	{ if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
 		else if	(i < 0x20000/2)	{ y = BITSWAP_1; }
-		else 					{ y = BITSWAP_2; }
+		else					{ y = BITSWAP_2; }
 
 #undef	BITSWAP_0
 #undef	BITSWAP_1
@@ -3554,7 +3554,7 @@ void astyanax_rom_decode(running_machine *machine, const char *region)
 		else if	(i < 0x10000/2)	{ y = BITSWAP_2; }
 		else if	(i < 0x18000/2)	{ if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
 		else if	(i < 0x20000/2)	{ y = BITSWAP_1; }
-		else 					{ y = BITSWAP_2; }
+		else					{ y = BITSWAP_2; }
 
 #undef	BITSWAP_0
 #undef	BITSWAP_1
@@ -3587,7 +3587,7 @@ void rodland_rom_decode(running_machine *machine, const char *region)
 		else if	(i < 0x10000/2)	{	if ( (i | (0x248/2)) != i ) {y = BITSWAP_2;} else {y = BITSWAP_3;} }
 		else if	(i < 0x18000/2)	{	if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
 		else if	(i < 0x20000/2)	{ y = BITSWAP_1; }
-		else 					{ y = BITSWAP_3; }
+		else					{ y = BITSWAP_3; }
 
 #undef	BITSWAP_0
 #undef	BITSWAP_1

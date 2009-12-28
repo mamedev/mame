@@ -131,7 +131,7 @@ READ8_HANDLER( gorf_speech_r )
     logerror("Date : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	 if(Phoneme==63) {
-   		sample_stop(samples, 0);
+		sample_stop(samples, 0);
                 if (strlen(totalword)>2) logerror("Clearing sample %s\n",totalword);
                 totalword[0] = 0;				   /* Clear the total word stack */
 					 return data;

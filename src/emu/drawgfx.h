@@ -126,7 +126,7 @@ struct _gfx_element
 	UINT16			origwidth;			/* starting pixel width of each element */
 	UINT16			origheight;			/* staring pixel height of each element */
 	UINT8			flags;				/* one of the GFX_ELEMENT_* flags above */
-	UINT32 			total_elements;		/* total number of decoded elements */
+	UINT32			total_elements;		/* total number of decoded elements */
 
 	UINT32			color_base;			/* base color for rendering */
 	UINT16			color_depth;		/* number of colors each pixel can represent */
@@ -151,11 +151,11 @@ typedef struct _gfx_decode_entry gfx_decode_entry;
 struct _gfx_decode_entry
 {
 	const char *	memory_region;		/* memory region where the data resides */
-	UINT32 			start;				/* offset of beginning of data to decode */
+	UINT32			start;				/* offset of beginning of data to decode */
 	const gfx_layout *gfxlayout;		/* pointer to gfx_layout describing the layout; NULL marks the end of the array */
-	UINT16 			color_codes_start;	/* offset in the color lookup table where color codes start */
-	UINT16 			total_color_codes;	/* total number of color codes */
-	UINT8 			xscale;				/* optional horizontal scaling factor; 0 means 1x */
+	UINT16			color_codes_start;	/* offset in the color lookup table where color codes start */
+	UINT16			total_color_codes;	/* total number of color codes */
+	UINT8			xscale;				/* optional horizontal scaling factor; 0 means 1x */
 	UINT8			yscale;				/* optional vertical scaling factor; 0 means 1x */
 };
 

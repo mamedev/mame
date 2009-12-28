@@ -91,7 +91,7 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 	PUSH(tms, tms->st);
 	RESET_ST(tms);
 	tms->pc = RLONG(tms, 0xfffffc20);
-  	COUNT_UNKNOWN_CYCLES(tms,16);
+	COUNT_UNKNOWN_CYCLES(tms,16);
 
 	/* extra check to prevent bad things */
 	if (tms->pc == 0 || opcode_table[memory_decrypted_read_word(tms->program, TOBYTE(tms->pc)) >> 4] == unimpl)
@@ -118,7 +118,7 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 	SET_C_BIT_LO(tms, b->y, 15);						\
 	SET_Z_LOG(tms, b->y == 0);						\
 	SET_V_BIT_LO(tms, b->x, 15);						\
-  	COUNT_CYCLES(tms,1);							\
+	COUNT_CYCLES(tms,1);							\
 }
 static void add_xy_a(tms34010_state *tms, UINT16 op) { ADD_XY(A); }
 static void add_xy_b(tms34010_state *tms, UINT16 op) { ADD_XY(B); }
@@ -134,7 +134,7 @@ static void add_xy_b(tms34010_state *tms, UINT16 op) { ADD_XY(B); }
 	SET_V_LOG(tms, a.x > b->x);						\
 	b->x -= a.x;								\
 	b->y -= a.y;								\
-  	COUNT_CYCLES(tms,1);							\
+	COUNT_CYCLES(tms,1);							\
 }
 static void sub_xy_a(tms34010_state *tms, UINT16 op) { SUB_XY(A); }
 static void sub_xy_b(tms34010_state *tms, UINT16 op) { SUB_XY(B); }
@@ -151,7 +151,7 @@ static void sub_xy_b(tms34010_state *tms, UINT16 op) { SUB_XY(B); }
 	res = a.y-b.y;								\
 	SET_Z_LOG(tms, res == 0);						\
 	SET_C_BIT_LO(tms, res, 15);						\
-  	COUNT_CYCLES(tms,1);							\
+	COUNT_CYCLES(tms,1);							\
 }
 static void cmp_xy_a(tms34010_state *tms, UINT16 op) { CMP_XY(A); }
 static void cmp_xy_b(tms34010_state *tms, UINT16 op) { CMP_XY(B); }
@@ -169,7 +169,7 @@ static void cmp_xy_b(tms34010_state *tms, UINT16 op) { CMP_XY(B); }
 	res |= ((y > WEND_Y(tms))   ? 0x100 : 0);		\
 	R##REG(tms,DSTREG(op)) = res;						\
 	SET_V_LOG(tms, res != 0);						\
-  	COUNT_CYCLES(tms,1);							\
+	COUNT_CYCLES(tms,1);							\
 }
 static void cpw_a(tms34010_state *tms, UINT16 op) { CPW(A); }
 static void cpw_b(tms34010_state *tms, UINT16 op) { CPW(B); }
@@ -177,7 +177,7 @@ static void cpw_b(tms34010_state *tms, UINT16 op) { CPW(B); }
 #define CVXYL(R)									\
 {													\
     R##REG(tms,DSTREG(op)) = DXYTOL(tms,R##REG_XY(tms,SRCREG(op)));		\
-  	COUNT_CYCLES(tms,3);								\
+	COUNT_CYCLES(tms,3);								\
 }
 static void cvxyl_a(tms34010_state *tms, UINT16 op) { CVXYL(A); }
 static void cvxyl_b(tms34010_state *tms, UINT16 op) { CVXYL(B); }
@@ -185,7 +185,7 @@ static void cvxyl_b(tms34010_state *tms, UINT16 op) { CVXYL(B); }
 #define MOVX(R)										\
 {													\
 	R##REG(tms,DSTREG(op)) = (R##REG(tms,DSTREG(op)) & 0xffff0000) | (UINT16)R##REG(tms,SRCREG(op));	\
-  	COUNT_CYCLES(tms,1);																	\
+	COUNT_CYCLES(tms,1);																	\
 }
 static void movx_a(tms34010_state *tms, UINT16 op) { MOVX(A); }
 static void movx_b(tms34010_state *tms, UINT16 op) { MOVX(B); }
@@ -193,7 +193,7 @@ static void movx_b(tms34010_state *tms, UINT16 op) { MOVX(B); }
 #define MOVY(R)										\
 {													\
 	R##REG(tms,DSTREG(op)) = (R##REG(tms,SRCREG(op)) & 0xffff0000) | (UINT16)R##REG(tms,DSTREG(op));	\
-  	COUNT_CYCLES(tms,1);																	\
+	COUNT_CYCLES(tms,1);																	\
 }
 static void movy_a(tms34010_state *tms, UINT16 op) { MOVY(A); }
 static void movy_b(tms34010_state *tms, UINT16 op) { MOVY(B); }
@@ -205,14 +205,14 @@ static void movy_b(tms34010_state *tms, UINT16 op) { MOVY(B); }
 ***************************************************************************/
 
 #define PIXT_RI(R)			                        \
-{							 						\
+{													\
 	WPIXEL(tms,R##REG(tms,DSTREG(op)),R##REG(tms,SRCREG(op)));	\
-  	COUNT_UNKNOWN_CYCLES(tms,2);						\
+	COUNT_UNKNOWN_CYCLES(tms,2);						\
 }
 static void pixt_ri_a(tms34010_state *tms, UINT16 op) { PIXT_RI(A); }
 static void pixt_ri_b(tms34010_state *tms, UINT16 op) { PIXT_RI(B); }
 
-#define PIXT_RIXY(R)		                       									\
+#define PIXT_RIXY(R)		                    									\
 {																					\
 	if (WINDOW_CHECKING(tms) != 0)														\
 	{																				\
@@ -226,8 +226,8 @@ static void pixt_ri_b(tms34010_state *tms, UINT16 op) { PIXT_RI(B); }
 		if (WINDOW_CHECKING(tms) == 1) goto skip;										\
 	}																				\
 	WPIXEL(tms,DXYTOL(tms,R##REG_XY(tms,DSTREG(op))),R##REG(tms,SRCREG(op)));								\
-skip: 																				\
-  	COUNT_UNKNOWN_CYCLES(tms,4);														\
+skip:																				\
+	COUNT_UNKNOWN_CYCLES(tms,4);														\
 }
 static void pixt_rixy_a(tms34010_state *tms, UINT16 op) { PIXT_RIXY(A); }
 static void pixt_rixy_b(tms34010_state *tms, UINT16 op) { PIXT_RIXY(B); }
@@ -236,33 +236,33 @@ static void pixt_rixy_b(tms34010_state *tms, UINT16 op) { PIXT_RIXY(B); }
 {													\
 	INT32 temp = RPIXEL(tms,R##REG(tms,SRCREG(op)));			\
 	CLR_V(tms);											\
-	R##REG(tms,DSTREG(op)) = temp;						 	\
+	R##REG(tms,DSTREG(op)) = temp;							\
 	SET_V_LOG(tms, temp != 0);							\
 	COUNT_CYCLES(tms,4);								\
 }
 static void pixt_ir_a(tms34010_state *tms, UINT16 op) { PIXT_IR(A); }
 static void pixt_ir_b(tms34010_state *tms, UINT16 op) { PIXT_IR(B); }
 
-#define PIXT_II(R)			                       	\
+#define PIXT_II(R)			                    	\
 {													\
 	WPIXEL(tms,R##REG(tms,DSTREG(op)),RPIXEL(tms,R##REG(tms,SRCREG(op))));	\
-  	COUNT_UNKNOWN_CYCLES(tms,4);						\
+	COUNT_UNKNOWN_CYCLES(tms,4);						\
 }
 static void pixt_ii_a(tms34010_state *tms, UINT16 op) { PIXT_II(A); }
 static void pixt_ii_b(tms34010_state *tms, UINT16 op) { PIXT_II(B); }
 
-#define PIXT_IXYR(R)			              		\
+#define PIXT_IXYR(R)			            		\
 {													\
 	INT32 temp = RPIXEL(tms,SXYTOL(tms,R##REG_XY(tms,SRCREG(op))));	\
 	CLR_V(tms);											\
-	R##REG(tms,DSTREG(op)) = temp;						 	\
+	R##REG(tms,DSTREG(op)) = temp;							\
 	SET_V_LOG(tms, temp != 0);							\
 	COUNT_CYCLES(tms,6);								\
 }
 static void pixt_ixyr_a(tms34010_state *tms, UINT16 op) { PIXT_IXYR(A); }
 static void pixt_ixyr_b(tms34010_state *tms, UINT16 op) { PIXT_IXYR(B); }
 
-#define PIXT_IXYIXY(R)			              			      						\
+#define PIXT_IXYIXY(R)			            			    						\
 {																					\
 	if (WINDOW_CHECKING(tms) != 0)														\
 	{																				\
@@ -276,13 +276,13 @@ static void pixt_ixyr_b(tms34010_state *tms, UINT16 op) { PIXT_IXYR(B); }
 		if (WINDOW_CHECKING(tms) == 1) goto skip;										\
 	}																				\
 	WPIXEL(tms,DXYTOL(tms,R##REG_XY(tms,DSTREG(op))),RPIXEL(tms,SXYTOL(tms,R##REG_XY(tms,SRCREG(op)))));			\
-skip: 																				\
-  	COUNT_UNKNOWN_CYCLES(tms,7);														\
+skip:																				\
+	COUNT_UNKNOWN_CYCLES(tms,7);														\
 }
 static void pixt_ixyixy_a(tms34010_state *tms, UINT16 op) { PIXT_IXYIXY(A); }
 static void pixt_ixyixy_b(tms34010_state *tms, UINT16 op) { PIXT_IXYIXY(B); }
 
-#define DRAV(R)			              			      								\
+#define DRAV(R)			            			    								\
 {																					\
 	if (WINDOW_CHECKING(tms) != 0)														\
 	{																				\
@@ -296,10 +296,10 @@ static void pixt_ixyixy_b(tms34010_state *tms, UINT16 op) { PIXT_IXYIXY(B); }
 		if (WINDOW_CHECKING(tms) == 1) goto skip;										\
 	}																				\
 	WPIXEL(tms,DXYTOL(tms,R##REG_XY(tms,DSTREG(op))),COLOR1(tms));										\
-skip: 																				\
+skip:																				\
 	R##REG_X(tms,DSTREG(op)) += R##REG_X(tms,SRCREG(op));											\
 	R##REG_Y(tms,DSTREG(op)) += R##REG_Y(tms,SRCREG(op));											\
-  	COUNT_UNKNOWN_CYCLES(tms,4);														\
+	COUNT_UNKNOWN_CYCLES(tms,4);														\
 }
 static void drav_a(tms34010_state *tms, UINT16 op) { DRAV(A); }
 static void drav_b(tms34010_state *tms, UINT16 op) { DRAV(B); }
@@ -310,7 +310,7 @@ static void drav_b(tms34010_state *tms, UINT16 op) { DRAV(B); }
     ARITHMETIC OPERATIONS
 ***************************************************************************/
 
-#define ABS(R)			              			      		\
+#define ABS(R)			            			    		\
 {															\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 r = 0 - *rd;										\
@@ -323,8 +323,8 @@ static void drav_b(tms34010_state *tms, UINT16 op) { DRAV(B); }
 static void abs_a(tms34010_state *tms, UINT16 op) { ABS(A); }
 static void abs_b(tms34010_state *tms, UINT16 op) { ABS(B); }
 
-#define ADD(R)			              			      		\
-{							 								\
+#define ADD(R)			            			    		\
+{															\
 	INT32 a = R##REG(tms,SRCREG(op));								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 b = *rd;											\
@@ -337,8 +337,8 @@ static void abs_b(tms34010_state *tms, UINT16 op) { ABS(B); }
 static void add_a(tms34010_state *tms, UINT16 op) { ADD(A); }
 static void add_b(tms34010_state *tms, UINT16 op) { ADD(B); }
 
-#define ADDC(R)			              			      		\
-{			  												\
+#define ADDC(R)			            			    		\
+{															\
 	/* I'm not sure to which side the carry is added to, should */	\
 	/* verify it against the examples */					\
 	INT32 a = R##REG(tms,SRCREG(op));								\
@@ -353,8 +353,8 @@ static void add_b(tms34010_state *tms, UINT16 op) { ADD(B); }
 static void addc_a(tms34010_state *tms, UINT16 op) { ADDC(A); }
 static void addc_b(tms34010_state *tms, UINT16 op) { ADDC(B); }
 
-#define ADDI_W(R)			              			      	\
-{			  												\
+#define ADDI_W(R)			            			    	\
+{															\
 	INT32 a = PARAM_WORD(tms);								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 b = *rd;											\
@@ -367,8 +367,8 @@ static void addc_b(tms34010_state *tms, UINT16 op) { ADDC(B); }
 static void addi_w_a(tms34010_state *tms, UINT16 op) { ADDI_W(A); }
 static void addi_w_b(tms34010_state *tms, UINT16 op) { ADDI_W(B); }
 
-#define ADDI_L(R)			              			      	\
-{			  												\
+#define ADDI_L(R)			            			    	\
+{															\
 	INT32 a = PARAM_LONG(tms);								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 b = *rd;											\
@@ -381,8 +381,8 @@ static void addi_w_b(tms34010_state *tms, UINT16 op) { ADDI_W(B); }
 static void addi_l_a(tms34010_state *tms, UINT16 op) { ADDI_L(A); }
 static void addi_l_b(tms34010_state *tms, UINT16 op) { ADDI_L(B); }
 
-#define ADDK(R)				              			      	\
-{			  												\
+#define ADDK(R)				            			    	\
+{															\
 	INT32 a = fw_inc[PARAM_K(op)];								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 b = *rd;											\
@@ -395,8 +395,8 @@ static void addi_l_b(tms34010_state *tms, UINT16 op) { ADDI_L(B); }
 static void addk_a(tms34010_state *tms, UINT16 op) { ADDK(A); }
 static void addk_b(tms34010_state *tms, UINT16 op) { ADDK(B); }
 
-#define AND(R)				              			      	\
-{			  												\
+#define AND(R)				            			    	\
+{															\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	CLR_Z(tms);													\
 	*rd &= R##REG(tms,SRCREG(op));									\
@@ -406,8 +406,8 @@ static void addk_b(tms34010_state *tms, UINT16 op) { ADDK(B); }
 static void and_a(tms34010_state *tms, UINT16 op) { AND(A); }
 static void and_b(tms34010_state *tms, UINT16 op) { AND(B); }
 
-#define ANDI(R)				              			      	\
-{			  												\
+#define ANDI(R)				            			    	\
+{															\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	CLR_Z(tms);													\
 	*rd &= ~PARAM_LONG(tms);								\
@@ -417,8 +417,8 @@ static void and_b(tms34010_state *tms, UINT16 op) { AND(B); }
 static void andi_a(tms34010_state *tms, UINT16 op) { ANDI(A); }
 static void andi_b(tms34010_state *tms, UINT16 op) { ANDI(B); }
 
-#define ANDN(R)				              			      	\
-{			  												\
+#define ANDN(R)				            			    	\
+{															\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	CLR_Z(tms);													\
 	*rd &= ~R##REG(tms,SRCREG(op));									\
@@ -428,8 +428,8 @@ static void andi_b(tms34010_state *tms, UINT16 op) { ANDI(B); }
 static void andn_a(tms34010_state *tms, UINT16 op) { ANDN(A); }
 static void andn_b(tms34010_state *tms, UINT16 op) { ANDN(B); }
 
-#define BTST_K(R)				              			    \
-{							 								\
+#define BTST_K(R)				            			    \
+{															\
 	int bit = 31 - PARAM_K(op);									\
 	CLR_Z(tms);													\
 	if (bit <= 29)											\
@@ -441,7 +441,7 @@ static void andn_b(tms34010_state *tms, UINT16 op) { ANDN(B); }
 static void btst_k_a(tms34010_state *tms, UINT16 op) { BTST_K(A); }
 static void btst_k_b(tms34010_state *tms, UINT16 op) { BTST_K(B); }
 
-#define BTST_R(R)				              			    \
+#define BTST_R(R)				            			    \
 {															\
 	int bit = R##REG(tms,SRCREG(op)) & 0x1f;						\
 	CLR_Z(tms);													\
@@ -460,7 +460,7 @@ static void clrc(tms34010_state *tms, UINT16 op)
 	COUNT_CYCLES(tms,1);
 }
 
-#define CMP(R)				       		       			    \
+#define CMP(R)				    		    			    \
 {															\
 	INT32 *rs = &R##REG(tms,SRCREG(op));							\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
@@ -472,7 +472,7 @@ static void clrc(tms34010_state *tms, UINT16 op)
 static void cmp_a(tms34010_state *tms, UINT16 op) { CMP(A); }
 static void cmp_b(tms34010_state *tms, UINT16 op) { CMP(B); }
 
-#define CMPI_W(R)			       		       			    \
+#define CMPI_W(R)			    		    			    \
 {															\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 t = (INT16)~PARAM_WORD(tms);						\
@@ -484,7 +484,7 @@ static void cmp_b(tms34010_state *tms, UINT16 op) { CMP(B); }
 static void cmpi_w_a(tms34010_state *tms, UINT16 op) { CMPI_W(A); }
 static void cmpi_w_b(tms34010_state *tms, UINT16 op) { CMPI_W(B); }
 
-#define CMPI_L(R)			       		       			    \
+#define CMPI_L(R)			    		    			    \
 {															\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
 	INT32 t = ~PARAM_LONG(tms);								\
@@ -502,7 +502,7 @@ static void dint(tms34010_state *tms, UINT16 op)
 	COUNT_CYCLES(tms,3);
 }
 
-#define DIVS(R)			       		       			   		\
+#define DIVS(R)			    		    					\
 {															\
 	INT32 *rs  = &R##REG(tms,SRCREG(op));							\
 	INT32 *rd1 = &R##REG(tms,DSTREG(op));							\
@@ -519,7 +519,7 @@ static void dint(tms34010_state *tms, UINT16 op)
 			INT64 dividend = ((UINT64)*rd1 << 32) | (UINT32)*rd2; \
 			INT64 quotient = dividend / *rs;				\
 			INT32 remainder = dividend % *rs;				\
-			UINT32 signbits = (INT32)quotient >> 31;	 	\
+			UINT32 signbits = (INT32)quotient >> 31;		\
 			if (EXTRACT_64HI(quotient) != signbits)			\
 			{												\
 				SET_V_LOG(tms, 1);								\
@@ -550,8 +550,8 @@ static void dint(tms34010_state *tms, UINT16 op)
 static void divs_a(tms34010_state *tms, UINT16 op) { DIVS(A); }
 static void divs_b(tms34010_state *tms, UINT16 op) { DIVS(B); }
 
-#define DIVU(R)			       		       			   		\
-{										  					\
+#define DIVU(R)			    		    					\
+{															\
 	INT32 *rs  = &R##REG(tms,SRCREG(op));							\
 	INT32 *rd1 = &R##REG(tms,DSTREG(op));							\
 	CLR_ZV(tms);													\
@@ -566,7 +566,7 @@ static void divs_b(tms34010_state *tms, UINT16 op) { DIVS(B); }
 			INT32 *rd2 = &R##REG(tms,DSTREG(op)+1);					\
 			UINT64 dividend  = ((UINT64)*rd1 << 32) | (UINT32)*rd2;	\
 			UINT64 quotient  = dividend / (UINT32)*rs;		\
-			UINT32 remainder = dividend % (UINT32)*rs;	 	\
+			UINT32 remainder = dividend % (UINT32)*rs;		\
 			if (EXTRACT_64HI(quotient) != 0)				\
 			{												\
 				SET_V_LOG(tms, 1);								\
@@ -587,7 +587,7 @@ static void divs_b(tms34010_state *tms, UINT16 op) { DIVS(B); }
 		}													\
 		else												\
 		{													\
-			*rd1 = (UINT32)*rd1 / (UINT32)*rs;			  	\
+			*rd1 = (UINT32)*rd1 / (UINT32)*rs;				\
 			SET_Z_VAL(tms, *rd1);								\
 		}													\
 	}														\
@@ -603,7 +603,7 @@ static void eint(tms34010_state *tms, UINT16 op)
 	COUNT_CYCLES(tms,3);
 }
 
-#define EXGF(F,R)			       		       			    	\
+#define EXGF(F,R)			    		    			    	\
 {																\
 	UINT8 shift = F ? 6 : 0;									\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
@@ -618,7 +618,7 @@ static void exgf0_b(tms34010_state *tms, UINT16 op) { EXGF(0,B); }
 static void exgf1_a(tms34010_state *tms, UINT16 op) { EXGF(1,A); }
 static void exgf1_b(tms34010_state *tms, UINT16 op) { EXGF(1,B); }
 
-#define LMO(R)			       		       			    		\
+#define LMO(R)			    		    			    		\
 {																\
 	UINT32 res = 0;												\
 	UINT32 rs  = R##REG(tms,SRCREG(op));								\
@@ -639,7 +639,7 @@ static void exgf1_b(tms34010_state *tms, UINT16 op) { EXGF(1,B); }
 static void lmo_a(tms34010_state *tms, UINT16 op) { LMO(A); }
 static void lmo_b(tms34010_state *tms, UINT16 op) { LMO(B); }
 
-#define MMFM(R)			       		       			    		\
+#define MMFM(R)			    		    			    		\
 {																\
 	INT32 i;													\
 	UINT16 l = (UINT16) PARAM_WORD(tms);						\
@@ -661,8 +661,8 @@ static void lmo_b(tms34010_state *tms, UINT16 op) { LMO(B); }
 static void mmfm_a(tms34010_state *tms, UINT16 op) { MMFM(A); }
 static void mmfm_b(tms34010_state *tms, UINT16 op) { MMFM(B); }
 
-#define MMTM(R)			       		       			    		\
-{			  													\
+#define MMTM(R)			    		    			    		\
+{																\
 	UINT32 i;													\
 	UINT16 l = (UINT16) PARAM_WORD(tms);						\
 	COUNT_CYCLES(tms,2);											\
@@ -688,8 +688,8 @@ static void mmfm_b(tms34010_state *tms, UINT16 op) { MMFM(B); }
 static void mmtm_a(tms34010_state *tms, UINT16 op) { MMTM(A); }
 static void mmtm_b(tms34010_state *tms, UINT16 op) { MMTM(B); }
 
-#define MODS(R)			       		       			    		\
-{				  												\
+#define MODS(R)			    		    			    		\
+{																\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
@@ -705,8 +705,8 @@ static void mmtm_b(tms34010_state *tms, UINT16 op) { MMTM(B); }
 static void mods_a(tms34010_state *tms, UINT16 op) { MODS(A); }
 static void mods_b(tms34010_state *tms, UINT16 op) { MODS(B); }
 
-#define MODU(R)			       		       			    		\
-{				  												\
+#define MODU(R)			    		    			    		\
+{																\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_ZV(tms);														\
@@ -722,7 +722,7 @@ static void mods_b(tms34010_state *tms, UINT16 op) { MODS(B); }
 static void modu_a(tms34010_state *tms, UINT16 op) { MODU(A); }
 static void modu_b(tms34010_state *tms, UINT16 op) { MODU(B); }
 
-#define MPYS(R)			       		       			    		\
+#define MPYS(R)			    		    			    		\
 {																\
 	INT32 *rd1 = &R##REG(tms,DSTREG(op));								\
 	INT32 m1 = R##REG(tms,SRCREG(op));									\
@@ -742,7 +742,7 @@ static void modu_b(tms34010_state *tms, UINT16 op) { MODU(B); }
 static void mpys_a(tms34010_state *tms, UINT16 op) { MPYS(A); }
 static void mpys_b(tms34010_state *tms, UINT16 op) { MPYS(B); }
 
-#define MPYU(R)			       		       			    		\
+#define MPYU(R)			    		    			    		\
 {																\
 	INT32 *rd1 = &R##REG(tms,DSTREG(op));								\
 	UINT32 m1 = R##REG(tms,SRCREG(op));									\
@@ -761,8 +761,8 @@ static void mpys_b(tms34010_state *tms, UINT16 op) { MPYS(B); }
 static void mpyu_a(tms34010_state *tms, UINT16 op) { MPYU(A); }
 static void mpyu_b(tms34010_state *tms, UINT16 op) { MPYU(B); }
 
-#define NEG(R)			       		       			    		\
-{			  													\
+#define NEG(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 r = 0 - *rd;											\
 	CLR_NCZV(tms);													\
@@ -773,8 +773,8 @@ static void mpyu_b(tms34010_state *tms, UINT16 op) { MPYU(B); }
 static void neg_a(tms34010_state *tms, UINT16 op) { NEG(A); }
 static void neg_b(tms34010_state *tms, UINT16 op) { NEG(B); }
 
-#define NEGB(R)			       		       			    		\
-{			  													\
+#define NEGB(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 t = *rd + (C_FLAG(tms) ? 1 : 0);							\
 	INT32 r = 0 - t;											\
@@ -791,8 +791,8 @@ static void nop(tms34010_state *tms, UINT16 op)
 	COUNT_CYCLES(tms,1);
 }
 
-#define NOT(R)			       		       			    		\
-{								 								\
+#define NOT(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_Z(tms);														\
 	*rd = ~(*rd);												\
@@ -802,8 +802,8 @@ static void nop(tms34010_state *tms, UINT16 op)
 static void not_a(tms34010_state *tms, UINT16 op) { NOT(A); }
 static void not_b(tms34010_state *tms, UINT16 op) { NOT(B); }
 
-#define OR(R)			       		       			    		\
-{			  													\
+#define OR(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_Z(tms);														\
 	*rd |= R##REG(tms,SRCREG(op));										\
@@ -813,8 +813,8 @@ static void not_b(tms34010_state *tms, UINT16 op) { NOT(B); }
 static void or_a(tms34010_state *tms, UINT16 op) { OR(A); }
 static void or_b(tms34010_state *tms, UINT16 op) { OR(B); }
 
-#define ORI(R)			       		       			    		\
-{			  													\
+#define ORI(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_Z(tms);														\
 	*rd |= PARAM_LONG(tms);										\
@@ -841,7 +841,7 @@ static void setf0(tms34010_state *tms, UINT16 op) { SETF(0); }
 static void setf1(tms34010_state *tms, UINT16 op) { SETF(1); }
 
 #define SEXT(F,R)												\
-{							   									\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZ(tms);														\
 	SEXTEND(*rd,FW(tms,F));											\
@@ -853,8 +853,8 @@ static void sext0_b(tms34010_state *tms, UINT16 op) { SEXT(0,B); }
 static void sext1_a(tms34010_state *tms, UINT16 op) { SEXT(1,A); }
 static void sext1_b(tms34010_state *tms, UINT16 op) { SEXT(1,B); }
 
-#define RL(R,K)			       		       			    		\
-{			 													\
+#define RL(R,K)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 res = *rd;											\
 	INT32 k = (K);												\
@@ -876,7 +876,7 @@ static void rl_r_a(tms34010_state *tms, UINT16 op) { RL(A,AREG(tms,SRCREG(op))&0
 static void rl_r_b(tms34010_state *tms, UINT16 op) { RL(B,BREG(tms,SRCREG(op))&0x1f); }
 
 #define SLA(R,K)												\
-{				 												\
+{																\
 	 INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	UINT32 res = *rd;											\
 	 INT32 k = K;												\
@@ -901,7 +901,7 @@ static void sla_r_a(tms34010_state *tms, UINT16 op) { SLA(A,AREG(tms,SRCREG(op))
 static void sla_r_b(tms34010_state *tms, UINT16 op) { SLA(B,BREG(tms,SRCREG(op))&0x1f); }
 
 #define SLL(R,K)												\
-{			 													\
+{																\
 	 INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	UINT32 res = *rd;											\
 	 INT32 k = K;												\
@@ -922,7 +922,7 @@ static void sll_r_a(tms34010_state *tms, UINT16 op) { SLL(A,AREG(tms,SRCREG(op))
 static void sll_r_b(tms34010_state *tms, UINT16 op) { SLL(B,BREG(tms,SRCREG(op))&0x1f); }
 
 #define SRA(R,K)												\
-{			  													\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 res = *rd;											\
 	INT32 k = (-(K)) & 0x1f;									\
@@ -943,7 +943,7 @@ static void sra_r_a(tms34010_state *tms, UINT16 op) { SRA(A,AREG(tms,SRCREG(op))
 static void sra_r_b(tms34010_state *tms, UINT16 op) { SRA(B,BREG(tms,SRCREG(op))); }
 
 #define SRL(R,K)												\
-{			  													\
+{																\
 	 INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	UINT32 res = *rd;											\
 	 INT32 k = (-(K)) & 0x1f;									\
@@ -963,8 +963,8 @@ static void srl_k_b(tms34010_state *tms, UINT16 op) { SRL(B,PARAM_K(op)); }
 static void srl_r_a(tms34010_state *tms, UINT16 op) { SRL(A,AREG(tms,SRCREG(op))); }
 static void srl_r_b(tms34010_state *tms, UINT16 op) { SRL(B,BREG(tms,SRCREG(op))); }
 
-#define SUB(R)			       		       			    		\
-{			  													\
+#define SUB(R)			    		    			    		\
+{																\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 r = *rd - *rs;										\
@@ -976,8 +976,8 @@ static void srl_r_b(tms34010_state *tms, UINT16 op) { SRL(B,BREG(tms,SRCREG(op))
 static void sub_a(tms34010_state *tms, UINT16 op) { SUB(A); }
 static void sub_b(tms34010_state *tms, UINT16 op) { SUB(B); }
 
-#define SUBB(R)			       		       			    		\
-{			  													\
+#define SUBB(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 t = R##REG(tms,SRCREG(op));									\
 	INT32 r = *rd - t - (C_FLAG(tms) ? 1 : 0);						\
@@ -989,8 +989,8 @@ static void sub_b(tms34010_state *tms, UINT16 op) { SUB(B); }
 static void subb_a(tms34010_state *tms, UINT16 op) { SUBB(A); }
 static void subb_b(tms34010_state *tms, UINT16 op) { SUBB(B); }
 
-#define SUBI_W(R)			       		       			    	\
-{			  													\
+#define SUBI_W(R)			    		    			    	\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 r;													\
 	INT32 t = ~PARAM_WORD(tms);									\
@@ -1003,8 +1003,8 @@ static void subb_b(tms34010_state *tms, UINT16 op) { SUBB(B); }
 static void subi_w_a(tms34010_state *tms, UINT16 op) { SUBI_W(A); }
 static void subi_w_b(tms34010_state *tms, UINT16 op) { SUBI_W(B); }
 
-#define SUBI_L(R)			       		       			    	\
-{			  													\
+#define SUBI_L(R)			    		    			    	\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 t = ~PARAM_LONG(tms);									\
 	INT32 r = *rd - t;											\
@@ -1016,8 +1016,8 @@ static void subi_w_b(tms34010_state *tms, UINT16 op) { SUBI_W(B); }
 static void subi_l_a(tms34010_state *tms, UINT16 op) { SUBI_L(A); }
 static void subi_l_b(tms34010_state *tms, UINT16 op) { SUBI_L(B); }
 
-#define SUBK(R)			       		       			    		\
-{			  													\
+#define SUBK(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 t = fw_inc[PARAM_K(op)];									\
 	INT32 r = *rd - t;											\
@@ -1029,8 +1029,8 @@ static void subi_l_b(tms34010_state *tms, UINT16 op) { SUBI_L(B); }
 static void subk_a(tms34010_state *tms, UINT16 op) { SUBK(A); }
 static void subk_b(tms34010_state *tms, UINT16 op) { SUBK(B); }
 
-#define XOR(R)			       		       			    		\
-{			  													\
+#define XOR(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_Z(tms);														\
 	*rd ^= R##REG(tms,SRCREG(op));										\
@@ -1040,8 +1040,8 @@ static void subk_b(tms34010_state *tms, UINT16 op) { SUBK(B); }
 static void xor_a(tms34010_state *tms, UINT16 op) { XOR(A); }
 static void xor_b(tms34010_state *tms, UINT16 op) { XOR(B); }
 
-#define XORI(R)			       		       			    		\
-{			  													\
+#define XORI(R)			    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_Z(tms);														\
 	*rd ^= PARAM_LONG(tms);										\
@@ -1070,8 +1070,8 @@ static void zext1_b(tms34010_state *tms, UINT16 op) { ZEXT(1,B); }
     MOVE INSTRUCTIONS
 ***************************************************************************/
 
-#define MOVI_W(R)		       		       			    		\
-{			  													\
+#define MOVI_W(R)		    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
 	*rd=PARAM_WORD(tms);										\
@@ -1081,8 +1081,8 @@ static void zext1_b(tms34010_state *tms, UINT16 op) { ZEXT(1,B); }
 static void movi_w_a(tms34010_state *tms, UINT16 op) { MOVI_W(A); }
 static void movi_w_b(tms34010_state *tms, UINT16 op) { MOVI_W(B); }
 
-#define MOVI_L(R)		       		       			    		\
-{			  													\
+#define MOVI_L(R)		    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
 	*rd=PARAM_LONG(tms);										\
@@ -1092,7 +1092,7 @@ static void movi_w_b(tms34010_state *tms, UINT16 op) { MOVI_W(B); }
 static void movi_l_a(tms34010_state *tms, UINT16 op) { MOVI_L(A); }
 static void movi_l_b(tms34010_state *tms, UINT16 op) { MOVI_L(B); }
 
-#define MOVK(R)		       		       			    			\
+#define MOVK(R)		    		    			    			\
 {																\
 	INT32 k = PARAM_K(op); if (!k) k = 32;							\
 	R##REG(tms,DSTREG(op)) = k;											\
@@ -1101,7 +1101,7 @@ static void movi_l_b(tms34010_state *tms, UINT16 op) { MOVI_L(B); }
 static void movk_a(tms34010_state *tms, UINT16 op) { MOVK(A); }
 static void movk_b(tms34010_state *tms, UINT16 op) { MOVK(B); }
 
-#define MOVB_RN(R)		       		       			    		\
+#define MOVB_RN(R)		    		    			    		\
 {																\
 	WBYTE(tms, R##REG(tms,DSTREG(op)),R##REG(tms,SRCREG(op)));						\
 	COUNT_CYCLES(tms,1);											\
@@ -1109,8 +1109,8 @@ static void movk_b(tms34010_state *tms, UINT16 op) { MOVK(B); }
 static void movb_rn_a(tms34010_state *tms, UINT16 op) { MOVB_RN(A); }
 static void movb_rn_b(tms34010_state *tms, UINT16 op) { MOVB_RN(B); }
 
-#define MOVB_NR(R)		       		       			    		\
-{			  													\
+#define MOVB_NR(R)		    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
 	*rd = (INT8)RBYTE(tms, R##REG(tms,SRCREG(op)));						\
@@ -1128,8 +1128,8 @@ static void movb_nr_b(tms34010_state *tms, UINT16 op) { MOVB_NR(B); }
 static void movb_nn_a(tms34010_state *tms, UINT16 op) { MOVB_NN(A); }
 static void movb_nn_b(tms34010_state *tms, UINT16 op) { MOVB_NN(B); }
 
-#define MOVB_R_NO(R)	       		       			    		\
-{							  									\
+#define MOVB_R_NO(R)	    		    			    		\
+{																\
 	INT32 o = PARAM_WORD(tms);									\
 	WBYTE(tms, R##REG(tms,DSTREG(op))+o,R##REG(tms,SRCREG(op)));						\
 	COUNT_CYCLES(tms,3);											\
@@ -1137,8 +1137,8 @@ static void movb_nn_b(tms34010_state *tms, UINT16 op) { MOVB_NN(B); }
 static void movb_r_no_a(tms34010_state *tms, UINT16 op) { MOVB_R_NO(A); }
 static void movb_r_no_b(tms34010_state *tms, UINT16 op) { MOVB_R_NO(B); }
 
-#define MOVB_NO_R(R)	       		       			    		\
-{			  													\
+#define MOVB_NO_R(R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 o = PARAM_WORD(tms);									\
 	CLR_NZV(tms);													\
@@ -1149,7 +1149,7 @@ static void movb_r_no_b(tms34010_state *tms, UINT16 op) { MOVB_R_NO(B); }
 static void movb_no_r_a(tms34010_state *tms, UINT16 op) { MOVB_NO_R(A); }
 static void movb_no_r_b(tms34010_state *tms, UINT16 op) { MOVB_NO_R(B); }
 
-#define MOVB_NO_NO(R)	       		       			    		\
+#define MOVB_NO_NO(R)	    		    			    		\
 {																\
 	INT32 o1 = PARAM_WORD(tms);									\
 	INT32 o2 = PARAM_WORD(tms);									\
@@ -1159,7 +1159,7 @@ static void movb_no_r_b(tms34010_state *tms, UINT16 op) { MOVB_NO_R(B); }
 static void movb_no_no_a(tms34010_state *tms, UINT16 op) { MOVB_NO_NO(A); }
 static void movb_no_no_b(tms34010_state *tms, UINT16 op) { MOVB_NO_NO(B); }
 
-#define MOVB_RA(R)	       		       			    			\
+#define MOVB_RA(R)	    		    			    			\
 {																\
 	WBYTE(tms, PARAM_LONG(tms),R##REG(tms,DSTREG(op)));						\
 	COUNT_CYCLES(tms,1);											\
@@ -1167,8 +1167,8 @@ static void movb_no_no_b(tms34010_state *tms, UINT16 op) { MOVB_NO_NO(B); }
 static void movb_ra_a(tms34010_state *tms, UINT16 op) { MOVB_RA(A); }
 static void movb_ra_b(tms34010_state *tms, UINT16 op) { MOVB_RA(B); }
 
-#define MOVB_AR(R)	       		       			    			\
-{			  													\
+#define MOVB_AR(R)	    		    			    			\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
 	*rd = (INT8)RBYTE(tms, PARAM_LONG(tms));					\
@@ -1185,7 +1185,7 @@ static void movb_aa(tms34010_state *tms, UINT16 op)
 	COUNT_CYCLES(tms,6);
 }
 
-#define MOVE_RR(RS,RD)	       		       			    		\
+#define MOVE_RR(RS,RD)	    		    			    		\
 {																\
 	INT32 *rd = &RD##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
@@ -1198,7 +1198,7 @@ static void move_rr_b (tms34010_state *tms, UINT16 op) { MOVE_RR(B,B); }
 static void move_rr_ax(tms34010_state *tms, UINT16 op) { MOVE_RR(A,B); }
 static void move_rr_bx(tms34010_state *tms, UINT16 op) { MOVE_RR(B,A); }
 
-#define MOVE_RN(F,R)	       		       			    		\
+#define MOVE_RN(F,R)	    		    			    		\
 {																\
 	WFIELD##F(tms,R##REG(tms,DSTREG(op)),R##REG(tms,SRCREG(op)));					\
 	COUNT_CYCLES(tms,1);											\
@@ -1208,7 +1208,7 @@ static void move0_rn_b (tms34010_state *tms, UINT16 op) { MOVE_RN(0,B); }
 static void move1_rn_a (tms34010_state *tms, UINT16 op) { MOVE_RN(1,A); }
 static void move1_rn_b (tms34010_state *tms, UINT16 op) { MOVE_RN(1,B); }
 
-#define MOVE_R_DN(F,R)	       		       			    		\
+#define MOVE_R_DN(F,R)	    		    			    		\
 {																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	*rd-=fw_inc[FW(tms,F)];											\
@@ -1220,8 +1220,8 @@ static void move0_r_dn_b (tms34010_state *tms, UINT16 op) { MOVE_R_DN(0,B); }
 static void move1_r_dn_a (tms34010_state *tms, UINT16 op) { MOVE_R_DN(1,A); }
 static void move1_r_dn_b (tms34010_state *tms, UINT16 op) { MOVE_R_DN(1,B); }
 
-#define MOVE_R_NI(F,R)	       		       			    		\
-{			  													\
+#define MOVE_R_NI(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
     WFIELD##F(tms,*rd,R##REG(tms,SRCREG(op)));								\
     *rd+=fw_inc[FW(tms,F)];											\
@@ -1232,7 +1232,7 @@ static void move0_r_ni_b (tms34010_state *tms, UINT16 op) { MOVE_R_NI(0,B); }
 static void move1_r_ni_a (tms34010_state *tms, UINT16 op) { MOVE_R_NI(1,A); }
 static void move1_r_ni_b (tms34010_state *tms, UINT16 op) { MOVE_R_NI(1,B); }
 
-#define MOVE_NR(F,R)	       		       			    		\
+#define MOVE_NR(F,R)	    		    			    		\
 {																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
@@ -1245,8 +1245,8 @@ static void move0_nr_b (tms34010_state *tms, UINT16 op) { MOVE_NR(0,B); }
 static void move1_nr_a (tms34010_state *tms, UINT16 op) { MOVE_NR(1,A); }
 static void move1_nr_b (tms34010_state *tms, UINT16 op) { MOVE_NR(1,B); }
 
-#define MOVE_DN_R(F,R)	       		       			    		\
-{			  													\
+#define MOVE_DN_R(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	CLR_NZV(tms);													\
@@ -1260,8 +1260,8 @@ static void move0_dn_r_b (tms34010_state *tms, UINT16 op) { MOVE_DN_R(0,B); }
 static void move1_dn_r_a (tms34010_state *tms, UINT16 op) { MOVE_DN_R(1,A); }
 static void move1_dn_r_b (tms34010_state *tms, UINT16 op) { MOVE_DN_R(1,B); }
 
-#define MOVE_NI_R(F,R)	       		       			    		\
-{			  													\
+#define MOVE_NI_R(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	INT32 data = RFIELD##F(tms,*rs);								\
@@ -1276,8 +1276,8 @@ static void move0_ni_r_b (tms34010_state *tms, UINT16 op) { MOVE_NI_R(0,B); }
 static void move1_ni_r_a (tms34010_state *tms, UINT16 op) { MOVE_NI_R(1,A); }
 static void move1_ni_r_b (tms34010_state *tms, UINT16 op) { MOVE_NI_R(1,B); }
 
-#define MOVE_NN(F,R)	       		       			    		\
-{										  						\
+#define MOVE_NN(F,R)	    		    			    		\
+{																\
 	WFIELD##F(tms,R##REG(tms,DSTREG(op)),RFIELD##F(tms,R##REG(tms,SRCREG(op))));		\
 	COUNT_CYCLES(tms,3);											\
 }
@@ -1286,8 +1286,8 @@ static void move0_nn_b (tms34010_state *tms, UINT16 op) { MOVE_NN(0,B); }
 static void move1_nn_a (tms34010_state *tms, UINT16 op) { MOVE_NN(1,A); }
 static void move1_nn_b (tms34010_state *tms, UINT16 op) { MOVE_NN(1,B); }
 
-#define MOVE_DN_DN(F,R)	       		       			    		\
-{			  													\
+#define MOVE_DN_DN(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	INT32 data;													\
@@ -1302,8 +1302,8 @@ static void move0_dn_dn_b (tms34010_state *tms, UINT16 op) { MOVE_DN_DN(0,B); }
 static void move1_dn_dn_a (tms34010_state *tms, UINT16 op) { MOVE_DN_DN(1,A); }
 static void move1_dn_dn_b (tms34010_state *tms, UINT16 op) { MOVE_DN_DN(1,B); }
 
-#define MOVE_NI_NI(F,R)	       		       			    		\
-{			  													\
+#define MOVE_NI_NI(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 *rs = &R##REG(tms,SRCREG(op));								\
 	INT32 data = RFIELD##F(tms,*rs);								\
@@ -1317,8 +1317,8 @@ static void move0_ni_ni_b (tms34010_state *tms, UINT16 op) { MOVE_NI_NI(0,B); }
 static void move1_ni_ni_a (tms34010_state *tms, UINT16 op) { MOVE_NI_NI(1,A); }
 static void move1_ni_ni_b (tms34010_state *tms, UINT16 op) { MOVE_NI_NI(1,B); }
 
-#define MOVE_R_NO(F,R)	       		       			    		\
-{								  								\
+#define MOVE_R_NO(F,R)	    		    			    		\
+{																\
 	INT32 o = PARAM_WORD(tms);									\
 	WFIELD##F(tms,R##REG(tms,DSTREG(op))+o,R##REG(tms,SRCREG(op)));					\
 	COUNT_CYCLES(tms,3);											\
@@ -1328,8 +1328,8 @@ static void move0_r_no_b (tms34010_state *tms, UINT16 op) { MOVE_R_NO(0,B); }
 static void move1_r_no_a (tms34010_state *tms, UINT16 op) { MOVE_R_NO(1,A); }
 static void move1_r_no_b (tms34010_state *tms, UINT16 op) { MOVE_R_NO(1,B); }
 
-#define MOVE_NO_R(F,R)	       		       			    		\
-{			  													\
+#define MOVE_NO_R(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 o = PARAM_WORD(tms);									\
 	CLR_NZV(tms);													\
@@ -1342,8 +1342,8 @@ static void move0_no_r_b (tms34010_state *tms, UINT16 op) { MOVE_NO_R(0,B); }
 static void move1_no_r_a (tms34010_state *tms, UINT16 op) { MOVE_NO_R(1,A); }
 static void move1_no_r_b (tms34010_state *tms, UINT16 op) { MOVE_NO_R(1,B); }
 
-#define MOVE_NO_NI(F,R)	       		       			    		\
-{			  													\
+#define MOVE_NO_NI(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 o = PARAM_WORD(tms);									\
 	INT32 data = RFIELD##F(tms,R##REG(tms,SRCREG(op))+o);					\
@@ -1356,8 +1356,8 @@ static void move0_no_ni_b (tms34010_state *tms, UINT16 op) { MOVE_NO_NI(0,B); }
 static void move1_no_ni_a (tms34010_state *tms, UINT16 op) { MOVE_NO_NI(1,A); }
 static void move1_no_ni_b (tms34010_state *tms, UINT16 op) { MOVE_NO_NI(1,B); }
 
-#define MOVE_NO_NO(F,R)	       		       			    		\
-{				 												\
+#define MOVE_NO_NO(F,R)	    		    			    		\
+{																\
 	INT32 o1 = PARAM_WORD(tms);									\
 	INT32 o2 = PARAM_WORD(tms);									\
 	INT32 data = RFIELD##F(tms,R##REG(tms,SRCREG(op))+o1);					\
@@ -1369,8 +1369,8 @@ static void move0_no_no_b (tms34010_state *tms, UINT16 op) { MOVE_NO_NO(0,B); }
 static void move1_no_no_a (tms34010_state *tms, UINT16 op) { MOVE_NO_NO(1,A); }
 static void move1_no_no_b (tms34010_state *tms, UINT16 op) { MOVE_NO_NO(1,B); }
 
-#define MOVE_RA(F,R)	       		       			    		\
-{							  									\
+#define MOVE_RA(F,R)	    		    			    		\
+{																\
 	WFIELD##F(tms,PARAM_LONG(tms),R##REG(tms,DSTREG(op)));					\
 	COUNT_CYCLES(tms,3);											\
 }
@@ -1379,8 +1379,8 @@ static void move0_ra_b (tms34010_state *tms, UINT16 op) { MOVE_RA(0,B); }
 static void move1_ra_a (tms34010_state *tms, UINT16 op) { MOVE_RA(1,A); }
 static void move1_ra_b (tms34010_state *tms, UINT16 op) { MOVE_RA(1,B); }
 
-#define MOVE_AR(F,R)	       		       			    		\
-{			  													\
+#define MOVE_AR(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	CLR_NZV(tms);													\
 	*rd = RFIELD##F(tms,PARAM_LONG(tms));							\
@@ -1392,8 +1392,8 @@ static void move0_ar_b (tms34010_state *tms, UINT16 op) { MOVE_AR(0,B); }
 static void move1_ar_a (tms34010_state *tms, UINT16 op) { MOVE_AR(1,A); }
 static void move1_ar_b (tms34010_state *tms, UINT16 op) { MOVE_AR(1,B); }
 
-#define MOVE_A_NI(F,R)	       		       			    		\
-{			  													\
+#define MOVE_A_NI(F,R)	    		    			    		\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
     WFIELD##F(tms,*rd,RFIELD##F(tms,PARAM_LONG(tms)));					\
     *rd+=fw_inc[FW(tms,F)];											\
@@ -1404,7 +1404,7 @@ static void move0_a_ni_b (tms34010_state *tms, UINT16 op) { MOVE_A_NI(0,B); }
 static void move1_a_ni_a (tms34010_state *tms, UINT16 op) { MOVE_A_NI(1,A); }
 static void move1_a_ni_b (tms34010_state *tms, UINT16 op) { MOVE_A_NI(1,B); }
 
-#define MOVE_AA(F)		       		       			    		\
+#define MOVE_AA(F)		    		    			    		\
 {																\
 	UINT32 bitaddrs=PARAM_LONG(tms);							\
 	WFIELD##F(tms,PARAM_LONG(tms),RFIELD##F(tms,bitaddrs));				\
@@ -1509,7 +1509,7 @@ static void dsjne_a (tms34010_state *tms, UINT16 op) { DSJNE(A); }
 static void dsjne_b (tms34010_state *tms, UINT16 op) { DSJNE(B); }
 
 #define DSJS(R)													\
-{									   							\
+{																\
 	if (op & 0x0400)										\
 	{															\
 		if (--R##REG(tms,DSTREG(op)))									\
@@ -1541,7 +1541,7 @@ static void emu(tms34010_state *tms, UINT16 op)
 }
 
 #define EXGPC(R)												\
-{			  													\
+{																\
 	INT32 *rd = &R##REG(tms,DSTREG(op));								\
 	INT32 temppc = *rd;											\
 	*rd = tms->pc;													\
@@ -1561,15 +1561,15 @@ static void getpc_a (tms34010_state *tms, UINT16 op) { GETPC(A); }
 static void getpc_b (tms34010_state *tms, UINT16 op) { GETPC(B); }
 
 #define GETST(R)												\
-{			  													\
+{																\
 	R##REG(tms,DSTREG(op)) = tms->st;								\
 	COUNT_CYCLES(tms,1);											\
 }
 static void getst_a (tms34010_state *tms, UINT16 op) { GETST(A); }
 static void getst_b (tms34010_state *tms, UINT16 op) { GETST(B); }
 
-#define j_xx_8(TAKE)			  								\
-{	   															\
+#define j_xx_8(TAKE)											\
+{																\
 	if (DSTREG(op))													\
 	{															\
 		if (TAKE)												\
@@ -2027,7 +2027,7 @@ New 34020 ops:
 	SET_C_BIT_LO(tms, b->y, 15);						\
 	SET_Z_LOG(tms, b->y == 0);						\
 	SET_V_BIT_LO(tms, b->x, 15);						\
-  	COUNT_CYCLES(tms,1);							\
+	COUNT_CYCLES(tms,1);							\
 }
 static void addxyi_a(tms34010_state *tms, UINT16 op)
 {
@@ -2187,7 +2187,7 @@ static void cmovmc_b(tms34010_state *tms, UINT16 op)
 	logerror("020:cmovmc_b\n");
 }
 
-#define CMPK(R)				       		       			    \
+#define CMPK(R)				    		    			    \
 {															\
 	INT32 r;												\
 	INT32 *rd = &R##REG(tms,DSTREG(op));							\
@@ -2321,7 +2321,7 @@ static void retm(tms34010_state *tms, UINT16 op)
 	logerror("020:retm\n");
 }
 
-#define RMO(R)			       		       			    		\
+#define RMO(R)			    		    			    		\
 {																\
 	UINT32 res = 0;												\
 	UINT32 rs  = R##REG(tms,SRCREG(op));								\
@@ -2350,8 +2350,8 @@ static void rmo_b(tms34010_state *tms, UINT16 op) { RMO(B); }
 	{											\
 		case 0:									\
 			v = (v & 1) ? 0xffffffff : 0x00000000;\
-		  	COUNT_CYCLES(tms,8);					\
-		  	break;								\
+			COUNT_CYCLES(tms,8);					\
+			break;								\
 		case 1:									\
 			v &= 3;								\
 			v |= v << 2;						\

@@ -133,7 +133,7 @@ static const eeprom_interface eeprom_intf =
 	"*101",			/* write command */
 	NULL,			/* erase command */
 	"*10000xxxx",	/* lock command */
-	"*10011xxxx" 	/* unlock command */
+	"*10011xxxx"	/* unlock command */
 };
 
 static UINT16 pntnpuzl_eeprom;

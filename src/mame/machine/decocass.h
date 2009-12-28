@@ -92,10 +92,10 @@ struct _decocass_state
 
 	/* dongle type #4: status */
 	INT32     type4_ctrs;		/* latched PROM address (E5x0 LSB, E5x1 MSB) */
-	INT32     type4_latch; 		/* latched enable PROM (1100xxxx written to E5x1) */
+	INT32     type4_latch;		/* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* dongle type #5: status */
-	INT32     type5_latch; 		/* latched enable PROM (1100xxxx written to E5x1) */
+	INT32     type5_latch;		/* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* devices */
 	const device_config *maincpu;

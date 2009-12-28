@@ -495,7 +495,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gticlub )
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) 		// Shift Down
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift Down
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift Up
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )		// AT/MT switch
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
@@ -788,7 +788,7 @@ static MACHINE_DRIVER_START( gticlub )
 
 	MDRV_K056230_ADD("k056230", gticlub_k056230_intf)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -887,7 +887,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_K033906_ADD("k033906_1", hangplt_k033906_intf_0)
 	MDRV_K033906_ADD("k033906_2", hangplt_k033906_intf_1)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
 
 	MDRV_SCREEN_ADD("lscreen", RASTER)

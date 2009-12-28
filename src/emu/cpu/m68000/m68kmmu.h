@@ -238,7 +238,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 						case 2:	// MC68881 form, FD never set
 							if (modes & 0x200)
 							{
-							 	switch ((modes>>10) & 7)
+								switch ((modes>>10) & 7)
 								{
 									case 0:	// translation control register
 										WRITE_EA_32(m68k, ea, m68k->mmu_tc);
@@ -259,7 +259,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 							}
 							else
 							{
-							 	switch ((modes>>10) & 7)
+								switch ((modes>>10) & 7)
 								{
 									case 0:	// translation control register
 										m68k->mmu_tc = READ_EA_32(m68k, ea);

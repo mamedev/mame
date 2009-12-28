@@ -175,7 +175,7 @@ struct _avi_stream
 struct _avi_file
 {
 	/* shared data */
-	osd_file *		 	file;					/* pointer to open file */
+	osd_file *			file;					/* pointer to open file */
 	int					type;					/* type of access (read/create) */
 	avi_movie_info		info;					/* movie info structure */
 	UINT8 *				tempbuffer;				/* temporary buffer */
@@ -1956,7 +1956,7 @@ static avi_error write_strh_chunk(avi_file *file, avi_stream *stream, int initia
 	/* video-stream specific data */
 	if (stream->type == STREAMTYPE_VIDS)
 	{
-		put_32bits(&buffer[4], 							/* fccHandler */
+		put_32bits(&buffer[4],							/* fccHandler */
 					(stream->format == FORMAT_HFYU) ? HANDLER_HFYU : HANDLER_DIB);
 		put_32bits(&buffer[36],							/* dwSuggestedBufferSize */
 					stream->width * stream->height * 4);
@@ -2017,7 +2017,7 @@ static avi_error write_strf_chunk(avi_file *file, avi_stream *stream)
 		put_16bits(&buffer[0], 1);						/* wFormatTag */
 		put_16bits(&buffer[2], stream->channels);		/* nChannels */
 		put_32bits(&buffer[4], stream->samplerate);		/* nSamplesPerSec */
-		put_32bits(&buffer[8], 							/* nAvgBytesPerSec */
+		put_32bits(&buffer[8],							/* nAvgBytesPerSec */
 					stream->samplerate * stream->channels * (stream->samplebits / 8));
 		put_16bits(&buffer[12],							/* nBlockAlign */
 					stream->channels * (stream->samplebits / 8));

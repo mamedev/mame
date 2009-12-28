@@ -104,7 +104,7 @@ static const sn76477_interface empty_interface =
 	0,			/*  6 filter_cap       */
 	0,			/*  7 decay_res        */
 	0,			/*  8 attack_decay_cap */
-	0, 			/* 10 attack_res       */
+	0,			/* 10 attack_res       */
 	0,			/* 11 amplitude_res    */
 	0,			/* 12 feedback_res     */
 	0,			/* 16 vco_voltage      */
@@ -136,8 +136,8 @@ static const sn76477_interface empty_interface =
  *
  *****************************************************************************/
 
-#define ONE_SHOT_CAP_VOLTAGE_MIN 	(0)			/* the voltage at which the one-shot starts from (measured) */
-#define ONE_SHOT_CAP_VOLTAGE_MAX 	(2.5)		/* the voltage at which the one-shot finishes (measured) */
+#define ONE_SHOT_CAP_VOLTAGE_MIN	(0)			/* the voltage at which the one-shot starts from (measured) */
+#define ONE_SHOT_CAP_VOLTAGE_MAX	(2.5)		/* the voltage at which the one-shot finishes (measured) */
 #define ONE_SHOT_CAP_VOLTAGE_RANGE	(ONE_SHOT_CAP_VOLTAGE_MAX - ONE_SHOT_CAP_VOLTAGE_MIN)
 
 #define SLF_CAP_VOLTAGE_MIN			(0.33)		/* the voltage at the bottom peak of the SLF triangle wave (measured) */
@@ -176,7 +176,7 @@ static const double out_pos_gain[] =
 	0.03, 0.11, 0.15, 0.19, 0.21, 0.23, 0.26, 0.29, 0.31, 0.33,  /* 1.0 - 1.9V */
 	0.36, 0.38, 0.41, 0.43, 0.46, 0.49, 0.52, 0.54, 0.57, 0.60,  /* 2.0 - 2.9V */
 	0.62, 0.65, 0.68, 0.70, 0.73, 0.76, 0.80, 0.82, 0.84, 0.87,  /* 3.0 - 3.9V */
-	0.90, 0.93, 0.96, 0.98, 1.00							 	 /* 4.0 - 4.4V */
+	0.90, 0.93, 0.96, 0.98, 1.00								 /* 4.0 - 4.4V */
 };
 
 static const double out_neg_gain[] =
@@ -256,7 +256,7 @@ struct _sn76477_state
 
 	/* others */
 	sound_stream *channel;				/* returned by stream_create() */
-	int sample_rate; 					/* from machine->sample_rate */
+	int sample_rate;					/* from machine->sample_rate */
 	const device_config *device;
 
 	wav_file *file;						/* handle of the wave file to produce */

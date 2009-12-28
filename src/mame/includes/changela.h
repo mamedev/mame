@@ -12,7 +12,7 @@ struct _changela_state
 	bitmap_t *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
 	UINT8*   tree_ram;
 	UINT8*   memory_devices;
-	UINT32   mem_dev_selected; 	/* an offset within memory_devices area */
+	UINT32   mem_dev_selected;	/* an offset within memory_devices area */
 	UINT32   slopeROM_bank;
 	UINT8    tree_en;
 	UINT8    horizon;

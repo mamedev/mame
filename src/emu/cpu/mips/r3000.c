@@ -852,7 +852,7 @@ static CPU_EXECUTE( r3000 )
 			case 0x25:	/* LHU */		temp = RWORD(r3000, SIMMVAL+r3000->RSVAL); if (RTREG) r3000->RTVAL = (UINT16)temp; break;
 			case 0x26:	/* LWR */		(*r3000->lwr)(r3000, op);														break;
 			case 0x28:	/* SB */		WBYTE(r3000, SIMMVAL+r3000->RSVAL, r3000->RTVAL);								break;
-			case 0x29:	/* SH */		WWORD(r3000, SIMMVAL+r3000->RSVAL, r3000->RTVAL); 								break;
+			case 0x29:	/* SH */		WWORD(r3000, SIMMVAL+r3000->RSVAL, r3000->RTVAL);								break;
 			case 0x2a:	/* SWL */		(*r3000->swl)(r3000, op);														break;
 			case 0x2b:	/* SW */		WLONG(r3000, SIMMVAL+r3000->RSVAL, r3000->RTVAL);								break;
 			case 0x2e:	/* SWR */		(*r3000->swr)(r3000, op);														break;
@@ -1182,11 +1182,11 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 29;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + R3000_IRQ0:		info->i = (r3000->cpr[0][COP0_Cause] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + R3000_IRQ1:		info->i = (r3000->cpr[0][COP0_Cause] & 0x800) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -1250,23 +1250,23 @@ static CPU_GET_INFO( r3000 )
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "MIPS II");						break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); 		break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles");		break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");							break;
 
-		case CPUINFO_STR_REGISTER + R3000_PC:  			sprintf(info->s, "PC: %08X", r3000->pc); 		break;
-		case CPUINFO_STR_REGISTER + R3000_SR:  			sprintf(info->s, "SR: %08X", r3000->SR); 		break;
+		case CPUINFO_STR_REGISTER + R3000_PC:			sprintf(info->s, "PC: %08X", r3000->pc);		break;
+		case CPUINFO_STR_REGISTER + R3000_SR:			sprintf(info->s, "SR: %08X", r3000->SR);		break;
 
-		case CPUINFO_STR_REGISTER + R3000_R0:			sprintf(info->s, "R0: %08X", r3000->r[0]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R1:			sprintf(info->s, "R1: %08X", r3000->r[1]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R2:			sprintf(info->s, "R2: %08X", r3000->r[2]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R3:			sprintf(info->s, "R3: %08X", r3000->r[3]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R4:			sprintf(info->s, "R4: %08X", r3000->r[4]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R5:			sprintf(info->s, "R5: %08X", r3000->r[5]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R6:			sprintf(info->s, "R6: %08X", r3000->r[6]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R7:			sprintf(info->s, "R7: %08X", r3000->r[7]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R8:			sprintf(info->s, "R8: %08X", r3000->r[8]); 		break;
-		case CPUINFO_STR_REGISTER + R3000_R9:			sprintf(info->s, "R9: %08X", r3000->r[9]); 		break;
+		case CPUINFO_STR_REGISTER + R3000_R0:			sprintf(info->s, "R0: %08X", r3000->r[0]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R1:			sprintf(info->s, "R1: %08X", r3000->r[1]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R2:			sprintf(info->s, "R2: %08X", r3000->r[2]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R3:			sprintf(info->s, "R3: %08X", r3000->r[3]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R4:			sprintf(info->s, "R4: %08X", r3000->r[4]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R5:			sprintf(info->s, "R5: %08X", r3000->r[5]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R6:			sprintf(info->s, "R6: %08X", r3000->r[6]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R7:			sprintf(info->s, "R7: %08X", r3000->r[7]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R8:			sprintf(info->s, "R8: %08X", r3000->r[8]);		break;
+		case CPUINFO_STR_REGISTER + R3000_R9:			sprintf(info->s, "R9: %08X", r3000->r[9]);		break;
 		case CPUINFO_STR_REGISTER + R3000_R10:			sprintf(info->s, "R10:%08X", r3000->r[10]); 	break;
 		case CPUINFO_STR_REGISTER + R3000_R11:			sprintf(info->s, "R11:%08X", r3000->r[11]); 	break;
 		case CPUINFO_STR_REGISTER + R3000_R12:			sprintf(info->s, "R12:%08X", r3000->r[12]); 	break;

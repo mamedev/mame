@@ -744,7 +744,7 @@ static MACHINE_DRIVER_START( zr107 )
 
 	MDRV_K056230_ADD("k056230", zr107_k056230_intf)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( jetwave )
 
 	MDRV_K056230_ADD("k056230", zr107_k056230_intf)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

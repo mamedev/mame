@@ -549,7 +549,7 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 
 	if ( galaga_starcontrol[5] == 1 )
 	{
-  		int star_cntr;
+		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */

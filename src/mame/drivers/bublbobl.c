@@ -276,7 +276,7 @@ TODO:
 #include "includes/bublbobl.h"
 
 
-#define MAIN_XTAL 	XTAL_24MHz
+#define MAIN_XTAL	XTAL_24MHz
 
 
 /*************************************

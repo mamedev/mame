@@ -364,7 +364,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 	else
 	{
- 		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 

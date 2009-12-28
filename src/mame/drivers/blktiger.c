@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
-	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP 	/* other ports unknown */
+	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP	/* other ports unknown */
 ADDRESS_MAP_END
 
 

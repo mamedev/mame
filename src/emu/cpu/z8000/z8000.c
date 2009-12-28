@@ -478,7 +478,7 @@ static CPU_SET_INFO( z8000 )
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(cpustate, 0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(cpustate, 1, info->i);				break;
 
-		case CPUINFO_INT_PC:							cpustate->pc = info->i; 					 		break;
+		case CPUINFO_INT_PC:							cpustate->pc = info->i; 							break;
 		case CPUINFO_INT_REGISTER + Z8000_PC:			cpustate->pc = info->i;							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + Z8000_NSP:			cpustate->nsp = info->i;							break;
@@ -535,11 +535,11 @@ CPU_GET_INFO( z8000 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;					break;
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_state[0];				break;

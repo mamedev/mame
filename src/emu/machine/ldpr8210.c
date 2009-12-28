@@ -112,8 +112,8 @@ struct _ldplayer_data
 	attotime			slowtrg;				/* time of the last SLOW TRG */
 	pioneer_pia			pia;					/* PIA state */
 	UINT8				vsync;					/* live VSYNC state */
-	UINT8 				port1;					/* 8049 port 1 state */
-	UINT8 				port2;					/* 8049 port 2 state */
+	UINT8				port1;					/* 8049 port 1 state */
+	UINT8				port2;					/* 8049 port 2 state */
 
 	/* Simutrek-specific data */
 	simutrek_data		simutrek;				/* Simutrek-specific data */

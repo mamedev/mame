@@ -648,7 +648,7 @@ static STREAM_UPDATE( ay8910_update )
 						/* if CountEnv has looped an odd number of times (usually 1), */
 						/* invert the output. */
 						if (psg->alternate && (psg->env_step & (psg->env_step_mask + 1)))
- 							psg->attack ^= psg->env_step_mask;
+							psg->attack ^= psg->env_step_mask;
 
 						psg->env_step &= psg->env_step_mask;
 					}
@@ -972,7 +972,7 @@ DEVICE_GET_INFO( ay8912 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8912A");					break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -982,7 +982,7 @@ DEVICE_GET_INFO( ay8913 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8913A");					break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -992,7 +992,7 @@ DEVICE_GET_INFO( ay8930 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "AY8930");						break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -1002,7 +1002,7 @@ DEVICE_GET_INFO( ym2149 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YM2149");						break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -1012,7 +1012,7 @@ DEVICE_GET_INFO( ym3439 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YM3439");						break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -1022,7 +1022,7 @@ DEVICE_GET_INFO( ymz284 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ284");						break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -1032,7 +1032,7 @@ DEVICE_GET_INFO( ymz294 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ294");						break;
-		default: 										DEVICE_GET_INFO_CALL(ay8910);						break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
 

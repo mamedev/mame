@@ -506,7 +506,7 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_BIT( 	  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(	  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tile_8x8x4 =

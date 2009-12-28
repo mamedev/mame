@@ -343,8 +343,8 @@ VIDEO_UPDATE( sraider )
 
 	// draw the gridlines
 	colortable_palette_set_color(screen->machine->colortable, 0x40, MAKE_RGB(state->grid_color & 0x40 ? 0xff : 0,
-		              					  									 state->grid_color & 0x20 ? 0xff : 0,
-		              					  									 state->grid_color & 0x10 ? 0xff : 0));
+		            														 state->grid_color & 0x20 ? 0xff : 0,
+		            														 state->grid_color & 0x10 ? 0xff : 0));
 	tilemap_draw(bitmap, cliprect, state->grid_tilemap, 0, flip_screen_get(screen->machine));
 
 	for (i = 0; i < 0x100; i++)

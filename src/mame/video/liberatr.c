@@ -192,7 +192,7 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 			/* transfer from the temporary arrays to the structure */
 			line->max_x = (latitude_scale_factor * 0xc0) >> 8;
 			if (line->max_x & 1)
-				line->max_x += 1; 				/* make it even */
+				line->max_x += 1;				/* make it even */
 
 			/*
                as part of the quest to reduce memory usage (and to a lesser degree

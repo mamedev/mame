@@ -174,7 +174,7 @@ static INT16 calc_compute_x(void)
 	else if ((hit.x1p >= hit.x2p) && (hit.x1p < (hit.x2p + hit.x2s)))	// x1p inside x2
 		x_coll = (hit.x2s - (hit.x1p - hit.x2p));
 	else																// normal/no overlap
-	 	x_coll = ((hit.x1s + hit.x2s)/2) - abs((hit.x1p + hit.x1s/2) - (hit.x2p + hit.x2s/2));
+		x_coll = ((hit.x1s + hit.x2s)/2) - abs((hit.x1p + hit.x1s/2) - (hit.x2p + hit.x2s/2));
 
 	return x_coll;
 }
@@ -2121,7 +2121,7 @@ void calc3_mcu_run(running_machine *machine)
 	if (mcu_command == 0) return;
 
 	logerror("%s : MCU executed command at %04X: %04X\n",
-	 	cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
+		cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
 
 
 	if (mcu_command>0)

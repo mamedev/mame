@@ -156,7 +156,7 @@ struct _SLOT
 #define MVOL(scsp)		((scsp->udata.data[0]>>0x0)&0x000F)
 #define RBL(scsp)		((scsp->udata.data[1]>>0x7)&0x0003)
 #define RBP(scsp)		((scsp->udata.data[1]>>0x0)&0x003F)
-#define MOFULL(scsp)   		((scsp->udata.data[2]>>0x0)&0x1000)
+#define MOFULL(scsp)		((scsp->udata.data[2]>>0x0)&0x1000)
 #define MOEMPTY(scsp)		((scsp->udata.data[2]>>0x0)&0x0800)
 #define MIOVF(scsp)		((scsp->udata.data[2]>>0x0)&0x0400)
 #define MIFULL(scsp)		((scsp->udata.data[2]>>0x0)&0x0200)
@@ -229,10 +229,10 @@ struct _SCSP
 	const device_config *device;
 };
 
-static void dma_scsp(const address_space *space, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
+static void dma_scsp(const address_space *space, struct _SCSP *SCSP);		/*SCSP DMA transfer function*/
 #define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
 #define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
-#define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
+#define scsp_dexe		scsp_regs[0x16/2] & 0x1000
 #define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
 static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f,0.0f};
@@ -490,7 +490,7 @@ static void SCSP_StartSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	slot->active=1;
 	start_offset = PCM8B(slot) ? SA(slot) : SA(slot) & 0x7FFFE;
 	slot->base=SCSP->SCSPRAM + start_offset;
- 	slot->cur_addr=0;
+	slot->cur_addr=0;
 	slot->nxt_addr=1<<SHIFT;
 	slot->step=SCSP_Step(slot);
 	Compute_EG(SCSP,slot);
@@ -960,16 +960,16 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		step>>=SHIFT;
 	}
 
-  	if(PCM8B(slot))
- 	{
- 		addr1=slot->cur_addr>>SHIFT;
- 		addr2=slot->nxt_addr>>SHIFT;
- 	}
-  	else
- 	{
- 		addr1=(slot->cur_addr>>(SHIFT-1))&0x7fffe;
- 		addr2=(slot->nxt_addr>>(SHIFT-1))&0x7fffe;
- 	}
+	if(PCM8B(slot))
+	{
+		addr1=slot->cur_addr>>SHIFT;
+		addr2=slot->nxt_addr>>SHIFT;
+	}
+	else
+	{
+		addr1=(slot->cur_addr>>(SHIFT-1))&0x7fffe;
+		addr2=(slot->nxt_addr>>(SHIFT-1))&0x7fffe;
+	}
 
 	if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
 	{
@@ -1011,10 +1011,10 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		slot->cur_addr-=step;
 	else
 		slot->cur_addr+=step;
- 	slot->nxt_addr=slot->cur_addr+(1<<SHIFT);
+	slot->nxt_addr=slot->cur_addr+(1<<SHIFT);
 
- 	addr1=slot->cur_addr>>SHIFT;
- 	addr2=slot->nxt_addr>>SHIFT;
+	addr1=slot->cur_addr>>SHIFT;
+	addr2=slot->nxt_addr>>SHIFT;
 
 	if(addr1>=LSA(slot) && !(slot->Backwards))
 	{
@@ -1022,54 +1022,54 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 			slot->EG.state = DECAY1;
 	}
 
- 	for (addr_select=0;addr_select<2;addr_select++)
- 	{
+	for (addr_select=0;addr_select<2;addr_select++)
+	{
 		INT32 rem_addr;
- 		switch(LPCTL(slot))
-  		{
- 		case 0:	//no loop
- 			if(*addr[addr_select]>=LSA(slot) && *addr[addr_select]>=LEA(slot))
- 			{
-  			//slot->active=0;
-  			SCSP_StopSlot(slot,0);
- 			}
- 			break;
- 		case 1: //normal loop
- 			if(*addr[addr_select]>=LEA(slot))
+		switch(LPCTL(slot))
+		{
+		case 0:	//no loop
+			if(*addr[addr_select]>=LSA(slot) && *addr[addr_select]>=LEA(slot))
+			{
+			//slot->active=0;
+			SCSP_StopSlot(slot,0);
+			}
+			break;
+		case 1: //normal loop
+			if(*addr[addr_select]>=LEA(slot))
 			{
 				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
 			}
- 			break;
- 		case 2:	//reverse loop
- 			if((*addr[addr_select]>=LSA(slot)) && !(slot->Backwards))
- 			{
+			break;
+		case 2:	//reverse loop
+			if((*addr[addr_select]>=LSA(slot)) && !(slot->Backwards))
+			{
 				rem_addr = *slot_addr[addr_select] - (LSA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
- 				slot->Backwards=1;
- 			}
+				slot->Backwards=1;
+			}
 			else if((*addr[addr_select]<LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)
 			{
 				rem_addr = (LSA(slot)<<SHIFT) - *slot_addr[addr_select];
 				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
 			}
- 			break;
- 		case 3: //ping-pong
- 			if(*addr[addr_select]>=LEA(slot)) //reached end, reverse till start
- 			{
+			break;
+		case 3: //ping-pong
+			if(*addr[addr_select]>=LEA(slot)) //reached end, reverse till start
+			{
 				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
- 				slot->Backwards=1;
- 			}
+				slot->Backwards=1;
+			}
 			else if((*addr[addr_select]<LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)//reached start or negative
- 			{
+			{
 				rem_addr = (LSA(slot)<<SHIFT) - *slot_addr[addr_select];
 				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
- 				slot->Backwards=0;
- 			}
- 			break;
-  		}
-  	}
+				slot->Backwards=0;
+			}
+			break;
+		}
+	}
 
 	if(ALFOS(slot)!=0)
 	{
@@ -1083,10 +1083,10 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
 
 	if(!STWINH(slot))
- 	{
- 		unsigned short Enc=((TL(slot))<<0x0)|(0x7<<0xd);
- 		*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
- 	}
+	{
+		unsigned short Enc=((TL(slot))<<0x0)|(0x7<<0xd);
+		*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+	}
 
 	return sample;
 }
@@ -1149,14 +1149,14 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 			struct _SLOT *slot=SCSP->Slots+i;
 			if(EFSDL(slot))
 			{
- 				unsigned short Enc=((EFPAN(slot))<<0x8)|((EFSDL(slot))<<0xd);
- 				smpl+=(SCSP->DSP.EFREG[i]*SCSP->LPANTABLE[Enc])>>SHIFT;
- 				smpr+=(SCSP->DSP.EFREG[i]*SCSP->RPANTABLE[Enc])>>SHIFT;
+				unsigned short Enc=((EFPAN(slot))<<0x8)|((EFSDL(slot))<<0xd);
+				smpl+=(SCSP->DSP.EFREG[i]*SCSP->LPANTABLE[Enc])>>SHIFT;
+				smpr+=(SCSP->DSP.EFREG[i]*SCSP->RPANTABLE[Enc])>>SHIFT;
 			}
 		}
 
- 		*bufl++ = ICLIP16(smpl>>2);
- 		*bufr++ = ICLIP16(smpr>>2);
+		*bufl++ = ICLIP16(smpl>>2);
+		*bufr++ = ICLIP16(smpr>>2);
 	}
 }
 
@@ -1171,7 +1171,7 @@ static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 			 "DGATE: %d  DDIR: %d\n",SCSP->scsp_dmea,SCSP->scsp_drga,SCSP->scsp_dtlg,scsp_dgate ? 1 : 0,scsp_ddir ? 1 : 0);
 
 	/* Copy the dma values in a temp storage for resuming later */
-     	/* (DMA *can't* overwrite his parameters).                  */
+    	/* (DMA *can't* overwrite his parameters).                  */
 	if(!(scsp_ddir))
 	{
 		tmp_dma[0] = scsp_regs[0x12/2];
@@ -1192,7 +1192,7 @@ static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-  			memory_write_word(space,0x100000|SCSP->scsp_drga,memory_read_word(space,SCSP->scsp_dmea));
+			memory_write_word(space,0x100000|SCSP->scsp_drga,memory_read_word(space,SCSP->scsp_dmea));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}
@@ -1201,7 +1201,7 @@ static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 	/*Resume the values*/
 	if(!(scsp_ddir))
 	{
-	 	scsp_regs[0x12/2] = tmp_dma[0];
+		scsp_regs[0x12/2] = tmp_dma[0];
 		scsp_regs[0x14/2] = tmp_dma[1];
 		scsp_regs[0x16/2] = tmp_dma[2];
 	}

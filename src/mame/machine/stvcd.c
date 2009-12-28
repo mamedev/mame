@@ -538,7 +538,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 		return;
 	case 0x000c:
 	case 0x000e:
-      		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
+    		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
 		hirqmask = data;
 		return;
 	case 0x0018:
@@ -792,7 +792,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				// is it a valid track?
 				if (cr2 >> 8)
 				{
-				 	cd_stat = CD_STAT_PAUSE;
+					cd_stat = CD_STAT_PAUSE;
 					// (index is cr2 low byte)
 				}
 				else
@@ -1231,7 +1231,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
 				finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
 				finfbuf[3] = (curdir[temp].firstfad&0xff);
-		 		// second 4 bytes = length of file
+				// second 4 bytes = length of file
 				finfbuf[4] = (curdir[temp].length>>24)&0xff;
 				finfbuf[5] = (curdir[temp].length>>16)&0xff;
 				finfbuf[6] = (curdir[temp].length>>8)&0xff;
@@ -1414,7 +1414,7 @@ static void read_new_dir(UINT32 fileno)
 
 			if ((sect[1] == 'C') && (sect[2] == 'D') && (sect[3] == '0') && (sect[4] == '0') && (sect[5] == '1'))
 			{
-			 	switch (sect[0])
+				switch (sect[0])
 				{
 					case 0:	// boot record
 						break;
@@ -1819,7 +1819,7 @@ static void cd_playdata(void)
 	{
 		if (fadstoplay)
 		{
-          		logerror("STVCD: Reading FAD %d\n", cd_curfad);
+        		logerror("STVCD: Reading FAD %d\n", cd_curfad);
 
 			if (cdrom)
 			{

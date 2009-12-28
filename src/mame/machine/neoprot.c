@@ -165,7 +165,7 @@ void mslugx_install_protection( running_machine *machine )
 	for (i = 0;i < (0x100000/2) - 4;i++)
 	{
 		if (mem16[i + 0] == 0x0243 &&
-			mem16[i + 1] == 0x0001 && 	/* andi.w  #$1, D3 */
+			mem16[i + 1] == 0x0001 &&	/* andi.w  #$1, D3 */
 			mem16[i + 2] == 0x6600)		/* bne xxxx */
 		{
 			mem16[i + 2] = 0x4e71;

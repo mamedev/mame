@@ -16,21 +16,21 @@
  *  Macro to access data in operands decoded with ReadAMAddress(cpustate)
  */
 
-#define F12LOADOPBYTE(cs, num)			  				\
+#define F12LOADOPBYTE(cs, num)							\
 	if ((cs)->flag##num)								\
 		appb = (UINT8)(cs)->reg[(cs)->op##num];			\
 	else												\
 		appb = MemRead8((cs)->program, (cs)->op##num);
 
-#define F12LOADOPHALF(cs, num)			  				\
+#define F12LOADOPHALF(cs, num)							\
 	if ((cs)->flag##num)								\
-		apph = (UINT16)(cs)->reg[(cs)->op##num];  		\
+		apph = (UINT16)(cs)->reg[(cs)->op##num];		\
 	else												\
 		apph = MemRead16((cs)->program, (cs)->op##num);
 
-#define F12LOADOPWORD(cs, num)			  				\
+#define F12LOADOPWORD(cs, num)							\
 	if ((cs)->flag##num)								\
-		appw = (cs)->reg[(cs)->op##num];  				\
+		appw = (cs)->reg[(cs)->op##num];				\
 	else												\
 		appw = MemRead32((cs)->program,(cs)->op##num);
 

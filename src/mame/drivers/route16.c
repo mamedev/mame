@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( routex_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
- 	AM_RANGE(0x6400, 0x6400) AM_READ(routex_prot_read)
+	AM_RANGE(0x6400, 0x6400) AM_READ(routex_prot_read)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(&route16_videoram1) AM_SIZE(&route16_videoram_size)
 ADDRESS_MAP_END
 

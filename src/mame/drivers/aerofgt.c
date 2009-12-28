@@ -562,7 +562,7 @@ static INPUT_PORTS_START( pspikesc )
 	PORT_INCLUDE( pspikes )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0030, 0x0030, "Country" ) 					PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0030, 0x0030, "Country" )					PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0030, "China" )
 	PORT_DIPSETTING(      0x0020, "Taiwan" )
 	PORT_DIPSETTING(      0x0010, "Hong-Kong" )
@@ -628,7 +628,7 @@ static INPUT_PORTS_START( karatblz )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) 			PORT_DIPLOCATION("SW1:1,2,3")  /* It affects Coin 1, 2, 3 and 4 */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:1,2,3")  /* It affects Coin 1, 2, 3 and 4 */
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
@@ -664,13 +664,13 @@ static INPUT_PORTS_START( karatblz )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	/* Default is DEF_STR( Hard ) */
-	PORT_DIPNAME( 0x1800, 0x0800, "Strength of Enemies" )  		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x1800, 0x0800, "Strength of Enemies" )		PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	/* Listed in manual as N.C. (aka No Connection) */
-	PORT_DIPNAME( 0x2000, 0x2000, "Freeze" )	 				PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x2000, 0x2000, "Freeze" )					PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:7")
@@ -827,7 +827,7 @@ static INPUT_PORTS_START( turbofrc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) 			PORT_DIPLOCATION("SW1:1,2,3")  /* It affects Coin 1, 2 and 3 */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:1,2,3")  /* It affects Coin 1, 2 and 3 */
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )

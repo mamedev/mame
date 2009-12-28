@@ -66,9 +66,9 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	{
 		switch (offset)
 		{
-		case 0:	if (data) sample_start(state->samples, 0, 0, 0); break;  	/* Walk */
-		case 1:	if (data) sample_start(state->samples, 0, 5, 0); break;  	/* Enemy Die 1 */
-		case 2:	if (data)								 	/* Drop 1 */
+		case 0:	if (data) sample_start(state->samples, 0, 0, 0); break; 	/* Walk */
+		case 1:	if (data) sample_start(state->samples, 0, 5, 0); break; 	/* Enemy Die 1 */
+		case 2:	if (data)									/* Drop 1 */
 				{
 					if (!sample_playing(state->samples, 1))
 					{
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 					sample_start(state->samples, 2, 2, 0);
 				break;
 
-		case 7:	if (data) 									/* Escape */
+		case 7:	if (data)									/* Escape */
 				{
 					sample_stop(state->samples, 2);
 					sample_start(state->samples, 3, 4, 0);
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	}
 
 	#ifdef MAME_DEBUG
- 	logerror("Sound output %x=%x\n", offset, data);
+	logerror("Sound output %x=%x\n", offset, data);
 	#endif
 }
 
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 		case 4:	state->march_select = (state->march_select & 0xfd) | (data << 1); break;
 		case 5:	state->march_select = (state->march_select & 0xfb) | (data << 2); break;
 
-		case 6:	if (data)  							/* Killer Attack (crawly thing at bottom of screen) */
+		case 6:	if (data)							/* Killer Attack (crawly thing at bottom of screen) */
 					sample_start(state->samples, 1, 8, 1);
 				else
 					sample_stop(state->samples, 1);
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 	}
 
 	#ifdef MAME_DEBUG
- 	if (offset != 11) logerror("Output %x=%x\n", offset, data);
+	if (offset != 11) logerror("Output %x=%x\n", offset, data);
 	#endif
 }
 
@@ -221,25 +221,25 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 					if (sample_playing(state->samples, 2))
 					{
 						sample_stop(state->samples, 2);
-		 				sample_start(state->samples, 2, 3, 0); break;
+						sample_start(state->samples, 2, 3, 0); break;
 					}
 					else
- 						sample_start(state->samples, 2, 3, 0); break;
+						sample_start(state->samples, 2, 3, 0); break;
 
 				case 3:
 					if (sample_playing(state->samples, 3))
 					{
 						sample_stop(state->samples, 3);
-		 				sample_start(state->samples, 3, 4, 0); break;
+						sample_start(state->samples, 3, 4, 0); break;
 					}
 					else
- 						sample_start(state->samples, 3, 4, 0); break;
+						sample_start(state->samples, 3, 4, 0); break;
 
 				case 4:
 					if (sample_playing(state->samples, 4))
 					{
 						sample_stop(state->samples, 4);
-	 					sample_start(state->samples, 4, 5, 0); break;
+						sample_start(state->samples, 4, 5, 0); break;
 					}
 					else
 						sample_start(state->samples, 4, 5, 0); break;
@@ -248,28 +248,28 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 					if (sample_playing(state->samples, 5))
 					{
 						sample_stop(state->samples, 5);
-	 					sample_start(state->samples, 5, 6, 0); break;
+						sample_start(state->samples, 5, 6, 0); break;
 					}
 					else
- 						sample_start(state->samples, 5, 6, 0); break;
+						sample_start(state->samples, 5, 6, 0); break;
 
 				case 6:
 					if (sample_playing(state->samples, 6))
 					{
 						sample_stop(state->samples, 6);
-	 					sample_start(state->samples, 6, 7, 0); break;
+						sample_start(state->samples, 6, 7, 0); break;
 					}
 					else
- 						sample_start(state->samples, 6, 7, 0); break;
+						sample_start(state->samples, 6, 7, 0); break;
 
 				case 7:
 					if (sample_playing(state->samples, 7))
 					{
 						sample_stop(state->samples, 7);
-	 					sample_start(state->samples, 7, 8, 0); break;
+						sample_start(state->samples, 7, 8, 0); break;
 					}
 					else
- 						sample_start(state->samples, 7, 8, 0); break;
+						sample_start(state->samples, 7, 8, 0); break;
 			}
 			}
 
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 	}
 
 	#ifdef MAME_DEBUG
- 	logerror("Sound output %x=%x\n", offset, data);
+	logerror("Sound output %x=%x\n", offset, data);
 	#endif
 }
 
@@ -369,7 +369,7 @@ static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
 	if (input_port_read(device->machine, "COINS") & 0x01)
-  		cpu_set_input_line(device, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else if (input_port_read(device->machine, "COINS") & 0x02)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -922,7 +922,7 @@ static const gfx_layout cosmic_spritelayout32 =
 	{ 0*32*8+0, 0*32*8+1, 0*32*8+2, 0*32*8+3, 0*32*8+4, 0*32*8+5, 0*32*8+6, 0*32*8+7,
 	  1*32*8+0, 1*32*8+1, 1*32*8+2, 1*32*8+3, 1*32*8+4, 1*32*8+5, 1*32*8+6, 1*32*8+7,
 	  2*32*8+0, 2*32*8+1, 2*32*8+2, 2*32*8+3, 2*32*8+4, 2*32*8+5, 2*32*8+6, 2*32*8+7,
-  	  3*32*8+0, 3*32*8+1, 3*32*8+2, 3*32*8+3, 3*32*8+4, 3*32*8+5, 3*32*8+6, 3*32*8+7 },
+	  3*32*8+0, 3*32*8+1, 3*32*8+2, 3*32*8+3, 3*32*8+4, 3*32*8+5, 3*32*8+6, 3*32*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
 	   8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
 	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,

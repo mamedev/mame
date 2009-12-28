@@ -422,7 +422,7 @@ static CPU_SET_INFO( m4510 )
 		case CPUINFO_INT_INPUT_STATE + M4510_IRQ_LINE:	m4510_set_irq_line(cpustate, M4510_IRQ_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m4510_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							PCW = info->i; 								break;
+		case CPUINFO_INT_PC:							PCW = info->i;								break;
 		case CPUINFO_INT_REGISTER + M4510_PC:			cpustate->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							SPL = info->i;							break;
 		case CPUINFO_INT_REGISTER + M4510_S:			cpustate->sp.b.l = info->i;					break;
@@ -475,13 +475,13 @@ CPU_GET_INFO( m4510 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 20;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = 13;					break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = 13;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M4510_IRQ_LINE:	info->i = cpustate->irq_state;				break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;				break;

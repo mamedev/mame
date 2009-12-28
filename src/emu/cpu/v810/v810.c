@@ -190,7 +190,7 @@ static UINT32 opMOVEA(v810_state *cpustate,UINT32 op)	// movea imm16, reg1, reg2
 	return clkIF;
 }
 
-static UINT32 opMOVHI(v810_state *cpustate,UINT32 op) 	// movhi imm16, reg1 ,reg2
+static UINT32 opMOVHI(v810_state *cpustate,UINT32 op)	// movhi imm16, reg1 ,reg2
 {
 	UINT32 op2=R_OP(cpustate,cpustate->PC);
 	cpustate->PC+=2;
@@ -200,7 +200,7 @@ static UINT32 opMOVHI(v810_state *cpustate,UINT32 op) 	// movhi imm16, reg1 ,reg
 	return clkIF;
 }
 
-static UINT32 opMOVi(v810_state *cpustate,UINT32 op) 	// mov imm5,r2
+static UINT32 opMOVi(v810_state *cpustate,UINT32 op)	// mov imm5,r2
 {
 	SETREG(cpustate,GET2,I5(op));
 	return clkIF;
@@ -958,40 +958,40 @@ static UINT32 (*const OpCodeTable[64])(v810_state *cpustate,UINT32 op) =
 	/* 0x1b */ opUNDEF,
 	/* 0x1c */ opLDSR,  	// ldsr reg2,regID          2
 	/* 0x1d */ opSTSR,  	// stsr regID,reg2          2
-	/* 0x1e */ opDI,  	// DI               2
+	/* 0x1e */ opDI,	// DI               2
 	/* 0x1f */ opUNDEF,
-	/* 0x20 */ opB,  	// Branch (7 bit opcode)
-	/* 0x21 */ opB,  	// Branch (7 bit opcode)
-	/* 0x22 */ opB,  	// Branch (7 bit opcode)
-	/* 0x23 */ opB,  	// Branch (7 bit opcode)
-	/* 0x24 */ opB,  	// Branch (7 bit opcode)
-	/* 0x25 */ opB,  	// Branch (7 bit opcode)
-	/* 0x26 */ opB,  	// Branch (7 bit opcode)
-	/* 0x27 */ opB,  	// Branch (7 bit opcode)
-	/* 0x28 */ opMOVEA,  	// movea imm16, reg1, reg2  5
+	/* 0x20 */ opB, 	// Branch (7 bit opcode)
+	/* 0x21 */ opB, 	// Branch (7 bit opcode)
+	/* 0x22 */ opB, 	// Branch (7 bit opcode)
+	/* 0x23 */ opB, 	// Branch (7 bit opcode)
+	/* 0x24 */ opB, 	// Branch (7 bit opcode)
+	/* 0x25 */ opB, 	// Branch (7 bit opcode)
+	/* 0x26 */ opB, 	// Branch (7 bit opcode)
+	/* 0x27 */ opB, 	// Branch (7 bit opcode)
+	/* 0x28 */ opMOVEA, 	// movea imm16, reg1, reg2  5
 	/* 0x29 */ opADDI,  	// addi imm16, reg1, reg2   5
-	/* 0x2a */ opJR,  	// jr disp26            4
-	/* 0x2b */ opJAL,  	// jal disp26           4
-	/* 0x2c */ opORI,  	// ori imm16, reg1, reg2    5
+	/* 0x2a */ opJR,	// jr disp26            4
+	/* 0x2b */ opJAL,	// jal disp26           4
+	/* 0x2c */ opORI,	// ori imm16, reg1, reg2    5
 	/* 0x2d */ opANDI,  	// andi imm16, reg1, reg2   5
 	/* 0x2e */ opXORI,  	// xori imm16, reg1, reg2   5
-	/* 0x2f */ opMOVHI,  	// movhi imm16, reg1 ,reg2  5
-	/* 0x30 */ opLDB,  	// ld.b disp16[reg1],reg2   6a
-	/* 0x31 */ opLDH,  	// ld.h disp16[reg1],reg2   6a
+	/* 0x2f */ opMOVHI, 	// movhi imm16, reg1 ,reg2  5
+	/* 0x30 */ opLDB,	// ld.b disp16[reg1],reg2   6a
+	/* 0x31 */ opLDH,	// ld.h disp16[reg1],reg2   6a
 	/* 0x32 */ opUNDEF,
-	/* 0x33 */ opLDW,  	// ld.w disp16[reg1],reg2   6a
-	/* 0x34 */ opSTB,  	// st.b reg2, disp16[reg1]  6b
-	/* 0x35 */ opSTH,  	// st.h reg2, disp16[reg1]  6b
+	/* 0x33 */ opLDW,	// ld.w disp16[reg1],reg2   6a
+	/* 0x34 */ opSTB,	// st.b reg2, disp16[reg1]  6b
+	/* 0x35 */ opSTH,	// st.h reg2, disp16[reg1]  6b
 	/* 0x36 */ opUNDEF,
-	/* 0x37 */ opSTW,  	// st.w reg2, disp16[reg1]  6b
-	/* 0x38 */ opINB,  	// in.b disp16[reg1], reg2  6a
-	/* 0x39 */ opINH,  	// in.h disp16[reg1], reg2  6a
+	/* 0x37 */ opSTW,	// st.w reg2, disp16[reg1]  6b
+	/* 0x38 */ opINB,	// in.b disp16[reg1], reg2  6a
+	/* 0x39 */ opINH,	// in.h disp16[reg1], reg2  6a
 	/* 0x3a */ opCAXI,  	// caxi disp16[reg1],reg2   6a
-	/* 0x3b */ opINW,  	// in.w disp16[reg1], reg2  6a
+	/* 0x3b */ opINW,	// in.w disp16[reg1], reg2  6a
 	/* 0x3c */ opOUTB,  	// out.b reg2, disp16[reg1]     6b
 	/* 0x3d */ opOUTH,  	// out.h reg2, disp16[reg1]     6b
 	/* 0x3e */ opFpoint, //floating point opcodes
-	/* 0x3f */ opOUTW  	// out.w reg2, disp16[reg1]     6b
+	/* 0x3f */ opOUTW	// out.w reg2, disp16[reg1]     6b
 };
 
 static CPU_INIT( v810 )
@@ -1167,11 +1167,11 @@ CPU_GET_INFO( v810 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_line;			break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_line;			break;
@@ -1179,7 +1179,7 @@ CPU_GET_INFO( v810 )
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PPC;				break;
 
 		case CPUINFO_INT_REGISTER + V810_PC:
-		case CPUINFO_INT_PC:							info->i = cpustate->PC;  				break;
+		case CPUINFO_INT_PC:							info->i = cpustate->PC; 				break;
 
 		case CPUINFO_INT_REGISTER + V810_R0:			info->i = cpustate->R0;					break;
 		case CPUINFO_INT_REGISTER + V810_R1:			info->i = cpustate->R1;					break;

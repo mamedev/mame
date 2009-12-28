@@ -209,7 +209,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) 	/* Switches 6-8 are not used */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )	/* Switches 6-8 are not used */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:5")
@@ -232,7 +232,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) ) 	/* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )	/* all other combinations give 1C_1C */
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )

@@ -445,7 +445,7 @@ static int BD1_setdata(int id, int segdata, int data)
 
 		if ( bd1[id].window_size <= 0 || (bd1[id].window_size > 16))
 			{ // no window selected default to rotate mode
-	  			if ( mode == 2 )      mode = 0;
+				if ( mode == 2 )      mode = 0;
 				else if ( mode == 3 ) mode = 1;
 				//mode &= -2;
 	}
@@ -503,7 +503,7 @@ static int BD1_setdata(int id, int segdata, int data)
 			{
 				bd1[id].string[bd1[id].window_end]   = BD1ASCII[data];
 				bd1[id].segments[bd1[id].cursor_pos] = segdata;
-		  	}
+			}
 			else
 			{
 				bd1[id].string[bd1[id].window_end]   = ' ';

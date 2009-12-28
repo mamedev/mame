@@ -290,7 +290,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 
     if (palette_bank != ((data >> 1) & 3))
 	{
-   		palette_bank = ((data >> 1) & 3);
+		palette_bank = ((data >> 1) & 3);
 
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 

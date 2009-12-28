@@ -95,7 +95,7 @@ struct _es5506_voice
 	/* internal state */
 	UINT8		index;					/* index of this voice */
 	UINT8		filtcount;				/* filter count */
-	UINT32 		accum_mask;
+	UINT32		accum_mask;
 };
 
 typedef struct _es5506_state es5506_state;
@@ -104,13 +104,13 @@ struct _es5506_state
 	sound_stream *stream;				/* which stream are we using */
 	int			sample_rate;			/* current sample rate */
 	UINT16 *	region_base[4];			/* pointer to the base of the region */
-	UINT32 		write_latch;			/* currently accumulated data for write */
-	UINT32 		read_latch;				/* currently accumulated data for read */
-	UINT32 		master_clock;			/* master clock frequency */
-	void 		(*irq_callback)(const device_config *, int);	/* IRQ callback */
+	UINT32		write_latch;			/* currently accumulated data for write */
+	UINT32		read_latch;				/* currently accumulated data for read */
+	UINT32		master_clock;			/* master clock frequency */
+	void		(*irq_callback)(const device_config *, int);	/* IRQ callback */
 	UINT16		(*port_read)(void);		/* input port read */
 
-	UINT8 		current_page;			/* current register page */
+	UINT8		current_page;			/* current register page */
 	UINT8		active_voices;			/* number of active voices */
 	UINT8		mode;					/* MODE register */
 	UINT8		wst;					/* W_ST register */
@@ -234,7 +234,7 @@ static void compute_tables(es5506_state *chip)
 ***********************************************************************************************/
 
 #define interpolate(sample1, sample2, accum)								\
-		(sample1 * (INT32)(0x800 - (accum & 0x7ff)) + 						\
+		(sample1 * (INT32)(0x800 - (accum & 0x7ff)) +						\
 		 sample2 * (INT32)(accum & 0x7ff)) >> 11;
 
 

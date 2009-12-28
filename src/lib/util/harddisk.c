@@ -48,7 +48,7 @@
 struct _hard_disk_file
 {
 	chd_file *			chd;				/* CHD file */
-	hard_disk_info 		info;				/* hard disk info */
+	hard_disk_info		info;				/* hard disk info */
 	UINT32				hunksectors;		/* sectors per hunk */
 	UINT32				cachehunk;			/* which hunk is cached */
 	UINT8 *				cache;				/* cache of the current hunk */

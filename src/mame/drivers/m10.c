@@ -481,8 +481,8 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
- 	m10_state *state = (m10_state *)space->machine->driver_data;
-  	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+	m10_state *state = (m10_state *)space->machine->driver_data;
+	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
 	ttl74123_clear_w(state->ic8j1, 0, 1);
@@ -492,7 +492,7 @@ static READ8_HANDLER( m10_a700_r )
 static READ8_HANDLER( m11_a700_r )
 {
 	m10_state *state = (m10_state *)space->machine->driver_data;
-   	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	//cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
@@ -548,7 +548,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-   	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART + 1, 80), NULL, -1, interrupt_callback);
+	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART + 1, 80), NULL, -1, interrupt_callback);
 }
 
 /*************************************

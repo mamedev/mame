@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( wrally )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1MHz) 					/* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1MHz)					/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

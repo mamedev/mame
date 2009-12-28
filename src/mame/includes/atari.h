@@ -235,7 +235,7 @@ typedef struct {
 	UINT8	cclock[256+32]; 	/* color clock buffer filled by ANTIC */
 	UINT8	pmbits[256+32]; 	/* player missile buffer filled by GTIA */
 	UINT16	color_lookup[256];	/* color lookup table */
-	UINT8   *prio_table[64]; 	/* player/missile priority tables */
+	UINT8   *prio_table[64];	/* player/missile priority tables */
 	VIDEO	*video[312];		/* video buffer */
 	UINT32	*cclk_expand;		/* shared buffer for the following: */
 	UINT32  *pf_21;				/* 1cclk 2 color txt 2,3 */
@@ -262,8 +262,8 @@ typedef struct {
 #define RDANTIC(space)		memory_read_byte(space, antic.dpage+antic.doffs)
 #define RDVIDEO(space,o)	memory_read_byte(space, antic.vpage+((antic.voffs+(o))&VOFFS))
 #define RDCHGEN(space,o)	memory_read_byte(space, antic.chbase+(o))
-#define RDPMGFXS(space,o) 	memory_read_byte(space, antic.pmbase_s+(o)+(antic.scanline>>1))
-#define RDPMGFXD(space,o) 	memory_read_byte(space, antic.pmbase_d+(o)+antic.scanline)
+#define RDPMGFXS(space,o)	memory_read_byte(space, antic.pmbase_s+(o)+(antic.scanline>>1))
+#define RDPMGFXD(space,o)	memory_read_byte(space, antic.pmbase_d+(o)+antic.scanline)
 
 #define PREPARE()												\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET]
@@ -364,7 +364,7 @@ typedef struct {
 	for( i = 0; i < width; i++ )								\
 		video->data[i] = RDVIDEO(space,i) << 1
 
-#define PREPARE_GFXA(space,width) 								\
+#define PREPARE_GFXA(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
@@ -376,7 +376,7 @@ typedef struct {
 	for( i = 0; i < width; i++ )								\
 		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXF(space,width) 								\
+#define PREPARE_GFXF(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\

@@ -1269,7 +1269,7 @@ INLINE void LMS(running_machine *machine, int new_cmd)
  *****************************************************************************/
 static void antic_scanline_dma(running_machine *machine, int param)
 {
-   	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;

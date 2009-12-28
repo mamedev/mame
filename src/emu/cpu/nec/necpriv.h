@@ -158,16 +158,16 @@ typedef enum {
 #define IncWordReg(Reg) 					\
 	unsigned tmp = (unsigned)nec_state->regs.w[Reg]; \
 	unsigned tmp1 = tmp+1;					\
-	nec_state->OverVal = (tmp == 0x7fff); 			\
+	nec_state->OverVal = (tmp == 0x7fff);			\
 	SetAF(tmp1,tmp,1);						\
 	SetSZPF_Word(tmp1); 					\
 	nec_state->regs.w[Reg]=tmp1
 
 #define DecWordReg(Reg) 					\
 	unsigned tmp = (unsigned)nec_state->regs.w[Reg]; \
-    unsigned tmp1 = tmp-1; 					\
-	nec_state->OverVal = (tmp == 0x8000); 			\
-    SetAF(tmp1,tmp,1); 						\
+    unsigned tmp1 = tmp-1;					\
+	nec_state->OverVal = (tmp == 0x8000);			\
+    SetAF(tmp1,tmp,1);						\
     SetSZPF_Word(tmp1); 					\
 	nec_state->regs.w[Reg]=tmp1
 
@@ -177,7 +177,7 @@ typedef enum {
 	tmp = (int)((INT8)FETCH());				\
 	if (flag)								\
 	{										\
-		static const UINT8 table[3]={3,10,10}; 	\
+		static const UINT8 table[3]={3,10,10};	\
 		nec_state->ip = (WORD)(nec_state->ip+tmp);			\
 		nec_state->icount-=table[nec_state->chip_type/8];	\
 		CHANGE_PC;							\
@@ -241,9 +241,9 @@ typedef enum {
 	else									\
 		tmp |= (1<<tmp2)
 
-#define XchgAWReg(Reg) 						\
-    WORD tmp; 								\
-	tmp = nec_state->regs.w[Reg]; 					\
+#define XchgAWReg(Reg)						\
+    WORD tmp;								\
+	tmp = nec_state->regs.w[Reg];					\
 	nec_state->regs.w[Reg] = nec_state->regs.w[AW]; 			\
 	nec_state->regs.w[AW] = tmp
 
@@ -307,7 +307,7 @@ typedef enum {
 	int count = (nec_state->regs.b[CL]+1)/2;							\
 	unsigned di = nec_state->regs.w[IY];								\
 	unsigned si = nec_state->regs.w[IX];								\
-	static const UINT8 table[3]={18,19,19};	 				\
+	static const UINT8 table[3]={18,19,19};					\
 	if (nec_state->seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC(nec_state));	\
 	nec_state->ZeroVal = nec_state->CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\

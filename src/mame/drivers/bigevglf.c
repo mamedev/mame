@@ -248,8 +248,8 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
- 	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
- 	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0xf0,   0xf0, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0x50, DEF_STR( 2C_1C ) )
@@ -264,14 +264,14 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c,   0x0c, "Holes" ) PORT_DIPLOCATION("SW2:3,4")
- 	PORT_DIPSETTING(      0x04, "1" )
- 	PORT_DIPSETTING(      0x08, "2" )
+	PORT_DIPSETTING(      0x04, "1" )
+	PORT_DIPSETTING(      0x08, "2" )
 	PORT_DIPSETTING(      0x0c, "3" )
- 	PORT_DIPSETTING(      0x00, "4" )
+	PORT_DIPSETTING(      0x00, "4" )
 	PORT_DIPNAME( 0x10,   0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5") /* Also changes the copyright on the title screen */
 	PORT_DIPSETTING(      0x00, DEF_STR( English ) )                            /* (c) 1986 Taito America Corp. */
- 	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )                           /* (c) Taito Corporation 1986 */
- 	PORT_DIPNAME( 0xe0,   0xa0, "Full game price (credits)" ) PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )                           /* (c) Taito Corporation 1986 */
+	PORT_DIPNAME( 0xe0,   0xa0, "Full game price (credits)" ) PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(      0xe0, "3" )
 	PORT_DIPSETTING(      0xc0, "4" )
 	PORT_DIPSETTING(      0xa0, "5" )
@@ -300,7 +300,7 @@ static INPUT_PORTS_START( bigevglj )
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5") /* Doesn't change the title screen copyright like the US set */
 	PORT_DIPSETTING(      0x00, DEF_STR( English ) )
- 	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
 
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP 	/* video ram enable ???*/
+	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
 	AM_RANGE(0x02, 0x02) AM_WRITE(beg_banking_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(beg13_a_set_w)
@@ -588,7 +588,7 @@ ROM_START( bigevglf )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a67-11",   0x00000, 0x4000, CRC(a2660d20) SHA1(3d8b670c071862d677d4e30655dcb6b8d830648a))
 
- 	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a67-16",   0x0000, 0x4000, CRC(5fb6d22e) SHA1(1701aa94b7f524187fd7213a94535bed3e8b6cc9))
 	ROM_LOAD( "a67-17",   0x4000, 0x4000, CRC(9f57deae) SHA1(dbdb3d77c3de0113ef6671aec854e4e44ee162ef))
 	ROM_LOAD( "a67-18",   0x8000, 0x4000, CRC(40d54fed) SHA1(bfa0922809bffafec15d3ef59ac8b8ad653860a1))
@@ -619,7 +619,7 @@ ROM_START( bigevglfj )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a67-11",   0x00000, 0x4000, CRC(a2660d20) SHA1(3d8b670c071862d677d4e30655dcb6b8d830648a))
 
- 	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a67-16",   0x0000, 0x4000, CRC(5fb6d22e) SHA1(1701aa94b7f524187fd7213a94535bed3e8b6cc9))
 	ROM_LOAD( "a67-17",   0x4000, 0x4000, CRC(9f57deae) SHA1(dbdb3d77c3de0113ef6671aec854e4e44ee162ef))
 	ROM_LOAD( "a67-18",   0x8000, 0x4000, CRC(40d54fed) SHA1(bfa0922809bffafec15d3ef59ac8b8ad653860a1))

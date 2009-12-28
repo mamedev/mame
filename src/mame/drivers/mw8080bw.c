@@ -2151,7 +2151,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 #define SPCENCTR_STROBE_FREQ		(9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_STROBE_DUTY_CYCLE	(95) 	/* % */
+#define SPCENCTR_STROBE_DUTY_CYCLE	(95)	/* % */
 
 
 static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )

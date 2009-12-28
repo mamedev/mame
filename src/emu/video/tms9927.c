@@ -43,7 +43,7 @@ struct _tms9927_state
 	UINT8	reg[9];
 	UINT8	start_datarow;
 	UINT8	reset;
-	UINT8 	hpixels_per_column;
+	UINT8	hpixels_per_column;
 
 	/* derived state; no need to save */
 	UINT8	valid_config;

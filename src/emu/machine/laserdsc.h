@@ -225,4 +225,4 @@ int laserdisc_get_type(const device_config *device);
 void laserdisc_set_type(const device_config *device, int type);
 
 
-#endif 	/* __LASERDSC_H__ */
+#endif	/* __LASERDSC_H__ */

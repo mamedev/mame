@@ -50,8 +50,8 @@ static UINT16	dma_register[16];
 static struct
 {
 	UINT32		offset;			/* source offset, in bits */
-	INT32 		rowbytes;		/* source bytes to skip each row */
-	INT32 		xpos;			/* x position, clipped */
+	INT32		rowbytes;		/* source bytes to skip each row */
+	INT32		xpos;			/* x position, clipped */
 	INT32		ypos;			/* y position, clipped */
 	INT32		width;			/* horizontal pixel count */
 	INT32		height;			/* vertical pixel count */

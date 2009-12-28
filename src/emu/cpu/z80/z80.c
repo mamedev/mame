@@ -154,7 +154,7 @@ struct _z80_state
 	int				icount;
 	z80_daisy_state *daisy;
 	cpu_state_table state;
-	UINT8 			rtemp;
+	UINT8			rtemp;
 	const UINT8 *	cc_op;
 	const UINT8 *	cc_cb;
 	const UINT8 *	cc_ed;
@@ -188,42 +188,42 @@ INLINE z80_state *get_safe_token(const device_config *device)
 #define PRVPC	prvpc.d		/* previous program counter */
 
 #define PCD		pc.d
-#define PC 		pc.w.l
+#define PC		pc.w.l
 
 #define SPD 	sp.d
-#define SP 		sp.w.l
+#define SP		sp.w.l
 
 #define AFD 	af.d
-#define AF 		af.w.l
-#define A 		af.b.h
-#define F 		af.b.l
+#define AF		af.w.l
+#define A		af.b.h
+#define F		af.b.l
 
 #define BCD 	bc.d
-#define BC 		bc.w.l
-#define B 		bc.b.h
-#define C 		bc.b.l
+#define BC		bc.w.l
+#define B		bc.b.h
+#define C		bc.b.l
 
 #define DED 	de.d
-#define DE 		de.w.l
-#define D 		de.b.h
-#define E 		de.b.l
+#define DE		de.w.l
+#define D		de.b.h
+#define E		de.b.l
 
 #define HLD 	hl.d
-#define HL 		hl.w.l
-#define H 		hl.b.h
-#define L 		hl.b.l
+#define HL		hl.w.l
+#define H		hl.b.h
+#define L		hl.b.l
 
 #define IXD 	ix.d
-#define IX 		ix.w.l
-#define HX 		ix.b.h
-#define LX 		ix.b.l
+#define IX		ix.w.l
+#define HX		ix.b.h
+#define LX		ix.b.l
 
 #define IYD 	iy.d
-#define IY 		iy.w.l
-#define HY 		iy.b.h
-#define LY 		iy.b.l
+#define IY		iy.w.l
+#define HY		iy.b.h
+#define LY		iy.b.l
 
-#define WZ 		wz.w.l
+#define WZ		wz.w.l
 #define WZ_H	wz.b.h
 #define WZ_L	wz.b.l
 
@@ -651,17 +651,17 @@ INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-#define IN(Z,port)   		memory_read_byte_8le((Z)->io, port)
+#define IN(Z,port)  		memory_read_byte_8le((Z)->io, port)
 
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-#define OUT(Z,port,value) 	memory_write_byte_8le((Z)->io, port, value)
+#define OUT(Z,port,value)	memory_write_byte_8le((Z)->io, port, value)
 
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(Z,addr) 			memory_read_byte_8le((Z)->program, addr)
+#define RM(Z,addr)			memory_read_byte_8le((Z)->program, addr)
 
 /***************************************************************
  * Read a word from given memory location
@@ -722,18 +722,18 @@ INLINE UINT32 ARG16(z80_state *z80)
  * Calculate the effective address EA of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
-#define EAX(Z) 		do { (Z)->ea = (UINT32)(UINT16)((Z)->IX + (INT8)ARG(Z)); (Z)->WZ = (Z)->ea; } while (0)
+#define EAX(Z)		do { (Z)->ea = (UINT32)(UINT16)((Z)->IX + (INT8)ARG(Z)); (Z)->WZ = (Z)->ea; } while (0)
 #define EAY(Z)		do { (Z)->ea = (UINT32)(UINT16)((Z)->IY + (INT8)ARG(Z)); (Z)->WZ = (Z)->ea; } while (0)
 
 /***************************************************************
  * POP
  ***************************************************************/
-#define POP(Z,DR) 	do { RM16((Z), (Z)->SPD, &(Z)->DR); (Z)->SP += 2; } while (0)
+#define POP(Z,DR)	do { RM16((Z), (Z)->SPD, &(Z)->DR); (Z)->SP += 2; } while (0)
 
 /***************************************************************
  * PUSH
  ***************************************************************/
-#define PUSH(Z,SR) 	do { (Z)->SP -= 2; WM16((Z), (Z)->SPD, &(Z)->SR); } while (0)
+#define PUSH(Z,SR)	do { (Z)->SP -= 2; WM16((Z), (Z)->SPD, &(Z)->SR); } while (0)
 
 /***************************************************************
  * JP
@@ -762,7 +762,7 @@ INLINE UINT32 ARG16(z80_state *z80)
  * JR
  ***************************************************************/
 #define JR(Z) do {												\
-	INT8 arg = (INT8)ARG(Z); 	/* ARG() also increments PC */	\
+	INT8 arg = (INT8)ARG(Z);	/* ARG() also increments PC */	\
 	(Z)->PC += arg;				/* so don't do PC += ARG() */	\
 	(Z)->WZ = (Z)->PC;											\
 } while (0)
@@ -823,8 +823,8 @@ INLINE UINT32 ARG16(z80_state *z80)
  * RETN
  ***************************************************************/
 #define RETN(Z) do {											\
-	LOG(("Z80 '%s' RETN z80->iff1:%d z80->iff2:%d\n", 			\
-		(Z)->device->tag, (Z)->iff1, (Z)->iff2)); 				\
+	LOG(("Z80 '%s' RETN z80->iff1:%d z80->iff2:%d\n",			\
+		(Z)->device->tag, (Z)->iff1, (Z)->iff2));				\
 	POP((Z), pc);												\
 	(Z)->WZ = (Z)->PC;											\
 	(Z)->iff1 = (Z)->iff2;										\
@@ -2361,7 +2361,7 @@ OP(dd,e6) { illegal_1(z80); op_e6(z80);												} /* DB   DD          */
 OP(dd,e7) { illegal_1(z80); op_e7(z80);												} /* DB   DD          */
 
 OP(dd,e8) { illegal_1(z80); op_e8(z80);												} /* DB   DD          */
-OP(dd,e9) { z80->PC = z80->IX; 														} /* JP   (IX)        */
+OP(dd,e9) { z80->PC = z80->IX;														} /* JP   (IX)        */
 OP(dd,ea) { illegal_1(z80); op_ea(z80);												} /* DB   DD          */
 OP(dd,eb) { illegal_1(z80); op_eb(z80);												} /* DB   DD          */
 OP(dd,ec) { illegal_1(z80); op_ec(z80);												} /* DB   DD          */
@@ -2652,7 +2652,7 @@ OP(fd,e6) { illegal_1(z80); op_e6(z80);												} /* DB   FD          */
 OP(fd,e7) { illegal_1(z80); op_e7(z80);												} /* DB   FD          */
 
 OP(fd,e8) { illegal_1(z80); op_e8(z80);												} /* DB   FD          */
-OP(fd,e9) { z80->PC = z80->IY; 														} /* JP   (IY)        */
+OP(fd,e9) { z80->PC = z80->IY;														} /* JP   (IY)        */
 OP(fd,ea) { illegal_1(z80); op_ea(z80);												} /* DB   FD          */
 OP(fd,eb) { illegal_1(z80); op_eb(z80);												} /* DB   FD          */
 OP(fd,ec) { illegal_1(z80); op_ec(z80);												} /* DB   FD          */
@@ -2879,7 +2879,7 @@ OP(ed,a7) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,a8) { LDD(z80);																} /* LDD              */
 OP(ed,a9) { CPD(z80);																} /* CPD              */
 OP(ed,aa) { IND(z80);																} /* IND              */
-OP(ed,ab) { OUTD(z80); 																} /* OUTD             */
+OP(ed,ab) { OUTD(z80);																} /* OUTD             */
 OP(ed,ac) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,ad) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,ae) { illegal_2(z80);															} /* DB   ED          */
@@ -2990,8 +2990,8 @@ OP(op,07) { RLCA(z80);																} /* RLCA             */
 
 OP(op,08) { EX_AF(z80);																} /* EX   AF,AF'      */
 OP(op,09) { ADD16(z80, hl, bc);														} /* ADD  HL,BC       */
-OP(op,0a) { z80->A = RM(z80, z80->BC);	z80->WZ=z80->BC+1;    						} /* LD   A,(BC)      */
-OP(op,0b) { z80->BC--; 																} /* DEC  BC          */
+OP(op,0a) { z80->A = RM(z80, z80->BC);	z80->WZ=z80->BC+1;  						} /* LD   A,(BC)      */
+OP(op,0b) { z80->BC--;																} /* DEC  BC          */
 OP(op,0c) { z80->C = INC(z80, z80->C);												} /* INC  C           */
 OP(op,0d) { z80->C = DEC(z80, z80->C);												} /* DEC  C           */
 OP(op,0e) { z80->C = ARG(z80);														} /* LD   C,n         */
@@ -3009,7 +3009,7 @@ OP(op,17) { RLA(z80);																} /* RLA              */
 OP(op,18) { JR(z80);																} /* JR   o           */
 OP(op,19) { ADD16(z80, hl, de);														} /* ADD  HL,DE       */
 OP(op,1a) { z80->A = RM(z80, z80->DE); z80->WZ=z80->DE+1;							} /* LD   A,(DE)      */
-OP(op,1b) { z80->DE--; 																} /* DEC  DE          */
+OP(op,1b) { z80->DE--;																} /* DEC  DE          */
 OP(op,1c) { z80->E = INC(z80, z80->E);												} /* INC  E           */
 OP(op,1d) { z80->E = DEC(z80, z80->E);												} /* DEC  E           */
 OP(op,1e) { z80->E = ARG(z80);														} /* LD   E,n         */
@@ -3027,7 +3027,7 @@ OP(op,27) { DAA(z80);																} /* DAA              */
 OP(op,28) { JR_COND(z80, z80->F & ZF, 0x28);										} /* JR   Z,o         */
 OP(op,29) { ADD16(z80, hl, hl);														} /* ADD  HL,HL       */
 OP(op,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->hl);	z80->WZ = z80->ea+1;} /* LD   HL,(w)      */
-OP(op,2b) { z80->HL--; 																} /* DEC  HL          */
+OP(op,2b) { z80->HL--;																} /* DEC  HL          */
 OP(op,2c) { z80->L = INC(z80, z80->L);												} /* INC  L           */
 OP(op,2d) { z80->L = DEC(z80, z80->L);												} /* DEC  L           */
 OP(op,2e) { z80->L = ARG(z80);														} /* LD   L,n         */
@@ -3241,7 +3241,7 @@ OP(op,e6) { AND(z80, ARG(z80));														} /* AND  n           */
 OP(op,e7) { RST(z80, 0x20);															} /* RST  4           */
 
 OP(op,e8) { RET_COND(z80, z80->F & PF, 0xe8);										} /* RET  PE          */
-OP(op,e9) { z80->PC = z80->HL; 														} /* JP   (HL)        */
+OP(op,e9) { z80->PC = z80->HL;														} /* JP   (HL)        */
 OP(op,ea) { JP_COND(z80, z80->F & PF);												} /* JP   PE,a        */
 OP(op,eb) { EX_DE_HL(z80);															} /* EX   DE,HL       */
 OP(op,ec) { CALL_COND(z80, z80->F & PF, 0xec);										} /* CALL PE,a        */

@@ -74,7 +74,7 @@ typedef struct { char dummy[3]; } NO_PRIORITY;
     regardless of pen, copying directly
 -------------------------------------------------*/
 
-#define PIXEL_OP_COPY_OPAQUE(DEST, PRIORITY, SOURCE) 								\
+#define PIXEL_OP_COPY_OPAQUE(DEST, PRIORITY, SOURCE)								\
 do																					\
 {																					\
 	(DEST) = SOURCE;																\
@@ -88,7 +88,7 @@ while (0)																			\
     directly
 -------------------------------------------------*/
 
-#define PIXEL_OP_COPY_TRANSPEN(DEST, PRIORITY, SOURCE) 								\
+#define PIXEL_OP_COPY_TRANSPEN(DEST, PRIORITY, SOURCE)								\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -104,14 +104,14 @@ while (0)																			\
     'paldata' array
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_OPAQUE(DEST, PRIORITY, SOURCE) 								\
+#define PIXEL_OP_REMAP_OPAQUE(DEST, PRIORITY, SOURCE)								\
 do																					\
 {																					\
 	(DEST) = paldata[SOURCE];														\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_OPAQUE_PRIORITY(DEST, PRIORITY, SOURCE) 						\
+#define PIXEL_OP_REMAP_OPAQUE_PRIORITY(DEST, PRIORITY, SOURCE)						\
 do																					\
 {																					\
 	if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)									\
@@ -127,7 +127,7 @@ while (0)																			\
     pen via the 'paldata' array
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSPEN(DEST, PRIORITY, SOURCE)				 				\
+#define PIXEL_OP_REMAP_TRANSPEN(DEST, PRIORITY, SOURCE)								\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -136,7 +136,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -156,7 +156,7 @@ while (0)																			\
     'color' to the pen value
 -------------------------------------------------*/
 
-#define PIXEL_OP_REBASE_TRANSPEN(DEST, PRIORITY, SOURCE)				 			\
+#define PIXEL_OP_REBASE_TRANSPEN(DEST, PRIORITY, SOURCE)							\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -165,7 +165,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REBASE_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_REBASE_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -185,7 +185,7 @@ while (0)																			\
     pen via the 'paldata' array
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSMASK(DEST, PRIORITY, SOURCE)				 			\
+#define PIXEL_OP_REMAP_TRANSMASK(DEST, PRIORITY, SOURCE)							\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -194,7 +194,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSMASK_PRIORITY(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_REMAP_TRANSMASK_PRIORITY(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -217,7 +217,7 @@ while (0)																			\
     the destination pixel using 'shadowtable'
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSTABLE16(DEST, PRIORITY, SOURCE)				 			\
+#define PIXEL_OP_REMAP_TRANSTABLE16(DEST, PRIORITY, SOURCE)							\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -232,7 +232,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSTABLE32(DEST, PRIORITY, SOURCE)				 			\
+#define PIXEL_OP_REMAP_TRANSTABLE32(DEST, PRIORITY, SOURCE)							\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -247,7 +247,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY(DEST, PRIORITY, SOURCE) 				\
+#define PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY(DEST, PRIORITY, SOURCE)				\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -306,7 +306,7 @@ while (0)																			\
     against the destination using 'alpha'
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA16(DEST, PRIORITY, SOURCE)	 					\
+#define PIXEL_OP_REMAP_TRANSPEN_ALPHA16(DEST, PRIORITY, SOURCE)						\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -315,7 +315,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA32(DEST, PRIORITY, SOURCE)				 		\
+#define PIXEL_OP_REMAP_TRANSPEN_ALPHA32(DEST, PRIORITY, SOURCE)						\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -324,7 +324,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA16_PRIORITY(DEST, PRIORITY, SOURCE)		 	\
+#define PIXEL_OP_REMAP_TRANSPEN_ALPHA16_PRIORITY(DEST, PRIORITY, SOURCE)			\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -337,7 +337,7 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(DEST, PRIORITY, SOURCE)	 		\
+#define PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(DEST, PRIORITY, SOURCE)			\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -373,9 +373,9 @@ while (0)																			\
 
 
 #define DRAWGFX_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)								\
-do { 																					\
+do {																					\
 	profiler_mark_start(PROFILER_DRAWGFX);													\
-	do { 																				\
+	do {																				\
 		const UINT8 *srcdata;															\
 		INT32 destendx, destendy;														\
 		INT32 srcx, srcy;																\
@@ -471,10 +471,10 @@ do { 																					\
 					/* iterate over unrolled blocks of 4 */								\
 					for (curx = 0; curx < numblocks; curx++)							\
 					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);		 				\
-						PIXEL_OP(destptr[1], priptr[1], srcptr[1]);	 					\
-						PIXEL_OP(destptr[2], priptr[2], srcptr[2]);	 					\
-						PIXEL_OP(destptr[3], priptr[3], srcptr[3]);	 					\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
+						PIXEL_OP(destptr[1], priptr[1], srcptr[1]);						\
+						PIXEL_OP(destptr[2], priptr[2], srcptr[2]);						\
+						PIXEL_OP(destptr[3], priptr[3], srcptr[3]);						\
 																						\
 						srcptr += 4;													\
 						destptr += 4;													\
@@ -484,7 +484,7 @@ do { 																					\
 					/* iterate over leftover pixels */									\
 					for (curx = 0; curx < leftovers; curx++)							\
 					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);				 		\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
 						srcptr++;														\
 						destptr++;														\
 						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
@@ -493,7 +493,7 @@ do { 																					\
 			}																			\
 																						\
 			/* flipped 8bpp case */														\
-			else 																		\
+			else																		\
 			{																			\
 				/* iterate over pixels in Y */											\
 				for (cury = desty; cury <= destendy; cury++)							\
@@ -506,10 +506,10 @@ do { 																					\
 					/* iterate over unrolled blocks of 4 */								\
 					for (curx = 0; curx < numblocks; curx++)							\
 					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]); 					\
-						PIXEL_OP(destptr[1], priptr[1], srcptr[-1]); 					\
-						PIXEL_OP(destptr[2], priptr[2], srcptr[-2]); 					\
-						PIXEL_OP(destptr[3], priptr[3], srcptr[-3]); 					\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]);					\
+						PIXEL_OP(destptr[1], priptr[1], srcptr[-1]);					\
+						PIXEL_OP(destptr[2], priptr[2], srcptr[-2]);					\
+						PIXEL_OP(destptr[3], priptr[3], srcptr[-3]);					\
 																						\
 						srcptr -= 4;													\
 						destptr += 4;													\
@@ -553,7 +553,7 @@ do { 																					\
 					/* odd starting pixel */											\
 					if (oddstart)														\
 					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] >> 4); 				\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0] >> 4);				\
 						srcptr++;														\
 						destptr++;														\
 						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
@@ -563,15 +563,15 @@ do { 																					\
 					for (curx = 0; curx < numblocks; curx++)							\
 					{																	\
 						UINT8 srcbyte = *srcptr++;										\
-						PIXEL_OP(destptr[0], priptr[0], srcbyte & 15); 					\
-						PIXEL_OP(destptr[1], priptr[1], srcbyte >> 4); 					\
+						PIXEL_OP(destptr[0], priptr[0], srcbyte & 15);					\
+						PIXEL_OP(destptr[1], priptr[1], srcbyte >> 4);					\
 						destptr += 2;													\
 						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 2);						\
 					}																	\
 																						\
 					/* iterate over leftover pixels */									\
 					if (leftovers > 0)													\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] & 15); 				\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0] & 15);				\
 				}																		\
 			}																			\
 																						\
@@ -594,7 +594,7 @@ do { 																					\
 					/* odd right pixel */												\
 					if (oddstart)														\
 					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] & 15);			 	\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0] & 15);				\
 						srcptr--;														\
 						destptr++;														\
 						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
@@ -604,15 +604,15 @@ do { 																					\
 					for (curx = 0; curx < numblocks; curx++)							\
 					{																	\
 						UINT8 srcbyte = *srcptr--;										\
-						PIXEL_OP(destptr[0], priptr[0], srcbyte >> 4); 					\
-						PIXEL_OP(destptr[1], priptr[1], srcbyte & 15);	 				\
+						PIXEL_OP(destptr[0], priptr[0], srcbyte >> 4);					\
+						PIXEL_OP(destptr[1], priptr[1], srcbyte & 15);					\
 						destptr += 2;													\
 						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 2);						\
 					}																	\
 																						\
 					/* odd left pixel */												\
 					if (leftovers > 0)													\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] >> 4); 				\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0] >> 4);				\
 				}																		\
 			}																			\
 		}																				\
@@ -645,9 +645,9 @@ do { 																					\
 
 
 #define DRAWGFXZOOM_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
-do { 																					\
+do {																					\
 	profiler_mark_start(PROFILER_DRAWGFX);													\
-	do { 																				\
+	do {																				\
 		const UINT8 *srcdata;															\
 		UINT32 dstwidth, dstheight;														\
 		INT32 destendx, destendy;														\
@@ -824,9 +824,9 @@ do { 																					\
 */
 
 #define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
-do { 																					\
+do {																					\
 	profiler_mark_start(PROFILER_COPYBITMAP);													\
-	do { 																				\
+	do {																				\
 		const PIXEL_TYPE *srcdata;														\
 		UINT32 numblocks, leftovers;													\
 		INT32 destendx, destendy;														\
@@ -923,10 +923,10 @@ do { 																					\
 				/* iterate over unrolled blocks of 4 */									\
 				for (curx = 0; curx < numblocks; curx++)								\
 				{																		\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);		 					\
-					PIXEL_OP(destptr[1], priptr[1], srcptr[1]);	 						\
-					PIXEL_OP(destptr[2], priptr[2], srcptr[2]);	 						\
-					PIXEL_OP(destptr[3], priptr[3], srcptr[3]);	 						\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);							\
+					PIXEL_OP(destptr[1], priptr[1], srcptr[1]);							\
+					PIXEL_OP(destptr[2], priptr[2], srcptr[2]);							\
+					PIXEL_OP(destptr[3], priptr[3], srcptr[3]);							\
 																						\
 					srcptr += 4;														\
 					destptr += 4;														\
@@ -936,7 +936,7 @@ do { 																					\
 				/* iterate over leftover pixels */										\
 				for (curx = 0; curx < leftovers; curx++)								\
 				{																		\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);				 			\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);							\
 					srcptr++;															\
 					destptr++;															\
 					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);							\
@@ -945,7 +945,7 @@ do { 																					\
 		}																				\
 																						\
 		/* flipped case */																\
-		else 																			\
+		else																			\
 		{																				\
 			/* iterate over pixels in Y */												\
 			for (cury = desty; cury <= destendy; cury++)								\
@@ -958,10 +958,10 @@ do { 																					\
 				/* iterate over unrolled blocks of 4 */									\
 				for (curx = 0; curx < numblocks; curx++)								\
 				{																		\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]); 						\
-					PIXEL_OP(destptr[1], priptr[1], srcptr[-1]); 						\
-					PIXEL_OP(destptr[2], priptr[2], srcptr[-2]); 						\
-					PIXEL_OP(destptr[3], priptr[3], srcptr[-3]); 						\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]);						\
+					PIXEL_OP(destptr[1], priptr[1], srcptr[-1]);						\
+					PIXEL_OP(destptr[2], priptr[2], srcptr[-2]);						\
+					PIXEL_OP(destptr[3], priptr[3], srcptr[-3]);						\
 																						\
 					srcptr -= 4;														\
 					destptr += 4;														\
@@ -1005,7 +1005,7 @@ do { 																					\
 */
 
 #define COPYROZBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)						\
-do { 																				\
+do {																				\
 	UINT32 srcfixwidth, srcfixheight;												\
 	UINT32 numblocks, leftovers;													\
 	INT32 curx, cury;																\
@@ -1091,7 +1091,7 @@ do { 																				\
 					for (curx = 0; curx < leftovers; curx++)						\
 					{																\
 						if ((UINT32)srcx < srcfixwidth)								\
-							PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]); 	\
+							PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]);	\
 						srcx += incxx;												\
 						destptr++;													\
 						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);					\
@@ -1122,13 +1122,13 @@ do { 																				\
 				/* iterate over unrolled blocks of 4 */								\
 				for (curx = 0; curx < numblocks; curx++)							\
 				{																	\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]); 			\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]);			\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 																					\
-					PIXEL_OP(destptr[1], priptr[1], srcptr[srcx >> 16]); 			\
+					PIXEL_OP(destptr[1], priptr[1], srcptr[srcx >> 16]);			\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 																					\
-					PIXEL_OP(destptr[2], priptr[2], srcptr[srcx >> 16]); 			\
+					PIXEL_OP(destptr[2], priptr[2], srcptr[srcx >> 16]);			\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 																					\
 					PIXEL_OP(destptr[3], priptr[3], srcptr[srcx >> 16]);			\
@@ -1141,7 +1141,7 @@ do { 																				\
 				/* iterate over leftover pixels */									\
 				for (curx = 0; curx < leftovers; curx++)							\
 				{																	\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]); 			\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]);			\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 					destptr++;														\
 					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
@@ -1213,7 +1213,7 @@ do { 																				\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
 						srcptr = BITMAP_ADDR(src, PIXEL_TYPE, srcy >> 16, srcx >> 16); \
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);				 	\
+						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
 					srcy += incxy;													\
@@ -1305,7 +1305,7 @@ do { 																				\
 */
 
 #define DRAWSCANLINE_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)						\
-do { 																				\
+do {																				\
 	assert(bitmap != NULL);															\
 	assert(destx >= 0);																\
 	assert(destx + length <= bitmap->width);										\
@@ -1360,7 +1360,7 @@ do { 																				\
 */
 
 #define EXTRACTSCANLINE_CORE(PIXEL_TYPE)											\
-do { 																				\
+do {																				\
 	assert(bitmap != NULL);															\
 	assert(srcx >= 0);																\
 	assert(srcx + length <= bitmap->width);											\
@@ -1374,10 +1374,10 @@ do { 																				\
 		/* iterate over unrolled blocks of 4 */										\
 		while (length >= 4)															\
 		{																			\
-			destptr[0] = srcptr[0];					 								\
-			destptr[1] = srcptr[1];					 								\
-			destptr[2] = srcptr[2];					 								\
-			destptr[3] = srcptr[3];					 								\
+			destptr[0] = srcptr[0];													\
+			destptr[1] = srcptr[1];													\
+			destptr[2] = srcptr[2];													\
+			destptr[3] = srcptr[3];													\
 			length -= 4;															\
 			srcptr += 4;															\
 			destptr += 4;															\
@@ -1386,7 +1386,7 @@ do { 																				\
 		/* iterate over leftover pixels */											\
 		while (length > 0)															\
 		{																			\
-			destptr[0] = srcptr[0];					 								\
+			destptr[0] = srcptr[0];													\
 			length--;																\
 			srcptr++;																\
 			destptr++;																\

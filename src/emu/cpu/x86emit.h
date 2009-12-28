@@ -30,7 +30,7 @@
 
 /* opcode size flag; low 4 bits must match REX low 4 bits, hence the odd numbers here */
 #define OP_16BIT				0x10
-#define OP_32BIT   				0x00
+#define OP_32BIT				0x00
 #define OP_64BIT				0x08
 
 /* 16 registers on x64, only 8 on x86 */
@@ -224,16 +224,16 @@
 #define OP_ADD_Gv_Ev			0x03
 #define OP_ADD_AL_Ib			0x04
 #define OP_ADD_rAX_Iz   		0x05
-#define OP_PUSH_ES	  			0x06
-#define OP_POP_ES	  	 		0x07
-#define OP_OR_Eb_Gb	 			(0x08 | OPFLAG_8BITRM | OPFLAG_8BITREG)
-#define OP_OR_Ev_Gv	 			0x09
-#define OP_OR_Gb_Eb	 			(0x0a | OPFLAG_8BITRM | OPFLAG_8BITREG)
-#define OP_OR_Gv_Ev	 			0x0b
-#define OP_OR_AL_Ib	 			0x0c
+#define OP_PUSH_ES				0x06
+#define OP_POP_ES				0x07
+#define OP_OR_Eb_Gb				(0x08 | OPFLAG_8BITRM | OPFLAG_8BITREG)
+#define OP_OR_Ev_Gv				0x09
+#define OP_OR_Gb_Eb				(0x0a | OPFLAG_8BITRM | OPFLAG_8BITREG)
+#define OP_OR_Gv_Ev				0x0b
+#define OP_OR_AL_Ib				0x0c
 #define OP_OR_eAX_Iv			0x0d
-#define OP_PUSH_CS	  			0x0e
-#define OP_EXTENDED	 			0x0f
+#define OP_PUSH_CS				0x0e
+#define OP_EXTENDED				0x0f
 
 #define OP_ADC_Eb_Gb			(0x10 | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_ADC_Ev_Gv			0x11
@@ -241,16 +241,16 @@
 #define OP_ADC_Gv_Ev			0x13
 #define OP_ADC_AL_Ib			0x14
 #define OP_ADC_rAX_Iz   		0x15
-#define OP_PUSH_SS	  			0x16
-#define OP_POP_SS	   			0x17
+#define OP_PUSH_SS				0x16
+#define OP_POP_SS				0x17
 #define OP_SBB_Eb_Gb			(0x18 | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_SBB_Ev_Gv			0x19
 #define OP_SBB_Gb_Eb			(0x1a | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_SBB_Gv_Ev			0x1b
 #define OP_SBB_AL_Ib			0x1c
 #define OP_SBB_eAX_Iv   		0x1d
-#define OP_PUSH_DS	  			0x1e
-#define OP_POP_DS	   			0x1f
+#define OP_PUSH_DS				0x1e
+#define OP_POP_DS				0x1f
 
 #define OP_AND_Eb_Gb			(0x20 | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_AND_Ev_Gv			0x21
@@ -258,16 +258,16 @@
 #define OP_AND_Gv_Ev			0x23
 #define OP_AND_AL_Ib			0x24
 #define OP_AND_rAX_Iz   		0x25
-#define PREFIX_ES	   			0x26
-#define OP_DAA		  			0x27
+#define PREFIX_ES				0x26
+#define OP_DAA					0x27
 #define OP_SUB_Eb_Gb			(0x28 | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_SUB_Ev_Gv			0x29
 #define OP_SUB_Gb_Eb			(0x2a | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_SUB_Gv_Ev			0x2b
 #define OP_SUB_AL_Ib			0x2c
 #define OP_SUB_eAX_Iv   		0x2d
-#define PREFIX_CS	   			0x2e
-#define OP_DAS		  			0x2f
+#define PREFIX_CS				0x2e
+#define OP_DAS					0x2f
 
 #define OP_XOR_Eb_Gb			(0x30 | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_XOR_Ev_Gv			0x31
@@ -275,16 +275,16 @@
 #define OP_XOR_Gv_Ev			0x33
 #define OP_XOR_AL_Ib			0x34
 #define OP_XOR_rAX_Iz   		0x35
-#define PREFIX_SS	   			0x36
-#define OP_AAA		  			0x37
+#define PREFIX_SS				0x36
+#define OP_AAA					0x37
 #define OP_CMP_Eb_Gb			(0x38 | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_CMP_Ev_Gv			0x39
 #define OP_CMP_Gb_Eb			(0x3a | OPFLAG_8BITRM | OPFLAG_8BITREG)
 #define OP_CMP_Gv_Ev			0x3b
 #define OP_CMP_AL_Ib			0x3c
 #define OP_CMP_eAX_Iv   		0x3d
-#define PREFIX_DS	   			0x3e
-#define OP_AAS		  			0x3f
+#define PREFIX_DS				0x3e
+#define OP_AAS					0x3f
 
 #define OP_REX					0x40
 #define OP_REX_B				0x41
@@ -330,7 +330,7 @@
 #define PREFIX_OPSIZE			0x66
 #define PREFIX_ADSIZE			0x67
 #define OP_PUSH_Iz				0x68
-#define OP_IMUL_Gv_Ev_Iz 		0x69
+#define OP_IMUL_Gv_Ev_Iz		0x69
 #define OP_PUSH_Ib				0x6a
 #define OP_IMUL_Gv_Ev_Ib		0x6b
 #define OP_INS_Yb_DX			0x6c
@@ -644,7 +644,7 @@
 #define OP_CVTSD2SS_Vss_Wsd		0xf20f5a
 #define OP_CVTDQ2PS_Vps_Wdq		0x0f5b
 #define OP_CVTPS2DQ_Vdq_Wps		0x660f5b
-#define OP_CVTTPS2DQ_Vdq_Wps 	0xf30f5b
+#define OP_CVTTPS2DQ_Vdq_Wps	0xf30f5b
 #define OP_SUBPS_Vps_Wps		0x0f5c
 #define OP_SUBSS_Vss_Wss		0xf30f5c
 #define OP_SUBPD_Vpd_Wpd		0x660f5c
@@ -663,11 +663,11 @@
 #define OP_MAXSD_Vsd_Wsd		0xf20f5f
 
 #define OP_PUNPCKLBW_Pq_Qd		0x0f60
-#define OP_PUNPCKLBW_Vdq_Wdq 	0x660f60
+#define OP_PUNPCKLBW_Vdq_Wdq	0x660f60
 #define OP_PUNPCKLWD_Pq_Qd		0x0f61
-#define OP_PUNPCKLWD_Vdq_Wdq 	0x660f61
+#define OP_PUNPCKLWD_Vdq_Wdq	0x660f61
 #define OP_PUNPCKLDQ_Pq_Qd		0x0f62
-#define OP_PUNPCKLDQ_Vdq_Wdq 	0x660f62
+#define OP_PUNPCKLDQ_Vdq_Wdq	0x660f62
 #define OP_PACKSSWB_Pq_Qq		0x0f63
 #define OP_PACKSSWB_Vdq_Wdq		0x660f63
 #define OP_PCMPGTB_Pq_Qq		0x0f64
@@ -679,15 +679,15 @@
 #define OP_PACKUSWB_Pq_Qq		0x0f67
 #define OP_PACKUSWB_Vdq_Wdq		0x660f67
 #define OP_PUNPCKHBW_Pq_Qq		0x0f68
-#define OP_PUNPCKHBW_Vdq_Qdq 	0x660f68
+#define OP_PUNPCKHBW_Vdq_Qdq	0x660f68
 #define OP_PUNPCKHWD_Pq_Qq		0x0f69
-#define OP_PUNPCKHWD_Vdq_Qdq 	0x660f69
+#define OP_PUNPCKHWD_Vdq_Qdq	0x660f69
 #define OP_PUNPCKHDQ_Pq_Qq		0x0f6a
-#define OP_PUNPCKHDQ_Vdq_Qdq 	0x660f6a
+#define OP_PUNPCKHDQ_Vdq_Qdq	0x660f6a
 #define OP_PACKSSDW_Pq_Qq		0x0f6b
 #define OP_PACKSSDW_Vdq_Qdq		0x660f6b
-#define OP_PUNPCKLQDQ_Vdq_Wdq 	0x660f6c
-#define OP_PUNPCKHQDQ_Vdq_Wdq 	0x660f6d
+#define OP_PUNPCKLQDQ_Vdq_Wdq	0x660f6c
+#define OP_PUNPCKHQDQ_Vdq_Wdq	0x660f6d
 #define OP_MOVD_Pd_Ed			0x0f6e
 #define OP_MOVD_Vd_Ed			0x660f6e
 #define OP_MOVQ_Pq_Qq			0x0f6f
@@ -695,9 +695,9 @@
 #define OP_MOVDQU_Vdq_Wdq		0xf30f6f
 
 #define OP_PSHUFW_Pq_Qq_Ib		0x0f70
-#define OP_PSHUFD_Vdq_Wdq_Ib 	0x660f70
-#define OP_PSHUFHW_Vdq_Wdq_Ib 	0xf30f70
-#define OP_PSHUFLW_Vdq_Wdq_Ib 	0xf20f70
+#define OP_PSHUFD_Vdq_Wdq_Ib	0x660f70
+#define OP_PSHUFHW_Vdq_Wdq_Ib	0xf30f70
+#define OP_PSHUFLW_Vdq_Wdq_Ib	0xf20f70
 #define OP_G12					0x0f71
 #define OP_G13					0x0f72
 #define OP_G14					0x0f73
@@ -1796,7 +1796,7 @@ INLINE void emit_push_imm(x86code **emitptr, INT32 imm)
 
 INLINE void emit_push_r32(x86code **emitptr, UINT8 reg)							{ emit_op_reg(emitptr, OP_PUSH_rAX + (reg & 7), OP_32BIT, reg); }
 INLINE void emit_push_m32(x86code **emitptr, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_G5, OP_32BIT, 6, MEMPARAMS); }
-INLINE void emit_pop_r32(x86code **emitptr, UINT8 reg) 							{ emit_op_reg(emitptr, OP_POP_rAX + (reg & 7), OP_32BIT, reg); }
+INLINE void emit_pop_r32(x86code **emitptr, UINT8 reg)							{ emit_op_reg(emitptr, OP_POP_rAX + (reg & 7), OP_32BIT, reg); }
 INLINE void emit_pop_m32(x86code **emitptr, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_G1A_Ev, OP_32BIT, 0, MEMPARAMS); }
 
 #else
@@ -1827,7 +1827,7 @@ INLINE void emit_mov_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)
 INLINE void emit_mov_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_MOV_Gb_Eb, OP_32BIT, dreg, sreg); }
 INLINE void emit_mov_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_MOV_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
 INLINE void emit_mov_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_MOV_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
-INLINE void emit_mov_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_op_modrm_mem_imm8(emitptr, OP_G11_Eb_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
+INLINE void emit_mov_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G11_Eb_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
 
 
 /*-------------------------------------------------
@@ -1841,7 +1841,7 @@ INLINE void emit_xchg_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_32BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Eb_Gb, OP_32BIT, dreg, sreg);
+		emit_op_modrm_reg(emitptr, OP_XCHG_Eb_Gb, OP_32BIT, dreg, sreg);
 }
 
 
@@ -1861,10 +1861,10 @@ INLINE void emit_mov_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)		
 INLINE void emit_mov_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)					{ emit_op_modrm_mem(emitptr, OP_MOV_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 INLINE void emit_movsx_r16_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{ emit_op_modrm_reg(emitptr, OP_MOVSX_Gv_Eb, OP_16BIT, dreg, sreg); }
 INLINE void emit_movsx_r16_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_MOVSX_Gv_Eb, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_movzx_r16_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 						{ emit_op_modrm_reg(emitptr, OP_MOVZX_Gv_Eb, OP_16BIT, dreg, sreg); }
+INLINE void emit_movzx_r16_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{ emit_op_modrm_reg(emitptr, OP_MOVZX_Gv_Eb, OP_16BIT, dreg, sreg); }
 INLINE void emit_movzx_r16_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_MOVZX_Gv_Eb, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_cmovcc_r16_r16(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_16BIT, dreg, sreg); }
-INLINE void emit_cmovcc_r16_m16(x86code **emitptr, UINT8 cond, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_cmovcc_r16_r16(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_16BIT, dreg, sreg); }
+INLINE void emit_cmovcc_r16_m16(x86code **emitptr, UINT8 cond, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_16BIT, dreg, MEMPARAMS); }
 
 
 /*-------------------------------------------------
@@ -1878,7 +1878,7 @@ INLINE void emit_xchg_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_16BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_16BIT, dreg, sreg);
+		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_16BIT, dreg, sreg);
 }
 
 
@@ -1906,7 +1906,7 @@ INLINE void emit_movzx_r32_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	if (sreg >= 4)
 	{
 		emit_op_modrm_reg(emitptr, OP_MOV_Gv_Ev, OP_32BIT, dreg, sreg);							// mov dreg,sreg
- 		emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 4, dreg, 0xff); 	// and dreg,0xff
+		emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 4, dreg, 0xff);	// and dreg,0xff
 	}
 	else
 #endif
@@ -1930,7 +1930,7 @@ INLINE void emit_xchg_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_32BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_32BIT, dreg, sreg);
+		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_32BIT, dreg, sreg);
 }
 
 
@@ -1970,7 +1970,7 @@ INLINE void emit_movzx_r64_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{ 
 INLINE void emit_movzx_r64_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_MOVZX_Gv_Eb, OP_64BIT, dreg, MEMPARAMS); }
 INLINE void emit_movzx_r64_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{ emit_op_modrm_reg(emitptr, OP_MOVZX_Gv_Ew, OP_64BIT, dreg, sreg); }
 INLINE void emit_movzx_r64_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_MOVZX_Gv_Ew, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_cmovcc_r64_r64(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_64BIT, dreg, sreg); }
+INLINE void emit_cmovcc_r64_r64(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_64BIT, dreg, sreg); }
 INLINE void emit_cmovcc_r64_m64(x86code **emitptr, UINT8 cond, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_64BIT, dreg, MEMPARAMS); }
 
 
@@ -1985,7 +1985,7 @@ INLINE void emit_xchg_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_64BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_64BIT, dreg, sreg);
+		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_64BIT, dreg, sreg);
 }
 
 #endif
@@ -2001,51 +2001,51 @@ INLINE void emit_xchg_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 
 INLINE void emit_add_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 0, dreg, imm); }
 INLINE void emit_add_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
-INLINE void emit_add_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_ADD_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_add_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_add_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_add_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_ADD_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_add_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADD_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_add_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADD_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_or_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 1, dreg, imm); }
 INLINE void emit_or_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)		{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_or_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_OR_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_or_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_OR_Gb_Eb, OP_32BIT, dreg, sreg); }
 INLINE void emit_or_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_OR_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
 INLINE void emit_or_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_OR_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_adc_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 2, dreg, imm); }
 INLINE void emit_adc_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 2, MEMPARAMS, imm); }
-INLINE void emit_adc_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_ADC_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_adc_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_adc_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_adc_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_ADC_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_adc_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADC_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_adc_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADC_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sbb_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 3, dreg, imm); }
 INLINE void emit_sbb_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 3, MEMPARAMS, imm); }
-INLINE void emit_sbb_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_SBB_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_sbb_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_sbb_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_sbb_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_SBB_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_sbb_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SBB_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_sbb_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SBB_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_and_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 4, dreg, imm); }
 INLINE void emit_and_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 4, MEMPARAMS, imm); }
-INLINE void emit_and_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_AND_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_and_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_AND_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_and_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_AND_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_and_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_AND_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_and_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_AND_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_and_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_AND_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sub_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 5, dreg, imm); }
 INLINE void emit_sub_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 5, MEMPARAMS, imm); }
-INLINE void emit_sub_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_SUB_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_sub_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_sub_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_sub_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_SUB_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_sub_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SUB_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_sub_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SUB_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_xor_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 6, dreg, imm); }
 INLINE void emit_xor_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 6, MEMPARAMS, imm); }
-INLINE void emit_xor_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_XOR_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_xor_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_xor_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_xor_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_XOR_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_xor_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_XOR_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_xor_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_XOR_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_cmp_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 7, dreg, imm); }
 INLINE void emit_cmp_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G1_Eb_Ib, OP_32BIT, 7, MEMPARAMS, imm); }
-INLINE void emit_cmp_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_CMP_Gb_Eb, OP_32BIT, dreg, sreg); }
-INLINE void emit_cmp_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_cmp_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_cmp_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CMP_Gb_Eb, OP_32BIT, dreg, sreg); }
+INLINE void emit_cmp_r8_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMP_Gb_Eb, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_cmp_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_CMP_Eb_Gb, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_test_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_G3_Eb, OP_32BIT, 0, dreg, imm); }
 INLINE void emit_test_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_G3_Eb, OP_32BIT, 0, MEMPARAMS, imm); }
@@ -2060,50 +2060,50 @@ INLINE void emit_test_m8_r8(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ 
 INLINE void emit_add_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 0, dreg, imm); }
 INLINE void emit_add_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 0, MEMPARAMS, imm); }
 INLINE void emit_add_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_ADD_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_add_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_add_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_add_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADD_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_add_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADD_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_or_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 1, dreg, imm); }
 INLINE void emit_or_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_or_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_OR_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_or_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_OR_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_or_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_OR_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_or_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_OR_Gv_Ev, OP_16BIT, dreg, sreg); }
+INLINE void emit_or_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_OR_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_or_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_OR_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_adc_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 2, dreg, imm); }
 INLINE void emit_adc_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 2, MEMPARAMS, imm); }
 INLINE void emit_adc_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_ADC_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_adc_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_adc_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_adc_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADC_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_adc_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADC_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sbb_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 3, dreg, imm); }
 INLINE void emit_sbb_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 3, MEMPARAMS, imm); }
 INLINE void emit_sbb_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_SBB_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_sbb_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_sbb_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_sbb_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SBB_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_sbb_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SBB_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_and_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 4, dreg, imm); }
 INLINE void emit_and_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 4, MEMPARAMS, imm); }
 INLINE void emit_and_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_AND_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_and_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_AND_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_and_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_AND_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_and_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_AND_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_and_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_AND_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sub_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 5, dreg, imm); }
 INLINE void emit_sub_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 5, MEMPARAMS, imm); }
 INLINE void emit_sub_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_SUB_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_sub_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_sub_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_sub_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SUB_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_sub_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SUB_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_xor_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 6, dreg, imm); }
 INLINE void emit_xor_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 6, MEMPARAMS, imm); }
 INLINE void emit_xor_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_XOR_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_xor_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_xor_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_xor_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_XOR_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_xor_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_XOR_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_cmp_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)			{ emit_op_modrm_reg_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 7, dreg, imm); }
 INLINE void emit_cmp_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm816(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_16BIT, 7, MEMPARAMS, imm); }
 INLINE void emit_cmp_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_CMP_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_cmp_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
-INLINE void emit_cmp_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
+INLINE void emit_cmp_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMP_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_cmp_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_CMP_Ev_Gv, OP_16BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_test_r16_imm(x86code **emitptr, UINT8 dreg, UINT16 imm)		{ emit_op_modrm_reg_imm16(emitptr, OP_G3_Ev, OP_16BIT, 0, dreg, imm); }
 INLINE void emit_test_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT16 imm)	{ emit_op_modrm_mem_imm16(emitptr, OP_G3_Ev, OP_16BIT, 0, MEMPARAMS, imm); }
@@ -2118,50 +2118,50 @@ INLINE void emit_test_m16_r16(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	
 INLINE void emit_add_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 0, dreg, imm); }
 INLINE void emit_add_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 0, MEMPARAMS, imm); }
 INLINE void emit_add_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_ADD_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_add_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_add_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_add_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADD_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_add_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADD_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_or_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 1, dreg, imm); }
 INLINE void emit_or_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_or_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_OR_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_or_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_OR_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_or_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_OR_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_or_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_OR_Gv_Ev, OP_32BIT, dreg, sreg); }
+INLINE void emit_or_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_OR_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_or_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_OR_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_adc_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 2, dreg, imm); }
 INLINE void emit_adc_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 2, MEMPARAMS, imm); }
 INLINE void emit_adc_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_ADC_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_adc_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_adc_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_adc_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADC_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_adc_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADC_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sbb_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 3, dreg, imm); }
 INLINE void emit_sbb_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 3, MEMPARAMS, imm); }
 INLINE void emit_sbb_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_SBB_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_sbb_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_sbb_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_sbb_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SBB_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_sbb_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SBB_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_and_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 4, dreg, imm); }
 INLINE void emit_and_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 4, MEMPARAMS, imm); }
 INLINE void emit_and_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_AND_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_and_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_AND_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_and_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_AND_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_and_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_AND_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_and_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_AND_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sub_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 5, dreg, imm); }
 INLINE void emit_sub_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 5, MEMPARAMS, imm); }
 INLINE void emit_sub_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_SUB_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_sub_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_sub_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_sub_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SUB_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_sub_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SUB_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_xor_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 6, dreg, imm); }
 INLINE void emit_xor_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 6, MEMPARAMS, imm); }
 INLINE void emit_xor_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_XOR_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_xor_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_xor_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_xor_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_XOR_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_xor_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_XOR_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_cmp_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 7, dreg, imm); }
 INLINE void emit_cmp_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_32BIT, 7, MEMPARAMS, imm); }
 INLINE void emit_cmp_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_CMP_Gv_Ev, OP_32BIT, dreg, sreg); }
-INLINE void emit_cmp_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_cmp_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
+INLINE void emit_cmp_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMP_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_cmp_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_CMP_Ev_Gv, OP_32BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_test_r32_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)		{ emit_op_modrm_reg_imm32(emitptr, OP_G3_Ev, OP_32BIT, 0, dreg, imm); }
 INLINE void emit_test_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm32(emitptr, OP_G3_Ev, OP_32BIT, 0, MEMPARAMS, imm); }
@@ -2178,50 +2178,50 @@ INLINE void emit_test_m32_r32(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	
 INLINE void emit_add_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 0, dreg, imm); }
 INLINE void emit_add_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 0, MEMPARAMS, imm); }
 INLINE void emit_add_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_ADD_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_add_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_add_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADD_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_add_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADD_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_add_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADD_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_or_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 1, dreg, imm); }
 INLINE void emit_or_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_or_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_OR_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_or_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_OR_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_or_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_OR_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_or_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_OR_Gv_Ev, OP_64BIT, dreg, sreg); }
+INLINE void emit_or_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_OR_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_or_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_OR_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_adc_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 2, dreg, imm); }
 INLINE void emit_adc_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 2, MEMPARAMS, imm); }
 INLINE void emit_adc_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_ADC_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_adc_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_adc_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_ADC_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_adc_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_ADC_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_adc_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_ADC_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sbb_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 3, dreg, imm); }
 INLINE void emit_sbb_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 3, MEMPARAMS, imm); }
 INLINE void emit_sbb_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_SBB_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_sbb_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_sbb_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SBB_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_sbb_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SBB_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_sbb_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SBB_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_and_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 4, dreg, imm); }
 INLINE void emit_and_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 4, MEMPARAMS, imm); }
 INLINE void emit_and_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_AND_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_and_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_AND_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_and_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_AND_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_and_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_AND_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_and_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_AND_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_sub_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 5, dreg, imm); }
 INLINE void emit_sub_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 5, MEMPARAMS, imm); }
 INLINE void emit_sub_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_SUB_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_sub_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_sub_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_SUB_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_sub_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_SUB_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_sub_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_SUB_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_xor_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 6, dreg, imm); }
 INLINE void emit_xor_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 6, MEMPARAMS, imm); }
 INLINE void emit_xor_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_XOR_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_xor_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_xor_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_XOR_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_xor_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_XOR_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_xor_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_XOR_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_cmp_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)			{ emit_op_modrm_reg_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 7, dreg, imm); }
 INLINE void emit_cmp_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm832(emitptr, OP_G1_Ev_Ib, OP_G1_Ev_Iz, OP_64BIT, 7, MEMPARAMS, imm); }
 INLINE void emit_cmp_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_CMP_Gv_Ev, OP_64BIT, dreg, sreg); }
-INLINE void emit_cmp_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
-INLINE void emit_cmp_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg) 	{ emit_op_modrm_mem(emitptr, OP_CMP_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
+INLINE void emit_cmp_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMP_Gv_Ev, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_cmp_m64_r64(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)	{ emit_op_modrm_mem(emitptr, OP_CMP_Ev_Gv, OP_64BIT, sreg, MEMPARAMS); }
 
 INLINE void emit_test_r64_imm(x86code **emitptr, UINT8 dreg, UINT32 imm)		{ emit_op_modrm_reg_imm32(emitptr, OP_G3_Ev, OP_64BIT, 0, dreg, imm); }
 INLINE void emit_test_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT32 imm)	{ emit_op_modrm_mem_imm32(emitptr, OP_G3_Ev, OP_64BIT, 0, MEMPARAMS, imm); }
@@ -2261,120 +2261,120 @@ INLINE void emit_shift_mem_imm(x86code **emitptr, UINT32 op1, UINT32 opn, UINT8 
     emit_shift_r8_*
 -------------------------------------------------*/
 
-INLINE void emit_rol_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 0, dreg, imm); }
-INLINE void emit_rol_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
-INLINE void emit_rol_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 0, dreg); }
-INLINE void emit_rol_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 0, MEMPARAMS); }
+INLINE void emit_rol_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 0, dreg, imm); }
+INLINE void emit_rol_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
+INLINE void emit_rol_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 0, dreg); }
+INLINE void emit_rol_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 0, MEMPARAMS); }
 
-INLINE void emit_ror_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 1, dreg, imm); }
-INLINE void emit_ror_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_ror_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 1, dreg); }
-INLINE void emit_ror_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 1, MEMPARAMS); }
+INLINE void emit_ror_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 1, dreg, imm); }
+INLINE void emit_ror_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 1, MEMPARAMS, imm); }
+INLINE void emit_ror_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 1, dreg); }
+INLINE void emit_ror_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 1, MEMPARAMS); }
 
-INLINE void emit_rcl_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 2, dreg, imm); }
-INLINE void emit_rcl_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 2, MEMPARAMS, imm); }
-INLINE void emit_rcl_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 2, dreg); }
-INLINE void emit_rcl_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 2, MEMPARAMS); }
+INLINE void emit_rcl_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 2, dreg, imm); }
+INLINE void emit_rcl_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 2, MEMPARAMS, imm); }
+INLINE void emit_rcl_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 2, dreg); }
+INLINE void emit_rcl_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 2, MEMPARAMS); }
 
-INLINE void emit_rcr_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 3, dreg, imm); }
-INLINE void emit_rcr_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 3, MEMPARAMS, imm); }
-INLINE void emit_rcr_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 3, dreg); }
-INLINE void emit_rcr_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 3, MEMPARAMS); }
+INLINE void emit_rcr_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 3, dreg, imm); }
+INLINE void emit_rcr_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 3, MEMPARAMS, imm); }
+INLINE void emit_rcr_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 3, dreg); }
+INLINE void emit_rcr_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 3, MEMPARAMS); }
 
-INLINE void emit_shl_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 4, dreg, imm); }
-INLINE void emit_shl_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 4, MEMPARAMS, imm); }
-INLINE void emit_shl_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 4, dreg); }
-INLINE void emit_shl_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 4, MEMPARAMS); }
+INLINE void emit_shl_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 4, dreg, imm); }
+INLINE void emit_shl_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 4, MEMPARAMS, imm); }
+INLINE void emit_shl_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 4, dreg); }
+INLINE void emit_shl_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 4, MEMPARAMS); }
 
-INLINE void emit_shr_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 5, dreg, imm); }
-INLINE void emit_shr_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 5, MEMPARAMS, imm); }
-INLINE void emit_shr_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 5, dreg); }
-INLINE void emit_shr_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 5, MEMPARAMS); }
+INLINE void emit_shr_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 5, dreg, imm); }
+INLINE void emit_shr_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 5, MEMPARAMS, imm); }
+INLINE void emit_shr_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 5, dreg); }
+INLINE void emit_shr_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 5, MEMPARAMS); }
 
-INLINE void emit_sar_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 7, dreg, imm); }
-INLINE void emit_sar_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 7, MEMPARAMS, imm); }
-INLINE void emit_sar_r8_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 7, dreg); }
-INLINE void emit_sar_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 7, MEMPARAMS); }
+INLINE void emit_sar_r8_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 7, dreg, imm); }
+INLINE void emit_sar_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Eb_1, OP_G2_Eb_Ib, OP_32BIT, 7, MEMPARAMS, imm); }
+INLINE void emit_sar_r8_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Eb_CL, OP_32BIT, 7, dreg); }
+INLINE void emit_sar_m8_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Eb_CL, OP_32BIT, 7, MEMPARAMS); }
 
 
 /*-------------------------------------------------
     emit_shift_r16_*
 -------------------------------------------------*/
 
-INLINE void emit_rol_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 0, dreg, imm); }
-INLINE void emit_rol_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 0, MEMPARAMS, imm); }
-INLINE void emit_rol_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 0, dreg); }
-INLINE void emit_rol_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 0, MEMPARAMS); }
+INLINE void emit_rol_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 0, dreg, imm); }
+INLINE void emit_rol_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 0, MEMPARAMS, imm); }
+INLINE void emit_rol_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 0, dreg); }
+INLINE void emit_rol_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 0, MEMPARAMS); }
 
-INLINE void emit_ror_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 1, dreg, imm); }
-INLINE void emit_ror_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_ror_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 1, dreg); }
-INLINE void emit_ror_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 1, MEMPARAMS); }
+INLINE void emit_ror_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 1, dreg, imm); }
+INLINE void emit_ror_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 1, MEMPARAMS, imm); }
+INLINE void emit_ror_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 1, dreg); }
+INLINE void emit_ror_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 1, MEMPARAMS); }
 
-INLINE void emit_rcl_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 2, dreg, imm); }
-INLINE void emit_rcl_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 2, MEMPARAMS, imm); }
-INLINE void emit_rcl_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 2, dreg); }
-INLINE void emit_rcl_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 2, MEMPARAMS); }
+INLINE void emit_rcl_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 2, dreg, imm); }
+INLINE void emit_rcl_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 2, MEMPARAMS, imm); }
+INLINE void emit_rcl_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 2, dreg); }
+INLINE void emit_rcl_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 2, MEMPARAMS); }
 
-INLINE void emit_rcr_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 3, dreg, imm); }
-INLINE void emit_rcr_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 3, MEMPARAMS, imm); }
-INLINE void emit_rcr_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 3, dreg); }
-INLINE void emit_rcr_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 3, MEMPARAMS); }
+INLINE void emit_rcr_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 3, dreg, imm); }
+INLINE void emit_rcr_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 3, MEMPARAMS, imm); }
+INLINE void emit_rcr_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 3, dreg); }
+INLINE void emit_rcr_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 3, MEMPARAMS); }
 
-INLINE void emit_shl_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 4, dreg, imm); }
-INLINE void emit_shl_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 4, MEMPARAMS, imm); }
-INLINE void emit_shl_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 4, dreg); }
-INLINE void emit_shl_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 4, MEMPARAMS); }
+INLINE void emit_shl_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 4, dreg, imm); }
+INLINE void emit_shl_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 4, MEMPARAMS, imm); }
+INLINE void emit_shl_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 4, dreg); }
+INLINE void emit_shl_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 4, MEMPARAMS); }
 
-INLINE void emit_shr_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 5, dreg, imm); }
-INLINE void emit_shr_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 5, MEMPARAMS, imm); }
-INLINE void emit_shr_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 5, dreg); }
-INLINE void emit_shr_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 5, MEMPARAMS); }
+INLINE void emit_shr_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 5, dreg, imm); }
+INLINE void emit_shr_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 5, MEMPARAMS, imm); }
+INLINE void emit_shr_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 5, dreg); }
+INLINE void emit_shr_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 5, MEMPARAMS); }
 
-INLINE void emit_sar_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 7, dreg, imm); }
-INLINE void emit_sar_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 7, MEMPARAMS, imm); }
-INLINE void emit_sar_r16_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 7, dreg); }
-INLINE void emit_sar_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 7, MEMPARAMS); }
+INLINE void emit_sar_r16_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 7, dreg, imm); }
+INLINE void emit_sar_m16_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_16BIT, 7, MEMPARAMS, imm); }
+INLINE void emit_sar_r16_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_16BIT, 7, dreg); }
+INLINE void emit_sar_m16_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_16BIT, 7, MEMPARAMS); }
 
 
 /*-------------------------------------------------
     emit_shift_r32_*
 -------------------------------------------------*/
 
-INLINE void emit_rol_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 0, dreg, imm); }
-INLINE void emit_rol_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
-INLINE void emit_rol_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 0, dreg); }
-INLINE void emit_rol_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 0, MEMPARAMS); }
+INLINE void emit_rol_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 0, dreg, imm); }
+INLINE void emit_rol_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 0, MEMPARAMS, imm); }
+INLINE void emit_rol_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 0, dreg); }
+INLINE void emit_rol_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 0, MEMPARAMS); }
 
-INLINE void emit_ror_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 1, dreg, imm); }
-INLINE void emit_ror_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_ror_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 1, dreg); }
-INLINE void emit_ror_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 1, MEMPARAMS); }
+INLINE void emit_ror_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 1, dreg, imm); }
+INLINE void emit_ror_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 1, MEMPARAMS, imm); }
+INLINE void emit_ror_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 1, dreg); }
+INLINE void emit_ror_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 1, MEMPARAMS); }
 
-INLINE void emit_rcl_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 2, dreg, imm); }
-INLINE void emit_rcl_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 2, MEMPARAMS, imm); }
-INLINE void emit_rcl_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 2, dreg); }
-INLINE void emit_rcl_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 2, MEMPARAMS); }
+INLINE void emit_rcl_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 2, dreg, imm); }
+INLINE void emit_rcl_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 2, MEMPARAMS, imm); }
+INLINE void emit_rcl_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 2, dreg); }
+INLINE void emit_rcl_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 2, MEMPARAMS); }
 
-INLINE void emit_rcr_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 3, dreg, imm); }
-INLINE void emit_rcr_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 3, MEMPARAMS, imm); }
-INLINE void emit_rcr_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 3, dreg); }
-INLINE void emit_rcr_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 3, MEMPARAMS); }
+INLINE void emit_rcr_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 3, dreg, imm); }
+INLINE void emit_rcr_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 3, MEMPARAMS, imm); }
+INLINE void emit_rcr_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 3, dreg); }
+INLINE void emit_rcr_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 3, MEMPARAMS); }
 
-INLINE void emit_shl_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 4, dreg, imm); }
-INLINE void emit_shl_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 4, MEMPARAMS, imm); }
-INLINE void emit_shl_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 4, dreg); }
-INLINE void emit_shl_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 4, MEMPARAMS); }
+INLINE void emit_shl_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 4, dreg, imm); }
+INLINE void emit_shl_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 4, MEMPARAMS, imm); }
+INLINE void emit_shl_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 4, dreg); }
+INLINE void emit_shl_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 4, MEMPARAMS); }
 
-INLINE void emit_shr_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 5, dreg, imm); }
-INLINE void emit_shr_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 5, MEMPARAMS, imm); }
-INLINE void emit_shr_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 5, dreg); }
-INLINE void emit_shr_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 5, MEMPARAMS); }
+INLINE void emit_shr_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 5, dreg, imm); }
+INLINE void emit_shr_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 5, MEMPARAMS, imm); }
+INLINE void emit_shr_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 5, dreg); }
+INLINE void emit_shr_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 5, MEMPARAMS); }
 
-INLINE void emit_sar_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 7, dreg, imm); }
-INLINE void emit_sar_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 7, MEMPARAMS, imm); }
-INLINE void emit_sar_r32_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 7, dreg); }
-INLINE void emit_sar_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 7, MEMPARAMS); }
+INLINE void emit_sar_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 7, dreg, imm); }
+INLINE void emit_sar_m32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_32BIT, 7, MEMPARAMS, imm); }
+INLINE void emit_sar_r32_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_32BIT, 7, dreg); }
+INLINE void emit_sar_m32_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_32BIT, 7, MEMPARAMS); }
 
 INLINE void emit_shld_r32_r32_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm) 		{ emit_op_modrm_reg_imm8(emitptr, OP_SHLD_Ev_Gv_Ib, OP_32BIT, sreg, dreg, imm); }
 INLINE void emit_shld_m32_r32_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_SHLD_Ev_Gv_Ib, OP_32BIT, sreg, MEMPARAMS, imm); }
@@ -2393,40 +2393,40 @@ INLINE void emit_shrd_m32_r32_cl(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sre
 
 #ifdef PTR64
 
-INLINE void emit_rol_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 0, dreg, imm); }
-INLINE void emit_rol_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 0, MEMPARAMS, imm); }
-INLINE void emit_rol_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 0, dreg); }
-INLINE void emit_rol_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 0, MEMPARAMS); }
+INLINE void emit_rol_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 0, dreg, imm); }
+INLINE void emit_rol_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 0, MEMPARAMS, imm); }
+INLINE void emit_rol_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 0, dreg); }
+INLINE void emit_rol_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 0, MEMPARAMS); }
 
-INLINE void emit_ror_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 1, dreg, imm); }
-INLINE void emit_ror_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 1, MEMPARAMS, imm); }
-INLINE void emit_ror_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 1, dreg); }
-INLINE void emit_ror_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 1, MEMPARAMS); }
+INLINE void emit_ror_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 1, dreg, imm); }
+INLINE void emit_ror_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 1, MEMPARAMS, imm); }
+INLINE void emit_ror_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 1, dreg); }
+INLINE void emit_ror_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 1, MEMPARAMS); }
 
-INLINE void emit_rcl_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 2, dreg, imm); }
-INLINE void emit_rcl_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 2, MEMPARAMS, imm); }
-INLINE void emit_rcl_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 2, dreg); }
-INLINE void emit_rcl_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 2, MEMPARAMS); }
+INLINE void emit_rcl_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 2, dreg, imm); }
+INLINE void emit_rcl_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 2, MEMPARAMS, imm); }
+INLINE void emit_rcl_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 2, dreg); }
+INLINE void emit_rcl_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 2, MEMPARAMS); }
 
-INLINE void emit_rcr_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 3, dreg, imm); }
-INLINE void emit_rcr_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 3, MEMPARAMS, imm); }
-INLINE void emit_rcr_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 3, dreg); }
-INLINE void emit_rcr_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 3, MEMPARAMS); }
+INLINE void emit_rcr_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 3, dreg, imm); }
+INLINE void emit_rcr_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 3, MEMPARAMS, imm); }
+INLINE void emit_rcr_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 3, dreg); }
+INLINE void emit_rcr_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 3, MEMPARAMS); }
 
-INLINE void emit_shl_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 4, dreg, imm); }
-INLINE void emit_shl_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 4, MEMPARAMS, imm); }
-INLINE void emit_shl_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 4, dreg); }
-INLINE void emit_shl_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 4, MEMPARAMS); }
+INLINE void emit_shl_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 4, dreg, imm); }
+INLINE void emit_shl_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 4, MEMPARAMS, imm); }
+INLINE void emit_shl_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 4, dreg); }
+INLINE void emit_shl_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 4, MEMPARAMS); }
 
-INLINE void emit_shr_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 5, dreg, imm); }
-INLINE void emit_shr_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 5, MEMPARAMS, imm); }
-INLINE void emit_shr_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 5, dreg); }
-INLINE void emit_shr_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 5, MEMPARAMS); }
+INLINE void emit_shr_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 5, dreg, imm); }
+INLINE void emit_shr_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 5, MEMPARAMS, imm); }
+INLINE void emit_shr_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 5, dreg); }
+INLINE void emit_shr_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 5, MEMPARAMS); }
 
-INLINE void emit_sar_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm) 			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 7, dreg, imm); }
-INLINE void emit_sar_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 7, MEMPARAMS, imm); }
-INLINE void emit_sar_r64_cl(x86code **emitptr, UINT8 dreg)			 			{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 7, dreg); }
-INLINE void emit_sar_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)			 	{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 7, MEMPARAMS); }
+INLINE void emit_sar_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 imm)			{ emit_shift_reg_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 7, dreg, imm); }
+INLINE void emit_sar_m64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_shift_mem_imm(emitptr, OP_G2_Ev_1, OP_G2_Ev_Ib, OP_64BIT, 7, MEMPARAMS, imm); }
+INLINE void emit_sar_r64_cl(x86code **emitptr, UINT8 dreg)						{ emit_op_modrm_reg(emitptr, OP_G2_Ev_CL, OP_64BIT, 7, dreg); }
+INLINE void emit_sar_m64_cl(x86code **emitptr, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_G2_Ev_CL, OP_64BIT, 7, MEMPARAMS); }
 
 INLINE void emit_shld_r64_r64_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)			{ emit_op_modrm_reg_imm8(emitptr, OP_SHLD_Ev_Gv_Ib, OP_64BIT, sreg, dreg, imm); }
 INLINE void emit_shld_m64_r64_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg, UINT8 imm)	{ emit_op_modrm_mem_imm8(emitptr, OP_SHLD_Ev_Gv_Ib, OP_64BIT, sreg, MEMPARAMS, imm); }
@@ -2580,8 +2580,8 @@ INLINE void emit_imul_r64_m64_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARA
     emit_bswap_*
 -------------------------------------------------*/
 
-INLINE void emit_bswap_r32(x86code **emitptr, UINT8 dreg) 						{ emit_op_reg(emitptr, OP_BSWAP_EAX + (dreg & 7), OP_32BIT, dreg); }
-INLINE void emit_bswap_r64(x86code **emitptr, UINT8 dreg) 						{ emit_op_reg(emitptr, OP_BSWAP_EAX + (dreg & 7), OP_64BIT, dreg); }
+INLINE void emit_bswap_r32(x86code **emitptr, UINT8 dreg)						{ emit_op_reg(emitptr, OP_BSWAP_EAX + (dreg & 7), OP_32BIT, dreg); }
+INLINE void emit_bswap_r64(x86code **emitptr, UINT8 dreg)						{ emit_op_reg(emitptr, OP_BSWAP_EAX + (dreg & 7), OP_64BIT, dreg); }
 
 
 /*-------------------------------------------------
@@ -2589,9 +2589,9 @@ INLINE void emit_bswap_r64(x86code **emitptr, UINT8 dreg) 						{ emit_op_reg(em
 -------------------------------------------------*/
 
 INLINE void emit_bsf_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_BSF_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_bsf_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_BSF_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_bsf_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_BSF_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
 INLINE void emit_bsr_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg) 		{ emit_op_modrm_reg(emitptr, OP_BSR_Gv_Ev, OP_16BIT, dreg, sreg); }
-INLINE void emit_bsr_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_BSR_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
+INLINE void emit_bsr_r16_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_BSR_Gv_Ev, OP_16BIT, dreg, MEMPARAMS); }
 
 INLINE void emit_bsf_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_BSF_Gv_Ev, OP_32BIT, dreg, sreg); }
 INLINE void emit_bsf_r32_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_BSF_Gv_Ev, OP_32BIT, dreg, MEMPARAMS); }
@@ -3038,7 +3038,7 @@ INLINE void emit_cvtps2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)		
 INLINE void emit_cvtps2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTPS2DQ_Vdq_Wps, OP_32BIT, dreg, MEMPARAMS); }
 
 INLINE void emit_cvttps2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CVTTPS2DQ_Vdq_Wps, OP_32BIT, dreg, sreg); }
-INLINE void emit_cvttps2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CVTTPS2DQ_Vdq_Wps, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_cvttps2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTTPS2DQ_Vdq_Wps, OP_32BIT, dreg, MEMPARAMS); }
 
 INLINE void emit_roundps_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPS_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
 INLINE void emit_roundps_r128_m128_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDPS_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
@@ -3151,7 +3151,7 @@ INLINE void emit_cvtpd2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)		
 INLINE void emit_cvtpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, MEMPARAMS); }
 
 INLINE void emit_cvttpd2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, sreg); }
-INLINE void emit_cvttpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_cvttpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, MEMPARAMS); }
 
 INLINE void emit_roundpd_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
 INLINE void emit_roundpd_r128_m128_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm) { emit_op_modrm_mem(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }

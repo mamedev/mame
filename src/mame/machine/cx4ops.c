@@ -134,7 +134,7 @@ static void CX4_op1f(running_machine *machine)
     	cx4.C41FAngleRes = cx4.C41FAngleRes;
     	if(cx4.C41FXVal < 0)
     	{
-      		cx4.C41FAngleRes += 0x100;
+    		cx4.C41FAngleRes += 0x100;
     	}
 		cx4.C41FAngleRes &= 0x1ff;
 	}

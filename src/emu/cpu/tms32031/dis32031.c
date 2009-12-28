@@ -407,13 +407,13 @@ static unsigned dasm_tms32031(char *buffer, unsigned pc, UINT32 op)
 		case 0x017:	disasm_general("NEGF", op, FLOAT, buffer);			break;
 
 		case 0x018:	disasm_general("NEGI", op, INTEGER, buffer);		break;
-		case 0x019:	disasm_general("NOP", op, NODEST, buffer); 			break;
+		case 0x019:	disasm_general("NOP", op, NODEST, buffer);			break;
 		case 0x01a:	disasm_general("NORM", op, FLOAT, buffer);			break;
 		case 0x01b:	disasm_general("NOT", op, INTEGER, buffer);			break;
-		case 0x01c:	disasm_general("POP", op, NOSOURCE, buffer);	 	break;
-		case 0x01d:	disasm_general("POPF", op, NOSOURCE, buffer); 		break;
-		case 0x01e:	disasm_general("PUSH", op, NOSOURCE, buffer); 		break;
-		case 0x01f:	disasm_general("PUSHF", op, NOSOURCE, buffer); 		break;
+		case 0x01c:	disasm_general("POP", op, NOSOURCE, buffer);		break;
+		case 0x01d:	disasm_general("POPF", op, NOSOURCE, buffer);		break;
+		case 0x01e:	disasm_general("PUSH", op, NOSOURCE, buffer);		break;
+		case 0x01f:	disasm_general("PUSHF", op, NOSOURCE, buffer);		break;
 
 		case 0x020:	disasm_general("OR", op, INTEGER | UNSIGNED, buffer);	break;
 		case 0x021:	disasm_general((op & 1) ? "LOPOWER" : "MAXSPEED", op, NOSOURCE | NODEST, buffer); break;

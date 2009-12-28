@@ -15,8 +15,8 @@ static struct {
 #define GetRMWord(ModRM) \
 	((ModRM) >= 0xc0 ? cpustate->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(cpustate), ReadWord( cpustate->ea ) ))
 
-#define PutbackRMWord(ModRM,val) 			     \
-{ 							     \
+#define PutbackRMWord(ModRM,val)			     \
+{							     \
 	if (ModRM >= 0xc0) cpustate->regs.w[Mod_RM.RM.w[ModRM]]=val; \
     else WriteWord(cpustate->ea,val);  \
 }

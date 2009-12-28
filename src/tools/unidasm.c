@@ -298,7 +298,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "s2650",      _8bit,  0, CPU_DISASSEMBLE_NAME(s2650) },
 	{ "saturn",     _8bit,  0, CPU_DISASSEMBLE_NAME(saturn) },
 	{ "sc61860",    _8bit,  0, CPU_DISASSEMBLE_NAME(sc61860) },
-	{ "scmp",    	_8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
+	{ "scmp",   	_8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
 	{ "se3208",     _16le,  0, CPU_DISASSEMBLE_NAME(se3208) },
 	{ "sh2",        _16be,  0, CPU_DISASSEMBLE_NAME(sh2) },
 	{ "sh4",        _16le,  0, CPU_DISASSEMBLE_NAME(sh4) },

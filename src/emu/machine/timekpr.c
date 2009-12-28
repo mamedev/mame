@@ -226,7 +226,7 @@ INLINE timekeeper_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
- 	assert((device->type == M48T02) ||
+	assert((device->type == M48T02) ||
 		   (device->type == M48T35) ||
 		   (device->type == M48T58) ||
 		   (device->type == MK48T08));
@@ -484,7 +484,7 @@ DEVICE_GET_INFO( m48t02 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t02);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
+		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }
 
@@ -498,7 +498,7 @@ DEVICE_GET_INFO( m48t35 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t35);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
+		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }
 
@@ -512,7 +512,7 @@ DEVICE_GET_INFO( m48t58 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t58);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
+		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }
 
@@ -526,6 +526,6 @@ DEVICE_GET_INFO( mk48t08 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mk48t08);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
+		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }

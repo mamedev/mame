@@ -1823,8 +1823,8 @@ static CPU_SET_INFO( se3208 )
 		case CPUINFO_INT_REGISTER + SE3208_PC:
 		case CPUINFO_INT_PC:							se3208_state->PC = info->i;					break;
 		case CPUINFO_INT_REGISTER + SE3208_SP:
-		case CPUINFO_INT_SP:							se3208_state->SP = info->i;    				break;
-		case CPUINFO_INT_REGISTER + SE3208_ER:   		se3208_state->ER = info->i;	   				break;
+		case CPUINFO_INT_SP:							se3208_state->SP = info->i; 				break;
+		case CPUINFO_INT_REGISTER + SE3208_ER:  		se3208_state->ER = info->i;					break;
 		case CPUINFO_INT_REGISTER + SE3208_SR:			se3208_state->SR = info->i;				    break;
 		case CPUINFO_INT_REGISTER + SE3208_R0:			se3208_state->R[ 0] = info->i;				break;
 		case CPUINFO_INT_REGISTER + SE3208_R1:			se3208_state->R[ 1] = info->i;				break;
@@ -1860,11 +1860,11 @@ CPU_GET_INFO( se3208 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + SE3208_INT:		info->i = se3208_state->IRQ;					break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = se3208_state->NMI;					break;
@@ -1874,7 +1874,7 @@ CPU_GET_INFO( se3208 )
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SE3208_PC:			info->i = se3208_state->PC;					break;
 		case CPUINFO_INT_REGISTER + SE3208_SP:
-		case CPUINFO_INT_SP:   							info->i = se3208_state->SP;					break;
+		case CPUINFO_INT_SP:							info->i = se3208_state->SP;					break;
 		case CPUINFO_INT_REGISTER + SE3208_SR:			info->i = se3208_state->SR;					break;
 		case CPUINFO_INT_REGISTER + SE3208_ER:			info->i = se3208_state->ER;					break;
 		case CPUINFO_INT_REGISTER + SE3208_R0:			info->i = se3208_state->R[ 0];				break;
@@ -1923,7 +1923,7 @@ CPU_GET_INFO( se3208 )
 		case CPUINFO_STR_REGISTER + SE3208_PC:				sprintf(info->s, "PC  :%08X", se3208_state->PC); break;
 		case CPUINFO_STR_REGISTER + SE3208_SR:				sprintf(info->s, "SR  :%08X", se3208_state->SR); break;
 		case CPUINFO_STR_REGISTER + SE3208_ER:				sprintf(info->s, "ER  :%08X", se3208_state->ER); break;
-		case CPUINFO_STR_REGISTER + SE3208_SP: 				sprintf(info->s, "SP  :%08X", se3208_state->SP); break;
+		case CPUINFO_STR_REGISTER + SE3208_SP:				sprintf(info->s, "SP  :%08X", se3208_state->SP); break;
 		case CPUINFO_STR_REGISTER + SE3208_R0:				sprintf(info->s, "R0  :%08X", se3208_state->R[ 0]); break;
 		case CPUINFO_STR_REGISTER + SE3208_R1:				sprintf(info->s, "R1  :%08X", se3208_state->R[ 1]); break;
 		case CPUINFO_STR_REGISTER + SE3208_R2:				sprintf(info->s, "R2  :%08X", se3208_state->R[ 2]); break;

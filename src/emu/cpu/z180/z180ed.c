@@ -82,7 +82,7 @@ OP(ed,3f) { illegal_2(cpustate);											} /* DB   ED          */
 OP(ed,40) { cpustate->_B = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_B]; 				} /* IN   B,(C)       */
 OP(ed,41) { OUT(cpustate, cpustate->_BC,cpustate->_B);											} /* OUT  (C),B       */
 OP(ed,42) { SBC16( BC );											} /* SBC  HL,BC       */
-OP(ed,43) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->BC ); 					} /* LD   (w),BC      */
+OP(ed,43) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->BC );					} /* LD   (w),BC      */
 OP(ed,44) { NEG;													} /* NEG              */
 OP(ed,45) { RETN;													} /* RETN;            */
 OP(ed,46) { cpustate->IM = 0;												} /* IM   0           */
@@ -91,7 +91,7 @@ OP(ed,47) { LD_I_A; 												} /* LD   I,A         */
 OP(ed,48) { cpustate->_C = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_C]; 				} /* IN   C,(C)       */
 OP(ed,49) { OUT(cpustate, cpustate->_BC,cpustate->_C);											} /* OUT  (C),C       */
 OP(ed,4a) { ADC16( BC );											} /* ADC  HL,BC       */
-OP(ed,4b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->BC ); 					} /* LD   BC,(w)      */
+OP(ed,4b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->BC );					} /* LD   BC,(w)      */
 OP(ed,4c) { MLT( BC );												} /* MLT  BC          */
 OP(ed,4d) { RETI;													} /* RETI             */
 OP(ed,4e) { cpustate->IM = 0;												} /* IM   0           */
@@ -100,7 +100,7 @@ OP(ed,4f) { LD_R_A; 												} /* LD   R,A         */
 OP(ed,50) { cpustate->_D = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_D]; 				} /* IN   D,(C)       */
 OP(ed,51) { OUT(cpustate, cpustate->_BC,cpustate->_D);											} /* OUT  (C),D       */
 OP(ed,52) { SBC16( DE );											} /* SBC  HL,DE       */
-OP(ed,53) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->DE ); 					} /* LD   (w),DE      */
+OP(ed,53) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->DE );					} /* LD   (w),DE      */
 OP(ed,54) { NEG;													} /* NEG              */
 OP(ed,55) { RETN;													} /* RETN;            */
 OP(ed,56) { cpustate->IM = 1;												} /* IM   1           */
@@ -109,7 +109,7 @@ OP(ed,57) { LD_A_I; 												} /* LD   A,I         */
 OP(ed,58) { cpustate->_E = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_E]; 				} /* IN   E,(C)       */
 OP(ed,59) { OUT(cpustate, cpustate->_BC,cpustate->_E);											} /* OUT  (C),E       */
 OP(ed,5a) { ADC16( DE );											} /* ADC  HL,DE       */
-OP(ed,5b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->DE ); 					} /* LD   DE,(w)      */
+OP(ed,5b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->DE );					} /* LD   DE,(w)      */
 OP(ed,5c) { MLT( DE );												} /* MLT  DE          */
 OP(ed,5d) { RETI;													} /* RETI             */
 OP(ed,5e) { cpustate->IM = 2;												} /* IM   2           */
@@ -118,7 +118,7 @@ OP(ed,5f) { LD_A_R; 												} /* LD   A,R         */
 OP(ed,60) { cpustate->_H = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_H]; 				} /* IN   H,(C)       */
 OP(ed,61) { OUT(cpustate, cpustate->_BC,cpustate->_H);											} /* OUT  (C),H       */
 OP(ed,62) { SBC16( HL );											} /* SBC  HL,HL       */
-OP(ed,63) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->HL ); 					} /* LD   (w),HL      */
+OP(ed,63) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->HL );					} /* LD   (w),HL      */
 OP(ed,64) { unsigned m = ARG(cpustate); TST( m );							} /* TST  m           */
 OP(ed,65) { RETN;													} /* RETN;            */
 OP(ed,66) { cpustate->IM = 0;												} /* IM   0           */
@@ -127,7 +127,7 @@ OP(ed,67) { RRD;													} /* RRD  (HL)        */
 OP(ed,68) { cpustate->_L = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_L]; 				} /* IN   L,(C)       */
 OP(ed,69) { OUT(cpustate, cpustate->_BC,cpustate->_L);											} /* OUT  (C),L       */
 OP(ed,6a) { ADC16( HL );											} /* ADC  HL,HL       */
-OP(ed,6b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->HL ); 					} /* LD   HL,(w)      */
+OP(ed,6b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->HL );					} /* LD   HL,(w)      */
 OP(ed,6c) { MLT( HL );												} /* MLT  HL          */
 OP(ed,6d) { RETI;													} /* RETI             */
 OP(ed,6e) { cpustate->IM = 0;												} /* IM   0           */
@@ -136,7 +136,7 @@ OP(ed,6f) { RLD;													} /* RLD  (HL)        */
 OP(ed,70) { UINT8 res = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[res]; 		} /* IN   0,(C)       */
 OP(ed,71) { OUT(cpustate, cpustate->_BC,0); 											} /* OUT  (C),0       */
 OP(ed,72) { SBC16( SP );											} /* SBC  HL,SP       */
-OP(ed,73) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->SP ); 					} /* LD   (w),SP      */
+OP(ed,73) { cpustate->ea = ARG16(cpustate); WM16(cpustate,  cpustate->ea, &cpustate->SP );					} /* LD   (w),SP      */
 OP(ed,74) { unsigned m = ARG(cpustate); cpustate->_F = (cpustate->_F & CF) | SZP[IN(cpustate, cpustate->_C) & m];	} /* TSTIO m          */
 OP(ed,75) { RETN;													} /* RETN;            */
 OP(ed,76) { SLP;													} /* SLP              */
@@ -145,7 +145,7 @@ OP(ed,77) { illegal_2(cpustate);											} /* DB   ED,77       */
 OP(ed,78) { cpustate->_A = IN(cpustate, cpustate->_BC); cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_A]; 				} /* IN   E,(C)       */
 OP(ed,79) { OUT(cpustate, cpustate->_BC,cpustate->_A);											} /* OUT  (C),E       */
 OP(ed,7a) { ADC16( SP );											} /* ADC  HL,SP       */
-OP(ed,7b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->SP ); 					} /* LD   SP,(w)      */
+OP(ed,7b) { cpustate->ea = ARG16(cpustate); RM16(cpustate,  cpustate->ea, &cpustate->SP );					} /* LD   SP,(w)      */
 OP(ed,7c) { MLT( SP );												} /* MLT  SP          */
 OP(ed,7d) { RETI;													} /* RETI             */
 OP(ed,7e) { cpustate->IM = 2;												} /* IM   2           */

@@ -382,7 +382,7 @@ static void update_colors(running_machine *machine)
 		else				{ b-=fade_effect; }
 		g = ((machine->generic.paletteram.u32[i] & 0x00ff0000) >>16);
 		if(fade_effect > g) { g = 0; }
-		else			 	{ g-=fade_effect; }
+		else				{ g-=fade_effect; }
 		r = ((machine->generic.paletteram.u32[i] & 0xff000000) >>24);
 		if(fade_effect > r) { r = 0; }
 		else				{ r-=fade_effect; }
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( macrossp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP	// irq related?
 	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
 	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)	// macrossp palette fade
-  	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
+	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
 
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
 

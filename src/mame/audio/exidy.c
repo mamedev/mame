@@ -28,7 +28,7 @@
 #define SH6840_CLOCK			(CRYSTAL_OSC / 4)
 #define SH6532_CLOCK			(CRYSTAL_OSC / 4)
 #define CVSD_CLOCK				(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
-#define CVSD_Z80_CLOCK 			(CRYSTAL_OSC / 2)
+#define CVSD_Z80_CLOCK			(CRYSTAL_OSC / 2)
 #define BASE_VOLUME				(32767 / 6)
 
 enum

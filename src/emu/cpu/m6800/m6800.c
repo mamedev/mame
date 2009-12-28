@@ -148,7 +148,7 @@ struct _m6800_state
 	PAIR	timer_over;
 	emu_timer *m6800_rx_timer;
 	emu_timer *m6800_tx_timer;
-	PAIR ea; 		/* effective address */
+	PAIR ea;		/* effective address */
 
 };
 
@@ -2652,7 +2652,7 @@ static CPU_SET_INFO( m6800 )
 		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	set_irq_line(cpustate, M6800_TIN_LINE, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 
-		case CPUINFO_INT_PC:							PC = info->i; 								break;
+		case CPUINFO_INT_PC:							PC = info->i;								break;
 		case CPUINFO_INT_REGISTER + M6800_PC:			cpustate->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6800_S:			cpustate->s.w.l = info->i;					break;
@@ -2690,11 +2690,11 @@ CPU_GET_INFO( m6800 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 9;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = cpustate->irq_state[M6800_IRQ_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	info->i = cpustate->irq_state[M6800_TIN_LINE]; break;
@@ -2763,7 +2763,7 @@ CPU_GET_INFO( m6801 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6801);				break;
@@ -2812,7 +2812,7 @@ CPU_GET_INFO( m6803 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6803);				break;
@@ -2863,7 +2863,7 @@ CPU_GET_INFO( hd63701 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd63701);				break;

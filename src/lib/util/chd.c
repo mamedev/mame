@@ -106,7 +106,7 @@ struct _codec_interface
 	const char *compname;					/* name of the algorithm */
 	UINT8		lossy;						/* is this a lossy algorithm? */
 	chd_error	(*init)(chd_file *chd);		/* codec initialize */
-	void 		(*free)(chd_file *chd);		/* codec free */
+	void		(*free)(chd_file *chd);		/* codec free */
 	chd_error	(*compress)(chd_file *chd, const void *src, UINT32 *complen); /* compress data */
 	chd_error	(*decompress)(chd_file *chd, UINT32 complen, void *dst); /* decompress data */
 	chd_error	(*config)(chd_file *chd, int param, void *config); /* configure */
@@ -153,7 +153,7 @@ struct _chd_file
 
 	core_file *				file;			/* handle to the open core file */
 	UINT8					owns_file;		/* flag indicating if this file should be closed on chd_close() */
-	chd_header 				header;			/* header, extracted from file */
+	chd_header				header;			/* header, extracted from file */
 
 	chd_file *				parent;			/* pointer to parent file, or NULL */
 
@@ -176,13 +176,13 @@ struct _chd_file
 	UINT32					maxhunk;		/* maximum hunk accessed */
 
 	UINT8					compressing;	/* are we compressing? */
-	struct MD5Context		compmd5; 		/* running MD5 during compression */
-	struct sha1_ctx			compsha1; 		/* running SHA1 during compression */
+	struct MD5Context		compmd5;		/* running MD5 during compression */
+	struct sha1_ctx			compsha1;		/* running SHA1 during compression */
 	UINT32					comphunk;		/* next hunk we will compress */
 
 	UINT8					verifying;		/* are we verifying? */
 	struct MD5Context		vermd5; 		/* running MD5 during verification */
-	struct sha1_ctx			versha1; 		/* running SHA1 during verification */
+	struct sha1_ctx			versha1;		/* running SHA1 during verification */
 	UINT32					verhunk;		/* next hunk we will verify */
 
 	osd_work_queue *		workqueue;		/* pointer to work queue for async operations */

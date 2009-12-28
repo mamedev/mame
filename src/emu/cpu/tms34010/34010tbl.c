@@ -490,8 +490,8 @@ static void (*const opcode_table[65536 >> 4])(tms34010_state *tms, UINT16 op) =
 	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,
 	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,
 	/* 0x1f00 */
-	btst_k_a,	btst_k_b, 	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,
-	btst_k_a,	btst_k_b, 	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,
+	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,
+	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,	btst_k_a,	btst_k_b,
 	/* 0x2000 */
 	sla_k_a,	sla_k_b,	sla_k_a,	sla_k_b,	sla_k_a,	sla_k_b,	sla_k_a,	sla_k_b,
 	sla_k_a,	sla_k_b,	sla_k_a,	sla_k_b,	sla_k_a,	sla_k_b,	sla_k_a,	sla_k_b,

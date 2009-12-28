@@ -144,7 +144,7 @@ struct _sound_stream
 	INT32				output_base_sampindex;	/* sample at base of buffer, relative to the current emulated second */
 
 	/* callback information */
-	stream_update_func 	callback;				/* callback function */
+	stream_update_func	callback;				/* callback function */
 	void *				param;					/* callback function parameter */
 };
 

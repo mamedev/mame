@@ -110,7 +110,7 @@ typedef struct
 	UINT32 target;				// target for jmp/jsr/etc so the delay slot can't kill it
 	irq_entry     irq_queue[16];
 
-	int pcfsel;	     			// last pcflush entry set
+	int pcfsel;	    			// last pcflush entry set
 	int maxpcfsel;				// highest valid pcflush entry
 	UINT32 pcflushes[16];			// pcflush entries
 
@@ -122,9 +122,9 @@ typedef struct
 	UINT32	*m;
 	INT8  nmi_line_state;
 
-	UINT16 	frc;
-	UINT16 	ocra, ocrb, icr;
-	UINT64 	frc_base;
+	UINT16	frc;
+	UINT16	ocra, ocrb, icr;
+	UINT64	frc_base;
 
 	int		frt_input;
 	int 	internal_irq_level;
@@ -140,7 +140,7 @@ typedef struct
 	void	(*ftcsr_read_callback)(UINT32 data);
 
 #ifdef USE_SH2DRC
-	drccache *			cache;			       	/* pointer to the DRC code cache */
+	drccache *			cache;			    	/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;					/* DRC UML generator state */
 	drcfe_state *		drcfe;					/* pointer to the DRC front-end state */
 	UINT32				drcoptions;			/* configurable DRC options */
@@ -157,7 +157,7 @@ typedef struct
 	UINT32				irq;				/* irq we're taking */
 
 	/* register mappings */
-	drcuml_parameter	regmap[16];		     		/* parameter to register mappings for all 16 integer registers */
+	drcuml_parameter	regmap[16];		    		/* parameter to register mappings for all 16 integer registers */
 
 	drcuml_codehandle *	entry;			    		/* entry point */
 	drcuml_codehandle *	read8;					/* read byte */

@@ -56,7 +56,7 @@ struct pic_state
 	UINT8	nvram_addr;
 	UINT8	buffer[0x10];
 	UINT8	nvram[PIC_NVRAM_SIZE];
-	UINT8 	default_nvram[PIC_NVRAM_SIZE];
+	UINT8	default_nvram[PIC_NVRAM_SIZE];
 	UINT8	time_buf[8];
 	UINT8	time_index;
 	UINT8	time_just_written;
@@ -73,7 +73,7 @@ struct ioasic_state
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
 	const UINT8 *	shuffle_map;
-	void 	(*irq_callback)(running_machine *, int);
+	void	(*irq_callback)(running_machine *, int);
 	UINT8	irq_state;
 	UINT16	sound_irq_state;
 	UINT8	auto_ack;

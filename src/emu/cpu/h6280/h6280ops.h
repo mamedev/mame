@@ -80,7 +80,7 @@
 	PCH = RDMEM(cpustate, (vector+1));									\
 }
 
-#define CHECK_AND_TAKE_IRQ_LINES 								\
+#define CHECK_AND_TAKE_IRQ_LINES								\
 	if ( cpustate->nmi_state != CLEAR_LINE ) {						\
 		cpustate->nmi_state = CLEAR_LINE;							\
 		DO_INTERRUPT(H6280_NMI_VEC);							\
@@ -90,7 +90,7 @@
         if ( cpustate->irq_state[2] != CLEAR_LINE &&                \
 			 !(cpustate->irq_mask & 0x4) )							\
 		{														\
- 			DO_INTERRUPT(H6280_TIMER_VEC);						\
+			DO_INTERRUPT(H6280_TIMER_VEC);						\
 		} else													\
 		if ( cpustate->irq_state[0] != CLEAR_LINE &&				\
 			 !(cpustate->irq_mask & 0x2) )							\
@@ -139,13 +139,13 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 /***************************************************************
  *  RDMEMZ   read memory - zero page
  ***************************************************************/
-#define RDMEMZ(addr) 											\
+#define RDMEMZ(addr)											\
 	memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr)&0x1fff));
 
 /***************************************************************
  *  WRMEMZ   write memory - zero page
  ***************************************************************/
-#define WRMEMZ(addr,data) 										\
+#define WRMEMZ(addr,data)										\
 	memory_write_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr)&0x1fff),data);
 
 /***************************************************************
@@ -298,7 +298,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #define EA_IND													\
 	EA_ABS; 													\
 	tmp = RDMEM(cpustate, EAD);									\
-	EAD++; 														\
+	EAD++;														\
 	EAH = RDMEM(cpustate, EAD);									\
 	EAL = tmp
 
@@ -309,7 +309,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	EA_ABS;														\
 	EAD+=X;														\
 	tmp = RDMEM(cpustate, EAD);											\
-	EAD++; 	 													\
+	EAD++;														\
 	EAH = RDMEM(cpustate, EAD);											\
 	EAL = tmp
 
@@ -374,7 +374,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 /* 6280 ********************************************************
  *  ADC Add with carry
  ***************************************************************/
-#define TADC 													\
+#define TADC													\
 	{															\
 		int tflagtemp;											\
 		CLEAR_T;												\
@@ -453,7 +453,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 /* 6280 ********************************************************
  *  AND Logical and
  ***************************************************************/
-#define TAND 													\
+#define TAND													\
 	{															\
 		int tflagtemp;											\
 		CLEAR_T;												\
@@ -562,7 +562,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	PUSH(PCL);													\
 	PUSH(P);													\
 	P = (P & ~_fD) | _fI;										\
-	PCL = RDMEM(cpustate, H6280_IRQ2_VEC); 								\
+	PCL = RDMEM(cpustate, H6280_IRQ2_VEC);								\
 	PCH = RDMEM(cpustate, H6280_IRQ2_VEC+1);								\
 
 /* 6280 ********************************************************
@@ -681,7 +681,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define DEC 													\
 	CLEAR_T;													\
-	tmp = (UINT8)(tmp-1); 										\
+	tmp = (UINT8)(tmp-1);										\
 	SET_NZ(tmp)
 
 /* 6280 ********************************************************
@@ -703,7 +703,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 /* 6280 ********************************************************
  *  EOR Logical exclusive or
  ***************************************************************/
-#define TEOR 													\
+#define TEOR													\
 	{															\
 		int tflagtemp;											\
 		CLEAR_T;												\
@@ -735,7 +735,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define INC 													\
 	CLEAR_T;													\
-	tmp = (UINT8)(tmp+1); 										\
+	tmp = (UINT8)(tmp+1);										\
 	SET_NZ(tmp)
 
 /* 6280 ********************************************************
@@ -817,7 +817,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  ORA Logical inclusive or
  ***************************************************************/
 
-#define TORA 													\
+#define TORA													\
 	{															\
 		int tflagtemp;											\
 		CLEAR_T;												\
@@ -888,7 +888,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #else
 
 #define PLP 													\
-	PULL(P); 													\
+	PULL(P);													\
 	P |= _fB;													\
 	CHECK_IRQ_LINES
 #endif
@@ -1173,12 +1173,12 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	to  =RDMEMW(PCW+2);											\
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
-	alternate=0; 												\
+	alternate=0;												\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
-	while ((length--) != 0) { 									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from+alternate)); 						\
-		to++; 													\
+	while ((length--) != 0) {									\
+		WRMEM(cpustate, to,RDMEM(cpustate, from+alternate));						\
+		to++;													\
 		alternate ^= 1; 										\
 	}
 
@@ -1223,9 +1223,9 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	PCW+=6; 													\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
-	while ((length--) != 0) { 									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from)); 									\
-		to--; 													\
+	while ((length--) != 0) {									\
+		WRMEM(cpustate, to,RDMEM(cpustate, from));									\
+		to--;													\
 		from--;													\
 	}
 
@@ -1238,10 +1238,10 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	to  =RDMEMW(PCW+2);											\
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
-	alternate=0; 												\
+	alternate=0;												\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
-	while ((length--) != 0) { 									\
+	while ((length--) != 0) {									\
 		WRMEM(cpustate, to+alternate,RDMEM(cpustate, from));						\
 		from++; 												\
 		alternate ^= 1; 										\
@@ -1258,9 +1258,9 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	PCW+=6; 													\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
-	while ((length--) != 0) { 									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from)); 									\
-		to++; 													\
+	while ((length--) != 0) {									\
+		WRMEM(cpustate, to,RDMEM(cpustate, from));									\
+		to++;													\
 		from++;													\
 	}
 
@@ -1275,8 +1275,8 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	PCW+=6; 													\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
-	while ((length--) != 0) { 									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from)); 									\
+	while ((length--) != 0) {									\
+		WRMEM(cpustate, to,RDMEM(cpustate, from));									\
 		from++;													\
 	}
 
@@ -1298,7 +1298,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 /* 6280 ********************************************************
  * TRB  Test and reset bits
  ***************************************************************/
-#define TRB                                                   	\
+#define TRB                                                 	\
 	CLEAR_T;													\
 	P = (P & ~(_fN|_fV|_fT|_fZ))								\
 		| ((tmp&0x80) ? _fN:0)									\

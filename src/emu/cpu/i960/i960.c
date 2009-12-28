@@ -477,7 +477,7 @@ static void check_irqs(i960_state_t *i960)
 				wordl = (lvl % 4) * 8;
 				wordh = (wordl + 8) - 1;
 
-			  	vword = memory_read_dword_32le(i960->program, int_tab + word);
+				vword = memory_read_dword_32le(i960->program, int_tab + word);
 
 				// take the first vector we find for this level
 				for (irq = wordh; irq >= wordl; irq--) {
@@ -2080,7 +2080,7 @@ static CPU_INIT( i960 )
 	state_save_register_device_item(device, 0, i960->AC);
 	state_save_register_device_item(device, 0, i960->ICR);
 	state_save_register_device_item_array(device, 0, i960->r);
- 	state_save_register_device_item_array(device, 0, i960->fp);
+	state_save_register_device_item_array(device, 0, i960->fp);
 	state_save_register_device_item_2d_array(device, 0, i960->rcache);
 	state_save_register_device_item_array(device, 0, i960->rcache_frame_addr);
 }

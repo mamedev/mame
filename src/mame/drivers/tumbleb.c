@@ -366,7 +366,7 @@ static WRITE16_HANDLER( jumppop_sound_w )
 
 static READ16_HANDLER( tumblepopb_controls_r )
 {
- 	switch (offset<<1)
+	switch (offset<<1)
 	{
 		case 0:
 			return input_port_read(space->machine, "PLAYERS");
@@ -1964,10 +1964,10 @@ static GFXDECODE_START( tumbleb )
 GFXDECODE_END
 
 static GFXDECODE_START( suprtrio )
-	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 		256, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout,		256, 16 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, suprtrio_tlayout,	512, 16 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, suprtrio_tlayout,	256, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       		  0, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,    		  0, 16 )	/* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( fncywld )
@@ -2343,7 +2343,7 @@ ROM_START( tumbleb2 )
 	ROM_LOAD16_BYTE( "thumbpop.19",  0x00000, 0x40000, CRC(0795aab4) SHA1(85b38804446f6b0b4d8c3a59a8958d520c567a4e) )
 	ROM_LOAD16_BYTE( "thumbpop.18",  0x00001, 0x40000, CRC(ad58df43) SHA1(2e562bfffb42543af767dd9e82a1d2465dfcd8b8) )
 
- 	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
 	ROM_LOAD( "map-00.rom",   0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
@@ -2480,7 +2480,7 @@ ROM_START( pangpang )
 	ROM_LOAD16_BYTE( "7.bin", 0x40001, 0x20000, CRC(cd544173) SHA1(b929d771040a48356b449458d3125142b9bfc365) )
 	ROM_CONTINUE(0xc0001,0x20000)
 
- 	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "8.bin",   0x00000, 0x40000, CRC(ea0fa1e0) SHA1(1f2f6264097d15339782c2e399d125c3835fd852) )
 	ROM_LOAD16_BYTE( "9.bin",   0x00001, 0x40000, CRC(1da5fe49) SHA1(338be1a9f8c42e685e1cefb12b2d169b7560e5f7) )
 	ROM_LOAD16_BYTE( "4.bin",   0x80000, 0x40000, CRC(4f282eb1) SHA1(3731045a500082d37588edf7cbb0c0ebae566aab) )

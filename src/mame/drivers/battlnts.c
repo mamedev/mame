@@ -214,7 +214,7 @@ static const k007342_interface bladestl_k007342_intf =
 
 static const k007420_interface bladestl_k007420_intf =
 {
-	0x3ff, 	battlnts_sprite_callback	/* banklimit, callback */
+	0x3ff,	battlnts_sprite_callback	/* banklimit, callback */
 };
 
 

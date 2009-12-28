@@ -2322,7 +2322,7 @@ static CPU_EXECUTE( z180 )
 	{
 		LOG(("Z180 '%s' take NMI\n", cpustate->device->tag));
 		cpustate->_PPC = -1;			/* there isn't a valid previous program counter */
-		LEAVE_HALT(cpustate); 		/* Check if processor was halted */
+		LEAVE_HALT(cpustate);		/* Check if processor was halted */
 
 		/* disable DMA transfers!! */
 		cpustate->IO_DSTAT &= ~Z180_DSTAT_DME;
@@ -2516,12 +2516,12 @@ static CPU_SET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		set_irq_line(cpustate, Z180_INT0, info->i);			break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cpustate->cc[Z180_TABLE_op] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cpustate->cc[Z180_TABLE_cb] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cpustate->cc[Z180_TABLE_ed] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cpustate->cc[Z180_TABLE_xy] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cpustate->cc[Z180_TABLE_xycb] = (UINT8 *)info->p;	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cpustate->cc[Z180_TABLE_ex] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:		cpustate->cc[Z180_TABLE_op] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:		cpustate->cc[Z180_TABLE_cb] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:		cpustate->cc[Z180_TABLE_ed] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:		cpustate->cc[Z180_TABLE_xy] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:	cpustate->cc[Z180_TABLE_xycb] = (UINT8 *)info->p;	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:		cpustate->cc[Z180_TABLE_ex] = (UINT8 *)info->p;		break;
 	}
 }
 
@@ -2551,8 +2551,8 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 20;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;			break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		info->i = cpustate->irq_state[0];		break;
@@ -2574,12 +2574,12 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		info->p = (void *)cpustate->cc[Z180_TABLE_op];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		info->p = (void *)cpustate->cc[Z180_TABLE_cb];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		info->p = (void *)cpustate->cc[Z180_TABLE_ed];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		info->p = (void *)cpustate->cc[Z180_TABLE_xy];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:		info->p = (void *)cpustate->cc[Z180_TABLE_op];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:		info->p = (void *)cpustate->cc[Z180_TABLE_cb];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:		info->p = (void *)cpustate->cc[Z180_TABLE_ed];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:		info->p = (void *)cpustate->cc[Z180_TABLE_xy];	break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:	info->p = (void *)cpustate->cc[Z180_TABLE_xycb];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		info->p = (void *)cpustate->cc[Z180_TABLE_ex];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:		info->p = (void *)cpustate->cc[Z180_TABLE_ex];	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z180");				break;

@@ -83,7 +83,7 @@ typedef struct
 	INT8 D1R;
 	INT8 DL;
 	INT8 D2R;
-	INT8 RC;   		/* rate correction */
+	INT8 RC;		/* rate correction */
 	INT8 RR;
 
 	UINT32 step;	/* fixed-point frequency step */
@@ -294,14 +294,14 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 						sample = rombase[slot->startaddr + (slot->stepptr>>16)]<<8;
 						break;
 
-					case 12:  	// 12 bit
+					case 12:	// 12 bit
 						if (slot->stepptr & 1)
 							sample = rombase[slot->startaddr + (slot->stepptr>>17)*3 + 2]<<8 | ((rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] << 4) & 0xf0);
 						else
 							sample = rombase[slot->startaddr + (slot->stepptr>>17)*3]<<8 | (rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] & 0xf0);
 						break;
 
-					case 16:  	// 16 bit
+					case 16:	// 16 bit
 						sample = rombase[slot->startaddr + ((slot->stepptr>>16)*2)]<<8;
 						sample |= rombase[slot->startaddr + ((slot->stepptr>>16)*2) + 1];
 						break;
@@ -330,7 +330,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 				// update envelope
 				slot->env_vol += slot->env_vol_step;
 				if(((INT32)(slot->env_vol - slot->env_vol_lim)) >= 0)
-			 		ymf278b_envelope_next(slot);
+					ymf278b_envelope_next(slot);
 			}
 		}
 	}
@@ -551,7 +551,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 			case 5:
 				slot->vib = data&0x7;
 				slot->lfo = (data>>3)&0x7;
-		       	break;
+		    	break;
 			case 6:
 				slot->AR = data>>4;
 				slot->D1R = data&0xf;
@@ -574,7 +574,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 		// All non-slot registers
 		switch (reg)
 		{
-			case 0x00:    	// TEST
+			case 0x00:  	// TEST
 			case 0x01:
 				break;
 
@@ -723,7 +723,7 @@ DEVICE_GET_INFO( ymf278b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF278BChip); 					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF278BChip);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymf278b );		break;

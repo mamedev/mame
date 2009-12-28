@@ -164,8 +164,8 @@ static const gfx_layout motion_layout =
 
 
 static GFXDECODE_START( subs )
-	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 ) 	/* playfield graphics */
-	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 ) 	/* motion graphics */
+	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )	/* playfield graphics */
+	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )	/* motion graphics */
 GFXDECODE_END
 
 

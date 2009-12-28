@@ -71,7 +71,7 @@ struct _debugcpu_private
 
 	UINT64			wpdata;
 	UINT64			wpaddr;
-	UINT64 			tempvar[NUM_TEMP_VARIABLES];
+	UINT64			tempvar[NUM_TEMP_VARIABLES];
 
 	osd_ticks_t 	last_periodic_update_time;
 };

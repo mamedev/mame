@@ -308,7 +308,7 @@ static const eeprom_interface eeprom_intf =
 	"0101",			/* write command */
 	"0111",			/* erase command */
 	"0100000000",	/* lock command */
-	"0100111111" 	/* unlock command */
+	"0100111111"	/* unlock command */
 };
 
 static WRITE16_HANDLER( othunder_tc0220ioc_w )

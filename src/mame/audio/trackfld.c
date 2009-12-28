@@ -108,6 +108,6 @@ WRITE8_HANDLER( konami_SN76496_latch_w )
 
 WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
- 	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
 	sn76496_w(device, offset, state->SN76496_latch);
 }

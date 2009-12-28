@@ -1044,7 +1044,7 @@ static INTERRUPT_GEN( system_h1_sub )
 {
 	switch(cpu_getiloops(device))
 	{
-      	case 0:cpu_set_input_line(device, 0xa, HOLD_LINE); break;
+    	case 0:cpu_set_input_line(device, 0xa, HOLD_LINE); break;
         case 1:cpu_set_input_line(device, 0xc, HOLD_LINE); break;
         case 2:cpu_set_input_line(device, 0xe, HOLD_LINE); break;
 	}

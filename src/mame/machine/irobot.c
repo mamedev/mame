@@ -21,7 +21,7 @@
  * too high.
  */
 
-#define IR_TIMING 				1		/* try to emulate MB and VG running time */
+#define IR_TIMING				1		/* try to emulate MB and VG running time */
 #define DISASSEMBLE_MB_ROM		0		/* generate a disassembly of the mathbox ROMs */
 
 #define IR_CPU_STATE(m) \
@@ -193,8 +193,8 @@ MACHINE_RESET( irobot )
 	UINT8 *MB = memory_region(machine, "mathbox");
 
 	/* initialize the memory regions */
-	mbROM 		= MB + 0x00000;
-	mbRAM 		= MB + 0x0c000;
+	mbROM		= MB + 0x00000;
+	mbRAM		= MB + 0x0c000;
 	comRAM[0]	= MB + 0x0e000;
 	comRAM[1]	= MB + 0x0f000;
 
@@ -562,7 +562,7 @@ TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback )
 	Y = zresult
 
 
-#define JUMP0 	curop++;
+#define JUMP0	curop++;
 #define JUMP1	if (cflag) curop = curop->nxtop; else curop++;
 #define JUMP2	if (!zresult) curop = curop->nxtop; else curop++;
 #define JUMP3	if (!nflag) curop = curop->nxtop; else curop++;

@@ -160,7 +160,7 @@ static const vr0_interface vr0_config =
 static MACHINE_DRIVER_START( psattack )
 	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(psattack_mem)
- 	MDRV_CPU_VBLANK_INT("screen", psattack_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", psattack_interrupt)
 
 	MDRV_MACHINE_START(psattack)
 	MDRV_MACHINE_RESET(psattack)

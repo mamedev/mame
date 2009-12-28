@@ -83,7 +83,7 @@
 
 
 /* macros for defining read_line/write_line functions */
-#define READ_LINE_DEVICE_HANDLER(name) 		int  name(ATTR_UNUSED const device_config *device)
+#define READ_LINE_DEVICE_HANDLER(name)		int  name(ATTR_UNUSED const device_config *device)
 #define WRITE_LINE_DEVICE_HANDLER(name) 	void name(ATTR_UNUSED const device_config *device, ATTR_UNUSED int state)
 
 

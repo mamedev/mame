@@ -3052,11 +3052,11 @@ static void d68851_p000(void)
 	{
 		if (modes & 0x0200)
 		{
-	 		sprintf(g_dasm_str, "pload  #%d, %s", (modes>>10)&7, str);
+			sprintf(g_dasm_str, "pload  #%d, %s", (modes>>10)&7, str);
 		}
 		else
 		{
-	 		sprintf(g_dasm_str, "pload  %s, #%d", str, (modes>>10)&7);
+			sprintf(g_dasm_str, "pload  %s, #%d", str, (modes>>10)&7);
 		}
 		return;
 	}
@@ -3098,22 +3098,22 @@ static void d68851_p000(void)
 			{
 				if (modes & 0x0200)
 				{
-			 		sprintf(g_dasm_str, "pmovefd  %s, %s", g_mmuregs[(modes>>10)&7], str);
+					sprintf(g_dasm_str, "pmovefd  %s, %s", g_mmuregs[(modes>>10)&7], str);
 				}
 				else
 				{
-			 		sprintf(g_dasm_str, "pmovefd  %s, %s", str, g_mmuregs[(modes>>10)&7]);
+					sprintf(g_dasm_str, "pmovefd  %s, %s", str, g_mmuregs[(modes>>10)&7]);
 				}
 			}
 			else
 			{
 				if (modes & 0x0200)
 				{
-			 		sprintf(g_dasm_str, "pmove  %s, %s", g_mmuregs[(modes>>10)&7], str);
+					sprintf(g_dasm_str, "pmove  %s, %s", g_mmuregs[(modes>>10)&7], str);
 				}
 				else
 				{
-			 		sprintf(g_dasm_str, "pmove  %s, %s", str, g_mmuregs[(modes>>10)&7]);
+					sprintf(g_dasm_str, "pmove  %s, %s", str, g_mmuregs[(modes>>10)&7]);
 				}
 			}
 			break;
@@ -3121,11 +3121,11 @@ static void d68851_p000(void)
 		case 3:	// MC68030 to/from status reg
 			if (modes & 0x0200)
 			{
-		 		sprintf(g_dasm_str, "pmove  mmusr, %s", str);
+				sprintf(g_dasm_str, "pmove  mmusr, %s", str);
 			}
 			else
 			{
-		 		sprintf(g_dasm_str, "pmove  %s, mmusr", str);
+				sprintf(g_dasm_str, "pmove  %s, mmusr", str);
 			}
 			break;
 

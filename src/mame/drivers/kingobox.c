@@ -336,7 +336,7 @@ static const gfx_layout charlayout =
 static const gfx_layout spritelayout =
 {
 	16,16,	/* 16*16 chars */
-	1024, 	/* 1024 characters */
+	1024,	/* 1024 characters */
 	3,		/* bits per pixel */
 	{ 2*0x4000*8, 1*0x4000*8, 0*0x4000*8 },
 	{ 3*0x4000*8+0,3*0x4000*8+1,3*0x4000*8+2,3*0x4000*8+3,
@@ -394,7 +394,7 @@ static const gfx_layout rk_charlayout2 =
 static const gfx_layout rk_spritelayout =
 {
 	16,16,	/* 16*16 chars */
-	1024, 	/* 1024 characters */
+	1024,	/* 1024 characters */
 	3,		/* bits per pixel */
 	{ 0*0x8000*8, 1*0x8000*8, 2*0x8000*8 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0,
@@ -407,7 +407,7 @@ static const gfx_layout rk_spritelayout =
 static const gfx_layout rk_tilelayout =
 {
 	16,16,	/* 16*16 chars */
-	512, 	/* 1024 characters */
+	512,	/* 1024 characters */
 	3,		/* bits per pixel */
 	{ 0*0x4000*8, 1*0x4000*8, 2*0x4000*8 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0,
@@ -420,7 +420,7 @@ static const gfx_layout rk_tilelayout =
 static const gfx_layout rk_bglayout =
 {
 	16,16,	/* 16*16 chars */
-	256, 	/* 1024 characters */
+	256,	/* 1024 characters */
 	3,		/* bits per pixel */
 	{ 0x4000*8+4, 0, 4 },
 	{ 16*8+3, 16*8+2, 16*8+1, 16*8+0, 0x2000*8+3, 0x2000*8+2, 0x2000*8+1, 0x2000*8+0,

@@ -554,7 +554,7 @@ static UINT8 vdp_ctrl_r(const address_space *space, struct sms_vdp *chip)
 	UINT8 retvalue;
 
 	retvalue = (chip->frame_irq_pending<<7) |
-	   	       (chip->sprite_overflow<<6) |
+		       (chip->sprite_overflow<<6) |
 	           (chip->sprite_collision<<5);
 
 	chip->cmd_pend = 0;

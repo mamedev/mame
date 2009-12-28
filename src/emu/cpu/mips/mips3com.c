@@ -361,19 +361,19 @@ void mips3com_set_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + MIPS3_PC:			mips->pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + MIPS3_SR:			mips->cpr[0][COP0_Status] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_EPC:			mips->cpr[0][COP0_EPC] = info->i; 		break;
+		case CPUINFO_INT_REGISTER + MIPS3_SR:			mips->cpr[0][COP0_Status] = info->i;	break;
+		case CPUINFO_INT_REGISTER + MIPS3_EPC:			mips->cpr[0][COP0_EPC] = info->i;		break;
 		case CPUINFO_INT_REGISTER + MIPS3_CAUSE:		mips->cpr[0][COP0_Cause] = info->i;		break;
 		case CPUINFO_INT_REGISTER + MIPS3_COUNT:		mips->cpr[0][COP0_Count] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_COMPARE:		mips->cpr[0][COP0_Compare] = info->i; 	break;
+		case CPUINFO_INT_REGISTER + MIPS3_COMPARE:		mips->cpr[0][COP0_Compare] = info->i;	break;
 		case CPUINFO_INT_REGISTER + MIPS3_INDEX:		mips->cpr[0][COP0_Index] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_RANDOM:		mips->cpr[0][COP0_Random] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_ENTRYHI:		mips->cpr[0][COP0_EntryHi] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_ENTRYLO0:		mips->cpr[0][COP0_EntryLo0] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_ENTRYLO1:		mips->cpr[0][COP0_EntryLo1] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_PAGEMASK:		mips->cpr[0][COP0_PageMask] = info->i; 	break;
+		case CPUINFO_INT_REGISTER + MIPS3_RANDOM:		mips->cpr[0][COP0_Random] = info->i;	break;
+		case CPUINFO_INT_REGISTER + MIPS3_ENTRYHI:		mips->cpr[0][COP0_EntryHi] = info->i;	break;
+		case CPUINFO_INT_REGISTER + MIPS3_ENTRYLO0:		mips->cpr[0][COP0_EntryLo0] = info->i;	break;
+		case CPUINFO_INT_REGISTER + MIPS3_ENTRYLO1:		mips->cpr[0][COP0_EntryLo1] = info->i;	break;
+		case CPUINFO_INT_REGISTER + MIPS3_PAGEMASK:		mips->cpr[0][COP0_PageMask] = info->i;	break;
 		case CPUINFO_INT_REGISTER + MIPS3_WIRED:		mips->cpr[0][COP0_Wired] = info->i; 	break;
-		case CPUINFO_INT_REGISTER + MIPS3_BADVADDR:		mips->cpr[0][COP0_BadVAddr] = info->i; 	break;
+		case CPUINFO_INT_REGISTER + MIPS3_BADVADDR:		mips->cpr[0][COP0_BadVAddr] = info->i;	break;
 
 		case CPUINFO_INT_REGISTER + MIPS3_R0:			/* can't change R0 */					break;
 		case CPUINFO_INT_REGISTER + MIPS3_R1:			mips->r[1] = info->i;					break;
@@ -472,7 +472,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = MIPS3_MIN_PAGE_SHIFT;	break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = MIPS3_MIN_PAGE_SHIFT;	break;
 
 		case CPUINFO_INT_INPUT_STATE + MIPS3_IRQ0:		info->i = (mips->cpr[0][COP0_Cause] & 0x400) ? ASSERT_LINE : CLEAR_LINE;	break;
 		case CPUINFO_INT_INPUT_STATE + MIPS3_IRQ1:		info->i = (mips->cpr[0][COP0_Cause] & 0x800) ? ASSERT_LINE : CLEAR_LINE;	break;
@@ -557,8 +557,8 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + MIPS3_PC:			sprintf(info->s, "PC: %08X", mips->pc); break;
 		case CPUINFO_STR_REGISTER + MIPS3_SR:			sprintf(info->s, "SR: %08X", (UINT32)mips->cpr[0][COP0_Status]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_EPC:			sprintf(info->s, "EPC:%08X", (UINT32)mips->cpr[0][COP0_EPC]); break;
-		case CPUINFO_STR_REGISTER + MIPS3_CAUSE: 		sprintf(info->s, "Cause:%08X", (UINT32)mips->cpr[0][COP0_Cause]); break;
-		case CPUINFO_STR_REGISTER + MIPS3_COUNT: 		sprintf(info->s, "Count:%08X", (UINT32)((cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2)); break;
+		case CPUINFO_STR_REGISTER + MIPS3_CAUSE:		sprintf(info->s, "Cause:%08X", (UINT32)mips->cpr[0][COP0_Cause]); break;
+		case CPUINFO_STR_REGISTER + MIPS3_COUNT:		sprintf(info->s, "Count:%08X", (UINT32)((cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2)); break;
 		case CPUINFO_STR_REGISTER + MIPS3_COMPARE:		sprintf(info->s, "Compare:%08X", (UINT32)mips->cpr[0][COP0_Compare]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_INDEX:		sprintf(info->s, "Index:%08X", (UINT32)mips->cpr[0][COP0_Index]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_RANDOM:		sprintf(info->s, "Random:%08X", (UINT32)mips->cpr[0][COP0_Random]); break;

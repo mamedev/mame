@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_bsb_tile_info )
 	int tileno,col;
 
 	tileno = bsb_videoram[tile_index] & 0x0fff;
-	col= 	bsb_videoram[tile_index] & 0xf000;
+	col=	bsb_videoram[tile_index] & 0xf000;
 
 	SET_TILE_INFO(0,tileno,col>>12,0);
 }
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bsb_tile2_info )
 	int tileno,col;
 
 	tileno = bsb_videoram2[tile_index] & 0x0fff;
-	col= 	bsb_videoram2[tile_index] & 0xf000;
+	col=	bsb_videoram2[tile_index] & 0xf000;
 
 	SET_TILE_INFO(1,tileno,col>>12,0);
 }
@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_bsb_tile3_info )
 	int tileno,col;
 
 	tileno = bsb_videoram3[tile_index] & 0x0fff;
-	col= 	bsb_videoram3[tile_index] & 0xf000;
+	col=	bsb_videoram3[tile_index] & 0xf000;
 
 	SET_TILE_INFO(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }

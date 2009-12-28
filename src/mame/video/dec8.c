@@ -322,7 +322,7 @@ static void draw_sprites2( running_machine* machine, bitmap_t *bitmap, const rec
 	for (offs = 0; offs < 0x800; offs += 8)
 	{
 		y = buffered_spriteram[offs + 1] + (buffered_spriteram[offs] << 8);
- 		if ((y & 0x8000) == 0) continue;
+		if ((y & 0x8000) == 0) continue;
 		x = buffered_spriteram[offs + 5] + (buffered_spriteram[offs + 4] << 8);
 		colour = ((x & 0xf000) >> 12);
 		flash = x & 0x800;
@@ -548,7 +548,7 @@ VIDEO_UPDATE( ghostb )
 	dec8_state *state = (dec8_state *)screen->machine->driver_data;
 	if (state->pf0_control[0] & 0x4)
 	{ /* Rowscroll */
- 		int offs;
+		int offs;
 
 		tilemap_set_scroll_rows(state->pf0_tilemap, 512);
 		for (offs = 0; offs < 512; offs += 2)

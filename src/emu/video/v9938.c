@@ -246,8 +246,8 @@ static void v9938_palette_w(UINT8 data)
 		vdp->palReg[indexp*2+1] = data & 0x07;
 		/* update palette */
 		vdp->pal_ind16[indexp] = (((int)vdp->pal_write << 2) & 0x01c0)  |
-						 	   (((int)data << 3) & 0x0038)  |
-						 		((int)vdp->pal_write & 0x0007);
+							   (((int)data << 3) & 0x0038)  |
+								((int)vdp->pal_write & 0x0007);
 
 		vdp->contReg[0x10] = (vdp->contReg[0x10] + 1) & 15;
 		vdp->pal_write_first = 0;
@@ -328,7 +328,7 @@ static void v9938_vram_write (int offset, int data)
 	if ( (vdp->mode == V9938_MODE_GRAPHIC6) || (vdp->mode == V9938_MODE_GRAPHIC7) )
 		{
         newoffset = ((offset & 1) << 16) | (offset >> 1);
-   		if (newoffset < vdp->vram_size)
+		if (newoffset < vdp->vram_size)
         	vdp->vram[newoffset] = data;
 		}
 	else
@@ -835,10 +835,10 @@ READ8_HANDLER( v9938_1_status_r )
 #define V9938_BPP	(16)
 #define V9938_WIDTH	(512 + 32)
 #include "v9938mod.c"
-#undef 	V9938_WIDTH
+#undef	V9938_WIDTH
 #define V9938_WIDTH	(256 + 16)
 #include "v9938mod.c"
-#undef 	V9938_WIDTH
+#undef	V9938_WIDTH
 #undef	V9938_BPP
 
 static void v9938_sprite_mode1 (int line, UINT8 *col)
@@ -932,13 +932,13 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 								{
 								if (col[x+1] & 0x40)
     	                        	{
-       		                    	/* we have a collision! */
+    		                    	/* we have a collision! */
 									if (p2 < 4)
 										vdp->statReg[0] |= 0x20;
                             		}
                         		if ( !(col[x+1] & 0x80) )
 	                            	{
-   		                         	if (c || (vdp->contReg[8] & 0x20) )
+		                        	if (c || (vdp->contReg[8] & 0x20) )
 										col[x+1] |= 0xc0 | c;
 									else
 										col[x+1] |= 0x80;

@@ -27,7 +27,7 @@
 #define m37710_read_8(addr) 			memory_read_byte_16le(cpustate->program, addr)
 #define m37710_write_8(addr,data)		memory_write_byte_16le(cpustate->program, addr,data)
 #define m37710_read_8_immediate(A)		memory_read_byte_16le(cpustate->program, A)
-#define m37710_read_16(addr) 			memory_read_word_16le(cpustate->program, addr)
+#define m37710_read_16(addr)			memory_read_word_16le(cpustate->program, addr)
 #define m37710_write_16(addr,data)		memory_write_word_16le(cpustate->program, addr,data)
 #define m37710_jumping(A)
 #define m37710_branching(A)
@@ -185,8 +185,8 @@ extern int (*const m37710i_execute[])(m37710i_cpu_struct *cpustate, int cycles);
 #define FTABLE_SET_REG	cpustate->set_reg
 #define FTABLE_SET_LINE	cpustate->set_line
 
-#define SRC  		cpustate->source		/* Source Operand */
-#define DST  		cpustate->destination	/* Destination Operand */
+#define SRC 		cpustate->source		/* Source Operand */
+#define DST 		cpustate->destination	/* Destination Operand */
 
 #define STOP_LEVEL_WAI	1
 #define STOP_LEVEL_STOP	2

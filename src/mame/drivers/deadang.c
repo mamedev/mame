@@ -200,7 +200,7 @@ static const gfx_layout spritelayout =
 	{ 8,12,0,4},
 	{ STEP4(3,-1), STEP4(19,-1), STEP4(512+3,-1), STEP4(512+19,-1) },
 	{ STEP16(0,32) },
- 	1024
+	1024
 };
 
 /* Graphics Decode Information */

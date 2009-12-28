@@ -161,7 +161,7 @@ WRITE32_HANDLER( am53cf96_w )
 				xfer_state = 0;
 				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				break;
-			case 0x42:    	// select with ATN steps
+			case 0x42:  	// select with ATN steps
 				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				if ((fifo[1] == 0) || (fifo[1] == 0x48) || (fifo[1] == 0x4b))
 				{

@@ -36,7 +36,7 @@ static const char ureg_names[256][16] =
 
 static const char bopnames[8][8] =
 {
-	"SET",		"CLEAR",	"TOGGLE",	"???",		"TEST",		"XOR", 		"???", 		"???"
+	"SET",		"CLEAR",	"TOGGLE",	"???",		"TEST",		"XOR",		"???",		"???"
 };
 
 static const char condition_codes_if[32][32] =

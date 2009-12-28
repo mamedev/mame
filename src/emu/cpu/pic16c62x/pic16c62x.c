@@ -113,14 +113,14 @@ typedef struct _pic16c62x_opcode pic16c62x_opcode;
 struct _pic16c62x_opcode
 {
 	UINT8	cycles;
-	void 	(*function)(pic16c62x_state *);
+	void	(*function)(pic16c62x_state *);
 };
 /* instruction list entry */
 typedef struct _pic16c62x_instruction pic16c62x_instruction;
 struct _pic16c62x_instruction
 {
 	char	*format;
-	void 	(*function)(pic16c62x_state *);
+	void	(*function)(pic16c62x_state *);
 	UINT8	cycles;
 };
 

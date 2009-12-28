@@ -311,7 +311,7 @@ static WRITE32_HANDLER( plygonet_palette_w )
 
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
- 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 	b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 
@@ -606,7 +606,7 @@ static const gfx_layout bglayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
- 	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
 	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 
@@ -789,7 +789,7 @@ ROM_START( plygonet )
 	ROM_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086) )
 
 	/* '936 tiles */
- 	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
 
 	/* sound data */
@@ -815,7 +815,7 @@ ROM_START( polynetw )
 	ROM_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
 
 	/* '936 tiles */
- 	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
 
 	/* sound data */

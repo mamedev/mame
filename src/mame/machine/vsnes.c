@@ -151,7 +151,7 @@ static READ8_HANDLER( gun_in0_r )
 	/* shift */
 	input_latch[0] >>= 1;
 
-	ret |= input_port_read(space->machine, "COINS"); 				/* merge coins, etc */
+	ret |= input_port_read(space->machine, "COINS");				/* merge coins, etc */
 	ret |= (input_port_read(space->machine, "DSW0") & 3) << 3;		/* merge 2 dipswitches */
 
 /* The gun games expect a 1 returned on every 5th read after sound_fix is reset*/
@@ -176,7 +176,7 @@ READ8_HANDLER( vsnes_in0_r )
 	/* shift */
 	input_latch[0] >>= 1;
 
-	ret |= input_port_read(space->machine, "COINS"); 				/* merge coins, etc */
+	ret |= input_port_read(space->machine, "COINS");				/* merge coins, etc */
 	ret |= (input_port_read(space->machine, "DSW0") & 3) << 3;		/* merge 2 dipswitches */
 
 	return ret;
@@ -213,7 +213,7 @@ READ8_HANDLER( vsnes_in0_1_r )
 	/* shift */
 	input_latch[2] >>= 1;
 
-	ret |= input_port_read(space->machine, "COINS2"); 				/* merge coins, etc */
+	ret |= input_port_read(space->machine, "COINS2");				/* merge coins, etc */
 	ret |= (input_port_read(space->machine, "DSW1") & 3) << 3;		/* merge 2 dipswitches */
 	return ret;
 }
@@ -925,7 +925,7 @@ DRIVER_INIT( cstlevna )
 	UINT8 *prg = memory_region(machine, "maincpu");
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
-   	/* banking is done with writes to the $8000-$ffff area */
+	/* banking is done with writes to the $8000-$ffff area */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, castlevania_rom_banking );
 
 	/* common init */
@@ -955,7 +955,7 @@ DRIVER_INIT( topgun )
 	UINT8 *prg = memory_region(machine, "maincpu");
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
-   	/* banking is done with writes to the $8000-$ffff area */
+	/* banking is done with writes to the $8000-$ffff area */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, castlevania_rom_banking );
 
 	/* tap on the PPU, due to some tricky protection */
@@ -1170,13 +1170,13 @@ static READ8_HANDLER( rbi_hack_r )
 	{
 		switch(VSindex++)
 		{
-   			case 9:
+			case 9:
     			return 0x6F;
 
 			case 14:
 				return 0x94;
 
-   			default:
+			default:
     			return 0xB4;
 		}
 	}
@@ -1343,7 +1343,7 @@ DRIVER_INIT( platoon )
 
 	init_vsnes(machine);
 
- 	remapped_colortable = rp2c04001_colortable;
+	remapped_colortable = rp2c04001_colortable;
 
 }
 

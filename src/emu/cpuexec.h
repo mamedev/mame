@@ -35,12 +35,12 @@ enum
 enum
 {
 	SUSPEND_REASON_HALT 	= 0x0001,
-	SUSPEND_REASON_RESET 	= 0x0002,
+	SUSPEND_REASON_RESET	= 0x0002,
 	SUSPEND_REASON_SPIN 	= 0x0004,
-	SUSPEND_REASON_TRIGGER 	= 0x0008,
-	SUSPEND_REASON_DISABLE 	= 0x0010,
+	SUSPEND_REASON_TRIGGER	= 0x0008,
+	SUSPEND_REASON_DISABLE	= 0x0010,
 	SUSPEND_REASON_TIMESLICE= 0x0020,
-	SUSPEND_ANY_REASON 		= ~0
+	SUSPEND_ANY_REASON		= ~0
 };
 
 
@@ -63,11 +63,11 @@ struct _cpu_config
 {
 	cpu_type			type;						/* index for the CPU type */
 	UINT32				flags;						/* flags; see #defines below */
-	cpu_interrupt_func 	vblank_interrupt;			/* for interrupts tied to VBLANK */
+	cpu_interrupt_func	vblank_interrupt;			/* for interrupts tied to VBLANK */
 	int 				vblank_interrupts_per_frame;/* usually 1 */
 	const char *		vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
-	cpu_interrupt_func 	timed_interrupt;			/* for interrupts not tied to VBLANK */
-	UINT64		 		timed_interrupt_period;		/* period for periodic interrupts */
+	cpu_interrupt_func	timed_interrupt;			/* for interrupts not tied to VBLANK */
+	UINT64				timed_interrupt_period;		/* period for periodic interrupts */
 };
 
 

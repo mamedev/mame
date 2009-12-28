@@ -53,7 +53,7 @@ static MACHINE_DRIVER_START( system246 )
 	MDRV_CPU_PROGRAM_MAP(ps2_map)
 	MDRV_CPU_CONFIG(config)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

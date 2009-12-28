@@ -20,7 +20,7 @@
 
 #define PEN_BRIGHTNESS_BITS		8
 #define MAX_PEN_BRIGHTNESS		(4 << PEN_BRIGHTNESS_BITS)
-#define MAX_SHADOW_PRESETS 		4
+#define MAX_SHADOW_PRESETS		4
 
 
 
@@ -45,10 +45,10 @@ struct _palette_private
 {
 	bitmap_format		format;				/* format assumed for palette data */
 
-	UINT32 				shadow_group;		/* index of the shadow group, or 0 if none */
+	UINT32				shadow_group;		/* index of the shadow group, or 0 if none */
 	UINT32				hilight_group;		/* index of the hilight group, or 0 if none */
 
-	pen_t 				black_pen;			/* precomputed black pen value */
+	pen_t				black_pen;			/* precomputed black pen value */
 	pen_t				white_pen;			/* precomputed white pen value */
 
 	shadow_table_data	shadow_table[MAX_SHADOW_PRESETS]; /* array of shadow table data */

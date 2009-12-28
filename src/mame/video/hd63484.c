@@ -42,7 +42,7 @@ static const int instruction_length[64] =
 	 0, 0, 4, 4,	/* 5x */
 	 5, 5, 5, 5,	/* 6x */
 	 5, 5, 5, 5,	/* 7x */
-	 3, 3, 3, 3, 	/* 8x */
+	 3, 3, 3, 3,	/* 8x */
 	 3, 3,-2,-2,	/* 9x */
 	-2,-2, 2, 4,	/* Ax */
 	 5, 5, 7, 7,	/* Bx */
@@ -62,7 +62,7 @@ static const char *const instruction_name[64] =
 	"undef","undef","CLR  ","SCLR ",	/* 5x */
 	"CPY  ","CPY  ","CPY  ","CPY  ",	/* 6x */
 	"SCPY ","SCPY ","SCPY ","SCPY ",	/* 7x */
-	"AMOVE","RMOVE","ALINE","RLINE", 	/* 8x */
+	"AMOVE","RMOVE","ALINE","RLINE",	/* 8x */
 	"ARCT ","RRCT ","APLL ","RPLL ",	/* 9x */
 	"APLG ","RPLG ","CRCL ","ELPS ",	/* Ax */
 	"AARC ","RARC ","AEARC","REARC",	/* Bx */
@@ -361,19 +361,19 @@ static void dot(int x, int y, int opm, UINT16 color)
 			break;
 		case 4:
 			if (get_pixel(x,y) == (ccmp & bitmask))
-			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+				HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 5:
 			if (get_pixel(x,y) != (ccmp & bitmask))
-			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+				HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 6:
 			if (get_pixel(x,y) < (cl0 & bitmask))
-			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+				HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 7:
 			if (get_pixel(x,y) > (cl0 & bitmask))
-			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+				HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 	}
 }
@@ -657,7 +657,7 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 			case 0x0200: logerror("PTN: not supported"); break;
 			case 0x0300: logerror("PTN: not supported"); break;
 			case 0x0400: logerror("PTN: not supported"); break;
- 			case 0x0500: logerror("PTN: not supported"); break;
+			case 0x0500: logerror("PTN: not supported"); break;
 			case 0x0600: logerror("PTN: not supported"); break;
 			case 0x0700: logerror("PTN: not supported"); break;
 		}

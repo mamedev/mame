@@ -1538,9 +1538,9 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 		case 0x0d:		/* PRESCALE   */
 		case 0x0e:
 		case 0x0f:		/* ADPCM data write */
-		case 0x10: 		/* DELTA-N    */
-		case 0x11: 		/* DELTA-N    */
-		case 0x12: 		/* ADPCM volume */
+		case 0x10:		/* DELTA-N    */
+		case 0x11:		/* DELTA-N    */
+		case 0x12:		/* ADPCM volume */
 			if(OPL->type&OPL_TYPE_ADPCM)
 				YM_DELTAT_ADPCM_Write(OPL->deltat,r-0x07,v);
 			break;

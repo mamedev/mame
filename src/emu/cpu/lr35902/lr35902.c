@@ -394,9 +394,9 @@ static CPU_SET_INFO( lr35902 )
 	case CPUINFO_INT_INPUT_STATE + 4:			lr35902_set_irq_line(cpustate, state-CPUINFO_INT_INPUT_STATE, info->i); break;
 
 	case CPUINFO_INT_SP:						cpustate->w.SP = info->i;						break;
-	case CPUINFO_INT_PC:						cpustate->w.PC = info->i; 						break;
+	case CPUINFO_INT_PC:						cpustate->w.PC = info->i;						break;
 
-	case CPUINFO_INT_REGISTER + LR35902_PC:		cpustate->w.PC = info->i; 						break;
+	case CPUINFO_INT_REGISTER + LR35902_PC:		cpustate->w.PC = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_SP:		cpustate->w.SP = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_AF:		cpustate->w.AF = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_BC:		cpustate->w.BC = info->i;						break;
@@ -430,11 +430,11 @@ CPU_GET_INFO( lr35902 )
 	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 16;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = cpustate->w.SP;					break;
 	case CPUINFO_INT_PC:							info->i = cpustate->w.PC;					break;
@@ -466,11 +466,11 @@ CPU_GET_INFO( lr35902 )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->w.icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME: 							strcpy(info->s, "LR35902"); break;
-	case DEVINFO_STR_FAMILY: 					strcpy(info->s, "Sharp LR35902"); break;
-	case DEVINFO_STR_VERSION: 					strcpy(info->s, "1.4"); break;
-	case DEVINFO_STR_SOURCE_FILE: 					strcpy(info->s, __FILE__); break;
-	case DEVINFO_STR_CREDITS: 					strcpy(info->s, "Copyright The MESS Team."); break;
+	case DEVINFO_STR_NAME:							strcpy(info->s, "LR35902"); break;
+	case DEVINFO_STR_FAMILY:					strcpy(info->s, "Sharp LR35902"); break;
+	case DEVINFO_STR_VERSION:					strcpy(info->s, "1.4"); break;
+	case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
+	case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright The MESS Team."); break;
 
 	case CPUINFO_STR_FLAGS:
 		sprintf(info->s, "%c%c%c%c%c%c%c%c",

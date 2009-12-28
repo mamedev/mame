@@ -1188,7 +1188,7 @@ static TIMER_CALLBACK( run_state_machine )
 	int cycles = 0;
 	UINT8 *state_prom = memory_region(machine, "user1");
 
-  	while (cycles < VGSLICE)
+	while (cycles < VGSLICE)
 	{
 		/* Get next state */
 		vg->state_latch = (vg->state_latch & 0x10)

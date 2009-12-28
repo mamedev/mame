@@ -31,7 +31,7 @@ struct _t11_state
     UINT8				wait_state;
     UINT8				irq_state;
     int					icount;
-	cpu_irq_callback 	irq_callback;
+	cpu_irq_callback	irq_callback;
 	const device_config *device;
 	const address_space *program;
 };
@@ -60,8 +60,8 @@ INLINE t11_state *get_safe_token(const device_config *device)
 #define REGB(x) reg[x].b.l
 
 /* PC, SP, and PSW definitions */
-#define SP 		REGW(6)
-#define PC 		REGW(7)
+#define SP		REGW(6)
+#define PC		REGW(7)
 #define SPD 	REGD(6)
 #define PCD 	REGD(7)
 #define PSW 	psw.b.l
@@ -391,7 +391,7 @@ static CPU_SET_INFO( t11 )
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		set_irq_line(cpustate, T11_IRQ3, info->i);		break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				cpustate->PC = info->i; 				 		break;
+		case CPUINFO_INT_REGISTER + T11_PC:				cpustate->PC = info->i; 						break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + T11_SP:				cpustate->SP = info->i;							break;
 		case CPUINFO_INT_REGISTER + T11_PSW:			cpustate->PSW = info->i;						break;
@@ -432,11 +432,11 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		info->i = (cpustate->irq_state & 1) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		info->i = (cpustate->irq_state & 2) ? ASSERT_LINE : CLEAR_LINE; break;

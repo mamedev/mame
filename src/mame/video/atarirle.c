@@ -48,10 +48,10 @@ typedef struct atarirle_info atarirle_info;
 struct atarirle_info
 {
 	INT16			width;
-	INT16 			height;
-	INT16 			xoffs;
-	INT16 			yoffs;
-	UINT8 			bpp;
+	INT16			height;
+	INT16			xoffs;
+	INT16			yoffs;
+	UINT8			bpp;
 	const UINT16 *	table;
 	const UINT16 *	data;
 };
@@ -73,15 +73,15 @@ struct atarirle_data
 
 	rectangle		cliprect;			/* clipping rectangle */
 
-	atarirle_mask 	codemask;			/* mask for the code index */
-	atarirle_mask 	colormask;			/* mask for the color */
-	atarirle_mask 	xposmask;			/* mask for the X position */
-	atarirle_mask 	yposmask;			/* mask for the Y position */
-	atarirle_mask 	scalemask;			/* mask for the scale factor */
-	atarirle_mask 	hflipmask;			/* mask for the horizontal flip */
-	atarirle_mask 	ordermask;			/* mask for the order */
-	atarirle_mask 	prioritymask;		/* mask for the priority */
-	atarirle_mask 	vrammask;			/* mask for the VRAM target */
+	atarirle_mask	codemask;			/* mask for the code index */
+	atarirle_mask	colormask;			/* mask for the color */
+	atarirle_mask	xposmask;			/* mask for the X position */
+	atarirle_mask	yposmask;			/* mask for the Y position */
+	atarirle_mask	scalemask;			/* mask for the scale factor */
+	atarirle_mask	hflipmask;			/* mask for the horizontal flip */
+	atarirle_mask	ordermask;			/* mask for the order */
+	atarirle_mask	prioritymask;		/* mask for the priority */
+	atarirle_mask	vrammask;			/* mask for the VRAM target */
 
 	const UINT16 *	rombase;			/* pointer to the base of the GFX ROM */
 	int				romlength;			/* length of the GFX ROM */

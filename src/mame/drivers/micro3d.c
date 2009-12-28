@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_CPU_PROGRAM_MAP(hostmem)
 	MDRV_CPU_VBLANK_INT("screen", micro3d_vblank)
 
- 	MDRV_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
+	MDRV_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(vgb_config)
 	MDRV_CPU_PROGRAM_MAP(vgbmem)
 

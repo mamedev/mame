@@ -12,7 +12,7 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
 	else
 		state->gc_up = data & 3;
 
-  	tilemap_mark_all_tiles_dirty(state->tilemap);
+	tilemap_mark_all_tiles_dirty(state->tilemap);
 
 	data >>= 5;
 	memory_set_bank(device->machine, "bank1", data & 0x07);

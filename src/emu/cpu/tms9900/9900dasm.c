@@ -102,7 +102,7 @@ enum opcodes {
 	/* ti990/12 instruction set */
 	_sram,	_slam,	_rto,	_lto,	_cnto,	_slsl,	_slsp,	_bdc,	_dbc,	_swpm,
 	_xorm,	_orm,	_andm,	_sm,	_am,	_mova,	_emd,	_eint,	_dint,	_stpc,
-	_cs,	_seqb,	_movs, 	_lim,	_lcs,	_blsk,	_mvsr,	_mvsk,	_pops,	_pshs,
+	_cs,	_seqb,	_movs,	_lim,	_lcs,	_blsk,	_mvsr,	_mvsk,	_pops,	_pshs,
 
 	_cri,	_cdi,	_negr,	_negd,	_cre,	_cde,	_cer,	_ced,	_nrm,	_tmb,
 	_tcmb,	_tsmb,	_srj,	_arj,	_xit,	_insf,	_xv,	_xf,	_ar,	_cir,
@@ -178,7 +178,7 @@ static const description_t descriptions[144+3+1] =
 	{ "emd",	format_7,	ps_ti990_12 },		{ "eint",	format_7,	ps_ti990_12 },
 	{ "dint",	format_7,	ps_ti990_12 },		{ "stpc",	format_18,	ps_ti990_12 },
 	{ "cs",		format_12,	ps_ti990_12 },		{ "seqb",	format_12,	ps_ti990_12 },
-	{ "movs", 	format_12,	ps_ti990_12 },		{ "lim",	format_18,	ps_ti990_12 },
+	{ "movs",	format_12,	ps_ti990_12 },		{ "lim",	format_18,	ps_ti990_12 },
 	{ "lcs",	format_18,	ps_ti990_12 },		{ "blsk",	format_8a,	ps_ti990_12 },
 	{ "mvsr",	format_12,	ps_ti990_12 },		{ "mvsk",	format_12,	ps_ti990_12 },
 	{ "pops",	format_12,	ps_ti990_12 },		{ "pshs",	format_12,	ps_ti990_12 },
@@ -329,7 +329,7 @@ static int print_arg (char *dest, int mode, int arg, const UINT8 *opram, unsigne
 			return sprintf (dest, "*R%d", arg);
 		case 0x2:	/* symbolic|indexed */
 			base = readop_arg(opram, pc);
-			if (arg) 	/* indexed */
+			if (arg)	/* indexed */
 				return sprintf (dest, "@>%04x(R%d)", base, arg);
 			else		/* symbolic (direct) */
 				return sprintf (dest, "@>%04x", base);
@@ -383,8 +383,8 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
         processor_mask |= ps_ti990_12;*/	/* ti990/12, tms99000, and later */
 
 	PC = pc;
- 	OP = oprom[PC++ - pc] << 8;
- 	OP |= oprom[PC++ - pc];
+	OP = oprom[PC++ - pc] << 8;
+	OP |= oprom[PC++ - pc];
 
 	/* let's identify the opcode */
 	if (OP >= 0x4000)

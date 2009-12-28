@@ -753,7 +753,7 @@ static void render_scanline( const device_config *device )
 	/* if sprites are on, draw them, but we call always to process them */
 	draw_sprites(device, line_priority);
 
- 	/* done updating, whew */
+	/* done updating, whew */
 	profiler_mark_end();
 }
 
@@ -1362,7 +1362,7 @@ DEVICE_GET_INFO(ppu2c03b)
 	{
 		case DEVINFO_STR_NAME:							strcpy(info->s, "2C02B PPU");				break;
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
-		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
+		default:										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
 }
 
@@ -1372,7 +1372,7 @@ DEVICE_GET_INFO(ppu2c04)
 	{
 		case DEVINFO_STR_NAME:							strcpy(info->s, "2C04 PPU");				break;
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
-		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
+		default:										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
 }
 
@@ -1382,7 +1382,7 @@ DEVICE_GET_INFO(ppu2c05)
 	{
 		case DEVINFO_STR_NAME:							strcpy(info->s, "2C05 PPU");				break;
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
-		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
+		default:										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
 }
 
@@ -1392,6 +1392,6 @@ DEVICE_GET_INFO(ppu2c07)
 	{
 		case DEVINFO_STR_NAME:							strcpy(info->s, "2C07 PPU");				break;
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_PAL_SCANLINES_PER_FRAME;		break;
-		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
+		default:										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
 }

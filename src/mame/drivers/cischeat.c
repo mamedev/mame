@@ -288,16 +288,16 @@ static ADDRESS_MAP_START( cischeat_map, ADDRESS_SPACE_PROGRAM, 16 )
     No mem access error from the other CPU's, though.. */
 
 	/* this is the right order of sharedram's */
-	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2) 				// Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE(&sharedram1) 				// Sharedram with sub CPU#1
+	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2)				// Sharedram with sub CPU#2
+	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE(&sharedram1)				// Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE(&megasys1_scrollram[0]) 		// Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE(&megasys1_scrollram[1]) 		// Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2]) 		// Scroll ram 2
+	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE(&megasys1_scrollram[0])		// Scroll ram 0
+	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE(&megasys1_scrollram[1])		// Scroll ram 1
+	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2])		// Scroll ram 2
 
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(cischeat_paletteram16_w) AM_BASE_GENERIC(paletteram) 				// Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(cischeat_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)												// RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
@@ -472,7 +472,7 @@ static WRITE16_HANDLER( scudhamm_leds_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
- 		set_led_status(space->machine, 0, data & 0x0100);	// 3 buttons
+		set_led_status(space->machine, 0, data & 0x0100);	// 3 buttons
 		set_led_status(space->machine, 1, data & 0x0200);
 		set_led_status(space->machine, 2, data & 0x0400);
 	}
@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( scudhamm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2])	// Scroll RAM 2
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(scudhamm_paletteram16_w) AM_BASE_GENERIC(paletteram)			// Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)											// Work RAM + Spriteram
- 	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)											// Sound
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)											// Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(scudhamm_leds_w)							// Buttons
 	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)				// Sound
 	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)				//
@@ -573,7 +573,7 @@ static WRITE16_HANDLER( armchmp2_leds_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(space->machine, 0, data & 0x0100);
- 		set_led_status(space->machine, 1, data & 0x1000);
+		set_led_status(space->machine, 1, data & 0x1000);
 		set_led_status(space->machine, 2, data & 0x2000);
 		set_led_status(space->machine, 3, data & 0x4000);
 	}
@@ -804,7 +804,7 @@ ADDRESS_MAP_END
 //                  [4] DSW 1 & 2   [5] DSW 3       [6] Driving Wheel
 
 static INPUT_PORTS_START( bigrun )
-  	PORT_START("FAKE")	// IN0 - Fake input port - Buttons status
+	PORT_START("FAKE")	// IN0 - Fake input port - Buttons status
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")
@@ -813,7 +813,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW ) 	// called "Test"
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	// called "Test"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -945,7 +945,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW) 	// called "Test"
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// called "Test"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1546,7 +1546,7 @@ static INTERRUPT_GEN( cischeat_interrupt )
 	else
 	{
 		if (cpu_getiloops(device)%2)	cpu_set_input_line(device, 2, HOLD_LINE);
-		else 					cpu_set_input_line(device, 1, HOLD_LINE);
+		else					cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 

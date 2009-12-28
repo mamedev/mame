@@ -107,13 +107,13 @@ struct _z80dma_t
 
 	emu_timer *timer;
 
-	UINT16 	regs[REGNUM(6,1)+1];
-	UINT8 	num_follow;
+	UINT16	regs[REGNUM(6,1)+1];
+	UINT8	num_follow;
 	UINT8	cur_follow;
-	UINT8 	regs_follow[4];
+	UINT8	regs_follow[4];
 	UINT8	read_num_follow;
 	UINT8	read_cur_follow;
-	UINT8 	read_regs_follow[7];
+	UINT8	read_regs_follow[7];
 	UINT8	status;
 	UINT8	dma_enabled;
 

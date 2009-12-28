@@ -20,9 +20,9 @@
 
 struct _generic_audio_private
 {
-	UINT16 		latch_clear_value;
-	UINT16 		latched_value[4];
-	UINT8 		latch_read[4];
+	UINT16		latch_clear_value;
+	UINT16		latched_value[4];
+	UINT8		latch_read[4];
 };
 
 

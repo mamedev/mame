@@ -1673,7 +1673,7 @@ static void tc0080vco_bg0_tilemap_draw( const device_config *device, bitmap_t *b
 }
 
 
-#define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -2116,7 +2116,7 @@ void tc0100scn_set_bg_tilemask( const device_config *device, int mask )
 
 WRITE16_DEVICE_HANDLER( tc0100scn_gfxbank_w )   /* Mjnquest banks its 2 sets of scr tiles */
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	tc0100scn->gfxbank = (data & 0x1);
 }
 
@@ -2146,7 +2146,7 @@ static void tc0100scn_set_layer_ptrs( tc0100scn_state *tc0100scn )
 
 static void tc0100scn_dirty_tilemaps( const device_config *device )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 
 	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[0][tc0100scn->dblwidth]);
 	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[1][tc0100scn->dblwidth]);
@@ -2187,13 +2187,13 @@ static STATE_POSTLOAD( tc0100scn_postload )
 
 READ16_DEVICE_HANDLER( tc0100scn_word_r )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	return tc0100scn->ram[offset];
 }
 
 WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 
 	COMBINE_DATA(&tc0100scn->ram[offset]);
 	if (!tc0100scn->dblwidth)
@@ -2237,13 +2237,13 @@ WRITE16_DEVICE_HANDLER( TC0100SCN_triple_screen_w )
 
 READ16_DEVICE_HANDLER( tc0100scn_ctrl_word_r )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	return tc0100scn->ctrl[offset];
 }
 
 WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 
 	COMBINE_DATA(&tc0100scn->ctrl[offset]);
 
@@ -2359,7 +2359,7 @@ WRITE32_DEVICE_HANDLER( tc0100scn_long_w )
 
 void tc0100scn_tilemap_update( const device_config *device )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int j;
 
 	tilemap_set_scrolly(tc0100scn->tilemap[0][tc0100scn->dblwidth], 0, tc0100scn->bgscrolly);
@@ -2373,7 +2373,7 @@ void tc0100scn_tilemap_update( const device_config *device )
 
 static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t* tmap, int flags, UINT32 priority )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
 	int column_offset, src_x = 0, src_y = 0;
@@ -2419,7 +2419,7 @@ static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bi
 
 int tc0100scn_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int disable = tc0100scn->ctrl[6] & 0xf7;
 	rectangle clip = *cliprect;
 	sect_rect(&clip, &tc0100scn->cliprect);
@@ -2452,7 +2452,7 @@ if (disable != 0 && disable != 3 && disable != 7)
 
 int tc0100scn_bottomlayer( const device_config *device )
 {
- 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	return (tc0100scn->ctrl[6] & 0x8) >> 3;
 }
 

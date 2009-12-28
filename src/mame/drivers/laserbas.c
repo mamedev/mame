@@ -49,7 +49,7 @@ static VIDEO_UPDATE(laserbas)
 	laserbas_state *state = (laserbas_state *)screen->machine->driver_data;
 	int x, y;
 
- 	for (y = 0; y < 256; y++)
+	for (y = 0; y < 256; y++)
 		for(x = 0; x < 128; x++)
 		{
 			if (state->vram2[y * 128 + x] & 0xf)
@@ -269,7 +269,7 @@ as a 2716 (FF.9), a 2532 like the others (FF.9A) and a 2732 (FF.9B).
 
 ROM_START( futflash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ff.1",    	  0x0000, 0x1000, CRC(bcd6b998) SHA1(4a210c40ce6015e2b921558b7571b7f2a27e1815) )
+	ROM_LOAD( "ff.1",   	  0x0000, 0x1000, CRC(bcd6b998) SHA1(4a210c40ce6015e2b921558b7571b7f2a27e1815) )
 	ROM_LOAD( "ff.2",         0x1000, 0x1000, CRC(1b1f6953) SHA1(8cd7b7e2236700ce63c60b4d2286099c8091bdbd) )
 	ROM_LOAD( "ff.3",         0x2000, 0x1000, CRC(30008f04) SHA1(e03b2dbcb6d2615650cdd47ecf1d587906ce149b) )
 	ROM_LOAD( "ff.4",         0x3000, 0x1000, CRC(e559aa12) SHA1(0fecfb60b0147e8060c640f684f69503478200ff) )

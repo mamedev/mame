@@ -190,7 +190,7 @@ struct _symbol_table
 {
 	symbol_table *			parent;							/* pointer to the parent symbol table */
 	void *					globalref;						/* global reference parameter */
-	internal_symbol_entry *	hash[SYM_TABLE_HASH_SIZE]; 		/* hash table */
+	internal_symbol_entry *	hash[SYM_TABLE_HASH_SIZE];		/* hash table */
 };
 
 
@@ -206,9 +206,9 @@ struct _expression_string
 /* typedef struct _parsed_expression parsed_expression -- defined in express.h */
 struct _parsed_expression
 {
-	const symbol_table *	table; 							/* symbol table */
+	const symbol_table *	table;							/* symbol table */
 	char *					original_string;				/* original string (prior to parsing) */
-	express_callbacks 		callbacks;						/* callbacks */
+	express_callbacks		callbacks;						/* callbacks */
 	void *					cbparam;						/* callbakc parameter */
 	expression_string *		stringlist; 					/* string list */
 	UINT16					stringcount;					/* number of strings allocated so far */

@@ -192,13 +192,13 @@ static DRIVER_INIT(tcl)
 		if(i&0x8000)
 		{
 			WRITEDEST(ROL(src[idx]^0x44,4)); // abcdefgh -> aFghaBcd
-		 	WRITEDEST(ROL(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
-		 	WRITEDEST(ROL(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
-		 	WRITEDEST((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
+			WRITEDEST(ROL(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
+			WRITEDEST(ROL(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
+			WRITEDEST((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
 		}
 		else
 		{
-		 	WRITEDEST(ROL(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
+			WRITEDEST(ROL(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
 			WRITEDEST(ROL(src[idx]^0x11,7)); // abcdefgh -> HabcDefg
 			WRITEDEST(ROL(src[idx]^0x11,2)); // abcdefgh -> cDefgHab
 			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH

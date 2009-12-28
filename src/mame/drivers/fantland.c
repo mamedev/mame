@@ -544,7 +544,7 @@ static INPUT_PORTS_START( galaxygn )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, "Invulnerability" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) 	// Demo Sounds? doesn't work
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	// Demo Sounds? doesn't work
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	// Allow Continue? doesn't work

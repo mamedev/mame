@@ -2988,7 +2988,7 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 		16,16,
 		0,
 		4,
-  		{ 24, 16, 8, 0 },
+		{ 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7,
 				8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -6233,7 +6233,7 @@ WRITE16_HANDLER( K056832_ram_half_word_w )
 		if (K056832_PageTileMode[K056832_SelectedPage])
 			tilemap_mark_tile_dirty(K056832_tilemap[K056832_SelectedPage], dofs);
 		else
-       			K056832_mark_line_dirty(K056832_SelectedPage, dofs);
+    			K056832_mark_line_dirty(K056832_SelectedPage, dofs);
 	}
 }
 

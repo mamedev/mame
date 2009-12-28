@@ -3927,7 +3927,7 @@ static const discrete_mixer_desc invaders_mixer =
 					RES_K(47),											/* R95 */                                   \
 					CAP_U(1),											/* C34 */                                   \
 					&invaders_bonus_555)                				                                            \
-	DISCRETE_SQUAREWFIX(INVADERS_NODE(41, _board),       				                                            \
+	DISCRETE_SQUAREWFIX(INVADERS_NODE(41, _board),      				                                            \
 					1,													/* ENAB */                                  \
 					480,												/* FREQ */                                  \
 					1,													/* AMP */                                   \

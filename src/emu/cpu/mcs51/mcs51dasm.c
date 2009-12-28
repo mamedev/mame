@@ -137,10 +137,10 @@ static const struct {
 	{ FEATURE_DS5002FP, 0xd8, "rpctl"	},
 	{ FEATURE_DS5002FP, 0xd9, "rps"		},
 
-	{ FEATURE_I83C751, 	0x98, "i2con"	},
-	{ FEATURE_I83C751, 	0x99, "i2dat"	},
-	{ FEATURE_I83C751, 	0xd8, "i2cfg"	},
-	{ FEATURE_I83C751, 	0xf8, "i2sta"	},	/* read only */
+	{ FEATURE_I83C751,	0x98, "i2con"	},
+	{ FEATURE_I83C751,	0x99, "i2dat"	},
+	{ FEATURE_I83C751,	0xd8, "i2cfg"	},
+	{ FEATURE_I83C751,	0xf8, "i2sta"	},	/* read only */
 
 	/* bit addresses */
 

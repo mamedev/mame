@@ -659,7 +659,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int attr = colorram[tile_index];
 	int code = ((attr & 1) << 8) | videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
- 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
+	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
 	SET_TILE_INFO(bank, code, color, 0);
 }

@@ -483,7 +483,7 @@ struct _tms99xx_state
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	/* additionnal registers */
-	UINT16 flag; 	  /* flag register */
+	UINT16 flag;	  /* flag register */
 	UINT8 MID_flag;   /* MID flag register */
 
 	/* chip config, which can be set on reset */
@@ -4676,8 +4676,8 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 			break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_IO:
 #if (TMS99XX_MODEL == TI990_10_ID)
@@ -4700,7 +4700,7 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 			info->i = 15;
 #endif
 			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 /* not implemented */
 /*      case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = get_irq_line(INPUT_LINE_NMI); break;

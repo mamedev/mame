@@ -1065,7 +1065,7 @@ READ16_HANDLER( ygv608_r )
 				if (regNum == 50)
 				{
 					regNum = 0;
-	   				logerror( "warning: rn=50 after read increment\n" );
+					logerror( "warning: rn=50 after read increment\n" );
 				}
 				ygv608.ports.s.p5 &= ~p5_rn;
 				ygv608.ports.s.p5 |= regNum;

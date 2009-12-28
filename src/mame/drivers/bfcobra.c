@@ -177,9 +177,9 @@ typedef union
 #define MODE_BITTOBYTE	0x04
 #define MODE_PALREMAP	0x10
 
-#define CMPFUNC_LT    	0x01
-#define CMPFUNC_EQ    	0x02
-#define CMPFUNC_GT    	0x04
+#define CMPFUNC_LT  	0x01
+#define CMPFUNC_EQ  	0x02
+#define CMPFUNC_GT  	0x04
 #define CMPFUNC_BEQ		0x08
 #define CMPFUNC_LOG0	0x10
 #define CMPFUNC_LOG1	0x20
@@ -1368,13 +1368,13 @@ static WRITE8_HANDLER( meter_w )
         is connected, the /FIRQ line will be pulsed.
     */
 	for (i = 0; i < 8; i++)
- 	{
+	{
 		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
 			generic_pulse_irq_line(space->cpu, M6809_FIRQ_LINE);
 		}
- 	}
+	}
 }
 
 /* TODO */

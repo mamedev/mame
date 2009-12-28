@@ -406,8 +406,8 @@ ROM_START( mermaid )
 	ROM_LOAD( "g960_43.26",	0x0000, 0x1000, CRC(6f077417) SHA1(f2c20e03427a2f5a113c6a4cf95875b77a0ec418) )
 
 	ROM_REGION( 0x40, "proms", 0 )
-	ROM_LOAD( "col_a.96", 	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) )
-	ROM_LOAD( "col_b.95", 	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) )
+	ROM_LOAD( "col_a.96",	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) )
+	ROM_LOAD( "col_b.95",	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) )
 
 	ROM_REGION( 0x1000, "user1", 0 )	// unknown
 	ROM_LOAD( "g960_42.39",	0x0000, 0x1000, CRC(287840bb) SHA1(9a1836f39f328b0c9672976d95a9ece45bb9e89f) )
@@ -476,8 +476,8 @@ ROM_START( yachtmn )
 	ROM_LOAD( "g960_43.26",	0x0000, 0x1000, CRC(6f077417) SHA1(f2c20e03427a2f5a113c6a4cf95875b77a0ec418) ) // merv_2.26
 
 	ROM_REGION( 0x40, "proms", 0 )
-	ROM_LOAD( "col_a.96", 	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) ) // col_a.96
-	ROM_LOAD( "col_b.95", 	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) ) // col_b.95
+	ROM_LOAD( "col_a.96",	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) ) // col_a.96
+	ROM_LOAD( "col_b.95",	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) ) // col_b.95
 
 	ROM_REGION( 0x1000, "user1", 0 )	// unknown
 	ROM_LOAD( "g960_42.39",	0x0000, 0x1000, CRC(287840bb) SHA1(9a1836f39f328b0c9672976d95a9ece45bb9e89f) ) // mervce.39

@@ -159,7 +159,7 @@ static FILE *sample[9];
  */
 
 
-#define R51 1400 	/* charge resistance */
+#define R51 1400	/* charge resistance */
 #define R52 28750	/* discharge resistance */
 
 #if 0

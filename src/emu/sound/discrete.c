@@ -680,7 +680,7 @@ static void *task_callback(void *param, int threadid)
 	{
 		for (entry = list; entry != 0; entry = entry->next)
 		{
-			discrete_task 		*task = (discrete_task *) entry->ptr;
+			discrete_task		*task = (discrete_task *) entry->ptr;
 			INT32				prev_id;
 
 			/* try to lock */
@@ -763,7 +763,7 @@ static STREAM_UPDATE( discrete_stream_update )
 	/* Setup tasks */
 	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
-		discrete_task 		*task = (discrete_task *) entry->ptr;
+		discrete_task		*task = (discrete_task *) entry->ptr;
 		linked_list_entry	*src_entry;
 		int					i;
 

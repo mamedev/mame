@@ -3,15 +3,15 @@
 #define F2END(cs) \
 	return 2 + (cs)->amlength1 + (cs)->amlength2;
 
-#define F2LOADOPFLOAT(cs, num) 								\
+#define F2LOADOPFLOAT(cs, num)								\
 	if ((cs)->flag##num)									\
-		appf = u2f((cs)->reg[(cs)->op##num]); 				\
+		appf = u2f((cs)->reg[(cs)->op##num]);				\
 	else													\
 		appf = u2f(MemRead32((cs)->program, (cs)->op##num));
 
-#define F2STOREOPFLOAT(cs,num) 								\
+#define F2STOREOPFLOAT(cs,num)								\
 	if ((cs)->flag##num)									\
-		(cs)->reg[(cs)->op##num] = f2u(appf);  				\
+		(cs)->reg[(cs)->op##num] = f2u(appf);				\
 	else													\
 		MemWrite32((cs)->program, (cs)->op##num, f2u(appf));
 

@@ -13,29 +13,29 @@ struct _atarisy2_state
 
 	UINT16 *		slapstic_base;
 
-	UINT8 			interrupt_enable;
+	UINT8			interrupt_enable;
 	UINT16 *		bankselect;
 
-	INT8 			pedal_count;
+	INT8			pedal_count;
 
-	UINT8 			has_tms5220;
-	UINT8 			tms5220_data;
-	UINT8 			tms5220_data_strobe;
+	UINT8			has_tms5220;
+	UINT8			tms5220_data;
+	UINT8			tms5220_data_strobe;
 
-	UINT8 			which_adc;
+	UINT8			which_adc;
 
-	UINT8 			p2portwr_state;
-	UINT8 			p2portrd_state;
+	UINT8			p2portwr_state;
+	UINT8			p2portrd_state;
 
 	UINT16 *		rombank1;
 	UINT16 *		rombank2;
 
-	UINT8 			sound_reset_state;
+	UINT8			sound_reset_state;
 
 	emu_timer *		yscroll_reset_timer;
-	UINT32 			playfield_tile_bank[2];
-	UINT32 			videobank;
-	UINT16 			vram[0x8000/2];
+	UINT32			playfield_tile_bank[2];
+	UINT32			videobank;
+	UINT16			vram[0x8000/2];
 };
 
 

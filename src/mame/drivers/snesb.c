@@ -191,7 +191,7 @@ static READ8_HANDLER(sb2b_75bd37_r)
 {
 	/* protection check */
 	static UINT8 cnt=0;
- 	return ++cnt;
+	return ++cnt;
 }
 
 static READ8_HANDLER(sb2b_6a6xxx_r)
@@ -214,12 +214,12 @@ static READ8_HANDLER(sb2b_6a6xxx_r)
 
 static READ8_HANDLER(sb2b_770071_r)
 {
- 	return input_port_read(space->machine, "DSW");
+	return input_port_read(space->machine, "DSW");
 }
 
 static READ8_HANDLER(sb2b_770079_r)
 {
- 	return input_port_read(space->machine, "COIN");
+	return input_port_read(space->machine, "COIN");
 }
 
 static READ8_HANDLER(sb2b_7xxx_r)
@@ -231,17 +231,17 @@ static READ8_HANDLER(sb2b_7xxx_r)
 
 static READ8_HANDLER(iron_770071_r)
 {
- 	return input_port_read(space->machine, "DSW1");
+	return input_port_read(space->machine, "DSW1");
 }
 
 static READ8_HANDLER(iron_770073_r)
 {
- 	return input_port_read(space->machine, "DSW2");
+	return input_port_read(space->machine, "DSW2");
 }
 
 static READ8_HANDLER(iron_770079_r)
 {
- 	return input_port_read(space->machine, "COIN");
+	return input_port_read(space->machine, "COIN");
 }
 
 
@@ -855,42 +855,42 @@ static DRIVER_INIT( sblast2b )
 	UINT8 *dst = memory_region(machine, "user3");
 	for (i=0; i<0x80000*3; i++)
     {
-       	cipherText = src[i];
-       	plainText = data_substitution0[cipherText&0xf]|data_substitution1[cipherText>>4];
-   		newAddress = (address_substitution_high[i>>15]<<15)|(i&0x7fc0)|(address_substitution_low[i&0x3f]);
+    	cipherText = src[i];
+    	plainText = data_substitution0[cipherText&0xf]|data_substitution1[cipherText>>4];
+		newAddress = (address_substitution_high[i>>15]<<15)|(i&0x7fc0)|(address_substitution_low[i&0x3f]);
 
 		if(newAddress<0x10000)
-	 	{
-	 		plainText = BITSWAP8(plainText, 6,3,5,4,2,0,7,1) ^ 0xff;
-	 	}
+		{
+			plainText = BITSWAP8(plainText, 6,3,5,4,2,0,7,1) ^ 0xff;
+		}
 		else
-	 	if(newAddress<0x20000)
-	 	{
-	 		plainText =	BITSWAP8(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
-	 	}
-	 	else
-	 	if(newAddress<0x30000)
-	 	{
-	 		plainText =	BITSWAP8(plainText, 5,7,6,1,4,3,0,2);
-	 	}
-	 	else
-	 	if(newAddress<0x40000)
-	 	{
-	 		plainText = BITSWAP8(plainText, 3,1,2,0,5,6,4,7) ^ 0xff;
-	 	}
+		if(newAddress<0x20000)
+		{
+			plainText =	BITSWAP8(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
+		}
+		else
+		if(newAddress<0x30000)
+		{
+			plainText =	BITSWAP8(plainText, 5,7,6,1,4,3,0,2);
+		}
+		else
+		if(newAddress<0x40000)
+		{
+			plainText = BITSWAP8(plainText, 3,1,2,0,5,6,4,7) ^ 0xff;
+		}
         dst[newAddress] = plainText;
     }
 
- 	/*  boot vector */
+	/*  boot vector */
     dst[0xfffc]=0xc0;
     dst[0xfffd]=0x7a;
 
-   	/*  protection checks */
- 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
-  	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
+	/*  protection checks */
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
 
-  	/* extra inputs */
-   	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, sb2b_770071_r);
+	/* extra inputs */
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, sb2b_770071_r);
     memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, sb2b_770079_r);
 
     /* handler to read boot code */
@@ -917,7 +917,7 @@ static DRIVER_INIT( iron )
 	}
 
 	/* extra inputs */
-   	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, iron_770071_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, iron_770071_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770073, 0x770073, 0, 0, iron_770073_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, iron_770079_r);
 

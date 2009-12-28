@@ -124,8 +124,8 @@ static VIDEO_UPDATE( dominob )
 	for (y = 0; y < 256 / 32; y++)
 	{
 		for (x = 0; x < 256 / 32; x++)
- 		{
- 			drawgfx_opaque(bitmap,
+		{
+			drawgfx_opaque(bitmap,
 					cliprect,
 					screen->machine->gfx[1],
 					state->bgram[index] + 256 * (state->bgram[index + 1] & 0xf),
@@ -133,21 +133,21 @@ static VIDEO_UPDATE( dominob )
 					0, 0,
 					x * 32, y * 32);
 			index += 2;
- 		}
+		}
 	}
 
 	for (y = 0; y < 32; y++)
 	{
- 		for (x = 0; x < 32; x++)
- 		{
- 			drawgfx_transpen(	bitmap,
+		for (x = 0; x < 32; x++)
+		{
+			drawgfx_transpen(	bitmap,
 					cliprect,
 					screen->machine->gfx[0],
 					state->videoram[(y * 32 + x) * 2 + 1] + (state->videoram[(y * 32 + x) * 2] & 7) * 256,
 					(state->videoram[(y * 32 + x) * 2] >> 3),
 					0, 0,
 					x * 8, y * 8,0);
- 		}
+		}
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect);

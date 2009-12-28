@@ -185,7 +185,7 @@ VIDEO_START( carpolo )
  *************************************/
 
 static void draw_alpha_line(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-					   		int alpha_line, int video_line)
+							int alpha_line, int video_line)
 {
 	int x;
 
@@ -645,19 +645,19 @@ VIDEO_EOF( carpolo )
 
 	else if (check_sprite_sprite_collision(machine,
 										   car2_x, car2_y, car2_code, car2_flipy,
-									  	   ball_x, ball_y, ball_code, ball_flipy,
+										   ball_x, ball_y, ball_code, ball_flipy,
 										   &col_x, &col_y))
 		carpolo_generate_car_ball_interrupt(machine, 1, col_x, col_y);
 
 	else if (check_sprite_sprite_collision(machine,
 										   car3_x, car3_y, car3_code, car3_flipy,
-									  	   ball_x, ball_y, ball_code, ball_flipy,
+										   ball_x, ball_y, ball_code, ball_flipy,
 										   &col_x, &col_y))
 		carpolo_generate_car_ball_interrupt(machine, 2, col_x, col_y);
 
 	else if (check_sprite_sprite_collision(machine,
 										   car4_x, car4_y, car4_code, car4_flipy,
-									  	   ball_x, ball_y, ball_code, ball_flipy,
+										   ball_x, ball_y, ball_code, ball_flipy,
 										   &col_x, &col_y))
 		carpolo_generate_car_ball_interrupt(machine, 3, col_x, col_y);
 

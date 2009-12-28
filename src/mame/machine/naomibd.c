@@ -429,7 +429,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 				printf("naomibd: PIO read count %x\n", v->prot_pio_count);
 				#endif
 
-			 	if (v->prot_reverse_bytes)
+				if (v->prot_reverse_bytes)
 				{
 					ret = (UINT64)(prot[byte_offset+1] | (prot[byte_offset]<<8));
 				}

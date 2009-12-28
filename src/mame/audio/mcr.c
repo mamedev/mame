@@ -514,7 +514,7 @@ static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 {
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
-  	cpu_set_input_line(csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
@@ -652,7 +652,7 @@ static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 {
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
-  	cpu_set_input_line(soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )

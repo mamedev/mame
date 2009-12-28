@@ -596,11 +596,11 @@ static CPU_GET_INFO( tms )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -691,7 +691,7 @@ static CPU_SET_INFO( tms32051 )
 	{
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + TMS32051_PC:		cpustate->pc = info->i; 						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ACC:		cpustate->acc = info->i; 						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ACC:		cpustate->acc = info->i;						break;
 		case CPUINFO_INT_REGISTER + TMS32051_ACCB:		cpustate->accb = info->i;						break;
 		case CPUINFO_INT_REGISTER + TMS32051_PREG:		cpustate->preg = info->i;						break;
 		case CPUINFO_INT_REGISTER + TMS32051_TREG0:		cpustate->treg0 = info->i;					break;
@@ -705,14 +705,14 @@ static CPU_SET_INFO( tms32051 )
 		case CPUINFO_INT_REGISTER + TMS32051_DP:		cpustate->st0.dp = info->i;					break;
 		case CPUINFO_INT_REGISTER + TMS32051_ARP:		cpustate->st0.arp = info->i;					break;
 		case CPUINFO_INT_REGISTER + TMS32051_ARB:		cpustate->st1.arb = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR0:		cpustate->ar[0] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR1:		cpustate->ar[1] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR2:		cpustate->ar[2] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR3:		cpustate->ar[3] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR4:		cpustate->ar[4] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR5:		cpustate->ar[5] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR6:		cpustate->ar[6] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR7:		cpustate->ar[7] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR0:		cpustate->ar[0] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR1:		cpustate->ar[1] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR2:		cpustate->ar[2] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR3:		cpustate->ar[3] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR4:		cpustate->ar[4] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR5:		cpustate->ar[5] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR6:		cpustate->ar[6] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR7:		cpustate->ar[7] = info->i;					break;
 
 		default:										CPU_SET_INFO_CALL(tms);				break;
 	}

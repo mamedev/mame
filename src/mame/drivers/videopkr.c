@@ -470,7 +470,7 @@ static READ8_HANDLER( videopkr_io_r )
 	{
 		case 0xef:	/* inputs are multiplexed through a diode matrix */
 		{
-			hf = ((input_port_read(space->machine, "IN1") & 0x10 ) >> 4) & 1; 			/* Hopper full detection */
+			hf = ((input_port_read(space->machine, "IN1") & 0x10 ) >> 4) & 1;			/* Hopper full detection */
 			co = 0x10 * ((input_port_read(space->machine, "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
 			kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
 

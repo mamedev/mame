@@ -2785,7 +2785,7 @@ static READ8_HANDLER( aquajet_mcu_adc_r )
 			return ddy & 0xff;
 
 		case 5:
-		       	return (ddy>>8);
+		    	return (ddy>>8);
 
 		default:
 			return 0;
@@ -2846,7 +2846,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
- 		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 1)
 	{
@@ -5196,7 +5196,7 @@ static INPUT_PORTS_START( timecris )
 	PORT_START( "LIGHTY" )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
 
-  	PORT_START("MCUP5A")
+	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )

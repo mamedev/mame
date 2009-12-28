@@ -24,7 +24,7 @@
 ***************************************************************************/
 
 #define REPORT_TIMES				(0)
-#define DETECT_OVERLAPPING_MEMORY 	(0)
+#define DETECT_OVERLAPPING_MEMORY	(0)
 
 
 

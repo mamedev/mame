@@ -401,7 +401,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )	// start
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)	// payout
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)		// cancel
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_START2   ) 	// start p2
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_START2   )	// start p2
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Payout") PORT_CODE(KEYCODE_RCONTROL)	// payout p2
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_CODE(KEYCODE_RALT)		// cancel p2
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
@@ -654,7 +654,7 @@ MACHINE_DRIVER_END
 
 static VIDEO_START(jclub2)
 {
- 	/* find first empty slot to decode gfx */
+	/* find first empty slot to decode gfx */
 	for (jclub2_gfx_index = 0; jclub2_gfx_index < MAX_GFX_ELEMENTS; jclub2_gfx_index++)
 		if (machine->gfx[jclub2_gfx_index] == 0)
 			break;

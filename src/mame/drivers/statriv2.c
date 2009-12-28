@@ -251,8 +251,8 @@ static const ppi8255_interface ppi8255_intf =
 	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
 	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_INPUT_PORT("IN2"),		/* Port C read (Lower Nibble as Input) */
-	DEVCB_NULL,   					/* Port A write */
-	DEVCB_NULL,  		 			/* Port B write */
+	DEVCB_NULL, 					/* Port A write */
+	DEVCB_NULL, 					/* Port B write */
 	DEVCB_HANDLER(ppi_portc_hi_w)	/* Port C write (High nibble as Output) */
 };
 
@@ -375,7 +375,7 @@ static INPUT_PORTS_START( hangman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Spinner")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -414,7 +414,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button D")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
- 	PORT_START("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(latched_coin_r, "COIN")
@@ -443,7 +443,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( statriv4 )
 	PORT_INCLUDE(statriv2)
 
- 	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
@@ -491,7 +491,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sextriv )
 	PORT_INCLUDE(statriv2)
 
- 	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )

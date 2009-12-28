@@ -282,7 +282,7 @@ static UINT32 GET_UREG(SHARC_REGS *cpustate, int ureg)
 			{
 				return cpustate->dag2.i[reg & 0x7];
 			}
-			else 				/* I0 - I7 */
+			else				/* I0 - I7 */
 			{
 				return cpustate->dag1.i[reg & 0x7];
 			}

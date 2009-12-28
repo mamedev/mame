@@ -162,10 +162,10 @@ static ADDRESS_MAP_START( base_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(realbrk_vram_0_w) AM_BASE(&realbrk_vram_0	)	// Background   (0)
 	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(realbrk_vram_1_w) AM_BASE(&realbrk_vram_1	)	// Background   (1)
 	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(realbrk_vram_2_w) AM_BASE(&realbrk_vram_2	)	// Text         (2)
-	AM_RANGE(0x606000, 0x60600f) AM_RAM_WRITE(realbrk_vregs_w) AM_BASE(&realbrk_vregs 	)	// Scroll + Video Regs
-	AM_RANGE(0x605000, 0x61ffff) AM_RAM							               	//
+	AM_RANGE(0x606000, 0x60600f) AM_RAM_WRITE(realbrk_vregs_w) AM_BASE(&realbrk_vregs	)	// Scroll + Video Regs
+	AM_RANGE(0x605000, 0x61ffff) AM_RAM							            	//
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff00)	// YMZ280
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM						                 	// RAM
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM						                	// RAM
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs	)	// TMP68301 Registers
 ADDRESS_MAP_END
 

@@ -315,7 +315,7 @@ OSDOBJS += $(WINOBJ)/d3d8intf.o
 endif
 
 # extra dependencies
-$(WINOBJ)/drawdd.o : 	$(SRC)/emu/rendersw.c
+$(WINOBJ)/drawdd.o :	$(SRC)/emu/rendersw.c
 $(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
 
 # add debug-specific files

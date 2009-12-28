@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 INTERRUPT_GEN( namcoc7x_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
- 		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	else
 		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 }

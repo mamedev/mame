@@ -139,8 +139,8 @@ static READ8_HANDLER( key_matrix_r )
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;
-		 		case 0x004: return 0x03;
-		 		case 0x008: return 0x04;
+				case 0x004: return 0x03;
+				case 0x008: return 0x04;
 				case 0x010: return 0x07;
 				case 0x020: return 0x08;
 				case 0x040: return 0x09;
@@ -365,8 +365,8 @@ ROM_START( speedatk )
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "cb0-5",        0x0000, 0x2000, CRC(47a966e7) SHA1(fdaa0f88656afc431bae367679ce6298fa962e0f) )
 	ROM_LOAD( "cb0-6",        0x2000, 0x2000, CRC(cc1da937) SHA1(1697bb008bfa5c33a282bd470ac39c324eea7509) )
-	ROM_COPY( "gfx2",    	  0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
-	ROM_COPY( "gfx1",    	  0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
+	ROM_COPY( "gfx2",   	  0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
+	ROM_COPY( "gfx1",   	  0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "cb1.bpr",      0x0000, 0x0020, CRC(a0176c23) SHA1(133fb9eef8a6595cac2dcd7edce4789899a59e84) ) /* color PROM */

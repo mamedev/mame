@@ -136,16 +136,16 @@ typedef enum {
 #define IncWordReg(Reg) 					\
 	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
 	unsigned tmp1 = tmp+1;					\
-	cpustate->OverVal = (tmp == 0x7fff); 			\
+	cpustate->OverVal = (tmp == 0x7fff);			\
 	SetAF(tmp1,tmp,1);						\
 	SetSZPF_Word(tmp1); 					\
 	cpustate->regs.w[Reg]=tmp1
 
 #define DecWordReg(Reg) 					\
 	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
-    unsigned tmp1 = tmp-1; 					\
-	cpustate->OverVal = (tmp == 0x8000); 			\
-    SetAF(tmp1,tmp,1); 						\
+    unsigned tmp1 = tmp-1;					\
+	cpustate->OverVal = (tmp == 0x8000);			\
+    SetAF(tmp1,tmp,1);						\
     SetSZPF_Word(tmp1); 					\
 	cpustate->regs.w[Reg]=tmp1
 
@@ -215,10 +215,10 @@ typedef enum {
 	else									\
 		tmp |= (1<<tmp2)
 
-#define XchgAWReg(Reg) 						\
-    WORD tmp; 								\
-	tmp = cpustate->regs.w[Reg]; 					\
-	cpustate->regs.w[Reg] = cpustate->regs.w[AW]; 			\
+#define XchgAWReg(Reg)						\
+    WORD tmp;								\
+	tmp = cpustate->regs.w[Reg];					\
+	cpustate->regs.w[Reg] = cpustate->regs.w[AW];			\
 	cpustate->regs.w[AW] = tmp
 
 #define ROL_BYTE cpustate->CarryVal = dst & 0x80; dst = (dst << 1)+CF

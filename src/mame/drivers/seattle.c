@@ -395,7 +395,7 @@ struct _galileo_data
 	UINT32			reg[0x1000/4];
 
 	/* timer info */
-	galileo_timer 	timer[4];
+	galileo_timer	timer[4];
 
 	/* DMA info */
 	INT8			dma_active;

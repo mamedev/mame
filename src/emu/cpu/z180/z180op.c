@@ -8,7 +8,7 @@ OP(op,02) { WM(cpustate,  cpustate->_BC, cpustate->_A );											} /* LD   (BC
 OP(op,03) { cpustate->_BC++;													} /* INC  BC          */
 OP(op,04) { cpustate->_B = INC(cpustate, cpustate->_B);											} /* INC  B           */
 OP(op,05) { cpustate->_B = DEC(cpustate, cpustate->_B);											} /* DEC  B           */
-OP(op,06) { cpustate->_B = ARG(cpustate); 											} /* LD   B,n         */
+OP(op,06) { cpustate->_B = ARG(cpustate);											} /* LD   B,n         */
 OP(op,07) { RLCA;													} /* RLCA             */
 
 OP(op,08) { EX_AF;													} /* EX   AF,AF'      */
@@ -17,7 +17,7 @@ OP(op,0a) { cpustate->_A = RM(cpustate, cpustate->_BC);											} /* LD   A,(B
 OP(op,0b) { cpustate->_BC--;													} /* DEC  BC          */
 OP(op,0c) { cpustate->_C = INC(cpustate, cpustate->_C);											} /* INC  C           */
 OP(op,0d) { cpustate->_C = DEC(cpustate, cpustate->_C);											} /* DEC  C           */
-OP(op,0e) { cpustate->_C = ARG(cpustate); 											} /* LD   C,n         */
+OP(op,0e) { cpustate->_C = ARG(cpustate);											} /* LD   C,n         */
 OP(op,0f) { RRCA;													} /* RRCA             */
 
 OP(op,10) { cpustate->_B--; JR_COND( cpustate->_B, 0x10 );								} /* DJNZ o           */
@@ -26,7 +26,7 @@ OP(op,12) { WM(cpustate,  cpustate->_DE, cpustate->_A );											} /* LD   (DE
 OP(op,13) { cpustate->_DE++;													} /* INC  DE          */
 OP(op,14) { cpustate->_D = INC(cpustate, cpustate->_D);											} /* INC  D           */
 OP(op,15) { cpustate->_D = DEC(cpustate, cpustate->_D);											} /* DEC  D           */
-OP(op,16) { cpustate->_D = ARG(cpustate); 											} /* LD   D,n         */
+OP(op,16) { cpustate->_D = ARG(cpustate);											} /* LD   D,n         */
 OP(op,17) { RLA;													} /* RLA              */
 
 OP(op,18) { JR();													} /* JR   o           */
@@ -35,25 +35,25 @@ OP(op,1a) { cpustate->_A = RM(cpustate, cpustate->_DE);											} /* LD   A,(D
 OP(op,1b) { cpustate->_DE--;				;									} /* DEC  DE          */
 OP(op,1c) { cpustate->_E = INC(cpustate, cpustate->_E);											} /* INC  E           */
 OP(op,1d) { cpustate->_E = DEC(cpustate, cpustate->_E);											} /* DEC  E           */
-OP(op,1e) { cpustate->_E = ARG(cpustate); 											} /* LD   E,n         */
+OP(op,1e) { cpustate->_E = ARG(cpustate);											} /* LD   E,n         */
 OP(op,1f) { RRA;													} /* RRA              */
 
 OP(op,20) { JR_COND( !(cpustate->_F & ZF), 0x20 );							} /* JR   NZ,o        */
 OP(op,21) { cpustate->_HL = ARG16(cpustate);											} /* LD   HL,w        */
-OP(op,22) { cpustate->ea = ARG16(cpustate); WM16(cpustate, cpustate->ea, &cpustate->HL ); 					} /* LD   (w),HL      */
+OP(op,22) { cpustate->ea = ARG16(cpustate); WM16(cpustate, cpustate->ea, &cpustate->HL );					} /* LD   (w),HL      */
 OP(op,23) { cpustate->_HL++;													} /* INC  HL          */
 OP(op,24) { cpustate->_H = INC(cpustate, cpustate->_H);											} /* INC  H           */
 OP(op,25) { cpustate->_H = DEC(cpustate, cpustate->_H);											} /* DEC  H           */
-OP(op,26) { cpustate->_H = ARG(cpustate); 											} /* LD   H,n         */
+OP(op,26) { cpustate->_H = ARG(cpustate);											} /* LD   H,n         */
 OP(op,27) { DAA;													} /* DAA              */
 
 OP(op,28) { JR_COND( cpustate->_F & ZF, 0x28 );								} /* JR   Z,o         */
 OP(op,29) { ADD16(HL,HL);											} /* ADD  HL,HL       */
-OP(op,2a) { cpustate->ea = ARG16(cpustate); RM16(cpustate, cpustate->ea, &cpustate->HL ); 					} /* LD   HL,(w)      */
+OP(op,2a) { cpustate->ea = ARG16(cpustate); RM16(cpustate, cpustate->ea, &cpustate->HL );					} /* LD   HL,(w)      */
 OP(op,2b) { cpustate->_HL--;													} /* DEC  HL          */
 OP(op,2c) { cpustate->_L = INC(cpustate, cpustate->_L);											} /* INC  L           */
 OP(op,2d) { cpustate->_L = DEC(cpustate, cpustate->_L);											} /* DEC  L           */
-OP(op,2e) { cpustate->_L = ARG(cpustate); 											} /* LD   L,n         */
+OP(op,2e) { cpustate->_L = ARG(cpustate);											} /* LD   L,n         */
 OP(op,2f) { cpustate->_A ^= 0xff; cpustate->_F = (cpustate->_F&(SF|ZF|PF|CF))|HF|NF|(cpustate->_A&(YF|XF)); } /* CPL              */
 
 OP(op,30) { JR_COND( !(cpustate->_F & CF), 0x30 );							} /* JR   NC,o        */
@@ -71,7 +71,7 @@ OP(op,3a) { cpustate->ea = ARG16(cpustate); cpustate->_A = RM(cpustate,  cpustat
 OP(op,3b) { cpustate->_SP--;													} /* DEC  SP          */
 OP(op,3c) { cpustate->_A = INC(cpustate, cpustate->_A);											} /* INC  A           */
 OP(op,3d) { cpustate->_A = DEC(cpustate, cpustate->_A);											} /* DEC  A           */
-OP(op,3e) { cpustate->_A = ARG(cpustate); 											} /* LD   A,n         */
+OP(op,3e) { cpustate->_A = ARG(cpustate);											} /* LD   A,n         */
 OP(op,3f) { cpustate->_F = ((cpustate->_F&(SF|ZF|PF|CF))|((cpustate->_F&CF)<<4)|(cpustate->_A&(YF|XF)))^CF; } /* CCF              */
 //OP(op,3f) { cpustate->_F = ((cpustate->_F & ~(HF|NF)) | ((cpustate->_F & CF)<<4)) ^ CF;           } /* CCF              */
 
@@ -135,7 +135,7 @@ OP(op,72) { WM(cpustate,  cpustate->_HL, cpustate->_D );											} /* LD   (HL
 OP(op,73) { WM(cpustate,  cpustate->_HL, cpustate->_E );											} /* LD   (HL),E      */
 OP(op,74) { WM(cpustate,  cpustate->_HL, cpustate->_H );											} /* LD   (HL),H      */
 OP(op,75) { WM(cpustate,  cpustate->_HL, cpustate->_L );											} /* LD   (HL),L      */
-OP(op,76) { ENTER_HALT(cpustate); 											} /* HALT             */
+OP(op,76) { ENTER_HALT(cpustate);											} /* HALT             */
 OP(op,77) { WM(cpustate,  cpustate->_HL, cpustate->_A );											} /* LD   (HL),A      */
 
 OP(op,78) { cpustate->_A = cpustate->_B;												} /* LD   A,B         */
@@ -201,38 +201,38 @@ OP(op,ad) { XOR(cpustate->_L);												} /* XOR  L           */
 OP(op,ae) { XOR(RM(cpustate, cpustate->_HL));											} /* XOR  (HL)        */
 OP(op,af) { XOR(cpustate->_A);												} /* XOR  A           */
 
-OP(op,b0) { OR(cpustate->_B); 												} /* OR   B           */
-OP(op,b1) { OR(cpustate->_C); 												} /* OR   C           */
-OP(op,b2) { OR(cpustate->_D); 												} /* OR   D           */
-OP(op,b3) { OR(cpustate->_E); 												} /* OR   E           */
-OP(op,b4) { OR(cpustate->_H); 												} /* OR   H           */
-OP(op,b5) { OR(cpustate->_L); 												} /* OR   L           */
+OP(op,b0) { OR(cpustate->_B);												} /* OR   B           */
+OP(op,b1) { OR(cpustate->_C);												} /* OR   C           */
+OP(op,b2) { OR(cpustate->_D);												} /* OR   D           */
+OP(op,b3) { OR(cpustate->_E);												} /* OR   E           */
+OP(op,b4) { OR(cpustate->_H);												} /* OR   H           */
+OP(op,b5) { OR(cpustate->_L);												} /* OR   L           */
 OP(op,b6) { OR(RM(cpustate, cpustate->_HL));											} /* OR   (HL)        */
-OP(op,b7) { OR(cpustate->_A); 												} /* OR   A           */
+OP(op,b7) { OR(cpustate->_A);												} /* OR   A           */
 
-OP(op,b8) { CP(cpustate->_B); 												} /* CP   B           */
-OP(op,b9) { CP(cpustate->_C); 												} /* CP   C           */
-OP(op,ba) { CP(cpustate->_D); 												} /* CP   D           */
-OP(op,bb) { CP(cpustate->_E); 												} /* CP   E           */
-OP(op,bc) { CP(cpustate->_H); 												} /* CP   H           */
-OP(op,bd) { CP(cpustate->_L); 												} /* CP   L           */
+OP(op,b8) { CP(cpustate->_B);												} /* CP   B           */
+OP(op,b9) { CP(cpustate->_C);												} /* CP   C           */
+OP(op,ba) { CP(cpustate->_D);												} /* CP   D           */
+OP(op,bb) { CP(cpustate->_E);												} /* CP   E           */
+OP(op,bc) { CP(cpustate->_H);												} /* CP   H           */
+OP(op,bd) { CP(cpustate->_L);												} /* CP   L           */
 OP(op,be) { CP(RM(cpustate, cpustate->_HL));											} /* CP   (HL)        */
-OP(op,bf) { CP(cpustate->_A); 												} /* CP   A           */
+OP(op,bf) { CP(cpustate->_A);												} /* CP   A           */
 
 OP(op,c0) { RET_COND( !(cpustate->_F & ZF), 0xc0 );							} /* RET  NZ          */
 OP(op,c1) { POP(cpustate, BC);												} /* POP  BC          */
 OP(op,c2) { JP_COND( !(cpustate->_F & ZF) );									} /* JP   NZ,a        */
 OP(op,c3) { JP; 													} /* JP   a           */
 OP(op,c4) { CALL_COND( !(cpustate->_F & ZF), 0xc4 );							} /* CALL NZ,a        */
-OP(op,c5) { PUSH(cpustate,  BC ); 											} /* PUSH BC          */
+OP(op,c5) { PUSH(cpustate,  BC );											} /* PUSH BC          */
 OP(op,c6) { ADD(ARG(cpustate)); 											} /* ADD  A,n         */
 OP(op,c7) { RST(0x00);												} /* RST  0           */
 
 OP(op,c8) { RET_COND( cpustate->_F & ZF, 0xc8 );								} /* RET  Z           */
-OP(op,c9) { POP(cpustate, PC); 												} /* RET              */
-OP(op,ca) { JP_COND( cpustate->_F & ZF ); 									} /* JP   Z,a         */
+OP(op,c9) { POP(cpustate, PC);												} /* RET              */
+OP(op,ca) { JP_COND( cpustate->_F & ZF );									} /* JP   Z,a         */
 OP(op,cb) { cpustate->R++; EXEC(cb,ROP(cpustate));									} /* **** CB xx       */
-OP(op,cc) { CALL_COND( cpustate->_F & ZF, 0xcc ); 							} /* CALL Z,a         */
+OP(op,cc) { CALL_COND( cpustate->_F & ZF, 0xcc );							} /* CALL Z,a         */
 OP(op,cd) { CALL(); 												} /* CALL a           */
 OP(op,ce) { ADC(ARG(cpustate)); 											} /* ADC  A,n         */
 OP(op,cf) { RST(0x08);												} /* RST  1           */
@@ -242,15 +242,15 @@ OP(op,d1) { POP(cpustate, DE);												} /* POP  DE          */
 OP(op,d2) { JP_COND( !(cpustate->_F & CF) );									} /* JP   NC,a        */
 OP(op,d3) { unsigned n = ARG(cpustate) | (cpustate->_A << 8); OUT( cpustate, n, cpustate->_A );			} /* OUT  (n),A       */
 OP(op,d4) { CALL_COND( !(cpustate->_F & CF), 0xd4 );							} /* CALL NC,a        */
-OP(op,d5) { PUSH(cpustate,  DE ); 											} /* PUSH DE          */
+OP(op,d5) { PUSH(cpustate,  DE );											} /* PUSH DE          */
 OP(op,d6) { SUB(ARG(cpustate)); 											} /* SUB  n           */
 OP(op,d7) { RST(0x10);												} /* RST  2           */
 
 OP(op,d8) { RET_COND( cpustate->_F & CF, 0xd8 );								} /* RET  C           */
 OP(op,d9) { EXX;													} /* EXX              */
-OP(op,da) { JP_COND( cpustate->_F & CF ); 									} /* JP   C,a         */
+OP(op,da) { JP_COND( cpustate->_F & CF );									} /* JP   C,a         */
 OP(op,db) { unsigned n = ARG(cpustate) | (cpustate->_A << 8); cpustate->_A = IN( cpustate, n );			} /* IN   A,(n)       */
-OP(op,dc) { CALL_COND( cpustate->_F & CF, 0xdc ); 							} /* CALL C,a         */
+OP(op,dc) { CALL_COND( cpustate->_F & CF, 0xdc );							} /* CALL C,a         */
 OP(op,dd) { cpustate->R++; EXEC(dd,ROP(cpustate));									} /* **** DD xx       */
 OP(op,de) { SBC(ARG(cpustate)); 											} /* SBC  A,n         */
 OP(op,df) { RST(0x18);												} /* RST  3           */
@@ -260,15 +260,15 @@ OP(op,e1) { POP(cpustate, HL);												} /* POP  HL          */
 OP(op,e2) { JP_COND( !(cpustate->_F & PF) );									} /* JP   PO,a        */
 OP(op,e3) { EXSP(HL);												} /* EX   HL,(SP)     */
 OP(op,e4) { CALL_COND( !(cpustate->_F & PF), 0xe4 );							} /* CALL PO,a        */
-OP(op,e5) { PUSH(cpustate,  HL ); 											} /* PUSH HL          */
+OP(op,e5) { PUSH(cpustate,  HL );											} /* PUSH HL          */
 OP(op,e6) { AND(ARG(cpustate)); 											} /* AND  n           */
 OP(op,e7) { RST(0x20);												} /* RST  4           */
 
 OP(op,e8) { RET_COND( cpustate->_F & PF, 0xe8 );								} /* RET  PE          */
-OP(op,e9) { cpustate->_PC = cpustate->_HL; 												} /* JP   (HL)        */
-OP(op,ea) { JP_COND( cpustate->_F & PF ); 									} /* JP   PE,a        */
+OP(op,e9) { cpustate->_PC = cpustate->_HL;												} /* JP   (HL)        */
+OP(op,ea) { JP_COND( cpustate->_F & PF );									} /* JP   PE,a        */
 OP(op,eb) { EX_DE_HL;												} /* EX   DE,HL       */
-OP(op,ec) { CALL_COND( cpustate->_F & PF, 0xec ); 							} /* CALL PE,a        */
+OP(op,ec) { CALL_COND( cpustate->_F & PF, 0xec );							} /* CALL PE,a        */
 OP(op,ed) { cpustate->R++; EXEC(ed,ROP(cpustate));									} /* **** ED xx       */
 OP(op,ee) { XOR(ARG(cpustate)); 											} /* XOR  n           */
 OP(op,ef) { RST(0x28);												} /* RST  5           */
@@ -278,7 +278,7 @@ OP(op,f1) { POP(cpustate, AF);												} /* POP  AF          */
 OP(op,f2) { JP_COND( !(cpustate->_F & SF) );									} /* JP   P,a         */
 OP(op,f3) { cpustate->IFF1 = cpustate->IFF2 = 0;										} /* DI               */
 OP(op,f4) { CALL_COND( !(cpustate->_F & SF), 0xf4 );							} /* CALL P,a         */
-OP(op,f5) { PUSH(cpustate,  AF ); 											} /* PUSH AF          */
+OP(op,f5) { PUSH(cpustate,  AF );											} /* PUSH AF          */
 OP(op,f6) { OR(ARG(cpustate));												} /* OR   n           */
 OP(op,f7) { RST(0x30);												} /* RST  6           */
 
@@ -286,7 +286,7 @@ OP(op,f8) { RET_COND( cpustate->_F & SF, 0xf8 );								} /* RET  M           */
 OP(op,f9) { cpustate->_SP = cpustate->_HL;												} /* LD   SP,HL       */
 OP(op,fa) { JP_COND(cpustate->_F & SF);										} /* JP   M,a         */
 OP(op,fb) { EI; 													} /* EI               */
-OP(op,fc) { CALL_COND( cpustate->_F & SF, 0xfc ); 							} /* CALL M,a         */
+OP(op,fc) { CALL_COND( cpustate->_F & SF, 0xfc );							} /* CALL M,a         */
 OP(op,fd) { cpustate->R++; EXEC(fd,ROP(cpustate));									} /* **** FD xx       */
 OP(op,fe) { CP(ARG(cpustate));												} /* CP   n           */
 OP(op,ff) { RST(0x38);												} /* RST  7           */

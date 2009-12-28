@@ -227,14 +227,14 @@ static const gfx_layout s2636_character =
 	1,
 	{ 0 },
 	{ STEP8(0,1) },
-   	{ STEP8(0,8), STEP2(8*8,8) },
+	{ STEP8(0,8), STEP2(8*8,8) },
 	8*8
 };
 
 static GFXDECODE_START( tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
-  	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 4, 3 )	/* dynamic */
-  	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )	/* dynamic */
+	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 4, 3 )	/* dynamic */
+	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )	/* dynamic */
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( tinvader )

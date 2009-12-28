@@ -138,8 +138,8 @@ static WRITE8_HANDLER( blitter_cmd_w )
 
 static WRITE8_HANDLER( sound_latch_w )
 {
- 	soundlatch_w(space, 0, data & 0xff);
- 	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	soundlatch_w(space, 0, data & 0xff);
+	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( ball_w )
@@ -255,7 +255,7 @@ static MACHINE_DRIVER_START( roul )
 
 	MDRV_PALETTE_INIT(roul)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)

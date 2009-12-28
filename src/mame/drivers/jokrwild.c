@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   bank select.
     ---- xxxx   color code.
 */
-  	int attr = colorram[tile_index];
+	int attr = colorram[tile_index];
 	int code = videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
- 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) //optical sensor is here
 //  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_address_w)

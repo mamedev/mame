@@ -907,8 +907,8 @@ WRITE32_HANDLER ( skns_v3_regs_w )
 		depthA = (skns_v3_regs[0x0c/4] & 0x0001) << 1;
 		depthB = (skns_v3_regs[0x0c/4] & 0x0100) >> 7;
 
-		if (old_depthA != depthA) 	tilemap_mark_all_tiles_dirty (skns_tilemap_A);
-		if (old_depthB != depthB) 	tilemap_mark_all_tiles_dirty (skns_tilemap_B);
+		if (old_depthA != depthA)	tilemap_mark_all_tiles_dirty (skns_tilemap_A);
+		if (old_depthB != depthB)	tilemap_mark_all_tiles_dirty (skns_tilemap_B);
 
 	}
 }

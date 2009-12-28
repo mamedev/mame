@@ -585,7 +585,7 @@ static READ16_HANDLER( wgp_adinput_r )
 			return steer;
 
 		case 0x02:
-			return 0xc0; 	/* steer offset, correct acc. to service mode */
+			return 0xc0;	/* steer offset, correct acc. to service mode */
 
 		case 0x03:
 			return 0xbf;	/* accel offset, correct acc. to service mode */

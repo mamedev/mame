@@ -389,7 +389,7 @@ static READ16_HANDLER( igs_##NUM##_dips_r )												\
 			ret = input_port_read(space->machine, dipnames[i]);							\
 																						\
 	/* 0x0100 is blitter busy */														\
-	return 	(ret & 0xff) | 0x0000;														\
+	return	(ret & 0xff) | 0x0000;														\
 }
 
 // Games have 3 to 5 dips
@@ -549,7 +549,7 @@ static void lhb2_decrypt(running_machine *machine)
 	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 	UINT16 *result_data = alloc_array_or_die(UINT16, rom_size/2);
 
- 	for (i=0; i<rom_size/2; i++)
+	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
 
@@ -557,7 +557,7 @@ static void lhb2_decrypt(running_machine *machine)
 			x ^= 0x0004;
 
 		if ((i & 0x0204) == 0x0000)
- 			x ^= 0x0008;
+			x ^= 0x0008;
 
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
 			x ^= 0x0020;
@@ -590,7 +590,7 @@ static void nkishusp_decrypt(running_machine *machine)
 	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 	UINT16 *result_data = alloc_array_or_die(UINT16, rom_size/2);
 
- 	for (i=0; i<rom_size/2; i++)
+	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
 
@@ -751,7 +751,7 @@ static void drgnwrld_gfx_decrypt(running_machine *machine)
 	UINT8 *src = (UINT8 *) (memory_region(machine, "blitter"));
 	UINT8 *result_data = alloc_array_or_die(UINT8, rom_size);
 
- 	for (i=0; i<rom_size; i++)
+	for (i=0; i<rom_size; i++)
     	result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
 
 	memcpy(src,result_data,rom_size);
@@ -1470,7 +1470,7 @@ static INPUT_PORTS_START( drgnwrldc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1562,7 +1562,7 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1661,7 +1661,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
@@ -1787,7 +1787,7 @@ static INPUT_PORTS_START( drgnwrldj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1868,7 +1868,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -1978,7 +1978,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x80, "2" )
 //  PORT_DIPSETTING(    0x00, "2" )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "Max Credit" )
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "2000" )
@@ -2145,7 +2145,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "Cabinet ID" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -2251,7 +2251,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "Cabinet ID" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -2355,7 +2355,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-  	PORT_START("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )

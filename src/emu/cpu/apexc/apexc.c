@@ -896,11 +896,11 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 15;	/*13+2 ignored bits to make double word address*/	break;
 	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = /*5*/8;	/* no I/O bus, but we use address 0 for punchtape I/O */	break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = /*0*/1;	/*0 is quite enough but the MAME core does not understand*/	break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = /*0*/1;	/*0 is quite enough but the MAME core does not understand*/	break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:

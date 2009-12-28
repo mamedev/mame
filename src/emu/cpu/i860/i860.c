@@ -91,9 +91,9 @@ static CPU_SET_INFO( i860 )
 		case CPUINFO_INT_REGISTER + I860_FIR:		cpustate->cregs[CR_FIR] 	= info->i & 0xffffffff;	break;
 		case CPUINFO_INT_REGISTER + I860_PSR:		cpustate->cregs[CR_PSR] 	= info->i & 0xffffffff;	break;
 		case CPUINFO_INT_REGISTER + I860_DIRBASE:	cpustate->cregs[CR_DIRBASE] = info->i & 0xffffffff;	break;
-		case CPUINFO_INT_REGISTER + I860_DB:		cpustate->cregs[CR_DB] 		= info->i & 0xffffffff;	break;
+		case CPUINFO_INT_REGISTER + I860_DB:		cpustate->cregs[CR_DB]		= info->i & 0xffffffff;	break;
 		case CPUINFO_INT_REGISTER + I860_FSR:		cpustate->cregs[CR_FSR] 	= info->i & 0xffffffff;	break;
-		case CPUINFO_INT_REGISTER + I860_EPSR:		cpustate->cregs[CR_EPSR] 	= info->i & 0xffffffff;	break;
+		case CPUINFO_INT_REGISTER + I860_EPSR:		cpustate->cregs[CR_EPSR]	= info->i & 0xffffffff;	break;
 
 		case CPUINFO_INT_REGISTER + I860_R0:		cpustate->iregs[0]  = info->i & 0xffffffff;	break;
 		case CPUINFO_INT_REGISTER + I860_R1:		cpustate->iregs[1]  = info->i & 0xffffffff;	break;
@@ -195,11 +195,11 @@ CPU_GET_INFO( i860 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;	break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;	break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 0;	break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 0;	break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;	break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 0;	break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;	break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 0;	break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 0;	break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;	break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 0;	break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;	break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + I860_PC:			info->i = cpustate->pc;					break;
@@ -280,19 +280,19 @@ CPU_GET_INFO( i860 )
 
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo 	  = CPU_SET_INFO_NAME(i860);	break;
-		case CPUINFO_FCT_INIT:							info->init 		  = CPU_INIT_NAME(i860);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo	  = CPU_SET_INFO_NAME(i860);	break;
+		case CPUINFO_FCT_INIT:							info->init		  = CPU_INIT_NAME(i860);		break;
 		case CPUINFO_FCT_RESET:							info->reset 	  = CPU_RESET_NAME(i860);		break;
-		case CPUINFO_FCT_EXIT:							info->exit 		  = NULL;						break;
-		case CPUINFO_FCT_EXECUTE:						info->execute 	  = CPU_EXECUTE_NAME(i860);		break;
-		case CPUINFO_FCT_BURN:							info->burn 		  = NULL;						break;
+		case CPUINFO_FCT_EXIT:							info->exit		  = NULL;						break;
+		case CPUINFO_FCT_EXECUTE:						info->execute	  = CPU_EXECUTE_NAME(i860);		break;
+		case CPUINFO_FCT_BURN:							info->burn		  = NULL;						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i860);	break;
 		case CPUINFO_FCT_DEBUG_INIT:					info->debug_init  = NULL;						break;
 		case CPUINFO_FCT_TRANSLATE:						info->translate	  = NULL;						break;
-		case CPUINFO_FCT_READ:							info->read 		  = NULL;						break;
+		case CPUINFO_FCT_READ:							info->read		  = NULL;						break;
 		case CPUINFO_FCT_WRITE:							info->write 	  = NULL;						break;
-		case CPUINFO_FCT_READOP:						info->readop 	  = NULL;						break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount 	  = &cpustate->icount;			break;
+		case CPUINFO_FCT_READOP:						info->readop	  = NULL;						break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount	  = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "i860XR");			break;

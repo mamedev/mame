@@ -210,7 +210,7 @@ void namcos2_adjust_posirq_timer( running_machine *machine, int scanline );
 /* SLAVE CPU RAM MEMORY                                       */
 /**************************************************************/
 
-#define NAMCOS2_68K_SLAVE_RAM 	"bank4"
+#define NAMCOS2_68K_SLAVE_RAM	"bank4"
 
 /**************************************************************/
 /*                                                            */

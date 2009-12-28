@@ -123,7 +123,7 @@ struct _smc91c9x_state
 	UINT8			alloc_count;
 
 	/* transmit/receive FIFOs */
-	UINT8 			fifo_count;
+	UINT8			fifo_count;
 	UINT8			rx[ETHER_BUFFER_SIZE * ETHER_RX_BUFFERS];
 	UINT8			tx[ETHER_BUFFER_SIZE];
 

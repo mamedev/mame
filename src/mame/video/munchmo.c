@@ -144,7 +144,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				drawgfx_transpen( bitmap, cliprect, gfx,
 					0x7f - (tile_number & 0x7f),
 					color_base - (attributes & 0x03),
-					0,0, 							/* no flip */
+					0,0,							/* no flip */
 					sx,sy, 7 );
 			}
 		}

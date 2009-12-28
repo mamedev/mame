@@ -231,7 +231,7 @@ static void draw_objects(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for(i=0;i<6;i++)
 	{
- 	  x=ssrj_scrollram[0x80+20*i];
+	  x=ssrj_scrollram[0x80+20*i];
 	  y=ssrj_scrollram[0x80+20*i+2];
 	  if(!ssrj_scrollram[0x80+20*i+3])
 	    for(k=0;k<5;k++,y+=8)

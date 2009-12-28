@@ -114,21 +114,21 @@ D0  explosion enable        gates a noise generator
 static const discrete_lfsr_desc bzone_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,			          	/* Bit Length */
-	0,			          	/* Reset Value */
-	3,			          	/* Use Bit 10 (QC of second LS164) as F0 input 0 */
-	14,			          	/* Use Bit 23 (QH of third LS164) as F0 input 1 */
+	16,			        	/* Bit Length */
+	0,			        	/* Reset Value */
+	3,			        	/* Use Bit 10 (QC of second LS164) as F0 input 0 */
+	14,			        	/* Use Bit 23 (QH of third LS164) as F0 input 1 */
 	DISC_LFSR_XOR,			/* F0 is XOR */
-	DISC_LFSR_NOT_IN0, 		/* F1 is inverted F0*/
-	DISC_LFSR_REPLACE,	  	/* F2 replaces the shifted register contents */
-	0x000001,		      	/* Everything is shifted into the first bit only */
+	DISC_LFSR_NOT_IN0,		/* F1 is inverted F0*/
+	DISC_LFSR_REPLACE,		/* F2 replaces the shifted register contents */
+	0x000001,		    	/* Everything is shifted into the first bit only */
 	DISC_LFSR_FLAG_OUTPUT_SR_SN1, /* output the complete shift register to sub node 1*/
-	15		          	/* Output bit */
+	15		        	/* Output bit */
 };
 
 static const discrete_op_amp_filt_info bzone_explo_0 =
 {
-		BZ_R18 + BZ_R19, 0, 0, 0, 		/* r1, r2, r3, r4 */
+		BZ_R18 + BZ_R19, 0, 0, 0,		/* r1, r2, r3, r4 */
 		BZ_R33,							/* rF */
 		BZ_C22, 0, 0,					/* c1, c2, c3 */
 		0,								/* vRef - not used */
@@ -137,7 +137,7 @@ static const discrete_op_amp_filt_info bzone_explo_0 =
 
 static const discrete_op_amp_filt_info bzone_explo_1 =
 {
-		BZ_R18, 0, 0, 0, 				/* r1, r2, r3, r4 */
+		BZ_R18, 0, 0, 0,				/* r1, r2, r3, r4 */
 		BZ_R33,							/* rF */
 		BZ_C22, 0, 0,					/* c1, c2, c3 */
 		0,								/* vRef - not used */
@@ -146,7 +146,7 @@ static const discrete_op_amp_filt_info bzone_explo_1 =
 
 static const discrete_op_amp_filt_info bzone_shell_0 =
 {
-		BZ_R13 + BZ_R12, 0, 0, 0, 		/* r1, r2, r3, r4 */
+		BZ_R13 + BZ_R12, 0, 0, 0,		/* r1, r2, r3, r4 */
 		BZ_R32,							/* rF */
 		BZ_C21, 0, 0,					/* c1, c2, c3 */
 		0,								/* vRef - not used */
@@ -155,7 +155,7 @@ static const discrete_op_amp_filt_info bzone_shell_0 =
 
 static const discrete_op_amp_filt_info bzone_shell_1 =
 {
-		BZ_R13, 0, 0, 0, 				/* r1, r2, r3, r4 */
+		BZ_R13, 0, 0, 0,				/* r1, r2, r3, r4 */
 		BZ_R32,							/* rF */
 		BZ_C21, 0, 0,					/* c1, c2, c3 */
 		0,								/* vRef - not used */
@@ -243,7 +243,7 @@ static DISCRETE_STEP(bzone_custom_filter)
 	struct bzone_custom_filter_context *context = (struct bzone_custom_filter_context *)node->context;
 
 	int		in0 = (BZONE_CUSTOM_FILTER__IN0 == 0) ? 0 : 1;
-	double 	v;
+	double	v;
 
 	if (BZONE_CUSTOM_FILTER__IN1 > 0)
 		v = 0;
@@ -289,7 +289,7 @@ static DISCRETE_SOUND_START(bzone)
 	/************************************************/
 	DISCRETE_INPUT_DATA(BZ_INPUT)
 	/* decode the bits */
-	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 1)      		 /* IC M2, bits 0 - 7 */
+	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 1)    		 /* IC M2, bits 0 - 7 */
 
 	/* the pot is 250K, but we will use a smaller range to get a better adjustment range */
 	DISCRETE_ADJUSTMENT(BZ_R11_POT, RES_K(75), RES_K(10), DISC_LINADJ, "R11")
@@ -364,13 +364,13 @@ static DISCRETE_SOUND_START(bzone)
 		1, NODE_64, NODE_63,								/* ENAB, RESET, CLK */
 		4, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)		/* MIN, MAX, DIR, INIT, CLKTYPE */
 	DISCRETE_TRANSFORM2(NODE_66, NODE_65, 7, "01>") 		/* QD - IC F4, pin 11 */
-	DISCRETE_TRANSFORM2(NODE_67, NODE_65, 15, "01=") 		/* Ripple - IC F4, pin 15 */
+	DISCRETE_TRANSFORM2(NODE_67, NODE_65, 15, "01=")		/* Ripple - IC F4, pin 15 */
 
 	DISCRETE_COUNTER(NODE_68,								/* IC F5 */
 		1, NODE_64, NODE_63,								/* ENAB, RESET, CLK */
 		6, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)		/* MIN, MAX, DIR, INIT, CLKTYPE */
 	DISCRETE_TRANSFORM2(NODE_69, NODE_68, 7, "01>") 		/* QD - IC F5, pin 11 */
-	DISCRETE_TRANSFORM2(NODE_70, NODE_68, 15, "01=") 		/* Ripple - IC F5, pin 15 */
+	DISCRETE_TRANSFORM2(NODE_70, NODE_68, 15, "01=")		/* Ripple - IC F5, pin 15 */
 
 	DISCRETE_MIXER4(BZ_ENGINE_SND, 1, NODE_66, NODE_67, NODE_69, NODE_70, &bzone_eng_mixer_desc)
 

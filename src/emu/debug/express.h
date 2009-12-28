@@ -140,8 +140,8 @@ struct _symbol_entry
 		/* register info */
 		struct
 		{
-			symbol_getter_func 		getter;		/* value getter */
-			symbol_setter_func 		setter;		/* value setter */
+			symbol_getter_func		getter;		/* value getter */
+			symbol_setter_func		setter;		/* value setter */
 		} reg;
 
 		/* function info */
@@ -149,7 +149,7 @@ struct _symbol_entry
 		{
 			UINT16					minparams;	/* minimum expected parameters */
 			UINT16					maxparams;	/* maximum expected parameters */
-			function_execute_func 	execute;	/* execute callback */
+			function_execute_func	execute;	/* execute callback */
 		} func;
 
 		/* generic info */
@@ -175,7 +175,7 @@ typedef struct _parsed_expression parsed_expression;
 EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, UINT64 *result);
 EXPRERR 					expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, parsed_expression **result);
 EXPRERR 					expression_execute(parsed_expression *expr, UINT64 *result);
-void 						expression_free(parsed_expression *expr);
+void						expression_free(parsed_expression *expr);
 const char *				expression_original_string(parsed_expression *expr);
 const char *				exprerr_to_string(EXPRERR error);
 
@@ -188,6 +188,6 @@ int 						symtable_add_function(symbol_table *table, const char *name, void *sym
 int							symtable_add_value(symbol_table *table, const char *name, UINT64 value);
 const symbol_entry *		symtable_find(const symbol_table *table, const char *name);
 const char *				symtable_find_indexed(const symbol_table *table, int index, const symbol_entry **entry);
-void 						symtable_free(symbol_table *table);
+void						symtable_free(symbol_table *table);
 
 #endif

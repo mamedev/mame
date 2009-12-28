@@ -1306,9 +1306,9 @@ static CPU_EXECUTE( cquestlin )
 				case 2: r = 0;					s = cpustate->q;      break;
 				case 3: r = 0;					s = cpustate->ram[b]; break;
 				case 4: r = 0;					s = cpustate->ram[a]; break;
-				case 5: r = data_in;		  	s = cpustate->ram[a]; break;
-				case 6: r = data_in;		  	s = cpustate->q;      break;
-				case 7: r = data_in;		  	s = 0;                break;
+				case 5: r = data_in;			s = cpustate->ram[a]; break;
+				case 6: r = data_in;			s = cpustate->q;      break;
+				case 7: r = data_in;			s = 0;                break;
 			}
 
 			/* 12-bits */
@@ -1575,22 +1575,22 @@ static CPU_SET_INFO( cquestsnd )
 		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:	cpustate->adrcntr = info->i;		break;
 		case CPUINFO_STR_REGISTER + CQUESTSND_DINLATCH:	cpustate->dinlatch = info->i;		break;
 
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM0:  cpustate->ram[0x0] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM1:  cpustate->ram[0x1] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM2:  cpustate->ram[0x2] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM3:  cpustate->ram[0x3] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM4:  cpustate->ram[0x4] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM5:  cpustate->ram[0x5] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM6:  cpustate->ram[0x6] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM7:  cpustate->ram[0x7] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM8:  cpustate->ram[0x8] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM9:  cpustate->ram[0x9] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMA:  cpustate->ram[0xa] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMB:  cpustate->ram[0xb] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMC:  cpustate->ram[0xc] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMD:  cpustate->ram[0xd] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAME:  cpustate->ram[0xe] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMF:  cpustate->ram[0xf] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM0:  cpustate->ram[0x0] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM1:  cpustate->ram[0x1] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM2:  cpustate->ram[0x2] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM3:  cpustate->ram[0x3] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM4:  cpustate->ram[0x4] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM5:  cpustate->ram[0x5] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM6:  cpustate->ram[0x6] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM7:  cpustate->ram[0x7] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM8:  cpustate->ram[0x8] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM9:  cpustate->ram[0x9] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMA:  cpustate->ram[0xa] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMB:  cpustate->ram[0xb] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMC:  cpustate->ram[0xc] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMD:  cpustate->ram[0xd] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAME:  cpustate->ram[0xe] = info->i;			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMF:  cpustate->ram[0xf] = info->i;			break;
 	}
 }
 
@@ -1617,11 +1617,11 @@ CPU_GET_INFO( cquestsnd )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -3;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CQUESTSND_PC:			info->i = cpustate->pc;				break;
@@ -1646,8 +1646,8 @@ CPU_GET_INFO( cquestsnd )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, ".......");			 break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_PC:  		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_Q:  		sprintf(info->s, "Q:   %04X", cpustate->q); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_PC:		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_Q:		sprintf(info->s, "Q:   %04X", cpustate->q); break;
 		case CPUINFO_STR_REGISTER + CQUESTSND_RTNLATCH: sprintf(info->s, "RTN: %02X", cpustate->rtnlatch); break;
 		case CPUINFO_STR_REGISTER + CQUESTSND_ADRCNTR:  sprintf(info->s, "CNT: %02X", cpustate->adrcntr); break;
 		case CPUINFO_STR_REGISTER + CQUESTSND_DINLATCH:	sprintf(info->s, "DIN: %04X", cpustate->dinlatch); break;
@@ -1685,30 +1685,30 @@ static CPU_SET_INFO( cquestrot )
 		case CPUINFO_INT_REGISTER + CQUESTROT_PC:	cpustate->pc = info->i;					break;
 		case CPUINFO_INT_REGISTER + CQUESTROT_Q:	cpustate->q = info->i;					break;
 
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		cpustate->ram[0x0] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		cpustate->ram[0x1] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM2:		cpustate->ram[0x2] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM3:		cpustate->ram[0x3] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM4:		cpustate->ram[0x4] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM5:		cpustate->ram[0x5] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM6:		cpustate->ram[0x6] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM7:		cpustate->ram[0x7] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM8:		cpustate->ram[0x8] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM9:		cpustate->ram[0x9] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMA:		cpustate->ram[0xa] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMB:		cpustate->ram[0xb] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMC:		cpustate->ram[0xc] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMD:		cpustate->ram[0xd] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAME:		cpustate->ram[0xe] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMF:		cpustate->ram[0xf] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_SEQCNT:	cpustate->seqcnt	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DYNADDR:	cpustate->dynaddr	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DYNDATA:	cpustate->dyndata	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_YRLATCH:	cpustate->yrlatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_YDLATCH:	cpustate->ydlatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DINLATCH:	cpustate->dinlatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DSRCLATCH:cpustate->dsrclatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RSRCLATCH:cpustate->rsrclatch	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		cpustate->ram[0x0] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		cpustate->ram[0x1] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM2:		cpustate->ram[0x2] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM3:		cpustate->ram[0x3] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM4:		cpustate->ram[0x4] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM5:		cpustate->ram[0x5] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM6:		cpustate->ram[0x6] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM7:		cpustate->ram[0x7] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM8:		cpustate->ram[0x8] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM9:		cpustate->ram[0x9] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMA:		cpustate->ram[0xa] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMB:		cpustate->ram[0xb] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMC:		cpustate->ram[0xc] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMD:		cpustate->ram[0xd] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAME:		cpustate->ram[0xe] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMF:		cpustate->ram[0xf] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_SEQCNT:	cpustate->seqcnt	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DYNADDR:	cpustate->dynaddr	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DYNDATA:	cpustate->dyndata	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_YRLATCH:	cpustate->yrlatch	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_YDLATCH:	cpustate->ydlatch	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DINLATCH:	cpustate->dinlatch	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DSRCLATCH:cpustate->dsrclatch	= info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RSRCLATCH:cpustate->rsrclatch	= info->i;		break;
 	}
 }
 
@@ -1735,11 +1735,11 @@ CPU_GET_INFO( cquestrot )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 9;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -3;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CQUESTROT_PC:		info->i = cpustate->pc;					break;
@@ -1764,7 +1764,7 @@ CPU_GET_INFO( cquestrot )
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c", cpustate->cflag ? 'C' : '.',
 																				   cpustate->vflag ? 'V' : '.',
 																				   cpustate->f ? '.' : 'Z');	break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_PC:  		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_PC:		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
 		case CPUINFO_STR_REGISTER + CQUESTROT_Q:		sprintf(info->s, "Q:   %04X", cpustate->q); break;
 		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		sprintf(info->s, "RAM[0]: %04X", cpustate->ram[0x0]); break;
 		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		sprintf(info->s, "RAM[1]: %04X", cpustate->ram[0x1]); break;
@@ -1853,11 +1853,11 @@ CPU_GET_INFO( cquestlin )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -3;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:		info->i = cpustate->pc[cpustate->clkcnt & 3 ? BACKGROUND : FOREGROUND];	break;
@@ -1883,8 +1883,8 @@ CPU_GET_INFO( cquestlin )
 																						cpustate->vflag ? 'V' : '.',
 																						cpustate->f ? '.' : 'Z',
 																						cpustate->clkcnt & 3 ? 'B' : 'F'); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_FGPC:  	sprintf(info->s, "FPC:  %02X", cpustate->pc[FOREGROUND]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_BGPC:  	sprintf(info->s, "BPC:  %02X", cpustate->pc[BACKGROUND]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_FGPC: 	sprintf(info->s, "FPC:  %02X", cpustate->pc[FOREGROUND]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_BGPC: 	sprintf(info->s, "BPC:  %02X", cpustate->pc[BACKGROUND]); break;
 		case CPUINFO_STR_REGISTER + CQUESTLIN_Q:		sprintf(info->s, "Q:   %04X", cpustate->q); break;
 		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM0:		sprintf(info->s, "RAM[0]: %04X", cpustate->ram[0x0]); break;
 		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM1:		sprintf(info->s, "RAM[1]: %04X", cpustate->ram[0x1]); break;

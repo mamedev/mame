@@ -430,7 +430,7 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz /2) 	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(toki_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
 

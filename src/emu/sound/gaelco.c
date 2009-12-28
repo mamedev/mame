@@ -48,7 +48,7 @@ Registers per channel:
 //#define ALT_MIX
 
 #define GAELCO_NUM_CHANNELS 	0x07
-#define VOLUME_LEVELS 			0x10
+#define VOLUME_LEVELS			0x10
 
 UINT16 *gaelco_sndregs;
 

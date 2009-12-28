@@ -282,7 +282,7 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( wc90 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,      	1*16*16, 16*16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   	1*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,		2*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,		3*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx4", 0x00000, spritelayout,		0*16*16, 16*16 ) // sprites

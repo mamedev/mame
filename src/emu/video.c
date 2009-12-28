@@ -69,9 +69,9 @@ struct _screen_state
 	attoseconds_t			frame_period;			/* attoseconds per frame */
 	attoseconds_t			scantime;				/* attoseconds per scanline */
 	attoseconds_t			pixeltime;				/* attoseconds per pixel */
-	attoseconds_t 			vblank_period;			/* attoseconds per VBLANK period */
-	attotime 				vblank_start_time;		/* time of last VBLANK start */
-	attotime 				vblank_end_time;		/* time of last VBLANK end */
+	attoseconds_t			vblank_period;			/* attoseconds per VBLANK period */
+	attotime				vblank_start_time;		/* time of last VBLANK start */
+	attotime				vblank_end_time;		/* time of last VBLANK end */
 	emu_timer *				vblank_begin_timer;		/* timer to signal VBLANK start */
 	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
 	emu_timer *				scanline0_timer;		/* scanline 0 timer */
@@ -92,15 +92,15 @@ struct _video_global
 
 	/* throttling calculations */
 	osd_ticks_t				throttle_last_ticks;	/* osd_ticks the last call to throttle */
-	attotime 				throttle_realtime;		/* real time the last call to throttle */
-	attotime 				throttle_emutime;		/* emulated time the last call to throttle */
-	UINT32 					throttle_history;		/* history of frames where we were fast enough */
+	attotime				throttle_realtime;		/* real time the last call to throttle */
+	attotime				throttle_emutime;		/* emulated time the last call to throttle */
+	UINT32					throttle_history;		/* history of frames where we were fast enough */
 
 	/* dynamic speed computation */
 	osd_ticks_t 			speed_last_realtime;	/* real time at the last speed calculation */
-	attotime 				speed_last_emutime;		/* emulated time at the last speed calculation */
-	double 					speed_percent;			/* most recent speed percentage */
-	UINT32 					partial_updates_this_frame;/* partial update counter this frame */
+	attotime				speed_last_emutime;		/* emulated time at the last speed calculation */
+	double					speed_percent;			/* most recent speed percentage */
+	UINT32					partial_updates_this_frame;/* partial update counter this frame */
 
 	/* overall speed computation */
 	UINT32					overall_real_seconds;	/* accumulated real seconds at normal speed */
@@ -135,7 +135,7 @@ struct _video_global
 	avi_file *				avifile;				/* handle to the open movie file */
 	attotime				movie_frame_period;		/* period of a single movie frame */
 	attotime				movie_next_frame_time;	/* time of next frame */
-	UINT32 					movie_frame;			/* current movie frame number */
+	UINT32					movie_frame;			/* current movie frame number */
 };
 
 

@@ -446,8 +446,8 @@ static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
 	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
- 	soundlatch_w(space, 0, data);
- 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
@@ -743,7 +743,7 @@ static const gfx_layout sprites =
 	16,16,
 	RGN_FRAC(1,3),
 	3,
- 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
 		0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
@@ -758,9 +758,9 @@ static const gfx_layout tilelayout =
 	{ RGN_FRAC(4,8)+4, 0, 4 },
 	{ 3, 2, 1, 0, 11, 10, 9 , 8, 19, 18, 17,16, 27, 26, 25, 24 },
 	{
-		RGN_FRAC(0,8)+0*8, 	RGN_FRAC(1,8)+0*8, RGN_FRAC(2,8)+0*8, RGN_FRAC(3,8)+0*8,
-		RGN_FRAC(0,8)+4*8, 	RGN_FRAC(1,8)+4*8, RGN_FRAC(2,8)+4*8, RGN_FRAC(3,8)+4*8,
-		RGN_FRAC(0,8)+8*8, 	RGN_FRAC(1,8)+8*8, RGN_FRAC(2,8)+8*8, RGN_FRAC(3,8)+8*8,
+		RGN_FRAC(0,8)+0*8,	RGN_FRAC(1,8)+0*8, RGN_FRAC(2,8)+0*8, RGN_FRAC(3,8)+0*8,
+		RGN_FRAC(0,8)+4*8,	RGN_FRAC(1,8)+4*8, RGN_FRAC(2,8)+4*8, RGN_FRAC(3,8)+4*8,
+		RGN_FRAC(0,8)+8*8,	RGN_FRAC(1,8)+8*8, RGN_FRAC(2,8)+8*8, RGN_FRAC(3,8)+8*8,
 		RGN_FRAC(0,8)+12*8, RGN_FRAC(1,8)+12*8,RGN_FRAC(2,8)+12*8,RGN_FRAC(3,8)+12*8
 	},
 	8*16
@@ -776,7 +776,7 @@ GFXDECODE_END
 static GFXDECODE_START( zerotrgt )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,			  0, 256 )
-   	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,		  0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,		  0, 256 )
 GFXDECODE_END
 
 /***************************************************************************/

@@ -2382,7 +2382,7 @@ static INPUT_PORTS_START( pairsnb )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )			// Hearts : 10 - Time : 60/60
-	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) ) 		// Hearts :  7 - Time : 44/60
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )		// Hearts :  7 - Time : 44/60
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )			// Hearts :  5 - Time : 32/60
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		// Hearts :  3 - Time : 24/60
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
@@ -3806,7 +3806,7 @@ ROM_START( hnxmasev )
 	ROM_LOAD( "b.3f",   0x00000, 0x10000, CRC(45e34624) SHA1(db7f880a8b2f36d5bed939bd0b2694f27e29141b) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
-	ROM_LOAD( "a.3c", 	 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) ) //same as maiko
+	ROM_LOAD( "a.3c",	 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) ) //same as maiko
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "c.10a", 0x000000, 0x10000, CRC(e46a1baa) SHA1(95ccf45a3c542391b67bd7993b5f7828ab525ebc) )
@@ -3860,7 +3860,7 @@ ROM_START( hnageman )
 	ROM_LOAD( "2.3f",   0x00000, 0x10000, CRC(155ed09a) SHA1(254f199063fe525c574032ae69d4d21b0debb4c5) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
-	ROM_LOAD( "1.3c", 	 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) ) //same as maiko
+	ROM_LOAD( "1.3c",	 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) ) //same as maiko
 
 	ROM_REGION( 0xd0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.10a", 0x000000, 0x20000, CRC(080e0daa) SHA1(331137392c46fededdc55bd731c3a0bee88e59e3) )

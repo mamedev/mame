@@ -97,7 +97,7 @@ static void hng64_mark_tile_dirty( int tilemap, int tile_index )
 }
 
 
-#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -719,7 +719,7 @@ struct _blit_parameters
 {
 	bitmap_t *			bitmap;
 	rectangle			cliprect;
-	UINT32 				tilemap_priority_code;
+	UINT32				tilemap_priority_code;
 	UINT8				mask;
 	UINT8				value;
 	UINT8				alpha;
@@ -804,9 +804,9 @@ INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 -------------------------------------------------*/
 
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)											        \
-do {																	  	        \
+do {																		        \
 	if (blit->drawformat == HNG64_TILEMAP_NORMAL)									\
-		*(UINT32 *)dest = clut[INPUT_VAL];								  	        \
+		*(UINT32 *)dest = clut[INPUT_VAL];									        \
 	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)			                \
 		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
 	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)		                        \
@@ -1044,7 +1044,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		debug_blend_enabled = 1;
 
 	if ((global_dimensions != 0) && (global_dimensions != 3))
- 		popmessage("unsupported global_dimensions on tilemaps");
+		popmessage("unsupported global_dimensions on tilemaps");
 
 	if (tm==0)
 	{

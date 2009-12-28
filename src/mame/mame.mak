@@ -374,7 +374,7 @@ $(MAMEOBJ)/aristocr.a: \
 	$(MACHINE)/archimds.o \
 
 $(MAMEOBJ)/atari.a: \
- 	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
+	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
 	$(DRIVERS)/arcadecl.o $(VIDEO)/arcadecl.o \
 	$(DRIVERS)/asteroid.o $(MACHINE)/asteroid.o $(AUDIO)/asteroid.o $(AUDIO)/llander.o \
 	$(DRIVERS)/atarifb.o $(MACHINE)/atarifb.o $(AUDIO)/atarifb.o $(VIDEO)/atarifb.o \
@@ -1858,7 +1858,7 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/mpu4.o:		$(MAMESRC)/drivers/mpu4drvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
-$(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
+$(MACHINE)/snes.o:		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snesdsp2.c \
 				$(MAMESRC)/machine/snesdsp3.c \
 				$(MAMESRC)/machine/snesdsp4.c \
@@ -1872,5 +1872,5 @@ $(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snessdd1.c \
 				$(MAMESRC)/machine/snes7110.c \
 				$(MAMESRC)/machine/snesst10.c
-$(VIDEO)/model2.o: 		$(MAMESRC)/video/model2rd.c
-$(VIDEO)/model3.o: 		$(MAMESRC)/video/m3raster.c
+$(VIDEO)/model2.o:		$(MAMESRC)/video/model2rd.c
+$(VIDEO)/model3.o:		$(MAMESRC)/video/m3raster.c

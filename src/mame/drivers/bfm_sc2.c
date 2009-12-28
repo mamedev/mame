@@ -605,15 +605,15 @@ static WRITE8_HANDLER( mmtr_w )
 	mmtr_latch = data;
 
 	for (i = 0; i<8; i++)
- 	{
+	{
 		if ( changed & (1 << i) )
- 		{
+		{
 			if ( Mechmtr_update(i, cycles, data & (1 << i) ) )
 			{
 				sc2gui_update_mmtr |= (1 << i);
 			}
- 		}
- 	}
+		}
+	}
 	if ( data & 0x1F ) cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
@@ -1275,7 +1275,7 @@ static WRITE8_HANDLER( e2ram_w )
 								e2data_to_read = e2ram[e2address];
 
 								if ( e2rw & 1 ) e2state = 7; // read data
-								else  		  e2state = 0; //?not sure
+								else		  e2state = 0; //?not sure
 							}
 							else
 							{
@@ -2613,7 +2613,7 @@ GAMEL( 1995, paradice, 0,		  scorpion2_vid, paradice,  adder_dutch,0,       "BFM
 GAMEL( 1996, pyramid,  0,		  scorpion2_vid, pyramid,   pyramid,	0,       "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",		GAME_SUPPORTS_SAVE,layout_pyramid )
 
 GAMEL( 1996, sltblgtk, 0,		  scorpion2_vid, sltblgtk,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",	GAME_SUPPORTS_SAVE,layout_sltblgtk )
-GAMEL( 1996, sltblgpo, 0, 		  scorpion2_vid, sltblgpo,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",	GAME_SUPPORTS_SAVE,layout_sltblgpo )
+GAMEL( 1996, sltblgpo, 0,		  scorpion2_vid, sltblgpo,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",	GAME_SUPPORTS_SAVE,layout_sltblgpo )
 GAMEL( 1996, sltblgp1, sltblgpo,  scorpion2_vid, sltblgpo,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",	GAME_SUPPORTS_SAVE,layout_sltblgpo )
 GAMEL( 1997, gldncrwn, 0,		  scorpion2_vid, gldncrwn,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",	GAME_SUPPORTS_SAVE,layout_gldncrwn )
 

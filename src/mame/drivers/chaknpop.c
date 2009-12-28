@@ -53,8 +53,8 @@ static ADDRESS_MAP_START( chaknpop_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
 	AM_RANGE(0x880c, 0x880c) AM_READWRITE(chaknpop_gfxmode_r, chaknpop_gfxmode_w)
 	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)												// coin lock out
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(chaknpop_txram_w) AM_BASE_MEMBER(chaknpop_state, tx_ram) 			// TX tilemap
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_BASE_MEMBER(chaknpop_state, attr_ram) 		// Color attribute
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(chaknpop_txram_w) AM_BASE_MEMBER(chaknpop_state, tx_ram)			// TX tilemap
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_BASE_MEMBER(chaknpop_state, attr_ram)		// Color attribute
 	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_BASE_SIZE_MEMBER(chaknpop_state, spr_ram, spr_ram_size)	// sprite
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank1")														// bitmap plane 1-4

@@ -83,13 +83,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vigilant_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(m72_sound_command_byte_w)	/* SD */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w) 			/* OUT2 */
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)			/* OUT2 */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(vigilant_bank_select_w)	/* PBANK */
-	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w) 		/* HSPL, HSPH */
+	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w)		/* HSPL, HSPH */
 	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
-	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w) 		/* RCOD */
+	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)		/* RCOD */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_map, ADDRESS_SPACE_PROGRAM, 8 )

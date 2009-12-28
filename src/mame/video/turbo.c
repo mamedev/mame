@@ -544,9 +544,9 @@ VIDEO_UPDATE( turbo )
 				priority = pr1122[priority];
 
 				/* use that to look up the overall priority in IC12/PR1123 (p. 144) */
-				mx = (priority & 7) | 						/* A0-A2: PR-1122 output, bits 0-2 */
-					 ((sprbits & 0x01000000) >> 21) | 		/*    A3: PLB0 */
-					 ((foreraw & 0x80) >> 3) | 				/*    A4: PLBE */
+				mx = (priority & 7) |						/* A0-A2: PR-1122 output, bits 0-2 */
+					 ((sprbits & 0x01000000) >> 21) |		/*    A3: PLB0 */
+					 ((foreraw & 0x80) >> 3) |				/*    A4: PLBE */
 					 ((forebits & 0x08) << 2) | 			/*    A5: PLBF */
 					 ((babit & 0x07) << 6) |				/* A6-A8: BABIT1-3 */
 					 ((state->turbo_fbpla & 0x08) << 6);	/*    A9: PLA3 */
@@ -844,7 +844,7 @@ VIDEO_UPDATE( subroc3d )
 
 				/* we then go through a muxer to select one of the 16 outputs computed above (p. 141) */
 				offs = (finalbits & 0x0f) | 				/* A0-A3: CD0-CD3 */
-					   ((mux & 0x08) << 1) | 				/*    A4: MUX3 */
+					   ((mux & 0x08) << 1) |				/*    A4: MUX3 */
 					   (state->subroc3d_col << 5);			/* A5-A8: COL0-COL3 */
 				dest[x + ix] = pr1419[offs];
 			}

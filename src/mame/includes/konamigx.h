@@ -32,8 +32,8 @@ int K055555GX_decode_osmixcolor(int layer, int *color);
     x------------------------------- (bit 31   : full shadow)
 */
 #define K055555_COLORMASK	0x0000ffff
-#define K055555_MIXSHIFT 	16
-#define K055555_BRTSHIFT 	18
+#define K055555_MIXSHIFT	16
+#define K055555_BRTSHIFT	18
 #define K055555_SKIPSHADOW	0x40000000
 #define K055555_FULLSHADOW	0x80000000
 
@@ -64,9 +64,9 @@ void konamigx_le2_sprite_callback(int *code, int *color, int *priority);
 
 // Sub Layer Flags
 #define GXSUB_K053250	0x10	// chip type: 0=K053936 ROZ+, 1=K053250 LVC
-#define GXSUB_4BPP 		0x04	//  16 colors
-#define GXSUB_5BPP 		0x05	//  32 colors
-#define GXSUB_8BPP 		0x08	// 256 colors
+#define GXSUB_4BPP		0x04	//  16 colors
+#define GXSUB_5BPP		0x05	//  32 colors
+#define GXSUB_8BPP		0x08	// 256 colors
 
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					tilemap_t *sub1, int sub1flags,

@@ -13,22 +13,22 @@ struct _atarisy1_state
 
 	UINT16 *		bankselect;
 
-	UINT8 			joystick_type;
-	UINT8 			trackball_type;
+	UINT8			joystick_type;
+	UINT8			trackball_type;
 
 	const device_config *joystick_timer;
-	UINT8 			joystick_int;
-	UINT8 			joystick_int_enable;
-	UINT8 			joystick_value;
+	UINT8			joystick_int;
+	UINT8			joystick_int_enable;
+	UINT8			joystick_value;
 
-	UINT8	 		tms5220_out_data;
-	UINT8	 		tms5220_in_data;
-	UINT8	 		tms5220_ctl;
+	UINT8			tms5220_out_data;
+	UINT8			tms5220_in_data;
+	UINT8			tms5220_ctl;
 
 	/* playfield parameters */
-	UINT16 			playfield_lookup[256];
-	UINT8 			playfield_tile_bank;
-	UINT16 			playfield_priority_pens;
+	UINT16			playfield_lookup[256];
+	UINT8			playfield_tile_bank;
+	UINT16			playfield_priority_pens;
 	const device_config *yscroll_reset_timer;
 
 	/* INT3 tracking */
@@ -37,8 +37,8 @@ struct _atarisy1_state
 	const device_config *int3off_timer;
 
 	/* graphics bank tracking */
-	UINT8 			bank_gfx[3][8];
-	UINT8 			bank_color_shift[MAX_GFX_ELEMENTS];
+	UINT8			bank_gfx[3][8];
+	UINT8			bank_color_shift[MAX_GFX_ELEMENTS];
 };
 
 

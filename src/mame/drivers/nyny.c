@@ -306,9 +306,9 @@ static MC6845_UPDATE_ROW( update_row )
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 5) & 0x8000) |
-		   			  ((ma << 3) & 0x1f00) |
-		   			  ((ra << 5) & 0x00e0) |
-		   			  ((ma << 0) & 0x001f);
+					  ((ma << 3) & 0x1f00) |
+					  ((ra << 5) & 0x00e0) |
+					  ((ma << 0) & 0x001f);
 
 		if (flipscreen)
 			offs = offs ^ 0x9fff;

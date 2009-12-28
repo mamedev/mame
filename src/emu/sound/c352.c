@@ -29,7 +29,7 @@ enum {
 	C352_FLG_KEYOFF		= 0x2000,	// Keyoff
 	C352_FLG_LOOPTRG	= 0x1000,	// Loop Trigger
 	C352_FLG_LOOPHIST	= 0x0800,	// Loop History
-	C352_FLG_FM	 		= 0x0400,	// Frequency Modulation
+	C352_FLG_FM			= 0x0400,	// Frequency Modulation
 	C352_FLG_PHASERL	= 0x0200,	// Rear Left invert phase 180 degrees
 	C352_FLG_PHASEFL	= 0x0100,	// Front Left invert phase 180 degrees
 	C352_FLG_PHASEFR	= 0x0080,	// invert phase 180 degrees (e.g. flip sign of sample)
@@ -101,7 +101,7 @@ static int get_mseq_bit(c352_state *info)
 
 	if (bit)
 	{
-       		reg = ((reg ^ mask) << 1) | 1;
+    		reg = ((reg ^ mask) << 1) | 1;
 	}
 	else
 	{

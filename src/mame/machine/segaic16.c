@@ -48,7 +48,7 @@ struct multiply_chip
 
 struct divide_chip
 {
-	UINT16 	regs[8];
+	UINT16	regs[8];
 };
 
 

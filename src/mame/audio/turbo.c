@@ -651,17 +651,17 @@ DISCRETE_SOUND_START(turbo)
 	/************************************************/
 	/*                  NODE             ADDR  MASK    GAIN    OFFSET  INIT */
 	DISCRETE_INPUT(TURBO_CRASH_EN		,0x00,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_TRIG1_INV    	,0x01,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_TRIG2_INV 		,0x02,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_TRIG3_INV 		,0x03,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_TRIG4_INV    	,0x04,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG1_INV  	,0x01,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG2_INV		,0x02,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG3_INV		,0x03,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG4_INV  	,0x04,0x001f,                  1.0)
 	DISCRETE_INPUT(TURBO_SLIP_EN    	,0x05,0x001f,                  0.0)
 	DISCRETE_INPUT(TURBO_CRASHL_EN		,0x06,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_ACC_VAL 		,0x07,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_AMBU_EN 		,0x08,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_SPIN_EN 		,0x09,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_OSEL_VAL 		,0x0a,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_BSEL_VAL 		,0x0b,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_ACC_VAL		,0x07,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_AMBU_EN		,0x08,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_SPIN_EN		,0x09,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_OSEL_VAL		,0x0a,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_BSEL_VAL		,0x0b,0x001f,                  0.0)
 
 	/************************************************/
 	/* Alarm sounds                                 */

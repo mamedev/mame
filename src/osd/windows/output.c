@@ -201,8 +201,8 @@ static int create_window_class(void)
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName 	= OUTPUT_WINDOW_CLASS;
-		wc.hInstance 		= GetModuleHandle(NULL);
+		wc.lpszClassName	= OUTPUT_WINDOW_CLASS;
+		wc.hInstance		= GetModuleHandle(NULL);
 		wc.lpfnWndProc		= output_window_proc;
 
 		// register the class; fail if we can't

@@ -561,28 +561,28 @@ INLINE void g65816i_check_maskable_interrupt(g65816i_cpu_struct *cpustate)
 
 
 #define OPER_8_IMM(cpustate)		read_8_IMM(EA_IMM8(cpustate))
-#define OPER_8_D(cpustate)	      	read_8_D(EA_D(cpustate))
-#define OPER_8_A(cpustate)	      	read_8_A(EA_A(cpustate))
-#define OPER_8_AL(cpustate)	      	read_8_AL(EA_AL(cpustate))
-#define OPER_8_DX(cpustate)	      	read_8_DX(EA_DX(cpustate))
-#define OPER_8_DY(cpustate)	      	read_8_DY(EA_DY(cpustate))
-#define OPER_8_AX(cpustate)	      	read_8_AX(EA_AX(cpustate))
+#define OPER_8_D(cpustate)	    	read_8_D(EA_D(cpustate))
+#define OPER_8_A(cpustate)	    	read_8_A(EA_A(cpustate))
+#define OPER_8_AL(cpustate)	    	read_8_AL(EA_AL(cpustate))
+#define OPER_8_DX(cpustate)	    	read_8_DX(EA_DX(cpustate))
+#define OPER_8_DY(cpustate)	    	read_8_DY(EA_DY(cpustate))
+#define OPER_8_AX(cpustate)	    	read_8_AX(EA_AX(cpustate))
 #define OPER_8_ALX(cpustate)		read_8_ALX(EA_ALX(cpustate))
-#define OPER_8_AY(cpustate)	      	read_8_AY(EA_AY(cpustate))
-#define OPER_8_DI(cpustate)	      	read_8_DI(EA_DI(cpustate))
+#define OPER_8_AY(cpustate)	    	read_8_AY(EA_AY(cpustate))
+#define OPER_8_DI(cpustate)	    	read_8_DI(EA_DI(cpustate))
 #define OPER_8_DLI(cpustate)		read_8_DLI(EA_DLI(cpustate))
-#define OPER_8_AI(cpustate)	      	read_8_AI(EA_AI(cpustate))
+#define OPER_8_AI(cpustate)	    	read_8_AI(EA_AI(cpustate))
 #define OPER_8_ALI(cpustate)		read_8_ALI(EA_ALI(cpustate))
 #define OPER_8_DXI(cpustate)		read_8_DXI(EA_DXI(cpustate))
 #define OPER_8_DIY(cpustate)		read_8_DIY(EA_DIY(cpustate))
 #define OPER_8_DLIY(cpustate)		read_8_DLIY(EA_DLIY(cpustate))
 #define OPER_8_AXI(cpustate)		read_8_AXI(EA_AXI(cpustate))
-#define OPER_8_S(cpustate)	      	read_8_S(EA_S(cpustate))
+#define OPER_8_S(cpustate)	    	read_8_S(EA_S(cpustate))
 #define OPER_8_SIY(cpustate)		read_8_SIY(EA_SIY(cpustate))
 
 #define OPER_16_IMM(cpustate)		read_16_IMM(EA_IMM16(cpustate))
-#define OPER_16_D(cpustate)	      	read_16_D(EA_D(cpustate))
-#define OPER_16_A(cpustate)	      	read_16_A(EA_A(cpustate))
+#define OPER_16_D(cpustate)	    	read_16_D(EA_D(cpustate))
+#define OPER_16_A(cpustate)	    	read_16_A(EA_A(cpustate))
 #define OPER_16_AL(cpustate)		read_16_AL(EA_AL(cpustate))
 #define OPER_16_DX(cpustate)		read_16_DX(EA_DX(cpustate))
 #define OPER_16_DY(cpustate)		read_16_DY(EA_DY(cpustate))
@@ -597,12 +597,12 @@ INLINE void g65816i_check_maskable_interrupt(g65816i_cpu_struct *cpustate)
 #define OPER_16_DIY(cpustate)		read_16_DIY(EA_DIY(cpustate))
 #define OPER_16_DLIY(cpustate)		read_16_DLIY(EA_DLIY(cpustate))
 #define OPER_16_AXI(cpustate)		read_16_AXI(EA_AXI(cpustate))
-#define OPER_16_S(cpustate)	      	read_16_S(EA_S(cpustate))
+#define OPER_16_S(cpustate)	    	read_16_S(EA_S(cpustate))
 #define OPER_16_SIY(cpustate)		read_16_SIY(EA_SIY(cpustate))
 
 #define OPER_24_IMM(cpustate)		read_24_IMM(EA_IMM24(cpustate))
-#define OPER_24_D(cpustate)	      	read_24_D(EA_D(cpustate))
-#define OPER_24_A(cpustate)	      	read_24_A(EA_A(cpustate))
+#define OPER_24_D(cpustate)	    	read_24_D(EA_D(cpustate))
+#define OPER_24_A(cpustate)	    	read_24_A(EA_A(cpustate))
 #define OPER_24_AL(cpustate)		read_24_AL(EA_AL(cpustate))
 #define OPER_24_DX(cpustate)		read_24_DX(EA_DX(cpustate))
 #define OPER_24_DY(cpustate)		read_24_DY(EA_DY(cpustate))
@@ -617,7 +617,7 @@ INLINE void g65816i_check_maskable_interrupt(g65816i_cpu_struct *cpustate)
 #define OPER_24_DIY(cpustate)		read_24_DIY(EA_DIY(cpustate))
 #define OPER_24_DLIY(cpustate)		read_24_DLIY(EA_DLIY(cpustate))
 #define OPER_24_AXI(cpustate)		read_24_AXI(EA_AXI(cpustate))
-#define OPER_24_S(cpustate)	      	read_24_S(EA_S(cpustate))
+#define OPER_24_S(cpustate)	    	read_24_S(EA_S(cpustate))
 #define OPER_24_SIY(cpustate)		read_24_SIY(EA_SIY(cpustate))
 
 INLINE uint EA_IMM8(g65816i_cpu_struct *cpustate)  {REGISTER_PC += 1; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-1);}
@@ -1899,7 +1899,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_TSB(MODE)														\
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);							\
 			DST    = EA_##MODE(cpustate);											\
-	  		FLAG_Z = read_16_##MODE(DST);									\
+			FLAG_Z = read_16_##MODE(DST);									\
 			write_16_##MODE(DST, FLAG_Z | REGISTER_A);							\
 			FLAG_Z &= REGISTER_A
 #endif

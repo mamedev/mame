@@ -15,7 +15,7 @@
 #define SPRITE_PEN_BASE		(0x820)
 #define BULLET_STAR_PEN		(0x828)
 
-#define STARS_COLOR_BASE 	16
+#define STARS_COLOR_BASE	16
 
 
 /******************************************************

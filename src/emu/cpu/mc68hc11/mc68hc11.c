@@ -557,11 +557,11 @@ CPU_GET_INFO( mc68hc11 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 			info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 			info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:				info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 				info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 				info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:				info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:				info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:					info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 					info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 					info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:					info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:					info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:	info->i = cpustate->irq_state[MC68HC11_IRQ_LINE]; break;
 

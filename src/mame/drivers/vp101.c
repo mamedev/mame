@@ -56,7 +56,7 @@ static const mips3_config config =
 };
 
 static MACHINE_DRIVER_START( vp101 )
- 	MDRV_CPU_ADD("maincpu", R5000LE, 300000000)	/* actually VR5500 with added NEC VR-series custom instructions */
+	MDRV_CPU_ADD("maincpu", R5000LE, 300000000)	/* actually VR5500 with added NEC VR-series custom instructions */
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 

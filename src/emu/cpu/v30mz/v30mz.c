@@ -65,7 +65,7 @@ typedef struct _v30mz_state v30mz_state;
 struct _v30mz_state
 {
 	necbasicregs regs;
- 	UINT16	sregs[4];
+	UINT16	sregs[4];
 
 	UINT16	ip;
 
@@ -216,7 +216,7 @@ static void external_int(v30mz_state *cpustate)
 
 #define OP(num,func_name) static void func_name(v30mz_state *cpustate)
 
-OP( 0x00, i_add_br8  ) { DEF_br8;	ADDB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);	 	}
+OP( 0x00, i_add_br8  ) { DEF_br8;	ADDB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);		}
 OP( 0x01, i_add_wr16 ) { DEF_wr16;	ADDW;	PutbackRMWord(ModRM,dst);	CLKM(1,3);}
 OP( 0x02, i_add_r8b  ) { DEF_r8b;	ADDB;	RegByte(ModRM)=dst;			CLKM(1,2);		}
 OP( 0x03, i_add_r16w ) { DEF_r16w;	ADDW;	RegWord(ModRM)=dst;			CLKM(1,2);	}
@@ -267,25 +267,25 @@ OP( 0x0f, i_pre_nec  ) { UINT32 ModRM, tmp, tmp2;
 	}
 }
 
-OP( 0x10, i_adc_br8  ) { DEF_br8;	src+=CF;	ADDB;	PutbackRMByte(ModRM,dst);	CLKM(1,3); 		}
+OP( 0x10, i_adc_br8  ) { DEF_br8;	src+=CF;	ADDB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);		}
 OP( 0x11, i_adc_wr16 ) { DEF_wr16;	src+=CF;	ADDW;	PutbackRMWord(ModRM,dst);	CLKM(1,3);}
-OP( 0x12, i_adc_r8b  ) { DEF_r8b;	src+=CF;	ADDB;	RegByte(ModRM)=dst;			CLKM(1,2); 		}
+OP( 0x12, i_adc_r8b  ) { DEF_r8b;	src+=CF;	ADDB;	RegByte(ModRM)=dst;			CLKM(1,2);		}
 OP( 0x13, i_adc_r16w ) { DEF_r16w;	src+=CF;	ADDW;	RegWord(ModRM)=dst;			CLKM(1,2);	}
 OP( 0x14, i_adc_ald8 ) { DEF_ald8;	src+=CF;	ADDB;	cpustate->regs.b[AL]=dst;			CLK(1);				}
 OP( 0x15, i_adc_axd16) { DEF_axd16;	src+=CF;	ADDW;	cpustate->regs.w[AW]=dst;			CLK(1);				}
 OP( 0x16, i_push_ss  ) { PUSH(cpustate->sregs[SS]);		CLK(2);	}
 OP( 0x17, i_pop_ss   ) { POP(cpustate->sregs[SS]);		CLK(3);	cpustate->no_interrupt=1; }
 
-OP( 0x18, i_sbb_br8  ) { DEF_br8;	src+=CF;	SUBB;	PutbackRMByte(ModRM,dst);	CLKM(1,3); 		}
+OP( 0x18, i_sbb_br8  ) { DEF_br8;	src+=CF;	SUBB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);		}
 OP( 0x19, i_sbb_wr16 ) { DEF_wr16;	src+=CF;	SUBW;	PutbackRMWord(ModRM,dst);	CLKM(1,3);}
-OP( 0x1a, i_sbb_r8b  ) { DEF_r8b;	src+=CF;	SUBB;	RegByte(ModRM)=dst;			CLKM(1,2); 		}
+OP( 0x1a, i_sbb_r8b  ) { DEF_r8b;	src+=CF;	SUBB;	RegByte(ModRM)=dst;			CLKM(1,2);		}
 OP( 0x1b, i_sbb_r16w ) { DEF_r16w;	src+=CF;	SUBW;	RegWord(ModRM)=dst;			CLKM(1,2);	}
 OP( 0x1c, i_sbb_ald8 ) { DEF_ald8;	src+=CF;	SUBB;	cpustate->regs.b[AL]=dst;			CLK(1); 				}
 OP( 0x1d, i_sbb_axd16) { DEF_axd16;	src+=CF;	SUBW;	cpustate->regs.w[AW]=dst;			CLK(1);	}
 OP( 0x1e, i_push_ds  ) { PUSH(cpustate->sregs[DS]);		CLK(2);	}
 OP( 0x1f, i_pop_ds   ) { POP(cpustate->sregs[DS]);		CLK(3);	}
 
-OP( 0x20, i_and_br8  ) { DEF_br8;	ANDB;	PutbackRMByte(ModRM,dst);	CLKM(1,3); 		}
+OP( 0x20, i_and_br8  ) { DEF_br8;	ANDB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);		}
 OP( 0x21, i_and_wr16 ) { DEF_wr16;	ANDW;	PutbackRMWord(ModRM,dst);	CLKM(1,3);}
 OP( 0x22, i_and_r8b  ) { DEF_r8b;	ANDB;	RegByte(ModRM)=dst;			CLKM(1,2);		}
 OP( 0x23, i_and_r16w ) { DEF_r16w;	ANDW;	RegWord(ModRM)=dst;			CLKM(1,2);	}
@@ -294,9 +294,9 @@ OP( 0x25, i_and_axd16) { DEF_axd16;	ANDW;	cpustate->regs.w[AW]=dst;			CLK(1);	}
 OP( 0x26, i_es       ) { cpustate->seg_prefix=TRUE;	cpustate->prefix_base=cpustate->sregs[ES]<<4;	CLK(1);		nec_instruction[FETCHOP](cpustate);	cpustate->seg_prefix=FALSE; }
 OP( 0x27, i_daa      ) { ADJ4(6,0x60);									CLK(10);	}
 
-OP( 0x28, i_sub_br8  ) { DEF_br8;	SUBB;	PutbackRMByte(ModRM,dst);	CLKM(1,3); 		}
+OP( 0x28, i_sub_br8  ) { DEF_br8;	SUBB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);		}
 OP( 0x29, i_sub_wr16 ) { DEF_wr16;	SUBW;	PutbackRMWord(ModRM,dst);	CLKM(1,3);}
-OP( 0x2a, i_sub_r8b  ) { DEF_r8b;	SUBB;	RegByte(ModRM)=dst;			CLKM(1,2); 		}
+OP( 0x2a, i_sub_r8b  ) { DEF_r8b;	SUBB;	RegByte(ModRM)=dst;			CLKM(1,2);		}
 OP( 0x2b, i_sub_r16w ) { DEF_r16w;	SUBW;	RegWord(ModRM)=dst;			CLKM(1,2);	}
 OP( 0x2c, i_sub_ald8 ) { DEF_ald8;	SUBB;	cpustate->regs.b[AL]=dst;			CLK(1); 				}
 OP( 0x2d, i_sub_axd16) { DEF_axd16;	SUBW;	cpustate->regs.w[AW]=dst;			CLK(1);	}
@@ -305,7 +305,7 @@ OP( 0x2f, i_das      ) { ADJ4(-6,-0x60);								CLK(10);	}
 
 OP( 0x30, i_xor_br8  ) { DEF_br8;	XORB;	PutbackRMByte(ModRM,dst);	CLKM(1,3);		}
 OP( 0x31, i_xor_wr16 ) { DEF_wr16;	XORW;	PutbackRMWord(ModRM,dst);	CLKM(1,3);}
-OP( 0x32, i_xor_r8b  ) { DEF_r8b;	XORB;	RegByte(ModRM)=dst;			CLKM(1,2); 		}
+OP( 0x32, i_xor_r8b  ) { DEF_r8b;	XORB;	RegByte(ModRM)=dst;			CLKM(1,2);		}
 OP( 0x33, i_xor_r16w ) { DEF_r16w;	XORW;	RegWord(ModRM)=dst;			CLKM(1,2);	}
 OP( 0x34, i_xor_ald8 ) { DEF_ald8;	XORB;	cpustate->regs.b[AL]=dst;			CLK(1); 				}
 OP( 0x35, i_xor_axd16) { DEF_axd16;	XORW;	cpustate->regs.w[AW]=dst;			CLK(1);	}
@@ -395,7 +395,7 @@ OP( 0x62, i_chkind  ) {
 	}
 	logerror("%06x: bound %04x high %04x low %04x tmp\n",PC(cpustate),high,low,tmp);
 }
-OP( 0x64, i_repnc  ) { 	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
+OP( 0x64, i_repnc  ) {	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
     switch(next) { /* Segments */
 	    case 0x26:	cpustate->seg_prefix=TRUE;	cpustate->prefix_base=cpustate->sregs[ES]<<4;	next = FETCHOP;	CLK(2); break;
 	    case 0x2e:	cpustate->seg_prefix=TRUE;	cpustate->prefix_base=cpustate->sregs[CS]<<4;	next = FETCHOP;	CLK(2); break;
@@ -423,7 +423,7 @@ OP( 0x64, i_repnc  ) { 	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
 	cpustate->seg_prefix=FALSE;
 }
 
-OP( 0x65, i_repc  ) { 	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
+OP( 0x65, i_repc  ) {	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
     switch(next) { /* Segments */
 	    case 0x26:	cpustate->seg_prefix=TRUE;	cpustate->prefix_base=cpustate->sregs[ES]<<4;	next = FETCHOP;	CLK(2); break;
 	    case 0x2e:	cpustate->seg_prefix=TRUE;	cpustate->prefix_base=cpustate->sregs[CS]<<4;	next = FETCHOP;	CLK(2); break;
@@ -452,7 +452,7 @@ OP( 0x65, i_repc  ) { 	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
 }
 
 OP( 0x68, i_push_d16 ) { UINT32 tmp;	FETCHWORD(tmp); PUSH(tmp);	CLK(1);	}
-OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w; 	FETCHWORD(tmp); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     if (ModRM >= 0xc0) CLK(3) else CLK(4) }
+OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w;	FETCHWORD(tmp); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     if (ModRM >= 0xc0) CLK(3) else CLK(4) }
 OP( 0x6a, i_push_d8  ) { UINT32 tmp = (WORD)((INT16)((INT8)FETCH)); 	PUSH(tmp);	CLK(1);	}
 OP( 0x6b, i_imul_d8  ) { UINT32 src2; DEF_r16w; src2= (WORD)((INT16)((INT8)FETCH)); dst = (INT32)((INT16)src)*(INT32)((INT16)src2); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1); RegWord(ModRM)=(WORD)dst; if (ModRM >= 0xc0) CLK(3) else CLK(4) }
 OP( 0x6c, i_insb     ) { PutMemB(ES,cpustate->regs.w[IY],read_port(cpustate->regs.w[DW])); cpustate->regs.w[IY]+= -2 * cpustate->DF + 1; CLK(6); }
@@ -538,12 +538,12 @@ OP( 0x85, i_test_wr16 ) { DEF_wr16;	ANDW;	CLKM(1,2);	}
 OP( 0x86, i_xchg_br8  ) { DEF_br8;	RegByte(ModRM)=dst; PutbackRMByte(ModRM,src); CLKM(3,5); }
 OP( 0x87, i_xchg_wr16 ) { DEF_wr16;	RegWord(ModRM)=dst; PutbackRMWord(ModRM,src); CLKM(3,5); }
 
-OP( 0x88, i_mov_br8   ) { UINT8  src; GetModRM; src = RegByte(ModRM); 	PutRMByte(ModRM,src); 	CLK(1); 			}
-OP( 0x89, i_mov_wr16  ) { UINT16 src; GetModRM; src = RegWord(ModRM); 	PutRMWord(ModRM,src);	CLK(1); 	}
+OP( 0x88, i_mov_br8   ) { UINT8  src; GetModRM; src = RegByte(ModRM);	PutRMByte(ModRM,src);	CLK(1); 			}
+OP( 0x89, i_mov_wr16  ) { UINT16 src; GetModRM; src = RegWord(ModRM);	PutRMWord(ModRM,src);	CLK(1); 	}
 OP( 0x8a, i_mov_r8b   ) { UINT8  src; GetModRM; src = GetRMByte(ModRM);	RegByte(ModRM)=src;		CLK(1); 		}
 OP( 0x8b, i_mov_r16w  ) { UINT16 src; GetModRM; src = GetRMWord(ModRM);	RegWord(ModRM)=src; 	CLK(1); 	}
 OP( 0x8c, i_mov_wsreg ) { GetModRM; PutRMWord(ModRM,cpustate->sregs[(ModRM & 0x38) >> 3]);				CLKM(1,3); }
-OP( 0x8d, i_lea       ) { UINT16 ModRM = FETCH; (void)(*GetEA[ModRM])(cpustate); RegWord(ModRM)=cpustate->eo; 	CLK(1); }
+OP( 0x8d, i_lea       ) { UINT16 ModRM = FETCH; (void)(*GetEA[ModRM])(cpustate); RegWord(ModRM)=cpustate->eo;	CLK(1); }
 OP( 0x8e, i_mov_sregw ) { UINT16 src; GetModRM; src = GetRMWord(ModRM); CLKM(2,3);
     switch (ModRM & 0x38) {
 	    case 0x00: cpustate->sregs[ES] = src; break; /* mov es,ew */
@@ -588,12 +588,12 @@ OP( 0xa7, i_cmpsw      ) { UINT32 src = GetMemW(ES, cpustate->regs.w[IY]); UINT3
 
 OP( 0xa8, i_test_ald8  ) { DEF_ald8;  ANDB; CLK(1); }
 OP( 0xa9, i_test_axd16 ) { DEF_axd16; ANDW; CLK(1); }
-OP( 0xaa, i_stosb      ) { PutMemB(ES,cpustate->regs.w[IY],cpustate->regs.b[AL]); 	cpustate->regs.w[IY] += -2 * cpustate->DF + 1; CLK(3);  }
-OP( 0xab, i_stosw      ) { PutMemW(ES,cpustate->regs.w[IY],cpustate->regs.w[AW]); 	cpustate->regs.w[IY] += -4 * cpustate->DF + 2; CLK(3); }
+OP( 0xaa, i_stosb      ) { PutMemB(ES,cpustate->regs.w[IY],cpustate->regs.b[AL]);	cpustate->regs.w[IY] += -2 * cpustate->DF + 1; CLK(3);  }
+OP( 0xab, i_stosw      ) { PutMemW(ES,cpustate->regs.w[IY],cpustate->regs.w[AW]);	cpustate->regs.w[IY] += -4 * cpustate->DF + 2; CLK(3); }
 OP( 0xac, i_lodsb      ) { cpustate->regs.b[AL] = GetMemB(DS,cpustate->regs.w[IX]); cpustate->regs.w[IX] += -2 * cpustate->DF + 1; CLK(3);  }
 OP( 0xad, i_lodsw      ) { cpustate->regs.w[AW] = GetMemW(DS,cpustate->regs.w[IX]); cpustate->regs.w[IX] += -4 * cpustate->DF + 2; CLK(3); }
-OP( 0xae, i_scasb      ) { UINT32 src = GetMemB(ES, cpustate->regs.w[IY]); 	UINT32 dst = cpustate->regs.b[AL]; SUBB; cpustate->regs.w[IY] += -2 * cpustate->DF + 1; CLK(4);  }
-OP( 0xaf, i_scasw      ) { UINT32 src = GetMemW(ES, cpustate->regs.w[IY]); 	UINT32 dst = cpustate->regs.w[AW]; SUBW; cpustate->regs.w[IY] += -4 * cpustate->DF + 2; CLK(4); }
+OP( 0xae, i_scasb      ) { UINT32 src = GetMemB(ES, cpustate->regs.w[IY]);	UINT32 dst = cpustate->regs.b[AL]; SUBB; cpustate->regs.w[IY] += -2 * cpustate->DF + 1; CLK(4);  }
+OP( 0xaf, i_scasw      ) { UINT32 src = GetMemW(ES, cpustate->regs.w[IY]);	UINT32 dst = cpustate->regs.w[AW]; SUBW; cpustate->regs.w[IY] += -4 * cpustate->DF + 2; CLK(4); }
 
 OP( 0xb0, i_mov_ald8  ) { cpustate->regs.b[AL] = FETCH;	CLK(1); }
 OP( 0xb1, i_mov_cld8  ) { cpustate->regs.b[CL] = FETCH; CLK(1); }
@@ -761,7 +761,7 @@ OP( 0xe7, i_outax  ) { UINT8 port = FETCH; write_port(port, cpustate->regs.b[AL]
 
 OP( 0xe8, i_call_d16 ) { UINT32 tmp; FETCHWORD(tmp); PUSH(cpustate->ip); cpustate->ip = (WORD)(cpustate->ip+(INT16)tmp); CLK(5); }
 OP( 0xe9, i_jmp_d16  ) { UINT32 tmp; FETCHWORD(tmp); cpustate->ip = (WORD)(cpustate->ip+(INT16)tmp); CLK(4); }
-OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; FETCHWORD(tmp); FETCHWORD(tmp1); cpustate->sregs[CS] = (WORD)tmp1; 	cpustate->ip = (WORD)tmp; CLK(7);  }
+OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; FETCHWORD(tmp); FETCHWORD(tmp1); cpustate->sregs[CS] = (WORD)tmp1;	cpustate->ip = (WORD)tmp; CLK(7);  }
 OP( 0xeb, i_jmp_d8   ) { int tmp = (int)((INT8)FETCH); CLK(4);
 	if (tmp==-2 && cpustate->no_interrupt==0 && (cpustate->pending_irq==0) && cpustate->icount>0) cpustate->icount%=12; /* cycle skip */
 	cpustate->ip = (WORD)(cpustate->ip+tmp);
@@ -833,7 +833,7 @@ OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
     switch (ModRM & 0x38) {
 		case 0x00: tmp &= FETCH; cpustate->CarryVal = cpustate->OverVal = 0; SetSZPF_Byte(tmp); CLKM(1,2); break; /* TEST */
 		case 0x08: logerror("%06x: Undefined opcode 0xf6 0x08\n",PC(cpustate)); break;
- 		case 0x10: PutbackRMByte(ModRM,~tmp); CLKM(1,3); break; /* NOT */
+		case 0x10: PutbackRMByte(ModRM,~tmp); CLKM(1,3); break; /* NOT */
 		case 0x18: cpustate->CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); CLKM(1,3); break; /* NEG */
 		case 0x20: uresult = cpustate->regs.b[AL]*tmp; cpustate->regs.w[AW]=(WORD)uresult; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MULU */
 		case 0x28: result = (INT16)((INT8)cpustate->regs.b[AL])*(INT16)((INT8)tmp); cpustate->regs.w[AW]=(WORD)result; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MUL */
@@ -847,13 +847,13 @@ OP( 0xf7, i_f7pre   ) { UINT32 tmp,tmp2; UINT32 uresult,uresult2; INT32 result,r
     switch (ModRM & 0x38) {
 		case 0x00: FETCHWORD(tmp2); tmp &= tmp2; cpustate->CarryVal = cpustate->OverVal = 0; SetSZPF_Word(tmp); CLKM(1,2); break; /* TEST */
 		case 0x08: logerror("%06x: Undefined opcode 0xf7 0x08\n",PC(cpustate)); break;
- 		case 0x10: PutbackRMWord(ModRM,~tmp); CLKM(1,3); break; /* NOT */
+		case 0x10: PutbackRMWord(ModRM,~tmp); CLKM(1,3); break; /* NOT */
 		case 0x18: cpustate->CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); CLKM(1,3); break; /* NEG */
 		case 0x20: uresult = cpustate->regs.w[AW]*tmp; cpustate->regs.w[AW]=uresult&0xffff; cpustate->regs.w[DW]=((UINT32)uresult)>>16; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.w[DW]!=0); CLKM(3,4); break; /* MULU */
 		case 0x28: result = (INT32)((INT16)cpustate->regs.w[AW])*(INT32)((INT16)tmp); cpustate->regs.w[AW]=result&0xffff; cpustate->regs.w[DW]=result>>16; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.w[DW]!=0); CLKM(3,4); break; /* MUL */
 		case 0x30: if (tmp) { DIVUW; } else nec_interrupt(cpustate,0,0); CLKM(23,24); break;
 		case 0x38: if (tmp) { DIVW;  } else nec_interrupt(cpustate,0,0); CLKM(24,25); break;
- 	}
+	}
 }
 
 OP( 0xf8, i_clc   ) { cpustate->CarryVal = 0;	CLK(4);	}
@@ -1063,11 +1063,11 @@ CPU_GET_INFO( v30mz )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 20;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (cpustate->pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;					break;

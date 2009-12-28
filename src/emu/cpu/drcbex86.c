@@ -159,7 +159,7 @@ struct _drcbe_state
 	const device_config *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
-	drcuml_machine_state 	state;					/* state of the machine */
+	drcuml_machine_state	state;					/* state of the machine */
 	drchash_state *			hash;					/* hash table state */
 	drcmap_state *			map;					/* code map */
 	drclabel_list *			labels;                 /* label list */
@@ -281,7 +281,7 @@ static const UINT16 fp_control[4] =
 	0x0e3f, 	/* DRCUML_FMOD_TRUNC */
 	0x023f, 	/* DRCUML_FMOD_ROUND */
 	0x0a3f, 	/* DRCUML_FMOD_CEIL */
-	0x063f	 	/* DRCUML_FMOD_FLOOR */
+	0x063f		/* DRCUML_FMOD_FLOOR */
 };
 
 

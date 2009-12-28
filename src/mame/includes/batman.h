@@ -11,9 +11,9 @@ struct _batman_state
 {
 	atarigen_state	atarigen;
 
-	UINT16 			latch_data;
+	UINT16			latch_data;
 
-	UINT8 			alpha_tile_bank;
+	UINT8			alpha_tile_bank;
 };
 
 

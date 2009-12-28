@@ -92,8 +92,8 @@ struct _acia6850_t
 	int brk;
 	int first_reset;
 	int status_read;
-	enum 	serial_state rx_state;
-	enum 	serial_state tx_state;
+	enum	serial_state rx_state;
+	enum	serial_state tx_state;
 
 	emu_timer *rx_timer;
 	emu_timer *tx_timer;

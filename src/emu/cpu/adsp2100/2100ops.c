@@ -51,7 +51,7 @@
 #define CALC_V(s,d,r)	(adsp->astat |= ((s ^ d ^ r ^ (r >> 1)) >> 13) & 0x04)
 #define CALC_C(r)		(adsp->astat |= (r >> 13) & 0x08)
 #define CALC_C_SUB(r)	(adsp->astat |= (~r >> 13) & 0x08)
-#define CALC_NZ(r) 		CLR_FLAGS; CALC_N(r); CALC_Z(r)
+#define CALC_NZ(r)		CLR_FLAGS; CALC_N(r); CALC_Z(r)
 #define CALC_NZV(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r)
 #define CALC_NZVC(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r); CALC_C(r)
 #define CALC_NZVC_SUB(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r); CALC_C_SUB(r)
@@ -295,7 +295,7 @@ INLINE void stat_stack_pop(adsp2100_state *adsp)
 	update_mstat(adsp);
 	adsp->imask = adsp->stat_stack[adsp->stat_sp][1];
 	adsp->astat = adsp->stat_stack[adsp->stat_sp][2];
- 	check_irqs(adsp);
+	check_irqs(adsp);
 }
 
 

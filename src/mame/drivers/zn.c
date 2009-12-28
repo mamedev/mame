@@ -1441,7 +1441,7 @@ static void atpsx_interrupt(const device_config *device, int state)
 {
 	if (state)
 	{
-	 	psx_irq_set(device->machine, 0x400);
+		psx_irq_set(device->machine, 0x400);
 	}
 }
 
@@ -2008,7 +2008,7 @@ static void jdredd_ide_interrupt(const device_config *device, int state)
 {
 	if (state)
 	{
-	 	psx_irq_set(device->machine, 0x400);
+		psx_irq_set(device->machine, 0x400);
 	}
 }
 

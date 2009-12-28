@@ -646,7 +646,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mk )
-	ROM_REGION( 0x50000, "adpcm", 0 ) 	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
 	ROM_LOAD( "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
 	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
@@ -679,7 +679,7 @@ ROM_END
 
 
 ROM_START( mkr4 )
-	ROM_REGION( 0x50000, "adpcm", 0 ) 	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
 	ROM_LOAD( "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
 	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
@@ -712,7 +712,7 @@ ROM_END
 
 
 ROM_START( mktturbo )
-	ROM_REGION( 0x50000, "adpcm", 0 ) 	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
 	ROM_LOAD( "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
 	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */

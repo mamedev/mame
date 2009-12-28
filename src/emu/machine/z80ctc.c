@@ -32,7 +32,7 @@
 
 /* these are the bits of the incoming commands to the CTC */
 #define INTERRUPT			0x80
-#define INTERRUPT_ON 		0x80
+#define INTERRUPT_ON		0x80
 #define INTERRUPT_OFF		0x00
 
 #define MODE				0x40
@@ -78,10 +78,10 @@ struct _ctc_channel
 	devcb_resolved_write_line	zc;			/* zero crossing callbacks */
 
 	UINT8				notimer;			/* no timer masks */
-	UINT16 				mode;				/* current mode */
-	UINT16 				tconst;				/* time constant */
-	UINT16 				down;				/* down counter (clock mode only) */
-	UINT8 				extclk;				/* current signal from the external clock */
+	UINT16				mode;				/* current mode */
+	UINT16				tconst;				/* time constant */
+	UINT16				down;				/* down counter (clock mode only) */
+	UINT8				extclk;				/* current signal from the external clock */
 	emu_timer *			timer;				/* array of active timers */
 	UINT8				int_state;			/* interrupt status (for daisy chain) */
 };

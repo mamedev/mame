@@ -95,7 +95,7 @@ struct _cop400_state
     const address_space *io;
 
 	/* registers */
-	UINT16 	pc;	   			/* 9/10/11-bit ROM address program counter */
+	UINT16	pc;				/* 9/10/11-bit ROM address program counter */
 	UINT16	prevpc;			/* previous value of program counter */
 	UINT8	a;				/* 4-bit accumulator */
 	UINT8	b;				/* 5/6/7-bit RAM address register */
@@ -338,41 +338,41 @@ INSTRUCTION(illegal)
 
 static const cop400_opcode_map COP410_OPCODE_23_MAP[] =
 {
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, xad	 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, xad		},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	}
 };
 
 static void cop410_op23(cop400_state *cpustate, UINT8 opcode)
@@ -384,41 +384,41 @@ static void cop410_op23(cop400_state *cpustate, UINT8 opcode)
 
 static const cop400_opcode_map COP410_OPCODE_33_MAP[] =
 {
-	{1, illegal 	},{1, skgbz0	},{1, illegal   },{1, skgbz2	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, skgz 		},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, ing	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, halt	 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
+	{1, illegal 	},{1, skgbz0	},{1, illegal   },{1, skgbz2	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, skgbz1	},{1, illegal	},{1, skgbz3	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, skgz		},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, ing		},{1, illegal	},{1, illegal	},{1, illegal	},{1, inl		},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, halt		},{1, illegal	},{1, omg		},{1, illegal	},{1, camq		},{1, illegal	},{1, obd		},{1, illegal	},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},
-	{1, lei 		},{1, lei 		},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, lei 		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},
+	{1, lei 		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	}
 };
 
 static void cop410_op33(cop400_state *cpustate, UINT8 opcode)
@@ -434,7 +434,7 @@ static const cop400_opcode_map COP410_OPCODE_MAP[] =
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{0, illegal		},{1, skmbz1	},{0, illegal	},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, skc			},{1, ske		},{1, sc		},{1, cop410_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop410_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{1, asc			},{1, add		},{1, rc		},{1, cop410_op33	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
@@ -469,41 +469,41 @@ static const cop400_opcode_map COP410_OPCODE_MAP[] =
 
 static const cop400_opcode_map COP420_OPCODE_23_MAP[] =
 {
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	}
 };
 
 static void cop420_op23(cop400_state *cpustate, UINT8 opcode)
@@ -515,41 +515,41 @@ static void cop420_op23(cop400_state *cpustate, UINT8 opcode)
 
 static const cop400_opcode_map COP420_OPCODE_33_MAP[] =
 {
-	{1, illegal		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, skgz	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, inin 		},{1, inil 		},{1, ing	 	},{1, illegal 	},{1, cqma	 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
+	{1, illegal		},{1, skgbz0	},{1, illegal	},{1, skgbz2	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, skgbz1	},{1, illegal	},{1, skgbz3	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, skgz		},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, inin		},{1, inil		},{1, ing		},{1, illegal	},{1, cqma		},{1, illegal	},{1, inl		},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, omg		},{1, illegal	},{1, camq		},{1, illegal	},{1, obd		},{1, illegal	},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
-	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
-	{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},
-	{1, lei 		},{1, lei 		},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, ogi			},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},
+	{1, ogi			},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},
+	{1, lei 		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},
+	{1, lei 		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	}
 };
 
 static void cop420_op33(cop400_state *cpustate, UINT8 opcode)
@@ -565,9 +565,9 @@ static const cop400_opcode_map COP420_OPCODE_MAP[] =
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{1, casc		},{1, skmbz1	},{1, xabr		},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, skc			},{1, ske		},{1, sc		},{1, cop420_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop420_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, asc			},{1, add		},{1, rc		},{1, cop420_op33  	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, asc			},{1, add		},{1, rc		},{1, cop420_op33	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 
 	{1, comp		},{1, skt		},{1, rmb2		},{1, rmb3			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
@@ -600,41 +600,41 @@ static const cop400_opcode_map COP420_OPCODE_MAP[] =
 
 static const cop400_opcode_map COP444_OPCODE_23_MAP[256] =
 {
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
 
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
-	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
+	{1, ldd			},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},{1, ldd		},
 
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
 
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
-	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
+	{1, xad			},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},{1, xad		},
 };
 
 static void cop444_op23(cop400_state *cpustate, UINT8 opcode)
@@ -646,41 +646,41 @@ static void cop444_op23(cop400_state *cpustate, UINT8 opcode)
 
 static const cop400_opcode_map COP444_OPCODE_33_MAP[256] =
 {
-	{1, illegal		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, skgz	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, inin 		},{1, inil 		},{1, ing	 	},{1, illegal 	},{1, cqma	 	},{1, illegal 	},{1, inl	 	},{1, ctma	 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, it		 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, camt	 	},
+	{1, illegal		},{1, skgbz0	},{1, illegal	},{1, skgbz2	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, skgbz1	},{1, illegal	},{1, skgbz3	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, skgz		},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, inin		},{1, inil		},{1, ing		},{1, illegal	},{1, cqma		},{1, illegal	},{1, inl		},{1, ctma		},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, it			},{1, illegal	},{1, omg		},{1, illegal	},{1, camq		},{1, illegal	},{1, obd		},{1, camt		},
 
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
-	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
-	{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},
-	{1, lei 		},{1, lei 		},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, ogi			},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},
+	{1, ogi			},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},{1, ogi		},
+	{1, lei 		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},
+	{1, lei 		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},{1, lei		},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
+	{1, illegal 	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},{1, illegal	},
 
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
-	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 };
 
 static void cop444_op33(cop400_state *cpustate, UINT8 opcode)
@@ -696,9 +696,9 @@ static const cop400_opcode_map COP444_OPCODE_MAP[256] =
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{1, casc		},{1, skmbz1	},{1, cop444_xabr},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, skc			},{1, ske		},{1, sc		},{1, cop444_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop444_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
-	{1, asc			},{1, add		},{1, rc		},{1, cop444_op33  	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, asc			},{1, add		},{1, rc		},{1, cop444_op33	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 
 	{1, comp		},{1, skt		},{1, rmb2		},{1, rmb3			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
@@ -1376,11 +1376,11 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			/* set per-core */										break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;											break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8; /* really 4 */								break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			/* set per-core */										break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			/* set per-core */										break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;											break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 9;											break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 9;											break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cop400);				break;
@@ -1394,7 +1394,7 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;						break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state_table;				break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	/* set per-core */										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		/* set per-core */ 										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		/* set per-core */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP400");								break;
@@ -1417,7 +1417,7 @@ CPU_GET_INFO( cop410 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 9;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 5;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 5;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop410);						break;
@@ -1480,7 +1480,7 @@ CPU_GET_INFO( cop420 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 6;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 6;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop420);						break;
@@ -1561,7 +1561,7 @@ CPU_GET_INFO( cop444 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 11;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 7;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 7;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop444);						break;
@@ -1609,7 +1609,7 @@ CPU_GET_INFO( cop424 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 6;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 6;											break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;

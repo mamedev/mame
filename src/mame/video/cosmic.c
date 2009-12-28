@@ -501,7 +501,7 @@ static void nomnlnd_draw_background( const device_config *screen, bitmap_t *bitm
 
 					color = (plane1 & plane2)       |	// R
 					        (plane2 		)  << 1 |	// G
-					        (plane1 & !plane2) << 2; 	// B
+					        (plane1 & !plane2) << 2;	// B
 				}
 			}
 			else
@@ -519,7 +519,7 @@ static void nomnlnd_draw_background( const device_config *screen, bitmap_t *bitm
 
 					color = ( plane1 & plane2)      |	// R
 					        ( plane1 | plane2) << 1 |	// G
-					        ((!plane1) & hd)     << 2; 	// B - see above
+					        ((!plane1) & hd)     << 2;	// B - see above
 				}
 			}
 

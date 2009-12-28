@@ -826,10 +826,10 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 
 			/* check if the cursor is visible and is on this scanline */
 			int cursor_visible = mc6845->cursor_state &&
-							 	(ra >= (mc6845->cursor_start_ras & 0x1f)) &&
-							 	(ra <= mc6845->cursor_end_ras) &&
-							 	(mc6845->cursor_addr >= mc6845->current_disp_addr) &&
-							 	(mc6845->cursor_addr < (mc6845->current_disp_addr + mc6845->horiz_disp));
+								(ra >= (mc6845->cursor_start_ras & 0x1f)) &&
+								(ra <= mc6845->cursor_end_ras) &&
+								(mc6845->cursor_addr >= mc6845->current_disp_addr) &&
+								(mc6845->cursor_addr < (mc6845->current_disp_addr + mc6845->horiz_disp));
 
 			/* compute the cursor X position, or -1 if not visible */
 			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_disp_addr) : -1;
@@ -1058,7 +1058,7 @@ DEVICE_GET_INFO( mc6845_1 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845_1);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+		default:										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -1073,7 +1073,7 @@ DEVICE_GET_INFO( c6545_1 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c6545_1);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+		default:										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -1088,7 +1088,7 @@ DEVICE_GET_INFO( r6545_1 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545_1);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+		default:										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -1103,7 +1103,7 @@ DEVICE_GET_INFO( h46505 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(h46505);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+		default:										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -1118,7 +1118,7 @@ DEVICE_GET_INFO( hd6845 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd6845);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+		default:										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -1133,6 +1133,6 @@ DEVICE_GET_INFO( sy6545_1 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sy6545_1);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+		default:										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }

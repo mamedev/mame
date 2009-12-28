@@ -885,9 +885,9 @@ INLINE void BUMP_DI(i386_state *cpustate,int adjustment)
 
 /***********************************************************************************/
 
-#define READPORT8(port)		       	(memory_read_byte_32le(cpustate->io, port))
-#define READPORT16(port)	       	(memory_read_word_32le(cpustate->io, port))
-#define READPORT32(port)	       	(memory_read_dword_32le(cpustate->io, port))
+#define READPORT8(port)		    	(memory_read_byte_32le(cpustate->io, port))
+#define READPORT16(port)	    	(memory_read_word_32le(cpustate->io, port))
+#define READPORT32(port)	    	(memory_read_dword_32le(cpustate->io, port))
 #define WRITEPORT8(port, value)		(memory_write_byte_32le(cpustate->io, port, value))
 #define WRITEPORT16(port, value)	(memory_write_word_32le(cpustate->io, port, value))
 #define WRITEPORT32(port, value)	(memory_write_dword_32le(cpustate->io, port, value))

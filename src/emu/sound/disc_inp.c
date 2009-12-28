@@ -34,7 +34,7 @@ struct dss_adjustment_context
 struct dss_input_context
 {
 	stream_sample_t *ptr;			/* current in ptr for stream */
-	double 		gain;				/* node gain */
+	double		gain;				/* node gain */
 	double		offset;				/* node offset */
 	UINT8		data;				/* data written */
 	UINT8		is_stream;

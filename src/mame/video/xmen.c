@@ -34,7 +34,7 @@ void xmen_sprite_callback(running_machine *machine, int *code,int *color,int *pr
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*color = sprite_colorbase + (*color & 0x001f);
 }
@@ -125,7 +125,7 @@ VIDEO_UPDATE( xmen )
 
 VIDEO_UPDATE( xmen6p )
 {
- 	const device_config *left_screen   = devtag_get_device(screen->machine, "lscreen");
+	const device_config *left_screen   = devtag_get_device(screen->machine, "lscreen");
 	const device_config *right_screen  = devtag_get_device(screen->machine, "rscreen");
 	int x,y;
 

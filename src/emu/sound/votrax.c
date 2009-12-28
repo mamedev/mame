@@ -28,7 +28,7 @@ struct _votrax_state
 	int		stream;
 	int		frequency;		/* Some games (Qbert) change this */
 	int 	volume;
-	sound_stream * 	channel;
+	sound_stream *	channel;
 
 	loaded_sample *sample;
 	UINT32		pos;
@@ -137,7 +137,7 @@ WRITE8_DEVICE_HANDLER( votrax_w )
     Phoneme = data & 0x3F;
     Intonation = data >> 6;
 
-  	logerror("Speech : %s at intonation %d\n",VotraxTable[Phoneme],Intonation);
+	logerror("Speech : %s at intonation %d\n",VotraxTable[Phoneme],Intonation);
 
     if(Phoneme==63)
     	info->sample = NULL;

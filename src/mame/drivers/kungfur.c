@@ -321,7 +321,7 @@ static const msm5205_interface msm5205_config_2 =
 
 static MACHINE_RESET( kungfur )
 {
-	adpcm_pos[0] = 	adpcm_pos[1] = 0;
+	adpcm_pos[0] =	adpcm_pos[1] = 0;
 	adpcm_idle[0] = adpcm_idle[1] = 1;
 }
 

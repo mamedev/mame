@@ -389,7 +389,7 @@ static void baddudes_i8751_write(running_machine *machine, int data)
 
 static void birdtry_i8751_write(running_machine *machine, int data)
 {
-	static int 	pwr,
+	static int	pwr,
 				hgt;
 
 	i8751_return=0;
@@ -429,22 +429,22 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 /*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
  *  Higher the value,stronger is the height.                                 */
-		case 0x200: hgt = 0x5c0;  			break; /*H*/
-		case 0x201: hgt = 0x580; 			break; /*|*/
-		case 0x202: hgt = 0x540; 			break; /*|*/
-		case 0x203: hgt = 0x500; 			break; /*|*/
-		case 0x204: hgt = 0x4c0; 			break; /*|*/
-		case 0x205: hgt = 0x480; 			break; /*|*/
-		case 0x206: hgt = 0x440; 			break; /*|*/
-		case 0x207: hgt = 0x400; 			break; /*M*/
-		case 0x208: hgt = 0x3c0; 			break; /*|*/
-		case 0x209: hgt = 0x380; 			break; /*|*/
-		case 0x20a: hgt = 0x340; 			break; /*|*/
-		case 0x20b: hgt = 0x300; 			break; /*|*/
-		case 0x20c: hgt = 0x2c0; 			break; /*|*/
-		case 0x20d: hgt = 0x280; 			break; /*|*/
-		case 0x20e: hgt = 0x240; 			break; /*|*/
-		case 0x20f: hgt = 0x200; 			break; /*L*/
+		case 0x200: hgt = 0x5c0;			break; /*H*/
+		case 0x201: hgt = 0x580;			break; /*|*/
+		case 0x202: hgt = 0x540;			break; /*|*/
+		case 0x203: hgt = 0x500;			break; /*|*/
+		case 0x204: hgt = 0x4c0;			break; /*|*/
+		case 0x205: hgt = 0x480;			break; /*|*/
+		case 0x206: hgt = 0x440;			break; /*|*/
+		case 0x207: hgt = 0x400;			break; /*M*/
+		case 0x208: hgt = 0x3c0;			break; /*|*/
+		case 0x209: hgt = 0x380;			break; /*|*/
+		case 0x20a: hgt = 0x340;			break; /*|*/
+		case 0x20b: hgt = 0x300;			break; /*|*/
+		case 0x20c: hgt = 0x2c0;			break; /*|*/
+		case 0x20d: hgt = 0x280;			break; /*|*/
+		case 0x20e: hgt = 0x240;			break; /*|*/
+		case 0x20f: hgt = 0x200;			break; /*L*/
 		case 0x534: i8751_return = hgt; 	break; /*Shot height*/
 
 		/*At the ending screen(???)*/

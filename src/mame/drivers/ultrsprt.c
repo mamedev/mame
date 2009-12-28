@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_MACHINE_START(ultrsprt)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

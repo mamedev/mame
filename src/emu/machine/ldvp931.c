@@ -50,7 +50,7 @@ struct _ldplayer_data
 	/* low-level emulation data */
 	const device_config *cpu;					/* CPU index of the 8049 */
 	const device_config *tracktimer;			/* timer device */
-	vp931_data_ready_func data_ready_cb; 		/* data ready callback */
+	vp931_data_ready_func data_ready_cb;		/* data ready callback */
 
 	/* I/O port states */
 	UINT8				out0;					/* output 0 state */

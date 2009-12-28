@@ -793,7 +793,7 @@ static UINT32 dasm_do_until_counter(UINT32 pc, UINT64 opcode)
 	int ureg = (opcode >> 32) & 0xff;
 	UINT32 addr = opcode & 0xffffff;
 
-	if (opcode & U64(0x10000000000)) 	/* Loop counter from universal register */
+	if (opcode & U64(0x10000000000))	/* Loop counter from universal register */
 	{
 		print("LCNTR = %s, ", GET_UREG(ureg));
 		print("DO (0x%08X)", pc + SIGN_EXTEND24(addr));
@@ -937,7 +937,7 @@ static UINT32 dasm_ireg_modify(UINT32 pc, UINT64 opcode)
 			print("BITREV (%s, 0x%08X)", GET_DAG1_I(i), data);
 		}
 	}
-	else	 							/* without bit-reverse */
+	else								/* without bit-reverse */
 	{
 		if (g)
 		{

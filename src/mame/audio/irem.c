@@ -298,7 +298,7 @@ static const discrete_mixer_desc m52_sound_c_stage1 =
 		{M52_R19, M52_R22, M52_R23 },
 		{      0,       0,		 0 },	/* variable resistors   */
 		{M52_C37,		0,		 0 },	/* node capacitors      */
-		       0, 		0,				/* rI, rF               */
+		       0,		0,				/* rI, rF               */
 		M52_C35*0,						/* cF                   */
 		0,								/* cAmp                 */
 		0, 1};

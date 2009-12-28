@@ -204,7 +204,7 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 	discoboy_state *state = (discoboy_state *)space->machine->driver_data;
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
- 	//printf("unk discoboy_port_01_w %02x\n",data);
+	//printf("unk discoboy_port_01_w %02x\n",data);
 	// discoboy gfxbank
 	state->gfxbank = data & 0xf0;
 

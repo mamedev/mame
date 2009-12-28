@@ -1598,7 +1598,7 @@ OP_HANDLER( jsr_ex )
 {
 	EXTENDED;
 	PUSHWORD(pPC);
- 	PC = EA;
+	PC = EA;
 }
 
 /* $be LDS extended -**0- */

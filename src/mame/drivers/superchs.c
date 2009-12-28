@@ -122,7 +122,7 @@ static READ32_HANDLER( superchs_input_r )
 
 		case 0x01:
 			return coin_word<<16;
- 	}
+	}
 
 	return 0xffffffff;
 }

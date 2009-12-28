@@ -281,7 +281,7 @@ enum
 #define CPU_READOP(name)				int CPU_READOP_NAME(name)(const device_config *device, UINT32 offset, int size, UINT64 *value)
 #define CPU_READOP_CALL(name)			CPU_READOP_NAME(name)(device, offset, size, value)
 
-#define CPU_DEBUG_INIT_NAME(name) 		cpu_debug_init_##name
+#define CPU_DEBUG_INIT_NAME(name)		cpu_debug_init_##name
 #define CPU_DEBUG_INIT(name)			void CPU_DEBUG_INIT_NAME(name)(const device_config *device)
 #define CPU_DEBUG_INIT_CALL(name)		CPU_DEBUG_INIT_NAME(name)(device)
 
@@ -437,8 +437,8 @@ union _cpuinfo
 	cpu_validity_check_func	validity_check;				/* CPUINFO_FCT_VALIDITY_CHECK */
 	cpu_state_io_func		import_state;				/* CPUINFO_FCT_IMPORT_STATE */
 	cpu_state_io_func		export_state;				/* CPUINFO_FCT_EXPORT_STATE */
-	cpu_string_io_func 		import_string;				/* CPUINFO_FCT_IMPORT_STRING */
-	cpu_string_io_func 		export_string;				/* CPUINFO_FCT_EXPORT_STRING */
+	cpu_string_io_func		import_string;				/* CPUINFO_FCT_IMPORT_STRING */
+	cpu_string_io_func		export_string;				/* CPUINFO_FCT_EXPORT_STRING */
 	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
 	const cpu_state_table *	state_table;				/* CPUINFO_PTR_STATE_TABLE */
 	const addrmap8_token *	internal_map8;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */

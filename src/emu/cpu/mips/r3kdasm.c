@@ -260,7 +260,7 @@ static unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
 							else
 							sprintf(buffer, "jalr   %s,%s", reg[rs], reg[rd]); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
 				case 0x0c:	sprintf(buffer, "syscall");	flags = DASMFLAG_STEP_OVER; 				break;
-				case 0x0d:	sprintf(buffer, "break"); flags = DASMFLAG_STEP_OVER; 					break;
+				case 0x0d:	sprintf(buffer, "break"); flags = DASMFLAG_STEP_OVER;					break;
 				case 0x0f:	sprintf(buffer, "sync [invalid]");										break;
 				case 0x10:	sprintf(buffer, "mfhi   %s", reg[rd]);									break;
 				case 0x11:	sprintf(buffer, "mthi   %s", reg[rs]);									break;

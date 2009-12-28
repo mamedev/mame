@@ -44,8 +44,8 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 /* IO registers accessor */
 #define IOREG(T,reg)				((T)->IOregs[reg])
 #define SMART_IOREG(T,reg)			((T)->IOregs[(T)->is_34020 ? (int)REG020_##reg : (int)REG_##reg])
-#define PBH(T) 						(IOREG(T, REG_CONTROL) & 0x0100)
-#define PBV(T) 						(IOREG(T, REG_CONTROL) & 0x0200)
+#define PBH(T)						(IOREG(T, REG_CONTROL) & 0x0100)
+#define PBV(T)						(IOREG(T, REG_CONTROL) & 0x0200)
 
 
 
@@ -53,10 +53,10 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
     FIELD WRITE MACROS
 ***************************************************************************/
 
-#define WFIELDMAC(T,MASK,MAX) 														\
-	UINT32 shift = offset & 0x0f;     												\
+#define WFIELDMAC(T,MASK,MAX)														\
+	UINT32 shift = offset & 0x0f;   												\
 	UINT32 masked_data = data & (MASK);												\
-	UINT32 old;				   														\
+	UINT32 old;																		\
 																					\
 	offset = TOBYTE(offset & 0xfffffff0);											\
 																					\
@@ -67,14 +67,14 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 	}																				\
 	else																			\
 	{																				\
-		old = (UINT32)TMS34010_RDMEM_WORD(T, offset) & ~((MASK) << shift); 			\
+		old = (UINT32)TMS34010_RDMEM_WORD(T, offset) & ~((MASK) << shift);			\
 		TMS34010_WRMEM_WORD(T, offset, ((masked_data & (MASK)) << shift) | old);		\
 	}																				\
 
 #define WFIELDMAC_BIG(T,MASK,MAX)														\
-	UINT32 shift = offset & 0x0f;     												\
+	UINT32 shift = offset & 0x0f;   												\
 	UINT32 masked_data = data & (MASK);												\
-	UINT32 old;				   														\
+	UINT32 old;																		\
 																					\
 	offset = TOBYTE(offset & 0xfffffff0);											\
 																					\

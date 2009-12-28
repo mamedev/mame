@@ -564,8 +564,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	dkong_state *state = (dkong_state *)machine->driver_data;
 	int offs;
 	int scanline_vf;	/* buffering scanline including flip */
-	int scanline_vfc;  		/* line buffering scanline including flip - this is the cached scanline_vf*/
-	int scanline; 		/* current scanline */
+	int scanline_vfc;		/* line buffering scanline including flip - this is the cached scanline_vf*/
+	int scanline;		/* current scanline */
 	int add_y;
 	int add_x;
 	int num_sprt;
@@ -694,7 +694,7 @@ INLINE double CD4049(running_machine *machine, double x)
 	dkong_state *state = (dkong_state *)machine->driver_data;
 
 	if (x>0)
-	 	return exp(-state->cd4049_a * pow(x,state->cd4049_b));
+		return exp(-state->cd4049_a * pow(x,state->cd4049_b));
 	else
 		return 1.0;
 }
@@ -811,8 +811,8 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 {
 	const UINT8 	*htable = NULL;
 	int 			x,y;
-	UINT8 			draw_ok;
-	UINT16 			*pixel;
+	UINT8			draw_ok;
+	UINT16			*pixel;
 
 	if (state->hardware_type == HARDWARE_TRS01)
 		htable = state->gfx4;
@@ -841,7 +841,7 @@ static void radarscp_scanline(running_machine *machine, int scanline)
 	const UINT8 *table = state->gfx3;
 	int 		table_len = state->gfx3_len;
 	int 			x,y,offset;
-	UINT16 			*pixel;
+	UINT16			*pixel;
 	static int		counter=0;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 

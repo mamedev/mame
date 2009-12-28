@@ -65,7 +65,7 @@ struct _drcfe_state
 	opcode_desc *		desc_live_list;				/* head of list of live descriptions */
 	opcode_desc *		desc_free_list;				/* head of list of free descriptions */
 	opcode_desc **		desc_array;					/* array of descriptions in PC order */
-	UINT32 				desc_array_size;			/* size of the array */
+	UINT32				desc_array_size;			/* size of the array */
 };
 
 

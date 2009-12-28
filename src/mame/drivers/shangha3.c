@@ -650,7 +650,7 @@ ROM_START( blocken )
 	/* 280000-37ffff empty */
 
 	ROM_REGION( 0x80000, "samples", 0 )	/* samples for M6295 */
- 	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
+	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	/* $00000-$20000 stays the same in all sound banks, */

@@ -210,7 +210,7 @@ typedef struct {
 
 
 #define PC				pc.w.l
-#define PCL	 			pc.b.l
+#define PCL				pc.b.l
 #define RD_REG(x)		cpustate->RAM[(cpustate->regPtr<<3)+(x)]
 #define WR_REG(x,d)		cpustate->RAM[(cpustate->regPtr<<3)+(x)]=(d)
 #define IX0				ix0.b.l
@@ -321,8 +321,8 @@ static void undefined2(alpha8201_state *cpustate)	{ M_UNDEFINED2(cpustate); }
 static void nop(alpha8201_state *cpustate)		 { }
 static void rora(alpha8201_state *cpustate)		 { cpustate->cf = cpustate->A &1;     cpustate->A = (cpustate->A>>1) | (cpustate->A<<7); }
 static void rola(alpha8201_state *cpustate)		 { cpustate->cf = (cpustate->A>>7)&1; cpustate->A = (cpustate->A<<1) | (cpustate->A>>7); }
-static void inc_b(alpha8201_state *cpustate)	 	 { M_ADDB(cpustate, 0x02); }
-static void dec_b(alpha8201_state *cpustate)	 	 { M_ADDB(cpustate, 0xfe); }
+static void inc_b(alpha8201_state *cpustate)		 { M_ADDB(cpustate, 0x02); }
+static void dec_b(alpha8201_state *cpustate)		 { M_ADDB(cpustate, 0xfe); }
 static void inc_a(alpha8201_state *cpustate)		 { M_ADD(cpustate, 0x01); }
 static void dec_a(alpha8201_state *cpustate)		 { M_ADD(cpustate, 0xff); }
 static void cpl(alpha8201_state *cpustate)		 { cpustate->A ^= 0xff; };
@@ -897,11 +897,11 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 6;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 6;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 #if HANDLE_HALT_LINE
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:		info->i = cpustate->halt ? ASSERT_LINE : CLEAR_LINE; break;
 #endif

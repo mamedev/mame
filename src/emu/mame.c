@@ -146,7 +146,7 @@ struct _mame_private
 	callback_item *	logerror_callback_list;
 
 	/* load/save */
-	void 			(*saveload_schedule_callback)(running_machine *);
+	void			(*saveload_schedule_callback)(running_machine *);
 	attotime		saveload_schedule_time;
 
 	/* list of memory regions, and a map for lookups */
@@ -1136,7 +1136,7 @@ static void fatalerror_common(running_machine *machine, int exitcode, const char
 
 	/* longjmp back if we can; otherwise, exit */
 	if (machine != NULL && machine->mame_data != NULL && machine->mame_data->fatal_error_jmpbuf_valid)
-  		longjmp(machine->mame_data->fatal_error_jmpbuf, exitcode);
+		longjmp(machine->mame_data->fatal_error_jmpbuf, exitcode);
 	else
 		exit(exitcode);
 }

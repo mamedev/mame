@@ -1072,7 +1072,7 @@ static MACHINE_DRIVER_START(mediagx)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

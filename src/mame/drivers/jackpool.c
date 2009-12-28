@@ -100,8 +100,8 @@ static READ16_HANDLER( jackpool_io_r )
 		case 0x1c: return input_port_read(space->machine,"BET");
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-     	case 0x2c: return eeprom_read_bit(devtag_get_device(space->machine,"eeprom"));
-     	case 0x2e: return eeprom_read_bit(devtag_get_device(space->machine,"eeprom"));
+    	case 0x2c: return eeprom_read_bit(devtag_get_device(space->machine,"eeprom"));
+    	case 0x2e: return eeprom_read_bit(devtag_get_device(space->machine,"eeprom"));
 //      default: printf("R %02x\n",offset*2); break;
 	}
 

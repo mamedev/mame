@@ -560,7 +560,7 @@ static ADDRESS_MAP_START( hnoridur_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT	( "DSW1"				)	// DSW2
 	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT	( "DSW3"				)	// DSW4
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT	( "DSW2"				)	// DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w 	)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE( "ymsnd", ym2413_w	)	//
 	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD	( "aysnd", ay8910_r			)	// AY8910, DSW1
@@ -643,7 +643,7 @@ static ADDRESS_MAP_START( hjingi_io_map, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBA
 	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT	( "DSW3"				)	// DSW3
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT	( "DSW2"				)	// DSW2
 
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w 	)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE( "ymsnd", ym2413_w			)	//
 
@@ -2679,7 +2679,7 @@ static INPUT_PORTS_START( yarunara )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )		// 1,6
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) ) 	// 3,4
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )	// 3,4
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )		// 5,2
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 7,0
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
@@ -2741,7 +2741,7 @@ static INPUT_PORTS_START( hanayara )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )		// 1,6
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) ) 	// 3,4
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )	// 3,4
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )		// 5,2
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 7,0
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
@@ -3141,7 +3141,7 @@ static INPUT_PORTS_START( jantouki )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
- 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -155,7 +155,7 @@ const ppi8255_interface scramble_ppi_0_intf =
 	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
 	DEVCB_NULL,						/* Port A write */
 	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL 						/* Port C write */
+	DEVCB_NULL						/* Port C write */
 };
 
 const ppi8255_interface scramble_ppi_1_intf =

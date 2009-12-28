@@ -41,7 +41,7 @@ struct _hc55516_state
 
 	UINT32	update_count;
 
-	double 	filter;
+	double	filter;
 	double	integrator;
 };
 
@@ -331,7 +331,7 @@ DEVICE_GET_INFO( mc3417 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( mc3417 );		break;
 		case DEVINFO_FCT_RESET:							/* chip has no reset pin */					break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "MC3417");					break;
-		default: 										DEVICE_GET_INFO_CALL(hc55516);					break;
+		default:										DEVICE_GET_INFO_CALL(hc55516);					break;
 	}
 }
 
@@ -343,6 +343,6 @@ DEVICE_GET_INFO( mc3418 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( mc3418 );		break;
 		case DEVINFO_FCT_RESET:							/* chip has no reset pin */					break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "MC3418");					break;
-		default: 										DEVICE_GET_INFO_CALL(hc55516);					break;
+		default:										DEVICE_GET_INFO_CALL(hc55516);					break;
 	}
 }

@@ -19,8 +19,8 @@
 ***************************************************************************/
 
 /* these constants are returned from the irq_state function */
-#define Z80_DAISY_INT 	0x01		/* interrupt request mask */
-#define Z80_DAISY_IEO 	0x02		/* interrupt disable mask (IEO) */
+#define Z80_DAISY_INT	0x01		/* interrupt request mask */
+#define Z80_DAISY_IEO	0x02		/* interrupt disable mask (IEO) */
 
 
 enum

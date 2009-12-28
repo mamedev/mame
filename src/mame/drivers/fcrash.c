@@ -225,7 +225,7 @@ static VIDEO_UPDATE( fcrash )
 
 	flip_screen_set(screen->machine, videocontrol & 0x8000);
 
- 	layercontrol = state->cps_b_regs[0x20 / 2];
+	layercontrol = state->cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen->machine);
@@ -305,7 +305,7 @@ static VIDEO_UPDATE( kodb )
 
 	flip_screen_set(screen->machine, videocontrol & 0x8000);
 
- 	layercontrol = state->cps_b_regs[0x20 / 2];
+	layercontrol = state->cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen->machine);

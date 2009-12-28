@@ -737,7 +737,7 @@ static READ8_HANDLER( headon2_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
- 	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
+	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
 	if (offset & 0x04)  ret = input_port_read(space->machine, "IN1");
 	if (offset & 0x08)  ret = input_port_read(space->machine, "IN2");
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
@@ -1336,7 +1336,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x00, "S.A. Bonus Life" )
 	PORT_DIPSETTING(    0x00, "10000" )
- 	PORT_DIPSETTING(    0x04, "15000" )
+	PORT_DIPSETTING(    0x04, "15000" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_get_timer_value, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )

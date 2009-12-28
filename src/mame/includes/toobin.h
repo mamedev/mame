@@ -13,7 +13,7 @@ struct _toobin_state
 
 	UINT16 *		interrupt_scan;
 
-	double 			brightness;
+	double			brightness;
 	bitmap_t *		pfbitmap;
 };
 

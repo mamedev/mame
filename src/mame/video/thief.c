@@ -223,10 +223,10 @@ WRITE8_HANDLER( thief_blit_w ){
 
 READ8_HANDLER( thief_coprocessor_r ){
 	switch( offset ){
- 	case SCREEN_XPOS: /* xpos */
+	case SCREEN_XPOS: /* xpos */
 	case SCREEN_YPOS: /* ypos */
 		{
-	 	/* XLAT: given (x,y) coordinate, return byte address in videoram */
+		/* XLAT: given (x,y) coordinate, return byte address in videoram */
 			int addr = thief_coprocessor.param[SCREEN_XPOS]+256*thief_coprocessor.param[SCREEN_YPOS];
 			int result = 0xc000 | (addr>>3);
 			return (offset==0x03)?(result>>8):(result&0xff);

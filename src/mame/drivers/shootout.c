@@ -232,7 +232,7 @@ static const gfx_layout tile_layout =
 
 static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   16*4+8*8, 16 ) /* characters */
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 16*4, 	 8 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 16*4,	 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,		16 ) /* tiles */
 GFXDECODE_END
 

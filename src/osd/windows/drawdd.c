@@ -134,10 +134,10 @@ typedef struct _mode_enum_info mode_enum_info;
 struct _mode_enum_info
 {
 	win_window_info *		window;
-	INT32 					minimum_width, minimum_height;
-	INT32 					target_width, target_height;
+	INT32					minimum_width, minimum_height;
+	INT32					target_width, target_height;
 	double					target_refresh;
-	float 					best_score;
+	float					best_score;
 };
 
 
@@ -406,7 +406,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		// based on the target format, use one of our standard renderers
 		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000: 	drawdd_rgb888_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x00ff0000:	drawdd_rgb888_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
 			case 0x000000ff:	drawdd_bgr888_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
 			case 0xf800:		drawdd_rgb565_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
 			case 0x7c00:		drawdd_rgb555_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
@@ -442,7 +442,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		// based on the target format, use one of our standard renderers
 		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000: 	drawdd_rgb888_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
+			case 0x00ff0000:	drawdd_rgb888_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
 			case 0x000000ff:	drawdd_bgr888_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
 			case 0xf800:		drawdd_rgb565_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
 			case 0x7c00:		drawdd_rgb555_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;

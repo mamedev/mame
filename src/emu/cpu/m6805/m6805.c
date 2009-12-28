@@ -47,7 +47,7 @@ typedef struct
 {
 	/* Pre-pointerafied public globals */
 	int iCount;
-	PAIR ea; 				/* effective address */
+	PAIR ea;				/* effective address */
 
 	int 	subtype;		/* Which sub-type is being emulated */
 	UINT32	sp_mask;		/* Stack pointer address mask */
@@ -891,7 +891,7 @@ static CPU_SET_INFO( m6805 )
 
 		case CPUINFO_INT_REGISTER + M6805_A:			A = info->i;			break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + M6805_PC:			PC = info->i; 			break;
+		case CPUINFO_INT_REGISTER + M6805_PC:			PC = info->i;			break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + M6805_S:			S = SP_ADJUST(info->i);	break;
 		case CPUINFO_INT_REGISTER + M6805_X:			X = info->i;			break;
@@ -927,11 +927,11 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 12;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	info->i = cpustate->irq_state[M6805_IRQ_LINE]; break;
 

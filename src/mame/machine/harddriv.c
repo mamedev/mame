@@ -396,7 +396,7 @@ WRITE16_HANDLER( hd68k_wr0_write )
 WRITE16_HANDLER( hd68k_wr1_write )
 {
 	if (offset == 0) { //   logerror("Shifter Interface Latch = %02X\n", data);
-	} else { 				logerror("/WR1(%04X)=%02X\n", offset, data);
+	} else {				logerror("/WR1(%04X)=%02X\n", offset, data);
 	}
 }
 
@@ -404,7 +404,7 @@ WRITE16_HANDLER( hd68k_wr1_write )
 WRITE16_HANDLER( hd68k_wr2_write )
 {
 	if (offset == 0) { //   logerror("Steering Wheel Latch = %02X\n", data);
-	} else { 				logerror("/WR2(%04X)=%02X\n", offset, data);
+	} else {				logerror("/WR2(%04X)=%02X\n", offset, data);
 	}
 }
 
@@ -1859,9 +1859,9 @@ READ16_HANDLER( stmsp_speedup_r )
 		state->stmsp_sync[0][5] == 0 && 		/* 80060 */
 		state->stmsp_sync[0][6] == 0 && 		/* 80070 */
 		state->stmsp_sync[1][0] == 0 && 		/* 99680 */
-		state->stmsp_sync[2][0] == 0xffff && 	/* 99d30 */
-		state->stmsp_sync[2][1] == 0xffff && 	/* 99d40 */
-		state->stmsp_sync[2][2] == 0 &&	 	/* 99d50 */
+		state->stmsp_sync[2][0] == 0xffff &&	/* 99d30 */
+		state->stmsp_sync[2][1] == 0xffff &&	/* 99d40 */
+		state->stmsp_sync[2][2] == 0 &&		/* 99d50 */
 		cpu_get_pc(space->cpu) == 0x3c0)
 	{
 		state->msp_speedup_count[0]++;

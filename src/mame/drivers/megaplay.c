@@ -133,7 +133,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")
- 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -763,11 +763,11 @@ ROM_START( mp_twc ) /* Tecmo World Cup */
 	ROM_LOAD16_BYTE( "ep15182.ic1", 0x000001, 0x040000, CRC(eb8325c3) SHA1(bb21ac926c353e14184dd476222bc6a8714606e5) )
 	/* Game Instruction rom copied to 0x300000 - 0x310000 (odd / even bytes equal) */
 
- 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
+	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "ep15175-04.ic3", 0x000000, 0x08000, CRC(faf7c030) SHA1(16ef405335b4d3ecb0b7d97b088dafc4278d4726) )
 
- 	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
- 	MEGAPLAY_BIOS
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
+	MEGAPLAY_BIOS
 ROM_END
 
 ROM_START( mp_sor2 ) /* Streets of Rage 2 */

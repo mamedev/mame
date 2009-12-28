@@ -231,7 +231,7 @@ static const gfx_layout hyperspt_spritelayout =
 
 static GFXDECODE_START( hyperspt )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperspt_spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout, 	16*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout,	16*16, 16 )
 GFXDECODE_END
 
 

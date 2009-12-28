@@ -65,7 +65,7 @@ struct _ldplayer_data
 
 	/* I/O port states */
 	UINT8				counter_start;			/* starting value for counter */
-	UINT8 				counter;				/* current counter value */
+	UINT8				counter;				/* current counter value */
 	UINT8				portc0;					/* port C on PPI 0 */
 	UINT8				portb1;					/* port B on PPI 1 */
 	UINT8				portc1;					/* port C on PPI 1 */

@@ -23,14 +23,14 @@ CPU_DISASSEMBLE( i8008 )
 	UINT8 op = OP(pc++);
 	switch (op >> 6)
 	{
-		case 0x03: 	// starting with 11
-				   	if (op==0xff) {
+		case 0x03:	// starting with 11
+					if (op==0xff) {
 						sprintf (buffer,"hlt");
 					} else {
-				   		sprintf (buffer,"l%c%c",reg[(op >> 3) & 7],reg[op & 7]);
-			   		}
-				   	break;
-		case 0x00: 	// starting with 00
+						sprintf (buffer,"l%c%c",reg[(op >> 3) & 7],reg[op & 7]);
+					}
+					break;
+		case 0x00:	// starting with 00
 					switch(op & 7) {
 						case 0 :	if(((op >> 3) & 7)==0) {
 							        	sprintf (buffer,"hlt");
@@ -58,7 +58,7 @@ CPU_DISASSEMBLE( i8008 )
 											case 1 :	sprintf (buffer,"rrc"); break;
 											case 2 :	sprintf (buffer,"ral"); break;
 											case 3 :	sprintf (buffer,"rar"); break;
-											default : 	sprintf (buffer,"illegal"); break;
+											default :	sprintf (buffer,"illegal"); break;
 										}
 									}
 									break;
@@ -77,16 +77,16 @@ CPU_DISASSEMBLE( i8008 )
 									}
 									break;
 						case 5 :	sprintf (buffer,"rst %02x",(op>>3) & 7); break;
-						case 6 : 	sprintf (buffer,"l%ci %02x",reg[(op >> 3) & 7],ARG(pc)); pc++; break;
+						case 6 :	sprintf (buffer,"l%ci %02x",reg[(op >> 3) & 7],ARG(pc)); pc++; break;
 						case 7 :	sprintf (buffer,"ret"); break;
 					}
-				   	break;
-		case 0x01: 	// starting with 01
+					break;
+		case 0x01:	// starting with 01
 					switch(op & 7) {
 						case 0 :	sprintf (buffer,"j%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
 						case 2 :	sprintf (buffer,"c%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
 						case 4 :	sprintf (buffer,"jmp %02x%02x",ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
-						case 6 : 	sprintf (buffer,"cal %02x%02x",ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
+						case 6 :	sprintf (buffer,"cal %02x%02x",ARG(pc+1) & 0x3f,ARG(pc)); pc+=2; break;
 						case 1 :
 						case 3 :
 						case 5 :
@@ -97,8 +97,8 @@ CPU_DISASSEMBLE( i8008 )
 									}
 									break;
 					}
-				   	break;
-		case 0x02: 	// starting with 10
+					break;
+		case 0x02:	// starting with 10
 					switch((op >> 3) & 7) {
 						case 0 :	sprintf (buffer,"ad%c",reg[op & 7]); break;
 						case 1 :	sprintf (buffer,"ac%c",reg[op & 7]); break;
@@ -109,7 +109,7 @@ CPU_DISASSEMBLE( i8008 )
 						case 6 :	sprintf (buffer,"or%c",reg[op & 7]); break;
 						case 7 :	sprintf (buffer,"cp%c",reg[op & 7]); break;
 					}
-				   	break;
+					break;
 	}
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
 }

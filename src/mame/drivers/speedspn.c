@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( speedspn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM 											/* RAM PROGRAM */
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1") 										/* banked ROM */
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")										/* banked ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speedspn_io_map, ADDRESS_SPACE_IO, 8 )

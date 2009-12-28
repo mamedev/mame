@@ -47,7 +47,7 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_sub_ald8),          /* 0x2c */
 	 PREFIX86(_sub_axd16),         /* 0x2d */
 	 PREFIX86(_cs),                /* 0x2e */
-	 PREFIX86(_das), 		/* 0x2f */
+	 PREFIX86(_das),		/* 0x2f */
 	 PREFIX86(_xor_br8),           /* 0x30 */
 	 PREFIX86(_xor_wr16),          /* 0x31 */
 	 PREFIX86(_xor_r8b),           /* 0x32 */
@@ -55,7 +55,7 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_xor_ald8),          /* 0x34 */
 	 PREFIX86(_xor_axd16),         /* 0x35 */
 	 PREFIX86(_ss),                /* 0x36 */
-	 PREFIX86(_aaa), 		/* 0x37 */
+	 PREFIX86(_aaa),		/* 0x37 */
 	 PREFIX86(_cmp_br8),           /* 0x38 */
 	 PREFIX86(_cmp_wr16),          /* 0x39 */
 	 PREFIX86(_cmp_r8b),           /* 0x3a */
@@ -63,7 +63,7 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_cmp_ald8),          /* 0x3c */
 	 PREFIX86(_cmp_axd16),         /* 0x3d */
 	 PREFIX86(_ds),                /* 0x3e */
-	 PREFIX86(_aas), 		/* 0x3f */
+	 PREFIX86(_aas),		/* 0x3f */
 	 PREFIX86(_inc_ax),            /* 0x40 */
 	 PREFIX86(_inc_cx),            /* 0x41 */
 	 PREFIX86(_inc_dx),            /* 0x42 */
@@ -130,7 +130,7 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_jnle),              /* 0x7f */
 	 PREFIX86(_80pre),             /* 0x80 */
 	 PREFIX86(_81pre),             /* 0x81 */
-	 PREFIX86(_82pre), 			/* 0x82 */
+	 PREFIX86(_82pre),			/* 0x82 */
 	 PREFIX86(_83pre),             /* 0x83 */
 	 PREFIX86(_test_br8),          /* 0x84 */
 	 PREFIX86(_test_wr16),         /* 0x85 */
@@ -244,7 +244,7 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_invalid),           /* 0xf1 */
 	 PREFIX186(_repne),             /* 0xf2 */
 	 PREFIX186(_repe),              /* 0xf3 */
-	 PREFIX86(_hlt), 		/* 0xf4 */
+	 PREFIX86(_hlt),		/* 0xf4 */
 	 PREFIX86(_cmc),               /* 0xf5 */
 	 PREFIX86(_f6pre),             /* 0xf6 */
 	 PREFIX86(_f7pre),             /* 0xf7 */

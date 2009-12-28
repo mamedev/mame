@@ -589,13 +589,13 @@ GFXDECODE_END
 
 static PALETTE_INIT( lazercmd )
 {
-	palette_set_color(machine, 0, MAKE_RGB(0xb0, 0xb0, 0xb0)); 	/* white */
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00)); 	/* black */
+	palette_set_color(machine, 0, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
+	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
 
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0x00)); 	/* black */
-	palette_set_color(machine, 3, MAKE_RGB(0xb0, 0xb0, 0xb0)); 	/* white */
+	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
+	palette_set_color(machine, 3, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
 
-	palette_set_color(machine, 4, MAKE_RGB(0xff, 0xff, 0xff)); 	/* bright white */
+	palette_set_color(machine, 4, MAKE_RGB(0xff, 0xff, 0xff));	/* bright white */
 }
 
 
@@ -637,7 +637,7 @@ static MACHINE_DRIVER_START( lazercmd )
     thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(lazercmd_map)
 	MDRV_CPU_IO_MAP(lazercmd_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
+	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128)	/* 7680 Hz */
 
 	MDRV_MACHINE_START(lazercmd)
 	MDRV_MACHINE_RESET(lazercmd)
@@ -678,7 +678,7 @@ static MACHINE_DRIVER_START( medlanes )
     thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(medlanes_map)
 	MDRV_CPU_IO_MAP(lazercmd_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
+	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128)	/* 7680 Hz */
 
 	MDRV_MACHINE_START(lazercmd)
 	MDRV_MACHINE_RESET(lazercmd)
@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START( bbonk )
     thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(bbonk_map)
 	MDRV_CPU_IO_MAP(lazercmd_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128) 	/* 7680 Hz */
+	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128)	/* 7680 Hz */
 
 	MDRV_MACHINE_START(lazercmd)
 	MDRV_MACHINE_RESET(lazercmd)

@@ -313,7 +313,7 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 	/* some values are already used in the table, so we force them manually */
 	if ((data == 0x6f) || (data == 0x6e))
 	{
-		state->oki_bank_0 = 0; 	// level 3b-5a samples
+		state->oki_bank_0 = 0;	// level 3b-5a samples
 		state->oki_bank_1 = 6;		// level 3b-5a music
 	}
 
@@ -341,11 +341,11 @@ static WRITE32_HANDLER( gstream_oki_4040_w )
 static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
-	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2") 	// extra coin switches etc
-	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w) 	// oki banking
-	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w) 	// ??
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff) 	// music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff) 	// music and samples
+	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc
+	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)	// oki banking
+	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)	// ??
+	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff)	// music and samples
+	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff)	// music and samples
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gstream )
@@ -417,8 +417,8 @@ static const gfx_layout layout32x32 =
 };
 
 static GFXDECODE_START( gstream )
- 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
- 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0, 0x80 )
 GFXDECODE_END
 
 

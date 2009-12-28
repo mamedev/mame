@@ -679,7 +679,7 @@ OP_HANDLER( rti )
 	t = CC & CC_E;		/* HJB 990225: entire state saved? */
 	if(t)
 	{
- 		m68_state->icount -= 9;
+		m68_state->icount -= 9;
 		PULLBYTE(A);
 		PULLBYTE(B);
 		PULLBYTE(DP);

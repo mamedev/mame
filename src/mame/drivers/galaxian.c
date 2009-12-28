@@ -1112,7 +1112,7 @@ static const ppi8255_interface moonwar_ppi8255_0_intf =
 	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
 	DEVCB_NULL,								/* Port A write */
 	DEVCB_NULL,								/* Port B write */
-	DEVCB_HANDLER(moonwar_port_select_w) 	/* Port C write */
+	DEVCB_HANDLER(moonwar_port_select_w)	/* Port C write */
 };
 
 

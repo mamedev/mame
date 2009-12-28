@@ -60,7 +60,7 @@
 struct _osd_file
 {
 	HANDLE		handle;
-	TCHAR 		filename[1];
+	TCHAR		filename[1];
 };
 
 
@@ -314,18 +314,18 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 		return FALSE;
 
 	// store the results
-  	*cylinders = (UINT32)dg.Cylinders.QuadPart;
-  	*heads = dg.TracksPerCylinder;
-  	*sectors = dg.SectorsPerTrack;
-  	*bps = dg.BytesPerSector;
+	*cylinders = (UINT32)dg.Cylinders.QuadPart;
+	*heads = dg.TracksPerCylinder;
+	*sectors = dg.SectorsPerTrack;
+	*bps = dg.BytesPerSector;
 
-  	// normalize
-  	while (*heads > 16 && !(*heads & 1))
-  	{
-  		*heads /= 2;
-  		*cylinders *= 2;
-  	}
-  	return TRUE;
+	// normalize
+	while (*heads > 16 && !(*heads & 1))
+	{
+		*heads /= 2;
+		*cylinders *= 2;
+	}
+	return TRUE;
 }
 
 

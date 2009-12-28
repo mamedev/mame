@@ -375,9 +375,9 @@ static const gfx_layout robowres_spritelayout =
 
 static GFXDECODE_START( robowres )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_charlayout,        0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,     	 0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,    	 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_spritelayout,      0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, robowres_spritelayout,   	 0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, robowres_spritelayout,  	 0, 32 )
 GFXDECODE_END
 
 

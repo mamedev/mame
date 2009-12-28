@@ -427,7 +427,7 @@ static MACHINE_DRIVER_START( triforce_base )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

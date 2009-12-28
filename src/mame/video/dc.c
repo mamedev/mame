@@ -304,7 +304,7 @@ INLINE UINT32 cv_565z(UINT16 c)
 INLINE UINT32 cv_4444(UINT16 c)
 {
 	return
- 		((c << 16) & 0xf0000000) | ((c << 12) & 0x0f000000) |
+		((c << 16) & 0xf0000000) | ((c << 12) & 0x0f000000) |
 		((c << 12) & 0x00f00000) | ((c <<  8) & 0x000f0000) |
 		((c <<  8) & 0x0000f000) | ((c <<  4) & 0x00000f00) |
 		((c <<  4) & 0x000000f0) | ((c      ) & 0x0000000f);
@@ -313,7 +313,7 @@ INLINE UINT32 cv_4444(UINT16 c)
 INLINE UINT32 cv_4444z(UINT16 c)
 {
 	return
- 		((c << 16) & 0xf0000000) |
+		((c << 16) & 0xf0000000) |
 		((c << 12) & 0x00f00000) |
 		((c <<  8) & 0x0000f000) |
 		((c <<  4) & 0x000000f0);
@@ -592,7 +592,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 
 	t->address     = sa->textureaddress;
 	t->pf          = sa->pixelformat;
-	t->palette 	   = 0;
+	t->palette	   = 0;
 
 
 	t->mode = (sa->vqcompressed<<1);
@@ -879,7 +879,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	{
 		reg++;
 		*shift = 32;
- 	}
+	}
 
 	return reg;
 }
@@ -1550,7 +1550,7 @@ static void process_ta_fifo(running_machine* machine)
 WRITE64_HANDLER( ta_fifo_poly_w )
 {
 
-	if (mem_mask == U64(0xffffffffffffffff)) 	// 64 bit
+	if (mem_mask == U64(0xffffffffffffffff))	// 64 bit
 	{
 		tafifo_buff[state_ta.tafifo_pos]=(UINT32)data;
 		tafifo_buff[state_ta.tafifo_pos+1]=(UINT32)(data >> 32);

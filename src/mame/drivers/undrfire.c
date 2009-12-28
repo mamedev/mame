@@ -280,7 +280,7 @@ static READ32_HANDLER( undrfire_input_r )
 		{
 			return input_port_read(space->machine, "SYSTEM") | (coin_word << 16);
 		}
- 	}
+	}
 
 	return 0xffffffff;
 }

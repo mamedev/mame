@@ -114,9 +114,9 @@ static ADDRESS_MAP_START( megazone_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")  			/* IO Coin */
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")  			/* P1 IO */
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")  			/* P2 IO */
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")			/* IO Coin */
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")			/* P1 IO */
+	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")			/* P2 IO */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP					/* INTMAIN - Interrupts main CPU (unused) */

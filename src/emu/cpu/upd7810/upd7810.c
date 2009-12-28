@@ -660,7 +660,7 @@ struct opcode_s {
 
 #define ZHC_SUB(after,before,carry) 	\
 	if (after == 0) PSW |= Z; else PSW &= ~Z; \
-	if (before == after) 					\
+	if (before == after)					\
 		PSW = (PSW & ~CY) | (carry);	\
 	else if (after > before)			\
 		PSW |= CY;			\
@@ -696,21 +696,21 @@ static UINT8 RP(upd7810_state *cpustate, offs_t port)
 		if (cpustate->mc)	// NS20031301 no need to read if the port is set as output
 			cpustate->pc_in = memory_read_byte_8le(cpustate->io, port);
 		data = (cpustate->pc_in & cpustate->mc) | (cpustate->pc_out & ~cpustate->mc);
-		if (cpustate->mcc & 0x01) 	/* PC0 = TxD output */
+		if (cpustate->mcc & 0x01)	/* PC0 = TxD output */
 			data = (data & ~0x01) | (cpustate->txd & 1 ? 0x01 : 0x00);
-		if (cpustate->mcc & 0x02) 	/* PC1 = RxD input */
+		if (cpustate->mcc & 0x02)	/* PC1 = RxD input */
 			data = (data & ~0x02) | (cpustate->rxd & 1 ? 0x02 : 0x00);
-		if (cpustate->mcc & 0x04) 	/* PC2 = SCK input/output */
+		if (cpustate->mcc & 0x04)	/* PC2 = SCK input/output */
 			data = (data & ~0x04) | (cpustate->sck & 1 ? 0x04 : 0x00);
-		if (cpustate->mcc & 0x08) 	/* PC3 = TI input */
+		if (cpustate->mcc & 0x08)	/* PC3 = TI input */
 			data = (data & ~0x08) | (cpustate->ti & 1 ? 0x08 : 0x00);
-		if (cpustate->mcc & 0x10) 	/* PC4 = TO output */
+		if (cpustate->mcc & 0x10)	/* PC4 = TO output */
 			data = (data & ~0x10) | (cpustate->to & 1 ? 0x10 : 0x00);
-		if (cpustate->mcc & 0x20) 	/* PC5 = CI input */
+		if (cpustate->mcc & 0x20)	/* PC5 = CI input */
 			data = (data & ~0x20) | (cpustate->ci & 1 ? 0x20 : 0x00);
-		if (cpustate->mcc & 0x40) 	/* PC6 = CO0 output */
+		if (cpustate->mcc & 0x40)	/* PC6 = CO0 output */
 			data = (data & ~0x40) | (cpustate->co0 & 1 ? 0x40 : 0x00);
-		if (cpustate->mcc & 0x80) 	/* PC7 = CO1 output */
+		if (cpustate->mcc & 0x80)	/* PC7 = CO1 output */
 			data = (data & ~0x80) | (cpustate->co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
@@ -777,21 +777,21 @@ static void WP(upd7810_state *cpustate, offs_t port, UINT8 data)
 		cpustate->pc_out = data;
 //      data = (data & ~cpustate->mc) | (cpustate->pc_in & cpustate->mc);
 		data = (data & ~cpustate->mc) | (cpustate->mc);	// NS20031401
-		if (cpustate->mcc & 0x01) 	/* PC0 = TxD output */
+		if (cpustate->mcc & 0x01)	/* PC0 = TxD output */
 			data = (data & ~0x01) | (cpustate->txd & 1 ? 0x01 : 0x00);
-		if (cpustate->mcc & 0x02) 	/* PC1 = RxD input */
+		if (cpustate->mcc & 0x02)	/* PC1 = RxD input */
 			data = (data & ~0x02) | (cpustate->rxd & 1 ? 0x02 : 0x00);
-		if (cpustate->mcc & 0x04) 	/* PC2 = SCK input/output */
+		if (cpustate->mcc & 0x04)	/* PC2 = SCK input/output */
 			data = (data & ~0x04) | (cpustate->sck & 1 ? 0x04 : 0x00);
-		if (cpustate->mcc & 0x08) 	/* PC3 = TI input */
+		if (cpustate->mcc & 0x08)	/* PC3 = TI input */
 			data = (data & ~0x08) | (cpustate->ti & 1 ? 0x08 : 0x00);
-		if (cpustate->mcc & 0x10) 	/* PC4 = TO output */
+		if (cpustate->mcc & 0x10)	/* PC4 = TO output */
 			data = (data & ~0x10) | (cpustate->to & 1 ? 0x10 : 0x00);
-		if (cpustate->mcc & 0x20) 	/* PC5 = CI input */
+		if (cpustate->mcc & 0x20)	/* PC5 = CI input */
 			data = (data & ~0x20) | (cpustate->ci & 1 ? 0x20 : 0x00);
-		if (cpustate->mcc & 0x40) 	/* PC6 = CO0 output */
+		if (cpustate->mcc & 0x40)	/* PC6 = CO0 output */
 			data = (data & ~0x40) | (cpustate->co0 & 1 ? 0x40 : 0x00);
-		if (cpustate->mcc & 0x80) 	/* PC7 = CO1 output */
+		if (cpustate->mcc & 0x80)	/* PC7 = CO1 output */
 			data = (data & ~0x80) | (cpustate->co1 & 1 ? 0x80 : 0x00);
 		memory_write_byte_8le(cpustate->io, port, data);
 		break;
@@ -1949,60 +1949,60 @@ static CPU_SET_INFO( upd7810 )
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF2:	set_irq_line(cpustate, UPD7810_INTF2, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTFE1:	set_irq_line(cpustate, UPD7810_INTFE1, info->i);	break;
 
-		case CPUINFO_INT_PC:							PC = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_PC:			PC = info->i; 							break;
+		case CPUINFO_INT_PC:							PC = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_PC:			PC = info->i;							break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + UPD7810_SP:			SP = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_PSW:		PSW = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_A:			A = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_V:			V = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_EA:			EA = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_VA:			VA = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_BC:			BC = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_DE:			DE = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_HL:			HL = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_EA2:		EA2 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_VA2:		VA2 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_BC2:		BC2 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_DE2:		DE2 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_HL2:		HL2 = info->i; 							break;
+		case CPUINFO_INT_REGISTER + UPD7810_SP:			SP = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_PSW:		PSW = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_A:			A = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_V:			V = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_EA:			EA = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_VA:			VA = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_BC:			BC = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_DE:			DE = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_HL:			HL = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_EA2:		EA2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_VA2:		VA2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_BC2:		BC2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_DE2:		DE2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_HL2:		HL2 = info->i;							break;
 		case CPUINFO_INT_REGISTER + UPD7810_CNT0:		CNT0 = info->i; 						break;
 		case CPUINFO_INT_REGISTER + UPD7810_CNT1:		CNT1 = info->i; 						break;
-		case CPUINFO_INT_REGISTER + UPD7810_TM0:		TM0 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_TM1:		TM1 = info->i; 							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TM0:		TM0 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TM1:		TM1 = info->i;							break;
 		case CPUINFO_INT_REGISTER + UPD7810_ECNT:		ECNT = info->i; 						break;
 		case CPUINFO_INT_REGISTER + UPD7810_ECPT:		ECPT = info->i; 						break;
 		case CPUINFO_INT_REGISTER + UPD7810_ETM0:		ETM0 = info->i; 						break;
 		case CPUINFO_INT_REGISTER + UPD7810_ETM1:		ETM1 = info->i; 						break;
-		case CPUINFO_INT_REGISTER + UPD7810_MA:			MA = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MB:			MB = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MCC:		MCC = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MC:			MC = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MM:			MM = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MF:			MF = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_TMM:		TMM = info->i; 							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MA:			MA = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MB:			MB = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MCC:		MCC = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MC:			MC = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MM:			MM = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MF:			MF = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TMM:		TMM = info->i;							break;
 		case CPUINFO_INT_REGISTER + UPD7810_ETMM:		ETMM = info->i; 						break;
-		case CPUINFO_INT_REGISTER + UPD7810_EOM:		EOM = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_SML:		SML = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_SMH:		SMH = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_ANM:		ANM = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MKL:		MKL = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_MKH:		MKH = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_ZCM:		ZCM = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_TXB:		TXB = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_RXB:		RXB = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CR0:		CR0 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CR1:		CR1 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CR2:		CR2 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CR3:		CR3 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_TXD:		TXD = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_RXD:		RXD = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_SCK:		SCK = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_TI:			TI	= info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_TO:			TO	= info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CI:			CI	= info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CO0:		CO0 = info->i; 							break;
-		case CPUINFO_INT_REGISTER + UPD7810_CO1:		CO1 = info->i; 							break;
+		case CPUINFO_INT_REGISTER + UPD7810_EOM:		EOM = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_SML:		SML = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_SMH:		SMH = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_ANM:		ANM = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MKL:		MKL = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_MKH:		MKH = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_ZCM:		ZCM = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TXB:		TXB = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_RXB:		RXB = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CR0:		CR0 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CR1:		CR1 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CR2:		CR2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CR3:		CR3 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TXD:		TXD = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_RXD:		RXD = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_SCK:		SCK = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TI:			TI	= info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_TO:			TO	= info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CI:			CI	= info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CO0:		CO0 = info->i;							break;
+		case CPUINFO_INT_REGISTER + UPD7810_CO1:		CO1 = info->i;							break;
 	}
 }
 
@@ -2033,11 +2033,11 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = (IRR & INTNMI) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF1:	info->i = (IRR & INTF1) ? ASSERT_LINE : CLEAR_LINE; break;

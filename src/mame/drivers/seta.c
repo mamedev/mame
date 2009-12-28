@@ -6647,7 +6647,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( qzkklgy2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,	512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed, 		512*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,		512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -9504,7 +9504,7 @@ ROM_START( crazyfgt )
 	ROM_LOAD16_BYTE( "rom.u3", 0x00000, 0x40000, CRC(bf333e75) SHA1(be124558ca49963cc56d3255c546587558b61926) )
 	ROM_LOAD16_BYTE( "rom.u4", 0x00001, 0x40000, CRC(505e9d47) SHA1(3797d396a24e46b891de4c40aafe960d1cf5f161) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) 	/* Sprites */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "rom.u228",  0x000000, 0x80000, CRC(7181618e) SHA1(57c5aced95b0a11a43dc9bd532290f067113e65a) )
 	ROM_LOAD( "rom.u227",  0x080000, 0x80000, CRC(7905b5f2) SHA1(633f86bf2be620afbe8012ade5d1e59c359a25d4) )
 	ROM_LOAD( "rom.u226",  0x100000, 0x80000, CRC(ef210e34) SHA1(99241ffcbc8af889c8ab6f0bc67eedef27d455f0) )

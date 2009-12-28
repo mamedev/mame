@@ -65,14 +65,14 @@ typedef enum {
 #define SUBB(dst,src) { unsigned res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define SUBW(dst,src) { unsigned res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
 
-#define ORB(dst,src) 		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
-#define ORW(dst,src) 		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
+#define ORB(dst,src)		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
+#define ORW(dst,src)		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
-#define ANDB(dst,src) 		dst &= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
-#define ANDW(dst,src) 		dst &= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
+#define ANDB(dst,src)		dst &= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
+#define ANDW(dst,src)		dst &= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
-#define XORB(dst,src) 		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
-#define XORW(dst,src) 		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
+#define XORB(dst,src)		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
+#define XORW(dst,src)		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
 #define CF					(cpustate->CarryVal != 0)
 #define SF					(cpustate->SignVal < 0)
@@ -96,17 +96,17 @@ typedef enum {
 
 /************************************************************************/
 
-#define SegBase(Seg) 			(cpustate->sregs[Seg] << 4)
+#define SegBase(Seg)			(cpustate->sregs[Seg] << 4)
 
-#define DefaultBase(Seg) 		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_base : cpustate->base[Seg])
+#define DefaultBase(Seg)		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_base : cpustate->base[Seg])
 
 #define GetMemB(Seg,Off)		(read_byte((DefaultBase(Seg) + (Off)) & AMASK))
 #define GetMemW(Seg,Off)		(read_word((DefaultBase(Seg) + (Off)) & AMASK))
 #define PutMemB(Seg,Off,x)		write_byte((DefaultBase(Seg) + (Off)) & AMASK, (x))
 #define PutMemW(Seg,Off,x)		write_word((DefaultBase(Seg) + (Off)) & AMASK, (x))
 
-#define PEEKBYTE(ea) 			(read_byte((ea) & AMASK))
-#define ReadByte(ea) 			(read_byte((ea) & AMASK))
+#define PEEKBYTE(ea)			(read_byte((ea) & AMASK))
+#define ReadByte(ea)			(read_byte((ea) & AMASK))
 #define ReadWord(ea)			(read_word((ea) & AMASK))
 #define WriteByte(ea,val)		write_byte((ea) & AMASK, val);
 #define WriteWord(ea,val)		write_word((ea) & AMASK, val);
@@ -115,7 +115,7 @@ typedef enum {
 #define FETCH					(memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))
 #define FETCHOP					(memory_decrypted_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))
 #define PEEKOP(addr)			(memory_decrypted_read_byte(cpustate->program, FETCH_XOR(addr)))
-#define FETCHWORD(var) 			{ var = memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc)); var += (memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc + 1)) << 8); cpustate->pc += 2; }
+#define FETCHWORD(var)			{ var = memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc)); var += (memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc + 1)) << 8); cpustate->pc += 2; }
 #define CHANGE_PC(addr)
 #define PUSH(val)				{ cpustate->regs.w[SP] -= 2; WriteWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ var = ReadWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK)); cpustate->regs.w[SP] += 2; }

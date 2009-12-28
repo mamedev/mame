@@ -267,7 +267,7 @@ struct _drcbe_state
 	const device_config *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
-	drcuml_machine_state 	state;					/* state of the machine */
+	drcuml_machine_state	state;					/* state of the machine */
 	drchash_state *			hash;					/* hash table state */
 	drcmap_state *			map;					/* code map */
 	drclabel_list *			labels;                 /* label list */
@@ -695,7 +695,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 		0xffc0, 	/* DRCUML_FMOD_TRUNC */
 		0x9fc0, 	/* DRCUML_FMOD_ROUND */
 		0xdfc0, 	/* DRCUML_FMOD_CEIL */
-		0xbfc0	 	/* DRCUML_FMOD_FLOOR */
+		0xbfc0		/* DRCUML_FMOD_FLOOR */
 	};
 	drcbe_state *drcbe;
 	int opnum, entry;

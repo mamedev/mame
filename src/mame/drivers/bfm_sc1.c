@@ -143,7 +143,7 @@ static int Scorpion1_GetSwitchState(int strobe, int data)
 {
 	int state = 0;
 
- 	if ( strobe < 7 && data < 8 ) state = (sc1_Inputs[strobe] & (1<<data))?1:0;
+	if ( strobe < 7 && data < 8 ) state = (sc1_Inputs[strobe] & (1<<data))?1:0;
 
 	return state;
 }
@@ -333,7 +333,7 @@ static WRITE8_HANDLER( vfd_w )
 		BFM_BD1_draw(0);
 		BFM_BD1_draw(1);
 		BFM_BD1_draw(2);
-  	}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -766,9 +766,9 @@ static MACHINE_RESET( bfm_sc1 )
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_BASE_SIZE_GENERIC(nvram) //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)	  			// reel 2+3 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)	  			// reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)	  			// vfd latch
+	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)				// reel 2+3 latch
+	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)				// reel 1+2 latch
+	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)				// vfd latch
 
 	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)	// mechanical meters
 	AM_RANGE(0x2800, 0x2800) AM_READWRITE(triac_r,triac_w)	// payslide triacs
@@ -794,7 +794,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3801, 0x3801) AM_READNOP						// uPD5579 status on soundcard (not installed)
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) 		// write bank
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)	 			// reel 5+6 latch
+	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)				// reel 5+6 latch
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)

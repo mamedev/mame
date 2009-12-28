@@ -231,9 +231,9 @@ static READ8_HANDLER( ldp_read )
 static READ8_HANDLER( pedal_in )
 {
 	if (brake_gas)
-		return 	input_port_read(space->machine, "INACCEL");
+		return	input_port_read(space->machine, "INACCEL");
 
-	return 	input_port_read(space->machine, "INBRAKE");
+	return	input_port_read(space->machine, "INBRAKE");
 
 }
 

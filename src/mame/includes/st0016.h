@@ -37,17 +37,17 @@ extern UINT8 *st0016_charram;
 extern UINT8 *macs_ram1,*macs_ram2;
 
 READ8_HANDLER(st0016_dma_r);
-WRITE8_HANDLER 	(st0016_sprite_bank_w);
-WRITE8_HANDLER 	(st0016_palette_bank_w);
-WRITE8_HANDLER 	(st0016_character_bank_w);
-READ8_HANDLER  	(st0016_sprite_ram_r);
-WRITE8_HANDLER 	(st0016_sprite_ram_w);
-READ8_HANDLER  	(st0016_sprite2_ram_r);
-WRITE8_HANDLER 	(st0016_sprite2_ram_w);
-READ8_HANDLER  	(st0016_palette_ram_r);
-WRITE8_HANDLER 	(st0016_palette_ram_w);
-READ8_HANDLER  	(st0016_character_ram_r);
-WRITE8_HANDLER 	(st0016_character_ram_w);
+WRITE8_HANDLER	(st0016_sprite_bank_w);
+WRITE8_HANDLER	(st0016_palette_bank_w);
+WRITE8_HANDLER	(st0016_character_bank_w);
+READ8_HANDLER	(st0016_sprite_ram_r);
+WRITE8_HANDLER	(st0016_sprite_ram_w);
+READ8_HANDLER	(st0016_sprite2_ram_r);
+WRITE8_HANDLER	(st0016_sprite2_ram_w);
+READ8_HANDLER	(st0016_palette_ram_r);
+WRITE8_HANDLER	(st0016_palette_ram_w);
+READ8_HANDLER	(st0016_character_ram_r);
+WRITE8_HANDLER	(st0016_character_ram_w);
 READ8_HANDLER	(st0016_vregs_r);
 WRITE8_HANDLER	(st0016_vregs_w);
 

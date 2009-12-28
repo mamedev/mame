@@ -36,7 +36,7 @@ static UINT8	term2_analog_select;
 
 /* CMOS-related variables */
        UINT16 *midyunit_cmos_ram;
-       UINT32 	midyunit_cmos_page;
+       UINT32	midyunit_cmos_page;
 static UINT8	cmos_w_enable;
 
 /* sound-related variables */

@@ -290,7 +290,7 @@ static VIDEO_START(hvyunit)
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
-#define SX_POS 	152
+#define SX_POS	152
 #define SY_POS	258
 
 static VIDEO_UPDATE(hvyunit)
@@ -635,7 +635,7 @@ static INTERRUPT_GEN( hvyunit_interrupt )
 static const kaneko_pandora_interface hvyunit_pandora_config =
 {
 	"screen",	/* screen tag */
-	0, 	/* gfx_region */
+	0,	/* gfx_region */
 	0, 0	/* x_offs, y_offs */
 };
 

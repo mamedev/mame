@@ -196,7 +196,7 @@ INLINE ssp1601_state_t *get_safe_token(const device_config *device)
 		OP(rP.d); \
 		break; \
 	} \
- 	if ((op & 0x0f) == SSP_A) { /* A <- A */ \
+	if ((op & 0x0f) == SSP_A) { /* A <- A */ \
 		OP(rA32); \
 		break; \
 	} \
@@ -828,11 +828,11 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 4;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 4;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:					/* not implemented */				break;
 
@@ -893,7 +893,7 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_STR_REGISTER + SSP_A:			sprintf(info->s, "A  :%08X", rA32);							break;
 		case CPUINFO_STR_REGISTER + SSP_ST:			sprintf(info->s, "ST  :%04X", rST);							break;
 		case CPUINFO_STR_REGISTER + SSP_STACK:		sprintf(info->s, "STACK  :%04X", rSTACK);					break;
-		case CPUINFO_STR_REGISTER + SSP_PC:  		sprintf(info->s, "PC  :%04X", rPC);							break;
+		case CPUINFO_STR_REGISTER + SSP_PC: 		sprintf(info->s, "PC  :%04X", rPC);							break;
 		case CPUINFO_STR_REGISTER + SSP_P:			sprintf(info->s, "P  :%08X", rP.d);							break;
 		case CPUINFO_STR_REGISTER + SSP_STACK0:		sprintf(info->s, "STACK0  :%04X", ssp1601_state->stack[0]);		break;
 		case CPUINFO_STR_REGISTER + SSP_STACK1:		sprintf(info->s, "STACK1  :%04X", ssp1601_state->stack[1]);		break;

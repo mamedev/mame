@@ -196,21 +196,21 @@ typedef struct _tms32025_opcode tms32025_opcode;
 struct _tms32025_opcode
 {
 	UINT8	cycles;
-	void 	(*function)(tms32025_state *);
+	void	(*function)(tms32025_state *);
 };
 /* opcode table entry (Opcode CE has sub-opcodes) */
 typedef struct _tms32025_opcode_CE tms32025_opcode_CE;
 struct _tms32025_opcode_CE
 {
 	UINT8	cycles;
-	void 	(*function)(tms32025_state *);
+	void	(*function)(tms32025_state *);
 };
 /* opcode table entry (Opcode Dx has sub-opcodes) */
 typedef struct _tms32025_opcode_Dx tms32025_opcode_Dx;
 struct _tms32025_opcode_Dx
 {
 	UINT8	cycles;
-	void 	(*function)(tms32025_state *);
+	void	(*function)(tms32025_state *);
 };
 
 
@@ -2270,29 +2270,29 @@ static CPU_SET_INFO( tms32025 )
 		case CPUINFO_INT_REGISTER + TMS32025_PC:		cpustate->PC = info->i;							break;
 		/* This is actually not a stack pointer, but the stack contents */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS32025_STK7: 		cpustate->STACK[7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK6: 		cpustate->STACK[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK5: 		cpustate->STACK[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK4: 		cpustate->STACK[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK3: 		cpustate->STACK[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK2: 		cpustate->STACK[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK1: 		cpustate->STACK[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK0: 		cpustate->STACK[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STR0: 		cpustate->STR0 = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_STR1: 		cpustate->STR1 = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_IFR:  		cpustate->IFR = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_RPTC: 		cpustate->RPTC = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_ACC:  		cpustate->ACC.d = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_PREG: 		cpustate->Preg.d = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_TREG: 		cpustate->Treg = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR0:  		cpustate->AR[0] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR1:  		cpustate->AR[1] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR2:  		cpustate->AR[2] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR3:  		cpustate->AR[3] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR4:  		cpustate->AR[4] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR5:  		cpustate->AR[5] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR6:  		cpustate->AR[6] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR7:  		cpustate->AR[7] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK7:		cpustate->STACK[7] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK6:		cpustate->STACK[6] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK5:		cpustate->STACK[5] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK4:		cpustate->STACK[4] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK3:		cpustate->STACK[3] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK2:		cpustate->STACK[2] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK1:		cpustate->STACK[1] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK0:		cpustate->STACK[0] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STR0:		cpustate->STR0 = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_STR1:		cpustate->STR1 = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_IFR:		cpustate->IFR = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_RPTC:		cpustate->RPTC = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_ACC:		cpustate->ACC.d = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_PREG:		cpustate->Preg.d = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_TREG:		cpustate->Treg = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR0:		cpustate->AR[0] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR1:		cpustate->AR[1] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR2:		cpustate->AR[2] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR3:		cpustate->AR[3] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR4:		cpustate->AR[4] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR5:		cpustate->AR[5] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR6:		cpustate->AR[6] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR7:		cpustate->AR[7] = info->i;						break;
 		case CPUINFO_INT_REGISTER + TMS32025_DRR:		M_WRTRAM(cpustate, 0,info->i);					break;
 		case CPUINFO_INT_REGISTER + TMS32025_DXR:		M_WRTRAM(cpustate, 1,info->i);					break;
 		case CPUINFO_INT_REGISTER + TMS32025_TIM:		M_WRTRAM(cpustate, 2,info->i);					break;
@@ -2330,11 +2330,11 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -1;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 17;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = -1;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 17;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = -1;					break;
 
 		case CPUINFO_INT_INPUT_STATE + TMS32025_INT0:		info->i = (cpustate->IFR & 0x01) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + TMS32025_INT1:		info->i = (cpustate->IFR & 0x02) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -2359,24 +2359,24 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_REGISTER + TMS32025_STK0:		info->i = cpustate->STACK[0];					break;
 		case CPUINFO_INT_REGISTER + TMS32025_STR0:		info->i = cpustate->STR0;						break;
 		case CPUINFO_INT_REGISTER + TMS32025_STR1:		info->i = cpustate->STR1;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_IFR: 		info->i = cpustate->IFR;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_IFR:		info->i = cpustate->IFR;						break;
 		case CPUINFO_INT_REGISTER + TMS32025_RPTC:		info->i = cpustate->RPTC;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_ACC: 		info->i = cpustate->ACC.d;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_ACC:		info->i = cpustate->ACC.d;						break;
 		case CPUINFO_INT_REGISTER + TMS32025_PREG:		info->i = cpustate->Preg.d;						break;
 		case CPUINFO_INT_REGISTER + TMS32025_TREG:		info->i = cpustate->Treg;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR0: 		info->i = cpustate->AR[0];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR1: 		info->i = cpustate->AR[1];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR2: 		info->i = cpustate->AR[2];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR3: 		info->i = cpustate->AR[3];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR4: 		info->i = cpustate->AR[4];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR5: 		info->i = cpustate->AR[5];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR6: 		info->i = cpustate->AR[6];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR7: 		info->i = cpustate->AR[7];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_DRR: 		info->i = M_RDRAM(cpustate, 0);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_DXR: 		info->i = M_RDRAM(cpustate, 1);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_TIM: 		info->i = M_RDRAM(cpustate, 2);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_PRD: 		info->i = M_RDRAM(cpustate, 3);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_IMR: 		info->i = M_RDRAM(cpustate, 4);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR0:		info->i = cpustate->AR[0];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR1:		info->i = cpustate->AR[1];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR2:		info->i = cpustate->AR[2];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR3:		info->i = cpustate->AR[3];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR4:		info->i = cpustate->AR[4];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR5:		info->i = cpustate->AR[5];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR6:		info->i = cpustate->AR[6];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR7:		info->i = cpustate->AR[7];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_DRR:		info->i = M_RDRAM(cpustate, 0);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_DXR:		info->i = M_RDRAM(cpustate, 1);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_TIM:		info->i = M_RDRAM(cpustate, 2);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_PRD:		info->i = M_RDRAM(cpustate, 3);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_IMR:		info->i = M_RDRAM(cpustate, 4);					break;
 		case CPUINFO_INT_REGISTER + TMS32025_GREG:		info->i = M_RDRAM(cpustate, 5);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

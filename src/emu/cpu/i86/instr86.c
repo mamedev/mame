@@ -1261,11 +1261,11 @@ static void PREFIX86(_inc_di)(i8086_state *cpustate)    /* Opcode 0x47 */
 }
 
 #define DecWordReg(Reg) 					\
-{ 											\
+{											\
 	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
-    unsigned tmp1 = tmp-1; 					\
+    unsigned tmp1 = tmp-1;					\
     SetOFW_Sub(tmp1,1,tmp); 				\
-    SetAF(tmp1,tmp,1); 						\
+    SetAF(tmp1,tmp,1);						\
 	SetSZPF_Word(tmp1);						\
 	cpustate->regs.w[Reg]=tmp1; 					\
 	ICOUNT -= timing.incdec_r16;			\
@@ -1934,11 +1934,11 @@ static void PREFIX86(_popw)(i8086_state *cpustate)    /* Opcode 0x8f */
 }
 
 
-#define XchgAXReg(Reg) 				\
-{ 									\
-    WORD tmp; 						\
-	tmp = cpustate->regs.w[Reg]; 			\
-	cpustate->regs.w[Reg] = cpustate->regs.w[AX]; 	\
+#define XchgAXReg(Reg)				\
+{									\
+    WORD tmp;						\
+	tmp = cpustate->regs.w[Reg];			\
+	cpustate->regs.w[Reg] = cpustate->regs.w[AX];	\
 	cpustate->regs.w[AX] = tmp; 			\
 	ICOUNT -= timing.xchg_ar16; 	\
 }

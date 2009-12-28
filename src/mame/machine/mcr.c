@@ -236,10 +236,10 @@ const z80_daisy_chain mcr_ipu_daisy_chain[] =
 Z80CTC_INTERFACE( mcr_ctc_intf )
 {
 	0,              			/* timer disables */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),  	/* interrupt handler */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_LINE(z80ctc_trg1_w),	/* ZC/TO0 callback */
-	DEVCB_NULL,              	/* ZC/TO1 callback */
-	DEVCB_NULL               	/* ZC/TO2 callback */
+	DEVCB_NULL,             	/* ZC/TO1 callback */
+	DEVCB_NULL              	/* ZC/TO2 callback */
 };
 
 
@@ -249,7 +249,7 @@ Z80CTC_INTERFACE( nflfoot_ctc_intf )
 	DEVCB_CPU_INPUT_LINE("ipu", INPUT_LINE_IRQ0),  /* interrupt handler */
 	DEVCB_NULL,			/* ZC/TO0 callback */
 	DEVCB_NULL,			/* ZC/TO1 callback */
-	DEVCB_NULL         	/* ZC/TO2 callback */
+	DEVCB_NULL      	/* ZC/TO2 callback */
 };
 
 

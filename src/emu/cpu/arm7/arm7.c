@@ -470,7 +470,7 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_FCT_BURN:                  info->burn = NULL;                              break;
         case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(arm7);                  break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &ARM7_ICOUNT;                    break;
-	case CPUINFO_FCT_TRANSLATE:	       	info->translate = CPU_TRANSLATE_NAME(arm7);		break;
+	case CPUINFO_FCT_TRANSLATE:	    	info->translate = CPU_TRANSLATE_NAME(arm7);		break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case DEVINFO_STR_NAME:                  strcpy(info->s, "ARM7");                        break;

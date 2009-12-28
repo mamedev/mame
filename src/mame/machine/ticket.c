@@ -128,13 +128,13 @@ static DEVICE_START( ticket )
 	assert(config != NULL);
 
 	/* initialize the state */
-	state->active_bit 			= 0x80;
+	state->active_bit			= 0x80;
 	state->time_msec			= device->clock;
 	state->motoron				= config->motorhigh  ? state->active_bit : 0;
 	state->ticketdispensed		= config->statushigh ? state->active_bit : 0;
 	state->ticketnotdispensed	= state->ticketdispensed ^ state->active_bit;
 
-	state->timer 				= timer_alloc(device->machine, ticket_dispenser_toggle, (void *)device);
+	state->timer				= timer_alloc(device->machine, ticket_dispenser_toggle, (void *)device);
 
 	state_save_register_device_item(device, 0, state->status);
 	state_save_register_device_item(device, 0, state->power);
@@ -149,7 +149,7 @@ static DEVICE_RESET( ticket )
 {
 	ticket_state *state = get_safe_token(device);
 	state->status				= state->ticketnotdispensed;
-	state->power 				= 0x00;
+	state->power				= 0x00;
 }
 
 

@@ -8,7 +8,7 @@
     MAME/M1 conversion and cleanup by R. Belmont
 */
 
-#define LFO_SHIFT 	8
+#define LFO_SHIFT	8
 
 struct _LFO
 {
@@ -21,7 +21,7 @@ struct _LFO
 #define LFIX(v)	((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v) 	LFIX(pow(10.0,v/20.0))
+#define DB(v)	LFIX(pow(10.0,v/20.0))
 
 //Convert cents to step increment
 #define CENTS(v) LFIX(pow(2.0,v/1200.0))
@@ -50,7 +50,7 @@ static void LFO_Init(running_machine *machine)
 		if(i<128)
 			p=i;
 		else
- 			p=i-256;
+			p=i-256;
 		ALFO_SAW[i]=a;
 		PLFO_SAW[i]=p;
 

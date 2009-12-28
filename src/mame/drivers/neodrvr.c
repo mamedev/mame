@@ -325,7 +325,7 @@ INPUT_PORTS_END
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define NEOGEO_BIOS \
-	ROM_REGION16_BE( 0x80000, "mainbios", 0 ) 													\
+	ROM_REGION16_BE( 0x80000, "mainbios", 0 )													\
 	ROM_SYSTEM_BIOS( 0, "euro",       "Europe MVS (Ver. 2)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-s2.sp1",    0x00000, 0x020000, CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543) ) /* Europe, 1 Slot, has also been found on 2 Slot and 4 Slot (the old hacks were designed for this one) */ \
 	ROM_SYSTEM_BIOS( 1, "euro-s1",    "Europe MVS (Ver. 1)" ) \
@@ -388,7 +388,7 @@ INPUT_PORTS_END
 
 ******************************************************************************/
 
-#define NEO_BIOS_AUDIO_64K(name, hash) 																			\
+#define NEO_BIOS_AUDIO_64K(name, hash)																			\
 	NEOGEO_BIOS 																								\
 																												\
 	ROM_REGION( 0x20000, "audiobios", 0 )														\
@@ -459,31 +459,31 @@ INPUT_PORTS_END
 #define NO_DELTAT_REGION
 
 
-#define NEO_SFIX_32K(name, hash) 																				\
-	ROM_REGION( 0x20000, "fixed", 0 ) 												\
+#define NEO_SFIX_32K(name, hash)																				\
+	ROM_REGION( 0x20000, "fixed", 0 )												\
 	ROM_LOAD( name,       0x000000, 0x08000, hash ) 															\
 																												\
-	ROM_REGION( 0x20000, "fixedbios", 0 ) 													\
+	ROM_REGION( 0x20000, "fixedbios", 0 )													\
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )		\
 																												\
 	ROM_Y_ZOOM
 
 
-#define NEO_SFIX_64K(name, hash) 																				\
-	ROM_REGION( 0x20000, "fixed", 0 ) 												\
+#define NEO_SFIX_64K(name, hash)																				\
+	ROM_REGION( 0x20000, "fixed", 0 )												\
 	ROM_LOAD( name,       0x000000, 0x10000, hash ) 															\
 																												\
-	ROM_REGION( 0x20000, "fixedbios", 0 ) 													\
+	ROM_REGION( 0x20000, "fixedbios", 0 )													\
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )		\
 																												\
 	ROM_Y_ZOOM
 
 
-#define NEO_SFIX_128K(name, hash) 																				\
-	ROM_REGION( 0x20000, "fixed", 0 ) 												\
+#define NEO_SFIX_128K(name, hash)																				\
+	ROM_REGION( 0x20000, "fixed", 0 )												\
 	ROM_LOAD( name,       0x000000, 0x20000, hash ) 															\
 																												\
-	ROM_REGION( 0x20000, "fixedbios", 0 ) 													\
+	ROM_REGION( 0x20000, "fixedbios", 0 )													\
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )		\
 																												\
 	ROM_Y_ZOOM
@@ -7021,7 +7021,7 @@ ROM_END
 
 ROM_START( kf2k3bl )
 	ROM_REGION( 0x800000, "maincpu", 0 )
- 	ROM_LOAD16_WORD_SWAP( "2k3-p1.bin", 0x100000, 0x400000, CRC(92ed6ee3) SHA1(5e7e21eb40dfcc453ba73808760d5ddedd49c58a) )
+	ROM_LOAD16_WORD_SWAP( "2k3-p1.bin", 0x100000, 0x400000, CRC(92ed6ee3) SHA1(5e7e21eb40dfcc453ba73808760d5ddedd49c58a) )
 	ROM_LOAD16_WORD_SWAP( "2k3-p2.bin", 0x500000, 0x200000, CRC(5d3d8bb3) SHA1(7f2341f14ca12ff5721eb038b3496228a1f34b60) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 	ROM_CONTINUE( 0x000000, 0x100000 )
@@ -7203,7 +7203,7 @@ ROM_START( 98best44 )
 	/* no S1 rom */
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )
-	ROM_LOAD( "pt004-m1", 	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
+	ROM_LOAD( "pt004-m1",	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
 	ROM_RELOAD(          0x10000, 0x20000 )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )

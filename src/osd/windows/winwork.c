@@ -110,10 +110,10 @@ struct _scalable_lock
 #if USE_SCALABLE_LOCKS
    struct
    {
-      volatile INT32 	haslock;		// do we have the lock?
+      volatile INT32	haslock;		// do we have the lock?
       INT32 			filler[64/4-1];	// assumes a 64-byte cache line
    } slot[WORK_MAX_THREADS];			// one slot per thread
-   volatile INT32 		nextindex;		// index of next slot to use
+   volatile INT32		nextindex;		// index of next slot to use
 #else
 	CRITICAL_SECTION	section;
 #endif
@@ -140,7 +140,7 @@ struct _work_thread_info
 
 struct _osd_work_queue
 {
-	scalable_lock	 	lock;			// lock for protecting the queue
+	scalable_lock		lock;			// lock for protecting the queue
 	osd_work_item * volatile list;		// list of items in the queue
 	osd_work_item ** volatile tailptr;	// pointer to the tail pointer of work items in the queue
 	osd_work_item * volatile free;		// free list of work items
@@ -166,7 +166,7 @@ struct _osd_work_item
 {
 	osd_work_item *		next;			// pointer to next item
 	osd_work_queue *	queue;			// pointer back to the owning queue
-	osd_work_callback 	callback;		// callback function
+	osd_work_callback	callback;		// callback function
 	void *				param;			// callback parameter
 	void *				result;			// callback result
 	HANDLE				event;			// event signalled when complete

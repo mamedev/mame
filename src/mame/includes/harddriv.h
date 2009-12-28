@@ -21,8 +21,8 @@ struct _harddriv_state
 	const device_config *	jsacpu;
 	const device_config *	dsp32;
 
-	UINT8 					hd34010_host_access;
-	UINT8 					dsk_pio_access;
+	UINT8					hd34010_host_access;
+	UINT8					dsk_pio_access;
 
 	UINT16 *				msp_ram;
 	UINT16 *				dsk_ram;
@@ -38,123 +38,123 @@ struct _harddriv_state
 	UINT16 *				stmsp_sync[3];
 
 	UINT16 *				gsp_speedup_addr[2];
-	offs_t 					gsp_speedup_pc;
+	offs_t					gsp_speedup_pc;
 
 	UINT16 *				msp_speedup_addr;
-	offs_t 					msp_speedup_pc;
+	offs_t					msp_speedup_pc;
 
 	UINT16 *				ds3_speedup_addr;
-	offs_t 					ds3_speedup_pc;
-	offs_t 					ds3_transfer_pc;
+	offs_t					ds3_speedup_pc;
+	offs_t					ds3_transfer_pc;
 
 	UINT32 *				rddsp32_sync[2];
 
-	UINT32 					gsp_speedup_count[4];
-	UINT32 					msp_speedup_count[4];
-	UINT32 					adsp_speedup_count[4];
+	UINT32					gsp_speedup_count[4];
+	UINT32					msp_speedup_count[4];
+	UINT32					adsp_speedup_count[4];
 
 	UINT16 *				sounddsp_ram;
 
-	UINT8 					gsp_multisync;
+	UINT8					gsp_multisync;
 	UINT8 *					gsp_vram;
 	UINT16 *				gsp_control_lo;
 	UINT16 *				gsp_control_hi;
 	UINT16 *				gsp_paletteram_lo;
 	UINT16 *				gsp_paletteram_hi;
-	size_t 					gsp_vram_size;
+	size_t					gsp_vram_size;
 
 	/* driver state */
 	UINT32 *				rddsp32_speedup;
-	offs_t 					rddsp32_speedup_pc;
+	offs_t					rddsp32_speedup_pc;
 
 	/* machine state */
-	UINT8 					irq_state;
-	UINT8 					gsp_irq_state;
-	UINT8 					msp_irq_state;
-	UINT8 					adsp_irq_state;
-	UINT8 					duart_irq_state;
+	UINT8					irq_state;
+	UINT8					gsp_irq_state;
+	UINT8					msp_irq_state;
+	UINT8					adsp_irq_state;
+	UINT8					duart_irq_state;
 
-	UINT8 					duart_read_data[16];
-	UINT8 					duart_write_data[16];
-	UINT8 					duart_output_port;
+	UINT8					duart_read_data[16];
+	UINT8					duart_write_data[16];
+	UINT8					duart_output_port;
 	const device_config *	duart_timer;
 
-	UINT8 					last_gsp_shiftreg;
+	UINT8					last_gsp_shiftreg;
 
-	UINT8 					m68k_zp1;
+	UINT8					m68k_zp1;
 	UINT8					m68k_zp2;
-	UINT8 					m68k_adsp_buffer_bank;
+	UINT8					m68k_adsp_buffer_bank;
 
-	UINT8 					adsp_halt;
+	UINT8					adsp_halt;
 	UINT8					adsp_br;
-	UINT8 					adsp_xflag;
-	UINT16 					adsp_sim_address;
-	UINT16 					adsp_som_address;
-	UINT32 					adsp_eprom_base;
+	UINT8					adsp_xflag;
+	UINT16					adsp_sim_address;
+	UINT16					adsp_som_address;
+	UINT32					adsp_eprom_base;
 
 	UINT16 *				sim_memory;
-	UINT32 					sim_memory_size;
-	UINT16 					som_memory[0x8000/2];
+	UINT32					sim_memory_size;
+	UINT16					som_memory[0x8000/2];
 	UINT16 *				adsp_pgm_memory_word;
 
-	UINT8 					ds3_gcmd;
+	UINT8					ds3_gcmd;
 	UINT8					ds3_gflag;
 	UINT8					ds3_g68irqs;
 	UINT8					ds3_gfirqs;
 	UINT8					ds3_g68flag;
 	UINT8					ds3_send;
 	UINT8					ds3_reset;
-	UINT16 					ds3_gdata;
+	UINT16					ds3_gdata;
 	UINT16					ds3_g68data;
-	UINT32 					ds3_sim_address;
+	UINT32					ds3_sim_address;
 
-	UINT16 					adc_control;
-	UINT8 					adc8_select;
-	UINT8 					adc8_data;
-	UINT8 					adc12_select;
-	UINT8 					adc12_byte;
-	UINT16 					adc12_data;
+	UINT16					adc_control;
+	UINT8					adc8_select;
+	UINT8					adc8_data;
+	UINT8					adc12_select;
+	UINT8					adc12_byte;
+	UINT16					adc12_data;
 
-	UINT16 					hdc68k_last_wheel;
-	UINT16 					hdc68k_last_port1;
-	UINT8 					hdc68k_wheel_edge;
-	UINT8 					hdc68k_shifter_state;
+	UINT16					hdc68k_last_wheel;
+	UINT16					hdc68k_last_port1;
+	UINT8					hdc68k_wheel_edge;
+	UINT8					hdc68k_shifter_state;
 
-	UINT8 					st68k_sloop_bank;
-	offs_t 					st68k_last_alt_sloop_offset;
+	UINT8					st68k_sloop_bank;
+	offs_t					st68k_last_alt_sloop_offset;
 
 	#define MAX_MSP_SYNC	16
 	UINT32 *				dataptr[MAX_MSP_SYNC];
-	UINT32 					dataval[MAX_MSP_SYNC];
+	UINT32					dataval[MAX_MSP_SYNC];
 	int 					next_msp_sync;
 
 	/* audio state */
-	UINT8 					soundflag;
-	UINT8 					mainflag;
-	UINT16 					sounddata;
-	UINT16 					maindata;
+	UINT8					soundflag;
+	UINT8					mainflag;
+	UINT16					sounddata;
+	UINT16					maindata;
 
-	UINT8 					dacmute;
-	UINT8 					cramen;
-	UINT8 					irq68k;
+	UINT8					dacmute;
+	UINT8					cramen;
+	UINT8					irq68k;
 
-	offs_t 					sound_rom_offs;
+	offs_t					sound_rom_offs;
 
 	UINT8 *					rombase;
-	UINT32 					romsize;
-	UINT16 					comram[0x400/2];
-	UINT64 					last_bio_cycles;
+	UINT32					romsize;
+	UINT16					comram[0x400/2];
+	UINT64					last_bio_cycles;
 
 	/* video state */
-	offs_t 					vram_mask;
+	offs_t					vram_mask;
 
-	UINT8 					shiftreg_enable;
+	UINT8					shiftreg_enable;
 
-	UINT32 					mask_table[65536 * 4];
+	UINT32					mask_table[65536 * 4];
 	UINT8 *					gsp_shiftreg_source;
 
-	INT8 					gfx_finescroll;
-	UINT8	 				gfx_palettebank;
+	INT8					gfx_finescroll;
+	UINT8					gfx_palettebank;
 };
 
 

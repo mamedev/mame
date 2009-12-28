@@ -226,7 +226,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 					if (rom[rom_offs+1]&0x80) break;	/* end of block */
 
- 					rom_offs += 8;
+					rom_offs += 8;
 				}
 			}
 		}

@@ -68,7 +68,7 @@ typedef struct _palette_client palette_client;
 ***************************************************************************/
 
 /* macros to assemble rgb_t values */
-#define MAKE_ARGB(a,r,g,b) 	((((rgb_t)(a) & 0xff) << 24) | (((rgb_t)(r) & 0xff) << 16) | (((rgb_t)(g) & 0xff) << 8) | ((rgb_t)(b) & 0xff))
+#define MAKE_ARGB(a,r,g,b)	((((rgb_t)(a) & 0xff) << 24) | (((rgb_t)(r) & 0xff) << 16) | (((rgb_t)(g) & 0xff) << 8) | ((rgb_t)(b) & 0xff))
 #define MAKE_RGB(r,g,b)		(MAKE_ARGB(255,r,g,b))
 
 /* macros to extract components from rgb_t values */

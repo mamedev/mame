@@ -54,8 +54,8 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct 	_m65ce02_Regs m65ce02_Regs;
-struct 	_m65ce02_Regs {
+typedef struct	_m65ce02_Regs m65ce02_Regs;
+struct	_m65ce02_Regs {
 	void	(*const *insn)(m65ce02_Regs *); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc;				/* program counter */
@@ -249,7 +249,7 @@ static CPU_SET_INFO( m65ce02 )
 	m65ce02_Regs *cpustate = get_safe_token(device);
 
 	switch( state )
- 	{
+	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + M65CE02_IRQ_STATE: m65ce02_set_irq_line( cpustate, M65CE02_IRQ_LINE, info->i ); break;
 		case CPUINFO_INT_INPUT_STATE + M65CE02_NMI_STATE: m65ce02_set_irq_line( cpustate, INPUT_LINE_NMI, info->i ); break;

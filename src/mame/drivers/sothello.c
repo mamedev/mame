@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( maincpu_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_w)
     AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
     AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-   						/* not sure, but the A1 line is ignored, code @ $8b8 */
+						/* not sure, but the A1 line is ignored, code @ $8b8 */
     AM_RANGE( 0x70, 0x70) AM_WRITE( v9938_0_vram_w ) AM_READ( v9938_0_vram_r )
     AM_RANGE( 0x71, 0x71) AM_WRITE( v9938_0_command_w ) AM_READ( v9938_0_status_r )
     AM_RANGE( 0x72, 0x72) AM_WRITE( v9938_0_palette_w )

@@ -1252,7 +1252,7 @@ static READ16_HANDLER( sci_steer_input_r )
 		case 0x04:
 			return (steer & 0xff);
 
- 		case 0x05:
+		case 0x05:
 			return (steer & 0xff00) >> 8;
 	}
 

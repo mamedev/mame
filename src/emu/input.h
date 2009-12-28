@@ -46,10 +46,10 @@
 
 /* build or modify input codes */
 #define INPUT_CODE(d,x,i,m,o)			((((d) & 0x0f) << 24) | (((x) & 0x0f) << 20) | (((i) & 0x0f) << 16) | (((m) & 0x0f) << 12) | ((o) & 0xfff))
-#define INPUT_CODE_SET_DEVINDEX(c,x) 	(((c) & ~(0xf << 20)) | (((x) & 0x0f) << 20))
-#define INPUT_CODE_SET_ITEMCLASS(c,i) 	(((c) & ~(0xf << 16)) | (((i) & 0x0f) << 16))
-#define INPUT_CODE_SET_MODIFIER(c,m) 	(((c) & ~(0xf << 12)) | (((m) & 0x0f) << 12))
-#define INPUT_CODE_SET_ITEMID(c,d) 		(((c) & ~0xfff) | ((d) & 0xfff))
+#define INPUT_CODE_SET_DEVINDEX(c,x)	(((c) & ~(0xf << 20)) | (((x) & 0x0f) << 20))
+#define INPUT_CODE_SET_ITEMCLASS(c,i)	(((c) & ~(0xf << 16)) | (((i) & 0x0f) << 16))
+#define INPUT_CODE_SET_MODIFIER(c,m)	(((c) & ~(0xf << 12)) | (((m) & 0x0f) << 12))
+#define INPUT_CODE_SET_ITEMID(c,d)		(((c) & ~0xfff) | ((d) & 0xfff))
 
 /* standard code building */
 #define STANDARD_CODE(d,x,i,m,o)		(INPUT_CODE(DEVICE_CLASS_##d, x, ITEM_CLASS_##i, ITEM_MODIFIER_##m, ITEM_ID_##o))

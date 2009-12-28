@@ -307,7 +307,7 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:m6509_set_irq_line(cpustate, M6509_SET_OVERFLOW, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m6509_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							PCW = info->i; 							break;
+		case CPUINFO_INT_PC:							PCW = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6509_PC:			cpustate->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6509_S:			cpustate->sp.b.l = info->i;					break;
@@ -350,11 +350,11 @@ CPU_GET_INFO( m6509 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 20;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6509_IRQ_LINE:	info->i = cpustate->irq_state;				break;
 		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:info->i = cpustate->so_state;				break;

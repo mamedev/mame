@@ -43,7 +43,7 @@ static void cchasm_refresh (running_machine *machine)
 	while (!done)
 	{
         data = cchasm_ram[pc];
-   		opcode = data >> 12;
+		opcode = data >> 12;
         data &= 0xfff;
         if ((opcode > COLOR) && (data & 0x800))
           data |= 0xfffff000;

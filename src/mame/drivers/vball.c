@@ -418,7 +418,7 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( vball )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */
+	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", vball_scanline, "screen", 0, 1)
 

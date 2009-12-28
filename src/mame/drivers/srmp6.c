@@ -247,7 +247,7 @@ static VIDEO_UPDATE(srmp6)
 
 						drawgfx_alpha(bitmap,cliprect,screen->machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
-		 			}
+					}
 				}
 
 				sprite_sublist+=8;
@@ -353,36 +353,36 @@ static int destl;
 static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 {
 
- 	int l=0;
+	int l=0;
 
- 	UINT8 *tram=(UINT8*)tileram;
+	UINT8 *tram=(UINT8*)tileram;
 
- 	if(lastb==lastb2)	//rle
- 	{
+	if(lastb==lastb2)	//rle
+	{
 		int i;
- 		int rle=(b+1)&0xff;
+		int rle=(b+1)&0xff;
 
- 		for(i=0;i<rle;++i)
- 		{
+		for(i=0;i<rle;++i)
+		{
 			tram[dst_offset+destl] = lastb;
 			gfx_element_mark_dirty(machine->gfx[0], (dst_offset+destl)/0x40);
 
 			dst_offset++;
- 			++l;
- 		}
- 		lastb2=0xffff;
+			++l;
+		}
+		lastb2=0xffff;
 
- 		return l;
- 	}
- 	else
- 	{
- 		lastb2=lastb;
- 		lastb=b;
+		return l;
+	}
+	else
+	{
+		lastb2=lastb;
+		lastb=b;
 		tram[dst_offset+destl] = b;
 		gfx_element_mark_dirty(machine->gfx[0], (dst_offset+destl)/0x40);
 
- 		return 1;
- 	}
+		return 1;
+	}
  }
 
 
@@ -423,7 +423,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 		{
 			int i;
 			UINT8 ctrl=rom[srcdata];
- 			++srcdata;
+			++srcdata;
 
 			for(i=0;i<8;++i)
 			{
@@ -436,14 +436,14 @@ static WRITE16_HANDLER(srmp6_dma_w)
 					tempidx+=process(space->machine,real_byte,tempidx);
 					real_byte = rom[srctab+p*2+1];//px[DMA_XOR((current_table_address+p*2+1))];
 					tempidx+=process(space->machine,real_byte,tempidx);
- 				}
- 				else
- 				{
- 					tempidx+=process(space->machine,p,tempidx);
- 				}
+				}
+				else
+				{
+					tempidx+=process(space->machine,p,tempidx);
+				}
 
- 				ctrl<<=1;
- 				++srcdata;
+				ctrl<<=1;
+				++srcdata;
 
 
 				if(tempidx>=len)
@@ -451,7 +451,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 					LOG(("%x\n",srcdata));
 					return;
 				}
- 			}
+			}
 		}
 	}
 }
@@ -528,8 +528,8 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE(&dmaram)
 
 	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE(&video_regs)	// ? gfx regs ST-0026 NiLe
-  	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_snd_r, nile_snd_w) AM_BASE(&nile_sound_regs)
-  	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_sndctrl_r, nile_sndctrl_w)
+	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_snd_r, nile_snd_w) AM_BASE(&nile_sound_regs)
+	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_sndctrl_r, nile_sndctrl_w)
 //  AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 //  AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 
@@ -682,7 +682,7 @@ ROM_START( srmp6 )
 	ROM_REGION( 0x200000, "user1", 0 ) /* 68000 Data */
 	ROM_LOAD( "sx011-09.10", 0x000000, 0x200000, CRC(58f74438) SHA1(a256e39ca0406e513ab4dbd812fb0b559b4f61f2) )
 
- 	/* these are accessed directly by the 68k, DMA device etc.  NOT decoded */
+	/* these are accessed directly by the 68k, DMA device etc.  NOT decoded */
 	ROM_REGION( 0x2000000, "nile", 0)	/* Banked ROM */
 	ROM_LOAD16_WORD_SWAP( "sx011-08.15", 0x0000000, 0x0400000, CRC(01b3b1f0) SHA1(bbd60509c9ba78358edbcbb5953eafafd6e2eaf5) ) // CHR00
 	ROM_LOAD16_WORD_SWAP( "sx011-07.16", 0x0400000, 0x0400000, CRC(26e57dac) SHA1(91272268977c5fbff7e8fbe1147bf108bd2ed321) ) // CHR01

@@ -178,7 +178,7 @@ static STREAM_UPDATE( seta_update )
 				for( i = 0; i < samples; i++ ) {
 					int vol;
 					delta = env_offs>>ENV_BASE_BITS;
-	 				// Envelope one shot mode
+					// Envelope one shot mode
 					if( (reg->status&4) != 0 && delta >= 0x80 ) {
 						reg->status &= 0xfe;					// Key off
 						break;
@@ -256,8 +256,8 @@ WRITE8_DEVICE_HANDLER( seta_sound_w )
 
 	if( channel < SETA_NUM_CHANNELS && reg == 0
 	 && (info->reg[offset]&1) == 0 && (data&1) != 0 ) {
-	 	info->smp_offset[channel] = 0;
-	 	info->env_offset[channel] = 0;
+		info->smp_offset[channel] = 0;
+		info->env_offset[channel] = 0;
 	}
 	LOG_REGISTER_WRITE(("%s: offset %6X : data %2X\n", cpuexec_describe_context(device->machine), offset, data ));
 	info->reg[offset] = data;

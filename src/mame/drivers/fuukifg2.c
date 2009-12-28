@@ -108,7 +108,7 @@ static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 	if (data <= 2)
 		memory_set_bank(space->machine, "bank1", data);
 	else
-	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )

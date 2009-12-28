@@ -180,9 +180,9 @@ static const discrete_dac_r1_ladder polepos_54xx_dac =
 {
 	4,				/* number of DAC bits */
 					/* 54XX_0   54XX_1  54XX_2 */
-	{ RES_K(47),  	/* R124,    R136,   R152 */
-	  RES_K(22),  	/* R120,    R132,   R142 */
-	  RES_K(10),  	/* R119,    R131,   R138 */
+	{ RES_K(47),	/* R124,    R136,   R152 */
+	  RES_K(22),	/* R120,    R132,   R142 */
+	  RES_K(10),	/* R119,    R131,   R138 */
 	  RES_K(4.7)},	/* R118,    R126,   R103 */
 	0, 0, 0, 0		/* nothing extra */
 };
@@ -192,8 +192,8 @@ static const discrete_dac_r1_ladder polepos_52xx_dac =
 {
 	4,				/* number of DAC bits */
 	{ RES_K(100),	/* R160 */
-	  RES_K(47), 	/* R159 */
-	  RES_K(22), 	/* R155 */
+	  RES_K(47),	/* R159 */
+	  RES_K(22),	/* R155 */
 	  RES_K(10)},	/* R154 */
 	0, 0, 0, 0		/* nothing extra */
 };

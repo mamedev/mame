@@ -90,7 +90,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			break;
 
 		case 0xa: /* Mix Psel(?). */
- 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -98,7 +98,7 @@ static WRITE16_HANDLER( dec0_control_w )
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
 			dec0_i8751_reset();
- 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
 			break;
 
 		default:
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)								/* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
- 	AM_RANGE(0x242000, 0x24207f) AM_WRITEONLY AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x242000, 0x24207f) AM_WRITEONLY AM_BASE(&dec0_pf1_colscroll)
 	AM_RANGE(0x242400, 0x2427ff) AM_WRITEONLY AM_BASE(&dec0_pf1_rowscroll)
 	AM_RANGE(0x242800, 0x243fff) AM_RAM														/* Robocop only */
 	AM_RANGE(0x244000, 0x245fff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)									/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(dec0_paletteram_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE(dec0_paletteram_b_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(&dec0_ram) 									/* Main ram */
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(&dec0_ram)									/* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_GENERIC(spriteram)								/* Sprites */
 ADDRESS_MAP_END
 
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( slyspy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300c00, 0x300fff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x301000, 0x3017ff) AM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 
-	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE(&dec0_ram) 	/* Sly spy main ram */
+	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE(&dec0_ram)	/* Sly spy main ram */
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
@@ -371,9 +371,9 @@ static ADDRESS_MAP_START( automat_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w) 				// NEW
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(&dec0_ram) 				/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_GENERIC(spriteram) 			/* Sprites */
+	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)				// NEW
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(&dec0_ram)				/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_GENERIC(spriteram)			/* Sprites */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( automat_adpcm_w )

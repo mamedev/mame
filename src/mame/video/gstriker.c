@@ -254,7 +254,7 @@ static void MB60553_draw(running_machine *machine, int numchip, bitmap_t* screen
 //      int scrollx;
 //      int scrolly;
 
-	 	UINT32 startx,starty;
+		UINT32 startx,starty;
 
 		UINT32 incxx,incyy;
 

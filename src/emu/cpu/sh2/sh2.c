@@ -2057,8 +2057,8 @@ INLINE void op1000(UINT16 opcode)
 {
 	switch ( opcode  & (15<<8) )
 	{
-	case  0 << 8: MOVBS4(opcode & 0x0f, Rm); 	break;
-	case  1 << 8: MOVWS4(opcode & 0x0f, Rm); 	break;
+	case  0 << 8: MOVBS4(opcode & 0x0f, Rm);	break;
+	case  1 << 8: MOVWS4(opcode & 0x0f, Rm);	break;
 	case  2<< 8: NOP(); 				break;
 	case  3<< 8: NOP(); 				break;
 	case  4<< 8: MOVBL4(Rm, opcode & 0x0f); 	break;
@@ -2096,13 +2096,13 @@ INLINE void op1100(UINT16 opcode)
 {
 	switch (opcode & (15<<8))
 	{
-	case  0<<8: MOVBSG(opcode & 0xff); 		break;
-	case  1<<8: MOVWSG(opcode & 0xff); 		break;
-	case  2<<8: MOVLSG(opcode & 0xff); 		break;
+	case  0<<8: MOVBSG(opcode & 0xff);		break;
+	case  1<<8: MOVWSG(opcode & 0xff);		break;
+	case  2<<8: MOVLSG(opcode & 0xff);		break;
 	case  3<<8: TRAPA(opcode & 0xff);		break;
-	case  4<<8: MOVBLG(opcode & 0xff); 		break;
-	case  5<<8: MOVWLG(opcode & 0xff); 		break;
-	case  6<<8: MOVLLG(opcode & 0xff); 		break;
+	case  4<<8: MOVBLG(opcode & 0xff);		break;
+	case  5<<8: MOVWLG(opcode & 0xff);		break;
+	case  6<<8: MOVLLG(opcode & 0xff);		break;
 	case  7<<8: MOVA(opcode & 0xff);		break;
 	case  8<<8: TSTI(opcode & 0xff);		break;
 	case  9<<8: ANDI(opcode & 0xff);		break;
@@ -2280,12 +2280,12 @@ static CPU_SET_INFO( sh2 )
 
 		case CPUINFO_INT_REGISTER + SH2_PC:
 		case CPUINFO_INT_PC:							sh2->pc = info->i; sh2->delay = 0;		break;
-		case CPUINFO_INT_SP:							sh2->r[15] = info->i;    				break;
-		case CPUINFO_INT_REGISTER + SH2_PR:   			sh2->pr = info->i;	   					break;
+		case CPUINFO_INT_SP:							sh2->r[15] = info->i;   				break;
+		case CPUINFO_INT_REGISTER + SH2_PR: 			sh2->pr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH2_SR:				sh2->sr = info->i; CHECK_PENDING_IRQ("sh2_set_reg"); break;
 		case CPUINFO_INT_REGISTER + SH2_GBR:			sh2->gbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH2_VBR:			sh2->vbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH2_MACH: 			sh2->mach = info->i;						break;
+		case CPUINFO_INT_REGISTER + SH2_MACH:			sh2->mach = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH2_MACL:			sh2->macl = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH2_R0:				sh2->r[ 0] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_R1:				sh2->r[ 1] = info->i;					break;
@@ -2333,11 +2333,11 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:	info->i = sh2->irq_line_state[SH2_INT_VBLIN]; break;
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:	info->i = sh2->irq_line_state[SH2_INT_VBLOUT]; break;
@@ -2362,7 +2362,7 @@ CPU_GET_INFO( sh2 )
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SH2_PC:				info->i = (sh2->delay) ? (sh2->delay & AM) : (sh2->pc & AM); break;
-		case CPUINFO_INT_SP:   							info->i = sh2->r[15];					break;
+		case CPUINFO_INT_SP:							info->i = sh2->r[15];					break;
 		case CPUINFO_INT_REGISTER + SH2_PR:				info->i = sh2->pr;						break;
 		case CPUINFO_INT_REGISTER + SH2_SR:				info->i = sh2->sr;						break;
 		case CPUINFO_INT_REGISTER + SH2_GBR:			info->i = sh2->gbr;						break;

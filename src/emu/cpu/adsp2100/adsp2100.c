@@ -239,8 +239,8 @@ typedef struct
 	UINT16		imask;
 	UINT8		icntl;
 	UINT16		ifc;
-    UINT8    	irq_state[9];
-    UINT8    	irq_latch[9];
+    UINT8   	irq_state[9];
+    UINT8   	irq_latch[9];
     cpu_irq_callback irq_callback;
     const device_config *device;
 
@@ -1904,8 +1904,8 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 14;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = -2;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 14;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = -1;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 14;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = -1;							break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:
 		case CPUINFO_INT_INPUT_STATE + 1:
@@ -2156,8 +2156,8 @@ CPU_GET_INFO( adsp2181 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 9;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = -1;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 11;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = -1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2181);					break;

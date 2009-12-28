@@ -61,11 +61,11 @@ struct n_state
 	INT32 lowpass_polybit;
 };
 
-static struct c_state 		c24_state;
-static struct c_state 		c25_state;
-static struct n_state 		noise_state;
-static UINT8 				sound_latch_a;
-static sound_stream * 		channel;
+static struct c_state		c24_state;
+static struct c_state		c25_state;
+static struct n_state		noise_state;
+static UINT8				sound_latch_a;
+static sound_stream *		channel;
 static UINT32 *				poly18;
 
 INLINE int update_c24(int samplerate)
@@ -303,12 +303,12 @@ static const discrete_mixer_desc phoenix_mixer =
 
 /* Nodes - Inputs */
 #define PHOENIX_EFFECT_1_DATA		NODE_01
-#define PHOENIX_EFFECT_1_FREQ  		NODE_02
+#define PHOENIX_EFFECT_1_FREQ		NODE_02
 #define PHOENIX_EFFECT_1_FILT		NODE_03
 #define PHOENIX_EFFECT_2_DATA		NODE_04
 #define PHOENIX_EFFECT_2_FREQ		NODE_05
-#define PHOENIX_EFFECT_3_EN  		NODE_06
-#define PHOENIX_EFFECT_4_EN  		NODE_07
+#define PHOENIX_EFFECT_3_EN 		NODE_06
+#define PHOENIX_EFFECT_4_EN 		NODE_07
 /* Nodes - Sounds */
 #define PHOENIX_EFFECT_1_SND		NODE_10
 #define PHOENIX_EFFECT_2_SND		NODE_11

@@ -886,7 +886,7 @@ static WRITE32_HANDLER( atapi_w )
 			switch (data)
 			{
 				case 0xa0:	// PACKET
-		 			atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
+					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
 					atapi_data_ptr = 0;
@@ -900,7 +900,7 @@ static WRITE32_HANDLER( atapi_w )
 					break;
 
 				case 0xa1:	// IDENTIFY PACKET DEVICE
-		 			atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
+					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
 					atapi_data_ptr = 0;
 					atapi_data_len = 512;
@@ -947,7 +947,7 @@ static WRITE32_HANDLER( atapi_w )
 					break;
 
 				case 0xef:	// SET FEATURES
-		 			atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
@@ -1374,7 +1374,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE( atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
 	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE( control_r, control_w )	// Konami can't make a game without a "control" register.
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE( atapi_reset_w )
-	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP 				// watchdog?
+	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP				// watchdog?
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8("m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE( security_r, security_w )

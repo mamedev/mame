@@ -109,7 +109,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 	data = space->machine->generic.paletteram.u32[offset];
 
- 	r = (data >>  0) & 0xff;
+	r = (data >>  0) & 0xff;
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 

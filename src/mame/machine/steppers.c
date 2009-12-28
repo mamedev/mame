@@ -29,7 +29,7 @@ typedef struct _stepper
 	UINT8	 pattern,	/* coil pattern */
 		 old_pattern,	/* old coil pattern */
 				type;	/* reel type */
-	INT16 	step_pos,	/* step position 0 - max_steps */
+	INT16	step_pos,	/* step position 0 - max_steps */
 			max_steps;	/* maximum step position */
 
 	INT16 index_start,	/* start position of index (in half steps) */
@@ -612,8 +612,8 @@ void stepper_config(running_machine *machine, int which, const stepper_interface
 
 	step[which].type = intf->type;
 	step[which].index_start = intf->index_start;/* location of first index value in half steps */
-	step[which].index_end 	= intf->index_end; 	/* location of last index value in half steps */
-	step[which].index_patt 	= intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
+	step[which].index_end	= intf->index_end;	/* location of last index value in half steps */
+	step[which].index_patt	= intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
 	step[which].pattern     = 0;
 	step[which].old_pattern = 0;
 	step[which].step_pos    = 0;

@@ -322,7 +322,7 @@ static WRITE8_HANDLER( zoar_w )
 {
 	btime_state *state = (btime_state *)space->machine->driver_data;
 
-	if      (offset <= 0x07ff) 					   ;
+	if      (offset <= 0x07ff)					   ;
 	else if (offset >= 0x8000 && offset <= 0x87ff) ;
 	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(space, offset - 0x8800, data);
 	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(space, offset - 0x8c00, data);
@@ -1376,7 +1376,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
  */
 
 #define BTIME_R52	RES_K(1)	/* pcb: .912k = 1K || 11k */
-#define BTIME_R51	RES_K(5) 	/* pcb: .923k = 1k || 11k schematics 1k */
+#define BTIME_R51	RES_K(5)	/* pcb: .923k = 1k || 11k schematics 1k */
 #define BTIME_R50	RES_K(10)	/* pcb: 1.667k = 10k || 2k */
 
 static const discrete_op_amp_filt_info btime_opamp_desc =

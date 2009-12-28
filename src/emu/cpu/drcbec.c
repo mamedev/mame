@@ -217,7 +217,7 @@ struct _drcbe_state
 	const address_space *	space[ADDRESS_SPACES];	/* pointers to CPU's address space */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
-	drcuml_machine_state 	state;					/* state of the machine */
+	drcuml_machine_state	state;					/* state of the machine */
 	drchash_state *			hash;					/* hash table state */
 	drcmap_state *			map;					/* code map */
 	drclabel_list *			labels;                 /* label list */

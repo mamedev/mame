@@ -337,7 +337,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 			if ( DELTAT->now_addr != (DELTAT->end<<1) )
 			{
 				DELTAT->memory[DELTAT->now_addr>>1] = v;
-			 	DELTAT->now_addr+=2; /* two nibbles at a time */
+				DELTAT->now_addr+=2; /* two nibbles at a time */
 
 				/* reset BRDY bit in status register, which means we are processing the write */
 				if(DELTAT->status_reset_handler)

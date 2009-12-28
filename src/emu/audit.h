@@ -84,8 +84,8 @@ struct _audit_record
 	const char *	name;					/* name of item */
 	UINT32			explength;				/* expected length of item */
 	UINT32			length;					/* actual length of item */
-	const char * 	exphash;        		/* expected hash data */
-	char 			hash[HASH_BUF_SIZE];	/* actual hash information */
+	const char *	exphash;        		/* expected hash data */
+	char			hash[HASH_BUF_SIZE];	/* actual hash information */
 };
 
 

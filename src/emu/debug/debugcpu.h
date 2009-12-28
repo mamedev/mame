@@ -112,19 +112,19 @@ struct _cpu_debug_data
 	int						stopirq;					/* stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT */
 	int						stopexception;				/* stop exception number for DEBUG_FLAG_STOP_EXCEPTION */
 	attotime				endexectime;				/* ending time of the current execution */
-	debug_trace_info	 	trace;						/* trace info */
+	debug_trace_info		trace;						/* trace info */
 	debug_cpu_breakpoint *	bplist;						/* list of breakpoints */
 	debug_hotspot_entry *	hotspots;					/* hotspot list */
 	offs_t					pc_history[DEBUG_HISTORY_SIZE]; /* history of recent PCs */
 	UINT32					pc_history_index;			/* current history index */
 	int						hotspot_count;				/* number of hotspots */
 	int						hotspot_threshhold;			/* threshhold for the number of hits to print */
-	cpu_read_func			read; 						/* memory read routine */
+	cpu_read_func			read;						/* memory read routine */
 	cpu_write_func			write;						/* memory write routine */
 	cpu_readop_func			readop;						/* opcode read routine */
-	cpu_translate_func 		translate;					/* pointer to CPU's translate function */
+	cpu_translate_func		translate;					/* pointer to CPU's translate function */
 	cpu_disassemble_func	disassemble;				/* pointer to CPU's dissasemble function */
-	cpu_disassemble_func 	dasm_override;				/* pointer to provided override function */
+	cpu_disassemble_func	dasm_override;				/* pointer to provided override function */
 	debug_instruction_hook_func instrhook;				/* per-instruction callback hook */
 	debug_cpu_watchpoint *	wplist[ADDRESS_SPACES];		/* watchpoint lists for each address space */
 	debug_cpu_comment_group *comments;					/* disassembly comments */

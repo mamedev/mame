@@ -118,7 +118,7 @@ WRITE8_HANDLER( nbmj8991_blitter_w )
 		case 0x20:	blitter_desty = (blitter_desty & 0xff00) | data; break;
 		case 0x30:	nbmj8991_scrollx = (nbmj8991_scrollx & 0xff00) | data; break;
 		case 0x40:	nbmj8991_scrolly = (nbmj8991_scrolly & 0xff00) | data; break;
-		case 0x50: 	blitter_destx = (blitter_destx & 0x00ff) | ((data & 0x01) << 8);
+		case 0x50:	blitter_destx = (blitter_destx & 0x00ff) | ((data & 0x01) << 8);
 					blitter_desty = (blitter_desty & 0x00ff) | ((data & 0x02) << 7);
 					nbmj8991_scrollx = (nbmj8991_scrollx & 0x00ff) | ((data & 0x04) << 6);
 					nbmj8991_scrolly = (nbmj8991_scrolly & 0x00ff) | ((data & 0x08) << 5);

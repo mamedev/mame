@@ -55,8 +55,8 @@
 #define ADDW(dst, src)		{ unsigned res = (dst) + (src); SetCFW(res); SetOFW_Add(res, src, dst); SetSZPF_Word(res); dst = (UINT16)res; }
 #define ADDL(dst, src)		{ UINT64 res = (UINT64)(dst) + (UINT64)(src); SetCFL(res); SetOFL_Add(res, src, dst); SetSZPF_Long(res); dst = (UINT32)res; }
 
-#define SETREG8(a, b)  		(a) = ((a) & ~0xff) | ((b) & 0xff)
-#define SETREG16(a, b) 		(a) = ((a) & ~0xffff) | ((b) & 0xffff)
+#define SETREG8(a, b)		(a) = ((a) & ~0xff) | ((b) & 0xff)
+#define SETREG16(a, b)		(a) = ((a) & ~0xffff) | ((b) & 0xffff)
 
 typedef struct _v60_flags v60_flags;
 struct _v60_flags
@@ -72,42 +72,42 @@ typedef struct _v60_state v60_state;
 struct _v60_state
 {
 	struct cpu_info 	info;
-	UINT32 				reg[68];
+	UINT32				reg[68];
 	v60_flags			flags;
-	UINT8 				irq_line;
-	UINT8 				nmi_line;
-	cpu_irq_callback 	irq_cb;
+	UINT8				irq_line;
+	UINT8				nmi_line;
+	cpu_irq_callback	irq_cb;
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
-	UINT32 				PPC;
+	UINT32				PPC;
 	int					icount;
 	int					stall_io;
 
-	UINT32 				op1, op2;
-	UINT8 				flag1, flag2;
-	UINT8 				instflags;
+	UINT32				op1, op2;
+	UINT8				flag1, flag2;
+	UINT8				instflags;
 	UINT32				lenop1, lenop2;
 	UINT8				subop;
 	UINT32				bamoffset1, bamoffset2;
 
 	// Output variables for ReadAMAddress(cpustate)
-	UINT8 				amflag;
-	UINT32 				amout;
-	UINT32 				bamoffset;
+	UINT8				amflag;
+	UINT32				amout;
+	UINT32				bamoffset;
 
 	// Appo temp var
-	UINT32 				amlength1, amlength2;
+	UINT32				amlength1, amlength2;
 
 	// Global vars used by AM functions
-	UINT32 				modadd;
-	UINT8 				modm;
-	UINT8 				modval;
-	UINT8 				modval2;
-	UINT8 				modwritevalb;
-	UINT16 				modwritevalh;
-	UINT32 				modwritevalw;
-	UINT8 				moddim;
+	UINT32				modadd;
+	UINT8				modm;
+	UINT8				modval;
+	UINT8				modval2;
+	UINT8				modwritevalb;
+	UINT16				modwritevalh;
+	UINT32				modwritevalw;
+	UINT8				moddim;
 };
 
 INLINE v60_state *get_safe_token(const device_config *device)
@@ -130,12 +130,12 @@ INLINE v60_state *get_safe_token(const device_config *device)
 
 #define _CY 	flags.CY
 #define _OV 	flags.OV
-#define _S 		flags.S
-#define _Z 		flags.Z
+#define _S		flags.S
+#define _Z		flags.Z
 
 
 // Defines of all v60 register...
-#define R0 		reg[0]
+#define R0		reg[0]
 #define R1		reg[1]
 #define R2		reg[2]
 #define R3		reg[3]
@@ -164,9 +164,9 @@ INLINE v60_state *get_safe_token(const device_config *device)
 #define R26		reg[26]
 #define R27		reg[27]
 #define R28		reg[28]
-#define AP 		reg[29]
+#define AP		reg[29]
 #define FP		reg[30]
-#define SP 		reg[31]
+#define SP		reg[31]
 
 #define PC		reg[32]
 #define PSW		reg[33]
@@ -571,11 +571,11 @@ CPU_GET_INFO( v60 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 24;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 24;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_line;			break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_line;			break;
@@ -715,11 +715,11 @@ CPU_GET_INFO( v60 )
 		case CPUINFO_STR_REGISTER + V60_ATLR2:			sprintf(info->s, "ATLR2:%08X", cpustate->ATLR2);	break;
 		case CPUINFO_STR_REGISTER + V60_ATBR3:			sprintf(info->s, "ATBR3:%08X", cpustate->ATBR3);	break;
 		case CPUINFO_STR_REGISTER + V60_ATLR3:			sprintf(info->s, "ATLR3:%08X", cpustate->ATLR3);	break;
-		case CPUINFO_STR_REGISTER + V60_TRMODE:			sprintf(info->s, "TRMODE:%08X", cpustate->TRMODE); 	break;
+		case CPUINFO_STR_REGISTER + V60_TRMODE:			sprintf(info->s, "TRMODE:%08X", cpustate->TRMODE);	break;
 		case CPUINFO_STR_REGISTER + V60_ADTR0:			sprintf(info->s, "ADTR0:%08X", cpustate->ADTR0);	break;
 		case CPUINFO_STR_REGISTER + V60_ADTR1:			sprintf(info->s, "ADTR1:%08X", cpustate->ADTR1);	break;
-		case CPUINFO_STR_REGISTER + V60_ADTMR0:			sprintf(info->s, "ADTMR0:%08X", cpustate->ADTMR0); 	break;
-		case CPUINFO_STR_REGISTER + V60_ADTMR1:			sprintf(info->s, "ADTMR1:%08X", cpustate->ADTMR1); 	break;
+		case CPUINFO_STR_REGISTER + V60_ADTMR0:			sprintf(info->s, "ADTMR0:%08X", cpustate->ADTMR0);	break;
+		case CPUINFO_STR_REGISTER + V60_ADTMR1:			sprintf(info->s, "ADTMR1:%08X", cpustate->ADTMR1);	break;
 	}
 }
 

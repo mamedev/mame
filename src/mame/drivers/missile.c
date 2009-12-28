@@ -541,7 +541,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 	/* the 3rd bit of video RAM is scattered about various areas
         we take a 16-bit pixel address here and convert it into
         a video RAM address based on logic in the schematics */
-	return 	(( pixaddr & 0x0800) >> 1) |
+	return	(( pixaddr & 0x0800) >> 1) |
 			((~pixaddr & 0x0800) >> 2) |
 			(( pixaddr & 0x07f8) >> 2) |
 			(( pixaddr & 0x1000) >> 12);
@@ -746,9 +746,9 @@ static READ8_HANDLER( missile_r )
 		if (ctrld)	/* trackball */
 		{
 			if (!flipscreen)
-		  	    result = ((input_port_read(space->machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK0_X") & 0x0f);
+			    result = ((input_port_read(space->machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK0_X") & 0x0f);
 			else
-		  	    result = ((input_port_read(space->machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK1_X") & 0x0f);
+			    result = ((input_port_read(space->machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK1_X") & 0x0f);
 		}
 		else	/* buttons */
 			result = input_port_read(space->machine, "IN0");

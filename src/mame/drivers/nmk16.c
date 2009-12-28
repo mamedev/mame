@@ -175,18 +175,18 @@ static WRITE16_HANDLER( nmk16_mainram_strange_w )
 {
 	UINT16* dstram;
 
- 	dstram = nmk16_mainram;
+	dstram = nmk16_mainram;
 
 	if (!ACCESSING_BITS_8_15)
 	{
 		dstram[offset] = (data & 0x00ff) |  ((data & 0x00ff)<<8);
- 	}
+	}
 	else if (!ACCESSING_BITS_0_7)
 	{
 		dstram[offset] = (data & 0xff00) |  ((data & 0xff00)>>8);
 	}
 	else
-  	{
+	{
 		dstram[offset] = data;
 	}
 }
@@ -626,7 +626,7 @@ static WRITE16_HANDLER( hachamf_mainram_w )
 		case 0xe15e/2: PROT_JSR(0xe15e,0x803c,0xb59e);//b59e - OK
 					  PROT_JSR(0xe15e,0x8035,0x8d0c); break;
 		case 0xe16e/2: PROT_JSR(0xe16e,0x801d,0x9ac2);//9ac2 - OK
-				 	  PROT_JSR(0xe16e,0x8026,0x8c36); break;
+					  PROT_JSR(0xe16e,0x8026,0x8c36); break;
 		case 0xe17e/2: PROT_JSR(0xe17e,0x802e,0xc366);//c366 - OK
 					  PROT_JSR(0xe17e,0x8017,0x870a); break;
 		case 0xe18e/2: PROT_JSR(0xe18e,0x8004,0xd620);        //unused
@@ -703,7 +703,7 @@ static WRITE16_HANDLER( tdragon_mainram_w )
 		case 0xe75e/2: PROT_JSR(0xe75e,0x803c,0xbb4c);
 					  PROT_JSR(0xe75e,0x8035,0xa154); break;
 		case 0xe76e/2: PROT_JSR(0xe76e,0x801d,0xafa6);
-				 	  PROT_JSR(0xe76e,0x8026,0xa57a); break;
+					  PROT_JSR(0xe76e,0x8026,0xa57a); break;
 		case 0xe77e/2: PROT_JSR(0xe77e,0x802e,0xc6a4);
 					  PROT_JSR(0xe77e,0x8017,0x9e22); break;
 		case 0xe78e/2: PROT_JSR(0xe78e,0x8004,0xaa0a);
@@ -2489,7 +2489,7 @@ static INPUT_PORTS_START( gunnail )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:7") 	/* The manual states this dip is "Unused" */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:7")	/* The manual states this dip is "Unused" */
 	PORT_DIPSETTING(    0x02, DEF_STR( Japanese ) )						/* Will add "Distributed by TECMO" to the title screen */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:6,5")
@@ -3266,7 +3266,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( firehawk )
 	PORT_INCLUDE( afega_common )
 
-	PORT_START("DSW1") 	// $080004.w
+	PORT_START("DSW1")	// $080004.w
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:7,6,5")
 	PORT_DIPSETTING(      0x0006, DEF_STR( Very_Easy) )
@@ -3321,7 +3321,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( spec2k )
 	PORT_INCLUDE( afega_common )
 
-	PORT_START("DSW1") 	// $080004.w
+	PORT_START("DSW1")	// $080004.w
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -4715,10 +4715,10 @@ static WRITE16_HANDLER( twinactn_flipscreen_w )
 ***************************************************************************/
 static WRITE8_DEVICE_HANDLER( spec2k_oki1_banking_w )
 {
- 	if(data == 0xfe)
- 		okim6295_set_bank_base(device, 0);
- 	else if(data == 0xff)
- 		okim6295_set_bank_base(device, 0x40000);
+	if(data == 0xfe)
+		okim6295_set_bank_base(device, 0);
+	else if(data == 0xff)
+		okim6295_set_bank_base(device, 0x40000);
 }
 
 static ADDRESS_MAP_START( afega_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )

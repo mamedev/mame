@@ -367,12 +367,12 @@ static INPUT_PORTS_START( sfkick )
 
     PORT_START("DSW1") /* bitswapped at read! 76543210 -> 45673210 */
     PORT_DIPNAME(   0x82, 0x02, DEF_STR( Unknown ) )  /* unknown, code @ $98a8 */
- 	PORT_DIPSETTING(      0x00, "3" )
+	PORT_DIPSETTING(      0x00, "3" )
 	PORT_DIPSETTING(      0x02, "2" )
 	PORT_DIPSETTING(      0x80, "1" )
 	PORT_DIPSETTING(      0x82, "0" )
     PORT_DIPNAME(   0x0c, 0x08, DEF_STR( Difficulty ) ) /* not sure, code @ $9877 */
-   	PORT_DIPSETTING(      0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( Hard ) )

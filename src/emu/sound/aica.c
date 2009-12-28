@@ -135,7 +135,7 @@ struct _SLOT
 #define MVOL(aica)		((aica->udata.data[0]>>0x0)&0x000F)
 #define RBL(aica)		((aica->udata.data[2]>>0xD)&0x0003)
 #define RBP(aica)		((aica->udata.data[2]>>0x0)&0x0fff)
-#define MOFULL(aica)   		((aica->udata.data[4]>>0x0)&0x1000)
+#define MOFULL(aica)		((aica->udata.data[4]>>0x0)&0x1000)
 #define MOEMPTY(aica)		((aica->udata.data[4]>>0x0)&0x0800)
 #define MIOVF(aica)		((aica->udata.data[4]>>0x0)&0x0400)
 #define MIFULL(aica)		((aica->udata.data[4]>>0x0)&0x0200)
@@ -401,7 +401,7 @@ static int EG_Update(struct _SLOT *slot)
 			slot->EG.volume-=slot->EG.RR;
 			if(slot->EG.volume<=0)
 			{
- 				slot->EG.volume=0;
+				slot->EG.volume=0;
 				AICA_StopSlot(slot,0);
 //              slot->EG.volume=0x17f<<EG_SHIFT;
 //              slot->EG.state=ATTACK;
@@ -990,7 +990,7 @@ static void AICA_TimersAddTicks(aica_state *AICA, int ticks)
 {
 	if(AICA->TimCnt[0]<=0xff00)
 	{
- 		AICA->TimCnt[0] += ticks << (8-((AICA->udata.data[0x18/2]>>8)&0x7));
+		AICA->TimCnt[0] += ticks << (8-((AICA->udata.data[0x18/2]>>8)&0x7));
 		if (AICA->TimCnt[0] > 0xFF00)
 		{
 			AICA->TimCnt[0] = 0xFFFF;
@@ -1369,7 +1369,7 @@ DEVICE_GET_INFO( aica )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "AICA");					break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega/Yamaha custom");		break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0.1");			 		break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0.1");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}

@@ -152,7 +152,7 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define FLAGPOS_P		BIT_5		/* Direct Page Selector */
 #define FLAGPOS_B		BIT_4		/* Break                */
 #define FLAGPOS_H		BIT_3		/* Half-carry           */
-#define FLAGPOS_I 		BIT_2		/* Interrupt            */
+#define FLAGPOS_I		BIT_2		/* Interrupt            */
 #define FLAGPOS_Z		BIT_1		/* Zero                 */
 #define FLAGPOS_C		BIT_0		/* Carry                */
 
@@ -224,8 +224,8 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* Codition code tests */
 #define COND_CC()	(!(FLAG_C&0x100))	/* Carry Clear */
 #define COND_CS()	(FLAG_C&0x100)		/* Carry Set */
-#define COND_EQ()	(!FLAG_Z)      		/* Equal */
-#define COND_NE()	(FLAG_Z)       		/* Not Equal */
+#define COND_EQ()	(!FLAG_Z)   		/* Equal */
+#define COND_NE()	(FLAG_Z)    		/* Not Equal */
 #define COND_MI()	(FLAG_N&0x80)		/* Minus */
 #define COND_PL()	(!(FLAG_N&0x80))	/* Plus */
 #define COND_VC()	(!(FLAG_V&0x80))	/* Overflow Clear */
@@ -567,7 +567,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 	TMP1 = ((A) & 0x0f) + (CFLAG_AS_1());			\
 	FLAG_C  = (cpustate->spc_int16 > 0xff) ? CFLAG_SET : 0;		\
 	FLAG_V =  (~((A) ^ (B))) & (((A) ^ cpustate->spc_int16) & 0x80); \
-	FLAG_H = (((cpustate->spc_int16 & 0x0f) - TMP1) & 0x10) >> 1; 	\
+	FLAG_H = (((cpustate->spc_int16 & 0x0f) - TMP1) & 0x10) >> 1;	\
 	FLAG_NZ = (UINT8)cpustate->spc_int16
 
 
@@ -778,7 +778,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			if (((SRC & 0x0f) > 9) || (FLAG_H & HFLAG_SET))	\
 			{				\
 				REG_A += 6;		\
-				if (REG_A < 6) 		\
+				if (REG_A < 6)		\
 				{			\
 					FLAG_C = CFLAG_SET;	\
 				}			\
@@ -798,7 +798,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			{				\
 				REG_A -= 6;		\
 			}				\
-			if (!(FLAG_C & CFLAG_SET) || (SRC > 0x99)) 	\
+			if (!(FLAG_C & CFLAG_SET) || (SRC > 0x99))	\
 			{				\
 				REG_A -= 0x60;		\
 				FLAG_C = 0;		\
@@ -1655,11 +1655,11 @@ CPU_GET_INFO( spc700 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;				break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (LINE_IRQ == IRQ_SET) ? ASSERT_LINE : CLEAR_LINE; break;
 
@@ -1668,9 +1668,9 @@ CPU_GET_INFO( spc700 )
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SPC700_PC:				info->i = REG_PC;			break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + SPC700_S:	      			info->i = REG_S + STACK_PAGE;		break;
-		case CPUINFO_INT_REGISTER + SPC700_P:	     			info->i = GET_REG_P();			break;
-		case CPUINFO_INT_REGISTER + SPC700_A:	       			info->i = REG_A;			break;
+		case CPUINFO_INT_REGISTER + SPC700_S:	    			info->i = REG_S + STACK_PAGE;		break;
+		case CPUINFO_INT_REGISTER + SPC700_P:	    			info->i = GET_REG_P();			break;
+		case CPUINFO_INT_REGISTER + SPC700_A:	    			info->i = REG_A;			break;
 		case CPUINFO_INT_REGISTER + SPC700_X:				info->i = REG_X;			break;
 		case CPUINFO_INT_REGISTER + SPC700_Y:				info->i = REG_Y;			break;
 

@@ -624,7 +624,7 @@ static CPU_GET_INFO( mips3 )
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3com_get_info(mips3, state, info); 			break;
+		default:										mips3com_get_info(mips3, state, info);			break;
 	}
 }
 
@@ -1213,7 +1213,7 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	UML_LABEL(block, skip);														// <skip>:
 
 	/* adjust cycles */
-	UML_SUB(block, MEM(&mips3->icount), MEM(&mips3->icount), IREG(1));			 	// sub icount,icount,cycles,S
+	UML_SUB(block, MEM(&mips3->icount), MEM(&mips3->icount), IREG(1));				// sub icount,icount,cycles,S
 	UML_EXHc(block, IF_S, mips3->impstate->out_of_cycles, IREG(0));					// exh     out_of_cycles,i0
 
 	UML_HASHJMP(block, MEM(&mips3->impstate->mode), IREG(0), mips3->impstate->nocode);// hashjmp <mode>,i0,nocode

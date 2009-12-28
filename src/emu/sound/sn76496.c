@@ -451,7 +451,7 @@ DEVICE_GET_INFO( sn76496 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sn76496_state); 				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sn76496_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76496 );		break;
@@ -473,7 +473,7 @@ DEVICE_GET_INFO( sn76489 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76489 );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76489");						break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -483,7 +483,7 @@ DEVICE_GET_INFO( sn76489a )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76489a );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76489A");					break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -493,7 +493,7 @@ DEVICE_GET_INFO( sn76494 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76494 );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76494");						break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -503,7 +503,7 @@ DEVICE_GET_INFO( sn94624 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn94624 );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SN94624");						break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -513,7 +513,7 @@ DEVICE_GET_INFO( ncr7496 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ncr7496 );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "NCR7496");						break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -523,7 +523,7 @@ DEVICE_GET_INFO( gamegear )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( gamegear );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Game Gear PSG");				break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -533,6 +533,6 @@ DEVICE_GET_INFO( smsiii )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( smsiii );			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SMSIII PSG");					break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }

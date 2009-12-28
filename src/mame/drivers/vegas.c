@@ -336,7 +336,7 @@
 #define NREG_BOOTCS			(0x078/4)
 #define NREG_CPUSTAT		(0x080/4)
 #define NREG_INTCTRL		(0x088/4)
-#define NREG_INTSTAT0  		(0x090/4)
+#define NREG_INTSTAT0		(0x090/4)
 #define NREG_INTSTAT1		(0x098/4)
 #define NREG_INTCLR			(0x0A0/4)
 #define NREG_INTPPES		(0x0A8/4)

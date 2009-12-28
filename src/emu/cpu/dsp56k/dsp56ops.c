@@ -2223,9 +2223,9 @@ static size_t dsp56k_op_asl4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
            not the same. */
 	/* C - Set if bit 36 of source operand is set. Cleared otherwise. */
 	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
-	if (*((UINT64*)D.addr) == 0) 					  Z_SET(); else Z_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
 	if ( (*((UINT64*)D.addr) & U64(0x000000ff00000000)) != (p_accum & U64(0x000000ff00000000)) ) V_SET(); else V_CLEAR();
-	if (p_accum & U64(0x0000001000000000)) 			  C_SET(); else C_CLEAR();
+	if (p_accum & U64(0x0000001000000000))			  C_SET(); else C_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -2254,7 +2254,7 @@ static size_t dsp56k_op_asr4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	/* TODO: E, U  */
 	/* C - Set if bit 3 of source operand is set. Cleared otherwise. */
 	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
-	if (*((UINT64*)D.addr) == 0) 					  Z_SET(); else Z_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
 	V_CLEAR();
 	if (p_accum & U64(0x0000000000000008))			  C_SET(); else C_CLEAR();
 
@@ -2350,7 +2350,7 @@ static size_t dsp56k_op_bfop(dsp56k_core* cpustate, const UINT16 op, const UINT1
 			if ((iVal & previousValue) == 0x0000) C_SET(); else C_CLEAR(); break;
 	}
 
-	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
+	cycles += 4;	/* TODO: + mvb oscillator clock cycles */
 	return 2;
 }
 
@@ -2416,7 +2416,7 @@ static size_t dsp56k_op_bfop_1(dsp56k_core* cpustate, const UINT16 op, const UIN
 			if ((iVal & previousValue) == 0x0000) C_SET(); else C_CLEAR(); break;
 	}
 
-	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
+	cycles += 4;	/* TODO: + mvb oscillator clock cycles */
 	return 2;
 }
 
@@ -2486,7 +2486,7 @@ static size_t dsp56k_op_bfop_2(dsp56k_core* cpustate, const UINT16 op, const UIN
 			if ((iVal & previousValue) == 0x0000) C_SET(); else C_CLEAR(); break;
 	}
 
-	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
+	cycles += 4;	/* TODO: + mvb oscillator clock cycles */
 	return 2;
 }
 

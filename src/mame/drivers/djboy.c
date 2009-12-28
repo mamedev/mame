@@ -840,7 +840,7 @@ static INTERRUPT_GEN( djboy_interrupt )
 static const kaneko_pandora_interface djboy_pandora_config =
 {
 	"screen",	/* screen tag */
-	0, 	/* gfx_region */
+	0,	/* gfx_region */
 	0, 0	/* x_offs, y_offs */
 };
 

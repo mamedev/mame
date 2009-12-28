@@ -95,9 +95,9 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, rozvideoram)
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) 							 /* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) 							 /* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) 							 /* mirror */
+	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
+	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
+	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, spr1cgram, spr1cgram_size)				// SPR-1 CG RAM
 	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, spr2cgram, spr2cgram_size)				// SPR-2 CG RAM
 	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_BASE_MEMBER(f1gp_state, spr1vram)								// SPR-1 VRAM

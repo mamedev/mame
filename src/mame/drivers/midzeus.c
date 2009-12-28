@@ -42,10 +42,10 @@ The Grid         v1.2   10/18/2000
 #define BEAM_DX			3
 #define BEAM_XOFFS		40		/* table in the code indicates an offset of 20 with a beam height of 7 */
 
-static UINT32 			gun_control;
-static UINT8 			gun_irq_state;
+static UINT32			gun_control;
+static UINT8			gun_irq_state;
 static emu_timer *		gun_timer[2];
-static INT32 			gun_x[2], gun_y[2];
+static INT32			gun_x[2], gun_y[2];
 
 static UINT8			crusnexo_leds_select;
 static UINT8			keypad_select;
@@ -686,21 +686,21 @@ static INPUT_PORTS_START( mk4 )
 	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0100, 0x0100, "Fatalities" )
+	PORT_DIPNAME( 0x0100, 0x0100, "Fatalities" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0200, 0x0200, "Blood" )
+	PORT_DIPNAME( 0x0200, 0x0200, "Blood" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) /* Manual states that switches 3-7 are Unused */
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) /* Manual states that switches 3-7 are Unused */
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
- 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
- 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -860,58 +860,58 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crusnexo )
 	PORT_START("DIPS")		/* DS1 */
- 	PORT_DIPNAME( 0x001f, 0x001f, "Country Code" )
- 	PORT_DIPSETTING(      0x001f, DEF_STR( USA ) )
- 	PORT_DIPSETTING(      0x001e, "Germany" )
- 	PORT_DIPSETTING(      0x001d, "France" )
- 	PORT_DIPSETTING(      0x001c, "Canada" )
- 	PORT_DIPSETTING(      0x001b, "Switzerland" )
- 	PORT_DIPSETTING(      0x001a, "Italy" )
- 	PORT_DIPSETTING(      0x0019, "UK" )
- 	PORT_DIPSETTING(      0x0018, "Spain" )
- 	PORT_DIPSETTING(      0x0017, "Austrilia" )
- 	PORT_DIPSETTING(      0x0016, DEF_STR( Japan ) )
- 	PORT_DIPSETTING(      0x0015, "Taiwan" )
- 	PORT_DIPSETTING(      0x0014, "Austria" )
- 	PORT_DIPSETTING(      0x0013, "Belgium" )
- 	PORT_DIPSETTING(      0x000f, "Sweden" )
- 	PORT_DIPSETTING(      0x000e, "Findland" )
+	PORT_DIPNAME( 0x001f, 0x001f, "Country Code" )
+	PORT_DIPSETTING(      0x001f, DEF_STR( USA ) )
+	PORT_DIPSETTING(      0x001e, "Germany" )
+	PORT_DIPSETTING(      0x001d, "France" )
+	PORT_DIPSETTING(      0x001c, "Canada" )
+	PORT_DIPSETTING(      0x001b, "Switzerland" )
+	PORT_DIPSETTING(      0x001a, "Italy" )
+	PORT_DIPSETTING(      0x0019, "UK" )
+	PORT_DIPSETTING(      0x0018, "Spain" )
+	PORT_DIPSETTING(      0x0017, "Austrilia" )
+	PORT_DIPSETTING(      0x0016, DEF_STR( Japan ) )
+	PORT_DIPSETTING(      0x0015, "Taiwan" )
+	PORT_DIPSETTING(      0x0014, "Austria" )
+	PORT_DIPSETTING(      0x0013, "Belgium" )
+	PORT_DIPSETTING(      0x000f, "Sweden" )
+	PORT_DIPSETTING(      0x000e, "Findland" )
 	PORT_DIPSETTING(      0x000d, "Netherlands" )
- 	PORT_DIPSETTING(      0x000c, "Norway" )
- 	PORT_DIPSETTING(      0x000b, "Denmark" )
- 	PORT_DIPSETTING(      0x000a, "Hungary" )
- 	PORT_DIPSETTING(      0x0008, "General" )
- 	PORT_DIPNAME( 0x0060, 0x0060, "Coin Mode" )
- 	PORT_DIPSETTING(      0x0060, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
- 	PORT_DIPSETTING(      0x0040, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
- 	PORT_DIPSETTING(      0x0020, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
- 	PORT_DIPSETTING(      0x0000, "Mode 4" ) /* USA8/GER1/FRA1/SPN1/AUSTRIA1/GEN7 */
+	PORT_DIPSETTING(      0x000c, "Norway" )
+	PORT_DIPSETTING(      0x000b, "Denmark" )
+	PORT_DIPSETTING(      0x000a, "Hungary" )
+	PORT_DIPSETTING(      0x0008, "General" )
+	PORT_DIPNAME( 0x0060, 0x0060, "Coin Mode" )
+	PORT_DIPSETTING(      0x0060, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
+	PORT_DIPSETTING(      0x0040, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
+	PORT_DIPSETTING(      0x0020, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
+	PORT_DIPSETTING(      0x0000, "Mode 4" ) /* USA8/GER1/FRA1/SPN1/AUSTRIA1/GEN7 */
 	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0100, 0x0100, "Game Type" )	/* Manual states "*DIP 1, Switch 1 MUST be set */
- 	PORT_DIPSETTING(      0x0100, "Dedicated" )	/*   to OFF position for proper operation" */
- 	PORT_DIPSETTING(      0x0000, "Kit" )
- 	PORT_DIPNAME( 0x0200, 0x0200, "Seat Motion" )	/* For dedicated Sit Down models with Motion Seat */
-  	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )
- 	PORT_DIPSETTING(      0x0400, "Stand Up" )
- 	PORT_DIPSETTING(      0x0000, "Sit Down" )
- 	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
-  	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" )	/* Manual lists this dip as Unused */
- 	PORT_DIPSETTING(      0x1000, "32M ROM Normal" )
-  	PORT_DIPSETTING(      0x0000, "16M ROM Split Active" )
- 	PORT_DIPNAME( 0x2000, 0x2000, "Link" )
- 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0xc000, 0xc000, "Linking I.D.")
- 	PORT_DIPSETTING(      0xc000, "Master #1" )
- 	PORT_DIPSETTING(      0x8000, "Slave #2" )
- 	PORT_DIPSETTING(      0x4000, "Slave #3" )
- 	PORT_DIPSETTING(      0x0000, "Slave #4" )
+	PORT_DIPNAME( 0x0100, 0x0100, "Game Type" )	/* Manual states "*DIP 1, Switch 1 MUST be set */
+	PORT_DIPSETTING(      0x0100, "Dedicated" )	/*   to OFF position for proper operation" */
+	PORT_DIPSETTING(      0x0000, "Kit" )
+	PORT_DIPNAME( 0x0200, 0x0200, "Seat Motion" )	/* For dedicated Sit Down models with Motion Seat */
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(      0x0400, "Stand Up" )
+	PORT_DIPSETTING(      0x0000, "Sit Down" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" )	/* Manual lists this dip as Unused */
+	PORT_DIPSETTING(      0x1000, "32M ROM Normal" )
+	PORT_DIPSETTING(      0x0000, "16M ROM Split Active" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Link" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc000, 0xc000, "Linking I.D.")
+	PORT_DIPSETTING(      0xc000, "Master #1" )
+	PORT_DIPSETTING(      0x8000, "Slave #2" )
+	PORT_DIPSETTING(      0x4000, "Slave #3" )
+	PORT_DIPSETTING(      0x0000, "Slave #4" )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -940,9 +940,9 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3")		/* View 3 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 4")		/* View 4 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1st Gear")	/* Gear 1 */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2nd Gear") 	/* Gear 2 */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("3rd Gear") 	/* Gear 3 */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("4th Gear") 	/* Gear 4 */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2nd Gear")	/* Gear 2 */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("3rd Gear")	/* Gear 3 */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("4th Gear")	/* Gear 4 */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )							/* Not Used */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )							/* Not Used */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )							/* Not Used */
@@ -982,21 +982,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( thegrid )
 	PORT_START("DIPS")		/* DS1 */
- 	PORT_DIPNAME( 0x0001, 0x0001, "Show Blood" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Show Blood" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) /* Manual states that switches 2-7 are Unused */
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) /* Manual states that switches 2-7 are Unused */
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
- 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
- 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
- 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1347,7 +1347,7 @@ ROM_START( thegrid ) /* Version 1.2 Program roms */
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
- 	ROM_LOAD32_WORD( "thegrid-12.u10", 0x0000000, 0x100000, CRC(eb6c2d54) SHA1(ddd32757a9be011988b7add3c091e93292a0867c) )
+	ROM_LOAD32_WORD( "thegrid-12.u10", 0x0000000, 0x100000, CRC(eb6c2d54) SHA1(ddd32757a9be011988b7add3c091e93292a0867c) )
 	ROM_LOAD32_WORD( "thegrid-12.u11", 0x0000002, 0x100000, CRC(b9b5f92b) SHA1(36e16f109af9a5172869344f09b337b67e0b3e11) )
 	ROM_LOAD32_WORD( "thegrid-12.u12", 0x0200000, 0x100000, CRC(2810c207) SHA1(d244eaf85473ed49442a906d437af1a9f91a2f9d) )
 	ROM_LOAD32_WORD( "thegrid-12.u13", 0x0200002, 0x100000, CRC(8b721848) SHA1(d82f39045437ada2061587176e24f558a5e203fe) )
@@ -1369,7 +1369,7 @@ ROM_START( thegrida ) /* Version 1.1 Program roms */
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
- 	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
+	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
 	ROM_LOAD32_WORD( "thegrid-11.u11", 0x0000002, 0x100000, CRC(73d84b1a) SHA1(8dcfcab5ff64f46f8486e6439a10d91ad26fd48a) )
 	ROM_LOAD32_WORD( "thegrid-11.u12", 0x0200000, 0x100000, CRC(78d16ca1) SHA1(7b893ec8af2f44d8bc293861fd8622d68d41ccbe) )
 	ROM_LOAD32_WORD( "thegrid-11.u13", 0x0200002, 0x100000, CRC(8e00b400) SHA1(96581c5da62afc19e6d69b2352b3166665cb9918) )

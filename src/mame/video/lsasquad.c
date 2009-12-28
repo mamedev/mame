@@ -82,9 +82,9 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 		scrolly = -lsasquad_scrollram[offs+0];
 		scrollx =  lsasquad_scrollram[offs+3];
 
-	 	//check for global x scroll used in bg layer in game (starts at offset 0 in scrollram
-	 	// and game name/logo on title screen (starts in the middle of scrollram, but with different
-	 	// (NOT unique )id than prev coulmn(s)
+		//check for global x scroll used in bg layer in game (starts at offset 0 in scrollram
+		// and game name/logo on title screen (starts in the middle of scrollram, but with different
+		// (NOT unique )id than prev coulmn(s)
 
 		if( *previd!=1 )
 		{

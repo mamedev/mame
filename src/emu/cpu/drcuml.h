@@ -327,7 +327,7 @@ typedef struct _drcuml_codehandle drcuml_codehandle;
 typedef struct _drcuml_parameter drcuml_parameter;
 struct _drcuml_parameter
 {
-	drcuml_ptype 		type;				/* parameter type */
+	drcuml_ptype		type;				/* parameter type */
 	drcuml_pvalue		value;				/* parameter value */
 };
 
@@ -341,7 +341,7 @@ struct _drcuml_instruction
 	UINT8				flags;				/* flags */
 	UINT8				size;				/* operation size */
 	UINT8				numparams;			/* number of parameters */
-	drcuml_parameter 	param[4];			/* up to 4 parameters */
+	drcuml_parameter	param[4];			/* up to 4 parameters */
 };
 
 

@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( blmbycar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
 	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE_MEMBER(blmbycar_state, vram_1)	// Layer 1
 	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE_MEMBER(blmbycar_state, vram_0)	// Layer 0
-	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY 												// ???
+	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY												// ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_1)				// Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_0)				// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
@@ -139,10 +139,10 @@ static READ16_HANDLER( waterball_unk_r )
 static ADDRESS_MAP_START( watrball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
-	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY 												// ???
+	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
 	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE_MEMBER(blmbycar_state, vram_1)	// Layer 1
 	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE_MEMBER(blmbycar_state, vram_0)	// Layer 0
-	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY 												// ???
+	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY												// ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_1)					// Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_0)					// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( watrball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700006, 0x700007) AM_READNOP													// read
 	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r)   								// 0x0008 must toggle
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY 												// ?? busy
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY												// ?? busy
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w)								// Sound
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	//
 ADDRESS_MAP_END

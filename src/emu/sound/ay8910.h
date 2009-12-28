@@ -67,7 +67,7 @@ typedef struct _ay8910_interface ay8910_interface;
 struct _ay8910_interface
 {
 	int					flags;			/* Flags */
-	int					res_load[3]; 	/* Load on channel in ohms */
+	int					res_load[3];	/* Load on channel in ohms */
 	devcb_read8			portAread;
 	devcb_read8			portBread;
 	devcb_write8		portAwrite;

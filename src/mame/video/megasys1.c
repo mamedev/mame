@@ -261,12 +261,12 @@ VIDEO_START( megasys1 )
 
 	megasys1_active_layers = megasys1_sprite_bank = megasys1_screen_flag = megasys1_sprite_flag = 0;
 
- 	for (i = 0; i < 3; i ++)
+	for (i = 0; i < 3; i ++)
 	{
 		megasys1_scroll_flag[i] = megasys1_scrollx[i] = megasys1_scrolly[i] = 0;
 	}
 
- 	megasys1_bits_per_color_code = 4;
+	megasys1_bits_per_color_code = 4;
 
 /*
     The tile code of a specific layer is multiplied for a constant
@@ -817,7 +817,7 @@ PALETTE_INIT( megasys1 )
 					{
 						if (opacity & top_mask)
 						{
-							if (layer != top )	result |= 1; 	// error: opaque pens aren't always opaque!
+							if (layer != top )	result |= 1;	// error: opaque pens aren't always opaque!
 						}
 						else
 						{

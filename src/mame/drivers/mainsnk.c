@@ -400,8 +400,8 @@ static MACHINE_DRIVER_START( mainsnk )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,4000000)
- 	MDRV_CPU_PROGRAM_MAP(sound_map)
- 	MDRV_CPU_IO_MAP(sound_portmap)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 244)
 
 	/* video hardware */

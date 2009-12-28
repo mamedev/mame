@@ -343,12 +343,12 @@ static WRITE16_HANDLER( gain_control_w )
 		if (offset == 0)
 		{
 			mb87078_data_w(mb87078, data >> 8, 0);
-      	      //logerror("MB87078 dsel=0 data=%4x\n", data);
+    	      //logerror("MB87078 dsel=0 data=%4x\n", data);
 		}
 		else
 		{
 			mb87078_data_w(mb87078, data >> 8, 1);
- 	           //logerror("MB87078 dsel=1 data=%4x\n", data);
+	           //logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
 }
@@ -367,7 +367,7 @@ static const eeprom_interface taitob_eeprom_intf =
 	"0101",			/* write command */
 	"0111",			/* erase command */
 	"0100000000",	/*  lock command */
-	"0100110000" 	/* unlock command*/
+	"0100110000"	/* unlock command*/
 };
 
 static UINT16 eep_latch = 0;
@@ -1999,7 +1999,7 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 1")//PHOTO 1 (punching pad photosensor 1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 2")//PHOTO 2 (punching pad photosensor 2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 3")//PHOTO 3 (punching pad photosensor 3)
- 	/*To simulate a punch:
+	/*To simulate a punch:
         - wait for "READY GO!" message,
         - press button1 + button 2 (LCTRL + ALT) (you'll hear a "punching" sound),
         - THEN  press button 3 (SPACE)

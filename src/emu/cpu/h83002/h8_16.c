@@ -388,8 +388,8 @@ static CPU_SET_INFO( h8 )
 	h83xx_state *h8 = get_safe_token(device);
 
 	switch(state) {
-	case CPUINFO_INT_PC:						h8->pc = info->i; 								break;
-	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i; 								break;
+	case CPUINFO_INT_PC:						h8->pc = info->i;								break;
+	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i;								break;
 	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;

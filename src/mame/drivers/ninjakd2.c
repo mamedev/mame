@@ -1063,7 +1063,7 @@ ROM_START( ninjakd2a )
 
 	ROM_REGION( 2*0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )	// decrypted opcodes
-	ROM_CONTINUE(             0x00000, 0x8000 )                                                              	// decrypted data
+	ROM_CONTINUE(             0x00000, 0x8000 )                                                             	// decrypted data
 
 	ROM_REGION( 0x08000, "gfx1", 0 )	// fg tiles (need lineswapping)
 	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
@@ -1090,7 +1090,7 @@ ROM_START( ninjakd2b )
 
 	ROM_REGION( 2*0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )	// 6.3g  decrypted opcodes
-	ROM_CONTINUE(             0x00000, 0x8000 )                                                              	// decrypted data
+	ROM_CONTINUE(             0x00000, 0x8000 )                                                             	// decrypted data
 
 	ROM_REGION( 0x08000, "gfx1", 0 )	// fg tiles (need lineswapping)
 	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )	// 12.5m
@@ -1189,7 +1189,7 @@ ROM_END
 ROM_START( robokid )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "robokid1.18j", 0x00000, 0x08000, CRC(378c21fc) SHA1(58163bd6fbfa8385b1bd648cfde3d75bf81ac07d) )
-	ROM_CONTINUE(             0x10000, 0x08000 )                                                              	// banked at 8000-bfff
+	ROM_CONTINUE(             0x10000, 0x08000 )                                                            	// banked at 8000-bfff
 	ROM_LOAD( "robokid2.18k", 0x18000, 0x10000, CRC(ddef8c5a) SHA1(a1dd2f51205863c3d5d3527991d538ca8adf7587) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
@@ -1237,7 +1237,7 @@ ROM_END
 ROM_START( robokidj )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "1.29",         0x00000, 0x08000, CRC(59a1e2ec) SHA1(71f9d28dd8d2cf77a27fab163ce9562e3e75a540) )
-	ROM_CONTINUE(             0x10000, 0x08000 )                                                              	// banked at 8000-bfff
+	ROM_CONTINUE(             0x10000, 0x08000 )                                                            	// banked at 8000-bfff
 	ROM_LOAD( "2.30",         0x18000, 0x10000, CRC(e3f73476) SHA1(bd1c8946d637df21432bd52ae9324255251570b9) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
@@ -1285,7 +1285,7 @@ ROM_END
 ROM_START( robokidj2 )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "1_rom29.18j",  0x00000, 0x08000, CRC(969fb951) SHA1(aa32f0cb33ba2ccbb933dab5444a7e0dbbb84b3d) )
-	ROM_CONTINUE(             0x10000, 0x08000 )                                                              	// banked at 8000-bfff
+	ROM_CONTINUE(             0x10000, 0x08000 )                                                            	// banked at 8000-bfff
 	ROM_LOAD( "2_rom30.18k",  0x18000, 0x10000, CRC(c0228b63) SHA1(8f7e3a29a35723abc8b10bf511fc8611e31a2961) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
@@ -1333,7 +1333,7 @@ ROM_END
 ROM_START( omegaf )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "1.5",          0x00000, 0x08000, CRC(57a7fd96) SHA1(65ca290b48f8579fcce00db5b3b3f8694667a136) )
-	ROM_CONTINUE(             0x10000, 0x18000 )                                                              	// banked at 8000-bfff
+	ROM_CONTINUE(             0x10000, 0x18000 )                                                            	// banked at 8000-bfff
 	ROM_LOAD( "6.4l",         0x28000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -1358,7 +1358,7 @@ ROM_END
 ROM_START( omegafs )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "5.3l",         0x00000, 0x08000, CRC(503a3e63) SHA1(73420aecb653cd4fd3b6afe67d6f5726f01411dd) )
-	ROM_CONTINUE(             0x10000, 0x18000 )                                                              	// banked at 8000-bfff
+	ROM_CONTINUE(             0x10000, 0x18000 )                                                            	// banked at 8000-bfff
 	ROM_LOAD( "6.4l",         0x28000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )

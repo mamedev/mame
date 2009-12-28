@@ -26,7 +26,7 @@ OP(cb,12) { cpustate->_D = RL(cpustate, cpustate->_D);											} /* RL   D    
 OP(cb,13) { cpustate->_E = RL(cpustate, cpustate->_E);											} /* RL   E           */
 OP(cb,14) { cpustate->_H = RL(cpustate, cpustate->_H);											} /* RL   H           */
 OP(cb,15) { cpustate->_L = RL(cpustate, cpustate->_L);											} /* RL   L           */
-OP(cb,16) { WM(cpustate,  cpustate->_HL, RL(cpustate, RM(cpustate, cpustate->_HL)) ); 								} /* RL   (HL)        */
+OP(cb,16) { WM(cpustate,  cpustate->_HL, RL(cpustate, RM(cpustate, cpustate->_HL)) );								} /* RL   (HL)        */
 OP(cb,17) { cpustate->_A = RL(cpustate, cpustate->_A);											} /* RL   A           */
 
 OP(cb,18) { cpustate->_B = RR(cpustate, cpustate->_B);											} /* RR   B           */
@@ -35,7 +35,7 @@ OP(cb,1a) { cpustate->_D = RR(cpustate, cpustate->_D);											} /* RR   D    
 OP(cb,1b) { cpustate->_E = RR(cpustate, cpustate->_E);											} /* RR   E           */
 OP(cb,1c) { cpustate->_H = RR(cpustate, cpustate->_H);											} /* RR   H           */
 OP(cb,1d) { cpustate->_L = RR(cpustate, cpustate->_L);											} /* RR   L           */
-OP(cb,1e) { WM(cpustate,  cpustate->_HL, RR(cpustate, RM(cpustate, cpustate->_HL)) ); 								} /* RR   (HL)        */
+OP(cb,1e) { WM(cpustate,  cpustate->_HL, RR(cpustate, RM(cpustate, cpustate->_HL)) );								} /* RR   (HL)        */
 OP(cb,1f) { cpustate->_A = RR(cpustate, cpustate->_A);											} /* RR   A           */
 
 OP(cb,20) { cpustate->_B = SLA(cpustate, cpustate->_B);											} /* SLA  B           */

@@ -291,7 +291,7 @@ void saa5050_update( const device_config *device, bitmap_t *bitmap, const rectan
 				}
 
 				if (saa5050->flags & SAA5050_HOLDGR)
-	  				code = saa5050->prvchr;
+					code = saa5050->prvchr;
 				else
 					code = 32;
 			}

@@ -44,7 +44,7 @@ enum
 static UINT16	midtunit_control;
 
 /* videoram-related variables */
-static UINT32 	gfxbank_offset[2];
+static UINT32	gfxbank_offset[2];
 static UINT16 *	local_videoram;
 static UINT8	videobank_select;
 
@@ -53,8 +53,8 @@ static UINT16	dma_register[18];
 static struct
 {
 	UINT32		offset;			/* source offset, in bits */
-	INT32 		rowbits;		/* source bits to skip each row */
-	INT32 		xpos;			/* x position, clipped */
+	INT32		rowbits;		/* source bits to skip each row */
+	INT32		xpos;			/* x position, clipped */
 	INT32		ypos;			/* y position, clipped */
 	INT32		width;			/* horizontal pixel count */
 	INT32		height;			/* vertical pixel count */
@@ -456,9 +456,9 @@ typedef void (*dma_draw_func)(void);
 			}																	\
 																				\
 			/* update pointers */												\
-			if (xflip) 															\
+			if (xflip)															\
 				sx = (sx - 1) & XPOSMASK;										\
-			else 																\
+			else																\
 				sx = (sx + 1) & XPOSMASK;										\
 																				\
 			/* advance to the next pixel */										\
@@ -558,15 +558,15 @@ DMA_DRAW_FUNC(prefix##_p0c1_xf, bpp, extract, XFLIP_YES, skip, scale, PIXEL_COPY
 static const dma_draw_func prefix[32] =																			\
 {																											\
 /*  B0:N / B1:N         B0:Y / B1:N         B0:N / B1:Y         B0:Y / B1:Y */								\
-	dma_draw_none,		prefix##_p0,		prefix##_p1,		prefix##_p0p1,		/* no color */ 			\
-	prefix##_c0,		prefix##_c0,		prefix##_c0p1,		prefix##_c0p1,		/* color 0 pixels */ 	\
+	dma_draw_none,		prefix##_p0,		prefix##_p1,		prefix##_p0p1,		/* no color */			\
+	prefix##_c0,		prefix##_c0,		prefix##_c0p1,		prefix##_c0p1,		/* color 0 pixels */	\
 	prefix##_c1,		prefix##_p0c1,		prefix##_c1,		prefix##_p0c1,		/* color non-0 pixels */\
-	prefix##_c0c1,		prefix##_c0c1,		prefix##_c0c1,		prefix##_c0c1,		/* fill */ 				\
+	prefix##_c0c1,		prefix##_c0c1,		prefix##_c0c1,		prefix##_c0c1,		/* fill */				\
 																											\
-	dma_draw_none,		prefix##_p0_xf,		prefix##_p1_xf,		prefix##_p0p1_xf,	/* no color */ 			\
-	prefix##_c0_xf,		prefix##_c0_xf,		prefix##_c0p1_xf,	prefix##_c0p1_xf,	/* color 0 pixels */ 	\
+	dma_draw_none,		prefix##_p0_xf,		prefix##_p1_xf,		prefix##_p0p1_xf,	/* no color */			\
+	prefix##_c0_xf,		prefix##_c0_xf,		prefix##_c0p1_xf,	prefix##_c0p1_xf,	/* color 0 pixels */	\
 	prefix##_c1_xf,		prefix##_p0c1_xf,	prefix##_c1_xf,		prefix##_p0c1_xf,	/* color non-0 pixels */\
-	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf	/* fill */ 				\
+	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf	/* fill */				\
 };
 
 

@@ -33,7 +33,7 @@
 enum
 {
 	TRIGGER_INT 		= -2000,
-	TRIGGER_YIELDTIME 	= -3000,
+	TRIGGER_YIELDTIME	= -3000,
 	TRIGGER_SUSPENDTIME = -4000
 };
 
@@ -83,8 +83,8 @@ struct _cpu_class_data
 	INT32			inttrigger;				/* interrupt trigger index */
 
 	/* clock and timing information */
-	UINT64 			totalcycles;			/* total CPU cycles executed */
-	attotime 		localtime;				/* local time, relative to the timer system's global time */
+	UINT64			totalcycles;			/* total CPU cycles executed */
+	attotime		localtime;				/* local time, relative to the timer system's global time */
 	INT32			clock;					/* current active clock */
 	double			clockscale;				/* current active clock scale factor */
 	INT32			divisor;				/* 32-bit attoseconds_per_cycle divisor */
@@ -98,7 +98,7 @@ struct _cpu_class_data
 	const cpu_state_entry *regstate[MAX_REGS];/* pointer to the state entry for each register */
 
 	/* these below are hacks to support multiple interrupts per frame */
-	INT32 			iloops; 				/* number of interrupts remaining this frame */
+	INT32			iloops; 				/* number of interrupts remaining this frame */
 	emu_timer *		partial_frame_timer;	/* the timer that triggers partial frame interrupts */
 	attotime		partial_frame_period;	/* the length of one partial frame for interrupt purposes */
 };
@@ -688,9 +688,9 @@ DEVICE_GET_INFO( cpu )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_CPU_CHIP;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(cpu); 		break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(cpu);		break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(cpu); 		break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(cpu); 		break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(cpu);		break;
 
 		default:
 			/* if we don't have a device pointer, ignore everything else */
@@ -1728,9 +1728,9 @@ static void get_register_string_value(const device_config *device, void *baseptr
 {
 	static const UINT64 decdivisor[] = {
 		1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
-		U64(10000000000), 			U64(100000000000), 			U64(1000000000000),
-		U64(10000000000000), 		U64(100000000000000), 		U64(1000000000000000),
-		U64(10000000000000000), 	U64(100000000000000000), 	U64(1000000000000000000),
+		U64(10000000000),			U64(100000000000),			U64(1000000000000),
+		U64(10000000000000),		U64(100000000000000),		U64(1000000000000000),
+		U64(10000000000000000), 	U64(100000000000000000),	U64(1000000000000000000),
 		U64(10000000000000000000)
 	};
 	static const char hexchars[] = "0123456789ABCDEF";
@@ -1788,7 +1788,7 @@ static void get_register_string_value(const device_config *device, void *baseptr
 				break;
 
 			/* 1-9 accumulate into the width */
-			case '1': 	case '2': 	case '3': 	case '4':	case '5':
+			case '1':	case '2':	case '3':	case '4':	case '5':
 			case '6':	case '7':	case '8':	case '9':
 				width = width * 10 + (*fptr - '0');
 				break;
@@ -1934,7 +1934,7 @@ static int get_register_string_max_width(const device_config *device, void *base
 				break;
 
 			/* 1-9 accumulate into the width */
-			case '1': 	case '2': 	case '3': 	case '4':	case '5':
+			case '1':	case '2':	case '3':	case '4':	case '5':
 			case '6':	case '7':	case '8':	case '9':
 				width = width * 10 + (*fptr - '0');
 				break;

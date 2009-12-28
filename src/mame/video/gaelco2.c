@@ -440,7 +440,7 @@ VIDEO_UPDATE( gaelco2 )
 	int i;
 
 	/* read scroll values */
- 	int scroll0x = gaelco2_videoram[0x2802/2] + 0x14;
+	int scroll0x = gaelco2_videoram[0x2802/2] + 0x14;
 	int scroll1x = gaelco2_videoram[0x2806/2] + 0x10;
 	int scroll0y = gaelco2_videoram[0x2800/2] + 0x01;
 	int scroll1y = gaelco2_videoram[0x2804/2] + 0x01;

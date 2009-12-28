@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( pitnrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(pitnrun_mcu_data_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(pitnrun_h_heed_w)
- 	AM_RANGE(0xc806, 0xc806) AM_WRITE(pitnrun_v_heed_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITE(pitnrun_v_heed_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(pitnrun_ha_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(pitnrun_mcu_status_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(pitnrun_mcu_data_r)

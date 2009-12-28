@@ -151,7 +151,7 @@ INPUT_PORTS_END
 
 static const gaelcosnd_interface maniacsq_snd_interface =
 {
-	"gfx1",		 							/* memory region */
+	"gfx1",									/* memory region */
 	{ 0*0x0080000, 1*0x0080000, 0, 0 },		/* start of each ROM bank */
 };
 
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( bang_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w) AM_BASE(&gaelco_sndregs)	/* Sound Registers */
     AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)	/* Video RAM */
     AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)							/* Palette */
-    AM_RANGE(0x218004, 0x218009) AM_READONLY 																/* Video Registers */
+    AM_RANGE(0x218004, 0x218009) AM_READONLY																/* Video Registers */
 	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_BASE(&gaelco2_vregs)										/* Video Registers */
 	AM_RANGE(0x218008, 0x218009) AM_WRITENOP																	/* CLR INT Video */
     AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
@@ -270,7 +270,7 @@ INPUT_PORTS_END
 
 static const gaelcosnd_interface bang_snd_interface =
 {
-	"gfx1",		 											/* memory region */
+	"gfx1",													/* memory region */
 	{ 0*0x0200000, 1*0x0200000, 2*0x0200000, 3*0x0200000 }	/* start of each ROM bank */
 };
 
@@ -527,7 +527,7 @@ INPUT_PORTS_END
 
 static const gaelcosnd_interface alighunt_snd_interface =
 {
-	"gfx1",		 											/* memory region */
+	"gfx1",													/* memory region */
 	{ 0*0x0400000, 1*0x0400000, 2*0x0400000, 3*0x0400000 }	/* start of each ROM bank */
 };
 
@@ -770,7 +770,7 @@ INPUT_PORTS_END
 
 static const gaelcosnd_interface touchgo_snd_interface =
 {
-	"gfx1",		 							/* memory region */
+	"gfx1",									/* memory region */
 	{ 0*0x0400000, 1*0x0400000, 0, 0 }		/* start of each ROM bank */
 };
 
@@ -963,7 +963,7 @@ INPUT_PORTS_END
 
 static const gaelcosnd_interface snowboar_snd_interface =
 {
-	"gfx1",		 							/* memory region */
+	"gfx1",									/* memory region */
 	{ 0*0x0400000, 1*0x0400000, 0, 0 }		/* start of each ROM bank */
 };
 
@@ -1359,22 +1359,22 @@ ROM_START( wrally2 )
 	ROM_LOAD16_BYTE( "wr2.63",	0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 )	/* GFX + Sound */
-	ROM_LOAD( "wr2.16d",	0x0000000, 0x0080000, CRC(ad26086b) SHA1(487ffaaca57c9d030fc486b8cae6735ee40a0ac3) ) 	/* GFX only */
-	ROM_LOAD( "wr2.17d",	0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) ) 	/* GFX only */
-	ROM_LOAD( "wr2.18d",	0x0100000, 0x0080000, CRC(e3617814) SHA1(9f9514052bb07d7e243f33b11bae409a444b7d9f) ) 	/* Sound only */
-	ROM_LOAD( "wr2.19d",	0x0180000, 0x0080000, CRC(2dae988c) SHA1(a585e10b0e1519b828738b0b90698f8600082250) ) 	/* Sound only */
-	ROM_LOAD( "wr2.09d",	0x0200000, 0x0080000, CRC(372d70c8) SHA1(a6d8419765eab1fa20c6d3ddff9d026adaab5cd9) ) 	/* GFX only */
-	ROM_LOAD( "wr2.10d",	0x0280000, 0x0080000, CRC(5db67eb3) SHA1(faa58dafa26befb3291e5185ee04c39ce3b45b3f) ) 	/* GFX only */
-	ROM_LOAD( "wr2.11d",	0x0300000, 0x0080000, CRC(ae66b97c) SHA1(bd0eba0b1c77864e06a9e136cfd834b35f200683) ) 	/* Sound only */
-	ROM_LOAD( "wr2.12d",	0x0380000, 0x0080000, CRC(6dbdaa95) SHA1(f23df65e3df92d79f7b1e99d611c067a79fc849a) ) 	/* Sound only */
-	ROM_LOAD( "wr2.01d",	0x0400000, 0x0080000, CRC(753a138d) SHA1(b05348af6d25e95208fc39007eb2082b759384e8) ) 	/* GFX only */
-	ROM_LOAD( "wr2.02d",	0x0480000, 0x0080000, CRC(9c2a723c) SHA1(5259c8fa1ad73518e89a8df6e76a565b8f8799e3) ) 	/* GFX only */
+	ROM_LOAD( "wr2.16d",	0x0000000, 0x0080000, CRC(ad26086b) SHA1(487ffaaca57c9d030fc486b8cae6735ee40a0ac3) )	/* GFX only */
+	ROM_LOAD( "wr2.17d",	0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) )	/* GFX only */
+	ROM_LOAD( "wr2.18d",	0x0100000, 0x0080000, CRC(e3617814) SHA1(9f9514052bb07d7e243f33b11bae409a444b7d9f) )	/* Sound only */
+	ROM_LOAD( "wr2.19d",	0x0180000, 0x0080000, CRC(2dae988c) SHA1(a585e10b0e1519b828738b0b90698f8600082250) )	/* Sound only */
+	ROM_LOAD( "wr2.09d",	0x0200000, 0x0080000, CRC(372d70c8) SHA1(a6d8419765eab1fa20c6d3ddff9d026adaab5cd9) )	/* GFX only */
+	ROM_LOAD( "wr2.10d",	0x0280000, 0x0080000, CRC(5db67eb3) SHA1(faa58dafa26befb3291e5185ee04c39ce3b45b3f) )	/* GFX only */
+	ROM_LOAD( "wr2.11d",	0x0300000, 0x0080000, CRC(ae66b97c) SHA1(bd0eba0b1c77864e06a9e136cfd834b35f200683) )	/* Sound only */
+	ROM_LOAD( "wr2.12d",	0x0380000, 0x0080000, CRC(6dbdaa95) SHA1(f23df65e3df92d79f7b1e99d611c067a79fc849a) )	/* Sound only */
+	ROM_LOAD( "wr2.01d",	0x0400000, 0x0080000, CRC(753a138d) SHA1(b05348af6d25e95208fc39007eb2082b759384e8) )	/* GFX only */
+	ROM_LOAD( "wr2.02d",	0x0480000, 0x0080000, CRC(9c2a723c) SHA1(5259c8fa1ad73518e89a8df6e76a565b8f8799e3) )	/* GFX only */
 	ROM_FILL(				0x0500000, 0x0100000, 0x0 )			/* Empty */
-	ROM_LOAD( "wr2.20d",	0x0600000, 0x0080000, CRC(4f7ade84) SHA1(c8efcd4bcb1f2ad6ab8104ec0daea8324cefd3fd) ) 	/* GFX only */
-	ROM_LOAD( "wr2.13d",	0x0680000, 0x0080000, CRC(a4cd32f8) SHA1(bc4cc73b7a58aecd735bf55bb5062baa6dd22f83) ) 	/* GFX only */
+	ROM_LOAD( "wr2.20d",	0x0600000, 0x0080000, CRC(4f7ade84) SHA1(c8efcd4bcb1f2ad6ab8104ec0daea8324cefd3fd) )	/* GFX only */
+	ROM_LOAD( "wr2.13d",	0x0680000, 0x0080000, CRC(a4cd32f8) SHA1(bc4cc73b7a58aecd735bf55bb5062baa6dd22f83) )	/* GFX only */
 	ROM_FILL(				0x0700000, 0x0100000, 0x0 )			/* Empty */
-	ROM_LOAD( "wr2.21d",	0x0800000, 0x0080000, CRC(899b0583) SHA1(a313e679980cc4da22bc70f2c7c9685af4f3d6df) ) 	/* GFX only */
-	ROM_LOAD( "wr2.14d",	0x0880000, 0x0080000, CRC(6eb781d5) SHA1(d5c13db88e6de606b34805391cef9f3fbf09fac4) ) 	/* GFX only */
+	ROM_LOAD( "wr2.21d",	0x0800000, 0x0080000, CRC(899b0583) SHA1(a313e679980cc4da22bc70f2c7c9685af4f3d6df) )	/* GFX only */
+	ROM_LOAD( "wr2.14d",	0x0880000, 0x0080000, CRC(6eb781d5) SHA1(d5c13db88e6de606b34805391cef9f3fbf09fac4) )	/* GFX only */
 	ROM_FILL(				0x0900000, 0x0100000, 0x0 )			/* Empty */
 ROM_END
 

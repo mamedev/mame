@@ -876,7 +876,7 @@ GFXDECODE_END
 static const kaneko_pandora_interface galpanic_pandora_config =
 {
 	"screen",	/* screen tag */
-	0, 	/* gfx_region */
+	0,	/* gfx_region */
 	0, -16	/* x_offs, y_offs */
 };
 

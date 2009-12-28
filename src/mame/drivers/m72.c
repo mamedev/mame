@@ -616,7 +616,7 @@ static const UINT8 loht_code[CODE_LEN] =
 	0xc6,0x06,0x00,0x0b,0x49^0xff,	// mov [0b00h], byte 049h
 
 	0x68,0x00,0xd0,				    // push 0d000h // Japan set only
-	0x1f,					  	    // pop ds // Japan set only
+	0x1f,						    // pop ds // Japan set only
 	0xc6,0x06,0x70,0x16,0x57,		// mov [1670h], byte 057h // Japan set only - checks this (W) of WARNING
 
 	0xea,0x5d,0x01,0x40,0x00	// jmp  0040:$015d
@@ -826,7 +826,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 }
 
 
-#define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM) 								\
+#define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)								\
 static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM									\
 	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM	/* work RAM */			\

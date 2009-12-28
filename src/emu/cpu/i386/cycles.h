@@ -359,7 +359,7 @@ static const X86_CYCLE_TABLE x86_cycle_table[] =
 	{ CYCLES_MOV_SREG_REG,		{ {  2,  2 },  {  3,  3 },  {  1,  1 },  {  1,  6 } }		},
 	{ CYCLES_MOV_SREG_MEM,		{ {  2,  2 },  {  3,  3 },  {  1,  1 },  {  1,  6 } }		},
 	{ CYCLES_MOVSX_REG_REG,		{ {  3,  3 },  {  3,  3 },  {  3,  3 },  {  1,  1 } }		},
-	{ CYCLES_MOVSX_MEM_REG,		{ {  6,  6 },  {  3,  3 },  {  3,  3 },  {  1,  1 }	} 		},
+	{ CYCLES_MOVSX_MEM_REG,		{ {  6,  6 },  {  3,  3 },  {  3,  3 },  {  1,  1 }	}		},
 	{ CYCLES_MOVZX_REG_REG,		{ {  3,  3 },  {  3,  3 },  {  3,  3 },  {  1,  1 } }		},
 	{ CYCLES_MOVZX_MEM_REG,		{ {  6,  6 },  {  3,  3 },  {  3,  3 },  {  1,  1 }	}		},
 	{ CYCLES_PUSH_RM,			{ {  5,  5 },  {  4,  4 },  {  2,  2 },  {  3,  3 }	}		},
@@ -666,7 +666,7 @@ static const X86_CYCLE_TABLE x86_cycle_table[] =
 	{ CYCLES_FYL2X,				{ {  0,  0 },  {196,196 },  {111,111 },  {  1,  1 }	}		},
 	{ CYCLES_FYL2XPI,			{ {  0,  0 },  {171,171 },  {103,103 },  {  1,  1 }	}		},
 	{ CYCLES_CMPXCHG_REG_REG_T,	{ {  0,  0 },  {  6,  6 },  {  6,  6 },  {  6,  6 } }		},
-	{ CYCLES_CMPXCHG_REG_REG_F,	{ {  0,  0 },  {  9,  9 },  {  9,  9 },  {  9,  9 } } 		},
+	{ CYCLES_CMPXCHG_REG_REG_F,	{ {  0,  0 },  {  9,  9 },  {  9,  9 },  {  9,  9 } }		},
 	{ CYCLES_CMPXCHG_REG_MEM_T,	{ {  0,  0 },  {  7,  7 },  {  7,  7 },  {  7,  7 } }		},
 	{ CYCLES_CMPXCHG_REG_MEM_F,	{ {  0,  0 },  { 10, 10 },  { 10, 10 },  { 10, 10 } }		},
 };

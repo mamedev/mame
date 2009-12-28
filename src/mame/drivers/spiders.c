@@ -235,7 +235,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
 	const device_config *pia3 = devtag_get_device(device->machine, "pia3");
 	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) |
-						 					      pia6821_get_irq_b(pia2) |
+											      pia6821_get_irq_b(pia2) |
 						 pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3);
 
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -462,8 +462,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x3f00) |
-			   		  ((ra << 5) & 0x00e0) |
-			   		  ((ma << 0) & 0x001f);
+					  ((ra << 5) & 0x00e0) |
+					  ((ma << 0) & 0x001f);
 
 		if (flipscreen)
 			offs = offs ^ 0x3fff;

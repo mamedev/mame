@@ -90,7 +90,7 @@ CPUOBJS += $(CPUOBJ)/arm7/arm7.o
 DASMOBJS += $(CPUOBJ)/arm7/arm7dasm.o
 endif
 
-$(CPUOBJ)/arm/arm.o: 	$(CPUSRC)/arm/arm.c \
+$(CPUOBJ)/arm/arm.o:	$(CPUSRC)/arm/arm.c \
 						$(CPUSRC)/arm/arm.h
 
 $(CPUOBJ)/arm7/arm7.o:	$(CPUSRC)/arm7/arm7.c \
@@ -110,7 +110,7 @@ CPUOBJS += $(CPUOBJ)/se3208/se3208.o
 DASMOBJS += $(CPUOBJ)/se3208/se3208dis.o
 endif
 
-$(CPUOBJ)/se3208/se3208.o: 	$(CPUSRC)/se3208/se3208.c \
+$(CPUOBJ)/se3208/se3208.o:	$(CPUSRC)/se3208/se3208.c \
 							$(CPUSRC)/se3208/se3208.h
 
 
@@ -193,7 +193,7 @@ CPUOBJS += $(CPUOBJ)/dsp32/dsp32.o
 DASMOBJS += $(CPUOBJ)/dsp32/dsp32dis.o
 endif
 
-$(CPUOBJ)/dsp32/dsp32.o: 	$(CPUSRC)/dsp32/dsp32.c \
+$(CPUOBJ)/dsp32/dsp32.o:	$(CPUSRC)/dsp32/dsp32.c \
 							$(CPUSRC)/dsp32/dsp32.h
 
 
@@ -377,7 +377,7 @@ G65816DEPS = \
 $(CPUOBJ)/g65816/g65816.o:		$(CPUSRC)/g65816/g65816.c \
 								$(G65816DEPS)
 
-$(CPUOBJ)/g65816/g65816o0.o: 	$(CPUSRC)/g65816/g65816o0.c \
+$(CPUOBJ)/g65816/g65816o0.o:	$(CPUSRC)/g65816/g65816o0.c \
 								$(G65816DEPS)
 
 $(CPUOBJ)/g65816/g65816o1.o:	$(CPUSRC)/g65816/g65816o1.c \
@@ -425,7 +425,7 @@ $(CPUOBJ)/h83002/h8_16.o:		$(CPUSRC)/h83002/h8_16.c \
 								$(CPUSRC)/h83002/h8ops.h \
 								$(CPUSRC)/h83002/h8priv.h
 
-$(CPUOBJ)/h83002/h8disasm.o: 	$(CPUSRC)/h83002/h8disasm.c
+$(CPUOBJ)/h83002/h8disasm.o:	$(CPUSRC)/h83002/h8disasm.c
 
 $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 								$(CPUSRC)/h83002/h8priv.h
@@ -446,7 +446,7 @@ $(CPUOBJ)/h83002/h8_8.o:		$(CPUSRC)/h83002/h8_8.c \
 								$(CPUSRC)/h83002/h8ops.h \
 								$(CPUSRC)/h83002/h8priv.h
 
-$(CPUOBJ)/h83002/h8disasm.o: 	$(CPUSRC)/h83002/h8disasm.c
+$(CPUOBJ)/h83002/h8disasm.o:	$(CPUSRC)/h83002/h8disasm.c
 
 $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 								$(CPUSRC)/h83002/h8priv.h
@@ -1326,7 +1326,7 @@ CPUOBJS += $(CPUOBJ)/avr8/avr8.o
 DASMOBJS += $(CPUOBJ)/avr8/avr8dasm.o
 endif
 
-$(CPUOBJ)/avr8/avr8.o: 	$(CPUSRC)/avr8/avr8.c \
+$(CPUOBJ)/avr8/avr8.o:	$(CPUSRC)/avr8/avr8.c \
 			$(CPUSRC)/avr8/avr8.h
 
 

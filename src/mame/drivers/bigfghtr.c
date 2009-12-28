@@ -259,7 +259,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,
 				color,
- 				flipx,flipy,
+				flipx,flipy,
 				sx,sy,15);
 		}
 	}

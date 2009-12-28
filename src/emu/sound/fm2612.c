@@ -648,8 +648,8 @@ typedef struct
 #if FM_BUSY_FLAG_SUPPORT
 	TIME_TYPE	busy_expiry_time;	/* expiry time of the busy status */
 #endif
-	UINT32 		clock;				/* master clock  (Hz)   */
-	UINT32 		rate;				/* sampling rate (Hz)   */
+	UINT32		clock;				/* master clock  (Hz)   */
+	UINT32		rate;				/* sampling rate (Hz)   */
 	UINT16		address;			/* address register     */
 	UINT8		status;				/* status flag          */
 	UINT32		mode;				/* mode  CSM / 3SLOT    */
@@ -1442,7 +1442,7 @@ static void update_ssg_eg_channel(FM_SLOT *SLOT)
 			{
 				/* set inversion flag */
 			        if (SLOT->ssg & 0x02)
-			 	       SLOT->ssgn = 4;
+				       SLOT->ssgn = 4;
 
 				/* force attenuation level during decay phases */
 				if ((SLOT->state != EG_ATT) && !(SLOT->ssgn ^ (SLOT->ssg & 0x04)))
@@ -2010,7 +2010,7 @@ static void OPNWriteMode(FM_OPN *OPN, int r, int v)
 		}
 		else
 		{
-	     		OPN->lfo_inc = 0;
+	    		OPN->lfo_inc = 0;
 		}
 		break;
 	case 0x24:	/* timer A High 8*/

@@ -245,7 +245,7 @@ WRITE16_HANDLER( pstars_w )
 
 		case 0xa0:
 			state->pstars_val = pstar_a0[state->pstars_int[0]];
-   			break;
+			break;
 
 		case 0x9d:
 			state->pstars_val = pstar_9d[state->pstars_int[0]];
@@ -260,7 +260,7 @@ WRITE16_HANDLER( pstars_w )
 			break;
 
 		case 0x80:
-	   		state->pstars_val = pstar_80[state->pstars_int[0]];
+			state->pstars_val = pstar_80[state->pstars_int[0]];
 			break;
 
 		default:
@@ -509,13 +509,13 @@ READ16_HANDLER( asic28_r )
 			break;
 
 		case 0xcc: //BG
-   			{
-   	 		int y = state->asic_params[0xcc];
+			{
+			int y = state->asic_params[0xcc];
 			if (y & 0x400)    //y is signed (probably x too and it also applies to TXT, but I've never seen it used)
 				y =- (0x400 - (y & 0x3ff));
 			val = 0x900000 + (((state->asic_params[0xcb] + (y) * 64) * 4) /*&0x1fff*/);
-   			}
-   			break;
+			}
+			break;
 
 		case 0xd0:	//txt palette
 			val = 0xa01000 + (state->asic28_regs[0] << 5);

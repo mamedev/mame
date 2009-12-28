@@ -371,7 +371,7 @@ static INPUT_PORTS_START( rocktris )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" ) 	// the rest seems unused
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )	// the rest seems unused
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )

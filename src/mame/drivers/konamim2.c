@@ -1142,7 +1142,7 @@ static MACHINE_DRIVER_START( m2 )
 	MDRV_CPU_CONFIG(ppc602_config)
 	MDRV_CPU_PROGRAM_MAP(m2_main)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

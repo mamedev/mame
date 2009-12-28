@@ -92,11 +92,11 @@ static int segac2_enable_display;
 ******************************************************************************/
 
 /* internal states */
-static UINT8 		misc_io_data[0x10];	/* holds values written to the I/O chip */
+static UINT8		misc_io_data[0x10];	/* holds values written to the I/O chip */
 
 /* protection-related tracking */
 static int (*prot_func)(int in);		/* emulation of protection chip */
-static UINT8 		prot_write_buf;		/* remembers what was written */
+static UINT8		prot_write_buf;		/* remembers what was written */
 static UINT8		prot_read_buf;		/* remembers what was returned */
 
 /* palette-related variables */
@@ -246,7 +246,7 @@ static WRITE16_HANDLER( palette_w )
 	megadrive_vdp_palette_lookup_shadow[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
 
 	// how is it calculated on c2?
-	tmpr = tmpr|0x10; 	tmpg = tmpg|0x10; 	tmpb = tmpb|0x10;
+	tmpr = tmpr|0x10;	tmpg = tmpg|0x10;	tmpb = tmpb|0x10;
 	megadrive_vdp_palette_lookup_highlight[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
 }
 
@@ -1173,14 +1173,14 @@ static INPUT_PORTS_START( pclub )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* Probably Unused */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel")
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* Probably Unused */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
@@ -1243,14 +1243,14 @@ static INPUT_PORTS_START( pclubjv2 )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* Probably Unused */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel")
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* Probably Unused */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */

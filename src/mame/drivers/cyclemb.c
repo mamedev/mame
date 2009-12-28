@@ -210,7 +210,7 @@ static WRITE8_HANDLER( cyclemb_bankswitch_w )
 static WRITE8_HANDLER( sound_cmd_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
- 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
@@ -224,7 +224,7 @@ static READ8_HANDLER( mcu_status_r )
 static WRITE8_HANDLER( sound_cmd_w ) //actually ciom
 {
 	soundlatch_w(space, 0, data & 0xff);
- 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 #endif
 

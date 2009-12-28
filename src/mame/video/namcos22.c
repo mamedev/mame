@@ -837,7 +837,7 @@ MallocSceneNode( running_machine *machine )
    }
    else
    {
-   	  node = alloc_or_die(struct SceneNode);
+	  node = alloc_or_die(struct SceneNode);
    }
    memset( node, 0, sizeof(*node) );
    return node;
@@ -896,7 +896,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
    for( row=0; row<node->data.sprite.numrows; row++ )
    {
       for( col=0; col<node->data.sprite.numcols; col++ )
-   	{
+	{
          int code = tile;
          if( node->data.sprite.linkType == 0xff )
          {
@@ -918,7 +918,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
                node->data.sprite.translucency,
                node->data.sprite.cz,
                node->data.sprite.pri );
-      	i++;
+    	i++;
       } /* next col */
 	} /* next row */
 } /* RenderSprite */
@@ -1216,18 +1216,18 @@ Prepare3dTexture( running_machine *machine, void *pTilemapROM, void *pTextureROM
     { /* following setup is Namco System 22 specific */
 	      const UINT8 *pPackedTileAttr = 0x200000 + (UINT8 *)pTilemapROM;
 	      UINT8 *pUnpackedTileAttr = auto_alloc_array(machine, UINT8, 0x080000*2);
-      	{
-       	   InitXYAttrToPixel();
-   	      mpTextureTileMapAttr = pUnpackedTileAttr;
-   	      for( i=0; i<0x80000; i++ )
-   	      {
-   	         *pUnpackedTileAttr++ = (*pPackedTileAttr)>>4;
-   	         *pUnpackedTileAttr++ = (*pPackedTileAttr)&0xf;
-   	         pPackedTileAttr++;
-   	   }
-   	   mpTextureTileMap16 = (UINT16 *)pTilemapROM;
+    	{
+    	   InitXYAttrToPixel();
+	      mpTextureTileMapAttr = pUnpackedTileAttr;
+	      for( i=0; i<0x80000; i++ )
+	      {
+	         *pUnpackedTileAttr++ = (*pPackedTileAttr)>>4;
+	         *pUnpackedTileAttr++ = (*pPackedTileAttr)&0xf;
+	         pPackedTileAttr++;
+	   }
+	   mpTextureTileMap16 = (UINT16 *)pTilemapROM;
          mpTextureTileData = (UINT8 *)pTextureROM;
-   	   PatchTexture();
+	   PatchTexture();
       }
    }
 } /* Prepare3dTexture */

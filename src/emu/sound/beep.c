@@ -21,7 +21,7 @@
 typedef struct _beep_state beep_state;
 struct _beep_state
 {
-	sound_stream *stream; 	/* stream number */
+	sound_stream *stream;	/* stream number */
 	int enable; 			/* enable beep */
 	int frequency;			/* set frequency - this can be changed using the appropiate function */
 	int incr;				/* initial wave state */

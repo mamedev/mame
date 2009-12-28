@@ -123,7 +123,7 @@ typedef void running_machine;
 
 #define KEYBOARD_SCROLL_LOCK_ON 			1
 #define KEYBOARD_NUM_LOCK_ON				2
-#define KEYBOARD_CAPS_LOCK_ON 				4
+#define KEYBOARD_CAPS_LOCK_ON				4
 
 
 
@@ -307,8 +307,8 @@ static int create_window_class(void)
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName 	= WINDOW_CLASS;
-		wc.hInstance 		= GetModuleHandle(NULL);
+		wc.lpszClassName	= WINDOW_CLASS;
+		wc.hInstance		= GetModuleHandle(NULL);
 		wc.lpfnWndProc		= listener_window_proc;
 
 		// register the class; fail if we can't

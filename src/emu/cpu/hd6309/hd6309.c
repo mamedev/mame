@@ -142,7 +142,7 @@ struct _m68_state_t
 	UINT8	nmi_state;
 
 	UINT8	dummy_byte;
-	UINT8 	*regTable[4];
+	UINT8	*regTable[4];
 
 	UINT8 const *cycle_counts_page0;
 	UINT8 const *cycle_counts_page01;
@@ -223,8 +223,8 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 #define EAD m68_state->ea.d
 #define EAP m68_state->ea
 
-#define M6809_CWAI 	8	/* set when CWAI is waiting for an interrupt */
-#define M6809_SYNC 	16	/* set when SYNC is waiting for an interrupt */
+#define M6809_CWAI	8	/* set when CWAI is waiting for an interrupt */
+#define M6809_SYNC	16	/* set when SYNC is waiting for an interrupt */
 #define M6809_LDS		32	/* set when LDS occured at least once */
 
 /****************************************************************************/
@@ -268,7 +268,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 
 #define CLR_HNZVC	CC&=~(CC_H|CC_N|CC_Z|CC_V|CC_C)
 #define CLR_NZV 	CC&=~(CC_N|CC_Z|CC_V)
-#define CLR_NZ	 	CC&=~(CC_N|CC_Z)
+#define CLR_NZ		CC&=~(CC_N|CC_Z)
 #define CLR_HNZC	CC&=~(CC_H|CC_N|CC_Z|CC_C)
 #define CLR_NZVC	CC&=~(CC_N|CC_Z|CC_V|CC_C)
 #define CLR_Z		CC&=~(CC_Z)
@@ -679,84 +679,84 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 			case 0x0f: clr_di(m68_state);   				break;
 			case 0x10: pref10(m68_state);				break;
 			case 0x11: pref11(m68_state);				break;
-			case 0x12: nop(m68_state);	   				break;
-			case 0x13: sync(m68_state);	   				break;
-			case 0x14: sexw(m68_state);	   				break;
+			case 0x12: nop(m68_state);					break;
+			case 0x13: sync(m68_state);					break;
+			case 0x14: sexw(m68_state);					break;
 			case 0x15: IIError(m68_state);				break;
-			case 0x16: lbra(m68_state);	   				break;
-			case 0x17: lbsr(m68_state);	   				break;
+			case 0x16: lbra(m68_state);					break;
+			case 0x17: lbsr(m68_state);					break;
 			case 0x18: IIError(m68_state);				break;
-			case 0x19: daa(m68_state);	   				break;
-			case 0x1a: orcc(m68_state);	   				break;
+			case 0x19: daa(m68_state);					break;
+			case 0x1a: orcc(m68_state);					break;
 			case 0x1b: IIError(m68_state);				break;
 			case 0x1c: andcc(m68_state);    				break;
-			case 0x1d: sex(m68_state);	   				break;
-			case 0x1e: exg(m68_state);	   				break;
-			case 0x1f: tfr(m68_state);	   				break;
-			case 0x20: bra(m68_state);	   				break;
-			case 0x21: brn(m68_state);	   				break;
-			case 0x22: bhi(m68_state);	   				break;
-			case 0x23: bls(m68_state);	   				break;
-			case 0x24: bcc(m68_state);	   				break;
-			case 0x25: bcs(m68_state);	   				break;
-			case 0x26: bne(m68_state);	   				break;
-			case 0x27: beq(m68_state);	   				break;
-			case 0x28: bvc(m68_state);	   				break;
-			case 0x29: bvs(m68_state);	   				break;
-			case 0x2a: bpl(m68_state);	   				break;
-			case 0x2b: bmi(m68_state);	   				break;
-			case 0x2c: bge(m68_state);	   				break;
-			case 0x2d: blt(m68_state);	   				break;
-			case 0x2e: bgt(m68_state);	   				break;
-			case 0x2f: ble(m68_state);	   				break;
-			case 0x30: leax(m68_state);	   				break;
-			case 0x31: leay(m68_state);	   				break;
-			case 0x32: leas(m68_state);	   				break;
-			case 0x33: leau(m68_state);	   				break;
-			case 0x34: pshs(m68_state);	   				break;
-			case 0x35: puls(m68_state);	   				break;
-			case 0x36: pshu(m68_state);	   				break;
-			case 0x37: pulu(m68_state);	   				break;
+			case 0x1d: sex(m68_state);					break;
+			case 0x1e: exg(m68_state);					break;
+			case 0x1f: tfr(m68_state);					break;
+			case 0x20: bra(m68_state);					break;
+			case 0x21: brn(m68_state);					break;
+			case 0x22: bhi(m68_state);					break;
+			case 0x23: bls(m68_state);					break;
+			case 0x24: bcc(m68_state);					break;
+			case 0x25: bcs(m68_state);					break;
+			case 0x26: bne(m68_state);					break;
+			case 0x27: beq(m68_state);					break;
+			case 0x28: bvc(m68_state);					break;
+			case 0x29: bvs(m68_state);					break;
+			case 0x2a: bpl(m68_state);					break;
+			case 0x2b: bmi(m68_state);					break;
+			case 0x2c: bge(m68_state);					break;
+			case 0x2d: blt(m68_state);					break;
+			case 0x2e: bgt(m68_state);					break;
+			case 0x2f: ble(m68_state);					break;
+			case 0x30: leax(m68_state);					break;
+			case 0x31: leay(m68_state);					break;
+			case 0x32: leas(m68_state);					break;
+			case 0x33: leau(m68_state);					break;
+			case 0x34: pshs(m68_state);					break;
+			case 0x35: puls(m68_state);					break;
+			case 0x36: pshu(m68_state);					break;
+			case 0x37: pulu(m68_state);					break;
 			case 0x38: IIError(m68_state);				break;
-			case 0x39: rts(m68_state);	   				break;
-			case 0x3a: abx(m68_state);	   				break;
-			case 0x3b: rti(m68_state);	   				break;
+			case 0x39: rts(m68_state);					break;
+			case 0x3a: abx(m68_state);					break;
+			case 0x3b: rti(m68_state);					break;
 			case 0x3c: cwai(m68_state);					break;
 			case 0x3d: mul(m68_state);					break;
 			case 0x3e: IIError(m68_state);				break;
 			case 0x3f: swi(m68_state);					break;
-			case 0x40: nega(m68_state);	   				break;
+			case 0x40: nega(m68_state);					break;
 			case 0x41: IIError(m68_state);				break;
 			case 0x42: IIError(m68_state);				break;
-			case 0x43: coma(m68_state);	   				break;
-			case 0x44: lsra(m68_state);	   				break;
+			case 0x43: coma(m68_state);					break;
+			case 0x44: lsra(m68_state);					break;
 			case 0x45: IIError(m68_state);				break;
-			case 0x46: rora(m68_state);	   				break;
-			case 0x47: asra(m68_state);	   				break;
-			case 0x48: asla(m68_state);	   				break;
-			case 0x49: rola(m68_state);	   				break;
-			case 0x4a: deca(m68_state);	   				break;
+			case 0x46: rora(m68_state);					break;
+			case 0x47: asra(m68_state);					break;
+			case 0x48: asla(m68_state);					break;
+			case 0x49: rola(m68_state);					break;
+			case 0x4a: deca(m68_state);					break;
 			case 0x4b: IIError(m68_state);				break;
-			case 0x4c: inca(m68_state);	   				break;
-			case 0x4d: tsta(m68_state);	   				break;
+			case 0x4c: inca(m68_state);					break;
+			case 0x4d: tsta(m68_state);					break;
 			case 0x4e: IIError(m68_state);				break;
-			case 0x4f: clra(m68_state);	   				break;
-			case 0x50: negb(m68_state);	   				break;
+			case 0x4f: clra(m68_state);					break;
+			case 0x50: negb(m68_state);					break;
 			case 0x51: IIError(m68_state);				break;
 			case 0x52: IIError(m68_state);				break;
-			case 0x53: comb(m68_state);	   				break;
-			case 0x54: lsrb(m68_state);	   				break;
+			case 0x53: comb(m68_state);					break;
+			case 0x54: lsrb(m68_state);					break;
 			case 0x55: IIError(m68_state);				break;
-			case 0x56: rorb(m68_state);	   				break;
-			case 0x57: asrb(m68_state);	   				break;
-			case 0x58: aslb(m68_state);	   				break;
-			case 0x59: rolb(m68_state);	   				break;
-			case 0x5a: decb(m68_state);	   				break;
+			case 0x56: rorb(m68_state);					break;
+			case 0x57: asrb(m68_state);					break;
+			case 0x58: aslb(m68_state);					break;
+			case 0x59: rolb(m68_state);					break;
+			case 0x5a: decb(m68_state);					break;
 			case 0x5b: IIError(m68_state);				break;
-			case 0x5c: incb(m68_state);	   				break;
-			case 0x5d: tstb(m68_state);	   				break;
+			case 0x5c: incb(m68_state);					break;
+			case 0x5d: tstb(m68_state);					break;
 			case 0x5e: IIError(m68_state);				break;
-			case 0x5f: clrb(m68_state);	   				break;
+			case 0x5f: clrb(m68_state);					break;
 			case 0x60: neg_ix(m68_state);   				break;
 			case 0x61: oim_ix(m68_state);   				break;
 			case 0x62: aim_ix(m68_state);   				break;
@@ -796,13 +796,13 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 			case 0x84: anda_im(m68_state);  				break;
 			case 0x85: bita_im(m68_state);  				break;
 			case 0x86: lda_im(m68_state);   				break;
-			case 0x87: IIError(m68_state); 				break;
+			case 0x87: IIError(m68_state);				break;
 			case 0x88: eora_im(m68_state);  				break;
 			case 0x89: adca_im(m68_state);  				break;
 			case 0x8a: ora_im(m68_state);   				break;
 			case 0x8b: adda_im(m68_state);  				break;
 			case 0x8c: cmpx_im(m68_state);  				break;
-			case 0x8d: bsr(m68_state);	   				break;
+			case 0x8d: bsr(m68_state);					break;
 			case 0x8e: ldx_im(m68_state);   				break;
 			case 0x8f: IIError(m68_state);  				break;
 			case 0x90: suba_di(m68_state);  				break;
@@ -860,7 +860,7 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 			case 0xc4: andb_im(m68_state);  				break;
 			case 0xc5: bitb_im(m68_state);  				break;
 			case 0xc6: ldb_im(m68_state);   				break;
-			case 0xc7: IIError(m68_state); 				break;
+			case 0xc7: IIError(m68_state);				break;
 			case 0xc8: eorb_im(m68_state);  				break;
 			case 0xc9: adcb_im(m68_state);  				break;
 			case 0xca: orb_im(m68_state);   				break;
@@ -1085,13 +1085,13 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0x86: EA=X+SIGNED(A);											break;
 	case 0x87: EA=X+SIGNED(E);											break;
 	case 0x88: IMMBYTE(EA); 	EA=X+SIGNED(EA);						break;
-	case 0x89: IMMWORD(EAP); 	EA+=X;									break;
+	case 0x89: IMMWORD(EAP);	EA+=X;									break;
 	case 0x8a: EA=X+SIGNED(F);											break;
 	case 0x8b: EA=X+D;													break;
 	case 0x8c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0x8d: IMMWORD(EAP); 	EA+=PC; 								break;
+	case 0x8d: IMMWORD(EAP);	EA+=PC; 								break;
 	case 0x8e: EA=X+W;													break;
-	case 0x8f: EA=W;		 											break;
+	case 0x8f: EA=W;													break;
 
 	case 0x90: EA=W;								EAD=RM16(m68_state, EAD);		break;
 	case 0x91: EA=X;	X+=2;						EAD=RM16(m68_state, EAD);		break;
@@ -1102,13 +1102,13 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0x96: EA=X+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
 	case 0x97: EA=X+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
 	case 0x98: IMMBYTE(EA); 	EA=X+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0x99: IMMWORD(EAP); 	EA+=X;				EAD=RM16(m68_state, EAD);		break;
+	case 0x99: IMMWORD(EAP);	EA+=X;				EAD=RM16(m68_state, EAD);		break;
 	case 0x9a: EA=X+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
 	case 0x9b: EA=X+D;								EAD=RM16(m68_state, EAD);		break;
 	case 0x9c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0x9d: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0x9d: IMMWORD(EAP);	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
 	case 0x9e: EA=X+W;								EAD=RM16(m68_state, EAD);		break;
-	case 0x9f: IMMWORD(EAP); 						EAD=RM16(m68_state, EAD);		break;
+	case 0x9f: IMMWORD(EAP);						EAD=RM16(m68_state, EAD);		break;
 
 	case 0xa0: EA=Y;	Y++;											break;
 	case 0xa1: EA=Y;	Y+=2;											break;
@@ -1119,15 +1119,15 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xa6: EA=Y+SIGNED(A);											break;
 	case 0xa7: EA=Y+SIGNED(E);											break;
 	case 0xa8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);						break;
-	case 0xa9: IMMWORD(EAP); 	EA+=Y;									break;
+	case 0xa9: IMMWORD(EAP);	EA+=Y;									break;
 	case 0xaa: EA=Y+SIGNED(F);											break;
 	case 0xab: EA=Y+D;													break;
 	case 0xac: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xad: IMMWORD(EAP); 	EA+=PC; 								break;
+	case 0xad: IMMWORD(EAP);	EA+=PC; 								break;
 	case 0xae: EA=Y+W;													break;
 	case 0xaf: IMMWORD(EAP);     EA+=W;									break;
 
-	case 0xb0: IMMWORD(EAP); 	EA+=W;				EAD=RM16(m68_state, EAD);		break;
+	case 0xb0: IMMWORD(EAP);	EA+=W;				EAD=RM16(m68_state, EAD);		break;
 	case 0xb1: EA=Y;	Y+=2;						EAD=RM16(m68_state, EAD);		break;
 	case 0xb2: IIError(m68_state);												break;
 	case 0xb3: Y-=2;	EA=Y;						EAD=RM16(m68_state, EAD);		break;
@@ -1136,11 +1136,11 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xb6: EA=Y+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
 	case 0xb7: EA=Y+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
 	case 0xb8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0xb9: IMMWORD(EAP); 	EA+=Y;				EAD=RM16(m68_state, EAD);		break;
+	case 0xb9: IMMWORD(EAP);	EA+=Y;				EAD=RM16(m68_state, EAD);		break;
 	case 0xba: EA=Y+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
 	case 0xbb: EA=Y+D;								EAD=RM16(m68_state, EAD);		break;
 	case 0xbc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0xbd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xbd: IMMWORD(EAP);	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
 	case 0xbe: EA=Y+W;								EAD=RM16(m68_state, EAD);		break;
 	case 0xbf: IIError(m68_state);												break;
 
@@ -1153,11 +1153,11 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xc6: EA=U+SIGNED(A);											break;
 	case 0xc7: EA=U+SIGNED(E);											break;
 	case 0xc8: IMMBYTE(EA); 	EA=U+SIGNED(EA);						break;
-	case 0xc9: IMMWORD(EAP); 	EA+=U;									break;
+	case 0xc9: IMMWORD(EAP);	EA+=U;									break;
 	case 0xca: EA=U+SIGNED(F);											break;
 	case 0xcb: EA=U+D;													break;
 	case 0xcc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xcd: IMMWORD(EAP); 	EA+=PC; 								break;
+	case 0xcd: IMMWORD(EAP);	EA+=PC; 								break;
 	case 0xce: EA=U+W;													break;
 	case 0xcf: EA=W;            W+=2;									break;
 
@@ -1170,11 +1170,11 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xd6: EA=U+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
 	case 0xd7: EA=U+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
 	case 0xd8: IMMBYTE(EA); 	EA=U+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0xd9: IMMWORD(EAP); 	EA+=U;				EAD=RM16(m68_state, EAD);		break;
+	case 0xd9: IMMWORD(EAP);	EA+=U;				EAD=RM16(m68_state, EAD);		break;
 	case 0xda: EA=U+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
 	case 0xdb: EA=U+D;								EAD=RM16(m68_state, EAD);		break;
 	case 0xdc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0xdd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xdd: IMMWORD(EAP);	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
 	case 0xde: EA=U+W;								EAD=RM16(m68_state, EAD);		break;
 	case 0xdf: IIError(m68_state);												break;
 
@@ -1187,11 +1187,11 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xe6: EA=S+SIGNED(A);											break;
 	case 0xe7: EA=S+SIGNED(E);											break;
 	case 0xe8: IMMBYTE(EA); 	EA=S+SIGNED(EA);						break;
-	case 0xe9: IMMWORD(EAP); 	EA+=S;									break;
+	case 0xe9: IMMWORD(EAP);	EA+=S;									break;
 	case 0xea: EA=S+SIGNED(F);											break;
 	case 0xeb: EA=S+D;													break;
 	case 0xec: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xed: IMMWORD(EAP); 	EA+=PC; 								break;
+	case 0xed: IMMWORD(EAP);	EA+=PC; 								break;
 	case 0xee: EA=S+W;													break;
 	case 0xef: W-=2;	EA=W;											break;
 
@@ -1204,11 +1204,11 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xf6: EA=S+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
 	case 0xf7: EA=S+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
 	case 0xf8: IMMBYTE(EA); 	EA=S+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0xf9: IMMWORD(EAP); 	EA+=S;				EAD=RM16(m68_state, EAD);		break;
+	case 0xf9: IMMWORD(EAP);	EA+=S;				EAD=RM16(m68_state, EAD);		break;
 	case 0xfa: EA=S+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
 	case 0xfb: EA=S+D;								EAD=RM16(m68_state, EAD);		break;
 	case 0xfc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
-	case 0xfd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xfd: IMMWORD(EAP);	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
 	case 0xfe: EA=S+W;								EAD=RM16(m68_state, EAD);		break;
 	case 0xff: IIError(m68_state);												break;
 	}
@@ -1238,15 +1238,15 @@ static CPU_SET_INFO( hd6309 )
 		case CPUINFO_INT_REGISTER + HD6309_S:		S = info->i;								break;
 		case CPUINFO_INT_REGISTER + HD6309_CC:		CC = info->i; check_irq_lines(m68_state);			break;
 		case CPUINFO_INT_REGISTER + HD6309_MD:		MD = info->i; UpdateState(m68_state);				break;
-		case CPUINFO_INT_REGISTER + HD6309_U: 		U = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_A: 		A = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_B: 		B = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_E: 		E = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_F: 		F = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_X: 		X = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_Y: 		Y = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_V: 		V = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_DP: 		DP = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_U:		U = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_A:		A = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_B:		B = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_E:		E = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_F:		F = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_X:		X = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_Y:		Y = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_V:		V = info->i;								break;
+		case CPUINFO_INT_REGISTER + HD6309_DP:		DP = info->i;								break;
 	}
 }
 
@@ -1278,11 +1278,11 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	info->i = m68_state->irq_state[HD6309_IRQ_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:info->i = m68_state->irq_state[HD6309_FIRQ_LINE]; break;

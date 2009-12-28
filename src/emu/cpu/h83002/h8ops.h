@@ -112,7 +112,7 @@ static CPU_EXECUTE(h8)
 
 	h8->cyccnt = cycles;
 
- 	h8_check_irqs(h8);
+	h8_check_irqs(h8);
 
 	while ((h8->cyccnt > 0) && (!h8->h8err))
 	{

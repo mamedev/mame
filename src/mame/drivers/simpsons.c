@@ -397,7 +397,7 @@ ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
-	ROM_CONTINUE(     	0x10000, 0x18000 )
+	ROM_CONTINUE(   	0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */

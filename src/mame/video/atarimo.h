@@ -60,22 +60,22 @@ struct _atarimo_desc
 	UINT16				maxcolors;			/* maximum number of colors */
 	UINT8				transpen;			/* transparent pen index */
 
-	atarimo_entry 		linkmask;			/* mask for the link */
-	atarimo_entry 		gfxmask;			/* mask for the graphics bank */
-	atarimo_entry 		codemask;			/* mask for the code index */
-	atarimo_entry 		codehighmask;		/* mask for the upper code index */
-	atarimo_entry 		colormask;			/* mask for the color */
-	atarimo_entry 		xposmask;			/* mask for the X position */
-	atarimo_entry 		yposmask;			/* mask for the Y position */
-	atarimo_entry 		widthmask;			/* mask for the width, in tiles*/
-	atarimo_entry 		heightmask;			/* mask for the height, in tiles */
-	atarimo_entry 		hflipmask;			/* mask for the horizontal flip */
-	atarimo_entry 		vflipmask;			/* mask for the vertical flip */
-	atarimo_entry 		prioritymask;		/* mask for the priority */
-	atarimo_entry 		neighbormask;		/* mask for the neighbor */
-	atarimo_entry 		absolutemask;		/* mask for absolute coordinates */
+	atarimo_entry		linkmask;			/* mask for the link */
+	atarimo_entry		gfxmask;			/* mask for the graphics bank */
+	atarimo_entry		codemask;			/* mask for the code index */
+	atarimo_entry		codehighmask;		/* mask for the upper code index */
+	atarimo_entry		colormask;			/* mask for the color */
+	atarimo_entry		xposmask;			/* mask for the X position */
+	atarimo_entry		yposmask;			/* mask for the Y position */
+	atarimo_entry		widthmask;			/* mask for the width, in tiles*/
+	atarimo_entry		heightmask;			/* mask for the height, in tiles */
+	atarimo_entry		hflipmask;			/* mask for the horizontal flip */
+	atarimo_entry		vflipmask;			/* mask for the vertical flip */
+	atarimo_entry		prioritymask;		/* mask for the priority */
+	atarimo_entry		neighbormask;		/* mask for the neighbor */
+	atarimo_entry		absolutemask;		/* mask for absolute coordinates */
 
-	atarimo_entry 		specialmask;		/* mask for the special value */
+	atarimo_entry		specialmask;		/* mask for the special value */
 	UINT16				specialvalue;		/* resulting value to indicate "special" */
 	atarimo_special_func specialcb;			/* callback routine for special entries */
 };

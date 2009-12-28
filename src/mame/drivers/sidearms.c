@@ -145,7 +145,7 @@ static WRITE8_HANDLER( whizz_bankswitch_w )
 	int bank = 0;
 
 	switch (data & 0xC0)
- 	{
+	{
 		case 0x00 :	bank = 0;	break;
 		case 0x40 :	bank = 2;	break;
 		case 0x80 :	bank = 1;	break;

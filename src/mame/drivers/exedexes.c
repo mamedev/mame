@@ -35,7 +35,7 @@ static ADDRESS_MAP_START( exedexes_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(exedexes_c804_w)								/* coin counters + text layer enable */
-	AM_RANGE(0xc806, 0xc806) AM_WRITENOP 											/* Watchdog ?? */
+	AM_RANGE(0xc806, 0xc806) AM_WRITENOP											/* Watchdog ?? */
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(exedexes_videoram_w) AM_BASE_MEMBER(exedexes_state, videoram)	/* Video RAM */
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(exedexes_colorram_w) AM_BASE_MEMBER(exedexes_state, colorram)	/* Color RAM */
 	AM_RANGE(0xd800, 0xd801) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, nbg_yscroll)

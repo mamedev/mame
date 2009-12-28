@@ -54,11 +54,11 @@
 typedef struct _debug_comment debug_comment;
 struct _debug_comment
 {
-	UINT8 			is_valid;
-	UINT32 			address;
-	char 			text[DEBUG_COMMENT_MAX_LINE_LENGTH];
-	rgb_t 			color;
-	UINT32 			crc;
+	UINT8			is_valid;
+	UINT32			address;
+	char			text[DEBUG_COMMENT_MAX_LINE_LENGTH];
+	rgb_t			color;
+	UINT32			crc;
 };
 
 
@@ -66,7 +66,7 @@ struct _debug_comment
 struct _debug_cpu_comment_group
 {
 	int 			comment_count;
-	UINT32 			change_count;
+	UINT32			change_count;
 	debug_comment *	comment_info[DEBUG_COMMENT_MAX_NUM];
 };
 
@@ -413,15 +413,15 @@ int debug_comment_save(running_machine *machine)
 	{
 		file_error filerr;
 		astring *fname;
- 		mame_file *fp;
+		mame_file *fp;
 
- 		fname = astring_assemble_2(astring_alloc(), machine->basename, ".cmt");
- 		filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
- 		astring_free(fname);
+		fname = astring_assemble_2(astring_alloc(), machine->basename, ".cmt");
+		filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
+		astring_free(fname);
 
- 		if (filerr == FILERR_NONE)
- 		{
-	 		xml_file_write(root, mame_core_file(fp));
+		if (filerr == FILERR_NONE)
+		{
+			xml_file_write(root, mame_core_file(fp));
 			mame_fclose(fp);
 		}
 	}

@@ -392,7 +392,7 @@ static UINT32 *tms1_boot;
 static UINT8 tms_spinning[2];
 
 #define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(space->cpu, 7351 + n); tms_spinning[n] = 1; } while (0)
-#define STOP_TMS_SPINNING(machine, n)  	do { cpuexec_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
+#define STOP_TMS_SPINNING(machine, n)	do { cpuexec_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
 
 
 

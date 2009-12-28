@@ -121,7 +121,7 @@ Video Hardware start
 
 static tilemap_t *sc3_tilemap_0,*sc3_tilemap_2,*sc3_tilemap_3,
 			   *sc0_tilemap_0,*sc0_tilemap_1,*sc0_tilemap_2,*sc0_tilemap_3,
-   			   *sc1_tilemap_0,*sc1_tilemap_1,*sc1_tilemap_2,*sc1_tilemap_3,
+			   *sc1_tilemap_0,*sc1_tilemap_1,*sc1_tilemap_2,*sc1_tilemap_3,
 			   *sc2_tilemap_0,*sc2_tilemap_1,*sc2_tilemap_2,*sc2_tilemap_3;
 static UINT16 *sc3_vram,*sc0_vram,*sc1_vram,*sc2_vram;
 static UINT16 *jm_scrollram,*jm_vregs;
@@ -414,7 +414,7 @@ static VIDEO_UPDATE( urashima )
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x1ff]);//selectable by a ram address?
 	if(jm_vregs[0] & 1) { tilemap_draw(bitmap,cliprect,sc0_tilemap_0,0,0); }
- 	if(jm_vregs[3] & 1) { tilemap_draw(bitmap,cliprect,sc3_tilemap_0,0,0); }
+	if(jm_vregs[3] & 1) { tilemap_draw(bitmap,cliprect,sc3_tilemap_0,0,0); }
 	return 0;
 }
 
@@ -1426,7 +1426,7 @@ ROM_START( daireika )
 	ROM_LOAD( "mj12.bin", 0x20000, 0x20000, CRC(236f809f) SHA1(9e15dd8a810a9d4f7f75f084d6bd277ea7d0e40a) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 ) /* BG1 */
-	ROM_COPY( "gfx1", 	  0x10000, 0x00000, 0x10000 )/*mj12.bin*/
+	ROM_COPY( "gfx1",	  0x10000, 0x00000, 0x10000 )/*mj12.bin*/
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1453,7 +1453,7 @@ ROM_START( mjzoomin )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "zoomin-3.bin", 0x40000, 0x80000, CRC(07d7b8cd) SHA1(e05ce80ffb945b04f93f8c49d0c840b0bff6310b) )
-	ROM_COPY( "oki" ,  		  0x40000, 0x00000, 0x40000 )
+	ROM_COPY( "oki" ,		  0x40000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "zoomin14.bin", 0x00000, 0x20000, CRC(4e32aa45) SHA1(450a3449ca8b4f0dfe8b62cceaee9366eaf3dc3d) )
@@ -1530,7 +1530,7 @@ ROM_START( kakumei2 )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "92000-01.3", 0x040000, 0x80000, CRC(4b0ed440) SHA1(11961d217a41f92b60d5083a5e346c245f7db620) )
-	ROM_COPY( "oki" ,  		0x040000, 0x00000, 0x40000 )
+	ROM_COPY( "oki" ,		0x040000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "mj-8956.14", 0x00000, 0x20000, CRC(2b2fe999) SHA1(d9d601e2c008791f5bff6e7b1340f754dd094201) )
@@ -1786,78 +1786,78 @@ static WRITE16_HANDLER( urashima_mcu_w )
 		jm_mcu_code[0x1052/2] = 0x17E0;
 		jm_mcu_code[0x1054/2] = 0x33C6;
 		jm_mcu_code[0x1056/2] = 0x0010;
- 		jm_mcu_code[0x1058/2] = 0x17B0;
- 		jm_mcu_code[0x105a/2] = 0x3C39;
- 		jm_mcu_code[0x105c/2] = 0x000F;
- 		jm_mcu_code[0x105e/2] = 0x201A;
- 		jm_mcu_code[0x1060/2] = 0x3A86;
- 		jm_mcu_code[0x1062/2] = 0x6700;
- 		jm_mcu_code[0x1064/2] = 0x0074;
- 		jm_mcu_code[0x1066/2] = 0x33C2;
- 		jm_mcu_code[0x1068/2] = 0x0010;
- 		jm_mcu_code[0x106a/2] = 0x17FE;
- 		jm_mcu_code[0x106c/2] = 0x33C1;
- 		jm_mcu_code[0x106e/2] = 0x0010;
- 		jm_mcu_code[0x1070/2] = 0x17FC;
- 		jm_mcu_code[0x1072/2] = 0x23C8;
- 		jm_mcu_code[0x1074/2] = 0x0010;
- 		jm_mcu_code[0x1076/2] = 0x17F0;
-	 	jm_mcu_code[0x1078/2] = 0x23C9;
-	 	jm_mcu_code[0x107a/2] = 0x0010;
-	 	jm_mcu_code[0x107c/2] = 0x17D0;
-	 	jm_mcu_code[0x107e/2] = 0x41F9;
-	 	jm_mcu_code[0x1080/2] = 0x0002;
-	 	jm_mcu_code[0x1082/2] = 0xA2C0;
-	 	jm_mcu_code[0x1084/2] = 0x3c15;
-	 	jm_mcu_code[0x1086/2] = 0xd1fc;
- 		jm_mcu_code[0x1088/2] = 0x0000;
- 		jm_mcu_code[0x108a/2] = 0x0040;
- 		jm_mcu_code[0x108c/2] = 0x5346;
- 		jm_mcu_code[0x108e/2] = 0x6704;
- 		jm_mcu_code[0x1090/2] = 0x4e71;
- 		jm_mcu_code[0x1092/2] = 0x60F2;
- 		jm_mcu_code[0x1094/2] = 0x23c8;
- 		jm_mcu_code[0x1096/2] = 0x0010;
- 		jm_mcu_code[0x1098/2] = 0x17a0;//store here the A0 reg,1017a0
- 		jm_mcu_code[0x109a/2] = 0xd3fc;
- 		jm_mcu_code[0x109c/2] = 0x0000;
- 		jm_mcu_code[0x109e/2] = 0x0200;
- 		jm_mcu_code[0x10a0/2] = 0x720F;
- 		jm_mcu_code[0x10a2/2] = 0x740F;
- 		jm_mcu_code[0x10a4/2] = 0x2050;
- 		jm_mcu_code[0x10a6/2] = 0x32D8;
- 		jm_mcu_code[0x10a8/2] = 0x51CA;
- 		jm_mcu_code[0x10aa/2] = 0xFFFC;
- 		jm_mcu_code[0x10ac/2] = 0x2079;//1017a0,not 1017f0
- 		jm_mcu_code[0x10ae/2] = 0x0010;
- 		jm_mcu_code[0x10b0/2] = 0x17a0;
- 		jm_mcu_code[0x10b2/2] = 0xD0FC;
- 		jm_mcu_code[0x10b4/2] = 0x0004;
- 		jm_mcu_code[0x10b6/2] = 0x23c8;
- 		jm_mcu_code[0x10b8/2] = 0x0010;
- 		jm_mcu_code[0x10ba/2] = 0x17a0;
- 		jm_mcu_code[0x10bc/2] = 0x51C9;
- 		jm_mcu_code[0x10be/2] = 0xffe4;
- 		jm_mcu_code[0x10c0/2] = 0x3439;
- 		jm_mcu_code[0x10c2/2] = 0x0010;
- 		jm_mcu_code[0x10c4/2] = 0x17FE;
- 		jm_mcu_code[0x10c6/2] = 0x3239;
- 		jm_mcu_code[0x10c8/2] = 0x0010;
- 		jm_mcu_code[0x10ca/2] = 0x17FC;
- 		jm_mcu_code[0x10cc/2] = 0x2079;
- 		jm_mcu_code[0x10ce/2] = 0x0010;
- 		jm_mcu_code[0x10d0/2] = 0x17F0;
- 		jm_mcu_code[0x10d2/2] = 0x2279;
- 		jm_mcu_code[0x10d4/2] = 0x0010;
- 		jm_mcu_code[0x10d6/2] = 0x17D0;
- 		jm_mcu_code[0x10d8/2] = 0x2A79;
- 		jm_mcu_code[0x10da/2] = 0x0010;
- 		jm_mcu_code[0x10dc/2] = 0x17c0;
- 		jm_mcu_code[0x10de/2] = 0x3C39;
- 		jm_mcu_code[0x10e0/2] = 0x0010;
- 		jm_mcu_code[0x10e2/2] = 0x17B0;
- 		jm_mcu_code[0x10e4/2] = 0x6000;
- 		jm_mcu_code[0x10e6/2] = 0xFF26;
+		jm_mcu_code[0x1058/2] = 0x17B0;
+		jm_mcu_code[0x105a/2] = 0x3C39;
+		jm_mcu_code[0x105c/2] = 0x000F;
+		jm_mcu_code[0x105e/2] = 0x201A;
+		jm_mcu_code[0x1060/2] = 0x3A86;
+		jm_mcu_code[0x1062/2] = 0x6700;
+		jm_mcu_code[0x1064/2] = 0x0074;
+		jm_mcu_code[0x1066/2] = 0x33C2;
+		jm_mcu_code[0x1068/2] = 0x0010;
+		jm_mcu_code[0x106a/2] = 0x17FE;
+		jm_mcu_code[0x106c/2] = 0x33C1;
+		jm_mcu_code[0x106e/2] = 0x0010;
+		jm_mcu_code[0x1070/2] = 0x17FC;
+		jm_mcu_code[0x1072/2] = 0x23C8;
+		jm_mcu_code[0x1074/2] = 0x0010;
+		jm_mcu_code[0x1076/2] = 0x17F0;
+		jm_mcu_code[0x1078/2] = 0x23C9;
+		jm_mcu_code[0x107a/2] = 0x0010;
+		jm_mcu_code[0x107c/2] = 0x17D0;
+		jm_mcu_code[0x107e/2] = 0x41F9;
+		jm_mcu_code[0x1080/2] = 0x0002;
+		jm_mcu_code[0x1082/2] = 0xA2C0;
+		jm_mcu_code[0x1084/2] = 0x3c15;
+		jm_mcu_code[0x1086/2] = 0xd1fc;
+		jm_mcu_code[0x1088/2] = 0x0000;
+		jm_mcu_code[0x108a/2] = 0x0040;
+		jm_mcu_code[0x108c/2] = 0x5346;
+		jm_mcu_code[0x108e/2] = 0x6704;
+		jm_mcu_code[0x1090/2] = 0x4e71;
+		jm_mcu_code[0x1092/2] = 0x60F2;
+		jm_mcu_code[0x1094/2] = 0x23c8;
+		jm_mcu_code[0x1096/2] = 0x0010;
+		jm_mcu_code[0x1098/2] = 0x17a0;//store here the A0 reg,1017a0
+		jm_mcu_code[0x109a/2] = 0xd3fc;
+		jm_mcu_code[0x109c/2] = 0x0000;
+		jm_mcu_code[0x109e/2] = 0x0200;
+		jm_mcu_code[0x10a0/2] = 0x720F;
+		jm_mcu_code[0x10a2/2] = 0x740F;
+		jm_mcu_code[0x10a4/2] = 0x2050;
+		jm_mcu_code[0x10a6/2] = 0x32D8;
+		jm_mcu_code[0x10a8/2] = 0x51CA;
+		jm_mcu_code[0x10aa/2] = 0xFFFC;
+		jm_mcu_code[0x10ac/2] = 0x2079;//1017a0,not 1017f0
+		jm_mcu_code[0x10ae/2] = 0x0010;
+		jm_mcu_code[0x10b0/2] = 0x17a0;
+		jm_mcu_code[0x10b2/2] = 0xD0FC;
+		jm_mcu_code[0x10b4/2] = 0x0004;
+		jm_mcu_code[0x10b6/2] = 0x23c8;
+		jm_mcu_code[0x10b8/2] = 0x0010;
+		jm_mcu_code[0x10ba/2] = 0x17a0;
+		jm_mcu_code[0x10bc/2] = 0x51C9;
+		jm_mcu_code[0x10be/2] = 0xffe4;
+		jm_mcu_code[0x10c0/2] = 0x3439;
+		jm_mcu_code[0x10c2/2] = 0x0010;
+		jm_mcu_code[0x10c4/2] = 0x17FE;
+		jm_mcu_code[0x10c6/2] = 0x3239;
+		jm_mcu_code[0x10c8/2] = 0x0010;
+		jm_mcu_code[0x10ca/2] = 0x17FC;
+		jm_mcu_code[0x10cc/2] = 0x2079;
+		jm_mcu_code[0x10ce/2] = 0x0010;
+		jm_mcu_code[0x10d0/2] = 0x17F0;
+		jm_mcu_code[0x10d2/2] = 0x2279;
+		jm_mcu_code[0x10d4/2] = 0x0010;
+		jm_mcu_code[0x10d6/2] = 0x17D0;
+		jm_mcu_code[0x10d8/2] = 0x2A79;
+		jm_mcu_code[0x10da/2] = 0x0010;
+		jm_mcu_code[0x10dc/2] = 0x17c0;
+		jm_mcu_code[0x10de/2] = 0x3C39;
+		jm_mcu_code[0x10e0/2] = 0x0010;
+		jm_mcu_code[0x10e2/2] = 0x17B0;
+		jm_mcu_code[0x10e4/2] = 0x6000;
+		jm_mcu_code[0x10e6/2] = 0xFF26;
 	}
 }
 
@@ -1887,7 +1887,7 @@ static READ16_HANDLER( daireika_mcu_r )
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
-  									       0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
+									       0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
 
 static WRITE16_HANDLER( daireika_mcu_w )
 {
@@ -1946,7 +1946,7 @@ static WRITE16_HANDLER( daireika_mcu_w )
         *******************************************************/
 		jm_shared_ram[0x00c6/2] = 0x6000;
 		jm_shared_ram[0x00c8/2] = 0x0008;//bra +$8,needed because we have only two bytes here
-		             			   //and we need three...
+		            			   //and we need three...
 		jm_shared_ram[0x00d0/2] = 0x4ef9;
 		jm_shared_ram[0x00d2/2] = 0x0010;
 		jm_shared_ram[0x00d4/2] = 0x0000;//jmp $100000

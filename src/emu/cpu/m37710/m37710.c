@@ -173,7 +173,7 @@ static const char *const m37710_rnames[128] =
 	"A/D 7",
 	"",
 	"UART0 transmit/recv mode", 	// 48 (0x30)
-	"UART0 baud rate",	     	// 0x31
+	"UART0 baud rate",	    	// 0x31
 	"UART0 transmit buf L",		// 0x32
 	"UART0 transmit buf H",		// 0x33
 	"UART0 transmit/recv ctrl 0",	// 0x34
@@ -326,7 +326,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 		{
 			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
 			{
-				case 0:	      	// timer mode
+				case 0:	    	// timer mode
 					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(cpustate->device)), tscales[cpustate->m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
@@ -338,7 +338,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					cpustate->reload[timer] = time;
 					break;
 
-				case 1:	      	// event counter mode
+				case 1:	    	// event counter mode
 					#if M37710_DEBUG
 					mame_printf_debug("Timer %d in event counter mode\n", timer);
 					#endif
@@ -350,7 +350,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					#endif
 					break;
 
-				case 3:	      	// PWM mode
+				case 3:	    	// PWM mode
 					#if M37710_DEBUG
 					mame_printf_debug("Timer %d in PWM mode\n", timer);
 					#endif
@@ -361,7 +361,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 		{
 			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
 			{
-				case 0:	      	// timer mode
+				case 0:	    	// timer mode
 					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(cpustate->device)), tscales[cpustate->m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
@@ -373,7 +373,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					cpustate->reload[timer] = time;
 					break;
 
-				case 1:	      	// event counter mode
+				case 1:	    	// event counter mode
 					#if M37710_DEBUG
 					mame_printf_debug("Timer %d in event counter mode\n", timer);
 					#endif
@@ -513,7 +513,7 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 
 			return;
 
-		case 0x60:     	// watchdog reset
+		case 0x60:  	// watchdog reset
 			return;
 	}
 
@@ -971,9 +971,9 @@ static CPU_SET_INFO( m37710 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_ADC: 	m37710_set_irq_line(cpustate, M37710_LINE_ADC, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0: 	m37710_set_irq_line(cpustate, M37710_LINE_IRQ0, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1: 	m37710_set_irq_line(cpustate, M37710_LINE_IRQ1, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2: 	m37710_set_irq_line(cpustate, M37710_LINE_IRQ2, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0:	m37710_set_irq_line(cpustate, M37710_LINE_IRQ0, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1:	m37710_set_irq_line(cpustate, M37710_LINE_IRQ1, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2:	m37710_set_irq_line(cpustate, M37710_LINE_IRQ2, info->i); break;
 
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA0TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA1TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
@@ -985,7 +985,7 @@ static CPU_SET_INFO( m37710 )
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB2TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
 
 		case CPUINFO_INT_PC:							REG_PB = info->i & 0xff0000; m37710_set_pc(cpustate, info->i & 0xffff); break;
-		case CPUINFO_INT_SP:							m37710_set_sp(cpustate, info->i);	     			break;
+		case CPUINFO_INT_SP:							m37710_set_sp(cpustate, info->i);	    			break;
 
 		case CPUINFO_INT_REGISTER + M37710_PC:			m37710_set_reg(cpustate, M37710_PC, info->i);		break;
 		case CPUINFO_INT_REGISTER + M37710_S:			m37710_set_reg(cpustate, M37710_S, info->i);		break;
@@ -1028,25 +1028,25 @@ CPU_GET_INFO( m37710 )
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 6;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 20; /* rough guess */			break;
-		case CPUINFO_INT_INPUT_LINES:        			info->i = M37710_LINE_MAX;				break;
+		case CPUINFO_INT_INPUT_LINES:       			info->i = M37710_LINE_MAX;				break;
 
 		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0: 	info->i = 0;						break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1: 	info->i = 0;						break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2: 	info->i = 0;						break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0:	info->i = 0;						break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1:	info->i = 0;						break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2:	info->i = 0;						break;
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_RESET:	info->i = 0;						break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = REG_PPC;						break;
-		case CPUINFO_INT_PC:	 						info->i = (REG_PB | REG_PC);			break;
+		case CPUINFO_INT_PC:							info->i = (REG_PB | REG_PC);			break;
 		case CPUINFO_INT_SP:							info->i = m37710_get_sp(cpustate);				break;
 
 		case CPUINFO_INT_REGISTER + M37710_PC:			info->i = m37710_get_reg(cpustate, M37710_PC);	break;

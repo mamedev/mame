@@ -86,7 +86,7 @@ static WRITE16_HANDLER( jumppop_sound_w )
 
 static READ16_HANDLER( tumblepop_controls_r )
 {
- 	switch (offset<<1)
+	switch (offset<<1)
 	{
 		case 0:
 			return input_port_read(space->machine, "PLAYERS");

@@ -747,7 +747,7 @@ static MACHINE_DRIVER_START( hasamu )
 	MDRV_CPU_CONFIG(hasamu_config)
 MACHINE_DRIVER_END
 
-static const nec_config quizf1_config ={ 	lethalth_decryption_table, };
+static const nec_config quizf1_config ={	lethalth_decryption_table, };
 static MACHINE_DRIVER_START( quizf1 )
 	MDRV_IMPORT_FROM( m90 )
 	MDRV_CPU_MODIFY("maincpu")
@@ -756,7 +756,7 @@ static MACHINE_DRIVER_START( quizf1 )
 	MDRV_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_DRIVER_END
 
-static const nec_config matchit2_config ={ 	matchit2_decryption_table, };
+static const nec_config matchit2_config ={	matchit2_decryption_table, };
 static MACHINE_DRIVER_START( matchit2 )
 	MDRV_IMPORT_FROM( m90 )
 	MDRV_CPU_MODIFY("maincpu")
@@ -766,7 +766,7 @@ static MACHINE_DRIVER_START( matchit2 )
 MACHINE_DRIVER_END
 
 
-static const nec_config riskchal_config ={ 	gussun_decryption_table, };
+static const nec_config riskchal_config ={	gussun_decryption_table, };
 static MACHINE_DRIVER_START( riskchal )
 	MDRV_IMPORT_FROM( m90 )
 	MDRV_CPU_MODIFY("maincpu")
@@ -820,7 +820,7 @@ static MACHINE_DRIVER_START( bombrman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
-static const nec_config dynablaster_config ={ 	dynablaster_decryption_table, };
+static const nec_config dynablaster_config ={	dynablaster_decryption_table, };
 
 static MACHINE_DRIVER_START( bbmanw )
 

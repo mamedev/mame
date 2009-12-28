@@ -1110,7 +1110,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
-  	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_BASE(&hng64_3dregs)
+	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_BASE(&hng64_3dregs)
 	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)	// 3D Display Buffer A
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r,hng64_3d_2_w) AM_BASE(&hng64_3d_2)	// 3D Display Buffer B
 
@@ -1859,12 +1859,12 @@ static MACHINE_RESET(hyperneo)
 
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK)  	// actually R4300
+	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(hng_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq_start,4)
 
-	MDRV_CPU_ADD("audiocpu", V30,8000000)		 		// v53, 16? mhz!
+	MDRV_CPU_ADD("audiocpu", V30,8000000)				// v53, 16? mhz!
 	MDRV_CPU_PROGRAM_MAP(hng_sound_map)
 
 	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */

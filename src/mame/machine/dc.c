@@ -179,7 +179,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	{
 		reg++;
 		*shift = 32;
- 	}
+	}
 
 	return reg;
 }
@@ -203,7 +203,7 @@ INLINE int decode_reg3216_64(running_machine *machine, UINT32 offset, UINT64 mem
 	{
 		reg++;
 		*shift = 32;
- 	}
+	}
 
 	return reg;
 }
@@ -1107,8 +1107,8 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	UINT64 shift;
 	UINT32 old,dat;
 	struct sh4_ddt_dma ddtdata;
- 	UINT8 *ROM;
- 	UINT32 dmaoffset;
+	UINT8 *ROM;
+	UINT32 dmaoffset;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -1127,16 +1127,16 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				return;
 			}
 //          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(space->cpu));
- 			ROM = (UINT8 *)devtag_get_info_ptr(space->machine, "rom_board", DEVINFO_PTR_MEMORY);
- 			dmaoffset = (UINT32)devtag_get_info_int(space->machine, "rom_board", DEVINFO_INT_DMAOFFSET);
+			ROM = (UINT8 *)devtag_get_info_ptr(space->machine, "rom_board", DEVINFO_PTR_MEMORY);
+			dmaoffset = (UINT32)devtag_get_info_int(space->machine, "rom_board", DEVINFO_INT_DMAOFFSET);
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
 			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
 			ddtdata.size=32;			// bytes per word
- 			ddtdata.buffer=ROM+dmaoffset;	// buffer address
+			ddtdata.buffer=ROM+dmaoffset;	// buffer address
 			ddtdata.direction=1;	// 0 source to buffer, 1 buffer to destination
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
- 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
+			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
 			sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"), &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;

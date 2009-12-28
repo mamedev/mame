@@ -151,15 +151,15 @@ INPUT_PORTS_END
 
 static const gfx_layout layout8x8x2 =
 {
- 	8,8,
- 	RGN_FRAC(1,2),
- 	2,
- 	{
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{
 		RGN_FRAC(0,2),RGN_FRAC(1,2)
- 	},
- 	{ STEP8(0,1) },
- 	{ STEP8(0,8) },
- 	8*8
+	},
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 static GFXDECODE_START( murogmbl )
@@ -175,7 +175,7 @@ static MACHINE_DRIVER_START( murogmbl )
 
 	MDRV_PALETTE_INIT(murogmbl)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)

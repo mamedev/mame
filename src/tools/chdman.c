@@ -1078,7 +1078,7 @@ static int do_createav(int argc, char *argv[], int param)
 		rate = info->audio_samplerate;
 		totalframes = info->video_numsamples;
 	}
-  	numframes = MIN(totalframes - firstframe, numframes);
+	numframes = MIN(totalframes - firstframe, numframes);
 
 	/* print some of it */
 	printf("Use frames:   %d-%d\n", firstframe, firstframe + numframes - 1);
@@ -1484,7 +1484,7 @@ static int do_extract(int argc, char *argv[], int param)
 		}
 
 		/* write the hunk to the file */
- 		bytes_to_write = MIN(bytesremaining, header->hunkbytes);
+		bytes_to_write = MIN(bytesremaining, header->hunkbytes);
 		core_fseek(outfile, (UINT64)hunknum * (UINT64)header->hunkbytes, SEEK_SET);
 		byteswritten = core_fwrite(outfile, hunk, bytes_to_write);
 		if (byteswritten != bytes_to_write)
@@ -3316,7 +3316,7 @@ int CLIB_DECL main(int argc, char **argv)
 	} option_list[] =
 	{
 		{ "-createhd",		do_createhd, 0 },
-		{ "-createuncomphd", 	do_createhd_uncomp, 0 },
+		{ "-createuncomphd",	do_createhd_uncomp, 0 },
 		{ "-createraw",		do_createraw, 0 },
 		{ "-createcd",		do_createcd, 0 },
 		{ "-createblankhd",	do_createblankhd, 0 },

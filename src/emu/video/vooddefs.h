@@ -990,17 +990,17 @@ static const UINT8 dither_matrix_2x2[16] =
  *************************************/
 
 #define EXTRACT_565_TO_888(val, a, b, c)					\
-	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07); 	\
+	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07);	\
 	(b) = (((val) >> 3) & 0xfc) | (((val) >> 9) & 0x03);	\
 	(c) = (((val) << 3) & 0xf8) | (((val) >> 2) & 0x07);	\
 
 #define EXTRACT_x555_TO_888(val, a, b, c)					\
-	(a) = (((val) >> 7) & 0xf8) | (((val) >> 12) & 0x07); 	\
+	(a) = (((val) >> 7) & 0xf8) | (((val) >> 12) & 0x07);	\
 	(b) = (((val) >> 2) & 0xf8) | (((val) >> 7) & 0x07);	\
 	(c) = (((val) << 3) & 0xf8) | (((val) >> 2) & 0x07);	\
 
 #define EXTRACT_555x_TO_888(val, a, b, c)					\
-	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07); 	\
+	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07);	\
 	(b) = (((val) >> 3) & 0xf8) | (((val) >> 8) & 0x07);	\
 	(c) = (((val) << 2) & 0xf8) | (((val) >> 3) & 0x07);	\
 
@@ -1084,7 +1084,7 @@ static const UINT8 dither_matrix_2x2[16] =
 #define FBZCP_CC_ASELECT(val)				(((val) >> 2) & 3)
 #define FBZCP_CC_LOCALSELECT(val)			(((val) >> 4) & 1)
 #define FBZCP_CCA_LOCALSELECT(val)			(((val) >> 5) & 3)
-#define FBZCP_CC_LOCALSELECT_OVERRIDE(val) 	(((val) >> 7) & 1)
+#define FBZCP_CC_LOCALSELECT_OVERRIDE(val)	(((val) >> 7) & 1)
 #define FBZCP_CC_ZERO_OTHER(val)			(((val) >> 8) & 1)
 #define FBZCP_CC_SUB_CLOCAL(val)			(((val) >> 9) & 1)
 #define FBZCP_CC_MSELECT(val)				(((val) >> 10) & 7)
@@ -1445,9 +1445,9 @@ struct _ncc_table
 {
 	UINT8				dirty;					/* is the texel lookup dirty? */
 	voodoo_reg *		reg;					/* pointer to our registers */
-	INT32 				ir[4], ig[4], ib[4];	/* I values for R,G,B */
-	INT32 				qr[4], qg[4], qb[4];	/* Q values for R,G,B */
-	INT32 				y[16];					/* Y values */
+	INT32				ir[4], ig[4], ib[4];	/* I values for R,G,B */
+	INT32				qr[4], qg[4], qb[4];	/* Q values for R,G,B */
+	INT32				y[16];					/* Y values */
 	rgb_t *				palette;				/* pointer to associated RGB palette */
 	rgb_t *				palettea;				/* pointer to associated ARGB palette */
 	rgb_t				texel[256];				/* texel lookup */
@@ -1514,7 +1514,7 @@ struct _setup_vertex
 {
 	float				x, y;					/* X, Y coordinates */
 	float				a, r, g, b;				/* A, R, G, B values */
-	float 				z, wb;					/* Z and broadcast W values */
+	float				z, wb;					/* Z and broadcast W values */
 	float				w0, s0, t0;				/* W, S, T for TMU 0 */
 	float				w1, s1, t1;				/* W, S, T for TMU 1 */
 };
@@ -1574,10 +1574,10 @@ struct _fbi_state
 	stats_block			lfb_stats;				/* LFB-access statistics */
 
 	UINT8				sverts;					/* number of vertices ready */
-	setup_vertex 		svert[3];				/* 3 setup vertices */
+	setup_vertex		svert[3];				/* 3 setup vertices */
 
 	fifo_state			fifo;					/* framebuffer memory fifo */
-	cmdfifo_info 		cmdfifo[2];				/* command FIFOs */
+	cmdfifo_info		cmdfifo[2];				/* command FIFOs */
 
 	UINT8				fogblend[64];			/* 64-entry fog table */
 	UINT8				fogdelta[64];			/* 64-entry fog table */
@@ -1647,7 +1647,7 @@ struct _poly_extra_data
 	INT64				dw1dy;					/* delta W per Y */
 	INT32				lodbase1;				/* used during rasterization */
 
-	UINT16 				dither[16];				/* dither matrix, for fastfill */
+	UINT16				dither[16];				/* dither matrix, for fastfill */
 };
 
 
@@ -1675,7 +1675,7 @@ struct _voodoo_state
 	UINT8				type;					/* type of system */
 	UINT8				chipmask;				/* mask for which chips are available */
 	UINT32				freq;					/* operating frequency */
-	attoseconds_t 		attoseconds_per_cycle;	/* attoseconds per cycle */
+	attoseconds_t		attoseconds_per_cycle;	/* attoseconds per cycle */
 	UINT32				extra_cycles;			/* extra cycles not yet accounted for */
 	int					trigger;				/* trigger used for stalling */
 
@@ -1689,13 +1689,13 @@ struct _voodoo_state
 
 	fbi_state			fbi;					/* FBI states */
 	tmu_state			tmu[MAX_TMU];			/* TMU states */
-	tmu_shared_state 	tmushare;				/* TMU shared state */
-	banshee_info 		banshee;				/* Banshee state */
+	tmu_shared_state	tmushare;				/* TMU shared state */
+	banshee_info		banshee;				/* Banshee state */
 
 	poly_manager *		poly;					/* polygon manager */
 	stats_block	*		thread_stats;			/* per-thread statistics */
 
-	voodoo_stats 		stats;					/* internal statistics */
+	voodoo_stats		stats;					/* internal statistics */
 
 	offs_t				last_status_pc;			/* PC of last status description (for logging) */
 	UINT32				last_status_value;		/* value of last status read (for logging) */
@@ -2048,8 +2048,8 @@ INLINE UINT32 compute_raster_hash(const raster_info *info)
 	const UINT8 *dither4 = NULL;												\
 	const UINT8 *dither = NULL													\
 
-#define COMPUTE_DITHER_POINTERS(FBZMODE, YY) 									\
-do 																				\
+#define COMPUTE_DITHER_POINTERS(FBZMODE, YY)									\
+do																				\
 {																				\
 	/* compute the dithering pointers */										\
 	if (FBZMODE_ENABLE_DITHERING(FBZMODE))										\
@@ -2070,7 +2070,7 @@ do 																				\
 while (0)
 
 #define APPLY_DITHER(FBZMODE, XX, DITHER_LOOKUP, RR, GG, BB)					\
-do 																				\
+do																				\
 {																				\
 	/* apply dithering */														\
 	if (FBZMODE_ENABLE_DITHERING(FBZMODE))										\
@@ -2101,7 +2101,7 @@ while (0)
  *************************************/
 
 #define CLAMPED_ARGB(ITERR, ITERG, ITERB, ITERA, FBZCP, RESULT)					\
-do 																				\
+do																				\
 {																				\
 	INT32 r = (INT32)(ITERR) >> 12;												\
 	INT32 g = (INT32)(ITERG) >> 12;												\
@@ -2145,12 +2145,12 @@ do 																				\
 		RESULT.rgb.b = (b < 0) ? 0 : (b > 0xff) ? 0xff : b;						\
 		RESULT.rgb.a = (a < 0) ? 0 : (a > 0xff) ? 0xff : a;						\
 	}																			\
-} 																				\
+}																				\
 while (0)
 
 
 #define CLAMPED_Z(ITERZ, FBZCP, RESULT)											\
-do 																				\
+do																				\
 {																				\
 	(RESULT) = (INT32)(ITERZ) >> 12;											\
 	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)											\
@@ -2167,12 +2167,12 @@ do 																				\
 	{																			\
 		CLAMP((RESULT), 0, 0xffff);												\
 	}																			\
-} 																				\
+}																				\
 while (0)
 
 
 #define CLAMPED_W(ITERW, FBZCP, RESULT)											\
-do 																				\
+do																				\
 {																				\
 	(RESULT) = (INT16)((ITERW) >> 32);											\
 	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)											\
@@ -2188,7 +2188,7 @@ do 																				\
 	{																			\
 		CLAMP((RESULT), 0, 0xff);												\
 	}																			\
-} 																				\
+}																				\
 while (0)
 
 
@@ -2200,7 +2200,7 @@ while (0)
  *************************************/
 
 #define APPLY_CHROMAKEY(VV, STATS, FBZMODE, COLOR)								\
-do 																				\
+do																				\
 {																				\
 	if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE))										\
 	{																			\
@@ -2274,7 +2274,7 @@ while (0)
  *************************************/
 
 #define APPLY_ALPHAMASK(VV, STATS, FBZMODE, AA)									\
-do 																				\
+do																				\
 {																				\
 	if (FBZMODE_ENABLE_ALPHA_MASK(FBZMODE))										\
 	{																			\
@@ -2296,7 +2296,7 @@ while (0)
  *************************************/
 
 #define APPLY_ALPHATEST(VV, STATS, ALPHAMODE, AA)								\
-do 																				\
+do																				\
 {																				\
 	if (ALPHAMODE_ALPHATEST(ALPHAMODE))											\
 	{																			\
@@ -2655,7 +2655,7 @@ while (0)
  *************************************/
 
 #define TEXTURE_PIPELINE(TT, XX, DITHER4, TEXMODE, COTHER, LOOKUP, LODBASE, ITERS, ITERT, ITERW, RESULT) \
-do 																				\
+do																				\
 {																				\
 	INT32 blendr, blendg, blendb, blenda;										\
 	INT32 tr, tg, tb, ta;														\
@@ -2982,7 +2982,7 @@ do 																				\
 		RESULT.u ^= 0x00ffffff;													\
 	if (TEXMODE_TCA_INVERT_OUTPUT(TEXMODE))										\
 		RESULT.rgb.a ^= 0xff;													\
-} 																				\
+}																				\
 while (0)
 
 
@@ -2994,7 +2994,7 @@ while (0)
  *************************************/
 
 #define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)	\
-do 																				\
+do																				\
 {																				\
 	INT32 depthval, wfloat;														\
 	INT32 prefogr, prefogg, prefogb;											\
@@ -3154,7 +3154,7 @@ do 																				\
 	prefogr = r;																\
 	prefogg = g;																\
 	prefogb = b;																\
-	APPLY_FOGGING(VV, FOGMODE, FBZCOLORPATH, XX, DITHER4, r, g, b, 				\
+	APPLY_FOGGING(VV, FOGMODE, FBZCOLORPATH, XX, DITHER4, r, g, b,				\
 					ITERZ, ITERW, ITERAXXX);									\
 																				\
 	/* perform alpha blending */												\
@@ -3234,7 +3234,7 @@ while (0)
     INT32 r, g, b, a;
 */
 #define COLORPATH_PIPELINE(VV, STATS, FBZCOLORPATH, FBZMODE, ALPHAMODE, TEXELARGB, ITERZ, ITERW, ITERARGB) \
-do 																				\
+do																				\
 {																				\
 	INT32 blendr, blendg, blendb, blenda;										\
 	rgb_union c_other;															\
@@ -3255,7 +3255,7 @@ do 																				\
 			c_other.u = (VV)->reg[color1].u;									\
 			break;																\
 																				\
-		default: 	/* reserved */												\
+		default:	/* reserved */												\
 			c_other.u = 0;														\
 			break;																\
 	}																			\
@@ -3278,7 +3278,7 @@ do 																				\
 			c_other.rgb.a = (VV)->reg[color1].rgb.a;							\
 			break;																\
 																				\
-		default: 	/* reserved */												\
+		default:	/* reserved */												\
 			c_other.rgb.a = 0;													\
 			break;																\
 	}																			\
@@ -3365,7 +3365,7 @@ do 																				\
 	/* blend RGB */																\
 	switch (FBZCP_CC_MSELECT(FBZCOLORPATH))										\
 	{																			\
-		default: 	/* reserved */												\
+		default:	/* reserved */												\
 		case 0:		/* 0 */														\
 			blendr = blendg = blendb = 0;										\
 			break;																\
@@ -3398,7 +3398,7 @@ do 																				\
 	/* blend alpha */															\
 	switch (FBZCP_CCA_MSELECT(FBZCOLORPATH))									\
 	{																			\
-		default: 	/* reserved */												\
+		default:	/* reserved */												\
 		case 0:		/* 0 */														\
 			blenda = 0;															\
 			break;																\
@@ -3606,7 +3606,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 																				\
 		/* pixel pipeline part 2 handles fog, alpha, and final output */		\
 		PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth, \
-							FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, 			\
+							FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE,			\
 							iterz, iterw, iterargb);							\
 																				\
 		/* update the iterated parameters */									\

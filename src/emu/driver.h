@@ -76,13 +76,13 @@
 #define memcard_handler_0			NULL
 #define machine_start_0 			NULL
 #define machine_reset_0 			NULL
-#define sound_start_0 				NULL
-#define sound_reset_0 				NULL
-#define video_start_0 				NULL
-#define video_reset_0 				NULL
+#define sound_start_0				NULL
+#define sound_reset_0				NULL
+#define video_start_0				NULL
+#define video_reset_0				NULL
 #define palette_init_0				NULL
 #define video_eof_0 				NULL
-#define video_update_0 				NULL
+#define video_update_0				NULL
 
 
 typedef void   (*driver_init_func)(running_machine *machine);

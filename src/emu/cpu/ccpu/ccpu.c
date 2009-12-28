@@ -203,7 +203,7 @@ static CPU_EXECUTE( ccpu )
 	do
 	{
 		UINT16 tempval;
-   		UINT8 opcode;
+		UINT8 opcode;
 
 		/* update the delayed MI flag */
 		cpustate->miflag = cpustate->nextmiflag;
@@ -750,16 +750,16 @@ CPU_GET_INFO( ccpu )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 15;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -1;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 5;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 5;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;							break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */							break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CCPU_PC: 			info->i = cpustate->PC;							break;
+		case CPUINFO_INT_REGISTER + CCPU_PC:			info->i = cpustate->PC;							break;
 		case CPUINFO_INT_REGISTER + CCPU_FLAGS:			info->i = 0;
 				if (TEST_A0(cpustate)) info->i |= 0x01;
 				if (TEST_NC(cpustate)) info->i |= 0x02;

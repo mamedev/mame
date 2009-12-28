@@ -1488,7 +1488,7 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 	{
 		TC0080VCO_tilemap[2] = tilemap_create(machine, TC0080VCO_get_tx_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	 	/* find first empty slot to decode gfx */
+		/* find first empty slot to decode gfx */
 		for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 			if (machine->gfx[gfx_index] == 0)
 				break;
@@ -1795,7 +1795,7 @@ static void TC0080VCO_bg0_tilemap_draw(running_machine *machine,bitmap_t *bitmap
 }
 
 
-#define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\

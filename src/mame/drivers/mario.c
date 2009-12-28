@@ -304,7 +304,7 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( mario )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 	  0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,	  0, 32 )
 GFXDECODE_END
 
 

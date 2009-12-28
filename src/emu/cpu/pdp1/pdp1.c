@@ -956,11 +956,11 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 18;	/*16+2 ignored bits to make double word address*/	break;
 	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:							info->i = PC;							break;
@@ -1031,7 +1031,7 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME: 							strcpy(info->s, "PDP1");	break;
+	case DEVINFO_STR_NAME:							strcpy(info->s, "PDP1");	break;
 	case DEVINFO_STR_FAMILY:					strcpy(info->s, "DEC PDP-1");	break;
 	case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");	break;
 	case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);	break;

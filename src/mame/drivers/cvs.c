@@ -114,7 +114,7 @@ Todo & FIXME:
 
 READ8_HANDLER( cvs_video_or_color_ram_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		return state->video_ram[offset];
@@ -124,7 +124,7 @@ READ8_HANDLER( cvs_video_or_color_ram_r )
 
 WRITE8_HANDLER( cvs_video_or_color_ram_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		state->video_ram[offset] = data;
@@ -135,7 +135,7 @@ WRITE8_HANDLER( cvs_video_or_color_ram_w )
 
 READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		return state->palette_ram[offset & 0x0f];
@@ -145,7 +145,7 @@ READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 
 WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		state->palette_ram[offset & 0x0f] = data;
@@ -156,7 +156,7 @@ WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 
 READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		return state->character_ram[(0 * 0x800) | 0x400 | state->character_ram_page_start | offset];
@@ -166,7 +166,7 @@ READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 	{
@@ -181,7 +181,7 @@ WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		return state->character_ram[(1 * 0x800) | 0x400 | state->character_ram_page_start | offset];
@@ -191,7 +191,7 @@ READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 	{
@@ -206,7 +206,7 @@ WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 		return state->character_ram[(2 * 0x800) | 0x400 | state->character_ram_page_start | offset];
@@ -216,7 +216,7 @@ READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	if (*state->fo_state)
 	{
@@ -262,7 +262,7 @@ static void cvs_slave_cpu_interrupt( const device_config *cpu, int state )
 
 static READ8_HANDLER( cvs_input_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 	UINT8 ret = 0;
 
 	/* the upper 4 bits of the address is used to select the character banking attributes */
@@ -294,14 +294,14 @@ static READ8_HANDLER( cvs_input_r )
 #if 0
 static READ8_HANDLER( cvs_393hz_clock_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
- 	return state->cvs_393hz_clock ? 0x80 : 0;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	return state->cvs_393hz_clock ? 0x80 : 0;
 }
 #endif
 
 static READ8_DEVICE_HANDLER( tms_clock_r )
 {
-  	return tms5110_romclk_r(device, 0) ? 0x80 : 0;
+	return tms5110_romclk_r(device, 0) ? 0x80 : 0;
 }
 
 static TIMER_CALLBACK( cvs_393hz_timer_cb )

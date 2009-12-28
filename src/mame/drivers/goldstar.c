@@ -494,11 +494,11 @@ static READ8_HANDLER( unkch_unk_r )
 
 // scrolling is wrong / different
 static ADDRESS_MAP_START( unkch_map, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x9fff) AM_ROM
- 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
- 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
- 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 
@@ -7988,14 +7988,14 @@ static DRIVER_INIT( schery97 )
 	{
 		UINT8 x = ROM[i];
 		switch(i & 0x12)
-     	{
-     		case 0x00: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-     		case 0x02: x = BITSWAP8(x^0x4d, 0,7,6,5,4,3,2,1); break;
-     		case 0x10: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-     		case 0x12: x = BITSWAP8(x^0xbb, 4,3,2,1,0,7,6,5); break;
-     	}
+    	{
+    		case 0x00: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+    		case 0x02: x = BITSWAP8(x^0x4d, 0,7,6,5,4,3,2,1); break;
+    		case 0x10: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+    		case 0x12: x = BITSWAP8(x^0xbb, 4,3,2,1,0,7,6,5); break;
+    	}
 
-     	ROM[i] = x;
+    	ROM[i] = x;
 	}
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);

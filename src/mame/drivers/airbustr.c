@@ -626,7 +626,7 @@ static MACHINE_RESET( airbustr )
 static const kaneko_pandora_interface airbustr_pandora_config =
 {
 	"screen",	/* screen tag */
-	1, 	/* gfx_region */
+	1,	/* gfx_region */
 	0, 0	/* x_offs, y_offs */
 };
 

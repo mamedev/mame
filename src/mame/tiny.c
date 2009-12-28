@@ -39,8 +39,8 @@ const game_driver * const drivers[] =
 #else	/* DRIVER_RECURSIVE */
 
 	DRIVER( robby )		/* (c) 1981 Bally Midway */
-	DRIVER( gridlee ) 	/* [1983 Videa] prototype - no copyright notice */
-	DRIVER( alienar ) 	/* (c) 1985 Duncan Brown */
+	DRIVER( gridlee )	/* [1983 Videa] prototype - no copyright notice */
+	DRIVER( alienar )	/* (c) 1985 Duncan Brown */
 	DRIVER( carpolo )	/* (c) 1977 Exidy */
 	DRIVER( sidetrac )	/* (c) 1979 Exidy */
 	DRIVER( targ )		/* (c) 1980 Exidy */

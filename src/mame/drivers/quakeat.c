@@ -164,7 +164,7 @@ static MACHINE_DRIVER_START( quake )
 	MDRV_PIC8259_ADD( "pic8259_1", quakeat_pic8259_1_config )
 	MDRV_PIC8259_ADD( "pic8259_2", quakeat_pic8259_2_config )
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)

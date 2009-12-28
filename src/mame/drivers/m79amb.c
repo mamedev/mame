@@ -224,7 +224,7 @@ static DRIVER_INIT( m79amb )
 	int i,j;
 
 	/* PROM data is active low */
- 	for (i = 0;i < 0x2000;i++)
+	for (i = 0;i < 0x2000;i++)
 		rom[i] = ~rom[i];
 
 	/* gun positions */

@@ -710,9 +710,9 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #define RECURSIVE_INCLUDE
 
 /* non-transparent replace ops */
-#define PIXEL_OP(src, mask, pixel) 		pixel = pixel
-#define PIXEL_OP_TIMING			 		2
-#define PIXEL_OP_REQUIRES_SOURCE 		0
+#define PIXEL_OP(src, mask, pixel)		pixel = pixel
+#define PIXEL_OP_TIMING					2
+#define PIXEL_OP_REQUIRES_SOURCE		0
 #define TRANSPARENCY					0
 
 	/* 1bpp cases */
@@ -756,9 +756,9 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #undef PIXEL_OP
 
 
-#define PIXEL_OP(src, mask, pixel) 		pixel = (*pixel_op)(src, mask, pixel)
-#define PIXEL_OP_TIMING			 		pixel_op_timing
-#define PIXEL_OP_REQUIRES_SOURCE 		1
+#define PIXEL_OP(src, mask, pixel)		pixel = (*pixel_op)(src, mask, pixel)
+#define PIXEL_OP_TIMING					pixel_op_timing
+#define PIXEL_OP_REQUIRES_SOURCE		1
 #define TRANSPARENCY					0
 
 	/* 1bpp cases */
@@ -803,9 +803,9 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 
 
 /* transparent replace ops */
-#define PIXEL_OP(src, mask, pixel) 		pixel = pixel
-#define PIXEL_OP_REQUIRES_SOURCE 		0
-#define PIXEL_OP_TIMING			 		4
+#define PIXEL_OP(src, mask, pixel)		pixel = pixel
+#define PIXEL_OP_REQUIRES_SOURCE		0
+#define PIXEL_OP_TIMING					4
 #define TRANSPARENCY					1
 
 	/* 1bpp cases */
@@ -849,8 +849,8 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #undef PIXEL_OP
 
 
-#define PIXEL_OP(src, mask, pixel) 		pixel = (*pixel_op)(src, mask, pixel)
-#define PIXEL_OP_REQUIRES_SOURCE 		1
+#define PIXEL_OP(src, mask, pixel)		pixel = (*pixel_op)(src, mask, pixel)
+#define PIXEL_OP_REQUIRES_SOURCE		1
 #define PIXEL_OP_TIMING					(2+pixel_op_timing)
 #define TRANSPARENCY					1
 

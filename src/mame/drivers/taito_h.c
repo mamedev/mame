@@ -310,8 +310,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP		/* pan control */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP 		/* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP 		/* ? */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP		/* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP		/* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

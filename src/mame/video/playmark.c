@@ -363,7 +363,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			pri = 2;
 
 		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
-		 		 code,
+				 code,
 				 color,
 				 flipx,0,
 				 sx + xoffset,sy + yoffset,

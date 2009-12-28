@@ -7,7 +7,7 @@
 
 
 #define pz  p[0]
-#define pu 	p[1]
+#define pu	p[1]
 #define pv	p[2]
 
 
@@ -1288,17 +1288,17 @@ static void draw_model(UINT32 addr)
 				memcpy(&tri.v[0], &clip_vert[0], sizeof(poly_vertex));
 				memcpy(&tri.v[1], &clip_vert[i-1], sizeof(poly_vertex));
 				memcpy(&tri.v[2], &clip_vert[i], sizeof(poly_vertex));
-				tri.texture_x 				= ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
-				tri.texture_y 				= (header[5] & 0x1f);
+				tri.texture_x				= ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
+				tri.texture_y				= (header[5] & 0x1f);
 				tri.texture_width			= ((header[3] >> 3) & 0x7);
 				tri.texture_height			= (header[3] & 0x7);
 				tri.texture_format			= (header[6] >> 7) & 0x7;
 				tri.transparency			= polygon_transparency;
-				tri.intensity 				= intensity;
-				tri.color 					= color;
+				tri.intensity				= intensity;
+				tri.color					= color;
 
 				tri.param	= 0;
-				tri.param 	|= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
+				tri.param	|= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
 				tri.param	|= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
 				tri.param	|= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
 				tri.param	|= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;

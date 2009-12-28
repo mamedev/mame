@@ -76,19 +76,19 @@ Sound Board 1b11107
 
 static WRITE8_HANDLER( video_page_select_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 	state->page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( io_page_select_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 	state->io_page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( quasar_video_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 
 	switch (state->page)
 	{
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( quasar_video_w )
 
 static READ8_HANDLER( quasar_IO_r )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 	UINT8 ans = 0;
 
 	switch (state->io_page)
@@ -117,7 +117,7 @@ static READ8_HANDLER( quasar_IO_r )
 
 static WRITE8_HANDLER( quasar_bullet_w )
 {
- 	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = (cvs_state *)space->machine->driver_data;
 	state->bullet_ram[offset] = (data ^ 0xff);
 }
 
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
-  	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_signed_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_signed_w)
 ADDRESS_MAP_END
 
 /************************************************************************

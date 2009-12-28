@@ -17,7 +17,7 @@ typedef struct
 {
 	UINT32 lba;
 	UINT32 blocks;
- 	hard_disk_file *disk;
+	hard_disk_file *disk;
 } SCSIHd;
 
 

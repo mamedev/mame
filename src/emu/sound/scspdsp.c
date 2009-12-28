@@ -308,7 +308,7 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 			if(MWT && (step&1))
 			{
 				if(NOFL)
-			      		DSP->SCSPRAM[ADDR]=SHIFTED>>8;
+			    		DSP->SCSPRAM[ADDR]=SHIFTED>>8;
 				else
 					DSP->SCSPRAM[ADDR]=PACK(SHIFTED);
 			}

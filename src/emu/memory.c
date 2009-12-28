@@ -265,7 +265,7 @@ struct _memory_block
 	memory_block *			next;					/* next memory block in the list */
 	const address_space *	space;					/* which address space are we associated with? */
 	UINT8					isallocated;			/* did we allocate this ourselves? */
-	offs_t 					bytestart, byteend;		/* byte-normalized start/end for verifying a match */
+	offs_t					bytestart, byteend;		/* byte-normalized start/end for verifying a match */
 	UINT8 *					data;					/* pointer to the data for this block */
 };
 
@@ -283,12 +283,12 @@ struct _bank_info
 {
 	bank_info *				next;					/* next bank in sequence */
 	UINT8					index;					/* array index for this handler */
-	UINT8 					read;					/* is this bank used for reads? */
-	UINT8 					write;					/* is this bank used for writes? */
+	UINT8					read;					/* is this bank used for reads? */
+	UINT8					write;					/* is this bank used for writes? */
 	void *					handler;				/* handler for this bank */
 	bank_reference *		reflist;				/* linked list of address spaces referencing this bank */
-	offs_t 					bytestart;				/* byte-adjusted start offset */
-	offs_t 					byteend;				/* byte-adjusted end offset */
+	offs_t					bytestart;				/* byte-adjusted start offset */
+	offs_t					byteend;				/* byte-adjusted end offset */
 	UINT16					curentry;				/* current entry */
 	void *					entry[MAX_BANK_ENTRIES];/* array of entries for this bank */
 	void *					entryd[MAX_BANK_ENTRIES];/* array of decrypted entries for this bank */
@@ -300,7 +300,7 @@ struct _bank_info
 struct _direct_range
 {
     direct_range *			next;					/* pointer to the next range in the list */
-    offs_t 					bytestart;				/* starting byte offset of the range */
+    offs_t					bytestart;				/* starting byte offset of the range */
     offs_t					byteend;				/* ending byte offset of the range */
 };
 
@@ -1436,10 +1436,10 @@ void _memory_install_port(const address_space *space, offs_t addrstart, offs_t a
 	/* pick the appropriate read/write handlers */
 	switch (space->dbits)
 	{
-		case 8:		rhandler = (genf *)input_port_read8;	whandler = (genf *)input_port_write8; 	break;
-		case 16:	rhandler = (genf *)input_port_read16; 	whandler = (genf *)input_port_write16;	break;
-		case 32:	rhandler = (genf *)input_port_read32; 	whandler = (genf *)input_port_write32;	break;
-		case 64:	rhandler = (genf *)input_port_read64; 	whandler = (genf *)input_port_write64;	break;
+		case 8:		rhandler = (genf *)input_port_read8;	whandler = (genf *)input_port_write8;	break;
+		case 16:	rhandler = (genf *)input_port_read16;	whandler = (genf *)input_port_write16;	break;
+		case 32:	rhandler = (genf *)input_port_read32;	whandler = (genf *)input_port_write32;	break;
+		case 64:	rhandler = (genf *)input_port_read64;	whandler = (genf *)input_port_write64;	break;
 	}
 
 	/* assign the read handler */
@@ -2175,7 +2175,7 @@ static void memory_init_locate(running_machine *machine)
 				{
 					memdata->bank_ptr[bank->index] = (UINT8 *)entry->memory;
 					foundit = TRUE;
-	 				VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag, entry->addrstart, entry->addrend, entry->memory));
+					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag, entry->addrstart, entry->addrend, entry->memory));
 					break;
 				}
 
@@ -3484,8 +3484,8 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 			if (shareptr != UNMAPPED_SHARE_PTR)
 			{
 				entry->memory = shareptr;
- 				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->addrstart, entry->addrend, entry->share, entry->memory));
- 			}
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->addrstart, entry->addrend, entry->share, entry->memory));
+			}
 		}
 
 		/* otherwise, look for a match in this block */

@@ -104,7 +104,7 @@ VIDEO_UPDATE( rastan )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
 	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,0);
@@ -124,7 +124,7 @@ VIDEO_UPDATE( opwolf )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
 	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,1);
@@ -181,7 +181,7 @@ VIDEO_UPDATE( jumping )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
+	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 
 	/* Draw the sprites. 128 sprites in total */
 	for (offs = screen->machine->generic.spriteram_size/2-8; offs >= 0; offs -= 8)
@@ -192,7 +192,7 @@ VIDEO_UPDATE( jumping )
 			int sx,sy,color,data1;
 
 			sy = ((spriteram16[offs+1] - 0xfff1) ^ 0xffff) & 0x1ff;
-  			if (sy > 400) sy = sy - 512;
+			if (sy > 400) sy = sy - 512;
 			sx = (spriteram16[offs+2] - 0x38) & 0x1ff;
 			if (sx > 400) sx = sx - 512;
 
@@ -207,7 +207,7 @@ VIDEO_UPDATE( jumping )
 		}
 	}
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,0);
+	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,0);
 
 #if 0
 	{

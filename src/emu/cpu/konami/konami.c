@@ -51,7 +51,7 @@ struct _konami_state
     PAIR    dp;         /* Direct Page register (page in MSB) */
 	PAIR	u, s;		/* Stack pointers */
 	PAIR	x, y;		/* Index registers */
-	PAIR 	ea;
+	PAIR	ea;
     UINT8   cc;
     UINT8	ireg;
     UINT8   irq_state[2];
@@ -236,9 +236,9 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 #define EXTWORD(cs,w) EXTENDED(cs); w.d=RM16(cs,EAD)
 
 /* macros for branch instructions */
-#define BRANCH(cs,f) { 					\
+#define BRANCH(cs,f) {					\
 	UINT8 t;							\
-	IMMBYTE(cs,t); 						\
+	IMMBYTE(cs,t);						\
 	if( f ) 							\
 	{									\
 		PC += SIGNED(t);				\
@@ -247,7 +247,7 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 
 #define LBRANCH(cs,f) {                 \
 	PAIR t; 							\
-	IMMWORD(cs,t); 						\
+	IMMWORD(cs,t);						\
 	if( f ) 							\
 	{									\
 		cpustate->icount -= 1;			\
@@ -261,10 +261,10 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 #define GETREG(val,reg) 				\
 	switch(reg) {						\
 	case 0: val = A;	break;			\
-	case 1: val = B; 	break; 			\
-	case 2: val = X; 	break;			\
-	case 3: val = Y;	break; 			\
-	case 4: val = S; 	break; /* ? */	\
+	case 1: val = B;	break;			\
+	case 2: val = X;	break;			\
+	case 3: val = Y;	break;			\
+	case 4: val = S;	break; /* ? */	\
 	case 5: val = U;	break;			\
 	default: val = 0xff; logerror("Unknown TFR/EXG idx at PC:%04x\n", PC ); break; \
 }
@@ -273,10 +273,10 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	switch(reg) {						\
 	case 0: A = val;	break;			\
 	case 1: B = val;	break;			\
-	case 2: X = val; 	break;			\
+	case 2: X = val;	break;			\
 	case 3: Y = val;	break;			\
 	case 4: S = val;	break; /* ? */	\
-	case 5: U = val; 	break;			\
+	case 5: U = val;	break;			\
 	default: logerror("Unknown TFR/EXG idx at PC:%04x\n", PC ); break; \
 }
 
@@ -526,7 +526,7 @@ static CPU_SET_INFO( konami )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + KONAMI_PC:			PC = info->i; 							break;
+		case CPUINFO_INT_REGISTER + KONAMI_PC:			PC = info->i;							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + KONAMI_S:			S = info->i;							break;
 		case CPUINFO_INT_REGISTER + KONAMI_CC:			CC = info->i;							break;
@@ -566,11 +566,11 @@ CPU_GET_INFO( konami )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + KONAMI_IRQ_LINE:	info->i = cpustate->irq_state[KONAMI_IRQ_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + KONAMI_FIRQ_LINE:info->i = cpustate->irq_state[KONAMI_FIRQ_LINE]; break;

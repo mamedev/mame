@@ -230,7 +230,7 @@ static void jchan_mcu_run(running_machine *machine)
 		}
 		break;
 
-		case 0x03: 	// DSW
+		case 0x03:	// DSW
 		{
 			mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
 			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",cpuexec_describe_context(machine),mcu_command,mcu_offset*2);

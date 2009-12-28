@@ -117,8 +117,8 @@ struct dst_rcfilter_sw_context
 {
 	double	vCap[4];
 	double	exp[4];
-	double  exp0; 	/* fast case bit 0 */
-	double  exp1; 	/* fast case bit 1 */
+	double  exp0;	/* fast case bit 0 */
+	double  exp1;	/* fast case bit 1 */
 	double  factor; /* fast case */
 	double  f1[16];
 	double  f2[16];

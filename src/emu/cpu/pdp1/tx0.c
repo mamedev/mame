@@ -315,7 +315,7 @@ static CPU_EXECUTE( tx0_8kw )
 
 					MBR = AC;
 					IR = MBR >> 13;		/* basic opcode */
-					if ((IR == 16) || (IR == 8)) 	/* trn or add instruction? */
+					if ((IR == 16) || (IR == 8))	/* trn or add instruction? */
 					{
 						PC = MBR & ADDRESS_MASK_8KW;
 						cpustate->rim = 0;	/* exit read-in mode */
@@ -455,11 +455,11 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;							break;
 	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -2;							break;
 	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;							break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;							break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;							break;
 	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;							break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;							break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;							break;
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */						break;
 	case CPUINFO_INT_PC:							info->i = PC;									break;
@@ -512,7 +512,7 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;						break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME: 							strcpy(info->s, "TX-0");						break;
+	case DEVINFO_STR_NAME:							strcpy(info->s, "TX-0");						break;
 	case DEVINFO_STR_FAMILY:					strcpy(info->s, "TX-0");						break;
 	case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
 	case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
@@ -581,11 +581,11 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 13;					break;
 	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -2;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:							info->i = PC;							break;
@@ -638,7 +638,7 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME: 							strcpy(info->s, "TX-0");	break;
+	case DEVINFO_STR_NAME:							strcpy(info->s, "TX-0");	break;
 	case DEVINFO_STR_FAMILY:					strcpy(info->s, "TX-0");	break;
 	case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");	break;
 	case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);	break;

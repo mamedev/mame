@@ -308,7 +308,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			state->firsttime = 0;
-			state->latch1 = 0; 	 /* reset latch (??) */
+			state->latch1 = 0;	 /* reset latch (??) */
 		}
 
 		if (0 == (offset & E5XX_MASK))
@@ -388,7 +388,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			state->firsttime = 0;
-			state->latch1 = 0; 	 /* reset latch (??) */
+			state->latch1 = 0;	 /* reset latch (??) */
 		}
 
 		if (0 == (offset & E5XX_MASK))
@@ -468,7 +468,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			state->firsttime = 0;
-			state->latch1 = 0; 	 /* reset latch (??) */
+			state->latch1 = 0;	 /* reset latch (??) */
 		}
 
 		if (0 == (offset & E5XX_MASK))
@@ -548,7 +548,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			state->firsttime = 0;
-			state->latch1 = 0; 	 /* reset latch (??) */
+			state->latch1 = 0;	 /* reset latch (??) */
 		}
 
 		if (0 == (offset & E5XX_MASK))
@@ -630,7 +630,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			state->firsttime = 0;
-			state->latch1 = 0; 	 /* reset latch (??) */
+			state->latch1 = 0;	 /* reset latch (??) */
 		}
 
 		if (0 == (offset & E5XX_MASK))
@@ -1202,11 +1202,11 @@ READ8_HANDLER( decocass_e5xx_r )
 		UINT8 bot_eot = (tape_get_status_bits(state->cassette) >> 5) & 1;
 
 		data =
-			(BIT(state->i8041_p1, 7) 	  << 0) |	/* D0 = P17 - REQ/ */
-			(BIT(state->i8041_p2, 0) 	  << 1) |	/* D1 = P20 - FNO/ */
-			(BIT(state->i8041_p2, 1) 	  << 2) |	/* D2 = P21 - EOT/ */
-			(BIT(state->i8041_p2, 2) 	  << 3) |	/* D3 = P22 - ERR/ */
-			((bot_eot) 	          << 4) |	/* D4 = BOT/EOT (direct from drive) */
+			(BIT(state->i8041_p1, 7)	  << 0) |	/* D0 = P17 - REQ/ */
+			(BIT(state->i8041_p2, 0)	  << 1) |	/* D1 = P20 - FNO/ */
+			(BIT(state->i8041_p2, 1)	  << 2) |	/* D2 = P21 - EOT/ */
+			(BIT(state->i8041_p2, 2)	  << 3) |	/* D3 = P22 - ERR/ */
+			((bot_eot)	          << 4) |	/* D4 = BOT/EOT (direct from drive) */
 			(1					  << 5) |	/* D5 floating input */
 			(1					  << 6) |	/* D6 floating input */
 			(!tape_is_present(state->cassette) << 7);	/* D7 = cassette present */

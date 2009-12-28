@@ -865,10 +865,10 @@ static CPU_GET_INFO( z8 )
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 2;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 2;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:				info->setinfo = CPU_SET_INFO_NAME(z8);			break;

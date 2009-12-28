@@ -21,23 +21,23 @@
 
 static struct _asic65_t
 {
-	UINT8  	type;
-	int    	command;
-	UINT16 	param[32];
-	UINT16 	yorigin;
-	UINT8  	param_index;
-	UINT8  	result_index;
-	UINT8  	reset_state;
-	UINT8  	last_bank;
+	UINT8	type;
+	int 	command;
+	UINT16	param[32];
+	UINT16	yorigin;
+	UINT8	param_index;
+	UINT8	result_index;
+	UINT8	reset_state;
+	UINT8	last_bank;
 
 	/* ROM-based interface states */
 	const device_config *cpu;
 	UINT8	tfull;
-	UINT8 	_68full;
-	UINT8 	cmd;
-	UINT8 	xflg;
-	UINT16 	_68data;
-	UINT16 	tdata;
+	UINT8	_68full;
+	UINT8	cmd;
+	UINT8	xflg;
+	UINT16	_68data;
+	UINT16	tdata;
 
 	FILE * log;
 } asic65;
@@ -75,7 +75,7 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
 {
 	{
 		/* standard version */
-		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM, 	OP_VERSION,		/* 00-03 */
+		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM,	OP_VERSION,		/* 00-03 */
 		OP_RAMTEST,		OP_UNKNOWN,		OP_UNKNOWN,		OP_RESET,		/* 04-07 */
 		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 08-0b */
 		OP_UNKNOWN,		OP_UNKNOWN,		OP_TMATRIXMULT,	OP_UNKNOWN,		/* 0c-0f */
@@ -89,7 +89,7 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
 	},
 	{
 		/* Steel Talons version */
-		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM, 	OP_VERSION,		/* 00-03 */
+		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM,	OP_VERSION,		/* 00-03 */
 		OP_RAMTEST,		OP_UNKNOWN,		OP_UNKNOWN,		OP_RESET,		/* 04-07 */
 		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 08-0b */
 		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 0c-0f */
@@ -103,7 +103,7 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
 	},
 	{
 		/* Guardians version */
-		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM, 	OP_VERSION,		/* 00-03 */
+		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM,	OP_VERSION,		/* 00-03 */
 		OP_RAMTEST,		OP_UNKNOWN,		OP_UNKNOWN,		OP_RESET,		/* 04-07 */
 		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 08-0b */
 		OP_UNKNOWN,		OP_UNKNOWN,		OP_INITBANKS,	OP_SETBANK,		/* 0c-0f */

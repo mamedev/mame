@@ -40,7 +40,7 @@ struct _riot6532_port
 {
 	UINT8					in;
 	UINT8					out;
-	UINT8			 		ddr;
+	UINT8					ddr;
 	devcb_resolved_read8	in_func;
 	devcb_resolved_write8	out_func;
 };
@@ -60,8 +60,8 @@ struct _riot6532_state
 	UINT8			irqstate;
 	UINT8			irqenable;
 
-	UINT8 			pa7dir;		/* 0x80 = high-to-low, 0x00 = low-to-high */
-	UINT8 			pa7prev;
+	UINT8			pa7dir;		/* 0x80 = high-to-low, 0x00 = low-to-high */
+	UINT8			pa7prev;
 
 	UINT8			timershift;
 	UINT8			timerstate;

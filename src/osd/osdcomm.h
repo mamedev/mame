@@ -161,7 +161,7 @@ __extension__ typedef signed long long		INT64;
 #endif
 
 #ifndef FALSE
-#define FALSE  				0
+#define FALSE				0
 #endif
 
 

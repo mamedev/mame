@@ -10,10 +10,10 @@ typedef struct _gauntlet_state gauntlet_state;
 struct _gauntlet_state
 {
 	atarigen_state	atarigen;
-	UINT16 			sound_reset_val;
-	UINT8 			vindctr2_screen_refresh;
-	UINT8 			playfield_tile_bank;
-	UINT8	 		playfield_color_bank;
+	UINT16			sound_reset_val;
+	UINT8			vindctr2_screen_refresh;
+	UINT8			playfield_tile_bank;
+	UINT8			playfield_color_bank;
 };
 
 

@@ -148,23 +148,23 @@ static VIDEO_UPDATE( srmp5 )
 						for(ys=0;ys<=sizey;ys++)
 						{
 							ys2 = (sprite_sublist[SPRITE_PALETTE] & 0x4000) ? ys : (sizey - ys);
-		 					for(xs=0;xs<=sizex;xs++)
-		 					{
-		 						UINT8 pen=pixels[address&(0x100000-1)];
-		 						xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
-		 						if(pen)
-		 						{
-		 							if(xb+xs2<=visarea->max_x && xb+xs2>=visarea->min_x && yb+ys2<=visarea->max_y && yb+ys2>=visarea->min_y )
-		 							{
-		 								UINT16 pixdata=palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
-		 								*BITMAP_ADDR32(bitmap, yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
-		 							}
-		 						}
-		 						++address;
-		 					}
-		 				}
-		 			}
-		 		}
+							for(xs=0;xs<=sizex;xs++)
+							{
+								UINT8 pen=pixels[address&(0x100000-1)];
+								xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
+								if(pen)
+								{
+									if(xb+xs2<=visarea->max_x && xb+xs2>=visarea->min_x && yb+ys2<=visarea->max_y && yb+ys2>=visarea->min_y )
+									{
+										UINT16 pixdata=palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
+										*BITMAP_ADDR32(bitmap, yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
+									}
+								}
+								++address;
+							}
+						}
+					}
+				}
 				sprite_sublist+=SPRITE_SUBLIST_ENTRY_LENGTH;
 				--sublist_length;
 			}

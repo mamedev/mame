@@ -387,8 +387,8 @@ void debugwin_init_windows(void)
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName 	= TEXT("MAMEDebugWindow");
-		wc.hInstance 		= GetModuleHandle(NULL);
+		wc.lpszClassName	= TEXT("MAMEDebugWindow");
+		wc.hInstance		= GetModuleHandle(NULL);
 		wc.lpfnWndProc		= debugwin_window_proc;
 		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
@@ -403,7 +403,7 @@ void debugwin_init_windows(void)
 			fatalerror("Unable to register debug window class");
 
 		// initialize the description of the view class
-		wc.lpszClassName 	= TEXT("MAMEDebugView");
+		wc.lpszClassName	= TEXT("MAMEDebugView");
 		wc.lpfnWndProc		= debugwin_view_proc;
 
 		// register the class; fail if we can't
@@ -1446,7 +1446,7 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 				debug_view_set_cursor_position(info->view, newpos);
 				SetFocus(wnd);
 			}
- 			break;
+			break;
 		}
 
 		// hscroll

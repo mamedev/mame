@@ -736,7 +736,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 ***************************************************************************/
 
 static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT32 priority,
-		  				 int sx, int sy, int wx, int wy)	// scroll & window values
+						 int sx, int sy, int wx, int wy)	// scroll & window values
 {
 #if 1
 		tilemap_set_scrollx(tmap, 0, sx - wx + (wx & 7));

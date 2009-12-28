@@ -433,7 +433,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 
 			/* print an update every 10000 frames */
 			if (framenum != 0 && framenum % 10000 == 0)
-   				printf("%6d.%d: detected frame %d\n", frame, fieldnum, framenum);
+				printf("%6d.%d: detected frame %d\n", frame, fieldnum, framenum);
 
 			/* if this frame is not consecutive, it's an error */
 			if (video->last_frame != -1 && framenum != video->last_frame + 1)
@@ -444,7 +444,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 
 			/* if we've seen a white flag before, but it's not here, warn */
 			if (video->first_whitefield != -1 && !metadata.white)
-   				printf("%6d.%d: detected frame number but no white flag (WARNING)\n", frame, fieldnum);
+				printf("%6d.%d: detected frame number but no white flag (WARNING)\n", frame, fieldnum);
 		}
 
 		/* is the whiteflag set? */
@@ -459,7 +459,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 
 			/* if we've seen frame numbers before, but not here, warn */
 			if (video->last_frame != -1 && (metadata.line1718 & VBI_MASK_CAV_PICTURE) != VBI_CODE_CAV_PICTURE)
-   				printf("%6d.%d: detected white flag but no frame number (WARNING)\n", frame, fieldnum);
+				printf("%6d.%d: detected white flag but no frame number (WARNING)\n", frame, fieldnum);
 		}
 
 		/* if this is the start of a frame, handle cadence */

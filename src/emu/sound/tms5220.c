@@ -196,7 +196,7 @@ struct _tms5220_state
     */
 	UINT8 tms5220_speaking;	/* Speak or Speak External command in progress */
 	UINT8 speak_external;	/* Speak External command in progress */
-	UINT8 talk_status; 		/* tms5220 is really currently speaking */
+	UINT8 talk_status;		/* tms5220 is really currently speaking */
 	UINT8 first_frame;		/* we have just started speaking, and we are to parse the first frame */
 	UINT8 last_frame;		/* we are doing the frame of sound */
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */

@@ -312,13 +312,13 @@ static INPUT_PORTS_START( astron )
 
 	PORT_START("IN1")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )								  /* SW8  = nonJAMMA pin 9  = right */
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  								  /* SW9  = nonJAMMA pin 10 = left */
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    								  /* SW10 = nonJAMMA pin 11 = up */
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  								  /* SW11 = nonJAMMA pin 12 = down */
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )        								  /* SW12 = nonJAMMA pin 13 = fire */
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )         								  /* SW13 = nonJAMMA pin 14 = unused? */
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )         								  /* SW14 = nonJAMMA pin V  = unused? */
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )         								  /* SW15 = nonJAMMA pin W  = unused? */
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) 								  /* SW9  = nonJAMMA pin 10 = left */
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   								  /* SW10 = nonJAMMA pin 11 = up */
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) 								  /* SW11 = nonJAMMA pin 12 = down */
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )       								  /* SW12 = nonJAMMA pin 13 = fire */
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )        								  /* SW13 = nonJAMMA pin 14 = unused? */
+	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )        								  /* SW14 = nonJAMMA pin V  = unused? */
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )        								  /* SW15 = nonJAMMA pin W  = unused? */
 INPUT_PORTS_END
 
 static GFXDECODE_START( segald )
@@ -385,7 +385,7 @@ ROM_START( astron )
 	ROM_LOAD( "5279", 0x000,  0x200,  CRC(8716aeb5) SHA1(9a8bf599d025d039b12bc616850386f280b4df11) )
 
 	/* Currently unused PROMs */
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pr-5278.bin", 0x000, 0x100, CRC(e81613da) SHA1(fc32141f7c0c8c0c1ed623636af3862a4ef0e940) )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
@@ -418,7 +418,7 @@ ROM_START( astronp )
 	ROM_LOAD( "5279", 0x000,  0x200,  CRC(8716aeb5) SHA1(9a8bf599d025d039b12bc616850386f280b4df11) )
 
 	/* Currently unused PROMs */
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pr-5278.bin", 0x000, 0x100, CRC(e81613da) SHA1(fc32141f7c0c8c0c1ed623636af3862a4ef0e940) )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
@@ -453,7 +453,7 @@ ROM_START( galaxyr )
 	ROM_LOAD( "5279", 0x000,  0x200,  CRC(8716aeb5) SHA1(9a8bf599d025d039b12bc616850386f280b4df11) )
 
 	/* Currently unused PROMs */
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pr-5278.bin", 0x000, 0x100, CRC(e81613da) SHA1(fc32141f7c0c8c0c1ed623636af3862a4ef0e940) )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
@@ -488,7 +488,7 @@ ROM_START( galaxyrp )
 	ROM_LOAD( "5279", 0x000,  0x200,  CRC(8716aeb5) SHA1(9a8bf599d025d039b12bc616850386f280b4df11) )
 
 	/* Currently unused PROMs */
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pr-5278.bin", 0x000, 0x100, CRC(e81613da) SHA1(fc32141f7c0c8c0c1ed623636af3862a4ef0e940) )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
@@ -523,7 +523,7 @@ ROM_START( sblazerp )
 	ROM_LOAD( "5279", 0x000,  0x200,  CRC(8716aeb5) SHA1(9a8bf599d025d039b12bc616850386f280b4df11) )
 
 	/* Currently unused PROMs */
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pr-5278.bin", 0x000, 0x100, CRC(e81613da) SHA1(fc32141f7c0c8c0c1ed623636af3862a4ef0e940) )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
@@ -554,7 +554,7 @@ ROM_START( cobraseg )
 	ROM_LOAD( "ic-13.bin", 0x000,  0x200,  CRC(3547a14c) SHA1(5b8e3ddac0f6fda940b69343fdce7d5caead7a35) )
 
 	/* Currently unused PROMs */
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pr-5278.bin", 0x000, 0x100, CRC(e81613da) SHA1(fc32141f7c0c8c0c1ed623636af3862a4ef0e940) )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )

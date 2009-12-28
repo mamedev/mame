@@ -98,15 +98,15 @@ VIDEO_UPDATE( route16 )
 		for (i = 0; i < 4; i++)
 		{
 			UINT8 color1 = color_prom1[((palette_1 << 6) & 0x80) |
-						   			    (palette_1 << 2) |
-						   				((data1 >> 3) & 0x02) |
-						   				((data1 >> 0) & 0x01)];
+									    (palette_1 << 2) |
+										((data1 >> 3) & 0x02) |
+										((data1 >> 0) & 0x01)];
 
 			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 - this is a guess */
 			UINT8 color2 = color_prom2[((palette_2 << 6) & 0x80) | (((color1 << 6) & 0x80) | ((color1 << 7) & 0x80)) |
-						   				(palette_2 << 2) |
-						   				((data2 >> 3) & 0x02) |
-						   				((data2 >> 0) & 0x01)];
+										(palette_2 << 2) |
+										((data2 >> 3) & 0x02) |
+										((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors (verified) */
 			UINT8 final_color = color1 | color2;
@@ -154,7 +154,7 @@ static int video_update_stratvox_ttmahjng(running_machine *machine, bitmap_t *bi
 		for (i = 0; i < 4; i++)
 		{
 			UINT8 color1 = color_prom1[(palette_1 << 2) |
-						   			   ((data1 >> 3) & 0x02) |
+									   ((data1 >> 3) & 0x02) |
 									   ((data1 >> 0) & 0x01)];
 
 			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified) */

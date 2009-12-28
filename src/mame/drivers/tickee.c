@@ -607,8 +607,8 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW"),
 	DEVCB_INPUT_PORT("IN1"),
- 	DEVCB_NULL,
- 	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_2 =

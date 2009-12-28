@@ -61,7 +61,7 @@
 #define WWORD_DEFERRED(cs,a,v)	do { int bufidx = (cs)->mbuf_index & 3; (cs)->mbufaddr[bufidx] = -(a); (cs)->mbufdata[bufidx] = (v); } while (0)
 #define WLONG_DEFERRED(cs,a,v)	do { int bufidx = (cs)->mbuf_index & 3; (cs)->mbufaddr[bufidx] = (a); (cs)->mbufdata[bufidx] = (v); } while (0)
 #define PROCESS_DEFERRED_MEMORY(cs) 									\
-	if ((cs)->mbufaddr[++(cs)->mbuf_index & 3] != 1) 					\
+	if ((cs)->mbufaddr[++(cs)->mbuf_index & 3] != 1)					\
 	{																	\
 		int bufidx = (cs)->mbuf_index & 3;								\
 		if ((cs)->mbufaddr[bufidx] >= 0)								\
@@ -171,9 +171,9 @@ static void cau_write_pi_special(dsp32_state *cpustate, UINT8 i, UINT32 val)
 		case 5:		cpustate->obuf = val;	break;
 		case 6:		cpustate->pdr = val; update_pcr(cpustate, cpustate->pcr | PCR_PDFs); break;
 		case 14:	cpustate->piop = val;	break;
-		case 20:	cpustate->pdr2 = val; 	break;
+		case 20:	cpustate->pdr2 = val;	break;
 		case 22:	cpustate->pir = val; update_pcr(cpustate, cpustate->pcr | PCR_PIFs); break;
-		case 30:	cpustate->pcw = val; 	break;
+		case 30:	cpustate->pcw = val;	break;
 		default:	fprintf(stderr, "Unimplemented CAU PI write = %X\n", i);
 	}
 }

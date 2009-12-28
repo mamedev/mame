@@ -498,7 +498,7 @@ static void hyperstone_set_trap_entry(hyperstone_state *cpustate, int which)
 	}
 }
 
-#define OP    			cpustate->op
+#define OP  			cpustate->op
 #define PPC				cpustate->ppc //previous pc
 #define PC				cpustate->global_regs[0] //Program Counter
 #define SR				cpustate->global_regs[1] //Status Register
@@ -561,7 +561,7 @@ static void hyperstone_set_trap_entry(hyperstone_state *cpustate, int which)
 #define SET_LOW_SR(val)			(SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
 
 
-#define CHECK_C(x) 				(SR = (SR & ~0x00000001) | (((x) & (((UINT64)1) << 32)) ? 1 : 0 ))
+#define CHECK_C(x)				(SR = (SR & ~0x00000001) | (((x) & (((UINT64)1) << 32)) ? 1 : 0 ))
 #define CHECK_VADD(x,y,z)		(SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 8: 0))
 #define CHECK_VADD3(x,y,w,z)	(SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) ? 8: 0))
 #define CHECK_VSUB(x,y,z)		(SR = (SR & ~0x00000008) | ((((z) ^ (y)) & ((y) ^ (x)) & 0x80000000) ? 8: 0))
@@ -4714,7 +4714,7 @@ static CPU_SET_INFO( hyperstone )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i; 						break;
+		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i;						break;
 		case CPUINFO_INT_REGISTER + E132XS_SR:			SR = info->i;						break;
 		case CPUINFO_INT_REGISTER + E132XS_FER:			FER = info->i;						break;
 		case CPUINFO_INT_REGISTER + E132XS_G3:			set_global_register(cpustate, 3, info->i);	break;
@@ -4863,10 +4863,10 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 15;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 15;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:					/* not implemented */				break;
 
@@ -5059,22 +5059,22 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_STR_REGISTER + E132XS_G29: 		sprintf(info->s, "G29 :%08X", cpustate->global_regs[29]); break;
 		case CPUINFO_STR_REGISTER + E132XS_G30: 		sprintf(info->s, "G30 :%08X", cpustate->global_regs[30]); break;
 		case CPUINFO_STR_REGISTER + E132XS_G31: 		sprintf(info->s, "G31 :%08X", cpustate->global_regs[31]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL0:  		sprintf(info->s, "CL0 :%08X", cpustate->local_regs[(0 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL1:  		sprintf(info->s, "CL1 :%08X", cpustate->local_regs[(1 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL2:  		sprintf(info->s, "CL2 :%08X", cpustate->local_regs[(2 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL3:  		sprintf(info->s, "CL3 :%08X", cpustate->local_regs[(3 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL4:  		sprintf(info->s, "CL4 :%08X", cpustate->local_regs[(4 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL5:  		sprintf(info->s, "CL5 :%08X", cpustate->local_regs[(5 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL6:  		sprintf(info->s, "CL6 :%08X", cpustate->local_regs[(6 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL7:  		sprintf(info->s, "CL7 :%08X", cpustate->local_regs[(7 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL8:  		sprintf(info->s, "CL8 :%08X", cpustate->local_regs[(8 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL9:  		sprintf(info->s, "CL9 :%08X", cpustate->local_regs[(9 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL10: 		sprintf(info->s, "CL10:%08X", cpustate->local_regs[(10 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL11: 		sprintf(info->s, "CL11:%08X", cpustate->local_regs[(11 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL12: 		sprintf(info->s, "CL12:%08X", cpustate->local_regs[(12 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL13: 		sprintf(info->s, "CL13:%08X", cpustate->local_regs[(13 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL14: 		sprintf(info->s, "CL14:%08X", cpustate->local_regs[(14 + GET_FP) % 64]); break;
-		case CPUINFO_STR_REGISTER + E132XS_CL15: 		sprintf(info->s, "CL15:%08X", cpustate->local_regs[(15 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL0: 		sprintf(info->s, "CL0 :%08X", cpustate->local_regs[(0 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL1: 		sprintf(info->s, "CL1 :%08X", cpustate->local_regs[(1 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL2: 		sprintf(info->s, "CL2 :%08X", cpustate->local_regs[(2 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL3: 		sprintf(info->s, "CL3 :%08X", cpustate->local_regs[(3 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL4: 		sprintf(info->s, "CL4 :%08X", cpustate->local_regs[(4 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL5: 		sprintf(info->s, "CL5 :%08X", cpustate->local_regs[(5 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL6: 		sprintf(info->s, "CL6 :%08X", cpustate->local_regs[(6 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL7: 		sprintf(info->s, "CL7 :%08X", cpustate->local_regs[(7 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL8: 		sprintf(info->s, "CL8 :%08X", cpustate->local_regs[(8 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL9: 		sprintf(info->s, "CL9 :%08X", cpustate->local_regs[(9 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL10:		sprintf(info->s, "CL10:%08X", cpustate->local_regs[(10 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL11:		sprintf(info->s, "CL11:%08X", cpustate->local_regs[(11 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL12:		sprintf(info->s, "CL12:%08X", cpustate->local_regs[(12 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL13:		sprintf(info->s, "CL13:%08X", cpustate->local_regs[(13 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL14:		sprintf(info->s, "CL14:%08X", cpustate->local_regs[(14 + GET_FP) % 64]); break;
+		case CPUINFO_STR_REGISTER + E132XS_CL15:		sprintf(info->s, "CL15:%08X", cpustate->local_regs[(15 + GET_FP) % 64]); break;
 		case CPUINFO_STR_REGISTER + E132XS_L0:  		sprintf(info->s, "L0  :%08X", cpustate->local_regs[0]); break;
 		case CPUINFO_STR_REGISTER + E132XS_L1:  		sprintf(info->s, "L1  :%08X", cpustate->local_regs[1]); break;
 		case CPUINFO_STR_REGISTER + E132XS_L2:  		sprintf(info->s, "L2  :%08X", cpustate->local_regs[2]); break;

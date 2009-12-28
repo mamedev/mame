@@ -4196,7 +4196,7 @@ ROM_END
     ROM Board: 171-5704
 */
 ROM_START( cottonu )
- 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "cotton.a7", 0x000000, 0x20000, CRC(e7ef7d10) SHA1(de70ebf04d78e938bf568df158a47b377ddb3dc5) )
 	ROM_LOAD16_BYTE( "cotton.a5", 0x000001, 0x20000, CRC(abe4f83e) SHA1(128f1815ecb27ee2a93e9d0708fdf6733dd1ab46) )
 	/* empty 0x40000 - 0x80000 */

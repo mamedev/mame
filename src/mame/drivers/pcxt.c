@@ -487,9 +487,9 @@ static const ppi8255_interface filetto_ppi8255_intf[2] =
 	{
 		DEVCB_HANDLER(port_a_r),		/* Port A read */
 		DEVCB_HANDLER(port_b_r),		/* Port B read */
-		DEVCB_HANDLER(port_c_r),  		/* Port C read */
-		DEVCB_NULL,   					/* Port A write */
-		DEVCB_HANDLER(port_b_w),  		/* Port B write */
+		DEVCB_HANDLER(port_c_r),		/* Port C read */
+		DEVCB_NULL, 					/* Port A write */
+		DEVCB_HANDLER(port_b_w),		/* Port B write */
 		DEVCB_NULL						/* Port C write */
 	},
 	{
@@ -720,7 +720,7 @@ static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
-  	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 //  AM_RANGE(0x0201, 0x0201) AM_READ_PORT("IN1") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port

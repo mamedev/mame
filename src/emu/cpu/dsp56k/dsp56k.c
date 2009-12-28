@@ -455,11 +455,11 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 16;							break;	/* 1-5 */
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = -1;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = -1;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = -1;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:	info->i = DSP56K_IRQ_MODA;				break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:	info->i = DSP56K_IRQ_MODB;				break;
@@ -534,10 +534,10 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_FCT_WRITE:							info->write = NULL;						break;
 		case CPUINFO_FCT_READOP:						info->readop = NULL;					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
- 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
- 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);						break;
- 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
- 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);						break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
+			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);						break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
+			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;

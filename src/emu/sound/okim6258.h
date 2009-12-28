@@ -18,7 +18,7 @@ struct _okim6258_interface
 #define FOSC_DIV_BY_768		1
 #define FOSC_DIV_BY_512		2
 
-#define TYPE_3BITS        	0
+#define TYPE_3BITS      	0
 #define TYPE_4BITS			1
 
 #define	OUTPUT_10BITS		0

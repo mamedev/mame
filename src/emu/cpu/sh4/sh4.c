@@ -2270,20 +2270,20 @@ INLINE void op0010(SH4 *sh4, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: MOVBS(sh4, Rm, Rn); 				break;
-	case  1: MOVWS(sh4, Rm, Rn); 				break;
-	case  2: MOVLS(sh4, Rm, Rn); 				break;
-	case  3: NOP(sh4); 						break;
-	case  4: MOVBM(sh4, Rm, Rn); 				break;
-	case  5: MOVWM(sh4, Rm, Rn); 				break;
-	case  6: MOVLM(sh4, Rm, Rn); 				break;
-	case  7: DIV0S(sh4, Rm, Rn); 				break;
+	case  0: MOVBS(sh4, Rm, Rn);				break;
+	case  1: MOVWS(sh4, Rm, Rn);				break;
+	case  2: MOVLS(sh4, Rm, Rn);				break;
+	case  3: NOP(sh4);						break;
+	case  4: MOVBM(sh4, Rm, Rn);				break;
+	case  5: MOVWM(sh4, Rm, Rn);				break;
+	case  6: MOVLM(sh4, Rm, Rn);				break;
+	case  7: DIV0S(sh4, Rm, Rn);				break;
 	case  8: TST(sh4, Rm, Rn);					break;
 	case  9: AND(sh4, Rm, Rn);					break;
 	case 10: XOR(sh4, Rm, Rn);					break;
 	case 11: OR(sh4, Rm, Rn);					break;
 	case 12: CMPSTR(sh4, Rm, Rn);				break;
-	case 13: XTRCT(sh4, Rm, Rn); 				break;
+	case 13: XTRCT(sh4, Rm, Rn);				break;
 	case 14: MULU(sh4, Rm, Rn);					break;
 	case 15: MULS(sh4, Rm, Rn);					break;
 	}
@@ -2293,20 +2293,20 @@ INLINE void op0011(SH4 *sh4, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: CMPEQ(sh4, Rm, Rn); 				break;
-	case  1: NOP(sh4); 						break;
-	case  2: CMPHS(sh4, Rm, Rn); 				break;
-	case  3: CMPGE(sh4, Rm, Rn); 				break;
+	case  0: CMPEQ(sh4, Rm, Rn);				break;
+	case  1: NOP(sh4);						break;
+	case  2: CMPHS(sh4, Rm, Rn);				break;
+	case  3: CMPGE(sh4, Rm, Rn);				break;
 	case  4: DIV1(sh4, Rm, Rn);					break;
-	case  5: DMULU(sh4, Rm, Rn); 				break;
-	case  6: CMPHI(sh4, Rm, Rn); 				break;
-	case  7: CMPGT(sh4, Rm, Rn); 				break;
+	case  5: DMULU(sh4, Rm, Rn);				break;
+	case  6: CMPHI(sh4, Rm, Rn);				break;
+	case  7: CMPGT(sh4, Rm, Rn);				break;
 	case  8: SUB(sh4, Rm, Rn);					break;
-	case  9: NOP(sh4); 						break;
+	case  9: NOP(sh4);						break;
 	case 10: SUBC(sh4, Rm, Rn);					break;
 	case 11: SUBV(sh4, Rm, Rn);					break;
 	case 12: ADD(sh4, Rm, Rn);					break;
-	case 13: DMULS(sh4, Rm, Rn); 				break;
+	case 13: DMULS(sh4, Rm, Rn);				break;
 	case 14: ADDC(sh4, Rm, Rn);					break;
 	case 15: ADDV(sh4, Rm, Rn);					break;
 	}
@@ -2516,22 +2516,22 @@ INLINE void op0110(SH4 *sh4, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: MOVBL(sh4, Rm, Rn); 				break;
-	case  1: MOVWL(sh4, Rm, Rn); 				break;
-	case  2: MOVLL(sh4, Rm, Rn); 				break;
+	case  0: MOVBL(sh4, Rm, Rn);				break;
+	case  1: MOVWL(sh4, Rm, Rn);				break;
+	case  2: MOVLL(sh4, Rm, Rn);				break;
 	case  3: MOV(sh4, Rm, Rn);					break;
-	case  4: MOVBP(sh4, Rm, Rn); 				break;
-	case  5: MOVWP(sh4, Rm, Rn); 				break;
-	case  6: MOVLP(sh4, Rm, Rn); 				break;
+	case  4: MOVBP(sh4, Rm, Rn);				break;
+	case  5: MOVWP(sh4, Rm, Rn);				break;
+	case  6: MOVLP(sh4, Rm, Rn);				break;
 	case  7: NOT(sh4, Rm, Rn);					break;
-	case  8: SWAPB(sh4, Rm, Rn); 				break;
-	case  9: SWAPW(sh4, Rm, Rn); 				break;
+	case  8: SWAPB(sh4, Rm, Rn);				break;
+	case  9: SWAPW(sh4, Rm, Rn);				break;
 	case 10: NEGC(sh4, Rm, Rn);					break;
 	case 11: NEG(sh4, Rm, Rn);					break;
-	case 12: EXTUB(sh4, Rm, Rn); 				break;
-	case 13: EXTUW(sh4, Rm, Rn); 				break;
-	case 14: EXTSB(sh4, Rm, Rn); 				break;
-	case 15: EXTSW(sh4, Rm, Rn); 				break;
+	case 12: EXTUB(sh4, Rm, Rn);				break;
+	case 13: EXTUW(sh4, Rm, Rn);				break;
+	case 14: EXTSB(sh4, Rm, Rn);				break;
+	case 15: EXTSW(sh4, Rm, Rn);				break;
 	}
 }
 
@@ -2544,21 +2544,21 @@ INLINE void op1000(SH4 *sh4, UINT16 opcode)
 {
 	switch ( opcode  & (15<<8) )
 	{
-	case  0 << 8: MOVBS4(sh4, opcode & 0x0f, Rm); 	break;
-	case  1 << 8: MOVWS4(sh4, opcode & 0x0f, Rm); 	break;
-	case  2<< 8: NOP(sh4); 				break;
-	case  3<< 8: NOP(sh4); 				break;
-	case  4<< 8: MOVBL4(sh4, Rm, opcode & 0x0f); 	break;
-	case  5<< 8: MOVWL4(sh4, Rm, opcode & 0x0f); 	break;
-	case  6<< 8: NOP(sh4); 				break;
-	case  7<< 8: NOP(sh4); 				break;
+	case  0 << 8: MOVBS4(sh4, opcode & 0x0f, Rm);	break;
+	case  1 << 8: MOVWS4(sh4, opcode & 0x0f, Rm);	break;
+	case  2<< 8: NOP(sh4);				break;
+	case  3<< 8: NOP(sh4);				break;
+	case  4<< 8: MOVBL4(sh4, Rm, opcode & 0x0f);	break;
+	case  5<< 8: MOVWL4(sh4, Rm, opcode & 0x0f);	break;
+	case  6<< 8: NOP(sh4);				break;
+	case  7<< 8: NOP(sh4);				break;
 	case  8<< 8: CMPIM(sh4, opcode & 0xff);		break;
-	case  9<< 8: BT(sh4, opcode & 0xff); 		break;
-	case 10<< 8: NOP(sh4); 				break;
-	case 11<< 8: BF(sh4, opcode & 0xff); 		break;
-	case 12<< 8: NOP(sh4); 				break;
+	case  9<< 8: BT(sh4, opcode & 0xff);		break;
+	case 10<< 8: NOP(sh4);				break;
+	case 11<< 8: BF(sh4, opcode & 0xff);		break;
+	case 12<< 8: NOP(sh4);				break;
 	case 13<< 8: BTS(sh4, opcode & 0xff);		break;
-	case 14<< 8: NOP(sh4); 				break;
+	case 14<< 8: NOP(sh4);				break;
 	case 15<< 8: BFS(sh4, opcode & 0xff);		break;
 	}
 }
@@ -3486,8 +3486,8 @@ static CPU_SET_INFO( sh4 )
 
 		case CPUINFO_INT_REGISTER + SH4_PC:
 		case CPUINFO_INT_PC:							sh4->pc = info->i; sh4->delay = 0;		break;
-		case CPUINFO_INT_SP:							sh4->r[15] = info->i;    				break;
-		case CPUINFO_INT_REGISTER + SH4_PR:   			sh4->pr = info->i;	   					break;
+		case CPUINFO_INT_SP:							sh4->r[15] = info->i;   				break;
+		case CPUINFO_INT_REGISTER + SH4_PR: 			sh4->pr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_SR:
 			sh4->sr = info->i;
 			sh4_exception_recompute(sh4);
@@ -3496,7 +3496,7 @@ static CPU_SET_INFO( sh4 )
 		case CPUINFO_INT_REGISTER + SH4_GBR:			sh4->gbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_VBR:			sh4->vbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_DBR:			sh4->dbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH4_MACH: 			sh4->mach = info->i;						break;
+		case CPUINFO_INT_REGISTER + SH4_MACH:			sh4->mach = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_MACL:			sh4->macl = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_R0:				sh4->r[ 0] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH4_R1:				sh4->r[ 1] = info->i;					break;
@@ -3694,11 +3694,11 @@ CPU_GET_INFO( sh4 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 	info->i = 32;				break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 	info->i = 0;				break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:		info->i = 0;				break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh4_internal_map); break;
 
@@ -3712,7 +3712,7 @@ CPU_GET_INFO( sh4 )
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SH4_PC:				info->i = (sh4->delay) ? (sh4->delay & AM) : (sh4->pc & AM); break;
-		case CPUINFO_INT_SP:   							info->i = sh4->r[15];					break;
+		case CPUINFO_INT_SP:							info->i = sh4->r[15];					break;
 		case CPUINFO_INT_REGISTER + SH4_PR:				info->i = sh4->pr;						break;
 		case CPUINFO_INT_REGISTER + SH4_SR:				info->i = sh4->sr;						break;
 		case CPUINFO_INT_REGISTER + SH4_GBR:			info->i = sh4->gbr;						break;

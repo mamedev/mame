@@ -121,7 +121,7 @@ typedef struct _pic16c5x_opcode pic16c5x_opcode;
 struct _pic16c5x_opcode
 {
 	UINT8	cycles;
-	void 	(*function)(pic16c5x_state *);
+	void	(*function)(pic16c5x_state *);
 };
 
 
@@ -1316,7 +1316,7 @@ CPU_GET_INFO( pic16c57 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;									break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;									break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 7;									break;
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c57);					break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c57_rom);	break;
@@ -1376,7 +1376,7 @@ CPU_GET_INFO( pic16c58 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;								break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;								break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 7;								break;
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c58);					break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c58_rom);	break;

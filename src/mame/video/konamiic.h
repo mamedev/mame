@@ -344,12 +344,12 @@ int K055555_get_palette_index(int idx);
 #define K55_PRIINP_10		17	// sub 2 (GX:PSAC) pri
 #define K55_PRIINP_11		18	// sub 3 pri
 
-#define K55_OINPRI_ON 		19	// object priority bits selector
+#define K55_OINPRI_ON		19	// object priority bits selector
 
-#define K55_PALBASE_A 		23	// layer A palette
-#define K55_PALBASE_B 		24	// layer B palette
-#define K55_PALBASE_C 		25	// layer C palette
-#define K55_PALBASE_D 		26	// layer D palette
+#define K55_PALBASE_A		23	// layer A palette
+#define K55_PALBASE_B		24	// layer B palette
+#define K55_PALBASE_C		25	// layer C palette
+#define K55_PALBASE_D		26	// layer D palette
 #define K55_PALBASE_OBJ		27	// OBJ palette
 #define K55_PALBASE_SUB1	28	// SUB1 palette
 #define K55_PALBASE_SUB2	29	// SUB2 palette

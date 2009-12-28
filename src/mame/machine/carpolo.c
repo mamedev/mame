@@ -48,8 +48,8 @@
 #define COIN3_PRIORITY_LINE			5
 #define COIN4_PRIORITY_LINE			4
 #define BALL_SCREEN_PRIORITY_LINE	3
-#define CAR_CAR_PRIORITY_LINE	 	2
-#define CAR_GOAL_PRIORITY_LINE	 	1
+#define CAR_CAR_PRIORITY_LINE		2
+#define CAR_GOAL_PRIORITY_LINE		1
 #define PRI0_PRIORTITY_LINE		    0
 
 /* priority 0 controls three different things */

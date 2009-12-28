@@ -22,7 +22,7 @@ static const rectangle* spritevisiblearea;
 static const rectangle* spritevisibleareaflipx;
 
 
-#define STARS_COLOR_BASE 		(memory_region_length(machine, "proms"))
+#define STARS_COLOR_BASE		(memory_region_length(machine, "proms"))
 #define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
 

@@ -186,8 +186,8 @@ static WRITE8_HANDLER(vram2_w)
 		 palram[offset]=data;
 		 if(offset<0x300)
 		 {
-		 	offset&=0xff;
-		 	palette_set_color_rgb(space->machine, offset, pal6bit(palram[offset]), pal6bit(palram[offset+0x100]), pal6bit(palram[offset+0x200]));
+			offset&=0xff;
+			palette_set_color_rgb(space->machine, offset, pal6bit(palram[offset]), pal6bit(palram[offset+0x100]), pal6bit(palram[offset+0x200]));
 		 }
 	}
 }

@@ -280,7 +280,7 @@ typedef struct {
 	UINT32 dccr;
 	UINT32 pit;
 	UINT32 pit_counter;
- 	UINT32 pit_int_enable;
+	UINT32 pit_int_enable;
 	UINT32 tsr;
 	UINT32 dbsr;
 	UINT32 sgr;
@@ -1660,11 +1660,11 @@ static CPU_SET_INFO( ppc )
 	{
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + PPC_PC:				ppc.pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + PPC_MSR:			ppc_set_msr(info->i);				 	break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				ppc_set_cr(info->i);			 		break;
+		case CPUINFO_INT_REGISTER + PPC_MSR:			ppc_set_msr(info->i);					break;
+		case CPUINFO_INT_REGISTER + PPC_CR:				ppc_set_cr(info->i);					break;
 		case CPUINFO_INT_REGISTER + PPC_LR:				LR = info->i;							break;
 		case CPUINFO_INT_REGISTER + PPC_CTR:			CTR = info->i;							break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			XER = info->i;						 	break;
+		case CPUINFO_INT_REGISTER + PPC_XER:			XER = info->i;							break;
 		case CPUINFO_INT_REGISTER + PPC_SRR0:			SRR0 = info->i;							break;
 		case CPUINFO_INT_REGISTER + PPC_SRR1:			SRR1 = info->i;							break;
 
@@ -1753,11 +1753,11 @@ static CPU_GET_INFO( ppc )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -1903,7 +1903,7 @@ CPU_GET_INFO( ppc603 )
 		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = 17;					break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = 17;					break;
 		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = read_decrementer();			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

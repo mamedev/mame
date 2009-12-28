@@ -357,7 +357,7 @@ static MACHINE_RESET( jackal )
 	// at the beginning of the game. This fixes it.
 	cpu_set_clockscale(cputag_get_cpu(machine, "slave"), 1.2f);
 
- 	state->rambank = rgn;
+	state->rambank = rgn;
 	state->spritebank = rgn;
 
 	state->irq_enable = 0;

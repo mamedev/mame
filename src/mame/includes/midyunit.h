@@ -9,7 +9,7 @@
 /*----------- defined in machine/midyunit.c -----------*/
 
 extern UINT16 *midyunit_cmos_ram;
-extern UINT32 	midyunit_cmos_page;
+extern UINT32	midyunit_cmos_page;
 
 WRITE16_HANDLER( midyunit_cmos_w );
 READ16_HANDLER( midyunit_cmos_r );

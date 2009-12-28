@@ -7,7 +7,7 @@
     By ElSemi, kingshriek, Deunan Knute, and R. Belmont
 */
 
-#define LFO_SHIFT 	8
+#define LFO_SHIFT	8
 
 struct _LFO
 {
@@ -20,7 +20,7 @@ struct _LFO
 #define LFIX(v)	((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v) 	LFIX(pow(10.0,v/20.0))
+#define DB(v)	LFIX(pow(10.0,v/20.0))
 
 //Convert cents to step increment
 #define CENTS(v) LFIX(pow(2.0,v/1200.0))
@@ -152,7 +152,7 @@ static void AICALFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32
 		    case 1: LFO->table=PLFO_SQR; break;
 			case 2: LFO->table=PLFO_TRI; break;
 		    case 3: LFO->table=PLFO_NOI; break;
-  		    default: printf("Unknown PLFO %d\n", LFOWS);
+		    default: printf("Unknown PLFO %d\n", LFOWS);
 		}
 		LFO->scale=PSCALES[LFOS];
 	}

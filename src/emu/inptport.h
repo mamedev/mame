@@ -586,10 +586,10 @@ union _input_port_token
 	TOKEN_COMMON_FIELDS
 	const input_port_token *	tokenptr;
 	input_field_custom_func 	customptr;
-	input_field_changed_func 	changedptr;
-	input_field_crossmap_func 	crossmapptr;
-	read_line_device_func 		read_line_device;
-	write_line_device_func 		write_line_device;
+	input_field_changed_func	changedptr;
+	input_field_crossmap_func	crossmapptr;
+	read_line_device_func		read_line_device;
+	write_line_device_func		write_line_device;
 };
 
 
@@ -650,7 +650,7 @@ struct _input_field_config
 	const char *				write_device_name;	/* input device name */
 	input_field_custom_func		custom;			/* custom callback routine */
 	void *						custom_param;	/* parameter for custom callback routine */
-	input_field_changed_func 	changed;		/* changed callback routine */
+	input_field_changed_func	changed;		/* changed callback routine */
 	void *						changed_param;	/* parameter for changed callback routine */
 
 	/* data relevant to analog control types */
@@ -663,7 +663,7 @@ struct _input_field_config
 	float						crossscale;		/* crosshair scale */
 	float						crossoffset;	/* crosshair offset */
 	float						crossaltaxis;	/* crosshair alternate axis value */
-	input_field_crossmap_func 	crossmapper;	/* crosshair mapping function */
+	input_field_crossmap_func	crossmapper;	/* crosshair mapping function */
 	UINT16						full_turn_count;/* number of optical counts for 1 full turn of the original control */
 	const input_port_value *	remap_table;	/* pointer to an array that remaps the port value */
 
@@ -671,7 +671,7 @@ struct _input_field_config
 	const input_setting_config *settinglist;	/* list of input_setting_configs */
 	const input_field_diplocation *diploclist;	/* list of locations for various bits */
 	UINT8						way;			/* digital joystick 2/4/8-way descriptions */
-	unicode_char 				chars[3];		/* (MESS-specific) unicode key data */
+	unicode_char				chars[3];		/* (MESS-specific) unicode key data */
 
 	/* this field is only valid if the device is live */
 	input_field_state *			state;			/* live state of field (NULL if not live) */

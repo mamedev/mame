@@ -537,7 +537,7 @@ static INPUT_PORTS_START( thunderx )
 	KONAMI_COINAGE(DEF_STR( Free_Play ), "No Coin B")
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
- 	PORT_START("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" ) // factory default

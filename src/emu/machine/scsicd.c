@@ -22,7 +22,7 @@ typedef struct
 	UINT32 num_subblocks;
 	UINT32 cur_subblock;
 	UINT32 play_err_flag;
- 	cdrom_file *cdrom;
+	cdrom_file *cdrom;
 } SCSICd;
 
 static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)

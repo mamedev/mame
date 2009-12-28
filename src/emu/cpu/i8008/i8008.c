@@ -30,7 +30,7 @@ struct _i8008_state
 	UINT8	ZF; // Zero flag
 	UINT8	SF; // Sign flag
 	UINT8	PF; // Parity flag
-	UINT8 	HALT;
+	UINT8	HALT;
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
@@ -204,8 +204,8 @@ static void execute_one(i8008_state *cpustate, int opcode)
 
 	switch (opcode >> 6)
 	{
-		case 0x03: 	// starting with 11
-				   	if (opcode==0xff) {
+		case 0x03:	// starting with 11
+					if (opcode==0xff) {
 						// HLT
 						cpustate->icount -= 4;
 						GET_PC.w.l = GET_PC.w.l - 1;
@@ -217,9 +217,9 @@ static void execute_one(i8008_state *cpustate, int opcode)
 						if (REG_1==7) cpustate->icount -= 2;
 						if (REG_2==7) cpustate->icount -= 3;
 						SET_REG(cpustate,REG_1, GET_REG(cpustate,REG_2));
-			   		}
-				   	break;
-		case 0x00: 	// starting with 00
+					}
+					break;
+		case 0x00:	// starting with 00
 					switch(opcode & 7) {
 						case 0 :	if(((opcode >> 3) & 7)==0) {
 							        	// HLT
@@ -374,7 +374,7 @@ static void execute_one(i8008_state *cpustate, int opcode)
 									GET_PC.w.l = opcode & 0x38;
 									cpustate->PC = GET_PC;
 									break;
-						case 6 : 	// LrI
+						case 6 :	// LrI
 									cpustate->icount -= 8;
 									if (REG_1==7) cpustate->icount -= 1; // LMI
 									SET_REG(cpustate,REG_1, ARG(cpustate));
@@ -385,9 +385,9 @@ static void execute_one(i8008_state *cpustate, int opcode)
 									cpustate->PC = GET_PC;
 									break;
 					}
-				   	break;
+					break;
 
-		case 0x01: 	// starting with 01
+		case 0x01:	// starting with 01
 					switch(opcode & 7) {
 						case 0 :
 							// Jcc
@@ -436,8 +436,8 @@ static void execute_one(i8008_state *cpustate, int opcode)
 							}
 							break;
 					}
-				   	break;
-		case 0x02: 	// starting with 10
+					break;
+		case 0x02:	// starting with 10
 					cpustate->icount -= 5;
 					if ((opcode & 7)==7) cpustate->icount -= 3; // operations with memory
 					switch((opcode >> 3) & 7) {
@@ -497,7 +497,7 @@ static void execute_one(i8008_state *cpustate, int opcode)
 							cpustate->CF = (tmp >> 8) & 1;
 							break;
 					}
-				   	break;
+					break;
 	}
 }
 
@@ -679,12 +679,12 @@ CPU_GET_INFO( i8008 )
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i8008);				break;

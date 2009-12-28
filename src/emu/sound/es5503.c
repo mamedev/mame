@@ -292,7 +292,7 @@ READ8_DEVICE_HANDLER( es5503_r )
 			case 0:		// freq lo
 				return (chip->oscillators[osc].freq & 0xff);
 
-			case 0x20:     	// freq hi
+			case 0x20:  	// freq hi
 				return (chip->oscillators[osc].freq >> 8);
 
 			case 0x40:	// volume
@@ -394,7 +394,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 				chip->oscillators[osc].freq |= data;
 				break;
 
-			case 0x20:     	// freq hi
+			case 0x20:  	// freq hi
 				chip->oscillators[osc].freq &= 0x00ff;
 				chip->oscillators[osc].freq |= (data<<8);
 				break;
@@ -528,7 +528,7 @@ DEVICE_GET_INFO( es5503 )
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ensoniq ES550x");				break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright R. Belmont");	 	break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright R. Belmont");		break;
 	}
 }
 

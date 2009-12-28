@@ -281,7 +281,7 @@ void neogeo_set_display_counter_lsb( const address_space *space, UINT16 data )
 	if (state->display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
- 		adjust_display_position_interrupt_timer(space->machine);
+		adjust_display_position_interrupt_timer(space->machine);
 	}
 }
 
@@ -867,7 +867,7 @@ static void audio_cpu_banking_init( running_machine *machine )
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
- 	if (memory_region(machine, "audiobios"))
+	if (memory_region(machine, "audiobios"))
 		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, "audiobios"), 0);
 	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audiocpu"), 0);
 
@@ -1022,7 +1022,7 @@ static void set_output_latch( running_machine *machine, UINT8 data )
 	if (falling_bits & 0x20)
 		state->led2_value = ~state->output_data;
 
-  	if (falling_bits & 0xc7)
+	if (falling_bits & 0xc7)
 		logerror("%s  Unmaped LED write.  Data: %x\n", cpuexec_describe_context(machine), falling_bits);
 
 	state->output_latch = data;
@@ -1299,7 +1299,7 @@ static const ym2610_interface ym2610_config =
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )													\
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */ 								\
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */								\
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_calendar_status, NULL)			\
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_audio_result, NULL)
 

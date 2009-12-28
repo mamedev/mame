@@ -123,18 +123,18 @@
 
 /* i/o */
 #define M_IN																		\
-	cpustate->STATUS = 0x42; 														\
+	cpustate->STATUS = 0x42;														\
 	cpustate->WZ.d=ARG(cpustate);													\
 	cpustate->AF.b.h=memory_read_byte_8le(cpustate->io, cpustate->WZ.d);
 
 #define M_OUT																		\
-	cpustate->STATUS = 0x10; 														\
+	cpustate->STATUS = 0x10;														\
 	cpustate->WZ.d=ARG(cpustate);													\
 	memory_write_byte_8le(cpustate->io, cpustate->WZ.d,cpustate->AF.b.h)
 
 /* stack */
 #define M_PUSH(R) {                                             					\
-	cpustate->STATUS = 0x04; 														\
+	cpustate->STATUS = 0x04;														\
 	memory_write_byte_8le(cpustate->program, --cpustate->SP.w.l, cpustate->R.b.h);	\
 	memory_write_byte_8le(cpustate->program, --cpustate->SP.w.l, cpustate->R.b.l);	\
 }

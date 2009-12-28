@@ -278,7 +278,7 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( actfancr )
 {
- 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = (actfancr_state *)machine->driver_data;
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
@@ -286,7 +286,7 @@ static MACHINE_START( actfancr )
 
 static MACHINE_START( triothep )
 {
- 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = (actfancr_state *)machine->driver_data;
 
 	MACHINE_START_CALL(actfancr);
 
@@ -295,7 +295,7 @@ static MACHINE_START( triothep )
 
 static MACHINE_RESET( actfancr )
 {
- 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = (actfancr_state *)machine->driver_data;
 	int i;
 
 	state->flipscreen = 0;
@@ -308,7 +308,7 @@ static MACHINE_RESET( actfancr )
 
 static MACHINE_RESET( triothep )
 {
- 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = (actfancr_state *)machine->driver_data;
 
 	MACHINE_RESET_CALL(actfancr);
 	state->trio_control_select = 0;

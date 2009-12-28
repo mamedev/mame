@@ -39,7 +39,7 @@ void vendetta_sprite_callback(running_machine *machine, int *code,int *color,int
 	if (pri <= layerpri[2])								*priority_mask = 0;
 	else if (pri > layerpri[2] && pri <= layerpri[1])	*priority_mask = 0xf0;
 	else if (pri > layerpri[1] && pri <= layerpri[0])	*priority_mask = 0xf0|0xcc;
-	else 												*priority_mask = 0xf0|0xcc|0xaa;
+	else												*priority_mask = 0xf0|0xcc|0xaa;
 
 	*color = sprite_colorbase + (*color & 0x001f);
 }

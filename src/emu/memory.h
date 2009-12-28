@@ -109,7 +109,7 @@ struct _direct_read_data
 	offs_t					bytemask;			/* byte address mask */
 	offs_t					bytestart;			/* minimum valid byte address */
 	offs_t					byteend;			/* maximum valid byte address */
-	UINT8		 			entry;				/* live entry */
+	UINT8					entry;				/* live entry */
 	direct_range *			rangelist[256];		/* list of ranges for each entry */
 	direct_range *			freerangelist;		/* list of recycled range entries */
 };
@@ -267,8 +267,8 @@ typedef struct _address_table address_table;
 struct _address_table
 {
 	UINT8 *					table;				/* pointer to base of table */
-	UINT8 					subtable_alloc;		/* number of subtables allocated */
-	subtable_data *			subtable; 			/* info about each subtable */
+	UINT8					subtable_alloc;		/* number of subtables allocated */
+	subtable_data *			subtable;			/* info about each subtable */
 	handler_data *			handlers[256];		/* array of user-installed handlers */
 };
 
@@ -284,9 +284,9 @@ struct _address_space
 	const char *			name;				/* friendly name of the address space */
 	UINT8 *					readlookup;			/* live lookup table for reads */
 	UINT8 *					writelookup;		/* live lookup table for writes */
-	data_accessors		 	accessors;			/* data access handlers */
+	data_accessors			accessors;			/* data access handlers */
 	direct_read_data		direct;				/* fast direct-access read info */
-	direct_update_func 		directupdate;		/* fast direct-access update callback */
+	direct_update_func		directupdate;		/* fast direct-access update callback */
 	UINT64					unmap;				/* unmapped value */
 	offs_t					addrmask;			/* physical address mask */
 	offs_t					bytemask;			/* byte-converted physical address mask */
@@ -296,7 +296,7 @@ struct _address_space
 	UINT8					endianness;			/* endianness of this space */
 	INT8					ashift;				/* address shift */
 	UINT8					abits;				/* address bits */
-	UINT8 					dbits;				/* data bits */
+	UINT8					dbits;				/* data bits */
 	UINT8					addrchars;			/* number of characters to use for physical addresses */
 	UINT8					logaddrchars;		/* number of characters to use for logical addresses */
 	UINT8					debugger_access;	/* treat accesses as coming from the debugger */
@@ -343,7 +343,7 @@ union _addrmap16_token
 	TOKEN_COMMON_FIELDS
 	const addrmap16_token *	tokenptr;
 	read16_space_func		sread;				/* pointer to native read handler */
-	write16_space_func 		swrite;				/* pointer to native write handler */
+	write16_space_func		swrite;				/* pointer to native write handler */
 	read16_device_func		dread;				/* pointer to native device read handler */
 	write16_device_func		dwrite;				/* pointer to native device write handler */
 	read8_space_func		sread8;				/* pointer to 8-bit space read handler */
@@ -364,7 +364,7 @@ union _addrmap32_token
 	TOKEN_COMMON_FIELDS
 	const addrmap32_token *	tokenptr;
 	read32_space_func		sread;				/* pointer to native read handler */
-	write32_space_func 		swrite;				/* pointer to native write handler */
+	write32_space_func		swrite;				/* pointer to native write handler */
 	read32_device_func		dread;				/* pointer to native device read handler */
 	write32_device_func		dwrite;				/* pointer to native device write handler */
 	read8_space_func		sread8;				/* pointer to 8-bit space read handler */
@@ -389,7 +389,7 @@ union _addrmap64_token
 	TOKEN_COMMON_FIELDS
 	const addrmap64_token *	tokenptr;
 	read64_space_func		sread;				/* pointer to native read handler */
-	write64_space_func 		swrite;				/* pointer to native write handler */
+	write64_space_func		swrite;				/* pointer to native write handler */
 	read64_device_func		dread;				/* pointer to native device read handler */
 	write64_device_func		dwrite;				/* pointer to native device write handler */
 	read8_space_func		sread8;				/* pointer to 8-bit space read handler */
@@ -422,7 +422,7 @@ union _addrmap64_token
 
 /* space read/write handler function macros */
 #define READ8_HANDLER(name) 			UINT8  name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset)
-#define WRITE8_HANDLER(name) 			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define WRITE8_HANDLER(name)			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
 #define READ16_HANDLER(name)			UINT16 name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
 #define WRITE16_HANDLER(name)			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
 #define READ32_HANDLER(name)			UINT32 name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
@@ -432,7 +432,7 @@ union _addrmap64_token
 
 
 /* device read/write handler function macros */
-#define READ8_DEVICE_HANDLER(name) 		UINT8  name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset)
+#define READ8_DEVICE_HANDLER(name)		UINT8  name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset)
 #define WRITE8_DEVICE_HANDLER(name) 	void   name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
 #define READ16_DEVICE_HANDLER(name)		UINT16 name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
 #define WRITE16_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED const device_config *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
@@ -577,12 +577,12 @@ union _addrmap64_token
 #define BYTE8_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,7))
 
 /* read/write a word to a 64-bit space */
-#define WORD2_XOR_BE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0))
-#define WORD2_XOR_LE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6))
+#define WORD2_XOR_BE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0))
+#define WORD2_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6))
 
 /* read/write a dword to a 64-bit space */
-#define DWORD_XOR_BE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
-#define DWORD_XOR_LE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
+#define DWORD_XOR_BE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
+#define DWORD_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
 
 
 

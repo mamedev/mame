@@ -1362,7 +1362,7 @@ READ8_DEVICE_HANDLER( leland_sound_port_r )
 WRITE8_DEVICE_HANDLER( leland_sound_port_w )
 {
     /* update the graphics banking */
-   	leland_gfx_port_w(device, 0, data);
+	leland_gfx_port_w(device, 0, data);
 
 	/* set the new value */
     leland_gfx_control = data;

@@ -189,7 +189,7 @@ struct _huffman_context
 	UINT8					prevdata;						/* value of the previous data (for delta-RLE encoding) */
 	UINT32					datahisto[MAX_HUFFMAN_CODES];	/* histogram of data values */
 	int						rleremaining;					/* number of RLE bytes remaining (for delta-RLE encoding) */
-	huffman_node 			huffnode[MAX_HUFFMAN_NODES];	/* array of nodes */
+	huffman_node			huffnode[MAX_HUFFMAN_NODES];	/* array of nodes */
 	huffman_lookup_value *	lookup;							/* pointer to the lookup table */
 };
 

@@ -297,7 +297,7 @@ VIDEO_UPDATE( momoko )
 			for (x=0; x<32; x++)
 			{
 				radr = ((ry + y +34) & 0x3f) *0x20 + ((rx + x) & 0x1f) + (momoko_fg_select & 3) *0x800;
- 				chr = FG_MAP[ radr ] ;
+				chr = FG_MAP[ radr ] ;
 				if (flip==0)
 				{
 					px = 8*x+dx-6;

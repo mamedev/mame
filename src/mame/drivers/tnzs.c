@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1") /* WORK RAM (shared by the 2 z80's) */
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram) 	/* VDC RAM */
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)	/* VDC RAM */
 	AM_RANGE(0xf200, 0xf2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
@@ -1441,7 +1441,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jpopnics )
 	/* 0xc600 (CPU1) -> 0xef0e (shared RAM) */
- 	PORT_START("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )               /* code at 0x6e99 - is it ever called ? */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1452,24 +1452,24 @@ static INPUT_PORTS_START( jpopnics )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
 
 	/* 0xc601 (CPU1) -> 0xef0f (shared RAM) */
-  	PORT_START("DSWB")
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x2b86 */
 	PORT_DIPSETTING(    0x08, "50k 200k 150k+" )
 	PORT_DIPSETTING(    0x0c, "50k 250k 200k+" )
 	PORT_DIPSETTING(    0x04, "100k 300k 200k+" )
 	PORT_DIPSETTING(    0x00, "100k 400k 300k+" )
-  	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-  	PORT_DIPSETTING(    0x20, "2" )
-  	PORT_DIPSETTING(    0x30, "3" )
-  	PORT_DIPSETTING(    0x10, "4" )
-  	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )               /* code at 0x3dcc */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-  	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
-  	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-  	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2562,7 +2562,7 @@ ROM_START( tnzsjo )
 ROM_END
 
  ROM_START( tnzso )
- 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "u32", 0x00000, 0x08000, CRC(edf3b39e) SHA1(be221c99e50795d569611dba454c3954a259a859) )
 	ROM_CONTINUE(          0x18000, 0x18000 )		/* banked at 8000-bfff */
 

@@ -88,7 +88,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			tnum = (source[sprnum + 1] & 0x0007ffff) >> 00;
 
 			colr = (source[sprnum + 1] & 0x3f000000) >> 24;
-   			if (scr)
+			if (scr)
 				colr += 0x40; /* Use second copy of palette which is dimmed appropriately */
 
 			flipx = (source[sprnum + 1] & 0x40000000);

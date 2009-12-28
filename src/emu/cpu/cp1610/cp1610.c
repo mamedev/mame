@@ -69,11 +69,11 @@ INLINE cp1610_state *get_safe_token(const device_config *device)
 	cpustate->flags &= ~(S|Z|C|OV)
 
 /* clear sign and zero flags */
-#define CLR_SZ                	\
+#define CLR_SZ              	\
 	cpustate->flags &= ~(S|Z)
 
 /* clear sign,zero, and carry flags */
-#define CLR_SZC                	\
+#define CLR_SZC             	\
 	cpustate->flags &= ~(S|Z|C)
 
 /* set sign and zero flags */
@@ -2127,7 +2127,7 @@ static void cp1610_do_sdbd(cp1610_state *cpustate)
 	case 0x3e8: /* 1 110 101 xxx */ cp1610_sdbd_xorat_i(cpustate, 5,dest);	break;
 	case 0x3f0: /* 1 110 110 xxx */ cp1610_sdbd_xorat_d(cpustate, 6,dest);	break; /* ??? */
 	case 0x3f8: /* 1 110 111 xxx */ cp1610_sdbd_xori(cpustate, dest);			break;
-	default: 						cp1610_illegal(cpustate); break;
+	default:						cp1610_illegal(cpustate); break;
 	}
 }
 
@@ -3432,7 +3432,7 @@ static CPU_SET_INFO( cp1610 )
 	case CPUINFO_INT_INPUT_STATE + CP1610_INT_INTR:
 			cp1610_set_irq_line(cpustate, state-CPUINFO_INT_INPUT_STATE, info->i);		break;
 
-	case CPUINFO_INT_REGISTER + CP1610_R0: cpustate->r[0] = info->i; 			break;
+	case CPUINFO_INT_REGISTER + CP1610_R0: cpustate->r[0] = info->i;			break;
 	case CPUINFO_INT_REGISTER + CP1610_R1: cpustate->r[1] = info->i;			break;
 	case CPUINFO_INT_REGISTER + CP1610_R2: cpustate->r[2] = info->i;			break;
 	case CPUINFO_INT_REGISTER + CP1610_R3: cpustate->r[3] = info->i;			break;
@@ -3467,11 +3467,11 @@ CPU_GET_INFO( cp1610 )
 	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;	break;
 	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;	break;
 	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;	break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;	break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;	break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;	break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;	break;
 	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;	break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;	break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;	break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;	break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;	break;
 
 	case CPUINFO_INT_PREVIOUSPC:		info->i = 0;	/* TODO??? */		break;
 
@@ -3501,7 +3501,7 @@ CPU_GET_INFO( cp1610 )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME: 			strcpy(info->s, "CP1610");		break;
+	case DEVINFO_STR_NAME:			strcpy(info->s, "CP1610");		break;
 	case DEVINFO_STR_FAMILY:	strcpy(info->s, "");				break;
 	case DEVINFO_STR_VERSION:	strcpy(info->s, "1.0");			break;
 	case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__);		break;

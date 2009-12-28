@@ -1909,7 +1909,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 			/* count consecutive columns scrolled by the same amount */
 			for (groupcols = 1; col + groupcols < numcols; groupcols++)
 				 if (colscroll[col + groupcols] != yscroll)
-				 	break;
+					break;
 
 			/* iterate over reps of the columns in question */
 			yscroll = normalize_yscroll(src, yscroll);
@@ -1947,7 +1947,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 			/* count consecutive rows scrolled by the same amount */
 			for (grouprows = 1; row + grouprows < numrows; grouprows++)
 				 if (rowscroll[row + grouprows] != xscroll)
-				 	break;
+					break;
 
 			/* iterate over reps of the rows in question */
 			xscroll = normalize_xscroll(src, xscroll);

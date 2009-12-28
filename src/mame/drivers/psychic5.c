@@ -580,7 +580,7 @@ static INPUT_PORTS_START( bombsa )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("P1")	 	/* player 1 control */
+	PORT_START("P1")		/* player 1 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -634,7 +634,7 @@ static const gfx_layout charlayout =
 	{ 0, 1, 2, 3 }, /* the four bitplanes for pixel are packed into one nibble */
 	{ 0, 4, 8, 12, 16, 20, 24, 28 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8   	/* every char takes 32 consecutive bytes */
+	32*8	/* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -784,7 +784,7 @@ ROM_START( psychic5 )
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
 	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) 					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "p5a",          0x00000, 0x08000, CRC(50060ecd) SHA1(e6051fb4a1fa9429cfb6084e8a5dfe994a08280b) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
@@ -808,7 +808,7 @@ ROM_START( psychic5a )
 	ROM_LOAD( "myp5d",          0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
 	ROM_LOAD( "myp5e",          0x10000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) 					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "myp5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */

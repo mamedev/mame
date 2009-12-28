@@ -26,7 +26,7 @@
 #define V9938_BORDER_FUNC(name) 	\
 	static void FNAME (name) (const pen_t *pens, PEN_TYPE *ln)
 
-#define V9938_MODE_FUNC(name) 		\
+#define V9938_MODE_FUNC(name)		\
 	static void FNAME (name) (const pen_t *pens, PEN_TYPE *ln, int line)
 
 #define V9938_SPRITE_FUNC(name)		\
@@ -325,7 +325,7 @@ V9938_MODE_FUNC (mode_graphic23)
 	patternmask = (vdp->contReg[4] & 0x03) * 256 | (colourmask & 255);
 
 	nametbl = vdp->vram + (vdp->contReg[2] << 10);
- 	colourtbl = vdp->vram + ((vdp->contReg[3] & 0x80) << 6) + (vdp->contReg[10] << 14);
+	colourtbl = vdp->vram + ((vdp->contReg[3] & 0x80) << 6) + (vdp->contReg[10] << 14);
 	patterntbl = vdp->vram + ((vdp->contReg[4] & 0x3c) << 11);
 
 	line2 = (line + vdp->contReg[23]) & 255;
@@ -449,7 +449,7 @@ V9938_MODE_FUNC (mode_graphic5)
         *ln++ = pen_bg0[colour>>6];
 		*ln++ = pen_bg1[(colour>>4)&3];
         *ln++ = pen_bg0[(colour>>2)&3];
-       	*ln++ = pen_bg1[(colour&3)];
+    	*ln++ = pen_bg1[(colour&3)];
 		}
 
 	pen_bg1[0] = pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
@@ -495,7 +495,7 @@ V9938_MODE_FUNC (mode_graphic6)
 	line2 = ((line + vdp->contReg[23]) & linemask) & 255;
 
     nametbl = line2 << 8 ;
-   	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
+	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
         nametbl += 0x10000;
 
 	pen_bg = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
@@ -555,12 +555,12 @@ V9938_MODE_FUNC (mode_graphic7)
     int line2, linemask, x, xx, nametbl;
     PEN_TYPE pen, pen_bg;
 
-   	linemask = ((vdp->contReg[2] & 0x1f) << 3) | 7;
+	linemask = ((vdp->contReg[2] & 0x1f) << 3) | 7;
 
 	line2 = ((line + vdp->contReg[23]) & linemask) & 255;
 
 	nametbl = line2 << 8;
-   	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
+	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
 		nametbl += 0x10000;
 
 	pen_bg = pens[vdp->pal_ind256[vdp->contReg[7]]];
@@ -593,16 +593,16 @@ V9938_MODE_FUNC (mode_graphic7)
 		}
 	else
 		{
-  		for (x=0;x<256;x++)
+		for (x=0;x<256;x++)
         	{
 			colour = vdp->vram[((nametbl&1) << 16) | (nametbl>>1)];
 			pen = pens[vdp->pal_ind256[colour]];
 			*ln++ = pen;
 #if (V9938_WIDTH > 512)
-		 	*ln++ = pen;
+			*ln++ = pen;
 #endif
 			nametbl++;
-       		}
+    		}
 		}
 
 	xx = 16 - vdp->offset_x;

@@ -78,7 +78,7 @@ VIDEO_START( magmax )
 	prom_tab = auto_alloc_array(machine, UINT32, 256);
 
 	/* Allocate temporary bitmap */
- 	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	for (i=0; i<256; i++)
 	{

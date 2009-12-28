@@ -154,7 +154,7 @@ WRITE8_HANDLER( elim1_sh_w )
 
 	/* Play bounce sample */
 	if (data & 0x20)
-   	{
+	{
 		if (sample_playing(samples, 2))
 			sample_stop (samples, 2);
 		sample_start (samples, 2, 1, 0);
@@ -162,7 +162,7 @@ WRITE8_HANDLER( elim1_sh_w )
 
 	/* Play lazer sample */
 	if (data & 0xc0)
-   	{
+	{
 		if (sample_playing(samples, 3))
 			sample_stop (samples, 3);
 		sample_start (samples, 3, 5, 0);
@@ -209,14 +209,14 @@ WRITE8_HANDLER( zektor1_sh_w )
 	/* Play explosion samples */
 	if (data & 0x04)
                 sample_start (samples, 1, 10, 0);
- 	if (data & 0x08)
+	if (data & 0x08)
                   sample_start (samples, 1, 9, 0);
- 	if (data & 0x10)
+	if (data & 0x10)
                   sample_start (samples, 1, 8, 0);
 
 	/* Play bounce sample */
 	if (data & 0x20)
-   	{
+	{
                 if (sample_playing(samples, 2))
                         sample_stop (samples, 2);
                 sample_start (samples, 2, 1, 0);
@@ -224,7 +224,7 @@ WRITE8_HANDLER( zektor1_sh_w )
 
 	/* Play lazer sample */
 	if (data & 0xc0)
-   	{
+	{
 		if (sample_playing(samples, 3))
 			sample_stop (samples, 3);
                 sample_start (samples, 3, 5, 0);
@@ -270,7 +270,7 @@ WRITE8_HANDLER( spacfury1_sh_w )
 
 	/* craft moving */
 	if (data & 0x02)
-   	{
+	{
 		if (!sample_playing(samples, 2))
 			sample_start (samples, 2, 1, 1);
 	}
@@ -279,7 +279,7 @@ WRITE8_HANDLER( spacfury1_sh_w )
 
 	/* Thrust */
 	if (data & 0x04)
-   	{
+	{
 		if (!sample_playing(samples, 3))
 			sample_start (samples, 3, 4, 1);
 	}
@@ -307,7 +307,7 @@ WRITE8_HANDLER( spacfury2_sh_w )
 
 	/* ship firing */
 	if (data & 0x02)
-   	{
+	{
 		if (sample_playing(samples, 6))
 			sample_stop(samples, 6);
 		sample_start(samples, 6, 3, 0);

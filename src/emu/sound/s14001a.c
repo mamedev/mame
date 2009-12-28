@@ -460,7 +460,7 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 			chip->nextstate = 6;
 			break;
 		case 6: // Play phone forward, shift = 2
-	   		CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0x30)>>4; // grab current delta from low 2 bits of high nybble
+			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0x30)>>4; // grab current delta from low 2 bits of high nybble
 			chip->DACOutput += DeltaTable[CurDelta][chip->OldDelta]; // send data to forward delta table and add result to accumulator
 			chip->OldDelta = CurDelta; // Move current delta to old
 			chip->nextstate = 7;

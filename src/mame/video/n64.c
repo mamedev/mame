@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "includes/n64.h"
 
-#define LOG_RDP_EXECUTION 		0
+#define LOG_RDP_EXECUTION		0
 
 #define STRICT_ERROR (0)
 
@@ -2801,7 +2801,7 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 					{
 						COLOR_COMBINER2_C0(&c1);
 						COLOR_COMBINER2_C1(&c2);
-  					}
+					}
 
 					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
 					{
@@ -3870,7 +3870,7 @@ static RDP_COMMAND( rdp_set_other_modes )
 	int index;
 
 	other_modes.cycle_type			= (w1 >> 20) & 0x3;
-	other_modes.persp_tex_en 		= (w1 & 0x80000) ? 1 : 0;
+	other_modes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0;
 	other_modes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0;
 	other_modes.sharpen_tex_en		= (w1 & 0x20000) ? 1 : 0;
 	other_modes.tex_lod_en			= (w1 & 0x10000) ? 1 : 0;
@@ -4412,7 +4412,7 @@ static RDP_COMMAND( rdp_set_mask_image )
 
 static RDP_COMMAND( rdp_set_color_image )
 {
-	fb_format 	= (w1 >> 21) & 0x7;
+	fb_format	= (w1 >> 21) & 0x7;
 	fb_size		= (w1 >> 19) & 0x3;
 	fb_width	= (w1 & 0x3ff) + 1;
 	fb_address	= w2 & 0x01ffffff;

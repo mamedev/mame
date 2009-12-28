@@ -202,7 +202,7 @@ READ16_HANDLER( namcos2_68k_serial_comms_ctrl_r )
 
 	switch(offset){
 	case 0x00:
-		retval |= 0x0004; 	/* Set READY? status bit */
+		retval |= 0x0004;	/* Set READY? status bit */
 		break;
 
 	default:

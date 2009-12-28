@@ -4245,7 +4245,7 @@ ROM_END
 ROM_START( ufosensib )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "k108.ic18.3-4s", 0x20000, 0x8000, CRC(6b1d0955) SHA1(dbda145d40eaecd30c1d55a9675c58a2967c20c4) )
-	ROM_CONTINUE(            	0x00000, 0x8000 )             /* Now load the operands in RAM */
+	ROM_CONTINUE(           	0x00000, 0x8000 )             /* Now load the operands in RAM */
 	ROM_LOAD( "k109.ic19.4s",   0x30000, 0x8000, CRC(fc543b26) SHA1(b9e1d2ca6f9811bf341edf104fe209dbf56e4b2d) )
 	ROM_CONTINUE(               0x10000, 0x8000 )
 	ROM_LOAD( "k110.ic20.4-5s", 0x38000, 0x8000, CRC(6ba2dc77) SHA1(09a65f55988ae28e285d402af9a2a1f1dc05a82c) )

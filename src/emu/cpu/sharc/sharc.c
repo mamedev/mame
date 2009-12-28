@@ -1078,11 +1078,11 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -3;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -2;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -2;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 

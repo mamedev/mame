@@ -99,7 +99,7 @@ static TIMER_CALLBACK( serial_timer );
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(memory_decrypted_read_byte(cpustate->program, a))
+#define READOP(a)			(memory_decrypted_read_byte(cpustate->program, a))
 
 #define RDMEM(a)			(memory_read_byte_8be(cpustate->data, a))
 #define WRMEM(a,v)			(memory_write_byte_8be(cpustate->data, (a), (v)))
@@ -946,19 +946,19 @@ CPU_GET_INFO( mb88 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 7;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 3;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 3;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + MB88_IRQ_LINE:	info->i = cpustate->pending_interrupt ? ASSERT_LINE : CLEAR_LINE; break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
 		case CPUINFO_INT_PC:							info->i = GETPC();						break;
-		case CPUINFO_INT_REGISTER + MB88_PC: 			info->i = cpustate->PC;						break;
-		case CPUINFO_INT_REGISTER + MB88_PA: 			info->i = cpustate->PA;						break;
+		case CPUINFO_INT_REGISTER + MB88_PC:			info->i = cpustate->PC;						break;
+		case CPUINFO_INT_REGISTER + MB88_PA:			info->i = cpustate->PA;						break;
 		case CPUINFO_INT_REGISTER + MB88_FLAGS:			info->i = 0;
 				if (TEST_ST()) info->i |= 0x01;
 				if (TEST_ZF()) info->i |= 0x02;
@@ -968,14 +968,14 @@ CPU_GET_INFO( mb88 )
 				if (TEST_NF()) info->i |= 0x20;
 				break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + MB88_SI: 			info->i = cpustate->SI;						break;
+		case CPUINFO_INT_REGISTER + MB88_SI:			info->i = cpustate->SI;						break;
 		case CPUINFO_INT_REGISTER + MB88_A: 			info->i = cpustate->A;						break;
 		case CPUINFO_INT_REGISTER + MB88_X: 			info->i = cpustate->X;						break;
 		case CPUINFO_INT_REGISTER + MB88_Y: 			info->i = cpustate->Y;						break;
-		case CPUINFO_INT_REGISTER + MB88_PIO: 			info->i = cpustate->pio;						break;
-		case CPUINFO_INT_REGISTER + MB88_TH: 			info->i = cpustate->TH;						break;
-		case CPUINFO_INT_REGISTER + MB88_TL: 			info->i = cpustate->TL;						break;
-		case CPUINFO_INT_REGISTER + MB88_SB: 			info->i = cpustate->SB;						break;
+		case CPUINFO_INT_REGISTER + MB88_PIO:			info->i = cpustate->pio;						break;
+		case CPUINFO_INT_REGISTER + MB88_TH:			info->i = cpustate->TH;						break;
+		case CPUINFO_INT_REGISTER + MB88_TL:			info->i = cpustate->TL;						break;
+		case CPUINFO_INT_REGISTER + MB88_SB:			info->i = cpustate->SB;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mb88);			break;
@@ -1035,7 +1035,7 @@ CPU_GET_INFO( mb8841 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 7;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit); break;
@@ -1054,7 +1054,7 @@ CPU_GET_INFO( mb8842 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 7;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit); break;
@@ -1073,7 +1073,7 @@ CPU_GET_INFO( mb8843 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 6;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 6;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit); break;
@@ -1092,7 +1092,7 @@ CPU_GET_INFO( mb8844 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 6;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 6;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit); break;

@@ -337,7 +337,7 @@ static void tmaster_draw(running_machine *machine)
 	bitmap_t *bitmap;
 
 	buffer	=	(tmaster_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
- 	sw		=	 tmaster_regs[0x04/2];
+	sw		=	 tmaster_regs[0x04/2];
 	sx		=	 tmaster_regs[0x06/2];
 	sh		=	 tmaster_regs[0x08/2] + 1;
 	sy		=	 tmaster_regs[0x0a/2];
@@ -766,8 +766,8 @@ static INPUT_PORTS_START( tmaster )
 	PORT_INCLUDE( microtouch )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) 	// "M. Coin 1 Input"
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) 	// "M. Coin 2 Input"
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )	// "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )	// "M. Coin 2 Input"
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)	// "DBV Input"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )

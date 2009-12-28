@@ -24,7 +24,7 @@ OP(_000) {		   H6280_CYCLES(8);		  BRK;		   } // 8 BRK
 OP(_020) {		   H6280_CYCLES(7); EA_ABS; JSR;	   } // 7 JSR  ABS
 OP(_040) {		   H6280_CYCLES(7);		  RTI;		   } // 7 RTI
 OP(_060) {		   H6280_CYCLES(7);		  RTS;		   } // 7 RTS
-OP(_080) { int tmp;  				          BRA(1);	   } // 4 BRA  REL
+OP(_080) { int tmp; 				          BRA(1);	   } // 4 BRA  REL
 OP(_0a0) { int tmp; H6280_CYCLES(2); RD_IMM; LDY;		   } // 2 LDY  IMM
 OP(_0c0) { int tmp; H6280_CYCLES(2); RD_IMM; CPY;		   } // 2 CPY  IMM
 OP(_0e0) { int tmp; H6280_CYCLES(2); RD_IMM; CPX;		   } // 2 CPX  IMM
@@ -84,9 +84,9 @@ OP(_0c3) { int to,from,length;			      TDD;		   } // 6*l+17 TDD  XFER
 OP(_0e3) { int to,from,length,alternate;       TIA;		   } // 6*l+17 TIA  XFER
 
 OP(_013) { int tmp; H6280_CYCLES(5); RD_IMM; ST1;		   } // 4 + 1 penalty cycle ST1
-OP(_033) {       	H6280_CYCLES(2);		   NOP;		   } // 2 NOP
+OP(_033) {      	H6280_CYCLES(2);		   NOP;		   } // 2 NOP
 OP(_053) { int tmp; H6280_CYCLES(5); RD_IMM; TAM;		   } // 5 TAM  IMM
-OP(_073) { int to,from,length;    			  TII;		   } // 6*l+17 TII  XFER
+OP(_073) { int to,from,length;  			  TII;		   } // 6*l+17 TII  XFER
 OP(_093) { int tmp,tmp2; H6280_CYCLES(8); RD_IMM2; RD_ABS; TST; } // 8 TST  IMM,ABS
 OP(_0b3) { int tmp,tmp2; H6280_CYCLES(8); RD_IMM2; RD_ABX; TST; } // 8 TST  IMM,ABX
 OP(_0d3) { int to,from,length;			      TIN;		   } // 6*l+17 TIN  XFER

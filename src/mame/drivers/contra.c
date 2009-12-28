@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
- 	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -187,11 +187,11 @@ static MACHINE_DRIVER_START( contra )
 	MDRV_DRIVER_DATA(contra_state)
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
 	MDRV_CPU_PROGRAM_MAP(contra_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
- 	MDRV_CPU_ADD("audiocpu", M6809, XTAL_24MHz/12) /* 2000000? */
+	MDRV_CPU_ADD("audiocpu", M6809, XTAL_24MHz/12) /* 2000000? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */

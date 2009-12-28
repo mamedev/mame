@@ -35,8 +35,8 @@
 #define FRAC_ONE			(1 << FRAC_BITS)
 #define FRAC_MASK			(FRAC_ONE - 1)
 
-#define INTERNAL_BUFFER_SIZE 	(1 << 15)
-#define INTERNAL_SAMPLE_RATE 	(chip->master_clock * 2.0)
+#define INTERNAL_BUFFER_SIZE	(1 << 15)
+#define INTERNAL_SAMPLE_RATE	(chip->master_clock * 2.0)
 
 #if MAKE_WAVS
 #include "wavwrite.h"

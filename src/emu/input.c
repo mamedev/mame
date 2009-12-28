@@ -118,7 +118,7 @@ struct _code_string_table
 struct _input_private
 {
 	/* array of devices for each class */
-	input_device_list 	device_list[DEVICE_CLASS_MAXIMUM];
+	input_device_list	device_list[DEVICE_CLASS_MAXIMUM];
 	input_code			code_pressed_memory[MAX_PRESSED_SWITCHES];
 
 	/* device configuration */
@@ -126,7 +126,7 @@ struct _input_private
 	UINT8				lightgun_reload_button;
 	const char *		joystick_map_default;
 	INT32				joystick_deadzone;
-	INT32 				joystick_saturation;
+	INT32				joystick_saturation;
 };
 
 

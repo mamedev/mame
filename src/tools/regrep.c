@@ -103,7 +103,7 @@ struct _summary_list
     summary_list *  next;
     summary_file *  files;
     char *			dir;
-    char 			version[40];
+    char			version[40];
 };
 
 

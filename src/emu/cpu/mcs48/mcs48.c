@@ -664,8 +664,8 @@ OPHANDLER( jnt_1 )  		{ execute_jcc(cpustate, test_r(1) == 0); return 2; }
 OPHANDLER( jnz )			{ execute_jcc(cpustate, cpustate->a != 0); return 2; }
 OPHANDLER( jobf )			{ execute_jcc(cpustate, (cpustate->sts & STS_OBF) != 0); return 2; }
 OPHANDLER( jtf )			{ execute_jcc(cpustate, cpustate->timer_flag); cpustate->timer_flag = FALSE; return 2; }
-OPHANDLER( jt_0 )  			{ execute_jcc(cpustate, test_r(0) != 0); return 2; }
-OPHANDLER( jt_1 )  			{ execute_jcc(cpustate, test_r(1) != 0); return 2; }
+OPHANDLER( jt_0 )			{ execute_jcc(cpustate, test_r(0) != 0); return 2; }
+OPHANDLER( jt_1 )			{ execute_jcc(cpustate, test_r(1) != 0); return 2; }
 OPHANDLER( jz )				{ execute_jcc(cpustate, cpustate->a == 0); return 2; }
 
 OPHANDLER( jmp_0 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x000); return 2; }
@@ -782,7 +782,7 @@ OPHANDLER( retr )
 }
 
 OPHANDLER( rl_a )			{ cpustate->a = (cpustate->a << 1) | (cpustate->a >> 7); return 1; }
-OPHANDLER( rlc_a ) 			{ UINT8 newc = cpustate->a & C_FLAG; cpustate->a = (cpustate->a << 1) | (cpustate->psw >> 7); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rlc_a )			{ UINT8 newc = cpustate->a & C_FLAG; cpustate->a = (cpustate->a << 1) | (cpustate->psw >> 7); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
 
 OPHANDLER( rr_a )			{ cpustate->a = (cpustate->a >> 1) | (cpustate->a << 7); return 1; }
 OPHANDLER( rrc_a )			{ UINT8 newc = (cpustate->a << 7) & C_FLAG; cpustate->a = (cpustate->a >> 1) | (cpustate->psw & C_FLAG); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
@@ -1384,13 +1384,13 @@ static CPU_GET_INFO( mcs48 )
 
 		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:	 		info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			/*info->i = 6 or 7 or 8;*/				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			/*info->i = 6 or 7 or 8;*/				break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 9;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	info->i = cpustate->ea;					break;
@@ -1408,7 +1408,7 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	/* set per-core */						break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		/* set per-core */ 						break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		/* set per-core */						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;

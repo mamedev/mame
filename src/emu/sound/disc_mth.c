@@ -853,8 +853,8 @@ static DISCRETE_RESET(dst_logic_ff)
 #define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(0)
 #define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(1)
 #define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(2)
-#define DST_LOGIC_JKFF__J 		 DISCRETE_INPUT(3)
-#define DST_LOGIC_JKFF__K	 	 DISCRETE_INPUT(4)
+#define DST_LOGIC_JKFF__J		 DISCRETE_INPUT(3)
+#define DST_LOGIC_JKFF__K		 DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_jkff)
 {
@@ -1466,10 +1466,10 @@ static DISCRETE_RESET(dst_oneshot)
 	context->countdown = 0;
 	context->state     = 0;
 
- 	context->last_trig = 0;
- 	context->type = DST_ONESHOT__TYPE;
+	context->last_trig = 0;
+	context->type = DST_ONESHOT__TYPE;
 
- 	node->output[0] = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+	node->output[0] = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 }
 
 
@@ -2011,7 +2011,7 @@ static DISCRETE_STEP(dst_tvca_op_amp)
          * So now the discharge rate is dependent upon F3.
          * If F3 is at ground then we discharge to 0V through r6.
          * If F3 is out of circuit then we discharge to OP_AMP_NORTON_VBE through r6+r7. */
- 		context->v_cap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - context->v_cap1) * context->exponent_d[f3];
+		context->v_cap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - context->v_cap1) * context->exponent_d[f3];
 	}
 
 	/* Calculate c1 current going in to + input. */

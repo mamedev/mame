@@ -597,7 +597,7 @@ static PALETTE_INIT( norautp )
 {
 	/* 1st gfx bank */
 	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
-	palette_set_color(machine, 1, MAKE_RGB(0xff, 0xff, 0x00)); 	/* yellow */
+	palette_set_color(machine, 1, MAKE_RGB(0xff, 0xff, 0x00));	/* yellow */
 	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
 	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
 	palette_set_color(machine, 4, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
@@ -1753,7 +1753,7 @@ ROM_START( norautjp )
 
 	ROM_REGION( 0x1000,	"gfx", 0 )
 	ROM_FILL(                     0x0000, 0x0800, 0xff )
-	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) 	/* first half 0xff filled */
+	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )	/* first half 0xff filled */
 	ROM_CONTINUE(                 0x0800, 0x0800 )
 
 	ROM_REGION( 0x400,	"nvram", 0 )

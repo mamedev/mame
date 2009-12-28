@@ -471,7 +471,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
 
 /* Get the condition code register */
-#define m68ki_get_ccr(M) 	((COND_XS(M) >> 4) | \
+#define m68ki_get_ccr(M)	((COND_XS(M) >> 4) | \
 						     (COND_MI(M) >> 4) | \
 						     (COND_EQ(M) << 2) | \
 						     (COND_VS(M) >> 6) | \
@@ -504,19 +504,19 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define m68ki_read_imm_8(M)			MASK_OUT_ABOVE_8(m68ki_read_imm_16(M))
 
 /* Map PC-relative reads */
-#define m68ki_read_pcrel_8(M, A) 	m68k_read_pcrelative_8(M, A)
-#define m68ki_read_pcrel_16(M, A) 	m68k_read_pcrelative_16(M, A)
-#define m68ki_read_pcrel_32(M, A) 	m68k_read_pcrelative_32(M, A)
+#define m68ki_read_pcrel_8(M, A)	m68k_read_pcrelative_8(M, A)
+#define m68ki_read_pcrel_16(M, A)	m68k_read_pcrelative_16(M, A)
+#define m68ki_read_pcrel_32(M, A)	m68k_read_pcrelative_32(M, A)
 
 /* Read from the program space */
-#define m68ki_read_program_8(M, A) 	m68ki_read_8_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_PROGRAM)
+#define m68ki_read_program_8(M, A)	m68ki_read_8_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_PROGRAM)
 #define m68ki_read_program_16(M, A) m68ki_read_16_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_PROGRAM)
 #define m68ki_read_program_32(M, A) m68ki_read_32_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_PROGRAM)
 
 /* Read from the data space */
 #define m68ki_read_data_8(M, A) 	m68ki_read_8_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_DATA)
-#define m68ki_read_data_16(M, A) 	m68ki_read_16_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_DATA)
-#define m68ki_read_data_32(M, A) 	m68ki_read_32_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_DATA)
+#define m68ki_read_data_16(M, A)	m68ki_read_16_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_DATA)
+#define m68ki_read_data_32(M, A)	m68ki_read_32_fc(M, A, m68k->s_flag | FUNCTION_CODE_USER_DATA)
 
 
 

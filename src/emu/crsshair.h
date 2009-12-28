@@ -46,8 +46,8 @@
 typedef struct _crosshair_user_settings crosshair_user_settings;
 struct _crosshair_user_settings
 {
-	UINT8 			used;		/* is used */
-	UINT8 			mode;		/* visibility mode */
+	UINT8			used;		/* is used */
+	UINT8			mode;		/* visibility mode */
 	UINT8			auto_time;	/* time in seconds to blank crosshair if no movement */
 	char			name[CROSSHAIR_PIC_NAME_LENGTH + 1];		/* bitmap name */
 };

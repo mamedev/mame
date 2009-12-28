@@ -188,7 +188,7 @@ static TIMER_CALLBACK( dma8257_timerproc )
 	{
 		i8257->drq    &= ~(0x01 << channel);
 		dma8257_update_status(device);
-  		if (!(DMA_MODE_AUTOLOAD(i8257->mode) && channel==2)) {
+		if (!(DMA_MODE_AUTOLOAD(i8257->mode) && channel==2)) {
 			if (DMA_MODE_TCSTOP(i8257->mode)) {
 				i8257->mode &= ~(0x01 << channel);
 			}

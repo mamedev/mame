@@ -18,8 +18,8 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const attotime 		attotime_zero = STATIC_ATTOTIME_IN_SEC(0);
-const attotime 		attotime_never = STATIC_ATTOTIME_IN_SEC(ATTOTIME_MAX_SECONDS);
+const attotime		attotime_zero = STATIC_ATTOTIME_IN_SEC(0);
+const attotime		attotime_never = STATIC_ATTOTIME_IN_SEC(ATTOTIME_MAX_SECONDS);
 
 
 

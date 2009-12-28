@@ -16,8 +16,8 @@ struct _tms_state {
 	int basefreq;			/* chip's base frequency */
 	int counter8[TONES];	/* tone frequency counter for 8' */
 	int counter16[TONES];	/* tone frequency counter for 16'*/
-	int output8; 			/* output signal bits for 8' */
-	int output16; 			/* output signal bits for 16' */
+	int output8;			/* output signal bits for 8' */
+	int output16;			/* output signal bits for 16' */
 	int enable; 			/* mask which tones to play */
 };
 
@@ -106,7 +106,7 @@ DEVICE_GET_INFO( tms3615 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms_state); 				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tms3615 );		break;

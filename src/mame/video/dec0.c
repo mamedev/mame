@@ -599,7 +599,7 @@ WRITE16_HANDLER( dec0_pf3_data_w )
 
 WRITE16_HANDLER( dec0_priority_w )
 {
-  	COMBINE_DATA(&dec0_pri);
+	COMBINE_DATA(&dec0_pri);
 }
 
 WRITE8_HANDLER( dec0_pf3_control_8bit_w )

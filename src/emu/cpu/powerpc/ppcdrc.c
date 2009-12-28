@@ -100,25 +100,25 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 /* DSISR values for various addressing types */
 #define DSISR_IMM(op)	((0) |										/* bits 15-16: cleared */			\
 						 ((((op) >> (31- 5)) & 0x01) << (31-17)) |	/* bit  17:    opcode bit 5 */		\
-						 ((((op) >> (31- 4)) & 0x0f) << (31-21)) | 	/* bits 18-21: opcode bits 1-4 */	\
+						 ((((op) >> (31- 4)) & 0x0f) << (31-21)) |	/* bits 18-21: opcode bits 1-4 */	\
 						 ((((op) >> (31-10)) & 0x1f) << (31-26)) |	/* bits 22-26: opcode bits 6-10 */	\
 						 (0))										/* bits 27-31: undefined */
 
 #define DSISR_IMMU(op)	((0) |										/* bits 15-16: cleared */			\
 						 ((((op) >> (31- 5)) & 0x01) << (31-17)) |	/* bit  17:    opcode bit 5 */		\
-						 ((((op) >> (31- 4)) & 0x0f) << (31-21)) | 	/* bits 18-21: opcode bits 1-4 */	\
+						 ((((op) >> (31- 4)) & 0x0f) << (31-21)) |	/* bits 18-21: opcode bits 1-4 */	\
 						 ((((op) >> (31-10)) & 0x1f) << (31-26)) |	/* bits 22-26: opcode bits 6-10 */	\
 						 ((((op) >> (31-15)) & 0x1f) << (31-31)))	/* bits 27-31: opcode bits 11-15 */
 
 #define DSISR_IDX(op)	(((((op) >> (31-30)) & 0x03) << (31-16)) |	/* bits 15-16: opcode bits 29-30 */	\
 						 ((((op) >> (31-25)) & 0x01) << (31-17)) |	/* bit  17:    opcode bit 25 */		\
-						 ((((op) >> (31-24)) & 0x0f) << (31-21)) | 	/* bits 18-21: opcode bits 21-24 */	\
+						 ((((op) >> (31-24)) & 0x0f) << (31-21)) |	/* bits 18-21: opcode bits 21-24 */	\
 						 ((((op) >> (31-10)) & 0x1f) << (31-26)) |	/* bits 22-26: opcode bits 6-10 */	\
 						 (0))										/* bits 27-31: undefined */
 
 #define DSISR_IDXU(op)	(((((op) >> (31-30)) & 0x03) << (31-16)) |	/* bits 15-16: opcode bits 29-30 */	\
 						 ((((op) >> (31-25)) & 0x01) << (31-17)) |	/* bit  17:    opcode bit 25 */		\
-						 ((((op) >> (31-24)) & 0x0f) << (31-21)) | 	/* bits 18-21: opcode bits 21-24 */	\
+						 ((((op) >> (31-24)) & 0x0f) << (31-21)) |	/* bits 18-21: opcode bits 21-24 */	\
 						 ((((op) >> (31-10)) & 0x1f) << (31-26)) |	/* bits 22-26: opcode bits 6-10 */	\
 						 ((((op) >> (31-15)) & 0x1f) << (31-31)))	/* bits 27-31: opcode bits 11-15 */
 
@@ -815,7 +815,7 @@ static CPU_GET_INFO( ppcdrc )
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppccom_get_info(ppc, state, info); 				break;
+		default:										ppccom_get_info(ppc, state, info);				break;
 	}
 }
 
@@ -1462,7 +1462,7 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 	}
 
 	/* adjust cycles */
-	UML_SUB(block, MEM(&ppc->icount), MEM(&ppc->icount), IREG(1));			 				// sub     icount,icount,cycles
+	UML_SUB(block, MEM(&ppc->icount), MEM(&ppc->icount), IREG(1));							// sub     icount,icount,cycles
 	UML_EXHc(block, IF_S, ppc->impstate->out_of_cycles, IREG(0));							// exh     out_of_cycles,i0
 	UML_HASHJMP(block, MEM(&ppc->impstate->mode), IREG(0), ppc->impstate->nocode);			// hashjmp <mode>,i0,nocode
 

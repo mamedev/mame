@@ -384,7 +384,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 #ifdef MAME_DEBUG
 	popmessage	("Pri %d=%02x-%s %d=%02x-%s %d=%02x-%s",
 		0, BG_TYPE(0), BG_LAYER_ENABLE(0)?"y":"n",
- 		1, BG_TYPE(1), BG_LAYER_ENABLE(1)?"y":"n",
+		1, BG_TYPE(1), BG_LAYER_ENABLE(1)?"y":"n",
 		2, BG_TYPE(2), BG_LAYER_ENABLE(2)?"y":"n");
 #endif
 #endif

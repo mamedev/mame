@@ -451,13 +451,13 @@ void decrypt_cthd2003( running_machine *machine )
 	memcpy(romdata, tmp, 8*128*128);
 
 	romdata = memory_region(machine, "audiocpu")+0x10000;
- 	memcpy(tmp+8*0*128, romdata+8*0*128, 8*32*128);
+	memcpy(tmp+8*0*128, romdata+8*0*128, 8*32*128);
 	memcpy(tmp+8*32*128, romdata+8*64*128, 8*32*128);
- 	memcpy(tmp+8*64*128, romdata+8*32*128, 8*32*128);
+	memcpy(tmp+8*64*128, romdata+8*32*128, 8*32*128);
 	memcpy(tmp+8*96*128, romdata+8*96*128, 8*32*128);
 	memcpy(romdata, tmp, 8*128*128);
 
- 	free(tmp);
+	free(tmp);
 
 	memcpy(romdata-0x10000,romdata,0x10000);
 
@@ -505,18 +505,18 @@ void patch_cthd2003( running_machine *machine )
 	{
 		mem16[i] -= 0x7000;
 		mem16[i+1] -= 0x0010;
- 	}
+	}
 
 	// Fix for green dots on title page
 	for (i=0xac500/2;i < 0xac520/2; i=i+1)
 	{
 		mem16[i] = 0xFFFF;
 	}
- 	// Fix for blanks as screen change level end clear
+	// Fix for blanks as screen change level end clear
 	mem16[0x991d0/2] = 0xdd03;
 	mem16[0x99306/2] = 0xdd03;
 	mem16[0x99354/2] = 0xdd03;
- 	mem16[0x9943e/2] = 0xdd03;
+	mem16[0x9943e/2] = 0xdd03;
 }
 
 
@@ -613,18 +613,18 @@ void patch_ct2k3sa( running_machine *machine )
 	{
 		mem16[i] -= 0x7000;
 		mem16[i+1] -= 0x0010;
- 	}
+	}
 
 	// Fix for green dots on title page
 	for (i=0xac500/2;i < 0xac520/2; i=i+1)
 	{
 		mem16[i] = 0xFFFF;
 	}
- 	// Fix for blanks as screen change level end clear
+	// Fix for blanks as screen change level end clear
 	mem16[0x991d0/2] = 0xdd03;
 	mem16[0x99306/2] = 0xdd03;
 	mem16[0x99354/2] = 0xdd03;
- 	mem16[0x9943e/2] = 0xdd03;
+	mem16[0x9943e/2] = 0xdd03;
 }
 
 

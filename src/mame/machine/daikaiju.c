@@ -110,7 +110,7 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 #define MCU_CONTROLS1 0x36
 #define MCU_MESSAGE   0x40
 #define MCU_CONTROLS2 0x44
-#define MCU_ID 				0x60
+#define MCU_ID				0x60
 
 #define MCU_ADDRESS1_LENGTH  2
 #define MCU_ADDRESS2_LENGTH  2
@@ -170,9 +170,9 @@ WRITE8_HANDLER( daikaiju_mcu_w )
 			case MCU_ADDRESS1:  SET_COMMAND(MCU_ADDRESS1_LENGTH); break;
 			case MCU_ADDRESS2:  SET_COMMAND(MCU_ADDRESS2_LENGTH); break;
 			case MCU_CONTROLS1: SET_COMMAND(MCU_CONTROLS1_LENGTH); break;
-			case MCU_MESSAGE: 	SET_COMMAND(MCU_MESSAGE_LENGTH); break;
+			case MCU_MESSAGE:	SET_COMMAND(MCU_MESSAGE_LENGTH); break;
 			case MCU_CONTROLS2: SET_COMMAND(MCU_CONTROLS2_LENGTH); break;
-			case MCU_ID: 				SET_COMMAND(MCU_ID_LENGTH); break;
+			case MCU_ID:				SET_COMMAND(MCU_ID_LENGTH); break;
 			default:
 				daikaiju_command=data;
 				logerror("Unknown MCU command W %x %x \n",data,cpu_get_pc(space->cpu));
@@ -193,7 +193,7 @@ READ8_HANDLER( daikaiju_mcu_r )
 			return ID_DAIKAIJU;
 
 		case MCU_CONTROLS1:
- 		{
+		{
 			int n;
 			switch( (daikaiju_buffer[0]&0xf)^0xf)
 			{

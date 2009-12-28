@@ -39,12 +39,12 @@ typedef enum _ui_event_type ui_event_type;
 typedef struct _ui_event ui_event;
 struct _ui_event
 {
-	ui_event_type 		event_type;
+	ui_event_type		event_type;
 	render_target *		target;
-	INT32 				mouse_x;
-	INT32 				mouse_y;
-	input_item_id 		key;
-	unicode_char 		ch;
+	INT32				mouse_x;
+	INT32				mouse_y;
+	input_item_id		key;
+	unicode_char		ch;
 };
 
 

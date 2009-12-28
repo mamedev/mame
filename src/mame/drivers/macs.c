@@ -112,7 +112,7 @@ static READ8_HANDLER( macs_input_r )
 		case 5: return input_port_read(space->machine, "DSW3");
 		case 6: return input_port_read(space->machine, "DSW4");
 		case 7: return input_port_read(space->machine, "SYS1");
-		default: 	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(space->cpu),offset+0xc0);
+		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(space->cpu),offset+0xc0);
 	}
 
 	return 0xff;
@@ -603,7 +603,7 @@ static MACHINE_RESET(macs)
 		memcpy(macs_ram1 + 0x0800, memory_region(machine, "user1")+0x73fa, 0x507);
 		memcpy(macs_ram1 + 0x1800, memory_region(machine, "user1")+0x73fa, 0x507);
 
-#define MAKEJMP(n,m) 	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
+#define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
 						macs_ram2[(n) - 0xe800 + 2]=((m)>>8)&0xff;
 

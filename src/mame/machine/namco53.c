@@ -66,9 +66,9 @@ struct _namco_53xx_state
 {
 	const device_config *	cpu;
 	UINT8					portO;
-	devcb_resolved_read8 	k;
-	devcb_resolved_read8 	in[4];
-	devcb_resolved_write8 	p;
+	devcb_resolved_read8	k;
+	devcb_resolved_read8	in[4];
+	devcb_resolved_write8	p;
 };
 
 INLINE namco_53xx_state *get_safe_token(const device_config *device)

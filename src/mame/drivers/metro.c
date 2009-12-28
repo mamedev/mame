@@ -957,7 +957,7 @@ static ADDRESS_MAP_START( bangball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe78860, 0xe7886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
 	AM_RANGE(0xe78870, 0xe7887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll
 	AM_RANGE(0xe78880, 0xe78881) AM_WRITENOP											// ? increasing
-	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP 											// ? increasing
+	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0xe788a2, 0xe788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xe788a4, 0xe788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
 	AM_RANGE(0xe788aa, 0xe788ab) AM_WRITEONLY AM_BASE(&metro_rombank)					// Rom Bank
@@ -1026,7 +1026,7 @@ static ADDRESS_MAP_START( daitorid_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x4788aa, 0x4788ab) AM_WRITEONLY AM_BASE(&metro_rombank)					// Rom Bank
 	AM_RANGE(0x4788ac, 0x4788ad) AM_WRITEONLY AM_BASE(&metro_screenctrl)				// Screen Control
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w) 		// To Sound CPU
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)		// To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("IN2")
@@ -1486,7 +1486,7 @@ static ADDRESS_MAP_START( pangpoms_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
 	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll Regs
-	AM_RANGE(0x478880, 0x478881) AM_WRITENOP						   					// ? increasing
+	AM_RANGE(0x478880, 0x478881) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x4788a4, 0x4788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
@@ -1798,7 +1798,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x778840, 0x77884f ) AM_WRITE( metro_blitter_w )	AM_BASE( &metro_blitter_regs )	// Tiles Blitter
 	AM_RANGE( 0x778860, 0x77886b ) AM_WRITE( metro_window_w )	AM_BASE( &metro_window )	// Tilemap Window
 	AM_RANGE( 0x778870, 0x77887b ) AM_WRITEONLY		AM_BASE( &metro_scroll )	// Scroll
-	AM_RANGE( 0x778890, 0x778891 ) AM_WRITENOP 	// ? increasing
+	AM_RANGE( 0x778890, 0x778891 ) AM_WRITENOP	// ? increasing
 	AM_RANGE( 0x7788a2, 0x7788a3 ) AM_WRITE( metro_irq_cause_w )	// IRQ Cause
 	AM_RANGE( 0x7788a4, 0x7788a5 ) AM_WRITE( puzzlet_irq_enable_w ) AM_BASE( &metro_irq_enable )	// IRQ Enable
 

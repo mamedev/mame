@@ -262,7 +262,7 @@ static void op_0000(t11_state *cpustate, UINT16 op)
 		case 0x04:	/* IOT   */ cpustate->icount -= 48; PUSH(cpustate, cpustate->PSW); PUSH(cpustate, cpustate->PC); cpustate->PC = RWORD(cpustate, 0x10); cpustate->PSW = RWORD(cpustate, 0x12); t11_check_irqs(cpustate); break;
 		case 0x05:	/* RESET */ cpustate->icount -= 110; break;
 		case 0x06:	/* RTT   */ cpustate->icount -= 33; cpustate->PC = POP(cpustate); cpustate->PSW = POP(cpustate); t11_check_irqs(cpustate); break;
-		default: 	illegal(cpustate, op); break;
+		default:	illegal(cpustate, op); break;
 	}
 }
 
@@ -292,7 +292,7 @@ static void mark(t11_state *cpustate, UINT16 op)
 
 	cpustate->SP = cpustate->SP + 2 * (op & 0x3f);
 	cpustate->PC = cpustate->REGW(5);
-   	cpustate->REGW(5) = POP(cpustate);
+	cpustate->REGW(5) = POP(cpustate);
 }
 
 static void jmp_rgd(t11_state *cpustate, UINT16 op)       { cpustate->icount -= 15; { JMP(RGD); } }

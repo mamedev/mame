@@ -18,7 +18,7 @@ UINT8 *madalien_videoram;
 UINT8 *madalien_charram;
 
 UINT8 *madalien_video_flags;
-UINT8 *madalien_video_control; 	/* bit #0 is set during player 2's turn, bit #3 is set during CRTC initialization */
+UINT8 *madalien_video_control;	/* bit #0 is set during player 2's turn, bit #3 is set during CRTC initialization */
 UINT8 *madalien_scroll;
 UINT8 *madalien_edge1_pos;
 UINT8 *madalien_edge2_pos;

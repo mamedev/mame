@@ -104,53 +104,53 @@ MCU simulation TODO:
          * incremented properly).*/
 		case 0x40:
 		case 0x41:
- 		case 0x42:
- 			return 0;
+		case 0x42:
+			return 0;
 
- 		/*With this command the MCU controls body direction  */
- 		case 0x02:
- 		{
- 			//direction:
- 			//0-left
- 			//1-leftup
- 			//2-up
- 			//3-rigtup
- 			//4-right
- 			//5-rightdwn
- 			//6-down
- 			//7-leftdwn
+		/*With this command the MCU controls body direction  */
+		case 0x02:
+		{
+			//direction:
+			//0-left
+			//1-leftup
+			//2-up
+			//3-rigtup
+			//4-right
+			//5-rightdwn
+			//6-down
+			//7-leftdwn
 
- 			UINT8 val= (input_port_read(space->machine, "IN1") >> 2) & 0x0f;
- 			/* bit0 = left
+			UINT8 val= (input_port_read(space->machine, "IN1") >> 2) & 0x0f;
+			/* bit0 = left
                bit1 = right
                bit2 = down
                bit3 = up
             */
- 			/* direction is encoded as:
+			/* direction is encoded as:
                                4
                              3   5
                             2     6
                              1   7
                                0
             */
- 			/*       0000   0001   0010   0011      0100   0101   0110   0111     1000   1001   1010   1011   1100   1101   1110   1111 */
- 			/*      nochange left  right nochange   down downlft dwnrght down     up     upleft uprgt  up    nochnge left   right  nochange */
+			/*       0000   0001   0010   0011      0100   0101   0110   0111     1000   1001   1010   1011   1100   1101   1110   1111 */
+			/*      nochange left  right nochange   down downlft dwnrght down     up     upleft uprgt  up    nochnge left   right  nochange */
 
- 			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
+			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
 
- 			if (table[val] >= 0)
- 				state->direction = table[val];
+			if (table[val] >= 0)
+				state->direction = table[val];
 
- 			return state->direction;
- 		}
+			return state->direction;
+		}
 
 		/*This controls the arms when they return to the player.            */
- 		case 0x07:
- 			return 0x45;
+		case 0x07:
+			return 0x45;
 
- 		default:
- 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), state->mcu_val);
- 		   	return state->mcu_val;
+		default:
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), state->mcu_val);
+			return state->mcu_val;
 	}
 #endif
 }
@@ -181,8 +181,8 @@ static ADDRESS_MAP_START( msisaac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITENOP 					//???
-	AM_RANGE(0xf002, 0xf002) AM_WRITENOP		 			//???
+	AM_RANGE(0xf001, 0xf001) AM_WRITENOP					//???
+	AM_RANGE(0xf002, 0xf002) AM_WRITENOP					//???
 
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/	//????

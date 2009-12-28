@@ -124,8 +124,8 @@ struct _attotime
 ***************************************************************************/
 
 /* constant times for zero and never */
-extern const attotime 		attotime_zero;
-extern const attotime 		attotime_never;
+extern const attotime		attotime_zero;
+extern const attotime		attotime_never;
 
 
 

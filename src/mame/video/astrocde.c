@@ -683,7 +683,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	{
 		funcgen_expand_count ^= 1;
 		data >>= 4 * funcgen_expand_count;
-		data = 	(funcgen_expand_color[(data >> 3) & 1] << 6) |
+		data =	(funcgen_expand_color[(data >> 3) & 1] << 6) |
 				(funcgen_expand_color[(data >> 2) & 1] << 4) |
 				(funcgen_expand_color[(data >> 1) & 1] << 2) |
 				(funcgen_expand_color[(data >> 0) & 1] << 0);
@@ -707,7 +707,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 		else
 		{
 			UINT8 shift = 2 * (~funcgen_rotate_count++ & 3);
-			data = 	(((funcgen_rotate_data[3] >> shift) & 3) << 6) |
+			data =	(((funcgen_rotate_data[3] >> shift) & 3) << 6) |
 					(((funcgen_rotate_data[2] >> shift) & 3) << 4) |
 					(((funcgen_rotate_data[1] >> shift) & 3) << 2) |
 					(((funcgen_rotate_data[0] >> shift) & 3) << 0);

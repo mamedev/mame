@@ -636,7 +636,7 @@ static const samples_interface meadows_samples_interface =
 
 static const samples_interface bowl3d_samples_interface =
 {
- 	1,
+	1,
 	bowl3d_sample_names
 };
 
@@ -651,9 +651,9 @@ static const samples_interface bowl3d_samples_interface =
 static MACHINE_DRIVER_START( meadows )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(meadows_main_map)
-	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt) 	/* one interrupt per frame!? */
+	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt)	/* one interrupt per frame!? */
 
 	MDRV_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
@@ -715,9 +715,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bowl3d )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(bowl3d_main_map)
-	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt) 	/* one interrupt per frame!? */
+	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt)	/* one interrupt per frame!? */
 
 	MDRV_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
@@ -749,7 +749,7 @@ static MACHINE_DRIVER_START( bowl3d )
 	MDRV_SOUND_CONFIG(meadows_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
- 	/* audio hardware */
+	/* audio hardware */
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(bowl3d_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -801,7 +801,7 @@ ROM_START( bowl3d )
 	// h13 empty
 
     /* Universal Game Logic according to schematics  */
-    ROM_REGION( 0x08000, "audiocpu", 0 ) 	/* 2650 CPU at j8 */
+    ROM_REGION( 0x08000, "audiocpu", 0 )	/* 2650 CPU at j8 */
 	ROM_LOAD( "82s115.a6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
 	ROM_LOAD( "82s115.c6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
 

@@ -219,7 +219,7 @@ static STREAM_UPDATE( namco_update_mono )
 						continue;
 					}
 
-					hold = 	hold_time;
+					hold =	hold_time;
 
 					c += delta;
 					cnt = (c >> 12);
@@ -311,7 +311,7 @@ static STREAM_UPDATE( namco_update_stereo )
 						continue;
 					}
 
-					hold = 	hold_time;
+					hold =	hold_time;
 
 					c += delta;
 					cnt = (c >> 12);

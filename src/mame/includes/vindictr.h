@@ -11,9 +11,9 @@ struct _vindictr_state
 {
 	atarigen_state	atarigen;
 
-	UINT8 			playfield_tile_bank;
-	UINT16 			playfield_xscroll;
-	UINT16 			playfield_yscroll;
+	UINT8			playfield_tile_bank;
+	UINT16			playfield_xscroll;
+	UINT16			playfield_yscroll;
 };
 
 

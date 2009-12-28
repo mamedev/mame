@@ -64,7 +64,7 @@ typedef enum _state_save_error state_save_error;
 
 
 /* generic registration; all further registrations are based on this */
-#define state_save_register_generic(_mach, _mod, _tag, _index, _name, _val, _valsize, _count) 		\
+#define state_save_register_generic(_mach, _mod, _tag, _index, _name, _val, _valsize, _count)		\
 do {																								\
 	assert_always(IS_VALID_SAVE_TYPE(_valsize), "Invalid data type supplied for state saving.");	\
 	state_save_register_memory(_mach, _mod, _tag, _index, _name, _val, sizeof(_valsize), _count, __FILE__, __LINE__);	\

@@ -115,7 +115,7 @@ static MACHINE_DRIVER_START( pangofun )
 	MDRV_CPU_ADD("maincpu", I486, 14318180*2)	/* I486 ?? Mhz */
 	MDRV_CPU_PROGRAM_MAP(pangofun_map)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)

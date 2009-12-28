@@ -129,7 +129,7 @@ WRITE8_HANDLER( suprloco_control_w )
 {
 	/* There is probably a palette select in here */
 
-   	/* Bit 0   - coin counter A */
+	/* Bit 0   - coin counter A */
 	/* Bit 1   - coin counter B (only used if coinage differs from A) */
 	/* Bit 2-3 - probably unused */
 	/* Bit 4   - ??? */

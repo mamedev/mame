@@ -1185,9 +1185,9 @@ static MACHINE_START( equites )
 {
 	equites_state *state = (equites_state *)machine->driver_data;
 
- 	state->mcu = devtag_get_device(machine, "mcu");
- 	state->audio_cpu = devtag_get_device(machine, "audiocpu");
- 	state->msm = devtag_get_device(machine, "msm");
+	state->mcu = devtag_get_device(machine, "mcu");
+	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+	state->msm = devtag_get_device(machine, "msm");
 	state->dac_1 = devtag_get_device(machine, "dac1");
 	state->dac_2 = devtag_get_device(machine, "dac2");
 

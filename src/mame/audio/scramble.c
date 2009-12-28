@@ -19,7 +19,7 @@
 #include "sound/ay8910.h"
 #include "includes/galaxold.h"
 
-#define AD2083_TMS5110_CLOCK 		XTAL_640kHz
+#define AD2083_TMS5110_CLOCK		XTAL_640kHz
 
 /* The timer clock in Scramble which feeds the upper 4 bits of          */
 /* AY-3-8910 port A is based on the same clock                          */

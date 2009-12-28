@@ -56,15 +56,15 @@ struct atarirle_desc
 	UINT16			palettebase;		/* base palette entry */
 	UINT16			maxcolors;			/* maximum number of colors */
 
-	atarirle_entry 	codemask;			/* mask for the code index */
-	atarirle_entry 	colormask;			/* mask for the color */
-	atarirle_entry 	xposmask;			/* mask for the X position */
-	atarirle_entry 	yposmask;			/* mask for the Y position */
-	atarirle_entry 	scalemask;			/* mask for the scale factor */
-	atarirle_entry 	hflipmask;			/* mask for the horizontal flip */
-	atarirle_entry 	ordermask;			/* mask for the order */
-	atarirle_entry 	prioritymask;		/* mask for the priority */
-	atarirle_entry 	vrammask;			/* mask for the VRAM target */
+	atarirle_entry	codemask;			/* mask for the code index */
+	atarirle_entry	colormask;			/* mask for the color */
+	atarirle_entry	xposmask;			/* mask for the X position */
+	atarirle_entry	yposmask;			/* mask for the Y position */
+	atarirle_entry	scalemask;			/* mask for the scale factor */
+	atarirle_entry	hflipmask;			/* mask for the horizontal flip */
+	atarirle_entry	ordermask;			/* mask for the order */
+	atarirle_entry	prioritymask;		/* mask for the priority */
+	atarirle_entry	vrammask;			/* mask for the VRAM target */
 };
 
 
