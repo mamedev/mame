@@ -2,7 +2,7 @@
 
     National Semiconductor ADC1038
 
-    10-Bit Serial I/O A/D Converters with Analog Multiplexer and 
+    10-Bit Serial I/O A/D Converters with Analog Multiplexer and
     Track/hold Function
 
 ***************************************************************************/

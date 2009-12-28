@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( ppking_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, ADDRESS_SPACE_IO, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc004, 0xc004) AM_NOP	// WRITE(ppking_irq_patch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READ(qx0_r) AM_WRITE(qx0_w)
@@ -446,7 +446,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, ADDRESS_SPACE_IO, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)

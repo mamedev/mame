@@ -709,7 +709,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
-static const k056800_interface gticlub_k056800_interface = 
+static const k056800_interface gticlub_k056800_interface =
 {
 	sound_irq_callback
 };
@@ -733,25 +733,25 @@ static int adc1038_input_callback( const device_config *device, int input )
 	return value;
 }
 
-static const adc1038_interface gticlub_adc1038_intf = 
+static const adc1038_interface gticlub_adc1038_intf =
 {
 	1,
 	adc1038_input_callback
 };
 
-static const adc1038_interface thunderh_adc1038_intf = 
+static const adc1038_interface thunderh_adc1038_intf =
 {
 	0,
 	adc1038_input_callback
 };
 
-static const k056230_interface gticlub_k056230_intf = 
+static const k056230_interface gticlub_k056230_intf =
 {
 	"maincpu",
 	0
 };
 
-static const k056230_interface thunderh_k056230_intf = 
+static const k056230_interface thunderh_k056230_intf =
 {
 	"maincpu",
 	1
@@ -780,7 +780,7 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	
+
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(gticlub)
 
@@ -829,12 +829,12 @@ static MACHINE_DRIVER_START( slrasslt )
 MACHINE_DRIVER_END
 
 
-static const k033906_interface hangplt_k033906_intf_0 = 
+static const k033906_interface hangplt_k033906_intf_0 =
 {
 	"voodoo0"
 };
 
-static const k033906_interface hangplt_k033906_intf_1 = 
+static const k033906_interface hangplt_k033906_intf_1 =
 {
 	"voodoo1"
 };

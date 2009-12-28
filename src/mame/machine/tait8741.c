@@ -561,15 +561,15 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 				break;
 			case 1:
 				/*
-				status codes:
-				0x06 sub NG IOX2
-				0x05 sub NG IOX1
-				0x04 sub NG CIOS
-				0x03 sub NG OPN
-				0x02 sub NG ROM
-				0x01 sub NG RAM
-				0x00 ok
-				*/
+                status codes:
+                0x06 sub NG IOX2
+                0x05 sub NG IOX1
+                0x04 sub NG CIOS
+                0x03 sub NG OPN
+                0x02 sub NG ROM
+                0x01 sub NG RAM
+                0x00 ok
+                */
 				cyclemb_mcu.rxd = 0x40;
 				cyclemb_mcu.rst = 0;
 				break;

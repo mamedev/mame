@@ -909,7 +909,7 @@ ROM_START( suplup ) /* version 4.0 / 990518 - also has 'Puzzle Bang Bang' title 
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM */
 	ROM_LOAD( "eeprom-suplup.bin", 0x0000, 0x0080, CRC(e60c9883) SHA1(662dd8fb85eb97a8a4d53886198b269a5f6a6268) )
 ROM_END
@@ -1255,7 +1255,7 @@ ROM_START( misncrft )
 
 	ROM_REGION( 0x80000, "wavetable", 0 )
 	ROM_LOAD( "qs1001a.u17", 0x00000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-misncrft.bin", 0x0000, 0x0080, CRC(9ad27077) SHA1(7f0e98eff9cf6e1b60c19fc1016b888e50b087e0) )
 ROM_END

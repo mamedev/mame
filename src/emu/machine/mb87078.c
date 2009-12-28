@@ -186,7 +186,7 @@ void mb87078_data_w( const device_config *device, int data, int dsel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 
-	if (mb87078->reset_comp == 0) 
+	if (mb87078->reset_comp == 0)
 		return;
 
 	if (dsel == 0)	/* gd0 - gd5 */

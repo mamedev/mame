@@ -511,13 +511,13 @@ INLINE void taitoic_drawscanline( bitmap_t *bitmap, const rectangle *cliprect, i
 	src += cliprect->min_x;
 	dsti += cliprect->min_x;
 	dstp += cliprect->min_x;
-	if (transparent) 
+	if (transparent)
 	{
-		while (length--) 
+		while (length--)
 		{
 			UINT32 spixel = *src++;
 
-			if (spixel < 0x7fff) 
+			if (spixel < 0x7fff)
 			{
 				*dsti = spixel;
 				*dstp = pri;
@@ -526,10 +526,10 @@ INLINE void taitoic_drawscanline( bitmap_t *bitmap, const rectangle *cliprect, i
 			dsti++;
 			dstp++;
 		}
-	} 
+	}
 	else	/* Not transparent case */
 	{
-		while (length--) 
+		while (length--)
 		{
 			*dsti++ = *src++;
 			*dstp++ = pri;
@@ -811,11 +811,11 @@ static UINT16 topspeed_get_road_pixel_color( UINT16 pixel, UINT16 color )
 	switch (pixel_type)
 	{
 	case 0x01:		/* Center lines */
-		if (color & 0x08)	
+		if (color & 0x08)
 			pixel = road_body_color;
 		break;
 	case 0x02:		/* Road edge (inner) */
-		if (color & 0x08)	
+		if (color & 0x08)
 			pixel = road_body_color;
 		break;
 	case 0x03:		/* Road edge (outer) */
@@ -871,9 +871,9 @@ static void topspeed_custom_draw( const device_config *device, bitmap_t *bitmap,
 		y_index = 0;
 	}
 
-	if (!machine_flip) 
-		y = min_y; 
-	else 
+	if (!machine_flip)
+		y = min_y;
+	else
 		y = max_y;
 
 	do
@@ -921,9 +921,9 @@ static void topspeed_custom_draw( const device_config *device, bitmap_t *bitmap,
 		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, device->machine->priority_bitmap, priority);
 		y_index++;
 
-		if (!machine_flip) 
-			y++; 
-		else 
+		if (!machine_flip)
+			y++;
+		else
 			y--;
 	}
 	while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
@@ -1617,9 +1617,9 @@ static void tc0080vco_bg0_tilemap_draw( const device_config *device, bitmap_t *b
 			y_index = ((-tc0080vco->scroll_ram[3] - 2) << 16) + min_y * zoomy - (max_y + min_y) * (zoomy - 0x10000);
 		}
 
-		if (!machine_flip) 
-			y = min_y; 
-		else 
+		if (!machine_flip)
+			y = min_y;
+		else
 			y = max_y;
 
 		do
@@ -1628,7 +1628,7 @@ static void tc0080vco_bg0_tilemap_draw( const device_config *device, bitmap_t *b
 
 			/* row areas are the same in flipscreen, so we must read in reverse */
 			row_index = (src_y_index & 0x1ff);
-			if (flip)	
+			if (flip)
 				row_index = 0x1ff - row_index;
 
 			x_index = sx - ((tc0080vco->bgscroll_ram[row_index] << 16));
@@ -1663,9 +1663,9 @@ static void tc0080vco_bg0_tilemap_draw( const device_config *device, bitmap_t *b
 
 			y_index += zoomy;
 
-			if (!machine_flip) 
-				y++; 
-			else 
+			if (!machine_flip)
+				y++;
+			else
 				y--;
 		}
 		while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
@@ -1783,17 +1783,17 @@ void tc0080vco_tilemap_draw( const device_config *device, bitmap_t *bitmap, cons
 	switch (layer)
 	{
 		case 0:
-			if (disable & 0x01) 
+			if (disable & 0x01)
 				return;
 			tc0080vco_bg0_tilemap_draw(device, bitmap, cliprect, flags, priority);
 			break;
 		case 1:
-			if (disable & 0x02) 
+			if (disable & 0x02)
 				return;
 			tc0080vco_bg1_tilemap_draw(device, bitmap, cliprect, flags, priority);
 			break;
 		case 2:
-			if (disable & 0x04) 
+			if (disable & 0x04)
 				return;
 			tilemap_draw(bitmap, cliprect, tc0080vco->tilemap[2], flags, priority);
 			break;
@@ -2321,9 +2321,9 @@ READ32_DEVICE_HANDLER( tc0100scn_ctrl_long_r )
 
 WRITE32_DEVICE_HANDLER( tc0100scn_ctrl_long_w )
 {
-	if (ACCESSING_BITS_16_31) 
+	if (ACCESSING_BITS_16_31)
 		tc0100scn_ctrl_word_w(device, offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15) 
+	if (ACCESSING_BITS_0_15)
 		tc0100scn_ctrl_word_w(device, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
 }
 
@@ -2390,14 +2390,14 @@ static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bi
 	//We use cliprect->max_y and cliprect->max_x to support games which use more than 1 screen
 
 	// Row offsets are 'screen space' 0-255 regardless of Y scroll
-	for (y = 0; y <= cliprect->max_y; y++) 
+	for (y = 0; y <= cliprect->max_y; y++)
 	{
 		src_x = (tc0100scn->fgscrollx - tc0100scn->fgscroll_ram[(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect->min_x) & width_mask;
 		if (tc0100scn->ctrl[0x7] & 1) // Flipscreen
 			src_x = (256 - 64 - src_x) & width_mask;
 
 		// Col offsets are 'tilemap' space 0-511, and apply to blocks of 8 pixels at once
-		for (x = 0; x <= (cliprect->max_x - cliprect->min_x); x++) 
+		for (x = 0; x <= (cliprect->max_x - cliprect->min_x); x++)
 		{
 			column_offset = tc0100scn->colscroll_ram[(src_x & 0x3ff) / 8];
 			p = *BITMAP_ADDR16(src_bitmap, (src_y - column_offset) & height_mask, src_x);
@@ -2432,17 +2432,17 @@ if (disable != 0 && disable != 3 && disable != 7)
 	switch (layer)
 	{
 		case 0:
-			if (disable & 0x01) 
+			if (disable & 0x01)
 				return 1;
 			tilemap_draw(bitmap, &clip, tc0100scn->tilemap[0][tc0100scn->dblwidth], flags, priority);
 			break;
 		case 1:
-			if (disable & 0x02) 
+			if (disable & 0x02)
 				return 1;
 			tc0100scn_tilemap_draw_fg(device, bitmap, &clip, tc0100scn->tilemap[1][tc0100scn->dblwidth], flags, priority);
 			break;
 		case 2:
-			if (disable & 0x04) 
+			if (disable & 0x04)
 				return 1;
 			tilemap_draw(bitmap, &clip, tc0100scn->tilemap[2][tc0100scn->dblwidth], flags, priority);
 			break;
@@ -2671,7 +2671,7 @@ static void zoom_draw( const device_config *device, bitmap_t *bitmap, const rect
 	/* 24-bit signed */
 	startx = ((tc0280grd->ctrl[0] & 0xff) << 16) + tc0280grd->ctrl[1];
 
-	if (startx & 0x800000) 
+	if (startx & 0x800000)
 		startx -= 0x1000000;
 
 	incxx = (INT16)tc0280grd->ctrl[2];
@@ -2681,7 +2681,7 @@ static void zoom_draw( const device_config *device, bitmap_t *bitmap, const rect
 	/* 24-bit signed */
 	starty = ((tc0280grd->ctrl[4] & 0xff) << 16) + tc0280grd->ctrl[5];
 
-	if (starty & 0x800000) 
+	if (starty & 0x800000)
 		starty -= 0x1000000;
 
 	incxy = (INT16)tc0280grd->ctrl[6];
@@ -3164,9 +3164,9 @@ READ32_DEVICE_HANDLER( tc0480scp_ctrl_long_r )
 
 WRITE32_DEVICE_HANDLER( tc0480scp_ctrl_long_w )
 {
-	if (ACCESSING_BITS_16_31) 
+	if (ACCESSING_BITS_16_31)
 		tc0480scp_ctrl_word_w(device, offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15) 
+	if (ACCESSING_BITS_0_15)
 		tc0480scp_ctrl_word_w(device, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
 }
 
@@ -3320,9 +3320,9 @@ static void tc0480scp_bg01_draw( const device_config *device, bitmap_t *bitmap, 
 			y_index -= (tc0480scp->y_offs - min_y) * zoomy;
 		}
 
-		if (!machine_flip) 
-			y = min_y; 
-		else 
+		if (!machine_flip)
+			y = min_y;
+		else
 			y = max_y;
 
 		do
@@ -3331,7 +3331,7 @@ static void tc0480scp_bg01_draw( const device_config *device, bitmap_t *bitmap, 
 
 			/* row areas are the same in flipscreen, so we must read in reverse */
 			row_index = src_y_index;
-			if (flip)	
+			if (flip)
 				row_index = 0x1ff - row_index;
 
 			x_index = sx - ((tc0480scp->bgscroll_ram[layer][row_index] << 16)) - ((tc0480scp->bgscroll_ram[layer][row_index + 0x800] << 8) & 0xffff);
@@ -3365,9 +3365,9 @@ static void tc0480scp_bg01_draw( const device_config *device, bitmap_t *bitmap, 
 			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, device->machine->priority_bitmap, priority);
 
 			y_index += zoomy;
-			if (!machine_flip) 
-				y++; 
-			else 
+			if (!machine_flip)
+				y++;
+			else
 				y--;
 		}
 		while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
@@ -3464,9 +3464,9 @@ static void tc0480scp_bg23_draw( const device_config *device, bitmap_t *bitmap, 
 	}
 
 
-	if (!machine_flip) 
-		y = min_y; 
-	else 
+	if (!machine_flip)
+		y = min_y;
+	else
 		y = max_y;
 
 	do
@@ -3529,9 +3529,9 @@ static void tc0480scp_bg23_draw( const device_config *device, bitmap_t *bitmap, 
 		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, device->machine->priority_bitmap, priority);
 
 		y_index += zoomy;
-		if (!machine_flip) 
-			y++; 
-		else 
+		if (!machine_flip)
+			y++;
+		else
 			y--;
 	}
 	while ((!machine_flip && y<=max_y) || (machine_flip && y>=min_y));
@@ -4676,7 +4676,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_word_w )
 		case 0:
 			/* In test mode game writes to odd register number so (data>>1) */
 			tc0110pcr->addr = (data >> 1) & 0xfff;
-			if (data > 0x1fff) 
+			if (data > 0x1fff)
 				logerror ("Write to palette index > 0x1fff\n");
 			break;
 
@@ -4699,7 +4699,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_word_w )
 	{
 		case 0:
 			tc0110pcr->addr = data & 0xfff;
-			if (data > 0xfff) 
+			if (data > 0xfff)
 				logerror ("Write to palette index (color area %d) > 0xfff\n", tc0110pcr->pal_offs);
 			break;
 
@@ -4724,7 +4724,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w )
 	{
 		case 0:
 			tc0110pcr->addr = data & 0xfff;
-			if (data > 0xfff) 
+			if (data > 0xfff)
 				logerror ("Write to palette index > 0xfff\n");
 			break;
 
@@ -4749,7 +4749,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w )
 	{
 		case 0:
 			tc0110pcr->addr = data & 0xfff;
-			if (data > 0xfff) 
+			if (data > 0xfff)
 				logerror ("Write to palette index > 0xfff\n");
 			break;
 
@@ -5105,11 +5105,11 @@ static DEVICE_START( tc0180vcu )
 	state_save_register_device_item(device, 0, tc0180vcu->video_control);
 	state_save_register_device_item_array(device, 0, tc0180vcu->ctrl);
 
-//	tc0180vcu->ram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
-//	tc0180vcu->scrollram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
+//  tc0180vcu->ram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
+//  tc0180vcu->scrollram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
 
-//	state_save_register_device_item_pointer(device, 0, tc0180vcu->ram, PC090OJ_RAM_SIZE / 2);
-//	state_save_register_device_item_pointer(device, 0, tc0180vcu->scrollram, PC090OJ_RAM_SIZE / 2);
+//  state_save_register_device_item_pointer(device, 0, tc0180vcu->ram, PC090OJ_RAM_SIZE / 2);
+//  state_save_register_device_item_pointer(device, 0, tc0180vcu->scrollram, PC090OJ_RAM_SIZE / 2);
 }
 
 static DEVICE_RESET( tc0180vcu )

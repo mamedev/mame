@@ -1841,7 +1841,7 @@ static MACHINE_DRIVER_START( model2o )
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
 
 	MDRV_MACHINE_RESET(model2o)
-	
+
 	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_NVRAM_HANDLER( model2 )
 

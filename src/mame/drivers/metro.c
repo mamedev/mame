@@ -5317,7 +5317,7 @@ ROM_START( dokyusp )
 
 	ROM_REGION( 0x200000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "7.bin", 0x000000, 0x200000, CRC(763985e1) SHA1(395d925b79922de5060a3f59de99fbcc9bd40fad) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-dokyusp.bin", 0x0000, 0x0080, CRC(cf159485) SHA1(f8e9c89e1b7c8bcd77ae5f55e334f79285f602a8) )
 ROM_END

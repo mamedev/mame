@@ -109,7 +109,7 @@ e0035 49 d3 06   mov [6d3],al
 0c53 ret nz                                 e0040 be e0083
 0c54 ld hl,d461                             .
 0c57 ld a,(d476)                            e0042 mov aw,[4b9] (68 -> a1)
-0c5a or a                                   e0045 and aw,aw                       
+0c5a or a                                   e0045 and aw,aw
 0c5b jr nz,0c6d                             e0047 be e0083
 0c5d ld a,(hl)                              .
 0c5e or a                                   e0049 and al,al
@@ -117,7 +117,7 @@ e0035 49 d3 06   mov [6d3],al
 0c61 inc hl                                 e004d dec al
 0c62 inc (hl)                               e004f mov [4b9],aw (4c -> a3)
 0c63 ld a,(hl)                              .
-.                                           e0052 br e0083 
+.                                           e0052 br e0083
 .                                           e0054 and ah,ah
 .                                           e0056 be e007b
 0c64 cp 3c                                  e0058 mov al,3c

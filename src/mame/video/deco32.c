@@ -1168,7 +1168,7 @@ static void tilemap_raster_draw(bitmap_t *bitmap, const rectangle *cliprect, int
 	deco32_raster_display_list[overflow++]=deco32_pf12_control[2];
 	deco32_raster_display_list[overflow++]=deco32_pf12_control[3];
 	deco32_raster_display_list[overflow++]=deco32_pf12_control[4];
-	
+
 	while (ptr<overflow) {
 		start=end;
 		end=deco32_raster_display_list[ptr++];

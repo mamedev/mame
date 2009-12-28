@@ -3164,13 +3164,13 @@ static const ym2203_interface ym2203_config =
 
 static const tc0220ioc_interface taitof2_io220_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 
 static const tc0510nio_interface taitof2_io510_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 

@@ -226,7 +226,7 @@ win_monitor_info *winvideo_monitor_from_handle(HMONITOR hmonitor)
 void osd_update(running_machine *machine, int skip_redraw)
 {
 	win_window_info *window;
-	
+
 	// ping the watchdog on each update
 	winmain_watchdog_ping();
 

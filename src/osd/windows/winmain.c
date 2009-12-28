@@ -461,20 +461,20 @@ static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
 	{
 		HANDLE handle_list[2];
 		DWORD wait_result;
-		
+
 		// wait for either a reset or an exit, or a timeout
 		handle_list[0] = watchdog_reset_event;
 		handle_list[1] = watchdog_exit_event;
 		wait_result = WaitForMultipleObjects(2, handle_list, FALSE, timeout);
-		
+
 		// on a reset, just loop around and re-wait
 		if (wait_result == WAIT_OBJECT_0 + 0)
 			continue;
-		
+
 		// on an exit, break out
 		if (wait_result == WAIT_OBJECT_0 + 1)
 			break;
-		
+
 		// on a timeout, kill the process
 		if (wait_result == WAIT_TIMEOUT)
 		{

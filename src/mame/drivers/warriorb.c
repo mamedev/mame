@@ -447,13 +447,13 @@ static DEVICE_GET_INFO( subwoofer )
 
 static const tc0220ioc_interface darius2d_io_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 
 static const tc0510nio_interface warriorb_io_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 

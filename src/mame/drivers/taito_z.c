@@ -2876,13 +2876,13 @@ Contcirc road glitchiness in attract?
 
 static const tc0220ioc_interface taitoz_io220_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 
 static const tc0510nio_interface taitoz_io510_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 

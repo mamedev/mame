@@ -271,12 +271,12 @@ MACHINE_DRIVER_END
 
 ROM_START( metalmx )
 	/* ----------------------------------------
-	   Layer 1 (there are 2 of these boards)
+       Layer 1 (there are 2 of these boards)
     ---------------------------------------- */
 
 	ROM_REGION( 0x80000, "boot", 0 )
 	ROM_LOAD( "bootmetl.r34", 0x00000, 0x80000, CRC(ec799644) SHA1(32c77abb70fee1da8e3d7141bce2032e73e0eb35) )
-	
+
 	ROM_REGION( 0x80000, "data", 0 )
 	ROM_LOAD( "datametl.0", 0x00000, 0x80000, CRC(004dc445) SHA1(e52e539cc38afa917d1c769f9ad1794f4bd833b2) )
 	ROM_LOAD( "datametl.1", 0x00000, 0x80000, CRC(e0465fc5) SHA1(cd8584e48b6cf33bc103cdfdb68d32eef3f2bec5) )
@@ -297,9 +297,9 @@ ROM_START( metalmx )
 
 	ROM_REGION( 0x80000, "palslayer1", 0 )
 	ROM_LOAD( "103-1500.bin",  0x000, 0x117, CRC(9883af90) SHA1(62b4a0cce5832628149c48e6810055ad3919cc5b) )
-	
+
 	/* ----------------------------------------
-	   Layer 2 (there are 2 of these boards)
+       Layer 2 (there are 2 of these boards)
     ---------------------------------------- */
 
 	ROM_REGION( 0x80000, "palslayer2", 0 )
@@ -308,7 +308,7 @@ ROM_START( metalmx )
 	ROM_LOAD( "xdec.bin",  0x000, 0x117, CRC(fcb37143) SHA1(c95a6714f151868d42722684c8b67e9356f70544) )
 
 	/* ----------------------------------------
-	   Layer 3 (there are 2 of these boards)
+       Layer 3 (there are 2 of these boards)
     ---------------------------------------- */
 
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
@@ -330,9 +330,9 @@ ROM_START( metalmx )
 	ROM_LOAD( "103-1300.bin",  0x000, 0x157, CRC(eec18a29) SHA1(cc41cc921f59d385df805217f3b09bc289379f79) )
 
 	/* ----------------------------
-	   Layer 4
+       Layer 4
     ---------------------------- */
-	
+
 	ROM_REGION( 0x80000, "palslayer4", 0 )
 	ROM_LOAD( "103-1200.bin",  0x000, 0x2e5, CRC(cf1d4df4) SHA1(2ae592df2f16af070620766b7ebf60918c7f725d) )
 	ROM_LOAD( "103-1202.bin",  0x000, 0x2e5, CRC(dab3b17f) SHA1(ac825063a293a32ae6ba5cbf5cfb52aa4aea62c9) )
@@ -341,9 +341,9 @@ ROM_START( metalmx )
 	ROM_LOAD( "103-1219.bin",  0x000, 0x117, CRC(bf08d1e8) SHA1(5710cbc941830594087320ed2b22bcbb2b5c48de) )
 
 	/* ----------------------------
-	   Layer 5
+       Layer 5
     ---------------------------- */
-	
+
 	ROM_REGION( 0x100000, "tex", 0 )
 	ROM_LOAD16_BYTE( "tex0h.bin", 0x00001, 0x80000, CRC(b4dc459e) SHA1(cd2c6616951bdedeb5bb0c81179b4eee42ed5148) )
 	ROM_LOAD16_BYTE( "tex0l.bin", 0x00000, 0x80000, CRC(370f9dca) SHA1(e26633f0f78f821fc59d8070ad927507f33d04d2) )

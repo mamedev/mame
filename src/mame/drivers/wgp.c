@@ -953,7 +953,7 @@ static MACHINE_START( wgp )
 
 static const tc0220ioc_interface wgp_io_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 

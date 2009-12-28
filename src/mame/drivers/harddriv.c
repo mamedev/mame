@@ -3379,16 +3379,16 @@ ROM_END
 
 5/2/2003
 
-The following roms (type 27C512) were dumped and verified from an Atari Race Drivin 
-Panorama v2.1 boardset by Mickey Johnson (mickster (at) derbyworks.com) and Dave France 
+The following roms (type 27C512) were dumped and verified from an Atari Race Drivin
+Panorama v2.1 boardset by Mickey Johnson (mickster (at) derbyworks.com) and Dave France
 (dfrance (at) revealed.net).  Any questions regarding the hardware, please contact Mickey.
 
 The Multisync PCB (A046901), used by the side monitor, uses the 137412-117 slapstic.
-The boardset is low rez, and is more similar to STUN Runner than the regular Race 
+The boardset is low rez, and is more similar to STUN Runner than the regular Race
 Drivin's hardware.
 
-The Multisync PCB (A045988), used by the main (center) monitor, uses the 137412-115 
-slapstic. 
+The Multisync PCB (A045988), used by the main (center) monitor, uses the 137412-115
+slapstic.
 
 The ADSP board was silkscreened "ADSP II A047046-01", but had a factory sticker stamped
 "ADSP II Panorama A047046-04".
@@ -3401,48 +3401,48 @@ have brought these ROMs up in MAME as Race Drivin.  It will pass the self-test, 
 game will come up with "DIVIDE BY ZERO ERR".  Hitting F2 (Self Test) will display
 "Hard Drivin / Race Drivin / Panorama Self Test P2.1" in the Test Menu.
 
-Filename	Location	Label			Board
---------------	--------------	----------------------	-----------------------------
-088-1022	9H		136088-1022 CS 0022	ADSP II A047046-01
-088-1018	9/10H		136088-1018 CS 6518	"
-088-1020	10H		136088-1020 CS BC20	"
-088-1021	9K		136088-1021 CS A121	"
-088-1017	9/10K		136088-1017 CS 4B17	"
-088-1019	10K		136088-1019 CS 6219	"
+Filename    Location    Label           Board
+--------------  --------------  ----------------------  -----------------------------
+088-1022    9H      136088-1022 CS 0022 ADSP II A047046-01
+088-1018    9/10H       136088-1018 CS 6518 "
+088-1020    10H     136088-1020 CS BC20 "
+088-1021    9K      136088-1021 CS A121 "
+088-1017    9/10K       136088-1017 CS 4B17 "
+088-1019    10K     136088-1019 CS 6219 "
 
-088-2015	210Y		136088-2015 CS DF15	Multisync PCB A046901
-088-2013	210X		136088-2013 CS DA13	"
-088-2011	210W		136088-2011 CS 6E11	"
-088-2009	210V		136088-2009 CS 1F09	"
-088-2007	210U		136088-2007 CS 2F07	"
-088-2005	210T		136088-2005C CS D305	"
-088-2003	210S		136088-2003C CS 2303	"
-088-2001	210R		136088-2001 CS DE01	"
-088-2016	200Y		136088-2016 CS 0D16	"
-088-2014	200X		136088-2014 CS EB14	"
-088-2012	200W		136088-2012 CS 2912	"
-088-2010	200V		136088-2010 CS FF10	"
-088-2008	200U		136088-2008 CS BA08	"
-088-2006	200T		136088-2006C CS D406	"
-088-2004	200S		136088-2004C CS 4504	"
-088-2002	200R		136088-2002 CS A502	"
+088-2015    210Y        136088-2015 CS DF15 Multisync PCB A046901
+088-2013    210X        136088-2013 CS DA13 "
+088-2011    210W        136088-2011 CS 6E11 "
+088-2009    210V        136088-2009 CS 1F09 "
+088-2007    210U        136088-2007 CS 2F07 "
+088-2005    210T        136088-2005C CS D305    "
+088-2003    210S        136088-2003C CS 2303    "
+088-2001    210R        136088-2001 CS DE01 "
+088-2016    200Y        136088-2016 CS 0D16 "
+088-2014    200X        136088-2014 CS EB14 "
+088-2012    200W        136088-2012 CS 2912 "
+088-2010    200V        136088-2010 CS FF10 "
+088-2008    200U        136088-2008 CS BA08 "
+088-2006    200T        136088-2006C CS D406    "
+088-2004    200S        136088-2004C CS 4504    "
+088-2002    200R        136088-2002 CS A502 "
 
-088-1015	210Y		136088-1015 CS E215	Multisync PCB A045988
-088-1013	210X		136088-1013 CS 8F13	"
-088-1011	210W		136088-1011 CS 5111	"
-088-1009	210V		136088-1009 CS EE09	"
-088-1007	210U		136088-1007 CS 4D07	"
-088-1005	210T		136088-1005B CS 3905	"
-088-1003	210S		136088-1003B CS 7403	"
-088-1001	210R		136088-1001 CS 6701	"
-088-1016	200Y		136088-1016 CS 3C16	"
-088-1014	200X		136088-1014 CS 9C14	"
-088-1012	200W		136088-1012 CS C312	"
-088-1010	200V		136088-1010 CS 9410	"
-088-1008	200U		136088-1008 CS 3408	"
-088-1006	200T		136088-1006B CS A006	"
-088-1004	200S		136088-1004B CS A904	"
-088-1002	200R		136088-1002 CS FB02	"
+088-1015    210Y        136088-1015 CS E215 Multisync PCB A045988
+088-1013    210X        136088-1013 CS 8F13 "
+088-1011    210W        136088-1011 CS 5111 "
+088-1009    210V        136088-1009 CS EE09 "
+088-1007    210U        136088-1007 CS 4D07 "
+088-1005    210T        136088-1005B CS 3905    "
+088-1003    210S        136088-1003B CS 7403    "
+088-1001    210R        136088-1001 CS 6701 "
+088-1016    200Y        136088-1016 CS 3C16 "
+088-1014    200X        136088-1014 CS 9C14 "
+088-1012    200W        136088-1012 CS C312 "
+088-1010    200V        136088-1010 CS 9410 "
+088-1008    200U        136088-1008 CS 3408 "
+088-1006    200T        136088-1006B CS A006    "
+088-1004    200S        136088-1004B CS A904    "
+088-1002    200R        136088-1002 CS FB02 "
 
 */
 

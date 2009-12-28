@@ -252,7 +252,7 @@ ROM_START( stlforce )
 	/* only one bank */
 	ROM_REGION( 0x80000, "oki", 0 ) /* samples */
 	ROM_LOAD( "stlforce.u1", 0x00000, 0x80000, CRC(0a55edf1) SHA1(091f12e8110c62df22b370a2e710c930ba06e8ca) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-stlforce.bin", 0x0000, 0x0080, CRC(3fb83951) SHA1(0cbf09751e46f100db847cf0594a4440126a7b6e) )
 ROM_END
@@ -328,7 +328,7 @@ ROM_START( twinbrat )
 	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END
@@ -364,7 +364,7 @@ ROM_START( twinbrata )
 	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END

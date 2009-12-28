@@ -392,7 +392,7 @@ static DEVICE_NVRAM( eeprom )
 				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
 			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
 				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
-			
+
 			if (eestate->intf->data_bits == 8)
 				memcpy(eestate->data, device->region, eeprom_length);
 			else

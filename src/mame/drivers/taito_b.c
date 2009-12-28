@@ -2122,19 +2122,19 @@ static const mb87078_interface taitob_mb87078_intf =
 
 static const tc0220ioc_interface taitob_io_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 
 static const tc0640fio_interface pbobble_io_intf =
 {
-	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COIN"), 
+	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COIN"),
 	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("P1_P2_A"), DEVCB_INPUT_PORT("P1_P2_B")	/* port read handlers */
 };
 
 static const tc0510nio_interface sbm_io_intf =
 {
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"), 
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("JOY"), DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("PHOTOSENSOR")	/* port read handlers */
 };
 

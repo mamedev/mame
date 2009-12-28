@@ -685,7 +685,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
-static const k056800_interface zr107_k056800_interface = 
+static const k056800_interface zr107_k056800_interface =
 {
 	sound_irq_callback
 };
@@ -699,7 +699,7 @@ static const k056832_interface zr107_k056832_intf =
 	game_tile_callback, "none"
 };
 
-static const k056230_interface zr107_k056230_intf = 
+static const k056230_interface zr107_k056230_intf =
 {
 	"maincpu",
 	0

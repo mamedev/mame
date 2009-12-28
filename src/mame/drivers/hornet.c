@@ -1101,12 +1101,12 @@ static const k056800_interface hornet_k056800_interface =
 	sound_irq_callback
 };
 
-static const k033906_interface hornet_k033906_intf_0 = 
+static const k033906_interface hornet_k033906_intf_0 =
 {
 	"voodoo0"
 };
 
-static const k033906_interface hornet_k033906_intf_1 = 
+static const k033906_interface hornet_k033906_intf_1 =
 {
 	"voodoo1"
 };

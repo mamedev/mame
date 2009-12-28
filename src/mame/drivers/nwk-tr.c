@@ -1043,7 +1043,7 @@ static const k056800_interface nwktr_k056800_interface =
 	sound_irq_callback
 };
 
-static const k033906_interface nwktr_k033906_interface = 
+static const k033906_interface nwktr_k033906_interface =
 {
 	"voodoo"
 };

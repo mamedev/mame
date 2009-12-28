@@ -1796,7 +1796,7 @@ static MACHINE_DRIVER_START( naomi_base )
 
 	MDRV_EEPROM_93C46_ADD("main_eeprom")
 	MDRV_EEPROM_DEFAULT_VALUE(0)
-	
+
 	MDRV_NVRAM_HANDLER(naomi_eeproms)
 
 	/* video hardware */
@@ -1855,7 +1855,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( aw )
 	MDRV_IMPORT_FROM(naomi_base)
-//	MDRV_DEVICE_REMOVE("main_eeprom")
+//  MDRV_DEVICE_REMOVE("main_eeprom")
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(aw_map)
 	MDRV_NVRAM_HANDLER(aw_nvram)
@@ -2075,7 +2075,7 @@ Region byte encoding is as follows:
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l", 0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */
 
-/* default EEPROM values, same works for all games */ 
+/* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )

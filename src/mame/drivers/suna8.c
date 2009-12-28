@@ -878,14 +878,14 @@ static WRITE8_HANDLER( suna8_wram_w )
 static WRITE8_HANDLER( sparkman_flipscreen_w )
 {
 	flip_screen_set(space->machine, data & 0x01);
-	//if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( sparkman_leds_w )
 {
 	set_led_status(space->machine, 0, data & 0x01);
 	set_led_status(space->machine, 1, data & 0x02);
-	//if (data & ~0x03)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( sparkman_coin_counter_w )
@@ -904,7 +904,7 @@ static WRITE8_HANDLER( sparkman_spritebank_w )
 		suna8_spritebank = 0;
 	else
 		suna8_spritebank = (data) & 1;
-	//if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -915,7 +915,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	//if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	memory_set_bank(space->machine, "bank1", bank);
 	suna8_rombank = data;

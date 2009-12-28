@@ -1,19 +1,19 @@
 /***************************************************************************************************
 
-	Cycle Mahbou (c) 1984 Taito Corporation / Seta
+    Cycle Mahbou (c) 1984 Taito Corporation / Seta
 
-	appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
+    appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- protection (two 8741);
-	- colors;
-	- fix remaining video issues;
-	- sound;
-	- add flipscreen;
+    TODO:
+    - protection (two 8741);
+    - colors;
+    - fix remaining video issues;
+    - sound;
+    - add flipscreen;
 
-	(wait until it completes the post test, then put 1 to be23)
+    (wait until it completes the post test, then put 1 to be23)
 
 =====================================================================================================
 
@@ -124,7 +124,7 @@ static VIDEO_UPDATE( cyclemb )
 			int tile = (cyclemb_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
-//			int sx_offs = flip_screen ? 512 : 0
+//          int sx_offs = flip_screen ? 512 : 0
 			int scrollx = ((cyclemb_vram[(y/2)+odd_line]) + (cyclemb_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(flip_screen)
@@ -145,28 +145,28 @@ static VIDEO_UPDATE( cyclemb )
 	}
 
 	/*
-	bank 1
-	xxxx xxxx [0] sprite offset
-	---x xxxx [1] color offset
-	bank 2
-	xxxx xxxx [0] y offs
-	xxxx xxxx [1] x offs
-	bank 3
-	---- ---x [1] sprite enable flag?
-	*/
+    bank 1
+    xxxx xxxx [0] sprite offset
+    ---x xxxx [1] color offset
+    bank 2
+    xxxx xxxx [0] y offs
+    xxxx xxxx [1] x offs
+    bank 3
+    ---- ---x [1] sprite enable flag?
+    */
 	{
 		UINT8 col,fx,fy,region;
 		UINT16 spr_offs,i;
 		INT16 x,y;
 
 		/*
-		0x3b-0x3c-0x3d tire (0x13 0x00 / 0x17 0x00 )
-		0x3b- shirt (0x16 0x00)
-		0x20 tire stick (0x16 0x00)
-		0x2e go sign (0x11 0x00)
-		0x18 trampoline (0x13 0x00)
-		0x27 cone (0x13 0x00)
-		*/
+        0x3b-0x3c-0x3d tire (0x13 0x00 / 0x17 0x00 )
+        0x3b- shirt (0x16 0x00)
+        0x20 tire stick (0x16 0x00)
+        0x2e go sign (0x11 0x00)
+        0x18 trampoline (0x13 0x00)
+        0x27 cone (0x13 0x00)
+        */
 
 		for(i=0;i<0x40;i+=2)
 		{
@@ -185,7 +185,7 @@ static VIDEO_UPDATE( cyclemb )
 			if(cyclemb_obj3_ram[i+1] & 1)
 				x+=256;
 			//if(cyclemb_obj3_ram[i+1] & 2)
-//				x-=256;
+//              x-=256;
 			fx = (cyclemb_obj3_ram[i+0] & 4) >> 2;
 			fy = (cyclemb_obj3_ram[i+0] & 8) >> 3;
 
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( cyclemb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_io, ADDRESS_SPACE_IO, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(cyclemb_8741_0_r, cyclemb_8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen

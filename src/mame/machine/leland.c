@@ -680,33 +680,33 @@ void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT1
 	UINT8 xorval = (serial_type == SERIAL_TYPE_ADD_XOR || serial_type == SERIAL_TYPE_ENCRYPT_XOR) ? 0xff : 0x00;
 	UINT8 eeprom_data[64*2];
 	UINT32 serial;
-	
-	/*
-		NOTE: This code is just illustrative, and explains how to generate the 
-		serial numbers for the classic Leland games. We currently load default
-		EEPROM data from the ROMs rather than generating it.
 
-		Here are the input parameters for various games:
-		
-			game		default_val 	serial_offset	serial_type
-			cerberus	0x00			0				SERIAL_TYPE_NONE
-			mayhem		0x00			0x28			SERIAL_TYPE_ADD
-			powrplay	0xff			0x2d			SERIAL_TYPE_ADD_XOR
-			wseries		0xff			0x12			SERIAL_TYPE_ENCRYPT_XOR
-			alleymas	0xff			0x0c			SERIAL_TYPE_ENCRYPT_XOR
-			upyoural	0xff			0x0c			SERIAL_TYPE_ENCRYPT_XOR
-			dangerz		0xff			0x10			SERIAL_TYPE_ENCRYPT_XOR
-			basebal2	0xff			0x12			SERIAL_TYPE_ENCRYPT_XOR
-			dblplay		0xff			0x11			SERIAL_TYPE_ENCRYPT_XOR
-			strkzone	0xff			0x0f			SERIAL_TYPE_ENCRYPT_XOR
-			redlin2p	0xff			0x18			SERIAL_TYPE_ENCRYPT_XOR
-			quarterb	0xff			0x24			SERIAL_TYPE_ENCRYPT_XOR
-			viper		0xff			0x0c			SERIAL_TYPE_ENCRYPT_XOR
-			teamqb		0xff			0x1a			SERIAL_TYPE_ENCRYPT_XOR
-			aafb		0xff			0x1a			SERIAL_TYPE_ENCRYPT_XOR
-			offroad		0xff			0x00			SERIAL_TYPE_ENCRYPT_XOR
-			pigout		0xff			0x00			SERIAL_TYPE_ENCRYPT
-	*/
+	/*
+        NOTE: This code is just illustrative, and explains how to generate the
+        serial numbers for the classic Leland games. We currently load default
+        EEPROM data from the ROMs rather than generating it.
+
+        Here are the input parameters for various games:
+
+            game        default_val     serial_offset   serial_type
+            cerberus    0x00            0               SERIAL_TYPE_NONE
+            mayhem      0x00            0x28            SERIAL_TYPE_ADD
+            powrplay    0xff            0x2d            SERIAL_TYPE_ADD_XOR
+            wseries     0xff            0x12            SERIAL_TYPE_ENCRYPT_XOR
+            alleymas    0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
+            upyoural    0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
+            dangerz     0xff            0x10            SERIAL_TYPE_ENCRYPT_XOR
+            basebal2    0xff            0x12            SERIAL_TYPE_ENCRYPT_XOR
+            dblplay     0xff            0x11            SERIAL_TYPE_ENCRYPT_XOR
+            strkzone    0xff            0x0f            SERIAL_TYPE_ENCRYPT_XOR
+            redlin2p    0xff            0x18            SERIAL_TYPE_ENCRYPT_XOR
+            quarterb    0xff            0x24            SERIAL_TYPE_ENCRYPT_XOR
+            viper       0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
+            teamqb      0xff            0x1a            SERIAL_TYPE_ENCRYPT_XOR
+            aafb        0xff            0x1a            SERIAL_TYPE_ENCRYPT_XOR
+            offroad     0xff            0x00            SERIAL_TYPE_ENCRYPT_XOR
+            pigout      0xff            0x00            SERIAL_TYPE_ENCRYPT
+    */
 
 	/* initialize everything to the default value */
 	memset(eeprom_data, default_val, sizeof(eeprom_data));
@@ -794,11 +794,11 @@ void ataxx_init_eeprom(running_machine *machine, const UINT16 *data)
 	UINT32 serial;
 
 	/*
-		NOTE: This code is just illustrative, and explains how to generate the 
-		serial numbers for the classic Leland games. We currently load default
-		EEPROM data from the ROMs rather than generating it.
-	*/
-	
+        NOTE: This code is just illustrative, and explains how to generate the
+        serial numbers for the classic Leland games. We currently load default
+        EEPROM data from the ROMs rather than generating it.
+    */
+
 	/* initialize everything to the default value */
 	memset(eeprom_data, default_val, sizeof(eeprom_data));
 
@@ -1176,7 +1176,7 @@ READ8_HANDLER( leland_master_input_r )
 WRITE8_HANDLER( leland_master_output_w )
 {
 	const device_config *eeprom;
-	
+
 	switch (offset)
 	{
 		case 0x09:	/* /MCONT */

@@ -1111,7 +1111,7 @@ static MACHINE_DRIVER_START( mgakuen )
 
 	MDRV_MACHINE_START(mitchell)
 	MDRV_MACHINE_RESET(mitchell)
-	
+
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
@@ -1732,7 +1732,7 @@ ROM_START( spang )
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "spe_01.rom",   0x00000, 0x20000, CRC(2d19c133) SHA1(b3ec226f35494dfc259e910895cec8a49dd2f846) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-spang.bin", 0x0000, 0x0080, CRC(deae1291) SHA1(f62f2ad99852903f1cea3f8c1f69fc11e4e7b48b) )
 ROM_END
@@ -1820,7 +1820,7 @@ ROM_START( spangj )
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "01.d1",          0x00000, 0x20000, CRC(b96ea126) SHA1(83fa71994518d40b8938520faa8701c63b7f579e) )	// spj01_1d.bin
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-spangj.bin", 0x0000, 0x0080, CRC(237c00eb) SHA1(35a7fe793186e148c163adb04433b6a55ee21502) )
 ROM_END
@@ -1845,7 +1845,7 @@ ROM_START( sbbros )
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "01.d1",        0x00000, 0x20000, CRC(b96ea126) SHA1(83fa71994518d40b8938520faa8701c63b7f579e) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom-sbbros.bin", 0x0000, 0x0080, CRC(ed69d3cd) SHA1(89eb0ca65ffe30f5cbe6427f767f1f0870c8a990) )
 ROM_END

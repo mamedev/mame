@@ -7668,12 +7668,12 @@ int k056832_read_register( const device_config *device, int regnum )
 
 static STATE_POSTLOAD( k056832_postload )
 {
-//	k056832_state *k056832 = (k056832_state *)param;
+//  k056832_state *k056832 = (k056832_state *)param;
 
 //    still in progress...
-//	k056832_update_page_layout(device);
-//	k056832_change_rambank(device);
-//	k056832_change_rombank(device);
+//  k056832_update_page_layout(device);
+//  k056832_change_rambank(device);
+//  k056832_change_rombank(device);
 }
 
 /*****************************************************************************
@@ -10143,7 +10143,7 @@ static const gfx_layout k001604_char_layout_layer_16x16 =
 };
 
 
-/* FIXME: The TILEMAP_MAPPER below depends on parameters passed by the device interface (being game dependent). 
+/* FIXME: The TILEMAP_MAPPER below depends on parameters passed by the device interface (being game dependent).
 we might simplify the code, by passing the whole TILEMAP_MAPPER as a callback in the interface, but is it really worth? */
 
 static TILEMAP_MAPPER( k001604_scan_layer_8x8_0_size0 )
@@ -10286,7 +10286,7 @@ void k001604_draw_front_layer( const device_config *device, bitmap_t *bitmap, co
 
 READ32_DEVICE_HANDLER( k001604_tile_r )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	return k001604->tile_ram[offset];
@@ -10294,7 +10294,7 @@ READ32_DEVICE_HANDLER( k001604_tile_r )
 
 READ32_DEVICE_HANDLER( k001604_char_r )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int set, bank;
@@ -10314,7 +10314,7 @@ READ32_DEVICE_HANDLER( k001604_char_r )
 
 WRITE32_DEVICE_HANDLER( k001604_tile_w )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int x, y;
@@ -10367,7 +10367,7 @@ WRITE32_DEVICE_HANDLER( k001604_tile_w )
 
 WRITE32_DEVICE_HANDLER( k001604_char_w )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int set, bank;
@@ -10390,7 +10390,7 @@ WRITE32_DEVICE_HANDLER( k001604_char_w )
 
 WRITE32_DEVICE_HANDLER( k001604_reg_w )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	COMBINE_DATA(k001604->reg + offset);
@@ -10412,7 +10412,7 @@ WRITE32_DEVICE_HANDLER( k001604_reg_w )
 
 READ32_DEVICE_HANDLER( k001604_reg_r )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	switch (offset)
@@ -10433,7 +10433,7 @@ static DEVICE_START( k001604 )
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 	const k001604_interface *intf = k001604_get_interface(device);
-	int roz_tile_size;  
+	int roz_tile_size;
 
 	k001604->layer_size = intf->layer_size;		// 0 -> width = 128 tiles, 1 -> width = 256 tiles
 	k001604->roz_size = intf->roz_size;		// 0 -> 8x8, 1 -> 16x16
@@ -10613,7 +10613,7 @@ static void update_palette_color( const device_config *device, UINT32 palette_ba
 
 READ32_DEVICE_HANDLER( k037122_sram_r )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	return k037122->tile_ram[offset];
@@ -10621,7 +10621,7 @@ READ32_DEVICE_HANDLER( k037122_sram_r )
 
 WRITE32_DEVICE_HANDLER( k037122_sram_w )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	COMBINE_DATA(k037122->tile_ram + offset);
@@ -10661,7 +10661,7 @@ WRITE32_DEVICE_HANDLER( k037122_sram_w )
 
 READ32_DEVICE_HANDLER( k037122_char_r )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	int bank = k037122->reg[0x30 / 4] & 0x7;
 
@@ -10670,7 +10670,7 @@ READ32_DEVICE_HANDLER( k037122_char_r )
 
 WRITE32_DEVICE_HANDLER( k037122_char_w )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	int bank = k037122->reg[0x30 / 4] & 0x7;
 	UINT32 addr = offset + (bank * (0x40000/4));
@@ -10681,7 +10681,7 @@ WRITE32_DEVICE_HANDLER( k037122_char_w )
 
 READ32_DEVICE_HANDLER( k037122_reg_r )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	switch (offset)
@@ -10696,7 +10696,7 @@ READ32_DEVICE_HANDLER( k037122_reg_r )
 
 WRITE32_DEVICE_HANDLER( k037122_reg_w )
 {
-//	int chip = get_cgboard_id();
+//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	COMBINE_DATA(k037122->reg + offset);

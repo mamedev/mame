@@ -2743,7 +2743,7 @@ static MACHINE_DRIVER_START( stv )
 
 	MDRV_MACHINE_START(stv)
 	MDRV_MACHINE_RESET(stv)
-	
+
 	MDRV_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MDRV_TIMER_ADD("scan_timer", hblank_in_irq)

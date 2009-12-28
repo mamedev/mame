@@ -4720,7 +4720,7 @@ static MACHINE_DRIVER_START( model3_10 )
 
 	MDRV_MACHINE_START(model3_10)
 	MDRV_MACHINE_RESET(model3_10)
-	
+
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 	MDRV_NVRAM_HANDLER(model3)
 

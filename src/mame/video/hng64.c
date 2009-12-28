@@ -2256,8 +2256,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				// uToF(threeDPointer[29]) - vertex #4 - System not capable yet
 
 				// threeDPointer[30]?
-				//polys[*numPolys].vert[2].texCoords[0] = uToF(threeDPointer[31]);	// System not capable yet
-				//polys[*numPolys].vert[2].texCoords[1] = uToF(threeDPointer[32]);	// System not capable yet
+				//polys[*numPolys].vert[2].texCoords[0] = uToF(threeDPointer[31]);  // System not capable yet
+				//polys[*numPolys].vert[2].texCoords[1] = uToF(threeDPointer[32]);  // System not capable yet
 				//polys[*numPolys].vert[2].texCoords[2] = 0.0f;
 				//polys[*numPolys].vert[2].texCoords[3] = 1.0f;
 
@@ -2269,14 +2269,14 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
 				/*
-				printf("0x2e : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
+                printf("0x2e : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 37; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n");
+                printf("\n");
                 for (m = 0; m < 37; m++)
                     printf("%3.4f ", uToF(threeDPointer[m]));
-				printf("\n\n"); 
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 36;
 			break;
 
@@ -2289,7 +2289,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				/*
                 printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]-1);
                 for (m = 0; m < 100; m++)
-				    printf("%04x ", threeDPointer[m]);
+                    printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
                 */
 				chunkLength = 0;

@@ -497,7 +497,7 @@ static const ym2610_interface ym2610_config =
 
 static const tc0640fio_interface slapshot_io_intf =
 {
-	DEVCB_NULL, DEVCB_INPUT_PORT("COINS"), 
+	DEVCB_NULL, DEVCB_INPUT_PORT("COINS"),
 	DEVCB_INPUT_PORT("BUTTONS"), DEVCB_INPUT_PORT("SYSTEM"), DEVCB_INPUT_PORT("JOY")	/* port read handlers */
 };
 
