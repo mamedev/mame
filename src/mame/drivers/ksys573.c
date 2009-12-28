@@ -960,7 +960,7 @@ static WRITE32_HANDLER( atapi_w )
 					break;
 			}
 		}
-	 }
+	}
 }
 
 static void atapi_exit(running_machine* machine)

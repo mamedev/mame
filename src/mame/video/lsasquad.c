@@ -119,19 +119,19 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 
 
 			if((type==0 && color!=0x0d) || (type !=0 && color==0x0d))
-				{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+			{
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flip_screen_get(machine),flip_screen_get(machine),
 					sx,sy,15);
-			if (sx > 248)	/* wraparound */
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				if (sx > 248)	/* wraparound */
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flip_screen_get(machine),flip_screen_get(machine),
 						sx-256,sy,15);
-					}
+			}
 		}
 	}
 	return offs;

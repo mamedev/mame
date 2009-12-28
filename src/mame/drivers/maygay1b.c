@@ -743,7 +743,7 @@ static WRITE8_HANDLER( m1_latch_w )
 		case 6: // Srsel
 		SRSEL = (data & 1);
 		break;
-		}
+	}
 }
 
 

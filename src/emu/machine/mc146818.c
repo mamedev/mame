@@ -185,7 +185,7 @@ static TIMER_CALLBACK( mc146818_timer )
 							} else {
 								YEAR%=100;
 							}
-                       }
+						}
 					}
 				}
 			}

@@ -136,7 +136,7 @@ void thunderj_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x,
 			break;
 		offnext = ((mo[x] & END_MARKER) == END_MARKER);
 	}
- }
+}
 
 
 

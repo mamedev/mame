@@ -785,12 +785,16 @@ static INT16 clip_and_wrap(INT16 cliptemp)
 	if (cliptemp > 2047) cliptemp = -2048 + (cliptemp-2047);
 	else if (cliptemp < -2048) cliptemp = 2047 - (cliptemp+2048);
 
-	if (cliptemp > 511) { mame_printf_debug ("cliptemp > 511\n");
-	    return 127<<8; }
-        else if (cliptemp < -512) { mame_printf_debug ("cliptemp < -512\n");
-	    return -128<<8; }
-        else
-            return cliptemp << 6;
+	if (cliptemp > 511) {
+		mame_printf_debug ("cliptemp > 511\n");
+		return 127<<8;
+	}
+	else if (cliptemp < -512) {
+		mame_printf_debug ("cliptemp < -512\n");
+		return -128<<8;
+	}
+	else
+	    return cliptemp << 6;
 }
 
 

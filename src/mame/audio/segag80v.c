@@ -312,7 +312,7 @@ WRITE8_HANDLER( spacfury2_sh_w )
 			sample_stop(samples, 6);
 		sample_start(samples, 6, 3, 0);
 
-        }
+	}
 
 	/* fireball */
 	if (data & 0x04)

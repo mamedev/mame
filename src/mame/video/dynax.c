@@ -924,14 +924,20 @@ static void jantouki_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i,
 {
 	int color,scrollx,scrolly,palettes,palbank;
 
-	if (i < 4)	{		scrollx		=	dynax_blit_scroll_x;
-						scrolly		=	dynax_blit_scroll_y;
-						palettes	=	dynax_blit_palettes;
-						palbank		=	dynax_blit_palbank;		}
-	else		{		scrollx		=	dynax_blit2_scroll_x;
-						scrolly		=	dynax_blit2_scroll_y;
-						palettes	=	dynax_blit2_palettes;
-						palbank		=	dynax_blit2_palbank;	}
+	if (i < 4)
+	{
+		scrollx		=	dynax_blit_scroll_x;
+		scrolly		=	dynax_blit_scroll_y;
+		palettes	=	dynax_blit_palettes;
+		palbank		=	dynax_blit_palbank;
+	}
+	else
+	{
+		scrollx		=	dynax_blit2_scroll_x;
+		scrolly		=	dynax_blit2_scroll_y;
+		palettes	=	dynax_blit2_palettes;
+		palbank		=	dynax_blit2_palbank;
+	}
 
 	switch ( i % 4 )
 	{
@@ -1092,10 +1098,14 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 		if (input_code_pressed_once(machine, KEYCODE_I))	c = (c-1) & 0x1f;
 		if (input_code_pressed_once(machine, KEYCODE_O))	c = (c+1) & 0x1f;
 		if (input_code_pressed_once(machine, KEYCODE_R))	{ r = (r+1) & 0x7;	i = size/8 * r; }
-		if (input_code_pressed(machine, KEYCODE_M) | input_code_pressed_once(machine, KEYCODE_K))	{
-			while( i < size && RAM[i] ) i++;		while( i < size && !RAM[i] ) i++;	}
-		if (input_code_pressed(machine, KEYCODE_N) | input_code_pressed_once(machine, KEYCODE_J))	{
-			if (i >= 2) i-=2;	while( i > 0 && RAM[i] ) i--;	i++;	}
+		if (input_code_pressed(machine, KEYCODE_M) | input_code_pressed_once(machine, KEYCODE_K))
+		{
+			while( i < size && RAM[i] ) i++;		while( i < size && !RAM[i] ) i++;
+		}
+		if (input_code_pressed(machine, KEYCODE_N) | input_code_pressed_once(machine, KEYCODE_J))
+		{
+			if (i >= 2) i-=2;	while( i > 0 && RAM[i] ) i--;	i++;
+		}
 
 		dynax_blit_palettes = (c & 0xf) * 0x111;
 		dynax_blit_palbank  = (c >>  4) & 1;

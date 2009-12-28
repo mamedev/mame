@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( sound_command_w )
 {
 	if( ACCESSING_BITS_0_7 )
-{
+	{
 		soundlatch_w( space, 0, data & 0xff );
 		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE );
 	}
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( sound_command_w )
 static WRITE16_HANDLER( sys16_coinctrl_w )
 {
 	if( ACCESSING_BITS_0_7 )
-{
+	{
 		coinctrl = data&0xff;
 		sys16_refreshenable = coinctrl & 0x20;
 		set_led_status(space->machine, 1,coinctrl & 0x08);

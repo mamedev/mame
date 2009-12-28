@@ -151,17 +151,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int pr = nycaptor_spriteram[0x9f-i];
 		int offs = (pr & 0x1f) * 4;
+		int code,sx,sy,flipx,flipy,pal,priori;
+
+		code = nycaptor_spriteram[offs+2] + ((nycaptor_spriteram[offs+1] & 0x10) << 4);//1 bit wolny = 0x20
+		pal=nycaptor_spriteram[offs+1] & 0x0f;
+		sx = nycaptor_spriteram[offs+3];
+		sy = 240-nycaptor_spriteram[offs+0];
+		priori=(pr&0xe0)>>5;
+		if(priori==pri)
 		{
-			int code,sx,sy,flipx,flipy,pal,priori;
-			code = nycaptor_spriteram[offs+2] + ((nycaptor_spriteram[offs+1] & 0x10) << 4);//1 bit wolny = 0x20
-			pal=nycaptor_spriteram[offs+1] & 0x0f;
-			sx = nycaptor_spriteram[offs+3];
-			sy = 240-nycaptor_spriteram[offs+0];
-			priori=(pr&0xe0)>>5;
-      if(priori==pri)
-      {
 #if NYCAPTOR_DEBUG
-      if(nycaptor_mask&(1<<(pri+4)))pal=0xd;
+			if(nycaptor_mask&(1<<(pri+4)))pal=0xd;
 #endif
 			flipx = ((nycaptor_spriteram[offs+1]&0x40)>>6);
 			flipy = ((nycaptor_spriteram[offs+1]&0x80)>>7);

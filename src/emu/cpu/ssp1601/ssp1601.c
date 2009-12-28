@@ -191,7 +191,7 @@ INLINE ssp1601_state_t *get_safe_token(const device_config *device)
 
 
 #define OP_CHECK32(OP) { \
-	 if ((op & 0x0f) == SSP_P) { /* A <- P */ \
+	if ((op & 0x0f) == SSP_P) { /* A <- P */ \
 		update_P(ssp1601_state); \
 		OP(rP.d); \
 		break; \

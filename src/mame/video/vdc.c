@@ -897,7 +897,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 					if(((obj_x + x) < (vdc[which].physical_width)) && ((obj_x + x) >= 0))
 					{
 						if ( buf[x] )
-						 {
+						{
 							if( drawn[pixel_x] < 2 )
 							{
 								if( priority || drawn[pixel_x] == 0 )
@@ -1024,7 +1024,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 								}
 								/* Check for sprite #0 collision */
 								else if ( drawn[pixel_x] == 2 )
-								 {
+								{
 									if(vdc[which].vdc_data[CR].w & CR_CC)
 										cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 									vdc[which].status |= VDC_CR;

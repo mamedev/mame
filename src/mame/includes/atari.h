@@ -424,10 +424,10 @@ typedef struct {
 /* erase a number of color clocks to background color PBK */
 #define ERASE4	{	\
 	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;	\
-    *dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
-    *dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
+	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
+	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
 	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;	\
-	}
+}
 
 #define ZAP48() 												\
 	dst = (UINT32 *)&antic.cclock[PMOFFSET];					\

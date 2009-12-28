@@ -669,7 +669,7 @@ static DISCRETE_STEP(dst_rcdisc)
 			{
 				context->state = 0;
 			}
-		}
+	}
 }
 
 static DISCRETE_RESET(dst_rcdisc)

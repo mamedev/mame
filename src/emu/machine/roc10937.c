@@ -276,9 +276,9 @@ void ROC10937_shift_data(int id, int data)
 			roc10937[id].changed |= 1;
 		}
 
-	roc10937[id].count = 0;
-	roc10937[id].data  = 0;
-  }
+		roc10937[id].count = 0;
+		roc10937[id].data  = 0;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -323,7 +323,7 @@ READ16_HANDLER(arf_wakeup_protection_r)
  ******************************************************************************
  ******************************************************************************/
 WRITE16_HANDLER( jleague_protection_w )
-		{
+{
 	COMBINE_DATA( &system32_workram[0xf700/2 + offset ] );
 
 	switch( offset )

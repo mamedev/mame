@@ -206,7 +206,7 @@ static int leland_vram_port_r(const address_space *space, int offset, int num)
 		logerror("%s:%s comm read %04X = %02X\n", cpuexec_describe_context(space->machine), num ? "slave" : "master", addr, ret);
 
 	return ret;
-	}
+}
 
 
 

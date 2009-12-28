@@ -105,10 +105,10 @@ struct _ui_menu_pool
 typedef struct _ui_menu_item ui_menu_item;
 struct _ui_menu_item
 {
-   const char *			text;
-   const char *			subtext;
-   UINT32				flags;
-   void *				ref;
+	const char *			text;
+	const char *			subtext;
+	UINT32				flags;
+	void *				ref;
 };
 
 

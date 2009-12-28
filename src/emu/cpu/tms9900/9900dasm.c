@@ -524,7 +524,7 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 			darg = 16;
 
 		if (format == format_3_9)
-	{
+		{
 			buffer += sprintf (buffer, "%-4s ", mnemonic);
 			buffer += print_arg (buffer, smode, sarg, opram, pc);
 			buffer += sprintf (buffer, ",R%d", darg);
@@ -708,7 +708,7 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 				break;
 
 	case format_20:		/* list search instructions */
-		{
+	{
 			const char *condition_code;
 
 			OP2 = readop_arg(opram, pc);
@@ -753,7 +753,7 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 			default:
 				condition_code = "??";
 				break;
-		}
+			}
 
 			buffer += sprintf (buffer, "%-4s %s,", mnemonic, condition_code);
 			buffer += print_arg (buffer, smode, sarg, opram, pc);

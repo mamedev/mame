@@ -260,9 +260,9 @@ INLINE void Interrupt(z8000_state *cpustate)
         set_irq(cpustate, type);
     }
 
-   /* trap ? */
-   if (cpustate->irq_req & Z8000_TRAP)
-   {
+    /* trap ? */
+    if (cpustate->irq_req & Z8000_TRAP)
+    {
         CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
         PUSHW(cpustate, SP, cpustate->pc);        /* save current cpustate->pc */
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
@@ -271,10 +271,10 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_req &= ~Z8000_TRAP;
         cpustate->pc = TRAP;
         LOG(("Z8K '%s' trap $%04x\n", cpustate->device->tag, cpustate->pc));
-   }
-   else
-   if (cpustate->irq_req & Z8000_SYSCALL)
-   {
+    }
+    else
+    if (cpustate->irq_req & Z8000_SYSCALL)
+    {
         CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
         PUSHW(cpustate, SP, cpustate->pc);        /* save current cpustate->pc */
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
@@ -283,10 +283,10 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_req &= ~Z8000_SYSCALL;
         cpustate->pc = SYSCALL;
         LOG(("Z8K '%s' syscall $%04x\n", cpustate->device->tag, cpustate->pc));
-   }
-   else
-   if (cpustate->irq_req & Z8000_SEGTRAP)
-   {
+    }
+    else
+    if (cpustate->irq_req & Z8000_SEGTRAP)
+    {
         CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
         PUSHW(cpustate, SP, cpustate->pc);        /* save current cpustate->pc */
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
@@ -295,10 +295,10 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_req &= ~Z8000_SEGTRAP;
         cpustate->pc = SEGTRAP;
         LOG(("Z8K '%s' segtrap $%04x\n", cpustate->device->tag, cpustate->pc));
-   }
-   else
-   if (cpustate->irq_req & Z8000_NMI)
-   {
+    }
+    else
+    if (cpustate->irq_req & Z8000_NMI)
+    {
         CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
         PUSHW(cpustate, SP, cpustate->pc);        /* save current cpustate->pc */
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */

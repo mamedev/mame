@@ -360,26 +360,26 @@ static TILE_GET_INFO( get_tile_info_A_16 )
       j = 0;
     }
 
-		if ((ygv608.regs.s.r12 & r12_apf) != 0)
-		{
-			// attribute only valid in 16 color mode
-			if( set == GFX_16X16_4BIT )
-				attr = ( j >> ( ((ygv608.regs.s.r12 & r12_apf)) * 2 ) ) & 0x0f;
-		}
+    if ((ygv608.regs.s.r12 & r12_apf) != 0)
+    {
+      // attribute only valid in 16 color mode
+      if( set == GFX_16X16_4BIT )
+        attr = ( j >> ( ((ygv608.regs.s.r12 & r12_apf)) * 2 ) ) & 0x0f;
+    }
 
-		// banking
-		if (set == GFX_16X16_4BIT)
-		{
-			j += namcond1_gfxbank * 0x4000;
-		}
-		else // 8x8x8
-		{
-			j += namcond1_gfxbank * 0x2000;
-		}
+    // banking
+    if (set == GFX_16X16_4BIT)
+    {
+      j += namcond1_gfxbank * 0x4000;
+    }
+    else // 8x8x8
+    {
+      j += namcond1_gfxbank * 0x2000;
+    }
 
 
-		SET_TILE_INFO( set, j, attr, f );
-	}
+    SET_TILE_INFO( set, j, attr, f );
+  }
 }
 
 static TILE_GET_INFO( get_tile_info_B_16 )
@@ -450,27 +450,26 @@ static TILE_GET_INFO( get_tile_info_B_16 )
       j = 0;
     }
 
-		if ((ygv608.regs.s.r12 & r12_bpf) != 0)
-		{
-			UINT8 color = (ygv608.regs.s.r12 & r12_bpf) >> 3;
+    if ((ygv608.regs.s.r12 & r12_bpf) != 0)
+    {
+      UINT8 color = (ygv608.regs.s.r12 & r12_bpf) >> 3;
 
-			/* assume 16 colour mode for now... */
-			attr = ( j >> (color * 2)) & 0x0f;
-		}
+      /* assume 16 colour mode for now... */
+      attr = ( j >> (color * 2)) & 0x0f;
+    }
 
-		// banking
-		if (set == GFX_16X16_4BIT)
-		{
-			j += namcond1_gfxbank * 0x4000;
-		}
-		else // 8x8x8
-		{
-			j += namcond1_gfxbank * 0x2000;
-		}
+    // banking
+    if (set == GFX_16X16_4BIT)
+    {
+      j += namcond1_gfxbank * 0x4000;
+    }
+    else // 8x8x8
+    {
+      j += namcond1_gfxbank * 0x2000;
+    }
 
-
-		SET_TILE_INFO( set, j, attr, f );
-	}
+    SET_TILE_INFO( set, j, attr, f );
+  }
 }
 
 static STATE_POSTLOAD( ygv608_postload )
@@ -711,10 +710,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 #ifdef _SHOW_VIDEO_DEBUG
-static const char *const mode[] = { "2PLANE_8BIT",
-			"2PLANE_16BIT",
-			"1PLANE_16COLORS",
-			"1PLANE_256COLORS" };
+static const char *const mode[] = {
+	"2PLANE_8BIT",
+	"2PLANE_16BIT",
+	"1PLANE_16COLORS",
+	"1PLANE_256COLORS"
+};
 
 static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
@@ -1405,45 +1406,45 @@ static void SetPreShortcuts( int reg, int data )
 
 static void SetPostShortcuts( running_machine *machine, int reg )
 {
-	int plane, addr;
+  int plane, addr;
 
-	switch (reg)
-	{
-		case 0:
-		{
-			UINT8 yTile = ygv608.regs.s.r0 & r0_pny;
+  switch (reg)
+  {
+    case 0:
+    {
+      UINT8 yTile = ygv608.regs.s.r0 & r0_pny;
 
-			if (yTile >= ygv608.page_y)
-				logerror ("%s:setting pny(%d) >= page_y(%d)\n", cpuexec_describe_context(machine),
-						yTile, ygv608.page_y );
-			yTile &= (ygv608.page_y - 1);
-			ygv608.regs.s.r0 &= ~r0_pny;
-			ygv608.regs.s.r0 |= yTile;
-		}
-		break;
+      if (yTile >= ygv608.page_y)
+        logerror ("%s:setting pny(%d) >= page_y(%d)\n", cpuexec_describe_context(machine),
+            yTile, ygv608.page_y );
+      yTile &= (ygv608.page_y - 1);
+      ygv608.regs.s.r0 &= ~r0_pny;
+      ygv608.regs.s.r0 |= yTile;
+    }
+    break;
 
-		case 1:
-		{
-			UINT8 xTile = ygv608.regs.s.r1 & r1_pnx;
+    case 1:
+    {
+      UINT8 xTile = ygv608.regs.s.r1 & r1_pnx;
 
-			if (xTile >= ygv608.page_x)
-				logerror ("%s:setting pnx(%d) >= page_x(%d)\n", cpuexec_describe_context(machine),
-						xTile, ygv608.page_x );
-			xTile &= (ygv608.page_x - 1);
-			ygv608.regs.s.r1 &= ~r1_pnx;
-			ygv608.regs.s.r1 |= xTile;
-		}
-		break;
+      if (xTile >= ygv608.page_x)
+        logerror ("%s:setting pnx(%d) >= page_x(%d)\n", cpuexec_describe_context(machine),
+            xTile, ygv608.page_x );
+      xTile &= (ygv608.page_x - 1);
+      ygv608.regs.s.r1 &= ~r1_pnx;
+      ygv608.regs.s.r1 |= xTile;
+    }
+    break;
 
-		case 6:
+    case 6:
 #if 0
-			logerror( "SBA = $%08X\n", (int)ygv608.regs.s.sba << 13 );
+      logerror( "SBA = $%08X\n", (int)ygv608.regs.s.sba << 13 );
 #endif
-			break;
+      break;
 
-		case 7:
-			ygv608.na8_mask = ((ygv608.regs.s.r7 & r7_flip) ? 0x03 : 0x0f );
-			/* fall thru */
+    case 7:
+      ygv608.na8_mask = ((ygv608.regs.s.r7 & r7_flip) ? 0x03 : 0x0f );
+      /* fall thru */
 
   case 8 :
     ygv608.bits16 = ((ygv608.regs.s.r7 & r7_md) == MD_2PLANE_8BIT ? 0 : 1 );
@@ -1451,12 +1452,12 @@ static void SetPostShortcuts( running_machine *machine, int reg )
       ygv608.page_x = ygv608.page_y = 32;
     else {
       if ((ygv608.regs.s.r8 & r8_pgs) == 0 ) {
-	ygv608.page_x = 64;
-	ygv608.page_y = 32;
+        ygv608.page_x = 64;
+        ygv608.page_y = 32;
       }
       else {
-	ygv608.page_x = 32;
-	ygv608.page_y = 64;
+        ygv608.page_x = 32;
+        ygv608.page_y = 64;
       }
     }
     ygv608.pny_shift = ( ygv608.page_x == 32 ? 5 : 6 );

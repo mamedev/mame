@@ -284,7 +284,7 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect, int flip)
 
 					if (y >= cliprect->min_y && y <= cliprect->max_y)
 						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
-				 }
+				}
 			}
 		}
 	}

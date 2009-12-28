@@ -578,8 +578,8 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 								}
 							}
-						}
-				i+=4;
+					}
+					i+=4;
 				}
 		}
 	}

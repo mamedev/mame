@@ -1332,7 +1332,7 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 	s23_tssio_port_4 = data;
 
 	namcos23_jvssense = (data & 0x04) ? 0 : 1;
- }
+}
 
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )

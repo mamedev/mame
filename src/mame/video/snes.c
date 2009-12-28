@@ -763,7 +763,7 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 						{0, 2, 3, 4},	// mode 7
 						{1, 3, 5, 6},	// mode 7 EXTBG
 						{1, 2, 5, 8}	// mode 1 + BG3 priority bit
-					};
+	};
 
 #ifdef MAME_DEBUG
 	if( debug_options.bg_disabled[4] )
@@ -1565,8 +1565,8 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 					destline[ii] = machine->pens[pixdata];
 			}
 			return 1;
-				}
 		}
+	}
 #if 0	// 2009-08 FP: what was the purpose of these lines?
 			/* Draw some useful information about the back/fixed colours and current bg mode etc. */
 			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 26) = machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0xc0) >> 6]];
@@ -1586,6 +1586,6 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 			scanlines[MAINSCREEN].buffer[snes_ram[WH3]] = machine->pens[dbg_mode_colours[2]];
 #endif
 	return 0;
-	}
+}
 
 #endif /* MAME_DEBUG */

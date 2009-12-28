@@ -1433,11 +1433,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #else
@@ -1463,11 +1463,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #endif
@@ -1497,11 +1497,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #else
@@ -1527,11 +1527,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #endif
@@ -2932,7 +2932,7 @@ TABLE_FUNCTION(void, set_reg, (m37710i_cpu_struct *cpustate, int regnum, uint va
 		case M37710_Y: REG_Y = MAKE_UINT_16(val); break;
 #endif
 		case M37710_IRQ_STATE: FTABLE_SET_LINE(cpustate, M37710_LINE_IRQ0, val == 0 ? CLEAR_LINE : ASSERT_LINE); break;
-		 }
+	}
 }
 
 TABLE_FUNCTION(int, execute, (m37710i_cpu_struct *cpustate, int clocks))

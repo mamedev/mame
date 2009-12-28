@@ -38,13 +38,17 @@
 /* O1 = Odd bytes 1st half */
 /* E2 = Even bytes 2nd half */
 /* O2 = Odd bytes 2nd half */
-enum {	MODE_A,
-		MODE_NIB1,MODE_NIB2,
-		MODE_12, MODE_22,
-		MODE_14, MODE_24, MODE_34, MODE_44,
-		MODE_E, MODE_O,
-		MODE_E12, MODE_O12, MODE_E22, MODE_O22,
-		TOTAL_MODES };
+enum
+{
+	MODE_A,
+	MODE_NIB1,MODE_NIB2,
+	MODE_12, MODE_22,
+	MODE_14, MODE_24, MODE_34, MODE_44,
+	MODE_E, MODE_O,
+	MODE_E12, MODE_O12, MODE_E22, MODE_O22,
+	TOTAL_MODES
+};
+
 static const char *const modenames[] =
 {
 	"          ",

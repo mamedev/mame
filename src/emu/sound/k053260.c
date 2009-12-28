@@ -159,7 +159,7 @@ static STREAM_UPDATE( k053260_update ) {
 						/* this is all due to the dynamic sample rate convertion */
 						if ( pos[i] == 0 || ( ( pos[i] ^ ( pos[i] - delta[i] ) ) & 0x8000 ) == 0x8000 )
 
-						 {
+						{
 							int newdata;
 							if ( pos[i] & 0x8000 ){
 

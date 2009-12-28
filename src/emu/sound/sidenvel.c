@@ -169,7 +169,7 @@ void enveEmuInit( UINT32 updateFreq, int measuredValues )
 		decayReleaseRates[i] = releaseTabLen / scaledenvelen;
 		decayReleaseRatesP[i] = (( releaseTabLen % scaledenvelen ) * 65536UL ) / scaledenvelen;
 #endif
-  }
+	}
 }
 
 /* Reset op. */

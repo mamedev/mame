@@ -2425,7 +2425,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 				*tailptr = subview;
 				tailptr = &subview->next;
 			}
-	}
+		}
 
 	/* then add all the memory regions */
 	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))

@@ -830,9 +830,9 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 						}
 					}
 				}
-		}//End PriTest
+			}//End PriTest
 
-		source+=4;
+			source+=4;
 		}
 	}
 }

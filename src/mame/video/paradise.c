@@ -193,8 +193,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		int flipx	=	0;	// ?
 		int flipy	=	0;
 
-		if (flip_screen_get(machine))	{	x = 0xf0 - x;	flipx = !flipx;
-								y = 0xf0 - y;	flipy = !flipy;	}
+		if (flip_screen_get(machine))
+		{
+			x = 0xf0 - x;	flipx = !flipx;
+			y = 0xf0 - y;	flipy = !flipy;
+		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code + (attr << 8),

@@ -1953,7 +1953,7 @@ static UINT32 ProcessByte8(running_machine *machine,UINT8 b,UINT32 dst_offset)
 		gfx_element_mark_dirty(machine->gfx[1], (dst_offset&0x7fffff)/0x100);
 		return 1;
 	}
- }
+}
 
 static void cps3_do_alt_char_dma( running_machine *machine, UINT32 src, UINT32 real_dest, UINT32 real_length )
 {

@@ -244,10 +244,10 @@ WRITE8_DEVICE_HANDLER( c140_w )
 				}
 				else
 				{
-				v->sample_loop = vreg->loop_msb*256 + vreg->loop_lsb;
-				v->sample_start = vreg->start_msb*256 + vreg->start_lsb;
-				v->sample_end = vreg->end_msb*256 + vreg->end_lsb;
-			}
+					v->sample_loop = vreg->loop_msb*256 + vreg->loop_lsb;
+					v->sample_start = vreg->start_msb*256 + vreg->start_lsb;
+					v->sample_end = vreg->end_msb*256 + vreg->end_lsb;
+				}
 			}
 			else
 			{

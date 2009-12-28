@@ -164,7 +164,7 @@ CPU_DISASSEMBLE( v810 )
 									case 0x7: sprintf(buffer,"DIVF.S %s, %s",GET1s(opc),GET2s(opc)); break;
 									case 0xb: sprintf(buffer,"TRNC.SW %s, %s",GET1s(opc),GET2s(opc)); break;
 									default : sprintf(buffer,"Unkf 0x%X",(opc2&0xfc00)>>10); break;
-							}
+								}
 							size=4;
 							break;
 		case 0x3f:	sprintf(buffer,"OUTW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;

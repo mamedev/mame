@@ -246,9 +246,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						sx,sy + 256,0);
 
 			}
-			}
 		}
 	}
+}
 
 VIDEO_UPDATE( brkthru )
 {

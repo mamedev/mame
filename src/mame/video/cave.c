@@ -1469,24 +1469,32 @@ VIDEO_UPDATE( cave )
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */
 	if (tilemap_0)
-	{	tiledim_0 = cave_vctrl_0[ 1 ] & 0x2000;
+	{
+		tiledim_0 = cave_vctrl_0[ 1 ] & 0x2000;
 		if (tiledim_0 != old_tiledim_0)	tilemap_mark_all_tiles_dirty(tilemap_0);
-		old_tiledim_0 = tiledim_0;		}
+		old_tiledim_0 = tiledim_0;
+	}
 
 	if (tilemap_1)
-	{	tiledim_1 = cave_vctrl_1[ 1 ] & 0x2000;
+	{
+		tiledim_1 = cave_vctrl_1[ 1 ] & 0x2000;
 		if (tiledim_1 != old_tiledim_1)	tilemap_mark_all_tiles_dirty(tilemap_1);
-		old_tiledim_1 = tiledim_1;		}
+		old_tiledim_1 = tiledim_1;
+	}
 
 	if (tilemap_2)
-	{	tiledim_2 = cave_vctrl_2[ 1 ] & 0x2000;
+	{
+		tiledim_2 = cave_vctrl_2[ 1 ] & 0x2000;
 		if (tiledim_2 != old_tiledim_2)	tilemap_mark_all_tiles_dirty(tilemap_2);
-		old_tiledim_2 = tiledim_2;		}
+		old_tiledim_2 = tiledim_2;
+	}
 
 	if (tilemap_3)
-	{	tiledim_3 = cave_vctrl_3[ 1 ] & 0x2000;
+	{
+		tiledim_3 = cave_vctrl_3[ 1 ] & 0x2000;
 		if (tiledim_3 != old_tiledim_3)	tilemap_mark_all_tiles_dirty(tilemap_3);
-		old_tiledim_3 = tiledim_3;		}
+		old_tiledim_3 = tiledim_3;
+	}
 
 
 #ifdef MAME_DEBUG
@@ -1526,14 +1534,26 @@ VIDEO_UPDATE( cave )
 
 	/* Show the row / "column" scroll enable flags, when they change state */
 	rasflag = 0;
-	if (tilemap_0)	{	rasflag |= (cave_vctrl_0[0] & 0x4000) ? 0x0001 : 0;
-						rasflag |= (cave_vctrl_0[1] & 0x4000) ? 0x0002 : 0;	}
-	if (tilemap_1)	{	rasflag |= (cave_vctrl_1[0] & 0x4000) ? 0x0010 : 0;
-						rasflag |= (cave_vctrl_1[1] & 0x4000) ? 0x0020 : 0;	}
-	if (tilemap_2)	{	rasflag |= (cave_vctrl_2[0] & 0x4000) ? 0x0100 : 0;
-						rasflag |= (cave_vctrl_2[1] & 0x4000) ? 0x0200 : 0;	}
-	if (tilemap_3)	{	rasflag |= (cave_vctrl_3[0] & 0x4000) ? 0x1000 : 0;
-						rasflag |= (cave_vctrl_3[1] & 0x4000) ? 0x2000 : 0;	}
+	if (tilemap_0)
+	{
+		rasflag |= (cave_vctrl_0[0] & 0x4000) ? 0x0001 : 0;
+		rasflag |= (cave_vctrl_0[1] & 0x4000) ? 0x0002 : 0;
+	}
+	if (tilemap_1)
+	{
+		rasflag |= (cave_vctrl_1[0] & 0x4000) ? 0x0010 : 0;
+		rasflag |= (cave_vctrl_1[1] & 0x4000) ? 0x0020 : 0;
+	}
+	if (tilemap_2)
+	{
+		rasflag |= (cave_vctrl_2[0] & 0x4000) ? 0x0100 : 0;
+		rasflag |= (cave_vctrl_2[1] & 0x4000) ? 0x0200 : 0;
+	}
+	if (tilemap_3)
+	{
+		rasflag |= (cave_vctrl_3[0] & 0x4000) ? 0x1000 : 0;
+		rasflag |= (cave_vctrl_3[1] & 0x4000) ? 0x2000 : 0;
+	}
 	if (rasflag != old_rasflag)
 	{
 		popmessage("Line Effect: 0:%c%c 1:%c%c 2:%c%c 3:%c%c",

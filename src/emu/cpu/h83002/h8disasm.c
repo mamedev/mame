@@ -1092,7 +1092,7 @@ static UINT32 h8disasm_6(UINT32 address, UINT32 opcode, char *buffer, const UINT
 			sprintf(buffer, "%4.4x mov.b %s,@(%x, %s)", opcode, reg_names8[opcode &0xf], data16, reg_names32[(opcode>>4)&7]);
 		}
 		else
-			{
+		{
 			sprintf(buffer, "%4.4x mov.b @(%x, %s), %s", opcode, data16, reg_names32[(opcode>>4)&7], reg_names8[opcode &0xf]);
 		}
 		size = 4;

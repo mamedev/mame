@@ -924,8 +924,10 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
 	if (msk != 0)
-	{	bitmap_fill(bitmap,cliprect,0);
-		layers_ctrl &= msk;	}
+	{
+		bitmap_fill(bitmap,cliprect,0);
+		layers_ctrl &= msk;
+	}
 
 	popmessage("l %x-%x-%x r %04x %04x %04x",
 				(metro_videoregs[0x10/2]&0x30)>>4,(metro_videoregs[0x10/2]&0xc)>>2,metro_videoregs[0x10/2]&3,

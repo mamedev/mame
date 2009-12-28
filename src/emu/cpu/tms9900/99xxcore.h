@@ -902,8 +902,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			{
 				memory_write_byte_8be(cpustate->program, addr, data);
 				memory_write_byte_8be(cpustate->program, addr+1, cpustate->extra_byte);
+			}
 		}
-	}
 	}
 
 #elif (TMS99XX_MODEL == TMS9995_ID)
@@ -1151,22 +1151,22 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 			cpustate->latch_control[7-offset] = data;
 			break;
 		}
-		}
+	}
 
 	INLINE void handle_error_interrupt(tms99xx_state *cpustate)
-		{
+	{
 		if (cpustate->error_interrupt_callback)
 			(*cpustate->error_interrupt_callback)(cpustate->device, cpustate->error_interrupt_register ? 1 : 0);
-		}
+	}
 
 	READ8_HANDLER(ti990_10_eir_cru_r)
-		{
+	{
 		tms99xx_state *cpustate = get_safe_token(space->cpu);
 		return (offset == 1) ? (cpustate->error_interrupt_register & 0xff) : 0;
-		}
+	}
 
 	WRITE8_HANDLER(ti990_10_eir_cru_w)
-		{
+	{
 		tms99xx_state *cpustate = get_safe_token(space->cpu);
 		if (offset < 4)	/* does not work for EIR_MAPERR */
 		{
@@ -1344,7 +1344,7 @@ static CPU_RESET( tms99xx )
 
 	#if HAS_MAPPING
 		cpustate->mapping_on = 0;
-{
+		{
 			int i,j;
 
 			for (i=0; i<3; i++)
@@ -1405,7 +1405,7 @@ INLINE UINT16 fetch(tms99xx_state *cpustate)
 
 
 static CPU_EXECUTE( tms99xx )
-			{
+{
 	tms99xx_state *cpustate = get_safe_token(device);
 	cpustate->icount = cycles;
 
@@ -1730,7 +1730,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 */
 
 static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state)
-	{
+{
 	int mask;
 
 	if (irqline == 0)
@@ -1783,7 +1783,7 @@ static void reset_decrementer(tms99xx_state *cpustate)
 	cpustate->decrementer_enabled = ((cpustate->flag & 2) && (cpustate->decrementer_interval));
 
 	if (cpustate->decrementer_enabled && ! (cpustate->flag & 1))
-		{	/* timer */
+	{	/* timer */
 		attotime period = cpu_clocks_to_attotime(cpustate->device, cpustate->decrementer_interval * 16L);
 		timer_adjust_periodic(cpustate->timer, period, 0, period);
 	}
@@ -2084,7 +2084,7 @@ static void write_single_CRU(tms99xx_state *cpustate, int port, int data)
 #elif (TMS99XX_MODEL == TMS9995_ID)
 /* on tms9995, we have to handle internal CRU ports */
 static void write_single_CRU(tms99xx_state *cpustate, int port, int data)
-	{
+{
 	/* Internal CRU */
 	switch (port)
 	{
@@ -2152,7 +2152,7 @@ static cru_error_code writeCRU(tms99xx_state *cpustate, int CRUAddr, int Number,
 		#if HAS_PRIVILEGE
 			if ((cpustate->STATUS & ST_PR) && (CRUAddr >= 0xE00))
 				return CRU_PRIVILEGE_VIOLATION;
-#endif
+		#endif
 
 		write_single_CRU(cpustate, CRUAddr, (Value & 0x01));
 		Value >>= 1;
@@ -2309,7 +2309,7 @@ static int read_single_CRU(tms99xx_state *cpustate, int port)
 static int read_single_CRU(tms99xx_state *cpustate, int port)
 {
 	switch (port)
-{
+	{
 	case 0x1EE:
 		/* flag, bits 0-7 */
 		return cpustate->flag & 0xFF;
@@ -2365,7 +2365,7 @@ static int readCRU(tms99xx_state *cpustate, int CRUAddr, int Number)
 		Value |= read_single_CRU(cpustate, Location) << 8;
 
 		if ((Offset+Number) > 16)
-	{
+		{
 			/* Read next 8 bits */
 			Location = (Location + 1) & rCRUAddrMask;
 			#if HAS_PRIVILEGE
@@ -2377,14 +2377,14 @@ static int readCRU(tms99xx_state *cpustate, int CRUAddr, int Number)
 	}
 
 		/* Allow for Offset */
-		Value >>= Offset;
+	Value >>= Offset;
 
 		/* Mask out what we want */
 	Value &= BitMask[Number];
 
 		/* And update */
 	return Value;
-	}
+}
 
 /*****************************************************************************/
 
@@ -2408,7 +2408,7 @@ static void load_map_file(tms99xx_state *cpustate, UINT16 src_addr, int src_map_
 	else if (! cpustate->mapping_on)
 	{
 		cpustate->mapper_address_latch = src_addr;
-}
+	}
 	else
 	{
 		int map_index;
@@ -2435,7 +2435,7 @@ static void load_map_file(tms99xx_state *cpustate, UINT16 src_addr, int src_map_
 
 
 	for (i=0; i<3; i++)
-{
+	{
 		cpustate->map_files[dst_file].L[i] = memory_read_word_16be(cpustate->program, cpustate->mapper_address_latch) & 0xffe0;
 		cpustate->map_files[dst_file].limit[i] = (cpustate->map_files[dst_file].L[i] ^ 0xffe0) | 0x001f;
 		cpustate->mapper_address_latch = (cpustate->mapper_address_latch+2) & 0x1fffff;
@@ -2726,7 +2726,7 @@ static void h0000(tms99xx_state *cpustate, UINT16 opcode)
 		HANDLE_ILLEGAL;
 		break;
 	}
-}
+	}
 }
 #endif
 
@@ -2943,7 +2943,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 			CYCLES(3, Mooof!, Mooof!);
 		return;
 	}
-#endif
+	#endif
 
 	#if BETTER_0200_DECODING
 		/* better instruction decoding on ti990/10 */
@@ -2957,27 +2957,27 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 	if (((opcode < 0x2E0) && (opcode & 0x10)) || ((opcode >= 0x2E0) && (opcode & 0x1F)))
 	{
 #if 0
-			/* tms99110 opcode (not supported by 990/12) */
+		/* tms99110 opcode (not supported by 990/12) */
 		if (opcode == 0x0301)
 		{	/* CR ---- Compare Reals */
 		}
-			else
-			/* tms99105+tms99110 opcode (not supported by 990/12) */
-			if (opcode == 0x0302)
+		else
+		/* tms99105+tms99110 opcode (not supported by 990/12) */
+		if (opcode == 0x0302)
 		{	/* MM ---- Multiply Multiple */
-		}
-			else
-		#endif
-		#if 0	/* ti990/12 only */
-			if (opcode >= 0x03F0)
-			{	/* EP ---- Extended Precision */
 		}
 		else
 #endif
+		#if 0	/* ti990/12 only */
+			if (opcode >= 0x03F0)
+			{	/* EP ---- Extended Precision */
+			}
+			else
+		#endif
 		HANDLE_ILLEGAL;
 		return;
 	}
-#endif
+	#endif
 
 	switch ((opcode & 0x1e0) >> 5)
 	{
@@ -3058,7 +3058,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 				HANDLE_PRIVILEGE_VIOLATION
 				break;
 			}
-#endif
+		#endif
 
 		value = fetch(cpustate);
 		cpustate->STATUS = (cpustate->STATUS & ~ST_IM) | (value & ST_IM);
@@ -3321,7 +3321,7 @@ static void h0400(tms99xx_state *cpustate, UINT16 opcode)
 			cpustate->STATUS &= ~ ST_DC;
 		else
 			cpustate->STATUS |= ST_DC;
-#endif
+		#endif
 
 		setst_laeo(cpustate, value);
 		writewordX(cpustate, addr, value, src_map);
@@ -3402,7 +3402,7 @@ static void h0400(tms99xx_state *cpustate, UINT16 opcode)
 		#if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
 		/* I guess ST_DC is cleared here, too*/
 		cpustate->STATUS &= ~ ST_DC;
-#endif
+		#endif
 
 		value = readwordX(cpustate, addr, src_map);
 
@@ -3419,7 +3419,7 @@ static void h0400(tms99xx_state *cpustate, UINT16 opcode)
 			#if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
 			if (! (value & 0x0FFF))
 				cpustate->STATUS |= ST_DC;
-#endif
+			#endif
 
 			writewordX(cpustate, addr, - ((INT16) value), src_map);
 			CYCLES(0, 2, Mooof!);
@@ -4174,14 +4174,14 @@ static void xop(tms99xx_state *cpustate, UINT16 opcode)
 
 	#if ((TMS99XX_MODEL <= TMS9989_ID) && (TMS99XX_MODEL != TI990_10_ID))
 		(void)readword(cpustate, operand & ~1); /*dummy read (personnal guess)*/
-#endif
+	#endif
 
 	contextswitchX(cpustate, 0x40 + (immediate << 2));
 
 	#if ! ((TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID))
 		/* The bit is not set on tms9940 */
 		cpustate->STATUS |= ST_X;
-#endif
+	#endif
 
 		WRITEREG(R11, operand);
 	CYCLES(7, 36, 15);
@@ -4388,7 +4388,7 @@ static void h4000w(tms99xx_state *cpustate, UINT16 opcode)
 		#if ((TMS99XX_MODEL >= TMS9900_ID) && (TMS99XX_MODEL <= TMS9985_ID))
 			/* MOV performs a dummy read with tms9900/9980 (but neither ti990/10 nor tms9995) */
 			(void)readwordX(cpustate, dest, dst_map);
-#endif
+		#endif
 		writewordX(cpustate, dest, value, dst_map);
 		CYCLES(1, 14, 3);
 		break;
@@ -4461,7 +4461,7 @@ static void h4000b(tms99xx_state *cpustate, UINT16 opcode)
               the result.  A tms9980 should not need to do so, but still does, because it is just
               a tms9900 with a 16 to 8 bit multiplexer (instead of a new chip design, like tms9995). */
 			(void)readbyteX(cpustate, dest, dst_map);
-#endif
+		#endif
 		writebyteX(cpustate, dest, value, dst_map);
 		CYCLES(3, 14, 3);
 		break;

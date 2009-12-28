@@ -80,7 +80,8 @@ struct __2mindril_state
 
 
 
-#define DRAW_MAP(map,num)	{	int x, y; \
+#define DRAW_MAP(map,num)	\
+			{	int x, y; \
 				for (y = 0; y < 16; y++) \
 					for (x = 0; x < 128; x++) \
 					{ \

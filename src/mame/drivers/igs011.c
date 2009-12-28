@@ -643,8 +643,8 @@ static void vbowlj_decrypt(running_machine *machine)
 		if((i & 0x2004) != 0x2004 || (i & 0x0090) == 0x0000)
 			x ^= 0x0020;
 
-	    src[i] = x;
-	  }
+		src[i] = x;
+	}
 }
 
 

@@ -331,7 +331,7 @@ VIDEO_UPDATE( battlera )
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (vram_dirty[offs/2]) {
 			vram_dirty[offs/2]=0;
-	        drawgfx_opaque(tile_bitmap,0,screen->machine->gfx[0],
+			drawgfx_opaque(tile_bitmap,0,screen->machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
@@ -341,12 +341,12 @@ VIDEO_UPDATE( battlera )
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-	        drawgfx_transmask(front_bitmap,0,screen->machine->gfx[0],
+			drawgfx_transmask(front_bitmap,0,screen->machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my,0x1);
-			}
+		}
 	}
 
 	/* Render bitmap */

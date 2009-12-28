@@ -218,7 +218,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 						else
 							set_status(record++, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND);
 					}
-				}
+			}
 		}
 
 skip:

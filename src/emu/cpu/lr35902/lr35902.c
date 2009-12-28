@@ -370,7 +370,7 @@ static void lr35902_set_irq_line (lr35902_state *cpustate, int irqline, int stat
 		cpustate->w.IF &= ~(0x01 << irqline);
 		/*logerror("LR35902 clear irq line %d ($%02X)\n", irqline, cpustate->w.IF);*/
 
-     }
+	}
 }
 
 #ifdef UNUSED_FUNCTION

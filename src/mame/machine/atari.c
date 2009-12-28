@@ -161,8 +161,10 @@ void a800_handle_keyboard(running_machine *machine)
 {
 	const device_config *pokey = devtag_get_device(machine, "pokey");
 	int atari_code, count, ipt, i;
-	static const char *const tag[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+	static const char *const tag[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
+	};
 
 	/* check keyboard */
 	for( i = 0; i < 8; i++ )

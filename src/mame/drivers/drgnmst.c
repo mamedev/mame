@@ -531,7 +531,7 @@ static DRIVER_INIT( drgnmst )
 		if ((drgnmst_PICROM_HEX[src_pos + 0] == ':') &&
 			(drgnmst_PICROM_HEX[src_pos + 1] == '1') &&
 			(drgnmst_PICROM_HEX[src_pos + 2] == '0'))
-			{
+		{
 			src_pos += 9;
 
 			for (offs = 0; offs < 32; offs += 4)
@@ -559,7 +559,7 @@ static DRIVER_INIT( drgnmst )
 			(drgnmst_PICROM_HEX[src_pos + 1] == '0') &&
 			(drgnmst_PICROM_HEX[src_pos + 2] == '2') &&
 			(drgnmst_PICROM_HEX[src_pos + 3] == '1'))
-			{
+		{
 			src_pos += 9;
 
 			data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 0]));

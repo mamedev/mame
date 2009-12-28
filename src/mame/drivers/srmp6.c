@@ -383,7 +383,7 @@ static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 
 		return 1;
 	}
- }
+}
 
 
 static WRITE16_HANDLER(srmp6_dma_w)

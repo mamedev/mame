@@ -205,7 +205,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,0);
 					}
 				} else {
-						if (flipy) {
+					if (flipy) {
 						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),0);
 					} else {
 						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,0);

@@ -2311,7 +2311,8 @@ INLINE signed int acc_calc(signed int value)
 	  {	signed int pom= -(chanout[j] & PSG->pan[j*2]); \
 		if (pom > 32767) pom = 32767; else if (pom < -32768) pom = -32768; \
 		fputc((unsigned short)pom&0xff,sample[j]); \
-		fputc(((unsigned short)pom>>8)&0xff,sample[j]);  }
+		fputc(((unsigned short)pom>>8)&0xff,sample[j]); \
+	  }
 	#else
 	  #define SAVE_SINGLE_CHANNEL(j)
 	#endif

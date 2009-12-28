@@ -241,11 +241,11 @@ void BFM_BD1_shift_data(int id, int data)
 		{
 			bd1[id].changed |= 1;
 		}
-	//logerror("vfd %3d -> %02X \"%s\"\n", id, bd1[id].data, bd1[id].string);
+		//logerror("vfd %3d -> %02X \"%s\"\n", id, bd1[id].data, bd1[id].string);
 
-	bd1[id].count = 0;
-	bd1[id].data  = 0;
-  }
+		bd1[id].count = 0;
+		bd1[id].data  = 0;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -444,14 +444,14 @@ static int BD1_setdata(int id, int segdata, int data)
 		bd1[id].pcursor_pos = bd1[id].cursor_pos;
 
 		if ( bd1[id].window_size <= 0 || (bd1[id].window_size > 16))
-			{ // no window selected default to rotate mode
+		{ // no window selected default to rotate mode
 				if ( mode == 2 )      mode = 0;
 				else if ( mode == 3 ) mode = 1;
 				//mode &= -2;
-	}
+		}
 
-	switch ( mode )
-	{
+		switch ( mode )
+		{
 		case 0: // rotate left
 
 		bd1[id].cursor_pos &= 0x0F;
@@ -514,7 +514,7 @@ static int BD1_setdata(int id, int segdata, int data)
 
 		case 3: // Scroll right
 
-		if ( bd1[id].cursor_pos > bd1[id].window_start )
+			if ( bd1[id].cursor_pos > bd1[id].window_start )
 			{
 				if ( change )
 				{

@@ -118,10 +118,10 @@ static UINT8 rtc_get_reg(running_machine *machine,int address_register)
 			return 0;
 		case 0x02:
 			//minutes
-            return bcd(systime.local_time.minute);
+			return bcd(systime.local_time.minute);
 		case 0x03:
 			//minutes alarm
-            return 0;//bcd(systime.local_time.minute);
+			return 0;//bcd(systime.local_time.minute);
 		case 0x04:
 			//hours
 			return bcd(systime.local_time.hour);
@@ -155,7 +155,7 @@ static UINT8 rtc_get_reg(running_machine *machine,int address_register)
 		default:
 			fatalerror("DALLAS DS1287: Unknown register %02X", address_register);
 			return 0x00;
-     }
+	}
 }
 
 // RTC CLOCK

@@ -133,10 +133,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				        pal,
 				        flipx,flipy,
 					      sx,sy,15);
-					}
-				}
+			}
 		}
-
+	}
 }
 
 static VIDEO_START( ladyfrog_common )

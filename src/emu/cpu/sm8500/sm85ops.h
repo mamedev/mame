@@ -1630,7 +1630,7 @@ case 0xF0:	/* STOP - 2 cycles - Flags affected: -------- */
 		/* TODO: Set system clock divider */
 		/* TODO: Add a bunch of additional cycles */
 		cpustate->clock_changed = 0;
-        }
+	}
 	break;
 case 0xF1:	/* HALT - 2 cycles - Flags affected: -------- */
 	cpustate->halted = 1;

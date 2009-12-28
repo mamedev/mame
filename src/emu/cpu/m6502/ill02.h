@@ -270,7 +270,7 @@
  *  ARR logical and, rotate right - no decimal mode
  ***************************************************************/
 #define ARR_NES												\
-        {												\
+	{												\
 		tmp &= A;										\
 		ROR;											\
 		P &=~(F_V|F_C);										\

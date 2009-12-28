@@ -324,7 +324,7 @@ static WRITE8_HANDLER( mux_ctrl_w )
 		case 0xE0:	  // End of interrupt
 		break;
 
-  }
+	}
 }
 
 static READ8_HANDLER( mux_ctrl_r )

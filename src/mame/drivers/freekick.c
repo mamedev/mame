@@ -130,8 +130,8 @@ static READ8_HANDLER( oigas_3_r )
 		case 0xc710: state->outval = 0x0fdd; break;
 		case 0xc4f0: state->outval = 0x05b6; break;
 		case 0xc4e0: state->outval = 0xae1e; break;
-	   }
-	   return state->outval>>8;
+		}
+		return state->outval>>8;
 	case 5: state->cnt=0;return state->outval&0xff;
 	}
 	return 0;

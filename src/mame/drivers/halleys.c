@@ -314,7 +314,8 @@ static void blit(int offset)
 if (0) {
 	logerror("%s:[%04x]", cpuexec_describe_context(machine), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
-	logerror("\n"); }
+	logerror("\n");
+}
 #endif
 
 
@@ -440,7 +441,8 @@ if (0) {
 	eax = wclip<<1; \
 	ecx = hclip; \
 	edi = dst_ptr; \
-	do { memset((UINT8*)edi, 0, eax); edi = (UINT8*)edi + SCREEN_BYTEWIDTH; } while (--ecx); }
+	do { memset((UINT8*)edi, 0, eax); edi = (UINT8*)edi + SCREEN_BYTEWIDTH; } while (--ecx); \
+}
 
 //--------------------------------------------------------------------------
 
@@ -690,7 +692,9 @@ COMMAND_MODE:
 	for (edx=y; edx<ebx; edx++) { \
 		dst_ptr = dst_base + ((edx & YMASK) << SCREEN_WIDTH_L2); \
 		if (ecx > 0) { memset(dst_ptr, 0, ecx); eax = SCREEN_WIDTH - x; } else eax = w; \
-		memset(dst_ptr+x, 0, eax<<1); } }
+		memset(dst_ptr+x, 0, eax<<1); \
+	} \
+}
 
 //--------------------------------------------------------------------------
 
@@ -884,7 +888,8 @@ COMMAND_MODE:
 		#define WARP_LINE_COMMON { \
 			if (ecx & 1) { ecx--; *dst_ptr = (UINT16)eax; dst_ptr++; } \
 			dst_ptr += ecx; ecx = -ecx; \
-			while (ecx) { *(UINT32*)(dst_ptr+ecx) = eax; ecx += 2; } }
+			while (ecx) { *(UINT32*)(dst_ptr+ecx) = eax; ecx += 2; } \
+		}
 
 		src1_ptr = src_base + src1;
 		src2_ptr = src_base + src2;
@@ -1256,7 +1261,9 @@ static void copy_scroll_xp(bitmap_t *bitmap, UINT16 *source, int sx, int sy)
 			bx = esi[ecx+1]; \
 			if (ax) edi[ecx] = ax; \
 			if (bx) edi[ecx+1] = bx; \
-			ecx += 2; } }
+			ecx += 2; \
+		} \
+	}
 
 //--------------------------------------------------------------------------
 
@@ -1264,7 +1271,8 @@ static void copy_scroll_xp(bitmap_t *bitmap, UINT16 *source, int sx, int sy)
 	esi = src_base + sx; ecx = rcw; XCOPY_COMMON \
 	esi = src_base; ecx = CLIP_W - rcw; XCOPY_COMMON \
 	src_base += SCREEN_WIDTH; \
-	edi += dst_adv; }
+	edi += dst_adv; \
+}
 
 //--------------------------------------------------------------------------
 

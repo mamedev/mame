@@ -667,8 +667,10 @@ static WRITE8_HANDLER( unknown_w )
 /* Main bankswitching routine */
 static void set_bank(running_machine *machine, int banknum, const bankhandler *handler)
 {
-	static const char *const banktags[] ={ "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8",
-	                                       "bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16" };
+	static const char *const banktags[] = {
+		"bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8",
+		"bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16"
+	};
 	static const char *const cputags[] = { "maincpu", "sub" };
 	const address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;

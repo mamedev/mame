@@ -175,7 +175,7 @@ static const int gfxlookup[][4]=
    { 0x1b78000, 0x017b5db, 512, 256 },
    { 0x1bd8000, 0x017f2e6, 512, 256 },
    { -1,-1,-1,-1}
- };
+};
 
 static WRITE16_HANDLER( sliver_RAMDAC_offset_w )
 {
@@ -354,8 +354,8 @@ static WRITE16_HANDLER( jpeg2_w )
 				jpeg_w = gfxlookup[idx][2];
 				jpeg_h = gfxlookup[idx][3];
 				render_jpeg(space->machine);
-		}
-		else
+			}
+			else
 			{
 				jpeg_addr = -1;
 			}

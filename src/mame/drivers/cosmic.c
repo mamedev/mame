@@ -270,7 +270,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 					}
 					else
 						sample_start(state->samples, 7, 8, 0); break;
-			}
+				}
 			}
 
 		case 3: /*Dive Bombing Type B (G.S.B)*/

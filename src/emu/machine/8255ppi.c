@@ -520,7 +520,7 @@ static void set_mode(const device_config *device, int data, int call_handlers)
 			ppi8255->in_mask[2] &= ~0x07;
 			ppi8255->out_mask[2] &= ~0x07;
 			break;
-		}
+	}
 
 	/* KT: 25-Dec-99 - 8255 resets latches when mode set */
 	ppi8255->latch[0] = ppi8255->latch[1] = ppi8255->latch[2] = 0;

@@ -920,7 +920,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
                node->data.sprite.pri );
     	i++;
       } /* next col */
-	} /* next row */
+   } /* next row */
 } /* RenderSprite */
 
 static void RenderSceneHelper(running_machine *machine, bitmap_t *bitmap, struct SceneNode *node )
@@ -1114,7 +1114,7 @@ PatchTexture( void )
 
 		default:
 			break;
-   }
+	}
 } /* PatchTexture */
 
 void

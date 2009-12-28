@@ -204,7 +204,7 @@ static void draw_line (UINT8 *polybitmap, int x1, int y1, int x2, int y2, int co
             {
                  x1 += sx;
                  cy += dy;
-             }
+            }
         }
     }
 }

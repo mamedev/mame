@@ -267,7 +267,7 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	case 4: val = S;	break; /* ? */	\
 	case 5: val = U;	break;			\
 	default: val = 0xff; logerror("Unknown TFR/EXG idx at PC:%04x\n", PC ); break; \
-}
+	}
 
 #define SETREG(val,reg) 				\
 	switch(reg) {						\
@@ -278,7 +278,7 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	case 4: S = val;	break; /* ? */	\
 	case 5: U = val;	break;			\
 	default: logerror("Unknown TFR/EXG idx at PC:%04x\n", PC ); break; \
-}
+	}
 
 /* opcode timings */
 static const UINT8 cycles1[] =

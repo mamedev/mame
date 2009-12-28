@@ -137,10 +137,12 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 WRITE8_HANDLER( bwing_paletteram_w )
 {
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
-	static const float rgb[4][3] = {{0.85f, 0.95f, 1.00f},
-						{0.90f, 1.00f, 1.00f},
-						{0.80f, 1.00f, 1.00f},
-						{0.75f, 0.90f, 1.10f}};
+	static const float rgb[4][3] = {
+		{0.85f, 0.95f, 1.00f},
+		{0.90f, 1.00f, 1.00f},
+		{0.80f, 1.00f, 1.00f},
+		{0.75f, 0.90f, 1.10f}
+	};
 	int r, g, b, i;
 
 	state->paletteram[offset] = data;

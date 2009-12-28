@@ -1103,7 +1103,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned
 			}
 
 			break;
-			}
+		}
 
 		// LDxx.N/S
 		case 0x94: case 0x95: case 0x96: case 0x97:
@@ -1293,7 +1293,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned
 			}
 
 			break;
-			}
+		}
 
 		// STxx.N/S
 		case 0x9c: case 0x9d: case 0x9e: case 0x9f:

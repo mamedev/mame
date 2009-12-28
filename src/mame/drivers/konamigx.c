@@ -811,7 +811,7 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x0236740)  rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x023674e)  rv = 0xffffffff;
 			break;
-		}
+	}
 
 	return(rv);
 }

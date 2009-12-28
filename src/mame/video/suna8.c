@@ -91,12 +91,16 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code, attr;
 	if (input_code_pressed(screen->machine, KEYCODE_X))
-	{	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x4000*rombank;
+	{
+		UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x4000*rombank;
 		code = rom[ 2 * tile_index + 0 ];
-		attr = rom[ 2 * tile_index + 1 ];	}
+		attr = rom[ 2 * tile_index + 1 ];
+	}
 	else
-	{	code = machine->generic.spriteram.u8[ 2 * tile_index + 0 ];
-		attr = machine->generic.spriteram.u8[ 2 * tile_index + 1 ];	}
+	{
+		code = machine->generic.spriteram.u8[ 2 * tile_index + 0 ];
+		attr = machine->generic.spriteram.u8[ 2 * tile_index + 1 ];
+	}
 	SET_TILE_INFO(
 			0,
 			( (attr & 0x03) << 8 ) + code + tiles*0x400,
@@ -312,8 +316,10 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 				if (flipy)	tile_flipy = !tile_flipy;
 
 				if (flip_screen_get(machine))
-				{	sx = max_x - sx;	tile_flipx = !tile_flipx;
-					sy = max_y - sy;	tile_flipy = !tile_flipy;	}
+				{
+					sx = max_x - sx;	tile_flipx = !tile_flipx;
+					sy = max_y - sy;	tile_flipy = !tile_flipy;
+				}
 
 				drawgfx_transpen(	bitmap,cliprect,machine->gfx[0],
 							tile + (attr & 0x3)*0x100 + gfxbank,
@@ -377,8 +383,10 @@ static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const r
 				int sy		=	(y + real_ty * 8) & 0xff;
 
 				if (flip_screen_get(machine))
-				{	sx = max_x - sx;	flipx = !flipx;
-					sy = max_y - sy;	flipy = !flipy;	}
+				{
+					sx = max_x - sx;	flipx = !flipx;
+					sy = max_y - sy;	flipy = !flipy;
+				}
 
 				drawgfx_transpen(	bitmap,cliprect,machine->gfx[0],
 							tile + (attr & 0x3)*0x100 + bank,

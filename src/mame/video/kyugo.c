@@ -215,7 +215,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 					 color,
 					 flipx,flipy,
 					 sx,state->flipscreen ? sy - 16*y : sy + 16*y, 0 );
-		 }
+		}
 	}
 }
 

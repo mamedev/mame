@@ -1066,7 +1066,7 @@ INLINE void MAC_W(SH4 *sh4, UINT32 m, UINT32 n)
 		sh4->mach += tempn;
 		if (templ > sh4->macl)
 			sh4->mach += 1;
-		}
+	}
 	sh4->sh4_icount -= 2;
 }
 

@@ -601,7 +601,7 @@ void at_keyboard_polling(void)
 						at_keyboard_extended_scancode_insert(i,0);
 					}
 				}
-		}
+			}
 	}
 }
 

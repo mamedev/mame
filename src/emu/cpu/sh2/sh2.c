@@ -1063,7 +1063,7 @@ INLINE void MAC_W(UINT32 m, UINT32 n)
 		sh2->mach += tempn;
 		if (templ > sh2->macl)
 			sh2->mach += 1;
-		}
+	}
 	sh2_icount -= 2;
 }
 

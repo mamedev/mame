@@ -406,7 +406,7 @@ static VIDEO_UPDATE( ddayjlc )
 					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 1, 0, 0, x*8, y*8, 0);
 				else
 					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 1, 0, 0, x*8, y*8);
-		}
+			}
 	}
 	return 0;
 }

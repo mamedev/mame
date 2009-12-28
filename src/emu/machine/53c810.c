@@ -326,7 +326,7 @@ static int scripts_compute_branch(void)
 	if (lsi810.dcmd & 0x00040000)
 	{
 		logerror("53c810: data test.  target: %x [not yet implemented]\n", lsi810.dcmd&0xff);
-}
+	}
 
 	// if all conditions go, take the jump
 	passed = 0;
@@ -370,7 +370,7 @@ static UINT32 scripts_get_jump_dest(running_machine *machine)
 static OPCODE_HANDLER( dmaop_jump )
 {
 	if (scripts_compute_branch())
-{
+	{
 		lsi810.dsp = scripts_get_jump_dest(machine);
 	}
 	else

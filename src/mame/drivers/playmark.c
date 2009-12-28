@@ -1407,7 +1407,7 @@ static DRIVER_INIT( bigtwin )
 		if ((playmark_PICROM_HEX[src_pos + 0] == ':') &&
 			(playmark_PICROM_HEX[src_pos + 1] == '1') &&
 			(playmark_PICROM_HEX[src_pos + 2] == '0'))
-			{
+		{
 			src_pos += 9;
 
 			for (offs = 0; offs < 32; offs += 4)
@@ -1435,7 +1435,7 @@ static DRIVER_INIT( bigtwin )
 			(playmark_PICROM_HEX[src_pos + 1] == '0') &&
 			(playmark_PICROM_HEX[src_pos + 2] == '2') &&
 			(playmark_PICROM_HEX[src_pos + 3] == '1'))
-			{
+		{
 			src_pos += 9;
 
 			data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 0]));

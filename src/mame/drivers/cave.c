@@ -252,8 +252,10 @@ static READ16_HANDLER( soundlatch_ack_r )
 		return data;
 	}
 	else
-	{	logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n",cpu_get_pc(space->cpu));
-		return 0xff;	}
+	{
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n",cpu_get_pc(space->cpu));
+		return 0xff;
+	}
 }
 
 
@@ -3981,7 +3983,8 @@ static DRIVER_INIT( pwrins2j )
 
 	buffer = alloc_array_or_die(UINT8, len);
 	{
-		 for(i=0; i<len/2; i++) 		{
+		for(i=0; i<len/2; i++)
+		{
 			j = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
 			if(((j & 6) == 0) || ((j & 6) == 6))
 				j ^= 6;

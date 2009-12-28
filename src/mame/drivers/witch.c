@@ -392,7 +392,7 @@ static READ8_HANDLER(prot_read_700x)
 	case 0x258:
 	case 0x25e:
 		return offset;//enough to pass...
-   }
+  }
   return memory_region(space->machine, "sub")[0x7000+offset];
 }
 

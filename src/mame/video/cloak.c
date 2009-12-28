@@ -144,7 +144,7 @@ WRITE8_HANDLER( graph_processor_w )
 
 			adjust_xy(offset);
 			break;
-		}
+	}
 }
 
 WRITE8_HANDLER( cloak_videoram_w )

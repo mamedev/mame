@@ -163,7 +163,7 @@ static const struct tms5100_coeffs pat4403965_coeff =
 	-19,-17,-9,-9,-6,1,4,3,
 	1,0,0,0,0,0,0,0,
 	0,0,0
-	 },
+	},
 	/* interpolation coefficients */
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };

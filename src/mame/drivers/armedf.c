@@ -773,7 +773,7 @@ static MACHINE_START( armedf )
 	state_save_register_global(machine, state->fg_scrolly);
 	state_save_register_global(machine, state->bg_scrollx);
 	state_save_register_global(machine, state->bg_scrolly);
-	}
+}
 
 static MACHINE_RESET( armedf )
 {

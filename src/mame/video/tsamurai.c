@@ -268,7 +268,7 @@ VIDEO_UPDATE( vsgongf )
 			k++;
 			vsgongf_color = k;
 			tilemap_mark_all_tiles_dirty( foreground );
-			}
+		}
 	}
 	#endif
 

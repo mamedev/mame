@@ -410,7 +410,7 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
          */
 	chip->oddeven = !(chip->oddeven); // invert the clock
 	if (chip->oddeven == 0) // even clock
-        {
+	{
 		chip->audioout = ALTFLAG; // flag to the renderer that this output should be the average of the last 8
 		// DIGITAL INPUT on the test pins occurs on this cycle used for output
 	}

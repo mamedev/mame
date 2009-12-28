@@ -644,7 +644,7 @@ static CPU_EXECUTE( cquestsnd )
 					cpustate->ram[b] = (cpustate->f << 1) | (_rin ? 0 : 0x0001);
 					cpustate->y = cpustate->f;
 					break;
-			 }
+			}
 		}
 
 		/* Now handle any SRAM accesses from the previous cycle */
@@ -1027,7 +1027,7 @@ static CPU_EXECUTE( cquestrot )
 					cpustate->y = cpustate->f;
 					break;
 				}
-			 }
+			}
 		}
 
 		/* Check for jump */
@@ -1408,7 +1408,7 @@ static CPU_EXECUTE( cquestlin )
 					cpustate->y = cpustate->f;
 					break;
 				}
-			 }
+			}
 		}
 
 		/* Adjust program counter */

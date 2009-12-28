@@ -235,7 +235,7 @@ static void appoooh_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect,
 				color,
 				flipx,flipy,
 				sx, sy, 0);
-	 }
+	}
 }
 
 static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect, const gfx_element *gfx, UINT8 *sprite )
@@ -266,7 +266,7 @@ static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect
 				color,
 				flipx,flipy,
 				sx, sy, 0);
-	 }
+	}
 }
 
 

@@ -275,7 +275,7 @@ void ppc403_exception(int exception)
 		}
 
 		case EXCEPTION_TRAP:			/* Program exception / Trap */
-			{
+		{
 				UINT32 msr = ppc_get_msr();
 
 				SRR0 = ppc.pc;
@@ -296,7 +296,7 @@ void ppc403_exception(int exception)
 		}
 
 		case EXCEPTION_SYSTEM_CALL:		/* System call */
-			{
+		{
 				UINT32 msr = ppc_get_msr();
 
 				SRR0 = ppc.npc;
@@ -797,7 +797,7 @@ static void ppc403_dma_exec(int ch)
 				if( ppc.dma[ch].cr & DMA_TD )	/* peripheral to mem */
 				{
 					// nothing to do for now */
-					}
+				}
 				else							/* mem to peripheral */
 				{
 

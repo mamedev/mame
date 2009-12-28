@@ -839,7 +839,7 @@ OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
 		case 0x28: result = (INT16)((INT8)cpustate->regs.b[AL])*(INT16)((INT8)tmp); cpustate->regs.w[AW]=(WORD)result; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MUL */
 		case 0x30: if (tmp) { DIVUB; } else nec_interrupt(cpustate,0,0); CLKM(15,16); break;
 		case 0x38: if (tmp) { DIVB;  } else nec_interrupt(cpustate,0,0); CLKM(17,18); break;
-   }
+	}
 }
 
 OP( 0xf7, i_f7pre   ) { UINT32 tmp,tmp2; UINT32 uresult,uresult2; INT32 result,result2;

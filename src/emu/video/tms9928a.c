@@ -113,7 +113,8 @@ static void change_register (running_machine *machine, int reg, UINT8 data);
 static void (*const ModeHandlers[])(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
         draw_mode3, draw_modebogus, draw_mode23,
-        draw_modebogus };
+        draw_modebogus
+};
 
 #define IMAGE_SIZE (256*192)        /* size of rendered image        */
 
@@ -309,7 +310,8 @@ static void change_register (running_machine *machine, int reg, UINT8 val) {
         "Mode 0 (GRAPHIC 1)", "Mode 1 (TEXT 1)", "Mode 2 (GRAPHIC 2)",
         "Mode 1+2 (TEXT 1 variation)", "Mode 3 (MULTICOLOR)",
         "Mode 1+3 (BOGUS)", "Mode 2+3 (MULTICOLOR variation)",
-        "Mode 1+2+3 (BOGUS)" };
+        "Mode 1+2+3 (BOGUS)"
+    };
     UINT8 b;
 
     val &= Mask[reg];
@@ -347,7 +349,7 @@ static void change_register (running_machine *machine, int reg, UINT8 val) {
         if (tms.Regs[0] & 2) {
             tms.colour = ((val & 0x80) * 64) & (tms.vramsize - 1);
             tms.colourmask = (val & 0x7f) * 8 | 7;
-         } else {
+        } else {
             tms.colour = (val * 64) & (tms.vramsize - 1);
         }
 		tms.patternmask = (tms.Regs[4] & 3) * 256 | (tms.colourmask & 255);
@@ -421,7 +423,7 @@ VIDEO_UPDATE( tms9928a )
 			bitmap_fill (bitmap, &rt, BackColour);
 			rt.min_x = LEFT_BORDER+256; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
 			bitmap_fill (bitmap, &rt, BackColour);
-                }
+		}
 		if (TMS_SPRITES_ENABLED)
 			draw_sprites(screen, bitmap, cliprect);
 	}
@@ -746,7 +748,7 @@ static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const r
                             /* illegal sprite line */
                             if (yy < illegalspriteline) {
                                 illegalspriteline = yy;
-                                 illegalsprite = p;
+                                illegalsprite = p;
                             } else if (illegalspriteline == yy) {
                                 if (illegalsprite > p) {
                                     illegalsprite = p;

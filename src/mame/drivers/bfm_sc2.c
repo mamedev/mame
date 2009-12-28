@@ -1399,7 +1399,7 @@ static WRITE8_HANDLER( e2ram_w )
 
 					LOG(("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
 					break;
-				}
+			}
 			break;
 		}
 	}

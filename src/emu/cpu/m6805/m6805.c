@@ -354,7 +354,7 @@ static void Interrupt( m6805_Regs *cpustate )
 		PUSHBYTE(cpustate->x);
 		PUSHBYTE(cpustate->a);
 		PUSHBYTE(cpustate->cc);
-        SEI;
+		SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		if (cpustate->irq_callback)
 			(*cpustate->irq_callback)(cpustate->device, 0);
@@ -377,7 +377,7 @@ static void Interrupt( m6805_Regs *cpustate )
 		PUSHBYTE(cpustate->x);
 		PUSHBYTE(cpustate->a);
 		PUSHBYTE(cpustate->cc);
-        SEI;
+		SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		if (cpustate->irq_callback)
 			(*cpustate->irq_callback)(cpustate->device, 0);
@@ -434,7 +434,7 @@ static void Interrupt( m6805_Regs *cpustate )
 			RM16( cpustate, 0xffff - 5, &pPC );
 		}
 
-		}	// CC & IFLAG
+	}	// CC & IFLAG
 			cpustate->pending_interrupts &= ~(1<<M6805_IRQ_LINE);
 		}
 		cpustate->iCount -= 11;

@@ -157,12 +157,14 @@ VIDEO_UPDATE( galpani2 )
 
 #ifdef MAME_DEBUG
 if (input_code_pressed(screen->machine, KEYCODE_Z))
-{	int msk = 0;
+{
+	int msk = 0;
 	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
 	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
 	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
-	if (msk != 0) layers_ctrl &= msk;	}
+	if (msk != 0) layers_ctrl &= msk;
+}
 #endif
 
 	bitmap_fill(bitmap,cliprect,0);

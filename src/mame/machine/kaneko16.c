@@ -1670,7 +1670,7 @@ static const INT16 calc3_keydata[0x40*0x100] = {
   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
- };
+};
 
 // global so we can use them in the filename when we save out the data (debug..)
 static UINT8 calc3_decryption_key_byte;

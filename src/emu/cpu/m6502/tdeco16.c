@@ -198,7 +198,7 @@ OP(67) {
 OP(87) { int tmp; cpustate->icount -= 1; RD_IMM;
 	logerror("%04x: OP87 %02x\n",PCW,tmp);
 
-				} /*  */
+} /*  */
 OP(a7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB2 ZPG ?? */
 OP(c7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB4 ZPG ?? */
 OP(e7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB6 ZPG ?? */
@@ -370,9 +370,8 @@ OP(8f) { int tmp; cpustate->icount -= 1; RD_IMM;
 
 	memory_write_byte_8le(cpustate->io,0,tmp);
 
-//swap bank in/out
-
-				} /*  */
+	//swap bank in/out
+} /*  */
 OP(af) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS2 ZPG ?? */
 OP(cf) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS4 ZPG ?? */
 OP(ef) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS6 ZPG ?? */

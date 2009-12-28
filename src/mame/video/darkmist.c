@@ -163,33 +163,32 @@ VIDEO_UPDATE( darkmist)
 3 - XXXX XXXX - x coord
 
 */
-	int i,fx,fy,tile,palette;
-	for(i=0;i<screen->machine->generic.spriteram_size;i+=32)
-	{
-		fy=spriteram[i+1]&0x40;
-		fx=spriteram[i+1]&0x80;
+		int i,fx,fy,tile,palette;
+		for(i=0;i<screen->machine->generic.spriteram_size;i+=32)
+		{
+			fy=spriteram[i+1]&0x40;
+			fx=spriteram[i+1]&0x80;
 
-		tile=spriteram[i+0];
+			tile=spriteram[i+0];
 
-		if(spriteram[i+1]&0x20)
-			tile += (*darkmist_spritebank << 8);
+			if(spriteram[i+1]&0x20)
+				tile += (*darkmist_spritebank << 8);
 
-		palette=((spriteram[i+1])>>1)&0xf;
+			palette=((spriteram[i+1])>>1)&0xf;
 
-		if(spriteram[i+1]&0x1)
-			palette=mame_rand(screen->machine)&15;
+			if(spriteram[i+1]&0x1)
+				palette=mame_rand(screen->machine)&15;
 
-		palette+=32;
+			palette+=32;
 
-		drawgfx_transpen(
-               bitmap,cliprect,
-               screen->machine->gfx[2],
-               tile,
-               palette,
-               fx,fy,
-               spriteram[i+3],spriteram[i+2],0 );
+			drawgfx_transpen(
+				bitmap,cliprect,
+				screen->machine->gfx[2],
+				tile,
+				palette,
+				fx,fy,
+				spriteram[i+3],spriteram[i+2],0 );
 		}
-
 	}
 
 	if(darkmist_hw & DISPLAY_TXT)

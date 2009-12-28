@@ -337,7 +337,7 @@ static WRITE8_HANDLER( tmpz84c011_pio_w )
 	if ((!strcmp(space->machine->gamedrv->name, "imekura")) ||
 		(!strcmp(space->machine->gamedrv->name, "mscoutm")) ||
 		(!strcmp(space->machine->gamedrv->name, "mjegolf")))
-		{
+	{
 
 		switch (offset)
 		{

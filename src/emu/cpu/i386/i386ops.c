@@ -911,7 +911,7 @@ static void I386OP(arpl)(i386_state *cpustate)           // Opcode 0x63
 			flag = 1;
 			WRITE16(cpustate, ea, dst);
 		}
-    }
+	}
 	SetZF(flag);
 }
 
@@ -1061,7 +1061,7 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 		break;
         default:
 		prefix_flag=0;
-      }
+	}
 	} while (prefix_flag);
 
 
@@ -1177,10 +1177,10 @@ outofcycles:
 static void I386OP(rep)(i386_state *cpustate)				// Opcode 0xf3
 {
 	I386OP(repeat)(cpustate, 0);
-	}
+}
 
 static void I386OP(repne)(i386_state *cpustate)				// Opcode 0xf2
-	{
+{
 	I386OP(repeat)(cpustate, 1);
 }
 
