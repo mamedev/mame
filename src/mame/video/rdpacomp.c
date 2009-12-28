@@ -19,10 +19,6 @@ INLINE int alpha_compare_ac_nda(UINT8 comb_alpha)
 
 INLINE int alpha_compare_ac_da(UINT8 comb_alpha)
 {
-	if (comb_alpha < (rdp_rand() & 0xff))
-	{
-		return 0;
-	}
-	return 1;
+	return comb_alpha < rdp_rand();
 }
 

@@ -2624,133 +2624,209 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
 
-	for (k = ycur; k <= ylfar; k++)
+	if(flip)
 	{
-		if (k == ym)
+		for (k = ycur; k <= ylfar; k++)
 		{
-			xleft = xl;
-			xleft_inc = dxldy >> 2;
-		}
-
-		xstart = xleft >> 16;
-		xend = xright >> 16;
-		j = k >> 2;
-		spix = k & 3;
-
-		if (k >= 0 && k < 0x1000)
-		{
-			int m = 0;
-			int n = 0;
-			int length = 0;
-			min = 0; max = 3;
-			if (j == yhpix)
+			if (k == ym)
 			{
-				min = yh & 3;
+				xleft = xl;
+				xleft_inc = dxldy >> 2;
 			}
-			if (j == ylpix)
+
+			xstart = xleft >> 16;
+			xend = xright >> 16;
+			j = k >> 2;
+			spix = k & 3;
+
+			if (k >= 0 && k < 0x1000)
 			{
-				max = yl & 3;
-			}
-			if (spix >= min && spix <= max)
-			{
-				if (spix == min)
+				int m = 0;
+				int n = 0;
+				int length = 0;
+				min = 0; max = 3;
+				if (j == yhpix)
 				{
-					minxmx = maxxmx = xstart;
-					minxhx = maxxhx = xend;
+					min = yh & 3;
 				}
-				else
+				if (j == ylpix)
 				{
-					minxmx = (xstart < minxmx) ? xstart : minxmx;
-					maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
-					minxhx = (xend < minxhx) ? xend : minxhx;
-					maxxhx = (xend > maxxhx) ? xend : maxxhx;
+					max = yl & 3;
 				}
-			}
+				if (spix >= min && spix <= max)
+				{
+					if (spix == min)
+					{
+						minxmx = maxxmx = xstart;
+						minxhx = maxxhx = xend;
+					}
+					else
+					{
+						minxmx = (xstart < minxmx) ? xstart : minxmx;
+						maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
+						minxhx = (xend < minxhx) ? xend : minxhx;
+						maxxhx = (xend > maxxhx) ? xend : maxxhx;
+					}
+				}
 
-			if (spix == max)
-			{
-				if (flip)
+				if (spix == max)
 				{
 					span[j].lx = maxxmx;
 					span[j].rx = minxhx;
 				}
-				else
+
+				length = xstart - xend;
+
+				if (spix == ldflag)
+				{
+					xfrac = ((xright >> 8) & 0xff);
+					adjust_attr();
+				}
+
+				m = xend + 1;
+
+				if (k >= yh && length >= 0 && k <= yl)
+				{
+					if (xstart>=0 && xstart <1024)
+					{
+						span[j].cvg[xstart] += addright(xleft);
+					}
+					if (xend>=0 && xend<1024)
+					{
+						if (xstart != xend)
+						{
+							span[j].cvg[xend] += addleft(xright);
+						}
+						else
+						{
+							span[j].cvg[xend] -= (2 - addleft(xright));
+							if (span[j].cvg[xend] > 200)
+							{
+								span[j].cvg[xend] = 0;
+							}
+						}
+					}
+					for (n = 0; n < (length - 1); n++)
+					{
+						if (m>=0 && m < 640)
+						{
+							span[j].cvg[m] += 2;
+						}
+
+						m += m_inc;
+					}
+				}
+			}
+
+			if (spix == 3)
+			{
+				addvalues();
+			}
+			xleft += xleft_inc;
+			xright += xright_inc;
+		}
+	}
+	else
+	{
+		for (k = ycur; k <= ylfar; k++)
+		{
+			if (k == ym)
+			{
+				xleft = xl;
+				xleft_inc = dxldy >> 2;
+			}
+
+			xstart = xleft >> 16;
+			xend = xright >> 16;
+			j = k >> 2;
+			spix = k & 3;
+
+			if (k >= 0 && k < 0x1000)
+			{
+				int m = 0;
+				int n = 0;
+				int length = 0;
+				min = 0; max = 3;
+				if (j == yhpix)
+				{
+					min = yh & 3;
+				}
+				if (j == ylpix)
+				{
+					max = yl & 3;
+				}
+				if (spix >= min && spix <= max)
+				{
+					if (spix == min)
+					{
+						minxmx = maxxmx = xstart;
+						minxhx = maxxhx = xend;
+					}
+					else
+					{
+						minxmx = (xstart < minxmx) ? xstart : minxmx;
+						maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
+						minxhx = (xend < minxhx) ? xend : minxhx;
+						maxxhx = (xend > maxxhx) ? xend : maxxhx;
+					}
+				}
+
+				if (spix == max)
 				{
 					span[j].lx = minxmx;
 					span[j].rx = maxxhx;
 				}
-			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+				length = xend - xstart;
 
-			if (spix == ldflag)
-			{
-				xfrac = ((xright >> 8) & 0xff);
-				adjust_attr();
-			}
-
-			m = flip ? (xend+1) : (xend-1);
-
-			if (k >= yh && length >= 0 && k <= yl)
-			{
-				if (xstart>=0 && xstart <1024)
+				if (spix == ldflag)
 				{
-					if (!flip)
+					xfrac = ((xright >> 8) & 0xff);
+					adjust_attr();
+				}
+
+				m = xend - 1;
+
+				if (k >= yh && length >= 0 && k <= yl)
+				{
+					if (xstart>=0 && xstart <1024)
 					{
 						span[j].cvg[xstart] += addleft(xleft);
 					}
-					else
+					if (xend>=0 && xend<1024)
 					{
-						span[j].cvg[xstart] += addright(xleft);
-					}
-				}
-				if (xend>=0 && xend<1024)
-				{
-					if (xstart != xend)
-					{
-						if (!flip)
+						if (xstart != xend)
 						{
 							span[j].cvg[xend] += addright(xright);
 						}
 						else
 						{
-							span[j].cvg[xend] += addleft(xright);
-						}
-					}
-					else
-					{
-						if (!flip)
-						{
 							span[j].cvg[xend] -= (2 - addright(xright));
-						}
-						else
-						{
-							span[j].cvg[xend] -= (2 - addleft(xright));
-						}
-						if (span[j].cvg[xend] > 200)
-						{
-							span[j].cvg[xend] = 0;
+							if (span[j].cvg[xend] > 200)
+							{
+								span[j].cvg[xend] = 0;
+							}
 						}
 					}
-				}
-				for (n = 0; n < (length - 1); n++)
-				{
-					if (m>=0 && m < 640)
+					for (n = 0; n < (length - 1); n++)
 					{
-						span[j].cvg[m] += 2;
-					}
+						if (m>=0 && m < 640)
+						{
+							span[j].cvg[m] += 2;
+						}
 
-					m += m_inc;
+						m += m_inc;
+					}
 				}
 			}
-		}
 
-		if (spix == 3)
-		{
-			addvalues();
+			if (spix == 3)
+			{
+				addvalues();
+			}
+			xleft += xleft_inc;
+			xright += xright_inc;
 		}
-		xleft += xleft_inc;
-		xright += xright_inc;
 	}
 
 	switch (fb_size) // 8bpp needs to be implemented

@@ -10,15 +10,7 @@
 #include "driver.h"
 #include "includes/n64.h"
 
-#define LOG_RDP_EXECUTION		0
-
-#define STRICT_ERROR (0)
-
-#if STRICT_ERROR
-#define stricterror fatalerror
-#else
-#define stricterror(...)
-#endif
+#define LOG_RDP_EXECUTION 		0
 
 static FILE *rdp_exec;
 
@@ -70,8 +62,6 @@ typedef struct
     UINT8 cvg[RDP_CVG_SPAN_MAX];
     int dzpix;
 } SPAN;
-
-//UINT8 cvg_mem[8*1048576];
 
 static SPAN span[4096];
 
@@ -198,6 +188,12 @@ typedef struct
 #define SAMPLE_TYPE_1x1         0
 #define SAMPLE_TYPE_2x2         1
 
+static UINT16 cc_lut1[(1<<24)];
+static UINT8 cc_lut2[(1<<24)];
+static UINT32 rgb16_to_32_lut[(1<<16)];
+static UINT32 ia8_to_32_lut[(1<<16)];
+static UINT32 tex_lerp_lut[(1<<21)];
+
 static COMBINE_MODES combine;
 static OTHER_MODES other_modes;
 
@@ -311,21 +307,22 @@ static INT32 maskbits_table[16]; // Pre-calculated
 static INT32 clamp_t_diff[8];
 static INT32 clamp_s_diff[8];
 
-INLINE void COMBINER_EQUATION(UINT8* out, UINT8 *A, UINT8 *B, UINT8 *C, UINT8 *D);
+#define COMBINER_EQUATION(A, B, C, D) cc_lut2[(cc_lut1[(A << 16) | (B << 8) | C] << 8) | D]
+//#define COMBINER_EQUATION(A, B, C, D) cc_lut_base[((D) << 17) + ((C) << 9) + (A) - (B)]
+
+//INLINE void COMBINER_EQUATION(UINT8* out, UINT8 *A, UINT8 *B, UINT8 *C, UINT8 *D);
 INLINE UINT32 addrightcvg(UINT32 x, UINT32 k);
 INLINE UINT32 addleftcvg(UINT32 x, UINT32 k);
 INLINE UINT32 z_decompress(UINT16* zb);
 INLINE UINT16 dz_decompress(UINT16* zb, UINT8* zhb);
 INLINE void z_build_com_table(void);
 INLINE void z_store(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz);
-INLINE UINT32 z_compare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix);
 INLINE INT32 normalize_dzpix(INT32 sum);
 INLINE INT32 CLIP(INT32 value,INT32 min,INT32 max);
 INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, UINT32 hres);
-INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index);
+INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index);
 INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);
 INLINE UINT32 getlog2(UINT32 lod_clamp);
-INLINE void set_shade_for_rects(void);
 INLINE void copy_colors(COLOR* dst, COLOR* src);
 INLINE void BILERP_AND_WRITE(UINT32* src0, UINT32* src1, UINT32* dest);
 INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
@@ -362,6 +359,10 @@ static int (*alpha_compare)(UINT8 comb_alpha);
 
 static void (*texture_rectangle_16bit)(TEX_RECTANGLE *rect);
 
+#include "video/rdpfrect.h"
+
+static void (*fill_rectangle_16bit)(RECTANGLE *rect);
+
 #include "video/rdpspn16.h"
 
 static void (*render_spans_16_ns_nt_nz_nf)( int start, int end, TILE* tex_tile);
@@ -383,215 +384,65 @@ static void (*render_spans_16_s_t_z_f)(int start, int end, TILE* tex_tile);
 
 #include "video/rdptpipe.h"
 
-static void (*TEXTURE_PIPELINE)(COLOR* TEX, INT32 SSS, INT32 SST, TILE* tex_tile);
+//static UINT32 (*TEXTURE_PIPELINE)(INT32 SSS, INT32 SST, TILE* tex_tile);
+static UINT32 (*TEXTURE_PIPELINE)(INT32 SSS, INT32 SST, TILE* tex_tile);
 
 #include "video/rdpblend.h"
 
-static int (*BLENDER1_16)(UINT16 *fb, UINT8* hb, COLOR c, int dith);
-static int (*BLENDER2_16)(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith);
+static int (*BLENDER1_16_NDITH)(UINT16 *fb, UINT8* hb, COLOR c);
+static int (*BLENDER2_16_NDITH)(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2);
+static int (*BLENDER1_16_DITH)(UINT16 *fb, UINT8* hb, COLOR c, int dith);
+static int (*BLENDER2_16_DITH)(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith);
 
 #include "video/rdptri.h"
 
-INLINE void CLAMP_C(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile);
-INLINE void CLAMP_NC(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile);
+#include "video/rdpclamp.h"
 
 static void (*CLAMP)(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile);
-
-INLINE void CLAMP_LIGHT_C(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile);
-INLINE void CLAMP_LIGHT_NC(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile);
-
 static void (*CLAMP_LIGHT)(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile);
+static void (*CLAMP_QUICK)(INT32* S, INT32* T, INT32 maxs, INT32 maxt, int num);
 
 static UINT8 rdp_rand_val = 0;
 
 #include "video/rdpfetch.h"
 
+#include "video/rdpmask.h"
+
+static void (*MASK)(INT32* S, INT32* T, TILE* tex_tile);
+
+#include "video/rdpcc.h"
+
+static UINT32 (*COLOR_COMBINER1)(void);
+static UINT32 (*COLOR_COMBINER2_C0)(void);
+static UINT32 (*COLOR_COMBINER2_C1)(void);
+
+#include "video/rdpshift.h"
+
+static void (*texshift)(INT32* S, INT32* T, INT32* maxs, INT32* maxt, TILE* tex_tile);
+
+#define CACHE_TEXTURE_PARAMS(TEX) \
+	CLAMP = rdp_clamp_func[((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | ((TEX->cs || !TEX->mask_s) ? 2 : 0) | ((TEX->ct || !TEX->mask_t) ? 1 : 0)]; \
+	CLAMP_LIGHT = rdp_clamp_light_func[((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | ((TEX->cs || !TEX->mask_s) ? 2 : 0) | ((TEX->ct || !TEX->mask_t) ? 1 : 0)]; \
+	CLAMP_QUICK = rdp_clamp_quick_func[((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | ((TEX->cs || !TEX->mask_s) ? 2 : 0) | ((TEX->ct || !TEX->mask_t) ? 1 : 0)]; \
+	MASK = rdp_mask_func[(TEX->mask_s ? 2 : 0) | (TEX->mask_t ? 1 : 0)]; \
+	texshift = rdp_shift_func[(TEX->shift_s ? 2 : 0) | (TEX->shift_t ? 1 : 0)]; \
+	cached_twidth  = TEX->line; \
+	cached_tbase   = TEX->tmem; \
+	cached_tpal    = (TEX->palette & 0xf) << 4; \
+	cached_tfetch  = TEX->fetch_index; \
+	cached_tbase_s1	= TEX->tmem >> 1; \
+	cached_twidth_s1 = TEX->line >> 1;
+
 // Hack, but more efficient than mame_rand
-static UINT8 rdp_rand(void)
-{
-	return (rdp_rand_val += 19);
-}
+#define rdp_rand()	(rdp_rand_val += 19)
 
-INLINE void MASK(INT32* S, INT32* T, TILE* tex_tile)
-{
-	INT32 swrap, twrap;
-
-	if (tex_tile->mask_s) // Select clamp if mask == 0
-	{
-		swrap = *S >> (tex_tile->mask_s > 10 ? 10 : tex_tile->mask_s);
-		swrap &= 1;
-		if (tex_tile->ms && swrap)
-		{
-			*S = (~(*S)) & maskbits_table[tex_tile->mask_s]; // Mirroring and masking
-		}
-		else if (tex_tile->mask_s)
-		{
-			*S &= maskbits_table[tex_tile->mask_s]; // Masking
-		}
-	}
-
-	if (tex_tile->mask_t)
-	{
-		twrap = *T >> (tex_tile->mask_t > 10 ? 10 : tex_tile->mask_t);
-		twrap &= 1;
-		if (tex_tile->mt && twrap)
-		{
-			*T = (~(*T)) & maskbits_table[tex_tile->mask_t]; // Mirroring and masking
-		}
-		else if (tex_tile->mask_t)
-		{
-			*T &= maskbits_table[tex_tile->mask_t];
-		}
-	}
-}
-
-INLINE void texshift(INT32* S, INT32* T, INT32* maxs, INT32* maxt, TILE* tex_tile)
-{
-	*S = SIGN16(*S);
-	*T = SIGN16(*T);
-	if (tex_tile->shift_s)
-	{
-		if (tex_tile->shift_s < 11)
-		{
-			*S >>= tex_tile->shift_s;
-		}
-		else
-		{
-			*S <<= (16 - tex_tile->shift_s);
-		}
-		*S = SIGN16(*S);
-	}
-	if (tex_tile->shift_s)
-	{
-		if (tex_tile->shift_t < 11)
-		{
-			*T >>= tex_tile->shift_t;
-		}
-    	else
-    	{
-			*T <<= (16 - tex_tile->shift_t);
-		}
-		*T = SIGN16(*T);
-	}
-	*maxs = ((*S >> 3) >= tex_tile->sh);
-	*maxt = ((*T >> 3) >= tex_tile->th);
-}
-
-INLINE void CLAMP_NC(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile)
-{
-	int dosfrac = (tex_tile->cs || !tex_tile->mask_s);
-	int dotfrac = (tex_tile->ct || !tex_tile->mask_t);
-	int overunders = 0;
-	int overundert = 0;
-	if (*S & 0x10000 && dosfrac)
-	{
-		*S = 0;
-		overunders = 1;
-	}
-	else if (maxs && dosfrac)
-	{
-		*S = clamp_s_diff[tex_tile->num];
-		overunders = 1;
-
-	}
-	else
-	{
-		*S = (SIGN17(*S) >> 5) & 0x1fff;
-	}
-
-	if (overunders && dosfrac)
-	{
-		*SFRAC = 0;
-	}
-
-	if (*T & 0x10000 && dotfrac)
-	{
-		*T = 0;
-		overundert = 1;
-	}
-	else if (maxt && dotfrac)
-	{
-		*T = clamp_t_diff[tex_tile->num];
-		overundert = 1;
-	}
-	else
-	{
-		*T = (SIGN17(*T) >> 5) & 0x1fff;
-	}
-
-	if (overundert && dotfrac)
-	{
-		*TFRAC = 0;
-	}
-}
-
-INLINE void CLAMP_C(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile)
-{
-	int dosfrac = (tex_tile->cs || !tex_tile->mask_s);
-	int dotfrac = (tex_tile->ct || !tex_tile->mask_t);
-	int overunders = 0;
-	int overundert = 0;
-
-	*S = (SIGN17(*S) >> 5) & 0x1fff;
-
-	if (overunders && dosfrac)
-	{
-		*SFRAC = 0;
-	}
-
-	*T = (SIGN17(*T) >> 5) & 0x1fff;
-
-	if (overundert && dotfrac)
-	{
-		*TFRAC = 0;
-	}
-}
-
-INLINE void CLAMP_LIGHT_C(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile)
-{
-	*S = (SIGN17(*S) >> 5) & 0x1fff;
-	*T = (SIGN17(*T) >> 5) & 0x1fff;
-}
-
-INLINE void CLAMP_LIGHT_NC(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile)
-{
-	int dos = (tex_tile->cs || !tex_tile->mask_s);
-	int dot = (tex_tile->ct || !tex_tile->mask_t);
-
-	if (*S & 0x10000 && dos)
-	{
-		*S = 0;
-	}
-	else if (maxs && dos)
-	{
-		*S = clamp_s_diff[tex_tile->num];
-	}
-	else
-	{
-		*S = (SIGN17(*S) >> 5) & 0x1fff;
-	}
-
-	if (*T & 0x10000 && dot)
-	{
-		*T = 0;
-	}
-	else if (maxt && dot)
-	{
-		*T = clamp_t_diff[tex_tile->num];
-	}
-	else
-	{
-		*T = (SIGN17(*T) >> 5) & 0x1fff;
-	}
-}
+static int special_bsel0, special_bsel1;
 
 /*****************************************************************************/
 
-
-
 VIDEO_START(n64)
 {
-	int i = 0;
+	int i = 0, j = 0;
 	UINT8 *normpoint = memory_region(machine, "normpoint");
 	UINT8 *normslope = memory_region(machine, "normslope");
 
@@ -606,6 +457,55 @@ VIDEO_START(n64)
 
 	one_color.c = 0xffffffff;
 	zero_color.c = 0;
+
+	for(i = 0; i < (1 << 21); i++)
+	{
+		INT32 frac = i >> 16;
+		INT32 left = (i >> 8) & 0x000000ff;
+		INT32 right = i & 0x000000ff;
+		tex_lerp_lut[i] = (frac*(left - right))>>5;
+	}
+
+	for(i = 0; i < (1 << 24); i++)
+	{
+		UINT8 A = (i >> 16) & 0x000000ff;
+		UINT8 B = (i >> 8) & 0x000000ff;
+		UINT8 C = i & 0x000000ff;
+		cc_lut1[i] = (INT16)((((((INT32)A - (INT32)B) * (INT32)C) + 0x80) >> 8) & 0x0000ffff);
+	}
+
+	for(i = 0; i < (1 << 16); i++)
+	{
+		for(j = 0; j < (1 << 8); j++)
+		{
+			INT32 temp = (INT32)((INT16)i) + j;
+			if(temp > 255)
+			{
+				cc_lut2[(i << 8) | j] = 255;
+			}
+			else if(temp < 0)
+			{
+				cc_lut2[(i << 8) | j] = 0;
+			}
+			else
+			{
+				cc_lut2[(i << 8) | j] = (UINT8)temp;
+			}
+		}
+	}
+
+	for(i = 0; i < (1 << 16); i++)
+	{
+		UINT8 r = ((i >> 8) & 0xf8) | (i >> 13);
+		UINT8 g = ((i >> 3) & 0xf8) | ((i >>  8) & 0x07);
+		UINT8 b = ((i << 2) & 0xf8) | ((i >>  3) & 0x07);
+		UINT8 a = (i & 1) ? 0xff : 0;
+		rgb16_to_32_lut[i] = (r << 24) | (g << 16) | (b << 8) | a;
+
+		r = g = b = (i >> 8) & 0xff;
+		a = i & 0xff;
+		ia8_to_32_lut[i] = (r << 24) | (g << 16) | (b << 8) | a;
+	}
 
 	combiner_rgbsub_a_r[0] = combiner_rgbsub_a_r[1] = &one_color.i.r;
 	combiner_rgbsub_a_g[0] = combiner_rgbsub_a_g[1] = &one_color.i.g;
@@ -649,7 +549,7 @@ VIDEO_START(n64)
 
 	for (i = 0; i < 0x4000; i++)
 	{
-		gamma_dither_table[i] = sqrt((double)i);
+		gamma_dither_table[i] = sqrt(i);
 		gamma_dither_table[i] <<= 1;
 	}
 
@@ -868,7 +768,7 @@ VIDEO_UPDATE(n64)
 
 /*****************************************************************************/
 
-INLINE void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+static void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -887,7 +787,7 @@ INLINE void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 	}
 }
 
-INLINE void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+static void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -906,7 +806,7 @@ INLINE void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 	}
 }
 
-INLINE void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+static void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0x1f)
 	{
@@ -934,7 +834,7 @@ INLINE void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b,
 	}
 }
 
-INLINE void SET_ADD_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+static void SET_ADD_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0x7)
 	{
@@ -949,7 +849,7 @@ INLINE void SET_ADD_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b,
 	}
 }
 
-INLINE void SET_SUB_ALPHA_INPUT(UINT8 **input, int code)
+static void SET_SUB_ALPHA_INPUT(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -964,7 +864,7 @@ INLINE void SET_SUB_ALPHA_INPUT(UINT8 **input, int code)
 	}
 }
 
-INLINE void SET_MUL_ALPHA_INPUT(UINT8 **input, int code)
+static void SET_MUL_ALPHA_INPUT(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -979,65 +879,7 @@ INLINE void SET_MUL_ALPHA_INPUT(UINT8 **input, int code)
 	}
 }
 
-
-
-INLINE void COLOR_COMBINER1(COLOR *c)
-{
-	if (combiner_rgbsub_a_r[1] == &noise_color.i.r)
-	{
-		noise_color.i.r = rdp_rand() & 0xff;
-		noise_color.i.g = rdp_rand() & 0xff;
-		noise_color.i.b = rdp_rand() & 0xff;
-	}
-
-	COMBINER_EQUATION(&c->i.r, combiner_rgbsub_a_r[1],combiner_rgbsub_b_r[1],combiner_rgbmul_r[1],combiner_rgbadd_r[1]);
-	COMBINER_EQUATION(&c->i.g, combiner_rgbsub_a_g[1],combiner_rgbsub_b_g[1],combiner_rgbmul_g[1],combiner_rgbadd_g[1]);
-	COMBINER_EQUATION(&c->i.b, combiner_rgbsub_a_b[1],combiner_rgbsub_b_b[1],combiner_rgbmul_b[1],combiner_rgbadd_b[1]);
-	COMBINER_EQUATION(&c->i.a, combiner_alphasub_a[1],combiner_alphasub_b[1],combiner_alphamul[1],combiner_alphaadd[1]);
-
-	//Alpha coverage combiner
-	alpha_cvg_get(&c->i.a);
-}
-
-INLINE void COLOR_COMBINER2_C0(COLOR *c)
-{
-	if (combiner_rgbsub_a_r[0] == &noise_color.i.r)
-	{
-		noise_color.i.r = rdp_rand() & 0xff;
-		noise_color.i.g = rdp_rand() & 0xff;
-		noise_color.i.b = rdp_rand() & 0xff;
-	}
-
-	COMBINER_EQUATION(&c->i.r, combiner_rgbsub_a_r[0],combiner_rgbsub_b_r[0],combiner_rgbmul_r[0],combiner_rgbadd_r[0]);
-	COMBINER_EQUATION(&c->i.g, combiner_rgbsub_a_g[0],combiner_rgbsub_b_g[0],combiner_rgbmul_g[0],combiner_rgbadd_g[0]);
-	COMBINER_EQUATION(&c->i.b, combiner_rgbsub_a_b[0],combiner_rgbsub_b_b[0],combiner_rgbmul_b[0],combiner_rgbadd_b[0]);
-	COMBINER_EQUATION(&c->i.a, combiner_alphasub_a[0],combiner_alphasub_b[0],combiner_alphamul[0],combiner_alphaadd[0]);
-
-	combined_color.c = c->c;
-}
-
-INLINE void COLOR_COMBINER2_C1(COLOR *c)
-{
-	c->c = texel0_color.c;
-	texel0_color.c = texel1_color.c;
-	texel1_color.c = c->c;
-
-	if (combiner_rgbsub_a_r[1] == &noise_color.i.r)
-	{
-		noise_color.i.r = rdp_rand() & 0xff;
-		noise_color.i.g = rdp_rand() & 0xff;
-		noise_color.i.b = rdp_rand() & 0xff;
-	}
-
-	COMBINER_EQUATION(&c->i.r, combiner_rgbsub_a_r[1],combiner_rgbsub_b_r[1],combiner_rgbmul_r[1],combiner_rgbadd_r[1]);
-	COMBINER_EQUATION(&c->i.g, combiner_rgbsub_a_g[1],combiner_rgbsub_b_g[1],combiner_rgbmul_g[1],combiner_rgbadd_g[1]);
-	COMBINER_EQUATION(&c->i.b, combiner_rgbsub_a_b[1],combiner_rgbsub_b_b[1],combiner_rgbmul_b[1],combiner_rgbadd_b[1]);
-	COMBINER_EQUATION(&c->i.a, combiner_alphasub_a[1],combiner_alphasub_b[1],combiner_alphamul[1],combiner_alphaadd[1]);
-
-	alpha_cvg_get(&c->i.a);
-}
-
-INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
+static void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
 {
 	switch (a & 0x3)
 	{
@@ -1119,183 +961,6 @@ static const UINT8 magic_matrix[16] =
 
 /*****************************************************************************/
 
-static void fill_rectangle_16bit(RECTANGLE *rect)
-{
-	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
-	UINT8* hb = &hidden_bits[fb_address >> 1];
-
-	int index, i, j;
-	int x1 = rect->xh / 4;
-	int x2 = rect->xl / 4;
-	int y1 = rect->yh / 4;
-	int y2 = rect->yl / 4;
-	int clipx1, clipx2, clipy1, clipy2;
-	UINT16 fill_color1, fill_color2;
-	int fill_cvg1;
-	int fill_cvg2;
-
-	if (x2 <= x1)
-	{
-		x2=x1+1; // SCARS (E)
-	}
-	if (y2 == y1)
-	{
-		y2=y1+1; // Goldeneye
-	}
-
-
-	fill_color1 = (fill_color >> 16) & 0xffff;
-	fill_color2 = (fill_color >>  0) & 0xffff;
-	fill_cvg1 = (fill_color1 & 1) ? 8 : 1;
-	fill_cvg2 = (fill_color2 & 1) ? 8 : 1;
-
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
-	// clip
-	if (x1 < clipx1)
-	{
-		x1 = clipx1;
-	}
-	if (y1 < clipy1)
-	{
-		y1 = clipy1;
-	}
-	if (x2 >= clipx2)
-	{
-		x2 = clipx2-1;
-	}
-	if (y2 >= clipy2)
-	{
-		y2 = clipy2-1;
-	}
-
-	set_shade_for_rects(); // Needed by Command & Conquer menus
-
-	if (other_modes.cycle_type == CYCLE_TYPE_FILL)
-	{
-		for (j=y1; j <= y2; j++)
-		{
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
-			{
-				int curpixel = index + i;
-				fb[curpixel ^ WORD_ADDR_XOR] = (i & 1) ? fill_color1 : fill_color2;
-				hb[curpixel ^ BYTE_ADDR_XOR] = (i & 1) ? ((fill_color1 & 1)? 3:0) : ((fill_color2 & 1) ? 3:0);
-			}
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_1)
-	{
-		if(!other_modes.rgb_dither_sel)
-		{
-			for (j = y1; j <= y2; j++)
-			{
-				COLOR c;
-				int dith = 0;
-				index = j * fb_width;
-				for (i = x1; i <= x2; i++)
-				{
-					curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-					COLOR_COMBINER1(&c);
-					dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
-					BLENDER1_16(&fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c, dith);
-				}
-			}
-		}
-		else if (other_modes.rgb_dither_sel == 1)
-		{
-			for (j = y1; j <= y2; j++)
-			{
-				COLOR c;
-				int dith = 0;
-				index = j * fb_width;
-				for (i = x1; i <= x2; i++)
-				{
-					curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-					COLOR_COMBINER1(&c);
-					dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
-					BLENDER1_16(&fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c, dith);
-				}
-			}
-		}
-		else
-		{
-			for (j = y1; j <= y2; j++)
-			{
-				COLOR c;
-				int dith = 0;
-				index = j * fb_width;
-				for (i = x1; i <= x2; i++)
-				{
-					curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-					COLOR_COMBINER1(&c);
-					BLENDER1_16(&fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c, dith);
-				}
-			}
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-		if (!other_modes.rgb_dither_sel)
-		{
-			for (j=y1; j <= y2; j++)
-			{
-				COLOR c1, c2;
-				int dith = 0;
-				index = j * fb_width;
-				for (i=x1; i <= x2; i++)
-				{
-					curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-					COLOR_COMBINER2_C0(&c1);
-					COLOR_COMBINER2_C1(&c2);
-					dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
-					BLENDER2_16(&fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2, dith);
-				}
-			}
-		}
-		else if (other_modes.rgb_dither_sel == 1)
-		{
-			for (j=y1; j <= y2; j++)
-			{
-				COLOR c1, c2;
-				int dith = 0;
-				index = j * fb_width;
-				for (i=x1; i <= x2; i++)
-				{
-					curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-					COLOR_COMBINER2_C0(&c1);
-					COLOR_COMBINER2_C1(&c2);
-					dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
-					BLENDER2_16(&fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2, dith);
-				}
-			}
-		}
-		else
-		{
-			for (j=y1; j <= y2; j++)
-			{
-				COLOR c1, c2;
-				int dith = 0;
-				index = j * fb_width;
-				for (i=x1; i <= x2; i++)
-				{
-					curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-					COLOR_COMBINER2_C0(&c1);
-					COLOR_COMBINER2_C1(&c2);
-					BLENDER2_16(&fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2, dith);
-				}
-			}
-		}
-	}
-	else
-	{
-		fatalerror("fill_rectangle_16bit: cycle type copy");
-	}
-}
-
 #define XOR_SWAP_BYTE	4
 #define XOR_SWAP_WORD	2
 #define XOR_SWAP_DWORD	1
@@ -1309,21 +974,14 @@ static void fill_rectangle_16bit(RECTANGLE *rect)
     if (s < 0) s = 0;
 */
 
-static INT32 tbase;
-static INT32 twidth;
-static INT32 tpal;
+static INT32 cached_tbase;
+static INT32 cached_twidth;
+static INT32 cached_tpal;
+static INT32 cached_tfetch;
+static INT32 cached_tbase_s1;
+static INT32 cached_twidth_s1;
 
-INLINE void FETCH_TEXEL(COLOR *color, int s, int t, TILE* tex_tile)
-{
-	twidth  = tex_tile->line;
-	tbase   = tex_tile->tmem;
-	tpal    = tex_tile->palette & 0xf;
-
-	if (t < 0) t = 0;
-	if (s < 0) s = 0;
-
-	rdp_fetch_texel_func[tex_tile->fetch_index](color, s, t);
-}
+#define FETCH_TEXEL(s, t) rdp_fetch_texel_func[cached_tfetch](s < 0 ? 0 : s, t < 0 ? 0 : t)
 
 INLINE UINT32 z_decompress(UINT16 *zb)
 {
@@ -1382,116 +1040,58 @@ INLINE UINT16 dz_decompress(UINT16* zb, UINT8* zhb)
 	return (1 << dz_compressed);
 }
 
-INLINE UINT32 z_compare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix)
-{
-	int force_coplanar = 0;
-	UINT32 oz = z_decompress(zb);
-	UINT32 dzmem = dz_decompress(zb, zhb);
-	UINT32 dznew = 0;
-	UINT32 farther = 0;
-	UINT32 diff = 0;
-	UINT32 nearer = 0;
-	UINT32 infront = 0;
-	UINT32 max = 0;
-	int precision_factor = (oz >> 15) & 0xf;
-	int overflow = 0;
-	int cvgcoeff = 0;
-	UINT32 mempixel, memory_cvg;
+#include "video/rdpzcomp.h"
 
-	sz &= 0x3ffff;
-	if (dzmem == 0x8000 && precision_factor < 3)
-	{
-		force_coplanar = 1;
-	}
-	if (!precision_factor)
-	{
-		dzmem = ((dzmem << 1) > 16) ? (dzmem << 1) : 16;
-	}
-	else if (precision_factor == 1)
-	{
-		dzmem = ((dzmem << 1) > 8) ? (dzmem << 1) : 8;
-	}
-	else if (precision_factor == 2)
-	{
-		dzmem = ((dzmem << 1) > 4) ? (dzmem << 1) : 4;
-	}
-	if (dzmem == 0 && precision_factor < 3)
-	{
-		dzmem = 0xffff;
-	}
-	if (dzmem > 0x8000)
-	{
-		dzmem = 0xffff;
-	}
-	dznew =((dzmem > dzpix) ? dzmem : (UINT32)dzpix) << 3;
-	dznew &= 0x3ffff;
+#define ZMODE0
+	#define ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+	#undef ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+#undef ZMODE0
+#define ZMODE1
+	#define ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+	#undef ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+#undef ZMODE1
+#define ZMODE2
+	#define ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+	#undef ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+#undef ZMODE2
+#define ZMODE3
+	#define ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+	#undef ANTIALIAS
+		#define IMGREAD
+			#include "video/rdpzcomp.c"
+		#undef IMGREAD
+			#include "video/rdpzcomp.c"
+#undef ZMODE3
 
-	farther = ((sz + dznew) >= oz) ? 1 : 0;
-	diff = (sz >= dznew) ? (sz - dznew) : 0;
-	nearer = (diff <= oz) ? 1: 0;
-	infront = (sz < oz) ? 1 : 0;
-	max = (dzmem == 0x3ffff);
-
-	if (force_coplanar)
-	{
-		farther = nearer = 1;
-	}
-
-	curpixel_overlap = 0;
-
-	switch(fb_size)
-	{
-		case 1: /* Banjo Tooie */
-			memory_cvg = 0; //??
-			break;
-		case 2:
-			mempixel = *(UINT16*)fb;
-			memory_cvg = ((mempixel & 1) << 2) + (*hb & 3);
-			break;
-		case 3:
-			mempixel = *(UINT32*)fb;
-			memory_cvg = (mempixel >> 5) & 7;
-			break;
-		default:
-			fatalerror("z_compare: fb_size = %d",fb_size);
-			break;
-	}
-
-	if (!other_modes.image_read_en)
-	{
-		memory_cvg = 7;
-	}
-
-	overflow = ((memory_cvg + curpixel_cvg - 1) > 7) ? 1 : 0;
-	curpixel_overlap = (other_modes.force_blend || (!overflow && other_modes.antialias_en && farther));
-
-	if (other_modes.z_mode == 1 && infront && farther && overflow)
-	{
-		cvgcoeff = ((dzmem >> dznew) - (sz >> dznew)) & 0xf;
-		curpixel_cvg = ((cvgcoeff * (curpixel_cvg - 1)) >> 3) & 0xf;
-	}
-	if (curpixel_cvg > 8)
-		curpixel_cvg = 8;
-
-	switch(other_modes.z_mode)
-	{
-		case 0: // Opaque
-			return (max || (overflow ? infront : nearer))? 1 : 0;
-			break;
-		case 1: // Interpenetrating
-			return (max || (overflow ? infront : nearer))? 1 : 0;
-			break;
-		case 2: // Transparent
-			return (infront || max)? 1: 0;
-			break;
-		case 3: // Decal
-			return (farther && nearer && !max) ? 1 : 0;
-			break;
-		default:
-			fatalerror( "z_mode = %d", other_modes.z_mode);
-			break;
-	}
-}
+static UINT32 (*z_compare)(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix);
 
 INLINE INT32 normalize_dzpix(INT32 sum)
 {
@@ -1555,9 +1155,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 	backr[0] = r;
 	backg[0] = g;
 	backb[0] = b;
-	invr[0] = 255 - r;
-	invg[0] = 255 - g;
-	invb[0] = 255 - b;
+	invr[0] = ~r;
+	invg[0] = ~g;
+	invb[0] = ~b;
 
 	if (centercvg == 8)
 	{
@@ -1578,9 +1178,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 				backr[numoffull] = ((pix >> 8) & 0xf8) | (pix >> 13);
 				backg[numoffull] = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
 				backb[numoffull] = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
-				invr[numoffull] = 255 - backr[numoffull];
-				invg[numoffull] = 255 - backg[numoffull];
-				invb[numoffull] = 255 - backb[numoffull];
+				invr[numoffull] = ~backr[numoffull];
+				invg[numoffull] = ~backg[numoffull];
+				invb[numoffull] = ~backb[numoffull];
 			}
 			else
 			{
@@ -1604,9 +1204,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 				backr[numoffull] = ((pix >> 8) & 0xf8) | (pix >> 13);
 				backg[numoffull] = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
 				backb[numoffull] = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
-				invr[numoffull] = 255 - backr[numoffull];
-				invg[numoffull] = 255 - backg[numoffull];
-				invb[numoffull] = 255 - backb[numoffull];
+				invr[numoffull] = ~backr[numoffull];
+				invg[numoffull] = ~backg[numoffull];
+				invb[numoffull] = ~backb[numoffull];
 			}
 			else
 			{
@@ -1630,9 +1230,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 				backr[numoffull] = ((pix >> 8) & 0xf8) | (pix >> 13);
 				backg[numoffull] = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
 				backb[numoffull] = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
-				invr[numoffull] = 255 - backr[numoffull];
-				invg[numoffull] = 255 - backg[numoffull];
-				invb[numoffull] = 255 - backb[numoffull];
+				invr[numoffull] = ~backr[numoffull];
+				invg[numoffull] = ~backg[numoffull];
+				invb[numoffull] = ~backb[numoffull];
 			}
 			else
 			{
@@ -1643,11 +1243,6 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 			numoffull++;
 		}
 		toleft++;
-	}
-
-	if (numoffull != 7)
-	{
-		fatalerror("Something went wrong in vi_filter16");
 	}
 
 	video_max(&backr[0], &max.i.r, &enb);
@@ -1723,9 +1318,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 	i = ge_two(enb);
 	penumin.i.b = i ? min.i.b : penumin.i.b;
 
-	penumin.i.r = 255 - penumin.i.r;
-	penumin.i.g = 255 - penumin.i.g;
-	penumin.i.b = 255 - penumin.i.b;
+	penumin.i.r = ~penumin.i.r;
+	penumin.i.g = ~penumin.i.g;
+	penumin.i.b = ~penumin.i.b;
 
 	colr = (UINT32)penumin.i.r + (UINT32)penumax.i.r - (r << 1);
 	colg = (UINT32)penumin.i.g + (UINT32)penumax.i.g - (g << 1);
@@ -1742,9 +1337,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 }
 
 // This needs to be fixed for endianness.
-INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index)
+INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index)
 {
-	UINT32 leftr, leftg, leftb, rightr, rightg, rightb;
+	UINT8 leftr, leftg, leftb, rightr, rightg, rightb;
 	UINT16 leftpix, rightpix;
 	UINT16* next, *prev;
 	UINT32 Lsw = fbuff_index & 1;
@@ -2034,6 +1629,91 @@ INLINE void restore_two(COLOR* filtered, COLOR* neighbour)
 
 INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 {
+	int pos = 0;
+	UINT32 temp = 0;
+	if (Pixels[0] > Pixels[pos])
+	{
+		temp |= 1;
+	}
+	else if (Pixels[0] < Pixels[pos])
+		temp |= 1;
+
+	if (Pixels[1] > Pixels[pos])
+	{
+		temp |= 2;
+		pos = 1;
+	}
+	else if (Pixels[1] < Pixels[pos])
+		temp |= 2;
+	else
+		pos = 1;
+
+	if (Pixels[2] > Pixels[pos])
+	{
+		temp |= 4;
+		pos = 2;
+	}
+	else if (Pixels[2] < Pixels[pos])
+		temp |= 4;
+	else
+		pos = 2;
+
+	if (Pixels[3] > Pixels[pos])
+	{
+		temp |= 8;
+		pos = 3;
+	}
+	else if (Pixels[3] < Pixels[pos])
+		temp |= 8;
+	else
+		pos = 3;
+
+	if (Pixels[4] > Pixels[pos])
+	{
+		temp |= 16;
+		pos = 4;
+	}
+	else if (Pixels[4] < Pixels[pos])
+		temp |= 16;
+	else
+		pos = 4;
+
+	if (Pixels[5] > Pixels[pos])
+	{
+		temp |= 32;
+		pos = 5;
+	}
+	else if (Pixels[5] < Pixels[pos])
+		temp |= 32;
+	else
+		pos = 5;
+
+	if (Pixels[6] > Pixels[pos])
+	{
+		temp |= 64;
+		pos = 6;
+	}
+	else if (Pixels[6] < Pixels[pos])
+		temp |= 64;
+	else
+		pos = 6;
+
+	if (Pixels[7] > Pixels[pos])
+	{
+		temp |= 128;
+		pos = 7;
+	}
+	else if (Pixels[7] < Pixels[pos])
+		temp |= 128;
+	else
+		pos = 7;
+
+	*enb = temp;
+	*max = Pixels[pos];
+}
+/*
+INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
+{
 	int i;
 	int pos = 0;
 	*enb = 0;
@@ -2055,19 +1735,95 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 	}
 	*max = Pixels[pos];
 }
+*/
 
 INLINE UINT32 ge_two(UINT32 enb)
 {
-	int i;
-	int j = 0;
-	for(i = 0; i < 7; i++)
+	if(enb & 1)
 	{
-		if (!((enb >> i) & 1))
-		{
-			j++;
-		}
+		if(enb & 2)
+			return 1;
+		if(enb & 4)
+			return 1;
+		if(enb & 8)
+			return 1;
+		if(enb & 16)
+			return 1;
+		if(enb & 32)
+			return 1;
+		if(enb & 64)
+			return 1;
+		if(enb & 128)
+			return 1;
+		return 0;
 	}
-	return (j > 1);
+	else if(enb & 2)
+	{
+		if(enb & 4)
+			return 1;
+		if(enb & 8)
+			return 1;
+		if(enb & 16)
+			return 1;
+		if(enb & 32)
+			return 1;
+		if(enb & 64)
+			return 1;
+		if(enb & 128)
+			return 1;
+		return 0;
+	}
+	else if(enb & 4)
+	{
+		if(enb & 8)
+			return 1;
+		if(enb & 16)
+			return 1;
+		if(enb & 32)
+			return 1;
+		if(enb & 64)
+			return 1;
+		if(enb & 128)
+			return 1;
+		return 0;
+	}
+	else if(enb & 8)
+	{
+		if(enb & 16)
+			return 1;
+		if(enb & 32)
+			return 1;
+		if(enb & 64)
+			return 1;
+		if(enb & 128)
+			return 1;
+		return 0;
+	}
+	else if(enb & 16)
+	{
+		if(enb & 32)
+			return 1;
+		if(enb & 64)
+			return 1;
+		if(enb & 128)
+			return 1;
+		return 0;
+	}
+	else if(enb & 32)
+	{
+		if(enb & 64)
+			return 1;
+		if(enb & 128)
+			return 1;
+		return 0;
+	}
+	else if(enb & 64)
+	{
+		if(enb & 128)
+			return 1;
+		return 0;
+	}
+	return 0;
 }
 
 INLINE void calculate_clamp_diffs(UINT32 prim_tile)
@@ -2112,15 +1868,6 @@ INLINE void rgb_dither(INT32* r, INT32* g, INT32* b, int dith)
 	}
 }
 
-INLINE void set_shade_for_rects(void)
-{
-	shade_color.c = 0;
-	//shade_color.i.r = 0;
-	//shade_color.i.g = 0;
-	//shade_color.i.b = 0;
-	//shade_color.i.a = 0;
-}
-
 INLINE UINT32 getlog2(UINT32 lod_clamp)
 {
 	int i;
@@ -2144,10 +1891,6 @@ INLINE UINT32 getlog2(UINT32 lod_clamp)
 INLINE void copy_colors(COLOR* dst, COLOR* src)
 {
 	dst->c = src->c;
-	//dst->i.r = src->i.r;
-	//dst->i.g = src->i.g;
-	//dst->i.b = src->i.b;
-	//dst->i.a = src->i.a;
 }
 
 INLINE void BILERP_AND_WRITE(UINT32* src0, UINT32* src1, UINT32* dest)
@@ -2167,12 +1910,10 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	int shift;
 	int normout;
 	int wnorm;
-	int temppoint, tempslope;
 	int tlu_rcp;
-	int tempmask;
 	int shift_value;
 
-	if ((sw & 0x8000) || !(sw & 0x7fff))
+	if (!(sw & 0x7fff))
 	{
 		w_carry = 1;
 	}
@@ -2187,26 +1928,19 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 
 	normout = ((sw << shift) & 0x3fff) >> 8;
 	wnorm = ((sw << shift) & 0xff) << 2;
-	temppoint = NormPointRom[normout];
-	tempslope = NormSlopeRom[normout];
 
-	tlu_rcp = ((-(tempslope * wnorm)) >> 10);
-	tlu_rcp = (tlu_rcp + temppoint);
+	tlu_rcp = ((-(NormSlopeRom[normout] * wnorm)) >> 10) + NormPointRom[normout];
 
-	*sss = SIGN16(ss) * tlu_rcp;
-	*sst = SIGN16(st) * tlu_rcp;
-	tempmask = ((1 << (shift+1)) - 1) << (29 - shift);
-	shift_value = 13 - shift;
-	if (shift_value < 0)
+	if(shift == 14)
 	{
-		shift_value = 0;
+		*sss = (SIGN16(ss) * tlu_rcp) << 1;
+		*sst = (SIGN16(st) * tlu_rcp) << 1;
 	}
-	*sss >>= shift_value;
-	*sst >>= shift_value;
-	if (shift == 0xe)
+	else
 	{
-		*sss <<= 1;
-		*sst <<= 1;
+		shift_value = 13 - shift;
+		*sss = (SIGN16(ss) * tlu_rcp) >> shift_value;
+		*sst = (SIGN16(st) * tlu_rcp) >> shift_value;
 	}
 }
 
@@ -2266,15 +2000,9 @@ INLINE int BLENDER1_32(UINT32 *fb, COLOR c)
 	}
 	else
 	{
-		int special_bsel = 0;
-		if (blender2b_a[0] == &memory_color.i.a)
-		{
-			special_bsel = 1;
-		}
-
 		inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-		BLENDER_EQUATION0(&r, &g, &b, special_bsel);
+		BLENDER_EQUATION0(&r, &g, &b, special_bsel0);
 	}
 
 	return  (FBWRITE_32(fb,r,g,b));
@@ -2284,7 +2012,6 @@ INLINE int BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 {
 	UINT32 mem = *fb;
 	int r, g, b;
-	int special_bsel = 0;
 
 	// Alpha compare
 	if (!alpha_compare(c2.i.a))
@@ -2317,14 +2044,9 @@ INLINE int BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 		memory_color.i.a = 0xe0;
 	}
 
-	if (blender2b_a[0] == &memory_color.i.a)
-	{
-		special_bsel = 1;
-	}
-
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-	BLENDER_EQUATION0(&r, &g, &b, special_bsel);
+	BLENDER_EQUATION0(&r, &g, &b, special_bsel0);
 
 	blended_pixel_color.i.r = r;
 	blended_pixel_color.i.g = g;
@@ -2342,18 +2064,9 @@ INLINE int BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 	}
 	else
 	{
-		if (blender2b_a[1] == &memory_color.i.a)
-		{
-			special_bsel = 1;
-		}
-		else
-		{
-			special_bsel = 0;
-		}
-
 		inv_pixel_color.i.a = 0xff - *blender1b_a[1];
 
-		BLENDER_EQUATION1(&r, &g, &b, special_bsel);
+		BLENDER_EQUATION1(&r, &g, &b, special_bsel1);
 	}
 
 	return  (FBWRITE_32(fb,r,g,b));
@@ -2369,11 +2082,6 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 	int y2 = rect->yl / 4;
 	int clipx1, clipx2, clipy1, clipy2;
 	int fill_cvg = 0;
-
-	if (x2 < x1)
-	{
-		stricterror ("SCARS (E) case: fill_rectangle_32bit");
-	}
 
 	// TODO: clip
 	clipx1 = clip.xh / 4;
@@ -2399,7 +2107,7 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 		y2 = clipy2-1;
 	}
 
-	set_shade_for_rects();
+	shade_color.c = 0;
 
 	fill_cvg = ((fill_color >> 5) & 7) + 1;
 
@@ -2424,7 +2132,7 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 			for (i=x1; i <= x2; i++)
 			{
 				curpixel_cvg = fill_cvg;
-				COLOR_COMBINER1(&c);
+				c.c = COLOR_COMBINER1();
 				BLENDER1_32(&fb[(index + i)], c);
 			}
 		}
@@ -2438,8 +2146,8 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 			for (i=x1; i <= x2; i++)
 			{
 				curpixel_cvg = fill_cvg;
-				COLOR_COMBINER2_C0(&c1);
-				COLOR_COMBINER2_C1(&c2);
+				c1.c = COLOR_COMBINER2_C0();
+				c2.c = COLOR_COMBINER2_C1();
 				BLENDER2_32(&fb[(index + i)], c1, c2);
 			}
 		}
@@ -2470,11 +2178,6 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 	y1 = (rect->yh / 4);
 	y2 = (rect->yl / 4);
 
-	if (x2 < x1)
-	{
-		stricterror( "x2 < x1: texture_rectangle_32bit" );
-	}
-
 	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		rect->dsdx /= 4;
@@ -2503,12 +2206,14 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 		}
 	}
 
-	set_shade_for_rects(); // Needed by Pilotwings 64
+	shade_color.c = 0;	// Needed by Pilotwings 64
 
 	t = (int)(rect->t) << 5;
 
 	if (other_modes.cycle_type == CYCLE_TYPE_1)
 	{
+		CACHE_TEXTURE_PARAMS(tex_tile);
+
 		for (j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
@@ -2523,14 +2228,14 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 				st = t >> 5;
 				if (rect->flip)
 				{
-					TEXTURE_PIPELINE(&texel0_color, st, ss, tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(st, ss, tex_tile);
 				}
 				else
 				{
-					TEXTURE_PIPELINE(&texel0_color, ss, st, tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(ss, st, tex_tile);
 				}
 
-				COLOR_COMBINER1(&c);
+				c.c = COLOR_COMBINER1();
 
 				BLENDER1_32(&fb[(fb_index + i)], c);
 
@@ -2556,17 +2261,23 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 				st = t >> 5;
 				if (rect->flip)
 				{
-					TEXTURE_PIPELINE(&texel0_color, st, ss, tex_tile);
-					TEXTURE_PIPELINE(&texel1_color, st, ss, tex_tile2);
+					CACHE_TEXTURE_PARAMS(tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(st, ss, tex_tile);
+
+					CACHE_TEXTURE_PARAMS(tex_tile2);
+					texel1_color.c = TEXTURE_PIPELINE(st, ss, tex_tile2);
 				}
 				else
 				{
-					TEXTURE_PIPELINE(&texel0_color, ss, st, tex_tile);
-					TEXTURE_PIPELINE(&texel1_color, ss, st, tex_tile2);
+					CACHE_TEXTURE_PARAMS(tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(ss, st, tex_tile);
+
+					CACHE_TEXTURE_PARAMS(tex_tile2);
+					texel1_color.c = TEXTURE_PIPELINE(ss, st, tex_tile2);
 				}
 
-				COLOR_COMBINER2_C0(&c1);
-				COLOR_COMBINER2_C1(&c2);
+				c1.c = COLOR_COMBINER2_C0();
+				c2.c = COLOR_COMBINER2_C1();
 
 				BLENDER2_32(&fb[(fb_index + i)], c1, c2);
 
@@ -2578,6 +2289,8 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 	}
 	else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
 	{
+		CACHE_TEXTURE_PARAMS(tex_tile);
+
 		for (j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
@@ -2590,11 +2303,11 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 				st = t >> 5;
 				if (rect->flip)
 				{
-					TEXTURE_PIPELINE(&texel0_color, st, ss, tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(st, ss, tex_tile);
 				}
 				else
 				{
-					TEXTURE_PIPELINE(&texel0_color, ss, st, tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(ss, st, tex_tile);
 				}
 
 				fb[fb_index + i] = (texel0_color.i.r << 24) | (texel0_color.i.g << 16) | (texel0_color.i.b << 8)|1;
@@ -2644,12 +2357,6 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 	clipy1 = clip.yh / 4;
 	clipy2 = clip.yl / 4;
 
-
-	if (other_modes.key_en)
-	{
-		stricterror( "render_spans_32: key_en" );
-	}
-
 	if (other_modes.cycle_type == CYCLE_TYPE_2 && texture)
 	{
 		if (!other_modes.tex_lod_en)
@@ -2695,6 +2402,8 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 		shade_color.c = prim_color.c;
 	}
 
+	CACHE_TEXTURE_PARAMS(tex_tile);
+
 	for (i = start; i <= end; i++)
 	{
 		int xstart = span[i].lx;
@@ -2736,10 +2445,6 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 			if (x >= clipx1 && x < clipx2)
 			{
 				curpixel_cvg = span[i].cvg[x];
-				if (curpixel_cvg > 8)
-				{
-					stricterror("render_spans_32: curpixel_cvg = %d", curpixel_cvg);
-				}
 				if (curpixel_cvg)
 				{
 					COLOR c1, c2;
@@ -2784,24 +2489,27 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 					{
 						if (other_modes.cycle_type == CYCLE_TYPE_1)
 						{
-							TEXTURE_PIPELINE(&texel0_color, sss, sst, tex_tile);
+							texel0_color.c = TEXTURE_PIPELINE(sss, sst, tex_tile);
 						}
 						else
 						{
-							TEXTURE_PIPELINE(&texel0_color, sss, sst, tex_tile);
-							TEXTURE_PIPELINE(&texel1_color, sss, sst, tex_tile2);
+							CACHE_TEXTURE_PARAMS(tex_tile);
+							texel0_color.c = TEXTURE_PIPELINE(sss, sst, tex_tile);
+
+							CACHE_TEXTURE_PARAMS(tex_tile2);
+							texel1_color.c = TEXTURE_PIPELINE(sss, sst, tex_tile2);
 						}
 					}
 
 					if (other_modes.cycle_type == CYCLE_TYPE_1)
 					{
-						COLOR_COMBINER1(&c1);
+						c1.c = COLOR_COMBINER1();
 					}
 					else if (other_modes.cycle_type == CYCLE_TYPE_2)
 					{
-						COLOR_COMBINER2_C0(&c1);
-						COLOR_COMBINER2_C1(&c2);
-					}
+						c1.c = COLOR_COMBINER2_C0();
+						c2.c = COLOR_COMBINER2_C1();
+  					}
 
 					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
 					{
@@ -3870,7 +3578,7 @@ static RDP_COMMAND( rdp_set_other_modes )
 	int index;
 
 	other_modes.cycle_type			= (w1 >> 20) & 0x3;
-	other_modes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0;
+	other_modes.persp_tex_en 		= (w1 & 0x80000) ? 1 : 0;
 	other_modes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0;
 	other_modes.sharpen_tex_en		= (w1 & 0x20000) ? 1 : 0;
 	other_modes.tex_lod_en			= (w1 & 0x10000) ? 1 : 0;
@@ -3906,33 +3614,33 @@ static RDP_COMMAND( rdp_set_other_modes )
 	other_modes.dither_alpha_en		= (w2 & 0x02) ? 1 : 0;
 	other_modes.alpha_compare_en	= (w2 & 0x01) ? 1 : 0;
 
-	texture_rectangle_16bit = rdp_texture_rectangle_16bit_func[((other_modes.z_update_en | other_modes.z_source_sel) << 3) | ((other_modes.z_compare_en | other_modes.z_source_sel) << 2) | other_modes.cycle_type];
+	texture_rectangle_16bit = rdp_texture_rectangle_16bit_func[((((other_modes.z_update_en | other_modes.z_source_sel) << 3) | ((other_modes.z_compare_en | other_modes.z_source_sel) << 2) | other_modes.cycle_type) << 2) | other_modes.rgb_dither_sel];
+	fill_rectangle_16bit = rdp_fill_rectangle_16bit_func[(other_modes.cycle_type << 2) | other_modes.rgb_dither_sel];
 
 	alpha_cvg_get = rdp_alpha_cvg_func[(other_modes.cvg_times_alpha << 1) | other_modes.alpha_cvg_select];
 
 	alpha_compare = rdp_alpha_compare_func[(other_modes.alpha_compare_en << 1) | other_modes.dither_alpha_en];
 
-	render_spans_16_ns_nt_nz_nf = rdp_render_spans_16_func[0 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_nt_z_nf = rdp_render_spans_16_func[2 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_t_nz_nf = rdp_render_spans_16_func[4 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_t_z_nf = rdp_render_spans_16_func[6 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_nt_nz_nf = rdp_render_spans_16_func[8 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_nt_z_nf = rdp_render_spans_16_func[10 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_t_nz_nf = rdp_render_spans_16_func[12 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_t_z_nf = rdp_render_spans_16_func[14 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_nt_nz_f = rdp_render_spans_16_func[16 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_nt_z_f = rdp_render_spans_16_func[18 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_t_nz_f = rdp_render_spans_16_func[20 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_ns_t_z_f = rdp_render_spans_16_func[22 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_nt_nz_f = rdp_render_spans_16_func[24 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_nt_z_f = rdp_render_spans_16_func[26 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_t_nz_f = rdp_render_spans_16_func[28 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
-	render_spans_16_s_t_z_f = rdp_render_spans_16_func[30 + ((other_modes.cycle_type) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6))];
+	z_compare = rdp_z_compare_func[(other_modes.z_mode << 2) | (other_modes.antialias_en << 1) | other_modes.image_read_en];
+
+	render_spans_16_ns_nt_nz_nf = rdp_render_spans_16_func[0 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_nt_z_nf = rdp_render_spans_16_func[2 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_t_nz_nf = rdp_render_spans_16_func[4 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_t_z_nf = rdp_render_spans_16_func[6 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_nt_nz_nf = rdp_render_spans_16_func[8 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_nt_z_nf = rdp_render_spans_16_func[10 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_t_nz_nf = rdp_render_spans_16_func[12 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_t_z_nf = rdp_render_spans_16_func[14 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_nt_nz_f = rdp_render_spans_16_func[16 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_nt_z_f = rdp_render_spans_16_func[18 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_t_nz_f = rdp_render_spans_16_func[20 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_ns_t_z_f = rdp_render_spans_16_func[22 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_nt_nz_f = rdp_render_spans_16_func[24 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_nt_z_f = rdp_render_spans_16_func[26 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_t_nz_f = rdp_render_spans_16_func[28 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
+	render_spans_16_s_t_z_f = rdp_render_spans_16_func[30 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
 
 	TEXTURE_PIPELINE = rdp_texture_pipeline_func[(other_modes.mid_texel << 1) | other_modes.sample_type];
-
-	CLAMP = (other_modes.cycle_type == CYCLE_TYPE_COPY) ? CLAMP_C : CLAMP_NC;
-	CLAMP_LIGHT = (other_modes.cycle_type == CYCLE_TYPE_COPY) ? CLAMP_LIGHT_C : CLAMP_LIGHT_NC;
 
 	for(index = 0; index < 8; index++)
 	{
@@ -3945,8 +3653,10 @@ static RDP_COMMAND( rdp_set_other_modes )
 	BLENDER_EQUATION0 = other_modes.force_blend ? BLENDER_EQUATION0_FORCE : BLENDER_EQUATION0_NFORCE;
 	BLENDER_EQUATION1 = other_modes.force_blend ? BLENDER_EQUATION1_FORCE : BLENDER_EQUATION1_NFORCE;
 
-	BLENDER1_16 = rdp_blender1_16_func[(other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | (other_modes.rgb_dither_sel >> 1)];
-	BLENDER2_16 = rdp_blender2_16_func[(other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | (other_modes.rgb_dither_sel >> 1)];
+	BLENDER1_16_DITH = rdp_blender1_16_dith_func[(other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
+	BLENDER2_16_DITH = rdp_blender2_16_dith_func[(other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
+	BLENDER1_16_NDITH = rdp_blender1_16_ndith_func[(other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
+	BLENDER2_16_NDITH = rdp_blender2_16_ndith_func[(other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
 
 	SET_BLENDER_INPUT(0, 0, &blender1a_r[0], &blender1a_g[0], &blender1a_b[0], &blender1b_a[0],
 					  other_modes.blend_m1a_0, other_modes.blend_m1b_0);
@@ -3956,6 +3666,9 @@ static RDP_COMMAND( rdp_set_other_modes )
 					  other_modes.blend_m1a_1, other_modes.blend_m1b_1);
 	SET_BLENDER_INPUT(1, 1, &blender2a_r[1], &blender2a_g[1], &blender2a_b[1], &blender2b_a[1],
 					  other_modes.blend_m2a_1, other_modes.blend_m2b_1);
+
+	special_bsel0 = (blender2b_a[0] == &memory_color.i.a) ? 2 : 0;
+	special_bsel1 = (blender2b_a[1] == &memory_color.i.a) ? 2 : 0;
 }
 
 static RDP_COMMAND( rdp_load_tlut )
@@ -4004,12 +3717,7 @@ static RDP_COMMAND( rdp_load_tlut )
             }
             break;
         }*/
-		default:	stricterror("RDP: load_tlut: size = %d\n", ti_size);
-	}
-
-	if (TMEM[0x1000] != 25 || TMEM[0x1001] != 25)
-	{
-		stricterror("rdp_load_tlut: TMEM has been written out-of-bounds");
+		default:	fatalerror("RDP: load_tlut: size = %d\n", ti_size);
 	}
 }
 
@@ -4040,11 +3748,6 @@ static RDP_COMMAND( rdp_load_block )
 	tile[tilenum].sh = sh = ((w2 >> 12) & 0xfff);
 	dxt	= ((w2 >>  0) & 0xfff);
 
-	if (sh < sl)
-	{
-		//fatalerror( "load_block: sh < sl" );
-	}
-
 	width = (sh - sl) + 1;
 
 	if (width > 2048) // Hack for Magical Tetris Challenge
@@ -4062,7 +3765,7 @@ static RDP_COMMAND( rdp_load_block )
 
 	if ((ti_address & 3) && (ti_address & 0xffffff00) != 0xf8a00)
 	{
-		stricterror( "load block: unaligned ti_address 0x%x",ti_address ); // Rat Attack, Frogger 2 prototype
+		fatalerror( "load block: unaligned ti_address 0x%x",ti_address ); // Rat Attack, Frogger 2 prototype
 	}
 
 	src = (UINT32*)&ram16[ti_address2 >> 1];
@@ -4072,11 +3775,6 @@ static RDP_COMMAND( rdp_load_block )
 	if ((tb + (width >> 2)) > 0x400)
 	{
 		width = 0x1000 - tb*4; // Hack for Magical Tetris Challenge
-	}
-
-	if (ti_width2 < 0)
-	{
-		fatalerror( "load_block: negative ti_width2" );
 	}
 
 	switch (ti_size)
@@ -4146,11 +3844,6 @@ static RDP_COMMAND( rdp_load_tile )
 	if (!line)
 	{
 		return; // Needed by Wipeout 64
-	}
-
-	if ((ti_format != tex_tile->format || ti_size != tex_tile->size))
-	{
-		fatalerror("load_tile: format conversion required!\n %d %d %d %d", ti_format, tex_tile->format, ti_size, tex_tile->size);
 	}
 
 	tex_tile->sl = ((w1 >> 12) & 0xfff);
@@ -4297,7 +3990,8 @@ static RDP_COMMAND( rdp_set_tile )
 	tex_tile->shift_s	= (w2 >>  0) & 0xf;
 	tex_tile->fetch_index = (tex_tile->size << 5) | (tex_tile->format << 2) | (other_modes.en_tlut << 1) | other_modes.tlut_type;
 
-	// TODO: clamp & mirror parameters
+	tex_tile->mask_s = (tex_tile->mask_s > 10) ? 10 : tex_tile->mask_s;
+	tex_tile->mask_t = (tex_tile->mask_t > 10) ? 10 : tex_tile->mask_t;
 }
 
 static RDP_COMMAND( rdp_fill_rect )
@@ -4395,6 +4089,19 @@ static RDP_COMMAND( rdp_set_combine )
 	SET_SUB_ALPHA_INPUT(&combiner_alphasub_b[1], combine.sub_b_a1);
 	SET_MUL_ALPHA_INPUT(&combiner_alphamul[1], combine.mul_a1);
 	SET_SUB_ALPHA_INPUT(&combiner_alphaadd[1], combine.add_a1);
+
+	if(combiner_rgbsub_a_r[1] == &noise_color.i.r)
+	{
+		COLOR_COMBINER1 = COLOR_COMBINER1_NOISE;
+		COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NOISE;
+		COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NOISE;
+	}
+	else
+	{
+		COLOR_COMBINER1 = COLOR_COMBINER1_NNOISE;
+		COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NNOISE;
+		COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NNOISE;
+	}
 }
 
 static RDP_COMMAND( rdp_set_texture_image )
@@ -4412,7 +4119,7 @@ static RDP_COMMAND( rdp_set_mask_image )
 
 static RDP_COMMAND( rdp_set_color_image )
 {
-	fb_format	= (w1 >> 21) & 0x7;
+	fb_format 	= (w1 >> 21) & 0x7;
 	fb_size		= (w1 >> 19) & 0x3;
 	fb_width	= (w1 & 0x3ff) + 1;
 	fb_address	= w2 & 0x01ffffff;
@@ -4521,8 +4228,15 @@ void rdp_process_list(running_machine *machine)
 	dp_start = dp_current = dp_end;
 }
 
-INLINE void COMBINER_EQUATION(UINT8 *out, UINT8 *A, UINT8 *B, UINT8 *C, UINT8 *D)
-{
+//INLINE void COMBINER_EQUATION(UINT8 *out, UINT8 *A, UINT8 *B, UINT8 *C, UINT8 *D)
+//{
+	//*out = cc_lut_base[(*D << 17) + (*C << 9) + *A - *B];
+	/* The speedy, lookup table enabled version */
+	//*out = cc_lut2[(cc_lut1[(*A << 16) | (*B << 8) | *C] << 8) | *D];
+
+	/*
+	The slow, branchy version
+
 	INT32 color = (((*A-*B)* *C) + (*D << 8) + 0x80);
 	color >>= 8;
 	if (color > 255)
@@ -4537,33 +4251,26 @@ INLINE void COMBINER_EQUATION(UINT8 *out, UINT8 *A, UINT8 *B, UINT8 *C, UINT8 *D
 	{
 		*out = (UINT8)color;
 	}
-}
+	*/
+//}
 
 INLINE void BLENDER_EQUATION0_FORCE(INT32* r, INT32* g, INT32* b, int bsel_special)
 {
-	UINT8 blend1a, blend2a;
-	UINT32 sum = 0;
+	int blend1a = *blender1b_a[0];
+	int blend2a = *blender2b_a[0];
 	INT32 tr, tg, tb;
-	blend1a = *blender1b_a[0];
-	blend2a = *blender2b_a[0];
 	if (bsel_special)
 	{
 		blend1a &= 0xe0;
 	}
 
-	sum = (((blend1a >> 5) + (blend2a >> 5) + 1) & 0xf) << 5;
+	tr = (int)(*blender1a_r[0]) * blend1a + (int)(*blender2a_r[0]) * blend2a;
+	tg = (int)(*blender1a_g[0]) * blend1a + (int)(*blender2a_g[0]) * blend2a;
+	tb = (int)(*blender1a_b[0]) * blend1a + (int)(*blender2a_b[0]) * blend2a;
 
-	tr = (((int)(*blender1a_r[0]) * (int)(blend1a))) +
-		(((int)(*blender2a_r[0]) * (int)(blend2a)));
-	tr += (bsel_special) ? (((int)(*blender2a_r[0])) << 5) : (((int)(*blender2a_r[0])) << 3);
-
-	tg = (((int)(*blender1a_g[0]) * (int)(blend1a))) +
-		(((int)(*blender2a_g[0]) * (int)(blend2a)));
-	tg += (bsel_special) ? ((int)((*blender2a_g[0])) << 5) : (((int)(*blender2a_g[0])) << 3);
-
-	tb = (((int)(*blender1a_b[0]) * (int)(blend1a))) +
-		(((int)(*blender2a_b[0]) * (int)(blend2a)));
-	tb += (bsel_special) ? (((int)(*blender2a_b[0])) << 5) : (((int)(*blender2a_b[0])) << 3);
+	tr += ((int)(*blender2a_r[0])) << (3 + bsel_special);
+	tg += ((int)(*blender2a_g[0])) << (3 + bsel_special);
+	tb += ((int)(*blender2a_b[0])) << (3 + bsel_special);
 
 	tr >>= 8;
 	tg >>= 8;
@@ -4791,28 +4498,52 @@ INLINE UINT32 addleftcvg(UINT32 x, UINT32 k)
 #undef COLOR_ON_CVG
 	#include "video/rdpfb.c"
 
-#define IMGREAD
-	#define ZCOMPARE
-		#define RGBDITHER1
-			#include "video/rdpblend.c"
-		#undef RGBDITHER1
-			#include "video/rdpblend.c"
-	#undef ZCOMPARE
-		#define RGBDITHER1
-			#include "video/rdpblend.c"
-		#undef RGBDITHER1
-			#include "video/rdpblend.c"
-#undef IMGREAD
-	#define ZCOMPARE
-		#define RGBDITHER1
-			#include "video/rdpblend.c"
-		#undef RGBDITHER1
-			#include "video/rdpblend.c"
-	#undef ZCOMPARE
-		#define RGBDITHER1
-			#include "video/rdpblend.c"
-		#undef RGBDITHER1
-			#include "video/rdpblend.c"
+#define ALPHACOMPARE
+	#define IMGREAD
+		#define ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+		#undef ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+	#undef IMGREAD
+		#define ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+		#undef ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+#undef ALPHACOMPARE
+	#define IMGREAD
+		#define ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+		#undef ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+	#undef IMGREAD
+		#define ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
+		#undef ZCOMPARE
+			#define RGBDITHER1
+				#include "video/rdpblend.c"
+			#undef RGBDITHER1
+				#include "video/rdpblend.c"
 
 #include "video/rdpfetch.c"
 
@@ -4853,195 +4584,626 @@ INLINE UINT32 addleftcvg(UINT32 x, UINT32 k)
 		#undef BAYERDITHER
 			#include "video/rdptrect.c"
 
-#define SHADE
-	#define TEXTURE
-		#define ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-		#undef ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-	#undef TEXTURE
-		#define ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-		#undef ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-#undef SHADE
-	#define TEXTURE
-		#define ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-		#undef ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-	#undef TEXTURE
-		#define ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-		#undef ZBUF
-			#define FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-			#undef FLIP
-				#define ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
-				#undef ZUPDATE
-					#define ZCOMPARE
-						#include "video/rdpspn16.c"
-					#undef ZCOMPARE
-						#include "video/rdpspn16.c"
+#define MAGICDITHER
+	#include "video/rdpfrect.c"
+#undef MAGICDITHER
+#define BAYERDITHER
+	#include "video/rdpfrect.c"
+#undef BAYERDITHER
+	#include "video/rdpfrect.c"
+
+#define MAGICDITHER
+	#define SHADE
+		#define TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+		#undef TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+	#undef SHADE
+		#define TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+		#undef TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+#undef MAGICDITHER
+#define BAYERDITHER
+	#define SHADE
+		#define TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+		#undef TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+	#undef SHADE
+		#define TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+		#undef TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+#undef BAYERDITHER
+	#define SHADE
+		#define TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+		#undef TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+	#undef SHADE
+		#define TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+		#undef TEXTURE
+			#define ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+			#undef ZBUF
+				#define FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+				#undef FLIP
+					#define ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+					#undef ZUPDATE
+						#define ZCOMPARE
+							#include "video/rdpspn16.c"
+						#undef ZCOMPARE
+							#include "video/rdpspn16.c"
+
 #include "video/rdptri.c"
+
+#define DOS
+	#define DOT
+		#include "video/rdpclamp.c"
+	#undef DOT
+		#include "video/rdpclamp.c"
+#undef DOS
+	#define DOT
+		#include "video/rdpclamp.c"
+	#undef DOT
+		#include "video/rdpclamp.c"
+
+#define MASK_S
+	#define MASK_T
+		#include "video/rdpmask.c"
+	#undef MASK_T
+		#include "video/rdpmask.c"
+#undef MASK_S
+	#define MASK_T
+		#include "video/rdpmask.c"
+	#undef MASK_T
+		#include "video/rdpmask.c"
+
+#define SHIFT_S
+	#define SHIFT_T
+		#include "video/rdpshift.c"
+	#undef SHIFT_T
+		#include "video/rdpshift.c"
+#undef SHIFT_S
+	#define SHIFT_T
+		#include "video/rdpshift.c"
+	#undef SHIFT_T
+		#include "video/rdpshift.c"
+
+#define NOISE
+	#include "video/rdpcc.c"
+#undef NOISE
+	#include "video/rdpcc.c"
 

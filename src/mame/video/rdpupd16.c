@@ -13,7 +13,6 @@
 #endif
 {
 	int i, j;
-	UINT32 final = 0;
 #if defined(DIVOT)
 	UINT32 prev_cvg = 0, next_cvg = 0;
 #endif
@@ -61,7 +60,8 @@
 
 			for (i=0; i < hres; i++)
 			{
-				int r, g, b;
+				COLOR c;
+				//int r, g, b;
 
 				pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
 				curpixel_cvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3);
@@ -73,15 +73,16 @@
 					next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
 				}
 #endif
-				r = ((pix >> 8) & 0xf8) | (pix >> 13);
-				g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
-				b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
+				c.c = rgb16_to_32_lut[pix];
+				//r = ((pix >> 8) & 0xf8) | (pix >> 13);
+				//g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
+				//b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
 
 #if defined(FSAA)
-				if (/*!vibuffering &&*/ curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2))
-				{
-					video_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
-				}
+				//if (/*!vibuffering &&*/ curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2))
+				//{
+					//video_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
+				//}
 #endif
 				//else if (dither_filter && curpixel_cvg == 7 && i > 0 && j > 0 && i < (hres - 1) && j < (vres - 1))
 				//{
@@ -103,7 +104,7 @@
 					//}
 					//else
 					//{
-						divot_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR);
+						divot_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR);
 					//}
 				}
 #endif
@@ -140,8 +141,7 @@
                 */
 				pixels++;
 
-				final = (r << 16) | (g << 8) | b;
-				d[i] = final; // Fix me for endianness
+				d[i] = c.c >> 8;//(r << 16) | (g << 8) | b; // Fix me for endianness
 			}
 			pixels +=invisiblewidth;
 		}

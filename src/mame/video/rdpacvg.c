@@ -57,14 +57,5 @@ INLINE void alpha_cvg_get_cta_nca(UINT8 *comb_alpha)
 
 INLINE void alpha_cvg_get_ncta_nca(UINT8 *comb_alpha)
 {
-	UINT32 temp = *comb_alpha;
-
-	if (temp > 0xff)
-	{
-		*comb_alpha = 0xff;
-	}
-	else
-	{
-		*comb_alpha = (UINT8)temp;
-	}
+	// DO nothing
 }
