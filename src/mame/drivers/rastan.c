@@ -160,7 +160,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
@@ -168,7 +168,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 WRITE16_HANDLER( rastan_spritectrl_w );
 
-VIDEO_START( rastan );
 VIDEO_UPDATE( rastan );
 
 
@@ -236,11 +235,11 @@ static ADDRESS_MAP_START( rastan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_WRITE(PC080SN_yscroll_word_0_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_WRITE(PC080SN_xscroll_word_0_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_WRITE(PC080SN_ctrl_word_0_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
+	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
+	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
 ADDRESS_MAP_END
 
 
@@ -381,6 +380,17 @@ static MACHINE_RESET( rastan )
 }
 
 
+static const pc080sn_interface rastan_pc080sn_intf =
+{
+	0,	 /* gfxnum */ 
+	0, 0, 0, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
+static const pc090oj_interface rastan_pc090oj_intf =
+{
+	1, 0, 0, 0
+};
+
 static MACHINE_DRIVER_START( rastan )
 
 	/* basic machine hardware */
@@ -404,8 +414,10 @@ static MACHINE_DRIVER_START( rastan )
 	MDRV_GFXDECODE(rastan)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(rastan)
 	MDRV_VIDEO_UPDATE(rastan)
+
+	MDRV_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
+	MDRV_PC090OJ_ADD("pc090oj", rastan_pc090oj_intf)
 
 	MDRV_MACHINE_RESET(rastan)
 

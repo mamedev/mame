@@ -321,13 +321,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "includes/cchip.h"
 
-VIDEO_START( rainbow );
 VIDEO_START( jumping );
 
 VIDEO_UPDATE( rainbow );
@@ -367,11 +366,11 @@ static ADDRESS_MAP_START( rainbow_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(rainbow_cchip_ram_r,rainbow_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE(rainbow_cchip_ctrl_r,rainbow_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(rainbow_cchip_bank_w)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(PC080SN_word_0_r,PC080SN_word_0_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_WRITE(PC080SN_yscroll_word_0_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_WRITE(PC080SN_xscroll_word_0_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_WRITE(PC080SN_ctrl_word_0_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_READWRITE(PC090OJ_word_0_r,PC090OJ_word_0_w)	/* sprite ram + other stuff */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
+	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
+	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram + other stuff */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jumping_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -387,12 +386,12 @@ static ADDRESS_MAP_START( jumping_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP		/* watchdog? */
 	AM_RANGE(0x400006, 0x400007) AM_WRITE(jumping_sound_w)
 	AM_RANGE(0x420000, 0x420001) AM_READNOP			/* read, but result not used */
-	AM_RANGE(0x430000, 0x430003) AM_WRITE(PC080SN_yscroll_word_0_w)
+	AM_RANGE(0x430000, 0x430003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP		/* original c-chip location (not used) */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(PC080SN_word_0_r,PC080SN_word_0_w)
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)
 	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP		/* seems it is a leftover from rainbow: scroll y written here too */
-	AM_RANGE(0xc40000, 0xc40003) AM_WRITE(PC080SN_xscroll_word_0_w)
+	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM				/* original spriteram location, needed for Attract Mode */
 ADDRESS_MAP_END
 
@@ -648,6 +647,23 @@ static const ym2151_interface ym2151_config =
                       MACHINE DRIVERS
 ***********************************************************/
 
+static const pc080sn_interface rainbow_pc080sn_intf =
+{
+	1,	 /* gfxnum */ 
+	0, 0, 0, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
+static const pc080sn_interface jumping_pc080sn_intf =
+{
+	1,	 /* gfxnum */ 
+	0, 0, 1, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
+static const pc090oj_interface rainbow_pc090oj_intf =
+{
+	0, 0, 0, 0
+};
+
 static MACHINE_DRIVER_START( rainbow )
 
 	/* basic machine hardware */
@@ -671,8 +687,10 @@ static MACHINE_DRIVER_START( rainbow )
 	MDRV_GFXDECODE(rainbow)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(rainbow)
 	MDRV_VIDEO_UPDATE(rainbow)
+
+	MDRV_PC080SN_ADD("pc080sn", rainbow_pc080sn_intf)
+	MDRV_PC090OJ_ADD("pc090oj", rainbow_pc090oj_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -710,6 +728,8 @@ static MACHINE_DRIVER_START( jumping )
 
 	MDRV_VIDEO_START(jumping)
 	MDRV_VIDEO_UPDATE(jumping)
+
+	MDRV_PC080SN_ADD("pc080sn", jumping_pc080sn_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -1,19 +1,11 @@
 #include "driver.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 
 UINT16 *topspeed_spritemap;
 UINT16 *topspeed_raster_ctrl;
 
-/****************************************************************************/
+/****************************************************************************
 
-VIDEO_START( topspeed )
-{
-	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	PC080SN_vh_start(machine,2,1,0,8,0,0,0);
-}
-
-
-/********************************************************************************
                                      SPRITES
 
     Layout 8 bytes per sprite
@@ -119,6 +111,8 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 VIDEO_UPDATE( topspeed )
 {
+	const device_config *pc080sn_1 = devtag_get_device(screen->machine, "pc080sn_1");
+	const device_config *pc080sn_2 = devtag_get_device(screen->machine, "pc080sn_2");
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG
@@ -157,7 +151,8 @@ VIDEO_UPDATE( topspeed )
 	}
 #endif
 
-	PC080SN_tilemap_update();
+	pc080sn_tilemap_update(pc080sn_1);
+	pc080sn_tilemap_update(pc080sn_2);
 
 	/* Tilemap layer priority seems hardwired (the order is odd, too) */
 	layer[0] = 1;
@@ -165,35 +160,33 @@ VIDEO_UPDATE( topspeed )
 	layer[2] = 1;
 	layer[3] = 0;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if (dislayer[3]==0)
+	if (dislayer[3] == 0)
 #endif
-	PC080SN_tilemap_draw(bitmap,cliprect,1,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	pc080sn_tilemap_draw(pc080sn_2, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (dislayer[2]==0)
+	if (dislayer[2] == 0)
 #endif
-	PC080SN_tilemap_draw_special(screen->machine,bitmap,cliprect,1,layer[1],0,2,topspeed_raster_ctrl);
+	pc080sn_tilemap_draw_special(pc080sn_2, bitmap, cliprect, layer[1], 0, 2, topspeed_raster_ctrl);
 
 #ifdef MAME_DEBUG
-	if (dislayer[1]==0)
+	if (dislayer[1] == 0)
 #endif
-	PC080SN_tilemap_draw_special(screen->machine,bitmap,cliprect,0,layer[2],0,4,topspeed_raster_ctrl + 0x100);
+	pc080sn_tilemap_draw_special(pc080sn_1, bitmap, cliprect, layer[2], 0, 4, topspeed_raster_ctrl + 0x100);
 
 #ifdef MAME_DEBUG
-	if (dislayer[0]==0)
+	if (dislayer[0] == 0)
 #endif
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[3],0,8);
+	pc080sn_tilemap_draw(pc080sn_1, bitmap, cliprect, layer[3], 0, 8);
 
 #ifdef MAME_DEBUG
-	if (dislayer[4]==0)
+	if (dislayer[4] == 0)
 #endif
 
 	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
-
-

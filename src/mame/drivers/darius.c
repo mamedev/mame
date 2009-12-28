@@ -128,7 +128,7 @@ sounds.
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "cpu/z80/z80.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
@@ -253,10 +253,10 @@ static ADDRESS_MAP_START( darius_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
 	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)			/* inputs, sound */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)	/* tilemaps */
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(PC080SN_yscroll_word_0_w)
-	AM_RANGE(0xd40000, 0xd40003) AM_WRITE(PC080SN_xscroll_word_0_w)
-	AM_RANGE(0xd50000, 0xd50003) AM_WRITE(PC080SN_ctrl_word_0_w)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)	/* tilemaps */
+	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
+	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
+	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_ctrl_word_w)
 	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
@@ -807,6 +807,12 @@ static const ym2203_interface ym2203_interface_2 =
                        MACHINE DRIVERS
 ***********************************************************/
 
+static const pc080sn_interface darius_pc080sn_intf =
+{
+	1,	 /* gfxnum */ 
+	-16, 8, 0, 1 	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
 static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
@@ -858,6 +864,8 @@ static MACHINE_DRIVER_START( darius )
 
 	MDRV_VIDEO_START(darius)
 	MDRV_VIDEO_UPDATE(darius)
+
+	MDRV_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -233,7 +233,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
@@ -459,14 +459,14 @@ static ADDRESS_MAP_START( topspeed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE(&topspeed_raster_ctrl)
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)
-	AM_RANGE(0xa20000, 0xa20003) AM_WRITE(PC080SN_yscroll_word_0_w)
-	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(PC080SN_xscroll_word_0_w)
-	AM_RANGE(0xa50000, 0xa50003) AM_WRITE(PC080SN_ctrl_word_0_w)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_READWRITE(PC080SN_word_1_r, PC080SN_word_1_w)
-	AM_RANGE(0xb20000, 0xb20003) AM_WRITE(PC080SN_yscroll_word_1_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_WRITE(PC080SN_xscroll_word_1_w)
-	AM_RANGE(0xb50000, 0xb50003) AM_WRITE(PC080SN_ctrl_word_1_w)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xa20000, 0xa20003) AM_DEVWRITE("pc080sn_1", pc080sn_yscroll_word_w)
+	AM_RANGE(0xa40000, 0xa40003) AM_DEVWRITE("pc080sn_1", pc080sn_xscroll_word_w)
+	AM_RANGE(0xa50000, 0xa50003) AM_DEVWRITE("pc080sn_1", pc080sn_ctrl_word_w)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE("pc080sn_2", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xb20000, 0xb20003) AM_DEVWRITE("pc080sn_2", pc080sn_yscroll_word_w)
+	AM_RANGE(0xb40000, 0xb40003) AM_DEVWRITE("pc080sn_2", pc080sn_xscroll_word_w)
+	AM_RANGE(0xb50000, 0xb50003) AM_DEVWRITE("pc080sn_2", pc080sn_ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(&topspeed_spritemap)
 ADDRESS_MAP_END
@@ -670,6 +670,12 @@ static MACHINE_RESET( topspeed )
 	adpcm_data = -1;
 }
 
+static const pc080sn_interface topspeed_pc080sn_intf =
+{
+	1,	 /* gfxnum */ 
+	0, 8, 0, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
 static const tc0220ioc_interface topspeed_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
@@ -706,8 +712,10 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_GFXDECODE(topspeed)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(topspeed)
 	MDRV_VIDEO_UPDATE(topspeed)
+
+	MDRV_PC080SN_ADD("pc080sn_1", topspeed_pc080sn_intf)
+	MDRV_PC080SN_ADD("pc080sn_2", topspeed_pc080sn_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

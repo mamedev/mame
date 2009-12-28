@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 
 static UINT16* video_ram = NULL;
 
@@ -18,8 +18,6 @@ VIDEO_START( volfied )
 	state_save_register_global_pointer(machine, video_ram, 0x40000);
 	state_save_register_global(machine, video_ctrl);
 	state_save_register_global(machine, video_mask);
-
-	PC090OJ_vh_start(machine, 0, 0, 0, 0);
 }
 
 
@@ -62,7 +60,8 @@ WRITE16_HANDLER( volfied_video_mask_w )
 
 WRITE16_HANDLER( volfied_sprite_ctrl_w )
 {
-	PC090OJ_sprite_ctrl = (data & 0x3c) >> 2;
+	const device_config *pc090oj = devtag_get_device(space->machine, "pc090oj");
+	pc090oj_set_sprite_ctrl(pc090oj, (data & 0x3c) >> 2);
 }
 
 
@@ -126,8 +125,10 @@ static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
 
 VIDEO_UPDATE( volfied )
 {
+	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
+
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	refresh_pixel_layer(screen->machine, bitmap);
-	PC090OJ_draw_sprites(screen->machine, bitmap, cliprect, 0);
+	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

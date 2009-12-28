@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 
 
 static UINT16 sprite_ctrl = 0;
@@ -17,31 +17,11 @@ static UINT16 sprites_flipscreen = 0;
 
 /***************************************************************************/
 
-VIDEO_START( rastan )
-{
-	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	PC080SN_vh_start(machine,1,0,0,0,0,0,0);
-	PC090OJ_vh_start(machine,1,0,0,0);
-}
-
-VIDEO_START( opwolf )
-{
-	PC080SN_vh_start(machine,1,1,0,0,0,0,0);
-	PC090OJ_vh_start(machine,0,0,0,0);
-}
-
-VIDEO_START( rainbow )
-{
-	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	PC080SN_vh_start(machine,1,1,0,0,0,0,0);
-	PC090OJ_vh_start(machine,0,0,0,0);
-}
-
 VIDEO_START( jumping )
 {
-	PC080SN_vh_start(machine,1,1,0,0,1,0,0);
+	const device_config *pc080sn = devtag_get_device(machine, "pc080sn");
 
-	PC080SN_set_trans_pen(0,1,15);
+	pc080sn_set_trans_pen(pc080sn, 1, 15);
 
 	/* not 100% sure Jumping needs to save both... */
 	state_save_register_global(machine, sprite_ctrl);
@@ -51,8 +31,10 @@ VIDEO_START( jumping )
 
 WRITE16_HANDLER( rastan_spritectrl_w )
 {
+	const device_config *pc090oj = devtag_get_device(space->machine, "pc090oj");
+
 	/* bits 5-7 are the sprite palette bank */
-	PC090OJ_sprite_ctrl = (data & 0xe0) >> 5;
+	pc090oj_set_sprite_ctrl(pc090oj, (data & 0xe0) >> 5);
 
 	/* bit 4 unused */
 
@@ -67,13 +49,14 @@ WRITE16_HANDLER( rastan_spritectrl_w )
 
 WRITE16_HANDLER( rainbow_spritectrl_w )
 {
+	const device_config *pc090oj = devtag_get_device(space->machine, "pc090oj");
 	if (offset == 0)
 	{
 		/* bits 0 and 1 always set */
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		PC090OJ_sprite_ctrl = (data & 0xe0) >> 5;
+		pc090oj_set_sprite_ctrl(pc090oj, (data & 0xe0) >> 5);
 	}
 }
 
@@ -95,19 +78,21 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 
 VIDEO_UPDATE( rastan )
 {
+	const device_config *pc080sn = devtag_get_device(screen->machine, "pc080sn");
+	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
 	int layer[2];
 
-	PC080SN_tilemap_update();
+	pc080sn_tilemap_update(pc080sn);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[1], 0, 2);
 
-	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,0);
+	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -115,19 +100,21 @@ VIDEO_UPDATE( rastan )
 
 VIDEO_UPDATE( opwolf )
 {
+	const device_config *pc080sn = devtag_get_device(screen->machine, "pc080sn");
+	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
 	int layer[2];
 
-	PC080SN_tilemap_update();
+	pc080sn_tilemap_update(pc080sn);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[1], 0, 2);
 
-	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,1);
+	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 1);
 
 //  if (input_port_read(machine, "P1X"))
 //  popmessage("%d %d", input_port_read(machine, "P1X"), input_port_read(machine, "P1Y"));
@@ -139,19 +126,21 @@ VIDEO_UPDATE( opwolf )
 
 VIDEO_UPDATE( rainbow )
 {
+	const device_config *pc080sn = devtag_get_device(screen->machine, "pc080sn");
+	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
 	int layer[2];
 
-	PC080SN_tilemap_update();
+	pc080sn_tilemap_update(pc080sn);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[1], 0, 2);
 
-	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,1);
+	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -167,24 +156,25 @@ the Y settings are active low.
 
 VIDEO_UPDATE( jumping )
 {
+	const device_config *pc080sn = devtag_get_device(screen->machine, "pc080sn");
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
-	int offs,layer[2];
+	int offs, layer[2];
 	int sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
 
-	PC080SN_tilemap_update();
+	pc080sn_tilemap_update(pc080sn);
 
 	/* Override values, or foreground layer is in wrong position */
-	PC080SN_set_scroll(0,1,16,0);
+	pc080sn_set_scroll(pc080sn, 1, 16, 0);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Draw the sprites. 128 sprites in total */
-	for (offs = screen->machine->generic.spriteram_size/2-8; offs >= 0; offs -= 8)
+	for (offs = screen->machine->generic.spriteram_size / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram16[offs];
 		if (tile < screen->machine->gfx[1]->total_elements)
@@ -207,7 +197,7 @@ VIDEO_UPDATE( jumping )
 		}
 	}
 
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,0);
+	pc080sn_tilemap_draw(pc080sn, bitmap, cliprect, layer[1], 0, 0);
 
 #if 0
 	{
