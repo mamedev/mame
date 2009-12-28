@@ -6000,6 +6000,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( racedrivcg4 )	/* 136077           (c) 1990 */
 	DRIVER( racedrivc2 )	/* 136077           (c) 1990 */
 	DRIVER( racedrivc1 )	/* 136077           (c) 1990 */
+	/* Race Drivin' Panorama */
+	DRIVER( racedrivpan )	/* 136077           (c) 1990 */
 				/* 136086 - BMX Heat (proto) */
 	/* Steel Talons */
 	DRIVER( steeltal )	/* 136087           (c) 1990 */
@@ -6164,6 +6166,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tmek20 )	/* 136100           (c) 1994 */
 	DRIVER( primrage )	/* 136102           (c) 1994 */
 	DRIVER( primrage20 )/* 136102           (c) 1994 */
+	DRIVER( metalmx )	/* 136103?          (c) 1994 */
 	DRIVER( area51 )	/* 136105           (c) 1995 */
 	DRIVER( area51t )	/* 136105           (c) 1995 */
 	DRIVER( area51a )	/* 136105           (c) 1995 */
@@ -7814,6 +7817,7 @@ Other Sun games
 	DRIVER( hardheadb )	/* bootleg */
 	DRIVER( pop_hh )	/* bootleg */
 	DRIVER( sparkman )	/* (c) 1989 SunA */
+	DRIVER( sparkmana )	/* (c) 1989 SunA */
 	DRIVER( starfigh )	/* (c) 1990 SunA */
 	DRIVER( hardhea2 )	/* (c) 1991 SunA */
 	DRIVER( brickzn )	/* (c) 1992 SunA */

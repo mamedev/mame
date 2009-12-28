@@ -1805,6 +1805,7 @@ src/mame/drivers/meijinsn.c svneol=native#text/plain
 src/mame/drivers/merit.c svneol=native#text/plain
 src/mame/drivers/meritm.c svneol=native#text/plain
 src/mame/drivers/mermaid.c svneol=native#text/plain
+src/mame/drivers/metalmx.c svneol=native#text/plain
 src/mame/drivers/metlclsh.c svneol=native#text/plain
 src/mame/drivers/metro.c svneol=native#text/plain
 src/mame/drivers/mexico86.c svneol=native#text/plain

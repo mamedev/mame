@@ -2315,6 +2315,35 @@ ROM_START( sparkman )
 ROM_END
 
 
+ROM_START( sparkmana )
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
+	ROM_LOAD( "p9.7f",       0x00000, 0x08000, CRC(b114cb2b) SHA1(4f79bf65ef17147004f7a8d1d6a58dac0293cdc7) ) // sparkman.e7 99.972534% (9 bytes differ, version string is the same)
+	ROM_LOAD( "sparkman.g7", 0x10000, 0x10000, CRC(48b4a31e) SHA1(771d1f1a2ce950ce2b661a4081471e98a7a7d53e) )
+	ROM_LOAD( "sparkman.g8", 0x20000, 0x10000, CRC(b8a4a557) SHA1(10251b49fb44fb1e7c71fde8fe9544df29d27346) )
+	ROM_LOAD( "sparkman.i7", 0x30000, 0x10000, CRC(f5f38e1f) SHA1(25f0abbac1298fad1f8e7202db05e48c3598bc88) )
+	ROM_LOAD( "sparkman.i8", 0x40000, 0x10000,  CRC(e54eea25) SHA1(b8ea884ee1a24953b6406f2d1edf103700f542d2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Music Z80 Code */
+	ROM_LOAD( "sparkman.h11", 0x00000, 0x08000, CRC(06822f3d) SHA1(d30592cecbcd4dbf67e5a8d9c151d60b3232a54d) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )	/* Sprites */
+	ROM_LOAD( "sparkman.u4", 0x00000, 0x10000, CRC(17c16ce4) SHA1(b4127e9aedab69193bef1d85e68003e225913417) )
+	ROM_LOAD( "sparkman.t1", 0x10000, 0x10000, CRC(2e474203) SHA1(a407126d92e529568129d5246f89d51330ff5d32) )
+	ROM_LOAD( "sparkman.r1", 0x20000, 0x08000, CRC(7115cfe7) SHA1(05fde6279a1edc97e79b1ff3f72b2da400a6a409) )
+	ROM_LOAD( "sparkman.u1", 0x30000, 0x10000, CRC(39dbd414) SHA1(03fe938ed1191329b6a2f7ed54c6ef69273998df) )
+
+	ROM_LOAD( "sparkman.u6", 0x40000, 0x10000, CRC(414222ea) SHA1(e05f0504c6e735c73027312a85cc55fc98728e53) )
+	ROM_LOAD( "sparkman.t2", 0x50000, 0x10000, CRC(0df5da2a) SHA1(abbd5ba22b30f17d203ecece7afafa0cbe78352c) )
+	ROM_LOAD( "sparkman.r2", 0x60000, 0x08000, CRC(6904bde2) SHA1(c426fa0c29b1874c729b981467f219c422f863aa) )
+	ROM_LOAD( "sparkman.u2", 0x70000, 0x10000, CRC(e6551db9) SHA1(bed2a9ba72895f3ba876b4e0a41c33ea8a3c5af2) )
+
+	ROM_REGION( 0x8000, "samples", 0 )		/* Samples */
+	ROM_LOAD( "sparkman.b10", 0x0000, 0x8000, CRC(46c7d4d8) SHA1(99f38cc044390ee4646498667ad2bf536ce91e8f) )
+
+	ROM_REGION( 0x8000, "samples2", 0 )		/* Samples */
+	ROM_LOAD( "sprkman.b11", 0x0000, 0x8000, CRC(d6823a62) SHA1(f8ce748aa7bdc9c95799dd111fd872717e46d416) )
+ROM_END
+
 /***************************************************************************
 
 
@@ -2339,7 +2368,8 @@ GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", 
 GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
 
 /* Non Working Games */
-GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0)", GAME_NOT_WORKING )
+GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 1)", GAME_NOT_WORKING )
+GAME( 1989, sparkmana,sparkman, sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 2)", GAME_NOT_WORKING )
 GAME( 1990, starfigh, 0,        starfigh, hardhea2, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
 GAME( 1992, brickzn,  0,        brickzn,  brickzn,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )
 GAME( 1992, brickzn3, brickzn,  brickzn,  brickzn,  brickzn3, ROT90, "SunA", "Brick Zone (v4.0)", GAME_NOT_WORKING )

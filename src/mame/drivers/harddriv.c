@@ -3375,6 +3375,148 @@ ROM_START( strtdriv )
 	ROM_LOAD( "136077-1017.12t", 0x000000, 0x010000, CRC(e93129a3) SHA1(1221b08c8efbfd8cf6bfbfd956545f10bef48663) )
 ROM_END
 
+/*
+
+5/2/2003
+
+The following roms (type 27C512) were dumped and verified from an Atari Race Drivin 
+Panorama v2.1 boardset by Mickey Johnson (mickster (at) derbyworks.com) and Dave France 
+(dfrance (at) revealed.net).  Any questions regarding the hardware, please contact Mickey.
+
+The Multisync PCB (A046901), used by the side monitor, uses the 137412-117 slapstic.
+The boardset is low rez, and is more similar to STUN Runner than the regular Race 
+Drivin's hardware.
+
+The Multisync PCB (A045988), used by the main (center) monitor, uses the 137412-115 
+slapstic. 
+
+The ADSP board was silkscreened "ADSP II A047046-01", but had a factory sticker stamped
+"ADSP II Panorama A047046-04".
+
+As far as I know, the DSK and Sound PCBs are identical with Race Drivin.  The side
+Multisync PCB sets do not have a DSK or Sound PCB since they are for display only.
+
+All the linking between the PCBs is via the Serial A on all three boardsets.  We
+have brought these ROMs up in MAME as Race Drivin.  It will pass the self-test, but
+game will come up with "DIVIDE BY ZERO ERR".  Hitting F2 (Self Test) will display
+"Hard Drivin / Race Drivin / Panorama Self Test P2.1" in the Test Menu.
+
+Filename	Location	Label			Board
+--------------	--------------	----------------------	-----------------------------
+088-1022	9H		136088-1022 CS 0022	ADSP II A047046-01
+088-1018	9/10H		136088-1018 CS 6518	"
+088-1020	10H		136088-1020 CS BC20	"
+088-1021	9K		136088-1021 CS A121	"
+088-1017	9/10K		136088-1017 CS 4B17	"
+088-1019	10K		136088-1019 CS 6219	"
+
+088-2015	210Y		136088-2015 CS DF15	Multisync PCB A046901
+088-2013	210X		136088-2013 CS DA13	"
+088-2011	210W		136088-2011 CS 6E11	"
+088-2009	210V		136088-2009 CS 1F09	"
+088-2007	210U		136088-2007 CS 2F07	"
+088-2005	210T		136088-2005C CS D305	"
+088-2003	210S		136088-2003C CS 2303	"
+088-2001	210R		136088-2001 CS DE01	"
+088-2016	200Y		136088-2016 CS 0D16	"
+088-2014	200X		136088-2014 CS EB14	"
+088-2012	200W		136088-2012 CS 2912	"
+088-2010	200V		136088-2010 CS FF10	"
+088-2008	200U		136088-2008 CS BA08	"
+088-2006	200T		136088-2006C CS D406	"
+088-2004	200S		136088-2004C CS 4504	"
+088-2002	200R		136088-2002 CS A502	"
+
+088-1015	210Y		136088-1015 CS E215	Multisync PCB A045988
+088-1013	210X		136088-1013 CS 8F13	"
+088-1011	210W		136088-1011 CS 5111	"
+088-1009	210V		136088-1009 CS EE09	"
+088-1007	210U		136088-1007 CS 4D07	"
+088-1005	210T		136088-1005B CS 3905	"
+088-1003	210S		136088-1003B CS 7403	"
+088-1001	210R		136088-1001 CS 6701	"
+088-1016	200Y		136088-1016 CS 3C16	"
+088-1014	200X		136088-1014 CS 9C14	"
+088-1012	200W		136088-1012 CS C312	"
+088-1010	200V		136088-1010 CS 9410	"
+088-1008	200U		136088-1008 CS 3408	"
+088-1006	200T		136088-1006B CS A006	"
+088-1004	200S		136088-1004B CS A904	"
+088-1002	200R		136088-1002 CS FB02	"
+
+*/
+
+ROM_START( racedrivpan )
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 2MB for 68000 code */
+	// Multisync PBB A045988 - Central Monitor
+	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
+	ROM_LOAD16_BYTE( "088-1002.bin", 0x000000, 0x010000, CRC(49a97391) SHA1(dbe4086cd87669a02d2a2133d0d9e2895946b383) )
+	ROM_LOAD16_BYTE( "088-1001.bin", 0x000001, 0x010000, CRC(4473accc) SHA1(099bda6cfe31d4e53cbe74046679ddf8b874982d) )
+	ROM_LOAD16_BYTE( "088-1004.bin", 0x020000, 0x010000, CRC(33b84ca6) SHA1(9e3cafadfb23bfc4a44e503043cc05db27d939a9) )
+	ROM_LOAD16_BYTE( "088-1003.bin", 0x020001, 0x010000, CRC(e617e6e2) SHA1(1bd308eff51588edfde21f3df1e84d3223d5d57a) )
+	ROM_LOAD16_BYTE( "088-1006.bin", 0x040000, 0x010000, CRC(1caeb314) SHA1(ebcf3e4cc13155206102bfada9422d4e318697e0) )
+	ROM_LOAD16_BYTE( "088-1005.bin", 0x040001, 0x010000, CRC(f23a73b8) SHA1(8e060077c971309dcc620402ee456ee66e59bfae) )
+	ROM_LOAD16_BYTE( "088-1008.bin", 0x060000, 0x010000, CRC(b0d60278) SHA1(d35ed22d3cbc725bbe023ae415a417f1c6532d30) )
+	ROM_LOAD16_BYTE( "088-1007.bin", 0x060001, 0x010000, CRC(c4fc82dc) SHA1(67575f533a658dd06fa6a143a654e9777f2e19ab) )
+	ROM_LOAD16_BYTE( "088-1010.bin", 0x080000, 0x010000, CRC(1b64bce1) SHA1(80edf1a77aee32f675c2a99769b1a390214ec075) )
+	ROM_LOAD16_BYTE( "088-1009.bin", 0x080001, 0x010000, CRC(413f4110) SHA1(6f71a5e46c29b4c51f3624484cdaed16babe3cd5) )
+	ROM_LOAD16_BYTE( "088-1012.bin", 0x0a0000, 0x010000, CRC(9a78b952) SHA1(53270d4d8c28579ebda477a63c034f6d1b9e5a58) ) // == 136091-0012.200w (strtdriv) / 136077-1012.200w
+	ROM_LOAD16_BYTE( "088-1011.bin", 0x0a0001, 0x010000, CRC(c5cd5491) SHA1(ede5a3bb888342032d6758b0fb149451b6543d8b) ) // == 136091-0011.210w (strtdriv) / 136077-1011.210w
+	ROM_LOAD16_BYTE( "088-1014.bin", 0x0c0000, 0x010000, CRC(5b721420) SHA1(cba03943d56eb1d747e48fbe2856c64d2129be3b) ) // == 136091-0014.200x (strtdriv)
+	ROM_LOAD16_BYTE( "088-1013.bin", 0x0c0001, 0x010000, CRC(c503b019) SHA1(e35779c0792bb2258dd0830c00a7d2722a0b115e) ) // == 136091-0013.210x (strtdriv)
+	ROM_LOAD16_BYTE( "088-1016.bin", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) ) // == 136077-1016.200y
+	ROM_LOAD16_BYTE( "088-1015.bin", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) ) // == 136077-4015.210y
+
+	// Multisync PCB (A046901) - Side Monitor
+	// these will boot with 'PROGRAM OK' and display an empty side view, if you use the 'compact' type board driver
+	//  there should be one board for each side.  (needs 137412-117 slapstic)
+	ROM_REGION( 0x200000, "sidecpu", 0 )		/* 2MB for 68000 code */
+	ROM_LOAD16_BYTE( "088-2002.bin", 0x000000, 0x010000, CRC(77724070) SHA1(5862f30f7e2ab9c0beb06cf5599bcb1ff97f3a47) )
+	ROM_LOAD16_BYTE( "088-2001.bin", 0x000001, 0x010000, CRC(16ab2fff) SHA1(bf6dcefc98e1fe27bef0ddacc265d8782c486c83) )
+	ROM_LOAD16_BYTE( "088-2004.bin", 0x020000, 0x010000, CRC(dccdb16b) SHA1(330cf39bcbdb9c73da48b4e947086a7988e37496) )
+	ROM_LOAD16_BYTE( "088-2003.bin", 0x020001, 0x010000, CRC(132ef986) SHA1(106f1a23ac200a868959181fa1c47419806e8366) )
+	ROM_LOAD16_BYTE( "088-2006.bin", 0x040000, 0x010000, CRC(de3a0c24) SHA1(1121b8a16ac11b2480f1c4336a5aa3271364f80e))
+	ROM_LOAD16_BYTE( "088-2005.bin", 0x040001, 0x010000, CRC(96ad705f) SHA1(cc0bc7fdd2a5f91a5929b889607dcf7ad015bb95) )
+	ROM_LOAD16_BYTE( "088-2008.bin", 0x060000, 0x010000, CRC(452d991c) SHA1(42dad0a93839a900c3571ce9e252e1c991a1da56) )
+	ROM_LOAD16_BYTE( "088-2007.bin", 0x060001, 0x010000, CRC(d6f526d3) SHA1(8406917c91c1d3690379cb0bca5809d1db27abec) )
+	ROM_LOAD16_BYTE( "088-2010.bin", 0x080000, 0x010000, CRC(775bca3d) SHA1(926b460faeb2aa46899432b3a9973381ffd7781d) )
+	ROM_LOAD16_BYTE( "088-2009.bin", 0x080001, 0x010000, CRC(6aedccc5) SHA1(9189881802969ecdde2fd41a20ff6ea0471ce2c0) )
+	ROM_LOAD16_BYTE( "088-2012.bin", 0x0a0000, 0x010000, CRC(bacf08c0) SHA1(2f7ddaf4ef350ee3e6ab886759d88c03aa94784b) )
+	ROM_LOAD16_BYTE( "088-2011.bin", 0x0a0001, 0x010000, CRC(1e0c2f71) SHA1(bcdd9089442934df78109df7c0dcf170873cf992) )
+	ROM_LOAD16_BYTE( "088-2014.bin", 0x0c0000, 0x010000, CRC(3512537c) SHA1(896975ef2685358bd98f7a9b45dda11e8bfa3a13) )
+	ROM_LOAD16_BYTE( "088-2013.bin", 0x0c0001, 0x010000, CRC(8d7c4e80) SHA1(eda8d02e51b18234fc0912eaca8171d75ae643c7) )
+	ROM_LOAD16_BYTE( "088-2016.bin", 0x0e0000, 0x010000, CRC(6a42b7e2) SHA1(2e0ff4b7e391106a976cb872f6311f6d35dca5b0) )
+	ROM_LOAD16_BYTE( "088-2015.bin", 0x0e0001, 0x010000, CRC(334e2a3b) SHA1(a19bfa7652845b9453c722091c773819ba248569) )
+
+	ROM_REGION16_BE( 0x60000, "user1", 0 )	/* 384k for ADSP object ROM */
+	ROM_LOAD16_BYTE( "136077-1021.10h", 0x000000, 0x010000, CRC(9831fe73) SHA1(5215ee89a0014399b7d829e443b16590a4679844) )
+	ROM_LOAD16_BYTE( "136077-1023.10k", 0x000001, 0x010000, CRC(74bf0e0e) SHA1(a3d91ecf13c3619e073324517a4a5afaae831982) )
+	ROM_LOAD16_BYTE( "136077-1022.10j", 0x020000, 0x010000, CRC(c0393c31) SHA1(31726c01eb0d4650936908c90d45161197b7efba) )
+	ROM_LOAD16_BYTE( "136077-1024.10l", 0x020001, 0x010000, CRC(1e2fb25f) SHA1(4940091bbad6144bce091d2737191d266d4b0310) )
+
+	/* ----------------------- */
+
+	/* None of this stuff was in the zip, is it meant to be the same as Race Drivin' Compact, Race' Drivin, or Hard Drivin? */
+	ROM_REGION( 0x2000, "asic65", 0 )	/* ASIC65 TMS32015 code */
+	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )		/* 2*64k for audio 68000 code */
+	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
+	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
+
+
+	ROM_REGION16_BE( 0x51000, "user3", 0 )	/* 256k for DSK ROMs + 64k for RAM + 4k for ZRAM */
+	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
+	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
+
+	ROM_REGION( 0x50000, "serialroms", 0 )		/* 10*128k for audio serial ROMs */
+	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
+	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
+	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
+	ROM_LOAD( "136052-1126.30a", 0x030000, 0x010000, CRC(f46ef09c) SHA1(ba62f73ee3b33d8f26b430ffa468f8792dca23de) )
+	ROM_LOAD( "136077-1017.45c", 0x040000, 0x010000, CRC(e93129a3) SHA1(1221b08c8efbfd8cf6bfbfd956545f10bef48663) )
+ROM_END
+
 
 ROM_START( hdrivair )
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* 2MB for 68000 code */
@@ -3926,6 +4068,7 @@ static DRIVER_INIT( racedrvc ) { racedrvc_init_common(machine, 0xfff95cd0); }
 static DRIVER_INIT( racedrc1 ) { racedrvc_init_common(machine, 0xfff7ecd0); }
 
 
+
 static READ16_HANDLER( steeltal_dummy_r )
 {
 	/* this is required so that INT 4 is recongized as a sound INT */
@@ -4123,6 +4266,8 @@ GAME( 1990, racedrivcb4, racedriv, racedrvc, racedrvc, racedrvc, ROT0, "Atari Ga
 GAME( 1990, racedrivcg4, racedriv, racedrvc, racedrvc, racedrvc, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
 GAME( 1990, racedrivc2,  racedriv, racedrvc, racedrvc, racedrc1, ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
 GAME( 1990, racedrivc1,  racedriv, racedrvc, racedrvc, racedrc1, ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
+
+GAME( 1990, racedrivpan, racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", GAME_NOT_WORKING )
 
 GAME( 1991, steeltal,  0,        steeltal, steeltal, steeltal, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
 GAME( 1991, steeltalg, steeltal, steeltal, steeltal, steeltal, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )

@@ -417,6 +417,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/klax.o $(VIDEO)/klax.o \
 	$(DRIVERS)/liberatr.o $(VIDEO)/liberatr.o \
 	$(DRIVERS)/mediagx.o \
+	$(DRIVERS)/metalmx.o \
 	$(DRIVERS)/mgolf.o \
 	$(DRIVERS)/mhavoc.o $(MACHINE)/mhavoc.o \
 	$(DRIVERS)/missile.o \
