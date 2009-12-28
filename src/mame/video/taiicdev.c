@@ -3616,11 +3616,8 @@ static DEVICE_START( tc0480scp )
 	const tc0480scp_interface *intf = tc0480scp_get_interface(device);
 	int i, xd, yd;
 
-	/* use the given gfx set for bg tiles */
+	/* use the given gfx set for bg/tx tiles */
 	tc0480scp->bg_gfx = intf->gfxnum;
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine->gfx[intf->txnum] = gfx_element_alloc(device->machine, &tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0);
 	tc0480scp->tx_gfx = intf->txnum;
 
 	tc0480scp->tile_colbase = intf->col_base;
@@ -3701,6 +3698,9 @@ static DEVICE_START( tc0480scp )
 	tc0480scp->ram = auto_alloc_array_clear(device->machine, UINT16, TC0480SCP_RAM_SIZE / 2);
 
 	tc0480scp_set_layer_ptrs(tc0480scp);
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	device->machine->gfx[tc0480scp->tx_gfx] = gfx_element_alloc(device->machine, &tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0);
 
 	state_save_register_device_item_pointer(device, 0, tc0480scp->ram, TC0480SCP_RAM_SIZE / 2);
 	state_save_register_device_item_array(device, 0, tc0480scp->ctrl);

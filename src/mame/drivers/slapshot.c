@@ -134,7 +134,7 @@ Region byte at offset 0x031:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "machine/timekpr.h"
@@ -284,11 +284,11 @@ static ADDRESS_MAP_START( slapshot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE(&taito_sprite_ext) AM_SIZE(&taito_spriteext_size)	/* debugging */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_word_r, TC0480SCP_word_w)	/* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_word_r, TC0480SCP_ctrl_word_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_BASE(&color_ram)	/* 8bpg palette */
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
-	AM_RANGE(0xb00000, 0xb0001f) AM_WRITE8(TC0360PRI_w, 0xff00)	/* priority chip */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)	/* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_halfword_byteswap_r, tc0640fio_halfword_byteswap_w)
 	AM_RANGE(0xc00020, 0xc0002f) AM_READ(slapshot_service_input_r)	/* service mirror */
 	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
@@ -299,11 +299,11 @@ static ADDRESS_MAP_START( opwolf3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE(&taito_sprite_ext) AM_SIZE(&taito_spriteext_size)	/* debugging */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_word_r, TC0480SCP_word_w)	/* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_word_r, TC0480SCP_ctrl_word_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_BASE(&color_ram)	/* 8bpg palette */
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
-	AM_RANGE(0xb00000, 0xb0001f) AM_WRITE8(TC0360PRI_w, 0xff00)	/* priority chip */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)	/* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_halfword_byteswap_r, tc0640fio_halfword_byteswap_w)
 	AM_RANGE(0xc00020, 0xc0002f) AM_READ(slapshot_service_input_r)	/* service mirror */
 	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
@@ -495,6 +495,16 @@ static const ym2610_interface ym2610_config =
                  MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0480scp_interface slapshot_tc0480scp_intf =
+{
+	1, 2,		/* gfxnum, txnum */
+	3, 		/* pixels */
+	30, 9,		/* x_offset, y_offset */
+	-1, 1,		/* text_xoff, text_yoff */
+	0, 2,		/* flip_xoff, flip_yoff */
+	256		/* col_base */
+};
+
 static const tc0640fio_interface slapshot_io_intf =
 {
 	DEVCB_NULL, DEVCB_INPUT_PORT("COINS"),
@@ -531,6 +541,9 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_VIDEO_START(slapshot)
 	MDRV_VIDEO_EOF(taito_no_buffer)
 	MDRV_VIDEO_UPDATE(slapshot)
+
+	MDRV_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
+	MDRV_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -573,6 +586,9 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_VIDEO_START(slapshot)
 	MDRV_VIDEO_EOF(taito_no_buffer)
 	MDRV_VIDEO_UPDATE(slapshot)
+
+	MDRV_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
+	MDRV_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -35,7 +35,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "audio/taitosnd.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
@@ -235,8 +235,8 @@ static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&superchs_ram)
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
-	AM_RANGE(0x1b0000, 0x1b002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x180000, 0x18ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
+	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE_GENERIC(paletteram)
@@ -248,7 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( superchs_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
+	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
 	AM_RANGE(0xa00000, 0xa001ff) AM_RAM	/* Extra road control?? */
 ADDRESS_MAP_END
@@ -360,6 +360,16 @@ static const eeprom_interface superchs_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
+static const tc0480scp_interface superchs_tc0480scp_intf =
+{
+	1, 2,		/* gfxnum, txnum */
+	0, 		/* pixels */
+	0x20, 0x08,		/* x_offset, y_offset */
+	-1, 0,		/* text_xoff, text_yoff */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0		/* col_base */
+};
+
 static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
@@ -388,6 +398,8 @@ static MACHINE_DRIVER_START( superchs )
 
 	MDRV_VIDEO_START(superchs)
 	MDRV_VIDEO_UPDATE(superchs)
+
+	MDRV_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)

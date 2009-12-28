@@ -1,8 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
-
-#define TC0480SCP_GFX_NUM 1
-#define TC0100SCN_GFX_NUM 1
+#include "video/taiicdev.h"
 
 struct tempsprite
 {
@@ -37,13 +34,6 @@ static VIDEO_START( slapshot_core )
 	spriteram_delayed = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 	spriteram_buffered = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
-
-	if (has_TC0480SCP(machine))	/* it's a tc0480scp game */
-		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,taito_hide_pixels,30,9,-1,1,0,2,256);
-	else	/* it's a tc0100scn game */
-		TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
-
-	TC0360PRI_vh_start(machine);	/* Purely for save-state purposes */
 
 	for (i = 0; i < 8; i ++)
 		spritebank[i] = 0x400 * i;
@@ -510,6 +500,8 @@ a bg layer given priority over some sprites.
 
 VIDEO_UPDATE( slapshot )
 {
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
+	const device_config *tc0360pri = devtag_get_device(screen->machine, "tc0360pri");
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];
@@ -553,9 +545,9 @@ VIDEO_UPDATE( slapshot )
 
 	taito_handle_sprite_buffering(screen->machine);
 
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
+	priority = tc0480scp_get_bg_priority(tc0480scp);
 
 	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
 	layer[1] = (priority &0x0f00) >>  8;
@@ -563,18 +555,18 @@ VIDEO_UPDATE( slapshot )
 	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = TC0360PRI_regs[4] & 0x0f;     /* bg0 */
-	tilepri[1] = TC0360PRI_regs[4] >> 4;       /* bg1 */
-	tilepri[2] = TC0360PRI_regs[5] & 0x0f;     /* bg2 */
-	tilepri[3] = TC0360PRI_regs[5] >> 4;       /* bg3 */
+	tilepri[0] = tc0360pri_r(tc0360pri, 4) & 0x0f;     /* bg0 */
+	tilepri[1] = tc0360pri_r(tc0360pri, 4) >> 4;       /* bg1 */
+	tilepri[2] = tc0360pri_r(tc0360pri, 5) & 0x0f;     /* bg2 */
+	tilepri[3] = tc0360pri_r(tc0360pri, 5) >> 4;       /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = TC0360PRI_regs[7] & 0x0f;    /* fg (text layer) */
+	tilepri[layer[4]] = tc0360pri_r(tc0360pri, 7) & 0x0f;    /* fg (text layer) */
 
-	spritepri[0] = TC0360PRI_regs[6] & 0x0f;
-	spritepri[1] = TC0360PRI_regs[6] >> 4;
-	spritepri[2] = TC0360PRI_regs[7] & 0x0f;
-	spritepri[3] = TC0360PRI_regs[7] >> 4;
+	spritepri[0] = tc0360pri_r(tc0360pri, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(tc0360pri, 6) >> 4;
+	spritepri[2] = tc0360pri_r(tc0360pri, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(tc0360pri, 7) >> 4;
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
@@ -582,22 +574,22 @@ VIDEO_UPDATE( slapshot )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[3]]==0)
 #endif
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -623,7 +615,7 @@ VIDEO_UPDATE( slapshot )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[4]]==0)
 #endif
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }
 

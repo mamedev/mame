@@ -1,8 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
-
-#define TC0100SCN_GFX_NUM 2
-#define TC0480SCP_GFX_NUM 1
+#include "video/taiicdev.h"
 
 UINT16 groundfx_rotate_ctrl[8];
 
@@ -24,14 +21,11 @@ VIDEO_START( groundfx )
 {
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
-	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
-	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
-
 	/* Hack */
-	hack_cliprect.min_x=69;
-	hack_cliprect.max_x=250;
-	hack_cliprect.min_y=24 + 5;
-	hack_cliprect.max_y=24 + 44;
+	hack_cliprect.min_x = 69;
+	hack_cliprect.max_x = 250;
+	hack_cliprect.min_y = 24 + 5;
+	hack_cliprect.max_y = 24 + 44;
 }
 
 /***************************************************************
@@ -220,31 +214,32 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( groundfx )
 {
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
 
-	TC0100SCN_tilemap_update(screen->machine);
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
+	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
-	layer[1] = (priority &0x0f00) >>  8;
-	layer[2] = (priority &0x00f0) >>  4;
-	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = TC0100SCN_bottomlayer(0);
+	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],TILEMAP_DRAW_OPAQUE,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
 
 	/*  BIG HACK!
 
@@ -262,23 +257,31 @@ VIDEO_UPDATE( groundfx )
         it's contents the usual way.
 
     */
-	if (TC0100SCN_long_r(space,0x4090/4,0xffffffff) || TC0480SCP_long_r(space,0x20/4,0xffffffff)==0x240866) { /* Anything in text layer - really stupid hack */
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
-		//TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
-		if (TC0480SCP_long_r(space,0x20/4,0xffffffff)!=0x240866) /* Stupid hack for start of race */
-			TC0480SCP_tilemap_draw(screen->machine,bitmap,&hack_cliprect,layer[0],0,0);
-		draw_sprites(screen->machine,bitmap,cliprect,1,44,-574);
-	} else {
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
-		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
-		draw_sprites(screen->machine,bitmap,cliprect,0,44,-574);
+	if (tc0100scn_long_r(tc0100scn, 0x4090 / 4, 0xffffffff) || 
+			tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
+	{
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+
+		//tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, 0, pivlayer[2], 0, 0);
+
+		if (tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
+			tc0480scp_tilemap_draw(tc0480scp, bitmap, &hack_cliprect, layer[0], 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 1, 44, -574);
+	} 
+	else 
+	{
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0, 1);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+
+		tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+
+		draw_sprites(screen->machine, bitmap, cliprect, 0, 44, -574);
 	}
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */
 	return 0;
 }

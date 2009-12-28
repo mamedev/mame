@@ -64,7 +64,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
@@ -228,10 +228,10 @@ static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500007) AM_WRITE(groundfx_input_w)	/* eeprom etc. */
 	AM_RANGE(0x600000, 0x600003) AM_READWRITE(groundfx_adc_r,groundfx_adc_w)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r,TC0480SCP_long_w)	  /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r,TC0480SCP_ctrl_long_w)	// debugging
-	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r,TC0100SCN_long_w)	/* piv tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r,TC0100SCN_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)	  /* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)	// debugging
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)	/* piv tilemaps */
+	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram) /* palette ram */
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM						// ?? single bytes, blending ??
 	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
@@ -341,6 +341,26 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0100scn_interface groundfx_tc0100scn_intf =
+{
+	"screen",
+	2, 3,		/* gfxnum, txnum */
+	50, 8,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0480scp_interface groundfx_tc0480scp_intf =
+{
+	1, 4,		/* gfxnum, txnum */
+	0, 		/* pixels */
+	0x24, 0,		/* x_offset, y_offset */
+	-1, 0,		/* text_xoff, text_yoff */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0		/* col_base */
+};
+
 static INTERRUPT_GEN( groundfx_interrupt )
 {
 	frame_counter^=1;
@@ -369,6 +389,9 @@ static MACHINE_DRIVER_START( groundfx )
 
 	MDRV_VIDEO_START(groundfx)
 	MDRV_VIDEO_UPDATE(groundfx)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)
+	MDRV_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
