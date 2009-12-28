@@ -482,7 +482,7 @@ static WRITE32_HANDLER( tattass_control_w )
 	static int pendingCommand=0; /* 1 = read, 2 = write */
 	static int readBitCount=0;
 	static int byteAddr=0;
-	UINT8 *eeprom=(UINT8 *)eeprom_get_data_pointer(devtag_get_device(space->machine, "eeprom"), NULL,NULL);
+	const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
@@ -532,7 +532,7 @@ static WRITE32_HANDLER( tattass_control_w )
 				int d=readBitCount/8;
 				int m=7-(readBitCount%8);
 				int a=(byteAddr+d)%1024;
-				int b=eeprom[a];
+				int b=memory_read_byte(eeprom_space, a);
 
 				tattass_eprom_bit=(b>>m)&1;
 
@@ -549,7 +549,7 @@ static WRITE32_HANDLER( tattass_control_w )
 					int b=(buffer[24]<<7)|(buffer[25]<<6)|(buffer[26]<<5)|(buffer[27]<<4)
 						|(buffer[28]<<3)|(buffer[29]<<2)|(buffer[30]<<1)|(buffer[31]<<0);
 
-					eeprom[byteAddr]=b;
+					memory_write_byte(eeprom_space, byteAddr, b);
 				}
 				lastClock=data&0x20;
 				return;
@@ -564,7 +564,7 @@ static WRITE32_HANDLER( tattass_control_w )
 
 				/* Check for read command */
 				if (buffer[0] && buffer[1]) {
-					tattass_eprom_bit=(eeprom[byteAddr]>>7)&1;
+					tattass_eprom_bit=(memory_read_byte(eeprom_space, byteAddr)>>7)&1;
 					readBitCount=1;
 					pendingCommand=1;
 				}

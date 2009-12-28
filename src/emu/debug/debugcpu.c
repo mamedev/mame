@@ -25,7 +25,6 @@
 #include "debugvw.h"
 #include "debugger.h"
 #include "uiinput.h"
-#include "machine/eeprom.h"
 #include <ctype.h>
 
 
@@ -101,11 +100,9 @@ static UINT32 dasm_wrapped(const device_config *device, char *buffer, offs_t pc)
 static UINT64 expression_read_memory(void *param, const char *name, int space, UINT32 address, int size);
 static UINT64 expression_read_program_direct(const address_space *space, int opcode, offs_t address, int size);
 static UINT64 expression_read_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size);
-static UINT64 expression_read_eeprom(const device_config *device, offs_t address, int size);
 static void expression_write_memory(void *param, const char *name, int space, UINT32 address, int size, UINT64 data);
 static void expression_write_program_direct(const address_space *space, int opcode, offs_t address, int size, UINT64 data);
 static void expression_write_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size, UINT64 data);
-static void expression_write_eeprom(const device_config *device, offs_t address, int size, UINT64 data);
 static EXPRERR expression_validate(void *param, const char *name, int space);
 
 /* variable getters/setters */
@@ -2503,13 +2500,6 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 			result = expression_read_program_direct(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 
-		case EXPSPACE_EEPROM:
-			if (name != NULL)
-				device = expression_get_device(machine, name);
-			if (device != NULL)
-				result = expression_read_eeprom(device, address, size);
-			break;
-
 		case EXPSPACE_REGION:
 			if (name == NULL)
 				break;
@@ -2632,31 +2622,6 @@ static UINT64 expression_read_memory_region(running_machine *machine, const char
 
 
 /*-------------------------------------------------
-    expression_read_eeprom - read EEPROM data
--------------------------------------------------*/
-
-static UINT64 expression_read_eeprom(const device_config *device, offs_t address, int size)
-{
-	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
-	UINT32 eelength, eesize;
-	void *base;
-
-	/* make sure we get a valid base before proceeding */
-	base = eeprom_get_data_pointer(device, &eelength, &eesize);
-	if (base != NULL && address < eelength)
-	{
-		/* switch off the size */
-		switch (eesize)
-		{
-			case 1:		result &= ((UINT8 *)base)[address];							break;
-			case 2:		result &= BIG_ENDIANIZE_INT16(((UINT16 *)base)[address]);	break;
-		}
-	}
-	return result;
-}
-
-
-/*-------------------------------------------------
     expression_write_memory - write 1,2,4 or 8
     bytes at the given offset in the given address
     space
@@ -2703,13 +2668,6 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
 			expression_write_program_direct(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
-			break;
-
-		case EXPSPACE_EEPROM:
-			if (name != NULL)
-				device = expression_get_device(machine, name);
-			if (device != NULL)
-				expression_write_eeprom(device, address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
@@ -2846,45 +2804,6 @@ static void expression_write_memory_region(running_machine *machine, const char 
 
 
 /*-------------------------------------------------
-    expression_write_eeprom - write EEPROM data
--------------------------------------------------*/
-
-static void expression_write_eeprom(const device_config *device, offs_t address, int size, UINT64 data)
-{
-	debugcpu_private *global = device->machine->debugcpu_data;
-	UINT32 eelength, eesize;
-	void *vbase = eeprom_get_data_pointer(device, &eelength, &eesize);
-
-	/* make sure we get a valid base before proceeding */
-	if (vbase != NULL && address < eelength)
-	{
-		UINT64 mask = ~(UINT64)0 >> (64 - 8*size);
-
-		/* switch off the size */
-		switch (eesize)
-		{
-			case 1:
-			{
-				UINT8 *base = (UINT8 *)vbase + address;
-				*base = (*base & ~mask) | (data & mask);
-				break;
-			}
-
-			case 2:
-			{
-				UINT16 *base = (UINT16 *)vbase + address;
-				UINT16 value = BIG_ENDIANIZE_INT16(*base);
-				value = (value & ~mask) | (data & mask);
-				*base = BIG_ENDIANIZE_INT16(value);
-				break;
-			}
-		}
-		global->memory_modified = TRUE;
-	}
-}
-
-
-/*-------------------------------------------------
     expression_validate - validate that the
     provided expression references an
     appropriate name
@@ -2942,15 +2861,6 @@ static EXPRERR expression_validate(void *param, const char *name, int space)
 			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM) == NULL)
 				return EXPRERR_NO_SUCH_MEMORY_SPACE;
 			break;
-
-		case EXPSPACE_EEPROM:
-			if (name != NULL)
-			{
-				device = expression_get_device(machine, name);
-				if (device != NULL)
-					break;
-			}
-			return EXPRERR_INVALID_MEMORY_NAME;
 
 		case EXPSPACE_REGION:
 			if (name == NULL)

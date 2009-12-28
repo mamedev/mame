@@ -57,8 +57,7 @@
 #define EXPSPACE_SPACE3_PHYSICAL			(7)
 #define EXPSPACE_OPCODE						(8)
 #define EXPSPACE_RAMWRITE					(9)
-#define EXPSPACE_EEPROM						(10)
-#define EXPSPACE_REGION						(11)
+#define EXPSPACE_REGION						(10)
 
 
 

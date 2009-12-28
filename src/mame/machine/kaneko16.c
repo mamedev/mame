@@ -1814,14 +1814,11 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 					//printf("save to eeprom\n");
 
 					{
-						UINT32 length, size;
-						UINT8 *dat;
-
-						dat = (UINT8 *)eeprom_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
+						const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
 
 						for (i=0;i<0x80;i++)
 						{
-							dat[i] = memory_read_byte(space, calc3_eeprom_addr+0x200000+i);
+							memory_write_byte(eeprom_space, i, memory_read_byte(space, calc3_eeprom_addr+0x200000+i));
 						}
 
 					}
@@ -2164,14 +2161,11 @@ void calc3_mcu_run(running_machine *machine)
             */
 
 			{
-				UINT32 length, size;
-				UINT8 *dat;
-
-				dat = (UINT8 *)eeprom_get_data_pointer(devtag_get_device(space->machine, "eeprom"), &length, &size);
+				const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
 
 				for (i=0;i<0x80;i++)
 				{
-					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, dat[i]);
+					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, memory_read_byte(eeprom_space, i));
 				}
 
 			}

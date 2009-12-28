@@ -10,7 +10,6 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define SERIAL_BUFFER_LENGTH 40
-#define MEMORY_SIZE 1024
 
 typedef struct _eeprom_state eeprom_state;
 struct _eeprom_state
@@ -18,7 +17,6 @@ struct _eeprom_state
 	const eeprom_interface *intf;
 	int serial_count;
 	UINT8 serial_buffer[SERIAL_BUFFER_LENGTH];
-	UINT8 data[MEMORY_SIZE];
 	int data_bits;
 	int read_address;
 	int clock_count;
@@ -127,8 +125,10 @@ const eeprom_interface eeprom_interface_93C66B =
 //  "*10010xxxxxx", /* erase all */
 };
 
-static void eeprom_write(eeprom_state *eestate, int bit)
+static void eeprom_write(const device_config *device, int bit)
 {
+	eeprom_state *eestate = get_safe_token(device);
+
 	LOG(("EEPROM write bit %d\n",bit));
 
 	if (eestate->serial_count >= SERIAL_BUFFER_LENGTH-1)
@@ -152,9 +152,9 @@ static void eeprom_write(eeprom_state *eestate, int bit)
 			if (eestate->serial_buffer[i] == '1') address |= 1;
 		}
 		if (eestate->intf->data_bits == 16)
-			eestate->data_bits = (eestate->data[2*address+0] << 8) + eestate->data[2*address+1];
+			eestate->data_bits = memory_read_word(device->space[0], address * 2);
 		else
-			eestate->data_bits = eestate->data[address];
+			eestate->data_bits = memory_read_byte(device->space[0], address);
 		eestate->read_address = address;
 		eestate->clock_count = 0;
 		eestate->sending = 1;
@@ -176,12 +176,9 @@ logerror("EEPROM erase address %02x\n",address);
 		if (eestate->locked == 0)
 		{
 			if (eestate->intf->data_bits == 16)
-			{
-				eestate->data[2*address+0] = 0x00;
-				eestate->data[2*address+1] = 0x00;
-			}
+				memory_write_word(device->space[0], address * 2, 0x0000);
 			else
-				eestate->data[address] = 0x00;
+				memory_write_byte(device->space[0], address, 0x00);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
@@ -208,12 +205,9 @@ logerror("EEPROM write %04x to address %02x\n",data,address);
 		if (eestate->locked == 0)
 		{
 			if (eestate->intf->data_bits == 16)
-			{
-				eestate->data[2*address+0] = data >> 8;
-				eestate->data[2*address+1] = data & 0xff;
-			}
+				memory_write_word(device->space[0], address * 2, data);
 			else
-				eestate->data[address] = data;
+				memory_write_byte(device->space[0], address, 0x00);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
@@ -302,9 +296,9 @@ WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line )
 				{
 					eestate->read_address = (eestate->read_address + 1) & ((1 << eestate->intf->address_bits) - 1);
 					if (eestate->intf->data_bits == 16)
-						eestate->data_bits = (eestate->data[2*eestate->read_address+0] << 8) + eestate->data[2*eestate->read_address+1];
+						eestate->data_bits = memory_read_word(device->space[0], eestate->read_address * 2);
 					else
-						eestate->data_bits = eestate->data[eestate->read_address];
+						eestate->data_bits = memory_read_byte(device->space[0], eestate->read_address);
 					eestate->clock_count = 0;
 logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read_address);
 				}
@@ -312,7 +306,7 @@ logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read
 				eestate->clock_count++;
 			}
 			else
-				eeprom_write(eestate,eestate->latch);
+				eeprom_write(device,eestate->latch);
 		}
 	}
 
@@ -320,44 +314,29 @@ logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read
 }
 
 
-void eeprom_set_data(const device_config *device, const UINT8 *data, int length)
-{
-	eeprom_state *eestate = get_safe_token(device);
-
-	assert(length <= ((1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8));
-	memcpy(eestate->data, data, length);
-/* temporary: write data to eeprom.bin when this happens so we capture it
-   for adding to a region */
-{
-	char filename[40];
-	FILE *f;
-	sprintf(filename, "eeprom-%s.bin", device->machine->gamedrv->name);
-	f = fopen(filename, "wb");
-	fwrite(eestate->data, 1, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8, f);
-	fclose(f);
-}
-}
-
-void *eeprom_get_data_pointer(const device_config *device, UINT32 *length, UINT32 *size)
-{
-	eeprom_state *eestate = get_safe_token(device);
-
-	if (length != NULL && eestate->intf != NULL)
-		*length = 1 << eestate->intf->address_bits;
-	if (size != NULL && eestate->intf != NULL)
-		*size = eestate->intf->data_bits / 8;
-
-	return eestate->data;
-}
-
 static DEVICE_NVRAM( eeprom )
 {
 	eeprom_state *eestate = get_safe_token(device);
+	UINT32 eeprom_length = 1 << eestate->intf->address_bits;
+	UINT32 eeprom_bytes = eeprom_length * eestate->intf->data_bits / 8;
+	UINT32 offs;
 
 	if (read_or_write)
-		mame_fwrite(file, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
+	{
+		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		for (offs = 0; offs < eeprom_bytes; offs++)
+			buffer[offs] = memory_read_byte(device->space[0], offs);
+		mame_fwrite(file, buffer, eeprom_bytes);
+		free(buffer);
+	}
 	else if (file != NULL)
-		mame_fread(file, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
+	{
+		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		mame_fread(file, buffer, eeprom_bytes);
+		for (offs = 0; offs < eeprom_bytes; offs++)
+			memory_write_byte(device->space[0], offs, buffer[offs]);
+		free(buffer);
+	}
 	else
 	{
 		const eeprom_config *config = (const eeprom_config *)device->inline_config;
@@ -367,49 +346,39 @@ static DEVICE_NVRAM( eeprom )
 		/* initialize to the default value */
 		if (config->default_value != 0)
 			default_value = config->default_value;
-		for (offs = 0; offs < (1 << eestate->intf->address_bits); offs++)
+		for (offs = 0; offs < eeprom_length; offs++)
 			if (eestate->intf->data_bits == 8)
-				eestate->data[offs] = (UINT8)default_value;
+				memory_write_byte(device->space[0], offs, default_value);
 			else
-			{
-				eestate->data[offs * 2 + 0] = default_value >> 8;
-				eestate->data[offs * 2 + 1] = default_value & 0xff;
-			}
+				memory_write_word(device->space[0], offs * 2, default_value);
 
 		/* handle hard-coded data from the driver */
 		if (config->default_data != NULL)
-			memcpy(eestate->data, config->default_data, config->default_data_size);
+			for (offs = 0; offs < config->default_data_size; offs++)
+				memory_write_byte(device->space[0], offs, config->default_data[offs]);
 
 		/* populate from a memory region if present */
 		if (device->region != NULL)
 		{
-			UINT32 eeprom_length = (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8;
 			UINT32 region_flags = memory_region_flags(device->machine, device->tag);
 
-			if (device->regionbytes != eeprom_length)
-				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, eeprom_length);
+			if (device->regionbytes != eeprom_bytes)
+				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, eeprom_bytes);
 			if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
 				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
 			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
 				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
 
-			if (eestate->intf->data_bits == 8)
-				memcpy(eestate->data, device->region, eeprom_length);
-			else
-			{
-				int offs;
-				for (offs = 0; offs < eeprom_length; offs += 2)
-				{
-					UINT16 data = *(UINT16 *)&device->region[offs];
-					eestate->data[offs + 0] = data >> 8;
-					eestate->data[offs + 1] = data & 0xff;
-				}
-			}
+			for (offs = 0; offs < eeprom_length; offs++)
+				if (eestate->intf->data_bits == 8)
+					memory_write_byte(device->space[0], offs, device->region[offs]);
+				else
+					memory_write_word(device->space[0], offs * 2, ((UINT16 *)device->region)[offs]);
 		}
 	}
 }
 
-static DEVICE_START(eeprom)
+static DEVICE_START( eeprom )
 {
 	eeprom_state *eestate = get_safe_token(device);
 	const eeprom_config *config;
@@ -424,9 +393,6 @@ static DEVICE_START(eeprom)
 
 	eestate->intf = config->pinterface;
 
-	if ((1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8 > MEMORY_SIZE)
-		fatalerror("EEPROM larger than eepromdev.c allows");
-
 	eestate->serial_count = 0;
 	eestate->latch = 0;
 	eestate->reset_line = ASSERT_LINE;
@@ -436,7 +402,6 @@ static DEVICE_START(eeprom)
 	if (eestate->intf->cmd_unlock) eestate->locked = 1;
 	else eestate->locked = 0;
 
-	state_save_register_device_item_pointer( device, 0, eestate->data, MEMORY_SIZE);
 	state_save_register_device_item_pointer( device, 0, eestate->serial_buffer, SERIAL_BUFFER_LENGTH);
 	state_save_register_device_item( device, 0, eestate->clock_line);
 	state_save_register_device_item( device, 0, eestate->reset_line);
@@ -449,10 +414,23 @@ static DEVICE_START(eeprom)
 	state_save_register_device_item( device, 0, eestate->read_address);
 }
 
+static ADDRESS_MAP_START( eeprom_map8, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( eeprom_map16, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+ADDRESS_MAP_END
+
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-#define DEVTEMPLATE_ID(p,s)		p##eeprom##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME		"EEPROM"
-#define DEVTEMPLATE_FAMILY		"EEPROM"
+#define DEVTEMPLATE_ID(p,s)			p##eeprom##s
+#define DEVTEMPLATE_FEATURES		DT_HAS_START | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG | DT_HAS_PROGRAM_SPACE
+#define DEVTEMPLATE_NAME			"EEPROM"
+#define DEVTEMPLATE_FAMILY			"EEPROM"
+#define DEVTEMPLATE_ENDIANNESS		ENDIANNESS_BIG
+#define DEVTEMPLATE_PGM_DATAWIDTH	(((const eeprom_config *)device->inline_config)->pinterface->data_bits)
+#define DEVTEMPLATE_PGM_ADDRWIDTH	(((const eeprom_config *)device->inline_config)->pinterface->address_bits)
+#define DEVTEMPLATE_PGM_ADDRSHIFT	(((const eeprom_config *)device->inline_config)->pinterface->data_bits == 8 ? 0 : -1)
+#define DEVTEMPLATE_PGM_DEFMAP		(((const eeprom_config *)device->inline_config)->pinterface->data_bits == 8 ? (const void *)ADDRESS_MAP_NAME(eeprom_map8) : (const void *)ADDRESS_MAP_NAME(eeprom_map16))
 #include "devtempl.h"

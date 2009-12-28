@@ -91,7 +91,6 @@ enum
 	TIN_MEMORY_SPACE3_PHYS	= (EXPSPACE_SPACE3_PHYSICAL  << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_OPCODE		= (EXPSPACE_OPCODE           << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_RAMWRITE		= (EXPSPACE_RAMWRITE         << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_EEPROM		= (EXPSPACE_EEPROM	         << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_REGION		= (EXPSPACE_REGION           << TIN_MEMORY_SPACE_SHIFT),
 
 	TIN_MEMORY_INDEX_SHIFT	= 16,
@@ -586,7 +585,6 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 		case '3':	*flags |= physical ? TIN_MEMORY_SPACE3_PHYS  : TIN_MEMORY_SPACE3_LOG;	break;
 		case 'o':	*flags |= TIN_MEMORY_OPCODE;											break;
 		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;											break;
-		case 'e':	*flags |= TIN_MEMORY_EEPROM;											break;
 		case 'm':	*flags |= TIN_MEMORY_REGION;											break;
 		default:	return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
 	}

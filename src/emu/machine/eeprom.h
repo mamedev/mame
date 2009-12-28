@@ -61,7 +61,4 @@ READ_LINE_DEVICE_HANDLER( eeprom_read_bit );
 WRITE_LINE_DEVICE_HANDLER( eeprom_set_cs_line );
 WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line );
 
-void eeprom_set_data( const device_config *device, const UINT8 *data, int length );
-void *eeprom_get_data_pointer( const device_config *device, UINT32 *length, UINT32 *size );
-
 #endif

@@ -1235,27 +1235,27 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 
 /*-------------------------------------------------
-    normalize_flags_for_cpu - modify the region
-    flags for the given CPU index
+    normalize_flags_for_device - modify the region
+    flags for the given device
 -------------------------------------------------*/
 
-static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflags, const char *rgntag)
+static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
-	const device_config *device = cputag_get_cpu(machine, rgntag);
-	if (device != NULL && cpu_get_databus_width(device, ADDRESS_SPACE_PROGRAM) != 0)
+	const device_config *device = devtag_get_device(machine, rgntag);
+	if (device != NULL && device_get_databus_width(device, ADDRESS_SPACE_0) != 0)
 	{
 		int buswidth;
 
 		/* set the endianness */
 		startflags &= ~ROMREGION_ENDIANMASK;
-		if (cpu_get_endianness(device) == ENDIANNESS_LITTLE)
+		if (device_get_endianness(device) == ENDIANNESS_LITTLE)
 			startflags |= ROMREGION_LE;
 		else
 			startflags |= ROMREGION_BE;
 
 		/* set the width */
 		startflags &= ~ROMREGION_WIDTHMASK;
-		buswidth = cpu_get_databus_width(device, ADDRESS_SPACE_PROGRAM);
+		buswidth = device_get_databus_width(device, ADDRESS_SPACE_0);
 		if (buswidth <= 8)
 			startflags |= ROMREGION_8BIT;
 		else if (buswidth <= 16)
@@ -1292,9 +1292,9 @@ static void process_region_list(rom_load_data *romdata)
 			/* the first entry must be a region */
 			assert(ROMENTRY_ISREGION(region));
 
-			/* if this is a CPU region, override with the CPU width and endianness */
-			if (cputag_get_cpu(romdata->machine, astring_c(regiontag)) != NULL)
-				regionflags = normalize_flags_for_cpu(romdata->machine, regionflags, astring_c(regiontag));
+			/* if this is a device region, override with the device width and endianness */
+			if (devtag_get_device(romdata->machine, astring_c(regiontag)) != NULL)
+				regionflags = normalize_flags_for_device(romdata->machine, regionflags, astring_c(regiontag));
 
 			/* remember the base and length */
 			romdata->regionbase = memory_region_alloc(romdata->machine, astring_c(regiontag), regionlength, regionflags);
