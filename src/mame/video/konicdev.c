@@ -1541,7 +1541,7 @@ struct _k007342_state
 	UINT8    *colorram_0;
 	UINT8    *colorram_1;
 
-	tilemap  *tilemap[2];
+	tilemap_t  *tilemap[2];
 	int      flipscreen, gfxnum, int_enabled;
 	UINT8    regs[8];
 	UINT16   scrollx[2];
@@ -2103,7 +2103,7 @@ struct _k052109_state
 	UINT8    *colorram_A;
 	UINT8    *colorram_B;
 
-	tilemap  *tilemap[3];
+	tilemap_t  *tilemap[3];
 	int      tileflip_enable, gfxnum;
 	UINT8    charrombank[4];
 	UINT8    charrombank_2[4];
@@ -5064,7 +5064,7 @@ struct _k051316_state
 {
 	UINT8    *ram;
 
-	tilemap  *tmap;
+	tilemap_t  *tmap;
 
 	int      gfxnum, wraparound, bpp;
 	int      offset[2];
@@ -5415,7 +5415,7 @@ READ16_DEVICE_HANDLER( k053936_linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
 	k053936_state *k053936= k053936_get_safe_token(device);
 	if (!tmap)
@@ -6008,7 +6008,7 @@ static DEVICE_RESET( k051733 )
 typedef struct _k056832_state k056832_state;
 struct _k056832_state
 {
-	tilemap   *tilemap[K056832_PAGE_COUNT];
+	tilemap_t   *tilemap[K056832_PAGE_COUNT];
 	bitmap_t  *pixmap[K056832_PAGE_COUNT];
 
 	UINT16    regs[0x20];	// 157/832 regs group 1
@@ -6920,7 +6920,7 @@ static int k056832_update_linemap( const device_config *device, bitmap_t *bitmap
 
 	{
 		rectangle zerorect;
-		tilemap *tmap;
+		tilemap_t *tmap;
 		UINT32 *dirty;
 		int all_dirty;
 		bitmap_t* xprmap;
@@ -7045,7 +7045,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 	int cminy, cmaxy, cminx, cmaxx;
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
@@ -7352,7 +7352,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 	int cminy, cmaxy, cminx, cmaxx;
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
@@ -7687,7 +7687,7 @@ static DEVICE_START( k056832 )
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	const k056832_interface *intf = k056832_get_interface(device);
 	running_machine *machine = device->machine;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	int i;
 	UINT32 total;
 	static const gfx_layout charlayout8 =
@@ -10080,8 +10080,8 @@ typedef struct _k001604_state k001604_state;
 struct _k001604_state
 {
 	const device_config *screen;
-	tilemap        *layer_8x8[2];
-	tilemap        *layer_roz[2];
+	tilemap_t        *layer_8x8[2];
+	tilemap_t        *layer_roz[2];
 	int            gfx_index[2];
 
 	UINT32 *       tile_ram;
@@ -10505,7 +10505,7 @@ typedef struct _k037122_state k037122_state;
 struct _k037122_state
 {
 	const device_config *screen;
-	tilemap        *layer[2];
+	tilemap_t        *layer[2];
 	int            gfx_index;
 
 	UINT32 *       tile_ram;

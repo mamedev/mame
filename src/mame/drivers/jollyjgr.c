@@ -112,7 +112,7 @@ struct _jollyjgr_state
 	UINT8 *  bitmap;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* misc */
 	int      nmi_enable, flip_x, flip_y;

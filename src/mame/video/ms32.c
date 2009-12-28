@@ -51,8 +51,8 @@ static int ms32_reverse_sprite_order;
 
 /********** Tilemaps **********/
 
-tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
-tilemap *ms32_extra_tilemap;
+tilemap_t *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
+tilemap_t *ms32_extra_tilemap;
 static int flipscreen;
 
 

@@ -4,7 +4,7 @@
 
 UINT8 *speedspn_attram;
 
-static tilemap *speedspn_tilemap;
+static tilemap_t *speedspn_tilemap;
 static UINT8 speedspn_display_disable = 0;
 static int speedspn_bank_vidram = 0;
 static UINT8* speedspn_vidram;

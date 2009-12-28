@@ -15,7 +15,7 @@ struct _dday_state
 	UINT8 *        colorram;
 
 	/* video-related */
-	tilemap        *fg_tilemap, *bg_tilemap, *text_tilemap, *sl_tilemap;
+	tilemap_t        *fg_tilemap, *bg_tilemap, *text_tilemap, *sl_tilemap;
 	bitmap_t       *main_bitmap;
 	int            control;
 	int            sl_image;

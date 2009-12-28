@@ -100,9 +100,9 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #define ms32_bg_tilemap bnstars_bg_tilemap
 #define ms32_roz_tilemap bnstars_tx_tilemap
 
-static tilemap *ms32_tx_tilemap[2];
-static tilemap *ms32_bg_tilemap[2];
-static tilemap *ms32_roz_tilemap[2];
+static tilemap_t *ms32_tx_tilemap[2];
+static tilemap_t *ms32_bg_tilemap[2];
+static tilemap_t *ms32_roz_tilemap[2];
 
 static UINT32 *ms32_tx0_ram, *ms32_tx1_ram;
 static UINT32 *ms32_bg0_ram, *ms32_bg1_ram;

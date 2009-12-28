@@ -5,7 +5,7 @@ struct _toypop_state
 	UINT8 *spriteram;
 	UINT16 *bg_image;
 	UINT8 *m68000_sharedram;
-	tilemap *bg_tilemap;
+	tilemap_t *bg_tilemap;
 
 	int bitmapflip;
 	int palettebank;

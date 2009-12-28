@@ -58,7 +58,7 @@ typedef struct _m14_state m14_state;
 struct _m14_state
 {
 	/* video-related */
-	tilemap  *m14_tilemap;
+	tilemap_t  *m14_tilemap;
 	UINT8 *  video_ram;
 	UINT8 *  color_ram;
 

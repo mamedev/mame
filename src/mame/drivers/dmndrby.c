@@ -62,7 +62,7 @@ static UINT8* sprite_ram;
 static UINT8 *nvram;
 static size_t nvram_size;
 static UINT8 *racetrack_tilemap_rom;
-static tilemap *racetrack_tilemap;
+static tilemap_t *racetrack_tilemap;
 
 static NVRAM_HANDLER( dderby )
 {

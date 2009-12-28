@@ -17,7 +17,7 @@ static UINT8 cocktail_mode;
 static UINT8 pleiads_protection_question;
 static UINT8 survival_protection_value;
 static int survival_sid_value;
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 static UINT8 survival_input_latches[2];
 static UINT8 survival_input_readc;
 

@@ -14,7 +14,7 @@ struct _aquarium_state
 	size_t    spriteram_size;
 
 	/* video-related */
-	tilemap  *txt_tilemap, *mid_tilemap, *bak_tilemap;
+	tilemap_t  *txt_tilemap, *mid_tilemap, *bak_tilemap;
 
 	/* misc */
 	int aquarium_snd_ack;

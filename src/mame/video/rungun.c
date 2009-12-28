@@ -11,7 +11,7 @@
 #include "video/konicdev.h"
 
 static int ttl_gfx_index;
-static tilemap *ttl_tilemap, *rng_936_tilemap;
+static tilemap_t *ttl_tilemap, *rng_936_tilemap;
 static UINT16 ttl_vram[0x1000];
 
 static int sprite_colorbase;

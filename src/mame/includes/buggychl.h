@@ -26,8 +26,8 @@ struct _buggychl_state
 
 	/* video-related */
 	bitmap_t    *tmp_bitmap1, *tmp_bitmap2;
-	tilemap     *bg_tilemap;
-	tilemap     *fg_tilemap, *bg2_tilemap;	// msisaac
+	tilemap_t     *bg_tilemap;
+	tilemap_t     *fg_tilemap, *bg2_tilemap;	// msisaac
 	// buggychl
 	int         sl_bank, bg_on, sky_on, sprite_color_base, bg_scrollx;
 	UINT8       sprite_lookup[0x2000];
@@ -38,7 +38,7 @@ struct _buggychl_state
 	UINT8       *pixram2;
 	bitmap_t    *pixel_bitmap1;
 	bitmap_t    *pixel_bitmap2;
-	tilemap     *background;
+	tilemap_t     *background;
 	int         pixram_sel;
 	// bking
 	int         pc3259_output[4];

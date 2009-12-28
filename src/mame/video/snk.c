@@ -26,9 +26,9 @@ UINT8 *snk_tx_videoram;
 UINT8 *snk_fg_videoram;
 UINT8 *snk_bg_videoram;
 
-static tilemap *tx_tilemap;
-static tilemap *fg_tilemap;
-static tilemap *bg_tilemap;
+static tilemap_t *tx_tilemap;
+static tilemap_t *fg_tilemap;
+static tilemap_t *bg_tilemap;
 static int fg_scrollx, fg_scrolly, bg_scrollx, bg_scrolly;
 static int sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
 static UINT8 sprite_split_point;

@@ -16,7 +16,7 @@ struct _ginganin_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	tilemap_t     *bg_tilemap, *fg_tilemap, *tx_tilemap;
 	int         layers_ctrl, flipscreen;
 #ifdef MAME_DEBUG
 	int         posx, posy;

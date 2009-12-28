@@ -12,7 +12,7 @@ struct __4enraya_state
 	size_t     videoram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 
 	/* sound-related */
 	int        soundlatch;

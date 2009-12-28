@@ -10,7 +10,7 @@
 UINT16 *sshangha_pf2_data,*sshangha_pf1_data;
 UINT16 *sshangha_pf1_rowscroll,*sshangha_pf2_rowscroll;
 static UINT16 sshangha_control_0[8];
-static tilemap *pf1_8x8_tilemap,*pf1_16x16_tilemap,*pf2_tilemap;
+static tilemap_t *pf1_8x8_tilemap,*pf1_16x16_tilemap,*pf2_tilemap;
 static int sshangha_pf1_bank,sshangha_pf2_bank,sshangha_video_control;
 
 /******************************************************************************/

@@ -2,7 +2,7 @@
 
 #include "driver.h"
 
-static tilemap *sslam_bg_tilemap, *sslam_tx_tilemap, *sslam_md_tilemap;
+static tilemap_t *sslam_bg_tilemap, *sslam_tx_tilemap, *sslam_md_tilemap;
 
 extern UINT16 *sslam_bg_tileram, *sslam_tx_tileram, *sslam_md_tileram;
 extern UINT16 *sslam_spriteram, *sslam_regs;

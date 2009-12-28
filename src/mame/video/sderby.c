@@ -1,12 +1,12 @@
 #include "driver.h"
 
-static tilemap *sderby_tilemap;
+static tilemap_t *sderby_tilemap;
 extern UINT16 *sderby_videoram;
 
-static tilemap *sderby_md_tilemap;
+static tilemap_t *sderby_md_tilemap;
 extern UINT16 *sderby_md_videoram;
 
-static tilemap *sderby_fg_tilemap;
+static tilemap_t *sderby_fg_tilemap;
 extern UINT16 *sderby_fg_videoram;
 
 /* BG Layer */

@@ -25,7 +25,7 @@ size_t rpunch_bitmapram_size;
 
 int rpunch_sprite_palette;
 
-static tilemap *background[2];
+static tilemap_t *background[2];
 
 static UINT16 videoflags;
 static UINT8 crtc_register;

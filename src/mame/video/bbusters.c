@@ -23,7 +23,7 @@
 
 #include "driver.h"
 
-static tilemap *fix_tilemap,*pf1_tilemap,*pf2_tilemap;
+static tilemap_t *fix_tilemap,*pf1_tilemap,*pf2_tilemap;
 static const UINT8 *scale_table_ptr;
 static UINT8 scale_line_count;
 

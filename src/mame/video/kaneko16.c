@@ -38,8 +38,8 @@
 static UINT16 kaneko16_disp_enable;
 
 
-static tilemap *kaneko16_tmap_0, *kaneko16_tmap_1;
-static tilemap *kaneko16_tmap_2, *kaneko16_tmap_3;
+static tilemap_t *kaneko16_tmap_0, *kaneko16_tmap_1;
+static tilemap_t *kaneko16_tmap_2, *kaneko16_tmap_3;
 UINT16 *kaneko16_vram_0,    *kaneko16_vram_1,    *kaneko16_layers_0_regs;
 UINT16 *kaneko16_vscroll_0, *kaneko16_vscroll_1;
 UINT16 *kaneko16_vram_2,    *kaneko16_vram_3,    *kaneko16_layers_1_regs;

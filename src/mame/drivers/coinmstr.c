@@ -30,7 +30,7 @@ x
 
 
 static UINT8 *attr_ram1, *attr_ram2, *attr_ram3;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static UINT8 question_adr[4];
 

@@ -7,7 +7,7 @@ extern void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor,
 
 /*----------- defined in video/ms32.c -----------*/
 
-extern tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
+extern tilemap_t *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
 extern UINT8* ms32_priram_8;
 extern UINT16* ms32_palram_16;
 extern UINT16* ms32_rozram_16;
@@ -18,7 +18,7 @@ extern UINT16* ms32_bgram_16;
 extern UINT32 ms32_tilemaplayoutcontrol;
 
 extern UINT16* f1superb_extraram_16;
-extern tilemap* ms32_extra_tilemap;
+extern tilemap_t* ms32_extra_tilemap;
 
 //extern UINT32 *ms32_fce00000;
 extern UINT32 *ms32_roz_ctrl;

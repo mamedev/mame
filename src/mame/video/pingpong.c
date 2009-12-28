@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 UINT8 *pingpong_videoram;
 UINT8 *pingpong_colorram;
 

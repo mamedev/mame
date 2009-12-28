@@ -5,7 +5,7 @@ UINT8 *solomon_colorram;
 UINT8 *solomon_videoram2;
 UINT8 *solomon_colorram2;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( solomon_videoram_w )
 {

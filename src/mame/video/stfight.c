@@ -15,7 +15,7 @@ UINT8 *stfight_text_attr_ram;
 UINT8 *stfight_vh_latch_ram;
 UINT8 *stfight_sprite_ram;
 
-static tilemap *fg_tilemap,*bg_tilemap,*tx_tilemap;
+static tilemap_t *fg_tilemap,*bg_tilemap,*tx_tilemap;
 static int stfight_sprite_base = 0;
 
 /*

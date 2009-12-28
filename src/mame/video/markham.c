@@ -13,7 +13,7 @@ Video hardware driver by Uki
 
 UINT8 *markham_xscroll;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( markham )
 {

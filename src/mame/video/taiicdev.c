@@ -556,7 +556,7 @@ struct _pc080sn_state
 	int            bgscrollx[2], bgscrolly[2];
 	int            xoffs, yoffs;
 
-	tilemap        *tilemap[2];
+	tilemap_t        *tilemap[2];
 	int            bg_gfx;
 	int            yinvert, dblwidth;
 };
@@ -1252,7 +1252,7 @@ struct _tc0080vco_state
 	UINT16         bg1_scrollx;
 	UINT16         bg1_scrolly;
 
-	tilemap        *tilemap[3];
+	tilemap_t        *tilemap[3];
 
 	int            bg_gfx, tx_gfx;
 	int            bg_xoffs, bg_yoffs;
@@ -1965,7 +1965,7 @@ struct _tc0100scn_state
 	int          bgscrollx, bgscrolly, fgscrollx, fgscrolly;
 
 	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
-	tilemap      *tilemap[3][2];
+	tilemap_t      *tilemap[3][2];
 	rectangle    cliprect;
 
 	int          bg_gfx, tx_gfx;
@@ -2371,7 +2371,7 @@ void tc0100scn_tilemap_update( const device_config *device )
 		tilemap_set_scrollx(tc0100scn->tilemap[1][tc0100scn->dblwidth], (j + tc0100scn->fgscrolly) & 0x1ff, tc0100scn->fgscrollx - tc0100scn->fgscroll_ram[j]);
 }
 
-static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap* tmap, int flags, UINT32 priority )
+static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t* tmap, int flags, UINT32 priority )
 {
  	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
@@ -2585,7 +2585,7 @@ struct _tc0280grd_state
 {
 	UINT16 *       ram;
 
-	tilemap        *tilemap;
+	tilemap_t        *tilemap;
 
 	UINT16         ctrl[8];
 	int            gfxnum, base_color;
@@ -2831,7 +2831,7 @@ struct _tc0480scp_state
 	int              pri_reg;
 
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
-	tilemap         *tilemap[5][2];
+	tilemap_t         *tilemap[5][2];
 	int             bg_gfx, tx_gfx;
 	INT32           tile_colbase, dblwidth;
 	int             x_offs, y_offs;
@@ -4803,7 +4803,7 @@ struct _tc0180vcu_state
 	UINT16 *       ram;
 	UINT16 *       scrollram;
 
-	tilemap        *tilemap[3];
+	tilemap_t        *tilemap[3];
 
 	UINT16         bg_rambank[2], fg_rambank[2], tx_rambank;
 	UINT8          framebuffer_page;

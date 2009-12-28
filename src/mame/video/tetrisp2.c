@@ -134,8 +134,8 @@ READ8_HANDLER( tetrisp2_priority_r )
 
 ***************************************************************************/
 
-static tilemap *tilemap_bg, *tilemap_fg, *tilemap_rot;
-static tilemap *tilemap_sub_bg, *tilemap_sub_fg, *tilemap_sub_rot;
+static tilemap_t *tilemap_bg, *tilemap_fg, *tilemap_rot;
+static tilemap_t *tilemap_sub_bg, *tilemap_sub_fg, *tilemap_sub_rot;
 
 #define NX_0  (0x40)
 #define NY_0  (0x40)

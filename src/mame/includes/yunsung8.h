@@ -11,7 +11,7 @@ struct _yunsung8_state
 	UINT8 *     videoram;
 
 	/* video-related */
-	tilemap     *tilemap_0, *tilemap_1;
+	tilemap_t     *tilemap_0, *tilemap_1;
 	UINT8       *videoram_0, *videoram_1;
 	int         layers_ctrl;
 	int         videobank;

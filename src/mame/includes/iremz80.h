@@ -24,8 +24,8 @@ struct _irem_z80_state
 	UINT8                port1, port2;
 
 	/* video-related */
-	tilemap*             bg_tilemap;	// m52, m57, m58, m62
-	tilemap*             fg_tilemap;	// m62
+	tilemap_t*             bg_tilemap;	// m52, m57, m58, m62
+	tilemap_t*             fg_tilemap;	// m62
 	int                  flipscreen;	// m57, m62
 
 	/* driver specific (video-related) */

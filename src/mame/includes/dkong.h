@@ -91,7 +91,7 @@ struct _dkong_state
 	const UINT8 *			snd_rom;
 
 	/* video state */
-	tilemap *bg_tilemap;
+	tilemap_t *bg_tilemap;
 
 	bitmap_t *		bg_bits;
 	const UINT8 *	color_codes;
@@ -139,7 +139,7 @@ struct _dkong_state
 	const UINT8       *snd_rom;
 
 	/* video state */
-	tilemap           *bg_tilemap;
+	tilemap_t           *bg_tilemap;
 
 	bitmap_t          *bg_bits;
 	const UINT8 *     color_codes;

@@ -175,7 +175,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "deprecat.h"
 #include "sound/8950intf.h"
 
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 static UINT16 *tx_vram;
 static UINT16 *shared_ram;
 static UINT16 *io_ram;

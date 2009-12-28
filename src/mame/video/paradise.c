@@ -69,7 +69,7 @@ WRITE8_HANDLER( paradise_palette_w )
 
 ***************************************************************************/
 
-static tilemap *tilemap_0,*tilemap_1,*tilemap_2;
+static tilemap_t *tilemap_0,*tilemap_1,*tilemap_2;
 
 /* Background */
 WRITE8_HANDLER( paradise_vram_0_w )

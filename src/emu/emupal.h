@@ -169,7 +169,7 @@ rgb_t colortable_palette_get_color(colortable_t *ctable, UINT32 entry);
 UINT32 colortable_get_transpen_mask(colortable_t *ctable, const gfx_element *gfx, int color, int transcolor);
 
 /* configure groups in a tilemap to represent transparency based on colortable entries (each group maps to a gfx color) */
-void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap *tmap, const gfx_element *gfx, int transcolor);
+void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap_t *tmap, const gfx_element *gfx, int transcolor);
 
 /* return the number of entries in a colortable */
 UINT32 colortable_palette_get_size(colortable_t *ctable);

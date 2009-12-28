@@ -11,11 +11,11 @@ static bitmap_t *sp_bitmap;
 // in robokid and omegaf big sprites are laid out differently in ROM
 static int robokid_sprites;
 
-static tilemap* fg_tilemap;
-static tilemap* bg_tilemap;
-static tilemap* bg0_tilemap;
-static tilemap* bg1_tilemap;
-static tilemap* bg2_tilemap;
+static tilemap_t* fg_tilemap;
+static tilemap_t* bg_tilemap;
+static tilemap_t* bg0_tilemap;
+static tilemap_t* bg1_tilemap;
+static tilemap_t* bg2_tilemap;
 
 static int bank_mask;
 static int robokid_bg0_bank = 0;
@@ -302,7 +302,7 @@ WRITE8_HANDLER( robokid_bg2_videoram_w )
 
 
 
-static void bg_ctrl(int offset, int data, tilemap* tilemap)
+static void bg_ctrl(int offset, int data, tilemap_t* tilemap)
 {
 	int scrollx = tilemap_get_scrollx(tilemap, 0);
 	int scrolly = tilemap_get_scrolly(tilemap, 0);

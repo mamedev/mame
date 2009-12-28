@@ -14,7 +14,7 @@ struct _cheekyms_state
 	UINT8 *        port_80;
 
 	/* video-related */
-	tilemap        *cm_tilemap;
+	tilemap_t        *cm_tilemap;
 	bitmap_t       *bitmap_buffer;
 
 	/* devices */

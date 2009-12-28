@@ -26,9 +26,9 @@ struct _atarifb_state
 	UINT8 *  scroll_register;
 	size_t   spriteram_size;
 
-	tilemap  *alpha1_tilemap;
-	tilemap  *alpha2_tilemap;
-	tilemap  *field_tilemap;
+	tilemap_t  *alpha1_tilemap;
+	tilemap_t  *alpha2_tilemap;
+	tilemap_t  *field_tilemap;
 
 	/* sound-related */
 	int CTRLD;

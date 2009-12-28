@@ -58,7 +58,7 @@
 static emu_timer *scanline_timer;
 static emu_timer *pot_timer;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static UINT8 sync2_value;
 static UINT8 pot_mask[2];

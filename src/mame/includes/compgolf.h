@@ -13,7 +13,7 @@ struct _compgolf_state
 	UINT8 *        spriteram;
 
 	/* video-related */
-	tilemap        *text_tilemap, *bg_tilemap;
+	tilemap_t        *text_tilemap, *bg_tilemap;
 	int            scrollx_lo, scrollx_hi;
 	int            scrolly_lo, scrolly_hi;
 

@@ -143,7 +143,7 @@ static rgb_t blaster_color0;
 static UINT8 blaster_video_control;
 
 /* tilemap variables */
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT16 tilemap_xscroll;
 static UINT8 williams2_fg_color;
 

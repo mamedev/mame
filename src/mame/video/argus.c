@@ -138,9 +138,9 @@ static UINT8 *butasan_txbackram;
 static UINT8 *butasan_pagedram[2];
 static UINT8 butasan_page_latch;
 
-static tilemap *tx_tilemap  = NULL;
-static tilemap *bg0_tilemap = NULL;
-static tilemap *bg1_tilemap = NULL;
+static tilemap_t *tx_tilemap  = NULL;
+static tilemap_t *bg0_tilemap = NULL;
+static tilemap_t *bg1_tilemap = NULL;
 
 static UINT8 argus_bg_status;
 static UINT8 butasan_bg1_status;

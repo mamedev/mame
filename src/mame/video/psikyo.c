@@ -537,7 +537,7 @@ VIDEO_UPDATE( psikyo )
 	UINT32 layer1_ctrl = state->vregs[0x416 / 4];
 	UINT32 spr_ctrl = state->spritebuf2[0x1ffe / 4];
 
-	tilemap *tmptilemap0, *tmptilemap1;
+	tilemap_t *tmptilemap0, *tmptilemap1;
 
 	flip_screen_set(screen->machine, ~input_port_read(screen->machine, "DSW") & 0x00010000);		// hardwired to a DSW bit
 
@@ -711,7 +711,7 @@ VIDEO_UPDATE( psikyo_bootleg )
 	UINT32 layer1_ctrl = state->vregs[0x416 / 4];
 	UINT32 spr_ctrl = state->spritebuf2[0x1ffe / 4];
 
-	tilemap *tmptilemap0, *tmptilemap1;
+	tilemap_t *tmptilemap0, *tmptilemap1;
 
 	flip_screen_set(screen->machine, ~input_port_read(screen->machine, "DSW") & 0x00010000);		// hardwired to a DSW bit
 

@@ -13,7 +13,7 @@
 
 UINT8 *zaccaria_videoram,*zaccaria_attributesram;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static const rectangle spritevisiblearea =
 {

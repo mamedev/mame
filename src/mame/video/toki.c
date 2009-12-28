@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-static tilemap *background_layer,*foreground_layer,*text_layer;
+static tilemap_t *background_layer,*foreground_layer,*text_layer;
 
 UINT16 *toki_background1_videoram16;
 UINT16 *toki_background2_videoram16;

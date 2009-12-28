@@ -12,7 +12,7 @@ struct _drmicro_state
 	UINT8 *        videoram;
 
 	/* video-related */
-	tilemap        *bg1, *bg2;
+	tilemap_t        *bg1, *bg2;
 	int            flipscreen;
 
 	/* misc */

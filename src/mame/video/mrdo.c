@@ -10,7 +10,7 @@
 
 
 UINT8 *mrdo_bgvideoram,*mrdo_fgvideoram;
-static tilemap *bg_tilemap,*fg_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap;
 static int flipscreen;
 
 

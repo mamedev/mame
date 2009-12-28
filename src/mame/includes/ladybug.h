@@ -17,8 +17,8 @@ struct _ladybug_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap, *grid_tilemap;	// ladybug
-	tilemap    *fg_tilemap;	// redclash
+	tilemap_t    *bg_tilemap, *grid_tilemap;	// ladybug
+	tilemap_t    *fg_tilemap;	// redclash
 	UINT8      grid_color;
 	int        star_speed;
 	int        gfxbank;	// redclash only

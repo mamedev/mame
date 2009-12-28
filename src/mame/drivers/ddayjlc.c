@@ -66,7 +66,7 @@ struct _ddayjlc_state
 	UINT8 *  spriteram;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 	INT32    char_bank;
 	INT32    bgadr;
 

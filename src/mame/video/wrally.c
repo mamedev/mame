@@ -13,7 +13,7 @@ UINT16 *wrally_spriteram;
 UINT16 *wrally_vregs;
 UINT16 *wrally_videoram;
 
-tilemap *wrally_pant[2];
+tilemap_t *wrally_pant[2];
 
 /***************************************************************************
 

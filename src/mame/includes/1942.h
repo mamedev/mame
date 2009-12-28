@@ -14,7 +14,7 @@ struct __1942_state
 	size_t  spriteram_size;
 
 	/* video-related */
-	tilemap *fg_tilemap, *bg_tilemap;
+	tilemap_t *fg_tilemap, *bg_tilemap;
 	int palette_bank;
 	UINT8 scroll[2];
 

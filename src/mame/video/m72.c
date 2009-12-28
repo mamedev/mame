@@ -7,7 +7,7 @@
 UINT16 *m72_videoram1,*m72_videoram2,*majtitle_rowscrollram;
 UINT32 m72_raster_irq_position;
 static UINT16 *m72_spriteram;
-static tilemap *fg_tilemap,*bg_tilemap;
+static tilemap_t *fg_tilemap,*bg_tilemap;
 static INT32 scrollx1,scrolly1,scrollx2,scrolly2;
 static INT32 video_off;
 

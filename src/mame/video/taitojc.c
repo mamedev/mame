@@ -24,7 +24,7 @@ static int taitojc_gfx_index;
 
 static UINT32 *taitojc_char_ram;
 static UINT32 *taitojc_tile_ram;
-static tilemap *taitojc_tilemap;
+static tilemap_t *taitojc_tilemap;
 
 static poly_manager *poly;
 

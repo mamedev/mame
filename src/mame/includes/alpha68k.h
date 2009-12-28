@@ -14,7 +14,7 @@ struct _alpha68k_state
 	UINT16 *    paletteram;
 
 	/* video-related */
-	tilemap     *fix_tilemap;
+	tilemap_t     *fix_tilemap;
 	int         bank_base, flipscreen, last_bank;
 	int         buffer_28, buffer_60, buffer_68;
 

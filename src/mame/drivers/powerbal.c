@@ -19,7 +19,7 @@ Magic Sticks:
 #include "sound/okim6295.h"
 #include "includes/playmark.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT16 *magicstk_videoram;
 static int magicstk_tilebank;
 

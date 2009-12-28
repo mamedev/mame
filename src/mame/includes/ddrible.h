@@ -17,7 +17,7 @@ struct _ddrible_state
 	UINT8 *     paletteram;
 
 	/* video-related */
-	tilemap     *fg_tilemap,*bg_tilemap;
+	tilemap_t     *fg_tilemap,*bg_tilemap;
 	int         vregs[2][5];
 	int         charbank[2];
 

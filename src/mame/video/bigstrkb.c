@@ -2,7 +2,7 @@
 
 #include "driver.h"
 
-static tilemap *bsb_tilemap, *bsb_tilemap2, *bsb_tilemap3;
+static tilemap_t *bsb_tilemap, *bsb_tilemap2, *bsb_tilemap3;
 
 extern UINT16 *bsb_videoram, *bsb_videoram2, *bsb_videoram3;
 extern UINT16 *bsb_vidreg1, *bsb_vidreg2;

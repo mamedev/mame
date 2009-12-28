@@ -13,7 +13,7 @@ struct _dec8_state
 	size_t   videoram_size;
 
 	/* video-related */
-	tilemap  *pf0_tilemap, *pf1_tilemap, *fix_tilemap;
+	tilemap_t  *pf0_tilemap, *pf1_tilemap, *fix_tilemap;
 	//int      scroll1[4];
 	int      scroll2[4];
 	int      pf0_control[0x20], pf1_control[0x20];

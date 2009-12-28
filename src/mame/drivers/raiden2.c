@@ -145,7 +145,7 @@ Current Problem(s) - in order of priority
 #include "includes/raiden2.h"
 
 
-static tilemap *background_layer,*midground_layer,*foreground_layer,*text_layer;
+static tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
 static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
 static int bg_bank, fg_bank, mid_bank;
 static int bg_col, fg_col, mid_col;
@@ -329,7 +329,7 @@ static TILE_GET_INFO( get_text_tile_info )
 }
 
 #if 0
-static void set_scroll(tilemap *tm, int plane)
+static void set_scroll(tilemap_t *tm, int plane)
 {
 	int x = mainram[0x620/2+plane*2+0];
 	int y = mainram[0x620/2+plane*2+1];

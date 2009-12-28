@@ -46,8 +46,8 @@ static UINT8	*bishjan_colorram;
 static UINT8	*bishjan_videoram_1_lo,	*bishjan_videoram_1_hi;
 static UINT8	*bishjan_videoram_2_lo,	*bishjan_videoram_2_hi;
 
-static tilemap	*tmap_1;
-static tilemap	*tmap_2;
+static tilemap_t	*tmap_1;
+static tilemap_t	*tmap_2;
 
 static TILE_GET_INFO( get_tile_info_1 )	{	SET_TILE_INFO(0, (bishjan_videoram_1_hi[ tile_index ] << 8) + bishjan_videoram_1_lo[ tile_index ], 0, 0);	}
 static TILE_GET_INFO( get_tile_info_2 )	{	SET_TILE_INFO(0, (bishjan_videoram_2_hi[ tile_index ] << 8) + bishjan_videoram_2_lo[ tile_index ], 0, 0);	}

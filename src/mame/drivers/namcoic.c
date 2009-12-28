@@ -20,7 +20,7 @@ static struct
      * 0x20/2 priority
      * 0x30/2 color
      */
-	tilemap *tmap[6];
+	tilemap_t *tmap[6];
 	UINT16 *videoram;
 	int gfxbank;
 	UINT8 *maskBaseAddr;
@@ -1019,7 +1019,7 @@ READ32_HANDLER( namco_obj32_le_r )
  *  Namco System FL - Final Lap R, Speed Racer
  */
 #define ROZ_TILEMAP_COUNT 2
-static tilemap *mRozTilemap[ROZ_TILEMAP_COUNT];
+static tilemap_t *mRozTilemap[ROZ_TILEMAP_COUNT];
 static UINT16 *rozbank16;
 static UINT16 *rozvideoram16;
 static UINT16 *rozcontrol16;
@@ -1214,7 +1214,7 @@ UnpackRozParam( const UINT16 *pSource, struct RozParam *pRozParam )
 static void
 DrawRozHelper(
 	bitmap_t *bitmap,
-	tilemap *tmap,
+	tilemap_t *tmap,
 	const rectangle *clip,
 	const struct RozParam *rozInfo )
 {
@@ -1509,7 +1509,7 @@ WRITE32_HANDLER( namco_rozvideoram32_le_w )
  */
 static UINT16 *mpRoadRAM; /* at 0x880000 in Final Lap; at 0xa00000 in Lucky&Wild */
 static int mRoadGfxBank;
-static tilemap *mpRoadTilemap;
+static tilemap_t *mpRoadTilemap;
 static pen_t mRoadTransparentColor;
 static int mbRoadNeedTransparent;
 

@@ -16,7 +16,7 @@ struct _airbustr_state
 	UINT8 *    devram;
 
 	/* video-related */
-	tilemap    *bg_tilemap, *fg_tilemap;
+	tilemap_t    *bg_tilemap, *fg_tilemap;
 	bitmap_t   *sprites_bitmap;
 	int        bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly, highbits;
 

@@ -15,7 +15,7 @@ UINT8 *bagman_video_enable;
 
 UINT8 *bagman_videoram;
 UINT8 *bagman_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 WRITE8_HANDLER( bagman_videoram_w )

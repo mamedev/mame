@@ -1,7 +1,7 @@
 
 #include "driver.h"
 
-static tilemap *bg_layer,*fg_layer,*tx_layer;
+static tilemap_t *bg_layer,*fg_layer,*tx_layer;
 UINT16 *dynduke_back_data,*dynduke_fore_data,*dynduke_scroll_ram;
 
 static int back_bankbase,fore_bankbase;

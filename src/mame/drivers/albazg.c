@@ -72,7 +72,7 @@ struct _albazg_state
 //  UINT8 *  paletteram_2;  // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* misc */
 	UINT8 mux_data;

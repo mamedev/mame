@@ -69,7 +69,7 @@ static int has_zoom;
 
 
 UINT16 *metro_K053936_ram;
-static tilemap *metro_K053936_tilemap;
+static tilemap_t *metro_K053936_tilemap;
 
 static UINT16 *metro_tiletable_old;
 static UINT8 *dirtyindex;
@@ -163,8 +163,8 @@ WRITE16_HANDLER( metro_paletteram_w )
 
 ***************************************************************************/
 
-static tilemap *bg_tilemap[3];
-static tilemap *tilemap_16x16[3];
+static tilemap_t *bg_tilemap[3];
+static tilemap_t *tilemap_16x16[3];
 static UINT8 *empty_tiles;
 
 /* A 2048 x 2048 virtual tilemap */
@@ -735,7 +735,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 ***************************************************************************/
 
-static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority,
+static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT32 priority,
 		  				 int sx, int sy, int wx, int wy)	// scroll & window values
 {
 #if 1

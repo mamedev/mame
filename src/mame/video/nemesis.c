@@ -22,7 +22,7 @@ static int tilemap_flip;
 static int flipscreen;
 static UINT8 irq_port_last;
 
-static tilemap *background, *foreground;
+static tilemap_t *background, *foreground;
 
 static const struct
 {

@@ -85,10 +85,10 @@ struct _atarigen_state
 	UINT32 *			playfield32;
 	UINT32 *			alpha32;
 
-	tilemap *			playfield_tilemap;
-	tilemap *			playfield2_tilemap;
-	tilemap *			alpha_tilemap;
-	tilemap *			alpha2_tilemap;
+	tilemap_t *			playfield_tilemap;
+	tilemap_t *			playfield2_tilemap;
+	tilemap_t *			alpha_tilemap;
+	tilemap_t *			alpha2_tilemap;
 
 	UINT16 *			atarivc_data;
 	UINT16 *			atarivc_eof_data;

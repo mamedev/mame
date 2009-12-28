@@ -13,7 +13,7 @@ static int palettebank;
 
 UINT8 *mikie_videoram;
 UINT8 *mikie_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 

@@ -16,7 +16,7 @@ UINT8 *slapfight_fixcolorram;
 UINT8 *slapfight_scrollx_lo,*slapfight_scrollx_hi,*slapfight_scrolly;
 static int flipscreen, slapfight_palette_bank = 0;
 
-static tilemap *pf1_tilemap,*fix_tilemap;
+static tilemap_t *pf1_tilemap,*fix_tilemap;
 
 
 

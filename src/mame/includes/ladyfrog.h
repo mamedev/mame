@@ -16,7 +16,7 @@ struct _ladyfrog_state
 	size_t     videoram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	int        tilebank, palette_bank;
 	int        spritetilebase;
 

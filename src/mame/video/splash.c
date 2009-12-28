@@ -15,7 +15,7 @@ UINT16 *splash_pixelram;
 UINT16 *roldfrog_bitmap_mode;
 int splash_bitmap_type;
 int splash_sprite_attr2_shift;
-static tilemap *bg_tilemap[2];
+static tilemap_t *bg_tilemap[2];
 
 /***************************************************************************
 

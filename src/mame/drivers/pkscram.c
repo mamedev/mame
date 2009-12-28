@@ -24,7 +24,7 @@ static UINT16* pkscramble_fgtilemap_ram;
 static UINT16* pkscramble_mdtilemap_ram;
 static UINT16* pkscramble_bgtilemap_ram;
 
-static tilemap *fg_tilemap, *md_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *md_tilemap, *bg_tilemap;
 static const device_config *scanline_timer;
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )

@@ -45,8 +45,8 @@
 typedef struct _pf_layer_info pf_layer_info;
 struct _pf_layer_info
 {
-	tilemap *		tmap;
-	tilemap *		wide_tmap;
+	tilemap_t *		tmap;
+	tilemap_t *		wide_tmap;
 	UINT16			vram_base;
 	UINT16			control[4];
 };

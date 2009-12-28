@@ -49,7 +49,7 @@ Notes:
 ***************************************************************************/
 
 static UINT8   *bg_ram,  *fg_ram;
-static tilemap *bg_tmap, *fg_tmap;
+static tilemap_t *bg_tmap, *fg_tmap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {

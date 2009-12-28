@@ -34,14 +34,14 @@ static int videoshift;
 static int bioship_background_bank;
 static UINT8 bioship_scroll[4];
 
-static tilemap *bg_tilemap0;
-static tilemap *bg_tilemap1;
-static tilemap *bg_tilemap2;
-static tilemap *bg_tilemap3;
+static tilemap_t *bg_tilemap0;
+static tilemap_t *bg_tilemap1;
+static tilemap_t *bg_tilemap2;
+static tilemap_t *bg_tilemap3;
 
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 
-static tilemap *fg_tilemap; // strahl
+static tilemap_t *fg_tilemap; // strahl
 static bitmap_t *background_bitmap; // bioship
 
 /***************************************************************************
@@ -596,7 +596,7 @@ VIDEO_UPDATE( gunnail )
 		{
 			int const yscroll = gunnail_scrollramy[0] + gunnail_scrollramy[y1];
 			int tilemap_bank_select;
-			tilemap* bg_tilemap = bg_tilemap0;
+			tilemap_t* bg_tilemap = bg_tilemap0;
 
 			bgclip.min_y = y1;
 			bgclip.max_y = y1;
@@ -627,7 +627,7 @@ VIDEO_UPDATE( gunnail )
 		UINT16 yscroll = ((gunnail_scrollram[2]&0xff)<<8) | ((gunnail_scrollram[3]&0xff)<<0);
 		UINT16 xscroll = ((gunnail_scrollram[0]&0xff)<<8) | ((gunnail_scrollram[1]&0xff)<<0);
 		int tilemap_bank_select;
-		tilemap* bg_tilemap = bg_tilemap0;
+		tilemap_t* bg_tilemap = bg_tilemap0;
 
 		//popmessage( "scroll %04x, %04x", yscroll,xscroll);
 

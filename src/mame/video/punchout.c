@@ -9,13 +9,13 @@
 #include "driver.h"
 
 
-static tilemap *bg_top_tilemap;
-static tilemap *bg_bot_tilemap;
-static tilemap *fg_tilemap;	// bottom only
+static tilemap_t *bg_top_tilemap;
+static tilemap_t *bg_bot_tilemap;
+static tilemap_t *fg_tilemap;	// bottom only
 
-static tilemap *spr1_tilemap;
-static tilemap *spr1_tilemap_flipx;
-static tilemap *spr2_tilemap;
+static tilemap_t *spr1_tilemap;
+static tilemap_t *spr1_tilemap_flipx;
+static tilemap_t *spr2_tilemap;
 
 UINT8 *punchout_bg_top_videoram;
 UINT8 *punchout_bg_bot_videoram;
@@ -262,7 +262,7 @@ static void armwrest_draw_big_sprite(bitmap_t *bitmap, const rectangle *cliprect
 		int sx,sy;
 		UINT32 startx,starty;
 		int incxx,incyy;
-		tilemap *_tilemap;
+		tilemap_t *_tilemap;
 
 		sx = 4096 - (punchout_spr1_ctrlram[2] + 256 * (punchout_spr1_ctrlram[3] & 0x0f));
 		if (sx > 2048) sx -= 4096;

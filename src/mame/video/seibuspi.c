@@ -1,10 +1,10 @@
 #include "driver.h"
 #include "includes/seibuspi.h"
 
-static tilemap *text_layer;
-static tilemap *back_layer;
-static tilemap *mid_layer;
-static tilemap *fore_layer;
+static tilemap_t *text_layer;
+static tilemap_t *back_layer;
+static tilemap_t *mid_layer;
+static tilemap_t *fore_layer;
 
 UINT32 *spi_scrollram;
 
@@ -543,7 +543,7 @@ VIDEO_START( spi )
 }
 
 #ifdef UNUSED_FUNCTION
-static void set_rowscroll(tilemap *layer, int scroll, INT16* rows)
+static void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows)
 {
 	int i;
 	int x = spi_scrollram[scroll] & 0xffff;
@@ -555,7 +555,7 @@ static void set_rowscroll(tilemap *layer, int scroll, INT16* rows)
 	tilemap_set_scrolly(layer, 0, y);
 }
 
-static void set_scroll(tilemap *layer, int scroll)
+static void set_scroll(tilemap_t *layer, int scroll)
 {
 	int x = spi_scrollram[scroll] & 0xffff;
 	int y = (spi_scrollram[scroll] >> 16) & 0xffff;
@@ -565,7 +565,7 @@ static void set_scroll(tilemap *layer, int scroll)
 #endif
 
 
-static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tile, int x, int y, int opaque, INT16 *rowscroll)
+static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
 {
 	int i,j;
 	UINT16 *s;

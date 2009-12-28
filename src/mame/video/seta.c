@@ -141,8 +141,8 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 /* Variables only used here */
 
-static tilemap *tilemap_0, *tilemap_1;	// Layer 0
-static tilemap *tilemap_2, *tilemap_3;	// Layer 1
+static tilemap_t *tilemap_0, *tilemap_1;	// Layer 0
+static tilemap_t *tilemap_2, *tilemap_3;	// Layer 1
 static int tilemaps_flip;
 
 /* Variables used elsewhere */

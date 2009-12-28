@@ -14,7 +14,7 @@ struct _blktiger_state
 //  UINT8 * paletteram2;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap *tx_tilemap, *bg_tilemap8x4, *bg_tilemap4x8;
+	tilemap_t *tx_tilemap, *bg_tilemap8x4, *bg_tilemap4x8;
 	UINT32  scroll_bank;
 	UINT8   scroll_x[2];
 	UINT8   scroll_y[2];

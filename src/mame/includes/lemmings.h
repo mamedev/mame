@@ -13,7 +13,7 @@ struct _lemmings_state
 
 	/* video-related */
 	bitmap_t *bitmap0;
-	tilemap *vram_tilemap;
+	tilemap_t *vram_tilemap;
 	UINT16 *sprite_triple_buffer_0,*sprite_triple_buffer_1;
 	UINT8 *vram_buffer;
 

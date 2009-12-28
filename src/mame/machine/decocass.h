@@ -34,7 +34,7 @@ struct _decocass_state
 	size_t    objectram_size;
 
 	/* video-related */
-	tilemap   *fg_tilemap, *bg_tilemap_l, *bg_tilemap_r;
+	tilemap_t   *fg_tilemap, *bg_tilemap_l, *bg_tilemap_r;
 	INT32     watchdog_count;
 	INT32     watchdog_flip;
 	INT32     color_missiles;

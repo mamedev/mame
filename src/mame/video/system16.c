@@ -183,8 +183,8 @@ UINT16 *sys18_splittab_bg_y;
 UINT16 *sys18_splittab_fg_x;
 UINT16 *sys18_splittab_fg_y;
 
-static tilemap *background, *foreground, *text_layer;
-static tilemap *background2, *foreground2;
+static tilemap_t *background, *foreground, *text_layer;
+static tilemap_t *background2, *foreground2;
 static int old_bg_page[4],old_fg_page[4], old_tile_bank1, old_tile_bank0;
 static int old_bg2_page[4],old_fg2_page[4];
 
@@ -668,8 +668,8 @@ VIDEO_START( system18old )
 
 *****************************************************************************************/
 
-static tilemap *system16a_bootleg_bg_tilemaps[2];
-static tilemap *system16a_bootleg_text_tilemap;
+static tilemap_t *system16a_bootleg_bg_tilemaps[2];
+static tilemap_t *system16a_bootleg_text_tilemap;
 static UINT16 system16a_bootleg_tilemapselect;
 
 

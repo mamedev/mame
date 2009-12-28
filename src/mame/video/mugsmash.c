@@ -2,7 +2,7 @@
 
 #include "driver.h"
 
-static tilemap *mugsmash_tilemap1,  *mugsmash_tilemap2;
+static tilemap_t *mugsmash_tilemap1,  *mugsmash_tilemap2;
 
 extern UINT16 *mugsmash_videoram1, *mugsmash_videoram2, *mugs_spriteram;
 extern UINT16 *mugsmash_regs1, *mugsmash_regs2;

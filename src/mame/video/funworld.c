@@ -60,7 +60,7 @@
 #include "driver.h"
 #include "video/resnet.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 UINT8 *funworld_colorram;
 UINT8 *funworld_videoram;
 

@@ -743,7 +743,7 @@ Notes:
 #include "sound/c352.h"
 
 static int ss23_vstat = 0, hstat = 0, vstate = 0;
-static tilemap *bgtilemap;
+static tilemap_t *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram;
 static UINT32 *namcos23_charram;
 static UINT8 namcos23_jvssense;

@@ -15,7 +15,7 @@ struct _commando_state
 //  UINT8 *  spriteram; // currently this uses generic buffered_spriteram
 
 	/* video-related */
-	tilemap  *bg_tilemap, *fg_tilemap;
+	tilemap_t  *bg_tilemap, *fg_tilemap;
 	UINT8 scroll_x[2];
 	UINT8 scroll_y[2];
 

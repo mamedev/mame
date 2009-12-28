@@ -11,7 +11,7 @@
 
 UINT8 *skydiver_videoram;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int width = 0;
 
 

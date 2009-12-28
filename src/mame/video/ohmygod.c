@@ -4,7 +4,7 @@
 UINT16 *ohmygod_videoram;
 
 static int spritebank;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 

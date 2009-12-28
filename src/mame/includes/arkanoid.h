@@ -19,7 +19,7 @@ struct _arkanoid_state
 	size_t   spriteram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 	UINT8    gfxbank, palettebank;
 
 	/* input-related */

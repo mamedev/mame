@@ -46,7 +46,7 @@ struct _dynadice_state
 //  UINT8 *  paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *bg_tilemap,*top_tilemap;
+	tilemap_t  *bg_tilemap,*top_tilemap;
 
 	/* misc */
 	int      ay_data;

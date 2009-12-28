@@ -16,7 +16,7 @@ UINT8 *gsword_spriteattrib_ram;
 
 static int charbank, charpalbank, flipscreen;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 static PALETTE_INIT( common )

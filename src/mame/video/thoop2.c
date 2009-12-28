@@ -17,7 +17,7 @@ UINT16 *thoop2_spriteram;
 
 static int sprite_count[5];
 static int *sprite_table[5];
-static tilemap *pant[2];
+static tilemap_t *pant[2];
 
 
 /***************************************************************************

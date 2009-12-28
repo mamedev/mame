@@ -1,7 +1,7 @@
 
 #include "driver.h"
 
-static tilemap *bg_layer,*fg_layer,*tx_layer;
+static tilemap_t *bg_layer,*fg_layer,*tx_layer;
 UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 static int flipscreen,alternate;

@@ -27,7 +27,7 @@ struct _fuuki32_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
+	tilemap_t     *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
 	UINT32      spr_buffered_tilebank[2];
 
 	/* misc */

@@ -32,7 +32,7 @@ struct _fcombat_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bgmap;
+	tilemap_t    *bgmap;
 	UINT8      cocktail_flip;
 	UINT8      char_palette, sprite_palette;
 	UINT8      char_bank;

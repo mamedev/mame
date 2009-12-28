@@ -7,7 +7,7 @@
 
 static UINT8 *mogura_tileram;
 static UINT8* mogura_gfxram;
-static tilemap *mogura_tilemap;
+static tilemap_t *mogura_tilemap;
 
 static PALETTE_INIT( mogura )
 {

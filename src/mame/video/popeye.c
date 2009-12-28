@@ -20,7 +20,7 @@ static UINT8 invertmask;
 static UINT8 bitmap_type;
 enum { TYPE_SKYSKIPR, TYPE_POPEYE };
 
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 
 static UINT8 lastflip;
 

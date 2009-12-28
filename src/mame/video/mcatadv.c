@@ -14,7 +14,7 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 #include "profiler.h"
 #include "includes/mcatadv.h"
 
-static tilemap *mcatadv_tilemap1,  *mcatadv_tilemap2;
+static tilemap_t *mcatadv_tilemap1,  *mcatadv_tilemap2;
 static UINT16 *spriteram_old, *vidregs_old;
 static int palette_bank1, palette_bank2;
 
@@ -151,7 +151,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap* current_tilemap, bitmap_t *bitmap, const rectangle *cliprect)
+static void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int flip;
 	UINT32 drawline;

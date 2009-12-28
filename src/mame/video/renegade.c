@@ -8,8 +8,8 @@
 
 UINT8 *renegade_videoram2;
 static INT32 renegade_scrollx;
-static tilemap *bg_tilemap;
-static tilemap *fg_tilemap;
+static tilemap_t *bg_tilemap;
+static tilemap_t *fg_tilemap;
 
 WRITE8_HANDLER( renegade_videoram_w )
 {

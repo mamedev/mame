@@ -15,7 +15,7 @@ struct _firetrap_state
 	size_t        spriteram_size;
 
 	/* video-related */
-	tilemap       *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
+	tilemap_t       *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
 	UINT8         scroll1_x[2], scroll1_y[2];
 	UINT8         scroll2_x[2], scroll2_y[2];
 

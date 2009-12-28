@@ -1,6 +1,6 @@
 #include "driver.h"
 
-static tilemap *bg_tilemap,*tx_tilemap;
+static tilemap_t *bg_tilemap,*tx_tilemap;
 static UINT16 control[2];
 
 

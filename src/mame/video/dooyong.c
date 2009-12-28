@@ -10,8 +10,8 @@ static UINT8 tx_pri;				/* Used by sadari/gundl94/primella */
 static UINT16 rshark_pri;			/* Used by rshark/superx/popbingo */
 
 /* Up to four ROM-based and one RAM-based tilemap */
-static tilemap *bg_tilemap, *bg2_tilemap, *fg_tilemap, *fg2_tilemap;
-static tilemap *tx_tilemap;
+static tilemap_t *bg_tilemap, *bg2_tilemap, *fg_tilemap, *fg2_tilemap;
+static tilemap_t *tx_tilemap;
 
 /* Tilemap control registers */
 static UINT8 bgscroll8[0x10] = {0}, bg2scroll8[0x10] = {0}, fgscroll8[0x10] = {0}, fg2scroll8[0x10] = {0};
@@ -25,7 +25,7 @@ static int tx_tilemap_mode;	/* 0 = lastday/gulfstrm/pollux/flytiger; 1 = bluehaw
 
 /* All the dooyong games have the same tilemap control registers */
 
-INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap *map)
+INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map)
 {
 	UINT8 old = scroll[offset];
 	if (old != data)

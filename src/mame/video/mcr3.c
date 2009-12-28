@@ -31,8 +31,8 @@ UINT8 *spyhunt_alpharam;
  *
  *************************************/
 
-static tilemap *bg_tilemap;
-static tilemap *alpha_tilemap;
+static tilemap_t *bg_tilemap;
+static tilemap_t *alpha_tilemap;
 
 
 

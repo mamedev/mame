@@ -13,7 +13,7 @@ struct _flstory_state
 	size_t   spriteram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 	int      char_bank, palette_bank, flipscreen, gfxctrl;
 
 	/* sound-related */

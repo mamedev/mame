@@ -19,7 +19,7 @@ etc.
 
 static UINT8 *ltcasino_tile_num_ram, *ltcasino_tile_atr_ram;
 
-static tilemap *ltcasino_tilemap;
+static tilemap_t *ltcasino_tilemap;
 
 /* Video */
 

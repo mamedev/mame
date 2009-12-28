@@ -8,7 +8,7 @@
 
 UINT16 *dcon_back_data,*dcon_fore_data,*dcon_mid_data,*dcon_scroll_ram,*dcon_textram;
 
-static tilemap *background_layer,*foreground_layer,*midground_layer,*text_layer;
+static tilemap_t *background_layer,*foreground_layer,*midground_layer,*text_layer;
 static UINT16 dcon_enable;
 static int dcon_gfx_bank_select;
 

@@ -21,7 +21,7 @@ struct _bsktball_state
 	UINT8 *  motion;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* misc */
 	UINT32   nmi_on;

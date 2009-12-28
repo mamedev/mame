@@ -16,7 +16,7 @@ UINT8 *crbaloon_spriteram;
 
 static UINT16 crbaloon_collision_address;
 static UINT8 crbaloon_collision_address_clear;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 /***************************************************************************

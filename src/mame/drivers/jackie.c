@@ -6,7 +6,7 @@
 static int exp_bank = 0;
 
 static UINT8   *fg_tile_ram, *fg_color_ram;
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
@@ -36,7 +36,7 @@ static WRITE8_HANDLER( bg_scroll_w )
 	bg_scroll[offset] = data;
 }
 
-static tilemap *jackie_reel1_tilemap;
+static tilemap_t *jackie_reel1_tilemap;
 static UINT8 *jackie_reel1_ram;
 
 static WRITE8_HANDLER( jackie_reel1_ram_w )
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_jackie_reel1_tile_info )
 }
 
 
-static tilemap *jackie_reel2_tilemap;
+static tilemap_t *jackie_reel2_tilemap;
 static UINT8 *jackie_reel2_ram;
 
 static WRITE8_HANDLER( jackie_reel2_ram_w )
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_jackie_reel2_tile_info )
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
-static tilemap *jackie_reel3_tilemap;
+static tilemap_t *jackie_reel3_tilemap;
 static UINT8 *jackie_reel3_ram;
 
 static WRITE8_HANDLER( jackie_reel3_ram_w )

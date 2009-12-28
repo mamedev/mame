@@ -32,7 +32,7 @@ UINT8 *pacland_videoram,*pacland_videoram2,*pacland_spriteram;
 static UINT8 palette_bank;
 static const UINT8 *pacland_color_prom;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 static bitmap_t *fg_bitmap;
 
 static UINT32 *transmask[3];

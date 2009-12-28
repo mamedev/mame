@@ -12,7 +12,7 @@ UINT8 *seicross_row_scroll;
 
 UINT8 *seicross_videoram;
 UINT8 *seicross_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 

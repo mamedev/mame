@@ -15,7 +15,7 @@ struct _equites_state
 //  UINT16 *  nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
-	tilemap   *fg_tilemap, *bg_tilemap;
+	tilemap_t   *fg_tilemap, *bg_tilemap;
 	int       fg_char_bank;
 	UINT8     bgcolor;
 	UINT16    splndrbt_bg_scrollx, splndrbt_bg_scrolly;

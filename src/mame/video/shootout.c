@@ -5,7 +5,7 @@
 
 #include "driver.h"
 
-static tilemap *background, *foreground;
+static tilemap_t *background, *foreground;
 extern UINT8 *shootout_textram;
 
 

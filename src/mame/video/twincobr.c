@@ -46,7 +46,7 @@ static INT32 scroll_y;
 static INT32 twincobr_display_on;
 static INT32 twincobr_flip_screen;
 
-static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
 
 
 /***************************************************************************

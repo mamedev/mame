@@ -9,7 +9,7 @@
 
 UINT8 *nitedrvr_hvc;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( nitedrvr_videoram_w )
 {

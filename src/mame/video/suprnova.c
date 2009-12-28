@@ -27,7 +27,7 @@ static bitmap_t *tilemap_bitmapflags_higher;
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle *cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
@@ -837,8 +837,8 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	}
 }
 
-static tilemap *skns_tilemap_A;
-static tilemap *skns_tilemap_B;
+static tilemap_t *skns_tilemap_A;
+static tilemap_t *skns_tilemap_B;
 
 static TILE_GET_INFO( get_tilemap_A_tile_info )
 {

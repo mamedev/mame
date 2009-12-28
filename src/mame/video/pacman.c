@@ -22,7 +22,7 @@
 
 UINT8 *pacman_videoram;
 UINT8 *pacman_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8 charbank;
 static UINT8 spritebank;
 static UINT8 palettebank;

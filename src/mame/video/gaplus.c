@@ -13,7 +13,7 @@
 UINT8 *gaplus_videoram;
 UINT8 *gaplus_spriteram;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 /***************************************************************************

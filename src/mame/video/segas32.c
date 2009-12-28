@@ -216,7 +216,7 @@ struct extents_list
 struct cache_entry
 {
 	struct cache_entry *	next;
-	tilemap *				tmap;
+	tilemap_t *				tmap;
 	UINT8					page;
 	UINT8					bank;
 };
@@ -741,7 +741,7 @@ WRITE32_HANDLER( multi32_mixer_1_w )
  *
  *************************************/
 
-static tilemap *find_cache_entry(int page, int bank)
+static tilemap_t *find_cache_entry(int page, int bank)
 {
 	struct cache_entry *entry, *prev;
 
@@ -914,7 +914,7 @@ static int compute_clipping_extents(const device_config *screen, int enable, int
  *
  *************************************/
 
-INLINE void get_tilemaps(int bgnum, tilemap **tilemaps)
+INLINE void get_tilemaps(int bgnum, tilemap_t **tilemaps)
 {
 	int tilebank, page;
 
@@ -941,7 +941,7 @@ static void update_tilemap_zoom(const device_config *screen, struct layer_info *
 	int clipenable, clipout, clips, clipdraw_start;
 	bitmap_t *bitmap = layer->bitmap;
 	struct extents_list clip_extents;
-	tilemap *tilemaps[4];
+	tilemap_t *tilemaps[4];
 	UINT32 srcx, srcx_start, srcy;
 	UINT32 srcxstep, srcystep;
 	int dstxstep, dstystep;
@@ -1094,7 +1094,7 @@ static void update_tilemap_rowscroll(const device_config *screen, struct layer_i
 	int clipenable, clipout, clips, clipdraw_start;
 	bitmap_t *bitmap = layer->bitmap;
 	struct extents_list clip_extents;
-	tilemap *tilemaps[4];
+	tilemap_t *tilemaps[4];
 	int rowscroll, rowselect;
 	int xscroll, yscroll;
 	UINT16 *table;

@@ -2,7 +2,7 @@
 
 UINT8 *baraduke_textram, *baraduke_videoram, *baraduke_spriteram;
 
-static tilemap *tx_tilemap, *bg_tilemap[2];
+static tilemap_t *tx_tilemap, *bg_tilemap[2];
 static int xscroll[2], yscroll[2];
 
 

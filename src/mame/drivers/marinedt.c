@@ -98,7 +98,7 @@ p2 ink doesn't always light up in test mode
 #include "cpu/z80/z80.h"
 
 static bitmap_t *tile, *obj1, *obj2;
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 
 static UINT8 *tx_tileram;
 

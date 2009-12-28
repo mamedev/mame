@@ -10,7 +10,7 @@
 
 UINT16 *wwfsstar_fg0_videoram, *wwfsstar_bg0_videoram;
 extern int wwfsstar_scrollx, wwfsstar_scrolly;
-static tilemap *fg0_tilemap, *bg0_tilemap;
+static tilemap_t *fg0_tilemap, *bg0_tilemap;
 
 /*******************************************************************************
  Write Handlers

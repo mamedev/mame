@@ -1459,7 +1459,7 @@ static UINT8 *K007342_videoram_0,*K007342_colorram_0;
 static UINT8 *K007342_videoram_1,*K007342_colorram_1;
 static UINT8 K007342_regs[8];
 static void (*K007342_callback)(int tmap, int bank, int *code, int *color, int *flags);
-static tilemap *K007342_tilemap[2];
+static tilemap_t *K007342_tilemap[2];
 
 /***************************************************************************
 
@@ -1895,7 +1895,7 @@ static int K052109_tileflip_enable;
 static UINT8 K052109_irq_enabled;
 static INT32 K052109_dx[3], K052109_dy[3];
 static UINT8 K052109_romsubbank,K052109_scrollctrl;
-tilemap *K052109_tilemap[3];
+tilemap_t *K052109_tilemap[3];
 
 
 
@@ -4549,7 +4549,7 @@ static int K051316_bpp[MAX_K051316];
 static void (*K051316_callback[MAX_K051316])(int *code,int *color,int *flags);
 static UINT8 *K051316_ram[MAX_K051316];
 static UINT8 K051316_ctrlram[MAX_K051316][16];
-static tilemap *K051316_tilemap[MAX_K051316];
+static tilemap_t *K051316_tilemap[MAX_K051316];
 
 /***************************************************************************
 
@@ -4907,7 +4907,7 @@ static int K053936_wraparound[K053936_MAX_CHIPS];
 // there is another implementation of this in  machine/konamigx.c (!)
 //  why?
 
-static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack)
+static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	if (!tmap)
 		return;
@@ -5028,12 +5028,12 @@ if (input_code_pressed(machine, KEYCODE_D))
 }
 
 
-void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack)
+void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	K053936_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
 
-void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack)
+void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	K053936_zoom_draw(1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
@@ -5061,7 +5061,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 
 static UINT8 K053251_ram[16];
 static int K053251_palette_index[5];
-static tilemap *K053251_tilemaps[5];
+static tilemap_t *K053251_tilemaps[5];
 static int K053251_tilemaps_set;
 
 static STATE_POSTLOAD( K053251_reset_indexes )
@@ -5081,7 +5081,7 @@ void K053251_vh_start(running_machine *machine)
 	state_save_register_postload(machine, K053251_reset_indexes, NULL);
 }
 
-void K053251_set_tilemaps(tilemap *ci0,tilemap *ci1,tilemap *ci2,tilemap *ci3,tilemap *ci4)
+void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4)
 {
 	K053251_tilemaps[0] = ci0;
 	K053251_tilemaps[1] = ci1;
@@ -5336,7 +5336,7 @@ READ8_HANDLER( K051733_r )
 #define K056832_PAGE_WIDTH  (K056832_PAGE_COLS*8)
 #define K056832_PAGE_COUNT 16
 
-static tilemap *K056832_tilemap[K056832_PAGE_COUNT];
+static tilemap_t *K056832_tilemap[K056832_PAGE_COUNT];
 static bitmap_t *K056832_pixmap[K056832_PAGE_COUNT];
 
 static UINT16 K056832_regs[0x20];	// 157/832 regs group 1
@@ -5623,7 +5623,7 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	void (*callback)(int layer, int *code, int *color, int *flags),
 	int djmain_hack)
 {
-	tilemap *tmap;
+	tilemap_t *tmap;
 	int gfx_index;
 	int i;
 	UINT32 total;
@@ -6438,7 +6438,7 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 	{
 
 		rectangle zerorect;
-		tilemap *tmap;
+		tilemap_t *tmap;
 		UINT32 *dirty;
 		int all_dirty;
 		bitmap_t* xprmap;
@@ -6565,7 +6565,7 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	int cminy, cmaxy, cminx, cmaxx;
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	UINT16 *pScrollData;
 	UINT16 ram16[2];
 
@@ -6854,7 +6854,7 @@ void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const r
 	int cminy, cmaxy, cminx, cmaxx;
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	UINT16 *pScrollData;
 	UINT16 ram16[2];
 

@@ -15,7 +15,7 @@ struct _fastlane_state
 	UINT8 *    k007121_regs;
 
 	/* video-related */
-	tilemap    *layer0, *layer1;
+	tilemap_t    *layer0, *layer1;
 	rectangle  clip0, clip1;
 
 	/* devices */

@@ -10,7 +10,7 @@
 
 static UINT16 xscroll;
 static UINT16 yscroll;
-static tilemap *background, *foreground;
+static tilemap_t *background, *foreground;
 
 UINT16 *amazon_videoram;
 

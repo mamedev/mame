@@ -64,13 +64,13 @@ size_t cave_paletteram_size;
 
 /* Variables only used here: */
 
-static tilemap *tilemap_0;
+static tilemap_t *tilemap_0;
 static int tiledim_0, old_tiledim_0;
-static tilemap *tilemap_1;
+static tilemap_t *tilemap_1;
 static int tiledim_1, old_tiledim_1;
-static tilemap *tilemap_2;
+static tilemap_t *tilemap_2;
 static int tiledim_2, old_tiledim_2;
-static tilemap *tilemap_3;
+static tilemap_t *tilemap_3;
 static int tiledim_3, old_tiledim_3;
 
 
@@ -368,7 +368,7 @@ static TILE_GET_INFO( sailormn_get_tile_info_2 )
 }
 
 
-INLINE void vram_w(UINT16 *VRAM, tilemap *TILEMAP, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+INLINE void vram_w(UINT16 *VRAM, tilemap_t *TILEMAP, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
 {
 	if ((VRAM[offset] & mem_mask)==(data & mem_mask)) return;
 	COMBINE_DATA(&VRAM[offset]);
@@ -390,7 +390,7 @@ INLINE void vram_w(UINT16 *VRAM, tilemap *TILEMAP, ATTR_UNUSED offs_t offset, AT
     and 408000-407fff both go to the 8x8 tilemap ram. Use this function
     in this cases. Note that the get_tile_info function looks in the
     4000-7fff range for tiles, so we have to write the data there. */
-INLINE void vram_8x8_w(UINT16 *VRAM, tilemap *TILEMAP,ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+INLINE void vram_8x8_w(UINT16 *VRAM, tilemap_t *TILEMAP,ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
 {
 	offset %= 0x4000/2;
 	if ((VRAM[offset] & mem_mask)==(data & mem_mask)) return;
@@ -1328,7 +1328,7 @@ static void sprite_draw_donpachi_zbuf( int priority )
 
 INLINE void cave_tilemap_draw(
 	bitmap_t *bitmap, const rectangle *cliprect,
-	tilemap *TILEMAP, UINT16 *VRAM, UINT16 *VCTRL,
+	tilemap_t *TILEMAP, UINT16 *VRAM, UINT16 *VCTRL,
 	UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
 	int sx, sy, flipx, flipy, offs_x, offs_y, offs_row;

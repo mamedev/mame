@@ -10,7 +10,7 @@ Video hardware
 #include "driver.h"
 
 UINT8 *mayumi_videoram;
-static tilemap *mayumi_tilemap;
+static tilemap_t *mayumi_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {

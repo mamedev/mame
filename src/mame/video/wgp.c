@@ -3,7 +3,7 @@
 
 #define TC0100SCN_GFX_NUM 1
 
-static tilemap *wgp_piv_tilemap[3];
+static tilemap_t *wgp_piv_tilemap[3];
 
 UINT16 *wgp_spritemap;
 size_t wgp_spritemap_size;

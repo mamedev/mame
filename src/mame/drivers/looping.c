@@ -104,7 +104,7 @@ struct _looping_state
 	UINT8 *		spriteram;
 
 	/* tilemaps */
-	tilemap *	bg_tilemap;
+	tilemap_t *	bg_tilemap;
 
 	/* sound state */
 	UINT8		sound[8];

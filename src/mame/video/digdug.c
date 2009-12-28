@@ -4,7 +4,7 @@
 
 UINT8 *digdug_videoram,*digdug_objram, *digdug_posram, *digdug_flpram;
 
-static tilemap *bg_tilemap,*tx_tilemap;
+static tilemap_t *bg_tilemap,*tx_tilemap;
 
 
 static INT32 bg_select, tx_color_mode, bg_disable, bg_color_bank;

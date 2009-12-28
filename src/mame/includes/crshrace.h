@@ -10,7 +10,7 @@ struct _crshrace_state
 //      UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap   *tilemap1, *tilemap2;
+	tilemap_t   *tilemap1, *tilemap2;
 	int       roz_bank, gfxctrl, flipscreen;
 
 	/* misc */

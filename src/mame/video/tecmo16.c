@@ -16,7 +16,7 @@ UINT16 *tecmo16_videoram2;
 UINT16 *tecmo16_colorram2;
 UINT16 *tecmo16_charram;
 
-static tilemap *fg_tilemap,*bg_tilemap,*tx_tilemap;
+static tilemap_t *fg_tilemap,*bg_tilemap,*tx_tilemap;
 static bitmap_t *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
 
 static int flipscreen, game_is_riot;

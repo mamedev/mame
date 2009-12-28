@@ -30,7 +30,7 @@ struct _dragrace_state
 	UINT8 *  position_ram;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* misc */
 	unsigned  misc_flags;

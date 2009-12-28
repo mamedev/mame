@@ -42,12 +42,12 @@
 
 static YGV608 ygv608;
 
-static tilemap *tilemap_A_cache_8[3];
-static tilemap *tilemap_A_cache_16[3];
-static tilemap *tilemap_B_cache_8[3];
-static tilemap *tilemap_B_cache_16[3];
-static tilemap *tilemap_A = NULL;
-static tilemap *tilemap_B = NULL;
+static tilemap_t *tilemap_A_cache_8[3];
+static tilemap_t *tilemap_A_cache_16[3];
+static tilemap_t *tilemap_B_cache_8[3];
+static tilemap_t *tilemap_B_cache_16[3];
+static tilemap_t *tilemap_A = NULL;
+static tilemap_t *tilemap_B = NULL;
 static bitmap_t *work_bitmap = NULL;
 
 static void HandleYGV608Reset( running_machine *machine );

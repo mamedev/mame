@@ -57,7 +57,7 @@ struct _galaxi_state
 //  UINT16 *  nvram;        // currently this uses generic nvram handling
 
 	/* video-related */
-	tilemap   *bg1_tmap, *bg2_tmap, *bg3_tmap, *bg4_tmap, *fg_tmap;
+	tilemap_t   *bg1_tmap, *bg2_tmap, *bg3_tmap, *bg4_tmap, *fg_tmap;
 
 	/* misc */
 	int       hopper, ticket;

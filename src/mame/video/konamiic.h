@@ -63,7 +63,7 @@ The callback must put:
   structure (e.g. TILE_FLIPX). Note that TILE_FLIPY is handled internally by the
   chip so it must not be set by the callback.
 */
-extern tilemap *K052109_tilemap[3];
+extern tilemap_t *K052109_tilemap[3];
 
 void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int layer,int bank,int *code,int *color,int *flags,int *priority));
@@ -223,8 +223,8 @@ void K051316_set_offset(int chip, int xoffs, int yoffs);
 
 extern UINT16 *K053936_0_ctrl,*K053936_0_linectrl;
 extern UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
-void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack);
-void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack);
+void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
+void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
 void K053936_wraparound_enable(int chip, int status);
 void K053936_set_offset(int chip, int xoffs, int yoffs);
 
@@ -240,7 +240,7 @@ WRITE16_HANDLER( K053251_msb_w );
 enum { K053251_CI0=0,K053251_CI1,K053251_CI2,K053251_CI3,K053251_CI4 };
 int K053251_get_priority(int ci);
 int K053251_get_palette_index(int ci);
-void K053251_set_tilemaps(tilemap *ci0,tilemap *ci1,tilemap *ci2,tilemap *ci3,tilemap *ci4);
+void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4);
 void K053251_vh_start(running_machine *machine);
 
 

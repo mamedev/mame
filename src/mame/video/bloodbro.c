@@ -10,7 +10,7 @@ UINT16 *bloodbro_txvideoram;
 UINT16 *bloodbro_bgvideoram,*bloodbro_fgvideoram;
 UINT16 *bloodbro_scroll;
 
-static tilemap *bg_tilemap,*fg_tilemap,*tx_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap,*tx_tilemap;
 
 
 /***************************************************************************

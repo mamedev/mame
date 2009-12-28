@@ -31,7 +31,7 @@
 static UINT16 *m90_spriteram;
 UINT16 *m90_video_data;
 static UINT16 m90_video_control_data[8];
-static tilemap *pf1_layer,*pf2_layer,*pf1_wide_layer,*pf2_wide_layer;
+static tilemap_t *pf1_layer,*pf2_layer,*pf1_wide_layer,*pf2_wide_layer;
 
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,int page_mask)
 {
@@ -268,7 +268,7 @@ WRITE16_HANDLER( m90_video_control_w )
 	COMBINE_DATA(&m90_video_control_data[offset]);
 }
 
-static void markdirty(tilemap *tmap,int page,offs_t offset)
+static void markdirty(tilemap_t *tmap,int page,offs_t offset)
 {
 	offset -= page * 0x2000;
 

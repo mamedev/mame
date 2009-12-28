@@ -1,6 +1,6 @@
 #include "driver.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( pcktgal )
 {

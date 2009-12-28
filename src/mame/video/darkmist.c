@@ -14,7 +14,7 @@ UINT8 *darkmist_spritebank;
 #define DISPLAY_BG		4
 #define DISPLAY_TXT		16
 
-static tilemap *bgtilemap, *fgtilemap, *txtilemap;
+static tilemap_t *bgtilemap, *fgtilemap, *txtilemap;
 
 static TILE_GET_INFO( get_bgtile_info )
 {

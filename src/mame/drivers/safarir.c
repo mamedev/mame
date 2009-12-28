@@ -54,7 +54,7 @@ modified by Hau
 static UINT8 *ram_1, *ram_2;
 static size_t ram_size;
 static UINT8 ram_bank;
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 static UINT8 *bg_scroll;
 
 

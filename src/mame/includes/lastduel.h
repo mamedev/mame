@@ -15,7 +15,7 @@ struct _lastduel_state
 	UINT16 *    paletteram;
 
 	/* video-related */
-	tilemap     *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	tilemap_t     *bg_tilemap, *fg_tilemap, *tx_tilemap;
 	UINT16      scroll[8];
 	int         sprite_flipy_mask, sprite_pri_mask, tilemap_priority;
 

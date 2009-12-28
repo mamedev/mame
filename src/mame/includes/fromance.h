@@ -18,7 +18,7 @@ struct _fromance_state
 	size_t   spriteram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap,*fg_tilemap;
+	tilemap_t  *bg_tilemap,*fg_tilemap;
 	UINT8    *local_videoram[2];
 	UINT8    *local_paletteram;
 	UINT8    selected_videoram, selected_paletteram;

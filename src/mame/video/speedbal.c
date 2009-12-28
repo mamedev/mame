@@ -11,7 +11,7 @@
 UINT8 *speedbal_background_videoram;
 UINT8 *speedbal_foreground_videoram;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 static TILE_GET_INFO( get_tile_info_bg )
 {

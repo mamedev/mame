@@ -13,7 +13,7 @@ struct _pandoras_state
 	UINT8 *    spriteram;
 
 	/* video-related */
-	tilemap     *layer0;
+	tilemap_t     *layer0;
 	int         flipscreen;
 
 	int irq_enable_a, irq_enable_b;

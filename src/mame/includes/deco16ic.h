@@ -42,7 +42,7 @@ void deco16_pdrawgfx(
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha);
 
-tilemap *deco16_get_tilemap(int pf, int size);
+tilemap_t *deco16_get_tilemap(int pf, int size);
 
 WRITE16_HANDLER( deco16_pf1_data_w );
 WRITE16_HANDLER( deco16_pf2_data_w );

@@ -7,7 +7,7 @@ extern UINT16 *welltris_spriteram;
 extern UINT16 *welltris_pixelram;
 extern UINT16 *welltris_charvideoram;
 
-static tilemap *char_tilemap;
+static tilemap_t *char_tilemap;
 static UINT8 gfxbank[8];
 static UINT16 charpalettebank;
 static UINT16 spritepalettebank;
@@ -153,7 +153,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static void setbank(tilemap *tmap, int num, int bank)
+static void setbank(tilemap_t *tmap, int num, int bank)
 {
 	if (gfxbank[num] != bank)
 	{

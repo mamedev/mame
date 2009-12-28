@@ -4,7 +4,7 @@
 
 static int pc10_bios;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( playch10_videoram_w )
 {

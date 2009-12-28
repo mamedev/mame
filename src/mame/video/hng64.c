@@ -10,20 +10,20 @@
 static UINT8 additive_tilemap_debug;
 
 UINT32* hng64_videoram;
-static tilemap *hng64_tilemap0_8x8;
-static tilemap *hng64_tilemap1_8x8;
-static tilemap *hng64_tilemap2_8x8;
-static tilemap *hng64_tilemap3_8x8;
+static tilemap_t *hng64_tilemap0_8x8;
+static tilemap_t *hng64_tilemap1_8x8;
+static tilemap_t *hng64_tilemap2_8x8;
+static tilemap_t *hng64_tilemap3_8x8;
 
-static tilemap *hng64_tilemap0_16x16;
-static tilemap *hng64_tilemap1_16x16;
-static tilemap *hng64_tilemap2_16x16;
-static tilemap *hng64_tilemap3_16x16;
+static tilemap_t *hng64_tilemap0_16x16;
+static tilemap_t *hng64_tilemap1_16x16;
+static tilemap_t *hng64_tilemap2_16x16;
+static tilemap_t *hng64_tilemap3_16x16;
 
-static tilemap *hng64_tilemap0_16x16_alt;
-static tilemap *hng64_tilemap1_16x16_alt;
-static tilemap *hng64_tilemap2_16x16_alt;
-static tilemap *hng64_tilemap3_16x16_alt;
+static tilemap_t *hng64_tilemap0_16x16_alt;
+static tilemap_t *hng64_tilemap1_16x16_alt;
+static tilemap_t *hng64_tilemap2_16x16_alt;
+static tilemap_t *hng64_tilemap3_16x16_alt;
 
 UINT32 *hng64_spriteram;
 UINT32 *hng64_videoregs;
@@ -728,7 +728,7 @@ struct _blit_parameters
 
 
 
-static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -813,7 +813,7 @@ do {																	  	        \
 		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
 } while (0)
 
-static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap *tmap, const blit_parameters *blit,
+static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap_t *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
 	const pen_t *clut = &machine->pens[blit->tilemap_priority_code >> 16];
@@ -991,7 +991,7 @@ static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap *tmap,
 
 
 
-static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
@@ -1019,7 +1019,7 @@ profiler_mark_end();
 }
 
 
-INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat)
 {
@@ -1030,7 +1030,7 @@ INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, con
 
 static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
 {
-	tilemap* tilemap = 0;
+	tilemap_t* tilemap = 0;
 	UINT32 scrollbase = 0;
 	UINT32 tileregs = 0;
 	int transmask;

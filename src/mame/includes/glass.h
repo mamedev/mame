@@ -14,7 +14,7 @@ struct _glass_state
 //      UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap     *pant[2];
+	tilemap_t     *pant[2];
 	bitmap_t    *screen_bitmap;
 
 	/* misc */

@@ -20,8 +20,8 @@ struct _esd16_state
 	size_t         spriteram_size;
 
 	/* video-related */
-	tilemap       *tilemap_0_16x16, *tilemap_1_16x16;
-	tilemap       *tilemap_0, *tilemap_1;
+	tilemap_t       *tilemap_0_16x16, *tilemap_1_16x16;
+	tilemap_t       *tilemap_0, *tilemap_1;
 	int           tilemap0_color;
 
 	/* devices */

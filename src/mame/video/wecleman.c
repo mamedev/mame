@@ -47,7 +47,7 @@ static int wecleman_bgpage[4], wecleman_fgpage[4];
 static const int *wecleman_gfx_bank;
 
 /* Variables only used here: */
-static tilemap *bg_tilemap, *fg_tilemap, *txt_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap, *txt_tilemap;
 
 static struct sprite *sprite_list;
 static struct sprite **spr_ptr_list;

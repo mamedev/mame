@@ -19,7 +19,7 @@ static UINT8 *tilerom;
 static int bgon, objon, staron, charon, flipon;
 static UINT32 hflop_74a_n, hcount_191, vcount_191, latch_374;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( sidearms_videoram_w )
 {

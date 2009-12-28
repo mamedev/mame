@@ -53,7 +53,7 @@ struct _mario_state
 	UINT8	*spriteram;
 	UINT8	*videoram;
 	size_t	spriteram_size;
-	tilemap *bg_tilemap;
+	tilemap_t *bg_tilemap;
 	int monitor;
 };
 

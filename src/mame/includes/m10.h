@@ -39,7 +39,7 @@ struct _m10_state
 	size_t              videoram_size;
 
 	/* video-related */
-	tilemap *           tx_tilemap;
+	tilemap_t *           tx_tilemap;
 	gfx_element *       back_gfx;
 
 	/* this is currently unused, because it is needed by gfx_layout (which has no machine) */

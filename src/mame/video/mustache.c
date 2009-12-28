@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int control_byte;
 
 PALETTE_INIT(mustache)

@@ -7,7 +7,7 @@
 #include "driver.h"
 
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 UINT8* runaway_video_ram;
 UINT8* runaway_sprite_ram;

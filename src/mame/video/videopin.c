@@ -12,7 +12,7 @@ UINT8* videopin_video_ram;
 static int ball_x;
 static int ball_y;
 
-static tilemap* bg_tilemap;
+static tilemap_t* bg_tilemap;
 
 
 static TILEMAP_MAPPER( get_memory_offset )

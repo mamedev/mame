@@ -12,7 +12,7 @@ size_t namcos2_68k_palette_size;
 UINT16 *namcos2_68k_roz_ram;
 
 static UINT16 namcos2_68k_roz_ctrl[0x8];
-static tilemap *tilemap_roz;
+static tilemap_t *tilemap_roz;
 
 static void
 TilemapCB( UINT16 code, int *tile, int *mask )
@@ -74,7 +74,7 @@ struct RozParam
 static void
 DrawRozHelper(
 	bitmap_t *bitmap,
-	tilemap *tmap,
+	tilemap_t *tmap,
 	const rectangle *clip,
 	const struct RozParam *rozInfo )
 {

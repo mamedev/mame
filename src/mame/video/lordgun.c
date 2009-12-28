@@ -56,7 +56,7 @@ lordgun_gun_data lordgun_gun[2];
 
 ***************************************************************************/
 
-static tilemap *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
+static tilemap_t *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
 
 static TILE_GET_INFO( get_tile_info_0 )
 {

@@ -15,7 +15,7 @@ struct _dogfgt_state
 
 	/* video-related */
 	bitmap_t  *pixbitmap;
-	tilemap   *bg_tilemap;
+	tilemap_t   *bg_tilemap;
 	UINT8     *bitmapram;
 	int       bm_plane, pixcolor;
 	int       scroll[4];

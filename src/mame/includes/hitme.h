@@ -19,7 +19,7 @@ struct _hitme_state
 	UINT8 *  videoram;
 
 	/* video-related */
-	tilemap  *tilemap;
+	tilemap_t  *tilemap;
 
 	/* misc */
 	attotime timeout_time;

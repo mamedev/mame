@@ -3,7 +3,7 @@ struct _mappy_state
 {
 	UINT8 *videoram;
 	UINT8 *spriteram;
-	tilemap *bg_tilemap;
+	tilemap_t *bg_tilemap;
 	bitmap_t *sprite_bitmap;
 
 	UINT8 scroll;

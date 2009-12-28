@@ -20,7 +20,7 @@ struct _goindol_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap     *bg_tilemap, *fg_tilemap;
+	tilemap_t     *bg_tilemap, *fg_tilemap;
 	UINT16      char_bank;
 
 	/* misc */

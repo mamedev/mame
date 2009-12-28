@@ -12,7 +12,7 @@ static int palettebank;
 
 UINT8 *tagteam_videoram;
 UINT8 *tagteam_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( tagteam )
 {

@@ -13,7 +13,7 @@ UINT8 *pbaction_videoram2, *pbaction_colorram2;
 
 static int scroll;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( pbaction_videoram_w )
 {

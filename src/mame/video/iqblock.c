@@ -8,7 +8,7 @@ UINT8 *iqblock_fgvideoram;
 int iqblock_videoenable;
 int iqblock_video_type;
 
-static tilemap *bg_tilemap,*fg_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap;
 
 
 /***************************************************************************

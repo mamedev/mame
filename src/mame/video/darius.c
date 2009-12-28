@@ -2,7 +2,7 @@
 #include "video/taitoic.h"
 
 
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 UINT16 *darius_fg_ram;
 
 struct tempsprite

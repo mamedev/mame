@@ -16,7 +16,7 @@ struct _deniam_state
 	size_t         spriteram_size;
 
 	/* video-related */
-	tilemap        *fg_tilemap, *bg_tilemap, *tx_tilemap;
+	tilemap_t        *fg_tilemap, *bg_tilemap, *tx_tilemap;
 	int            display_enable;
 	int            bg_scrollx_offs, bg_scrolly_offs;
 	int            fg_scrollx_offs, fg_scrolly_offs;

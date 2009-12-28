@@ -15,7 +15,7 @@ struct _bionicc_state
 //  UINT16 *  spriteram;  // needed for EOF, but currently handled through buffer_spriteram16
 
 	/* video-related */
-	tilemap   *tx_tilemap, *bg_tilemap, *fg_tilemap;
+	tilemap_t   *tx_tilemap, *bg_tilemap, *fg_tilemap;
 	UINT16    scroll[4];
 
 	UINT16    inp[3];

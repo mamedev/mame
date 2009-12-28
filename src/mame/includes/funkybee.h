@@ -8,7 +8,7 @@ struct _funkybee_state
 	UINT8 *    colorram;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	int        gfx_bank;
 };
 

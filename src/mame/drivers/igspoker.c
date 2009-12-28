@@ -107,7 +107,7 @@ static WRITE8_HANDLER( igs_irqack_w )
 
 
 static UINT8   *fg_tile_ram, *fg_color_ram, *bg_tile_ram;
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {

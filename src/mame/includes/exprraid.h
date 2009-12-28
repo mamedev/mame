@@ -16,7 +16,7 @@ struct _exprraid_state
 	size_t         spriteram_size;
 
 	/* video-related */
-	tilemap        *bg_tilemap, *fg_tilemap;
+	tilemap_t        *bg_tilemap, *fg_tilemap;
 	int            bg_index[4];
 
 	/* misc */

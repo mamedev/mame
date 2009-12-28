@@ -1,7 +1,7 @@
 #include "driver.h"
 
-static tilemap *tx_tilemap;
-static tilemap *bg_tilemap;
+static tilemap_t *tx_tilemap;
+static tilemap_t *bg_tilemap;
 UINT8 *mainsnk_fgram;
 UINT8 *mainsnk_bgram;
 

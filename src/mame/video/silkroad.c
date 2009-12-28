@@ -6,7 +6,7 @@
 /* Clean Up */
 /* is theres a bg colour register? */
 
-static tilemap *fg_tilemap,*fg2_tilemap,*fg3_tilemap;
+static tilemap_t *fg_tilemap,*fg2_tilemap,*fg3_tilemap;
 extern UINT32 *silkroad_vidram,*silkroad_vidram2,*silkroad_vidram3, *silkroad_sprram, *silkroad_regs;
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

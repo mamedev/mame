@@ -57,7 +57,7 @@ static UINT16 *livequiz_gfxram, *livequiz_gfxregs;
 static VIDEO_START( livequiz );
 static VIDEO_UPDATE( livequiz );
 
-static tilemap *tmap;
+static tilemap_t *tmap;
 
 static TILE_GET_INFO( get_tile_info )
 {

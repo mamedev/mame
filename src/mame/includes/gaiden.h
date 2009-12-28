@@ -15,7 +15,7 @@ struct _gaiden_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *text_layer,*foreground,*background;
+	tilemap_t     *text_layer,*foreground,*background;
 	bitmap_t    *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
 	UINT16      tx_scroll_x, tx_scroll_y;
 	UINT16      bg_scroll_x, bg_scroll_y;

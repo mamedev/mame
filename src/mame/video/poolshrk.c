@@ -11,7 +11,7 @@ UINT8* poolshrk_playfield_ram;
 UINT8* poolshrk_hpos_ram;
 UINT8* poolshrk_vpos_ram;
 
-static tilemap* bg_tilemap;
+static tilemap_t* bg_tilemap;
 
 
 static TILE_GET_INFO( get_tile_info )

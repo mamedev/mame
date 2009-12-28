@@ -16,7 +16,7 @@ struct _actfancr_state
 //  UINT8 *        paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap        *pf1_tilemap, *pf1_alt_tilemap, *pf2_tilemap;
+	tilemap_t        *pf1_tilemap, *pf1_alt_tilemap, *pf2_tilemap;
 	UINT8          control_1[0x20], control_2[0x20];
 	int            flipscreen;
 

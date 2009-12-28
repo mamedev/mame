@@ -7,7 +7,7 @@ struct _blockade_state
 	UINT8 *  videoram;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* input-related */
 	UINT8 coin_latch;  /* Active Low */

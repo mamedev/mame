@@ -15,7 +15,7 @@ struct _karnov_state
 
 	/* video-related */
 	bitmap_t    *bitmap_f;
-	tilemap     *fix_tilemap;
+	tilemap_t     *fix_tilemap;
 	int         flipscreen;
 	UINT16      scroll[2];
 

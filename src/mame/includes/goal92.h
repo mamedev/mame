@@ -16,7 +16,7 @@ struct _goal92_state
 //  UINT16 *    spriteram;  // this currently use generic buffered spriteram
 
 	/* video-related */
-	tilemap     *bg_layer, *fg_layer, *tx_layer;
+	tilemap_t     *bg_layer, *fg_layer, *tx_layer;
 	UINT16      fg_bank;
 
 	/* misc */

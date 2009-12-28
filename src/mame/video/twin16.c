@@ -46,7 +46,7 @@ enum
 	TWIN16_SPRITE_CAST_SHADOW	= 0x20
 };
 
-static tilemap *text_tilemap;
+static tilemap_t *text_tilemap;
 
 WRITE16_HANDLER( twin16_text_ram_w )
 {

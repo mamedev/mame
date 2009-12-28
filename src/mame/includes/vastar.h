@@ -12,9 +12,9 @@ struct _vastar_state
 	UINT8 *bg2_scroll;
 	UINT8 *sprite_priority;
 
-	tilemap *fg_tilemap;
-	tilemap *bg1_tilemap;
-	tilemap *bg2_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg1_tilemap;
+	tilemap_t *bg2_tilemap;
 
 	UINT8 *sharedram;
 };

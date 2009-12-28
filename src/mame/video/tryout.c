@@ -7,7 +7,7 @@
 
 #include "driver.h"
 
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 static UINT8 vram_bank;
 static UINT8 *tryout_vram, *tryout_vram_gfx;
 UINT8 *tryout_gfx_control;

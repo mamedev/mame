@@ -19,7 +19,7 @@ struct _lasso_state
 	size_t   spriteram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap, *track_tilemap;
+	tilemap_t  *bg_tilemap, *track_tilemap;
 	UINT8    gfxbank;		/* used by lasso, chameleo, wwjgtin and pinbo */
 	UINT8    track_enable;	/* used by wwjgtin */
 

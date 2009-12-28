@@ -15,7 +15,7 @@ struct _crospang_state
 	size_t    spriteram_size;
 
 	/* video-related */
-	tilemap   *bg_layer,*fg_layer;
+	tilemap_t   *bg_layer,*fg_layer;
 	int       xsproff, ysproff;
 	int       bestri_tilebank;
 

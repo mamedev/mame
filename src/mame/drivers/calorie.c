@@ -92,7 +92,7 @@ struct _calorie_state
 //  UINT8 *  paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *bg_tilemap,*fg_tilemap;
+	tilemap_t  *bg_tilemap,*fg_tilemap;
 	UINT8    bg_bank;
 };
 

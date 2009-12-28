@@ -18,7 +18,7 @@ static UINT8 background_priority = 0;
 static UINT8 spritebank;
 static UINT8 transparent0;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static double weights[4];
 
 

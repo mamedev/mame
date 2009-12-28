@@ -48,7 +48,7 @@ static UINT8 *namcos1_spriteram;
 
 static UINT8 namcos1_playfield_control[0x20];
 
-static tilemap *bg_tilemap[6];
+static tilemap_t *bg_tilemap[6];
 static UINT8 *tilemap_maskdata;
 static int copy_sprites;
 

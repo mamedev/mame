@@ -101,7 +101,7 @@ static int rabbit_vblirqlevel, rabbit_bltirqlevel, rabbit_banking;
 static UINT32 *rabbit_tilemap_ram[4];
 
 static UINT32 *rabbit_spriteram;
-static tilemap *rabbit_tilemap[4];
+static tilemap_t *rabbit_tilemap[4];
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
 INLINE void get_rabbit_tilemap_info(running_machine *machine, tile_data *tileinfo, int tile_index, int whichtilemap, int tilesize)

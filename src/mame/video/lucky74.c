@@ -98,7 +98,7 @@
 
 
 UINT8 *lucky74_fg_videoram, *lucky74_fg_colorram, *lucky74_bg_videoram, *lucky74_bg_colorram;
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 
 
 WRITE8_HANDLER( lucky74_fg_videoram_w )

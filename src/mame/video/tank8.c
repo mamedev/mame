@@ -14,7 +14,7 @@ UINT8 *tank8_pos_v_ram;
 UINT8 *tank8_pos_d_ram;
 UINT8 *tank8_team;
 
-static tilemap *tank8_tilemap;
+static tilemap_t *tank8_tilemap;
 
 static bitmap_t *helper1;
 static bitmap_t *helper2;

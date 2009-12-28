@@ -7,7 +7,7 @@ size_t timelimt_bg_videoram_size;
 /* locals */
 static int scrollx, scrolly;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 /***************************************************************************
 

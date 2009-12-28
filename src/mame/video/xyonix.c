@@ -3,7 +3,7 @@
 
 extern UINT8 *xyonix_vidram;
 
-static tilemap *xyonix_tilemap;
+static tilemap_t *xyonix_tilemap;
 
 
 PALETTE_INIT( xyonix )

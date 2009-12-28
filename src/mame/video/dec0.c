@@ -97,9 +97,9 @@ Todo:
 #include "driver.h"
 #include "includes/dec0.h"
 
-static tilemap *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;
-static tilemap *pf2_tilemap_0,*pf2_tilemap_1,*pf2_tilemap_2;
-static tilemap *pf3_tilemap_0,*pf3_tilemap_1,*pf3_tilemap_2;
+static tilemap_t *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;
+static tilemap_t *pf2_tilemap_0,*pf2_tilemap_1,*pf2_tilemap_2;
+static tilemap_t *pf3_tilemap_0,*pf3_tilemap_1,*pf3_tilemap_2;
 
 UINT16 *dec0_pf1_data,*dec0_pf2_data,*dec0_pf3_data;
 UINT16 *dec0_pf1_rowscroll,*dec0_pf2_rowscroll,*dec0_pf3_rowscroll;
@@ -217,7 +217,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 static void custom_tilemap_draw(running_machine *machine,
 								bitmap_t *bitmap,
 								const rectangle *cliprect,
-								tilemap *tilemap_ptr,
+								tilemap_t *tilemap_ptr,
 								const UINT16 *rowscroll_ptr,
 								const UINT16 *colscroll_ptr,
 								const UINT16 *control0,

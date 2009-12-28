@@ -10,7 +10,7 @@
 
 static int tile_bank;
 static UINT16 *tileram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( mole )
 {

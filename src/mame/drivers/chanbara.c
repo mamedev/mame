@@ -62,7 +62,7 @@ struct _chanbara_state
 	UINT8 *  spriteram;
 
 	/* video-related */
-	tilemap  *bg_tilemap,*bg2_tilemap;
+	tilemap_t  *bg_tilemap,*bg2_tilemap;
 	UINT8    scroll, scrollhi;
 
 	/* devices */

@@ -24,7 +24,7 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-static tilemap *suprgolf_tilemap;
+static tilemap_t *suprgolf_tilemap;
 static UINT8 *suprgolf_bg_vram;
 static UINT16 *suprgolf_bg_fb,*suprgolf_fg_fb;
 static int suprgolf_rom_bank;

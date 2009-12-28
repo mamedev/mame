@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "video/konicdev.h"
 
-static tilemap *dbz_bg1_tilemap, *dbz_bg2_tilemap;
+static tilemap_t *dbz_bg1_tilemap, *dbz_bg2_tilemap;
 UINT16 *dbz_bg1_videoram, *dbz_bg2_videoram;
 static int sprite_colorbase, layer_colorbase[6], layer[5], layerpri[5];
 

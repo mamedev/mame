@@ -12,7 +12,7 @@ static bitmap_t *spritebitmap;
 static int CollisionBackground;
 static int CollisionSprite;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 /**************************************************************/

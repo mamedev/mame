@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "includes/wwfwfest.h"
 
-static tilemap *fg0_tilemap, *bg0_tilemap, *bg1_tilemap;
+static tilemap_t *fg0_tilemap, *bg0_tilemap, *bg1_tilemap;
 UINT16 wwfwfest_pri;
 UINT16 wwfwfest_bg0_scrollx, wwfwfest_bg0_scrolly, wwfwfest_bg1_scrollx, wwfwfest_bg1_scrolly;
 UINT16 *wwfwfest_fg0_videoram, *wwfwfest_bg0_videoram, *wwfwfest_bg1_videoram;

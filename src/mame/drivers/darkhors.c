@@ -76,7 +76,7 @@ To do:
 static VIDEO_START( darkhors );
 static VIDEO_UPDATE( darkhors );
 
-static tilemap *darkhors_tmap, *darkhors_tmap2;
+static tilemap_t *darkhors_tmap, *darkhors_tmap2;
 static UINT32 *darkhors_tmapram,  *darkhors_tmapscroll;
 static UINT32 *darkhors_tmapram2, *darkhors_tmapscroll2;
 

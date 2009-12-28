@@ -2,8 +2,8 @@
 
 #include "driver.h"
 
-static tilemap *pass_bg_tilemap;
-static tilemap *pass_fg_tilemap;
+static tilemap_t *pass_bg_tilemap;
+static tilemap_t *pass_fg_tilemap;
 
 /* in drivers/pass.c */
 extern UINT16 *pass_bg_videoram;

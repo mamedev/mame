@@ -93,7 +93,7 @@ UINT16 *darkseal_pf1_data,*darkseal_pf2_data,*darkseal_pf3_data;
 static UINT16 darkseal_control_0[8];
 static UINT16 darkseal_control_1[8];
 
-static tilemap *pf1_tilemap,*pf2_tilemap,*pf3_tilemap;
+static tilemap_t *pf1_tilemap,*pf2_tilemap,*pf3_tilemap;
 static int flipscreen;
 
 /***************************************************************************/

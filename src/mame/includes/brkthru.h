@@ -16,7 +16,7 @@ struct _brkthru_state
 	size_t  fg_videoram_size;
 
 	/* video-related */
-	tilemap *fg_tilemap, *bg_tilemap;
+	tilemap_t *fg_tilemap, *bg_tilemap;
 	int     bgscroll;
 	int     bgbasecolor;
 	int     flipscreen;

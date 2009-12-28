@@ -128,7 +128,7 @@ struct _ddealer_state
 //  UINT16 *  paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *back_tilemap;
+	tilemap_t  *back_tilemap;
 	int      respcount;
 	int      flipscreen;
 

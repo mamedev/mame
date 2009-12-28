@@ -465,7 +465,7 @@ UINT32 colortable_get_transpen_mask(colortable_t *ctable, const gfx_element *gfx
     (each group maps to a gfx color)
 -------------------------------------------------*/
 
-void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap *tmap, const gfx_element *gfx, int transcolor)
+void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap_t *tmap, const gfx_element *gfx, int transcolor)
 {
 	int color;
 

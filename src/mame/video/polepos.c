@@ -16,7 +16,7 @@ static UINT16 polepos_vertical_position_modifier[256];
 
 static UINT16 road16_vscroll;
 
-static tilemap *bg_tilemap,*tx_tilemap;
+static tilemap_t *bg_tilemap,*tx_tilemap;
 static int polepos_chacl;
 
 int polepos_gear_bit;

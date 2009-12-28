@@ -402,8 +402,8 @@ struct tilemap_info
 	UINT16			latched_yscroll[4];				/* latched Y scroll values */
 	UINT16			latched_pageselect[4];			/* latched page select values */
 	INT32			xoffs;							/* X scroll offset */
-	tilemap *		tilemaps[16];					/* up to 16 tilemap pages */
-	tilemap *		textmap;						/* a single text tilemap */
+	tilemap_t *		tilemaps[16];					/* up to 16 tilemap pages */
+	tilemap_t *		textmap;						/* a single text tilemap */
 	struct tilemap_callback_info tmap_info[16];		/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
 	void			(*reset)(running_machine *machine, struct tilemap_info *info);/* reset callback */

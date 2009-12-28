@@ -28,7 +28,7 @@ struct _cultures_state
 	UINT8 *   bg2_regs_y;
 
 	/* video-related */
-	tilemap  *bg0_tilemap, *bg1_tilemap, *bg2_tilemap;
+	tilemap_t  *bg0_tilemap, *bg1_tilemap, *bg2_tilemap;
 	int      video_bank;
 	int      irq_enable;
 	int      bg1_bank, bg2_bank;

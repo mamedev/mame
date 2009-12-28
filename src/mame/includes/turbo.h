@@ -40,7 +40,7 @@ struct _turbo_state
 	UINT8		sound_state[3];
 
 	/* video state */
-	tilemap *	fg_tilemap;
+	tilemap_t *	fg_tilemap;
 
 	/* Turbo-specific states */
 	UINT8		turbo_opa, turbo_opb, turbo_opc;

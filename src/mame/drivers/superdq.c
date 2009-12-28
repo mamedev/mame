@@ -31,7 +31,7 @@ static const device_config *laserdisc;
 static UINT8 superdq_ld_in_latch;
 static UINT8 superdq_ld_out_latch;
 
-static tilemap *superdq_tilemap;
+static tilemap_t *superdq_tilemap;
 static int superdq_color_bank = 0;
 
 static TILE_GET_INFO( get_tile_info )

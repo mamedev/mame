@@ -12,7 +12,7 @@ struct _appoooh_state
 	UINT8 *  spriteram_2;
 
 	/* video-related */
-	tilemap  *fg_tilemap, *bg_tilemap;
+	tilemap_t  *fg_tilemap, *bg_tilemap;
 	int scroll_x;
 	int priority;
 

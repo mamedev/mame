@@ -1506,7 +1506,7 @@ static void UpdatePalette(running_machine *machine) /* for System22 - ignore gam
 	}
 } /* UpdatePalette */
 
-static tilemap *bgtilemap;
+static tilemap_t *bgtilemap;
 
 static TILE_GET_INFO( TextTilemapGetInfo )
 {

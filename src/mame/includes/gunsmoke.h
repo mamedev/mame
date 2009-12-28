@@ -16,7 +16,7 @@ struct _gunsmoke_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap, *fg_tilemap;
+	tilemap_t    *bg_tilemap, *fg_tilemap;
 	UINT8      chon, objon, bgon;
 	UINT8      sprite3bank;
 };

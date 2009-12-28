@@ -17,7 +17,7 @@ struct _exedexes_state
 //  UINT8 *        spriteram;   // currently this uses generic buffered_spriteram
 
 	/* video-related */
-	tilemap        *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	tilemap_t        *bg_tilemap, *fg_tilemap, *tx_tilemap;
 	int            chon, objon, sc1on, sc2on;
 };
 

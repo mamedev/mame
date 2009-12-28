@@ -55,8 +55,8 @@ Notes:
 #include "cpu/z80/z80daisy.h"
 #include "cpu/m6805/m6805.h"
 
-static tilemap *tilemap1;
-static tilemap *tilemap2;
+static tilemap_t *tilemap1;
+static tilemap_t *tilemap2;
 
 static UINT8 *vram1;
 static UINT8 *vram2;

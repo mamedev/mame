@@ -14,7 +14,7 @@ UINT8 *retofinv_fg_videoram;
 UINT8 *retofinv_sharedram;
 
 static int fg_bank,bg_bank;
-static tilemap *bg_tilemap,*fg_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap;
 
 
 

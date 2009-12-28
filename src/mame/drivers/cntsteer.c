@@ -40,7 +40,7 @@ struct _cntsteer_state
 	UINT8 *  spriteram;
 
 	/* video-related */
-	tilemap  *bg_tilemap,*fg_tilemap;
+	tilemap_t  *bg_tilemap,*fg_tilemap;
 	int      bg_bank, bg_color_bank;
 	int      flipscreen;
 	int      scrolly, scrolly_hi;

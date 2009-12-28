@@ -75,7 +75,7 @@ static VIDEO_RESET( igs017 )
 }
 
 static UINT8 *fg_videoram, *bg_videoram;
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 
 #define COLOR(_X)	(((_X)>>2)&7)
 

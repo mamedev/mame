@@ -12,7 +12,7 @@ struct _hanaawas_state
 	UINT8 *    colorram;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 
 	/* misc */
 	int        mux;

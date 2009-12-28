@@ -14,8 +14,8 @@ struct _gundealr_state
 	UINT8 *    paletteram;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
-	tilemap    *fg_tilemap;
+	tilemap_t    *bg_tilemap;
+	tilemap_t    *fg_tilemap;
 	int        flipscreen;
 	UINT8      scroll[4];
 

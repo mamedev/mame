@@ -15,7 +15,7 @@ struct _hcastle_state
 //  UINT8 *    spriteram2;
 
 	/* video-related */
-	tilemap    *fg_tilemap, *bg_tilemap;
+	tilemap_t    *fg_tilemap, *bg_tilemap;
 	int        pf2_bankbase, pf1_bankbase;
 	int        old_pf1, old_pf2;
 	int        gfx_bank;

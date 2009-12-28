@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "includes/lkage.h"
 
-static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
 static UINT8 bg_tile_bank, fg_tile_bank;
 UINT8 *lkage_scroll, *lkage_vreg;
 

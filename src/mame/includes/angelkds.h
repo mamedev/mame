@@ -14,7 +14,7 @@ struct _angelkds_state
 	UINT8 *    bgtopvideoram;
 	UINT8 *    bgbotvideoram;
 
-	tilemap    *tx_tilemap, *bgbot_tilemap, *bgtop_tilemap;
+	tilemap_t    *tx_tilemap, *bgbot_tilemap, *bgtop_tilemap;
 	int        txbank;
 	int        bgbotbank;
 	int        bgtopbank;

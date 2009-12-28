@@ -18,8 +18,8 @@ size_t thepit_spriteram_size;
 static UINT8 graphics_bank;
 static UINT8 thepit_flip_screen_x;
 static UINT8 thepit_flip_screen_y;
-static tilemap *thepit_solid_tilemap;
-static tilemap *thepit_tilemap;
+static tilemap_t *thepit_solid_tilemap;
+static tilemap_t *thepit_tilemap;
 static UINT8 *dummy_tile;
 
 

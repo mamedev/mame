@@ -567,7 +567,7 @@ WRITE16_DEVICE_HANDLER( k053936_ctrl_w );
 READ16_DEVICE_HANDLER( k053936_ctrl_r );	// FIXME: this is probably unused... to be checked!
 WRITE16_DEVICE_HANDLER( k053936_linectrl_w );
 READ16_DEVICE_HANDLER( k053936_linectrl_r );
-void k053936_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int flags, UINT32 priority, int glfgreat_hack);
+void k053936_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
 void k053936_wraparound_enable(const device_config *device, int status);	// shall we merge this into the configuration intf?
 void k053936_set_offset(const device_config *device, int xoffs, int yoffs);	// shall we merge this into the configuration intf?
 

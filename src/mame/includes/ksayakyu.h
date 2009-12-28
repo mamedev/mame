@@ -13,7 +13,7 @@ struct _ksayakyu_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *tilemap, *textmap;
+	tilemap_t    *tilemap, *textmap;
 	int        video_ctrl, flipscreen;
 
 	/* misc */

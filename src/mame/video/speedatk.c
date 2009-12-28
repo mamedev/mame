@@ -7,7 +7,7 @@
 
 UINT8 *speedatk_videoram;
 UINT8 *speedatk_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /*
 

@@ -213,7 +213,7 @@ static bitmap_t *tmp_tilemap_composebitmap;
 static bitmap_t *tmp_tilemap_renderbitmap;
 
 
-static tilemap *bg0tilemap;
+static tilemap_t *bg0tilemap;
 static TILE_GET_INFO( get_bg0tile_info )
 {
 
@@ -230,7 +230,7 @@ static WRITE16_HANDLER( bg0_tilemap_w )
 	tilemap_mark_tile_dirty(bg0tilemap,offset/2);
 }
 
-static tilemap *bg1tilemap;
+static tilemap_t *bg1tilemap;
 static TILE_GET_INFO( get_bg1tile_info )
 {
 
@@ -247,7 +247,7 @@ static WRITE16_HANDLER( bg1_tilemap_w )
 	tilemap_mark_tile_dirty(bg1tilemap,offset/2);
 }
 
-static tilemap *bg2tilemap;
+static tilemap_t *bg2tilemap;
 static TILE_GET_INFO( get_bg2tile_info )
 {
 
@@ -264,7 +264,7 @@ static WRITE16_HANDLER( bg2_tilemap_w )
 	tilemap_mark_tile_dirty(bg2tilemap,offset/2);
 }
 
-static tilemap *txt_tilemap;
+static tilemap_t *txt_tilemap;
 static TILE_GET_INFO( get_tile_info )
 {
 

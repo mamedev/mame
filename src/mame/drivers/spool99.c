@@ -93,7 +93,7 @@ Note
 #include "machine/eeprom.h"
 
 static UINT8 *spool99_main;
-static tilemap *sc0_tilemap;
+static tilemap_t *sc0_tilemap;
 static UINT8 *spool99_cram;
 static UINT8 *spool99_vram;
 

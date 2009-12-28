@@ -14,7 +14,7 @@ struct _gyruss_state
 	UINT8 *    flipscreen;
 
 	/* video-related */
-	tilemap    *tilemap;
+	tilemap_t    *tilemap;
 
 	/* devices */
 	const device_config *audiocpu;

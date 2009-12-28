@@ -225,7 +225,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
-static tilemap *fg_tilemap,*bg_tilemap;
+static tilemap_t *fg_tilemap,*bg_tilemap;
 static UINT16 *nmg5_bitmap;
 static UINT16 *fg_videoram,*bg_videoram,*scroll_ram;
 static UINT8 prot_val, input_data, priority_reg, gfx_bank;

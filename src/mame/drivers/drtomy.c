@@ -21,7 +21,7 @@ struct _drtomy_state
 //  UINT16 *  paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap   *tilemap_bg,*tilemap_fg;
+	tilemap_t   *tilemap_bg,*tilemap_fg;
 
 	/* misc */
 	int       oki_bank;

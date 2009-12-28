@@ -26,7 +26,7 @@ NVRAM   :   Battery for main RAM
 ***************************************************************************/
 
 
-static tilemap *gp98_reel1_tilemap;
+static tilemap_t *gp98_reel1_tilemap;
 static UINT8 *gp98_reel1_ram;
 
 static WRITE8_HANDLER( gp98_reel1_ram_w )
@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_gp98_reel1_tile_info )
 			0);
 }
 
-static tilemap *gp98_reel2_tilemap;
+static tilemap_t *gp98_reel2_tilemap;
 static UINT8 *gp98_reel2_ram;
 
 static WRITE8_HANDLER( gp98_reel2_ram_w )
@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_gp98_reel2_tile_info )
 }
 
 
-static tilemap *gp98_reel3_tilemap;
+static tilemap_t *gp98_reel3_tilemap;
 static UINT8 *gp98_reel3_ram;
 
 static WRITE8_HANDLER( gp98_reel3_ram_w )
@@ -122,7 +122,7 @@ static TILE_GET_INFO( get_gp98_reel3_tile_info )
 }
 
 
-static tilemap *gp98_reel4_tilemap;
+static tilemap_t *gp98_reel4_tilemap;
 static UINT8 *gp98_reel4_ram;
 
 static WRITE8_HANDLER( gp98_reel4_ram_w )
@@ -159,7 +159,7 @@ static TILE_GET_INFO( get_gp98_reel4_tile_info )
 static UINT8   *fg_tile_ram, *fg_color_ram;
 static UINT8   *bg_scroll, *bg_scroll2;
 
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 
 static int video_enable;
 

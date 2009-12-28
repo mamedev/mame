@@ -1,8 +1,8 @@
 #include "driver.h"
 #include "includes/tatsumi.h"
 
-static tilemap *tx_layer;
-static tilemap *layer0, *layer1, *layer2, *layer3;
+static tilemap_t *tx_layer;
+static tilemap_t *layer0, *layer1, *layer2, *layer3;
 
 static bitmap_t *temp_bitmap;
 
@@ -970,7 +970,7 @@ static void update_cluts(running_machine *machine, int fake_palette_offset, int 
 
 /**********************************************************************/
 
-static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
+static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap_t *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
 {
 	/*
         Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette

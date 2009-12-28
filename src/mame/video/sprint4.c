@@ -7,7 +7,7 @@ Atari Sprint 4 video emulation
 #include "driver.h"
 #include "audio/sprint4.h"
 
-static tilemap* playfield;
+static tilemap_t* playfield;
 
 static bitmap_t* helper;
 

@@ -15,7 +15,7 @@ struct _jack_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 
 	/* misc */
 	int timer_rate;

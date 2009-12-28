@@ -13,7 +13,7 @@ UINT16 *prehisle_bg_videoram16;
 
 static UINT16 invert_controls;
 
-static tilemap *bg2_tilemap, *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg2_tilemap, *bg_tilemap, *fg_tilemap;
 
 
 WRITE16_HANDLER( prehisle_bg_videoram16_w )

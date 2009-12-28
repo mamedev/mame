@@ -37,7 +37,7 @@
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 
-static tilemap *tmap;
+static tilemap_t *tmap;
 
 static UINT8 *skylncr_videoram,*skylncr_colorram;
 
@@ -49,10 +49,10 @@ static UINT8* reeltileshigh_1_ram;
 static UINT8* reeltileshigh_2_ram;
 static UINT8* reeltileshigh_3_ram;
 static UINT8* reeltileshigh_4_ram;
-static tilemap *reel_1_tilemap;
-static tilemap *reel_2_tilemap;
-static tilemap *reel_3_tilemap;
-static tilemap *reel_4_tilemap;
+static tilemap_t *reel_1_tilemap;
+static tilemap_t *reel_2_tilemap;
+static tilemap_t *reel_3_tilemap;
+static tilemap_t *reel_4_tilemap;
 static UINT8* reelscroll1;
 static UINT8* reelscroll2;
 static UINT8* reelscroll3;

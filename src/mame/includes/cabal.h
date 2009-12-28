@@ -5,8 +5,8 @@ struct _cabal_state
 	UINT16 *colorram;
 	UINT16 *videoram;
 	size_t spriteram_size;
-	tilemap *background_layer;
-	tilemap *text_layer;
+	tilemap_t *background_layer;
+	tilemap_t *text_layer;
 	int sound_command1;
 	int sound_command2;
 	int last[4];

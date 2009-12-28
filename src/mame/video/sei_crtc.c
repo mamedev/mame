@@ -59,7 +59,7 @@ List of default vregs (title screen):
 #include "driver.h"
 #include "includes/sei_crtc.h"
 
-static tilemap *sc0_tilemap,*sc2_tilemap,*sc1_tilemap,*sc3_tilemap_0,*sc3_tilemap_1;
+static tilemap_t *sc0_tilemap,*sc2_tilemap,*sc1_tilemap,*sc3_tilemap_0,*sc3_tilemap_1;
 UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
 UINT16 *seibucrtc_vregs;
 UINT16 seibucrtc_sc0bank;

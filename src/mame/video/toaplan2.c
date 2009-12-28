@@ -219,8 +219,8 @@ static UINT8 fg_tile_priority[2][16];
 static UINT8 bg_tile_priority[2][16];
 
 
-static tilemap *top_tilemap[2], *fg_tilemap[2], *bg_tilemap[2];
-static tilemap *tx_tilemap;	/* Tilemap for extra-text-layer */
+static tilemap_t *top_tilemap[2], *fg_tilemap[2], *bg_tilemap[2];
+static tilemap_t *tx_tilemap;	/* Tilemap for extra-text-layer */
 
 static int xoffset[4];
 static int yoffset[4];

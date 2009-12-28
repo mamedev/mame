@@ -40,7 +40,7 @@ static int b000_ret = 0;
 static int b800_prev = 0;
 
 static UINT8 *bg_videoram, *fg_videoram;
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 static WRITE8_HANDLER( ettrivia_fg_w )
 {

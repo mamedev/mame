@@ -14,7 +14,7 @@ UINT8 *wc90_scroll1ylo, *wc90_scroll1yhi;
 UINT8 *wc90_scroll2ylo, *wc90_scroll2yhi;
 
 
-static tilemap *tx_tilemap,*fg_tilemap,*bg_tilemap;
+static tilemap_t *tx_tilemap,*fg_tilemap,*bg_tilemap;
 
 
 

@@ -23,10 +23,10 @@ static int sprite16;
 static int sprite32;
 static int bg;
 
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 
-static tilemap *bg1_tilemap;
-static tilemap *bg2_tilemap;
+static tilemap_t *bg1_tilemap;
+static tilemap_t *bg2_tilemap;
 
 static INT32 bg1_scroll_x, bg1_scroll_y;
 static INT32 bg2_scroll_x, bg2_scroll_y;

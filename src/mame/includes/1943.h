@@ -17,7 +17,7 @@ struct __1943_state
 	size_t  spriteram_size;
 
 	/* video-related */
-	tilemap *fg_tilemap, *bg_tilemap, *bg2_tilemap;
+	tilemap_t *fg_tilemap, *bg_tilemap, *bg2_tilemap;
 	int     char_on, obj_on, bg1_on, bg2_on;
 };
 

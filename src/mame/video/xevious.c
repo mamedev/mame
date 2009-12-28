@@ -14,7 +14,7 @@ UINT8 *xevious_fg_videoram,*xevious_fg_colorram;
 UINT8 *xevious_bg_videoram,*xevious_bg_colorram;
 UINT8 *xevious_sr1,*xevious_sr2,*xevious_sr3;
 
-static tilemap *fg_tilemap,*bg_tilemap;
+static tilemap_t *fg_tilemap,*bg_tilemap;
 static INT32 xevious_bs[2];
 
 /***************************************************************************

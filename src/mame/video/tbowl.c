@@ -4,7 +4,7 @@
 
 #include "driver.h"
 
-static tilemap *tx_tilemap, *bg_tilemap, *bg2_tilemap;
+static tilemap_t *tx_tilemap, *bg_tilemap, *bg2_tilemap;
 UINT8 *tbowl_txvideoram, *tbowl_bgvideoram, *tbowl_bg2videoram;
 UINT8 *tbowl_spriteram;
 

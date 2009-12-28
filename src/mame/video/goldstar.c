@@ -22,7 +22,7 @@ static int bgcolor;
 
 ***************************************************************************/
 
-static tilemap *goldstar_fg_tilemap;
+static tilemap_t *goldstar_fg_tilemap;
 static UINT8 cmaster_girl_num;
 static UINT8 cmaster_girl_pal;
 static UINT8 cm_enable_reg;
@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_cherrym_fg_tile_info )
 
 
 
-static tilemap *goldstar_reel1_tilemap;
+static tilemap_t *goldstar_reel1_tilemap;
 UINT8 *goldstar_reel1_ram;
 
 WRITE8_HANDLER( goldstar_reel1_ram_w )
@@ -115,7 +115,7 @@ static TILE_GET_INFO( get_goldstar_reel1_tile_info )
 }
 
 
-static tilemap *goldstar_reel2_tilemap;
+static tilemap_t *goldstar_reel2_tilemap;
 UINT8 *goldstar_reel2_ram;
 
 WRITE8_HANDLER( goldstar_reel2_ram_w )
@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_goldstar_reel2_tile_info )
 			0);
 }
 
-static tilemap *goldstar_reel3_tilemap;
+static tilemap_t *goldstar_reel3_tilemap;
 UINT8 *goldstar_reel3_ram;
 
 WRITE8_HANDLER( goldstar_reel3_ram_w )

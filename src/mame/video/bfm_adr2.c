@@ -118,8 +118,8 @@ int adder2_acia_triggered;		  // flag <>0, ACIA receive IRQ
 static UINT8 adder_ram[0xE80];				// normal RAM
 static UINT8 adder_screen_ram[2][0x1180];	// paged  display RAM
 
-static tilemap *tilemap0;  // tilemap screen0
-static tilemap *tilemap1;  // timemap screen1
+static tilemap_t *tilemap0;  // tilemap screen0
+static tilemap_t *tilemap1;  // timemap screen1
 
 UINT8 adder2_data_from_sc2;
 UINT8 adder2_data_to_sc2;

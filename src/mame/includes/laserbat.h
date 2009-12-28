@@ -8,7 +8,7 @@ typedef struct _laserbat_state laserbat_state;
 struct _laserbat_state
 {
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	UINT8      *videoram;
 	UINT8      *colorram;
 	int        video_page;

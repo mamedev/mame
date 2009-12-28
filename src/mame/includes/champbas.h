@@ -18,7 +18,7 @@ struct _champbas_state
 	size_t         spriteram_size;
 
 	/* video-related */
-	tilemap        *bg_tilemap;
+	tilemap_t        *bg_tilemap;
 	UINT8          gfx_bank;
 	UINT8          palette_bank;
 

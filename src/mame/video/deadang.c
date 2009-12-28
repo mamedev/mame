@@ -1,6 +1,6 @@
 #include "driver.h"
 
-static tilemap *pf3_layer,*pf2_layer,*pf1_layer,*text_layer;
+static tilemap_t *pf3_layer,*pf2_layer,*pf1_layer,*text_layer;
 static int deadangle_tilebank, deadangle_oldtilebank;
 UINT16 *deadang_video_data,*deadang_scroll_ram;
 

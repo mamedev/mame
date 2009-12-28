@@ -24,7 +24,7 @@
 #include "sound/2413intf.h"
 
 static UINT8 *lo_vram,*hi_vram,*cram;
-static tilemap *sc0_tilemap;
+static tilemap_t *sc0_tilemap;
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {

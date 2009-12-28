@@ -3,7 +3,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 
-static tilemap *background;
+static tilemap_t *background;
 UINT8 *shangkid_videoreg;
 int shangkid_gfx_type;
 

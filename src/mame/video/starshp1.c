@@ -34,7 +34,7 @@ static UINT16 *LSFR;
 
 static bitmap_t *helper;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 static void set_pens(colortable_t *colortable)

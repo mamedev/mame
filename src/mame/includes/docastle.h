@@ -10,7 +10,7 @@ struct _docastle_state
 	size_t   spriteram_size;
 
 	/* video-related */
-	tilemap  *do_tilemap;
+	tilemap_t  *do_tilemap;
 
 	/* misc */
 	int      adpcm_pos, adpcm_idle;

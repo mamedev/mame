@@ -92,7 +92,7 @@ static UINT8 system1_video_mode;
 
 static UINT8 videoram_bank;
 
-static tilemap *tilemap_page[8];
+static tilemap_t *tilemap_page[8];
 static UINT8 tilemap_pages;
 
 

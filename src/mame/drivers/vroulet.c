@@ -44,7 +44,7 @@ Tomasz Slanina 20050225
 static UINT8 *vroulet_ball;
 static UINT8 *videoram;
 static UINT8 *colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static WRITE8_HANDLER(vroulet_paletteram_w)
 {

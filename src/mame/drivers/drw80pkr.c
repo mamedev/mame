@@ -32,7 +32,7 @@
 #define CPU_CLOCK			XTAL_8MHz
 #define DATA_NVRAM_SIZE     0x100
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static UINT8 t0, t1, p0, p1, p2, prog, bus;
 static UINT8 attract_mode = 0;

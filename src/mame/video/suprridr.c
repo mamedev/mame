@@ -11,9 +11,9 @@
 UINT8 *suprridr_bgram;
 UINT8 *suprridr_fgram;
 
-static tilemap *fg_tilemap;
-static tilemap *bg_tilemap;
-static tilemap *bg_tilemap_noscroll;
+static tilemap_t *fg_tilemap;
+static tilemap_t *bg_tilemap;
+static tilemap_t *bg_tilemap_noscroll;
 static UINT8 flipx, flipy;
 
 

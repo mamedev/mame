@@ -39,10 +39,10 @@ static INT32 gx_tilebanks[8], gx_oldbanks[8];
 static int gx_tilemode, gx_rozenable, psac_colorbase, last_psac_colorbase;
 static int gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 static int gx_rushingheroes_hack;
-static tilemap *gx_psac_tilemap, *gx_psac_tilemap2;
+static tilemap_t *gx_psac_tilemap, *gx_psac_tilemap2;
 extern UINT32 *gx_psacram, *gx_subpaletteram32;
 static bitmap_t* type3_roz_temp_bitmap;
-static tilemap* gx_psac_tilemap_alt;
+static tilemap_t* gx_psac_tilemap_alt;
 
 static int konamigx_has_dual_screen;
 int konamigx_current_frame;
@@ -265,7 +265,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 // adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine *machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
-		bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap,
+		bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap,
 		int tilebpp, int blend, int alpha)
 {
 	bitmap_t *src_bitmap;
@@ -336,13 +336,13 @@ static void K053936GP_zoom_draw(running_machine *machine,
 }
 
 void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-		tilemap *tmap, int tilebpp, int blend, int alpha)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha)
 {
 	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha);
 }
 
 void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-		tilemap *tmap, int tilebpp, int blend, int alpha)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha)
 {
 	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha);
 }
@@ -1140,8 +1140,8 @@ void konamigx_objdma(void)
 }
 
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-					tilemap *sub1, int sub1flags,
-					tilemap *sub2, int sub2flags,
+					tilemap_t *sub1, int sub1flags,
+					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_t *extra_bitmap, int rushingheroes_hack)
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };

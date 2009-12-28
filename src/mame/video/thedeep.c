@@ -33,7 +33,7 @@
 
 /* Variables only used here: */
 
-static tilemap *tilemap_0,*tilemap_1;
+static tilemap_t *tilemap_0,*tilemap_1;
 
 /* Variables & functions needed by drivers: */
 

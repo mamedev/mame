@@ -48,7 +48,7 @@ PROMs : NEC B406 (1kx4) x2
 static int bgmap = 0;
 
 static int sbw_system = 0;
-static tilemap *sb_tilemap;
+static tilemap_t *sb_tilemap;
 static UINT32 color_prom_address = 0;
 static UINT8 pix_sh = 0;
 static UINT8 pix[2] = {0, 0};

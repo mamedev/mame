@@ -15,7 +15,7 @@ struct _holeland_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	int        palette_offset;
 	int        po[2];
 };

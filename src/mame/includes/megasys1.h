@@ -23,7 +23,7 @@
 /*----------- defined in video/megasys1.c -----------*/
 
 /* Variables */
-extern tilemap *megasys1_tmap[3];
+extern tilemap_t *megasys1_tmap[3];
 
 extern UINT16 *megasys1_scrollram[3];
 extern UINT16 *megasys1_objectram, *megasys1_vregs, *megasys1_ram;

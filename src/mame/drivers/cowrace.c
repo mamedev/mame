@@ -11,7 +11,7 @@
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 
-static tilemap *tmap;
+static tilemap_t *tmap;
 static UINT8 *colorram;
 static UINT8 *videoram;
 

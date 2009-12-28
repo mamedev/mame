@@ -335,7 +335,7 @@ static UINT32 jvs_sdata_ptr = 0;
 static UINT32 *K037122_tile_ram[MAX_K037122_CHIPS];
 static UINT32 *K037122_char_ram[MAX_K037122_CHIPS];
 static int K037122_gfx_index[MAX_K037122_CHIPS];
-static tilemap *K037122_layer[MAX_K037122_CHIPS][2];
+static tilemap_t *K037122_layer[MAX_K037122_CHIPS][2];
 static UINT32 *K037122_reg[MAX_K037122_CHIPS];
 
 #define K037122_NUM_TILES		16384

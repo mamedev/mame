@@ -9,7 +9,7 @@
 UINT16 *quizpani_bg_videoram, *quizpani_txt_videoram;
 UINT16 *quizpani_scrollreg;
 
-static tilemap *bg_tilemap, *txt_tilemap;
+static tilemap_t *bg_tilemap, *txt_tilemap;
 
 static int quizpani_bgbank = 0, quizpani_txtbank = 0;
 

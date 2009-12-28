@@ -196,9 +196,9 @@ TODO :
 
 #define UNBANKED_SIZE 0x800
 
-static tilemap *gfx0a_tilemap;
-static tilemap *gfx0b_tilemap;
-static tilemap *gfx1_tilemap;
+static tilemap_t *gfx0a_tilemap;
+static tilemap_t *gfx0b_tilemap;
+static tilemap_t *gfx1_tilemap;
 
 static UINT8 *gfx0_cram;
 static UINT8 *gfx0_vram;

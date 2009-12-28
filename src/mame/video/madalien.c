@@ -24,10 +24,10 @@ UINT8 *madalien_edge1_pos;
 UINT8 *madalien_edge2_pos;
 UINT8 *madalien_headlight_pos;
 
-static tilemap *tilemap_fg;
+static tilemap_t *tilemap_fg;
 
-static tilemap *tilemap_edge1[4];
-static tilemap *tilemap_edge2[4];
+static tilemap_t *tilemap_edge1[4];
+static tilemap_t *tilemap_edge2[4];
 
 static bitmap_t *headlight_bitmap;
 

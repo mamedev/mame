@@ -17,7 +17,7 @@
 
 UINT8 *calomega_videoram;
 UINT8 *calomega_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( calomega_videoram_w )
 {

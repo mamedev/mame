@@ -22,7 +22,7 @@ struct _espial_state
 	size_t    bulletsram_size;	// zodiack
 
 	/* video-related */
-	tilemap   *bg_tilemap, *fg_tilemap;
+	tilemap_t   *bg_tilemap, *fg_tilemap;
 	int       flipscreen;	// espial
 	UINT8     palette_bank;	// marineb
 	UINT8     column_scroll;	// marineb

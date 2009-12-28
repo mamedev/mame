@@ -13,7 +13,7 @@ struct _jackal_state
 	UINT8 *  paletteram;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* misc */
 	int      irq_enable;

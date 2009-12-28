@@ -12,7 +12,7 @@ UINT32 *macrossp_spriteram;
 
 static UINT32 *spriteram_old,*spriteram_old2;
 
-static tilemap  *macrossp_scra_tilemap, *macrossp_scrb_tilemap,*macrossp_scrc_tilemap, *macrossp_text_tilemap;
+static tilemap_t  *macrossp_scra_tilemap, *macrossp_scrb_tilemap,*macrossp_scrc_tilemap, *macrossp_text_tilemap;
 
 
 /*** SCR A LAYER ***/
@@ -295,7 +295,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_layer(bitmap_t *bitmap, const rectangle *cliprect, int layer)
 {
-	tilemap *tm;
+	tilemap_t *tm;
 	UINT32 *vr;
 
 	switch (layer)

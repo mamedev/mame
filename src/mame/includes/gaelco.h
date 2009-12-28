@@ -15,7 +15,7 @@ struct _gaelco_state
 //  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap      *tilemap[2];
+	tilemap_t      *tilemap[2];
 
 	/* devices */
 	const device_config *audiocpu;

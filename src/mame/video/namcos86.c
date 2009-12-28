@@ -12,7 +12,7 @@ UINT8 *rthunder_videoram1, *rthunder_videoram2, *rthunder_spriteram;
 static int tilebank;
 static int xscroll[4], yscroll[4];	/* scroll + priority */
 
-static tilemap *bg_tilemap[4];
+static tilemap_t *bg_tilemap[4];
 
 static int backcolor;
 static const UINT8 *tile_address_prom;

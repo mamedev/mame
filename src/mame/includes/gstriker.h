@@ -11,7 +11,7 @@ extern UINT16 *gstriker_lineram;
 
 typedef struct
 {
-	tilemap* tmap;
+	tilemap_t* tmap;
 	UINT16* vram;
 	UINT16 pal_base;
 	UINT8 gfx_region;
@@ -33,7 +33,7 @@ extern WRITE16_HANDLER( VS920A_1_vram_w );
 
 typedef struct
 {
-	tilemap* tmap;
+	tilemap_t* tmap;
 	UINT16* vram;
 	UINT16 regs[8];
 	UINT8 bank[8];

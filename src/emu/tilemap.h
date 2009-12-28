@@ -159,7 +159,7 @@
     order. Based on bits in the tile memory, tiles can be drawn either
     behind or in front of sprites.
 
-        tilemap *tmap;
+        tilemap_t *tmap;
         UINT16 *my_tmap_memory;
 
         TILE_GET_INFO( my_get_info )
@@ -379,7 +379,7 @@
 typedef UINT32 tilemap_memory_index;
 
 /* opaque tilemap definition */
-typedef struct _tilemap tilemap;
+typedef struct _tilemap_t tilemap_t;
 
 
 /* tile_data is filled in by the get_tile_info callback */
@@ -421,25 +421,25 @@ void tilemap_init(running_machine *machine);
 /* ----- tilemap creation and configuration ----- */
 
 /* create a new tilemap; note that tilemaps are tracked by the core so there is no dispose */
-tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+tilemap_t *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* create a new tilemap that is owned by a device */
-tilemap *tilemap_create_device(const device_config *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+tilemap_t *tilemap_create_device(const device_config *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* specify a parameter to be passed into the tile_get_info callback */
-void tilemap_set_user_data(tilemap *tmap, void *user_data);
+void tilemap_set_user_data(tilemap_t *tmap, void *user_data);
 
 /* specify an offset to be added to each pixel before looking up the palette.
  * The offset only applies at final rendering time (e.g., tilemap_draw())
  * It does not apply to the cached pixmap, which is provided by tilemap_get_pixmap().
  */
-void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset);
+void tilemap_set_palette_offset(tilemap_t *tmap, UINT32 offset);
 
 /* set an enable flag for the tilemap; if 0, requests to draw the tilemap are ignored */
-void tilemap_set_enable(tilemap *tmap, int enable);
+void tilemap_set_enable(tilemap_t *tmap, int enable);
 
 /* set a global flip for the tilemap */
-void tilemap_set_flip(tilemap *tmap, UINT32 attributes);
+void tilemap_set_flip(tilemap_t *tmap, UINT32 attributes);
 
 /* set a global flip for all tilemaps */
 void tilemap_set_flip_all(running_machine *machine, UINT32 attributes);
@@ -449,10 +449,10 @@ void tilemap_set_flip_all(running_machine *machine, UINT32 attributes);
 /* ----- dirty tile marking ----- */
 
 /* mark a single tile dirty based on its memory index */
-void tilemap_mark_tile_dirty(tilemap *tmap, tilemap_memory_index memory_index);
+void tilemap_mark_tile_dirty(tilemap_t *tmap, tilemap_memory_index memory_index);
 
 /* mark all the tiles dirty in a tilemap */
-void tilemap_mark_all_tiles_dirty(tilemap *tmap);
+void tilemap_mark_all_tiles_dirty(tilemap_t *tmap);
 
 /* mark all the tiles dirty in all tilemaps */
 void tilemap_mark_all_tiles_dirty_all(running_machine *machine);
@@ -462,63 +462,63 @@ void tilemap_mark_all_tiles_dirty_all(running_machine *machine);
 /* ----- pen-to-layer mapping ----- */
 
 /* specify the mapping of one or more pens (where (<pen> & mask == pen) to a layer */
-void tilemap_map_pens_to_layer(tilemap *tmap, int group, pen_t pen, pen_t mask, UINT8 layermask);
+void tilemap_map_pens_to_layer(tilemap_t *tmap, int group, pen_t pen, pen_t mask, UINT8 layermask);
 
 /* set a single transparent pen into the tilemap, mapping all other pens to layer 0 */
-void tilemap_set_transparent_pen(tilemap *tmap, pen_t pen);
+void tilemap_set_transparent_pen(tilemap_t *tmap, pen_t pen);
 
 /* set up the first 32 pens using a foreground (layer 0) mask and a background (layer 1) mask */
-void tilemap_set_transmask(tilemap *tmap, int group, UINT32 fgmask, UINT32 bgmask);
+void tilemap_set_transmask(tilemap_t *tmap, int group, UINT32 fgmask, UINT32 bgmask);
 
 
 
 /* ----- tilemap scrolling ----- */
 
 /* specify the number of independently scrollable row units; each unit covers height/scroll_rows pixels */
-void tilemap_set_scroll_rows(tilemap *tmap, UINT32 scroll_rows);
+void tilemap_set_scroll_rows(tilemap_t *tmap, UINT32 scroll_rows);
 
 /* specify the number of independently scrollable column units; each unit covers width/scroll_cols pixels */
-void tilemap_set_scroll_cols(tilemap *tmap, UINT32 scroll_cols);
+void tilemap_set_scroll_cols(tilemap_t *tmap, UINT32 scroll_cols);
 
 /* specify global horizontal and vertical scroll offsets, for non-flipped and flipped cases */
-void tilemap_set_scrolldx(tilemap *tmap, int dx, int dx_if_flipped);
-void tilemap_set_scrolldy(tilemap *tmap, int dy, int dy_if_flipped);
+void tilemap_set_scrolldx(tilemap_t *tmap, int dx, int dx_if_flipped);
+void tilemap_set_scrolldy(tilemap_t *tmap, int dy, int dy_if_flipped);
 
 /* return the global horizontal or vertical scroll offset, based on current flip state */
-int tilemap_get_scrolldx(tilemap *tmap);
-int tilemap_get_scrolldy(tilemap *tmap);
+int tilemap_get_scrolldx(tilemap_t *tmap);
+int tilemap_get_scrolldy(tilemap_t *tmap);
 
 /* specify the scroll value for a row/column unit */
-void tilemap_set_scrollx(tilemap *tmap, int row, int value);
-void tilemap_set_scrolly(tilemap *tmap, int col, int value);
+void tilemap_set_scrollx(tilemap_t *tmap, int row, int value);
+void tilemap_set_scrolly(tilemap_t *tmap, int col, int value);
 
 /* return the scroll value for a row/column unit */
-int tilemap_get_scrollx(tilemap *tmap, int row);
-int tilemap_get_scrolly(tilemap *tmap, int col);
+int tilemap_get_scrollx(tilemap_t *tmap, int row);
+int tilemap_get_scrolly(tilemap_t *tmap, int col);
 
 
 
 /* ----- internal map access ----- */
 
 /* return a pointer to the (updated) internal pixmap for a tilemap */
-bitmap_t *tilemap_get_pixmap(tilemap *tmap);
+bitmap_t *tilemap_get_pixmap(tilemap_t *tmap);
 
 /* return a pointer to the (updated) internal flagsmap for a tilemap */
-bitmap_t *tilemap_get_flagsmap(tilemap *tmap);
+bitmap_t *tilemap_get_flagsmap(tilemap_t *tmap);
 
 /* return a pointer to the (updated) internal per-tile flags for a tilemap */
-UINT8 *tilemap_get_tile_flags(tilemap *tmap);
+UINT8 *tilemap_get_tile_flags(tilemap_t *tmap);
 
 
 
 /* ----- tilemap rendering ----- */
 
 /* draw a tilemap to the destination with clipping; pixels apply priority/priority_mask to the priority bitmap */
-void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 
 /* draw a tilemap to the destination with clipping and arbitrary rotate/zoom; */
 /* pixels apply priority/priority_mask to the priority bitmap */
-void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 
@@ -580,7 +580,7 @@ INLINE void tileinfo_set(running_machine *machine, tile_data *tileinfo, int gfxn
     to a layer
 -------------------------------------------------*/
 
-INLINE void tilemap_map_pen_to_layer(tilemap *tmap, int group, pen_t pen, UINT8 layermask)
+INLINE void tilemap_map_pen_to_layer(tilemap_t *tmap, int group, pen_t pen, UINT8 layermask)
 {
 	tilemap_map_pens_to_layer(tmap, group, pen, ~0, layermask);
 }
@@ -591,7 +591,7 @@ INLINE void tilemap_map_pen_to_layer(tilemap *tmap, int group, pen_t pen, UINT8 
     tilemap_draw_primask
 -------------------------------------------------*/
 
-INLINE void tilemap_draw(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority)
+INLINE void tilemap_draw(bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority)
 {
 	tilemap_draw_primask(dest, cliprect, tmap, flags, priority, 0xff);
 }
@@ -602,7 +602,7 @@ INLINE void tilemap_draw(bitmap_t *dest, const rectangle *cliprect, tilemap *tma
     tilemap_draw_roz_primask
 -------------------------------------------------*/
 
-INLINE void tilemap_draw_roz(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+INLINE void tilemap_draw_roz(bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority)
 {

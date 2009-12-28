@@ -102,7 +102,7 @@
 
 static UINT8 *videoram;
 static UINT8 *colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 static WRITE8_HANDLER( jokrwild_videoram_w )

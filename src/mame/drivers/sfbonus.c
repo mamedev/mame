@@ -56,11 +56,11 @@ In a couple of cases, due to too many older revisions, I used: parent + version 
 
 
 static bitmap_t *temp_reel_bitmap;
-static tilemap *sfbonus_tilemap;
-static tilemap *sfbonus_reel_tilemap;
-static tilemap *sfbonus_reel2_tilemap;
-static tilemap *sfbonus_reel3_tilemap;
-static tilemap *sfbonus_reel4_tilemap;
+static tilemap_t *sfbonus_tilemap;
+static tilemap_t *sfbonus_reel_tilemap;
+static tilemap_t *sfbonus_reel2_tilemap;
+static tilemap_t *sfbonus_reel3_tilemap;
+static tilemap_t *sfbonus_reel4_tilemap;
 static UINT8 *sfbonus_tilemap_ram;
 static UINT8 *sfbonus_reel_ram;
 static UINT8 *sfbonus_reel2_ram;

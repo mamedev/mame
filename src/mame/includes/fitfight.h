@@ -16,7 +16,7 @@ struct _fitfight_state
 //  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *fof_bak_tilemap, *fof_mid_tilemap, *fof_txt_tilemap;
+	tilemap_t  *fof_bak_tilemap, *fof_mid_tilemap, *fof_txt_tilemap;
 
 	/* misc */
 	int      bbprot_kludge;

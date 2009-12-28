@@ -26,7 +26,7 @@ struct _hyprduel_state
 	size_t    spriteram_size;
 
 	/* video-related */
-	tilemap   *bg_tilemap[3];
+	tilemap_t   *bg_tilemap[3];
 	UINT8     *empty_tiles;
 	UINT8     *dirtyindex;
 	int       sprite_xoffs, sprite_yoffs, sprite_yoffs_sub;

@@ -12,7 +12,7 @@
 UINT8 *mosaic_fgvideoram;
 UINT8 *mosaic_bgvideoram;
 
-static tilemap *bg_tilemap,*fg_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap;
 
 
 

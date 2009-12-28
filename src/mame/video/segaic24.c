@@ -82,7 +82,7 @@ enum {SYS24_TILES = 0x4000};
 static UINT16 *sys24_char_ram, *sys24_tile_ram;
 static UINT16 sys24_tile_mask;
 static int sys24_char_gfx_index;
-static tilemap *sys24_tile_layer[4];
+static tilemap_t *sys24_tile_layer[4];
 
 #define XOR(a) WORD_XOR_BE(a)
 

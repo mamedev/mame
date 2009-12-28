@@ -20,7 +20,7 @@ struct _bwing_state
 	size_t     bwp3_romsize;
 
 	/* video-related */
-	tilemap *charmap, *fgmap, *bgmap;
+	tilemap_t *charmap, *fgmap, *bgmap;
 	UINT8 *srbase[4], *fgdata, *bgdata;
 	int *srxlat;
 	unsigned sreg[8], palatch, srbank, mapmask, mapflip;

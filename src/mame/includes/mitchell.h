@@ -13,7 +13,7 @@ struct _mitchell_state
 	size_t     videoram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	UINT8      *objram;           /* Sprite RAM */
 	int        flipscreen;
 	int        video_bank;

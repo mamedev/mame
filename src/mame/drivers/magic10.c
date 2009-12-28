@@ -80,7 +80,7 @@
 #include "sound/okim6295.h"
 #include "sgsafari.lh"
 
-static tilemap *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;
+static tilemap_t *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;
 static UINT16 *layer0_videoram, *layer1_videoram, *layer2_videoram;
 static int layer2_offset[2];
 static UINT16 *magic10_vregs;

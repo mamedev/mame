@@ -79,7 +79,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
-static tilemap *pturn_fgmap,*pturn_bgmap;
+static tilemap_t *pturn_fgmap,*pturn_bgmap;
 static int bgbank=0;
 static int fgbank=0;
 static int bgpalette=0;

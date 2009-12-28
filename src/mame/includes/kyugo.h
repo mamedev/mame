@@ -16,7 +16,7 @@ struct _kyugo_state
 	UINT8 *     shared_ram;
 
 	/* video-related */
-	tilemap     *bg_tilemap, *fg_tilemap;
+	tilemap_t     *bg_tilemap, *fg_tilemap;
 	UINT8       scroll_x_lo, scroll_x_hi, scroll_y;
 	int         bgpalbank, fgcolor;
 	int         flipscreen;

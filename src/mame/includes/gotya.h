@@ -10,7 +10,7 @@ struct _gotya_state
 	UINT8 *  scroll;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 	int      scroll_bit_8;
 
 	/* sound-related */

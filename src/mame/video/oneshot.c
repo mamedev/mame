@@ -3,9 +3,9 @@
 #include "driver.h"
 #include "includes/oneshot.h"
 
-static tilemap *oneshot_bg_tilemap;
-static tilemap *oneshot_mid_tilemap;
-static tilemap *oneshot_fg_tilemap;
+static tilemap_t *oneshot_bg_tilemap;
+static tilemap_t *oneshot_mid_tilemap;
+static tilemap_t *oneshot_fg_tilemap;
 
 /* bg tilemap */
 static TILE_GET_INFO( get_oneshot_bg_tile_info )

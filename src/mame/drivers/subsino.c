@@ -28,7 +28,7 @@ To enter test mode in smoto, keep F2 pressed during boot.
 
 static UINT8 *videoram;
 static UINT8 *colorram;
-static tilemap *tmap;
+static tilemap_t *tmap;
 static int tiles_offset;
 
 static WRITE8_HANDLER( subsino_tiles_offset_w )

@@ -8,7 +8,7 @@ UINT8 *spdodgeb_videoram;
 static int tile_palbank;
 static int sprite_palbank;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 

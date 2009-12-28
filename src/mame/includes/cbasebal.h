@@ -13,7 +13,7 @@ struct _cbasebal_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *fg_tilemap, *bg_tilemap;
+	tilemap_t    *fg_tilemap, *bg_tilemap;
 	UINT8      *textram, *scrollram;
 	UINT8      scroll_x[2], scroll_y[2];
 	int        tilebank, spritebank;

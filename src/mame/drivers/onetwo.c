@@ -44,7 +44,7 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 static UINT8 *fgram;
 
 #define MASTER_CLOCK	(XTAL_4MHz)

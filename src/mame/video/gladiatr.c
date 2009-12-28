@@ -13,7 +13,7 @@ static int fg_scrollx, fg_scrolly, bg_scrollx, bg_scrolly;
 static int sprite_bank, sprite_buffer;
 
 
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 static int fg_tile_bank, bg_tile_bank;
 
 

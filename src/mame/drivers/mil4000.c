@@ -91,7 +91,7 @@ Changes (2008-12-10, Roberto Fresca):
 
 
 static UINT16 *sc0_vram,*sc1_vram,*sc2_vram,*sc3_vram;
-static tilemap *sc0_tilemap,*sc1_tilemap,*sc2_tilemap,*sc3_tilemap;
+static tilemap_t *sc0_tilemap,*sc1_tilemap,*sc2_tilemap,*sc3_tilemap;
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {

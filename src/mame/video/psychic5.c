@@ -33,7 +33,7 @@ static UINT8 *ps5_io_ram;
 static UINT8 *ps5_palette_ram;
 static UINT8 *psychic5_fg_videoram;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 static int bg_palette_ram_base;
 static int bg_palette_base;

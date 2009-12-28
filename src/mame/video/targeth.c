@@ -12,7 +12,7 @@ UINT16 *targeth_spriteram;
 UINT16 *targeth_vregs;
 UINT16 *targeth_videoram;
 
-static tilemap *pant[2];
+static tilemap_t *pant[2];
 
 
 /***************************************************************************

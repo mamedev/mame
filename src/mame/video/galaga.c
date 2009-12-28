@@ -20,7 +20,7 @@ static UINT32 stars_scrollx,stars_scrolly;
 
 static INT32 galaga_gfxbank; // used by catsbee
 
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 
 /*
 Galaga star line and pixel locations pulled directly from

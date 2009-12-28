@@ -15,7 +15,7 @@ static attotime time_released;
 static UINT8 prev = 0;
 static UINT8 mask = 0;
 
-static tilemap* bg_tilemap;
+static tilemap_t* bg_tilemap;
 
 
 static TILE_GET_INFO( get_tile_info )

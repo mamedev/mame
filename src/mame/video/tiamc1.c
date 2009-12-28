@@ -21,7 +21,7 @@ static UINT8 tiamc1_layers_ctrl;
 static UINT8 tiamc1_bg_vshift;
 static UINT8 tiamc1_bg_hshift;
 
-static tilemap *bg_tilemap1, *bg_tilemap2;
+static tilemap_t *bg_tilemap1, *bg_tilemap2;
 static rgb_t *palette;
 
 WRITE8_HANDLER( tiamc1_videoram_w )

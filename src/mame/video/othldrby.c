@@ -11,7 +11,7 @@ static UINT16 *vram,*buf_spriteram,*buf_spriteram2;
 #define VREG_SIZE 18
 static UINT16 vreg[VREG_SIZE];
 
-static tilemap *bg_tilemap[3];
+static tilemap_t *bg_tilemap[3];
 
 
 /***************************************************************************

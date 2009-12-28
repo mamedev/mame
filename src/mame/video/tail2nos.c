@@ -5,7 +5,7 @@
 UINT16 *tail2nos_bgvideoram;
 
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static int charbank,charpalette,video_enable;
 static UINT16 *zoomdata;

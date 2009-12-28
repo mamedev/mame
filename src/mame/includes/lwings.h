@@ -11,7 +11,7 @@ struct _lwings_state
 //      UINT8 *  paletteram2;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
+	tilemap_t  *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
 	UINT8    bg2_image;
 	int      bg2_avenger_hw;
 	UINT8    scroll_x[2], scroll_y[2];

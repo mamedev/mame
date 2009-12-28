@@ -15,7 +15,7 @@ struct _bombjack_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *fg_tilemap, *bg_tilemap;
+	tilemap_t    *fg_tilemap, *bg_tilemap;
 	UINT8      background_image;
 
 	/* sound-related */

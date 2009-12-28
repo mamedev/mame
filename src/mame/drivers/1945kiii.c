@@ -47,7 +47,7 @@ The rationale for saving/not saving are as follows:
 static UINT16* k3_spriteram_1;  Saved via reference to AM_BASE
 static UINT16* k3_spriteram_2;  Saved via reference to AM_BASE
 static UINT16* k3_bgram;        Saved via reference to AM_BASE
-static tilemap *k3_bg_tilemap;  Saved due to tilemap supporting save
+static tilemap_t *k3_bg_tilemap;  Saved due to tilemap supporting save
 
 There are no static local variables.
 
@@ -70,7 +70,7 @@ struct _k3_state
 //  UINT16 *  paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* devices */
 	const device_config *oki1;

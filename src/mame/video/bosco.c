@@ -18,7 +18,7 @@ static UINT32 stars_scrolly;
 
 static INT32 bosco_starcontrol,bosco_starblink[2];
 
-static tilemap *bg_tilemap,*fg_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap;
 
 #define VIDEO_RAM_SIZE 0x400
 

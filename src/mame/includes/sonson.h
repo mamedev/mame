@@ -15,7 +15,7 @@ struct _sonson_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 
 	/* misc */
 	int        last_irq;

@@ -45,7 +45,7 @@ Notes:
 #define MASTER_CLOCK	XTAL_12MHz
 #define SOUND_CLOCK		XTAL_45MHz
 
-static tilemap *bg_tilemap, *mlow_tilemap, *mhigh_tilemap, *tx_tilemap;
+static tilemap_t *bg_tilemap, *mlow_tilemap, *mhigh_tilemap, *tx_tilemap;
 static UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram, *sprites_buffer;
 static UINT16 *bg_scrollram, *mlow_scrollram, *mhigh_scrollram, *vidattrram;
 static UINT16 *mwarr_ram;

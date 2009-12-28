@@ -20,7 +20,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 static UINT16 tumblepb_control_0[8];
 UINT16 *tumblepb_pf1_data,*tumblepb_pf2_data;
-static tilemap *pf1_tilemap,*pf1_alt_tilemap,*pf2_tilemap,*pf2_alt_tilemap;
+static tilemap_t *pf1_tilemap,*pf1_alt_tilemap,*pf2_tilemap,*pf2_alt_tilemap;
 static int flipscreen;
 static UINT16 bcstory_tilebank;
 static int sprite_xoffset;

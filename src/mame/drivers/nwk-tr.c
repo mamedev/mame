@@ -245,9 +245,9 @@ static WRITE32_HANDLER( paletteram32_w )
 static UINT32 *K001604_tile_ram[MAX_K001604_CHIPS];
 static UINT32 *K001604_char_ram[MAX_K001604_CHIPS];
 static int K001604_gfx_index[MAX_K001604_CHIPS][2];
-static tilemap *K001604_layer_8x8[MAX_K001604_CHIPS][2];
+static tilemap_t *K001604_layer_8x8[MAX_K001604_CHIPS][2];
 static int K001604_tilemap_offset;
-static tilemap *K001604_layer_roz[MAX_K001604_CHIPS][2];
+static tilemap_t *K001604_layer_roz[MAX_K001604_CHIPS][2];
 static int K001604_roz_size[MAX_K001604_CHIPS];
 
 static UINT32 *K001604_reg[MAX_K001604_CHIPS];

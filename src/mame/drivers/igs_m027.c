@@ -32,7 +32,7 @@
 ***************************************************************************/
 static UINT32 *igs_mainram,*igs_cg_videoram,*igs_tx_videoram,*igs_bg_videoram;
 static UINT32 *igs_pallete32;
-static tilemap *igs_tx_tilemap,*igs_bg_tilemap;
+static tilemap_t *igs_tx_tilemap,*igs_bg_tilemap;
 
 
 

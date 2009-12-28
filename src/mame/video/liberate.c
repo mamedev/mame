@@ -15,7 +15,7 @@
 UINT8 *liberate_videoram;
 UINT8 *liberate_colorram;
 static int background_color, background_disable;
-static tilemap *background_tilemap, *fix_tilemap;
+static tilemap_t *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
 extern UINT8 *prosoccr_charram;
 extern UINT8 *prosport_bg_vram;

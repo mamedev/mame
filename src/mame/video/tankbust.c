@@ -10,9 +10,9 @@
 
 UINT8 * tankbust_videoram;
 UINT8 * tankbust_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
-static tilemap *txt_tilemap;
+static tilemap_t *txt_tilemap;
 UINT8 * tankbust_txtram;
 
 /***************************************************************************

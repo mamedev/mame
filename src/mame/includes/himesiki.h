@@ -13,7 +13,7 @@ struct _himesiki_state
 //  UINT8 *    paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	int 	     scrollx[2];
 	int        flipscreen;
 

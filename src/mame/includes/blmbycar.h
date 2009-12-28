@@ -17,7 +17,7 @@ struct _blmbycar_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *tilemap_0, *tilemap_1;
+	tilemap_t     *tilemap_0, *tilemap_1;
 
 	/* input-related */
 	UINT8       pot_wheel;	// blmbycar

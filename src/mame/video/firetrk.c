@@ -31,8 +31,8 @@ static UINT32 color2_mask;
 
 static const rectangle playfield_window = { 0x02a, 0x115, 0x000, 0x0ff };
 
-static tilemap *tilemap1; /* for screen display */
-static tilemap *tilemap2; /* for collision detection */
+static tilemap_t *tilemap1; /* for screen display */
+static tilemap_t *tilemap2; /* for collision detection */
 
 
 

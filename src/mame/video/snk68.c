@@ -17,7 +17,7 @@ Notes:
 UINT16* pow_fg_videoram;
 
 static int sprite_flip_axis;
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 static int flipscreen;
 static UINT32 fg_tile_offset;
 

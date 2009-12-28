@@ -5,7 +5,7 @@ UINT16 *pirates_tx_tileram, *pirates_spriteram;
 UINT16 *pirates_fg_tileram,  *pirates_bg_tileram;
 UINT16 *pirates_scroll;
 
-static tilemap *tx_tilemap, *fg_tilemap, *bg_tilemap;
+static tilemap_t *tx_tilemap, *fg_tilemap, *bg_tilemap;
 
 /* Video Hardware */
 

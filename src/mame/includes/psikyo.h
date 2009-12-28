@@ -19,8 +19,8 @@ struct _psikyo_state
 //  size_t         spriteram_size;
 
 	/* video-related */
-	tilemap        *tilemap_0_size0, *tilemap_0_size1, *tilemap_0_size2, *tilemap_0_size3;
-	tilemap        *tilemap_1_size0, *tilemap_1_size1, *tilemap_1_size2, *tilemap_1_size3;
+	tilemap_t        *tilemap_0_size0, *tilemap_0_size1, *tilemap_0_size2, *tilemap_0_size3;
+	tilemap_t        *tilemap_1_size0, *tilemap_1_size1, *tilemap_1_size2, *tilemap_1_size3;
 	int            tilemap_0_bank, tilemap_1_bank;
 	int            ka302c_banking;
 

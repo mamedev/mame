@@ -69,7 +69,7 @@ D.9B         [f99cac4b] /
 #define SOUND_CLOCK		XTAL_14_31818MHz
 #define TC15_CLOCK		XTAL_12MHz
 
-static tilemap *bgtilemap, *txttilemap;
+static tilemap_t *bgtilemap, *txttilemap;
 static UINT8 *scrollram;
 static UINT8 *mainram;
 

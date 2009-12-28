@@ -8,7 +8,7 @@
 #include "includes/atetris.h"
 
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 /*************************************

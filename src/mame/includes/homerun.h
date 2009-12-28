@@ -13,7 +13,7 @@ struct _homerun_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *tilemap;
+	tilemap_t    *tilemap;
 	int        gfx_ctrl;
 
 	/* misc */

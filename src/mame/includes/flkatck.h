@@ -12,7 +12,7 @@ struct _flkatck_state
 //  UINT8 *    paletteram;  // this currently uses generic palette handling
 
 	/* video-related */
-	tilemap    *k007121_tilemap[2];
+	tilemap_t    *k007121_tilemap[2];
 	int        flipscreen;
 
 	/* misc */

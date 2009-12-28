@@ -298,7 +298,7 @@ static UINT8 sbp0, sbp2, sbp3;
 *     Video Hardware     *
 *************************/
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /* BCD to Seven Segment Decoder */
 static UINT8 dec_7seg(int data)

@@ -6,8 +6,8 @@ void K053247GP_set_SpriteOffset(int offsx, int offsy);
 void K053936GP_set_offset(int chip, int xoffs, int yoffs);
 void K053936GP_clip_enable(int chip, int status);
 void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy);
-void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int tilebpp, int blend, int alpha);
-void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int tilebpp, int blend, int alpha);
+void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int tilebpp, int blend, int alpha);
+void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int tilebpp, int blend, int alpha);
 
 
 
@@ -69,8 +69,8 @@ void konamigx_le2_sprite_callback(int *code, int *color, int *priority);
 #define GXSUB_8BPP 		0x08	// 256 colors
 
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-					tilemap *sub1, int sub1flags,
-					tilemap *sub2, int sub2flags,
+					tilemap_t *sub1, int sub1flags,
+					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_t* extra_bitmap, int rushingheroes_hack);
 
 void konamigx_mixer_init(running_machine *machine, int objdma);

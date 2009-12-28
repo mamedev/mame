@@ -553,7 +553,7 @@ VIDEO_UPDATE( fromanc2 )
 	int i;
 	int *scrollx = NULL;
 	int *scrolly = NULL;
-	tilemap **tilemaps = NULL;
+	tilemap_t **tilemaps = NULL;
 
 	if (screen == state->left_screen)
 	{

@@ -180,7 +180,7 @@ Stephh's log (2007.11.28) :
 
 static UINT16 autohold_addr; /* address to patch in program RAM to enable autohold feature */
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8 wingboard;
 static UINT8 jumper_e16_e17; /* Set this to TRUE when CG chips are 27c512 instead of 27c256 */
 

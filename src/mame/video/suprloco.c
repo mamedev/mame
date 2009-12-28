@@ -11,7 +11,7 @@
 UINT8 *suprloco_videoram;
 UINT8 *suprloco_scrollram;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int control;
 
 #define SPR_Y_TOP		0

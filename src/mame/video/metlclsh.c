@@ -22,7 +22,7 @@
 
 /* Local variables: */
 
-static tilemap *bg_tilemap,*fg_tilemap;
+static tilemap_t *bg_tilemap,*fg_tilemap;
 
 static UINT8 metlclsh_write_mask, *metlclsh_otherram;
 

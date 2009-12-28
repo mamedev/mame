@@ -15,7 +15,7 @@ int pbillian_show_power;
 static int gfxbank;
 static bitmap_t *fg_bitmap[2];
 static int show_bitmap;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int last_power[2];
 
 

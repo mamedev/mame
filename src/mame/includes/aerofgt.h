@@ -17,7 +17,7 @@ struct _aerofgt_state
 	size_t    spriteram3_size;
 
 	/* video-related */
-	tilemap   *bg1_tilemap, *bg2_tilemap;
+	tilemap_t   *bg1_tilemap, *bg2_tilemap;
 	UINT8     gfxbank[8];
 	UINT16    bank[4];
 	UINT16    bg1scrollx, bg1scrolly, bg2scrollx, bg2scrolly, wbbc97_bitmap_enable;

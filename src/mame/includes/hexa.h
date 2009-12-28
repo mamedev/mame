@@ -8,7 +8,7 @@ struct _hexa_state
 	size_t   videoram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 	int      charbank;
 
 };

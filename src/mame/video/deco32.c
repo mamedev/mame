@@ -10,7 +10,7 @@ UINT32 *dragngun_sprite_lookup_0_ram, *dragngun_sprite_lookup_1_ram;
 UINT32 *deco32_ace_ram;
 
 static UINT8 *dirty_palette;
-static tilemap *pf1_tilemap,*pf1a_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
+static tilemap_t *pf1_tilemap,*pf1a_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
 static int deco32_pf1_bank,deco32_pf2_bank,deco32_pf3_bank,deco32_pf4_bank;
 static int deco32_pf1_flip,deco32_pf2_flip,deco32_pf3_flip,deco32_pf4_flip;
 static int deco32_pf2_colourbank,deco32_pf4_colourbank,deco32_pri;
@@ -1111,7 +1111,7 @@ static void print_debug_info(bitmap_t *bitmap)
 
 #endif
 
-static void deco32_setup_scroll(tilemap *pf_tilemap, UINT16 height, UINT8 control0, UINT8 control1, UINT16 sy, UINT16 sx, UINT32 *rowdata, UINT32 *coldata)
+static void deco32_setup_scroll(tilemap_t *pf_tilemap, UINT16 height, UINT8 control0, UINT8 control1, UINT16 sy, UINT16 sx, UINT32 *rowdata, UINT32 *coldata)
 {
 	int rows,offs;
 

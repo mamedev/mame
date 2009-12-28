@@ -21,7 +21,7 @@ UINT8 *tp84_palette_bank;
 UINT8 *tp84_flipscreen_x;
 UINT8 *tp84_flipscreen_y;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 
 /*

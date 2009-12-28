@@ -64,7 +64,7 @@ Technology = NMOS
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8 *trvmadns_gfxram;
 static UINT8 *trvmadns_tileram;
 static int old_data;

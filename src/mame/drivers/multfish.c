@@ -140,8 +140,8 @@ static int multfish_disp_enable;
 
 /* Video Part */
 
-static tilemap *multfish_tilemap;
-static tilemap *multfish_reel_tilemap;
+static tilemap_t *multfish_tilemap;
+static tilemap_t *multfish_reel_tilemap;
 
 
 static TILE_GET_INFO( get_multfish_tile_info )

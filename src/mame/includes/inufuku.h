@@ -12,7 +12,7 @@ struct _inufuku_state
 	size_t    spriteram1_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap,*tx_tilemap;
+	tilemap_t  *bg_tilemap,*tx_tilemap;
 	int       bg_scrollx, bg_scrolly;
 	int       tx_scrollx, tx_scrolly;
 	int       bg_raster;

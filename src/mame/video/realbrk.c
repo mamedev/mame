@@ -56,7 +56,7 @@ WRITE16_HANDLER( dai2kaku_flipscreen_w )
 
 ***************************************************************************/
 
-static tilemap	*tilemap_0,*tilemap_1,	// Backgrounds
+static tilemap_t	*tilemap_0,*tilemap_1,	// Backgrounds
 						*tilemap_2;				// Text
 
 

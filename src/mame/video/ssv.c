@@ -208,7 +208,7 @@ VIDEO_START( eaglshot )
 	gfx_element_set_source(machine->gfx[1], (UINT8 *)eaglshot_gfxram);
 }
 
-static tilemap *gdfs_tmap;
+static tilemap_t *gdfs_tmap;
 
 static TILE_GET_INFO( get_tile_info_0 )
 {

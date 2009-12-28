@@ -104,7 +104,7 @@ VIDEO_EOF( cninja )
 
 static void raster_pf3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
 {
-	tilemap *tmap=deco16_get_tilemap(2,0);
+	tilemap_t *tmap=deco16_get_tilemap(2,0);
 	int ptr=0,start,end=0;
 	rectangle clip;
 	int overflow=deco16_raster_display_position;

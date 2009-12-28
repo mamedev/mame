@@ -10,7 +10,7 @@
 
 UINT8 *lvcards_videoram;
 UINT8 *lvcards_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( ponttehk )
 {

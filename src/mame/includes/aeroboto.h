@@ -24,7 +24,7 @@ struct _aeroboto_state
 	int     stars_length;
 
 	/* video-related */
-	tilemap *bg_tilemap;
+	tilemap_t *bg_tilemap;
 	int     charbank, starsoff;
 	int     sx, sy;
 	UINT8   ox, oy;

@@ -16,7 +16,7 @@ struct _fuuki16_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
+	tilemap_t     *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
 
 	/* misc */
 	emu_timer   *raster_interrupt_timer;

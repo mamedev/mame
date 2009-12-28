@@ -16,7 +16,7 @@ UINT16 *madmotor_pf2_control;
 UINT16 *madmotor_pf3_control;
 
 static int flipscreen;
-static tilemap *madmotor_pf1_tilemap,*madmotor_pf2_tilemap,*madmotor_pf3_tilemap,*madmotor_pf3a_tilemap;
+static tilemap_t *madmotor_pf1_tilemap,*madmotor_pf2_tilemap,*madmotor_pf3_tilemap,*madmotor_pf3a_tilemap;
 
 
 

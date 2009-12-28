@@ -26,7 +26,7 @@ Dip Locations added according to Service Mode
 /* Video Handling */
 
 static UINT16 *bestleag_txram,*bestleag_bgram,*bestleag_fgram,*bestleag_vregs;
-static tilemap *tx_tilemap,*bg_tilemap,*fg_tilemap;
+static tilemap_t *tx_tilemap,*bg_tilemap,*fg_tilemap;
 
 static TILE_GET_INFO( get_tx_tile_info )
 {

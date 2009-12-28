@@ -26,7 +26,7 @@ static int pitnrun_scroll;
 static int pitnrun_char_bank;
 static int pitnrun_color_select;
 static bitmap_t *tmp_bitmap[4];
-static tilemap *bg, *fg;
+static tilemap_t *bg, *fg;
 UINT8* pitnrun_videoram2;
 
 

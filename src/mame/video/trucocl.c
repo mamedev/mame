@@ -36,7 +36,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 UINT8 *trucocl_videoram;
 UINT8 *trucocl_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( trucocl )
 {

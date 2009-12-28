@@ -35,7 +35,7 @@ ft5_v6_c4.u58 /
 
 
 static UINT16 *bmc_1_videoram, *bmc_2_videoram,*main_ram;
-static tilemap *tilemap_1,*tilemap_2;
+static tilemap_t *tilemap_1,*tilemap_2;
 static UINT8 *bmc_colorram;
 static int clr_offset=0;
 

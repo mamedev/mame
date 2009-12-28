@@ -136,7 +136,7 @@ Dip locations added based on the notes above.
 #include "sound/dac.h"
 
 
-static tilemap *ppmast93_fg_tilemap, *ppmast93_bg_tilemap;
+static tilemap_t *ppmast93_fg_tilemap, *ppmast93_bg_tilemap;
 static UINT8 *ppmast93_fgram, *ppmast93_bgram;
 
 static WRITE8_HANDLER( ppmast93_fgram_w )

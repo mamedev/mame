@@ -3,7 +3,7 @@
 UINT8 *usgames_videoram,*usgames_charram;
 
 
-static tilemap *usgames_tilemap;
+static tilemap_t *usgames_tilemap;
 
 
 

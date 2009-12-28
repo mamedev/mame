@@ -128,7 +128,7 @@ static unsigned char *tile_palette;
 static unsigned char *sprite_palette;
 static const device_config *nvram_1c;
 static const device_config *nvram_1d;
-static tilemap *bgtiles;
+static tilemap_t *bgtiles;
 
 static int control_num;
 static UINT8 sound_to_main_flag;

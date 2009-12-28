@@ -4,7 +4,7 @@ UINT8 *scotrsht_scroll;
 
 UINT8 *scotrsht_videoram;
 UINT8 *scotrsht_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int scotrsht_charbank = 0;
 static int scotrsht_palette_bank = 0;
 

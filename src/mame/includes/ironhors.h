@@ -17,7 +17,7 @@ struct _ironhors_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *bg_tilemap;
+	tilemap_t    *bg_tilemap;
 	int        palettebank, charbank, spriterambank;
 
 	/* devices */

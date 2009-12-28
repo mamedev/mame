@@ -19,7 +19,7 @@ UINT8 *senjyo_bg1videoram,*senjyo_bg2videoram,*senjyo_bg3videoram;
 UINT8 *senjyo_radarram;
 UINT8 *senjyo_bgstripesram;
 
-static tilemap *fg_tilemap,*bg1_tilemap,*bg2_tilemap,*bg3_tilemap;
+static tilemap_t *fg_tilemap,*bg1_tilemap,*bg2_tilemap,*bg3_tilemap;
 
 int is_senjyo, senjyo_scrollhack;
 static int senjyo_bgstripes;

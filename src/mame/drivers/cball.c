@@ -15,7 +15,7 @@ struct _cball_state
 	UINT8 *  video_ram;
 
 	/* video-related */
-	tilemap* bg_tilemap;
+	tilemap_t* bg_tilemap;
 
 	/* devices */
 	const device_config *maincpu;

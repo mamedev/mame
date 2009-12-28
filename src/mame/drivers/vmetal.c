@@ -87,9 +87,9 @@ static UINT16 *vmetal_tlookup;
 static UINT16 *vmetal_videoregs;
 
 
-static tilemap *vmetal_texttilemap;
-static tilemap *vmetal_mid1tilemap;
-static tilemap *vmetal_mid2tilemap;
+static tilemap_t *vmetal_texttilemap;
+static tilemap_t *vmetal_mid1tilemap;
+static tilemap_t *vmetal_mid2tilemap;
 
 /* video/metro.c */
 extern UINT16 *metro_videoregs;

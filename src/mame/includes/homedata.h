@@ -7,7 +7,7 @@ struct _homedata_state
 	UINT8 *  videoram;
 
 	/* video-related */
-	tilemap *bg_tilemap[2][4];
+	tilemap_t *bg_tilemap[2][4];
 	int      visible_page;
 	int      priority;
 	UINT8    reikaids_which;

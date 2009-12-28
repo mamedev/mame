@@ -21,7 +21,7 @@ struct _ddragon_state
 	size_t         spriteram_size;	// FIXME: this appears in chinagat.c, but is it really used?
 
 	/* video-related */
-	tilemap        *fg_tilemap, *bg_tilemap;
+	tilemap_t        *fg_tilemap, *bg_tilemap;
 	UINT8          technos_video_hw;
 	UINT8          scrollx_hi;
 	UINT8          scrolly_hi;

@@ -136,7 +136,7 @@ struct _gstream_state
 //  UINT32 *  nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
-	tilemap   *tilemap1, *tilemap2, *tilemap3;
+	tilemap_t   *tilemap1, *tilemap2, *tilemap3;
 	UINT32    tmap1_scrollx, tmap2_scrollx, tmap3_scrollx;
 	UINT32    tmap1_scrolly, tmap2_scrolly, tmap3_scrolly;
 

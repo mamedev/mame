@@ -195,7 +195,7 @@ actual code sent to the hardware.
 #include "includes/megasys1.h"
 
 /* Variables defined here, that have to be shared: */
-tilemap *megasys1_tmap[3];
+tilemap_t *megasys1_tmap[3];
 
 UINT16 *megasys1_scrollram[3];
 UINT16 *megasys1_objectram, *megasys1_vregs, *megasys1_ram;
@@ -209,7 +209,7 @@ static int megasys1_sprite_bank;
 static int megasys1_screen_flag, megasys1_sprite_flag;
 static int megasys1_8x8_scroll_factor[3], megasys1_16x16_scroll_factor[3];
 
-static tilemap *megasys1_tilemap[3][2][4];
+static tilemap_t *megasys1_tilemap[3][2][4];
 
 /* Variables defined in driver: */
 static int hardware_type_z;

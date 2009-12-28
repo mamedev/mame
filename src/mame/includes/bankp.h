@@ -19,7 +19,7 @@ struct _bankp_state
 	UINT8 * colorram2;
 
 	/* video-related */
-	tilemap *bg_tilemap, *fg_tilemap;
+	tilemap_t *bg_tilemap, *fg_tilemap;
 	int     scroll_x, priority;
 };
 

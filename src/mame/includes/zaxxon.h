@@ -29,8 +29,8 @@ struct _zaxxon_state
 	UINT8 congo_custom[4];
 
 	const UINT8 *color_codes;
-	tilemap *fg_tilemap;
-	tilemap *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
 };
 
 

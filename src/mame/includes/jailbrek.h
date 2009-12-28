@@ -19,7 +19,7 @@ struct _jailbrek_state
 	size_t       spriteram_size;
 
 	/* video-related */
-	tilemap      *bg_tilemap;
+	tilemap_t      *bg_tilemap;
 
 	/* misc */
 	UINT8        irq_enable, nmi_enable;

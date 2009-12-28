@@ -30,10 +30,10 @@ struct _grchamp_state
 	UINT8 *		spriteram;
 
 	bitmap_t *	work_bitmap;
-	tilemap *	text_tilemap;
-	tilemap *	left_tilemap;
-	tilemap *	center_tilemap;
-	tilemap *	right_tilemap;
+	tilemap_t *	text_tilemap;
+	tilemap_t *	left_tilemap;
+	tilemap_t *	center_tilemap;
+	tilemap_t *	right_tilemap;
 
 	rgb_t		bgcolor[0x20];
 };

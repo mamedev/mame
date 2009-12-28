@@ -1,6 +1,6 @@
 #include "driver.h"
 
-static tilemap *tilemap1,*tilemap2,*tilemap4;
+static tilemap_t *tilemap1,*tilemap2,*tilemap4;
 UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
 
 /* tilemap 1 */

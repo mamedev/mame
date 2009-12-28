@@ -42,7 +42,7 @@
 
 UINT8 *snookr10_videoram;
 UINT8 *snookr10_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 WRITE8_HANDLER( snookr10_videoram_w )

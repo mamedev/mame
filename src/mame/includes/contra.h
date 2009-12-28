@@ -20,7 +20,7 @@ struct _contra_state
 	// this driver also uses a large generic spriteram region...
 
 	/* video-related */
-	tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
 	rectangle bg_clip, fg_clip, tx_clip;
 
 	/* devices */

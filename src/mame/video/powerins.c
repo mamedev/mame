@@ -45,7 +45,7 @@ UINT16 *powerins_vram_1, *powerins_vctrl_1;
 //UINT16 *powerins_vregs;
 
 /* Variables only used here: */
-static tilemap *tilemap_0, *tilemap_1;
+static tilemap_t *tilemap_0, *tilemap_1;
 static int tile_bank;
 
 

@@ -84,7 +84,7 @@ struct _cps_state
 	UINT16 *     gigamn2_dummyqsound_ram;
 
 	/* video-related */
-	tilemap      *bg_tilemap[3];
+	tilemap_t      *bg_tilemap[3];
 	int          scanline1;
 	int          scanline2;
 	int          scancalls;

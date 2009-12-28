@@ -10,7 +10,7 @@ Atari Orbit video emulation
 UINT8* orbit_playfield_ram;
 UINT8* orbit_sprite_ram;
 
-static tilemap* bg_tilemap;
+static tilemap_t* bg_tilemap;
 
 static int orbit_flip_screen;
 

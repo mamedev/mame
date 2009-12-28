@@ -19,7 +19,7 @@ struct _finalizr_state
 	size_t        spriteram_size;
 
 	/* video-related */
-	tilemap       *fg_tilemap, *bg_tilemap;
+	tilemap_t       *fg_tilemap, *bg_tilemap;
 	int           spriterambank, charbank;
 
 	/* misc */

@@ -3,7 +3,7 @@
 
 static UINT8 *vram[2],*unkram;
 static int bankctrl,rambank,pmcbank,gfxrom_select;
-static tilemap *bg_tilemap[2];
+static tilemap_t *bg_tilemap[2];
 
 
 

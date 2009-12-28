@@ -8,7 +8,7 @@
 #include "includes/centiped.h"
 
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 UINT8 centiped_flipscreen, *bullsdrt_tiles_bankram;
 static UINT8 bullsdrt_sprites_bank;
 static UINT8 penmask[64];

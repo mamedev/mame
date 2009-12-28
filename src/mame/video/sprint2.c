@@ -9,7 +9,7 @@
 
 UINT8* sprint2_video_ram;
 
-static tilemap* bg_tilemap;
+static tilemap_t* bg_tilemap;
 static bitmap_t* helper;
 
 static int collision[2];

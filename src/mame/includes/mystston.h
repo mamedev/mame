@@ -18,8 +18,8 @@ struct _mystston_state
 	UINT8 *ay8910_select;
 
 	/* video state */
-	tilemap *fg_tilemap;
-	tilemap *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
 	emu_timer *interrupt_timer;
 	UINT8 *bg_videoram;
 	UINT8 *fg_videoram;

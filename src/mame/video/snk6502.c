@@ -18,8 +18,8 @@ UINT8 *snk6502_charram;
 static int charbank;
 static int backcolor;
 
-static tilemap *bg_tilemap;
-static tilemap *fg_tilemap;
+static tilemap_t *bg_tilemap;
+static tilemap_t *fg_tilemap;
 
 static rgb_t palette[64];
 

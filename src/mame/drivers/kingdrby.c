@@ -78,7 +78,7 @@ static UINT8 sound_cmd;
  *************************************/
 
 static UINT8 *kingdrby_vram,*kingdrby_attr;
-static tilemap *sc0_tilemap,*sc0w_tilemap,*sc1_tilemap;
+static tilemap_t *sc0_tilemap,*sc0w_tilemap,*sc1_tilemap;
 
 /*
 tile

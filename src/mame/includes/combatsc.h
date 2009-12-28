@@ -15,7 +15,7 @@ struct _combatsc_state
 	UINT8 *    spriteram[2];
 
 	/* video-related */
-	tilemap *bg_tilemap[2], *textlayer;
+	tilemap_t *bg_tilemap[2], *textlayer;
 	UINT8 scrollram0[0x40];
 	UINT8 scrollram1[0x40];
 	int priority;

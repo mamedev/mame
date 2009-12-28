@@ -89,7 +89,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "audio/seibu.h"
 
 static UINT8* cshooter_txram;
-static tilemap *cshooter_txtilemap;
+static tilemap_t *cshooter_txtilemap;
 static int coin_stat=0;
 
 static UINT8 *mainram;

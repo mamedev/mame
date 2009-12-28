@@ -69,7 +69,7 @@ struct _dunhuang_state
 	UINT8  *        paldata;
 
 	/* video-related */
-	tilemap         *tmap,*tmap2;
+	tilemap_t         *tmap,*tmap2;
 	int             written, written2;
 	UINT8           pos_x, pos_y, clear_y;
 	UINT8           block_x, block_y, block_w, block_h;

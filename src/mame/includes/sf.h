@@ -14,7 +14,7 @@ struct _sf_state
 	size_t      videoram_size;
 
 	/* video-related */
-	tilemap     *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	tilemap_t     *bg_tilemap, *fg_tilemap, *tx_tilemap;
 	int         sf_active;
 	UINT16      bgscroll, fgscroll;
 

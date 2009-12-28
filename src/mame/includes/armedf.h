@@ -14,7 +14,7 @@ struct _armedf_state
 //  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *bg_tilemap,*fg_tilemap, *tx_tilemap;
+	tilemap_t  *bg_tilemap,*fg_tilemap, *tx_tilemap;
 	UINT16   scroll_msb;
 	UINT16   vreg;
 	UINT16   fg_scrollx, fg_scrolly;

@@ -1,7 +1,7 @@
 #include "driver.h"
 
 static int bgcharbank;
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 WRITE16_HANDLER( tigeroad_videoram_w )
 {

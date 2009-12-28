@@ -18,7 +18,7 @@ int triplhnt_sprite_zoom;
 int triplhnt_sprite_bank;
 
 static bitmap_t* helper;
-static tilemap* bg_tilemap;
+static tilemap_t* bg_tilemap;
 
 
 static TILE_GET_INFO( get_tile_info )

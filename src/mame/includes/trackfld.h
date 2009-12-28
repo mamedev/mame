@@ -24,7 +24,7 @@ struct _trackfld_state
 	UINT8 *  spriteram_select;	// sbasketb
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 	int      bg_bank, sprite_bank1, sprite_bank2;	// trackfld
 	int      old_gfx_bank;					// needed by atlantol
 

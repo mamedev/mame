@@ -13,7 +13,7 @@
 /* TTL text plane stuff */
 
 static int ttl_gfx_index;
-static tilemap *ttl_tilemap, *roz_tilemap;
+static tilemap_t *ttl_tilemap, *roz_tilemap;
 static UINT16 ttl_vram[0x800], roz_vram[0x800];
 
 /* TTL text plane */

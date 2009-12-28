@@ -256,7 +256,7 @@ UINT8 galaxian_sprite_clip_end;
  *
  *************************************/
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static UINT8 flipscreen_x;
 static UINT8 flipscreen_y;

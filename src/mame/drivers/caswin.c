@@ -46,7 +46,7 @@ TODO:
 #include "sound/ay8910.h"
 
 static UINT8 *sc0_vram,*sc0_attr;
-static tilemap *sc0_tilemap;
+static tilemap_t *sc0_tilemap;
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {

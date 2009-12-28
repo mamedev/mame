@@ -14,7 +14,7 @@ struct _djboy_state
 	UINT8 *    paletteram;
 
 	/* video-related */
-	tilemap    *background;
+	tilemap_t    *background;
 	UINT8      videoreg, scrollx, scrolly;
 
 	/* Kaneko BEAST state */

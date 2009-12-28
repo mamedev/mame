@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8 sound_flag;
 static UINT8 tile_bank = 0;
 //static UINT8 player_mux = 0;

@@ -10,7 +10,7 @@
 
 UINT8 *mrjong_videoram;
 UINT8 *mrjong_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 

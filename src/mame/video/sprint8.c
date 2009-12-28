@@ -13,8 +13,8 @@ UINT8* sprint8_pos_v_ram;
 UINT8* sprint8_pos_d_ram;
 UINT8* sprint8_team;
 
-static tilemap* tilemap1;
-static tilemap* tilemap2;
+static tilemap_t* tilemap1;
+static tilemap_t* tilemap2;
 
 static bitmap_t* helper1;
 static bitmap_t* helper2;

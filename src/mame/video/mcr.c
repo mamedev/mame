@@ -11,7 +11,7 @@
 INT8 mcr12_sprite_xoffs;
 INT8 mcr12_sprite_xoffs_flip;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 /*************************************

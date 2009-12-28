@@ -20,7 +20,7 @@ struct _chaknpop_state
 
 
 	/* video-related */
-	tilemap  *tx_tilemap;
+	tilemap_t  *tx_tilemap;
 	UINT8    *vram1, *vram2, *vram3, *vram4;
 	UINT8    gfxmode;
 	UINT8    flip_x, flip_y;

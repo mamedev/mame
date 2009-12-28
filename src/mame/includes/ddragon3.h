@@ -15,7 +15,7 @@ struct _ddragon3_state
 //  UINT16 *        paletteram; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap         *fg_tilemap, *bg_tilemap;
+	tilemap_t         *fg_tilemap, *bg_tilemap;
 	UINT16          vreg;
 	UINT16          bg_scrollx;
 	UINT16          bg_scrolly;

@@ -18,7 +18,7 @@ struct _yunsun16_state
 	size_t      spriteram_size;
 
 	/* other video-related elements */
-	tilemap     *tilemap_0, *tilemap_1;
+	tilemap_t     *tilemap_0, *tilemap_1;
 	int         sprites_scrolldx, sprites_scrolldy;
 
 	/* devices */

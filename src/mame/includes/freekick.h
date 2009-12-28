@@ -9,7 +9,7 @@ struct _freekick_state
 	size_t     spriteram_size;
 
 	/* video-related */
-	tilemap    *freek_tilemap;
+	tilemap_t    *freek_tilemap;
 
 	/* misc */
 	int        inval, outval, cnt;	// used by oigas

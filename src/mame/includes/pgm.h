@@ -19,7 +19,7 @@ struct _pgm_state
 //  UINT16 *      paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap       *bg_tilemap, *tx_tilemap;
+	tilemap_t       *bg_tilemap, *tx_tilemap;
 	UINT16        *sprite_temp_render;
 	bitmap_t      *tmppgmbitmap;
 

@@ -52,7 +52,7 @@ struct _koikoi_state
 	UINT8 *  videoram;
 
 	/* video-related */
-	tilemap  *tmap;
+	tilemap_t  *tmap;
 
 	/* misc */
 	int inputcnt;

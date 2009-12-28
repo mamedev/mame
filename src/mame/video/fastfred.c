@@ -34,7 +34,7 @@ static const rectangle spritevisibleareaflipx =
 static UINT16 charbank;
 static UINT8 colorbank;
 int fastfred_hardware_type;
-static tilemap *bg_tilemap, *fg_tilemap, *web_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap, *web_tilemap;
 
 /***************************************************************************
 

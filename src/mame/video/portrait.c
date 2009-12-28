@@ -9,7 +9,7 @@
 
 int portrait_scroll;
 UINT8 *portrait_bgvideoram, *portrait_fgvideoram;
-static tilemap *foreground, *background;
+static tilemap_t *foreground, *background;
 
 WRITE8_HANDLER( portrait_bgvideo_write )
 {

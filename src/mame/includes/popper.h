@@ -16,8 +16,8 @@ struct _popper_state
 	size_t  spriteram_size;
 
 	/* video-related */
-	tilemap *p123_tilemap, *p0_tilemap;
-	tilemap *ol_p123_tilemap, *ol_p0_tilemap;
+	tilemap_t *p123_tilemap, *p0_tilemap;
+	tilemap_t *ol_p123_tilemap, *ol_p0_tilemap;
 	INT32 flipscreen, e002, gfx_bank;
 	rectangle tilemap_clip;
 

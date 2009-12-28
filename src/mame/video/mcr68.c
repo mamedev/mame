@@ -14,8 +14,8 @@
 UINT8 mcr68_sprite_clip;
 INT8 mcr68_sprite_xoffset;
 
-static tilemap *bg_tilemap;
-static tilemap *fg_tilemap;
+static tilemap_t *bg_tilemap;
+static tilemap_t *fg_tilemap;
 
 
 

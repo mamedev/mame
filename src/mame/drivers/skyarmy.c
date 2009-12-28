@@ -27,7 +27,7 @@
 static UINT8 *skyarmy_videoram;
 static UINT8 *skyarmy_colorram;
 static UINT8 *skyarmy_scrollram;
-static tilemap* skyarmy_tilemap;
+static tilemap_t* skyarmy_tilemap;
 
 static TILE_GET_INFO( get_skyarmy_tile_info )
 {

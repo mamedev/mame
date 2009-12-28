@@ -17,8 +17,8 @@ static UINT8 video_control;
 static UINT8 video_flip;
 static UINT8 vblank_latch;
 
-static tilemap *spaceod_bg_htilemap;
-static tilemap *spaceod_bg_vtilemap;
+static tilemap_t *spaceod_bg_htilemap;
+static tilemap_t *spaceod_bg_vtilemap;
 static UINT16 spaceod_hcounter;
 static UINT16 spaceod_vcounter;
 static UINT8 spaceod_fixed_color;
@@ -26,7 +26,7 @@ static UINT8 spaceod_bg_control;
 static UINT8 spaceod_bg_detect;
 static const UINT8 spaceod_bg_detect_tile_color = 1;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8 bg_enable;
 static UINT8 bg_char_bank;
 static UINT16 bg_scrollx, bg_scrolly;

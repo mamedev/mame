@@ -13,7 +13,7 @@ struct _carjmbre_state
 	size_t  spriteram_size;
 
 	/* video-related */
-	tilemap *cj_tilemap;
+	tilemap_t *cj_tilemap;
 	UINT8   flipscreen;
 	UINT16  bgcolor;
 };

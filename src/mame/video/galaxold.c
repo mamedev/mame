@@ -40,15 +40,15 @@ size_t galaxold_bulletsram_size;
 
 static TILE_GET_INFO( get_tile_info );
 static TILE_GET_INFO( rockclim_get_tile_info );
-static tilemap *bg_tilemap;
-static tilemap *rockclim_tilemap;
+static tilemap_t *bg_tilemap;
+static tilemap_t *rockclim_tilemap;
 static int mooncrst_gfxextend;
 static int spriteram2_present;
 static UINT8 gfxbank[5];
 static UINT8 flipscreen_x;
 static UINT8 flipscreen_y;
 static UINT8 color_mask;
-static tilemap *dambustr_tilemap2;
+static tilemap_t *dambustr_tilemap2;
 static UINT8 *dambustr_videoram2;
 static void (*modify_charcode)(running_machine *machine, UINT16 *code,UINT8 x);		/* function to call to do character banking */
 static void mooncrst_modify_charcode(running_machine *machine, UINT16 *code,UINT8 x);
@@ -73,7 +73,7 @@ static void (*modify_ypos)(UINT8*);	/* function to call to do modify how vertica
 static TIMER_CALLBACK( stars_blink_callback );
 static TIMER_CALLBACK( stars_scroll_callback );
 
-static void (*tilemap_set_scroll)( tilemap *, int col, int value );
+static void (*tilemap_set_scroll)( tilemap_t *, int col, int value );
 
 /* star circuit */
 #define STAR_COUNT  252

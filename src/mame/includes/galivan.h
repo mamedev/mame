@@ -15,7 +15,7 @@ struct _galivan_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *bg_tilemap, *tx_tilemap;
+	tilemap_t     *bg_tilemap, *tx_tilemap;
 	UINT8       scrollx[2], scrolly[2];
 	UINT8       flipscreen;
 	UINT8       write_layers, layers;

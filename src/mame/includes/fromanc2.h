@@ -7,7 +7,7 @@ struct _fromanc2_state
 	UINT16   *videoram[2][4];
 
 	/* video-related */
-	tilemap  *tilemap[2][4];
+	tilemap_t  *tilemap[2][4];
 	int      scrollx[2][4], scrolly[2][4];
 	int      gfxbank[2][4];
 

@@ -12,7 +12,7 @@ struct _battlex_state
 	UINT8 * spriteram;
 
 	/* video-related */
-	tilemap *bg_tilemap;
+	tilemap_t *bg_tilemap;
 	int     scroll_lsb, scroll_msb;
 };
 

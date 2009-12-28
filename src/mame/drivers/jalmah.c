@@ -119,7 +119,7 @@ Video Hardware start
 
 ******************************************************************************************/
 
-static tilemap *sc3_tilemap_0,*sc3_tilemap_2,*sc3_tilemap_3,
+static tilemap_t *sc3_tilemap_0,*sc3_tilemap_2,*sc3_tilemap_3,
 			   *sc0_tilemap_0,*sc0_tilemap_1,*sc0_tilemap_2,*sc0_tilemap_3,
    			   *sc1_tilemap_0,*sc1_tilemap_1,*sc1_tilemap_2,*sc1_tilemap_3,
 			   *sc2_tilemap_0,*sc2_tilemap_1,*sc2_tilemap_2,*sc2_tilemap_3;

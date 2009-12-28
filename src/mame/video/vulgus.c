@@ -12,7 +12,7 @@ UINT8 *vulgus_fgvideoram,*vulgus_bgvideoram;
 UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
 
 static int vulgus_palette_bank;
-static tilemap *fg_tilemap, *bg_tilemap;
+static tilemap_t *fg_tilemap, *bg_tilemap;
 
 
 /***************************************************************************

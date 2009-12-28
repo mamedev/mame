@@ -4,9 +4,9 @@
 
 extern UINT8 *taitol_rambanks;
 
-static tilemap *bg18_tilemap;
-static tilemap *bg19_tilemap;
-static tilemap *ch1a_tilemap;
+static tilemap_t *bg18_tilemap;
+static tilemap_t *bg19_tilemap;
+static tilemap_t *ch1a_tilemap;
 
 static int cur_ctrl = 0;
 static int horshoes_gfxbank = 0;

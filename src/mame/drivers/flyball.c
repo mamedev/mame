@@ -19,7 +19,7 @@ struct _flyball_state
 	UINT8 *  playfield_ram;
 
 	/* video-related */
-	tilemap  *tmap;
+	tilemap_t  *tmap;
 	UINT8    pitcher_vert;
 	UINT8    pitcher_horz;
 	UINT8    pitcher_pic;

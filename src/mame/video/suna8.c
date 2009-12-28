@@ -84,7 +84,7 @@ UINT8 suna8_unknown;
     For Debug: there's no tilemap, just sprites.
 ***************************************************************************/
 #if TILEMAPS
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int tiles, rombank, page;
 
 static TILE_GET_INFO( get_tile_info )

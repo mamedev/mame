@@ -204,7 +204,7 @@ WRITE16_HANDLER( aerofgt_bg2videoram_w )
 }
 
 
-static void setbank( running_machine *machine, tilemap *tmap, int num, int bank )
+static void setbank( running_machine *machine, tilemap_t *tmap, int num, int bank )
 {
 	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
 	if (state->gfxbank[num] != bank)
@@ -262,7 +262,7 @@ WRITE16_HANDLER( spinlbrk_gfxbank_w )
 WRITE16_HANDLER( turbofrc_gfxbank_w )
 {
 	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
-	tilemap *tmap = (offset == 0) ? state->bg1_tilemap : state->bg2_tilemap;
+	tilemap_t *tmap = (offset == 0) ? state->bg1_tilemap : state->bg2_tilemap;
 
 	data = COMBINE_DATA(&state->bank[offset]);
 
@@ -275,7 +275,7 @@ WRITE16_HANDLER( turbofrc_gfxbank_w )
 WRITE16_HANDLER( aerofgt_gfxbank_w )
 {
 	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
-	tilemap *tmap = (offset < 2) ? state->bg1_tilemap : state->bg2_tilemap;
+	tilemap_t *tmap = (offset < 2) ? state->bg1_tilemap : state->bg2_tilemap;
 
 	data = COMBINE_DATA(&state->bank[offset]);
 

@@ -3,7 +3,7 @@
 
 UINT8 *sidepckt_videoram;
 UINT8 *sidepckt_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int flipscreen;
 
 

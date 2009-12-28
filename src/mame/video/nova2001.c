@@ -3,7 +3,7 @@
 
 UINT8 *nova2001_fg_videoram, *nova2001_bg_videoram;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 
 /*************************************

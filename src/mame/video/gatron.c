@@ -19,7 +19,7 @@
 
 #include "driver.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 WRITE8_HANDLER( gat_videoram_w )

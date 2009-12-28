@@ -15,7 +15,7 @@ struct _gng_state
 //  UINT8 *    spriteram;   // currently this uses generic buffered spriteram
 
 	/* video-related */
-	tilemap    *bg_tilemap, *fg_tilemap;
+	tilemap_t    *bg_tilemap, *fg_tilemap;
 	UINT8      scrollx[2];
 	UINT8      scrolly[2];
 };

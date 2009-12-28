@@ -14,7 +14,7 @@ struct _zerozone_state
 
 	/* video-related */
 	UINT16      tilebank;
-	tilemap     *zz_tilemap;
+	tilemap_t     *zz_tilemap;
 
 	/* devices */
 	const device_config *audiocpu;

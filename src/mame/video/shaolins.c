@@ -14,7 +14,7 @@ extern UINT8 shaolins_nmi_enable;
 static int palettebank;
 UINT8 *shaolins_videoram;
 UINT8 *shaolins_colorram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 

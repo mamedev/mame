@@ -645,7 +645,7 @@ static UINT16 *PC080SN_ram[PC080SN_MAX_CHIPS],
 static int PC080SN_bgscrollx[PC080SN_MAX_CHIPS][2],PC080SN_bgscrolly[PC080SN_MAX_CHIPS][2];
 static int PC080SN_xoffs,PC080SN_yoffs;
 
-static tilemap *PC080SN_tilemap[PC080SN_MAX_CHIPS][2];
+static tilemap_t *PC080SN_tilemap[PC080SN_MAX_CHIPS][2];
 static int PC080SN_bg_gfx[PC080SN_MAX_CHIPS];
 static int PC080SN_yinvert,PC080SN_dblwidth;
 
@@ -1310,7 +1310,7 @@ UINT16 *TC0080VCO_chain_ram_0, *TC0080VCO_chain_ram_1,
 static UINT16 TC0080VCO_bg0_scrollx,TC0080VCO_bg0_scrolly,
 		TC0080VCO_bg1_scrollx,TC0080VCO_bg1_scrolly;
 
-static tilemap *TC0080VCO_tilemap[3];
+static tilemap_t *TC0080VCO_tilemap[3];
 
 static int TC0080VCO_bg_gfx,TC0080VCO_tx_gfx;
 static int TC0080VCO_bg_xoffs,TC0080VCO_bg_yoffs;
@@ -1948,7 +1948,7 @@ static int TC0100SCN_bgscrollx[TC0100SCN_MAX_CHIPS],TC0100SCN_bgscrolly[TC0100SC
 		TC0100SCN_fgscrollx[TC0100SCN_MAX_CHIPS],TC0100SCN_fgscrolly[TC0100SCN_MAX_CHIPS];
 
 /* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
-static tilemap *TC0100SCN_tilemap[TC0100SCN_MAX_CHIPS][3][2];
+static tilemap_t *TC0100SCN_tilemap[TC0100SCN_MAX_CHIPS][3][2];
 static rectangle TC0100SCN_cliprect[TC0100SCN_MAX_CHIPS];
 
 static int TC0100SCN_bg_gfx[TC0100SCN_MAX_CHIPS],TC0100SCN_tx_gfx[TC0100SCN_MAX_CHIPS];
@@ -2556,7 +2556,7 @@ void TC0100SCN_tilemap_update(running_machine *machine)
 	}
 }
 
-static void TC0100SCN_tilemap_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, tilemap* tmap, int flags, UINT32 priority)
+static void TC0100SCN_tilemap_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, tilemap_t* tmap, int flags, UINT32 priority)
 {
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
@@ -2639,7 +2639,7 @@ int TC0100SCN_bottomlayer(int chip)
 #define TC0280GRD_RAM_SIZE 0x2000
 static UINT16 TC0280GRD_ctrl[8];
 static UINT16 *TC0280GRD_ram;
-static tilemap *TC0280GRD_tilemap;
+static tilemap_t *TC0280GRD_tilemap;
 static int TC0280GRD_gfxnum,TC0280GRD_base_color;
 
 
@@ -2798,7 +2798,7 @@ static int TC0480SCP_bgscrolly[4];
 int TC0480SCP_pri_reg;
 
 /* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
-static tilemap *TC0480SCP_tilemap[5][2];
+static tilemap_t *TC0480SCP_tilemap[5][2];
 static int TC0480SCP_bg_gfx,TC0480SCP_tx_gfx;
 static INT32 TC0480SCP_tile_colbase,TC0480SCP_dblwidth;
 static int TC0480SCP_x_offs,TC0480SCP_y_offs;

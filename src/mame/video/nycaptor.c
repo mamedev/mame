@@ -14,7 +14,7 @@
 static  int nycaptor_mask=0;
 #endif
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int char_bank,palette_bank,gfxctrl;
 
 UINT8 *nycaptor_scrlram;

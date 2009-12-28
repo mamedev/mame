@@ -7,7 +7,7 @@ UINT16 *TC0180VCU_ram;
 UINT16 *taitob_spriteram;
 UINT16 *taitob_pixelram;
 
-static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
 static UINT16 bg_rambank[2],fg_rambank[2],tx_rambank;
 
 /* framebuffer is a raw bitmap, remapped as a last step */
@@ -450,7 +450,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 
-static void TC0180VCU_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int plane)
+static void TC0180VCU_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int plane)
 {
 /*plane = 0 fg tilemap*/
 /*plane = 1 bg tilemap*/

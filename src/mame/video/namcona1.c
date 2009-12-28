@@ -21,9 +21,9 @@ UINT16 *namcona1_workram;
 /* private variables */
 static UINT16 *shaperam;
 static UINT16 *cgram;
-static tilemap *roz_tilemap;
+static tilemap_t *roz_tilemap;
 static int roz_palette;
-static tilemap *bg_tilemap[NAMCONA1_NUM_TILEMAPS];
+static tilemap_t *bg_tilemap[NAMCONA1_NUM_TILEMAPS];
 static int tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
 static int palette_is_dirty;
 

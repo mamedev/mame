@@ -34,7 +34,7 @@
 
 UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
-static tilemap *char_tilemap, *bgram0_tilemap, *bgram1_tilemap;
+static tilemap_t *char_tilemap, *bgram0_tilemap, *bgram1_tilemap;
 
 
 /***************************************************************************

@@ -2,7 +2,7 @@
 
 UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
 
-static tilemap *bg_tilemap,*tx_tilemap;
+static tilemap_t *bg_tilemap,*tx_tilemap;
 static UINT8 priority;
 static UINT16 scroll_x,scroll_y;
 

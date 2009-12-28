@@ -11,7 +11,7 @@
 UINT8 *tankbatt_bulletsram;
 size_t tankbatt_bulletsram_size;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 

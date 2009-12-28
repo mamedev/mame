@@ -73,7 +73,7 @@ quaquiz2 - no inputs, needs NVRAM
 #define MASTER_CLOCK		12440000
 
 
-static tilemap *statriv2_tilemap;
+static tilemap_t *statriv2_tilemap;
 static UINT8 *question_offset;
 
 static UINT8 question_offset_low;

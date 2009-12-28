@@ -9,7 +9,7 @@
 
 UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 
-static tilemap *background_layer,*foreground_layer,*midground_layer,*text_layer;
+static tilemap_t *background_layer,*foreground_layer,*midground_layer,*text_layer;
 UINT16 legionna_layer_disable;
 
 /******************************************************************************/

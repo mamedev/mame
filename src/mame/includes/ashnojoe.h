@@ -20,7 +20,7 @@ struct _ashnojoe_state
 //  UINT16 *    paletteram; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap     *joetilemap, *joetilemap2, *joetilemap3, *joetilemap4, *joetilemap5, *joetilemap6, *joetilemap7;
+	tilemap_t     *joetilemap, *joetilemap2, *joetilemap3, *joetilemap4, *joetilemap5, *joetilemap6, *joetilemap7;
 
 	/* sound-related */
 	UINT8       adpcm_byte;

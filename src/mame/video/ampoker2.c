@@ -69,7 +69,7 @@
 #include "driver.h"
 #include "video/resnet.h"
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 
 PALETTE_INIT( ampoker2 )

@@ -10,7 +10,7 @@ struct _gcpinbal_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *tilemap[3];
+	tilemap_t     *tilemap[3];
 	UINT16      scrollx[3], scrolly[3];
 	UINT16      bg0_gfxset, bg1_gfxset;
 #ifdef MAME_DEBUG

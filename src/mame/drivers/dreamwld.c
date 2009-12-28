@@ -101,7 +101,7 @@ struct _dreamwld_state
 	UINT32 *  spriteram;
 
 	/* video-related */
-	tilemap  *bg_tilemap,*bg2_tilemap;
+	tilemap_t  *bg_tilemap,*bg2_tilemap;
 	int      tilebank[2], tilebankold[2];
 
 	/* misc */

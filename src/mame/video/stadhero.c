@@ -15,7 +15,7 @@ UINT16 *stadhero_pf1_data;
 static UINT16 *stadhero_pf2_data;
 UINT16 *stadhero_pf2_control_0;
 UINT16 *stadhero_pf2_control_1;
-static tilemap *pf1_tilemap,*pf2_tilemap;
+static tilemap_t *pf1_tilemap,*pf2_tilemap;
 static int flipscreen;
 
 /******************************************************************************/

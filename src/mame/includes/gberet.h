@@ -16,7 +16,7 @@ struct _gberet_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *bg_tilemap;
+	tilemap_t     *bg_tilemap;
 	UINT8       spritebank;
 
 	/* misc */

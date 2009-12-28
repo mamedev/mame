@@ -20,7 +20,7 @@
 #include "machine/eeprom.h"
 
 static UINT16 *bg_videoram, *mid_videoram, *txt_videoram, *tilemap_regs, *video_regs;
-static tilemap *mid_tilemap, *txt_tilemap;
+static tilemap_t *mid_tilemap, *txt_tilemap;
 static int ticket = 0;
 
 static TILE_GET_INFO( get_mid_tile_info )

@@ -83,7 +83,7 @@ UINT16 *gaelco2_vregs;
 static UINT16 *gaelco2_videoram;
 
 /* tilemaps */
-static tilemap *pant[2];
+static tilemap_t *pant[2];
 
 static int dual_monitor;
 

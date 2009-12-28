@@ -37,8 +37,8 @@ struct _timeplt_state
 	size_t   spriteram_size;	// rocnrope
 
 	/* video-related */
-	tilemap  *bg_tilemap;
-	tilemap  *fg_tilemap;		// jungler
+	tilemap_t  *bg_tilemap;
+	tilemap_t  *fg_tilemap;		// jungler
 	UINT8     blitterdata[4];	// junofrst
 	UINT8     flip_x, flip_y;	// tutankham, junofrst
 

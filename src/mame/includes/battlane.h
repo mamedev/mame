@@ -12,7 +12,7 @@ struct _battlane_state
 	UINT8 *     spriteram;
 
 	/* video-related */
-	tilemap     *bg_tilemap;
+	tilemap_t     *bg_tilemap;
 	bitmap_t    *screen_bitmap;
 	int         video_ctrl;
 	int         cpu_control;	/* CPU interrupt control register */

@@ -32,11 +32,11 @@ are the same of IGS.  AMT may be previous IGS name.
 
 
 static UINT8   *bg_tile_ram;
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8   *bg_scroll;
 
 static UINT8   *fg_tile_ram, *fg_color_ram;
-static tilemap *fg_tilemap;
+static tilemap_t *fg_tilemap;
 
 static WRITE8_HANDLER( bg_scroll_w )
 {

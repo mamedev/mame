@@ -21,7 +21,7 @@ struct _f1gp_state
 	size_t    spriteram_size;
 
 	/* video-related */
-	tilemap   *fg_tilemap, *roz_tilemap;
+	tilemap_t   *fg_tilemap, *roz_tilemap;
 	int       roz_bank, flipscreen, gfxctrl;
 	int       scroll[2];
 

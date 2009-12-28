@@ -17,7 +17,7 @@ struct _kickgoal_state
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap     *fgtm, *bgtm, *bg2tm;
+	tilemap_t     *fgtm, *bgtm, *bg2tm;
 
 	/* misc */
 	int         melody_loop;

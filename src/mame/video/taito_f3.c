@@ -212,8 +212,8 @@ Playfield tile info:
 #define DARIUSG_KLUDGE
 //#define DEBUG_F3 1
 
-static tilemap *pf1_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
-static tilemap *pixel_layer,*vram_layer;
+static tilemap_t *pf1_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
+static tilemap_t *pixel_layer,*vram_layer;
 static UINT32 *spriteram32_buffered;
 static UINT32 f3_control_0[8];
 static UINT32 f3_control_1[8];
@@ -1845,7 +1845,7 @@ static void get_spritealphaclip_info(void)
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
+static void get_line_ram_info(running_machine *machine, tilemap_t *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
 {
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[pos];
 	const bitmap_t *srcbitmap;
@@ -2065,7 +2065,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 	}
 }
 
-static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx, int sy)
+static void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
 {
 	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&sa_line_inf[0];
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[4];

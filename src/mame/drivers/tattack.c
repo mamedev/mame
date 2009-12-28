@@ -24,7 +24,7 @@
 
 static UINT8 *videoram;
 static UINT8 *colorram;
-static tilemap *tmap;
+static tilemap_t *tmap;
 
 static TILE_GET_INFO( get_tile_info )
 {

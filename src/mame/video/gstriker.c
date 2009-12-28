@@ -71,7 +71,7 @@ static void VS920A_init(running_machine *machine, int numchips)
 	}
 }
 
-static tilemap* VS920A_get_tilemap(int numchip)
+static tilemap_t* VS920A_get_tilemap(int numchip)
 {
 	return VS920A[numchip].tmap;
 }
@@ -281,7 +281,7 @@ static void MB60553_draw(running_machine *machine, int numchip, bitmap_t* screen
 
 }
 
-static tilemap* MB60553_get_tilemap(int numchip)
+static tilemap_t* MB60553_get_tilemap(int numchip)
 {
 	return MB60553[numchip].tmap;
 }

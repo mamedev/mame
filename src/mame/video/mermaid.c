@@ -1,6 +1,6 @@
 #include "driver.h"
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap_t *bg_tilemap, *fg_tilemap;
 
 UINT8* mermaid_videoram;
 UINT8* mermaid_colorram;
