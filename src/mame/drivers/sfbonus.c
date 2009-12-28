@@ -514,7 +514,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 	}
 	else
 	{
-		printf("access vram at %04x\n",offset);
+		//printf("access vram at %04x\n",offset);
 	}
 
 }
