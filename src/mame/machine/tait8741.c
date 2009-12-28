@@ -603,10 +603,13 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 		printf("READ PC=%04x\n",cpu_get_pc(space->cpu));
 		if(cyclemb_mcu.rst)
 		{
+			/* FIXME: mame rands are supposedly parity checks or signals that the i8741 sends to the main z80 for telling him what kind of input
+			          this specific packet contains. DSW3 surely contains something else too... */
+			/* FIXME: remove cpu_get_pc hack */
 			switch(cpu_get_pc(space->cpu))
 			{
-				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW1") & 0x1f) << 2) | (mame_rand(space->machine) & 1); break;
-				case 0x35c: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0xff); break;
+				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW1") & 0x1f) << 2); break;
+				case 0x35c: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mame_rand(space->machine) & 0x60); break;
 			}
 		}
 
