@@ -87,7 +87,7 @@ static WRITE8_HANDLER( cmmb_paletteram_w )
 
 static READ8_HANDLER( cmmb_input_r )
 {
-	printf("%02x R\n",offset);
+	//printf("%02x R\n",offset);
 	switch(offset)
 	{
 		case 0x00: return input_port_read(space->machine, "IN2");
@@ -113,7 +113,7 @@ static UINT8 irq_mask;
 
 static WRITE8_HANDLER( cmmb_output_w )
 {
-	printf("%02x -> [%02x] W\n",data,offset);
+	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
 	{
 		case 0x01:
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( cmmb )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("IN2")
