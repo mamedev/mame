@@ -440,6 +440,18 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 	}
 }
 
+static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
+{
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	if (ACCESSING_BITS_0_7)
+		tc0220ioc_w(tc0220ioc, offset, data & 0xff);
+	else
+	{
+		/* spacedxo also writes here - bug? */
+		tc0220ioc_w(tc0220ioc, offset, (data >> 8) & 0xff);
+	}
+}
+
 
 
 #define TC0180VCU_MEMRW( ADDR )											\
@@ -561,16 +573,16 @@ static ADDRESS_MAP_START( spacedx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( spacedxo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_WRITE8(taitosound_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0xff00)
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_r, 0x00ff) AM_WRITE(spacedxo_tc0220ioc_w)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x302000, 0x303fff) AM_READONLY
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x500000 )
 ADDRESS_MAP_END
