@@ -609,7 +609,16 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 			switch(cpu_get_pc(space->cpu))
 			{
 				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW1") & 0x1f) << 2); break;
-				case 0x35c: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mame_rand(space->machine) & 0x60); break;
+				case 0x35c:
+				{
+					static UINT8 mux_r;
+					mux_r^=0x20;
+					if(mux_r & 0x20)
+						cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mux_r) | (mame_rand(space->machine) & 0x40);
+					else
+						cyclemb_mcu.rxd = ((input_port_read(space->machine,"IN0")) & 0x9f) | (mux_r) | (mame_rand(space->machine) & 0x40);
+				}
+				break;
 			}
 		}
 
