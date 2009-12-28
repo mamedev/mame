@@ -2516,12 +2516,12 @@ static CPU_SET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		set_irq_line(cpustate, Z180_INT0, info->i);			break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cpustate->cc[Z180_TABLE_op] = info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cpustate->cc[Z180_TABLE_cb] = info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cpustate->cc[Z180_TABLE_ed] = info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cpustate->cc[Z180_TABLE_xy] = info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cpustate->cc[Z180_TABLE_xycb] = info->p;	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cpustate->cc[Z180_TABLE_ex] = info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cpustate->cc[Z180_TABLE_op] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cpustate->cc[Z180_TABLE_cb] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cpustate->cc[Z180_TABLE_ed] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cpustate->cc[Z180_TABLE_xy] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cpustate->cc[Z180_TABLE_xycb] = (UINT8 *)info->p;	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cpustate->cc[Z180_TABLE_ex] = (UINT8 *)info->p;		break;
 	}
 }
 

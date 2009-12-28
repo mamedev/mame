@@ -396,7 +396,7 @@ static void init_systeme_map(running_machine *machine)
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
 
 	/* main ram area */
-	sms_mainram = memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, NULL);
+	sms_mainram = (UINT8 *)memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, NULL);
 	memset(sms_mainram,0x00,0x4000);
 
 	init_ports_systeme(machine);

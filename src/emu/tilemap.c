@@ -1324,7 +1324,7 @@ profiler_mark_start(PROFILER_TILEMAP_UPDATE);
 
 	/* call the get info callback for the associated memory index */
 	memindex = tmap->logical_to_memory[logindex];
-	(*tmap->tile_get_info)(tmap->tile_get_info_object, &tmap->tileinfo, memindex, tmap->user_data);
+	(*tmap->tile_get_info)((running_machine *)tmap->tile_get_info_object, &tmap->tileinfo, memindex, tmap->user_data);
 
 	/* apply the global tilemap flip to the returned flip flags */
 	flags = tmap->tileinfo.flags ^ (tmap->attributes & 0x03);

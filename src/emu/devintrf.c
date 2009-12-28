@@ -153,7 +153,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	tmerr = tagmap_add_unique_hash(devlist->map, tag, device, FALSE);
 	if (tmerr == TMERR_DUPLICATE)
 	{
-		device_config *match = tagmap_find_hash_only(devlist->map, tag);
+		device_config *match = (device_config *)tagmap_find_hash_only(devlist->map, tag);
 		assert(match != NULL);
 		if (strcmp(tag, match->tag) == 0)
 			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);

@@ -795,7 +795,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info, FALSE);
 	if (tagerr == TMERR_DUPLICATE)
 	{
-		region_info *match = tagmap_find_hash_only(mame->regionmap, name);
+		region_info *match = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
 		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, astring_c(match->name));
 	}
 
@@ -848,7 +848,7 @@ UINT8 *memory_region(running_machine *machine, const char *name)
     	return NULL;
 
     /* look up the region and return the base */
-	info = tagmap_find_hash_only(mame->regionmap, name);
+	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
 	return (info != NULL) ? info->base : NULL;
 }
 
@@ -868,7 +868,7 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
     	return 0;
 
     /* look up the region and return the length */
-	info = tagmap_find_hash_only(mame->regionmap, name);
+	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
 	return (info != NULL) ? info->length : 0;
 }
 
@@ -888,7 +888,7 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
     	return 0;
 
     /* look up the region and return the flags */
-	info = tagmap_find_hash_only(mame->regionmap, name);
+	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
 	return (info != NULL) ? info->flags : 0;
 }
 
@@ -912,7 +912,7 @@ const char *memory_region_next(running_machine *machine, const char *name)
     	return astring_c(mame->regionlist->name);
 
     /* look up the region and return the next guy */
-	info = tagmap_find_hash_only(mame->regionmap, name);
+	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
 	return (info != NULL && info->next != NULL) ? astring_c(info->next->name) : NULL;
 }
 

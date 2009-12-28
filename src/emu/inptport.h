@@ -1157,7 +1157,7 @@ INLINE const input_port_config *input_port_by_tag(const input_port_list *portlis
 {
 	/* use the map if we have it */
 	if (portlist->map != NULL)
-		return tagmap_find_hash_only(portlist->map, tag);
+		return (const input_port_config *)tagmap_find_hash_only(portlist->map, tag);
 
 	/* otherwise, do it the slow way */
 	return input_port_by_tag_slow(portlist, tag);

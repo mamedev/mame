@@ -2497,7 +2497,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = malloc(sizeof(struct polygon) * (1024*5));
+	struct polygon* polys = (struct polygon*)malloc(sizeof(struct polygon) * (1024*5));
 
 	//printf("packet type : %04x\n", packet[0]);
 	switch (packet[0])

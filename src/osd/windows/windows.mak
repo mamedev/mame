@@ -244,7 +244,9 @@ endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 ifdef CPP_COMPILE
+ifndef MSVC_BUILD
 LIBS += -lsupc++
+endif
 endif
 
 ifeq ($(DIRECTINPUT),8)

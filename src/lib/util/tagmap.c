@@ -58,7 +58,7 @@ static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object
 
 tagmap *tagmap_alloc(void)
 {
-	tagmap *map = malloc(sizeof(*map));
+	tagmap *map = (tagmap *)malloc(sizeof(*map));
 	if (map != NULL)
 		memset(map, 0, sizeof(*map));
 	return map;
@@ -174,7 +174,7 @@ static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object
 			}
 
 	/* now allocate a new entry */
-	entry = malloc(sizeof(*entry) + strlen(tag));
+	entry = (tagmap_entry *)malloc(sizeof(*entry) + strlen(tag));
 	if (entry == NULL)
 		return TMERR_OUT_OF_MEMORY;
 

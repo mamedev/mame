@@ -1882,7 +1882,7 @@ static size_t dsp56k_op_abs(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 		opD &= U64(0x000000ffffffffff);
 
 	/* Take the absolute value and clean up */
-	opD = abs(opD);
+	opD = (opD < 0) ? -opD : opD;
 	opD &= U64(0x000000ffffffffff);
 
 	/* Reassign */

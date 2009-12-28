@@ -2476,7 +2476,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 					tagmap_error err = tagmap_add_unique_hash(portlist->map, curport->tag, curport, FALSE);
 					if (err == TMERR_DUPLICATE)
 					{
-						const input_port_config *match = tagmap_find_hash_only(portlist->map, curport->tag);
+						const input_port_config *match = (const input_port_config *)tagmap_find_hash_only(portlist->map, curport->tag);
 						error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
 					}
 				}

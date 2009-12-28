@@ -285,7 +285,7 @@ WRITE8_DEVICE_HANDLER( ds2404_clk_w )
 
 static TIMER_CALLBACK( ds2404_tick )
 {
-	ds2404_state *state = get_safe_token(ptr);
+	ds2404_state *state = get_safe_token((const device_config *)ptr);
 	int i;
 	for( i = 0; i < 5; i++ )
 	{

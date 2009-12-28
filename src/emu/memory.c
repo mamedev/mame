@@ -406,7 +406,7 @@ static void *space_find_backing_memory(const address_space *space, offs_t addrst
 static int space_needs_backing_store(const address_space *space, const address_map_entry *entry);
 
 /* banking helpers */
-static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
+static genf *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
 static STATE_POSTLOAD( bank_reattach );
 
 /* table management */
@@ -866,16 +866,16 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	/* append the internal device map (first so it takes priority) */
 	internal_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	if (internal_map != NULL)
-		map_detokenize(memdata, map, driver, device->tag, internal_map);
+		map_detokenize((memory_private *)memdata, map, driver, device->tag, internal_map);
 
 	/* construct the standard map */
 	if (device->address_map[spacenum] != NULL)
-		map_detokenize(memdata, map, driver, device->tag, device->address_map[spacenum]);
+		map_detokenize((memory_private *)memdata, map, driver, device->tag, device->address_map[spacenum]);
 
 	/* append the default device map (last so it can be overridden) */
 	default_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum);
 	if (default_map != NULL)
-		map_detokenize(memdata, map, driver, device->tag, default_map);
+		map_detokenize((memory_private *)memdata, map, driver, device->tag, default_map);
 
 	return map;
 }
@@ -1102,7 +1102,7 @@ void *memory_get_write_ptr(const address_space *space, offs_t byteaddress)
 void memory_configure_bank(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
 	int entrynum;
 
 	/* validation checks */
@@ -1131,7 +1131,7 @@ void memory_configure_bank(running_machine *machine, const char *tag, int starte
 void memory_configure_bank_decrypted(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
 	int entrynum;
 
 	/* validation checks */
@@ -1160,7 +1160,7 @@ void memory_configure_bank_decrypted(running_machine *machine, const char *tag, 
 void memory_set_bank(running_machine *machine, const char *tag, int entrynum)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
 	bank_reference *ref;
 
 	/* validation checks */
@@ -1190,7 +1190,7 @@ void memory_set_bank(running_machine *machine, const char *tag, int entrynum)
 int memory_get_bank(running_machine *machine, const char *tag)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
 
 	/* validation checks */
 	if (bank == NULL)
@@ -1206,7 +1206,7 @@ int memory_get_bank(running_machine *machine, const char *tag)
 void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
 	bank_reference *ref;
 
 	/* validation checks */
@@ -1477,14 +1477,14 @@ void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t a
 	/* map the read bank */
 	if (rtag != NULL)
 	{
-		void *handler = bank_find_or_allocate(space, rtag, addrstart, addrend, addrmask, addrmirror, ROW_READ);
+		genf *handler = bank_find_or_allocate(space, rtag, addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, rtag);
 	}
 
 	/* map the write bank */
 	if (wtag != NULL)
 	{
-		void *handler = bank_find_or_allocate(space, wtag, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
+		genf *handler = bank_find_or_allocate(space, wtag, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
 		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, wtag);
 	}
 
@@ -1503,7 +1503,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 	memory_private *memdata = space->machine->memory_data;
 	address_space *spacerw = (address_space *)space;
 	FPTR bankindex;
-	void *handler;
+	genf *handler;
 
 	/* map for read */
 	if (install_read)
@@ -1514,7 +1514,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		/* if we are provided a pointer, set it */
 		bankindex = (FPTR)handler;
 		if (baseptr != NULL)
-			memdata->bank_ptr[bankindex] = baseptr;
+			memdata->bank_ptr[bankindex] = (UINT8 *)baseptr;
 
 		/* if we don't have a bank pointer yet, try to find one */
 		if (memdata->bank_ptr[bankindex] == NULL)
@@ -1525,7 +1525,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		{
 			if (mame_get_phase(space->machine) >= MAME_PHASE_RESET)
 				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
-			memdata->bank_ptr[bankindex] = block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
+			memdata->bank_ptr[bankindex] = (UINT8 *)block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
 		}
 	}
 
@@ -1538,7 +1538,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		/* if we are provided a pointer, set it */
 		bankindex = (FPTR)handler;
 		if (baseptr != NULL)
-			memdata->bank_ptr[bankindex] = baseptr;
+			memdata->bank_ptr[bankindex] = (UINT8 *)baseptr;
 
 		/* if we don't have a bank pointer yet, try to find one */
 		if (memdata->bank_ptr[bankindex] == NULL)
@@ -1549,7 +1549,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		{
 			if (mame_get_phase(space->machine) >= MAME_PHASE_RESET)
 				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
-			memdata->bank_ptr[bankindex] = block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
+			memdata->bank_ptr[bankindex] = (UINT8 *)block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
 		}
 	}
 
@@ -2298,6 +2298,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 	address_map_entry *entry;
 	address_map tmap = {0};
 	UINT32 entrytype;
+	int maptype;
 
 	/* check the first token */
 	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, tmap.spacenum, 8, tmap.databits, 8);
@@ -2379,7 +2380,8 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 			case ADDRMAP_TOKEN_READ:
 				check_entry_handler(read);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, entry->read.type, 8, entry->read.bits, 8, entry->read.mask, 8);
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->read.bits, 8, entry->read.mask, 8);
+				entry->read.type = (map_handler_type)maptype;
 				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
 				{
 					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
@@ -2396,7 +2398,8 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 			case ADDRMAP_TOKEN_WRITE:
 				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, entry->write.type, 8, entry->write.bits, 8, entry->write.mask, 8);
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->write.bits, 8, entry->write.mask, 8);
+				entry->write.type = (map_handler_type)maptype;
 				if (entry->write.type == AMH_HANDLER || entry->write.type == AMH_DEVICE_HANDLER)
 				{
 					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
@@ -2414,8 +2417,8 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				check_entry_handler(read);
 				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, entry->read.type, 8, entry->read.bits, 8, entry->read.mask, 8);
-				entry->write.type = entry->read.type;
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->read.bits, 8, entry->read.mask, 8);
+				entry->write.type = entry->read.type = (map_handler_type)maptype;
 				entry->write.bits = entry->read.bits;
 				entry->write.mask = entry->read.mask;
 				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
@@ -2650,7 +2653,7 @@ static int space_needs_backing_store(const address_space *space, const address_m
     read/write handler
 -------------------------------------------------*/
 
-static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite)
+static genf *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite)
 {
 	memory_private *memdata = space->machine->memory_data;
 	offs_t bytemirror = addrmirror;
@@ -2666,7 +2669,7 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 
 	/* if this bank is named, look it up */
 	if (tag != NULL)
-		bank = tagmap_find_hash_only(memdata->bankmap, tag);
+		bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
 
 	/* else try to find an exact match */
 	else
@@ -2734,7 +2737,7 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 
 	/* add a reference for this space */
 	add_bank_reference(bank, space);
-	return bank->handler;
+	return (genf *)bank->handler;
 }
 
 

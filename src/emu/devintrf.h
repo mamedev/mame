@@ -475,7 +475,7 @@ INLINE const device_config *device_list_find_by_tag(const device_list *devlist, 
 {
 	/* if we have a map, use it */
 	if (devlist->map != NULL)
-		return tagmap_find_hash_only(devlist->map, tag);
+		return (const device_config *)tagmap_find_hash_only(devlist->map, tag);
 
 	/* otherwise, go the slow route */
 	return device_list_find_by_tag_slow(devlist, tag);

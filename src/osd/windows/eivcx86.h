@@ -46,6 +46,7 @@
 
 #ifdef PTR64
 #include <emmintrin.h>
+#include <intrin.h>
 #endif
 
 
