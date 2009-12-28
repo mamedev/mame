@@ -178,6 +178,7 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "video/taiicdev.h"
 #include "includes/taito_b.h"
 
 static WRITE8_HANDLER( bankswitch_w )
@@ -453,14 +454,13 @@ static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
 }
 
 
-
 #define TC0180VCU_MEMRW( ADDR )											\
-	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_READWRITE(TC0180VCU_word_r, TC0180VCU_word_w) AM_BASE(&TC0180VCU_ram)	\
-	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE(&taitob_spriteram)		\
-	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM							\
-	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_RAM AM_BASE(&taitob_scroll)			\
-	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_READWRITE(taitob_v_control_r, taitob_v_control_w)					\
-	AM_RANGE(ADDR+0x40000, ADDR+0x7ffff) AM_READWRITE(TC0180VCU_framebuffer_word_r, TC0180VCU_framebuffer_word_w)
+	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_word_r, tc0180vcu_word_w)	\
+	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE(&taitob_spriteram)	\
+	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM					\
+	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)	\
+	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)		\
+	AM_RANGE(ADDR+0x40000, ADDR+0x7ffff) AM_READWRITE(tc0180vcu_framebuffer_word_r, tc0180vcu_framebuffer_word_w)
 
 
 static ADDRESS_MAP_START( rastsag2_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2138,6 +2138,30 @@ static const tc0510nio_interface sbm_io_intf =
 	DEVCB_INPUT_PORT("JOY"), DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("PHOTOSENSOR")	/* port read handlers */
 };
 
+/* this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris */
+static const tc0180vcu_interface color0_tc0180vcu_intf =
+{
+	0xc0,		/* background */
+	0x80,		/* foreground */
+	0x00		/* text       */
+};
+
+/* this is the reversed layout used in: Crime City, Puzzle Bobble */
+static const tc0180vcu_interface color1_tc0180vcu_intf =
+{
+	0x00,		/* background */
+	0x40,		/* foreground */
+	0xc0		/* text       */
+};
+
+/* this is used in: rambo3a, masterw, silentd, selfeena, ryujin */
+static const tc0180vcu_interface color2_tc0180vcu_intf =
+{
+	0x30,		/* background */
+	0x20,		/* foreground */
+	0x00		/* text       */
+};
+
 
 static MACHINE_DRIVER_START( rastsag2 )
 
@@ -2167,6 +2191,8 @@ static MACHINE_DRIVER_START( rastsag2 )
 	MDRV_VIDEO_START(taitob_color_order0)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2208,6 +2234,8 @@ static MACHINE_DRIVER_START( ashura )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2247,6 +2275,8 @@ static MACHINE_DRIVER_START( crimec )
 	MDRV_VIDEO_START(taitob_color_order1)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2288,6 +2318,8 @@ static MACHINE_DRIVER_START( tetrist )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2326,6 +2358,8 @@ static MACHINE_DRIVER_START( tetrista )
 	MDRV_VIDEO_START(taitob_color_order2)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2367,6 +2401,8 @@ static MACHINE_DRIVER_START( hitice )
 	MDRV_VIDEO_RESET(hitice)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2413,6 +2449,8 @@ static MACHINE_DRIVER_START( rambo3 )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2452,6 +2490,8 @@ static MACHINE_DRIVER_START( rambo3a )
 	MDRV_VIDEO_START(taitob_color_order2)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2495,6 +2535,8 @@ static MACHINE_DRIVER_START( pbobble )
 	MDRV_VIDEO_START(taitob_color_order1)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2540,6 +2582,8 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2579,6 +2623,8 @@ static MACHINE_DRIVER_START( spacedxo )
 	MDRV_VIDEO_START(taitob_color_order2)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2624,6 +2670,8 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2663,6 +2711,8 @@ static MACHINE_DRIVER_START( viofight )
 	MDRV_VIDEO_START(taitob_color_order2)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2708,6 +2758,8 @@ static MACHINE_DRIVER_START( masterw )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2749,6 +2801,8 @@ static MACHINE_DRIVER_START( silentd )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2788,6 +2842,8 @@ static MACHINE_DRIVER_START( selfeena )
 	MDRV_VIDEO_START(taitob_color_order2)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2838,6 +2894,8 @@ static MACHINE_DRIVER_START( ryujin )
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
 
+	MDRV_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2884,6 +2942,8 @@ static MACHINE_DRIVER_START( sbm )
 	MDRV_VIDEO_START(taitob_color_order0)
 	MDRV_VIDEO_EOF(taitob)
 	MDRV_VIDEO_UPDATE(taitob)
+
+	MDRV_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

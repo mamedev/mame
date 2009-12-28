@@ -355,4 +355,14 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w );	/* only 4 bits per color 
 
 
 /** TC0180VCU **/
+READ8_DEVICE_HANDLER( tc0180vcu_get_fb_page );
+WRITE8_DEVICE_HANDLER( tc0180vcu_set_fb_page );
+READ8_DEVICE_HANDLER( tc0180vcu_get_videoctrl );
+READ16_DEVICE_HANDLER( tc0180vcu_ctrl_r );
+WRITE16_DEVICE_HANDLER( tc0180vcu_ctrl_w );
+READ16_DEVICE_HANDLER( tc0180vcu_scroll_r );
+WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w );
+READ16_DEVICE_HANDLER( tc0180vcu_word_r );
+WRITE16_DEVICE_HANDLER( tc0180vcu_word_w );
+void tc0180vcu_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, int plane);
 

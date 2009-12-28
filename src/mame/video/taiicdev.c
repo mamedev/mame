@@ -4814,6 +4814,9 @@ struct _tc0180vcu_state
 	int            tx_color_base;
 };
 
+#define TC0180VCU_RAM_SIZE          0x10000
+#define TC0180VCU_SCROLLRAM_SIZE    0x0800
+
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
@@ -4881,10 +4884,22 @@ INLINE const tc0180vcu_interface *tc0180vcu_get_interface( const device_config *
 *
 */
 
-READ8_DEVICE_HANDLER( tc0180vcu_fb_page_r )
+READ8_DEVICE_HANDLER( tc0180vcu_get_fb_page )
 {
 	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
 	return tc0180vcu->framebuffer_page;
+}
+
+WRITE8_DEVICE_HANDLER( tc0180vcu_set_fb_page )
+{
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	tc0180vcu->framebuffer_page = data;
+}
+
+READ8_DEVICE_HANDLER( tc0180vcu_get_videoctrl )
+{
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	return tc0180vcu->video_control;
 }
 
 static void tc0180vcu_video_control( const device_config *device, UINT8 data )
@@ -5000,7 +5015,6 @@ WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w )
 	COMBINE_DATA(&tc0180vcu->scrollram[offset]);
 }
 
-
 READ16_DEVICE_HANDLER( tc0180vcu_word_r )
 {
 	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
@@ -5096,6 +5110,12 @@ static DEVICE_START( tc0180vcu )
 	tilemap_set_scrolldx(tc0180vcu->tilemap[1], 0, 24 * 8);
 	tilemap_set_scrolldx(tc0180vcu->tilemap[2], 0, 24 * 8);
 
+	tc0180vcu->ram = auto_alloc_array_clear(device->machine, UINT16, TC0180VCU_RAM_SIZE / 2);
+	tc0180vcu->scrollram = auto_alloc_array_clear(device->machine, UINT16, TC0180VCU_SCROLLRAM_SIZE / 2);
+
+	state_save_register_device_item_pointer(device, 0, tc0180vcu->ram, TC0180VCU_RAM_SIZE / 2);
+	state_save_register_device_item_pointer(device, 0, tc0180vcu->scrollram, TC0180VCU_SCROLLRAM_SIZE / 2);
+
 	state_save_register_device_item_array(device, 0, tc0180vcu->bg_rambank);
 	state_save_register_device_item_array(device, 0, tc0180vcu->fg_rambank);
 	state_save_register_device_item(device, 0, tc0180vcu->tx_rambank);
@@ -5104,12 +5124,6 @@ static DEVICE_START( tc0180vcu )
 
 	state_save_register_device_item(device, 0, tc0180vcu->video_control);
 	state_save_register_device_item_array(device, 0, tc0180vcu->ctrl);
-
-//  tc0180vcu->ram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
-//  tc0180vcu->scrollram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
-
-//  state_save_register_device_item_pointer(device, 0, tc0180vcu->ram, PC090OJ_RAM_SIZE / 2);
-//  state_save_register_device_item_pointer(device, 0, tc0180vcu->scrollram, PC090OJ_RAM_SIZE / 2);
 }
 
 static DEVICE_RESET( tc0180vcu )

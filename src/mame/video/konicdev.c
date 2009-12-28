@@ -6086,10 +6086,8 @@ INLINE const k056832_interface *k056832_get_interface( const device_config *devi
 #define k056832_mark_line_dirty(P, L) if (L < 0x100) k056832->line_dirty[P][L >> 5] |= 1 << (L & 0x1f)
 #define k056832_mark_all_lines_dirty(P) k056832->all_lines_dirty[P] = 1
 
-static void k056832_mark_page_dirty( const device_config *device, int page )
+static void k056832_mark_page_dirty( k056832_state *k056832, int page )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-
 	if (k056832->page_tile_mode[page])
 		tilemap_mark_all_tiles_dirty(k056832->tilemap[page]);
 	else
@@ -6108,14 +6106,13 @@ void k056832_mark_plane_dirty( const device_config *device, int layer )
 		if (k056832->layer_assoc_with_page[i] == layer)
 		{
 			k056832->page_tile_mode[i] = tilemode;
-			k056832_mark_page_dirty(device, i);
+			k056832_mark_page_dirty(k056832, i);
 		}
 	}
 }
 
-void k056832_mark_all_tmaps_dirty( const device_config *device )
+static void k056832_mark_all_tilemaps_dirty( k056832_state *k056832 )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int i;
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
@@ -6123,14 +6120,20 @@ void k056832_mark_all_tmaps_dirty( const device_config *device )
 		if (k056832->layer_assoc_with_page[i] != -1)
 		{
 			k056832->page_tile_mode[i] = k056832->layer_tile_mode[k056832->layer_assoc_with_page[i]];
-			k056832_mark_page_dirty(device, i);
+			k056832_mark_page_dirty(k056832, i);
 		}
 	}
 }
 
-static void k056832_update_page_layout( const device_config *device )
+/* moo.c needs to call this in its VIDEO_UPDATE */
+void k056832_mark_all_tmaps_dirty( const device_config *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
+	k056832_mark_all_tilemaps_dirty(k056832);
+}
+
+static void k056832_update_page_layout( k056832_state *k056832 )
+{
 	int layer, rowstart, rowspan, colstart, colspan, r, c, page_idx, setlayer;
 
 	// enable layer association by default
@@ -6179,7 +6182,7 @@ static void k056832_update_page_layout( const device_config *device )
 	}
 
 	// refresh associated tilemaps
-	k056832_mark_all_tmaps_dirty(device);
+	k056832_mark_all_tilemaps_dirty(k056832);
 }
 
 int k056832_get_lookup( const device_config *device, int bits )
@@ -6202,7 +6205,7 @@ INLINE void k056832_get_tile_info( const device_config *device, tile_data *tilei
 	{
 		int flips, palm1, pals2, palm2;
 	}
-	k056832_shiftmasks[4] = {{6,0x3f,0,0x00},{4,0x0f,2,0x30},{2,0x03,2,0x3c},{0,0x00,2,0x3f}};
+	k056832_shiftmasks[4] = {{6, 0x3f, 0, 0x00}, {4, 0x0f, 2, 0x30}, {2, 0x03, 2, 0x3c}, {0, 0x00, 2, 0x3f}};
 
 	const struct K056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
@@ -6258,12 +6261,11 @@ static TILE_GET_INFO_DEVICE( k056832_get_tile_infod ) { k056832_get_tile_info(de
 static TILE_GET_INFO_DEVICE( k056832_get_tile_infoe ) { k056832_get_tile_info(device, tileinfo, tile_index, 0xe); }
 static TILE_GET_INFO_DEVICE( k056832_get_tile_infof ) { k056832_get_tile_info(device, tileinfo, tile_index, 0xf); }
 
-static void k056832_change_rambank( const device_config *device )
+static void k056832_change_rambank( k056832_state *k056832 )
 {
 	/* ------xx page col
      * ---xx--- page row
      */
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int bank = k056832->regs[0x19];
 
 	if (k056832->regs[0] & 0x02)	// external linescroll enable
@@ -6274,7 +6276,7 @@ static void k056832_change_rambank( const device_config *device )
 	k056832->selected_page_x4096 = k056832->selected_page << 12;
 
 	// refresh associated tilemaps
-	k056832_mark_all_tmaps_dirty(device);
+	k056832_mark_all_tilemaps_dirty(k056832);
 }
 
 int k056832_get_current_rambank( const device_config *device )
@@ -6285,9 +6287,8 @@ int k056832_get_current_rambank( const device_config *device )
 	return ((bank >> 1) & 0xc) | (bank & 3);
 }
 
-static void k056832_change_rombank( const device_config *device )
+static void k056832_change_rombank( k056832_state *k056832 )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int bank;
 
 	if (k056832->uses_tile_banks)	/* Asterix */
@@ -6313,7 +6314,7 @@ void k056832_set_tile_bank( const device_config *device, int bank )
 		k056832_mark_plane_dirty(device, 3);
 	}
 
-	k056832_change_rombank(device);
+	k056832_change_rombank(k056832);
 }
 
 /* call if a game uses external linescroll */
@@ -6771,7 +6772,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 
 				if ((new_data & 0x02) != (old_data & 0x02))
 				{
-					k056832_change_rambank(device);
+					k056832_change_rambank(k056832);
 				}
 			break;
 
@@ -6807,12 +6808,12 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 			//case 0x0a/2: break;
 
 			case 0x32/2:
-				k056832_change_rambank(device);
+				k056832_change_rambank(k056832);
 			break;
 
 			case 0x34/2: /* ROM bank select for checksum */
 			case 0x36/2: /* secondary ROM bank select for use with tile banking */
-				k056832_change_rombank(device);
+				k056832_change_rombank(k056832);
 			break;
 
 			// extended tile address
@@ -6832,7 +6833,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					k056832->y[layer] = (new_data & 0x18) >> 3;
 					k056832->h[layer] = (new_data & 0x3);
 					k056832->active_layer = layer;
-					k056832_update_page_layout(device);
+					k056832_update_page_layout(k056832);
 				} else
 
 				if (offset >= 0x18/2 && offset <= 0x1e/2)
@@ -6840,7 +6841,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					k056832->x[layer] = (new_data & 0x18) >> 3;
 					k056832->w[layer] = (new_data & 0x03);
 					k056832->active_layer = layer;
-					k056832_update_page_layout(device);
+					k056832_update_page_layout(k056832);
 				} else
 
 				if (offset >= 0x20/2 && offset <= 0x26/2)
@@ -7240,7 +7241,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
 					k056832->last_colorbase[pageIndex] = new_colorbase;
-					k056832_mark_page_dirty(device, pageIndex);
+					k056832_mark_page_dirty(k056832, pageIndex);
 				}
 			}
 			else
@@ -7517,7 +7518,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
 					k056832->last_colorbase[pageIndex] = new_colorbase;
-					k056832_mark_page_dirty(device, pageIndex);
+					k056832_mark_page_dirty(k056832, pageIndex);
 				}
 			}
 			else
@@ -7668,12 +7669,11 @@ int k056832_read_register( const device_config *device, int regnum )
 
 static STATE_POSTLOAD( k056832_postload )
 {
-//  k056832_state *k056832 = (k056832_state *)param;
+	k056832_state *k056832 = (k056832_state *)param;
 
-//    still in progress...
-//  k056832_update_page_layout(device);
-//  k056832_change_rambank(device);
-//  k056832_change_rombank(device);
+	k056832_update_page_layout(k056832);
+	k056832_change_rambank(k056832);
+	k056832_change_rombank(k056832);
 }
 
 /*****************************************************************************
@@ -7872,10 +7872,10 @@ static DEVICE_START( k056832 )
 	memset(k056832->regs,     0x00, sizeof(k056832->regs) );
 	memset(k056832->regsb,    0x00, sizeof(k056832->regsb) );
 
-	k056832_update_page_layout(device);
+	k056832_update_page_layout(k056832);
 
-	k056832_change_rambank(device);
-	k056832_change_rombank(device);
+	k056832_change_rambank(k056832);
+	k056832_change_rombank(k056832);
 
 	state_save_register_device_item_pointer(device, 0, k056832->videoram, 0x10000);
 	state_save_register_device_item_array(device, 0, k056832->regs);
