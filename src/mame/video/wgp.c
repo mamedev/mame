@@ -1,7 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
-
-#define TC0100SCN_GFX_NUM 1
+#include "video/taiicdev.h"
 
 static tilemap_t *wgp_piv_tilemap[3];
 
@@ -47,46 +45,41 @@ static TILE_GET_INFO( get_piv2_tile_info )
 }
 
 
-static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
+static void wgp_core_vh_start(running_machine *machine, int piv_xoffs, int piv_yoffs)
 {
-	wgp_piv_tilemap[0] = tilemap_create(machine, get_piv0_tile_info,tilemap_scan_rows,16,16,64,64);
-	wgp_piv_tilemap[1] = tilemap_create(machine, get_piv1_tile_info,tilemap_scan_rows,16,16,64,64);
-	wgp_piv_tilemap[2] = tilemap_create(machine, get_piv2_tile_info,tilemap_scan_rows,16,16,64,64);
+	const device_config *tc0100scn = devtag_get_device(machine, "tc0100scn");
 
-	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
-
-	if (TC0110PCR_mask(machine) & 1)
-		TC0110PCR_vh_start(machine);
+	wgp_piv_tilemap[0] = tilemap_create(machine, get_piv0_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	wgp_piv_tilemap[1] = tilemap_create(machine, get_piv1_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	wgp_piv_tilemap[2] = tilemap_create(machine, get_piv2_tile_info, tilemap_scan_rows, 16, 16, 64, 64); 
 
 	wgp_piv_xoffs = piv_xoffs;
 	wgp_piv_yoffs = piv_yoffs;
 
-	tilemap_set_transparent_pen( wgp_piv_tilemap[0],0 );
-	tilemap_set_transparent_pen( wgp_piv_tilemap[1],0 );
-	tilemap_set_transparent_pen( wgp_piv_tilemap[2],0 );
+	tilemap_set_transparent_pen(wgp_piv_tilemap[0], 0);
+	tilemap_set_transparent_pen(wgp_piv_tilemap[1], 0);
+	tilemap_set_transparent_pen(wgp_piv_tilemap[2], 0);
 
 	/* flipscreen n/a */
-	tilemap_set_scrolldx( wgp_piv_tilemap[0],-piv_xoffs,0 );
-	tilemap_set_scrolldx( wgp_piv_tilemap[1],-piv_xoffs,0 );
-	tilemap_set_scrolldx( wgp_piv_tilemap[2],-piv_xoffs,0 );
-	tilemap_set_scrolldy( wgp_piv_tilemap[0],-piv_yoffs,0 );
-	tilemap_set_scrolldy( wgp_piv_tilemap[1],-piv_yoffs,0 );
-	tilemap_set_scrolldy( wgp_piv_tilemap[2],-piv_yoffs,0 );
+	tilemap_set_scrolldx(wgp_piv_tilemap[0], -piv_xoffs, 0);
+	tilemap_set_scrolldx(wgp_piv_tilemap[1], -piv_xoffs, 0);
+	tilemap_set_scrolldx(wgp_piv_tilemap[2], -piv_xoffs, 0);
+	tilemap_set_scrolldy(wgp_piv_tilemap[0], -piv_yoffs, 0);
+	tilemap_set_scrolldy(wgp_piv_tilemap[1], -piv_yoffs, 0);
+	tilemap_set_scrolldy(wgp_piv_tilemap[2], -piv_yoffs, 0);
 
-	/* We don't need tilemap_set_scroll_rows, as the custom draw routine
-       applies rowscroll manually */
-
-	TC0100SCN_set_colbanks(0x80,0xc0,0x40);
+	/* We don't need tilemap_set_scroll_rows, as the custom draw routine applies rowscroll manually */
+	tc0100scn_set_colbanks(tc0100scn, 0x80, 0xc0, 0x40);
 }
 
 VIDEO_START( wgp )
 {
-	wgp_core_vh_start(machine, 0,0,32,16);
+	wgp_core_vh_start(machine, 32, 16);
 }
 
 VIDEO_START( wgp2 )
 {
-	wgp_core_vh_start(machine, 4,2,32,16);
+	wgp_core_vh_start(machine, 32, 16);
 }
 
 
@@ -646,6 +639,7 @@ static void wgp_piv_layer_draw(running_machine *machine,bitmap_t *bitmap,const r
 
 VIDEO_UPDATE( wgp )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
 	int i;
 	UINT8 layer[3];
 
@@ -685,7 +679,7 @@ VIDEO_UPDATE( wgp )
 		tilemap_set_scrolly(wgp_piv_tilemap[i], 0, wgp_piv_scrolly[i]);
 	}
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -702,36 +696,34 @@ VIDEO_UPDATE( wgp )
 /* We should draw the following on a 1024x1024 bitmap... */
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[0]]==0)
+	if (dislayer[layer[0]] == 0)
 #endif
-	wgp_piv_layer_draw(screen->machine,bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	wgp_piv_layer_draw(screen->machine, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[1]]==0)
+	if (dislayer[layer[1]] == 0)
 #endif
-	wgp_piv_layer_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+	wgp_piv_layer_draw(screen->machine, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[2]]==0)
+	if (dislayer[layer[2]] == 0)
 #endif
-	wgp_piv_layer_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+	wgp_piv_layer_draw(screen->machine, bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(screen->machine, bitmap,cliprect,16);
+	draw_sprites(screen->machine, bitmap, cliprect, 16);
 
-/* ... then here we should apply rotation from wgp_sate_ctrl[] to
-   the bitmap before we draw the TC0100SCN layers on it */
-
-	layer[0] = TC0100SCN_bottomlayer(0);
-	layer[1] = layer[0]^1;
+/* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
+	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], 0, 0);
 
 #ifdef MAME_DEBUG
-	if (dislayer[3]==0)
+	if (dislayer[3] == 0)
 #endif
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);
 
 #if 0
 	{

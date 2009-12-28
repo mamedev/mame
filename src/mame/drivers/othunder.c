@@ -235,7 +235,7 @@ TODO:
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -478,9 +478,9 @@ static ADDRESS_MAP_START( othunder_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
 //  AM_RANGE(0x090006, 0x090007) AM_WRITE(eeprom_w)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
-	AM_RANGE(0x100000, 0x100007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_rbswap_word_w)	/* palette */
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
-	AM_RANGE(0x220000, 0x22000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
+	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(othunder_sound_r, othunder_sound_w)
 	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(othunder_lightgun_r, othunder_lightgun_w)
@@ -663,6 +663,21 @@ static const ym2610_interface ym2610_config =
                  MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0100scn_interface othunder_tc0100scn_intf =
+{
+	"screen",
+	1, 2,		/* gfxnum, txnum */
+	4, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0110pcr_interface othunder_tc0110pcr_intf =
+{
+	0
+};
+
 static const tc0220ioc_interface othunder_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
@@ -700,6 +715,9 @@ static MACHINE_DRIVER_START( othunder )
 
 	MDRV_VIDEO_START(othunder)
 	MDRV_VIDEO_UPDATE(othunder)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", othunder_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

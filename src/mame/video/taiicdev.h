@@ -58,6 +58,7 @@ struct _tc0100scn_interface
 	int                flip_text_xoffs, flip_text_yoffs;
 
 	int                multiscrn_xoffs;
+	int                multiscrn_hack;
 };
 
 
@@ -232,23 +233,9 @@ READ16_DEVICE_HANDLER( tc0080vco_cram_1_r );
 READ16_DEVICE_HANDLER( tc0080vco_sprram_r );
 READ16_DEVICE_HANDLER( tc0080vco_scrram_r );
 READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r );
-WRITE16_DEVICE_HANDLER( tc0080vco_cram_0_w );
-WRITE16_DEVICE_HANDLER( tc0080vco_cram_1_w );
-WRITE16_DEVICE_HANDLER( tc0080vco_sprram_w );
-WRITE16_DEVICE_HANDLER( tc0080vco_scrram_w );
-WRITE_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_w );
-
-#if 0
-extern UINT16	*TC0080VCO_chain_ram_0;
-extern UINT16	*TC0080VCO_chain_ram_1;
-extern UINT16	*TC0080VCO_spriteram;
-extern UINT16	*TC0080VCO_scroll_ram;
-extern int	TC0080VCO_flipscreen;
-#endif
 
 
 /** TC0100SCN **/
-
 #define TC0100SCN_SINGLE_VDU    1024
 
 /* Function to set separate color banks for the three tilemapped layers.
@@ -276,12 +263,6 @@ WRITE32_DEVICE_HANDLER( tc0100scn_long_w );
 READ32_DEVICE_HANDLER( tc0100scn_ctrl_long_r );
 WRITE32_DEVICE_HANDLER( tc0100scn_ctrl_long_w );
 
-#if 0
-/* Functions to write multiple TC0100SCNs with the same data */
-WRITE16_DEVICE_HANDLER( TC0100SCN_dual_screen_w );
-WRITE16_DEVICE_HANDLER( TC0100SCN_triple_screen_w );
-#endif
-
 void tc0100scn_tilemap_update(const device_config *device);
 int tc0100scn_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
 
@@ -291,7 +272,6 @@ int tc0100scn_bottomlayer(const device_config *device);
 
 
 /** TC0280GRD & TC0430GRW **/
-
 READ16_DEVICE_HANDLER( tc0280grd_word_r );
 WRITE16_DEVICE_HANDLER( tc0280grd_word_w );
 WRITE16_DEVICE_HANDLER( tc0280grd_ctrl_word_w );
@@ -306,7 +286,6 @@ void TC0430GRW_zoom_draw(const device_config *device, bitmap_t *bitmap, const re
 
 
 /** TC0360PRI **/
-
 WRITE8_DEVICE_HANDLER( tc0360pri_w );
 READ8_DEVICE_HANDLER( tc0360pri_r );
 
@@ -339,7 +318,6 @@ int tc0480scp_get_bg_priority(const device_config *device);
 //extern int TC0480SCP_pri_reg;
 
 
-
 /** TC0150ROD **/
 READ16_DEVICE_HANDLER( tc0150rod_word_r );
 WRITE16_DEVICE_HANDLER( tc0150rod_word_w );
@@ -365,4 +343,3 @@ WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w );
 READ16_DEVICE_HANDLER( tc0180vcu_word_r );
 WRITE16_DEVICE_HANDLER( tc0180vcu_word_w );
 void tc0180vcu_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, int plane);
-

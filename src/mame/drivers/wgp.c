@@ -398,7 +398,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/taitoio.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 
@@ -661,8 +661,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_word_0_w)			/* tilemaps */
-	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)			/* tilemaps */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_BASE(&wgp_spritemap) AM_SIZE(&wgp_spritemap_size)	/* sprite tilemaps */
 	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			/* sprite ram */
 	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITENOP	/* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
@@ -897,9 +897,7 @@ static const gfx_layout charlayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-/* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
-   slot */
-
+/* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx slot */
 static GFXDECODE_START( wgp )
 	GFXDECODE_ENTRY( "gfx3", 0x0, wgp_tilelayout,  0, 256 )		/* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )		/* sprites & playfield */
@@ -951,6 +949,26 @@ static MACHINE_START( wgp )
 	state_save_register_postload(machine, wgp_postload, NULL);
 }
 
+static const tc0100scn_interface wgp_tc0100scn_intf =
+{
+	"screen",
+	1, 3,		/* gfxnum, txnum */
+	0, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0100scn_interface wgp2_tc0100scn_intf =
+{
+	"screen",
+	1, 3,		/* gfxnum, txnum */
+	4, 2,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
 static const tc0220ioc_interface wgp_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
@@ -992,6 +1010,8 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_VIDEO_START(wgp)
 	MDRV_VIDEO_UPDATE(wgp)
 
+	MDRV_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1010,6 +1030,9 @@ static MACHINE_DRIVER_START( wgp2 )
 	MDRV_QUANTUM_TIME(HZ(12000))
 	/* video hardware */
 	MDRV_VIDEO_START(wgp2)
+
+	MDRV_DEVICE_REMOVE("tc0100scn")
+	MDRV_TC0100SCN_ADD("tc0100scn", wgp2_tc0100scn_intf)
 MACHINE_DRIVER_END
 
 

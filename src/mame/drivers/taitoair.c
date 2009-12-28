@@ -220,7 +220,7 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "machine/taitoio.h"
 #include "cpu/tms32025/tms32025.h"
 #include "sound/2610intf.h"
@@ -231,7 +231,6 @@ static UINT16 *taitoh_68000_mainram;
 UINT16 *taitoair_line_ram;
 static UINT16 *dsp_ram;	/* Shared 68000/TMS32025 RAM */
 
-VIDEO_START( taitoair );
 VIDEO_UPDATE( taitoair );
 
 
@@ -383,7 +382,7 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x183fff) AM_RAM             		/* "gradiation ram (0)" */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM         			/* "gradiation ram (1)" */
 	AM_RANGE(0x188000, 0x18bfff) AM_RAM_WRITE(airsys_paletteram16_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x800000, 0x820fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)	/* tilemaps, sprites */
+	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE(&taitoair_line_ram)	/* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE(&dsp_ram)	/* "dsp common ram" (TMS320C25) */
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
@@ -596,6 +595,13 @@ static const ym2610_interface airsys_ym2610_interface =
                 MACHINE DRIVERS
 ************************************************************/
 
+static const tc0080vco_interface airsys_tc0080vco_intf =
+{
+	0, 1,	/* gfxnum, txnum */
+	1, 1, -2,
+	0
+};
+
 static const tc0220ioc_interface airsys_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
@@ -634,8 +640,9 @@ static MACHINE_DRIVER_START( airsys )
 	MDRV_GFXDECODE(airsys)
 	MDRV_PALETTE_LENGTH(512*16)
 
-	MDRV_VIDEO_START(taitoair)
 	MDRV_VIDEO_UPDATE(taitoair)
+
+	MDRV_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

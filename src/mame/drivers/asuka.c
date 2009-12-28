@@ -216,7 +216,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -226,9 +226,6 @@ DIP locations verified for:
 
 WRITE16_HANDLER( asuka_spritectrl_w );
 
-VIDEO_START( asuka );
-VIDEO_START( galmedes );
-VIDEO_START( cadash );
 VIDEO_UPDATE( asuka );
 VIDEO_UPDATE( bonzeadv );
 
@@ -325,7 +322,7 @@ static ADDRESS_MAP_START( bonzeadv_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)
+	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("DSWB")
@@ -336,24 +333,24 @@ static ADDRESS_MAP_START( bonzeadv_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(bonzeadv_cchip_ram_r, bonzeadv_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE(bonzeadv_cchip_ctrl_r, bonzeadv_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(bonzeadv_cchip_bank_w)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
-	AM_RANGE(0xc20000, 0xc2000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( asuka_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP	/* Mofflott init does dummy reads here */
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xc10000, 0xc103ff) AM_WRITENOP	/* error in Asuka init code */
-	AM_RANGE(0xc20000, 0xc2000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
+	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cadash_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -364,25 +361,25 @@ static ADDRESS_MAP_START( cadash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM	/* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_4bpg_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
-	AM_RANGE(0xc20000, 0xc2000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_4bpg_word_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eto_map, ADDRESS_SPACE_PROGRAM, 16 )	/* N.B. tc100scn mirror overlaps spriteram */
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)
+	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_r, 0x00ff)	/* service mode mirror */
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x4e0002, 0x4e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(TC0100SCN_word_0_w)	/* service mode mirror */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
-	AM_RANGE(0xd20000, 0xd2000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVWRITE("tc0100scn", tc0100scn_word_w)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
 
@@ -783,9 +780,45 @@ static const msm5205_interface msm5205_config =
                  MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0100scn_interface asuka_tc0100scn_intf =
+{
+	"screen",
+	1, 2,		/* gfxnum, txnum */
+	0, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0100scn_interface cadash_tc0100scn_intf =
+{
+	"screen",
+	1, 2,		/* gfxnum, txnum */
+	1, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const pc090oj_interface asuka_pc090oj_intf =
+{
+	0, 0, 8, 0
+};
+
+static const pc090oj_interface cadash_pc090oj_intf =
+{
+	0, 0, 8, 1
+};
+
+static const tc0110pcr_interface asuka_tc0110pcr_intf =
+{
+	0
+};
+
 static VIDEO_EOF( asuka )
 {
-	PC090OJ_eof_callback();
+	const device_config *pc090oj = devtag_get_device(machine, "pc090oj");
+	pc090oj_eof_callback(pc090oj);
 }
 
 static const tc0220ioc_interface asuka_io_intf =
@@ -805,6 +838,9 @@ static MACHINE_DRIVER_START( bonzeadv )
 	MDRV_CPU_ADD("audiocpu", Z80,4000000)    /* sound CPU, also required for test mode */
 	MDRV_CPU_PROGRAM_MAP(bonzeadv_z80_map)
 
+	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
+
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
@@ -817,12 +853,12 @@ static MACHINE_DRIVER_START( bonzeadv )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
 
-	MDRV_MACHINE_START(asuka)
-	MDRV_MACHINE_RESET(asuka)
-
-	MDRV_VIDEO_START(asuka)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(bonzeadv)
+
+	MDRV_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MDRV_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -844,6 +880,9 @@ static MACHINE_DRIVER_START( asuka )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(z80_map)
 
+	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
+
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
@@ -858,12 +897,12 @@ static MACHINE_DRIVER_START( asuka )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
 
-	MDRV_MACHINE_START(asuka)
-	MDRV_MACHINE_RESET(asuka)
-
-	MDRV_VIDEO_START(asuka)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(asuka)
+
+	MDRV_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MDRV_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -888,6 +927,9 @@ static MACHINE_DRIVER_START( cadash )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map)
 
+	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
+
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
@@ -902,12 +944,12 @@ static MACHINE_DRIVER_START( cadash )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
 
-	MDRV_MACHINE_START(asuka)
-	MDRV_MACHINE_RESET(asuka)
-
-	MDRV_VIDEO_START(cadash)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(bonzeadv)
+
+	MDRV_PC090OJ_ADD("pc090oj", cadash_pc090oj_intf)
+	MDRV_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -928,6 +970,9 @@ static MACHINE_DRIVER_START( mofflott )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_map)
 
+	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
+
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
@@ -942,12 +987,12 @@ static MACHINE_DRIVER_START( mofflott )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
 
-	MDRV_MACHINE_START(asuka)
-	MDRV_MACHINE_RESET(asuka)
-
-	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(asuka)
+
+	MDRV_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MDRV_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -972,6 +1017,9 @@ static MACHINE_DRIVER_START( galmedes )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map)
 
+	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
+
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
@@ -986,12 +1034,12 @@ static MACHINE_DRIVER_START( galmedes )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
 
-	MDRV_MACHINE_START(asuka)
-	MDRV_MACHINE_RESET(asuka)
-
-	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(asuka)
+
+	MDRV_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MDRV_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1012,6 +1060,9 @@ static MACHINE_DRIVER_START( eto )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map)
 
+	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
+
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
@@ -1026,12 +1077,12 @@ static MACHINE_DRIVER_START( eto )
 	MDRV_GFXDECODE(asuka)
 	MDRV_PALETTE_LENGTH(4096)
 
-	MDRV_MACHINE_START(asuka)
-	MDRV_MACHINE_RESET(asuka)
-
-	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
 	MDRV_VIDEO_UPDATE(asuka)
+
+	MDRV_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MDRV_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

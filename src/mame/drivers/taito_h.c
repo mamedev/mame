@@ -139,16 +139,14 @@ some kind of zoom table?
 
 ****************************************************************************/
 
-
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "sound/2610intf.h"
-
 
 
 /***************************************************************************
@@ -159,9 +157,6 @@ some kind of zoom table?
 
 static UINT16 *taitoh_68000_mainram;
 
-VIDEO_START( syvalion );
-VIDEO_START( recordbr );
-VIDEO_START( dleague );
 VIDEO_UPDATE( syvalion );
 VIDEO_UPDATE( recordbr );
 VIDEO_UPDATE( dleague );
@@ -274,7 +269,7 @@ static ADDRESS_MAP_START( syvalion_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
+	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -285,7 +280,7 @@ static ADDRESS_MAP_START( recordbr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
+	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -295,7 +290,7 @@ static ADDRESS_MAP_START( dleague_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
+	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* ?? writes zero once per frame */
 ADDRESS_MAP_END
@@ -546,6 +541,20 @@ static MACHINE_START( taitoh )
 }
 
 
+static const tc0080vco_interface syvalion_tc0080vco_intf =
+{
+	0, 1,	/* gfxnum, txnum */
+	1, 1, -2,
+	1
+};
+
+static const tc0080vco_interface recordbr_tc0080vco_intf =
+{
+	0, 1,	/* gfxnum, txnum */
+	1, 1, -2,
+	0
+};
+
 static const tc0220ioc_interface taitoh_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
@@ -580,8 +589,9 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_GFXDECODE(syvalion)
 	MDRV_PALETTE_LENGTH(33*16)
 
-	MDRV_VIDEO_START(syvalion)
 	MDRV_VIDEO_UPDATE(syvalion)
+
+	MDRV_TC0080VCO_ADD("tc0080vco", syvalion_tc0080vco_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -622,8 +632,9 @@ static MACHINE_DRIVER_START( recordbr )
 	MDRV_GFXDECODE(recordbr)
 	MDRV_PALETTE_LENGTH(32*16)
 
-	MDRV_VIDEO_START(recordbr)
 	MDRV_VIDEO_UPDATE(recordbr)
+
+	MDRV_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -664,8 +675,9 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_GFXDECODE(dleague)
 	MDRV_PALETTE_LENGTH(33*16)
 
-	MDRV_VIDEO_START(dleague)
 	MDRV_VIDEO_UPDATE(dleague)
+
+	MDRV_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

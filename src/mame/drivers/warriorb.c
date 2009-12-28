@@ -148,7 +148,7 @@ Colscroll effects?
 #include "includes/taitoipt.h"
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -157,7 +157,6 @@ Colscroll effects?
 static MACHINE_START( warriorb );
 static MACHINE_RESET( taito_dualscreen );
 
-VIDEO_START( darius2d );
 VIDEO_START( warriorb );
 VIDEO_UPDATE( warriorb );
 
@@ -210,6 +209,14 @@ static WRITE8_HANDLER( warriorb_pancontrol )
 }
 
 
+WRITE16_HANDLER( tc0100scn_dual_screen_w )
+{
+	const device_config *tc0100scn_1 = devtag_get_device(space->machine, "tc0100scn_1");
+	const device_config *tc0100scn_2 = devtag_get_device(space->machine, "tc0100scn_2");
+
+	tc0100scn_word_w(tc0100scn_1, offset, data, mem_mask);
+	tc0100scn_word_w(tc0100scn_2, offset, data, mem_mask);
+}
 
 /***********************************************************
                       MEMORY STRUCTURES
@@ -218,13 +225,13 @@ static WRITE8_HANDLER( warriorb_pancontrol )
 static ADDRESS_MAP_START( darius2d_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main ram */
-	AM_RANGE(0x200000, 0x213fff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_dual_screen_w)	/* tilemaps (all screens) */
+	AM_RANGE(0x200000, 0x213fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_dual_screen_w)	/* tilemaps (all screens) */
 	AM_RANGE(0x214000, 0x2141ff) AM_WRITENOP											/* error in screen clearing code ? */
-	AM_RANGE(0x220000, 0x22000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x240000, 0x253fff) AM_READWRITE(TC0100SCN_word_1_r, TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
-	AM_RANGE(0x260000, 0x26000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r, TC0100SCN_ctrl_word_1_w)
-	AM_RANGE(0x400000, 0x400007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
+	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x240000, 0x253fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
+	AM_RANGE(0x260000, 0x26000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (1st screen) */
+	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
@@ -234,12 +241,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warriorb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x213fff) AM_RAM
-	AM_RANGE(0x300000, 0x313fff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_dual_screen_w)	/* tilemaps (all screens) */
-	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x340000, 0x353fff) AM_READWRITE(TC0100SCN_word_1_r, TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
-	AM_RANGE(0x360000, 0x36000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r, TC0100SCN_ctrl_word_1_w)
-	AM_RANGE(0x400000, 0x400007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
+	AM_RANGE(0x300000, 0x313fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_dual_screen_w)	/* tilemaps (all screens) */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x340000, 0x353fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
+	AM_RANGE(0x360000, 0x36000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (1st screen) */
+	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
@@ -445,6 +452,57 @@ static DEVICE_GET_INFO( subwoofer )
                        MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0100scn_interface darius2d_tc0100scn_intf_l =
+{
+	"lscreen",
+	1, 3,		/* gfxnum, txnum */
+	4, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0100scn_interface darius2d_tc0100scn_intf_r =
+{
+	"rscreen",
+	2, 3,		/* gfxnum, txnum */
+	4, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 1
+};
+
+static const tc0100scn_interface warriorb_tc0100scn_intf_l =
+{
+	"lscreen",
+	1, 3,		/* gfxnum, txnum */
+	4, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0100scn_interface warriorb_tc0100scn_intf_r =
+{
+	"rscreen",
+	2, 3,		/* gfxnum, txnum */
+	4, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 1
+};
+
+static const tc0110pcr_interface darius2d_tc0110pcr_intf_l =
+{
+	0
+};
+
+static const tc0110pcr_interface darius2d_tc0110pcr_intf_r =
+{
+	1
+};
+
+
 static const tc0220ioc_interface darius2d_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
@@ -491,8 +549,13 @@ static MACHINE_DRIVER_START( darius2d )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
 
-	MDRV_VIDEO_START(darius2d)
+	MDRV_VIDEO_START(warriorb)
 	MDRV_VIDEO_UPDATE(warriorb)
+
+	MDRV_TC0100SCN_ADD("tc0100scn_1", darius2d_tc0100scn_intf_l)
+	MDRV_TC0100SCN_ADD("tc0100scn_2", darius2d_tc0100scn_intf_r)
+	MDRV_TC0110PCR_ADD("tc0110pcr_1", darius2d_tc0110pcr_intf_l)
+	MDRV_TC0110PCR_ADD("tc0110pcr_2", darius2d_tc0110pcr_intf_r)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -553,6 +616,11 @@ static MACHINE_DRIVER_START( warriorb )
 
 	MDRV_VIDEO_START(warriorb)
 	MDRV_VIDEO_UPDATE(warriorb)
+
+	MDRV_TC0100SCN_ADD("tc0100scn_1", warriorb_tc0100scn_intf_l)
+	MDRV_TC0100SCN_ADD("tc0100scn_2", warriorb_tc0100scn_intf_r)
+	MDRV_TC0110PCR_ADD("tc0110pcr_1", darius2d_tc0110pcr_intf_l)
+	MDRV_TC0110PCR_ADD("tc0110pcr_2", darius2d_tc0110pcr_intf_r)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

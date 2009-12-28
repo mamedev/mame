@@ -1,7 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
-
-#define TC0100SCN_GFX_NUM 1
+#include "video/taiicdev.h"
 
 struct tempsprite
 {
@@ -14,43 +12,17 @@ struct tempsprite
 };
 static struct tempsprite *spritelist;
 
-static int taito_hide_pixels;
-
-
 
 /**********************************************************/
 
-static VIDEO_START( ninjaw_core )
+VIDEO_START( ninjaw )
 {
-	int chips;
-	int mask;
+	const device_config *tc0100scn = devtag_get_device(machine, "tc0100scn_1");
 
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x1000);
 
-	chips = TC0100SCN_count(machine);
-
-	assert_always(chips > 0, "we have an erroneous TC0100SCN configuration");
-
-	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,2);
-
-	mask = TC0110PCR_mask(machine);
-	if (mask & 1)
-		TC0110PCR_vh_start(machine);
-
-	if (mask & 2)
-		TC0110PCR_1_vh_start(machine);
-
-	if (mask & 4)
-		TC0110PCR_2_vh_start(machine);
-
 	/* Ensure palette from correct TC0110PCR used for each screen */
-	TC0100SCN_set_chip_colbanks(0x0,0x100,0x200);
-}
-
-VIDEO_START( ninjaw )
-{
-	taito_hide_pixels = 22;
-	VIDEO_START_CALL(ninjaw_core);
+	tc0100scn_set_colbanks(tc0100scn, 0x0, 0x100, 0x200);
 }
 
 /************************************************************
@@ -149,51 +121,53 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( ninjaw )
 {
-	int xoffs = 0, screen_number = -1;
+	int xoffs = 0;
 	UINT8 layer[3], nodraw;
 
 	const device_config *left_screen   = devtag_get_device(screen->machine, "lscreen");
 	const device_config *middle_screen = devtag_get_device(screen->machine, "mscreen");
 	const device_config *right_screen  = devtag_get_device(screen->machine, "rscreen");
+	const device_config *tc0100scn = NULL;
 
 	if (screen == left_screen)
 	{
-		xoffs = 36*8*0;
-		screen_number = 0;
+		xoffs = 36 * 8 * 0;
+		tc0100scn = devtag_get_device(screen->machine, "tc0100scn_1");
 	}
 	else if (screen == middle_screen)
 	{
-		xoffs = 36*8*1;
-		screen_number = 1;
+		xoffs = 36 * 8 * 1;
+		tc0100scn = devtag_get_device(screen->machine, "tc0100scn_2");
 	}
 	else if (screen == right_screen)
 	{
-		xoffs = 36*8*2;
-		screen_number = 2;
+		xoffs = 36 * 8 * 2;
+		tc0100scn = devtag_get_device(screen->machine, "tc0100scn_3");
 	}
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	layer[0] = TC0100SCN_bottomlayer(0);
-	layer[1] = layer[0]^1;
+	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
 	/* chip 0 does tilemaps on the left, chip 1 center, chip 2 the right */
 	// draw bottom layer
-	nodraw  = TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
+	nodraw  = tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
-	if (nodraw) bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	if (nodraw) 
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen->machine,bitmap,cliprect,1,xoffs,8); // draw sprites with priority 1 which are under the mid layer
+	draw_sprites(screen->machine, bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
 
 	// draw middle layer
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[1],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 0);
 
 	draw_sprites(screen->machine,bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
 
 	// draw top(text) layer
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[2],0,0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);
 	return 0;
 }

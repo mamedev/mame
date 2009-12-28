@@ -32,12 +32,11 @@ TODO:
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "sound/2203intf.h"
 
 static const int clear_hack=1;
 
-VIDEO_START( parentj );
 VIDEO_UPDATE( parentj );
 
 static WRITE16_HANDLER(io_w)
@@ -67,7 +66,7 @@ static ADDRESS_MAP_START( parentj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(io_r, io_w) /* TC0220IOC ? */
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
-	AM_RANGE(0x400000, 0x420fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)
+	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -232,6 +231,13 @@ static const ym2203_interface ym2203_config =
 	NULL
 };
 
+static const tc0080vco_interface parentj_intf =
+{
+	0, 1,	/* gfxnum, txnum */
+	1, 1, -2,
+	0
+};
+
 static MACHINE_DRIVER_START( parentj )
 
 
@@ -249,8 +255,9 @@ static MACHINE_DRIVER_START( parentj )
 	MDRV_GFXDECODE(parentj)
 	MDRV_PALETTE_LENGTH(33*16)
 
-	MDRV_VIDEO_START(parentj)
 	MDRV_VIDEO_UPDATE(parentj)
+
+	MDRV_TC0080VCO_ADD("tc0080vco", parentj_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

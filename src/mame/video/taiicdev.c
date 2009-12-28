@@ -1800,7 +1800,8 @@ void tc0080vco_tilemap_draw( const device_config *device, bitmap_t *bitmap, cons
 	}
 }
 
-/* FIXME: these could replace the external uses of RAM regions... completely untested! */
+/* FIXME: maybe it would be better to provide pointers to these RAM regions 
+which can be accessed directly by the drivers... */
 READ16_DEVICE_HANDLER( tc0080vco_cram_0_r )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
@@ -1829,36 +1830,6 @@ READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
 	return tc0080vco->flipscreen;
-}
-
-WRITE16_DEVICE_HANDLER( tc0080vco_cram_0_w )
-{
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	COMBINE_DATA(&tc0080vco->chain_ram_0[offset]);
-}
-
-WRITE16_DEVICE_HANDLER( tc0080vco_cram_1_w )
-{
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	COMBINE_DATA(&tc0080vco->chain_ram_1[offset]);
-}
-
-WRITE16_DEVICE_HANDLER( tc0080vco_sprram_w )
-{
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	COMBINE_DATA(&tc0080vco->spriteram[offset]);
-}
-
-WRITE16_DEVICE_HANDLER( tc0080vco_scrram_w )
-{
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	COMBINE_DATA(&tc0080vco->scroll_ram[offset]);
-}
-
-WRITE_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_w )
-{
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	tc0080vco->flipscreen = state;
 }
 
 
@@ -1912,9 +1883,6 @@ static DEVICE_START( tc0080vco )
 	/* Perform extra initialisations for text layer */
 	tc0080vco->tilemap[2] = tilemap_create_device(device, tc0080vco_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine->gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine, &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
-
 	tilemap_set_scrolldx(tc0080vco->tilemap[2], 0, 0);
 	tilemap_set_scrolldy(tc0080vco->tilemap[2], 48, -448);
 
@@ -1937,6 +1905,9 @@ static DEVICE_START( tc0080vco )
 	tc0080vco->bgscroll_ram  = tc0080vco->ram + 0x20000 / 2;
 	tc0080vco->spriteram     = tc0080vco->ram + 0x20400 / 2;
 	tc0080vco->scroll_ram    = tc0080vco->ram + 0x20800 / 2;
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	device->machine->gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine, &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
 
 	state_save_register_device_item_pointer(device, 0, tc0080vco->ram, TC0080VCO_RAM_SIZE / 2);
 	state_save_register_postload(device->machine, tc0080vco_postload, tc0080vco);
@@ -2220,21 +2191,6 @@ WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 	}
 }
 
-#if 0	// these must be moved to the drivers
-WRITE16_DEVICE_HANDLER( TC0100SCN_dual_screen_w )
-{
-	TC0100SCN_word_0_w(space,offset,data,mem_mask);
-	TC0100SCN_word_1_w(space,offset,data,mem_mask);
-}
-
-WRITE16_DEVICE_HANDLER( TC0100SCN_triple_screen_w )
-{
-	TC0100SCN_word_0_w(space,offset,data,mem_mask);
-	TC0100SCN_word_1_w(space,offset,data,mem_mask);
-	TC0100SCN_word_2_w(space,offset,data,mem_mask);
-}
-#endif
-
 READ16_DEVICE_HANDLER( tc0100scn_ctrl_word_r )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
@@ -2468,13 +2424,16 @@ static DEVICE_START( tc0100scn )
 
 	tc0100scn->screen = devtag_get_device(device->machine, intf->screen);
 
+	/* Set up clipping for multi-TC0100SCN games. We assume
+       this code won't ever affect single screen games:
+       Thundfox is the only one of those with two chips, and
+       we're safe as it uses single width tilemaps. */
+
 	tc0100scn->cliprect = *video_screen_get_visible_area(tc0100scn->screen);
 
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine->gfx[intf->txnum] = gfx_element_alloc(device->machine, &tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0);
+	/* use the given gfx sets for bg/tx tiles*/
+	tc0100scn->bg_gfx = intf->gfxnum;	/* 2nd/3rd chips will use the same gfx set */
 	tc0100scn->tx_gfx = intf->txnum;
-
-	tc0100scn->bg_gfx = intf->gfxnum;	/* use the given gfx set for bg tiles; 2nd/3rd chips will use the same gfx set */
 
 	/* Single width versions */
 	tc0100scn->tilemap[0][0] = tilemap_create_device(device, tc0100scn_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
@@ -2485,13 +2444,6 @@ static DEVICE_START( tc0100scn )
 	tc0100scn->tilemap[0][1] = tilemap_create_device(device, tc0100scn_get_bg_tile_info, tilemap_scan_rows, 8, 8, 128, 64);
 	tc0100scn->tilemap[1][1] = tilemap_create_device(device, tc0100scn_get_fg_tile_info, tilemap_scan_rows, 8, 8, 128, 64);
 	tc0100scn->tilemap[2][1] = tilemap_create_device(device, tc0100scn_get_tx_tile_info, tilemap_scan_rows, 8, 8, 128, 32);
-
-	/* Set up clipping for multi-TC0100SCN games. We assume
-       this code won't ever affect single screen games:
-       Thundfox is the only one of those with two chips, and
-       we're safe as it uses single width tilemaps. */
-
-	tc0100scn_set_layer_ptrs(tc0100scn);
 
 	tilemap_set_transparent_pen(tc0100scn->tilemap[0][0], 0);
 	tilemap_set_transparent_pen(tc0100scn->tilemap[1][0], 0);
@@ -2505,9 +2457,8 @@ static DEVICE_START( tc0100scn )
        7 bits higher and 2 pixels to the left than chip #1 because
        that's how thundfox wants it. */
 
-	// FIXME: use intf->multiscrn_xoffs to deal screen 2 & 3!
-	xd = -intf->x_offset;
-	yd = 8 - intf->y_offset;
+	xd = (intf->multiscrn_hack == 0) ?  (-intf->x_offset) : (-intf->x_offset - 2);
+	yd = (intf->multiscrn_hack == 0) ?  (8 - intf->y_offset) : (1 - intf->y_offset);
 
 	tilemap_set_scrolldx(tc0100scn->tilemap[0][0], xd - 16, -intf->flip_xoffs - xd - 16);
 	tilemap_set_scrolldy(tc0100scn->tilemap[0][0], yd,      -intf->flip_yoffs - yd);
@@ -2521,7 +2472,8 @@ static DEVICE_START( tc0100scn )
        display not from the edges of individual screens.
        NB flipscreen tilemap offsets are based on Cameltry */
 
-	// FIXME: use intf->multiscrn_xoffs to deal screen 2 & 3!
+	xd = -intf->x_offset - intf->multiscrn_xoffs;
+	yd = 8 - intf->y_offset;
 
 	tilemap_set_scrolldx(tc0100scn->tilemap[0][1], xd - 16, -intf->flip_xoffs - xd - 16);
 	tilemap_set_scrolldy(tc0100scn->tilemap[0][1], yd,      -intf->flip_yoffs - yd);
@@ -2546,10 +2498,17 @@ static DEVICE_START( tc0100scn )
 	if (device->machine->gfx[intf->gfxnum]->color_granularity == 0x40)	/* Undrfire */
 		tc0100scn->tx_col_mult = 4;
 
-//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n",
-//device->machine->gfx[intf->gfxnum]->color_granularity,TC0100SCN_tx_col_mult);
+//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", device->machine->gfx[intf->gfxnum]->color_granularity, tc0100scn->tx_col_mult);
 
 	tc0100scn->ram = auto_alloc_array_clear(device->machine, UINT16, TC0100SCN_RAM_SIZE / 2);
+
+	tc0100scn_set_layer_ptrs(tc0100scn);
+
+	tc0100scn_set_colbanks(device, 0, 0, 0);	/* standard values, only Wgp & multiscreen games change them */ 
+									/* we call this here, so that they can be modified at VIDEO_START*/
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	device->machine->gfx[tc0100scn->tx_gfx] = gfx_element_alloc(device->machine, &tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0);
 
 	state_save_register_device_item_pointer(device, 0, tc0100scn->ram, TC0100SCN_RAM_SIZE / 2);
 	state_save_register_device_item_array(device, 0, tc0100scn->ctrl);
@@ -2567,7 +2526,6 @@ static DEVICE_RESET( tc0100scn )
 	tc0100scn->dblwidth = 0;
 	tc0100scn->colbank = 0;
 	tc0100scn->gfxbank = 0;	/* Mjnquest uniquely banks tiles */
-	tc0100scn_set_colbanks(device, 0, 0, 0);	/* standard values, only Wgp changes them */
 
 	for (i = 0; i < 8; i++)
 		tc0100scn->ctrl[i] = 0;
@@ -2585,7 +2543,7 @@ struct _tc0280grd_state
 {
 	UINT16 *       ram;
 
-	tilemap_t        *tilemap;
+	tilemap_t      *tilemap;
 
 	UINT16         ctrl[8];
 	int            gfxnum, base_color;

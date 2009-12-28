@@ -46,7 +46,7 @@ sprite RAM
 ***************************************************************************/
 
 #include "driver.h"
-#include "taitoic.h"
+#include "taiicdev.h"
 
 
 /* These are hand-tuned values */
@@ -64,24 +64,13 @@ static const int zoomy_conv_table[] =
 	0x67,0x68,0x6a,0x6b,0x6c,0x6e,0x6f,0x71, 0x72,0x74,0x76,0x78,0x80,0x7b,0x7d,0x7f
 };
 
-
-
-/***************************************************************************
-  Initialize and destroy video hardware emulation
-***************************************************************************/
-
-VIDEO_START( taitoair )
-{
-	TC0080VCO_vh_start(machine,0,0,1,1,-2);
-}
-
-
 /***************************************************************************
   Screen refresh
 ***************************************************************************/
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
+	const device_config *tc0080vco = devtag_get_device(machine, "tc0080vco");
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
@@ -93,17 +82,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int tile_offs;				/* sprite chain offset */
 	int zoomx, zoomy;			/* zoom value */
 
-	for (offs = 0x03f8 / 2 ; offs >= 0 ; offs -= 0x008 / 2)
+	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
 		if (offs <  0x01b0 && priority == 0)	continue;
 		if (offs >= 0x01b0 && priority == 1)	continue;
 
-		x0        =  TC0080VCO_spriteram[offs + 1] & 0x3ff;
-		y0        =  TC0080VCO_spriteram[offs + 0] & 0x3ff;
-		zoomx     = (TC0080VCO_spriteram[offs + 2] & 0x7f00) >> 8;
-		zoomy     = (TC0080VCO_spriteram[offs + 2] & 0x007f);
-		tile_offs = (TC0080VCO_spriteram[offs + 3] & 0x1fff) << 2;
-		ysize     = size[ ( TC0080VCO_spriteram[ offs ] & 0x0c00 ) >> 10 ];
+		x0        =  tc0080vco_sprram_r(tc0080vco, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(tc0080vco, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(tc0080vco, offs + 2, 0xffff) & 0x7f00) >> 8;
+		zoomy     = (tc0080vco_sprram_r(tc0080vco, offs + 2, 0xffff) & 0x007f);
+		tile_offs = (tc0080vco_sprram_r(tc0080vco, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(tc0080vco_sprram_r(tc0080vco, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -139,7 +128,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (TC0080VCO_flipscreen)
+			if (tc0080vco_flipscreen_r(tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -153,21 +142,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 
 			y = y0;
-			for (j = 0 ; j < ysize ; j ++)
+			for (j = 0; j < ysize; j ++)
 			{
 				x = x0;
-				for (k = 0 ; k < 4 ; k ++)
+				for (k = 0; k < 4; k ++)
 				{
 					if (tile_offs >= 0x1000)
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = TC0080VCO_chain_ram_0[tile_offs] & 0x7fff;
-						color = TC0080VCO_chain_ram_1[tile_offs] & 0x001f;
-						flipx = TC0080VCO_chain_ram_1[tile_offs] & 0x0040;
-						flipy = TC0080VCO_chain_ram_1[tile_offs] & 0x0080;
+						tile  = tc0080vco_cram_0_r(tc0080vco, tile_offs, 0xffff) & 0x7fff;
+						color = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x001f;
+						flipx = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0040;
+						flipy = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0080;
 
-						if (TC0080VCO_flipscreen)
+						if (tc0080vco_flipscreen_r(tc0080vco))
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
@@ -356,29 +345,32 @@ static void fill_poly(bitmap_t *bitmap, const struct poly *q)
 
 VIDEO_UPDATE( taitoair )
 {
-	TC0080VCO_tilemap_update(screen->machine);
+	const device_config *tc0080vco = devtag_get_device(screen->machine, "tc0080vco");
+
+	tc0080vco_tilemap_update(tc0080vco);
 
 	bitmap_fill(bitmap, cliprect, 0x41);
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(screen->machine, KEYCODE_A) )
-		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
+		tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, 0, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_S) )
-		draw_sprites(screen->machine,bitmap,cliprect,0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_D) )
-		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
+		tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_F) )
-		draw_sprites(screen->machine,bitmap,cliprect,1);
+		draw_sprites(screen->machine, bitmap, cliprect, 1);
 #else
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
-	draw_sprites (screen->machine,bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	draw_sprites (screen->machine,bitmap,cliprect,1);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
 #endif
 
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 2, 0, 0);
 
-	if(taitoair_line_ram[0x3fff]) {
+	if (taitoair_line_ram[0x3fff]) 
+	{
 		int adr = 0x3fff;
 		struct poly q;
 		view.x1 = cliprect->min_x;
@@ -386,16 +378,19 @@ VIDEO_UPDATE( taitoair )
 		view.x2 = cliprect->max_x;
 		view.y2 = cliprect->max_y;
 
-		while(adr>=0 && taitoair_line_ram[adr] && taitoair_line_ram[adr] != 0x4000) {
+		while(adr>=0 && taitoair_line_ram[adr] && taitoair_line_ram[adr] != 0x4000) 
+		{
 			int pcount;
-			if(!(taitoair_line_ram[adr] & 0x8000) || adr<10) {
+			if(!(taitoair_line_ram[adr] & 0x8000) || adr < 10) 
+			{
 				logerror("quad: unknown value %04x at %04x\n", taitoair_line_ram[adr], adr);
 				break;
 			}
 			q.col = (taitoair_line_ram[adr] & 0x7fff) + 0x300;
 			adr--;
 			pcount = 0;
-			while(pcount < POLY_MAX_PT && adr>=1 && !(taitoair_line_ram[adr] & 0xc000)) {
+			while(pcount < POLY_MAX_PT && adr>=1 && !(taitoair_line_ram[adr] & 0xc000)) 
+			{
 				q.p[pcount].y = taitoair_line_ram[adr]+3*16;
 				q.p[pcount].x = taitoair_line_ram[adr-1];
 				pcount++;

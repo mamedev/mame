@@ -1,32 +1,5 @@
 #include "driver.h"
-#include "video/taitoic.h"
-
-#define TC0100SCN_GFX_NUM 1
-
-
-/**********************************************************/
-
-static void asuka_core_video_start(running_machine *machine, int x_offs,int buffering)
-{
-	PC090OJ_vh_start(machine,0,0,8,buffering);	/* gfxset, x offset, y offset, buffering */
-	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
-	TC0110PCR_vh_start(machine);
-}
-
-VIDEO_START( asuka )
-{
-	asuka_core_video_start(machine, 0,0);
-}
-
-VIDEO_START( galmedes )
-{
-	asuka_core_video_start(machine, 1,0);
-}
-
-VIDEO_START( cadash )
-{
-	asuka_core_video_start(machine, 1,1);
-}
+#include "video/taiicdev.h"
 
 /**************************************************************
                  SPRITE READ AND WRITE HANDLERS
@@ -34,8 +7,10 @@ VIDEO_START( cadash )
 
 WRITE16_HANDLER( asuka_spritectrl_w )
 {
+	const device_config *pc090oj = devtag_get_device(space->machine, "pc090oj");
+
 	/* Bits 2-5 are color bank; in asuka games bit 0 is global priority */
-	PC090OJ_sprite_ctrl = ((data & 0x3c) >> 2) | ((data & 0x1) << 15);
+	pc090oj_set_sprite_ctrl(pc090oj, ((data & 0x3c) >> 2) | ((data & 0x1) << 15));
 }
 
 
@@ -45,11 +20,13 @@ WRITE16_HANDLER( asuka_spritectrl_w )
 
 VIDEO_UPDATE( asuka )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	layer[0] = TC0100SCN_bottomlayer(0);
+	layer[0] = tc0100scn_bottomlayer(tc0100scn);
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
@@ -58,36 +35,38 @@ VIDEO_UPDATE( asuka )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites may be over or under top bg layer */
-	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,2);
+	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 2);
 	return 0;
 }
 
 
 VIDEO_UPDATE( bonzeadv )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	layer[0] = TC0100SCN_bottomlayer(0);
-	layer[1] = layer[0]^1;
+	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites are always over both bg layers */
-	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,0);
+	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

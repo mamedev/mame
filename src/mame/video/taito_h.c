@@ -46,7 +46,7 @@ sprite RAM
 ***************************************************************************/
 
 #include "driver.h"
-#include "taitoic.h"
+#include "taiicdev.h"
 
 
 /* These are hand-tuned values */
@@ -65,33 +65,13 @@ static const int zoomy_conv_table[] =
 };
 
 
-
-/***************************************************************************
-  Initialize and destroy video hardware emulation
-***************************************************************************/
-
-VIDEO_START( syvalion )
-{
-	TC0080VCO_vh_start(machine,0,1,1,1,-2);
-}
-
-VIDEO_START( recordbr )
-{
-	TC0080VCO_vh_start(machine,0,0,1,1,-2);
-}
-
-VIDEO_START( dleague )
-{
-	TC0080VCO_vh_start(machine,0,0,1,1,-2);
-}
-
-
 /***************************************************************************
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
+static void syvalion_draw_sprites( running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect )
 {
+	const device_config *tc0080vco = devtag_get_device(machine, "tc0080vco");
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
@@ -103,13 +83,13 @@ static void syvalion_draw_sprites(running_machine *machine,bitmap_t *bitmap,cons
 	int tile_offs;				/* sprite chain offset */
 	int zoomx;					/* zoomx value */
 
-	for (offs = 0x03f8 / 2 ; offs >= 0 ; offs -= 0x008 / 2)
+	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
-		x0        =  TC0080VCO_spriteram[offs + 1] & 0x3ff;
-		y0        =  TC0080VCO_spriteram[offs + 0] & 0x3ff;
-		zoomx     = (TC0080VCO_spriteram[offs + 2] & 0x7f00) >> 8;
-		tile_offs = (TC0080VCO_spriteram[offs + 3] & 0x1fff) << 2;
-		ysize     = size[ ( TC0080VCO_spriteram[ offs ] & 0x0c00 ) >> 10 ];
+		x0        =  tc0080vco_sprram_r(tc0080vco, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(tc0080vco, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(tc0080vco, offs + 2, 0xffff) & 0x7f00) >> 8;
+		tile_offs = (tc0080vco_sprram_r(tc0080vco, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(tc0080vco_sprram_r(tc0080vco, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -131,7 +111,7 @@ static void syvalion_draw_sprites(running_machine *machine,bitmap_t *bitmap,cons
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (TC0080VCO_flipscreen)
+			if (tc0080vco_flipscreen_r(tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -144,21 +124,21 @@ static void syvalion_draw_sprites(running_machine *machine,bitmap_t *bitmap,cons
 			}
 
 			y = y0;
-			for ( j = 0 ; j < ysize ; j ++ )
+			for (j = 0 ; j < ysize ; j++)
 			{
 				x = x0;
-				for (k = 0 ; k < 4 ; k ++ )
+				for (k = 0 ; k < 4 ; k++)
 				{
 					if (tile_offs >= 0x1000)
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = TC0080VCO_chain_ram_0[tile_offs] & 0x7fff;
-						color = TC0080VCO_chain_ram_1[tile_offs] & 0x001f;
-						flipx = TC0080VCO_chain_ram_1[tile_offs] & 0x0040;
-						flipy = TC0080VCO_chain_ram_1[tile_offs] & 0x0080;
+						tile  = tc0080vco_cram_0_r(tc0080vco, tile_offs, 0xffff) & 0x7fff;
+						color = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x001f;
+						flipx = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0040;
+						flipy = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0080;
 
-						if (TC0080VCO_flipscreen)
+						if (tc0080vco_flipscreen_r(tc0080vco))
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
@@ -184,6 +164,7 @@ static void syvalion_draw_sprites(running_machine *machine,bitmap_t *bitmap,cons
 
 static void recordbr_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
+	const device_config *tc0080vco = devtag_get_device(machine, "tc0080vco");
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
@@ -200,12 +181,12 @@ static void recordbr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		if (offs <  0x01b0 && priority == 0)	continue;
 		if (offs >= 0x01b0 && priority == 1)	continue;
 
-		x0        =  TC0080VCO_spriteram[offs + 1] & 0x3ff;
-		y0        =  TC0080VCO_spriteram[offs + 0] & 0x3ff;
-		zoomx     = (TC0080VCO_spriteram[offs + 2] & 0x7f00) >> 8;
-		zoomy     = (TC0080VCO_spriteram[offs + 2] & 0x007f);
-		tile_offs = (TC0080VCO_spriteram[offs + 3] & 0x1fff) << 2;
-		ysize     = size[ ( TC0080VCO_spriteram[ offs ] & 0x0c00 ) >> 10 ];
+		x0        =  tc0080vco_sprram_r(tc0080vco, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(tc0080vco, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(tc0080vco, offs + 2, 0xffff) & 0x7f00) >> 8;
+		zoomy     = (tc0080vco_sprram_r(tc0080vco, offs + 2, 0xffff) & 0x007f);
+		tile_offs = (tc0080vco_sprram_r(tc0080vco, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(tc0080vco_sprram_r(tc0080vco, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -241,7 +222,7 @@ static void recordbr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (TC0080VCO_flipscreen)
+			if (tc0080vco_flipscreen_r(tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -264,12 +245,12 @@ static void recordbr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = TC0080VCO_chain_ram_0[tile_offs] & 0x7fff;
-						color = TC0080VCO_chain_ram_1[tile_offs] & 0x001f;
-						flipx = TC0080VCO_chain_ram_1[tile_offs] & 0x0040;
-						flipy = TC0080VCO_chain_ram_1[tile_offs] & 0x0080;
+						tile  = tc0080vco_cram_0_r(tc0080vco, tile_offs, 0xffff) & 0x7fff;
+						color = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x001f;
+						flipx = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0040;
+						flipy = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0080;
 
-						if (TC0080VCO_flipscreen)
+						if (tc0080vco_flipscreen_r(tc0080vco))
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
@@ -295,6 +276,7 @@ static void recordbr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 static void dleague_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
+	const device_config *tc0080vco = devtag_get_device(machine, "tc0080vco");
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
@@ -309,12 +291,12 @@ static void dleague_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 	for (offs = 0x03f8 / 2 ; offs >= 0 ; offs -= 0x008 / 2)
 	{
-		x0        =  TC0080VCO_spriteram[offs + 1] & 0x3ff;
-		y0        =  TC0080VCO_spriteram[offs + 0] & 0x3ff;
-		zoomx     = (TC0080VCO_spriteram[offs + 2] & 0x7f00) >> 8;
-		tile_offs = (TC0080VCO_spriteram[offs + 3] & 0x1fff) << 2;
-		pribit    = (TC0080VCO_spriteram[offs + 0] & 0x1000) >> 12;
-		ysize     = size[ ( TC0080VCO_spriteram[ offs ] & 0x0c00 ) >> 10 ];
+		x0        =  tc0080vco_sprram_r(tc0080vco, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(tc0080vco, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(tc0080vco, offs + 2, 0xffff) & 0x7f00) >> 8;
+		tile_offs = (tc0080vco_sprram_r(tc0080vco, offs + 3, 0xffff) & 0x1fff) << 2;
+		pribit    = (tc0080vco_sprram_r(tc0080vco, offs + 0, 0xffff) & 0x1000) >> 12;
+		ysize     = size[(tc0080vco_sprram_r(tc0080vco, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -334,13 +316,13 @@ static void dleague_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 				zx = (dx + ex) << 12;
 			}
 
-			if (TC0080VCO_scroll_ram[0x0002] & 0x8000)
+			if (tc0080vco_scrram_r(tc0080vco, 0x0002, 0xffff) & 0x8000)
 				pribit = 1;
 
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (TC0080VCO_flipscreen)
+			if (tc0080vco_flipscreen_r(tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -352,24 +334,25 @@ static void dleague_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 				y0 += 2;
 			}
 
-			if ( priority == pribit )
+			if (priority == pribit)
 			{
 				y = y0;
-				for ( j = 0 ; j < ysize ; j ++ )
+				for (j = 0; j < ysize; j ++)
 				{
 					x = x0;
-					for (k = 0 ; k < 4 ; k ++ )
+					for (k = 0; k < 4; k ++ )
 					{
 						if (tile_offs >= 0x1000)	/* or pitcher gets blanked */
 						{
 							int tile, color, flipx, flipy;
 
-							tile  = TC0080VCO_chain_ram_0[tile_offs] & 0x7fff;
-							color = TC0080VCO_chain_ram_1[tile_offs] & 0x001f;
-							flipx = TC0080VCO_chain_ram_1[tile_offs] & 0x0040;
-							flipy = TC0080VCO_chain_ram_1[tile_offs] & 0x0080;
+							tile  = tc0080vco_cram_0_r(tc0080vco, tile_offs, 0xffff) & 0x7fff;
+							color = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x001f;
+							flipx = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0040;
+							flipy = tc0080vco_cram_1_r(tc0080vco, tile_offs, 0xffff) & 0x0080;
 
-							if (TC0080VCO_flipscreen)
+
+							if (tc0080vco_flipscreen_r(tc0080vco))
 							{
 								flipx ^= 0x0040;
 								flipy ^= 0x0080;
@@ -409,23 +392,27 @@ static void taitoh_log_vram(running_machine *machine)
 
 VIDEO_UPDATE( syvalion )
 {
-	TC0080VCO_tilemap_update(screen->machine);
+	const device_config *tc0080vco = devtag_get_device(screen->machine, "tc0080vco");
+
+	tc0080vco_tilemap_update(tc0080vco);
 
 	taitoh_log_vram(screen->machine);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	syvalion_draw_sprites(screen->machine,bitmap,cliprect);
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
+	syvalion_draw_sprites(screen->machine, bitmap,cliprect);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( recordbr )
 {
-	TC0080VCO_tilemap_update(screen->machine);
+	const device_config *tc0080vco = devtag_get_device(screen->machine, "tc0080vco");
+
+	tc0080vco_tilemap_update(tc0080vco);
 
 	taitoh_log_vram(screen->machine);
 
@@ -433,28 +420,30 @@ VIDEO_UPDATE( recordbr )
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(screen->machine, KEYCODE_A) )
-		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
+		tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_S) )
-		recordbr_draw_sprites(screen->machine,bitmap,cliprect,0);
+		recordbr_draw_sprites(screen->machine, bitmap, cliprect, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_D) )
-		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
+		tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_F) )
-		recordbr_draw_sprites(screen->machine,bitmap,cliprect,1);
+		recordbr_draw_sprites(screen->machine, bitmap, cliprect, 1);
 #else
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	recordbr_draw_sprites(screen->machine,bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	recordbr_draw_sprites(screen->machine,bitmap,cliprect,1);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	recordbr_draw_sprites(screen->machine, bitmap, cliprect, 0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
+	recordbr_draw_sprites(screen->machine, bitmap, cliprect, 1);
 #endif
 
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( dleague )
 {
-	TC0080VCO_tilemap_update(screen->machine);
+	const device_config *tc0080vco = devtag_get_device(screen->machine, "tc0080vco");
+
+	tc0080vco_tilemap_update(tc0080vco);
 
 	taitoh_log_vram(screen->machine);
 
@@ -462,21 +451,21 @@ VIDEO_UPDATE( dleague )
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(screen->machine, KEYCODE_A) )
-		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
+		tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_S) )
-		dleague_draw_sprites(screen->machine,bitmap,cliprect,0);
+		dleague_draw_sprites(screen->machine, bitmap, cliprect, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_D) )
-		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
+		tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if ( !input_code_pressed(screen->machine, KEYCODE_F) )
-		dleague_draw_sprites(screen->machine,bitmap,cliprect,1);
+		dleague_draw_sprites(screen->machine, bitmap, cliprect, 1);
 #else
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	dleague_draw_sprites (screen->machine,bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	dleague_draw_sprites (screen->machine,bitmap,cliprect,1);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	dleague_draw_sprites (screen->machine, bitmap, cliprect, 0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 1, 0, 0);
+	dleague_draw_sprites (screen->machine, bitmap, cliprect, 1);
 #endif
 
-	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
+	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
