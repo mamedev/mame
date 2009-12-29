@@ -10,40 +10,65 @@
 #include "driver.h"
 #include "nmk112.h"
 
-#define MAXCHIPS 2
-#define TABLESIZE 0x100
-#define BANKSIZE 0x10000
+#define TABLESIZE   0x100
+#define BANKSIZE    0x10000
 
-/* which chips have their sample address table divided into pages */
-static UINT8 page_mask;
-
-static UINT8 current_bank[8];
-static const char *region[2];
-
-void NMK112_init(UINT8 disable_page_mask, const char *rgn0, const char *rgn1)
+typedef struct _nmk112_state nmk112_state;
+struct _nmk112_state
 {
-	region[0] = rgn0;
-	region[1] = rgn1;
-	memset(current_bank, ~0, sizeof(current_bank));
-	page_mask = ~disable_page_mask;
+	/* which chips have their sample address table divided into pages */
+	UINT8 page_mask;
+
+	UINT8 current_bank[8];
+	UINT8 last_bank[2];
+
+	UINT8 *rom0, *rom1;
+	int   size0, size1;
+};
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE nmk112_state *get_safe_token( const device_config *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == NMK112);
+
+	return (nmk112_state *)device->token;
 }
 
-WRITE8_HANDLER( NMK112_okibank_w )
+INLINE const nmk112_interface *get_interface( const device_config *device )
 {
-	int chip	=	(offset & 4) >> 2;
-	int banknum	=	offset & 3;
-	int paged	=	(page_mask & (1 << chip));
+	assert(device != NULL);
+	assert((device->type == NMK112));
+	return (const nmk112_interface *) device->static_config;
+}
 
-	UINT8 *rom	=	memory_region(space->machine, region[chip]);
-	int size			=	memory_region_length(space->machine, region[chip]) - 0x40000;
-	int bankaddr		=	(data * BANKSIZE) % size;
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
 
-	if (current_bank[offset] == data) return;
-	current_bank[offset] = data;
+WRITE8_DEVICE_HANDLER( nmk112_okibank_w )
+{
+	nmk112_state *nmk112 = get_safe_token(device);
+	int chip = (offset & 4) >> 2;
+	int banknum = offset & 3;
+	int paged = (nmk112->page_mask & (1 << chip));
+
+	UINT8 *rom = chip ? nmk112->rom1 : nmk112->rom0;
+	int size = chip ? nmk112->size1 : nmk112->size0;
+	int bankaddr = (data * BANKSIZE) % size;
+
+	if (nmk112->current_bank[offset] == data) 
+		return;
+
+	nmk112->current_bank[offset] = data;
 
 	/* copy the samples */
 	if ((paged) && (banknum == 0))
-		memcpy(rom + 0x400, rom + 0x40000 + bankaddr+0x400, BANKSIZE-0x400);
+		memcpy(rom + 0x400, rom + 0x40000 + bankaddr + 0x400, BANKSIZE - 0x400);
 	else
 		memcpy(rom + banknum * BANKSIZE, rom + 0x40000 + bankaddr, BANKSIZE);
 
@@ -53,12 +78,87 @@ WRITE8_HANDLER( NMK112_okibank_w )
 		rom += banknum * TABLESIZE;
 		memcpy(rom, rom + 0x40000 + bankaddr, TABLESIZE);
 	}
+
+	nmk112->last_bank[chip] = offset & 3;
 }
 
-WRITE16_HANDLER( NMK112_okibank_lsb_w )
+WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		NMK112_okibank_w(space, offset, data & 0xff);
+		nmk112_okibank_w(device, offset, data & 0xff);
 	}
 }
+
+static STATE_POSTLOAD( nmk112_postload_bankswitch )
+{
+	nmk112_state *nmk112 = (nmk112_state *)param;
+	int i;
+
+	for (i = 0; i < 2; i++)
+	{
+		int banknum = nmk112->last_bank[i];
+		int paged = (nmk112->page_mask & (1 << i));
+	
+		UINT8 *rom = i ? nmk112->rom1 : nmk112->rom0;
+		int size = i ? nmk112->size1 : nmk112->size0;
+		int bankaddr = (nmk112->current_bank[nmk112->last_bank[i] + i * 4] * BANKSIZE) % size;
+
+		/* copy the samples */
+		if ((paged) && (banknum == 0))
+			memcpy(rom + 0x400, rom + 0x40000 + bankaddr + 0x400, BANKSIZE - 0x400);
+		else
+			memcpy(rom + banknum * BANKSIZE, rom + 0x40000 + bankaddr, BANKSIZE);
+
+		/* also copy the sample address table, if it is paged on this chip */
+		if (paged)
+		{
+			rom += banknum * TABLESIZE;
+			memcpy(rom, rom + 0x40000 + bankaddr, TABLESIZE);
+		}
+	}
+}
+
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( nmk112 )
+{
+	nmk112_state *nmk112 = get_safe_token(device);
+	const nmk112_interface *intf = get_interface(device);
+
+	nmk112->rom0 = memory_region(device->machine, intf->rgn0);
+	nmk112->size0 = memory_region_length(device->machine, intf->rgn0) - 0x40000;
+	nmk112->rom1 = memory_region(device->machine, intf->rgn1);
+	nmk112->size1 = memory_region_length(device->machine, intf->rgn1) - 0x40000;
+
+	nmk112->page_mask = ~intf->disable_page_mask;
+
+	state_save_register_device_item_array(device, 0, nmk112->current_bank);
+	state_save_register_device_item_array(device, 0, nmk112->last_bank);
+	state_save_register_postload(device->machine, nmk112_postload_bankswitch, nmk112);
+}
+
+static DEVICE_RESET( nmk112 )
+{
+	nmk112_state *nmk112 = get_safe_token(device);
+	int i;
+
+	for (i = 0; i < 8; i++)
+		nmk112->current_bank[i] = ~0;
+}
+
+
+/*****************************************************************************
+    DEVICE DEFINITION
+*****************************************************************************/
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##nmk112##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"NMK 112"
+#define DEVTEMPLATE_FAMILY				"NMK 112 Bankswitch IC"
+#include "devtempl.h"

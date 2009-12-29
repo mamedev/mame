@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( donpachi_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)		// Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)				// M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)				//
-	AM_RANGE(0xb00020, 0xb0002f) AM_WRITE(NMK112_okibank_lsb_w)											//
+	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)											//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")													// Inputs + EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
@@ -1053,7 +1053,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	//
-	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w)							// Samples bank
+	AM_RANGE(0x10, 0x17) AM_DEVWRITE("nmk112", nmk112_okibank_w)							// Samples bank
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)			//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITENOP                                  // ?? volume
@@ -1653,7 +1653,6 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
@@ -1697,6 +1696,7 @@ MACHINE_DRIVER_END
                                 Dodonpachi
 ***************************************************************************/
 
+
 static MACHINE_DRIVER_START( ddonpach )
 
 	/* basic machine hardware */
@@ -1736,6 +1736,11 @@ MACHINE_DRIVER_END
                                     Donpachi
 ***************************************************************************/
 
+static const nmk112_interface donpachi_nmk112_intf =
+{
+	"oki1", "oki2", 1 << 0	// chip #0 (music) is not paged
+};
+
 static MACHINE_DRIVER_START( donpachi )
 
 	/* basic machine hardware */
@@ -1773,6 +1778,8 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", donpachi_nmk112_intf)
 MACHINE_DRIVER_END
 
 
@@ -2101,6 +2108,11 @@ MACHINE_DRIVER_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
+static const nmk112_interface pwrinst2_nmk112_intf =
+{
+	"oki1", "oki2", 0
+};
+
 static MACHINE_DRIVER_START( pwrinst2 )
 
 	/* basic machine hardware */
@@ -2153,6 +2165,8 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MDRV_NMK112_ADD("nmk112", pwrinst2_nmk112_intf)
 MACHINE_DRIVER_END
 
 
@@ -3820,9 +3834,8 @@ static void init_cave(running_machine *machine)
 	time_vblank_irq = 100;
 
 	irq_level = 1;
-
-	NMK112_init(0, "oki1", "oki2");
 }
+
 
 static DRIVER_INIT( agallet )
 {
@@ -3878,9 +3891,8 @@ static DRIVER_INIT( donpachi )
 	ddonpach_unpack_sprites(machine);
 	cave_spritetype = 1;	// "different" sprites (no zooming?)
 	time_vblank_irq = 90;
-
-	NMK112_init(1<<0, "oki1", "oki2");	// chip #0 (music) is not paged
 }
+
 
 static DRIVER_INIT( esprade )
 {

@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( powerins_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
+	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerinb_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( powerinb_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_NOP
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
+	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
 
@@ -334,9 +334,7 @@ GFXDECODE_END
 static MACHINE_RESET( powerins )
 {
 	oki_bank = -1;	// samples bank "unitialised"
-	NMK112_init(0, "oki1", "oki2");
 }
-
 
 static void irqhandler(const device_config *device, int irq)
 {
@@ -352,6 +350,12 @@ static const ym2203_interface ym2203_config =
 	},
 	irqhandler
 };
+
+static const nmk112_interface powerins_nmk112_intf =
+{
+	"oki1", "oki2", 0
+};
+
 
 static MACHINE_DRIVER_START( powerins )
 
@@ -394,6 +398,8 @@ static MACHINE_DRIVER_START( powerins )
 	MDRV_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+
+	MDRV_NMK112_ADD("nmk112", powerins_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( powerina )

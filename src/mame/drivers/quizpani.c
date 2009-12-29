@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( quizpani_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP /* IRQ enable? */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(quizpani_tilesbank_w)
 	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
-	AM_RANGE(0x104020, 0x104027) AM_WRITE(NMK112_okibank_lsb_w)
+	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)
 	AM_RANGE(0x108000, 0x1083ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
 	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_BASE(&quizpani_scrollreg)
@@ -234,10 +234,11 @@ static GFXDECODE_START( quizpani )
 GFXDECODE_END
 
 
-static MACHINE_RESET( quizpani )
+static const nmk112_interface quizpani_nmk112_intf =
 {
-	NMK112_init(0, "oki", "oki");
-}
+	"oki", "oki", 0
+};
+
 
 static MACHINE_DRIVER_START( quizpani )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -245,11 +246,8 @@ static MACHINE_DRIVER_START( quizpani )
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,164) // music tempo
 
-	MDRV_MACHINE_RESET( quizpani )
-
 	MDRV_GFXDECODE(quizpani)
 	MDRV_PALETTE_LENGTH(0x200)
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -266,6 +264,8 @@ static MACHINE_DRIVER_START( quizpani )
 	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", quizpani_nmk112_intf)
 MACHINE_DRIVER_END
 
 ROM_START( quizpani )

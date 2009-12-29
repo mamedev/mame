@@ -5,30 +5,30 @@
 
 
 
-#define FM_CHANNELS			6
-#define PSG_CHANNELS		3
-#define EFFECTS_CHANNELS	8
+#define FM_CHANNELS          6
+#define PSG_CHANNELS         3
+#define EFFECTS_CHANNELS     8
 
-#define FM_FLAG_NEED_INITIALIZATION			(1<<0)
-#define FM_FLAG_UNKNOWN2					(1<<1)
-#define FM_FLAG_NOTE_IS_PAUSE				(1<<2)
-#define FM_FLAG_UNKNOWN3					(1<<3)
-#define FM_FLAG_MODULATE_NOTE				(1<<4)
-#define FM_FLAG_MUST_SEND_KEYON				(1<<5)
-#define FM_FLAG_MUST_SEND_CONFIGURATION		(1<<6)
-#define FM_FLAG_ACTIVE						(1<<7)
+#define FM_FLAG_NEED_INITIALIZATION      (1<<0)
+#define FM_FLAG_UNKNOWN2                 (1<<1)
+#define FM_FLAG_NOTE_IS_PAUSE            (1<<2)
+#define FM_FLAG_UNKNOWN3                 (1<<3)
+#define FM_FLAG_MODULATE_NOTE            (1<<4)
+#define FM_FLAG_MUST_SEND_KEYON          (1<<5)
+#define FM_FLAG_MUST_SEND_CONFIGURATION  (1<<6)
+#define FM_FLAG_ACTIVE                   (1<<7)
 
-#define PSG_FLAG_ACTIVE						(1<<0)
-#define PSG_FLAG_NOTE_IS_PAUSE				(1<<1)
-#define PSG_FLAG_NEED_INITIALIZATION		(1<<2)
-#define PSG_FLAG_INITIALIZE_VOLUME			(1<<3)
-#define PSG_FLAG_NOTE_IS_NOISE				(1<<5)
-#define PSG_FLAG_NOISE_NOT_ENABLED			(1<<6)
+#define PSG_FLAG_ACTIVE                  (1<<0)
+#define PSG_FLAG_NOTE_IS_PAUSE           (1<<1)
+#define PSG_FLAG_NEED_INITIALIZATION     (1<<2)
+#define PSG_FLAG_INITIALIZE_VOLUME       (1<<3)
+#define PSG_FLAG_NOTE_IS_NOISE           (1<<5)
+#define PSG_FLAG_NOISE_NOT_ENABLED       (1<<6)
 
-#define EFFECTS_FLAG_NEED_INITIALIZATION	(1<<0)
-#define EFFECTS_FLAG_ACTIVE					(1<<7)
+#define EFFECTS_FLAG_NEED_INITIALIZATION (1<<0)
+#define EFFECTS_FLAG_ACTIVE              (1<<7)
 
-#define NOTE_PAUSE	0x0c
+#define NOTE_PAUSE             0x0c
 
 struct psg_control
 {

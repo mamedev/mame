@@ -192,12 +192,6 @@ static WRITE16_HANDLER( nmk16_mainram_strange_w )
 }
 
 
-
-static MACHINE_RESET( nmk16 )
-{
-	NMK112_init(0, "oki1", "oki2");
-}
-
 static MACHINE_RESET( NMK004 )
 {
 	NMK004_init(machine);
@@ -1082,16 +1076,16 @@ static WRITE8_HANDLER( raphero_sound_rombank_w )
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xbfff ) AM_ROMBANK( "bank1" )
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w )
-	AM_RANGE( 0xc800, 0xc800 ) AM_DEVREADWRITE( "oki1", okim6295_r, okim6295_w )
-	AM_RANGE( 0xc808, 0xc808 ) AM_DEVREADWRITE( "oki2", okim6295_r, okim6295_w )
-	AM_RANGE( 0xc810, 0xc817 ) AM_WRITE( NMK112_okibank_w )
-//  AM_RANGE( 0xc810, 0xc817 ) AM_WRITE( okibank_w )
-	AM_RANGE( 0xd000, 0xd000 ) AM_WRITE( raphero_sound_rombank_w )
-	AM_RANGE( 0xd800, 0xd800 ) AM_READWRITE( soundlatch_r, soundlatch2_w )	// main cpu
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0xc808, 0xc808) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0xc810, 0xc817) AM_DEVWRITE("nmk112", nmk112_okibank_w)
+//  AM_RANGE(0xc810, 0xc817) AM_WRITE(okibank_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(raphero_sound_rombank_w)
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, soundlatch2_w)	// main cpu
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1108,7 +1102,7 @@ static ADDRESS_MAP_START( macross2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
+	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bjtwin_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1120,7 +1114,7 @@ static ADDRESS_MAP_START( bjtwin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_r,okim6295_w, 0x00ff)
 	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_r,okim6295_w, 0x00ff)
-	AM_RANGE(0x084020, 0x08402f) AM_WRITE(NMK112_okibank_lsb_w)
+	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP	/* IRQ enable? */
@@ -3529,6 +3523,10 @@ static INTERRUPT_GEN( nmk_interrupt )
 	else cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
+static const nmk112_interface nmk16_nmk112_intf =
+{
+	"oki1", "oki2", 0
+};
 
 static MACHINE_DRIVER_START( tharrier )
 
@@ -3543,7 +3541,6 @@ static MACHINE_DRIVER_START( tharrier )
 	MDRV_CPU_IO_MAP(tharrier_sound_io_map)
 
 	MDRV_MACHINE_RESET(mustang_sound)
-
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3963,8 +3960,6 @@ static MACHINE_DRIVER_START( ssmissin )
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2) /* 4 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_sound_map)
 
-	MDRV_MACHINE_RESET(nmk16)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
@@ -3986,6 +3981,8 @@ static MACHINE_DRIVER_START( ssmissin )
 	MDRV_SOUND_ADD("oki1", OKIM6295, 8000000/8) /* 1 Mhz, pin 7 high */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( strahl )
@@ -4221,8 +4218,6 @@ static MACHINE_DRIVER_START( macross2 )
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_map)
 	MDRV_CPU_IO_MAP(macross2_sound_io_map)
 
-	MDRV_MACHINE_RESET(nmk16)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
@@ -4252,6 +4247,8 @@ static MACHINE_DRIVER_START( macross2 )
 	MDRV_SOUND_ADD("oki2", OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tdragon2 )
@@ -4265,8 +4262,6 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_map)
 	MDRV_CPU_IO_MAP(macross2_sound_io_map)
-
-	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4297,6 +4292,8 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_SOUND_ADD("oki2", OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+
+	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( raphero )
@@ -4309,8 +4306,6 @@ static MACHINE_DRIVER_START( raphero )
 
 	MDRV_CPU_ADD("audiocpu",TMP90841, 8000000)
 	MDRV_CPU_PROGRAM_MAP(raphero_sound_mem_map)
-
-	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4341,6 +4336,8 @@ static MACHINE_DRIVER_START( raphero )
 	MDRV_SOUND_ADD("oki2", OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bjtwin )
@@ -4350,8 +4347,6 @@ static MACHINE_DRIVER_START( bjtwin )
 	MDRV_CPU_PROGRAM_MAP(bjtwin_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
-
-	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4378,6 +4373,8 @@ static MACHINE_DRIVER_START( bjtwin )
 	MDRV_SOUND_ADD("oki2", OKIM6295, 16000000/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_DRIVER_END
 
 

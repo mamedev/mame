@@ -353,10 +353,6 @@ static MACHINE_RESET( bgaregga )
 	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
 	memory_set_bank(machine, "bank1", 4);
 
-	if (memory_region(machine, "oki1") != NULL)
-		NMK112_init(0, "oki1", "oki2");
-	else
-		NMK112_init(0, "oki", "oki");
 	MACHINE_RESET_CALL(toaplan2);
 }
 
@@ -1091,26 +1087,34 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	NMK112_okibank_w(space, 0,  data		& 0x0f);	// chip 0 bank 0
-	NMK112_okibank_w(space, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 0,  data		& 0x0f);	// chip 0 bank 0
+	nmk112_okibank_w(nmk112, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	NMK112_okibank_w(space, 2,  data		& 0x0f);	// chip 0 bank 2
-	NMK112_okibank_w(space, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 2,  data		& 0x0f);	// chip 0 bank 2
+	nmk112_okibank_w(nmk112, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	NMK112_okibank_w(space, 4,  data		& 0x0f);	// chip 1 bank 0
-	NMK112_okibank_w(space, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 4,  data		& 0x0f);	// chip 1 bank 0
+	nmk112_okibank_w(nmk112, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	NMK112_okibank_w(space, 6,  data		& 0x0f);	// chip 1 bank 2
-	NMK112_okibank_w(space, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 6,  data		& 0x0f);	// chip 1 bank 2
+	nmk112_okibank_w(nmk112, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
 }
 
 
@@ -4043,6 +4047,17 @@ static const UINT8 ts007spy_decryption_table[256] = {
 
 static const nec_config ts007spy_config ={ ts007spy_decryption_table, };
 
+
+static const nmk112_interface bgaregga_nmk112_intf =
+{
+	"oki", "oki", 0
+};
+
+static const nmk112_interface batrider_nmk112_intf =
+{
+	"oki1", "oki2", 0
+};
+
 static MACHINE_DRIVER_START( batsugun )
 
 	/* basic machine hardware */
@@ -4247,6 +4262,8 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
 MACHINE_DRIVER_END
 
 
@@ -4293,6 +4310,8 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32MHz/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", batrider_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbakraid )
