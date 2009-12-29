@@ -213,6 +213,8 @@ static void i_aad(nec_state_t *nec_state);
 static void i_setalc(nec_state_t *nec_state);
 static void i_trans(nec_state_t *nec_state);
 static void i_fpo(nec_state_t *nec_state);
+static void i_mov_pre_r8b(nec_state_t *nec_state);
+static void i_mov_pre_r16w(nec_state_t *nec_state);
 static void i_loopne(nec_state_t *nec_state);
 static void i_loope(nec_state_t *nec_state);
 static void i_loop(nec_state_t *nec_state);
@@ -264,7 +266,7 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
     i_or_ald8,          /* 0x0c */
     i_or_axd16,         /* 0x0d */
     i_push_cs,          /* 0x0e */
-	i_pre_nec			/* 0x0f */,
+    i_pre_nec		/* 0x0f */,
     i_adc_br8,          /* 0x10 */
     i_adc_wr16,         /* 0x11 */
     i_adc_r8b,          /* 0x12 */
@@ -379,7 +381,7 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
     i_jnle,             /* 0x7f */
     i_80pre,            /* 0x80 */
     i_81pre,            /* 0x81 */
-	i_82pre,			/* 0x82 */
+    i_82pre,		/* 0x82 */
     i_83pre,            /* 0x83 */
     i_test_br8,         /* 0x84 */
     i_test_wr16,        /* 0x85 */
@@ -463,12 +465,12 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
     i_rotshft_wcl,      /* 0xd3 */
     i_aam,              /* 0xd4 */
     i_aad,              /* 0xd5 */
-    i_setalc,
+    i_setalc,		/* 0xd6 */
     i_trans,            /* 0xd7 */
     i_fpo,              /* 0xd8 */
     i_fpo,              /* 0xd9 */
-    i_fpo,              /* 0xda */
-    i_fpo,              /* 0xdb */
+    i_mov_pre_r8b,      /* 0xda wrong? */
+    i_mov_pre_r16w,     /* 0xdb wrong? */
     i_fpo,              /* 0xdc */
     i_fpo,              /* 0xdd */
     i_fpo,              /* 0xde */
@@ -493,14 +495,14 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
     i_invalid,          /* 0xf1 */
     i_repne,            /* 0xf2 */
     i_repe,             /* 0xf3 */
-    i_hlt,				/* 0xf4 */
+    i_hlt,		/* 0xf4 */
     i_cmc,              /* 0xf5 */
     i_f6pre,            /* 0xf6 */
     i_f7pre,            /* 0xf7 */
     i_clc,              /* 0xf8 */
     i_stc,              /* 0xf9 */
-    i_di,              /* 0xfa */
-    i_ei,              /* 0xfb */
+    i_di,		/* 0xfa */
+    i_ei,		/* 0xfb */
     i_cld,              /* 0xfc */
     i_std,              /* 0xfd */
     i_fepre,            /* 0xfe */

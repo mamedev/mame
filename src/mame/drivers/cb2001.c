@@ -46,14 +46,14 @@ In test mode (c) is 2000
 #define xxxx 0x90 /* Unknown */
 
 static const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,0x94,xxxx,0x80,0x61,0x12,0x27, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//    pppp      ????      pppp ???? pppp p?p?  pppp           p?p?
-	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0xbb,0x1f, /* 10 */
-//                   p?p? pppp                 pppp      ???? pppp pppp pppp pppp pppp
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, xxxx,xxxx,xxxx,0x75,0x33,xxxx,xxxx,xxxx, /* 20 */
-//         !!!!      pppp      ???? pppp                      pppp ????
+	0xe8,xxxx,xxxx,xxxx,0x80,0x61,0x12,0x27, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,xxxx, /* 00 */
+//    pppp                pppp ???? pppp p?p?  pppp           p?p?
+	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0xa2,0x1f, /* 10 */
+//                   p?p? pppp                 pppp      ???? pppp pppp pppp p?p? pppp
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,0x33,xxxx,xxxx,xxxx, /* 20 */
+//         !!!!      pppp      pppp p?p?                      pppp ????
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
-//    ????                          pppp                 ????           ???? ???? pppp
+//    ????                          p?p?                 ????           ???? p?p? pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,xxxx, /* 40 */
 //         !!!!                gggg                 pppp           pppp
 	xxxx,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
@@ -62,16 +62,16 @@ static const UINT8 cb2001_decryption_table[256] = {
 //                        pppp                 pppp ????                pppp gggg
 	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
 //    pppp      pppp                pppp       pppp      ????           pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
-//                                       ????            pppp      pppp      ????
+	0x26,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+//    pppp                               ????            pppp      pppp      ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
-//              ????           p?p?                                pppp
-	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xfc,xxxx,0x51,xxxx,xxxx,0x1a, /* A0 */
-//                   ???? ???? ????      !!!!            ????      pppp           pppp
-	0x75,xxxx,0xb4,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
-//    ????      pppp                                     pppp      pppp      ???? ????
+//              pppp           p?p?                                pppp
+	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xdb,xxxx,0x51,xxxx,xxxx,0x1a, /* A0 */
+//                   pppp pppp ????      !!!!            p?p?      pppp           pppp
+	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
+//    pppp      pppp           ????                      pppp      pppp      pppp ????
 	xxxx,0xec,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x2e,xxxx, /* C0 */
-//         pppp ????           pppp                                          pppp
+//         pppp pppp           pppp                                          pppp
 	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //              pppp      ????           pppp  pppp                     ???? !!!! pppp
 	0x8a,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
@@ -82,10 +82,35 @@ static const UINT8 cb2001_decryption_table[256] = {
 
 /* robiza's notes:
 
+aa opcode:
+e0086 aa
+e0087 3e cc 00          mov iy,0cc
+e008a aa
+e008b 36 1c 05          mov ix,51c
+e008e 9c 08 00          mov cw,8h
+e0091 23 26             cmp4s
+e0093 78 03             bc e0098
+
+probably "aa" is an undocumented opcode
+
+1) aa 1e ## ## -> bb mov bw,####
+_     1e ## ## -> 89 mov 
+
+2) aa 26 ## ## -> bc mov sp,####
+_     26 ##    -> b5 mov ch,##
+
+3) aa 36 ## ## -> be mov ix,####
+_     36       -> ????
+
+4) aa 3e ## ## -> bf mov iy,####
+_     3e       -> ????
+
+e01f7-e0204 (b0 -> ac) (ce -> 2e) (a4 -> aa) : this routine write the "dyna..." string in nvram
+
 e0022 a5         push psw ?
 e0023 d4         push r ?
-e0024 bc         push ds0 (bc -> 1e)
-e0025 a3         push ds1 ?
+e0024 bc         push ds0                                                          (bc -> 1e)
+e0025 a3         push ds1                                                          (a3 -> 06)
 e0026 dd         di ?
 e0027 a7 00 00   mov aw,0
 e002a 21 d8      mov ds0,aw
@@ -137,13 +162,13 @@ e0035 49 d3 06   mov [6d3],al
 
 
 
-e00a6 be         pop ds1 ?
-e00a7 1f         pop ds0 (1f -> 1f)
+e00a6 be         pop ds1                                                             (be -> 07)
+e00a7 1f         pop ds0                                                             (1f -> 1f)
 e00a8 05         pop r ?
 e0030 30         pop psw ?
 e00aa cb         ?
 e00ab 54         ?
-e00ac 23 92      fint
+e00ac 23 92      fint                                                                (23 -> 0f)
 e00ae bf         reti
 
 
@@ -182,8 +207,8 @@ cmv4                          cb2001                     (en -> de)
 029f ld b,$fc
 02a1 call $0c38               e0239 call 0e30b8h
 02a4 ld hl,$d023              e023d mov ix,90h           (36 -> be)
-02a7 call $2b2d               e0240 call 0e32a6h
-  2b2d ld a,$01                 e32a6 mov al,1h
+02a7 call $2b2d               e0240 call 0e32a6h         (00 -> e8)
+  2b2d ld a,$01                 e32a6 mov al,1h                                                                           c3ecf
   2b2f or a                     e32a8 and al,al
   2b30 add a,(hl)               e32aa add al,b ptr [ix]
   2b31 daa                      e32ac daa                (13 -> 27) not sure
@@ -288,40 +313,22 @@ cmv4                          cb2001                     (en -> de)
 
 -------------------------------------------------
 
-56 -> ????
 
-5c -> conditional jmp for sure
+56 -> 42 (inc dw or dec dw)
 
 aa -> ????
 92 -> e9 (probably)
 1c ????
-d8 ????
 dd -> fa (di)
 
-guessed:
-45 -> b0 (mov al,#value)
-6e -> ba (mov dw,#value)
-c2 -> ee (out dw,al)
-
-probably:
-
-2b -> conditional jmp for sure (75)
-36 -> be
-9c -> it's a counter (like mov cw,#value) -> not sure the register (cw,bw,....) -> b9 (cw)
-c5 -> 75 (loop?)
-
-very probably:
-00 -> e8 (call)
+checked against gussun (from 10000) and quizf1 (start up code):
 41 -> ea (jmp_far)
-70 -> c3 (ret)
-
-checked against gussun and quizf1 (start up code):
 21 -> 8e
 a7 -> b8
 de -> c7
 e3 -> c6
 
-opcodes: 36,9c,00,18,d8,d2,c5,70 probably:
+opcodes: 18,c5 probably:
 e1af1 36 62 06 mov ix,0662
       9c 04 00 mov cw,0004
       00 94 17 call e328e
