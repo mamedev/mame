@@ -423,12 +423,49 @@ static ADDRESS_MAP_START( backgamn_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( ramdac_io_w )
+{
+	static int pal_offs,r,g,b,internal_pal_offs;
+
+	switch(offset)
+	{
+		case 0:
+			pal_offs = data;
+			internal_pal_offs = 0;
+			break;
+		case 2:
+			//mask pen reg
+			break;
+		case 1:
+			switch(internal_pal_offs)
+			{
+				case 0:
+					r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					internal_pal_offs++;
+					break;
+				case 1:
+					g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					internal_pal_offs++;
+					break;
+				case 2:
+					b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
+					internal_pal_offs = 0;
+					pal_offs++;
+					pal_offs&=0xff;
+					break;
+			}
+
+			break;
+	}
+}
+
 static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//400000-40001f?
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-//  AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
+	AM_RANGE(0x800088, 0x80008d) AM_WRITE8(ramdac_io_w, 0x00ff)
+	AM_RANGE(0x800100, 0x800101) AM_RAM //???
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
@@ -642,6 +679,9 @@ static MACHINE_DRIVER_START( funland )
 	MDRV_IMPORT_FROM( skattv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(funland_mem)
+
+	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_INIT(all_black)
 MACHINE_DRIVER_END
 
 ROM_START( quickjac )
