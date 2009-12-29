@@ -48,12 +48,12 @@ In test mode (c) is 2000
 static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,0x61,0x12,0x27, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,xxxx, /* 00 */
 //    pppp                pppp ???? pppp p?p?  pppp           p?p?
-	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0xa2,0x1f, /* 10 */
-//                   p?p? pppp                 pppp      ???? pppp pppp pppp p?p? pppp
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,0x33,xxxx,xxxx,xxxx, /* 20 */
-//         !!!!      pppp      pppp p?p?                      pppp ????
-	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
-//    ????                          p?p?                 ????           ???? p?p? pppp
+	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
+//                   p?p? pppp                 pppp      ???? pppp pppp pppp pppp pppp
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, xxxx,xxxx,xxxx,0x75,0x33,xxxx,xxxx,xxxx, /* 20 */
+//         !!!!      pppp      pppp pppp                      pppp ????
+	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
+//    ????                                               ????           ????      pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,xxxx, /* 40 */
 //         !!!!                gggg                 pppp           pppp
 	xxxx,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
