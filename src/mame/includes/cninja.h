@@ -6,6 +6,7 @@ VIDEO_START( robocop2 );
 VIDEO_START( stoneage );
 VIDEO_START( mutantf );
 VIDEO_UPDATE( cninja );
+VIDEO_UPDATE( cninjabl );
 VIDEO_UPDATE( edrandy );
 VIDEO_UPDATE( robocop2 );
 VIDEO_UPDATE( mutantf );

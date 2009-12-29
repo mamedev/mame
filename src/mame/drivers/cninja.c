@@ -72,19 +72,6 @@ static WRITE16_HANDLER( stoneage_sound_w )
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	int scanline = param;
-
-	/* Save state of scroll registers before the IRQ */
-	deco16_raster_display_list[deco16_raster_display_position++] = scanline;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[1] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[2] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[3] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[4] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[1] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[2] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[3] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[4] & 0xffff;
-
 	cputag_set_input_line(timer->machine, "maincpu", (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
 	timer_device_adjust_oneshot(raster_irq_timer, attotime_never, 0);
 }
@@ -122,7 +109,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
+		{
 			timer_device_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, cninja_scanline, 0), cninja_scanline);
+		}
 		else
 			timer_device_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		return;
@@ -153,16 +142,30 @@ static READ16_HANDLER( robocop2_prot_r )
 
 /**********************************************************************************/
 
+static WRITE16_HANDLER( deco16_pf12_control_w )
+{
+	COMBINE_DATA(&deco16_pf12_control[offset]);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+}
+
+
+static WRITE16_HANDLER( deco16_pf34_control_w )
+{
+	COMBINE_DATA(&deco16_pf34_control[offset]);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+}
+
+
 static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -190,13 +193,13 @@ static ADDRESS_MAP_START( cninjabl_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* bootleg sprite-ram (sprites rewritten here in new format) */
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control) // not used / incorrect on this
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control) // not used / incorrect on this
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -218,13 +221,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -242,16 +245,17 @@ static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1bc800, 0x1bcfff) AM_WRITENOP /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( robocop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -281,13 +285,13 @@ static ADDRESS_MAP_START( mutantf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READWRITE(deco16_71_r, buffer_spriteram16_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w)
 
-	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x304000, 0x305fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x306000, 0x307fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x30a000, 0x30a7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x310000, 0x31000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x310000, 0x31000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x314000, 0x315fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x316000, 0x317fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x318000, 0x3187ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -770,7 +774,6 @@ static MACHINE_DRIVER_START( cninja )
 
 	MDRV_VIDEO_START(cninja)
 	MDRV_VIDEO_UPDATE(cninja)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -820,7 +823,6 @@ static MACHINE_DRIVER_START( stoneage )
 
 	MDRV_VIDEO_START(stoneage)
 	MDRV_VIDEO_UPDATE(cninja)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -866,9 +868,8 @@ static MACHINE_DRIVER_START( cninjabl )
 	MDRV_GFXDECODE(cninjabl)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(stoneage)
-	MDRV_VIDEO_UPDATE(cninja)
-	MDRV_VIDEO_EOF(cninja)
+	MDRV_VIDEO_START(cninja)
+	MDRV_VIDEO_UPDATE(cninjabl)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -912,7 +913,6 @@ static MACHINE_DRIVER_START( edrandy )
 
 	MDRV_VIDEO_START(edrandy)
 	MDRV_VIDEO_UPDATE(edrandy)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -962,7 +962,6 @@ static MACHINE_DRIVER_START( robocop2 )
 
 	MDRV_VIDEO_START(robocop2)
 	MDRV_VIDEO_UPDATE(robocop2)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

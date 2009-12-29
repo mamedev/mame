@@ -972,8 +972,6 @@ VIDEO_START( captaven )
 	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
 	pf3_tilemap = tilemap_create(machine, get_ca_pf3_tile_info, tilemap_scan_rows,16,16,32,32);
-	deco32_raster_display_list=auto_alloc_array(machine, UINT16, 10 * 256 / 2);
-	memset(deco32_raster_display_list, 0, 10 * 256);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1a_tilemap,0);
@@ -1000,7 +998,6 @@ VIDEO_START( fghthist )
 	tilemap_set_transparent_pen(pf2_tilemap,0);
 	tilemap_set_transparent_pen(pf3_tilemap,0);
 
-	deco32_raster_display_list=0;
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 	has_ace_ram=0;
 }
@@ -1072,7 +1069,6 @@ VIDEO_START( nslasher )
 	tilemap_set_transparent_pen(pf3_tilemap,0);
 	memset(dirty_palette,0,4096);
 
-	deco32_raster_display_list=0;
 	deco32_pf2_colourbank=16;
 	deco32_pf4_colourbank=16;
 	state_save_register_global(machine, deco32_pri);
@@ -1084,7 +1080,6 @@ VIDEO_START( nslasher )
 VIDEO_EOF( captaven )
 {
 	memcpy(machine->generic.buffered_spriteram.u32,machine->generic.spriteram.u32,machine->generic.spriteram_size);
-	deco32_raster_display_position=0;
 }
 
 VIDEO_EOF( dragngun )
@@ -1153,37 +1148,6 @@ static void deco32_setup_scroll(tilemap_t *pf_tilemap, UINT16 height, UINT8 cont
 	}
 }
 
-static void tilemap_raster_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
-{
-	int ptr=0,start,end=0;
-	rectangle clip;
-	int overflow=deco32_raster_display_position;
-
-	clip.min_x = cliprect->min_x;
-	clip.max_x = cliprect->max_x;
-
-	/* Finish list up to end of visible display */
-	deco32_raster_display_list[overflow++]=255;
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[1];
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[2];
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[3];
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[4];
-
-	while (ptr<overflow) {
-		start=end;
-		end=deco32_raster_display_list[ptr++];
-		deco32_pf12_control[1]=deco32_raster_display_list[ptr++];
-		deco32_pf12_control[2]=deco32_raster_display_list[ptr++];
-		deco32_pf12_control[3]=deco32_raster_display_list[ptr++];
-		deco32_pf12_control[4]=deco32_raster_display_list[ptr++];
-
-		clip.min_y = start;
-		clip.max_y = end;
-
-		deco32_setup_scroll(pf2_tilemap, 512,(deco32_pf12_control[5]>>8)&0xff,(deco32_pf12_control[6]>>8)&0xff,deco32_pf12_control[4],deco32_pf12_control[3],deco32_pf2_rowscroll,deco32_pf2_rowscroll+0x200);
-		tilemap_draw(bitmap,&clip,pf2_tilemap,flags,pri);
-	}
-}
 
 static void combined_tilemap_draw(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -1266,16 +1230,10 @@ VIDEO_UPDATE( captaven )
 		else
 			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-		if (deco32_raster_display_position)
-			tilemap_raster_draw(bitmap,cliprect,0,2);
-		else
-			tilemap_draw(bitmap,cliprect,pf2_tilemap,0,2);
+		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,2);
 	} else {
 		if (pf2_enable) {
-			if (deco32_raster_display_position)
-				tilemap_raster_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
-			else
-				tilemap_draw(bitmap,cliprect,pf2_tilemap,0,1);
+			tilemap_draw(bitmap,cliprect,pf2_tilemap,0,1);
 		}
 		else
 			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));

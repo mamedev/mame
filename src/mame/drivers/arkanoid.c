@@ -1088,6 +1088,28 @@ ROM_START( block2 )
 	ROM_LOAD( "a75-09.bpr",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
 ROM_END
 
+// this set has the same 'space invader' scrambled block gfx, and unknown (sound?) rom as the one above
+//  sadly no mention of what chip it might be for in the readme.
+ROM_START( arkbloc3 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "blockbl.001",         0x00000, 0x8000, CRC(bf7197a0) SHA1(4fbc0cbc09d292ab0f2e4a35b30505b2f7e4dc0d) )
+	ROM_LOAD( "blockbl.002",         0x08000, 0x8000, CRC(29dbe452) SHA1(b99cb98549bddf1e673e2e715c80664001581f9f) )
+
+	ROM_REGION( 0x8000, "unknown", 0 )	/* is it more data or something else like sound or palette ? not Z80 code nor levels anyway */
+	ROM_LOAD( "blockbl.006",         0x00000, 0x8000, CRC(e336c219) SHA1(e1dce37727e7084a83e73f15a138312ab6224061) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "blockbl.003",   0x00000, 0x8000, CRC(6d2c6123) SHA1(26f32099d363ab2c8505722513638b827e49a8fc) )
+	ROM_LOAD( "blockbl.004",   0x08000, 0x8000, CRC(09a1f9d9) SHA1(c7e21aba6efb51c5501aa1428f6d9a817cb86555) )
+	ROM_LOAD( "blockbl.005",   0x10000, 0x8000, CRC(dfb9f7e2) SHA1(8d938ee6f8dcac0a564d5fa7cd5da34e0db07c71) )
+
+	// no proms were present in this set.. assumed to be the same
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "a75-07.bpr",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )	/* red component */
+	ROM_LOAD( "a75-08.bpr",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )	/* green component */
+	ROM_LOAD( "a75-09.bpr",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
+ROM_END
+
 ROM_START( arkblock )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ark-6.bin",    0x0000, 0x8000, CRC(0be015de) SHA1(f4209085b59d2c96a62ac9657c7bf097da55362b) )
@@ -1365,9 +1387,10 @@ GAME( 1986, arkmcubl,   arkanoid, arkanoid, arknoidj, 0,        ROT90, "bootleg"
 GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc,  arkangc,  ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkangc2, ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, block2,     arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block 2 (S.P.A. CO. bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkblock,   arkanoid, bootleg,  arkangc,  arkblock, ROT90, "bootleg", "Block (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkbloc2,   arkanoid, bootleg,  arkangc,  arkbloc2, ROT90, "bootleg", "Block (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkbloc3,   arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block (Game Corporation bootleg, set 3)", GAME_SUPPORTS_SAVE )// Both these sets have an extra unknown rom
+GAME( 1986, block2,     arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block 2 (S.P.A. CO. bootleg)", GAME_SUPPORTS_SAVE )           //  and scrambled gfx roms with 'space invader' themed gfx 
 GAME( 1986, arkgcbl,    arkanoid, bootleg,  arkgcbl,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkgcbla,   arkanoid, bootleg,  arkgcbl,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )

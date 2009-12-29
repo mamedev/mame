@@ -97,55 +97,6 @@ VIDEO_START( mutantf )
 
 /******************************************************************************/
 
-VIDEO_EOF( cninja )
-{
-	deco16_raster_display_position=0;
-}
-
-static void raster_pf3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
-{
-	tilemap_t *tmap=deco16_get_tilemap(2,0);
-	int ptr=0,start,end=0;
-	rectangle clip;
-	int overflow=deco16_raster_display_position;
-
-	clip.min_x = cliprect->min_x;
-	clip.max_x = cliprect->max_x;
-
-	/* Finish list up to end of visible display */
-	deco16_raster_display_list[overflow++]=255;
-	deco16_raster_display_list[overflow++]=deco16_pf12_control[1];
-	deco16_raster_display_list[overflow++]=deco16_pf12_control[2];
-	deco16_raster_display_list[overflow++]=deco16_pf12_control[3];
-	deco16_raster_display_list[overflow++]=deco16_pf12_control[4];
-	deco16_raster_display_list[overflow++]=deco16_pf34_control[1];
-	deco16_raster_display_list[overflow++]=deco16_pf34_control[2];
-	deco16_raster_display_list[overflow++]=deco16_pf34_control[3];
-	deco16_raster_display_list[overflow++]=deco16_pf34_control[4];
-
-	while (ptr<overflow) {
-		start=end;
-		end=deco16_raster_display_list[ptr++];
-
-		/* Restore state of registers before IRQ */
-		deco16_pf12_control[1]=deco16_raster_display_list[ptr++];
-		deco16_pf12_control[2]=deco16_raster_display_list[ptr++];
-		deco16_pf12_control[3]=deco16_raster_display_list[ptr++];
-		deco16_pf12_control[4]=deco16_raster_display_list[ptr++];
-		deco16_pf34_control[1]=deco16_raster_display_list[ptr++];
-		deco16_pf34_control[2]=deco16_raster_display_list[ptr++];
-		deco16_pf34_control[3]=deco16_raster_display_list[ptr++];
-		deco16_pf34_control[4]=deco16_raster_display_list[ptr++];
-
-		clip.min_y = start;
-		clip.max_y = end;
-
-		/* Update tilemap for this register state, and draw */
-		deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
-		tilemap_draw(bitmap,&clip,tmap,flags,pri);
-	}
-}
-
 /******************************************************************************/
 
 static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -217,6 +168,104 @@ static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 		}
 	}
 }
+
+/* The bootleg sprites are in a different format! */
+static void cninjabl_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	int offs;
+	int endoffs;
+
+	// bootleg seems to use 0x180 as an end of list marker
+	// find it first, so we can use normal list processing
+	endoffs = 0x400-4;
+	for (offs = 0;offs <0x400-4 ;offs += 4)
+	{
+		int y;
+
+		y = buffered_spriteram16[offs+1];
+
+		if (y==0x180)
+		{
+			endoffs = offs;
+			offs = 0x400-4;
+		}
+	}
+
+	for (offs = endoffs;offs >=0 ;offs -= 4)
+	{
+		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult,pri=0;
+
+		sprite = buffered_spriteram16[offs+0]; // changed on bootleg!
+		y = buffered_spriteram16[offs+1]; // changed on bootleg!
+
+		if (!sprite) continue;
+		
+		x = buffered_spriteram16[offs+2];
+
+		/* Sprite/playfield priority */
+		switch (x&0xc000) {
+		case 0x0000: pri=0; break;
+		case 0x4000: pri=0xf0; break;
+		case 0x8000: pri=0xf0|0xcc; break;
+		case 0xc000: pri=0xf0|0xcc; break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+		}
+
+
+
+		flash=y&0x1000;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+
+		colour = (x >> 9) &0x1f;
+
+
+		fx = y & 0x2000;
+		fy = y & 0x4000;
+
+		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
+		
+		y -= multi*16; // changed on bootleg!
+		y += 4;
+
+		x = x & 0x01ff;
+		y = y & 0x01ff;
+		if (x >= 256) x -= 512;
+		if (y >= 256) y -= 512;
+		x = 240 - x;
+		y = 240 - y;
+
+		//sprite &= ~multi;
+		if (fy)
+			inc = -1;
+		else
+		{
+			sprite += multi;
+			inc = 1;
+		}
+
+		if (flip_screen_get(machine)) {
+			y=240-y;
+			x=240-x;
+			if (fx) fx=0; else fx=1;
+			if (fy) fy=0; else fy=1;
+			mult=16;
+		}
+		else mult=-16;
+
+		while (multi >= 0)
+		{
+			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+					sprite - multi * inc,
+					colour,
+					fx,fy,
+					x,y + mult * multi,
+					machine->priority_bitmap,pri,0);
+
+			multi--;
+		}
+	}
+}
+
 
 static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -414,6 +463,24 @@ VIDEO_UPDATE( cninja )
 	return 0;
 }
 
+VIDEO_UPDATE( cninjabl )
+{
+	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
+	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
+	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
+
+	/* Draw playfields */
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,512);
+	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
+	deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER0,4);
+	cninjabl_draw_sprites(screen->machine,bitmap,cliprect);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	return 0;
+}
+
 VIDEO_UPDATE( edrandy )
 {
 	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
@@ -423,10 +490,7 @@ VIDEO_UPDATE( edrandy )
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
-	if (deco16_raster_display_position)
-		raster_pf3_draw(bitmap,cliprect,0,2);
-	else
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+	deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,4);
 	cninja_draw_sprites(screen->machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
@@ -461,17 +525,11 @@ VIDEO_UPDATE( robocop2 )
 	switch (deco16_priority&0x8) {
 		case 8:
 			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
-			if (deco16_raster_display_position)
-				raster_pf3_draw(bitmap,cliprect,0,4);
-			else
-				deco16_tilemap_3_draw(screen,bitmap,cliprect,0,4);
+			deco16_tilemap_3_draw(screen,bitmap,cliprect,0,4);
 			break;
 		default:
 		case 0:
-			if (deco16_raster_display_position)
-				raster_pf3_draw(bitmap,cliprect,0,2);
-			else
-				deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+			deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
 			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,4);
 			break;
 	}

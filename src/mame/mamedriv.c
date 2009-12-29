@@ -1805,6 +1805,7 @@ const game_driver * const drivers[] =
 	DRIVER( arkangc2 )	/* bootleg */
 	DRIVER( arkblock )	/* bootleg */
 	DRIVER( arkbloc2 )	/* bootleg */
+	DRIVER( arkbloc3 )	/* bootleg */
 	DRIVER( arkgcbl )	/* bootleg */
 	DRIVER( arkgcbla )	/* bootleg */
 	DRIVER( paddle2 )	/* bootleg */
@@ -9365,9 +9366,6 @@ Other Sun games
 	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
 
 	/* Dyna */
-	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
-	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
-
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */
@@ -9378,7 +9376,14 @@ Other Sun games
 	DRIVER( cmaster )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmasterbv )	/* (c) 1991 Dyna Electronics / Gerald Duhamel?*/
+	DRIVER( cmasterd )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmastere )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmasterf )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmast92 )	/* (c) 1992 Dyna Electronics */
+	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
+	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
 
 	/* STG? */
 	DRIVER( queen )
