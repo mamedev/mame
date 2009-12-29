@@ -57,6 +57,7 @@
 
 
 #if (DIRECT3D_VERSION >= 0x0900)
+#ifndef __WINE_D3D9TYPES_H
 // the following used to be TEXTURESTAGESTATES but are now SAMPLERSTATES
 enum
 {
@@ -70,6 +71,7 @@ enum
     D3DTSS_MAXMIPLEVEL    = 20,
     D3DTSS_MAXANISOTROPY  = 21
 };
+#endif
 #endif
 
 

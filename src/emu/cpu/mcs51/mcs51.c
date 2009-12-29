@@ -1977,7 +1977,7 @@ static CPU_EXECUTE( mcs51 )
 
 		/* decrement the timed access window */
 		if (mcs51_state->features & FEATURE_DS5002FP)
-			mcs51_state->ds5002fp.ta_window = (mcs51_state->ds5002fp.ta_window ? mcs51_state->ds5002fp.ta_window-- : 0x00);
+			mcs51_state->ds5002fp.ta_window = (mcs51_state->ds5002fp.ta_window ? (mcs51_state->ds5002fp.ta_window - 1) : 0x00);
 
 		/* If the chip entered in idle mode, end the loop */
 		if ((mcs51_state->features & FEATURE_CMOS) && GET_IDL)

@@ -141,7 +141,9 @@ static int is_double_click_start(int argc);
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info);
 static const char *lookup_symbol(UINT32 address);
+#ifndef PTR64
 static int get_code_base_size(UINT32 *base, UINT32 *size);
+#endif
 
 static void start_profiler(void);
 static void stop_profiler(void);
@@ -364,7 +366,7 @@ void osd_init(running_machine *machine)
 		assert_always(watchdog_reset_event != NULL, "Failed to create watchdog reset event");
 		watchdog_exit_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 		assert_always(watchdog_exit_event != NULL, "Failed to create watchdog exit event");
-		watchdog_thread = CreateThread(NULL, 0, watchdog_thread_entry, (LPVOID)watchdog, 0, NULL);
+		watchdog_thread = CreateThread(NULL, 0, watchdog_thread_entry, (LPVOID)(FPTR)watchdog, 0, NULL);
 		assert_always(watchdog_thread != NULL, "Failed to create watchdog thread");
 	}
 }
@@ -706,6 +708,7 @@ static const char *lookup_symbol(UINT32 address)
 //  get_code_base_size
 //============================================================
 
+#ifndef PTR64
 static int get_code_base_size(UINT32 *base, UINT32 *size)
 {
 	FILE *	map = fopen(mapfile_name, "r");
@@ -728,6 +731,7 @@ static int get_code_base_size(UINT32 *base, UINT32 *size)
 	fclose(map);
 	return result;
 }
+#endif
 
 
 #if ENABLE_PROFILER

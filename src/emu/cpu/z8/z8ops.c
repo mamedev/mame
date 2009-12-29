@@ -556,7 +556,7 @@ static int check_condition_code(z8_state *cpustate, int cc)
 	case CC_T:		truth = 1; break;
 	case CC_GE:		truth = !(flag(S) ^ flag(V)); break;
 	case CC_GT:		truth = !(flag(Z) | (flag(S) ^ flag(V))); break;
-	case CC_UGT:	truth = (!flag(C) & !flag(Z)); break;
+	case CC_UGT:	truth = ((!flag(C)) & (!flag(Z))); break;
 	case CC_NOV:	truth = !flag(V); break;
 	case CC_PL:		truth = !flag(S); break;
 	case CC_NZ:		truth = !flag(Z); break;

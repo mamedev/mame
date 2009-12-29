@@ -5101,7 +5101,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 					else if (spritedata==0x3f)
 					{
 						/* This is a Shadow operator set shadow bit */
-						video_renderline[x] = video_renderline[x]|=0x2000;
+						video_renderline[x] = video_renderline[x]|0x2000;
 					}
 					else
 					{

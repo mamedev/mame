@@ -457,7 +457,7 @@ void check_unfreed_mem(void)
 				if (total == 0)
 					fprintf(stderr, "--- memory leak warning ---\n");
 				total += entry->size;
-				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", entry->id, entry->size, entry->file, entry->line);
+				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", entry->id, entry->size, entry->file, (int)entry->line);
 			}
 
 		memory_lock_release();

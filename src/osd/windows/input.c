@@ -193,10 +193,10 @@ struct _device_info
 
 
 // RawInput APIs
-typedef WINUSERAPI INT (WINAPI *get_rawinput_device_list_ptr)(OUT PRAWINPUTDEVICELIST pRawInputDeviceList, IN OUT PINT puiNumDevices, IN UINT cbSize);
-typedef WINUSERAPI INT (WINAPI *get_rawinput_data_ptr)(IN HRAWINPUT hRawInput, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize, IN UINT cbSizeHeader);
-typedef WINUSERAPI INT (WINAPI *get_rawinput_device_info_ptr)(IN HANDLE hDevice, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize);
-typedef WINUSERAPI BOOL (WINAPI *register_rawinput_devices_ptr)(IN PCRAWINPUTDEVICE pRawInputDevices, IN UINT uiNumDevices, IN UINT cbSize);
+typedef /*WINUSERAPI*/ INT (WINAPI *get_rawinput_device_list_ptr)(OUT PRAWINPUTDEVICELIST pRawInputDeviceList, IN OUT PINT puiNumDevices, IN UINT cbSize);
+typedef /*WINUSERAPI*/ INT (WINAPI *get_rawinput_data_ptr)(IN HRAWINPUT hRawInput, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize, IN UINT cbSizeHeader);
+typedef /*WINUSERAPI*/ INT (WINAPI *get_rawinput_device_info_ptr)(IN HANDLE hDevice, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize);
+typedef /*WINUSERAPI*/ BOOL (WINAPI *register_rawinput_devices_ptr)(IN PCRAWINPUTDEVICE pRawInputDevices, IN UINT uiNumDevices, IN UINT cbSize);
 
 
 

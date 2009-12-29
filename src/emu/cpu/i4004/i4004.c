@@ -395,7 +395,7 @@ static void execute_one(i4004_state *cpustate, int opcode)
 			cpustate->C = 0;
 			break;
 		case 0xf2: /* IAC */
-			cpustate->A = cpustate->A++;
+			cpustate->A += 1;
 			cpustate->C = cpustate->A >> 4;
 			cpustate->A &= 0x0f;
 			break;

@@ -1246,9 +1246,9 @@ INLINE void LMS(running_machine *machine, int new_cmd)
     {
     	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		int addr = RDANTIC(space);
-        antic.doffs = ++antic.doffs & DOFFS;
+        antic.doffs = (antic.doffs + 1) & DOFFS;
         addr += 256 * RDANTIC(space);
-        antic.doffs = ++antic.doffs & DOFFS;
+        antic.doffs = (antic.doffs + 1) & DOFFS;
         antic.vpage = addr & VPAGE;
         antic.voffs = addr & VOFFS;
 		LOG(("           LMS $%04x\n", addr));
@@ -1284,7 +1284,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 				UINT8 new_cmd;
 
 				new_cmd = RDANTIC(space);
-				antic.doffs = ++antic.doffs & DOFFS;
+				antic.doffs = (antic.doffs + 1) & DOFFS;
 				/* steal at one clock cycle from the CPU for fetching the command */
                 antic.steal_cycles += 1;
 				LOG(("           ANTIC CMD $%02x\n", new_cmd));
@@ -1347,7 +1347,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					if( new_cmd & ANTIC_LMS )
 					{
 						int addr = RDANTIC(space);
-                        antic.doffs = ++antic.doffs & DOFFS;
+                        antic.doffs = (antic.doffs + 1) & DOFFS;
                         addr += 256 * RDANTIC(space);
                         antic.dpage = addr & DPAGE;
                         antic.doffs = addr & DOFFS;
@@ -1360,7 +1360,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					else
 					{
 						int addr = RDANTIC(space);
-                        antic.doffs = ++antic.doffs & DOFFS;
+                        antic.doffs = (antic.doffs + 1) & DOFFS;
                         addr += 256 * RDANTIC(space);
                         antic.dpage = addr & DPAGE;
                         antic.doffs = addr & DOFFS;

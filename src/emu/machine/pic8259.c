@@ -307,7 +307,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 							}
 							break;
 						case 0x80:
-							pic8259->prio = ++pic8259->prio & 7;
+							pic8259->prio = (pic8259->prio + 1) & 7;
 							break;
 						case 0xa0:
 							for (n = 0, mask = 1<<pic8259->prio; n < 8; n++, mask = (mask<<1) | (mask>>7))
@@ -315,7 +315,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 								if( pic8259->isr & mask )
 								{
 									pic8259->isr &= ~mask;
-									pic8259->prio = ++pic8259->prio & 7;
+									pic8259->prio = (pic8259->prio + 1) & 7;
 									break;
 								}
 							}
@@ -328,7 +328,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 							{
 								pic8259->isr &= ~mask;
 								pic8259->irr &= ~mask;
-								pic8259->prio = ++pic8259->prio & 7;
+								pic8259->prio = (pic8259->prio + 1) & 7;
 							}
 							break;
 					}

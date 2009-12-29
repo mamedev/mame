@@ -421,7 +421,7 @@ static MACHINE_RESET( spdodgeb )
 {
 	toggle = 0;
 	adpcm_pos[0] = adpcm_pos[1] = 0;
-	adpcm_end[0] = adpcm_end[0] = 0;
+	adpcm_end[0] = adpcm_end[1] = 0;
 	adpcm_idle[0] = adpcm_data[1] = 0;
 	adpcm_data[0] = adpcm_data[1] = -1;
 	mcu63701_command = 0;

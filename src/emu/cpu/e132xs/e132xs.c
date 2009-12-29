@@ -1739,7 +1739,7 @@ INLINE void hyperstone_movd(hyperstone_state *cpustate, struct regs_decode *deco
 			old_l = GET_L;
 			PPC = PC;
 
-			PC = SET_PC(SREG);
+			SET_PC(SREG);
 			SR = (SREGF & 0xffe00000) | ((SREG & 0x01) << 18 ) | (SREGF & 0x3ffff);
 			if (cpustate->intblock < 1)
 				cpustate->intblock = 1;
