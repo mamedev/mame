@@ -415,12 +415,12 @@ static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( backgamn_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x503ffa, 0x503ffb) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
-	AM_RANGE(0x503ffc, 0x503ffd) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-	AM_RANGE(0x500000, 0x503fff) AM_RAM // sound?
-	AM_RANGE(0x600000, 0x60001f) AM_NOP // sound?
-	AM_RANGE(0x800084, 0xffbfff) AM_RAM // used?
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10003f) AM_RAM
+	AM_RANGE(0x200000, 0x20003f) AM_RAM
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0x500000, 0x503fff) AM_RAM //work RAM
+	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -434,10 +434,11 @@ static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-
+#if 0
 static INPUT_PORTS_START( adp )
 
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( skattv )
 	PORT_INCLUDE(microtouch)
@@ -616,6 +617,8 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(backgamn_mem)
 
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -706,7 +709,7 @@ ROM_START( funlddlx )
 	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
 ROM_END
 
-GAME( 1990, backgamn,        0, backgamn,    adp,       0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
+GAME( 1990, backgamn,        0, backgamn,    skattv,    0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
 GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
