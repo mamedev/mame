@@ -2605,9 +2605,20 @@ WRITE16_DEVICE_HANDLER( tc0280grd_ctrl_word_w )
 	COMBINE_DATA(&tc0280grd->ctrl[offset]);
 }
 
-#define tc0430grw_word_r        tc0280grd_word_r
-#define tc0430grw_word_w        tc0280grd_word_w
-#define tc0430grw_ctrl_word_w   tc0280grd_ctrl_word_w
+READ16_DEVICE_HANDLER( tc0430grw_word_r )
+{
+	return tc0280grd_word_r(device, offset, mem_mask);
+}
+
+WRITE16_DEVICE_HANDLER( tc0430grw_word_w )
+{
+	tc0280grd_word_w(device, offset, data, mem_mask);
+}
+
+WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w )
+{
+	tc0280grd_ctrl_word_w(device, offset, data, mem_mask);
+}
 
 void tc0280grd_tilemap_update( const device_config *device, int base_color )
 {
@@ -2619,6 +2630,10 @@ void tc0280grd_tilemap_update( const device_config *device, int base_color )
 	}
 }
 
+void tc0430grw_tilemap_update( const device_config *device, int base_color )
+{
+	tc0280grd_tilemap_update(device, base_color);
+}
 
 static void zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
 {

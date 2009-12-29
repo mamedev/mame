@@ -281,8 +281,8 @@ void tc0280grd_zoom_draw(const device_config *device, bitmap_t *bitmap, const re
 READ16_DEVICE_HANDLER( tc0430grw_word_r );
 WRITE16_DEVICE_HANDLER( tc0430grw_word_w );
 WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w );
-void TC0430GRW_tilemap_update(const device_config *device, int base_color);
-void TC0430GRW_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority);
+void tc0430grw_tilemap_update(const device_config *device, int base_color);
+void tc0430grw_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority);
 
 
 /** TC0360PRI **/

@@ -1,11 +1,6 @@
 #include "driver.h"
-#include "video/taitoic.h"
+#include "video/taiicdev.h"
 #include "includes/taito_f2.h"
-
-#define TC0100SCN_GFX_NUM 1
-#define TC0480SCP_GFX_NUM 1
-#define TC0280GRD_GFX_NUM 2
-#define TC0430GRW_GFX_NUM 2
 
 struct tempsprite
 {
@@ -60,12 +55,6 @@ static INT32 f2_flip_hide_pixels;	/* Different in some games */
 static INT32 f2_pivot_xdisp = 0;	/* Needed in games with a pivot layer */
 static INT32 f2_pivot_ydisp = 0;
 
-static INT32 f2_tilemap_xoffs = 0;	/* Needed in TC0480SCP games */
-static INT32 f2_tilemap_yoffs = 0;
-static INT32 f2_text_xoffs = 0;
-
-static int f2_tilemap_col_base = 0;
-
 static INT32 f2_game = 0;
 
 static UINT8 f2_tilepri[6]; // todo - move into taitoic.c
@@ -80,10 +69,9 @@ enum
 
 /***********************************************************************************/
 
-static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int hide,int flip_hide,int x_offs,int y_offs,
-		int flip_xoffs,int flip_yoffs,int flip_text_x_offs,int flip_text_yoffs)
+static void taitof2_core_vh_start (running_machine *machine, int sprite_type, int hide, int flip_hide )
 {
-	int i,chips;
+	int i;
 	f2_sprite_type = sprite_type;
 	f2_hide_pixels = hide;
 	f2_flip_hide_pixels = flip_hide;
@@ -91,33 +79,6 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	spriteram_delayed = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 	spriteram_buffered = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
-
-	chips = TC0100SCN_count(machine);
-
-	assert_always(chips >= 0, "erroneous TC0100SCN configuratiom");
-
-	if (has_TC0480SCP(machine))	/* it's a tc0480scp game */
-	{
-		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,f2_hide_pixels,f2_tilemap_xoffs,
-		   f2_tilemap_yoffs,f2_text_xoffs,0,-1,0,f2_tilemap_col_base);
-	}
-	else	/* it's a tc0100scn game */
-	{
-		TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,f2_hide_pixels,0,
-			flip_xoffs,flip_yoffs,flip_text_x_offs,flip_text_yoffs,TC0100SCN_SINGLE_VDU);
-	}
-
-	if (TC0110PCR_mask(machine) & 1)
-		TC0110PCR_vh_start(machine);
-
-	if (has_TC0280GRD(machine))
-		TC0280GRD_vh_start(machine, TC0280GRD_GFX_NUM);
-
-	if (has_TC0430GRW(machine))
-		TC0430GRW_vh_start(machine, TC0430GRW_GFX_NUM);
-
-	if (has_TC0360PRI(machine))
-		TC0360PRI_vh_start(machine);	/* Purely for save-state purposes */
 
 	for (i = 0; i < 8; i ++)
 	{
@@ -146,153 +107,135 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 
 VIDEO_START( taitof2_default )
 {
-	taitof2_core_vh_start(machine, 0,0,0,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,0,0);
 }
 
 VIDEO_START( taitof2_megab )   /* Megab, Liquidk */
 {
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_quiz )   /* Quiz Crayons, Quiz Jinsei */
 {
-	taitof2_core_vh_start(machine, 3,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 3,3,3);
 }
 
 VIDEO_START( taitof2_finalb )
 {
-	taitof2_core_vh_start(machine, 0,1,1,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,1,1);
 }
 
 VIDEO_START( taitof2_ssi )
 {
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_growl )
 {
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_ninjak )
 {
-	taitof2_core_vh_start(machine, 0,0,0,0,0,0,0,1,2);
+	taitof2_core_vh_start(machine, 0,0,0);
 }
 
 VIDEO_START( taitof2_qzchikyu )
 {
-	taitof2_core_vh_start(machine, 0,0,4,0,0,-4,0,-11,0);
+	taitof2_core_vh_start(machine, 0,0,4);
 }
 
 VIDEO_START( taitof2_solfigtr )
 {
-	taitof2_core_vh_start(machine, 0,3,-3,0,0,6,0,6,0);
+	taitof2_core_vh_start(machine, 0,3,-3);
 }
 
 VIDEO_START( taitof2_koshien )
 {
-	taitof2_core_vh_start(machine, 0,1,-1,0,0,2,0,0,0);
+	taitof2_core_vh_start(machine, 0,1,-1);
 }
 
 VIDEO_START( taitof2_gunfront )
 {
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_thundfox )
 {
-	taitof2_core_vh_start(machine, 0,3,-3,0,0,5,0,4,1);
+	taitof2_core_vh_start(machine, 0,3,-3);
 }
 
 VIDEO_START( taitof2_mjnquest )
 {
-	taitof2_core_vh_start(machine, 0,0,0,0,0,0,0,0,0);
-	TC0100SCN_set_bg_tilemask(0x7fff);
+	const device_config *tc0100scn = devtag_get_device(machine, "tc0100scn");
+	taitof2_core_vh_start(machine, 0,0,0);
+
+	tc0100scn_set_bg_tilemask(tc0100scn, 0x7fff);
 }
 
 VIDEO_START( taitof2_footchmp )
 {
-	f2_tilemap_xoffs = 0x1d;
-	f2_tilemap_yoffs = 0x08;
-	f2_text_xoffs = -1;
-	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 
 	f2_game = FOOTCHMP;
 }
 
 VIDEO_START( taitof2_hthero )
 {
-	f2_tilemap_xoffs = 0x33;
-	f2_tilemap_yoffs = - 0x04;
-	f2_text_xoffs = -1;
-	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 
 	f2_game = FOOTCHMP;
 }
 
 VIDEO_START( taitof2_deadconx )
 {
-	f2_tilemap_xoffs = 0x1e;
-	f2_tilemap_yoffs = 0x08;
-	f2_text_xoffs = -1;
-	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_deadconxj )
 {
-	f2_tilemap_xoffs = 0x34;
-	f2_tilemap_yoffs = - 0x05;
-	f2_text_xoffs = -1;
-	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_metalb )
 {
-	f2_tilemap_xoffs = 0x32;
-	f2_tilemap_yoffs = - 0x04;
-	f2_text_xoffs = 1;	/* not the usual -1 */
-	f2_tilemap_col_base = 256;   /* separate palette area for tilemaps */
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_yuyugogo )
 {
-	taitof2_core_vh_start(machine, 1,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 1,3,3);
 }
 
 VIDEO_START( taitof2_yesnoj )
 {
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_dinorex )
 {
-	taitof2_core_vh_start(machine, 3,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 3,3,3);
 }
 
 VIDEO_START( taitof2_dondokod )	/* dondokod, cameltry */
 {
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 0;
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 VIDEO_START( taitof2_pulirula )
 {
 	f2_pivot_xdisp = -10;	/* alignment seems correct (see level 2, falling */
 	f2_pivot_ydisp = 16;	/* block of ice after armour man) */
-	taitof2_core_vh_start(machine, 2,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 2,3,3);
 }
 
 VIDEO_START( taitof2_driftout )
 {
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 16;
-	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3);
 }
 
 
@@ -1050,66 +993,70 @@ VIDEO_UPDATE( taitof2_ssi )
 
 VIDEO_UPDATE( taitof2_yesnoj )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
-	draw_sprites(screen->machine, bitmap,cliprect,NULL, 0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,2,0,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
+	draw_sprites(screen->machine, bitmap, cliprect, NULL, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(tc0100scn), 0, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(tc0100scn) ^ 1, 0, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( taitof2 )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect,NULL, 0);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,2,0,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(tc0100scn), 0, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(tc0100scn) ^ 1, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, NULL, 0);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( taitof2_pri )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *tc0360pri = devtag_get_device(screen->machine, "tc0360pri");
 	int layer[3];
 
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	layer[0] = TC0100SCN_bottomlayer(0);
-	layer[1] = layer[0]^1;
+	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
-	f2_tilepri[layer[0]] = TC0360PRI_regs[5] & 0x0f;
-	f2_tilepri[layer[1]] = TC0360PRI_regs[5] >> 4;
-	f2_tilepri[layer[2]] = TC0360PRI_regs[4] >> 4;
+	f2_tilepri[layer[0]] = tc0360pri_r(tc0360pri, 5) & 0x0f;
+	f2_tilepri[layer[1]] = tc0360pri_r(tc0360pri, 5) >> 4;
+	f2_tilepri[layer[2]] = tc0360pri_r(tc0360pri, 4) >> 4;
 
-	f2_spritepri[0] = TC0360PRI_regs[6] & 0x0f;
-	f2_spritepri[1] = TC0360PRI_regs[6] >> 4;
-	f2_spritepri[2] = TC0360PRI_regs[7] & 0x0f;
-	f2_spritepri[3] = TC0360PRI_regs[7] >> 4;
+	f2_spritepri[0] = tc0360pri_r(tc0360pri, 6) & 0x0f;
+	f2_spritepri[1] = tc0360pri_r(tc0360pri, 6) >> 4;
+	f2_spritepri[2] = tc0360pri_r(tc0360pri, 7) & 0x0f;
+	f2_spritepri[3] = tc0360pri_r(tc0360pri, 7) >> 4;
 
-	f2_spriteblendmode = TC0360PRI_regs[0]&0xc0;
+	f2_spriteblendmode = tc0360pri_r(tc0360pri, 0) & 0xc0;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],0,1);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], 0, 1);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(screen->machine, bitmap,cliprect,NULL,1);
+	draw_sprites(screen->machine, bitmap, cliprect, NULL, 1);
 	return 0;
 }
 
@@ -1117,75 +1064,82 @@ VIDEO_UPDATE( taitof2_pri )
 
 static void draw_roz_layer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT32 priority)
 {
-	if (has_TC0280GRD(machine))
-		TC0280GRD_zoom_draw(bitmap,cliprect,f2_pivot_xdisp,f2_pivot_ydisp,priority);
+	const device_config *tc0280grd = devtag_get_device(machine, "tc0280grd");
+	const device_config *tc0430grw = devtag_get_device(machine, "tc0430grw");
 
-	if (has_TC0430GRW(machine))
-		TC0430GRW_zoom_draw(bitmap,cliprect,f2_pivot_xdisp,f2_pivot_ydisp,priority);
+	if (tc0280grd != NULL)
+		tc0280grd_zoom_draw(tc0280grd, bitmap, cliprect, f2_pivot_xdisp, f2_pivot_ydisp, priority);
+
+	if (tc0430grw != NULL)
+		tc0430grw_zoom_draw(tc0430grw, bitmap, cliprect, f2_pivot_xdisp, f2_pivot_ydisp, priority);
 }
 
 VIDEO_UPDATE( taitof2_pri_roz )
 {
+	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	const device_config *tc0360pri = devtag_get_device(screen->machine, "tc0360pri");
+	const device_config *tc0280grd = devtag_get_device(screen->machine, "tc0280grd");
+	const device_config *tc0430grw = devtag_get_device(screen->machine, "tc0430grw");
 	int tilepri[3];
 	int rozpri;
 	int layer[3];
 	int drawn;
 	int i,j;
-	int roz_base_color = (TC0360PRI_regs[1] & 0x3f) << 2;
+	int roz_base_color = (tc0360pri_r(tc0360pri, 1) & 0x3f) << 2;
 
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	if (has_TC0280GRD(screen->machine))
-		TC0280GRD_tilemap_update(roz_base_color);
+	if (tc0280grd != NULL)
+		tc0280grd_tilemap_update(tc0280grd, roz_base_color);
 
-	if (has_TC0430GRW(screen->machine))
-		TC0430GRW_tilemap_update(roz_base_color);
+	if (tc0430grw != NULL)
+		tc0430grw_tilemap_update(tc0430grw, roz_base_color);
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn);
 
-	rozpri = (TC0360PRI_regs[1] & 0xc0) >> 6;
-	rozpri = (TC0360PRI_regs[8 + rozpri/2] >> 4*(rozpri & 1)) & 0x0f;
+	rozpri = (tc0360pri_r(tc0360pri, 1) & 0xc0) >> 6;
+	rozpri = (tc0360pri_r(tc0360pri, 8 + rozpri / 2) >> 4 * (rozpri & 1)) & 0x0f;
 
-	layer[0] = TC0100SCN_bottomlayer(0);
-	layer[1] = layer[0]^1;
+	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	tilepri[layer[0]] = TC0360PRI_regs[5] & 0x0f;
-	tilepri[layer[1]] = TC0360PRI_regs[5] >> 4;
-	tilepri[layer[2]] = TC0360PRI_regs[4] >> 4;
+	tilepri[layer[0]] = tc0360pri_r(tc0360pri, 5) & 0x0f;
+	tilepri[layer[1]] = tc0360pri_r(tc0360pri, 5) >> 4;
+	tilepri[layer[2]] = tc0360pri_r(tc0360pri, 4) >> 4;
 
-	f2_spritepri[0] = TC0360PRI_regs[6] & 0x0f;
-	f2_spritepri[1] = TC0360PRI_regs[6] >> 4;
-	f2_spritepri[2] = TC0360PRI_regs[7] & 0x0f;
-	f2_spritepri[3] = TC0360PRI_regs[7] >> 4;
+	f2_spritepri[0] = tc0360pri_r(tc0360pri, 6) & 0x0f;
+	f2_spritepri[1] = tc0360pri_r(tc0360pri, 6) >> 4;
+	f2_spritepri[2] = tc0360pri_r(tc0360pri, 7) & 0x0f;
+	f2_spritepri[3] = tc0360pri_r(tc0360pri, 7) >> 4;
 
-	f2_spriteblendmode = TC0360PRI_regs[0]&0xc0;
+	f2_spriteblendmode = tc0360pri_r(tc0360pri, 0) & 0xc0;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
-	drawn=0;
-	for (i=0; i<16; i++)
+	drawn = 0;
+	for (i = 0; i < 16; i++)
 	{
-		if (rozpri==i)
+		if (rozpri == i)
 		{
-			draw_roz_layer(screen->machine,bitmap,cliprect,1 << drawn);
-			f2_tilepri[drawn]=i;
+			draw_roz_layer(screen->machine, bitmap, cliprect, 1 << drawn);
+			f2_tilepri[drawn] = i;
 			drawn++;
 		}
 
-		for (j=0; j<3; j++)
+		for (j = 0; j < 3; j++)
 		{
-			if (tilepri[layer[j]]==i)
+			if (tilepri[layer[j]] == i)
 			{
-				TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[j],0,1<<drawn);
-				f2_tilepri[drawn]=i;
+				tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[j], 0, 1 << drawn);
+				f2_tilepri[drawn] = i;
 				drawn++;
 			}
 		}
 	}
 
-	draw_sprites(screen->machine, bitmap,cliprect,NULL,1);
+	draw_sprites(screen->machine, bitmap, cliprect, NULL, 1);
 	return 0;
 }
 
@@ -1194,39 +1148,40 @@ VIDEO_UPDATE( taitof2_pri_roz )
 /* Thunderfox */
 VIDEO_UPDATE( taitof2_thundfox )
 {
+	const device_config *tc0100scn_1 = devtag_get_device(screen->machine, "tc0100scn_1");
+	const device_config *tc0100scn_2 = devtag_get_device(screen->machine, "tc0100scn_2");
+	const device_config *tc0360pri = devtag_get_device(screen->machine, "tc0360pri");
 	int tilepri[2][3];
 	int spritepri[4];
 	int layer[2][3];
 	int drawn[2];
 
-
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	TC0100SCN_tilemap_update(screen->machine);
+	tc0100scn_tilemap_update(tc0100scn_1);
+	tc0100scn_tilemap_update(tc0100scn_2);
 
-	layer[0][0] = TC0100SCN_bottomlayer(0);
-	layer[0][1] = layer[0][0]^1;
+	layer[0][0] = tc0100scn_bottomlayer(tc0100scn_1);
+	layer[0][1] = layer[0][0] ^ 1;
 	layer[0][2] = 2;
-	tilepri[0][layer[0][0]] = TC0360PRI_regs[5] & 0x0f;
-	tilepri[0][layer[0][1]] = TC0360PRI_regs[5] >> 4;
-	tilepri[0][layer[0][2]] = TC0360PRI_regs[4] >> 4;
+	tilepri[0][layer[0][0]] = tc0360pri_r(tc0360pri, 5) & 0x0f;
+	tilepri[0][layer[0][1]] = tc0360pri_r(tc0360pri, 5) >> 4;
+	tilepri[0][layer[0][2]] = tc0360pri_r(tc0360pri, 4) >> 4;
 
-	layer[1][0] = TC0100SCN_bottomlayer(1);
-	layer[1][1] = layer[1][0]^1;
+	layer[1][0] = tc0100scn_bottomlayer(tc0100scn_2);
+	layer[1][1] = layer[1][0] ^ 1;
 	layer[1][2] = 2;
-	tilepri[1][layer[1][0]] = TC0360PRI_regs[9] & 0x0f;
-	tilepri[1][layer[1][1]] = TC0360PRI_regs[9] >> 4;
-	tilepri[1][layer[1][2]] = TC0360PRI_regs[8] >> 4;
+	tilepri[1][layer[1][0]] = tc0360pri_r(tc0360pri, 9) & 0x0f;
+	tilepri[1][layer[1][1]] = tc0360pri_r(tc0360pri, 9) >> 4;
+	tilepri[1][layer[1][2]] = tc0360pri_r(tc0360pri, 8) >> 4;
 
-	spritepri[0] = TC0360PRI_regs[6] & 0x0f;
-	spritepri[1] = TC0360PRI_regs[6] >> 4;
-	spritepri[2] = TC0360PRI_regs[7] & 0x0f;
-	spritepri[3] = TC0360PRI_regs[7] >> 4;
+	spritepri[0] = tc0360pri_r(tc0360pri, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(tc0360pri, 6) >> 4;
+	spritepri[2] = tc0360pri_r(tc0360pri, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(tc0360pri, 7) >> 4;
 
-
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
-
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
 	/*
     TODO: This isn't the correct way to handle the priority. At the moment of
@@ -1238,22 +1193,30 @@ VIDEO_UPDATE( taitof2_thundfox )
 	while (drawn[0] < 2 && drawn[1] < 2)
 	{
 		int pick;
+		const device_config *tc0100scn;
 
 		if (tilepri[0][drawn[0]] < tilepri[1][drawn[1]])
+		{
 			pick = 0;
-		else pick = 1;
+			tc0100scn = tc0100scn_1;
+		}
+		else
+		{
+			pick = 1;
+			tc0100scn = tc0100scn_2;
+		}
 
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,pick,layer[pick][drawn[pick]],0,1<<(drawn[pick]+2*pick));
+		tc0100scn_tilemap_draw(tc0100scn , bitmap, cliprect, layer[pick][drawn[pick]], 0, 1 << (drawn[pick] + 2 * pick));
 		drawn[pick]++;
 	}
 	while (drawn[0] < 2)
 	{
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0][drawn[0]],0,1<<drawn[0]);
+		tc0100scn_tilemap_draw(tc0100scn_1, bitmap, cliprect, layer[0][drawn[0]], 0, 1 << drawn[0]);
 		drawn[0]++;
 	}
 	while (drawn[1] < 2)
 	{
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,1,layer[1][drawn[1]],0,1<<(drawn[1]+2));
+		tc0100scn_tilemap_draw(tc0100scn_2, bitmap, cliprect, layer[1][drawn[1]], 0, 1 << (drawn[1] + 2));
 		drawn[1]++;
 	}
 
@@ -1281,13 +1244,13 @@ VIDEO_UPDATE( taitof2_thundfox )
 
 	if (tilepri[0][2] < tilepri[1][2])
 	{
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0][2],0,0);
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,1,layer[1][2],0,0);
+		tc0100scn_tilemap_draw(tc0100scn_1, bitmap, cliprect, layer[0][2], 0, 0);
+		tc0100scn_tilemap_draw(tc0100scn_2, bitmap, cliprect, layer[1][2], 0, 0);
 	}
 	else
 	{
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,1,layer[1][2],0,0);
-		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0][2],0,0);
+		tc0100scn_tilemap_draw(tc0100scn_2, bitmap, cliprect, layer[1][2], 0, 0);
+		tc0100scn_tilemap_draw(tc0100scn_1, bitmap, cliprect, layer[0][2], 0, 0);
 	}
 	return 0;
 }
@@ -1324,49 +1287,51 @@ and it changes these (and the sprite pri settings) a lot.
 
 VIDEO_UPDATE( taitof2_metalb )
 {
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
+	const device_config *tc0360pri = devtag_get_device(screen->machine, "tc0360pri");
 	UINT8 layer[5], invlayer[4];
 	UINT16 priority;
 
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
+	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
-	layer[1] = (priority &0x0f00) >>  8;
-	layer[2] = (priority &0x00f0) >>  4;
-	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	invlayer[layer[0]]=0;
-	invlayer[layer[1]]=1;
-	invlayer[layer[2]]=2;
-	invlayer[layer[3]]=3;
+	invlayer[layer[0]] = 0;
+	invlayer[layer[1]] = 1;
+	invlayer[layer[2]] = 2;
+	invlayer[layer[3]] = 3;
 
-	f2_tilepri[invlayer[0]] = TC0360PRI_regs[4] & 0x0f;	/* bg0 */
-	f2_tilepri[invlayer[1]] = TC0360PRI_regs[4] >> 4;	/* bg1 */
-	f2_tilepri[invlayer[2]] = TC0360PRI_regs[5] & 0x0f;	/* bg2 */
-	f2_tilepri[invlayer[3]] = TC0360PRI_regs[5] >> 4;	/* bg3 */
-	f2_tilepri[4] = TC0360PRI_regs[9] & 0x0f;			/* fg (text layer) */
+	f2_tilepri[invlayer[0]] = tc0360pri_r(tc0360pri, 4) & 0x0f;	/* bg0 */
+	f2_tilepri[invlayer[1]] = tc0360pri_r(tc0360pri, 4) >> 4;	/* bg1 */
+	f2_tilepri[invlayer[2]] = tc0360pri_r(tc0360pri, 5) & 0x0f;	/* bg2 */
+	f2_tilepri[invlayer[3]] = tc0360pri_r(tc0360pri, 5) >> 4;	/* bg3 */
+	f2_tilepri[4] = tc0360pri_r(tc0360pri, 9) & 0x0f;			/* fg (text layer) */
 
-	f2_spritepri[0] = TC0360PRI_regs[6] & 0x0f;
-	f2_spritepri[1] = TC0360PRI_regs[6] >> 4;
-	f2_spritepri[2] = TC0360PRI_regs[7] & 0x0f;
-	f2_spritepri[3] = TC0360PRI_regs[7] >> 4;
+	f2_spritepri[0] = tc0360pri_r(tc0360pri, 6) & 0x0f;
+	f2_spritepri[1] = tc0360pri_r(tc0360pri, 6) >> 4;
+	f2_spritepri[2] = tc0360pri_r(tc0360pri, 7) & 0x0f;
+	f2_spritepri[3] = tc0360pri_r(tc0360pri, 7) >> 4;
 
-	f2_spriteblendmode = TC0360PRI_regs[0]&0xc0;
+	f2_spriteblendmode = tc0360pri_r(tc0360pri, 0) & 0xc0;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,16);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 16);
 
-	draw_sprites(screen->machine, bitmap,cliprect,NULL,1);
+	draw_sprites(screen->machine, bitmap, cliprect, NULL, 1);
 	return 0;
 }
 
@@ -1374,6 +1339,8 @@ VIDEO_UPDATE( taitof2_metalb )
 /* Deadconx, Footchmp */
 VIDEO_UPDATE( taitof2_deadconx )
 {
+	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
+	const device_config *tc0360pri = devtag_get_device(screen->machine, "tc0360pri");
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];
@@ -1381,36 +1348,36 @@ VIDEO_UPDATE( taitof2_deadconx )
 
 	taitof2_handle_sprite_buffering(screen->machine);
 
-	TC0480SCP_tilemap_update(screen->machine);
+	tc0480scp_tilemap_update(tc0480scp);
 
-	priority = TC0480SCP_get_bg_priority();
+	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
-	layer[1] = (priority &0x0f00) >>  8;
-	layer[2] = (priority &0x00f0) >>  4;
-	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = TC0360PRI_regs[4] >> 4;      /* bg0 */
-	tilepri[1] = TC0360PRI_regs[5] & 0x0f;    /* bg1 */
-	tilepri[2] = TC0360PRI_regs[5] >> 4;      /* bg2 */
-	tilepri[3] = TC0360PRI_regs[4] & 0x0f;    /* bg3 */
+	tilepri[0] = tc0360pri_r(tc0360pri, 4) >> 4;      /* bg0 */
+	tilepri[1] = tc0360pri_r(tc0360pri, 5) & 0x0f;    /* bg1 */
+	tilepri[2] = tc0360pri_r(tc0360pri, 5) >> 4;      /* bg2 */
+	tilepri[3] = tc0360pri_r(tc0360pri, 4) & 0x0f;    /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = TC0360PRI_regs[7] >> 4;    /* fg (text layer) */
+	tilepri[layer[4]] = tc0360pri_r(tc0360pri, 7) >> 4;    /* fg (text layer) */
 
-	spritepri[0] = TC0360PRI_regs[6] & 0x0f;
-	spritepri[1] = TC0360PRI_regs[6] >> 4;
-	spritepri[2] = TC0360PRI_regs[7] & 0x0f;
-	spritepri[3] = TC0360PRI_regs[7] >> 4;
+	spritepri[0] = tc0360pri_r(tc0360pri, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(tc0360pri, 6) >> 4;
+	spritepri[2] = tc0360pri_r(tc0360pri, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(tc0360pri, 7) >> 4;
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -1424,7 +1391,7 @@ VIDEO_UPDATE( taitof2_deadconx )
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(screen->machine, bitmap,cliprect,primasks,0);
+		draw_sprites(screen->machine, bitmap, cliprect, primasks, 0);
 	}
 
 	/*
@@ -1433,6 +1400,6 @@ VIDEO_UPDATE( taitof2_deadconx )
     that the FG layer is always on top of sprites.
     */
 
-	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }
