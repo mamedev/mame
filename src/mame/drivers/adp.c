@@ -374,19 +374,23 @@ static WRITE16_HANDLER(wh2_w)
 	state->register_active = data;
 }
 
-static READ16_HANDLER(t2_r)
+static READ8_DEVICE_HANDLER(t2_r)
 {
-	static UINT16 vblank = 0, hblank = 0;
+	static UINT8 res;
+	static int h,w;
+	res = 0;
+	h = video_screen_get_height(device->machine->primary_screen);
+	w = video_screen_get_width(device->machine->primary_screen);
 
-	vblank ^=0x40;
-	hblank ^=0x20;
+//  popmessage("%d %d",h,w);
 
-	return mame_rand(space->machine) & 0x00f0;
+	if (video_screen_get_hpos(device->machine->primary_screen) > h)
+		res|= 0x20; //hblank
 
-// FIXME: this code is never executed
-// popmessage("%08x",cpu_get_pc(space->cpu));
-// return 0x0000;
-	return 0xff9f | vblank | hblank;
+	if (video_screen_get_vpos(device->machine->primary_screen) > w)
+		res|= 0x40; //vblank
+
+	return res;
 }
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -394,9 +398,7 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
-	AM_RANGE(0x800140, 0x800141) AM_READ(t2_r)
-	AM_RANGE(0x800140, 0x800143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800142, 0x800143) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff) //18b too
+	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 //  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
@@ -414,9 +416,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( backgamn_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM // sound?
 	AM_RANGE(0x503ffa, 0x503ffb) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
 	AM_RANGE(0x503ffc, 0x503ffd) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x500000, 0x503fff) AM_RAM // sound?
 	AM_RANGE(0x600000, 0x60001f) AM_NOP // sound?
 	AM_RANGE(0x800084, 0xffbfff) AM_RAM // used?
 ADDRESS_MAP_END
@@ -427,9 +429,7 @@ static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 //  AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
-	AM_RANGE(0x800140, 0x800141) AM_READ(t2_r)
-	AM_RANGE(0x800140, 0x800143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800142, 0x800143) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff) //18b too
+	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -525,12 +525,23 @@ static INPUT_PORTS_START( skattv )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
 INPUT_PORTS_END
+
 /*
 static INTERRUPT_GEN( adp_int )
 {
     cpu_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_HANDLER(t2_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( quickjac )
 
 	/* driver data */
@@ -546,8 +557,8 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
@@ -559,6 +570,7 @@ static MACHINE_DRIVER_START( quickjac )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 3686400/2)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
@@ -578,8 +590,8 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
@@ -591,6 +603,7 @@ static MACHINE_DRIVER_START( skattv )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 3686400/2)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
@@ -605,7 +618,7 @@ static MACHINE_DRIVER_START( backgamn )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -617,6 +630,7 @@ static MACHINE_DRIVER_START( backgamn )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 3686400/2)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
