@@ -32,7 +32,7 @@ TODO:
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "sound/2203intf.h"
 
 static const int clear_hack=1;

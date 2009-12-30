@@ -296,7 +296,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
 #include "includes/taito_f2.h"

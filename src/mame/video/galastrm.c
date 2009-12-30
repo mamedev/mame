@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "video/poly.h"
 
 #define X_OFFSET 96

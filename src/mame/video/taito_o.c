@@ -5,7 +5,7 @@ Based on taito_h.c
 ***************************************************************************/
 
 #include "driver.h"
-#include "taiicdev.h"
+#include "taitoic.h"
 
 
 /* These are hand-tuned values */

@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 
 
 static UINT16 sprite_ctrl = 0;

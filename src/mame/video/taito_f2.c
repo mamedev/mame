@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "includes/taito_f2.h"
 
 struct tempsprite

@@ -1,6 +1,6 @@
 /*************************************************************************
 
-    taiicdev.h
+    taitoic.h
 
     Implementation of various Taito custom video & input ICs
 

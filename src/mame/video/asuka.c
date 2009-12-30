@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 
 /**************************************************************
                  SPRITE READ AND WRITE HANDLERS

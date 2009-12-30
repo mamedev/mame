@@ -39,7 +39,7 @@ $305.b invincibility
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"

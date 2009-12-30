@@ -145,7 +145,7 @@ some kind of zoom table?
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "sound/2610intf.h"
 
 

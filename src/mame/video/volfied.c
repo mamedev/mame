@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 
 static UINT16* video_ram = NULL;
 

@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 
 UINT16 groundfx_rotate_ctrl[8];
 

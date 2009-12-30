@@ -220,7 +220,7 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "machine/taitoio.h"
 #include "cpu/tms32025/tms32025.h"
 #include "sound/2610intf.h"

@@ -880,7 +880,7 @@ J1100256A VIDEO PCB
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"

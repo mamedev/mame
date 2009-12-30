@@ -494,7 +494,7 @@ The data bus is 16 bits wide.
 
 #include "driver.h"
 #include "drawgfxm.h"
-#include "taiicdev.h"
+#include "taitoic.h"
 
 #define TOPSPEED_ROAD_COLORS
 

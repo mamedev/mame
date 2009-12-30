@@ -314,7 +314,7 @@ rumbling on a subwoofer in the cabinet.)
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"

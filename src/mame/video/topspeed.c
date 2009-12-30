@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 
 UINT16 *topspeed_spritemap;
 UINT16 *topspeed_raster_ctrl;

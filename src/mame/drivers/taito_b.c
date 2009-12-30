@@ -178,7 +178,7 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "includes/taito_b.h"
 
 static WRITE8_HANDLER( bankswitch_w )

@@ -46,7 +46,7 @@ sprite RAM
 ***************************************************************************/
 
 #include "driver.h"
-#include "taiicdev.h"
+#include "taitoic.h"
 
 
 /* These are hand-tuned values */

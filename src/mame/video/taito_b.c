@@ -1,6 +1,6 @@
 #include "driver.h"
 #include "profiler.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "includes/taito_b.h"
 
 UINT16 *taitob_spriteram;

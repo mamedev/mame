@@ -128,7 +128,7 @@ sounds.
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taiicdev.h"
+#include "video/taitoic.h"
 #include "cpu/z80/z80.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
