@@ -549,12 +549,12 @@ void rspdrc_add_dmem(const device_config *device, void *base)
     debugging
 -------------------------------------------------*/
 
-static void cfunc_printf_debug(void *param)
-{
-	rsp_state *rsp = (rsp_state *)param;
-	printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
-	logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
-}
+//static void cfunc_printf_debug(void *param)
+//{
+//	rsp_state *rsp = (rsp_state *)param;
+//	printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
+//	logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
+//}
 
 
 /*-------------------------------------------------
@@ -7312,10 +7312,10 @@ static void cfunc_unimplemented(void *param)
     cfunc_fatalerror - a generic fatalerror call
 -------------------------------------------------*/
 
-static void cfunc_fatalerror(void *param)
-{
+//static void cfunc_fatalerror(void *param)
+//{
 	//fatalerror("fatalerror");
-}
+//}
 
 
 /***************************************************************************
@@ -7431,11 +7431,7 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	drcuml_state *drcuml = rsp->impstate->drcuml;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-	int unaligned_w2 = 1;
-	int aligned_w2 = 2;
-	int unaligned_w4 = 1;
-	int unaligned_r2 = 1;
-	int unaligned_r4 = 1;
+	int unaligned_case = 1;
 
 	/* if we get an error back, we're screwed */
 	if (setjmp(errorbuf) != 0)
@@ -7450,132 +7446,116 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	alloc_handle(drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);													// handle  *handleptr
 
-	UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));
-
 	// write:
 	if (iswrite)
 	{
 		if (size == 1)
 		{
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));			// xor     i0,i0,bytexor
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);	// store   dmem,i0,i1,byte
+#ifdef LSB_FIRST
+			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);				// store   dmem,i0,i1,byte
 		}
 		else if (size == 2)
 		{
-			static const char text[] = "%08x: Unaligned word write to %08x\n";
+#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
-			UML_JMPc(block, IF_NZ, unaligned_w2);										// jnz     <unaligned_w2>
-			UML_JMP(block, aligned_w2);													// jmp     <aligned_w2>
-
-			UML_LABEL(block, unaligned_w2);												// <unaligned_w2>:
-			UML_MOV(block, MEM(&rsp->impstate->format), IMM((FPTR)text));				// mov     [format],text
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(rsp->pc));					// mov     [arg0],rsp->pc
-			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   printf_debug
-			UML_CALLC(block, cfunc_fatalerror, rsp);
-
-			UML_LABEL(block, aligned_w2);												// <aligned_w2>:
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));									// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));						// xor     i0,i0,bytexor
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD);				// store   dmem,i0,i1,word
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD_x1);			// store   dmem,i0,i1,word_x1
+			UML_RET(block);
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(2), IREG(0), IMM(3));									// and     i2,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
+			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1); 			// dload   i3,dmem,i0,qword_x1
+			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
+			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
+			UML_DAND(block, IREG(1), IREG(1), IMM(0xffff));								// dand    i1,i1,0xffff
+			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffffffff0000)));			// dand	   i3,i3,~0xffff
+			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
+			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
+			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
+#endif
 		}
 		else if (size == 4)
 		{
+#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_w4);										// jnz     <unaligned_w4>
-
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
 			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), DWORD_x1);			// store   dmem,i0,i1,dword_x1
 			UML_RET(block);
-
-			UML_LABEL(block, unaligned_w4);
-			UML_ADD(block, IREG(0), IREG(0), IMM(3));
-
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
-
-			UML_SHR(block, IREG(1), IREG(1), IMM(8));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_SUB(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
-
-			UML_SHR(block, IREG(1), IREG(1), IMM(8));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_SUB(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
-
-			UML_SHR(block, IREG(1), IREG(1), IMM(8));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_SUB(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(2), IREG(0), IMM(3));									// and     i2,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
+			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1); 			// dload   i3,dmem,i0,qword_x1
+			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
+			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
+			UML_DAND(block, IREG(1), IREG(1), IMM(0xffffffff));							// dand    i1,i1,0xffffffff
+			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffff00000000)));			// dand	   i3,i3,~0xffffffff
+			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
+			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
+			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
+#endif
 		}
 	}
 	else
 	{
 		if (size == 1)
 		{
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));						// xor     i0,i0,bytexor
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);				// load    i0,dmem,i0,byte
+#ifdef LSB_FIRST
+			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+ 			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);				// load    i0,dmem,i0,byte
 		}
 		else if (size == 2)
 		{
-			UML_TEST(block, IREG(0), IMM(1));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_r2);										// jnz     <unaligned_r2>
-
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));									// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));						// xor     i0,i0,bytexor
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD);				// load    i0,dmem,i0,word
+#ifdef LSB_FIRST
+			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD_x1);			// load    i0,dmem,i0,word_x1
 			UML_RET(block);
-
-			UML_LABEL(block, unaligned_r2);
-			UML_MOV(block, IREG(2), IMM(0));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), BYTE);
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_ADD(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), BYTE);
-			UML_ADD(block, IREG(0), IREG(0), IMM(1));
-			UML_SHL(block, IREG(2), IREG(2), IMM(8));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_MOV(block, IREG(0), IREG(2));
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(1), IREG(0), IMM(3));									// and     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
+			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1); 			// dload   i0,dmem,i0,qword_x1
+			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
+			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffff));								// and     i0,i0,0xffff
+#endif
 		}
 		else if (size == 4)
 		{
-			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_r4);										// jnz     <unaligned_r4>
-
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword
+#ifdef LSB_FIRST
+ 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword_x1
 			UML_RET(block);
-
-			UML_LABEL(block, unaligned_r4);
-
-			UML_XOR(block, IREG(1), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_SHL(block, IREG(2), IREG(3), IMM(24));
-
-			UML_ADD(block, IREG(1), IREG(0), IMM(1));
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_SHL(block, IREG(3), IREG(3), IMM(16));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_ADD(block, IREG(1), IREG(0), IMM(2));
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_SHL(block, IREG(3), IREG(3), IMM(8));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_ADD(block, IREG(1), IREG(0), IMM(3));
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_OR(block, IREG(0), IREG(2), IREG(3));
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(1), IREG(0), IMM(3));									// and     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
+			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1); 			// dload   i0,dmem,i0,qword_x1
+			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
+			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
+#endif
 		}
 	}
 	UML_RET(block);

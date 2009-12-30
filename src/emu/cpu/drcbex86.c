@@ -2896,32 +2896,33 @@ static void emit_rol_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 	else
 	{
 		emit_link skip1, skip2;
-		emit_mov_m32_r32(dst, MBD(REG_ESP, -8), REG_EBX);								// mov   [esp-8],ebx
+		int tempreg = REG_EAX;
+//		emit_mov_m32_r32(dst, MBD(REG_ESP, -8), tempreg);								// mov   [esp-8],ebx
 		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
 		emit_test_r32_imm(dst, REG_ECX, 0x20);											// test  ecx,0x20
 		emit_jcc_short_link(dst, COND_Z, &skip1);										// jz    skip1
 		if (inst->flags != 0)
 		{
 			emit_sub_r32_imm(dst, REG_ECX, 31);											// sub   ecx,31
-			emit_mov_r32_r32(dst, REG_EBX, reglo);										// mov   ebx,reglo
+			emit_mov_r32_r32(dst, tempreg, reglo);										// mov   ebx,reglo
 			emit_shld_r32_r32_imm(dst, reglo, reghi, 31);								// shld  reglo,reghi,31
-			emit_shld_r32_r32_imm(dst, reghi, REG_EBX, 31);								// shld  reghi,ebx,31
+			emit_shld_r32_r32_imm(dst, reghi, tempreg, 31);								// shld  reghi,ebx,31
 			emit_test_r32_imm(dst, REG_ECX, 0x20);										// test  ecx,0x20
 			emit_jcc_short_link(dst, COND_Z, &skip2);									// jz    skip2
 			emit_sub_r32_imm(dst, REG_ECX, 31);											// sub   ecx,31
-			emit_mov_r32_r32(dst, REG_EBX, reglo);										// mov   ebx,reglo
+			emit_mov_r32_r32(dst, tempreg, reglo);										// mov   ebx,reglo
 			emit_shld_r32_r32_imm(dst, reglo, reghi, 31);								// shld  reglo,reghi,31
-			emit_shld_r32_r32_imm(dst, reghi, REG_EBX, 31);								// shld  reghi,ebx,31
+			emit_shld_r32_r32_imm(dst, reghi, tempreg, 31);								// shld  reghi,ebx,31
 			track_resolve_link(drcbe, dst, &skip2);									// skip2:
 		}
 		else
 			emit_xchg_r32_r32(dst, reghi, reglo);										// xchg  reghi,reglo
 		track_resolve_link(drcbe, dst, &skip1);										// skip1:
-		emit_mov_r32_r32(dst, REG_EBX, reglo);											// mov   ebx,reglo
+		emit_mov_r32_r32(dst, tempreg, reglo);											// mov   ebx,reglo
 		emit_shld_r32_r32_cl(dst, reglo, reghi);										// shld  reglo,reghi,cl
 		if (saveflags) emit_pushf(dst);													// pushf
-		emit_shld_r32_r32_cl(dst, reghi, REG_EBX);										// shld  reghi,ebx,cl
-		emit_mov_r32_m32(dst, REG_EBX, MBD(REG_ESP, saveflags ? -4 : -8));				// mov   ebx,[esp-8]
+		emit_shld_r32_r32_cl(dst, reghi, tempreg);										// shld  reghi,ebx,cl
+//		emit_mov_r32_m32(dst, tempreg, MBD(REG_ESP, saveflags ? -4 : -8));				// mov   ebx,[esp-8]
 	}
 	if (saveflags)
 		emit_combine_z_flags(dst);
@@ -2970,32 +2971,33 @@ static void emit_ror_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 	else
 	{
 		emit_link skip1, skip2;
-		emit_mov_m32_r32(dst, MBD(REG_ESP, -8), REG_EBX);								// mov   [esp-8],ebx
+		int tempreg = REG_EAX;
+//		emit_mov_m32_r32(dst, MBD(REG_ESP, -8), tempreg);								// mov   [esp-8],ebx
 		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
 		emit_test_r32_imm(dst, REG_ECX, 0x20);											// test  ecx,0x20
 		emit_jcc_short_link(dst, COND_Z, &skip1);										// jz    skip1
 		if (inst->flags != 0)
 		{
 			emit_sub_r32_imm(dst, REG_ECX, 31);											// sub   ecx,31
-			emit_mov_r32_r32(dst, REG_EBX, reglo);										// mov   ebx,reglo
+			emit_mov_r32_r32(dst, tempreg, reglo);										// mov   ebx,reglo
 			emit_shrd_r32_r32_imm(dst, reglo, reghi, 31);								// shrd  reglo,reghi,31
-			emit_shrd_r32_r32_imm(dst, reghi, REG_EBX, 31);								// shrd  reghi,ebx,31
+			emit_shrd_r32_r32_imm(dst, reghi, tempreg, 31);								// shrd  reghi,ebx,31
 			emit_test_r32_imm(dst, REG_ECX, 0x20);										// test  ecx,0x20
 			emit_jcc_short_link(dst, COND_Z, &skip2);									// jz    skip2
 			emit_sub_r32_imm(dst, REG_ECX, 31);											// sub   ecx,31
-			emit_mov_r32_r32(dst, REG_EBX, reglo);										// mov   ebx,reglo
+			emit_mov_r32_r32(dst, tempreg, reglo);										// mov   ebx,reglo
 			emit_shrd_r32_r32_imm(dst, reglo, reghi, 31);								// shrd  reglo,reghi,31
-			emit_shrd_r32_r32_imm(dst, reghi, REG_EBX, 31);								// shrd  reghi,ebx,31
+			emit_shrd_r32_r32_imm(dst, reghi, tempreg, 31);								// shrd  reghi,ebx,31
 			track_resolve_link(drcbe, dst, &skip2);									// skip2:
 		}
 		else
 			emit_xchg_r32_r32(dst, reghi, reglo);										// xchg  reghi,reglo
 		track_resolve_link(drcbe, dst, &skip1);										// skip1:
-		emit_mov_r32_r32(dst, REG_EBX, reglo);											// mov   ebx,reglo
+		emit_mov_r32_r32(dst, tempreg, reglo);											// mov   ebx,reglo
 		emit_shrd_r32_r32_cl(dst, reglo, reghi);										// shrd  reglo,reghi,cl
 		if (saveflags) emit_pushf(dst);													// pushf
-		emit_shrd_r32_r32_cl(dst, reghi, REG_EBX);										// shrd  reghi,ebx,cl
-		emit_mov_r32_m32(dst, REG_EBX, MBD(REG_ESP, saveflags ? -4 : -8));				// mov   ebx,[esp-8]
+		emit_shrd_r32_r32_cl(dst, reghi, tempreg);										// shrd  reghi,ebx,cl
+//		emit_mov_r32_m32(dst, tempreg, MBD(REG_ESP, saveflags ? -4 : -8));				// mov   ebx,[esp-8]
 	}
 	if (saveflags)
 		emit_combine_z_flags(dst);
@@ -4863,27 +4865,28 @@ static x86code *op_rolins(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		}
 		else
 		{
-			emit_mov_m32_r32(&dst, MBD(REG_ESP, -8), REG_EBX);							// mov   [esp-8],ebx
-			emit_mov_r64_p64(drcbe, &dst, REG_EBX, REG_ECX, &maskp);					// mov   ecx:ebx,maskp
-			emit_and_r32_r32(&dst, REG_EAX, REG_EBX);									// and   eax,ebx
+			int tempreg = REG_EBX;
+			emit_mov_m32_r32(&dst, MBD(REG_ESP, -8), tempreg);							// mov   [esp-8],ebx
+			emit_mov_r64_p64(drcbe, &dst, tempreg, REG_ECX, &maskp);					// mov   ecx:ebx,maskp
+			emit_and_r32_r32(&dst, REG_EAX, tempreg);									// and   eax,ebx
 			emit_and_r32_r32(&dst, REG_EDX, REG_ECX);									// and   edx,ecx
-			emit_not_r32(&dst, REG_EBX);												// not   ebx
+			emit_not_r32(&dst, tempreg);												// not   ebx
 			emit_not_r32(&dst, REG_ECX);												// not   ecx
 			if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
 			{
-				emit_and_r32_r32(&dst, dstp.value, REG_EBX);							// and   dstp.lo,ebx
+				emit_and_r32_r32(&dst, dstp.value, tempreg);							// and   dstp.lo,ebx
 				emit_and_m32_r32(&dst, MABS(drcbe->reghi[dstp.value]), REG_ECX);		// and   dstp.hi,ecx
 				emit_or_r32_r32(&dst, dstp.value, REG_EAX);								// or    dstp.lo,eax
 				emit_or_m32_r32(&dst, MABS(drcbe->reghi[dstp.value]), REG_EDX);			// or    dstp.hi,edx
 			}
 			else
 			{
-				emit_and_m32_r32(&dst, MABS(dstp.value), REG_EBX);						// and   dstp.lo,ebx
+				emit_and_m32_r32(&dst, MABS(dstp.value), tempreg);						// and   dstp.lo,ebx
 				emit_and_m32_r32(&dst, MABS(dstp.value + 4), REG_ECX);					// and   dstp.hi,ecx
 				emit_or_m32_r32(&dst, MABS(dstp.value), REG_EAX);						// or    dstp.lo,eax
 				emit_or_m32_r32(&dst, MABS(dstp.value + 4), REG_EDX);					// or    dstp.hi,edx
 			}
-			emit_mov_r32_m32(&dst, REG_EBX, MBD(REG_ESP, -8));							// mov   ebx,[esp-8]
+			emit_mov_r32_m32(&dst, tempreg, MBD(REG_ESP, -8));							// mov   ebx,[esp-8]
 		}
 		if (inst->flags == DRCUML_FLAG_Z)
 			emit_or_r32_r32(&dst, REG_EAX, REG_EDX);									// or    eax,edx
