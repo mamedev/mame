@@ -36,6 +36,8 @@ static emu_timer *snes_scanline_timer;
 static emu_timer *snes_hblank_timer;
 static emu_timer *snes_nmi_timer;
 static emu_timer *snes_hirq_timer;
+static emu_timer *snes_div_timer;
+static emu_timer *snes_mult_timer;
 static UINT16 hblank_offset;
 UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
 UINT8 snes_has_addon_chip;
@@ -176,7 +178,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
 			}
 		}
-	}
+   	}
 
 	/* Start of VBlank */
 	if( snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line )
@@ -291,6 +293,36 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	}
 
 	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
+}
+
+
+static TIMER_CALLBACK(snes_div_callback)
+{
+	UINT16 value, dividend, remainder;
+	dividend = remainder = 0;
+	value = (snes_ram[WRDIVH] << 8) + snes_ram[WRDIVL];
+	if( snes_ram[WRDVDD] > 0 )
+	{
+		dividend = value / snes_ram[WRDVDD];
+		remainder = value % snes_ram[WRDVDD];
+	}
+	else
+	{
+		dividend = 0xffff;
+		remainder = value;
+	}
+	snes_ram[RDDIVL] = dividend & 0xff;
+	snes_ram[RDDIVH] = (dividend >> 8) & 0xff;
+	snes_ram[RDMPYL] = remainder & 0xff;
+	snes_ram[RDMPYH] = (remainder >> 8) & 0xff;
+}
+
+
+static TIMER_CALLBACK(snes_mult_callback)
+{
+	UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
+	snes_ram[RDMPYL] = c & 0xff;
+	snes_ram[RDMPYH] = (c >> 8) & 0xff;
 }
 
 
@@ -1291,34 +1323,14 @@ WRITE8_HANDLER( snes_w_io )
 		case WRMPYA:	/* Multiplier A */
 			break;
 		case WRMPYB:	/* Multiplier B */
-			{
-				UINT32 c = snes_ram[WRMPYA] * data;
-				snes_ram[RDMPYL] = c & 0xff;
-				snes_ram[RDMPYH] = (c >> 8) & 0xff;
-			} break;
+			timer_adjust_oneshot(snes_mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+			break;
 		case WRDIVL:	/* Dividend (low) */
 		case WRDIVH:	/* Dividend (high) */
 			break;
 		case WRDVDD:	/* Divisor */
-			{
-				UINT16 value, dividend, remainder;
-				dividend = remainder = 0;
-				value = (snes_ram[WRDIVH] << 8) + snes_ram[WRDIVL];
-				if( data > 0 )
-				{
-					dividend = value / data;
-					remainder = value % data;
-				}
-				else
-				{
-					dividend = 0xffff;
-					remainder = value;
-				}
-				snes_ram[RDDIVL] = dividend & 0xff;
-				snes_ram[RDDIVH] = (dividend >> 8) & 0xff;
-				snes_ram[RDMPYL] = remainder & 0xff;
-				snes_ram[RDMPYH] = (remainder >> 8) & 0xff;
-			} break;
+			timer_adjust_oneshot(snes_div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+			break;
 		case HTIMEL:	/* H-Count timer settings (low)  */
 		case HTIMEH:	/* H-Count timer settings (high) */
 		case VTIMEL:	/* V-Count timer settings (low)  */
@@ -1983,6 +1995,10 @@ static void snes_init_timers(running_machine *machine)
 	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
 	snes_hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
 	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
+	snes_div_timer = timer_alloc(machine, snes_div_callback, NULL);
+	timer_adjust_oneshot(snes_div_timer, attotime_never, 0);
+	snes_mult_timer = timer_alloc(machine, snes_mult_callback, NULL);
+	timer_adjust_oneshot(snes_mult_timer, attotime_never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
