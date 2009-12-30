@@ -39,7 +39,6 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define LOG_UML							(0)
 #define LOG_NATIVE						(0)
 
-#define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
 
 #define DRC_LSV							(1)
@@ -47,7 +46,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define DRC_LDV							(1)
 #define DRC_LQV							(1)
 #define DRC_LPV							(1)
-#define DRC_LUV							(1)
+#define DRC_LUV							(0)
 
 #define DRC_SSV							(1)
 #define DRC_SLV							(1)
@@ -1074,10 +1073,8 @@ static void cfunc_rsp_lpv(void *param)
 
 	for (i=0; i < 8; i++)
 	{
-		printf("%08x ", READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
 		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
 	}
-	printf("\n");
 }
 #endif
 
@@ -1294,9 +1291,7 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 			index = 7 - index;
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));					// xor     i0,i0,bytexor
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD);			// load    i0,dmem,i0,word
+			UML_CALLH(block, rsp->impstate->read16);								// callh   read32
 			UML_STORE(block, &rsp->v[dest].s[index], IMM(0), IREG(0), WORD);		// store   v[dest][index],i0,word
 			return TRUE;
 #else
@@ -1310,7 +1305,7 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			index >>= 2;
 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);		// load    i0,dmem,i0,dword
+			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
 			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest][index].i0
 			return TRUE;
 #else
@@ -1324,12 +1319,13 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			index >>= 2;
 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_LOAD(block, IREG(1), rsp->impstate->dmem, IREG(0), DWORD_x1);		// load    i0,dmem,i0,dword
-			UML_MOV(block, VLX(dest, index), IREG(1));								// mov     v[dest][index],i0
+			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
+			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest][index],i0
 
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
 			UML_ADD(block, IREG(0), IREG(0), IMM(4));								// add     i0,i0,4
-			UML_LOAD(block, IREG(1), rsp->impstate->dmem, IREG(0), DWORD_x1);		// load    i0,dmem,i0,dword
-			UML_MOV(block, VLX(dest, index+1), IREG(1));							// mov     v[dest][index+1],i0
+			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
+			UML_MOV(block, VLX(dest, index+1), IREG(0));							// mov     v[dest][index+1],i0
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2004,10 +2000,10 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			offset <<= 1;
 			index >>= 1;
 
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));					// xor     i0,i0,byte4xor
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), VSX(dest, index), WORD);	// store   dmem,i0,v[dest].s[index],word
+			index = 7 - index;
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));				// add     i0,<rsreg>,offset
+			UML_LOAD(block, IREG(1), &rsp->v[dest].s[index], IMM(0), WORD);	// load    i1,v[dest].b[0],0,byte
+			UML_CALLH(block, rsp->impstate->write16);						// callh   read32
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2020,7 +2016,8 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			index >>= 2;
 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));							// add     i0,<rsreg>,offset
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), VLX(dest, index), DWORD_x1); // store   dmem,i0,v[dest].l[index],dword_x1
+			UML_MOV(block, IREG(1), VLX(dest, index));									// mov     i1,v[dest].l[index]
+			UML_CALLH(block, rsp->impstate->write32);									// callh   read32
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2032,11 +2029,14 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			offset <<= 3;
 			index >>= 2;
 
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));								// add     i0,<rsreg>,offset
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), VLX(dest, index), DWORD_x1); 	// store   dmem,i0,v[dest].l[index],dword_x1
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));							// add     i0,<rsreg>,offset
+			UML_MOV(block, IREG(1), VLX(dest, index));									// mov     i1,v[dest].l[index]
+			UML_CALLH(block, rsp->impstate->write32);									// callh   write32
 
-			UML_ADD(block, IREG(0), IREG(0), IMM(4));										// add     i0,i0,4
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), VLX(dest, index+1), DWORD_x1);	// store   dmem,i0,v[dest].l[index+1],dword_x1
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));							// add     i0,<rsreg>,offset
+			UML_ADD(block, IREG(0), IREG(0), IMM(4));									// add     i0,i0,4
+			UML_MOV(block, IREG(1), VLX(dest, index+1));								// mov     i1,v[dest].l[index+1]
+			UML_CALLH(block, rsp->impstate->write32);									// callh   write32
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
