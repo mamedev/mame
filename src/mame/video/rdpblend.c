@@ -1,60 +1,124 @@
-#if defined(ALPHACOMPARE)
-	#if defined(RGBDITHER1)
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_ZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+#if defined(FORCEBLEND)
+	#if defined(ALPHACOMPARE)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_ZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_NZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_NZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#endif
 	#else
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_ZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_ZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_NZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_NZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#endif
 	#endif
 #else
-	#if defined(RGBDITHER1)
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_ZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+	#if defined(ALPHACOMPARE)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_ZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_NZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_NZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#endif
 	#else
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_ZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_ZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER1_16_IMR_NZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_ZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_ZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#else
-				INLINE int BLENDER1_16_NIMR_NZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER1_16_IMR_NZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#else
+					INLINE int BLENDER1_16_NIMR_NZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c, int dith)
+				#endif
 			#endif
 		#endif
 	#endif
@@ -100,20 +164,12 @@
 #endif
 
 #if defined(ZCOMPARE)
-	if (!curpixel_overlap && !other_modes.force_blend)
-	{
-		r = *blender1a_r[0];
-		g = *blender1a_g[0];
-		b = *blender1a_b[0];
-	}
-	else
-	{
-		inv_pixel_color.i.a = 0xff - *blender1b_a[0];
+#if defined(FORCEBLEND)
+	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-		BLENDER_EQUATION0(&r, &g, &b, special_bsel);
-	}
+	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
 #else
-	if (!other_modes.force_blend)
+	if (!curpixel_overlap)
 	{
 		r = *blender1a_r[0];
 		g = *blender1a_g[0];
@@ -123,8 +179,19 @@
 	{
 		inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-		BLENDER_EQUATION0(&r, &g, &b, special_bsel);
+		BLENDER_EQUATION0_NFORCE(&r, &g, &b, special_bsel);
 	}
+#endif
+#else
+#if defined(FORCEBLEND)
+	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
+
+	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
+#else
+	r = *blender1a_r[0];
+	g = *blender1a_g[0];
+	b = *blender1a_b[0];
+#endif
 #endif
 
 #if !defined(RGBDITHER1)
@@ -138,63 +205,127 @@
     return (FBWRITE_16(fb, hb, r, g, b));
 }
 
-#if defined(ALPHACOMPARE)
-	#if defined(RGBDITHER1)
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_ZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+#if defined(FORCEBLEND)
+	#if defined(ALPHACOMPARE)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_ZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_DITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_NZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_NZC_DITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_NDITH_AC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#endif
 	#else
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_ZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_ZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_DITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_NZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_NZC_NDITH_AC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_NDITH_NAC_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#endif
 	#endif
 #else
-	#if defined(RGBDITHER1)
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_ZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+	#if defined(ALPHACOMPARE)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_ZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_DITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_NZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_NZC_DITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_NDITH_AC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#endif
 	#else
-		#if defined(ZCOMPARE)
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_ZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+		#if defined(RGBDITHER1)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_ZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_DITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#else
-			#if defined(IMGREAD)
-				INLINE int BLENDER2_16_IMR_NZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+			#if defined(ZCOMPARE)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_ZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_ZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#else
-				INLINE int BLENDER2_16_NIMR_NZC_NDITH_NAC(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#if defined(IMGREAD)
+					INLINE int BLENDER2_16_IMR_NZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#else
+					INLINE int BLENDER2_16_NIMR_NZC_NDITH_NAC_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
+				#endif
 			#endif
 		#endif
 	#endif
@@ -241,7 +372,11 @@
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-	BLENDER_EQUATION0(&r, &g, &b, special_bsel);
+#if defined(FORCEBLEND)
+	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
+#else
+	BLENDER_EQUATION1_FORCE(&r, &g, &b, special_bsel);
+#endif
 
 	blended_pixel_color.i.r = r;
 	blended_pixel_color.i.g = g;
@@ -254,7 +389,19 @@
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[1];
 
-	if (!curpixel_overlap && !other_modes.force_blend)
+#if defined(FORCEBLEND)
+	if (blender2b_a[1] == &memory_color.i.a)
+	{
+		special_bsel = 1;
+	}
+	else
+	{
+		special_bsel = 0;
+	}
+
+	BLENDER_EQUATION1_FORCE(&r, &g, &b, special_bsel);
+#else
+	if (!curpixel_overlap)
 	{
 		r = *blender1a_r[1];
 		g = *blender1a_g[1];
@@ -271,8 +418,9 @@
 			special_bsel = 0;
 		}
 
-		BLENDER_EQUATION1(&r, &g, &b, special_bsel);
+		BLENDER_EQUATION1_NFORCE(&r, &g, &b, special_bsel);
 	}
+#endif
 
 #if !defined(RGBDITH1)
 	// Hack to prevent "double-dithering" artifacts
@@ -286,32 +434,64 @@
 }
 
 #if !defined(RGBDITHER1)
-#if defined(ALPHACOMPARE)
-	#if defined(ZCOMPARE)
-		#if defined(IMGREAD)
-			INLINE int BLENDER1_16_IMR_ZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+#if defined(FORCEBLEND)
+	#if defined(ALPHACOMPARE)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_ZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_ZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#else
-			INLINE int BLENDER1_16_NIMR_ZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_NZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_NZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#endif
 	#else
-		#if defined(IMGREAD)
-			INLINE int BLENDER1_16_IMR_NZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_ZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_ZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#else
-			INLINE int BLENDER1_16_NIMR_NZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_NZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_NZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#endif
 	#endif
 #else
-	#if defined(ZCOMPARE)
-		#if defined(IMGREAD)
-			INLINE int BLENDER1_16_IMR_ZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+	#if defined(ALPHACOMPARE)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_ZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_ZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#else
-			INLINE int BLENDER1_16_NIMR_ZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_NZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_NZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#endif
 	#else
-		#if defined(IMGREAD)
-			INLINE int BLENDER1_16_IMR_NZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_ZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_ZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#else
-			INLINE int BLENDER1_16_NIMR_NZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c)
+			#if defined(IMGREAD)
+				INLINE int BLENDER1_16_IMR_NZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#else
+				INLINE int BLENDER1_16_NIMR_NZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c)
+			#endif
 		#endif
 	#endif
 #endif
@@ -356,20 +536,12 @@
 #endif
 
 #if defined(ZCOMPARE)
-	if (!curpixel_overlap && !other_modes.force_blend)
-	{
-		r = *blender1a_r[0];
-		g = *blender1a_g[0];
-		b = *blender1a_b[0];
-	}
-	else
-	{
-		inv_pixel_color.i.a = 0xff - *blender1b_a[0];
+#if defined(FORCEBLEND)
+	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-		BLENDER_EQUATION0(&r, &g, &b, special_bsel);
-	}
+	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
 #else
-	if (!other_modes.force_blend)
+	if (!curpixel_overlap)
 	{
 		r = *blender1a_r[0];
 		g = *blender1a_g[0];
@@ -379,39 +551,82 @@
 	{
 		inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-		BLENDER_EQUATION0(&r, &g, &b, special_bsel);
+		BLENDER_EQUATION0_NFORCE(&r, &g, &b, special_bsel);
 	}
+#endif
+#else
+#if defined(FORCEBLEND)
+	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
+
+	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
+#else
+	r = *blender1a_r[0];
+	g = *blender1a_g[0];
+	b = *blender1a_b[0];
+#endif
 #endif
 
     return (FBWRITE_16(fb, hb, r, g, b));
 }
 
-#if defined(ALPHACOMPARE)
-	#if defined(ZCOMPARE)
-		#if defined(IMGREAD)
-			INLINE int BLENDER2_16_IMR_ZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+#if defined(FORCEBLEND)
+	#if defined(ALPHACOMPARE)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_ZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_ZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#else
-			INLINE int BLENDER2_16_NIMR_ZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_NZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_NZC_AC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#endif
 	#else
-		#if defined(IMGREAD)
-			INLINE int BLENDER2_16_IMR_NZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_ZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_ZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#else
-			INLINE int BLENDER2_16_NIMR_NZC_AC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_NZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_NZC_NAC_ND_FORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#endif
 	#endif
 #else
-	#if defined(ZCOMPARE)
-		#if defined(IMGREAD)
-			INLINE int BLENDER2_16_IMR_ZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+	#if defined(ALPHACOMPARE)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_ZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_ZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#else
-			INLINE int BLENDER2_16_NIMR_ZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_NZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_NZC_AC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#endif
 	#else
-		#if defined(IMGREAD)
-			INLINE int BLENDER2_16_IMR_NZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+		#if defined(ZCOMPARE)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_ZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_ZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#else
-			INLINE int BLENDER2_16_NIMR_NZC_NAC_ND(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#if defined(IMGREAD)
+				INLINE int BLENDER2_16_IMR_NZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#else
+				INLINE int BLENDER2_16_NIMR_NZC_NAC_ND_NFORCE(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2)
+			#endif
 		#endif
 	#endif
 #endif
@@ -457,7 +672,11 @@
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-	BLENDER_EQUATION0(&r, &g, &b, special_bsel);
+#if defined(FORCEBLEND)
+	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
+#else
+	BLENDER_EQUATION0_NFORCE(&r, &g, &b, special_bsel);
+#endif
 
 	blended_pixel_color.i.r = r;
 	blended_pixel_color.i.g = g;
@@ -470,7 +689,19 @@
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[1];
 
-	if (!curpixel_overlap && !other_modes.force_blend)
+#if defined(FORCEBLEND)
+	if (blender2b_a[1] == &memory_color.i.a)
+	{
+		special_bsel = 1;
+	}
+	else
+	{
+		special_bsel = 0;
+	}
+
+	BLENDER_EQUATION1_FORCE(&r, &g, &b, special_bsel);
+#else
+	if (!curpixel_overlap)
 	{
 		r = *blender1a_r[1];
 		g = *blender1a_g[1];
@@ -487,8 +718,9 @@
 			special_bsel = 0;
 		}
 
-		BLENDER_EQUATION1(&r, &g, &b, special_bsel);
+		BLENDER_EQUATION1_NFORCE(&r, &g, &b, special_bsel);
 	}
+#endif
 
 	return (FBWRITE_16(fb, hb, r, g, b));
 }

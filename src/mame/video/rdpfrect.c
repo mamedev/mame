@@ -68,7 +68,7 @@
 		for (i = x1; i <= x2; i++)
 		{
 			curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-			c.c = COLOR_COMBINER1();
+			COLOR_COMBINER1(c);
 			dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
 			BLENDER1_16_DITH(&fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c, dith);
 		}
@@ -82,7 +82,7 @@
 		for (i = x1; i <= x2; i++)
 		{
 			curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-			c.c = COLOR_COMBINER1();
+			COLOR_COMBINER1(c);
 			dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
 			BLENDER1_16_DITH(&fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c, dith);
 		}
@@ -95,7 +95,7 @@
 		for (i = x1; i <= x2; i++)
 		{
 			curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-			c.c = COLOR_COMBINER1();
+			COLOR_COMBINER1(c);
 			BLENDER1_16_NDITH(&fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c);
 		}
 	}
@@ -172,8 +172,8 @@
 		for (i=x1; i <= x2; i++)
 		{
 			curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-			c1.c = COLOR_COMBINER2_C0();
-			c2.c = COLOR_COMBINER2_C1();
+			COLOR_COMBINER2_C0(c1);
+			COLOR_COMBINER2_C1(c2);
 			dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
 			BLENDER2_16_DITH(&fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2, dith);
 		}
@@ -187,8 +187,8 @@
 		for (i=x1; i <= x2; i++)
 		{
 			curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-			c1.c = COLOR_COMBINER2_C0();
-			c2.c = COLOR_COMBINER2_C1();
+			COLOR_COMBINER2_C0(c1);
+			COLOR_COMBINER2_C1(c2);
 			dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
 			BLENDER2_16_DITH(&fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2, dith);
 		}
@@ -201,8 +201,8 @@
 		for (i=x1; i <= x2; i++)
 		{
 			curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
-			c1.c = COLOR_COMBINER2_C0();
-			c2.c = COLOR_COMBINER2_C1();
+			COLOR_COMBINER2_C0(c1);
+			COLOR_COMBINER2_C1(c2);
 			BLENDER2_16_NDITH(&fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2);
 		}
 	}

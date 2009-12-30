@@ -980,7 +980,7 @@
 					texel0_color.c = TEXTURE_PIPELINE(sss, sst, tex_tile);
 #endif
 
-					c1.c = COLOR_COMBINER1();
+					COLOR_COMBINER1(c1);
 
 #if defined(ZCOMPARE)
 #if !defined(ZBUF)
@@ -2144,8 +2144,8 @@
 					texel1_color.c = TEXTURE_PIPELINE(sss, sst, tex_tile2);
 #endif
 
-					c1.c = COLOR_COMBINER2_C0();
-					c2.c = COLOR_COMBINER2_C1();
+					COLOR_COMBINER2_C0(c1);
+					COLOR_COMBINER2_C1(c2);
 
 #if defined(ZCOMPARE)
 #if !defined(ZBUF)

@@ -12,8 +12,6 @@
 	#endif
 #endif
 {
-	//int dosfrac = (tex_tile->cs || !tex_tile->mask_s);
-	//int dotfrac = (tex_tile->ct || !tex_tile->mask_t);
 #if defined(DOS)
 	if (*S & 0x10000)
 	{

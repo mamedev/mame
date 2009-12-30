@@ -339,9 +339,6 @@ INLINE void BLENDER_EQUATION0_NFORCE(INT32* r, INT32* g, INT32* b, int bsel_spec
 INLINE void BLENDER_EQUATION1_FORCE(INT32* r, INT32* g, INT32* b, int bsel_special);
 INLINE void BLENDER_EQUATION1_NFORCE(INT32* r, INT32* g, INT32* b, int bsel_special);
 
-static void (*BLENDER_EQUATION0)(INT32* r, INT32* g, INT32* b, int bsel_special);
-static void (*BLENDER_EQUATION1)(INT32* r, INT32* g, INT32* b, int bsel_special);
-
 #include "video/rdpfb.h"
 
 static UINT32 (*FBWRITE_16)(UINT16*, UINT8*, UINT32, UINT32, UINT32);
@@ -396,11 +393,11 @@ static int (*BLENDER2_16_DITH)(UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int di
 
 #include "video/rdptri.h"
 
-#include "video/rdpclamp.h"
+//#include "video/rdpclamp.h"
 
-static void (*CLAMP)(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile);
-static void (*CLAMP_LIGHT)(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile);
-static void (*CLAMP_QUICK)(INT32* S, INT32* T, INT32 maxs, INT32 maxt, int num);
+//static void (*CLAMP)(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, TILE* tex_tile);
+//static void (*CLAMP_LIGHT)(INT32* S, INT32* T, INT32 maxs, INT32 maxt, TILE* tex_tile);
+//static void (*CLAMP_QUICK)(INT32* S, INT32* T, INT32 maxs, INT32 maxt, int num);
 
 static UINT8 rdp_rand_val = 0;
 
@@ -410,22 +407,14 @@ static UINT8 rdp_rand_val = 0;
 
 static void (*MASK)(INT32* S, INT32* T, TILE* tex_tile);
 
-#include "video/rdpcc.h"
-
-static UINT32 (*COLOR_COMBINER1)(void);
-static UINT32 (*COLOR_COMBINER2_C0)(void);
-static UINT32 (*COLOR_COMBINER2_C1)(void);
-
-#include "video/rdpshift.h"
-
-static void (*texshift)(INT32* S, INT32* T, INT32* maxs, INT32* maxt, TILE* tex_tile);
+#define NOISE
+	#include "video/rdpcc.c"
+#undef NOISE
+	#include "video/rdpcc.c"
 
 #define CACHE_TEXTURE_PARAMS(TEX) \
-	CLAMP = rdp_clamp_func[((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | ((TEX->cs || !TEX->mask_s) ? 2 : 0) | ((TEX->ct || !TEX->mask_t) ? 1 : 0)]; \
-	CLAMP_LIGHT = rdp_clamp_light_func[((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | ((TEX->cs || !TEX->mask_s) ? 2 : 0) | ((TEX->ct || !TEX->mask_t) ? 1 : 0)]; \
-	CLAMP_QUICK = rdp_clamp_quick_func[((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | ((TEX->cs || !TEX->mask_s) ? 2 : 0) | ((TEX->ct || !TEX->mask_t) ? 1 : 0)]; \
+	TEXTURE_PIPELINE = rdp_texture_pipeline_func[(TEX->shift_t ? 64 : 0) | (TEX->shift_s ? 32 : 0) | ((TEX->ct || !TEX->mask_t) ? 16 : 0) | ((TEX->cs || !TEX->mask_s) ? 8 : 0) | ((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | (other_modes.mid_texel << 1) | other_modes.sample_type]; \
 	MASK = rdp_mask_func[(TEX->mask_s ? 2 : 0) | (TEX->mask_t ? 1 : 0)]; \
-	texshift = rdp_shift_func[(TEX->shift_s ? 2 : 0) | (TEX->shift_t ? 1 : 0)]; \
 	cached_twidth  = TEX->line; \
 	cached_tbase   = TEX->tmem; \
 	cached_tpal    = (TEX->palette & 0xf) << 4; \
@@ -2002,7 +1991,14 @@ INLINE int BLENDER1_32(UINT32 *fb, COLOR c)
 	{
 		inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-		BLENDER_EQUATION0(&r, &g, &b, special_bsel0);
+		if(other_modes.force_blend)
+		{
+			BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel0);
+		}
+		else
+		{
+			BLENDER_EQUATION0_NFORCE(&r, &g, &b, special_bsel0);
+		}
 	}
 
 	return  (FBWRITE_32(fb,r,g,b));
@@ -2046,7 +2042,14 @@ INLINE int BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
-	BLENDER_EQUATION0(&r, &g, &b, special_bsel0);
+	if(other_modes.force_blend)
+	{
+		BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel0);
+	}
+	else
+	{
+		BLENDER_EQUATION0_NFORCE(&r, &g, &b, special_bsel0);
+	}
 
 	blended_pixel_color.i.r = r;
 	blended_pixel_color.i.g = g;
@@ -2066,7 +2069,14 @@ INLINE int BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 	{
 		inv_pixel_color.i.a = 0xff - *blender1b_a[1];
 
-		BLENDER_EQUATION1(&r, &g, &b, special_bsel1);
+		if(other_modes.force_blend)
+		{
+			BLENDER_EQUATION1_FORCE(&r, &g, &b, special_bsel1);
+		}
+		else
+		{
+			BLENDER_EQUATION1_NFORCE(&r, &g, &b, special_bsel1);
+		}
 	}
 
 	return  (FBWRITE_32(fb,r,g,b));
@@ -2132,7 +2142,7 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 			for (i=x1; i <= x2; i++)
 			{
 				curpixel_cvg = fill_cvg;
-				c.c = COLOR_COMBINER1();
+				COLOR_COMBINER1(c);
 				BLENDER1_32(&fb[(index + i)], c);
 			}
 		}
@@ -2146,8 +2156,8 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 			for (i=x1; i <= x2; i++)
 			{
 				curpixel_cvg = fill_cvg;
-				c1.c = COLOR_COMBINER2_C0();
-				c2.c = COLOR_COMBINER2_C1();
+				COLOR_COMBINER2_C0(c1);
+				COLOR_COMBINER2_C1(c2);
 				BLENDER2_32(&fb[(index + i)], c1, c2);
 			}
 		}
@@ -2235,7 +2245,7 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 					texel0_color.c = TEXTURE_PIPELINE(ss, st, tex_tile);
 				}
 
-				c.c = COLOR_COMBINER1();
+				COLOR_COMBINER1(c);
 
 				BLENDER1_32(&fb[(fb_index + i)], c);
 
@@ -2276,8 +2286,8 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 					texel1_color.c = TEXTURE_PIPELINE(ss, st, tex_tile2);
 				}
 
-				c1.c = COLOR_COMBINER2_C0();
-				c2.c = COLOR_COMBINER2_C1();
+				COLOR_COMBINER2_C0(c1);
+				COLOR_COMBINER2_C1(c2);
 
 				BLENDER2_32(&fb[(fb_index + i)], c1, c2);
 
@@ -2503,12 +2513,12 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 
 					if (other_modes.cycle_type == CYCLE_TYPE_1)
 					{
-						c1.c = COLOR_COMBINER1();
+						COLOR_COMBINER1(c1);
 					}
 					else if (other_modes.cycle_type == CYCLE_TYPE_2)
 					{
-						c1.c = COLOR_COMBINER2_C0();
-						c2.c = COLOR_COMBINER2_C1();
+						COLOR_COMBINER2_C0(c1);
+						COLOR_COMBINER2_C1(c2);
   					}
 
 					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
@@ -3640,8 +3650,6 @@ static RDP_COMMAND( rdp_set_other_modes )
 	render_spans_16_s_t_nz_f = rdp_render_spans_16_func[28 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
 	render_spans_16_s_t_z_f = rdp_render_spans_16_func[30 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
 
-	TEXTURE_PIPELINE = rdp_texture_pipeline_func[(other_modes.mid_texel << 1) | other_modes.sample_type];
-
 	for(index = 0; index < 8; index++)
 	{
 		tile[index].fetch_index = (tile[index].size << 5) | (tile[index].format << 2) | (other_modes.en_tlut << 1) | other_modes.tlut_type;
@@ -3650,13 +3658,10 @@ static RDP_COMMAND( rdp_set_other_modes )
 	FBWRITE_16 = rdp_fbwrite_16_func[(other_modes.color_on_cvg << 3) | (other_modes.image_read_en << 2) | other_modes.cvg_dest];
 	FBWRITE_32 = rdp_fbwrite_32_func[(other_modes.color_on_cvg << 3) | (other_modes.image_read_en << 2) | other_modes.cvg_dest];
 
-	BLENDER_EQUATION0 = other_modes.force_blend ? BLENDER_EQUATION0_FORCE : BLENDER_EQUATION0_NFORCE;
-	BLENDER_EQUATION1 = other_modes.force_blend ? BLENDER_EQUATION1_FORCE : BLENDER_EQUATION1_NFORCE;
-
-	BLENDER1_16_DITH = rdp_blender1_16_dith_func[(other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
-	BLENDER2_16_DITH = rdp_blender2_16_dith_func[(other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
-	BLENDER1_16_NDITH = rdp_blender1_16_ndith_func[(other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
-	BLENDER2_16_NDITH = rdp_blender2_16_ndith_func[(other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
+	BLENDER1_16_DITH = rdp_blender1_16_dith_func[(other_modes.force_blend << 4) | (other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
+	BLENDER2_16_DITH = rdp_blender2_16_dith_func[(other_modes.force_blend << 4) | (other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
+	BLENDER1_16_NDITH = rdp_blender1_16_ndith_func[(other_modes.force_blend << 3) | (other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
+	BLENDER2_16_NDITH = rdp_blender2_16_ndith_func[(other_modes.force_blend << 3) | (other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
 
 	SET_BLENDER_INPUT(0, 0, &blender1a_r[0], &blender1a_g[0], &blender1a_b[0], &blender1b_a[0],
 					  other_modes.blend_m1a_0, other_modes.blend_m1b_0);
@@ -3892,10 +3897,6 @@ static RDP_COMMAND( rdp_load_tile )
 				{
 					tc[(tline + i) ^ xorval8] = src[(ti_address + s + i) ^ BYTE_ADDR_XOR];
 				}
-				//for (int k=0; k < (topad); k++) // Padding is possibly necessary, not yet known.
-				//{
-				//    tc[((tline+i+k) ^ xorval8] = src[(ti_address + s + i) ^ BYTE_ADDR_XOR];
-				//}
 			}
 			break;
 		}
@@ -4090,6 +4091,7 @@ static RDP_COMMAND( rdp_set_combine )
 	SET_MUL_ALPHA_INPUT(&combiner_alphamul[1], combine.mul_a1);
 	SET_SUB_ALPHA_INPUT(&combiner_alphaadd[1], combine.add_a1);
 
+	/*
 	if(combiner_rgbsub_a_r[1] == &noise_color.i.r)
 	{
 		COLOR_COMBINER1 = COLOR_COMBINER1_NOISE;
@@ -4102,6 +4104,7 @@ static RDP_COMMAND( rdp_set_combine )
 		COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NNOISE;
 		COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NNOISE;
 	}
+	*/
 }
 
 static RDP_COMMAND( rdp_set_texture_image )
@@ -4257,24 +4260,15 @@ void rdp_process_list(running_machine *machine)
 INLINE void BLENDER_EQUATION0_FORCE(INT32* r, INT32* g, INT32* b, int bsel_special)
 {
 	int blend1a = *blender1b_a[0];
-	int blend2a = *blender2b_a[0];
 	INT32 tr, tg, tb;
 	if (bsel_special)
 	{
 		blend1a &= 0xe0;
 	}
 
-	tr = (int)(*blender1a_r[0]) * blend1a + (int)(*blender2a_r[0]) * blend2a;
-	tg = (int)(*blender1a_g[0]) * blend1a + (int)(*blender2a_g[0]) * blend2a;
-	tb = (int)(*blender1a_b[0]) * blend1a + (int)(*blender2a_b[0]) * blend2a;
-
-	tr += ((int)(*blender2a_r[0])) << (3 + bsel_special);
-	tg += ((int)(*blender2a_g[0])) << (3 + bsel_special);
-	tb += ((int)(*blender2a_b[0])) << (3 + bsel_special);
-
-	tr >>= 8;
-	tg >>= 8;
-	tb >>= 8;
+	tr = ((int)(*blender1a_r[0]) * blend1a + (int)(*blender2a_r[0]) * *blender2b_a[0] + ((int)(*blender2a_r[0]) << (3 + bsel_special))) >> 8;
+	tg = ((int)(*blender1a_g[0]) * blend1a + (int)(*blender2a_g[0]) * *blender2b_a[0] + ((int)(*blender2a_g[0]) << (3 + bsel_special))) >> 8;
+	tb = ((int)(*blender1a_b[0]) * blend1a + (int)(*blender2a_b[0]) * *blender2b_a[0] + ((int)(*blender2a_b[0]) << (3 + bsel_special))) >> 8;
 
 	if (tr > 255) *r = 255; else *r = tr;
 	if (tg > 255) *g = 255; else *g = tg;
@@ -4498,56 +4492,197 @@ INLINE UINT32 addleftcvg(UINT32 x, UINT32 k)
 #undef COLOR_ON_CVG
 	#include "video/rdpfb.c"
 
-#define ALPHACOMPARE
-	#define IMGREAD
-		#define ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-		#undef ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-	#undef IMGREAD
-		#define ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-		#undef ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-#undef ALPHACOMPARE
-	#define IMGREAD
-		#define ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-		#undef ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-	#undef IMGREAD
-		#define ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
-		#undef ZCOMPARE
-			#define RGBDITHER1
-				#include "video/rdpblend.c"
-			#undef RGBDITHER1
-				#include "video/rdpblend.c"
+#define FORCEBLEND
+	#define ALPHACOMPARE
+		#define IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+		#undef IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+	#undef ALPHACOMPARE
+		#define IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+		#undef IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+#undef FORCEBLEND
+	#define ALPHACOMPARE
+		#define IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+		#undef IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+	#undef ALPHACOMPARE
+		#define IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+		#undef IMGREAD
+			#define ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
+			#undef ZCOMPARE
+				#define RGBDITHER1
+					#include "video/rdpblend.c"
+				#undef RGBDITHER1
+					#include "video/rdpblend.c"
 
 #include "video/rdpfetch.c"
 
-#include "video/rdptpipe.c"
+#define SHIFT_T
+	#define SHIFT_S
+		#define DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+		#undef DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+	#undef SHIFT_S
+		#define DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+		#undef DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+#undef SHIFT_T
+	#define SHIFT_S
+		#define DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+		#undef DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+	#undef SHIFT_S
+		#define DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+		#undef DOT
+			#define DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
+			#undef DOS
+				#define COPY
+					#include "video/rdptpipe.c"
+				#undef COPY
+					#include "video/rdptpipe.c"
 
 #define ZCOMPARE
 	#define ZUPDATE
@@ -5169,17 +5304,6 @@ INLINE UINT32 addleftcvg(UINT32 x, UINT32 k)
 
 #include "video/rdptri.c"
 
-#define DOS
-	#define DOT
-		#include "video/rdpclamp.c"
-	#undef DOT
-		#include "video/rdpclamp.c"
-#undef DOS
-	#define DOT
-		#include "video/rdpclamp.c"
-	#undef DOT
-		#include "video/rdpclamp.c"
-
 #define MASK_S
 	#define MASK_T
 		#include "video/rdpmask.c"
@@ -5190,20 +5314,3 @@ INLINE UINT32 addleftcvg(UINT32 x, UINT32 k)
 		#include "video/rdpmask.c"
 	#undef MASK_T
 		#include "video/rdpmask.c"
-
-#define SHIFT_S
-	#define SHIFT_T
-		#include "video/rdpshift.c"
-	#undef SHIFT_T
-		#include "video/rdpshift.c"
-#undef SHIFT_S
-	#define SHIFT_T
-		#include "video/rdpshift.c"
-	#undef SHIFT_T
-		#include "video/rdpshift.c"
-
-#define NOISE
-	#include "video/rdpcc.c"
-#undef NOISE
-	#include "video/rdpcc.c"
-
