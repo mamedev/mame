@@ -1222,7 +1222,7 @@ chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, 
 chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags)
 {
 	UINT8 raw_meta_header[METADATA_HEADER_SIZE];
-	metadata_entry metaentry;
+	metadata_entry metaentry = { 0 };
 	chd_error err;
 	UINT64 offset;
 	UINT32 count;

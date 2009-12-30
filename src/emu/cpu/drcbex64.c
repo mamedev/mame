@@ -3679,6 +3679,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp;
+	int regoffs;
 	int regnum;
 
 	/* validate instruction */
@@ -3707,26 +3708,28 @@ static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	emit_mov_m32_r32(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, exp)), REG_EAX);	// mov    state->exp,eax
 
 	/* copy integer registers */
+	regoffs = offsetof(drcuml_machine_state, r);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
-			emit_mov_m64_r64(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)), int_register_map[regnum]);
+			emit_mov_m64_r64(&dst, MBD(REG_RCX, regoffs + 8 * regnum), int_register_map[regnum]);
 		else
 		{
 			emit_mov_r64_m64(&dst, REG_RAX, MABS(drcbe, &drcbe->state.r[regnum].d));
-			emit_mov_m64_r64(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)), REG_RAX);
+			emit_mov_m64_r64(&dst, MBD(REG_RCX, regoffs + 8 * regnum), REG_RAX);
 		}
 	}
 
 	/* copy FP registers */
+	regoffs = offsetof(drcuml_machine_state, f);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
-			emit_movsd_m64_r128(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)), float_register_map[regnum]);
+			emit_movsd_m64_r128(&dst, MBD(REG_RCX, regoffs + 8 * regnum), float_register_map[regnum]);
 		else
 		{
 			emit_mov_r64_m64(&dst, REG_RAX, MABS(drcbe, &drcbe->state.f[regnum].d));
-			emit_mov_m64_r64(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)), REG_RAX);
+			emit_mov_m64_r64(&dst, MBD(REG_RCX, regoffs + 8 * regnum), REG_RAX);
 		}
 	}
 
@@ -3741,6 +3744,7 @@ static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp;
+	int regoffs;
 	int regnum;
 
 	/* validate instruction */
@@ -3754,25 +3758,27 @@ static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	emit_mov_r64_imm(&dst, REG_ECX, dstp.value);										// mov    rcx,dstp
 
 	/* copy integer registers */
+	regoffs = offsetof(drcuml_machine_state, r);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
-			emit_mov_r64_m64(&dst, int_register_map[regnum], MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)));
+			emit_mov_r64_m64(&dst, int_register_map[regnum], MBD(REG_RCX, regoffs + 8 * regnum));
 		else
 		{
-			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)));
+			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, regoffs + 8 * regnum));
 			emit_mov_m64_r64(&dst, MABS(drcbe, &drcbe->state.r[regnum].d), REG_RAX);
 		}
 	}
 
 	/* copy FP registers */
+	regoffs = offsetof(drcuml_machine_state, f);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
-			emit_movsd_r128_m64(&dst, float_register_map[regnum], MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)));
+			emit_movsd_r128_m64(&dst, float_register_map[regnum], MBD(REG_RCX, regoffs + 8 * regnum));
 		else
 		{
-			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)));
+			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, regoffs + 8 * regnum));
 			emit_mov_m64_r64(&dst, MABS(drcbe, &drcbe->state.f[regnum].d), REG_RAX);
 		}
 	}

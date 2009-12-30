@@ -1148,6 +1148,8 @@ static void draw_model(UINT32 addr)
 	center_x = (float)(viewport_region_x + (viewport_region_width / 2));
 	center_y = (float)(viewport_region_y + (viewport_region_height / 2));
 
+	memset(prev_vertex, 0, sizeof(prev_vertex));
+
 	while (!last_polygon)
 	{
 		float texture_coord_scale;
