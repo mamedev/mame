@@ -1250,6 +1250,29 @@ static void emit_mov_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 
 
 /*-------------------------------------------------
+    emit_movsx_r64_p32 - move a 32-bit parameter
+    sign-extended into a register
+-------------------------------------------------*/
+
+static void emit_movsx_r64_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE)
+	{
+		if (param->value == 0)
+			emit_xor_r32_r32(dst, reg, reg);											// xor   reg,reg
+		else if ((INT32)param->value >= 0)
+			emit_mov_r32_imm(dst, reg, param->value);									// mov   reg,param
+		else
+			emit_mov_r64_imm(dst, reg, (INT32)param->value);							// mov   reg,param
+	}
+	else if (param->type == DRCUML_PTYPE_MEMORY)
+		emit_movsxd_r64_m32(dst, reg, MABS(drcbe, param->value));						// movsxd reg,[param]
+	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
+		emit_movsxd_r64_r32(dst, reg, param->value);									// movsdx reg,param
+}
+
+
+/*-------------------------------------------------
     emit_mov_r32_p32_keepflags - move a 32-bit
     parameter into a register without affecting
     any flags
@@ -3849,7 +3872,7 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
+		emit_movsx_r64_p32(drcbe, &dst, indreg, &indp);
 		if (size == DRCUML_SIZE_BYTE)
 			emit_movzx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movzx dstreg,[basep + scale*indp]
 		else if (size == DRCUML_SIZE_WORD)
@@ -3925,7 +3948,7 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
+		emit_movsx_r64_p32(drcbe, &dst, indreg, &indp);
 		if (inst->size == 4)
 		{
 			if (size == DRCUML_SIZE_BYTE)
@@ -4031,7 +4054,7 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
+		emit_movsx_r64_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
 
 		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
