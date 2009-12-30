@@ -266,7 +266,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	UINT8* bios_region;
 	char tempname[20];
 
-	printf("game 0 selected\n");
+	//printf("game 0 selected\n");
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
@@ -294,7 +294,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		// knows from the cart pinout
 		if (bios_region[0x8000]==2)
 		{
-			printf("SMS cart!!, CPU not running\n");
+			//printf("SMS cart!!, CPU not running\n");
 			mtech_bios.current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
 			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
@@ -304,7 +304,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		}
 		else if (bios_region[0x8000]==1)
 		{
-			printf("Genesis Cart, CPU0 running\n");
+			//printf("Genesis Cart, CPU0 running\n");
 			mtech_bios.current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
@@ -406,7 +406,7 @@ static WRITE8_HANDLER (mt_z80_bank_w)
 		mtech_bios.mt_bank_bank_pos = 0;
 		mtech_bios.mt_bank_addr = mtech_bios.mt_bank_partial;
 		mtech_bios.mt_bank_partial = 0;
-		printf("MT z80 bank set to %08x\n", mtech_bios.mt_bank_addr);
+		//printf("MT z80 bank set to %08x\n", mtech_bios.mt_bank_addr);
 
 	}
 }

@@ -6252,7 +6252,7 @@ static void megadriv_init_common(running_machine *machine)
 	_genesis_snd_z80_cpu = cputag_get_cpu(machine, "genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
-		printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
+		//printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
 
 		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
 		memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
