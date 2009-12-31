@@ -5267,6 +5267,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( yiear2 )	/* GX407 (c) 1985 */
 	DRIVER( kicker )	/* GX477 (c) 1985 */
 	DRIVER( shaolins )	/* GX477 (c) 1985 */
+	DRIVER( shaolinb )	/* bootleg */
 	DRIVER( pingpong )	/* GX555 (c) 1985 */
 	DRIVER( merlinmm )	/* (c) 1986 Zilec-Zenitone */
 	DRIVER( cashquiz )	/* (c) 1986 Zilec-Zenitone */

@@ -11,6 +11,7 @@ driver by Allard Van Der Bas
 #include "deprecat.h"
 #include "sound/sn76496.h"
 
+#define MASTER_CLOCK XTAL_18_432MHz
 
 UINT8 shaolins_nmi_enable;
 
@@ -202,7 +203,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( shaolins )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)        /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shaolins_map)
 	MDRV_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
@@ -224,13 +225,22 @@ static MACHINE_DRIVER_START( shaolins )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, XTAL_18_432MHz/12)        /* verified on pcb */
+	MDRV_SOUND_ADD("sn1", SN76496, MASTER_CLOCK/12)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn2", SN76496, XTAL_18_432MHz/6)        /* verified on pcb */
+	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/6)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( shaolinb )
+    MDRV_IMPORT_FROM(shaolins)
+
+    MDRV_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+    MDRV_SOUND_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -282,7 +292,64 @@ ROM_START( shaolins )
 	ROM_LOAD( "kicker.f16",   0x0400, 0x0100, CRC(80009cf5) SHA1(a367f3f55d75a9d5bf4d43f9d77272eb910a1344) ) /* sprite lookup table */
 ROM_END
 
+/*
+    Shao-lin's Road (Bootleg)
+
+    Main Board:    VWXYZ
+    Daughterboard: QSTU (Replaces 3 custom Konami chips)
+    Daughterboard: RSTU (Replaces 4 custom Konami chips)
+
+    All the roms/proms are located on the main board.
+
+    Board Layout with edge connector on the left.  ROM's/PROM's are marked too.
+    PROM's have an asterick suffix to distinguish them from the ROM's.
+
+         A  B  C  D  E  F  G  H  I  J  K  L  M  N  O
+    |-------------------------------------------------|
+    |                                                 |
+    |                            6  7  3* 4* 5*       | 1
+    |                                                 |
+    |                      2*                         | 2
+    |--|                                              |
+       |                                              | 3
+    |--|                                              |
+    |                         3  4  5                 | 4
+    |                                                 |
+    |                                                 | 5
+    |--|                                              |
+       |                                           1* | 6
+    |--|                                              |
+    |                                                 | 7
+    |                                                 |
+    |                                        1  2     | 8
+    |                                                 |
+    |-------------------------------------------------|
+*/
+
+ROM_START( shaolinb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.h4", 0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) ) /* 2764 */
+	ROM_LOAD( "4.i4", 0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) ) /* 27128 */
+	ROM_LOAD( "5.j4", 0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) ) /* 27128 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "6.i1", 0x0000, 0x2000, CRC(ff18a7ed) SHA1(f28bfeff84bb6a08a8bee999a0b7a19e09a8dfc3) ) /* 2764 */
+	ROM_LOAD( "7.j1", 0x2000, 0x4000, CRC(d9a7cff6) SHA1(47244426b9a674326c5303347112aa9d33bcf1df) ) /* 27128 */
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) /* All roms are 27128 */
+	ROM_LOAD( "1.l8", 0x0000, 0x4000, CRC(a79959b2) SHA1(9c58975c55f7be32add0dccb259d9680410fa9bc) )
+	ROM_LOAD( "2.m8", 0x4000, 0x4000, CRC(560521c7) SHA1(f8a50c66364995041e29ed7be2e4ea1ad16aa735) )
+
+	ROM_REGION( 0x0500, "proms", 0 ) /* All proms are N82S129N */
+	ROM_LOAD( "3.k1", 0x0000, 0x0100, CRC(b09db4b4) SHA1(d21176cdc7def760da109083eb52e5b6a515021f) ) /* palette red component */
+	ROM_LOAD( "4.l1", 0x0100, 0x0100, CRC(270a2bf3) SHA1(c0aec04bd3bceccddf5f5a814a560a893b29ef6b) ) /* palette green component */
+	ROM_LOAD( "5.m1", 0x0200, 0x0100, CRC(83e95ea8) SHA1(e0bfa20600488f5c66233e13ea6ad857f62acb7c) ) /* palette blue component */
+	ROM_LOAD( "2.g2", 0x0300, 0x0100, CRC(aa900724) SHA1(c5343273d0a7101b8ba6876c4f22e43d77610c75) ) /* character lookup table */
+	ROM_LOAD( "1.o6", 0x0400, 0x0100, CRC(80009cf5) SHA1(a367f3f55d75a9d5bf4d43f9d77272eb910a1344) ) /* sprite lookup table */
+ROM_END
 
 
-GAME( 1985, kicker,   0,      shaolins, shaolins, 0, ROT90, "Konami", "Kicker", 0 )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, 0, ROT90, "Konami", "Shao-lin's Road", 0 )
+/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    INIT, MONITOR, COMPANY,  FULLNAME,                    FLAGS */
+GAME( 1985, kicker,   0,      shaolins, shaolins, 0,    ROT90,  "Konami",  "Kicker",                    0 )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, 0,    ROT90,  "Konami",  "Shao-lin's Road",           0 )
+GAME( 1985, shaolinb, kicker, shaolinb, shaolins, 0,    ROT90,  "Bootleg", "Shao-lin's Road (bootleg)", GAME_IMPERFECT_COLORS )
