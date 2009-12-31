@@ -4565,8 +4565,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
 	DRIVER( karous )	/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
-						/* 2006.12 Melty Blood Act Cadenza ver.B */
-						/* 2006.12.16 Noukone Puzzle Takoron */
+	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
+	DRIVER( meltyba )	/* 2006.12 Melty Blood Act Cadenza ver.B (Rev A) */
+	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
 						/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
 
 	DRIVER( ngdup23a )	/* DIMM Firmware Updater */
