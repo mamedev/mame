@@ -710,8 +710,8 @@ static const msm5205_interface msm5205_config =
 
 static const pc080sn_interface opwolf_pc080sn_intf =
 {
-	1,	 /* gfxnum */ 
-	0, 0, 0, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+	1,	 /* gfxnum */
+	0, 0, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const pc090oj_interface opwolf_pc090oj_intf =

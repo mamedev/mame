@@ -51,7 +51,7 @@ static void wgp_core_vh_start(running_machine *machine, int piv_xoffs, int piv_y
 
 	wgp_piv_tilemap[0] = tilemap_create(machine, get_piv0_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	wgp_piv_tilemap[1] = tilemap_create(machine, get_piv1_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	wgp_piv_tilemap[2] = tilemap_create(machine, get_piv2_tile_info, tilemap_scan_rows, 16, 16, 64, 64); 
+	wgp_piv_tilemap[2] = tilemap_create(machine, get_piv2_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 
 	wgp_piv_xoffs = piv_xoffs;
 	wgp_piv_yoffs = piv_yoffs;

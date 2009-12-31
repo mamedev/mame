@@ -604,7 +604,7 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 		if(cyclemb_mcu.rst)
 		{
 			/* FIXME: mame rands are supposedly parity checks or signals that the i8741 sends to the main z80 for telling him what kind of input
-			          this specific packet contains. DSW3 surely contains something else too... */
+                      this specific packet contains. DSW3 surely contains something else too... */
 			/* FIXME: remove cpu_get_pc hack */
 			switch(cpu_get_pc(space->cpu))
 			{

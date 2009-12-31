@@ -62,8 +62,8 @@ VIDEO_START( taitob_color_order0 )
 	/*this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris*/
 
 	/*Note that in both this and color order 1
-	* pixel_color_base/color_granularity is equal to sprites color base.
-	* Pure coincidence ?*/
+    * pixel_color_base/color_granularity is equal to sprites color base.
+    * Pure coincidence ?*/
 
 	b_sp_color_base = 0x40 * 16;	/*sprites   */
 
@@ -394,7 +394,7 @@ VIDEO_UPDATE( taitob )
 
 VIDEO_EOF( taitob )
 {
- 	const device_config *tc0180vcu = devtag_get_device(machine, "tc0180vcu");
+	const device_config *tc0180vcu = devtag_get_device(machine, "tc0180vcu");
 	UINT8 video_control = tc0180vcu_get_videoctrl(tc0180vcu, 0);
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(tc0180vcu, 0);
 

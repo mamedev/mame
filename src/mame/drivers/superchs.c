@@ -363,7 +363,7 @@ static const eeprom_interface superchs_eeprom_interface =
 static const tc0480scp_interface superchs_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	0, 		/* pixels */
+	0,		/* pixels */
 	0x20, 0x08,		/* x_offset, y_offset */
 	-1, 0,		/* text_xoff, text_yoff */
 	0, 0,		/* flip_xoff, flip_yoff */

@@ -1,4 +1,4 @@
-#define RELATIVE(x, y) 	(((((x) >> 3) - (y)) << 3) | (x & 7))
+#define RELATIVE(x, y)	(((((x) >> 3) - (y)) << 3) | (x & 7))
 
 	#if defined(COPY)
 		#define CLAMP(SSS, SST, maxs, maxt) \

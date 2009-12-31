@@ -178,7 +178,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
 			}
 		}
-   	}
+	}
 
 	/* Start of VBlank */
 	if( snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line )

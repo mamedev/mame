@@ -317,7 +317,7 @@ static const eeprom_interface gunbustr_eeprom_interface =
 static const tc0480scp_interface gunbustr_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	0, 		/* pixels */
+	0,		/* pixels */
 	0x20, 0x07,		/* x_offset, y_offset */
 	-1, -1,		/* text_xoff, text_yoff */
 	-1, 0,		/* flip_xoff, flip_yoff */

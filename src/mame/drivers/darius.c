@@ -809,8 +809,8 @@ static const ym2203_interface ym2203_interface_2 =
 
 static const pc080sn_interface darius_pc080sn_intf =
 {
-	1,	 /* gfxnum */ 
-	-16, 8, 0, 1 	/* x_offset, y_offset, y_invert, dblwidth */
+	1,	 /* gfxnum */
+	-16, 8, 0, 1	/* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static MACHINE_DRIVER_START( darius )

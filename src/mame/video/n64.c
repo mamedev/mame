@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "includes/n64.h"
 
-#define LOG_RDP_EXECUTION 		0
+#define LOG_RDP_EXECUTION		0
 
 static FILE *rdp_exec;
 
@@ -1703,26 +1703,26 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 /*
 INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 {
-	int i;
-	int pos = 0;
-	*enb = 0;
-	for(i = 0; i < 7; i++)
-	{
-		if (Pixels[i] > Pixels[pos])
-		{
-		    *enb += (1 << i);
-			pos = i;
-		}
-		else if (Pixels[i] < Pixels[pos])
-		{
-		    *enb += (1 << i);
-		}
-		else
-		{
-			pos = i;
-		}
-	}
-	*max = Pixels[pos];
+    int i;
+    int pos = 0;
+    *enb = 0;
+    for(i = 0; i < 7; i++)
+    {
+        if (Pixels[i] > Pixels[pos])
+        {
+            *enb += (1 << i);
+            pos = i;
+        }
+        else if (Pixels[i] < Pixels[pos])
+        {
+            *enb += (1 << i);
+        }
+        else
+        {
+            pos = i;
+        }
+    }
+    *max = Pixels[pos];
 }
 */
 
@@ -2519,7 +2519,7 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 					{
 						COLOR_COMBINER2_C0(c1);
 						COLOR_COMBINER2_C1(c2);
-  					}
+					}
 
 					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
 					{
@@ -3588,7 +3588,7 @@ static RDP_COMMAND( rdp_set_other_modes )
 	int index;
 
 	other_modes.cycle_type			= (w1 >> 20) & 0x3;
-	other_modes.persp_tex_en 		= (w1 & 0x80000) ? 1 : 0;
+	other_modes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0;
 	other_modes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0;
 	other_modes.sharpen_tex_en		= (w1 & 0x20000) ? 1 : 0;
 	other_modes.tex_lod_en			= (w1 & 0x10000) ? 1 : 0;
@@ -4092,19 +4092,19 @@ static RDP_COMMAND( rdp_set_combine )
 	SET_SUB_ALPHA_INPUT(&combiner_alphaadd[1], combine.add_a1);
 
 	/*
-	if(combiner_rgbsub_a_r[1] == &noise_color.i.r)
-	{
-		COLOR_COMBINER1 = COLOR_COMBINER1_NOISE;
-		COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NOISE;
-		COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NOISE;
-	}
-	else
-	{
-		COLOR_COMBINER1 = COLOR_COMBINER1_NNOISE;
-		COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NNOISE;
-		COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NNOISE;
-	}
-	*/
+    if(combiner_rgbsub_a_r[1] == &noise_color.i.r)
+    {
+        COLOR_COMBINER1 = COLOR_COMBINER1_NOISE;
+        COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NOISE;
+        COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NOISE;
+    }
+    else
+    {
+        COLOR_COMBINER1 = COLOR_COMBINER1_NNOISE;
+        COLOR_COMBINER2_C0 = COLOR_COMBINER2_C0_NNOISE;
+        COLOR_COMBINER2_C1 = COLOR_COMBINER2_C1_NNOISE;
+    }
+    */
 }
 
 static RDP_COMMAND( rdp_set_texture_image )
@@ -4122,7 +4122,7 @@ static RDP_COMMAND( rdp_set_mask_image )
 
 static RDP_COMMAND( rdp_set_color_image )
 {
-	fb_format 	= (w1 >> 21) & 0x7;
+	fb_format	= (w1 >> 21) & 0x7;
 	fb_size		= (w1 >> 19) & 0x3;
 	fb_width	= (w1 & 0x3ff) + 1;
 	fb_address	= w2 & 0x01ffffff;
@@ -4238,23 +4238,23 @@ void rdp_process_list(running_machine *machine)
 	//*out = cc_lut2[(cc_lut1[(*A << 16) | (*B << 8) | *C] << 8) | *D];
 
 	/*
-	The slow, branchy version
+    The slow, branchy version
 
-	INT32 color = (((*A-*B)* *C) + (*D << 8) + 0x80);
-	color >>= 8;
-	if (color > 255)
-	{
-		*out = 255;
-	}
-	else if (color < 0)
-	{
-		*out = 0;
-	}
-	else
-	{
-		*out = (UINT8)color;
-	}
-	*/
+    INT32 color = (((*A-*B)* *C) + (*D << 8) + 0x80);
+    color >>= 8;
+    if (color > 255)
+    {
+        *out = 255;
+    }
+    else if (color < 0)
+    {
+        *out = 0;
+    }
+    else
+    {
+        *out = (UINT8)color;
+    }
+    */
 //}
 
 INLINE void BLENDER_EQUATION0_FORCE(INT32* r, INT32* g, INT32* b, int bsel_special)

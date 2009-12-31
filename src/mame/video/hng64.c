@@ -2103,7 +2103,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 24 word chunk, 3 vertices, per-vertex UVs
 			case 0x04:	// 0000 0100
 			case 0x0e:	// 0000 1110
-			case 0x24:	// 0010 0100		- TODO: I'm missing a lot of geo in the driving game intros
+			case 0x24:	// 0010 0100        - TODO: I'm missing a lot of geo in the driving game intros
 			case 0x2e:	// 0010 1110
 				for (m = 0; m < 3; m++)
 				{
@@ -2182,7 +2182,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 12 word chunk, 1 vertex, per-vertex UVs
 			case 0x86:	// 1000 0110
 			case 0x96:	// 1001 0110
-			case 0xb6:	// 1011 0110		- TODO: I'm missing a lot of geo in the driving game intros.
+			case 0xb6:	// 1011 0110        - TODO: I'm missing a lot of geo in the driving game intros.
 			case 0xc6:	// 1100 0110
 			case 0xd6:	// 1101 0110
 				// Copy over the proper vertices from the previous triangle...
@@ -2219,15 +2219,15 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal) !!!
 
-				/* DEBUG 
-				printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-				for (m = 0; m < 13; m++)
-					printf("%04x ", threeDPointer[m]);
-				printf("\n");
-				for (m = 0; m < 13; m++)
-					printf("%3.4f ", uToF(threeDPointer[m]));
-				printf("\n\n");
-				*/
+				/* DEBUG
+                printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
+                for (m = 0; m < 13; m++)
+                    printf("%04x ", threeDPointer[m]);
+                printf("\n");
+                for (m = 0; m < 13; m++)
+                    printf("%3.4f ", uToF(threeDPointer[m]));
+                printf("\n\n");
+                */
 
 				chunkLength = 12;
 				break;

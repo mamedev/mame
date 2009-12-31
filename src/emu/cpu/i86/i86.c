@@ -185,7 +185,7 @@ static void i8086_state_register(const device_config *device)
 	state_save_register_device_item(device, 0, cpustate->nmi_state);
 	state_save_register_device_item(device, 0, cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->extra_cycles);
-	state_save_register_device_item(device, 0, cpustate->halted);   
+	state_save_register_device_item(device, 0, cpustate->halted);
 	state_save_register_device_item(device, 0, cpustate->test_state);	/* PJB 03/05 */
 	state_save_register_device_item(device, 0, cpustate->rep_in_progress);	/* PJB 03/05 */
 }

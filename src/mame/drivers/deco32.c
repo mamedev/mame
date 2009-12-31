@@ -774,14 +774,14 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x138000, 0x138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE(deco32_palette_dma_w)
 
-//	AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
+//  AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
 
-//	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
+//  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
@@ -827,14 +827,14 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x170000, 0x170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
 	AM_RANGE(0x178008, 0x17800f) AM_WRITENOP /* Gun read ACK's */
 
-//	AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
+//  AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
 
-//	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
+//  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)

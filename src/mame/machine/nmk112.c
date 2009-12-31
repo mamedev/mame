@@ -61,7 +61,7 @@ WRITE8_DEVICE_HANDLER( nmk112_okibank_w )
 	int size = chip ? nmk112->size1 : nmk112->size0;
 	int bankaddr = (data * BANKSIZE) % size;
 
-	if (nmk112->current_bank[offset] == data) 
+	if (nmk112->current_bank[offset] == data)
 		return;
 
 	nmk112->current_bank[offset] = data;
@@ -99,7 +99,7 @@ static STATE_POSTLOAD( nmk112_postload_bankswitch )
 	{
 		int banknum = nmk112->last_bank[i];
 		int paged = (nmk112->page_mask & (1 << i));
-	
+
 		UINT8 *rom = i ? nmk112->rom1 : nmk112->rom0;
 		int size = i ? nmk112->size1 : nmk112->size0;
 		int bankaddr = (nmk112->current_bank[nmk112->last_bank[i] + i * 4] * BANKSIZE) % size;

@@ -310,7 +310,7 @@ static const tc0100scn_interface galastrm_tc0100scn_intf =
 static const tc0480scp_interface galastrm_tc0480scp_intf =
 {
 	1, 3,		/* gfxnum, txnum */
-	0, 		/* pixels */
+	0,		/* pixels */
 	-40, -3,		/* x_offset, y_offset */
 	0, 0,		/* text_xoff, text_yoff */
 	0, 0,		/* flip_xoff, flip_yoff */

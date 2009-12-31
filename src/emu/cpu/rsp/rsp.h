@@ -113,10 +113,10 @@ void rspdrc_add_dmem(const device_config *device, void *base);
 #define FSREG			((op >> 11) & 31)
 #define FDREG			((op >> 6) & 31)
 
-#define IS_SINGLE(o) 	(((o) & (1 << 21)) == 0)
-#define IS_DOUBLE(o) 	(((o) & (1 << 21)) != 0)
+#define IS_SINGLE(o)	(((o) & (1 << 21)) == 0)
+#define IS_DOUBLE(o)	(((o) & (1 << 21)) != 0)
 #define IS_FLOAT(o) 	(((o) & (1 << 23)) == 0)
-#define IS_INTEGRAL(o) 	(((o) & (1 << 23)) != 0)
+#define IS_INTEGRAL(o)	(((o) & (1 << 23)) != 0)
 
 #define SIMMVAL			((INT16)op)
 #define UIMMVAL			((UINT16)op)

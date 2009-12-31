@@ -5969,7 +5969,7 @@ there is extra hardware which causes it to run a different game contained in tha
 
 the extra rom contains
 
-MEGA DOUBLE POKER TM        COPYRIGHT 1991     
+MEGA DOUBLE POKER TM        COPYRIGHT 1991
 
 as well as various
 
@@ -6016,7 +6016,7 @@ ROM_START( cmasterbv )
 	ROM_CONTINUE(0x5000,0x1000)
 
 	ROM_REGION( 0x20000, "extra", 0 ) // how do we use this?!!
-	ROM_LOAD( "mgraise.bin",  0x0000, 0x20000, CRC(019f37d4) SHA1(ab71fe0b41ff4415896a23f28b27a0e64950c68c) ) 
+	ROM_LOAD( "mgraise.bin",  0x0000, 0x20000, CRC(019f37d4) SHA1(ab71fe0b41ff4415896a23f28b27a0e64950c68c) )
 
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -8638,7 +8638,7 @@ GAME( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",   
 
 GAME( 1991, cmast91,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 
-GAME( 1992, cmast92,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '92",                GAME_NOT_WORKING ) // no gfx roms are dumped 
+GAME( 1992, cmast92,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '92",                GAME_NOT_WORKING ) // no gfx roms are dumped
 
 
 GAME( 1989, lucky8,    0,        lucky8,   lucky8,   0,         ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",                   0 )

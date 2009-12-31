@@ -287,7 +287,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_CPU_ADD("maincpu", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(namcond1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
-	
+
 	// I've disabled this for now, I don't think it's correct, it breaks ncv2 'game options' in test
 	// mode (and could also be responsible for the random resets?)
 	// also, if you log the timing of it and the scanlines on which the interrupt fires, it doesn't

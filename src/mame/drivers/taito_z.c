@@ -2902,7 +2902,7 @@ static const tc0100scn_interface spacegun_tc0100scn_intf =
 static const tc0480scp_interface taitoz_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	0, 		/* pixels */
+	0,		/* pixels */
 	0x21, 0x08,		/* x_offset, y_offset */
 	4, 0,		/* text_xoff, text_yoff */
 	0, 0,		/* flip_xoff, flip_yoff */

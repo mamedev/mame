@@ -369,7 +369,7 @@ VIDEO_UPDATE( taitoair )
 
 	tc0080vco_tilemap_draw(tc0080vco, bitmap, cliprect, 2, 0, 0);
 
-	if (taitoair_line_ram[0x3fff]) 
+	if (taitoair_line_ram[0x3fff])
 	{
 		int adr = 0x3fff;
 		struct poly q;
@@ -378,10 +378,10 @@ VIDEO_UPDATE( taitoair )
 		view.x2 = cliprect->max_x;
 		view.y2 = cliprect->max_y;
 
-		while(adr>=0 && taitoair_line_ram[adr] && taitoair_line_ram[adr] != 0x4000) 
+		while(adr>=0 && taitoair_line_ram[adr] && taitoair_line_ram[adr] != 0x4000)
 		{
 			int pcount;
-			if(!(taitoair_line_ram[adr] & 0x8000) || adr < 10) 
+			if(!(taitoair_line_ram[adr] & 0x8000) || adr < 10)
 			{
 				logerror("quad: unknown value %04x at %04x\n", taitoair_line_ram[adr], adr);
 				break;
@@ -389,7 +389,7 @@ VIDEO_UPDATE( taitoair )
 			q.col = (taitoair_line_ram[adr] & 0x7fff) + 0x300;
 			adr--;
 			pcount = 0;
-			while(pcount < POLY_MAX_PT && adr>=1 && !(taitoair_line_ram[adr] & 0xc000)) 
+			while(pcount < POLY_MAX_PT && adr>=1 && !(taitoair_line_ram[adr] & 0xc000))
 			{
 				q.p[pcount].y = taitoair_line_ram[adr]+3*16;
 				q.p[pcount].x = taitoair_line_ram[adr-1];

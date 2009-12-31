@@ -200,7 +200,7 @@ static void cninjabl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		y = buffered_spriteram16[offs+1]; // changed on bootleg!
 
 		if (!sprite) continue;
-		
+
 		x = buffered_spriteram16[offs+2];
 
 		/* Sprite/playfield priority */
@@ -223,7 +223,7 @@ static void cninjabl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		fy = y & 0x4000;
 
 		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-		
+
 		y -= multi*16; // changed on bootleg!
 		y += 4;
 

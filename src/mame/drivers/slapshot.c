@@ -498,7 +498,7 @@ static const ym2610_interface ym2610_config =
 static const tc0480scp_interface slapshot_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	3, 		/* pixels */
+	3,		/* pixels */
 	30, 9,		/* x_offset, y_offset */
 	-1, 1,		/* text_xoff, text_yoff */
 	0, 2,		/* flip_xoff, flip_yoff */

@@ -1800,7 +1800,7 @@ void tc0080vco_tilemap_draw( const device_config *device, bitmap_t *bitmap, cons
 	}
 }
 
-/* FIXME: maybe it would be better to provide pointers to these RAM regions 
+/* FIXME: maybe it would be better to provide pointers to these RAM regions
 which can be accessed directly by the drivers... */
 READ16_DEVICE_HANDLER( tc0080vco_cram_0_r )
 {
@@ -2504,7 +2504,7 @@ static DEVICE_START( tc0100scn )
 
 	tc0100scn_set_layer_ptrs(tc0100scn);
 
-	tc0100scn_set_colbanks(device, 0, 0, 0);	/* standard values, only Wgp & multiscreen games change them */ 
+	tc0100scn_set_colbanks(device, 0, 0, 0);	/* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at VIDEO_START*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */

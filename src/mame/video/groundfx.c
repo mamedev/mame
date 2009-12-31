@@ -257,7 +257,7 @@ VIDEO_UPDATE( groundfx )
         it's contents the usual way.
 
     */
-	if (tc0100scn_long_r(tc0100scn, 0x4090 / 4, 0xffffffff) || 
+	if (tc0100scn_long_r(tc0100scn, 0x4090 / 4, 0xffffffff) ||
 			tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
 	{
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
@@ -269,8 +269,8 @@ VIDEO_UPDATE( groundfx )
 		if (tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
 			tc0480scp_tilemap_draw(tc0480scp, bitmap, &hack_cliprect, layer[0], 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 1, 44, -574);
-	} 
-	else 
+	}
+	else
 	{
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], 0, 1);
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);

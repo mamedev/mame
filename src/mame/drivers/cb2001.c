@@ -94,7 +94,7 @@ e0093 78 03             bc e0098
 probably "aa" is an undocumented opcode
 
 1) aa 1e ## ## -> bb mov bw,####
-_     1e ## ## -> 89 mov 
+_     1e ## ## -> 89 mov
 
 2) aa 26 ## ## -> bc mov sp,####
 _     26 ##    -> b5 mov ch,##

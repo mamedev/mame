@@ -1390,7 +1390,7 @@ GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkangc2, ROT90, "bootleg"
 GAME( 1986, arkblock,   arkanoid, bootleg,  arkangc,  arkblock, ROT90, "bootleg", "Block (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkbloc2,   arkanoid, bootleg,  arkangc,  arkbloc2, ROT90, "bootleg", "Block (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkbloc3,   arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block (Game Corporation bootleg, set 3)", GAME_SUPPORTS_SAVE )// Both these sets have an extra unknown rom
-GAME( 1986, block2,     arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block 2 (S.P.A. CO. bootleg)", GAME_SUPPORTS_SAVE )           //  and scrambled gfx roms with 'space invader' themed gfx 
+GAME( 1986, block2,     arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block 2 (S.P.A. CO. bootleg)", GAME_SUPPORTS_SAVE )           //  and scrambled gfx roms with 'space invader' themed gfx
 GAME( 1986, arkgcbl,    arkanoid, bootleg,  arkgcbl,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkgcbla,   arkanoid, bootleg,  arkgcbl,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )

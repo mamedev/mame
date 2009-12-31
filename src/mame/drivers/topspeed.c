@@ -672,8 +672,8 @@ static MACHINE_RESET( topspeed )
 
 static const pc080sn_interface topspeed_pc080sn_intf =
 {
-	1,	 /* gfxnum */ 
-	0, 8, 0, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+	1,	 /* gfxnum */
+	0, 8, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const tc0220ioc_interface topspeed_io_intf =

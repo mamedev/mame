@@ -382,8 +382,8 @@ static MACHINE_RESET( rastan )
 
 static const pc080sn_interface rastan_pc080sn_intf =
 {
-	0,	 /* gfxnum */ 
-	0, 0, 0, 0 	/* x_offset, y_offset, y_invert, dblwidth */
+	0,	 /* gfxnum */
+	0, 0, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const pc090oj_interface rastan_pc090oj_intf =

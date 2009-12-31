@@ -3265,7 +3265,7 @@ static const tc0100scn_interface thundfox_tc0100scn_intf_2 =
 static const tc0480scp_interface footchmp_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	3, 		/* pixels */
+	3,		/* pixels */
 	0x1d, 0x08,		/* x_offset, y_offset */
 	-1, 0,		/* text_xoff, text_yoff */
 	-1, 0,		/* flip_xoff, flip_yoff */
@@ -3275,7 +3275,7 @@ static const tc0480scp_interface footchmp_tc0480scp_intf =
 static const tc0480scp_interface hthero_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	3, 		/* pixels */
+	3,		/* pixels */
 	0x33, -0x04,		/* x_offset, y_offset */
 	-1, 0,		/* text_xoff, text_yoff */
 	-1, 0,		/* flip_xoff, flip_yoff */
@@ -3285,7 +3285,7 @@ static const tc0480scp_interface hthero_tc0480scp_intf =
 static const tc0480scp_interface deadconx_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	3, 		/* pixels */
+	3,		/* pixels */
 	0x1e, 0x08,		/* x_offset, y_offset */
 	-1, 0,		/* text_xoff, text_yoff */
 	-1, 0,		/* flip_xoff, flip_yoff */
@@ -3295,7 +3295,7 @@ static const tc0480scp_interface deadconx_tc0480scp_intf =
 static const tc0480scp_interface deadconxj_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	3, 		/* pixels */
+	3,		/* pixels */
 	0x34, -0x05,		/* x_offset, y_offset */
 	-1, 0,		/* text_xoff, text_yoff */
 	-1, 0,		/* flip_xoff, flip_yoff */
@@ -3305,7 +3305,7 @@ static const tc0480scp_interface deadconxj_tc0480scp_intf =
 static const tc0480scp_interface metalb_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	3, 		/* pixels */
+	3,		/* pixels */
 	0x32, -0x04,		/* x_offset, y_offset */
 	1, 0,		/* text_xoff, text_yoff */
 	-1, 0,		/* flip_xoff, flip_yoff */
