@@ -775,7 +775,7 @@ bitmap_t *tilemap_get_pixmap(tilemap_t *tmap)
 
 bitmap_t *tilemap_get_flagsmap(tilemap_t *tmap)
 {
-	/* ensure all the tiles are up-to-date and then return the pixmap */
+	/* ensure all the tiles are up-to-date and then return the flagsmap */
 	pixmap_update(tmap, NULL);
 	return tmap->flagsmap;
 }
@@ -788,7 +788,7 @@ bitmap_t *tilemap_get_flagsmap(tilemap_t *tmap)
 
 UINT8 *tilemap_get_tile_flags(tilemap_t *tmap)
 {
-	/* ensure all the tiles are up-to-date and then return the pixmap */
+	/* ensure all the tiles are up-to-date and then return the per-tile flags */
 	pixmap_update(tmap, NULL);
 	return tmap->tileflags;
 }
