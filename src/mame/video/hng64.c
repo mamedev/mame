@@ -2054,7 +2054,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // CHUNK TYPE BITS - These are very likely incorrect.
             // x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
             // -x-- ---- -
-            // --x- ---- - 1 = Contains (at least one?) quad(s)
+            // --x- ---- -
             // ---x ---- -
             // ---- x--- -
             // ---- -x-- - 1 = Has per-vert UVs
@@ -2103,6 +2103,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 24 word chunk, 3 vertices, per-vertex UVs
 			case 0x04:	// 0000 0100
 			case 0x0e:	// 0000 1110
+			case 0x24:	// 0010 0100		- TODO: I'm missing a lot of geo in the driving game intros
+			case 0x2e:	// 0010 1110
 				for (m = 0; m < 3; m++)
 				{
 					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (6*m)]);
@@ -2139,8 +2141,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 
 			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
-			case 0x97:	// 1001 0111
 			case 0x87:	// 1000 0111
+			case 0x97:	// 1001 0111
 			case 0xd7:	// 1101 0111
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
@@ -2178,7 +2180,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 
 			// 12 word chunk, 1 vertex, per-vertex UVs
+			case 0x86:	// 1000 0110
 			case 0x96:	// 1001 0110
+			case 0xb6:	// 1011 0110		- TODO: I'm missing a lot of geo in the driving game intros.
+			case 0xc6:	// 1100 0110
+			case 0xd6:	// 1101 0110
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
@@ -2213,142 +2219,18 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal) !!!
 
+				/* DEBUG 
+				printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
+				for (m = 0; m < 13; m++)
+					printf("%04x ", threeDPointer[m]);
+				printf("\n");
+				for (m = 0; m < 13; m++)
+					printf("%3.4f ", uToF(threeDPointer[m]));
+				printf("\n\n");
+				*/
+
 				chunkLength = 12;
 				break;
-
-			// 36 word chunk, 3 vertices + 1 fan vertex (a quad), per-vertex UVs, per-face normals
-			case 0x2e:	// 0010 1110
-				for (m = 0; m < 3; m++)
-				{
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
-					polys[*numPolys].n = 3;
-
-					// threeDPointer[6 + (6*m)] = ???
-					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (6*m)]);
-					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (6*m)]);
-					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
-					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
-
-					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[21]);
-					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[22]);
-					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[23]);
-					polys[*numPolys].vert[m].normal[3] = 0.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
-				}
-
-				// ??? Looks normalized
-				//polys[*numPolys].faceNormal[0] = uToF(threeDPointer[24]);
-				//polys[*numPolys].faceNormal[1] = uToF(threeDPointer[25]);
-				//polys[*numPolys].faceNormal[2] = uToF(threeDPointer[26]);
-				//polys[*numPolys].faceNormal[3] = 0.0f;
-
-				polys[*numPolys].n = 3;
-
-				// uToF(threeDPointer[27]) - vertex #4 - System not capable yet
-				// uToF(threeDPointer[28]) - vertex #4 - System not capable yet
-				// uToF(threeDPointer[29]) - vertex #4 - System not capable yet
-
-				// threeDPointer[30]?
-				//polys[*numPolys].vert[2].texCoords[0] = uToF(threeDPointer[31]);  // System not capable yet
-				//polys[*numPolys].vert[2].texCoords[1] = uToF(threeDPointer[32]);  // System not capable yet
-				//polys[*numPolys].vert[2].texCoords[2] = 0.0f;
-				//polys[*numPolys].vert[2].texCoords[3] = 1.0f;
-
-				// ??? Looks normalized - always seems the same as [24,25,26]
-				//polys[*numPolys].faceNormal[0] = uToF(threeDPointer[33]);
-				//polys[*numPolys].faceNormal[1] = uToF(threeDPointer[34]);
-				//polys[*numPolys].faceNormal[2] = uToF(threeDPointer[35]);
-				//polys[*numPolys].faceNormal[3] = 0.0f;
-
-				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
-				/*
-                printf("0x2e : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 37; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n");
-                for (m = 0; m < 37; m++)
-                    printf("%3.4f ", uToF(threeDPointer[m]));
-                printf("\n\n");
-                */
-				chunkLength = 36;
-			break;
-
-			/* This shouldn't exist. */
-			/* There's something funky going on with 0x2e - it's often well-behaved, except for
-               when it "ends" with e67a.  Maybe this chunkLength thing isn't where it's at?
-               Luckily the 0x7a is always at the end of a series of 2 chunks (2e,7a) so ignoring
-               it won't kill us for now. */
-			case 0x7a:	// 0111 1010
-				/*
-                printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]-1);
-                for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 0;
-			break;
-
-			case 0x24:	// 0010 0100
-				/*
-                printf("0x24 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 49; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 48;
-			break;
-
-			case 0xb6:	// 1011 0110
-				/*
-                printf("0xb6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 13; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 12;
-			break;
-
-#if 0
-			case 0x86:	// 1000 0110
-				/* Very likely not fixed-length since it leads into c6 & d6 */
-				/*
-                printf("0x86 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 13; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 12;
-			break;
-
-			/* Are c6 and d6 just insanely long? They aren't at the end of the numTris like 0x7a */
-			case 0xc6:	// 1100 0110
-				/*
-                printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 0;
-			break;
-
-			/* Are c6 and d6 just insanely long? They aren't at the end of numTris like 0x7a */
-			case 0xd6:	// 1101 0110
-				/*
-                printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 0;
-			break;
-#endif
 
 			default:
 				printf("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
