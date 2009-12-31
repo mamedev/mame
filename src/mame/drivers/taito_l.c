@@ -2236,11 +2236,16 @@ static MACHINE_DRIVER_START( evilston )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lagirl )
+
+	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cachat_map)
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_27_2109MHz/4)
+
+	/* sound hardware */
 	MDRV_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
+
 	MDRV_MACHINE_RESET(cachat)
 MACHINE_DRIVER_END
 
@@ -2689,7 +2694,7 @@ ROM_START( cachat )
 	ROM_LOAD( "pal20l8b-c63-01.14", 0x0000, 0x0144, CRC(14a7dd2a) SHA1(2a39ca6069bdac553d73c34db6f50f880559113c) )
 ROM_END
 
-ROM_START( tubeit )
+ROM_START( tubeit ) /* Title changed. Year, copyright and manufacture removed */
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "t-i_02.6", 0x00000, 0x20000, CRC(54730669) SHA1(a44ebd31a8588a133a7552a39fa8d52ba1985e45) )
 	ROM_RELOAD(           0x10000, 0x20000 )
@@ -2751,7 +2756,7 @@ ROM_END
 /*
 
 LA Girl
-(no manufacturer/year?)
+Clearly a bootleg / hack of Play Girls by Hot-B, reportedly by Ta Ta Electronics, 1993
 
 PCB Layout
 ----------
@@ -2856,9 +2861,8 @@ GAME( 1993, cachat,    0,        cachat,   cachat,   0,        ROT0,   "Taito Co
 GAME( 1993, tubeit,    cachat,   cachat,   tubeit,   0,        ROT0,   "Taito Corporation", "Tube-It", 0 )  // No (c) message
 GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Taito Corporation", "Cuby Bop (Location Test)", 0 ) // No (c) message
 
-GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.", "Play Girls", 0 )
-GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.", "Play Girls 2", 0 )
-
-GAME( 199?, lagirl,   0,         cachat,   plgirls,  0,        ROT270, "<unknown>", "LA Girl", 0 )
+GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.",  "Play Girls", 0 )
+GAME( 1992, lagirl,    plgirls,  cachat,   plgirls,  0,        ROT270, "bootleg", "LA Girl", 0 ) /* bootleg hardware with changed title & backgrounds */
+GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.",  "Play Girls 2", 0 )
 
 GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
