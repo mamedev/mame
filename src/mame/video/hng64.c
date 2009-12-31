@@ -1699,6 +1699,34 @@ static float uToF(UINT16 input);
 // 3d 'Functions' //
 ////////////////////
 
+void printPacket(const UINT16* packet, int hex)
+{
+	if (hex)
+	{
+		printf("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
+				packet[0],  packet[1],
+				packet[2],  packet[3],
+				packet[4],  packet[5],
+				packet[6],  packet[7],
+				packet[8],  packet[9],
+				packet[10], packet[11],
+				packet[12], packet[13],
+				packet[14], packet[15]);
+	}
+	else
+	{
+		printf("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
+				packet[0],            uToF(packet[1] )*128,
+				uToF(packet[2] )*128, uToF(packet[3] )*128,
+				uToF(packet[4] )*128, uToF(packet[5] )*128,
+				uToF(packet[6] )*128, uToF(packet[7] )*128,
+				uToF(packet[8] )*128, uToF(packet[9] )*128,
+				uToF(packet[10])*128, uToF(packet[11])*128,
+				uToF(packet[12])*128, uToF(packet[13])*128,
+				uToF(packet[14])*128, uToF(packet[15])*128);
+	}
+}
+
 // Operation 0001
 // Camera transformation.
 static void setCameraTransformation(const UINT16* packet)
@@ -1858,9 +1886,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [10] - xxxx ... Transformation matrix
     // [11] - xxxx ... Transformation matrix
     // [12] - xxxx ... Transformation matrix
-    // [13] - ???? ... Transformation matrix
-    // [14] - ???? ... Transformation matrix
-    // [15] - ???? ... Transformation matrix
+    // [13] - xxxx ... Transformation matrix
+    // [14] - xxxx ... Transformation matrix
+    // [15] - xxxx ... Transformation matrix
     ////////////*/
 	int k, l, m;
 
@@ -1896,6 +1924,13 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
 	threeDPointer = &threeDRoms[threeDOffset * 3];
+
+	if (threeDOffset >= 0x0c00000) 
+	{
+		printf("Strange geometry packet: (ignoring)\n");
+		printPacket(packet, 1);
+		return;
+	}
 
 	// Debug - ajg
 	/*
@@ -1943,11 +1978,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [3]  - lower word of sub-address 3
     // [4]  - lower word of sub-address 4
     // [5]  - ???? always 0 ????
-    // [6]  - number of triangles in sub-address 1 block
-    // [7]  - number of triangles in sub-address 2 block
+    // [6]  - number of chunks in sub-address 1 block
+    // [7]  - number of chunks in sub-address 2 block
     // [8]  - ???? always 0 ????
-    // [9]  - number of triangles in sub-address 3 block
-    // [10] - number of triangles in sub-address 4 block
+    // [9]  - number of chunks in sub-address 3 block
+    // [10] - number of chunks in sub-address 4 block
     // [11] - ? definitely used.
     // [12] - ? definitely used.
     // [13] - ? definitely used.
@@ -2027,7 +2062,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			//  continue;
 			//}
 
-			// Get which texture this polygon refers to...
+			// TEXTURE TYPE
 			// In fatfur it's 0xc for the smooth-shaded earth - maybe this is for all things with alpha - check the hair at some point.
 			//                0x9 for the untextured buildings
 			//                0xd for the 'explosion' of the HNG64
@@ -2035,6 +2070,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			//        they're 0x8 in the buriki intro too (those are 66-byte chunks!)
 			polys[*numPolys].texType = ((threeDPointer[1] & 0xf000) >> 4 >> 8);
 
+			// TEXTURE INDEX
 			if (polys[*numPolys].texType == 0x8 || polys[*numPolys].texType == 0xc)		//  || polys[*numPolys].texType == 0x9
 			{
 				polys[*numPolys].texIndex = threeDPointer[1] & 0x000f;
@@ -2044,8 +2080,12 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].texIndex = -1;
 			}
 
-			// Set the polygon's palette offset
-			// TODO: Figure this out for real.  It doesn't work like this in roadedge.
+			// HACK - just to get bbust2 going until i can figure out the STs.
+			if (hng64_mcu_type == SHOOT_MCU) polys[*numPolys].texIndex = -1;
+
+
+			// PALETTE OFFSET
+			// TODO: Figure this out for real.  It doesn't work like this in many games.
 			polys[*numPolys].palOffset = paletteState3d * 0x80;
 
 			switch(chunkType)
@@ -2343,36 +2383,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-void printPacket(const UINT16* packet, int hex)
-{
-	if (hex)
-	{
-		printf("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
-				packet[0],  packet[1],
-				packet[2],  packet[3],
-				packet[4],  packet[5],
-				packet[6],  packet[7],
-				packet[8],  packet[9],
-				packet[10], packet[11],
-				packet[12], packet[13],
-				packet[14], packet[15]);
-	}
-	else
-	{
-		printf("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
-				packet[0],            uToF(packet[1] )*128,
-				uToF(packet[2] )*128, uToF(packet[3] )*128,
-				uToF(packet[4] )*128, uToF(packet[5] )*128,
-				uToF(packet[6] )*128, uToF(packet[7] )*128,
-				uToF(packet[8] )*128, uToF(packet[9] )*128,
-				uToF(packet[10])*128, uToF(packet[11])*128,
-				uToF(packet[12])*128, uToF(packet[13])*128,
-				uToF(packet[14])*128, uToF(packet[15])*128);
-	}
-}
-#endif
-
 void hng64_command3d(running_machine* machine, const UINT16* packet)
 {
 	int i;
@@ -2405,6 +2415,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0100:	// Geometry
+	case 0x0101:	// Similar to 0x0100, but throws a strange packet in every now and again.
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
 
 		/* Immeditately rasterize the chunk's polygons into the display buffer */
@@ -2418,9 +2429,6 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		}
 
 		numPolys = 0;
-		break;
-
-	case 0x0101:	// Geometry of a different type - bbust2.
 		break;
 
 	case 0x0102:	// Geometry of a different type - sams games.
@@ -2863,17 +2871,14 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
-					// Greyscale texture - for Buriki...
-					// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
-
-					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[palOffset + paletteEntry];
+					// Greyscale texture test.
+					// *cb = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 					*cb = machine->pens[palOffset + paletteEntry];
 					*db = z_start;
 				}
 			}
 			else
 			{
-				// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*db = z_start;
 			}
