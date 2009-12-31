@@ -2729,13 +2729,13 @@ static void PREFIX(_repne)(i8086_state *cpustate)    /* Opcode 0xf2 */
 
 static void PREFIX(_repe)(i8086_state *cpustate)    /* Opcode 0xf3 */
 {
-	 PREFIX(rep)(cpustate, 1);
+	PREFIX(rep)(cpustate, 1);
 }
 
 #ifndef I80186
 static void PREFIX86(_hlt)(i8086_state *cpustate)    /* Opcode 0xf4 */
 {
-	cpustate->pc--;
+	cpustate->halted=1;
 	ICOUNT = 0;
 }
 

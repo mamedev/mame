@@ -60,15 +60,17 @@ struct _i80286_state
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
-    INT32     AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
-    UINT8	ParityVal;
+	INT32	AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
+	UINT8	ParityVal;
 	UINT8	TF, IF; 	/* 0 or 1 valued flags */
 	UINT8	int_vector;
 	INT8	nmi_state;
 	INT8	irq_state;
-	INT8	test_state;		/* PJB 03/05 */
+	INT8	test_state;
 	UINT8 rep_in_progress;
 	INT32	extra_cycles;       /* extra cycles for interrupts */
+
+	int halted;         /* Is the CPU halted ? */
 
 	memory_interface	mem;
 	int icount;
@@ -173,6 +175,7 @@ static CPU_RESET( i80286 )
 
 	CHANGE_PC(cpustate->pc);
 
+	cpustate->halted = 0;
 }
 
 /****************************************************************************/
@@ -181,6 +184,11 @@ static CPU_RESET( i80286 )
 
 static void set_irq_line(i80286_state *cpustate, int irqline, int state)
 {
+	if (state != CLEAR_LINE && cpustate->halted)
+	{
+		cpustate->halted = 0;
+	}
+
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (cpustate->nmi_state == state)
@@ -204,6 +212,9 @@ static void set_irq_line(i80286_state *cpustate, int irqline, int state)
 static CPU_EXECUTE( i80286 )
 {
 	i80286_state *cpustate = get_safe_token(device);
+
+	if (cpustate->halted)
+		return cycles;
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 80286)
