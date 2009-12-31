@@ -9758,7 +9758,7 @@ Other Sun games
 	DRIVER( mfish_3a )	/* (c) 2002 */
 	//DRIVER( mfish_4 ) /* (c) 2002 */
 	//DRIVER( mfish_5 ) /* (c) 2002 */
-	//DRIVER( mfish_6 ) /* (c) 2002 */
+	DRIVER( mfish_6 ) /* (c) 2002 */
 	//DRIVER( mfish_7 ) /* (c) 2002 */
 	//DRIVER( mfish_8 ) /* (c) 2002 */
 	//DRIVER( mfish_9 ) /* (c) 2002 */
