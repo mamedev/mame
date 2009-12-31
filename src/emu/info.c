@@ -49,12 +49,16 @@ static void print_game_switches(FILE *out, const game_driver *game, const input_
 				const input_setting_config *setting;
 
 				/* output the switch name information */
-				fprintf(out, "\t\t<dipswitch name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
+				fprintf(out, "\t\t<dipswitch name=\"%s\"", xml_normalize_string(input_field_name(field)));
+				fprintf(out, " tag=\"%s\"", xml_normalize_string(field->port->tag));
+				fprintf(out, " mask=\"%u\"", field->mask);
+				fprintf(out, ">\n");
 
 				/* loop over settings */
 				for (setting = field->settinglist; setting != NULL; setting = setting->next)
 				{
 					fprintf(out, "\t\t\t<dipvalue name=\"%s\"", xml_normalize_string(setting->name));
+					fprintf(out, " value=\"%u\"", setting->value);
 					if (setting->value == field->defvalue)
 						fprintf(out, " default=\"yes\"");
 					fprintf(out, "/>\n");
@@ -83,12 +87,16 @@ static void print_game_configs(FILE *out, const game_driver *game, const input_p
 				const input_setting_config *setting;
 
 				/* output the configuration name information */
-				fprintf(out, "\t\t<configuration name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
+				fprintf(out, "\t\t<configuration name=\"%s\"", xml_normalize_string(input_field_name(field)));
+				fprintf(out, " tag=\"%s\"", xml_normalize_string(field->port->tag));
+				fprintf(out, " mask=\"%u\"", field->mask);
+				fprintf(out, ">\n");
 
 				/* loop over settings */
 				for (setting = field->settinglist; setting != NULL; setting = setting->next)
 				{
 					fprintf(out, "\t\t\t<confsetting name=\"%s\"", xml_normalize_string(setting->name));
+					fprintf(out, " value=\"%u\"", setting->value);
 					if (setting->value == field->defvalue)
 						fprintf(out, " default=\"yes\"");
 					fprintf(out, "/>\n");
@@ -996,13 +1004,19 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST control reverse (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
 		"\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
 		"\t\t\t<!ELEMENT dipvalue EMPTY>\n"
 		"\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
+		"\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT configuration (confsetting*)>\n"
 		"\t\t\t<!ATTLIST configuration name CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST configuration tag CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST configuration mask CDATA #REQUIRED>\n"
 		"\t\t\t<!ELEMENT confsetting EMPTY>\n"
 		"\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
+		"\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
 #ifdef MESS
 		"\t\t<!ELEMENT category (item*)>\n"
