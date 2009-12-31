@@ -732,10 +732,11 @@ ROM_START( mfish_5 ) // 021227
 	ROM_LOAD( "7", 0x280000, 0x80000, CRC(9afdc2d3) SHA1(b112fd2005354c9f97d77030bdb6f99d7b5c8050) )
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
 ROM_END
+#endif
 
 ROM_START( mfish_6 ) // 030124
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "mf030124.rom", 0x00000, 0x40000, MD5(4772becb7c2b3220492c690501e174a7) SHA1(b119b086bad3f6f8acc64a5809ce449800615406) )
+	ROM_LOAD( "mf030124.rom", 0x00000, 0x40000, CRC(554c9cda) SHA1(b119b086bad3f6f8acc64a5809ce449800615406) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
@@ -748,6 +749,7 @@ ROM_START( mfish_6 ) // 030124
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
 ROM_END
 
+#if ALL_REVISIONS
 ROM_START( mfish_7 ) // 030511
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf030511.rom", 0x00000, 0x40000, MD5(a910910ce7963a4385e31769789842f7) SHA1(06b3e3875f036782983e29e305f67a36f78a4f06) )
@@ -2100,8 +2102,9 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 */
 
-GAME( 2002, mfish_3,     0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 1)",  0 )
-GAME( 2002, mfish_3a,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 2)",  0 )
+GAME( 2002, mfish_3,     0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124)",  0 )
+GAME( 2002, mfish_3a,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, banking address hack)",  0 ) // bank F9
+GAME( 2002, mfish_6,     mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030124)",  0 ) /* World */
 GAME( 2002, mfish_11,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031124)",  0 ) /* World */
 GAME( 2002, mfish_12,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308)",  0 ) /* World */
 GAME( 2002, mfish_12a,   mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, banking address hack)",  0 ) // bank F9
@@ -2110,7 +2113,6 @@ GAME( 2002, mfish,       0,        multfish, multfish,  0, ROT0, "Igro", "Multi 
 GAME( 2002, mfish_2,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021121)",  0 ) /* World */
 GAME( 2002, mfish_4,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021219)",  0 ) /* World */
 GAME( 2002, mfish_5,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021227)",  0 ) /* World */
-GAME( 2002, mfish_6,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030124)",  0 ) /* World */
 GAME( 2002, mfish_7,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030511)",  0 ) /* World */
 GAME( 2002, mfish_8,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030522)",  0 ) /* World */
 GAME( 2002, mfish_9,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031026)",  0 ) /* World */
