@@ -147,7 +147,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
-	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag) + configlen);
+	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag));
 
 	/* add to the map */
 	tmerr = tagmap_add_unique_hash(devlist->map, tag, device, FALSE);
@@ -180,7 +180,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 		device->clock = device->owner->clock * ((device->clock >> 12) & 0xfff) / ((device->clock >> 0) & 0xfff);
 	}
 	device->static_config = NULL;
-	device->inline_config = (configlen == 0) ? NULL : (device->tag + strlen(tag) + 1);
+	device->inline_config = (configlen == 0) ? NULL : alloc_array_or_die(UINT8, configlen);
 
 	/* ensure live fields are all cleared */
 	device->machine = NULL;
@@ -258,6 +258,8 @@ void device_list_remove(device_list *devlist, const char *tag)
 		tagmap_remove(devlist->map, device->tag);
 
 	/* free the device object */
+	if (device->inline_config != NULL)
+		free(device->inline_config);
 	free(device);
 }
 
