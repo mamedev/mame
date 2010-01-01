@@ -1925,7 +1925,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
 	threeDPointer = &threeDRoms[threeDOffset * 3];
 
-	if (threeDOffset >= 0x0c00000) 
+	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU) 
 	{
 		printf("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
@@ -2184,6 +2184,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			case 0x87:	// 1000 0111
 			case 0x97:	// 1001 0111
 			case 0xd7:	// 1101 0111
+			case 0xc7:	// 1100 0111
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
@@ -2362,18 +2363,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					}
 				}
 			}
-
-			/*
-            // DEBUG
-            if (chunkLength == (9 << 1))
-            {
-                mame_printf_debug("Chunk : ");
-                for (int a = 0; a < chunkLength; a+=2)
-                    mame_printf_debug("%.2x%.2x ", threeDPointer[a], threeDPointer[a+1]);
-                mame_printf_debug("\n");
-            }
-            // END DEBUG
-            */
 
 			// Advance to the next polygon chunk...
 			threeDPointer += chunkLength;
