@@ -6,6 +6,7 @@
 #include "streams.h"
 #include "includes/n64.h"
 #include "sound/dmadac.h"
+#include "profiler.h"
 
 UINT32 *rdram;
 UINT32 *rsp_imem;
@@ -764,7 +765,9 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 
 		case 0x04/4:		// DP_END_REG
 			dp_end = data;
+			profiler_mark_start(PROFILER_USER1);
 			rdp_process_list(device->machine);
+			profiler_mark_end();
 			break;
 
 		case 0x0c/4:		// DP_STATUS_REG
