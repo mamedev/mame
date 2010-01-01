@@ -7431,7 +7431,9 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	drcuml_state *drcuml = rsp->impstate->drcuml;
 	drcuml_block *block;
 	jmp_buf errorbuf;
+#ifdef LSB_FIRST
 	int unaligned_case = 1;
+#endif
 
 	/* if we get an error back, we're screwed */
 	if (setjmp(errorbuf) != 0)
