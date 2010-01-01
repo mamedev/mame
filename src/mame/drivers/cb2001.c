@@ -50,18 +50,18 @@ static const UINT8 cb2001_decryption_table[256] = {
 //    pppp                pppp ???? pppp p?p?  pppp           p?p?                pppp
 	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
 //                   p?p? pppp                 pppp      ???? pppp pppp pppp pppp pppp
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,xxxx,xxxx,xxxx, /* 20 */
-//         !!!!      pppp      pppp pppp       pppp           pppp ????
-	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
-//    ????                                               ????           ????      pppp
-	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,xxxx, /* 40 */
-//         !!!!                gggg pppp            pppp           pppp
-	xxxx,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
-//              pppp                ???? pppp                      pppp
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,xxxx, /* 20 */
+//         !!!!      pppp      pppp pppp       pppp           pppp ???? pppp     
+	0x9d,xxxx,xxxx,xxxx,xxxx,0x0a,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
+//    ????                     ???? pppp                 ????           ????      pppp
+	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, /* 40 */
+//         !!!!           ???? gggg pppp            pppp           pppp           ????
+	0x2b,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
+//    ????      pppp                ???? pppp                      pppp
 	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
 //                        pppp                 pppp ????                pppp gggg
-	0xc3,xxxx,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
-//    pppp      pppp pppp           pppp       pppp      ????           pppp
+	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
+//    pppp pppp pppp pppp           pppp       pppp      ????           pppp
 	0x26,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
 //    pppp                               ????            pppp      pppp      ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
@@ -69,15 +69,15 @@ static const UINT8 cb2001_decryption_table[256] = {
 	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, 0x4e,xxxx,0xdb,0x50,0x51,0xa5,xxxx,0x1a, /* A0 */
 //                   pppp pppp ????      !!!!  pppp      p?p? pppp pppp ????      pppp
 	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
-//    pppp      pppp           ????                      pppp      pppp      pppp ????
-	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x2e,xxxx, /* C0 */
-//         pppp pppp           pppp pppp                                     pppp
+//    pppp      pppp           pppp                      pppp      pppp      pppp ????
+	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,xxxx,xxxx,xxxx,0x2e,xxxx, /* C0 */
+//         pppp pppp           pppp pppp                 pppp                pppp
 	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //              pppp      ????           pppp  pppp                     ???? !!!! pppp
-	0x8a,xxxx,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, xxxx,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
-//    pppp           !!!!      ????                 ????
-	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
-//              pppp
+	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, xxxx,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
+//    pppp gggg      !!!!      ????                 ????
+	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
+//              pppp                     ????
 };
 
 /* robiza's notes:
@@ -121,28 +121,28 @@ e002e 18 c0      xor al,al
 e0030 49 67 07   mov [767],al
 e0033 45 01      mov al,1
 e0035 49 d3 06   mov [6d3],al
-0089 call 2a9d                            e0038 00 67 30   call e30a2
-  .                                         e30a2 aa         clr1 dir
-  2a9d ld hl,d0b3                           e30a3 1e a6 04   mov bw,04a6 (1e -> bb, but in e66fd is different, bad dump?)
-  2aa0 inc (hl)                             e30a5 f2 07      inc b ptr[bw]
-  2aa1 inc hl                               e30a8 7d         inc bw
-  2aa2 inc (hl)                             e30a9 f2 07      inc b ptr[bw]
-  2aa3 ld a,(hl)                            e30ab e0 07      mov al,b ptr[bw]
-  2aa4 cp 3c                                e30ad 08 3c      cmp al,3c
-  2aa6 ret c                                e30af 78 06      bc e30b7
+
+0089 call 2a9d                            e0038 call e30a2
+  2a9d ld hl,d0b3                           e30a2 premov bw,[04a6]			(1e -> bb)
+  2aa0 inc (hl)                             e30a5 inc b ptr[bw]
+  2aa1 inc hl                               e30a8 inc bw
+  2aa2 inc (hl)                             e30a9 inc b ptr[bw]
+  2aa3 ld a,(hl)                            e30ab mov al,b ptr[bw]
+  2aa4 cp 3c                                e30ad cmp al,3c
+  2aa6 ret c                                e30af bc e30b7
 
 0c4f ld a,(d44d)                            e003b mov al,[512]
 0c52 or a,a                                 e003e and al,al
 0c53 ret nz                                 e0040 be e0083
 0c54 ld hl,d461                             .
-0c57 ld a,(d476)                            e0042 mov aw,[4b9] (68 -> a1)
+0c57 ld a,(d476)                            e0042 mov aw,[4b9]				(68 -> a1)
 0c5a or a                                   e0045 and aw,aw
 0c5b jr nz,0c6d                             e0047 be e0083
 0c5d ld a,(hl)                              .
 0c5e or a                                   e0049 and al,al
 0c5f jr nz,0c71                             e004b be e0054
 0c61 inc hl                                 e004d dec al
-0c62 inc (hl)                               e004f mov [4b9],aw (4c -> a3)
+0c62 inc (hl)                               e004f mov [4b9],aw				(4c -> a3)
 0c63 ld a,(hl)                              .
 .                                           e0052 br e0083
 .                                           e0054 and ah,ah
