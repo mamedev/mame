@@ -51,7 +51,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define DRC_SSV							(1)
 #define DRC_SLV							(1)
 #define DRC_SDV							(1)
-#define DRC_SQV							(1)
+#define DRC_SQV							(0)
 #define DRC_SPV							(0) // Todo
 
 #define DRC_VMUDL						(0)
@@ -1977,7 +1977,7 @@ static void cfunc_rsp_stv(void *param)
 
 static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	int loopdest;
+//	int loopdest;
 	UINT32 op = desc->opptr.l[0];
 	int dest = (op >> 16) & 0x1f;
 	//int base = (op >> 21) & 0x1f;
@@ -7474,9 +7474,8 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
 			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
 			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
-			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
 			UML_DAND(block, IREG(1), IREG(1), IMM(0xffff));								// dand    i1,i1,0xffff
-			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffffffff0000)));			// dand    i3,i3,~0xffff
+			UML_DROLAND(block, IREG(3), IREG(3), IREG(2), IMM(U64(0xffffffffffff0000)));// droland i3,i3,i2,~0xffff
 			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
 			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
 			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
@@ -7497,10 +7496,8 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
 			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
 			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
-			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
-			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
 			UML_DAND(block, IREG(1), IREG(1), IMM(0xffffffff));							// dand    i1,i1,0xffffffff
-			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffff00000000)));			// dand    i3,i3,~0xffffffff
+			UML_DROLAND(block, IREG(3), IREG(3), IREG(2), IMM(U64(0xffffffff00000000)));// droland i3,i3,i2,~0xffffffff
 			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
 			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
 			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
@@ -7534,8 +7531,7 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
 			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
 			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
-			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffff));								// and     i0,i0,0xffff
+			UML_DROLAND(block, IREG(0), IREG(0), IREG(1), IMM(0xffff));					// droland i0,i0,i1,0xffff
 #endif
 		}
 		else if (size == 4)
@@ -7553,7 +7549,6 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
 			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
 			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
-			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
 			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
 #endif
 		}
