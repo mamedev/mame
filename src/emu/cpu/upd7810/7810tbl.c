@@ -3549,7 +3549,7 @@ static const struct opcode_s op48_7801[256] =
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{SK_CY, 		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{SK_Z,			2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
-	{PUSH_VA,		2,15,15,L0|L1},	{POP_VA,		2,15,15,L0|L1},
+	{PUSH_VA,		2,17,17,L0|L1},	{POP_VA,		2,15,15,L0|L1},
 
 	{SKNIT_F0,		2, 8, 8,L0|L1},	{SKNIT_FT0,		2, 8, 8,L0|L1},
 	{SKNIT_F1,		2, 8, 8,L0|L1},	{SKNIT_F2,		2, 8, 8,L0|L1},
@@ -3575,7 +3575,7 @@ static const struct opcode_s op48_7801[256] =
 	{SLL_A,			2, 8, 8,L0|L1},	{SLR_A, 		2, 8, 8,L0|L1},
 	{SLL_C, 		2, 8, 8,L0|L1},	{SLR_C, 		2, 8, 8,L0|L1},
 	{RLD,			2,17,17,L0|L1},	{RRD,			2,17,17,L0|L1},
-	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{PER,			2,11,11,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{PUSH_HL,		2,17,17,L0|L1},	{POP_HL,		2,15,15,L0|L1},
 

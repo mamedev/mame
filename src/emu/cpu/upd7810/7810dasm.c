@@ -4115,7 +4115,7 @@ static const struct dasm_s dasm4c_7801[256] = {
 
 	/* 0xC0 - 0xFF */
 	{ MOV, "A,PA" },	{ MOV, "A,PB" },	{ MOV, "A,PC" },	{ MOV, "A,MK" },
-	{ MOV, "A,MB" },	{ MOV, "A,MC" },	{ MOV, "A,TM0" },	{ MOV, "A,TM1" },
+	{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },
 	{ MOV, "A,S" },		{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },
 	{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },
 
@@ -4379,12 +4379,12 @@ static const struct dasm_s dasm64_7801[256] = {
 
 	{ ACI, "PA,%b" }, { ACI, "PB,%b" }, { ACI, "PC,%b" }, { ACI, "MK,%b" },
 	{ illegal, 0 }, { illegal, 0 }, { illegal, 0 }, { illegal, 0 },
-	{ SUI, "PA,%b" }, { SUI, "PB,%b" }, { SUI, "PC,%b" }, { SUI, "MK,%b" },
+	{ OFFI, "PA,%b" }, { OFFI, "PB,%b" }, { OFFI, "PC,%b" }, { OFFI, "MK,%b" },
 	{ illegal, 0 }, { illegal, 0 }, { illegal, 0 }, { illegal, 0 },
 
-	{ NEI, "PA,%b" }, { NEI, "PB,%b" }, { NEI, "PC,%b" }, { NEI, "MK,%b" },
+	{ SUI, "PA,%b" }, { SUI, "PB,%b" }, { SUI, "PC,%b" }, { SUI, "MK,%b" },
 	{ illegal, 0 }, { illegal, 0 }, { illegal, 0 }, { illegal, 0 },
-	{ SBI, "PA,%b" }, { SBI, "PB,%b" }, { SBI, "PC,%b" }, { SBI, "MK,%b" },
+	{ NEI, "PA,%b" }, { NEI, "PB,%b" }, { NEI, "PC,%b" }, { NEI, "MK,%b" },
 	{ illegal, 0 }, { illegal, 0 }, { illegal, 0 }, { illegal, 0 },
 
 	{ SBI, "PA,%b" }, { SBI, "PB,%b" }, { SBI, "PC,%b" }, { SBI, "MK,%b" },
@@ -4600,7 +4600,7 @@ static const struct dasm_s dasmXX_7801[256] = {
 
 	{ 0, dasm60_7801 },	{ DAA, 0 },			{ RETI, 0 },		{ CALB, 0 },
 	{ 0, dasm64_7801 },	{ NEIW, "%a,%b" },	{ SUI, "A,%b" },	{ NEI, "A,%b" },
-	{ MVI, "V,%b?" },	{ MVI, "A,%b" },	{ MVI, "B,%b" },	{ MVI, "C,%b" },
+	{ MVI, "V,%b" },	{ MVI, "A,%b" },	{ MVI, "B,%b" },	{ MVI, "C,%b" },
 	{ MVI, "D,%b" },	{ MVI, "E,%b" },	{ MVI, "H,%b" },	{ MVI, "L,%b" },
 
 	{ 0, dasm70_7801 },	{ MVIW, "%a,%b" },	{ SOFTI, 0 },		{ JB, 0 },
