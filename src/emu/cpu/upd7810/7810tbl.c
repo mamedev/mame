@@ -1043,6 +1043,7 @@ static void INR_A_7801(upd7810_state *cpustate);
 static void INR_B_7801(upd7810_state *cpustate);
 static void INR_C_7801(upd7810_state *cpustate);
 static void INRW_wa_7801(upd7810_state *cpustate);
+static void STM_7801(upd7810_state *cpustate);
 
 
 static const struct opcode_s op48[256] =
@@ -4645,7 +4646,7 @@ static const struct opcode_s opXX_7801[256] =
 	{INX_BC,		1, 7, 7,L0|L1},	{DCX_BC,		1, 7, 7,L0|L1},
 	{LXI_B_w,		3,10,10,L0|L1},	{ORIW_wa_xx,	3,16,16,L0|L1},
 	{XRI_A_xx,		2, 7, 7,L0|L1},	{ORI_A_xx,		2, 7, 7,L0|L1},
-	{RETS,			1,11,11,L0|L1},	{STM,			1, 4, 4,L0|L1},
+	{RETS,			1,11,11,L0|L1},	{STM_7801,		1, 4, 4,L0|L1},
 	{MOV_B_A,		1, 4, 4,L0|L1},	{MOV_C_A,		1, 4, 4,L0|L1},
 	{MOV_D_A,		1, 4, 4,L0|L1},	{MOV_E_A,		1, 4, 4,L0|L1},
 	{MOV_H_A,		1, 4, 4,L0|L1},	{MOV_L_A,		1, 4, 4,L0|L1},

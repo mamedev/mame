@@ -1654,9 +1654,27 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 	}
 }
 
-//static void upd7801_timers(upd7810_state *cpustate, int cycles)
-//{
-//}
+static void upd7801_timers(upd7810_state *cpustate, int cycles)
+{
+	if ( cpustate->ovc0 )
+	{
+		cpustate->ovc0 -= cycles;
+
+		/* Check if timer expired */
+		if ( cpustate->ovc0 <= 0 )
+		{
+			IRR |= INTFT0;
+
+			/* Reset the timer flip/fliop */
+			TO = 0;
+			if ( cpustate->config.io_callback)
+				(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
+
+			/* Reload the timer */
+			cpustate->ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
+		}
+	}
+}
 
 static void upd78c05_timers(upd7810_state *cpustate, int cycles)
 {
@@ -1821,6 +1839,8 @@ static CPU_RESET( upd7801 )
 	cpustate->op70 = op70_7801;
 	cpustate->op74 = op74_7801;
 	cpustate->opXX = opXX_7801;
+	cpustate->handle_timers = upd7801_timers;
+	cpustate->ovc0 = 0;
 }
 
 static CPU_RESET( upd78c05 )

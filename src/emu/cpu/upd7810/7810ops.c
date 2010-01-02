@@ -9457,3 +9457,14 @@ static void STM(upd7810_state *cpustate)
 {
 	cpustate->ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
 }
+
+static void STM_7801(upd7810_state *cpustate)
+{
+	/* Set the timer flip/fliop */
+	TO = 1;
+	if ( cpustate->config.io_callback)
+		(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
+
+	/* Reload the timer */
+	cpustate->ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
+}
