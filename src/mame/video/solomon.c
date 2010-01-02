@@ -9,7 +9,7 @@ static tilemap_t *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( solomon_videoram_w )
 {
-	solomon_colorram[offset] = data;
+	solomon_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = solomon_colorram[tile_index];
-	int code = solomon_colorram[tile_index] + 256 * (attr & 0x07);
+	int code = solomon_videoram[tile_index] + 256 * (attr & 0x07);
 	int color = (attr & 0x70) >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
