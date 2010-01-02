@@ -492,7 +492,7 @@ include $(SRC)/build/build.mak
 include $(SRC)/tools/tools.mak
 
 # combine the various definitions to one
-CDEFS = $(DEFS) $(COREDEFS) $(SOUNDDEFS)
+CDEFS = $(DEFS)
 
 
 

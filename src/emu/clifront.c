@@ -593,8 +593,6 @@ int cli_info_listroms(core_options *options, const char *gamename)
 int cli_info_listsamples(core_options *options, const char *gamename)
 {
 	int count = 0;
-
-#if (HAS_SAMPLES)
 	int drvindex;
 
 	/* since we expand the machine driver, we need to set things up */
@@ -626,9 +624,6 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 
 	/* clean up our tracked resources */
 	exit_resource_tracking();
-#else
-	mame_printf_error("Samples not supported in this build\n");
-#endif
 
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }

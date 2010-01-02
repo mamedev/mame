@@ -551,7 +551,6 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 
 static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
 {
-#if (HAS_SAMPLES)
 	const device_config *device;
 
 	for (device = sound_first(config); device != NULL; device = sound_next(device))
@@ -573,7 +572,6 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 				}
 			}
 		}
-#endif
 }
 
 
@@ -584,7 +582,6 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 
 static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
-#if (HAS_SAMPLES)
 	const device_config *device;
 
 	/* iterate over sound chips looking for samples */
@@ -618,7 +615,6 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 				}
 			}
 		}
-#endif
 }
 
 

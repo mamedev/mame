@@ -146,11 +146,10 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit)
 {
-	int records = 0;
-#if HAS_SAMPLES
 	machine_config *config = machine_config_alloc(gamedrv->machine_config);
 	const device_config *device;
 	audit_record *record;
+	int records = 0;
 	int sampnum;
 
 	/* count the number of sample records attached to this driver */
@@ -223,7 +222,6 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 
 skip:
 	machine_config_free(config);
-#endif /* HAS_SAMPLES */
 	return records;
 }
 
