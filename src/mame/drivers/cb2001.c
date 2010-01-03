@@ -72,12 +72,12 @@ static const UINT8 cb2001_decryption_table[256] = {
 //    pppp      pppp           pppp                      pppp      pppp      pppp pppp
 	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
 //         pppp pppp           pppp pppp                 pppp ????           pppp
-	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
-//              pppp      ????           pppp  pppp                     ???? !!!! pppp
+	xxxx,xxxx,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
+//              pppp      ????      pppp pppp  pppp                     ???? !!!! pppp
 	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, xxxx,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    pppp gggg      !!!!      ????                 ????
-	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
-//              pppp                     ????
+	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
+//              pppp                     ????                      ????
 };
 
 /* robiza's notes:
@@ -531,7 +531,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-//  cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
 static const gfx_layout cb2001_layout =
