@@ -47,29 +47,29 @@ In test mode (c) is 2000
 
 static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,xxxx,0x12,0x27, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
-//    pppp                pppp      pppp p?p?  pppp           p?p?                pppp
+//    pppp                pppp      pppp p?p?  pppp           pppp                pppp
 	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
-//                   p?p? pppp                 pppp      ???? pppp pppp pppp pppp pppp
+//                   p?p? pppp                 pppp      pppp pppp pppp pppp pppp pppp
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,xxxx, /* 20 */
 //         !!!!      pppp      pppp pppp       pppp           pppp ???? pppp     
 	xxxx,xxxx,xxxx,xxxx,xxxx,0x0a,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
-//                             ???? pppp                 ????           ????      pppp
+//                             ???? pppp                 ????           pppp      pppp
 	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, /* 40 */
-//         !!!!           ???? gggg pppp            pppp           pppp           ????
-	0x2b,xxxx,0x2c,xxxx,0x9d,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,0xa4,xxxx,xxxx, /* 50 */
-//    ????      pppp      ????      ???? pppp                      pppp ????
+//         !!!!           ???? gggg pppp            pppp           pppp           pppp
+	0x2b,xxxx,0x2c,xxxx,0x9d,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,0xab,xxxx,xxxx, /* 50 */
+//    ????      pppp      ????      pppp pppp                      pppp pppp
 	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
-//                        pppp                 pppp ????                pppp gggg
-	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
-//    pppp pppp pppp pppp           pppp       pppp      ????           pppp
+//                        pppp                 pppp pppp                pppp gggg
+	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
+//    pppp pppp pppp pppp           pppp       pppp      pppp           pppp
 	0x26,xxxx,xxxx,xxxx,xxxx,xxxx,0xfb,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
-//    pppp                          ???? ????            pppp      pppp      ????
-	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbe,xxxx, /* 90 */
-//              pppp           pppp                      pppp      pppp      ????
-	xxxx,xxxx,0xe6,0x06,0xaa,0x9c,xxxx,0xb8, 0x4e,xxxx,0xdb,0x50,0x51,0xa5,xxxx,0x1a, /* A0 */
-//              ???? pppp pppp ????      !!!!  pppp      p?p? pppp pppp ????      pppp
+//    pppp                          ???? pppp            pppp      pppp      ????
+	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
+//              pppp           pppp                      pppp      pppp      pppp
+	xxxx,xxxx,0xe6,0x06,0xaa,0x9c,xxxx,0xb8, 0x4e,xxxx,0xdb,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
+//              pppp pppp pppp ????      !!!!  pppp      vvvv pppp pppp pppp      pppp
 	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
-//    pppp      pppp           pppp                      pppp      pppp      pppp ????
+//    pppp      pppp           pppp                      pppp      pppp      pppp pppp
 	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
 //         pppp pppp           pppp pppp                 pppp ????           pppp
 	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
