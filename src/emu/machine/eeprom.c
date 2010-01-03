@@ -207,7 +207,7 @@ logerror("EEPROM write %04x to address %02x\n",data,address);
 			if (eestate->intf->data_bits == 16)
 				memory_write_word(device->space[0], address * 2, data);
 			else
-				memory_write_byte(device->space[0], address, 0x00);
+				memory_write_byte(device->space[0], address, data);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
