@@ -51,7 +51,7 @@ static const UINT8 cb2001_decryption_table[256] = {
 	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
 //                   p?p? pppp                 pppp      pppp pppp pppp pppp pppp pppp
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,xxxx, /* 20 */
-//         !!!!      pppp      pppp pppp       pppp           pppp ???? pppp     
+//         !!!!      pppp      pppp pppp       pppp           pppp ???? pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,0x0a,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
 //                             ???? pppp                 ????           pppp      pppp
 	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, /* 40 */
@@ -94,7 +94,7 @@ e0093 78 03             bc e0098
 probably "aa" is an undocumented opcode
 
 1) aa 1e ## ## -> bb mov bw,####
-_     1e ## ## -> 89 mov 
+_     1e ## ## -> 89 mov
 
 2) aa 26 ## ## -> bc mov sp,####
 _     26 ##    -> b5 mov ch,##
@@ -342,6 +342,7 @@ e328e 18 c0 xor al,al
       70    ret
 */
 
+static UINT16 *cb2001_vram;
 
 static VIDEO_START(cb2001)
 {
@@ -350,11 +351,27 @@ static VIDEO_START(cb2001)
 
 static VIDEO_UPDATE(cb2001)
 {
+	int count,x,y;
+
+	count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			int tile;
+
+			tile = (cb2001_vram[count] & 0x3fff);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8);
+			count++;
+		}
+	}
 	return 0;
 }
 
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0xbffff) AM_RAM
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0x20000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -531,7 +548,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x60/4);
 }
 
 static const gfx_layout cb2001_layout =
