@@ -1840,6 +1840,7 @@ static CPU_RESET( upd7801 )
 	cpustate->op74 = op74_7801;
 	cpustate->opXX = opXX_7801;
 	cpustate->handle_timers = upd7801_timers;
+	MA = 0;		/* Port A is output port on the uPD7801 */
 	cpustate->ovc0 = 0;
 }
 
