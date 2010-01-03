@@ -143,9 +143,6 @@ BUILD_ZLIB = 1
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
 # OPTIMIZE = 3
 
-# experimental: uncomment to compile everything as C++ for stricter type checking
-# CPP_COMPILE = 1
-
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -195,7 +192,7 @@ endif
 # compiler, linker and utilities
 AR = @ar
 CC = @gcc
-LD = @gcc
+LD = @g++
 MD = -mkdir$(EXE)
 RM = @rm -f
 
@@ -205,14 +202,14 @@ RM = @rm -f
 # form the name of the executable
 #-------------------------------------------------
 
-# debug builds just get the 'd' suffix and nothing more
-ifdef DEBUG
-DEBUGSUFFIX = d
+# 64-bit builds get a '64' suffix
+ifdef PTR64
+SUFFIX64 = 64
 endif
 
-# cpp builds get a 'pp' suffix
-ifdef CPP_COMPILE
-CPPSUFFIX = pp
+# debug builds just get the 'd' suffix and nothing more
+ifdef DEBUG
+SUFFIXDEBUG = d
 endif
 
 # the name is just 'target' if no subtarget; otherwise it is
@@ -223,8 +220,8 @@ else
 NAME = $(TARGET)$(SUBTARGET)
 endif
 
-# fullname is prefix+name+suffix+debugsuffix
-FULLNAME = $(PREFIX)$(NAME)$(CPPSUFFIX)$(SUFFIX)$(DEBUGSUFFIX)
+# fullname is prefix+name+suffix+suffix64+suffixdebug
+FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)
 
 # add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
@@ -258,7 +255,7 @@ DEFS = -DCRLF=3
 endif
 
 # map the INLINE to something digestible by GCC
-DEFS += -DINLINE="static __inline__"
+DEFS += -DINLINE=inline
 
 # define LSB_FIRST if we are a little-endian target
 ifndef BIGENDIAN
@@ -298,11 +295,7 @@ CPPONLYFLAGS =
 
 # CFLAGS is defined based on C or C++ targets
 # (remember, expansion only happens when used, so doing it here is ok)
-ifdef CPP_COMPILE
 CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
-else
-CFLAGS = $(CCOMFLAGS) $(CONLYFLAGS)
-endif
 
 # we compile C-only to C89 standard with GNU extensions
 # we compile C++ code to C++98 standard with GNU extensions
@@ -350,11 +343,6 @@ CONLYFLAGS += \
 	-Wpointer-arith \
 	-Wbad-function-cast \
 	-Wstrict-prototypes
-
-# this warning is not supported on the os2 compilers
-ifneq ($(TARGETOS),os2)
-CONLYFLAGS += -Wdeclaration-after-statement
-endif
 
 
 
@@ -458,11 +446,13 @@ endif
 
 
 #-------------------------------------------------
-# 'all' target needs to go here, before the 
+# 'default' target needs to go here, before the 
 # include files which define additional targets
 #-------------------------------------------------
 
-all: maketree buildtools emulator tools
+default: maketree buildtools emulator
+
+all: default tools
 
 
 

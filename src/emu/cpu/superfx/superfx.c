@@ -381,7 +381,7 @@ INLINE void superfx_rambuffer_write(superfx_state *cpustate, UINT16 addr, UINT8 
 	cpustate->ramdr = data;
 }
 
-static void superfx_rombuffer_sync(superfx_state *cpustate)
+INLINE void superfx_rombuffer_sync(superfx_state *cpustate)
 {
 	if(cpustate->romcl)
 	{
@@ -389,13 +389,13 @@ static void superfx_rombuffer_sync(superfx_state *cpustate)
 	}
 }
 
-static void superfx_rombuffer_update(superfx_state *cpustate)
+INLINE void superfx_rombuffer_update(superfx_state *cpustate)
 {
 	cpustate->sfr |= SUPERFX_SFR_R;
 	cpustate->romcl = cpustate->memory_access_speed;
 }
 
-static UINT8 superfx_rombuffer_read(superfx_state *cpustate)
+INLINE UINT8 superfx_rombuffer_read(superfx_state *cpustate)
 {
 	superfx_rombuffer_sync(cpustate);
 	return cpustate->romdr;

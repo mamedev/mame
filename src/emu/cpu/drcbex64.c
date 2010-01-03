@@ -327,7 +327,7 @@ static void debug_log_hashjmp(int mode, offs_t pc);
 ***************************************************************************/
 
 /* globally-accessible interface to the backend */
-const drcbe_interface drcbe_x64_be_interface =
+extern const drcbe_interface drcbe_x64_be_interface =
 {
 	drcbex64_alloc,
 	drcbex64_free,

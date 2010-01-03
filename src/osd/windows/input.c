@@ -1089,7 +1089,7 @@ static void dinput_init(running_machine *machine)
 	int didevtype_joystick = DI8DEVCLASS_GAMECTRL;
 
 	dinput_version = DIRECTINPUT_VERSION;
-	result = DirectInput8Create(GetModuleHandle(NULL), dinput_version, &IID_IDirectInput8, (void *)&dinput, NULL);
+	result = DirectInput8Create(GetModuleHandle(NULL), dinput_version, IID_IDirectInput8, (void **)&dinput, NULL);
 	if (result != DI_OK)
 	{
 		dinput_version = 0;

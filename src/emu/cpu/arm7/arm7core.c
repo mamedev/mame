@@ -793,7 +793,7 @@ static void HandleCoProcDT(arm_state *cpustate, UINT32 insn)
         SET_REGISTER(cpustate, rn, ornv);
 }
 
-static void HandleBranch(arm_state *cpustate, UINT32 insn)
+INLINE void HandleBranch(arm_state *cpustate, UINT32 insn)
 {
     UINT32 off = (insn & INSN_BRANCH) << 2;
 

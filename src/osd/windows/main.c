@@ -61,27 +61,10 @@ extern int utf8_main(int argc, char *argv[]);
 #undef wmain
 #endif
 
-#ifdef __GNUC__
-int main(int argc, char **a_argv)
-#else // !__GNUC__
-int _tmain(int argc, TCHAR **argv)
-#endif // __GNUC__
+extern "C" int _tmain(int argc, TCHAR **argv)
 {
 	int i, rc;
 	char **utf8_argv;
-
-#ifdef __GNUC__
-	TCHAR **argv;
-#ifdef UNICODE
-	// MinGW doesn't support wmain() directly, so we have to jump through some hoops
-	extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron, int expand_wildcards, int *startupinfo);
-	WCHAR **wenviron;
-	int startupinfo;
-	__wgetmainargs(&argc, &argv, &wenviron, 0, &startupinfo);
-#else // !UNICODE
-	argv = a_argv;
-#endif // UNICODE
-#endif // __GNUC__
 
 #ifdef MALLOC_DEBUG
 {
