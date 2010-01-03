@@ -18,110 +18,99 @@ i8751 protection simluation and other fixes by Bryan McPhail, 15/10/00.
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-
-/* from video */
-extern UINT8 *sidepckt_videoram;
-extern UINT8 *sidepckt_colorram;
-
-PALETTE_INIT( sidepckt );
-VIDEO_START( sidepckt );
-VIDEO_UPDATE( sidepckt );
-
-WRITE8_HANDLER( sidepckt_flipscreen_w );
-WRITE8_HANDLER( sidepckt_videoram_w );
-WRITE8_HANDLER( sidepckt_colorram_w );
-static int i8751_return;
+#include "includes/sidepckt.h"
 
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-    soundlatch_w(space, offset, data);
-    cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sidepckt_i8751_r )
 {
-	return i8751_return;
+	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
+	return state->i8751_return;
 }
 
 static WRITE8_HANDLER( sidepckt_i8751_w )
 {
+	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
 	static const int table_1[]={5,3,2};
 	static const int table_2[]={0x8e,0x42,0xad,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa2,0xff};
 	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
-	static int current_ptr=0,current_table=0,in_math=0,math_param;
 
 	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
-	if (in_math==1) {
-		in_math=2;
-		i8751_return=math_param=data;
+	if (state->in_math==1) {
+		state->in_math=2;
+		state->i8751_return=state->math_param=data;
 	}
-	else if (in_math==2) {
-		in_math=0;
-		i8751_return=math_param/data;
+	else if (state->in_math==2) {
+		state->in_math=0;
+		state->i8751_return=state->math_param/data;
 	}
 	else switch (data) {
 		case 1: /* ID Check */
-			current_table=1; current_ptr=0; i8751_return=table_1[current_ptr++]; break;
+			state->current_table=1; state->current_ptr=0; state->i8751_return=table_1[state->current_ptr++]; break;
 
 		case 2: /* Protection data (executable code) */
-			current_table=2; current_ptr=0; i8751_return=table_2[current_ptr++]; break;
+			state->current_table=2; state->current_ptr=0; state->i8751_return=table_2[state->current_ptr++]; break;
 
 		case 3: /* Protection data (executable code) */
-			current_table=3; current_ptr=0; i8751_return=table_3[current_ptr++]; break;
+			state->current_table=3; state->current_ptr=0; state->i8751_return=table_3[state->current_ptr++]; break;
 
 		case 4: /* Divide function - multiple parameters */
-			in_math=1;
-			i8751_return=4;
+			state->in_math=1;
+			state->i8751_return=4;
 			break;
 
 		case 6: /* Read table data */
-			if (current_table==1) i8751_return=table_1[current_ptr++];
-			if (current_table==2) i8751_return=table_2[current_ptr++];
-			if (current_table==3) i8751_return=table_3[current_ptr++];
+			if (state->current_table==1) state->i8751_return=table_1[state->current_ptr++];
+			if (state->current_table==2) state->i8751_return=table_2[state->current_ptr++];
+			if (state->current_table==3) state->i8751_return=table_3[state->current_ptr++];
 			break;
 	}
 }
 
 static WRITE8_HANDLER( sidepctj_i8751_w )
 {
+	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
 	static const int table_1[]={5,3,0};
 	static const int table_2[]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
 	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
-	static int current_ptr=0,current_table=0,in_math,math_param;
 
 	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
-	if (in_math==1) {
-		in_math=2;
-		i8751_return=math_param=data;
+	if (state->in_math==1) {
+		state->in_math=2;
+		state->i8751_return=state->math_param=data;
 	}
-	else if (in_math==2) {
-		in_math=0;
-		i8751_return=math_param/data;
+	else if (state->in_math==2) {
+		state->in_math=0;
+		state->i8751_return=state->math_param/data;
 	}
 	else switch (data) {
 		case 1: /* ID Check */
-			current_table=1; current_ptr=0; i8751_return=table_1[current_ptr++]; break;
+			state->current_table=1; state->current_ptr=0; state->i8751_return=table_1[state->current_ptr++]; break;
 
 		case 2: /* Protection data */
-			current_table=2; current_ptr=0; i8751_return=table_2[current_ptr++]; break;
+			state->current_table=2; state->current_ptr=0; state->i8751_return=table_2[state->current_ptr++]; break;
 
 		case 3: /* Protection data (executable code) */
-			current_table=3; current_ptr=0; i8751_return=table_3[current_ptr++]; break;
+			state->current_table=3; state->current_ptr=0; state->i8751_return=table_3[state->current_ptr++]; break;
 
 		case 4: /* Divide function - multiple parameters */
-			in_math=1;
-			i8751_return=4;
+			state->in_math=1;
+			state->i8751_return=4;
 			break;
 
 		case 6: /* Read table data */
-			if (current_table==1) i8751_return=table_1[current_ptr++];
-			if (current_table==2) i8751_return=table_2[current_ptr++];
-			if (current_table==3) i8751_return=table_3[current_ptr++];
+			if (state->current_table==1) state->i8751_return=table_1[state->current_ptr++];
+			if (state->current_table==2) state->i8751_return=table_2[state->current_ptr++];
+			if (state->current_table==3) state->i8751_return=table_3[state->current_ptr++];
 			break;
 	}
 }
@@ -130,11 +119,11 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 
 static ADDRESS_MAP_START( sidepckt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE(&sidepckt_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_MEMBER(sidepckt_state,videoram) AM_SIZE_MEMBER(sidepckt_state,videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE(&sidepckt_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE_MEMBER(sidepckt_state,colorram)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_MEMBER(sidepckt_state,spriteram) AM_SIZE_MEMBER(sidepckt_state,spriteram_size)
 	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
@@ -159,28 +148,28 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( sidepckt )
-    PORT_START("P1")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-    PORT_START("P2")
+	PORT_START("P2")
 	/* I haven't found a way to make the game use the 2p controls */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-    PORT_START("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
@@ -204,7 +193,7 @@ static INPUT_PORTS_START( sidepckt )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-    PORT_START("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Timer Speed" )
 	PORT_DIPSETTING(    0x00, "Stopped (Cheat)")
 	PORT_DIPSETTING(    0x03, "Slow" )
@@ -220,7 +209,7 @@ static INPUT_PORTS_START( sidepckt )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_DIPNAME( 0x80, 0x80, "Unused?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -271,6 +260,8 @@ static const ym3526_interface ym3526_config =
 
 
 static MACHINE_DRIVER_START( sidepckt )
+
+	MDRV_DRIVER_DATA(sidepckt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */

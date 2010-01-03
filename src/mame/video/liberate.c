@@ -11,14 +11,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-
-UINT8 *liberate_videoram;
-UINT8 *liberate_colorram;
-static int background_color, background_disable;
-static tilemap_t *background_tilemap, *fix_tilemap;
-static UINT8 deco16_io_ram[16];
-extern UINT8 *prosoccr_charram;
-extern UINT8 *prosport_bg_vram;
+#include "includes/liberate.h"
 
 #if 0
 void debug_print(bitmap_t *bitmap)
@@ -46,6 +39,7 @@ static TILEMAP_MAPPER( fix_scan )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
+	liberate_state *state = (liberate_state *)machine->driver_data;
 	const UINT8 *RAM = memory_region(machine, "user1");
 	int tile, bank;
 
@@ -53,27 +47,28 @@ static TILE_GET_INFO( get_back_tile_info )
 	if (tile_index & 0x100)
 	{
 		if (tile_index & 0x200)
-			tile_index = (tile_index & 0xff) + (deco16_io_ram[5] << 8); /* Bottom right */
+			tile_index = (tile_index & 0xff) + (state->io_ram[5] << 8); /* Bottom right */
 		else
-			tile_index = (tile_index & 0xff) + (deco16_io_ram[4] << 8); /* Bottom left */
+			tile_index = (tile_index & 0xff) + (state->io_ram[4] << 8); /* Bottom left */
 	}
 	else
 	{
 		if (tile_index & 0x200)
-			tile_index = (tile_index & 0xff) + (deco16_io_ram[3] << 8); /* Top right */
+			tile_index = (tile_index & 0xff) + (state->io_ram[3] << 8); /* Top right */
 		else
-			tile_index = (tile_index & 0xff) + (deco16_io_ram[2] << 8); /* Top left */
+			tile_index = (tile_index & 0xff) + (state->io_ram[2] << 8); /* Top left */
 	}
 
 	tile = RAM[tile_index];
 	if (tile > 0x7f) bank = 3; else bank = 2;
-	SET_TILE_INFO(bank, tile & 0x7f, background_color, 0);
+	SET_TILE_INFO(bank, tile & 0x7f, state->background_color, 0);
 }
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	UINT8 *videoram = liberate_videoram;
-	UINT8 *colorram = liberate_colorram;
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	UINT8 *videoram = state->videoram;
+	UINT8 *colorram = state->colorram;
 	int tile, color;
 
 	tile = videoram[tile_index] + (colorram[tile_index] << 8);
@@ -84,6 +79,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 static TILE_GET_INFO( prosport_get_back_tile_info )
 {
+	liberate_state *state = (liberate_state *)machine->driver_data;
 	int tile;
 
 	/*
@@ -92,11 +88,11 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
         - bits 0-3 are not used by gfx hardware; the value is the color of the pixel in the map (golf)
     */
 
-	tile = (prosport_bg_vram[tile_index] & 0xf0)>>4;
+	tile = (state->bg_vram[tile_index] & 0xf0)>>4;
 
 	if (tile_index & 0x8) tile += 0x10;
 
-	tile += deco16_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
+	tile += state->io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
 
 	SET_TILE_INFO(8, tile, 0, 0);
 }
@@ -105,19 +101,20 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
 
 WRITE8_HANDLER( deco16_io_w )
 {
-	deco16_io_ram[offset] = data;
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
-		tilemap_mark_all_tiles_dirty(background_tilemap);
+		tilemap_mark_all_tiles_dirty(state->background_tilemap);
 
 	switch (offset)
 	{
 		case 6: /* Background colour */
-			if (((data >> 4) & 3) != background_color)
+			if (((data >> 4) & 3) != state->background_color)
 			{
-				background_color = (data >> 4) & 3;
-				tilemap_mark_all_tiles_dirty(background_tilemap);
+				state->background_color = (data >> 4) & 3;
+				tilemap_mark_all_tiles_dirty(state->background_tilemap);
 			}
-			background_disable = data & 0x4;
+			state->background_disable = data & 0x4;
 			flip_screen_set(space->machine, data & 0x1);
 			break;
 		case 7: /* Background palette resistors? */
@@ -135,18 +132,19 @@ WRITE8_HANDLER( deco16_io_w )
 
 WRITE8_HANDLER( prosoccr_io_w )
 {
-	deco16_io_ram[offset] = data;
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
-		tilemap_mark_all_tiles_dirty(background_tilemap);
+		tilemap_mark_all_tiles_dirty(state->background_tilemap);
 
-//  popmessage("%02x %02x",deco16_io_ram[6],deco16_io_ram[7]);
+//  popmessage("%02x %02x",state->io_ram[6],state->io_ram[7]);
 
 	switch (offset)
 	{
 		case 6: /* unused here */
 			break;
 		case 7:
-			background_disable = ~data & 0x10;
+			state->background_disable = ~data & 0x10;
 			//sprite_priority = (data & 0x80)>>7;
 			/* -x-- --xx used during gameplay */
 			/* x--- ---- used on the attract mode */
@@ -164,14 +162,15 @@ WRITE8_HANDLER( prosoccr_io_w )
 /* completely different i/o...*/
 WRITE8_HANDLER( prosport_io_w )
 {
-	deco16_io_ram[offset] = data;
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->io_ram[offset] = data;
 
 	switch (offset)
 	{
 		case 0:
 			//background_disable = ~data & 0x80;
 			flip_screen_set(space->machine, data & 0x80);
-			tilemap_mark_all_tiles_dirty(background_tilemap);
+			tilemap_mark_all_tiles_dirty(state->background_tilemap);
 			break;
 		case 2: /* Sound */
 			soundlatch_w(space, 0, data);
@@ -185,57 +184,64 @@ WRITE8_HANDLER( prosport_io_w )
 
 WRITE8_HANDLER( liberate_videoram_w )
 {
-	liberate_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fix_tilemap, offset);
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
 
 WRITE8_HANDLER( liberate_colorram_w )
 {
-	liberate_colorram[offset] = data;
-	tilemap_mark_tile_dirty(fix_tilemap, offset);
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
 
 WRITE8_HANDLER( prosport_bg_vram_w )
 {
-	prosport_bg_vram[offset] = data;
-	tilemap_mark_tile_dirty(background_tilemap, offset);
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->bg_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->background_tilemap, offset);
 }
 
 /***************************************************************************/
 
 VIDEO_START( prosoccr )
 {
-	background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
-	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	state->background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
 
-	tilemap_set_transparent_pen(fix_tilemap,0);
+	tilemap_set_transparent_pen(state->fix_tilemap,0);
 
-	prosoccr_charram = auto_alloc_array(machine, UINT8, 0x1800*2);
+	state->charram = auto_alloc_array(machine, UINT8, 0x1800*2);
 }
 
 VIDEO_START( boomrang )
 {
-	background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
-	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	state->background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
 
-	tilemap_set_transmask(background_tilemap,0,0x0001,0x007e); /* Bottom 1 pen/Top 7 pens */
-	tilemap_set_transparent_pen(fix_tilemap,0);
+	tilemap_set_transmask(state->background_tilemap,0,0x0001,0x007e); /* Bottom 1 pen/Top 7 pens */
+	tilemap_set_transparent_pen(state->fix_tilemap,0);
 }
 
 VIDEO_START( liberate )
 {
-	background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
-	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	state->background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
 
-	tilemap_set_transparent_pen(fix_tilemap,0);
+	tilemap_set_transparent_pen(state->fix_tilemap,0);
 }
 
 VIDEO_START( prosport )
 {
-	background_tilemap = tilemap_create(machine, prosport_get_back_tile_info,back_scan,16,16,32,32);
-	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	state->background_tilemap = tilemap_create(machine, prosport_get_back_tile_info,back_scan,16,16,32,32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
 
-	tilemap_set_transparent_pen(fix_tilemap,0);
+	tilemap_set_transparent_pen(state->fix_tilemap,0);
 }
 
 /***************************************************************************/
@@ -333,13 +339,13 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				sy2=sy+16;
 		}
 
-	    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-	        		code,
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+					code,
 					color,
 					fx,fy,
 					sx,sy,0);
-	        if (multi)
-	    		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		if (multi)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code+1,
 					color,
 					fx,fy,
@@ -349,6 +355,7 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	liberate_state *state = (liberate_state *)machine->driver_data;
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color,gfx_region;
 	UINT8 *spriteram = machine->generic.spriteram.u8;
 
@@ -359,10 +366,10 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		code = spriteram[offs+1] + ((spriteram[offs+0]&0x3)<<8);
 		code2=code+1;
 
-		if(deco16_io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
+		if(state->io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
 			gfx_region = 3+4;
 		else
-			gfx_region = ((deco16_io_ram[0]&0x30)>>4)+4;
+			gfx_region = ((state->io_ram[0]&0x30)>>4)+4;
 
 
 		multi = spriteram[offs+0] & 0x10;
@@ -373,7 +380,7 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      sy = (240-spriteram[offs+2]);//-16;
 		sy = 240-sy;
 
-		color = 1;//(deco16_io_ram[4] & 2)+1;//(spriteram[offs+0]&0x4)>>2;
+		color = 1;//(state->io_ram[4] & 2)+1;//(spriteram[offs+0]&0x4)>>2;
 
 		fy = spriteram[offs+0] & 0x02;
 		fx = spriteram[offs+0] & 0x04;
@@ -395,13 +402,13 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy2=sy+16;
 		}
 
-	drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
-	        		code,
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
+				code,
 				color,
 				fx,fy,
 				sx,sy,0);
-	if (multi)
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
+		if (multi)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
 				code2,
 				color,
 				fx,fy,
@@ -452,13 +459,13 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy2=sy+16;
 		}
 
-    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-        		code,
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				code,
 				color,
 				fx,fy,
 				sx,sy,0);
-        if (multi)
-    		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		if (multi)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code2,
 				color,
 				fx,fy,
@@ -481,8 +488,8 @@ static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		fx = spriteram[offs+0] & 4;
 		fy = spriteram[offs+0] & 2;
 
-    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-        			code,
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				code,
 				0,
 				fx,fy,
 				sx,sy,0);
@@ -493,15 +500,16 @@ static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( prosoccr )
 {
-	tilemap_set_scrolly(background_tilemap,0,deco16_io_ram[1]);
-	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
+	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	tilemap_set_scrolly(state->background_tilemap,0, state->io_ram[1]);
+	tilemap_set_scrollx(state->background_tilemap,0,-state->io_ram[0]);
 
-	if (background_disable)
+	if (state->background_disable)
 		bitmap_fill(bitmap,cliprect,32);
 	else
-		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->background_tilemap,0,0);
 
-	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fix_tilemap,0,0);
 	prosoccr_draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
@@ -509,6 +517,9 @@ VIDEO_UPDATE( prosoccr )
 
 VIDEO_UPDATE( prosport )
 {
+	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	UINT8 *videoram = state->videoram;
+	UINT8 *colorram = state->colorram;
 	int mx,my,tile,offs,gfx_region;
 	int scrollx,scrolly;
 
@@ -516,25 +527,25 @@ VIDEO_UPDATE( prosport )
 
 	offs = 0;
 	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
-	scrolly = ((deco16_io_ram[0] & 0x8)<<5);
-	scrollx = ((deco16_io_ram[0] & 0x2)<<7) | (deco16_io_ram[1]);
+	scrolly = ((state->io_ram[0] & 0x8)<<5);
+	scrollx = ((state->io_ram[0] & 0x2)<<7) | (state->io_ram[1]);
 
-	tilemap_set_scrolly(background_tilemap,0,scrolly);
-	tilemap_set_scrollx(background_tilemap,0,-scrollx);
+	tilemap_set_scrolly(state->background_tilemap,0,scrolly);
+	tilemap_set_scrollx(state->background_tilemap,0,-scrollx);
 
-	tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->background_tilemap,0,0);
 
 //  popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
 //  ,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
 
 	for (offs = 0;offs < 0x400;offs++)
 	{
-		tile=liberate_videoram[offs]+((liberate_colorram[offs]&0x3)<<8);
+		tile=videoram[offs]+((colorram[offs]&0x3)<<8);
 
-		if(deco16_io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
+		if(state->io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
 			gfx_region = 3;
 		else
-			gfx_region = ((deco16_io_ram[0]&0x30)>>4);
+			gfx_region = ((state->io_ram[0]&0x30)>>4);
 
 		my = (offs) % 32;
 		mx = (offs) / 32;
@@ -550,33 +561,35 @@ VIDEO_UPDATE( prosport )
 
 VIDEO_UPDATE( boomrang )
 {
-	tilemap_set_scrolly(background_tilemap,0, deco16_io_ram[1]);
-	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
+	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	tilemap_set_scrolly(state->background_tilemap,0, state->io_ram[1]);
+	tilemap_set_scrollx(state->background_tilemap,0,-state->io_ram[0]);
 
-	if (background_disable)
+	if (state->background_disable)
 		bitmap_fill(bitmap,cliprect,32);
 	else
-		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_DRAW_LAYER1,0);
+		tilemap_draw(bitmap,cliprect,state->background_tilemap,TILEMAP_DRAW_LAYER1,0);
 
 	boomrang_draw_sprites(screen->machine,bitmap,cliprect,8);
-	if (!background_disable)
-		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_DRAW_LAYER0,0);
+	if (!state->background_disable)
+		tilemap_draw(bitmap,cliprect,state->background_tilemap,TILEMAP_DRAW_LAYER0,0);
 	boomrang_draw_sprites(screen->machine,bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fix_tilemap,0,0);
 	return 0;
 }
 
 VIDEO_UPDATE( liberate )
 {
-	tilemap_set_scrolly(background_tilemap,0, deco16_io_ram[1]);
-	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
+	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	tilemap_set_scrolly(state->background_tilemap,0, state->io_ram[1]);
+	tilemap_set_scrollx(state->background_tilemap,0,-state->io_ram[0]);
 
-	if (background_disable)
+	if (state->background_disable)
 		bitmap_fill(bitmap,cliprect,32);
 	else
-		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->background_tilemap,0,0);
 
 	liberate_draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fix_tilemap,0,0);
 	return 0;
 }

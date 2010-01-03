@@ -39,24 +39,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-
-extern UINT8 *sidearms_videoram;
-extern UINT8 *sidearms_colorram;
-extern UINT8 *sidearms_bg_scrollx;
-extern UINT8 *sidearms_bg_scrolly;
-
-extern WRITE8_HANDLER( sidearms_videoram_w );
-extern WRITE8_HANDLER( sidearms_colorram_w );
-extern WRITE8_HANDLER( sidearms_star_scrollx_w );
-extern WRITE8_HANDLER( sidearms_star_scrolly_w );
-extern WRITE8_HANDLER( sidearms_c804_w );
-extern WRITE8_HANDLER( sidearms_gfxctrl_w );
-
-extern VIDEO_START( sidearms );
-extern VIDEO_UPDATE( sidearms );
-extern VIDEO_EOF( sidearms );
-
-int sidearms_gameid;
+#include "includes/sidearms.h"
 
 static WRITE8_HANDLER( sidearms_bankswitch_w )
 {
@@ -98,11 +81,11 @@ static ADDRESS_MAP_START( sidearms_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("DSW1") AM_WRITE(sidearms_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("DSW2") AM_WRITE(sidearms_star_scrollx_w)
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(sidearms_star_scrolly_w)
-	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_BASE(&sidearms_bg_scrollx)
-	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_BASE(&sidearms_bg_scrolly)
+	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_BASE_MEMBER(sidearms_state,bg_scrollx)
+	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_BASE_MEMBER(sidearms_state,bg_scrolly)
 	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(sidearms_gfxctrl_w)	/* background and sprite enable */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE(&sidearms_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE(&sidearms_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_MEMBER(sidearms_state,videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_MEMBER(sidearms_state,colorram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -121,11 +104,11 @@ static ADDRESS_MAP_START( turtship_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe804, 0xe804) AM_WRITE(sidearms_c804_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(sidearms_star_scrollx_w)
 	AM_RANGE(0xe806, 0xe806) AM_WRITE(sidearms_star_scrolly_w)
-	AM_RANGE(0xe808, 0xe809) AM_WRITEONLY AM_BASE(&sidearms_bg_scrollx)
-	AM_RANGE(0xe80a, 0xe80b) AM_WRITEONLY AM_BASE(&sidearms_bg_scrolly)
+	AM_RANGE(0xe808, 0xe809) AM_WRITEONLY AM_BASE_MEMBER(sidearms_state,bg_scrollx)
+	AM_RANGE(0xe80a, 0xe80b) AM_WRITEONLY AM_BASE_MEMBER(sidearms_state,bg_scrolly)
 	AM_RANGE(0xe80c, 0xe80c) AM_WRITE(sidearms_gfxctrl_w)	/* background and sprite enable */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE(&sidearms_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE(&sidearms_colorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_MEMBER(sidearms_state,videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_MEMBER(sidearms_state,colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sidearms_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -169,13 +152,13 @@ static ADDRESS_MAP_START( whizz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0xc806, 0xc806) AM_READ_PORT("IN3")
 	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("IN4")
-	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_BASE(&sidearms_bg_scrollx)
-	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_BASE(&sidearms_bg_scrolly)
+	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_BASE_MEMBER(sidearms_state,bg_scrollx)
+	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_BASE_MEMBER(sidearms_state,bg_scrolly)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(sidearms_star_scrollx_w)
 	AM_RANGE(0xe806, 0xe806) AM_WRITE(sidearms_star_scrolly_w)
 	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(sidearms_gfxctrl_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE(&sidearms_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE(&sidearms_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_MEMBER(sidearms_state,videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_MEMBER(sidearms_state,colorram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -657,9 +640,9 @@ static void irqhandler(const device_config *device, int irq)
 static const ym2203_interface ym2203_config =
 {
 	{
-			AY8910_LEGACY_OUTPUT,
-			AY8910_DEFAULT_LOADS,
-			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	},
 	irqhandler
 };
@@ -670,6 +653,8 @@ static const ym2151_interface whizz_ym2151_interface =
 };
 
 static MACHINE_DRIVER_START( sidearms )
+
+	MDRV_DRIVER_DATA(sidearms_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -716,6 +701,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( turtship )
 
+	MDRV_DRIVER_DATA(sidearms_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(turtship_map)
@@ -759,6 +746,8 @@ static MACHINE_DRIVER_START( turtship )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( whizz )
+
+	MDRV_DRIVER_DATA(sidearms_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
@@ -1164,10 +1153,33 @@ ROM_START( whizz )	/* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Seri
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-static DRIVER_INIT( sidearms ) { sidearms_gameid = 0; }
-static DRIVER_INIT( turtship ) { sidearms_gameid = 1; }
-static DRIVER_INIT( dyger    ) { sidearms_gameid = 2; }
-static DRIVER_INIT( whizz    ) { sidearms_gameid = 3; }
+static DRIVER_INIT( sidearms )
+{
+	sidearms_state *state = (sidearms_state *)machine->driver_data;
+
+	state->gameid = 0;
+}
+
+static DRIVER_INIT( turtship )
+{
+	sidearms_state *state = (sidearms_state *)machine->driver_data;
+
+	state->gameid = 1;
+}
+
+static DRIVER_INIT( dyger )
+{
+	sidearms_state *state = (sidearms_state *)machine->driver_data;
+
+	state->gameid = 2;
+}
+
+static DRIVER_INIT( whizz )
+{
+	sidearms_state *state = (sidearms_state *)machine->driver_data;
+
+	state->gameid = 3;
+}
 
 GAME( 1986, sidearms, 0,        sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, sidearmsr,sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US)", GAME_IMPERFECT_GRAPHICS )

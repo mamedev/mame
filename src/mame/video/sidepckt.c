@@ -1,10 +1,5 @@
 #include "driver.h"
-
-
-UINT8 *sidepckt_videoram;
-UINT8 *sidepckt_colorram;
-static tilemap_t *bg_tilemap;
-static int flipscreen;
+#include "includes/sidepckt.h"
 
 
 PALETTE_INIT( sidepckt )
@@ -48,10 +43,11 @@ PALETTE_INIT( sidepckt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 attr = sidepckt_colorram[tile_index];
+	sidepckt_state *state = (sidepckt_state *)machine->driver_data;
+	UINT8 attr = state->colorram[tile_index];
 	SET_TILE_INFO(
 			0,
-			sidepckt_videoram[tile_index] + ((attr & 0x07) << 8),
+			state->videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);
 	tileinfo->group = (attr & 0x80) >> 7;
@@ -67,10 +63,11 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( sidepckt )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	sidepckt_state *state = (sidepckt_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transmask(bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
 	tilemap_set_flip_all(machine,TILEMAP_FLIPX);
 }
@@ -85,19 +82,21 @@ VIDEO_START( sidepckt )
 
 WRITE8_HANDLER( sidepckt_videoram_w )
 {
-	sidepckt_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( sidepckt_colorram_w )
 {
-	sidepckt_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( sidepckt_flipscreen_w )
 {
-	flipscreen = data;
+	int flipscreen = data;
 	tilemap_set_flip_all(space->machine,flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
 }
 
@@ -110,10 +109,11 @@ WRITE8_HANDLER( sidepckt_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	sidepckt_state *state = (sidepckt_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0;offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0;offs < state->spriteram_size; offs += 4)
 	{
 		int sx,sy,code,color,flipx,flipy;
 
@@ -143,8 +143,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( sidepckt )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	sidepckt_state *state = (sidepckt_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

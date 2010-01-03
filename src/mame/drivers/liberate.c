@@ -17,32 +17,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *liberate_videoram;
-extern UINT8 *liberate_colorram;
-
-PALETTE_INIT( liberate );
-VIDEO_UPDATE( prosoccr );
-VIDEO_UPDATE( prosport );
-VIDEO_UPDATE( liberate );
-VIDEO_UPDATE( boomrang );
-VIDEO_START( prosoccr );
-VIDEO_START( prosport );
-VIDEO_START( boomrang );
-VIDEO_START( liberate );
-
-static int deco16_bank;
-static UINT8 *scratchram;
-UINT8 *prosoccr_charram;
-UINT8 *prosport_bg_vram;
-
-WRITE8_HANDLER( deco16_io_w );
-WRITE8_HANDLER( prosoccr_io_w );
-WRITE8_HANDLER( prosport_io_w );
-WRITE8_HANDLER( prosport_paletteram_w );
-WRITE8_HANDLER( prosport_bg_vram_w );
-WRITE8_HANDLER( liberate_videoram_w );
-WRITE8_HANDLER( liberate_colorram_w );
+#include "includes/liberate.h"
 
 /*************************************
  *
@@ -52,18 +27,19 @@ WRITE8_HANDLER( liberate_colorram_w );
 
 static READ8_HANDLER( deco16_bank_r )
 {
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	const UINT8 *ROM = memory_region(space->machine, "user1");
 
 	/* The tilemap bank can be swapped into main memory */
-	if (deco16_bank)
+	if (state->bank)
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset<0x400) return liberate_colorram[offset];
-	if (offset<0x800) return liberate_videoram[offset-0x400];
+	if (offset<0x400) return state->colorram[offset];
+	if (offset<0x800) return state->videoram[offset-0x400];
 	if (offset<0x1000) return space->machine->generic.spriteram.u8[offset-0x800];
 	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
-	if (offset<0x2800) return scratchram[offset-0x2200];
+	if (offset<0x2800) return state->scratchram[offset-0x2200];
 
 	logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset);
 	return 0;
@@ -83,31 +59,31 @@ static READ8_HANDLER( deco16_io_r )
 
 static WRITE8_HANDLER( deco16_bank_w )
 {
-	deco16_bank = data;
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->bank = data;
 
-	if (deco16_bank)
+	if (state->bank)
 		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
 		memory_install_read_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
 }
 
-static UINT8 gfx_rom_readback;
-
 static READ8_HANDLER( prosoccr_bank_r )
 {
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	const UINT8 *ROM = memory_region(space->machine, "user1");
 
 	/* The tilemap bank can be swapped into main memory */
-	if (deco16_bank)
+	if (state->bank)
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset<0x400) return liberate_colorram[offset];
-	if (offset<0x800) return liberate_videoram[offset-0x400];
-	if (offset<0xc00) return liberate_colorram[offset-0x800];
+	if (offset<0x400) return state->colorram[offset];
+	if (offset<0x800) return state->videoram[offset-0x400];
+	if (offset<0xc00) return state->colorram[offset-0x800];
 	if (offset<0x1000) return space->machine->generic.spriteram.u8[offset-0xc00];
 	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
-	if (offset<0x2800) return scratchram[offset-0x2200];
+	if (offset<0x2800) return state->scratchram[offset-0x2200];
 
 	logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset);
 	return 0;
@@ -115,9 +91,10 @@ static READ8_HANDLER( prosoccr_bank_r )
 
 static READ8_HANDLER( prosoccr_charram_r )
 {
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	UINT8 *SRC_GFX = memory_region(space->machine, "shared_gfx");
 
-	if(gfx_rom_readback)
+	if (state->gfx_rom_readback)
 	{
 		switch(offset & 0x1800)
 		{
@@ -131,21 +108,22 @@ static READ8_HANDLER( prosoccr_charram_r )
 	}
 
 	/* note: gfx_rom_readback == 1 never happens. */
-	return prosoccr_charram[offset+gfx_rom_readback*0x1800];
+	return state->charram[offset+state->gfx_rom_readback*0x1800];
 }
 
 static WRITE8_HANDLER( prosoccr_charram_w )
 {
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	UINT8 *FG_GFX = memory_region(space->machine, "fg_gfx");
 
-	if(deco16_bank)
+	if (state->bank)
 	{
 		prosoccr_io_w(space,offset & 0xf,data);
 	}
 	else
 	{
 		/* note: gfx_rom_readback == 1 never happens. */
-		prosoccr_charram[offset+gfx_rom_readback*0x1800] = data;
+		state->charram[offset+state->gfx_rom_readback*0x1800] = data;
 
 		switch(offset & 0x1800)
 		{
@@ -167,22 +145,24 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 	offset&=0x7ff;
 
 	/* dirty char */
-    gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
+	gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
 //  gfx_element_mark_dirty(space->machine->gfx[0], (offset|0x1800) >> 3);
 }
 
 static WRITE8_HANDLER( prosoccr_char_bank_w )
 {
-	gfx_rom_readback = data & 1; //enable GFX rom read-back
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->gfx_rom_readback = data & 1; //enable GFX rom read-back
 	if(data & 0xfe)
 		printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER( prosoccr_io_bank_w )
 {
-	deco16_bank = data & 1;
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->bank = data & 1;
 
-	if (deco16_bank)
+	if (state->bank)
 		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
 		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
@@ -232,8 +212,8 @@ static WRITE8_HANDLER( prosport_charram_w )
 	offset&=0x7ff;
 
 	/* dirty char */
-    gfx_element_mark_dirty(space->machine->gfx[3], (offset+0x800) >> 3);
-    gfx_element_mark_dirty(space->machine->gfx[3+4], (offset+0x800) >> 5);
+	gfx_element_mark_dirty(space->machine->gfx[3], (offset+0x800) >> 3);
+	gfx_element_mark_dirty(space->machine->gfx[3+4], (offset+0x800) >> 5);
 }
 
 
@@ -246,11 +226,11 @@ static WRITE8_HANDLER( prosport_charram_w )
 static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_BASE(&prosport_bg_vram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_BASE_MEMBER(liberate_state,bg_vram)
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
 	AM_RANGE(0x2400, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state,colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state,videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosport_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
@@ -261,10 +241,10 @@ static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state,colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state,videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
+	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE_MEMBER(liberate_state,scratchram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -274,10 +254,10 @@ static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state,colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state,videoram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
+	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE_MEMBER(liberate_state,scratchram)
 	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(prosoccr_charram_r,prosoccr_charram_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(prosoccr_char_bank_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -298,10 +278,10 @@ static ADDRESS_MAP_START( liberatb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state,colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state,videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_BASE(&scratchram)
+	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_BASE_MEMBER(liberate_state,scratchram)
 	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("IN2")
@@ -771,17 +751,17 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( deco16_interrupt )
 {
-	static int latch = 0;
+	liberate_state *state = (liberate_state *)device->machine->driver_data;
 	int p = ~input_port_read(device->machine, "IN3");
-	if ((p & 0x43) && !latch)
+	if ((p & 0x43) && !state->latch)
 	{
 		cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
-		latch = 1;
+		state->latch = 1;
 	}
 	else
 	{
 		if (!(p & 0x43))
-			latch=0;
+			state->latch=0;
 	}
 }
 
@@ -800,6 +780,8 @@ static INTERRUPT_GEN( prosport_interrupt )
  *************************************/
 
 static MACHINE_DRIVER_START( liberate )
+
+	MDRV_DRIVER_DATA(liberate_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",DECO16, 2000000)
@@ -882,6 +864,8 @@ static MACHINE_DRIVER_START( prosoccr )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( prosport )
+
+	MDRV_DRIVER_DATA(liberate_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
