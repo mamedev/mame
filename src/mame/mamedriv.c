@@ -8604,6 +8604,7 @@ Other Sun games
 	DRIVER( coronatn )	/* (c) 1999 */
 
 	/* Other Games */
+	DRIVER( vega )		/* (c) 19?? Olympia? */
 	DRIVER( astinvad )	/* (c) 1980 Stern */
 	DRIVER( kosmokil )	/* bootleg */
 	DRIVER( kamikaze )	/* Leijac Corporation */

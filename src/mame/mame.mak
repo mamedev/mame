@@ -1024,6 +1024,7 @@ $(MAMEOBJ)/nmk.a: \
 $(MAMEOBJ)/olympia.a: \
 	$(DRIVERS)/dday.o $(VIDEO)/dday.o \
 	$(DRIVERS)/portrait.o $(VIDEO)/portrait.o \
+	$(DRIVERS)/vega.o \
 
 $(MAMEOBJ)/omori.a: \
 	$(DRIVERS)/battlex.o $(VIDEO)/battlex.o \
