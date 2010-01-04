@@ -4483,7 +4483,7 @@ INLINE void execute(tms99xx_state *cpustate, UINT16 opcode)
 
 	/* tms9900-like instruction set*/
 
-	static void (*const jumptable[128])(tms99xx_state *,UINT16) =
+	static void (*const jumptable_short[128])(tms99xx_state *,UINT16) =
 	{
 		&illegal,&h0200,&h0400,&h0400,&h0800,&h0800,&illegal,&illegal,
 		&h1000,&h1000,&h1000,&h1000,&h1000,&h1000,&h1000,&h1000,
@@ -4503,14 +4503,14 @@ INLINE void execute(tms99xx_state *cpustate, UINT16 opcode)
 		&h4000b,&h4000b,&h4000b,&h4000b,&h4000b,&h4000b,&h4000b,&h4000b
 	};
 
-	(* jumptable[opcode >> 9])(cpustate, opcode);
+	(* jumptable_short[opcode >> 9])(cpustate, opcode);
 
 #else
 
 	/* tms9989 and tms9995 include 4 extra instructions, and one additionnal instruction type */
 	/* tms99000 includes yet another additional instruction */
 
-	static void (*const jumptable[256])(tms99xx_state *,UINT16) =
+	static void (*const jumptable_long[256])(tms99xx_state *,UINT16) =
 	{
 		&h0040,&h0100,&h0200,&h0200,&h0400,&h0400,&h0400,&h0400,
 		&h0800,&h0800,&h0800,&h0800,&illegal,&illegal,&illegal,&illegal,
@@ -4546,7 +4546,7 @@ INLINE void execute(tms99xx_state *cpustate, UINT16 opcode)
 		&h4000b,&h4000b,&h4000b,&h4000b,&h4000b,&h4000b,&h4000b,&h4000b
 	};
 
-	(* jumptable[opcode >> 8])(cpustate, opcode);
+	(* jumptable_long[opcode >> 8])(cpustate, opcode);
 
 #endif
 }
