@@ -143,6 +143,9 @@ endif
 # disable function pointer warnings in C++ which are evil to work around
 CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 
+# explicitly set the entry point for UNICODE builds
+LDFLAGS += /ENTRY:wmainCRTStartup
+
 # add some VC++-specific defines
 DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
 

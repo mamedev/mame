@@ -260,7 +260,7 @@ static void winui_output_error(void *param, const char *format, va_list argptr)
 //  utf8_main
 //============================================================
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	char *ext;
 

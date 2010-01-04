@@ -538,7 +538,7 @@ VIDEO_START(n64)
 
 	for (i = 0; i < 0x4000; i++)
 	{
-		gamma_dither_table[i] = sqrt(i);
+		gamma_dither_table[i] = sqrt((float)i);
 		gamma_dither_table[i] <<= 1;
 	}
 

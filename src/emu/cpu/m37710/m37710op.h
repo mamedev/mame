@@ -2832,7 +2832,7 @@ TABLE_OPCODES3 =
 	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200)
 };
 
-extern int m37710_irq_levels[M37710_LINE_MAX];
+extern const int m37710_irq_levels[M37710_LINE_MAX];
 
 /* Assert or clear a line on the CPU */
 TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int state))
