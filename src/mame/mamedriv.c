@@ -8618,6 +8618,7 @@ Other Sun games
 	DRIVER( spacedem )	/* (c) 1980 Fortrek + made by Nintendo */
 	DRIVER( omegrace )	/* (c) 1981 Midway */
 	DRIVER( deltrace )	/* bootleg */
+	DRIVER( monzagp )	/* (c) 1981 Olympia */
 	DRIVER( dday )		/* (c) 1982 Olympia */
 	DRIVER( ddayc )		/* (c) 1982 Olympia + Centuri license */
 	DRIVER( hexa )		/* D. R. Korea */
