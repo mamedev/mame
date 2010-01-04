@@ -133,11 +133,11 @@ int config_load_settings(running_machine *machine)
 		astring_free(fname);
 
 		if (filerr != FILERR_NONE)
-			fatalerror("Could not load controller file %s.cfg", controller);
+			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
 
 		/* load the XML */
 		if (!config_load_xml(machine, file, CONFIG_TYPE_CONTROLLER))
-			fatalerror("Could not load controller file %s.cfg", controller);
+			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
 		mame_fclose(file);
 	}
 

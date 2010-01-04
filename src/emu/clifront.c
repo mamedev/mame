@@ -20,6 +20,7 @@
 #include "romload.h"
 #include "sound/samples.h"
 
+#include <new>
 #include <ctype.h>
 
 #ifdef MESS
@@ -111,67 +112,89 @@ static const options_entry cli_options[] =
 
 int cli_execute(int argc, char **argv, const options_entry *osd_options)
 {
-	core_options *options;
+	core_options *options = NULL;
 	astring *gamename = astring_alloc();
 	astring *exename = astring_alloc();
 	const char *gamename_option;
 	const game_driver *driver;
-	int result;
+	int result = MAMERR_FATALERROR;
 
-	/* initialize the options manager and add the CLI-specific options */
-	options = mame_options_init(osd_options);
-	options_add_entries(options, cli_options);
-
-	/* parse the command line first; if we fail here, we're screwed */
-	if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE))
+	try
 	{
-		result = MAMERR_INVALID_CONFIG;
-		goto error;
+		/* initialize the options manager and add the CLI-specific options */
+		options = mame_options_init(osd_options);
+		options_add_entries(options, cli_options);
+
+		/* parse the command line first; if we fail here, we're screwed */
+		if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE))
+		{
+			result = MAMERR_INVALID_CONFIG;
+			goto error;
+		}
+
+		/* parse the simple commmands before we go any further */
+		core_filename_extract_base(exename, argv[0], TRUE);
+		result = execute_simple_commands(options, astring_c(exename));
+		if (result != -1)
+			goto error;
+
+		/* find out what game we might be referring to */
+		gamename_option = options_get_string(options, OPTION_GAMENAME);
+		core_filename_extract_base(gamename, gamename_option, TRUE);
+		driver = driver_get_name(astring_c(gamename));
+
+		/* execute any commands specified */
+		result = execute_commands(options, astring_c(exename), driver);
+		if (result != -1)
+			goto error;
+
+		/* if we don't have a valid driver selected, offer some suggestions */
+		if (strlen(gamename_option) > 0 && driver == NULL)
+		{
+			const game_driver *matches[10];
+			int drvnum;
+
+			/* get the top 10 approximate matches */
+			driver_list_get_approx_matches(drivers, gamename_option, ARRAY_LENGTH(matches), matches);
+
+			/* print them out */
+			fprintf(stderr, "\n\"%s\" approximately matches the following\n"
+					"supported " GAMESNOUN " (best match first):\n\n", gamename_option);
+			for (drvnum = 0; drvnum < ARRAY_LENGTH(matches); drvnum++)
+				if (matches[drvnum] != NULL)
+					fprintf(stderr, "%-18s%s\n", matches[drvnum]->name, matches[drvnum]->description);
+
+			/* exit with an error */
+			result = MAMERR_NO_SUCH_GAME;
+			goto error;
+		}
+
+		/* run the game */
+		result = mame_execute(options);
 	}
-
-	/* parse the simple commmands before we go any further */
-	core_filename_extract_base(exename, argv[0], TRUE);
-	result = execute_simple_commands(options, astring_c(exename));
-	if (result != -1)
-		goto error;
-
-	/* find out what game we might be referring to */
-	gamename_option = options_get_string(options, OPTION_GAMENAME);
-	core_filename_extract_base(gamename, gamename_option, TRUE);
-	driver = driver_get_name(astring_c(gamename));
-
-	/* execute any commands specified */
-	result = execute_commands(options, astring_c(exename), driver);
-	if (result != -1)
-		goto error;
-
-	/* if we don't have a valid driver selected, offer some suggestions */
-	if (strlen(gamename_option) > 0 && driver == NULL)
+	catch (emu_fatalerror &fatal)
 	{
-		const game_driver *matches[10];
-		int drvnum;
-
-		/* get the top 10 approximate matches */
-		driver_list_get_approx_matches(drivers, gamename_option, ARRAY_LENGTH(matches), matches);
-
-		/* print them out */
-		fprintf(stderr, "\n\"%s\" approximately matches the following\n"
-				"supported " GAMESNOUN " (best match first):\n\n", gamename_option);
-		for (drvnum = 0; drvnum < ARRAY_LENGTH(matches); drvnum++)
-			if (matches[drvnum] != NULL)
-				fprintf(stderr, "%-18s%s\n", matches[drvnum]->name, matches[drvnum]->description);
-
-		/* exit with an error */
-		result = MAMERR_NO_SUCH_GAME;
-		goto error;
+		fprintf(stderr, "%s\n", fatal.string());
+		if (fatal.exitcode() != 0)
+			result = fatal.exitcode();
 	}
-
-	/* run the game */
-	result = mame_execute(options);
+	catch (emu_exception &exception)
+	{
+		fprintf(stderr, "Caught unhandled emulator exception\n");
+	}
+	catch (std::bad_alloc &)
+	{
+		fprintf(stderr, "Out of memory!\n");
+	}
+	catch (...)
+	{
+		fprintf(stderr, "Caught unhandled exception\n");
+	}
 
 error:
 	/* free our options and exit */
-	options_free(options);
+	if (options != NULL)
+		options_free(options);
 	astring_free(gamename);
 	astring_free(exename);
 	return result;

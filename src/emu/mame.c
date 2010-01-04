@@ -19,7 +19,6 @@
 
         mame_execute() [mame.c]
             - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
-            - calls setjmp to prepare for deep error handling
             - begins resource tracking (level 1)
             - calls create_machine [mame.c] to initialize the running_machine structure
             - calls init_machine() [mame.c]
@@ -87,8 +86,8 @@
 #include "streams.h"
 #include "debug/debugcon.h"
 
+#include <new>
 #include <stdarg.h>
-#include <setjmp.h>
 #include <time.h>
 
 
@@ -152,10 +151,6 @@ struct _mame_private
 	/* list of memory regions, and a map for lookups */
 	region_info	*	regionlist;
 	tagmap *		regionmap;
-
-	/* error recovery and exiting */
-	jmp_buf			fatal_error_jmpbuf;
-	int				fatal_error_jmpbuf_valid;
 
 	/* random number seed */
 	UINT32			rand_seed;
@@ -298,10 +293,8 @@ int mame_execute(core_options *options)
 
 		init_resource_tracking();
 
-		/* use setjmp/longjmp for deep error recovery */
-		mame->fatal_error_jmpbuf_valid = TRUE;
-		error = setjmp(mame->fatal_error_jmpbuf);
-		if (error == 0)
+		/* use try/catch for deep error recovery */
+		try
 		{
 			int settingsloaded;
 
@@ -372,7 +365,23 @@ int mame_execute(core_options *options)
 			nvram_save(machine);
 			config_save_settings(machine);
 		}
-		mame->fatal_error_jmpbuf_valid = FALSE;
+		catch (emu_fatalerror &fatal)
+		{
+			mame_printf_error("%s\n", fatal.string());
+			error = MAMERR_FATALERROR;
+			if (fatal.exitcode() != 0)
+				error = fatal.exitcode();
+		}
+		catch (emu_exception &exception)
+		{
+			mame_printf_error("Caught unhandled emulator exception\n");
+			error = MAMERR_FATALERROR;
+		}
+		catch (std::bad_alloc &)
+		{
+			mame_printf_error("Out of memory!\n");
+			error = MAMERR_FATALERROR;
+		}
 
 		/* call all exit callbacks registered */
 		for (cb = mame->exit_callback_list; cb; cb = cb->next)
@@ -1118,56 +1127,6 @@ void mame_printf_log(const char *format, ...)
 /***************************************************************************
     MISCELLANEOUS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    fatalerror - print a message and escape back
-    to the OSD layer
--------------------------------------------------*/
-
-DECL_NORETURN static void fatalerror_common(running_machine *machine, int exitcode, const char *buffer) ATTR_NORETURN;
-
-static void fatalerror_common(running_machine *machine, int exitcode, const char *buffer)
-{
-	/* output and return */
-	mame_printf_error("%s\n", giant_string_buffer);
-
-	/* break into the debugger if attached */
-	osd_break_into_debugger(giant_string_buffer);
-
-	/* longjmp back if we can; otherwise, exit */
-	if (machine != NULL && machine->mame_data != NULL && machine->mame_data->fatal_error_jmpbuf_valid)
-		longjmp(machine->mame_data->fatal_error_jmpbuf, exitcode);
-	else
-		exit(exitcode);
-}
-
-
-void CLIB_DECL fatalerror(const char *text, ...)
-{
-	running_machine *machine = global_machine;
-	va_list arg;
-
-	/* dump to the buffer; assume no one writes >2k lines this way */
-	va_start(arg, text);
-	vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, text, arg);
-	va_end(arg);
-
-	fatalerror_common(machine, MAMERR_FATALERROR, giant_string_buffer);
-}
-
-
-void CLIB_DECL fatalerror_exitcode(running_machine *machine, int exitcode, const char *text, ...)
-{
-	va_list arg;
-
-	/* dump to the buffer; assume no one writes >2k lines this way */
-	va_start(arg, text);
-	vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, text, arg);
-	va_end(arg);
-
-	fatalerror_common(machine, exitcode, giant_string_buffer);
-}
-
 
 /*-------------------------------------------------
     popmessage - pop up a user-visible message

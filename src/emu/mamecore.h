@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <exception>
 #include "osdcomm.h"
 #include "bitmap.h"
 #include "coreutil.h"
@@ -319,12 +321,75 @@ inline void operator--(type &value, int) { value = (type)((int)value - 1); }
 
 
 /***************************************************************************
+    EXCEPTION CLASSES
+***************************************************************************/
+
+// emu_exception is the base class for all emu-related exceptions
+class emu_exception : public std::exception
+{
+};
+
+
+// emu_fatalerror is a generic fatal exception that provides an error string
+class emu_fatalerror : public emu_exception
+{
+public:
+	emu_fatalerror(const char *format, ...)
+		: m_exitcode(0)
+	{
+		va_list ap;
+		va_start(ap, format);
+		sprintf(m_text, format, ap);
+		va_end(ap);
+		osd_break_into_debugger(m_text);
+	}
+	
+	emu_fatalerror(const char *format, va_list ap)
+		: m_exitcode(0)
+	{
+		vsprintf(m_text, format, ap);
+		osd_break_into_debugger(m_text);
+	}
+	
+	emu_fatalerror(int _exitcode, const char *format, va_list ap)
+		: m_exitcode(_exitcode)
+	{
+		vsprintf(m_text, format, ap);
+		osd_break_into_debugger(m_text);
+	}
+	
+	const char *string() const { return m_text; }
+	int exitcode() const { return m_exitcode; }
+
+private:
+	char m_text[1024];
+	int m_exitcode;
+};
+
+
+
+/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* Used by assert(), so definition here instead of mame.h */
-DECL_NORETURN void CLIB_DECL fatalerror(const char *text, ...) ATTR_PRINTF(1,2) ATTR_NORETURN;
-DECL_NORETURN void CLIB_DECL fatalerror_exitcode(running_machine *machine, int exitcode, const char *text, ...) ATTR_PRINTF(3,4) ATTR_NORETURN;
+DECL_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2) ATTR_NORETURN;
+DECL_NORETURN void fatalerror_exitcode(running_machine *machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4) ATTR_NORETURN;
+
+inline void fatalerror(const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	throw emu_fatalerror(format, ap);
+	va_end(ap);
+}
+
+inline void fatalerror_exitcode(running_machine *machine, int exitcode, const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	throw emu_fatalerror(exitcode, format, ap);
+	va_end(ap);
+}
 
 
 
@@ -333,7 +398,7 @@ DECL_NORETURN void CLIB_DECL fatalerror_exitcode(running_machine *machine, int e
 ***************************************************************************/
 
 /* population count */
-INLINE int popcount(UINT32 val)
+inline int popcount(UINT32 val)
 {
 	int count;
 
@@ -344,7 +409,7 @@ INLINE int popcount(UINT32 val)
 
 
 /* convert a series of 32 bits into a float */
-INLINE float u2f(UINT32 v)
+inline float u2f(UINT32 v)
 {
 	union {
 		float ff;
@@ -356,7 +421,7 @@ INLINE float u2f(UINT32 v)
 
 
 /* convert a float into a series of 32 bits */
-INLINE UINT32 f2u(float f)
+inline UINT32 f2u(float f)
 {
 	union {
 		float ff;
@@ -368,7 +433,7 @@ INLINE UINT32 f2u(float f)
 
 
 /* convert a series of 64 bits into a double */
-INLINE double u2d(UINT64 v)
+inline double u2d(UINT64 v)
 {
 	union {
 		double dd;
@@ -380,7 +445,7 @@ INLINE double u2d(UINT64 v)
 
 
 /* convert a double into a series of 64 bits */
-INLINE UINT64 d2u(double d)
+inline UINT64 d2u(double d)
 {
 	union {
 		double dd;
