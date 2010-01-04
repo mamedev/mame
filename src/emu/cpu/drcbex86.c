@@ -2895,8 +2895,8 @@ static void emit_rol_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 	else
 	{
 		emit_link skip1, skip2;
-		int tempreg = REG_EAX;
-//      emit_mov_m32_r32(dst, MBD(REG_ESP, -8), tempreg);                               // mov   [esp-8],ebx
+		int tempreg = REG_EBX;
+		emit_mov_m32_r32(dst, MBD(REG_ESP, -8), tempreg);                               // mov   [esp-8],ebx
 		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
 		emit_test_r32_imm(dst, REG_ECX, 0x20);											// test  ecx,0x20
 		emit_jcc_short_link(dst, COND_Z, &skip1);										// jz    skip1
@@ -2921,7 +2921,7 @@ static void emit_rol_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 		emit_shld_r32_r32_cl(dst, reglo, reghi);										// shld  reglo,reghi,cl
 		if (saveflags) emit_pushf(dst);													// pushf
 		emit_shld_r32_r32_cl(dst, reghi, tempreg);										// shld  reghi,ebx,cl
-//      emit_mov_r32_m32(dst, tempreg, MBD(REG_ESP, saveflags ? -4 : -8));              // mov   ebx,[esp-8]
+		emit_mov_r32_m32(dst, tempreg, MBD(REG_ESP, saveflags ? -4 : -8));              // mov   ebx,[esp-8]
 	}
 	if (saveflags)
 		emit_combine_z_flags(dst);
@@ -2970,8 +2970,8 @@ static void emit_ror_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 	else
 	{
 		emit_link skip1, skip2;
-		int tempreg = REG_EAX;
-//      emit_mov_m32_r32(dst, MBD(REG_ESP, -8), tempreg);                               // mov   [esp-8],ebx
+		int tempreg = REG_EBX;
+		emit_mov_m32_r32(dst, MBD(REG_ESP, -8), tempreg);                               // mov   [esp-8],ebx
 		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
 		emit_test_r32_imm(dst, REG_ECX, 0x20);											// test  ecx,0x20
 		emit_jcc_short_link(dst, COND_Z, &skip1);										// jz    skip1
@@ -2996,7 +2996,7 @@ static void emit_ror_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 		emit_shrd_r32_r32_cl(dst, reglo, reghi);										// shrd  reglo,reghi,cl
 		if (saveflags) emit_pushf(dst);													// pushf
 		emit_shrd_r32_r32_cl(dst, reghi, tempreg);										// shrd  reghi,ebx,cl
-//      emit_mov_r32_m32(dst, tempreg, MBD(REG_ESP, saveflags ? -4 : -8));              // mov   ebx,[esp-8]
+		emit_mov_r32_m32(dst, tempreg, MBD(REG_ESP, saveflags ? -4 : -8));              // mov   ebx,[esp-8]
 	}
 	if (saveflags)
 		emit_combine_z_flags(dst);
