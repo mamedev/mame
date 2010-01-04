@@ -79,6 +79,7 @@ A |||                                                     |______|   |          
   7C = non populated
 
 =====================================================================================================
+(quarterh, quarterhb)
 
 ----------------------------------------
 Quarterhorse by Electro-Sport Inc (1983)
@@ -141,6 +142,107 @@ CPU 8F  2114          1024x4 SRAM
 CPU 8E  2114          1024x4 SRAM
 CPU 8D  2114          1024x4 SRAM
 CPU 8C  M3-6514C      1024x4 CMOS SRAM, Battery Backed
+
+=====================================================================================
+(quarterhb)
+
+----------------------------------------
+Quarterhorse by Electro-Sport Inc (1983)
+----------------------------------------
+
+Dumped by Grull Osgo
+
+Location    Device   File ID    Checksum
+----------------------------------------
+CPU 10A      27C128  a1.bin	    9f26    [ CPU ROM   ]
+
+CPU 6H       27C128  a2.bin	    7ccc    [ Character ]
+CPU 6K       27C128  a3.bin	    ba34    [ Character ]
+
+LDP O7       27c128  a4.bin     2120    [ LDP Ctrl  ] (Add-On Board "7-50A" on O7-O9-010 IC Sockets)
+
+
+Notes:	CPU - Main Board includes NTSC decoder, video Switch & Audio control.
+	No Model or Serial number on PCB.
+        Uses a Pioneer LD-V2000 Laserdisc player.
+        The laserdisc player is modified - has a custom communication & audio cable (10 Wires Flat Cable).
+
+Brief Hardware Overview
+-----------------------
+
+CPU 5E  X-TAL         10.00MHz Xtal
+CPU 8B  M5L8085AC     8085 CPU
+CPU 4F  P8275         Prog CRT Controller, Video Output Graphics Controller
+CPU 4G  AY-3-8910     Programmable Sound Generator
+CPU 10B TMM2016       2048x8 SRAM, Battery Backed
+CPU 10D UM6116        2048X8 SRAM
+CPU 3K  82S123        32X8   TTL PROM
+CPU 4N  uPC1325       NTSC Decoder
+CPU 3A  NEC C1182H    Audio Amplifier
+CPU 10K Dip-SW        8 x Dip Switch bank.
+
+
+Quarter Horse LD (Pioneer)
+
+It has oly one side recorded. The other side has a video with a single slide ad. that says
+"The recorded  material is on the other side"
+
+Disk 1
+------
+Sticker:
+
+	09-251	A
+
+	HORSE RACE I
+
+	QUARTER HORSE
+
+	(C) 1981 DALE FRANK RODESCH
+	SAN DIEGO, CA USA
+
+Stamp on disk:
+
+	09-251A1-15
+
+
+
+Disk 2
+------
+Sticker:
+
+
+	09251	1
+
+	QUARTER HORSE
+
+	VIDEO DISK
+
+	(C) 1981 DALE FRANK RODESCH
+
+
+Stamp on disk:
+
+	09-251A1-01
+
+	09-251    A
+
+
+Disk 1
+------
+Sticker:
+
+	09-251	A
+
+	HORSE RACE I
+
+	QUARTER HORSE
+
+	(C) 1981 DALE FRANK RODESCH
+
+Stamp on disk:
+
+	09-251A1-06
+
 
 
 */
@@ -936,6 +1038,36 @@ ROM_START( quarterha )
 	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
 ROM_END
 
+ROM_START( quarterhb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a1.bin",  0x0000, 0x4000, CRC(9eace6a3) SHA1(285945034b73ff660a5a138d7be2fa431c0872e1) )
+
+	ROM_REGION( 0x8000, "gfx_data", 0 )
+	ROM_LOAD16_BYTE( "a2.bin",0x0001, 0x4000, CRC(b8cf5e27) SHA1(a5b451ab94ea1f2dda18a2d8ef9b8e0e46621420) ) // - oversized dumps perhaps?
+	ROM_LOAD16_BYTE( "a3.bin",0x0000, 0x4000, CRC(8b5296b1) SHA1(9d27d85f2edb44b96acce3c3f3e611217dcef70d) ) // /
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_COPY("gfx_data", 0x0000, 0x1000, 0x0800 )
+	ROM_COPY("gfx_data", 0x0800, 0x0000, 0x0800 )
+	ROM_COPY("gfx_data", 0x1000, 0x1800, 0x0800 )
+	ROM_COPY("gfx_data", 0x1800, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0)
+
+	ROM_REGION( 0x800, "ld_data", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	/* ??? colors */
+	ROM_LOAD( "3a_50-1381_63s080n.bin",0x00, 0x20, CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
+	/* memory map */
+//	ROM_LOAD( "7h_7602.bin",0x20, 0x20, BAD_DUMP CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
+	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, BAD_DUMP CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) ) //taken from the other set, might be bad
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
+ROM_END
+
 
 static DRIVER_INIT(dwarfd)
 {
@@ -988,5 +1120,6 @@ static DRIVER_INIT(dwarfd)
 }
 
 GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterhb, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
