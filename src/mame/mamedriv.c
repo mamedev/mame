@@ -9077,6 +9077,8 @@ Other Sun games
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
+	DRIVER( quarterh )	/* (c) 1983 Electro-Sports */
+	DRIVER( quarterha )	/* (c) 1983 Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */
 	DRIVER( littlerb )	/* (c) 1993 TCH */
