@@ -412,10 +412,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 					}
 				}
 
-				if ( elapsed_cycles >= 0 && timer->phase == 3 )
+				if ( elapsed_cycles > 0 && timer->phase == 3 )
 				{
 					/* Reload counter, output goes high */
-					if (elapsed_cycles > 0) --elapsed_cycles;
+					--elapsed_cycles;
 					timer->phase = 2;
 					load_counter_value( device, timer );
 					adjusted_value = adjusted_count( bcd, timer->value );
@@ -548,7 +548,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		{
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
-				--elapsed_cycles;
+				if (elapsed_cycles > 0) --elapsed_cycles;
 				timer->phase = 2;
 				load_counter_value( device, timer );
 			}
