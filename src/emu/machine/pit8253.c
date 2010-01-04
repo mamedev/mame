@@ -266,10 +266,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		}
 		else
 		{
-			if (elapsed_cycles > 0 && timer->phase == 1)
+			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
 				/* Counter load cycle */
-				--elapsed_cycles;
+				if (elapsed_cycles > 0) --elapsed_cycles;
 				timer->phase = 2;
 				load_counter_value( device, timer );
 			}
@@ -327,10 +327,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
         Gate rising-edge sensitive only.
         Rising edge initiates counting and resets output after next clock. */
 
-		if ( elapsed_cycles > 0 && timer->phase == 1 )
+		if ( elapsed_cycles >= 0 && timer->phase == 1 )
 		{
 			/* Counter load cycle, output goes low */
-			--elapsed_cycles;
+			if (elapsed_cycles > 0) --elapsed_cycles;
 			timer->phase = 2;
 			load_counter_value( device, timer );
 			set_output( device, timer, 0 );
@@ -391,9 +391,9 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		}
 		else
 		{
-			if ( elapsed_cycles > 0 && timer->phase == 1 )
+			if ( elapsed_cycles >= 0 && timer->phase == 1 )
 			{
-				--elapsed_cycles;
+				if (elapsed_cycles > 0) --elapsed_cycles;
 				timer->phase = 2;
 				load_counter_value( device, timer );
 			}
@@ -412,10 +412,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 					}
 				}
 
-				if ( elapsed_cycles > 0 && timer->phase == 3 )
+				if ( elapsed_cycles >= 0 && timer->phase == 3 )
 				{
 					/* Reload counter, output goes high */
-					--elapsed_cycles;
+					if (elapsed_cycles > 0) --elapsed_cycles;
 					timer->phase = 2;
 					load_counter_value( device, timer );
 					adjusted_value = adjusted_count( bcd, timer->value );
@@ -468,7 +468,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		}
 		else
 		{
-			if ( elapsed_cycles > 0 && timer->phase == 1 )
+			if ( elapsed_cycles >= 0 && timer->phase == 1 )
 			{
 				--elapsed_cycles;
 				timer->phase = 2;
@@ -546,7 +546,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		}
 		else
 		{
-			if (elapsed_cycles > 0 && timer->phase == 1)
+			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
 				--elapsed_cycles;
 				timer->phase = 2;
