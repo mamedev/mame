@@ -8571,6 +8571,7 @@ Other Sun games
 	DRIVER( skattv )	/* (c) 1994 */
 	DRIVER( skattva )	/* (c) 1995 */
 	DRIVER( fashiong )	/* (c) 1997 */
+	DRIVER( fstation )	/* (c) 2000 */
 
 	/* Other games on adp hardware */
 	DRIVER( funlddlx )	/* (c) 1999 */

@@ -16,6 +16,7 @@ Supported games :
 - Fashion Gambler ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1997")
 - Backgammon        ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1994")
 - Funny Land de Luxe ("Copyright 1992-99 by Stella International Germany")
+- Fun Station Spielekoffer 9 Spiele ("COPYRIGHT BY ADP LUEBBECKE GERMANY 2000")
 
 
 Skat TV (Version TS3)
@@ -471,6 +472,18 @@ static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( fstation_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	//400000-40001f?
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x800100, 0x800101) AM_RAM //???
+	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+
 #if 0
 static INPUT_PORTS_START( adp )
 
@@ -684,6 +697,13 @@ static MACHINE_DRIVER_START( funland )
 	MDRV_PALETTE_INIT(all_black)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( fstation )
+	MDRV_IMPORT_FROM( skattv )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(fstation_mem)
+MACHINE_DRIVER_END
+
+
 ROM_START( quickjac )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "quick_jack_index_a.1.u2.bin", 0x00000, 0x10000, CRC(c2fba6fe) SHA1(f79e5913f9ded1e370cc54dd55860263b9c51d61) )
@@ -749,9 +769,21 @@ ROM_START( funlddlx )
 	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
 ROM_END
 
+ROM_START( fstation )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.i", 0x00000, 0x80000, CRC(4572efbd) SHA1(e0a91d32ab4096767cafb743523d038f5e0d3238) )
+	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.ii", 0x00001, 0x80000, CRC(a972184d) SHA1(1849e71e696039f07b7b67c4172c7999e81664c3) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.i", 0x00000, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
+ROM_END
+
+
 GAME( 1990, backgamn,        0, backgamn,    skattv,    0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
 GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      skattv,    0, ROT0,  "ADP",     "Fashion Gambler", GAME_NOT_WORKING )
 GAME( 1999, funlddlx,        0, funland,     skattv,    0, ROT0,  "Stella",  "Funny Land de Luxe", GAME_NOT_WORKING )
+GAME( 2000, fstation,        0, fstation,    skattv,    0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", GAME_NOT_WORKING )
