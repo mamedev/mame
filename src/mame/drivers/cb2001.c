@@ -62,12 +62,12 @@ static const UINT8 cb2001_decryption_table[256] = {
 //                        pppp                 pppp pppp                pppp gggg
 	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
 //    pppp pppp pppp pppp           pppp       pppp      pppp           pppp
-	0x26,xxxx,xxxx,xxxx,xxxx,0x3d,0xfb,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+	0x26,xxxx,xxxx,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
 //    pppp                     pppp ???? pppp            pppp      pppp      ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
 //              pppp           pppp                      pppp      pppp      pppp
-	xxxx,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0xdb,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
-//              pppp pppp pppp ???? pppp !!!!  pppp      vvvv pppp pppp pppp      pppp
+	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0xdb,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
+//    ????      pppp pppp pppp ???? pppp !!!!  pppp      vvvv pppp pppp pppp      pppp
 	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
 //    pppp      pppp           pppp                      pppp      pppp      pppp pppp
 	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
@@ -75,12 +75,15 @@ static const UINT8 cb2001_decryption_table[256] = {
 	xxxx,xxxx,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //              pppp      ????      pppp pppp  pppp                     ???? !!!! pppp
 	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, xxxx,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
-//    pppp gggg      !!!!      ????                 ????
+//    pppp gggg      !!!!      ????            pppp ????
 	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
 //              pppp                     ????                      ????
 };
 
 /* robiza's notes:
+
+sure but for now don't add
+e8 -> 9a
 
 aa opcode:
 e0086 aa
