@@ -874,6 +874,10 @@ ROM_START( dwarfd )
 	ROM_LOAD( "7h_7602.bin",0x20, 0x20, CRC(d5457333) SHA1(5872c868638c08faef7365d9c6e41dc3f070bd97) )
 ROM_END
 
+/*
+bp 32f9
+do pc=3319
+*/
 ROM_START( quarterh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9l_qh_60-2402_7193.bin",  0x0000, 0x1000, CRC(6a097741) SHA1(f42de58743f79447c8b2b7e3f2d1aa87da663231) )
@@ -882,10 +886,10 @@ ROM_START( quarterh )
 	ROM_LOAD( "9h_qh_80-2399_10193.bin", 0x3000, 0x1000, CRC(20be3f2f) SHA1(b6a67b664cc899e997742fb4350e3c8c1e23664a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x0000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
-	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x1000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
-	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x0001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
-	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x1001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
+	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x1000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
+	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x0000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
+	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x1001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
+	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x0001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
 	ROM_FILL(0,  0x4000*2, 0)
@@ -898,6 +902,9 @@ ROM_START( quarterh )
 	ROM_LOAD( "3a_bprom.bin",0x00, 0x20, CRC(d4febd88) SHA1(37abb6508b375784f35d3eedc75ec7df4ef86048) )
 	/* memory map */
 	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
 ROM_END
 
 ROM_START( quarterha )
@@ -908,10 +915,10 @@ ROM_START( quarterha )
 	ROM_LOAD( "9h_qh_50-2399_10193.bin", 0x3000, 0x1000, CRC(7d96c776) SHA1(e97080b0b0f524c3f313d5f7b7f3b093fb071bf9) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x0000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
-	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x1000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
-	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x0001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
-	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x1001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
+	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x1000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
+	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x0000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
+	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x1001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
+	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x0001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
 	ROM_FILL(0,  0x4000*2, 0)
@@ -924,6 +931,9 @@ ROM_START( quarterha )
 	ROM_LOAD( "3a_bprom.bin",0x00, 0x20, CRC(d4febd88) SHA1(37abb6508b375784f35d3eedc75ec7df4ef86048) )
 	/* memory map */
 	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
 ROM_END
 
 
@@ -978,5 +988,5 @@ static DRIVER_INIT(dwarfd)
 }
 
 GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (Set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (Set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
