@@ -1679,12 +1679,15 @@ MACHINE_RESET( czeroize )
 	/*
      * FIXME: remove if the original ROM is available.
      * The Zeroize 6502 code at 0x3707 issues LODCTRS with 0x8a,
-     * and expects to read 0x18 from 0x08a0 ff. within 7 bytes.
+     * and expects to read 0x18 from 0x08a0 ff. within 7 bytes
+     * and 0xf7 from 0x8a1 (which 0xd is subtracted from presumably in order
+     * to form a NOP of 0xea).
      * This hack seems to be sufficient to get around
      * the missing dongle ROM contents and play the game.
      */
 	memset(mem, 0x00, 0x1000);
 	mem[0x08a0] = 0x18;
+	mem[0x08a1] = 0xf7;
 }
 
 /***************************************************************************
