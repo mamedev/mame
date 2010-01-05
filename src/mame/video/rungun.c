@@ -1,74 +1,72 @@
-/*
+/*************************************************************************
+
    Run and Gun
    (c) 1993 Konami
 
    Video hardware emulation.
 
    Driver by R. Belmont
-*/
+
+*************************************************************************/
 
 #include "driver.h"
 #include "video/konicdev.h"
-
-static int ttl_gfx_index;
-static tilemap_t *ttl_tilemap, *rng_936_tilemap;
-static UINT16 ttl_vram[0x1000];
-
-static int sprite_colorbase;
-UINT16 *rng_936_videoram;
+#include "includes/rungun.h"
 
 /* TTL text plane stuff */
-
 static TILE_GET_INFO( ttl_get_tile_info )
 {
-	UINT32 *lvram = (UINT32 *)ttl_vram;
+	rungun_state *state = (rungun_state *)machine->driver_data;
+	UINT32 *lvram = (UINT32 *)state->ttl_vram;
 	int attr, code;
 
-	code = (lvram[tile_index]>>16)&0xffff;
-	code |= (lvram[tile_index]&0x0f)<<8;	/* tile "bank" */
+	code = (lvram[tile_index] >> 16) & 0xffff;
+	code |= (lvram[tile_index] & 0x0f) << 8;	/* tile "bank" */
+	attr = ((lvram[tile_index] & 0xf0) >> 4);	/* palette */
 
-	attr = ((lvram[tile_index]&0xf0)>>4);	/* palette */
-
-	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
+	SET_TILE_INFO(state->ttl_gfx_index, code, attr, 0);
 }
 
-void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask)
+void rng_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	*color = sprite_colorbase | (*color & 0x001f);
+	rungun_state *state = (rungun_state *)machine->driver_data;
+	*color = state->sprite_colorbase | (*color & 0x001f);
 }
 
 READ16_HANDLER( rng_ttl_ram_r )
 {
-	return(ttl_vram[offset]);
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	return state->ttl_vram[offset];
 }
 
 WRITE16_HANDLER( rng_ttl_ram_w )
 {
-	COMBINE_DATA(&ttl_vram[offset]);
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->ttl_vram[offset]);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
-
 WRITE16_HANDLER(rng_936_videoram_w)
 {
-	COMBINE_DATA(&rng_936_videoram[offset]);
-	tilemap_mark_tile_dirty(rng_936_tilemap, offset/2);
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->_936_videoram[offset]);
+	tilemap_mark_tile_dirty(state->_936_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_rng_936_tile_info )
 {
+	rungun_state *state = (rungun_state *)machine->driver_data;
 	int tileno, colour, flipx;
 
-	tileno = rng_936_videoram[tile_index*2+1] & 0x3fff;
-	flipx =  (rng_936_videoram[tile_index*2+1] & 0xc000) >> 14;
-
-	colour = 0x10 + (rng_936_videoram[tile_index*2] & 0x000f);
+	tileno = state->_936_videoram[tile_index * 2 + 1] & 0x3fff;
+	flipx = (state->_936_videoram[tile_index * 2 + 1] & 0xc000) >> 14;
+	colour = 0x10 + (state->_936_videoram[tile_index * 2] & 0x000f);
 
 	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flipx));
 }
 
 
-VIDEO_START(rng)
+VIDEO_START( rng )
 {
 	static const gfx_layout charlayout =
 	{
@@ -81,47 +79,43 @@ VIDEO_START(rng)
 		8*8*4
 	};
 
-//  K055673_vh_start(machine, "gfx2", 1, -8, 15, rng_sprite_callback);
+	rungun_state *state = (rungun_state *)machine->driver_data;
+	int gfx_index;
 
-//  K053936_wraparound_enable(0, 0);
-//  K053936_set_offset(0, 34, 9);
-
-	rng_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
-	tilemap_set_transparent_pen(rng_936_tilemap, 0);
+	state->_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
+	tilemap_set_transparent_pen(state->_936_tilemap, 0);
 
 	/* find first empty slot to decode gfx */
-	for (ttl_gfx_index = 0; ttl_gfx_index < MAX_GFX_ELEMENTS; ttl_gfx_index++)
-		if (machine->gfx[ttl_gfx_index] == 0)
+	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 
-	assert(ttl_gfx_index != MAX_GFX_ELEMENTS);
+	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	machine->gfx[ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, memory_region(machine, "gfx3"), machine->config->total_colors / 16, 0);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, memory_region(machine, "gfx3"), machine->config->total_colors / 16, 0);
+	state->ttl_gfx_index = gfx_index;
 
 	// create the tilemap
-	ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(ttl_tilemap, 0);
+	tilemap_set_transparent_pen(state->ttl_tilemap, 0);
 
-	state_save_register_global_array(machine, ttl_vram);
-
-	sprite_colorbase = 0x20;
+	state->sprite_colorbase = 0x20;
 }
 
 VIDEO_UPDATE(rng)
 {
-	const device_config *k055673 = devtag_get_device(screen->machine, "k055673");
-	const device_config *k053936 = devtag_get_device(screen->machine, "k053936");
+	rungun_state *state = (rungun_state *)screen->machine->driver_data;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	k053936_zoom_draw(k053936, bitmap, cliprect, rng_936_tilemap, 0, 0, 1);
+	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->_936_tilemap, 0, 0, 1);
 
-	k053247_sprites_draw(k055673, bitmap, cliprect);
+	k053247_sprites_draw(state->k055673, bitmap, cliprect);
 
-	tilemap_mark_all_tiles_dirty(ttl_tilemap);
-	tilemap_draw(bitmap, cliprect, ttl_tilemap, 0, 0);
+	tilemap_mark_all_tiles_dirty(state->ttl_tilemap);
+	tilemap_draw(bitmap, cliprect, state->ttl_tilemap, 0, 0);
 	return 0;
 }

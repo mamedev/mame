@@ -1,8 +1,7 @@
 #include "driver.h"
 #include "video/konicdev.h"
+#include "includes/crimfght.h"
 
-
-static int layer_colorbase[3],sprite_colorbase;
 
 /***************************************************************************
 
@@ -10,11 +9,13 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-void crimfght_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
+void crimfght_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
+	crimfght_state *state = (crimfght_state *)machine->driver_data;
+
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x1f) << 8) | (bank << 13);
-	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 /***************************************************************************
@@ -23,12 +24,14 @@ void crimfght_tile_callback(running_machine *machine, int layer,int bank,int *co
 
 ***************************************************************************/
 
-void crimfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
+void crimfght_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
 {
 	/* Weird priority scheme. Why use three bits when two would suffice? */
 	/* The PROM allows for mixed priorities, where sprites would have */
 	/* priority over text but not on one or both of the other two planes. */
 	/* Luckily, this isn't used by the game. */
+	crimfght_state *state = (crimfght_state *)machine->driver_data;
+
 	switch (*color & 0x70)
 	{
 		case 0x10: *priority = 0; break;
@@ -42,7 +45,7 @@ void crimfght_sprite_callback(running_machine *machine, int *code,int *color,int
 	}
 	/* bit 7 is on in the "Game Over" sprites, meaning unknown */
 	/* in Aliens it is the top bit of the code, but that's not needed here */
-	*color = sprite_colorbase + (*color & 0x0f);
+	*color = state->sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -54,12 +57,16 @@ void crimfght_sprite_callback(running_machine *machine, int *code,int *color,int
 
 VIDEO_START( crimfght )
 {
+	crimfght_state *state = (crimfght_state *)machine->driver_data;
+
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400);
 
-	layer_colorbase[0] = 0;
-	layer_colorbase[1] = 4;
-	layer_colorbase[2] = 8;
-	sprite_colorbase = 16;
+	state->layer_colorbase[0] = 0;
+	state->layer_colorbase[1] = 4;
+	state->layer_colorbase[2] = 8;
+	state->sprite_colorbase = 16;
+
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x400);
 }
 
 
@@ -72,16 +79,15 @@ VIDEO_START( crimfght )
 
 VIDEO_UPDATE( crimfght )
 {
-	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
-	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
+	crimfght_state *state = (crimfght_state *)screen->machine->driver_data;
 
-	k052109_tilemap_update(k052109);
+	k052109_tilemap_update(state->k052109);
 
-	k052109_tilemap_draw(k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
-	k051960_sprites_draw(k051960, bitmap,cliprect,2,2);
-	k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 0);
-	k051960_sprites_draw(k051960, bitmap,cliprect,1,1);
-	k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 0);
-	k051960_sprites_draw(k051960, bitmap,cliprect,0,0);
+	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+	k051960_sprites_draw(state->k051960, bitmap, cliprect, 2, 2);
+	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 2, 0, 0);
+	k051960_sprites_draw(state->k051960, bitmap, cliprect, 1, 1);
+	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 0, 0, 0);
+	k051960_sprites_draw(state->k051960, bitmap, cliprect, 0, 0);
 	return 0;
 }

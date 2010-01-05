@@ -1,4 +1,65 @@
+
+typedef struct _tmnt_state tmnt_state;
+struct _tmnt_state
+{
+	/* memory pointers */
+	INT16 *    sampledata;
+	UINT16 *   tmnt2_1c0800; 
+	UINT16 *   sunset_104000;
+	UINT16 *   tmnt2_rom;
+//  UINT16 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *     nvram;    // currently cuebrick uses generic nvram handling
+//  UINT8 *     cuebrick_nvram;
+
+	/* video-related */
+	int        layer_colorbase[3], sprite_colorbase;
+	int        layerpri[3];
+	int        sorted_layer[3];	// this might not be necessary, but tmnt2 uses it in a strange way... 
+
+	tilemap_t  *roz_tilemap;
+	int        glfgreat_roz_rom_bank, glfgreat_roz_char_bank, glfgreat_roz_rom_mode;
+	int        glfgreat_pixel;
+	int        prmrsocr_sprite_bank;
+	int        blswhstl_rombank;
+	int        tmnt_priorityflag;
+	int        lastdim, lasten, dim_c, dim_v;	/* lgtnfght, ssriders, tmnt2 only */
+
+	/* misc */
+	int        tmnt_soundlatch;
+	int        cuebrick_snd_irqlatch, cuebrick_nvram_bank;
+	int        toggle, last;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+	const device_config *k007232;
+	const device_config *k053260;
+	const device_config *k054539;
+	const device_config *k052109;
+	const device_config *k051960;
+	const device_config *k053245;
+	const device_config *k053251;
+	const device_config *k053936;
+	const device_config *k054000;
+	const device_config *upd;
+	const device_config *samples;
+};
+
+
 /*----------- defined in video/tmnt.c -----------*/
+
+extern void mia_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void cuebrick_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void tmnt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void ssbl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void blswhstl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void mia_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
+extern void tmnt_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
+extern void punkshot_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void thndrx2_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void blswhstl_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
 
 WRITE16_HANDLER( tmnt_paletteram_word_w );
 WRITE16_HANDLER( tmnt_0a0000_w );
@@ -13,12 +74,15 @@ WRITE16_HANDLER( prmrsocr_122000_w );
 WRITE16_HANDLER( tmnt_priority_w );
 READ16_HANDLER( glfgreat_ball_r );
 READ16_HANDLER( prmrsocr_rom_r );
+
 VIDEO_START( cuebrick );
 VIDEO_START( mia );
 VIDEO_START( tmnt );
 VIDEO_START( lgtnfght );
+VIDEO_START( blswhstl );
 VIDEO_START( glfgreat );
 VIDEO_START( prmrsocr );
+
 VIDEO_UPDATE( mia );
 VIDEO_UPDATE( tmnt );
 VIDEO_UPDATE( punkshot );
@@ -26,4 +90,5 @@ VIDEO_UPDATE( lgtnfght );
 VIDEO_UPDATE( glfgreat );
 VIDEO_UPDATE( tmnt2 );
 VIDEO_UPDATE( thndrx2 );
+
 VIDEO_EOF( blswhstl );

@@ -1262,6 +1262,68 @@ static void deinterleave_gfx(running_machine *machine, const char *gfx_memory_re
 	}
 }
 
+/* useful function to sort three tile layers by priority order */
+void konami_sortlayers3( int *layer, int *pri )
+{
+#define SWAP(a,b) \
+	if (pri[a] < pri[b]) \
+	{ \
+		int t; \
+		t = pri[a]; pri[a] = pri[b]; pri[b] = t; \
+		t = layer[a]; layer[a] = layer[b]; layer[b] = t; \
+	}
+
+	SWAP(0,1)
+	SWAP(0,2)
+	SWAP(1,2)
+#undef  SWAP
+}
+
+/* useful function to sort four tile layers by priority order */
+void konami_sortlayers4( int *layer, int *pri )
+{
+#define SWAP(a,b) \
+	if (pri[a] <= pri[b]) \
+	{ \
+		int t; \
+		t = pri[a]; pri[a] = pri[b]; pri[b] = t; \
+		t = layer[a]; layer[a] = layer[b]; layer[b] = t; \
+	}
+
+	SWAP(0, 1)
+	SWAP(0, 2)
+	SWAP(0, 3)
+	SWAP(1, 2)
+	SWAP(1, 3)
+	SWAP(2, 3)
+#undef  SWAP
+}
+
+/* useful function to sort five tile layers by priority order */
+void konami_sortlayers5( int *layer, int *pri )
+{
+#define SWAP(a,b) \
+	if (pri[a] <= pri[b]) \
+	{ \
+		int t; \
+		t = pri[a]; pri[a] = pri[b]; pri[b] = t; \
+		t = layer[a]; layer[a] = layer[b]; layer[b] = t; \
+	}
+
+	SWAP(0, 1)
+	SWAP(0, 2)
+	SWAP(0, 3)
+	SWAP(0, 4)
+	SWAP(1, 2)
+	SWAP(1, 3)
+	SWAP(1, 4)
+	SWAP(2, 3)
+	SWAP(2, 4)
+	SWAP(3, 4)
+#undef  SWAP
+}
+
+
 /***************************************************************************/
 /*                                                                         */
 /*                                 007121                                  */
@@ -2108,7 +2170,7 @@ struct _k052109_state
 	UINT8    charrombank[4];
 	UINT8    charrombank_2[4];
 	UINT8    has_extra_video_ram;
-	INT32    RMRD_line;
+	INT32    rmrd_line;
 	UINT8    irq_enabled;
 	INT32    dx[3], dy[3];
 	UINT8    romsubbank, scrollctrl;
@@ -2147,7 +2209,7 @@ READ8_DEVICE_HANDLER( k052109_r )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 
-	if (k052109->RMRD_line == CLEAR_LINE)
+	if (k052109->rmrd_line == CLEAR_LINE)
 	{
 		if ((offset & 0x1fff) >= 0x1800)
 		{
@@ -2347,13 +2409,13 @@ WRITE16_DEVICE_HANDLER( k052109_lsb_w )
 void k052109_set_rmrd_line( const device_config *device, int state )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	k052109->RMRD_line = state;
+	k052109->rmrd_line = state;
 }
 
 int k052109_get_rmrd_line(const device_config *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	return k052109->RMRD_line;
+	return k052109->rmrd_line;
 }
 
 
@@ -2694,7 +2756,7 @@ static DEVICE_START( k052109 )
 	tilemap_set_transparent_pen(k052109->tilemap[2], 0);
 
 	state_save_register_device_item_pointer(device, 0, k052109->ram, 0x6000);
-	state_save_register_device_item(device, 0, k052109->RMRD_line);
+	state_save_register_device_item(device, 0, k052109->rmrd_line);
 	state_save_register_device_item(device, 0, k052109->romsubbank);
 	state_save_register_device_item(device, 0, k052109->scrollctrl);
 	state_save_register_device_item(device, 0, k052109->irq_enabled);
@@ -2711,15 +2773,22 @@ static DEVICE_RESET( k052109 )
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	int i;
 
-	k052109->RMRD_line = CLEAR_LINE;
+	k052109->rmrd_line = CLEAR_LINE;
 	k052109->irq_enabled = 0;
+	k052109->romsubbank = 0;
+	k052109->scrollctrl = 0;
 
 	k052109->has_extra_video_ram = 0;
 
 	for (i = 0; i < 3; i++)
 		k052109->dx[i] = k052109->dy[i] = 0;
-}
 
+	for (i = 0; i < 4; i++)
+	{
+		k052109->charrombank[i] = 0;
+		k052109->charrombank_2[i] = 0;
+	}
+}
 
 /***************************************************************************/
 /*                                                                         */
@@ -3245,35 +3314,17 @@ static DEVICE_RESET( k051960 )
 
 	k051960->dx = k051960->dy = 0;
 	k051960->k051937_counter = 0;
+
+	k051960->romoffset = 0;
+	k051960->spriteflip = 0;
+	k051960->readroms = 0;
+	k051960->irq_enabled = 0;
+	k051960->nmi_enabled = 0;
+
+	k051960->spriterombank[0] = 0;
+	k051960->spriterombank[1] = 0;
+	k051960->spriterombank[2] = 0;
 }
-
-
-#if 0 // to be moved in the specific drivers!
-READ8_DEVICE_HANDLER( k052109_051960_r )
-{
-	if (k052109_RMRD_line == CLEAR_LINE)
-	{
-		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(space,offset - 0x3800);
-		else if (offset < 0x3c00)
-			return k052109_r(space,offset);
-		else
-			return k051960_r(space,offset - 0x3c00);
-	}
-	else return k052109_r(space,offset);
-}
-
-WRITE8_DEVICE_HANDLER( k052109_051960_w )
-{
-	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(space,offset - 0x3800,data);
-	else if (offset < 0x3c00)
-		k052109_w(space,offset,data);
-	else
-		k051960_w(space,offset - 0x3c00,data);
-}
-#endif
-
 
 /***************************************************************************/
 /*                                                                         */
@@ -4084,8 +4135,8 @@ struct _k053247_state
 
 	gfx_element *gfx;
 
-	UINT8    Kx46_regs[8];
-	UINT16   Kx47_regs[16];
+	UINT8    kx46_regs[8];
+	UINT16   kx47_regs[16];
 	int      dx, dy, wraparound;
 	UINT8    objcha_line;
 	int      z_rejection;
@@ -4158,13 +4209,13 @@ int k053247_get_dy( const device_config *device )
 int k053246_read_register( const device_config *device, int regnum )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx46_regs[regnum]);
+	return(k053247->kx46_regs[regnum]);
 }
 
 int k053247_read_register( const device_config *device, int regnum )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx47_regs[regnum]);
+	return(k053247->kx47_regs[regnum]);
 }
 
 void k053247_set_sprite_offs( const device_config *device, int offsx, int offsy )
@@ -4183,17 +4234,17 @@ void k053247_wraparound_enable( const device_config *device, int status )
 WRITE16_DEVICE_HANDLER( k053247_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	COMBINE_DATA(k053247->Kx47_regs + offset);
+	COMBINE_DATA(k053247->kx47_regs + offset);
 }
 
 WRITE32_DEVICE_HANDLER( k053247_reg_long_w )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	offset <<= 1;
-	COMBINE_DATA(k053247->Kx47_regs + offset + 1);
+	COMBINE_DATA(k053247->kx47_regs + offset + 1);
 	mem_mask >>= 16;
 	data >>= 16;
-	COMBINE_DATA(k053247->Kx47_regs + offset);
+	COMBINE_DATA(k053247->kx47_regs + offset);
 }
 
 READ16_DEVICE_HANDLER( k053247_word_r )
@@ -4261,7 +4312,7 @@ READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 	size4 *= 4 * 1024 * 1024;	// get offset to 5th bit
 	ROM8 += size4;
 
-	romofs = k053246->Kx46_regs[6] << 16 | k053246->Kx46_regs[7] << 8 | k053246->Kx46_regs[4];
+	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
 
 	switch (offset)
 	{
@@ -4295,7 +4346,7 @@ READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 	UINT16 *ROM = (UINT16 *)memory_region(device->machine, k053246->memory_region);
 	int romofs;
 
-	romofs = k053246->Kx46_regs[6] << 16 | k053246->Kx46_regs[7] << 8 | k053246->Kx46_regs[4];
+	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
 
 	romofs /= 4;	// romofs increments 4 at a time
 	romofs *= 12 / 2;	// each increment of romofs = 12 new bytes (6 new words)
@@ -4331,7 +4382,7 @@ READ8_DEVICE_HANDLER( k053246_r )
 	{
 		int addr;
 
-		addr = (k053246->Kx46_regs[6] << 17) | (k053246->Kx46_regs[7] << 9) | (k053246->Kx46_regs[4] << 1) | ((offset & 1) ^ 1);
+		addr = (k053246->kx46_regs[6] << 17) | (k053246->kx46_regs[7] << 9) | (k053246->kx46_regs[4] << 1) | ((offset & 1) ^ 1);
 		addr &= memory_region_length(device->machine, k053246->memory_region) - 1;
 //      if (VERBOSE)
 //          popmessage("%04x: offset %02x addr %06x", cpu_get_pc(space->cpu), offset, addr);
@@ -4347,7 +4398,7 @@ READ8_DEVICE_HANDLER( k053246_r )
 WRITE8_DEVICE_HANDLER( k053246_w )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	k053247->Kx46_regs[offset] = data;
+	k053247->kx46_regs[offset] = data;
 }
 
 READ16_DEVICE_HANDLER( k053246_word_r )
@@ -4387,7 +4438,7 @@ int k053246_is_irq_enabled( const device_config *device )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
-	return k053247->Kx46_regs[5] & 0x10;
+	return k053247->kx46_regs[5] & 0x10;
 }
 
 /*
@@ -4443,10 +4494,10 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 	int ox, oy, color, code, size, w, h, x, y, xa, ya, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy, primask;
 	int shdmask, nozoom, count, temp;
 
-	int flipscreenx = k053246->Kx46_regs[5] & 0x01;
-	int flipscreeny = k053246->Kx46_regs[5] & 0x02;
-	int offx = (short)((k053246->Kx46_regs[0] << 8) | k053246->Kx46_regs[1]);
-	int offy = (short)((k053246->Kx46_regs[2] << 8) | k053246->Kx46_regs[3]);
+	int flipscreenx = k053246->kx46_regs[5] & 0x01;
+	int flipscreeny = k053246->kx46_regs[5] & 0x02;
+	int offx = (short)((k053246->kx46_regs[0] << 8) | k053246->kx46_regs[1]);
+	int offy = (short)((k053246->kx46_regs[2] << 8) | k053246->kx46_regs[3]);
 
 	int screen_width = video_screen_get_width(k053246->screen);
 	UINT8 drawmode_table[256];
@@ -4519,7 +4570,7 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 	count--;
 	h = count;
 
-	if (!(k053246->Kx47_regs[0xc / 2] & 0x10))
+	if (!(k053246->kx47_regs[0xc / 2] & 0x10))
 	{
 		// sort objects in decending order(smaller z closer) when OPSET PRI is clear
 		for (y = 0; y < h; y++)
@@ -4633,7 +4684,7 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 //    Below 7 lines supports this 053246's(???) function.
 //    Don't rely on it, Please.  But, Escape Kids works correctly!
 // ************************************************************************************
-		if ( k053246->Kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
+		if ( k053246->kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
 		{
 			zoomx >>= 1;		// Fix sprite width to HALF size
 			ox = (ox >> 1) + 1;	// Fix sprite draw position
@@ -4878,11 +4929,11 @@ static DEVICE_START( k053247 )
 	k053247->gfx = machine->gfx[intf->gfx_num];
 	k053247->callback = intf->callback;
 
-	k053247->ram = auto_alloc_array(machine, UINT16, 0x1000/2);
+	k053247->ram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
 
-	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x800);
-	state_save_register_device_item_array(device, 0, k053247->Kx46_regs);
-	state_save_register_device_item_array(device, 0, k053247->Kx47_regs);
+	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x1000 / 2);
+	state_save_register_device_item_array(device, 0, k053247->kx46_regs);
+	state_save_register_device_item_array(device, 0, k053247->kx47_regs);
 	state_save_register_device_item(device, 0, k053247->objcha_line);
 	state_save_register_device_item(device, 0, k053247->wraparound);
 	state_save_register_device_item(device, 0, k053247->z_rejection);
@@ -5004,8 +5055,8 @@ static DEVICE_START( k055673 )
 	k053247->ram = auto_alloc_array(machine, UINT16, 0x1000 / 2);
 
 	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x800);
-	state_save_register_device_item_array(device, 0, k053247->Kx46_regs);
-	state_save_register_device_item_array(device, 0, k053247->Kx47_regs);
+	state_save_register_device_item_array(device, 0, k053247->kx46_regs);
+	state_save_register_device_item_array(device, 0, k053247->kx47_regs);
 	state_save_register_device_item(device, 0, k053247->objcha_line);
 	state_save_register_device_item(device, 0, k053247->wraparound);
 	state_save_register_device_item(device, 0, k053247->z_rejection);
@@ -5019,8 +5070,8 @@ static DEVICE_RESET( k053247 )
 	k053247->z_rejection = -1;
 	k053247->objcha_line = CLEAR_LINE;
 
-	memset(k053247->Kx46_regs, 0, 8);
-	memset(k053247->Kx47_regs, 0, 32);
+	memset(k053247->kx46_regs, 0, 8);
+	memset(k053247->kx47_regs, 0, 32);
 }
 
 /*
@@ -5721,6 +5772,8 @@ static DEVICE_RESET( k053251 )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	int i;
+
+	k053251->tilemaps_set = 0;
 
 	for (i = 0; i < 0x10; i++)
 		k053251->ram[i] = 0;
@@ -10762,13 +10815,13 @@ READ16_DEVICE_HANDLER( k056832_b_word_r )
 READ16_DEVICE_HANDLER( k053246_reg_word_r )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx46_regs[offset * 2] << 8 | k053247->Kx46_regs[offset * 2 + 1]);
+	return(k053247->kx46_regs[offset * 2] << 8 | k053247->kx46_regs[offset * 2 + 1]);
 }	// OBJSET1
 
 READ16_DEVICE_HANDLER( k053247_reg_word_r )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx47_regs[offset]);
+	return(k053247->kx47_regs[offset]);
 }	// OBJSET2
 
 READ16_DEVICE_HANDLER( k054338_word_r )

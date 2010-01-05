@@ -1,11 +1,11 @@
 /***************************************************************************
 
-Ultraman (c) 1991  Banpresto / Bandai
+    Ultraman (c) 1991  Banpresto / Bandai
 
-Driver by Manuel Abadia <manu@teleline.es>
+    Driver by Manuel Abadia <manu@teleline.es>
 
-2009-03:
-Added dsw locations and verified factory setting based on Guru's notes
+    2009-03:
+    Added dsw locations and verified factory setting based on Guru's notes
 
 ***************************************************************************/
 
@@ -15,18 +15,7 @@ Added dsw locations and verified factory setting based on Guru's notes
 #include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-
-/* from video/ultraman.c */
-WRITE16_HANDLER( ultraman_gfxctrl_w );
-VIDEO_START( ultraman );
-VIDEO_UPDATE( ultraman );
-
-extern void ultraman_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void ultraman_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-extern void ultraman_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
-extern void ultraman_zoom_callback_2(running_machine *machine, int *code,int *color,int *flags);
-
+#include "includes/ultraman.h"
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
@@ -36,8 +25,10 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_trigger_w )
 {
+	ultraman_state *state = (ultraman_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -200,7 +191,35 @@ static const k051316_interface ultraman_k051316_intf_2 =
 	ultraman_zoom_callback_2
 };
 
+static MACHINE_START( ultraman )
+{
+	ultraman_state *state = (ultraman_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k051960 = devtag_get_device(machine, "k051960");
+	state->k051316_1 = devtag_get_device(machine, "k051316_1");
+	state->k051316_2 = devtag_get_device(machine, "k051316_2");
+	state->k051316_3 = devtag_get_device(machine, "k051316_3");
+
+	state_save_register_global(machine, state->bank0);
+	state_save_register_global(machine, state->bank1);
+	state_save_register_global(machine, state->bank2);
+}
+
+static MACHINE_RESET( ultraman )
+{
+	ultraman_state *state = (ultraman_state *)machine->driver_data;
+
+	state->bank0 = -1;
+	state->bank1 = -1;
+	state->bank2 = -1;
+}
+
 static MACHINE_DRIVER_START( ultraman )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ultraman_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz? */
@@ -212,6 +231,9 @@ static MACHINE_DRIVER_START( ultraman )
 	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(ultraman)
+	MDRV_MACHINE_RESET(ultraman)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -286,4 +308,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, 0, ROT0, "Banpresto/Bandai", "Ultraman (Japan)", 0 )
+GAME( 1991, ultraman, 0, ultraman, ultraman, 0, ROT0, "Banpresto/Bandai", "Ultraman (Japan)", GAME_SUPPORTS_SAVE )

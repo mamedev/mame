@@ -25,14 +25,6 @@ likewise be a 2 screen game
 #include "includes/xmen.h"
 #include "includes/konamipt.h"
 
-UINT16 xmen_current_frame;
-
-/* 6p version */
-UINT16*xmen6p_spriteramleft;
-UINT16*xmen6p_spriteramright;
-UINT16*xmen6p_tilemapleft;
-UINT16*xmen6p_tilemapright;
-
 /***************************************************************************
 
   EEPROM
@@ -52,8 +44,7 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	xmen_state *state = (xmen_state *)space->machine->driver_data;
 
 	logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
@@ -69,9 +60,9 @@ static WRITE16_HANDLER( eeprom_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = enable sprite ROM reading */
-		k053246_set_objcha_line(k053246, (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(state->k053246, (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 		/* bit 9 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(k052109, (data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(state->k052109, (data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -91,10 +82,9 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	xmen_state *state = (xmen_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
-
-//int xmen_irqenabled;
 
 static WRITE16_HANDLER( xmen_18fa00_w )
 {
@@ -102,20 +92,19 @@ static WRITE16_HANDLER( xmen_18fa00_w )
 	{
 		/* bit 2 is interrupt enable */
 		interrupt_enable_w(space, 0, data & 0x04);
-	//  xmen_irqenabled = data;
 	}
 }
 
-static UINT8 sound_curbank;
-
-static void sound_reset_bank(running_machine *machine)
+static void sound_reset_bank( running_machine *machine )
 {
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "audiocpu") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
+	xmen_state *state = (xmen_state *)machine->driver_data;
+	memory_set_bank(machine, "bank4", state->sound_curbank & 0x07);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	sound_curbank = data;
+	xmen_state *state = (xmen_state *)space->machine->driver_data;
+	state->sound_curbank = data;
 	sound_reset_bank(space->machine);
 }
 
@@ -145,7 +134,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_r, k054539_w)
 	AM_RANGE(0xe800, 0xe801) AM_MIRROR(0x0400) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
@@ -156,9 +145,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&xmen6p_spriteramleft)	/* sprites (screen 1) */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(xmen_state, xmen6p_spriteramleft)	/* sprites (screen 1) */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_BASE(&xmen6p_spriteramright)	/* sprites (screen 2) */
+	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_BASE_MEMBER(xmen_state, xmen6p_spriteramright)	/* sprites (screen 2) */
 	AM_RANGE(0x103000, 0x103fff) AM_RAM		/* 6p - a buffer? */
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
@@ -174,8 +163,8 @@ static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053246_word_r) /* sprites */
 	AM_RANGE(0x110000, 0x113fff) AM_RAM		/* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_lsb_w) AM_BASE(&xmen6p_tilemapleft) */
-	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_BASE(&xmen6p_tilemapleft) /* left tilemap (p1,p2,p3 counters) */
+/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_lsb_w) AM_BASE_MEMBER(xmen_state, xmen6p_tilemapleft) */
+	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_BASE_MEMBER(xmen_state, xmen6p_tilemapleft) /* left tilemap (p1,p2,p3 counters) */
 /*
     AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
     AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY
@@ -186,7 +175,7 @@ static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x1b4000, 0x1b77ff) AM_READONLY
     AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITEONLY
 */
-	AM_RANGE(0x1ac000, 0x1b7fff) AM_RAM AM_BASE(&xmen6p_tilemapright) /* right tilemap */
+	AM_RANGE(0x1ac000, 0x1b7fff) AM_RAM AM_BASE_MEMBER(xmen_state, xmen6p_tilemapright) /* right tilemap */
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
@@ -269,7 +258,8 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
 {
-	return xmen_current_frame;
+	xmen_state *state = (xmen_state *)field->port->machine->driver_data;
+	return state->current_frame;
 }
 
 static INPUT_PORTS_START( xmen6p )
@@ -308,8 +298,10 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( xmen_interrupt )
 {
-	if (cpu_getiloops(device) == 0) irq5_line_hold(device);
-	else irq3_line_hold(device);
+	if (cpu_getiloops(device) == 0) 
+		irq5_line_hold(device);
+	else 
+		irq3_line_hold(device);
 }
 
 static STATE_POSTLOAD( xmen_postload )
@@ -319,10 +311,42 @@ static STATE_POSTLOAD( xmen_postload )
 
 static MACHINE_START( xmen )
 {
-	state_save_register_global(machine, sound_curbank);
+	xmen_state *state = (xmen_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x10000], 0x4000);
+	memory_set_bank(machine, "bank4", 0);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k053246 = devtag_get_device(machine, "k053246");
+	state->k053251 = devtag_get_device(machine, "k053251");
+	state->k052109 = devtag_get_device(machine, "k052109");
+	state->k054539 = devtag_get_device(machine, "k054539");
+	state->lscreen = devtag_get_device(machine, "lscreen");
+	state->rscreen = devtag_get_device(machine, "rscreen");
+
+	state_save_register_global(machine, state->sound_curbank);
+	state_save_register_global(machine, state->sprite_colorbase);
+	state_save_register_global_array(machine, state->layer_colorbase);
+	state_save_register_global_array(machine, state->layerpri);
 	state_save_register_postload(machine, xmen_postload, NULL);
 }
 
+static MACHINE_RESET( xmen )
+{
+	xmen_state *state = (xmen_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 3; i++)
+	{
+		state->layerpri[i] = 0;
+		state->layer_colorbase[i] = 0;
+	}
+
+	state->sprite_colorbase = 0;
+	state->sound_curbank = 0;
+}
 
 static const k052109_interface xmen_k052109_intf =
 {
@@ -344,6 +368,9 @@ static const k053247_interface xmen_k053246_intf =
 
 static MACHINE_DRIVER_START( xmen )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(xmen_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -353,6 +380,7 @@ static MACHINE_DRIVER_START( xmen )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(xmen)
+	MDRV_MACHINE_RESET(xmen)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -380,15 +408,25 @@ static MACHINE_DRIVER_START( xmen )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("konami", K054539, 48000)
+	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 
-static MACHINE_RESET(xmen6p)
+static MACHINE_START( xmen6p )
 {
-	xmen_current_frame = 0x00;
+	xmen_state *state = (xmen_state *)machine->driver_data;
+
+	MACHINE_START_CALL(xmen);
+
+	state_save_register_global(machine, state->current_frame);
+}
+
+static MACHINE_RESET( xmen6p )
+{
+	xmen_state *state = (xmen_state *)machine->driver_data;
+	state->current_frame = 0x00;
 }
 
 static INTERRUPT_GEN( xmen6p_interrupt )
@@ -404,7 +442,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 //      if (xmen_irqenabled & 0x04)
 //      {
 			irq3_line_hold(device);
-//          xmen_current_frame = 0x00;
+//          state->current_frame = 0x00;
 
 //      }
 	}
@@ -422,6 +460,9 @@ static const k053247_interface xmen6p_k053246_intf =
 
 static MACHINE_DRIVER_START( xmen6p )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(xmen_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(6p_main_map)
@@ -430,6 +471,7 @@ static MACHINE_DRIVER_START( xmen6p )
 	MDRV_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(xmen6p)
 	MDRV_MACHINE_RESET(xmen6p)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
@@ -468,7 +510,7 @@ static MACHINE_DRIVER_START( xmen6p )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("konami", K054539, 48000)
+	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -551,7 +593,7 @@ ROM_START( xmen )
 	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -576,7 +618,7 @@ ROM_START( xmenj )
 	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -601,7 +643,7 @@ ROM_START( xmene )
 	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -626,7 +668,7 @@ ROM_START( xmen2pe )
 	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -651,7 +693,7 @@ ROM_START( xmen2pa )
 	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -676,7 +718,7 @@ ROM_START( xmen2pj )
 	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -755,7 +797,7 @@ ROM_START( xmen6p )
 	ROM_LOAD( "065-a12.22h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.22l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1d",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
@@ -781,16 +823,16 @@ ROM_START( xmen6pu )
 	ROM_LOAD( "065-a12.22h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD( "065-a11.22l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1d",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
-GAME( 1992, xmen,    0,    xmen, xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", 0 ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
-GAME( 1992, xmenj,   xmen, xmen, xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", 0 )
-GAME( 1992, xmene,   xmen, xmen, xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", 0 )
-GAME( 1992, xmen2pe, xmen, xmen, xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", 0 )
-GAME( 1992, xmen2pa, xmen, xmen, xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", 0 )
-GAME( 1992, xmen2pj, xmen, xmen, xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", 0 )
+GAME( 1992, xmen,    0,    xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", GAME_SUPPORTS_SAVE ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
+GAME( 1992, xmenj,   xmen, xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, xmene,   xmen, xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, xmen2pe, xmen, xmen,   xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, xmen2pa, xmen, xmen,   xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, xmen2pj, xmen, xmen,   xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, xmen6p,  xmen, xmen6p,xmen6p, 0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, xmen6pu, xmen, xmen6p,xmen6p, 0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p,  0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p,  0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

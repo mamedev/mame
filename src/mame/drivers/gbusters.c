@@ -1,9 +1,9 @@
 /***************************************************************************
 
-Gangbusters(GX878) (c) 1988 Konami
+    Gangbusters (GX878) (c) 1988 Konami
 
-Preliminary driver by:
-    Manuel Abadia <manu@teleline.es>
+    Preliminary driver by:
+        Manuel Abadia <manu@teleline.es>
 
 ***************************************************************************/
 
@@ -14,57 +14,51 @@ Preliminary driver by:
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 #include "includes/konamipt.h"
+#include "includes/gbusters.h"
 
 /* prototypes */
-static MACHINE_RESET( gbusters );
 static KONAMI_SETLINES_CALLBACK( gbusters_banking );
-
-extern void gbusters_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags, int *priority);
-extern void gbusters_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-
-extern int gbusters_priority;
-
-VIDEO_START( gbusters );
-VIDEO_UPDATE( gbusters );
-
-static int palette_selected;
-static UINT8 *ram;
 
 static INTERRUPT_GEN( gbusters_interrupt )
 {
-	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+	gbusters_state *state = (gbusters_state *)device->machine->driver_data;
 
-	if (k052109_is_irq_enabled(k052109))
+	if (k052109_is_irq_enabled(state->k052109))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
 {
-	if (palette_selected)
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
+
+	if (state->palette_selected)
 		return space->machine->generic.paletteram.u8[offset];
 	else
-		return ram[offset];
+		return state->ram[offset];
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
+
+	if (state->palette_selected)
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	else
-		ram[offset] = data;
+		state->ram[offset] = data;
 }
 
 static WRITE8_HANDLER( gbusters_1f98_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
 
 	/* bit 0 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 7 used (during gfx rom tests), but unknown */
 
 	/* other bits unused/unknown */
-	if (data & 0xfe){
+	if (data & 0xfe)
+	{
 		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(space->cpu), data);
 		//popmessage("$1f98 = %02x", data);
 	}
@@ -72,15 +66,17 @@ static WRITE8_HANDLER( gbusters_1f98_w )
 
 static WRITE8_HANDLER( gbusters_coin_counter_w )
 {
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
+
 	/* bit 0 select palette RAM  or work RAM at 5800-5fff */
-	palette_selected = ~data & 0x01;
+	state->palette_selected = ~data & 0x01;
 
 	/* bits 1 & 2 = coin counters */
-	coin_counter_w(space->machine, 0,data & 0x02);
-	coin_counter_w(space->machine, 1,data & 0x04);
+	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x04);
 
 	/* bits 3 selects tilemap priority */
-	gbusters_priority = data & 0x08;
+	state->priority = data & 0x08;
 
 	/* bit 7 is used but unknown */
 
@@ -89,10 +85,10 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 	{
 #if 0
 		char baf[40];
-		sprintf(baf,"ccnt = %02x", data);
+		sprintf(baf, "ccnt = %02x", data);
 		popmessage(baf);
 #endif
-		logerror("%04x: (ccount) write %02x\n",cpu_get_pc(space->cpu), data);
+		logerror("%04x: (ccount) write %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
 
@@ -109,14 +105,15 @@ char baf[40];
 
 static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 {
-	int bank_B = ((data >> 2) & 0x01);	/* ?? */
-	int bank_A = ((data) & 0x01);		/* ?? */
-	k007232_set_bank( device, bank_A, bank_B );
+	int bank_B = BIT(data, 2);	/* ?? */
+	int bank_A = BIT(data, 0);		/* ?? */
+	k007232_set_bank(device, bank_A, bank_B );
 
 #if 0
 	{
@@ -130,33 +127,31 @@ static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 /* special handlers to combine 052109 & 051960 */
 static READ8_HANDLER( k052109_051960_r )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
 
-	if (k052109_get_rmrd_line(k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(k051960, offset - 0x3800);
+			return k051937_r(state->k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(k052109, offset);
+			return k052109_r(state->k052109, offset);
 		else
-			return k051960_r(k051960, offset - 0x3c00);
+			return k051960_r(state->k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(k052109, offset);
+		return k052109_r(state->k052109, offset);
 }
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+	gbusters_state *state = (gbusters_state *)space->machine->driver_data;
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(k051960, offset - 0x3800, data);
+		k051937_w(state->k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(k052109, offset, data);
+		k052109_w(state->k052109, offset, data);
 	else
-		k051960_w(k051960, offset - 0x3c00, data);
+		k051960_w(state->k051960, offset - 0x3c00, data);
 }
 
 
@@ -175,7 +170,7 @@ static ADDRESS_MAP_START( gbusters_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)							/* ??? */
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)	/* palette + work RAM (RAM D16 & C16) */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(gbusters_state, ram)	/* palette + work RAM (RAM D16 & C16) */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END
@@ -184,10 +179,10 @@ static ADDRESS_MAP_START( gbusters_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM													/* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)									/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)		/* 007232 registers */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)		/* 007232 registers */
 	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ymsnd", ym2151_status_port_r)					/* YM 2151 */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)				/* YM 2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("k007232", gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -250,10 +245,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void volume_callback(const device_config *device, int v)
+static void volume_callback( const device_config *device, int v )
 {
-	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -277,7 +272,45 @@ static const k051960_interface gbusters_k051960_intf =
 	gbusters_sprite_callback
 };
 
+static MACHINE_START( gbusters )
+{
+	gbusters_state *state = (gbusters_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
+	memory_set_bank(machine, "bank1", 0);
+
+	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k052109 = devtag_get_device(machine, "k052109");
+	state->k051960 = devtag_get_device(machine, "k051960");
+	state->k007232 = devtag_get_device(machine, "k007232");
+
+	state_save_register_global(machine, state->palette_selected);
+	state_save_register_global(machine, state->priority);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
+}
+
+static MACHINE_RESET( gbusters )
+{
+	gbusters_state *state = (gbusters_state *)machine->driver_data;
+	UINT8 *RAM = memory_region(machine, "maincpu");
+
+	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), gbusters_banking);
+
+	/* mirror address for banked ROM */
+	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);	
+
+	state->palette_selected = 0;
+	state->priority = 0;
+}
+
 static MACHINE_DRIVER_START( gbusters )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gbusters_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
@@ -287,6 +320,7 @@ static MACHINE_DRIVER_START( gbusters )
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(gbusters_sound_map)
 
+	MDRV_MACHINE_START(gbusters)
 	MDRV_MACHINE_RESET(gbusters)
 
 	/* video hardware */
@@ -314,7 +348,7 @@ static MACHINE_DRIVER_START( gbusters )
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("konami", K007232, 3579545)
+	MDRV_SOUND_ADD("k007232", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
@@ -328,7 +362,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( gbusters )
-	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878n02.k13", 0x10000, 0x08000, CRC(51697aaa) SHA1(1e6461e2e5e871d44085623a890158a4c1c4c404) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "878j03.k15", 0x20000, 0x10000, CRC(3943a065) SHA1(6b0863f4182e6c973adfaa618f096bd4cc9b7b6d) )
@@ -347,12 +381,12 @@ ROM_START( gbusters )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
 ROM_END
 
 ROM_START( gbustersa )
-	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878_02.k13", 0x10000, 0x08000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "878_03.k15", 0x20000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version leter */
@@ -371,12 +405,12 @@ ROM_START( gbustersa )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
 ROM_END
 
 ROM_START( crazycop )
-	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878m02.k13", 0x10000, 0x08000, CRC(9c1c9f52) SHA1(7a60ad20aac92da8258b43b04f8c7f27bb71f1df) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "878j03.k15", 0x20000, 0x10000, CRC(3943a065) SHA1(6b0863f4182e6c973adfaa618f096bd4cc9b7b6d) )
@@ -395,21 +429,18 @@ ROM_START( crazycop )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
 ROM_END
 
 
 static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "maincpu");
-	int offs = 0x10000;
-
 	/* bits 0-3 ROM bank */
-	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr(device->machine,  "bank1", &RAM[offs] );
+	memory_set_bank(device->machine,  "bank1", lines & 0x0f);
 
-	if (lines & 0xf0){
+	if (lines & 0xf0)
+	{
 		//logerror("%04x: (lines) write %02x\n",cpu_get_pc(device), lines);
 		//popmessage("lines = %02x", lines);
 	}
@@ -417,19 +448,7 @@ static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 	/* other bits unknown */
 }
 
-static MACHINE_RESET( gbusters )
-{
-	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), gbusters_banking);
-
-	/* mirror address for banked ROM */
-	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000 );
-
-	machine->generic.paletteram.u8 = &RAM[0x30000];
-}
-
-
-GAME( 1988, gbusters, 0,        gbusters, gbusters, 0, ROT90, "Konami", "Gang Busters (set 1)", 0 ) /* N02 & J03 program roms */
-GAME( 1988, gbustersa,gbusters, gbusters, gbusters, 0, ROT90, "Konami", "Gang Busters (set 2)", 0 ) /* unknown region program roms */
-GAME( 1988, crazycop, gbusters, gbusters, gbusters, 0, ROT90, "Konami", "Crazy Cop (Japan)", 0 )    /* M02 & J03 program roms */
+GAME( 1988, gbusters,  0,        gbusters, gbusters, 0, ROT90, "Konami", "Gang Busters (set 1)", GAME_SUPPORTS_SAVE ) /* N02 & J03 program roms */
+GAME( 1988, gbustersa, gbusters, gbusters, gbusters, 0, ROT90, "Konami", "Gang Busters (set 2)", GAME_SUPPORTS_SAVE ) /* unknown region program roms */
+GAME( 1988, crazycop,  gbusters, gbusters, gbusters, 0, ROT90, "Konami", "Crazy Cop (Japan)", GAME_SUPPORTS_SAVE )    /* M02 & J03 program roms */

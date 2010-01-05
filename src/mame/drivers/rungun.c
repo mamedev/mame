@@ -1,6 +1,5 @@
-#define RNG_DEBUG 0
+/*************************************************************************
 
-/*
    Run and Gun / Slam Dunk
    (c) 1993 Konami
 
@@ -33,7 +32,8 @@
      - P3 and P4 coin chutes not working in 4-player mode
      - sprite palettes are not entirely right
      - ROZ update causes music to stutter
-*/
+
+*************************************************************************/
 
 #include "driver.h"
 
@@ -43,20 +43,10 @@
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
+#include "includes/rungun.h"
 
-VIDEO_START( rng );
-VIDEO_UPDATE( rng );
-static MACHINE_RESET( rng );
-READ16_HANDLER( rng_ttl_ram_r );
-WRITE16_HANDLER( rng_ttl_ram_w );
-WRITE16_HANDLER( rng_936_videoram_w );
+#define RNG_DEBUG 0
 
-extern UINT16 *rng_936_videoram;
-extern void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
-
-static UINT16 *rng_sysreg;
-static int rng_z80_control;
-static int rng_sound_status;
 
 static const eeprom_interface eeprom_intf =
 {
@@ -71,26 +61,27 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( rng_sysregs_r )
 {
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
 	UINT16 data = 0;
 
 	switch (offset)
 	{
 		case 0x00/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
-				return(input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3") << 8);
+				return (input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3") << 8);
 			else
 			{
 				data = input_port_read(space->machine, "P1") & input_port_read(space->machine, "P3");
-				return(data << 8 | data);
+				return (data << 8 | data);
 			}
 
 		case 0x02/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
-				return(input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4") << 8);
+				return (input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4") << 8);
 			else
 			{
 				data = input_port_read(space->machine, "P2") & input_port_read(space->machine, "P4");
-				return(data << 8 | data);
+				return (data << 8 | data);
 			}
 
 		case 0x04/2:
@@ -106,16 +97,17 @@ static READ16_HANDLER( rng_sysregs_r )
 			{
 				data = input_port_read(space->machine, "DSW");
 			}
-			return((rng_sysreg[0x06/2] & 0xff00) | data);
+			return ((state->sysreg[0x06 / 2] & 0xff00) | data);
 	}
 
-	return(rng_sysreg[offset]);
+	return state->sysreg[offset];
 }
 
 static WRITE16_HANDLER( rng_sysregs_w )
 {
-	const device_config *k055673 = devtag_get_device(space->machine, "k055673");
-	COMBINE_DATA(rng_sysreg + offset);
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
+
+	COMBINE_DATA(state->sysreg + offset);
 
 	switch (offset)
 	{
@@ -129,12 +121,10 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit10 : IRQ5 ACK
             */
 			if (ACCESSING_BITS_0_7)
-			{
 				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
-			}
 
 			if (!(data & 0x40))
-				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_5, CLEAR_LINE);
+				cpu_set_input_line(state->maincpu, M68K_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -144,7 +134,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit 2 : OBJCHA
                 bit 3 : enable IRQ 5
             */
-			k053246_set_objcha_line(k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			k053246_set_objcha_line(state->k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -158,26 +148,32 @@ static WRITE16_HANDLER( sound_cmd1_w )
 static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch2_w(space, 0, data>>8);
+		soundlatch2_w(space, 0, data >> 8);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
-		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_msb_r )
 {
-	if (ACCESSING_BITS_8_15)
-		return(rng_sound_status << 8);
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
 
-	return(0);
+	if (ACCESSING_BITS_8_15)
+		return(state->sound_status << 8);
+
+	return 0;
 }
 
 static INTERRUPT_GEN(rng_interrupt)
 {
-	if (rng_sysreg[0x0c/2] & 0x09)
+	rungun_state *state = (rungun_state *)device->machine->driver_data;
+
+	if (state->sysreg[0x0c / 2] & 0x09)
 		cpu_set_input_line(device, M68K_IRQ_5, ASSERT_LINE);
 }
 
@@ -186,7 +182,7 @@ static ADDRESS_MAP_START( rungun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ( K053936_0_rom_r )       // '936 ROM readback window
-	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r,rng_sysregs_w) AM_BASE(&rng_sysreg)
+	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_BASE_MEMBER(rungun_state, sysreg)
 	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREAD("k053252", k053252_word_r)						// CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
@@ -199,9 +195,9 @@ static ADDRESS_MAP_START( rungun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x601000, 0x601fff) AM_RAM											// communication? second monitor buffer?
 	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k053246_word_w)						// '246A registers
 	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_ctrl_w)			// '936 registers
-	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_BASE(&rng_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
+	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_BASE_MEMBER(rungun_state, _936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
 	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
-	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r,rng_ttl_ram_w)		// text plane RAM
+	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)		// text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP									// watchdog
 #if RNG_DEBUG
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD("k055673", k053247_reg_word_r)
@@ -214,22 +210,28 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_status_w )
 {
-	rng_sound_status = data;
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	state->sound_status = data;
 }
 
 static WRITE8_HANDLER( z80ctrl_w )
 {
-	rng_z80_control = data;
+	rungun_state *state = (rungun_state *)space->machine->driver_data;
 
-	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "soundcpu") + 0x10000 + (data & 0x07) * 0x4000);
+	state->z80_control = data;
+
+	memory_set_bank(space->machine, "bank2", data & 0x07);
 
 	if (data & 0x10)
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	if (rng_z80_control & 0x80) return;
+	rungun_state *state = (rungun_state *)device->machine->driver_data;
+
+	if (state->z80_control & 0x80) 
+		return;
 
 	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -240,9 +242,9 @@ static ADDRESS_MAP_START( rungun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami1", k054539_r,k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_r, k054539_w)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("konami2", k054539_r,k054539_w)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_r, k054539_w)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
@@ -352,7 +354,44 @@ static const k053247_interface rng_k055673_intf =
 };
 
 
+static MACHINE_START( rng )
+{
+	rungun_state *state = (rungun_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "soundcpu");
+
+	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "soundcpu");
+	state->k053936 = devtag_get_device(machine, "k053936");
+	state->k055673 = devtag_get_device(machine, "k055673");
+	state->k053252 = devtag_get_device(machine, "k053252");
+	state->k054539_1 = devtag_get_device(machine, "k054539_1");
+	state->k054539_2 = devtag_get_device(machine, "k054539_2");
+
+	state_save_register_global(machine, state->z80_control);
+	state_save_register_global(machine, state->sound_status);
+	state_save_register_global_array(machine, state->sysreg);
+	state_save_register_global_array(machine, state->ttl_vram);
+}
+
+static MACHINE_RESET( rng )
+{
+	rungun_state *state = (rungun_state *)machine->driver_data;
+
+	k054539_init_flags(devtag_get_device(machine, "k054539_1"), K054539_REVERSE_STEREO);
+
+	memset(state->sysreg, 0, 0x20);
+	memset(state->ttl_vram, 0, 0x1000);
+
+	state->z80_control = 0;
+	state->sound_status = 0;
+}
+
 static MACHINE_DRIVER_START( rng )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(rungun_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -367,6 +406,7 @@ static MACHINE_DRIVER_START( rng )
 
 	MDRV_GFXDECODE(rungun)
 
+	MDRV_MACHINE_START(rng)
 	MDRV_MACHINE_RESET(rng)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
@@ -393,12 +433,12 @@ static MACHINE_DRIVER_START( rng )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
+	MDRV_SOUND_ADD("k054539_1", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
+	MDRV_SOUND_ADD("k054539_2", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -593,22 +633,9 @@ ROM_START( slmdunkj )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 ROM_END
 
-static DRIVER_INIT( rng )
-{
-}
 
-static MACHINE_RESET( rng )
-{
-	k054539_init_flags(devtag_get_device(machine, "konami1"), K054539_REVERSE_STEREO);
-
-	memset(rng_sysreg, 0, 0x20);
-
-	rng_z80_control = 0;
-	rng_sound_status = 0;
-}
-
-GAME( 1993, rungun,   0,      rng, rng, rng, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1993, runguna,  rungun, rng, rng, rng, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1993, rungunu,  rungun, rng, rng, rng, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1993, rungunua, rungun, rng, rng, rng, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1993, slmdunkj, rungun, rng, rng, rng, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1993, rungun,   0,      rng, rng, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, runguna,  rungun, rng, rng, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, rungunu,  rungun, rng, rng, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, rungunua, rungun, rng, rng, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, slmdunkj, rungun, rng, rng, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -8,8 +8,8 @@
 
 #include "driver.h"
 #include "video/konicdev.h"
+#include "includes/chqflag.h"
 
-static int sprite_colorbase,zoom_colorbase[2];
 
 /***************************************************************************
 
@@ -17,10 +17,11 @@ static int sprite_colorbase,zoom_colorbase[2];
 
 ***************************************************************************/
 
-void chqflag_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
+void chqflag_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
 {
+	chqflag_state *state = (chqflag_state *)machine->driver_data;
 	*priority = (*color & 0x10) >> 4;
-	*color = sprite_colorbase + (*color & 0x0f);
+	*color = state->sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -30,16 +31,19 @@ void chqflag_sprite_callback(running_machine *machine, int *code,int *color,int 
 
 ***************************************************************************/
 
-void chqflag_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags)
-{	*code |= ((*color & 0x03) << 8);
-	*color = zoom_colorbase[0] + ((*color & 0x3c) >> 2);
+void chqflag_zoom_callback_0( running_machine *machine, int *code, int *color, int *flags )
+{
+	chqflag_state *state = (chqflag_state *)machine->driver_data;
+	*code |= ((*color & 0x03) << 8);
+	*color = state->zoom_colorbase[0] + ((*color & 0x3c) >> 2);
 }
 
-void chqflag_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags)
+void chqflag_zoom_callback_1( running_machine *machine, int *code, int *color, int *flags )
 {
+	chqflag_state *state = (chqflag_state *)machine->driver_data;
 	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
-	*color = zoom_colorbase[1] + ((*color & 0x10) >> 4);
+	*color = state->zoom_colorbase[1] + ((*color & 0x10) >> 4);
 }
 
 /***************************************************************************
@@ -50,9 +54,15 @@ void chqflag_zoom_callback_1(running_machine *machine, int *code,int *color,int 
 
 VIDEO_START( chqflag )
 {
-	sprite_colorbase = 0;
-	zoom_colorbase[0] = 0x10;
-	zoom_colorbase[1] = 0x02;
+	chqflag_state *state = (chqflag_state *)machine->driver_data;
+
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x800);
+
+	state->sprite_colorbase = 0;
+	state->zoom_colorbase[0] = 0x10;
+	state->zoom_colorbase[1] = 0x02;
+
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
 }
 
 /***************************************************************************
@@ -63,16 +73,14 @@ VIDEO_START( chqflag )
 
 VIDEO_UPDATE( chqflag )
 {
-	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
-	const device_config *k051316_1 = devtag_get_device(screen->machine, "k051316_1");
-	const device_config *k051316_2 = devtag_get_device(screen->machine, "k051316_2");
+	chqflag_state *state = (chqflag_state *)screen->machine->driver_data;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	k051316_zoom_draw(k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	k051960_sprites_draw(k051960, bitmap, cliprect, 0, 0);
-	k051316_zoom_draw(k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	k051960_sprites_draw(k051960, bitmap, cliprect, 1, 1);
-	k051316_zoom_draw(k051316_1, bitmap, cliprect, 0, 0);
+	k051316_zoom_draw(state->k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	k051960_sprites_draw(state->k051960, bitmap, cliprect, 0, 0);
+	k051316_zoom_draw(state->k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	k051960_sprites_draw(state->k051960, bitmap, cliprect, 1, 1);
+	k051316_zoom_draw(state->k051316_1, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -83,50 +83,37 @@ Notes:
 
 ***************************************************************************/
 
-#define CPU_CLOCK	(XTAL_24MHz / 2)	/* 68000 clock */
-#define SOUND_CLOCK	XTAL_16_9344MHz		/* YMZ280 clock */
-
 #include "driver.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
-
-VIDEO_START(bishi);
-VIDEO_UPDATE(bishi);
-
-extern void bishi_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-
-
-static UINT16 cur_control, cur_control2;
-
-static MACHINE_START( bishi )
-{
-	state_save_register_global(machine, cur_control);
-	state_save_register_global(machine, cur_control2);
-}
-
+#include "includes/bishi.h"
 
 static READ16_HANDLER( control_r )
 {
-	return cur_control;
+	bishi_state *state = (bishi_state *)space->machine->driver_data;
+	return state->cur_control;
 }
 
 static WRITE16_HANDLER( control_w )
 {
 	// bit 8 = interrupt gate
-	COMBINE_DATA(&cur_control);
+	bishi_state *state = (bishi_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->cur_control);
 }
 
 static WRITE16_HANDLER( control2_w )
 {
 	// bit 12 = part of the banking calculation for the K056832 ROM readback
-	COMBINE_DATA(&cur_control2);
+	bishi_state *state = (bishi_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->cur_control2);
 }
 
 static INTERRUPT_GEN(bishi_interrupt)
 {
-	if (cur_control & 0x800)
+	bishi_state *state = (bishi_state *)device->machine->driver_data;
+	if (state->cur_control & 0x800)
 	{
 		switch (cpu_getiloops(device))
 		{
@@ -149,17 +136,17 @@ static READ16_HANDLER( bishi_mirror_r )
 
 static READ16_HANDLER( bishi_K056832_rom_r )
 {
-	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+	bishi_state *state = (bishi_state *)space->machine->driver_data;
 	UINT16 ouroffs;
 
 	ouroffs = (offset >> 1) * 8;
 	if (offset & 1)
 		ouroffs++;
 
-	if (cur_control2 & 0x1000)
+	if (state->cur_control2 & 0x1000)
 		ouroffs += 4;
 
-	return k056832_bishi_rom_word_r(k056832, ouroffs, mem_mask);
+	return k056832_bishi_rom_word_r(state->k056832, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -380,16 +367,13 @@ static INPUT_PORTS_START( bishi2p )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( bishi )
-{
-}
-
 static void sound_irq_gen(const device_config *device, int state)
 {
+	bishi_state *bishi = (bishi_state *)device->machine->driver_data;
 	if (state)
-		cputag_set_input_line(device->machine, "maincpu", M68K_IRQ_1, ASSERT_LINE);
+		cpu_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine, "maincpu", M68K_IRQ_1, CLEAR_LINE);
+		cpu_set_input_line(bishi->maincpu, M68K_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =
@@ -414,7 +398,30 @@ static const k054338_interface bishi_k054338_intf =
 	"none"
 };
 
+static MACHINE_START( bishi )
+{
+	bishi_state *state = (bishi_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->k056832 = devtag_get_device(machine, "k056832");
+	state->k054338 = devtag_get_device(machine, "k054338");
+	state->k055555 = devtag_get_device(machine, "k055555");
+
+	state_save_register_global(machine, state->cur_control);
+	state_save_register_global(machine, state->cur_control2);
+}
+
+static MACHINE_RESET( bishi )
+{
+	bishi_state *state = (bishi_state *)machine->driver_data;
+	state->cur_control = 0;
+	state->cur_control2 = 0;
+}
+
 static MACHINE_DRIVER_START( bishi )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bishi_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
@@ -519,6 +526,6 @@ ROM_START( sbishik )
 ROM_END
 
 
-GAME( 1996, bishi,    0,      bishi, bishi, 0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1998, sbishi,   0,      bishi, bishi2p, 0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1998, sbishik,  sbishi, bishi, bishi, 0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", GAME_IMPERFECT_GRAPHICS)
+GAME( 1996, bishi,    0,      bishi, bishi, 0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi, bishi2p, 0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, sbishik,  sbishi, bishi, bishi, 0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

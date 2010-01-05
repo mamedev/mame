@@ -14,65 +14,58 @@ Preliminary driver by:
 #include "sound/2151intf.h"
 #include "video/konicdev.h"
 #include "includes/konamipt.h"
+#include "includes/aliens.h"
 
 /* prototypes */
-static MACHINE_RESET( aliens );
 static KONAMI_SETLINES_CALLBACK( aliens_banking );
-
-extern void aliens_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color, int *flags, int *priority);
-extern void aliens_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
-
-VIDEO_START( aliens );
-VIDEO_UPDATE( aliens );
-
-
-static int palette_selected;
-static UINT8 *ram;
-
 
 static INTERRUPT_GEN( aliens_interrupt )
 {
-	const device_config *k051960 = devtag_get_device(device->machine, "k051960");
+	aliens_state *state = (aliens_state *)device->machine->driver_data;
 
-	if (k051960_is_irq_enabled(k051960))
+	if (k051960_is_irq_enabled(state->k051960))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
 {
-	if (palette_selected)
+	aliens_state *state = (aliens_state *)space->machine->driver_data;
+
+	if (state->palette_selected)
 		return space->machine->generic.paletteram.u8[offset];
 	else
-		return ram[offset];
+		return state->ram[offset];
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
+	aliens_state *state = (aliens_state *)space->machine->driver_data;
+
+	if (state->palette_selected)
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	else
-		ram[offset] = data;
+		state->ram[offset] = data;
 }
 
 static WRITE8_HANDLER( aliens_coin_counter_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	aliens_state *state = (aliens_state *)space->machine->driver_data;
 
 	/* bits 0-1 = coin counters */
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bit 5 = select work RAM or palette */
-	palette_selected = data & 0x20;
+	state->palette_selected = data & 0x20;
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 #if 0
 {
 	char baf[40];
-	sprintf(baf,"%02x",data);
+	sprintf(baf, "%02x", data);
 	popmessage(baf);
 }
 #endif
@@ -80,55 +73,57 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 
 static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 {
-	soundlatch_w(space,offset,data);
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	aliens_state *state = (aliens_state *)space->machine->driver_data;
+
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 {
+	aliens_state *state = (aliens_state *)device->machine->driver_data;
+
 	/* b1: bank for chanel A */
 	/* b0: bank for chanel B */
 
-	int bank_A = ((data >> 1) & 0x01);
-	int bank_B = ((data) & 0x01);
+	int bank_A = BIT(data, 1);
+	int bank_B = BIT(data, 0);
 
-	k007232_set_bank( devtag_get_device(device->machine, "konami"), bank_A, bank_B );
+	k007232_set_bank(state->k007232, bank_A, bank_B);
 }
 
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+	aliens_state *state = (aliens_state *)space->machine->driver_data;
 
-	if (k052109_get_rmrd_line(k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(k051960, offset - 0x3800);
+			return k051937_r(state->k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(k052109, offset);
+			return k052109_r(state->k052109, offset);
 		else
-			return k051960_r(k051960, offset - 0x3c00);
+			return k051960_r(state->k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(k052109, offset);
+		return k052109_r(state->k052109, offset);
 }
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+	aliens_state *state = (aliens_state *)space->machine->driver_data;
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(k051960, offset - 0x3800, data);
+		k051937_w(state->k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(k052109, offset, data);
+		k052109_w(state->k052109, offset, data);
 	else
-		k051960_w(k051960, offset - 0x3c00, data);
+		k051960_w(state->k051960, offset - 0x3c00, data);
 }
 
 static ADDRESS_MAP_START( aliens_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)		/* palette + work RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(aliens_state, ram)		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")												/* banked ROM */
 	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
@@ -147,7 +142,7 @@ static ADDRESS_MAP_START( aliens_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)				/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)
 ADDRESS_MAP_END
 
 
@@ -206,10 +201,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void volume_callback(const device_config *device, int v)
+static void volume_callback( const device_config *device, int v )
 {
-	k007232_set_volume(device,0,(v & 0x0f) * 0x11,0);
-	k007232_set_volume(device,1,0,(v >> 4) * 0x11);
+	k007232_set_volume(device, 0, (v & 0x0f) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v >> 4) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -240,7 +235,36 @@ static const k051960_interface aliens_k051960_intf =
 	aliens_sprite_callback
 };
 
+static MACHINE_START( aliens )
+{
+	aliens_state *state = (aliens_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 20, &ROM[0x10000], 0x2000);
+	memory_set_bank(machine, "bank1", 0);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k007232 = devtag_get_device(machine, "k007232");
+	state->k052109 = devtag_get_device(machine, "k052109");
+	state->k051960 = devtag_get_device(machine, "k051960");
+
+	state_save_register_global(machine, state->palette_selected);
+}
+
+static MACHINE_RESET( aliens )
+{
+	aliens_state *state = (aliens_state *)machine->driver_data;
+
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), aliens_banking);
+
+	state->palette_selected = 0;
+}
+
 static MACHINE_DRIVER_START( aliens )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(aliens_state)
 
 	/* basic machine hardware */
 
@@ -253,6 +277,7 @@ static MACHINE_DRIVER_START( aliens )
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(aliens_sound_map)
 
+	MDRV_MACHINE_START(aliens)
 	MDRV_MACHINE_RESET(aliens)
 
 	/* video hardware */
@@ -281,7 +306,7 @@ static MACHINE_DRIVER_START( aliens )
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("konami", K007232, 3579545)
+	MDRV_SOUND_ADD("k007232", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -322,7 +347,7 @@ ROM_START( aliens )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14",  0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -354,7 +379,7 @@ ROM_START( aliens2 )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14",  0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -386,7 +411,7 @@ ROM_START( aliens3 )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -418,7 +443,7 @@ ROM_START( aliensu )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -450,7 +475,7 @@ ROM_START( aliensj )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -482,7 +507,7 @@ ROM_START( aliensj2 )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -514,7 +539,7 @@ ROM_START( aliensa )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
@@ -526,38 +551,19 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( aliens_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "maincpu");
-	int offs = 0x18000;
+	int bank = 4;
 
+	if (lines & 0x10) 
+		bank -= 4;
 
-	if (lines & 0x10) offs -= 0x8000;
-
-	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr(device->machine,  "bank1", &RAM[offs] );
+	bank += (lines & 0x0f);
+	memory_set_bank(device->machine, "bank1", bank);
 }
 
-static MACHINE_RESET( aliens )
-{
-	UINT8 *RAM = memory_region(machine, "maincpu");
-
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), aliens_banking);
-
-	/* init the default bank */
-	memory_set_bankptr(machine,  "bank1", &RAM[0x10000]);
-}
-
-
-
-static DRIVER_INIT( aliens )
-{
-	state_save_register_global(machine, palette_selected);
-}
-
-
-GAME( 1990, aliens,   0,      aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, aliens2,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, aliens3,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)",          GAME_SUPPORTS_SAVE )
-GAME( 1990, aliensj,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, aliensj2, aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, aliensa,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Asia)",        GAME_SUPPORTS_SAVE )
+GAME( 1990, aliens,   0,      aliens, aliens, 0, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, 0, ROT0, "Konami", "Aliens (World set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, 0, ROT0, "Konami", "Aliens (World set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, 0, ROT0, "Konami", "Aliens (US)",          GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, 0, ROT0, "Konami", "Aliens (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, 0, ROT0, "Konami", "Aliens (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, 0, ROT0, "Konami", "Aliens (Asia)",        GAME_SUPPORTS_SAVE )

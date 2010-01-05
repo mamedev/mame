@@ -1,6 +1,3 @@
-#define MOO_DEBUG 0
-#define MOO_DMADELAY (100)
-
 /***************************************************************************
 
  Wild West C.O.W.boys of Moo Mesa
@@ -50,17 +47,10 @@ Bucky:
 #include "sound/k054539.h"
 #include "video/konicdev.h"
 #include "includes/konamipt.h"
+#include "includes/moo.h"
 
-VIDEO_START(moo);
-VIDEO_UPDATE(moo);
-
-static int init_nosound_count, game_type;
-static UINT16 *workram;
-static UINT16 protram[16];
-static UINT16 cur_control2;
-
-extern void moo_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-extern void moo_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+#define MOO_DEBUG 0
+#define MOO_DMADELAY (100)
 
 
 static const eeprom_interface eeprom_intf =
@@ -76,7 +66,8 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( control2_r )
 {
-	return cur_control2;
+	moo_state *state = (moo_state *)space->machine->driver_data;
+	return state->cur_control2;
 }
 
 static WRITE16_HANDLER( control2_w )
@@ -89,28 +80,27 @@ static WRITE16_HANDLER( control2_w )
 	/* bit 10 is watchdog */
 	/* bit 11 is enable irq 4 (unconfirmed) */
 
-	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	moo_state *state = (moo_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->cur_control2);
 
-	COMBINE_DATA(&cur_control2);
-
-	input_port_write(space->machine, "EEPROMOUT", cur_control2, 0xff);
+	input_port_write(space->machine, "EEPROMOUT", state->cur_control2, 0xff);
 
 	if (data & 0x100)
-		k053246_set_objcha_line(k053246, ASSERT_LINE);
+		k053246_set_objcha_line(state->k053246, ASSERT_LINE);
 	else
-		k053246_set_objcha_line(k053246, CLEAR_LINE);
+		k053246_set_objcha_line(state->k053246, CLEAR_LINE);
 }
 
 
-static void moo_objdma(running_machine *machine, int type)
+static void moo_objdma( running_machine *machine, int type )
 {
+	moo_state *state = (moo_state *)machine->driver_data;
 	int num_inactive;
 	UINT16 *src, *dst, zmask;
-	const device_config *k053246 = devtag_get_device(machine, "k053246");
-	int counter = k053247_get_dy(k053246);
+	int counter = k053247_get_dy(state->k053246);
 
-	k053247_get_ram(k053246, &dst);
-	src = machine->generic.spriteram.u16;
+	k053247_get_ram(state->k053246, &dst);
+	src = state->spriteram;
 	num_inactive = counter = 256;
 
 	zmask = (type) ? 0x00ff : 0xffff;
@@ -131,30 +121,31 @@ static void moo_objdma(running_machine *machine, int type)
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	if (cur_control2 & 0x800)
-		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	moo_state *state = (moo_state *)machine->driver_data;
+	if (state->cur_control2 & 0x800)
+		cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
-static INTERRUPT_GEN(moo_interrupt)
+static INTERRUPT_GEN( moo_interrupt )
 {
-	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
-
-	if (k053246_is_irq_enabled(k053246))
+	moo_state *state = (moo_state *)device->machine->driver_data;
+	if (k053246_is_irq_enabled(state->k053246))
 	{
-		moo_objdma(device->machine, game_type);
+		moo_objdma(device->machine, state->game_type);
 
 		// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 		timer_set(device->machine, ATTOTIME_IN_USEC(MOO_DMADELAY), NULL, 0, dmaend_callback);
 	}
 
 	// trigger V-blank interrupt
-	if (cur_control2 & 0x20)
+	if (state->cur_control2 & 0x20)
 		cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN(moobl_interrupt)
+static INTERRUPT_GEN( moobl_interrupt )
 {
-	moo_objdma(device->machine, game_type);
+	moo_state *state = (moo_state *)device->machine->driver_data;
+	moo_objdma(device->machine, state->game_type);
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 	timer_set(device->machine, ATTOTIME_IN_USEC(MOO_DMADELAY), NULL, 0, dmaend_callback);
@@ -165,7 +156,8 @@ static INTERRUPT_GEN(moobl_interrupt)
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	if((data & 0x00ff0000) == 0) {
+	if ((data & 0x00ff0000) == 0) 
+	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);
 	}
@@ -173,19 +165,19 @@ static WRITE16_HANDLER( sound_cmd1_w )
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	if((data & 0x00ff0000) == 0) {
+	if ((data & 0x00ff0000) == 0) 
 		soundlatch2_w(space, 0, data & 0xff);
-	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	moo_state *state = (moo_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch3_r(space,0);
+	return soundlatch3_r(space, 0);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -200,28 +192,28 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
-	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+	moo_state *state = (moo_state *)space->machine->driver_data;
 
 	if (offset & 0x0078)
-		return space->machine->generic.spriteram.u16[offset];
+		return state->spriteram[offset];
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return k053247_word_r(k053246, offset, mem_mask);
+		return k053247_word_r(state->k053246, offset, mem_mask);
 	}
 }
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
-	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+	moo_state *state = (moo_state *)space->machine->driver_data;
 
 	if (offset & 0x0078)
-		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
+		COMBINE_DATA(state->spriteram + offset);
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		k053247_word_w(k053246, offset, data, mem_mask);
+		k053247_word_w(state->k053246, offset, data, mem_mask);
 	}
 }
 
@@ -230,22 +222,23 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static WRITE16_HANDLER( moo_prot_w )
 {
+	moo_state *state = (moo_state *)space->machine->driver_data;
 	UINT32 src1, src2, dst, length, a, b, res;
 
-	COMBINE_DATA(&protram[offset]);
+	COMBINE_DATA(&state->protram[offset]);
 
 	if (offset == 0xc)	// trigger operation
 	{
-		src1 = (protram[1]&0xff)<<16 | protram[0];
-		src2 = (protram[3]&0xff)<<16 | protram[2];
-		dst = (protram[5]&0xff)<<16 | protram[4];
-		length = protram[0xf];
+		src1 = (state->protram[1] & 0xff) << 16 | state->protram[0];
+		src2 = (state->protram[3] & 0xff) << 16 | state->protram[2];
+		dst = (state->protram[5] & 0xff) << 16 | state->protram[4];
+		length = state->protram[0xf];
 
 		while (length)
 		{
 			a = memory_read_word(space, src1);
 			b = memory_read_word(space, src2);
-			res = a+2*b;
+			res = a + 2 * b;
 
 			memory_write_word(space, dst, res);
 
@@ -262,7 +255,7 @@ static WRITE16_DEVICE_HANDLER( moobl_oki_bank_w )
 {
 	logerror("%x to OKI bank\n", data);
 
-	okim6295_set_bank_base(device, (data & 0x0f)* 0x40000);
+	okim6295_set_bank_base(device, (data & 0x0f) * 0x40000);
 }
 
 static ADDRESS_MAP_START( moo_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -287,8 +280,8 @@ static ADDRESS_MAP_START( moo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_BASE(&workram)		/* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprite RAM */
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_BASE_MEMBER(moo_state, workram)		/* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_MEMBER(moo_state, spriteram)	/* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
@@ -321,8 +314,8 @@ static ADDRESS_MAP_START( moobl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&workram)		 /* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_GENERIC(spriteram)	 /* Sprite RAM */
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_MEMBER(moo_state, workram)		 /* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_MEMBER(moo_state, spriteram)	 /* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w) /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
@@ -332,7 +325,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bucky_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprite RAM */
+	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_BASE_MEMBER(moo_state, spriteram)	/* Sprite RAM */
 	AM_RANGE(0x0a0000, 0x0affff) AM_RAM							/* extra sprite RAM? */
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053246_word_w)
@@ -373,7 +366,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r,k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_r,k054539_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
@@ -438,15 +431,42 @@ INPUT_PORTS_END
 
 static MACHINE_START( moo )
 {
-	state_save_register_global(machine, cur_control2);
-	state_save_register_global_array(machine, protram);
+	moo_state *state = (moo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "soundcpu");
+	state->k054539 = devtag_get_device(machine, "k054539");
+	state->k053246 = devtag_get_device(machine, "k053246");
+	state->k053251 = devtag_get_device(machine, "k053251");
+	state->k056832 = devtag_get_device(machine, "k056832");
+	state->k054338 = devtag_get_device(machine, "k054338");
+
+	state_save_register_global(machine, state->cur_control2);
+	state_save_register_global(machine, state->alpha_enabled);
+	state_save_register_global(machine, state->sprite_colorbase);
+	state_save_register_global_array(machine, state->layer_colorbase);
+	state_save_register_global_array(machine, state->layerpri);
+	state_save_register_global_array(machine, state->protram);
 }
 
 static MACHINE_RESET( moo )
 {
-	init_nosound_count = 0;
-}
+	moo_state *state = (moo_state *)machine->driver_data;
+	int i;
 
+	for (i = 0; i < 16; i++)
+		state->protram[i] = 0;
+
+	for (i = 0; i < 4; i++)
+		state->layer_colorbase[i] = 0;
+
+	for (i = 0; i < 3; i++)
+		state->layerpri[i] = 0;
+
+	state->cur_control2 = 0;
+	state->alpha_enabled = 0;
+	state->sprite_colorbase = 0;
+}
 
 static const k056832_interface moo_k056832_intf =
 {
@@ -486,6 +506,9 @@ static const k054338_interface moo_k054338_intf =
 
 
 static MACHINE_DRIVER_START( moo )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(moo_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -527,12 +550,15 @@ static MACHINE_DRIVER_START( moo )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("konami", K054539, 48000)
+	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( moobl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(moo_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16100000)
@@ -617,7 +643,7 @@ ROM_START( moo ) /* Version EA - Euro Ver A */
 	ROM_LOAD( "151a12", 0x400000, 0x200000, CRC(4978555f) SHA1(d9871f21d0c8a512b408e137e2e80e9392c2bf6f) )
 	ROM_LOAD( "151a13", 0x600000, 0x200000, CRC(4771f525) SHA1(218d86b6230919b5db0304dac00513eb6b27ba9a) )
 
-	ROM_REGION( 0x200000, "konami", 0 )
+	ROM_REGION( 0x200000, "k054539", 0 )
 	/* K054539 samples */
 	ROM_LOAD( "151a08", 0x000000, 0x200000, CRC(962251d7) SHA1(32dccf515d2ca8eeffb45cada3dcc60089991b77) )
 ROM_END
@@ -649,7 +675,7 @@ ROM_START( mooua ) /* Version UA - USA Ver A */
 	ROM_LOAD( "151a12", 0x400000, 0x200000, CRC(4978555f) SHA1(d9871f21d0c8a512b408e137e2e80e9392c2bf6f) )
 	ROM_LOAD( "151a13", 0x600000, 0x200000, CRC(4771f525) SHA1(218d86b6230919b5db0304dac00513eb6b27ba9a) )
 
-	ROM_REGION( 0x200000, "konami", 0 )
+	ROM_REGION( 0x200000, "k054539", 0 )
 	/* K054539 samples */
 	ROM_LOAD( "151a08", 0x000000, 0x200000, CRC(962251d7) SHA1(32dccf515d2ca8eeffb45cada3dcc60089991b77) )
 ROM_END
@@ -681,7 +707,7 @@ ROM_START( mooaa ) /* Version AA - Asia Ver A */
 	ROM_LOAD( "151a12", 0x400000, 0x200000, CRC(4978555f) SHA1(d9871f21d0c8a512b408e137e2e80e9392c2bf6f) )
 	ROM_LOAD( "151a13", 0x600000, 0x200000, CRC(4771f525) SHA1(218d86b6230919b5db0304dac00513eb6b27ba9a) )
 
-	ROM_REGION( 0x200000, "konami", 0 )
+	ROM_REGION( 0x200000, "k054539", 0 )
 	/* K054539 samples */
 	ROM_LOAD( "151a08", 0x000000, 0x200000, CRC(962251d7) SHA1(32dccf515d2ca8eeffb45cada3dcc60089991b77) )
 ROM_END
@@ -713,7 +739,7 @@ ROM_START( bucky )
 	ROM_LOAD( "173a12.b10", 0x400000, 0x200000, CRC(0fc2ad24) SHA1(6eda1043ee1266b8ba938a03a90bc7787210a936) )
 	ROM_LOAD( "173a13.a10", 0x600000, 0x200000, CRC(4cf85439) SHA1(8c298bf0e659a830a1830a1180f4ce71215ade45) )
 
-	ROM_REGION( 0x400000, "konami", 0 )
+	ROM_REGION( 0x400000, "k054539", 0 )
 	/* K054539 samples */
 	ROM_LOAD("173a08.b6", 0x000000, 0x200000, CRC(dcdded95) SHA1(8eeb546a0b60a35a6dce36c5ee872e6c93c577c9) )
 	ROM_LOAD("173a09.a6", 0x200000, 0x200000, CRC(c93697c4) SHA1(0528a604868267a30d281b822c187df118566691) )
@@ -746,7 +772,7 @@ ROM_START( buckyua )
 	ROM_LOAD( "173a12.b10", 0x400000, 0x200000, CRC(0fc2ad24) SHA1(6eda1043ee1266b8ba938a03a90bc7787210a936) )
 	ROM_LOAD( "173a13.a10", 0x600000, 0x200000, CRC(4cf85439) SHA1(8c298bf0e659a830a1830a1180f4ce71215ade45) )
 
-	ROM_REGION( 0x400000, "konami", 0 )
+	ROM_REGION( 0x400000, "k054539", 0 )
 	/* K054539 samples */
 	ROM_LOAD("173a08.b6", 0x000000, 0x200000, CRC(dcdded95) SHA1(8eeb546a0b60a35a6dce36c5ee872e6c93c577c9) )
 	ROM_LOAD("173a09.a6", 0x200000, 0x200000, CRC(c93697c4) SHA1(0528a604868267a30d281b822c187df118566691) )
@@ -779,17 +805,12 @@ ROM_START( buckyaa )
 	ROM_LOAD( "173a12.b10", 0x400000, 0x200000, CRC(0fc2ad24) SHA1(6eda1043ee1266b8ba938a03a90bc7787210a936) )
 	ROM_LOAD(	 "173a13.a10", 0x600000, 0x200000, CRC(4cf85439) SHA1(8c298bf0e659a830a1830a1180f4ce71215ade45) )
 
-	ROM_REGION( 0x400000, "konami", 0 )
+	ROM_REGION( 0x400000, "k054539", 0 )
 	/* K054539 samples */
 	ROM_LOAD("173a08.b6", 0x000000, 0x200000, CRC(dcdded95) SHA1(8eeb546a0b60a35a6dce36c5ee872e6c93c577c9) )
 	ROM_LOAD("173a09.a6", 0x200000, 0x200000, CRC(c93697c4) SHA1(0528a604868267a30d281b822c187df118566691) )
 ROM_END
 
-
-static DRIVER_INIT( moo )
-{
-	game_type = (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"));
-}
 
 ROM_START( moobl )
 	ROM_REGION( 0x180000, "maincpu", 0 )
@@ -842,10 +863,17 @@ ROM_START( moobl )
 	ROM_CONTINUE(          0x300000+0x30000, 0x010000)//bank c hi
 ROM_END
 
-GAME( 1992, moo,     0,       moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver EA)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1992, mooua,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1992, mooaa,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AA)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1992, moobl,   moo,     moobl,   moo,     moo,      ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg ver AA)", GAME_NOT_WORKING)
-GAME( 1992, bucky,   0,       bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EA)", 0)
-GAME( 1992, buckyua, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UA)", 0)
-GAME( 1992, buckyaa, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver AA)", 0)
+static DRIVER_INIT( moo )
+{
+	moo_state *state = (moo_state *)machine->driver_data;
+	state->game_type = (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"));
+}
+
+
+GAME( 1992, moo,     0,       moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver EA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, mooua,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, mooaa,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, moobl,   moo,     moobl,   moo,     moo,      ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg ver AA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1992, bucky,   0,       bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, buckyua, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, buckyaa, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver AA)", GAME_SUPPORTS_SAVE )

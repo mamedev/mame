@@ -354,6 +354,13 @@ void konamid_rom_deinterleave_2_half(running_machine *machine, const char *mem_r
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
 void konamid_rom_deinterleave_4(running_machine *machine, const char *mem_region);
 
+/* helper function to sort three tile layers by priority order */
+void konami_sortlayers3(int *layer, int *pri);
+/* helper function to sort four tile layers by priority order */
+void konami_sortlayers4(int *layer, int *pri);
+/* helper function to sort five tile layers by priority order */
+void konami_sortlayers5(int *layer, int *pri);
+
 /***************************************************************************
     DEVICE I/O FUNCTIONS
 ***************************************************************************/

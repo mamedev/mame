@@ -1,12 +1,12 @@
 /***************************************************************************
 
-"AJAX/Typhoon"  (Konami GX770)
+    "AJAX/Typhoon"  (Konami GX770)
 
-Driver by:
-    Manuel Abadia <manu@teleline.es>
+    Driver by:
+        Manuel Abadia <manu@teleline.es>
 
-TO DO:
-- Find the CPU core bug, that makes the 052001 to read from 0x0000
+    TO DO:
+    - Find the CPU core bug, that makes the 052001 to read from 0x0000
 
 ***************************************************************************/
 
@@ -22,11 +22,6 @@ TO DO:
 
 static WRITE8_DEVICE_HANDLER( k007232_extvol_w );
 static WRITE8_HANDLER( sound_bank_w );
-
-extern void ajax_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void ajax_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void ajax_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
-
 
 /****************************************************************************/
 
@@ -56,9 +51,9 @@ static ADDRESS_MAP_START( ajax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM F6 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM 2128SL at D16 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)		/* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r, k007232_w)		/* 007232 registers (chip 2) */
-	AM_RANGE(0xb80c, 0xb80c) AM_DEVWRITE("konami2", k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_r, k007232_w)		/* 007232 registers (chip 1) */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_r, k007232_w)		/* 007232 registers (chip 2) */
+	AM_RANGE(0xb80c, 0xb80c) AM_DEVWRITE("k007232_2", k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)				/* soundlatch_r */
@@ -142,35 +137,36 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( sound_bank_w )
 {
+	ajax_state *state = (ajax_state *)space->machine->driver_data;
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
-	bank_A = ((data >> 1) & 0x01);
-	bank_B = ((data >> 0) & 0x01);
-	k007232_set_bank( devtag_get_device(space->machine, "konami1"), bank_A, bank_B );
+	bank_A = BIT(data, 1);
+	bank_B = BIT(data, 0);
+	k007232_set_bank(state->k007232_1, bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank( devtag_get_device(space->machine, "konami2"), bank_A, bank_B );
+	k007232_set_bank(state->k007232_2, bank_A, bank_B);
 }
 
 static void volume_callback0(const device_config *device, int v)
 {
-	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
 static WRITE8_DEVICE_HANDLER( k007232_extvol_w )
 {
 	/* channel A volume (mono) */
-	k007232_set_volume(device,0,(data & 0x0f) * 0x11/2,(data & 0x0f) * 0x11/2);
+	k007232_set_volume(device, 0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
 }
 
 static void volume_callback1(const device_config *device, int v)
 {
 	/* channel B volume/pan */
-	k007232_set_volume(device,1,(v & 0x0f) * 0x11/2,(v >> 4) * 0x11/2);
+	k007232_set_volume(device, 1, (v & 0x0f) * 0x11/2, (v >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =
@@ -210,6 +206,9 @@ static const k051316_interface ajax_k051316_intf =
 };
 
 static MACHINE_DRIVER_START( ajax )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ajax_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 12/4 MHz*/
@@ -252,14 +251,14 @@ static MACHINE_DRIVER_START( ajax )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami1", K007232, 3579545)
+	MDRV_SOUND_ADD("k007232_1", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface_1)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MDRV_SOUND_ADD("konami2", K007232, 3579545)
+	MDRV_SOUND_ADD("k007232_2", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -326,13 +325,13 @@ ROM_START( ajax )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "63s241.j11",	0x0000, 0x0200, CRC(9bdd719f) SHA1(de98e562080a97714047a8ad17abc6662c188897) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x040000, "konami1", 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x040000, "k007232_1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "770c10-a.a7",		0x000000, 0x010000, CRC(e45ec094) SHA1(540c56e1d778e6082db23aa3da64f6179b1f3635) )
 	ROM_LOAD( "770c10-b.a6",		0x010000, 0x010000, CRC(349db7d3) SHA1(210da067038abeb021a77b3bf2664c9a49b3410a) )
 	ROM_LOAD( "770c10-c.a5",		0x020000, 0x010000, CRC(71cb1f05) SHA1(57399806746b659f52114fb7bd4e11a7992a2c5d) )
 	ROM_LOAD( "770c10-d.a4",		0x030000, 0x010000, CRC(e8ab1844) SHA1(dc22c4d11d6396a051398ba9ec6380aa3f856e71) )
 
-	ROM_REGION( 0x080000, "konami2", 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, "k007232_2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "770c11-a.c6",		0x000000, 0x010000, CRC(8cccd9e0) SHA1(73e50a896ed212462046b7bfa04aad5e266425ca) )
 	ROM_LOAD( "770c11-b.c5",		0x010000, 0x010000, CRC(0af2fedd) SHA1(038189210a73f668a0d913ff2dfc4ffa2e6bd5f4) )
 	ROM_LOAD( "770c11-c.c4",		0x020000, 0x010000, CRC(7471f24a) SHA1(04d7a69ddc01017a773485fa891711d94c8ad47c) )
@@ -372,10 +371,10 @@ ROM_START( typhoon )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "63s241.j11",	0x0000, 0x0200, CRC(9bdd719f) SHA1(de98e562080a97714047a8ad17abc6662c188897) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x040000, "konami1", 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x040000, "k007232_1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "770c10",		0x000000, 0x040000, CRC(7fac825f) SHA1(581522d7a02dad16d2803ff344b4db133f767e6b) )
 
-	ROM_REGION( 0x080000, "konami2", 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, "k007232_2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "770c11",		0x000000, 0x080000, CRC(299a615a) SHA1(29cdcc21998c72f4cf311792b904b79bde236bab) )
 ROM_END
 
@@ -408,10 +407,10 @@ ROM_START( ajaxj )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "63s241.j11",	0x0000, 0x0200, CRC(9bdd719f) SHA1(de98e562080a97714047a8ad17abc6662c188897) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x040000, "konami1", 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x040000, "k007232_1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "770c10",		0x000000, 0x040000, CRC(7fac825f) SHA1(581522d7a02dad16d2803ff344b4db133f767e6b) )
 
-	ROM_REGION( 0x080000, "konami2", 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, "k007232_2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "770c11",		0x000000, 0x080000, CRC(299a615a) SHA1(29cdcc21998c72f4cf311792b904b79bde236bab) )
 ROM_END
 

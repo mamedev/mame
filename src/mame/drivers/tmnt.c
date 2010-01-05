@@ -33,7 +33,7 @@ Updates:
 - blswhstl: sprites are left on screen during attract mode(fixed)
   Sprite buffer should be cleared at vblank start. On the GX OBJDMA
   automatically occurs 32.0-42.7us after clearing but on older boards
-  using the K053245, DMA must be triggered manually. The game uses a
+  using the k053245, DMA must be triggered manually. The game uses a
   trick to disable sprites by simply not triggering OBJDMA.
 - a garbage sprite is STILL sticking on screen in ssriders.(fixed)
 - sprite colors / zoomed placement in tmnt2(improved MCU sim)
@@ -80,121 +80,103 @@ Updates:
 #include "includes/tmnt.h"
 #include "includes/konamipt.h"
 
+static UINT16 cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
-extern void mia_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void cuebrick_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void tmnt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void ssbl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void blswhstl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void mia_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void tmnt_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void punkshot_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void thndrx2_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
-extern void blswhstl_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
-extern void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
-
-WRITE16_HANDLER( ssriders_eeprom_w );	/* in video/tmnt.c */
-
-static int tmnt_soundlatch;
-static int cuebrick_snd_irqlatch, cuebrick_nvram_bank;
-static UINT16 cuebrick_nvram[0x400*0x20];	// 32k paged in a 1k window
-static INT16 *sampledata;
-
-
-static READ16_HANDLER( K052109_word_noA12_r )
+static READ16_HANDLER( k052109_word_noA12_r )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return k052109_word_r(k052109, offset, mem_mask);
+	return k052109_word_r(state->k052109, offset, mem_mask);
 }
 
-static WRITE16_HANDLER( K052109_word_noA12_w )
+static WRITE16_HANDLER( k052109_word_noA12_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	k052109_word_w(k052109, offset, data, mem_mask);
+	k052109_word_w(state->k052109, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER( punkshot_K052109_word_w )
+static WRITE16_HANDLER( punkshot_k052109_word_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		k052109_w(k052109, offset, (data >> 8) & 0xff);
+		k052109_w(state->k052109, offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		k052109_w(k052109, offset + 0x2000, data & 0xff);
+		k052109_w(state->k052109, offset + 0x2000, data & 0xff);
 }
 
-static WRITE16_HANDLER( punkshot_K052109_word_noA12_w )
+static WRITE16_HANDLER( punkshot_k052109_word_noA12_w )
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	punkshot_K052109_word_w(space, offset, data, mem_mask);
+	punkshot_k052109_word_w(space, offset, data, mem_mask);
 }
 
 
 /* the interface with the 053245 is weird. The chip can address only 0x800 bytes */
 /* of RAM, but they put 0x4000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053245. */
-static READ16_HANDLER( K053245_scattered_word_r )
+static READ16_HANDLER( k053245_scattered_word_r )
 {
-	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	if (offset & 0x0031)
 		return space->machine->generic.spriteram.u16[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return k053245_word_r(k053245, offset, mem_mask);
+		return k053245_word_r(state->k053245, offset, mem_mask);
 	}
 }
 
-static WRITE16_HANDLER( K053245_scattered_word_w )
+static WRITE16_HANDLER( k053245_scattered_word_w )
 {
-	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	COMBINE_DATA(space->machine->generic.spriteram.u16 + offset);
 
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		k053245_word_w(k053245, offset, data, mem_mask);
+		k053245_word_w(state->k053245, offset, data, mem_mask);
 	}
 }
 
-static READ16_HANDLER( K053244_word_noA1_r )
+static READ16_HANDLER( k053244_word_noA1_r )
 {
-	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	offset &= ~1;	/* handle mirror address */
 
-	return k053244_r(k053245, offset + 1) | (k053244_r(k053245, offset) << 8);
+	return k053244_r(state->k053245, offset + 1) | (k053244_r(state->k053245, offset) << 8);
 }
 
-static WRITE16_HANDLER( K053244_word_noA1_w )
+static WRITE16_HANDLER( k053244_word_noA1_w )
 {
-	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	offset &= ~1;	/* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		k053244_w(k053245, offset, (data >> 8) & 0xff);
+		k053244_w(state->k053245, offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		k053244_w(k053245, offset + 1, data & 0xff);
+		k053244_w(state->k053245, offset + 1, data & 0xff);
 }
 
 static INTERRUPT_GEN(cuebrick_interrupt)
 {
+	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+
 	// cheap IRQ multiplexing to avoid losing sound IRQs
 	switch (cpu_getiloops(device))
 	{
@@ -203,7 +185,7 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 			break;
 
 		default:
-			if (cuebrick_snd_irqlatch)
+			if (state->cuebrick_snd_irqlatch)
 				cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 			break;
 	}
@@ -211,17 +193,17 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 
 static INTERRUPT_GEN( punkshot_interrupt )
 {
-	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
 
-	if (k052109_is_irq_enabled(k052109))
+	if (k052109_is_irq_enabled(state->k052109))
 		irq4_line_hold(device);
 }
 
 static INTERRUPT_GEN( lgtnfght_interrupt )
 {
-	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
 
-	if (k052109_is_irq_enabled(k052109))
+	if (k052109_is_irq_enabled(state->k052109))
 		irq5_line_hold(device);
 }
 
@@ -242,15 +224,16 @@ static READ8_DEVICE_HANDLER( punkshot_sound_r )
 
 static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
 {
+	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
 	k053260_w(device, offset, data);
 
 	if (offset)
-		cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+		cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ16_HANDLER( prmrsocr_sound_r )
 {
-	return soundlatch3_r(space,0);
+	return soundlatch3_r(space, 0);
 }
 
 static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
@@ -258,44 +241,47 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		if (offset == 0) soundlatch_w(space, 0, data);
-		else soundlatch2_w(space, 0, data);
+		if (offset == 0) 
+			soundlatch_w(space, 0, data);
+		else 
+			soundlatch2_w(space, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
-
-	memory_set_bankptr(space->machine, "bank1",rom + (data & 7) * 0x4000);
+	memory_set_bank(space->machine, "bank1", data & 7);
 }
 
 
 static READ8_HANDLER( tmnt_sres_r )
 {
-	return tmnt_soundlatch;
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	return state->tmnt_soundlatch;
 }
 
 static WRITE8_HANDLER( tmnt_sres_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
-	const device_config *upd = devtag_get_device(space->machine, "upd");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	/* bit 1 resets the UPD7795C sound chip */
-	upd7759_reset_w(upd, data & 2);
+	upd7759_reset_w(state->upd, data & 2);
 
 	/* bit 2 plays the title music */
 	if (data & 0x04)
 	{
-		if (!sample_playing(samples, 0))	sample_start_raw(samples,0,sampledata,0x40000,20000,0);
+		if (!sample_playing(state->samples, 0))	
+			sample_start_raw(state->samples, 0, state->sampledata, 0x40000, 20000, 0);
 	}
-	else sample_stop(samples, 0);
-	tmnt_soundlatch = data;
+	else 	
+		sample_stop(state->samples, 0);
+	state->tmnt_soundlatch = data;
 }
 
 static WRITE8_DEVICE_HANDLER( tmnt_upd_start_w )
@@ -312,10 +298,12 @@ static READ8_DEVICE_HANDLER( tmnt_upd_busy_r )
 static SAMPLES_START( tmnt_decode_sample )
 {
 	running_machine *machine = device->machine;
+	tmnt_state *state = (tmnt_state *)machine->driver_data;
 	int i;
 	UINT8 *source = memory_region(machine, "title");
 
-	sampledata = auto_alloc_array(machine, INT16, 0x40000);
+	state->sampledata = auto_alloc_array(machine, INT16, 0x40000);
+	state_save_register_global_pointer(machine, state->sampledata, 0x40000);
 
 	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
      *
@@ -325,17 +313,17 @@ static SAMPLES_START( tmnt_decode_sample )
      *  (Sound info courtesy of Dave <dave@finalburn.com>)
      */
 
-	for (i = 0;i < 0x40000;i++)
+	for (i = 0; i < 0x40000; i++)
 	{
-		int val = source[2*i] + source[2*i+1] * 256;
+		int val = source[2 * i] + source[2 * i + 1] * 256;
 		int expo = val >> 13;
 
 		val = (val >> 3) & (0x3ff);	/* 10 bit, Max Amplitude 0x400 */
 		val -= 0x200;					/* Centralize value */
 
-		val <<= (expo-3);
+		val <<= (expo - 3);
 
-		sampledata[i] = val;
+		state->sampledata[i] = val;
 	}
 }
 
@@ -352,14 +340,16 @@ static void sound_nmi_callback( int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 //  sound_nmi_enabled = 1;
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
 
@@ -376,7 +366,7 @@ static READ16_HANDLER( punkshot_kludge_r )
 /* protection simulation derived from a bootleg */
 static READ16_HANDLER( ssriders_protection_r )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	int data = memory_read_word(space, 0x105a0a);
 	int cmd = memory_read_word(space, 0x1058fc);
 
@@ -408,7 +398,7 @@ static READ16_HANDLER( ssriders_protection_r )
 			data = -memory_read_word(space, 0x105818);
 			data = ((data / 8 - 4) & 0x1f) * 0x40;
 			data += ((memory_read_word(space, 0x105cb0) +
-						256 * k052109_r(k052109, 0x1a01) + k052109_r(k052109, 0x1a00) - 6) / 8 + 12) & 0x3f;
+						256 * k052109_r(state->k052109, 0x1a01) + k052109_r(state->k052109, 0x1a00) - 6) / 8 + 12) & 0x3f;
 			return data;
 
 		default:
@@ -420,23 +410,23 @@ static READ16_HANDLER( ssriders_protection_r )
 
 static WRITE16_HANDLER( ssriders_protection_w )
 {
-	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	if (offset == 1)
 	{
-		int logical_pri,hardware_pri;
+		int logical_pri, hardware_pri;
 
 		/* create sprite priority attributes */
 		hardware_pri = 1;
-		for (logical_pri = 1;logical_pri < 0x100;logical_pri <<= 1)
+		for (logical_pri = 1; logical_pri < 0x100; logical_pri <<= 1)
 		{
 			int i;
 
-			for (i = 0;i < 128;i++)
+			for (i = 0; i < 128; i++)
 			{
-				if ((memory_read_word(space, 0x180006 + 128*i) >> 8) == logical_pri)
+				if ((memory_read_word(space, 0x180006 + 128 * i) >> 8) == logical_pri)
 				{
-					k053245_word_w(k053245, 8 * i, hardware_pri, 0x00ff);
+					k053245_word_w(state->k053245, 8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -466,21 +456,21 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( blswhstl_coin_r )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	int res;
-	static int toggle;
 
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
 	res = input_port_read(space->machine, "COINS");
 
-	toggle ^= 0x40;
-	return res ^ toggle;
+	state->toggle ^= 0x40;
+	return res ^ state->toggle;
 }
 
 static READ16_HANDLER( ssriders_eeprom_r )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	int res;
-	static int toggle;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
@@ -488,14 +478,14 @@ static READ16_HANDLER( ssriders_eeprom_r )
 	/* bit 7 is service button */
 	res = input_port_read(space->machine, "EEPROM");
 
-	toggle ^= 0x04;
-	return res ^ toggle;
+	state->toggle ^= 0x04;
+	return res ^ state->toggle;
 }
 
 static READ16_HANDLER( sunsetbl_eeprom_r )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	int res;
-	static int toggle;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
@@ -503,8 +493,8 @@ static READ16_HANDLER( sunsetbl_eeprom_r )
 	/* bit 3 is service button */
 	res = input_port_read(space->machine, "EEPROM");
 
-	toggle ^= 0x04;
-	return res ^ toggle;
+	state->toggle ^= 0x04;
+	return res ^ state->toggle;
 }
 
 static WRITE16_HANDLER( blswhstl_eeprom_w )
@@ -531,22 +521,21 @@ static const eeprom_interface thndrx2_eeprom_intf =
 
 static READ16_HANDLER( thndrx2_eeprom_r )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	int res;
-	static int toggle;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
 	res = input_port_read(space->machine, "P2/EEPROM");
-	toggle ^= 0x0800;
-	return (res ^ toggle);
+	state->toggle ^= 0x0800;
+	return (res ^ state->toggle);
 }
 
 static WRITE16_HANDLER( thndrx2_eeprom_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	static int last;
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -556,12 +545,12 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 		/* bit 5 triggers IRQ on sound cpu */
-		if (last == 0 && (data & 0x20) != 0)
-			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
-		last = data & 0x20;
+		if (state->last == 0 && (data & 0x20) != 0)
+			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		state->last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(state->k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -569,7 +558,7 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		prmrsocr_122000_w(space,offset,data,mem_mask);
+		prmrsocr_122000_w(space, offset, data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -583,17 +572,20 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 
 static READ16_HANDLER( cuebrick_nv_r )
 {
-	return cuebrick_nvram[offset + (cuebrick_nvram_bank*0x400/2)];
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	return cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
 }
 
 static WRITE16_HANDLER( cuebrick_nv_w )
 {
-       COMBINE_DATA(&cuebrick_nvram[offset + (cuebrick_nvram_bank*0x400/2)]);
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+       COMBINE_DATA(&cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
 static WRITE16_HANDLER( cuebrick_nvbank_w )
 {
-	cuebrick_nvram_bank = (data>>8);
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	state->cuebrick_nvram_bank = data >> 8;
 }
 
 static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -611,7 +603,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w)
 	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0xff00)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
@@ -632,7 +624,7 @@ static ADDRESS_MAP_START( mia_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #if 0
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
 #endif
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
@@ -653,7 +645,7 @@ static ADDRESS_MAP_START( tmnt_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0014, 0x0a0015) AM_READ_PORT("P4")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
@@ -669,11 +661,11 @@ static ADDRESS_MAP_START( punkshot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(punkshot_0a0020_w)
-	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x0a0040, 0x0a0041) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
+	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREAD8("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x0a0040, 0x0a0041) AM_DEVWRITE8("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, punkshot_K052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
 	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
@@ -691,30 +683,32 @@ static ADDRESS_MAP_START( lgtnfght_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0008, 0x0a0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_WRITE(lgtnfght_0a0018_w)
-	AM_RANGE(0x0a0020, 0x0a0023) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x0a0020, 0x0a0021) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
+	AM_RANGE(0x0a0020, 0x0a0023) AM_DEVREAD8("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x0a0020, 0x0a0021) AM_DEVWRITE8("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE("k053251", k053251_lsb_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 ADDRESS_MAP_END
 
 
 static WRITE16_HANDLER( ssriders_soundkludge_w )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+
 	/* I think this is more than just a trigger */
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_lsb_r, k054000_lsb_w)
-	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
+	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ(blswhstl_coin_r)
@@ -722,31 +716,30 @@ static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
 	AM_RANGE(0x700300, 0x700301) AM_WRITE(blswhstl_700300_w)
 	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
+	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_lsb_w)
 ADDRESS_MAP_END
 
 
-static WRITE16_HANDLER( K053251_glfgreat_w )
+static WRITE16_HANDLER( k053251_glfgreat_w )
 {
-	const device_config *k053251 = devtag_get_device(space->machine, "k053251");
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	int i;
 
 	if (ACCESSING_BITS_8_15)
 	{
-		k053251_w(k053251, offset, (data >> 8) & 0xff);
+		k053251_w(state->k053251, offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
         and got marked as dirty in the write above... how was the original hardware working?!? */
 		for (i = 0; i < 3; i++)
 		{
-			if (k053251_get_tmap_dirty(k053251, 2 + i))
+			if (k053251_get_tmap_dirty(state->k053251, 2 + i))
 			{
-				k052109_tilemap_mark_dirty(k052109, i);
-				k053251_set_tmap_dirty(k053251, 2 + i, 0);
+				k052109_tilemap_mark_dirty(state->k052109, i);
+				k053251_set_tmap_dirty(state->k053251, 2 + i, 0);
 			}
 		}
 	}
@@ -755,14 +748,14 @@ static WRITE16_HANDLER( K053251_glfgreat_w )
 static ADDRESS_MAP_START( glfgreat_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)	/* 053936? */
-	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
+	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_glfgreat_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x120004, 0x120005) AM_READ_PORT("COINS/DSW3")
@@ -770,8 +763,8 @@ static ADDRESS_MAP_START( glfgreat_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x121000, 0x121001) AM_READ(glfgreat_ball_r)	/* returns the color of the center pixel of the roz layer */
 	AM_RANGE(0x122000, 0x122001) AM_WRITE(glfgreat_122000_w)
 	AM_RANGE(0x124000, 0x124001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x125000, 0x125003) AM_DEVREADWRITE8("konami", punkshot_sound_r, glfgreat_sound_w, 0xff00)	/* K053260 */
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x125000, 0x125003) AM_DEVREADWRITE8("k053260", punkshot_sound_r, glfgreat_sound_w, 0xff00)	/* K053260 */
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(glfgreat_rom_r)
 ADDRESS_MAP_END
 
@@ -779,86 +772,94 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( prmrsocr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
-	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
+	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_glfgreat_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
 	AM_RANGE(0x12100c, 0x12100f) AM_WRITE(prmrsocr_sound_cmd_w)
 	AM_RANGE(0x121014, 0x121015) AM_READ(prmrsocr_sound_r)
 	AM_RANGE(0x122000, 0x122001) AM_WRITE(prmrsocr_eeprom_w)	/* EEPROM + video control */
 	AM_RANGE(0x123000, 0x123001) AM_WRITE(prmrsocr_sound_irq_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x300000, 0x33ffff) AM_READ(prmrsocr_rom_r)
 ADDRESS_MAP_END
 
 
-static UINT16 *tmnt2_1c0800,*sunset_104000;
-static UINT16 *tmnt2_rom;
-
 #if 1
-INLINE UINT32 tmnt2_get_word(running_machine *machine, UINT32 addr)
+INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
 {
-	if (addr <= 0x07ffff/2) return(tmnt2_rom[addr]); else
-	if (addr >= 0x104000/2 && addr <= 0x107fff/2) return(sunset_104000[addr-0x104000/2]); else
-	if (addr >= 0x180000/2 && addr <= 0x183fff/2) return(machine->generic.spriteram.u16[addr-0x180000/2]);
-	return(0);
+	tmnt_state *state = (tmnt_state *)machine->driver_data;
+
+	if (addr <= 0x07ffff / 2) 
+		return(state->tmnt2_rom[addr]); 
+	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2) 
+		return(state->sunset_104000[addr - 0x104000 / 2]); 
+	else if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2) 
+		return(machine->generic.spriteram.u16[addr - 0x180000 / 2]);
+	return 0;
 }
 
-static void tmnt2_put_word(const address_space *space, UINT32 addr, UINT16 data)
+static void tmnt2_put_word( const address_space *space, UINT32 addr, UINT16 data )
 {
-	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 
 	UINT32 offs;
-	if (addr >= 0x180000/2 && addr <= 0x183fff/2)
+	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
 	{
-		space->machine->generic.spriteram.u16[addr-0x180000/2] = data;
-		offs = addr-0x180000/2;
+		space->machine->generic.spriteram.u16[addr - 0x180000 / 2] = data;
+		offs = addr - 0x180000 / 2;
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			k053245_word_w(k053245, offs, data, 0xffff);
+			k053245_word_w(state->k053245, offs, data, 0xffff);
 		}
 	}
-	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;
+	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2) 
+		state->sunset_104000[addr - 0x104000 / 2] = data;
 }
 
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
 	UINT32 src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
 	UINT16 *mcu;
 	UINT16 src[4], mod[24];
 	UINT8 keepaspect, xlock, ylock, zlock;
 
-	COMBINE_DATA(tmnt2_1c0800 + offset);
+	COMBINE_DATA(state->tmnt2_1c0800 + offset);
 
-	if (offset != 0x18/2 || !ACCESSING_BITS_8_15) return;
+	if (offset != 0x18/2 || !ACCESSING_BITS_8_15) 
+		return;
 
-	mcu = tmnt2_1c0800;
-	if ((mcu[8] & 0xff00) != 0x8200) return;
+	mcu = state->tmnt2_1c0800;
+	if ((mcu[8] & 0xff00) != 0x8200) 
+		return;
 
-	src_addr = (mcu[0] | (mcu[1]&0xff)<<16) >> 1;
-	dst_addr = (mcu[2] | (mcu[3]&0xff)<<16) >> 1;
-	mod_addr = (mcu[4] | (mcu[5]&0xff)<<16) >> 1;
+	src_addr = (mcu[0] | (mcu[1] & 0xff) << 16) >> 1;
+	dst_addr = (mcu[2] | (mcu[3] & 0xff) << 16) >> 1;
+	mod_addr = (mcu[4] | (mcu[5] & 0xff) << 16) >> 1;
 	zlock    = (mcu[8] & 0xff) == 0x0001;
 
-	for (i=0; i< 4; i++) src[i] = tmnt2_get_word(space->machine, src_addr + i);
-	for (i=0; i<24; i++) mod[i] = tmnt2_get_word(space->machine, mod_addr + i);
+	for (i = 0; i < 4; i++) 
+		src[i] = tmnt2_get_word(space->machine, src_addr + i);
+	for (i = 0; i < 24; i++) mod[i] = 
+		tmnt2_get_word(space->machine, mod_addr + i);
 
 	code = src[0];			// code
 
-	i= src[1];
-	attr1 = i>>2 & 0x3f00;	// flip y, flip x and sprite size
+	i = src[1];
+	attr1 = i >> 2 & 0x3f00;	// flip y, flip x and sprite size
 	attr2 = i & 0x380;		// mirror y, mirror x, shadow
 	cbase = i & 0x01f;		// base color
-	cmod  = mod[0x2a/2]>>8;
+	cmod  = mod[0x2a / 2] >> 8;
 	color = (cbase != 0x0f && cmod <= 0x1f && !zlock) ? cmod : cbase;
 
 	xoffs = (INT16)src[2];	// local x
@@ -875,8 +876,8 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	xmod = (INT16)mod[6];	// global x
 	ymod = (INT16)mod[7];	// global y
 	zmod = (INT16)mod[8];	// global z
-	xzoom = mod[0x1c/2];
-	yzoom = (keepaspect) ? xzoom : mod[0x1e/2];
+	xzoom = mod[0x1c / 2];
+	yzoom = (keepaspect) ? xzoom : mod[0x1e / 2];
 
 	ylock = xlock = (i & 0x0020 && (!xzoom || xzoom == 0x100));
 
@@ -891,7 +892,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
         The most accurate method is to trace how MCU zoom is transformed
         from ROM data, reverse the maths, plug the result into the sprite
         zoom code and derive the scale factor from there; but zooming
-        would still suffer from precision loss in K053245_sprites_draw()
+        would still suffer from precision loss in k053245_sprites_draw()
         and drawgfx() producing gaps in logical sprite groups.
 
         A few sample points on the real curve:
@@ -915,7 +916,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		}
 		else if (i < 0)
 		{
-			i = (i>>3) + (i>>4) + (i>>5) + (i>>6) + xzoom;
+			i = (i >> 3) + (i >> 4) + (i >> 5) + (i >> 6) + xzoom;
 			xoffs = (i > 0) ? (xoffs * i / 0x4f00) : 0;
 		}
 	}
@@ -929,7 +930,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		}
 		else if (i < 0)
 		{
-			i = (i>>3) + (i>>4) + (i>>5) + (i>>6) + yzoom;
+			i = (i >> 3) + (i >> 4) + (i >> 5) + (i >> 6) + yzoom;
 			yoffs = (i > 0) ? (yoffs * i / 0x4f00) : 0;
 		}
 
@@ -947,8 +948,9 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 #else // for reference; do not remove
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
-	COMBINE_DATA( tmnt2_1c0800 + offset);
-	if ( offset == 0x0008 && ( tmnt2_1c0800[0x8] & 0xff00 ) == 0x8200 )
+	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	COMBINE_DATA(state->tmnt2_1c0800 + offset);
+	if (offset == 0x0008 && (state->tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
 	{
 		UINT32 CellSrc;
 		UINT32 CellVar;
@@ -956,18 +958,18 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		int dst;
 		int x,y;
 
-		CellVar = tmnt2_1c0800[0x04] | (tmnt2_1c0800[0x05] << 16 );
-		dst = tmnt2_1c0800[0x02] | (tmnt2_1c0800[0x03] << 16 );
-		CellSrc = tmnt2_1c0800[0x00] | (tmnt2_1c0800[0x01] << 16 );
-//        if ( CellDest >= 0x180000 && CellDest < 0x183fe0 ) {
+		CellVar = state->tmnt2_1c0800[0x04] | (state->tmnt2_1c0800[0x05] << 16 );
+		dst = state->tmnt2_1c0800[0x02] | (state->tmnt2_1c0800[0x03] << 16 );
+		CellSrc = state->tmnt2_1c0800[0x00] | (state->tmnt2_1c0800[0x01] << 16 );
+//        if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
 		CellVar -= 0x104000;
 		src = (UINT16 *)(memory_region(space->machine, "maincpu") + CellSrc);
 
 		CellVar >>= 1;
 
-		memory_write_word(space,dst+0x00, 0x8000 | ((src[1] & 0xfc00) >> 2));	/* size, flip xy */
-		memory_write_word(space,dst+0x04, src[0]);	/* code */
-		memory_write_word(space,dst+0x18, (src[1] & 0x3ff) ^		/* color, mirror, priority */
+		memory_write_word(space, dst + 0x00, 0x8000 | ((src[1] & 0xfc00) >> 2));	/* size, flip xy */
+		memory_write_word(space, dst + 0x04, src[0]);	/* code */
+		memory_write_word(space, dst + 0x18, (src[1] & 0x3ff) ^		/* color, mirror, priority */
 				(sunset_104000[CellVar + 0x00] & 0x0060));
 
 		/* base color modifier */
@@ -976,55 +978,55 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		/* It fixes the enemies, though, they are not all purple when you throw them around. */
 		/* Also, the bosses don't blink when they are about to die - don't know */
 		/* if this is correct or not. */
-//      if (sunset_104000[CellVar + 0x15] & 0x001f)
-//          memory_write_word(dst+0x18,(memory_read_word(space, dst+0x18) & 0xffe0) |
-//                  (sunset_104000[CellVar + 0x15] & 0x001f));
+//      if (state->sunset_104000[CellVar + 0x15] & 0x001f)
+//          memory_write_word(dst + 0x18, (memory_read_word(space, dst + 0x18) & 0xffe0) |
+//                  (state->sunset_104000[CellVar + 0x15] & 0x001f));
 
 		x = src[2];
-		if (sunset_104000[CellVar + 0x00] & 0x4000)
+		if (state->sunset_104000[CellVar + 0x00] & 0x4000)
 		{
 			/* flip x */
-			memory_write_word(space,dst+0x00,memory_read_word(space, dst+0x00) ^ 0x1000);
+			memory_write_word(space, dst + 0x00, memory_read_word(space, dst + 0x00) ^ 0x1000);
 			x = -x;
 		}
-		x += sunset_104000[CellVar + 0x06];
-		memory_write_word(space,dst+0x0c,x);
+		x += state->sunset_104000[CellVar + 0x06];
+		memory_write_word(space, dst + 0x0c, x);
 		y = src[3];
-		y += sunset_104000[CellVar + 0x07];
+		y += state->sunset_104000[CellVar + 0x07];
 		/* don't do second offset for shadows */
-		if ((tmnt2_1c0800[0x08] & 0x00ff) != 0x01)
-			y += sunset_104000[CellVar + 0x08];
-		memory_write_word(space,dst+0x08,y);
+		if ((state->tmnt2_1c0800[0x08] & 0x00ff) != 0x01)
+			y += state->sunset_104000[CellVar + 0x08];
+		memory_write_word(space, dst + 0x08, y);
 #if 0
 logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers %08x:%04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x\n",
-	tmnt2_1c0800[0x05],
+	state->tmnt2_1c0800[0x05],
 	CellDest,CellSrc,
 	src[0], src[1], src[2], src[3],
 	CellVar*2,
-	sunset_104000[CellVar + 0x00],
-	sunset_104000[CellVar + 0x01],
-	sunset_104000[CellVar + 0x02],
-	sunset_104000[CellVar + 0x03],
-	sunset_104000[CellVar + 0x04],
-	sunset_104000[CellVar + 0x05],
-	sunset_104000[CellVar + 0x06],
-	sunset_104000[CellVar + 0x07],
-	sunset_104000[CellVar + 0x08],
-	sunset_104000[CellVar + 0x09],
-	sunset_104000[CellVar + 0x0a],
-	sunset_104000[CellVar + 0x0b],
-	sunset_104000[CellVar + 0x0c],
-	sunset_104000[CellVar + 0x0d],
-	sunset_104000[CellVar + 0x0e],
-	sunset_104000[CellVar + 0x0f],
-	sunset_104000[CellVar + 0x10],
-	sunset_104000[CellVar + 0x11],
-	sunset_104000[CellVar + 0x12],
-	sunset_104000[CellVar + 0x13],
-	sunset_104000[CellVar + 0x14],
-	sunset_104000[CellVar + 0x15],
-	sunset_104000[CellVar + 0x16],
-	sunset_104000[CellVar + 0x17]
+	state->sunset_104000[CellVar + 0x00],
+	state->sunset_104000[CellVar + 0x01],
+	state->sunset_104000[CellVar + 0x02],
+	state->sunset_104000[CellVar + 0x03],
+	state->sunset_104000[CellVar + 0x04],
+	state->sunset_104000[CellVar + 0x05],
+	state->sunset_104000[CellVar + 0x06],
+	state->sunset_104000[CellVar + 0x07],
+	state->sunset_104000[CellVar + 0x08],
+	state->sunset_104000[CellVar + 0x09],
+	state->sunset_104000[CellVar + 0x0a],
+	state->sunset_104000[CellVar + 0x0b],
+	state->sunset_104000[CellVar + 0x0c],
+	state->sunset_104000[CellVar + 0x0d],
+	state->sunset_104000[CellVar + 0x0e],
+	state->sunset_104000[CellVar + 0x0f],
+	state->sunset_104000[CellVar + 0x10],
+	state->sunset_104000[CellVar + 0x11],
+	state->sunset_104000[CellVar + 0x12],
+	state->sunset_104000[CellVar + 0x13],
+	state->sunset_104000[CellVar + 0x14],
+	state->sunset_104000[CellVar + 0x15],
+	state->sunset_104000[CellVar + 0x16],
+	state->sunset_104000[CellVar + 0x17]
 	);
 #endif
 //        }
@@ -1033,10 +1035,10 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 #endif
 
 static ADDRESS_MAP_START( tmnt2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_BASE(&tmnt2_rom)
-	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_BASE(&sunset_104000)	/* main RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_BASE_MEMBER(tmnt_state, tmnt2_rom)
+	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_BASE_MEMBER(tmnt_state, sunset_104000)	/* main RAM */
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)	// K053245_scattered_word_r
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)	// k053245_scattered_word_r
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P3")
@@ -1048,10 +1050,10 @@ static ADDRESS_MAP_START( tmnt2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown, mostly MCU blit offsets */
 //  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
-	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE(tmnt2_1c0800_w) AM_BASE(&tmnt2_1c0800)	/* protection device */
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
-	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
+	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE(tmnt2_1c0800_w) AM_BASE_MEMBER(tmnt_state, tmnt2_1c0800)	/* protection device */
+	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
+	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
@@ -1062,7 +1064,7 @@ static ADDRESS_MAP_START( ssriders_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P3")
@@ -1075,9 +1077,9 @@ static ADDRESS_MAP_START( ssriders_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown */
 	AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r)
 	AM_RANGE(0x1c0800, 0x1c0803) AM_WRITE(ssriders_protection_w)
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
-	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
+	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
+	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
@@ -1089,11 +1091,11 @@ static ADDRESS_MAP_START( sunsetbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE("k053251", k053251_lsb_w)
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_WRITENOP
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
+	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x604020, 0x60402f) AM_WRITENOP	/* written every frame */
 	AM_RANGE(0x604200, 0x604201) AM_WRITENOP	/* watchdog */
@@ -1115,14 +1117,14 @@ static ADDRESS_MAP_START( thndrx2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE("k053251", k053251_lsb_w)
-	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_lsb_r, k054000_lsb_w)
 	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
 	AM_RANGE(0x500200, 0x500201) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)
 	AM_RANGE(0x500300, 0x500301) AM_WRITENOP	/* watchdog reset? irq enable? */
-	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
+	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
@@ -1133,7 +1135,7 @@ static ADDRESS_MAP_START( mia_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 ADDRESS_MAP_END
 
@@ -1143,7 +1145,7 @@ static ADDRESS_MAP_START( tmnt_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("upd", tmnt_upd_start_w)
@@ -1156,7 +1158,7 @@ static ADDRESS_MAP_START( punkshot_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
@@ -1164,14 +1166,14 @@ static ADDRESS_MAP_START( lgtnfght_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc000, 0xc02f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
+	AM_RANGE(0xc000, 0xc02f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( glfgreat_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf82f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
+	AM_RANGE(0xf800, 0xf82f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
@@ -1180,7 +1182,7 @@ static ADDRESS_MAP_START( ssriders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
+	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
@@ -1190,25 +1192,26 @@ static ADDRESS_MAP_START( thndrx2_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x0010) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
 static READ8_DEVICE_HANDLER( k054539_ctrl_r )
 {
-	return k054539_r(device,0x200+offset);
+	return k054539_r(device, 0x200 + offset);
 }
+
 static WRITE8_DEVICE_HANDLER( k054539_ctrl_w )
 {
-	k054539_w(device,0x200+offset,data);
+	k054539_w(device, 0x200 + offset, data);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
-	AM_RANGE(0xe100, 0xe12f) AM_DEVREADWRITE("konami", k054539_ctrl_r, k054539_ctrl_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("k054539", k054539_r, k054539_w)
+	AM_RANGE(0xe100, 0xe12f) AM_DEVREADWRITE("k054539", k054539_ctrl_r, k054539_ctrl_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -2060,9 +2063,10 @@ static INPUT_PORTS_START( prmrsocr )
 INPUT_PORTS_END
 
 
-static void cuebrick_irq_handler(const device_config *device, int state)
+static void cuebrick_irq_handler( const device_config *device, int state )
 {
-	cuebrick_snd_irqlatch = state;
+	tmnt_state *tmnt = (tmnt_state *)device->machine->driver_data;
+	tmnt->cuebrick_snd_irqlatch = state;
 }
 
 static const ym2151_interface ym2151_interface_cbj =
@@ -2072,8 +2076,8 @@ static const ym2151_interface ym2151_interface_cbj =
 
 static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -2229,12 +2233,59 @@ static const k053936_interface prmrsocr_k053936_interface =
 };
 
 
+static MACHINE_START( common )
+{
+	tmnt_state *state = (tmnt_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k007232 = devtag_get_device(machine, "k007232");
+	state->k053260 = devtag_get_device(machine, "k053260");
+	state->k054539 = devtag_get_device(machine, "k054539");
+	state->upd = devtag_get_device(machine, "upd");
+	state->samples = devtag_get_device(machine, "samples");
+	state->k052109 = devtag_get_device(machine, "k052109");
+	state->k051960 = devtag_get_device(machine, "k051960");
+	state->k053245 = devtag_get_device(machine, "k053245");
+	state->k053251 = devtag_get_device(machine, "k053251");
+	state->k053936 = devtag_get_device(machine, "k053936");
+	state->k054000 = devtag_get_device(machine, "k054000");
+
+	state_save_register_global(machine, state->toggle);
+	state_save_register_global(machine, state->last);
+	state_save_register_global(machine, state->tmnt_soundlatch);
+	state_save_register_global(machine, state->cuebrick_snd_irqlatch);
+	state_save_register_global(machine, state->cuebrick_nvram_bank);
+	state_save_register_global(machine, state->sprite_colorbase);
+	state_save_register_global_array(machine, state->layer_colorbase);
+	state_save_register_global_array(machine, state->layerpri);
+	state_save_register_global_array(machine, state->sorted_layer);
+}
+
+static MACHINE_RESET( common )
+{
+	tmnt_state *state = (tmnt_state *)machine->driver_data;
+
+	state->toggle = 0;
+	state->last = 0;
+	state->tmnt_soundlatch = 0;
+	state->cuebrick_snd_irqlatch = 0;
+	state->cuebrick_nvram_bank = 0;
+}
+
+
 static MACHINE_DRIVER_START( cuebrick )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(cuebrick_main_map)
 	MDRV_CPU_VBLANK_INT_HACK(cuebrick_interrupt,10)
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2267,6 +2318,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mia )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MDRV_CPU_PROGRAM_MAP(mia_main_map)
@@ -2274,6 +2328,9 @@ static MACHINE_DRIVER_START( mia )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(mia_audio_map)
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
@@ -2300,7 +2357,7 @@ static MACHINE_DRIVER_START( mia )
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
-	MDRV_SOUND_ADD("konami", K007232, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2309,13 +2366,17 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( tmnt )
 {
-	const device_config *upd = devtag_get_device(machine, "upd");
+	tmnt_state *state = (tmnt_state *)machine->driver_data;
+
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
-	upd7759_start_w(upd, 0);
-	upd7759_reset_w(upd, 1);
+	upd7759_start_w(state->upd, 0);
+	upd7759_reset_w(state->upd, 1);
 }
 
 static MACHINE_DRIVER_START( tmnt )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2325,6 +2386,7 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(tmnt_audio_map)
 
+	MDRV_MACHINE_START(common)
 	MDRV_MACHINE_RESET(tmnt)
 
 	/* video hardware */
@@ -2352,7 +2414,7 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
-	MDRV_SOUND_ADD("konami", K007232, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2368,6 +2430,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( punkshot )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MDRV_CPU_PROGRAM_MAP(punkshot_main_map)
@@ -2376,6 +2441,9 @@ static MACHINE_DRIVER_START( punkshot )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(punkshot_audio_map)
 								/* NMIs are generated by the 053260 */
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2402,12 +2470,15 @@ static MACHINE_DRIVER_START( punkshot )
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( lgtnfght )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2416,6 +2487,9 @@ static MACHINE_DRIVER_START( lgtnfght )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(lgtnfght_audio_map)
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2443,13 +2517,16 @@ static MACHINE_DRIVER_START( lgtnfght )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( blswhstl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -2459,6 +2536,9 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2474,6 +2554,7 @@ static MACHINE_DRIVER_START( blswhstl )
 
 	MDRV_PALETTE_LENGTH(2048)
 
+	MDRV_VIDEO_START( blswhstl )
 	MDRV_VIDEO_UPDATE(lgtnfght)
 	MDRV_VIDEO_EOF( blswhstl )
 
@@ -2489,7 +2570,7 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)	/* fixed inverted stereo channels */
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.50)
 MACHINE_DRIVER_END
@@ -2514,6 +2595,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( glfgreat )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(glfgreat_main_map)
@@ -2522,6 +2606,9 @@ static MACHINE_DRIVER_START( glfgreat )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(glfgreat_audio_map)
 								/* NMIs are generated by the 053260 */
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2547,15 +2634,16 @@ static MACHINE_DRIVER_START( glfgreat )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
-static void sound_nmi(const device_config *device)
+static void sound_nmi( const device_config *device )
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const k054539_interface k054539_config =
@@ -2565,7 +2653,17 @@ static const k054539_interface k054539_config =
 	sound_nmi
 };
 
+static MACHINE_START( prmrsocr )
+{
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+}
+
 static MACHINE_DRIVER_START( prmrsocr )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ? */
@@ -2575,6 +2673,9 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(prmrsocr_audio_map)
 								/* NMIs are generated by the 054539 */
+
+	MDRV_MACHINE_START(prmrsocr)
+	MDRV_MACHINE_RESET(common)
 
 	MDRV_EEPROM_ADD("eeprom", thndrx2_eeprom_intf)
 
@@ -2602,7 +2703,7 @@ static MACHINE_DRIVER_START( prmrsocr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami", K054539, 48000)
+	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2610,6 +2711,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( tmnt2 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2623,6 +2727,9 @@ static MACHINE_DRIVER_START( tmnt2 )
 						/* 02 instead of 00. */
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2652,13 +2759,16 @@ static MACHINE_DRIVER_START( tmnt2 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ssriders )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2668,6 +2778,9 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ????? makes the ROM test sync */
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2697,7 +2810,7 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_DRIVER_END
@@ -2705,10 +2818,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sunsetbl )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(sunsetbl_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2741,6 +2860,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( thndrx2 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tmnt_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(thndrx2_main_map)
@@ -2749,6 +2871,9 @@ static MACHINE_DRIVER_START( thndrx2 )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(thndrx2_audio_map)
 								/* NMIs are generated by the 053260 */
+
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(common)
 
 	MDRV_EEPROM_ADD("eeprom", thndrx2_eeprom_intf)
 
@@ -2778,7 +2903,7 @@ static MACHINE_DRIVER_START( thndrx2 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
@@ -2830,7 +2955,7 @@ ROM_START( mia )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "808a18.f16",   0x0000, 0x0100, CRC(eb95aede) SHA1(8153eb516ae9753910c6d6a2143e91e079586836) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "808d01.d4",    0x00000, 0x20000, CRC(fd4d37c0) SHA1(ef91c6e7bb57c27a9a51729fffd1bfe3e806fb61) ) /* samples for 007232 */
 ROM_END
 
@@ -2855,7 +2980,7 @@ ROM_START( mia2 )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "808a18.f16",   0x0000, 0x0100, CRC(eb95aede) SHA1(8153eb516ae9753910c6d6a2143e91e079586836) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "808d01.d4",    0x00000, 0x20000, CRC(fd4d37c0) SHA1(ef91c6e7bb57c27a9a51729fffd1bfe3e806fb61) ) /* samples for 007232 */
 ROM_END
 
@@ -2883,7 +3008,7 @@ ROM_START( tmnt )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -2917,7 +3042,7 @@ ROM_START( tmntu )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -2951,7 +3076,7 @@ ROM_START( tmntua )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -2985,7 +3110,7 @@ ROM_START( tmht )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -3019,7 +3144,7 @@ ROM_START( tmntj )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -3053,7 +3178,7 @@ ROM_START( tmht2p )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -3087,7 +3212,7 @@ ROM_START( tmht2pa )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -3121,7 +3246,7 @@ ROM_START( tmnt2pj )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -3155,7 +3280,7 @@ ROM_START( tmnt2po )
 	ROM_LOAD( "963a30.g7",      0x0000, 0x0100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )	/* sprite address decoder */
 	ROM_LOAD( "963a31.g19",      0x0100, 0x0100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x20000, "konami", 0 )	/* 128k for the samples */
+	ROM_REGION( 0x20000, "k007232", 0 )	/* 128k for the samples */
 	ROM_LOAD( "963a26.c13",      0x00000, 0x20000, CRC(e2ac3063) SHA1(5bb294c46fb5eaba9935a18c0aa5d3931168f474) ) /* samples for 007232 */
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* 128k for the samples */
@@ -3181,7 +3306,7 @@ ROM_START( punkshot )
 	ROM_LOAD( "907d07.k2",    0x000000, 0x100000, CRC(b0fe4543) SHA1(3be1caef29084063dd8754c1eecc34a2ec842415) )
 	ROM_LOAD( "907d08.k7",    0x100000, 0x100000, CRC(d5ac8d9d) SHA1(cb330be1c5c016465ef7048b3b29c65a741ee45b) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for 053260 */
 	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
 ROM_END
 
@@ -3201,7 +3326,7 @@ ROM_START( punkshot2 )
 	ROM_LOAD( "907d07.k2",    0x000000, 0x100000, CRC(b0fe4543) SHA1(3be1caef29084063dd8754c1eecc34a2ec842415) )
 	ROM_LOAD( "907d08.k7",    0x100000, 0x100000, CRC(d5ac8d9d) SHA1(cb330be1c5c016465ef7048b3b29c65a741ee45b) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
 ROM_END
 
@@ -3221,7 +3346,7 @@ ROM_START( punkshotj )
 	ROM_LOAD( "907d07.k2",    0x000000, 0x100000, CRC(b0fe4543) SHA1(3be1caef29084063dd8754c1eecc34a2ec842415) )
 	ROM_LOAD( "907d08.k7",    0x100000, 0x100000, CRC(d5ac8d9d) SHA1(cb330be1c5c016465ef7048b3b29c65a741ee45b) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
 ROM_END
 
@@ -3241,7 +3366,7 @@ ROM_START( lgtnfght )
 	ROM_LOAD( "939a06.k8",    0x000000, 0x80000, CRC(e393c206) SHA1(9b35fc6dba1f15c3d9d69ff5a4e1673c539aa533) )
 	ROM_LOAD( "939a05.k2",    0x080000, 0x80000, CRC(3662d47a) SHA1(789c3f07ce812902050970f48be5115b8e95bea0) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "939a04.c5",    0x0000, 0x80000, CRC(c24e2b6e) SHA1(affc142883c2383afd08dcf156e48709ceca49fd) )
 ROM_END
 
@@ -3261,7 +3386,7 @@ ROM_START( lgtnfghtu )
 	ROM_LOAD( "939a06.k8",    0x000000, 0x80000, CRC(e393c206) SHA1(9b35fc6dba1f15c3d9d69ff5a4e1673c539aa533) )
 	ROM_LOAD( "939a05.k2",    0x080000, 0x80000, CRC(3662d47a) SHA1(789c3f07ce812902050970f48be5115b8e95bea0) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "939a04.c5",    0x0000, 0x80000, CRC(c24e2b6e) SHA1(affc142883c2383afd08dcf156e48709ceca49fd) )
 ROM_END
 
@@ -3281,7 +3406,7 @@ ROM_START( lgtnfghta )
 	ROM_LOAD( "939a06.k8",    0x000000, 0x80000, CRC(e393c206) SHA1(9b35fc6dba1f15c3d9d69ff5a4e1673c539aa533) )
 	ROM_LOAD( "939a05.k2",    0x080000, 0x80000, CRC(3662d47a) SHA1(789c3f07ce812902050970f48be5115b8e95bea0) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "939a04.c5",    0x0000, 0x80000, CRC(c24e2b6e) SHA1(affc142883c2383afd08dcf156e48709ceca49fd) )
 ROM_END
 
@@ -3301,7 +3426,7 @@ ROM_START( trigon )
 	ROM_LOAD( "939a06.k8",    0x000000, 0x80000, CRC(e393c206) SHA1(9b35fc6dba1f15c3d9d69ff5a4e1673c539aa533) )
 	ROM_LOAD( "939a05.k2",    0x080000, 0x80000, CRC(3662d47a) SHA1(789c3f07ce812902050970f48be5115b8e95bea0) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "939a04.c5",    0x0000, 0x80000, CRC(c24e2b6e) SHA1(affc142883c2383afd08dcf156e48709ceca49fd) )
 ROM_END
 
@@ -3323,7 +3448,7 @@ ROM_START( blswhstl )
 	ROM_LOAD16_WORD_SWAP( "060e06.k7",  0x000000, 0x080000, CRC(09381492) SHA1(5a3008dec99a8e0043405e9c4f5145794b8606e0) )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "060e05.k3",  0x080000, 0x080000, CRC(32454241) SHA1(7a246b255ff30118c4f8e07e6ba03a22fd5ddc8a) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "060e04.d1",  0x0000, 0x100000, CRC(c680395d) SHA1(acde593a5ec501e89c8aaca6c4fbacf707a727e1) )
 ROM_END
 
@@ -3345,7 +3470,7 @@ ROM_START( detatwin )
 	ROM_LOAD16_WORD_SWAP( "060e06.k7",  0x000000, 0x080000, CRC(09381492) SHA1(5a3008dec99a8e0043405e9c4f5145794b8606e0) )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "060e05.k3",  0x080000, 0x080000, CRC(32454241) SHA1(7a246b255ff30118c4f8e07e6ba03a22fd5ddc8a) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "060e04.d1",  0x0000, 0x100000, CRC(c680395d) SHA1(acde593a5ec501e89c8aaca6c4fbacf707a727e1) )
 ROM_END
 
@@ -3375,7 +3500,7 @@ ROM_START( glfgreat )
 	ROM_LOAD( "061b06.16d",   0x080000, 0x080000, CRC(41ada2ad) SHA1(7b200e44e040e3d79f2603a02c9991b4655407d4) )
 	ROM_LOAD( "061b05.15d",   0x100000, 0x020000, CRC(2456fb11) SHA1(e1bdb9f5983751d28addad6977a44df3d9899a14) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "061e04.1d",    0x0000, 0x100000, CRC(7921d8df) SHA1(19ca4850ec489cca245e90a41bfc22493cd52263) )
 ROM_END
 
@@ -3405,7 +3530,7 @@ ROM_START( glfgreatj )
 	ROM_LOAD( "061b06.16d",   0x080000, 0x080000, CRC(41ada2ad) SHA1(7b200e44e040e3d79f2603a02c9991b4655407d4) )
 	ROM_LOAD( "061b05.15d",   0x100000, 0x020000, CRC(2456fb11) SHA1(e1bdb9f5983751d28addad6977a44df3d9899a14) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "061e04.1d",    0x0000, 0x100000, CRC(7921d8df) SHA1(19ca4850ec489cca245e90a41bfc22493cd52263) )
 ROM_END
 
@@ -3431,7 +3556,7 @@ ROM_START( tmnt2 )
 	ROM_LOAD( "063b08", 0x300000, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
 	/* second half empty */
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
 ROM_END
 
@@ -3457,7 +3582,7 @@ ROM_START( tmnt22pu )
 	ROM_LOAD( "063b08", 0x300000, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
 	/* second half empty */
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
 ROM_END
 
@@ -3483,7 +3608,7 @@ ROM_START( tmht22pe )
 	ROM_LOAD( "063b08", 0x300000, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
 	/* second half empty */
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
 ROM_END
 
@@ -3509,7 +3634,7 @@ ROM_START( tmnt2a )
 	ROM_LOAD( "063b08", 0x300000, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
 	/* second half empty */
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
 ROM_END
 
@@ -3531,7 +3656,7 @@ ROM_START( qgakumon )
 	ROM_LOAD( "248a09.7l",          0x000000, 0x100000, CRC(a176e205) SHA1(e0b2176a1525711c6e692f88a913f57b9bdd0046) )	/* sprites */
 	ROM_LOAD( "248a07.3l",          0x200000, 0x100000, CRC(9595589f) SHA1(3e48f66448577a8fa39b6707e89c2267152b6f0b) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "248a06.1d",       0x0000, 0x200000, CRC(0fba1def) SHA1(f2ba23213effd06f14c7a179acea974c78c2198f) )
 ROM_END
 
@@ -3553,7 +3678,7 @@ ROM_START( ssriders )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3575,7 +3700,7 @@ ROM_START( ssridersebd )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3597,7 +3722,7 @@ ROM_START( ssridersebc )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3619,7 +3744,7 @@ ROM_START( ssriderseaa )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3641,7 +3766,7 @@ ROM_START( ssridersuda )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3663,7 +3788,7 @@ ROM_START( ssridersuac )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3685,7 +3810,7 @@ ROM_START( ssridersubc )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3707,7 +3832,7 @@ ROM_START( ssridersabd )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3729,7 +3854,7 @@ ROM_START( ssridersadd )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3751,7 +3876,7 @@ ROM_START( ssridersjbd )
 	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
 	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
 ROM_END
 
@@ -3792,7 +3917,7 @@ ROM_START( thndrx2 )
 	ROM_LOAD( "073-c07.7k",   0x000000, 0x080000, CRC(14e93f38) SHA1(bf111b68be722c9c2f0f9c7700b3af6cd8fd28be) )	/* sprites */
 	ROM_LOAD( "073-c08.3k",   0x080000, 0x080000, CRC(09fab3ab) SHA1(af54c7bfe8edc5b5ea2c4fba4d5c637cfcbbeff5) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
 ROM_END
 
@@ -3812,7 +3937,7 @@ ROM_START( thndrx2a )
 	ROM_LOAD( "073-c07.7k",   0x000000, 0x080000, CRC(14e93f38) SHA1(bf111b68be722c9c2f0f9c7700b3af6cd8fd28be) )	/* sprites */
 	ROM_LOAD( "073-c08.3k",   0x080000, 0x080000, CRC(09fab3ab) SHA1(af54c7bfe8edc5b5ea2c4fba4d5c637cfcbbeff5) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
 ROM_END
 
@@ -3832,7 +3957,7 @@ ROM_START( thndrx2j )
 	ROM_LOAD( "073-c07.7k",   0x000000, 0x080000, CRC(14e93f38) SHA1(bf111b68be722c9c2f0f9c7700b3af6cd8fd28be) )	/* sprites */
 	ROM_LOAD( "073-c08.3k",   0x080000, 0x080000, CRC(09fab3ab) SHA1(af54c7bfe8edc5b5ea2c4fba4d5c637cfcbbeff5) )
 
-	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
 ROM_END
 
@@ -3860,7 +3985,7 @@ ROM_START( prmrsocr )
 	ROM_LOAD( "101a01.18d",   0x000000, 0x020000, CRC(716f910f) SHA1(fbe69cac266084ea1efb094a7f863dca39f12500) )
 	ROM_LOAD( "101a02.16d",   0x020000, 0x020000, CRC(222869c7) SHA1(0a9bea294ff3281f316dd4beecc4c94d75d52b49) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "101a06.1d",    0x0000, 0x200000, CRC(4f48e043) SHA1(f50e8642d9d3a028c243777640e7cd13da1abf86) )
 ROM_END
 
@@ -3888,7 +4013,7 @@ ROM_START( prmrsocrj )
 	ROM_LOAD( "101a01.18d",   0x000000, 0x020000, CRC(716f910f) SHA1(fbe69cac266084ea1efb094a7f863dca39f12500) )
 	ROM_LOAD( "101a02.16d",   0x020000, 0x020000, CRC(222869c7) SHA1(0a9bea294ff3281f316dd4beecc4c94d75d52b49) )
 
-	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "101a06.1d",    0x0000, 0x200000, CRC(4f48e043) SHA1(f50e8642d9d3a028c243777640e7cd13da1abf86) )
 ROM_END
 
@@ -3897,7 +4022,7 @@ static DRIVER_INIT( mia )
 {
 	UINT8 *gfxdata;
 	int len;
-	int i,j,k,A,B;
+	int i, j, k, A, B;
 	int bits[32];
 	UINT8 *temp;
 
@@ -3908,17 +4033,17 @@ static DRIVER_INIT( mia )
     */
 	gfxdata = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
-	for (i = 0;i < len;i += 4)
+	for (i = 0; i < len; i += 4)
 	{
-		for (j = 0;j < 4;j++)
-			for (k = 0;k < 8;k++)
-				bits[8*j + k] = (gfxdata[i + j] >> k) & 1;
+		for (j = 0; j < 4; j++)
+			for (k = 0; k < 8; k++)
+				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
 
-		for (j = 0;j < 4;j++)
+		for (j = 0; j < 4; j++)
 		{
 			gfxdata[i + j] = 0;
-			for (k = 0;k < 8;k++)
-				gfxdata[i + j] |= bits[j + 4*k] << k;
+			for (k = 0; k < 8; k++)
+				gfxdata[i + j] |= bits[j + 4 * k] << k;
 		}
 	}
 
@@ -3929,26 +4054,26 @@ static DRIVER_INIT( mia )
     */
 	gfxdata = memory_region(machine, "gfx2");
 	len = memory_region_length(machine, "gfx2");
-	for (i = 0;i < len;i += 4)
+	for (i = 0; i < len; i += 4)
 	{
-		for (j = 0;j < 4;j++)
-			for (k = 0;k < 8;k++)
-				bits[8*j + k] = (gfxdata[i + j] >> k) & 1;
+		for (j = 0; j < 4; j++)
+			for (k = 0; k < 8; k++)
+				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
 
-		for (j = 0;j < 4;j++)
+		for (j = 0; j < 4; j++)
 		{
 			gfxdata[i + j] = 0;
-			for (k = 0;k < 8;k++)
-				gfxdata[i + j] |= bits[j + 4*k] << k;
+			for (k = 0; k < 8; k++)
+				gfxdata[i + j] |= bits[j + 4 * k] << k;
 		}
 	}
 
 	temp = alloc_array_or_die(UINT8, len);
-	memcpy(temp,gfxdata,len);
-	for (A = 0;A < len/4;A++)
+	memcpy(temp, gfxdata, len);
+	for (A = 0; A < len / 4; A++)
 	{
 		/* the bits to scramble are the low 8 ones */
-		for (i = 0;i < 8;i++)
+		for (i = 0; i < 8; i++)
 			bits[i] = (A >> i) & 0x01;
 
 		B = A & 0x3ff00;
@@ -3976,10 +4101,10 @@ static DRIVER_INIT( mia )
 			B |= bits[6] << 7;
 		}
 
-		gfxdata[4*A+0] = temp[4*B+0];
-		gfxdata[4*A+1] = temp[4*B+1];
-		gfxdata[4*A+2] = temp[4*B+2];
-		gfxdata[4*A+3] = temp[4*B+3];
+		gfxdata[4 * A + 0] = temp[4 * B + 0];
+		gfxdata[4 * A + 1] = temp[4 * B + 1];
+		gfxdata[4 * A + 2] = temp[4 * B + 2];
+		gfxdata[4 * A + 3] = temp[4 * B + 3];
 	}
 	free(temp);
 }
@@ -3990,7 +4115,7 @@ static DRIVER_INIT( tmnt )
 	UINT8 *gfxdata;
 	const UINT8 *code_conv_table;
 	int len;
-	int i,j,k,A,B,entry;
+	int i, j, k, A, B, entry;
 	int bits[32];
 	UINT8 *temp;
 
@@ -4001,17 +4126,17 @@ static DRIVER_INIT( tmnt )
     */
 	gfxdata = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
-	for (i = 0;i < len;i += 4)
+	for (i = 0; i < len; i += 4)
 	{
-		for (j = 0;j < 4;j++)
-			for (k = 0;k < 8;k++)
-				bits[8*j + k] = (gfxdata[i + j] >> k) & 1;
+		for (j = 0; j < 4; j++)
+			for (k = 0; k < 8; k++)
+				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
 
-		for (j = 0;j < 4;j++)
+		for (j = 0; j < 4; j++)
 		{
 			gfxdata[i + j] = 0;
-			for (k = 0;k < 8;k++)
-				gfxdata[i + j] |= bits[j + 4*k] << k;
+			for (k = 0; k < 8; k++)
+				gfxdata[i + j] |= bits[j + 4 * k] << k;
 		}
 	}
 
@@ -4022,24 +4147,24 @@ static DRIVER_INIT( tmnt )
     */
 	gfxdata = memory_region(machine, "gfx2");
 	len = memory_region_length(machine, "gfx2");
-	for (i = 0;i < len;i += 4)
+	for (i = 0; i < len; i += 4)
 	{
-		for (j = 0;j < 4;j++)
-			for (k = 0;k < 8;k++)
-				bits[8*j + k] = (gfxdata[i + j] >> k) & 1;
+		for (j = 0; j < 4; j++)
+			for (k = 0; k < 8; k++)
+				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
 
-		for (j = 0;j < 4;j++)
+		for (j = 0; j < 4; j++)
 		{
 			gfxdata[i + j] = 0;
-			for (k = 0;k < 8;k++)
-				gfxdata[i + j] |= bits[j + 4*k] << k;
+			for (k = 0; k < 8; k++)
+				gfxdata[i + j] |= bits[j + 4 * k] << k;
 		}
 	}
 
 	temp = alloc_array_or_die(UINT8, len);
-	memcpy(temp,gfxdata,len);
+	memcpy(temp, gfxdata, len);
 	code_conv_table = &memory_region(machine, "proms")[0x0000];
-	for (A = 0;A < len/4;A++)
+	for (A = 0; A < len / 4; A++)
 	{
 #define CA0 0
 #define CA1 1
@@ -4075,18 +4200,18 @@ static DRIVER_INIT( tmnt )
 		entry = code_conv_table[(A & 0x7f800) >> 11] & 7;
 
 		/* the bits to scramble are the low 10 ones */
-		for (i = 0;i < 10;i++)
+		for (i = 0; i < 10; i++)
 			bits[i] = (A >> i) & 0x01;
 
 		B = A & 0x7fc00;
 
-		for (i = 0;i < 10;i++)
+		for (i = 0; i < 10; i++)
 			B |= bits[bit_pick_table[i][entry]] << i;
 
-		gfxdata[4*A+0] = temp[4*B+0];
-		gfxdata[4*A+1] = temp[4*B+1];
-		gfxdata[4*A+2] = temp[4*B+2];
-		gfxdata[4*A+3] = temp[4*B+3];
+		gfxdata[4 * A + 0] = temp[4 * B + 0];
+		gfxdata[4 * A + 1] = temp[4 * B + 1];
+		gfxdata[4 * A + 2] = temp[4 * B + 2];
+		gfxdata[4 * A + 3] = temp[4 * B + 3];
 	}
 	free(temp);
 }
@@ -4094,61 +4219,61 @@ static DRIVER_INIT( tmnt )
 static DRIVER_INIT( cuebrick )
 {
 	machine->generic.nvram.u8 = (UINT8 *)cuebrick_nvram;
-	machine->generic.nvram_size = 0x400*0x20;
+	machine->generic.nvram_size = 0x400 * 0x20;
 }
 
-GAME( 1989, cuebrick, 0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", 0 )
+GAME( 1989, cuebrick,    0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, mia,      0,        mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version T)", 0 )
-GAME( 1989, mia2,     mia,      mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version S)", 0 )
+GAME( 1989, mia,         0,        mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version T)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mia2,        mia,      mia,      mia,      mia,      ROT0,  "Konami", "M.I.A. - Missing in Action (version S)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,     0,        tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", 0 )
-GAME( 1989, tmntu,    tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", 0 )
-GAME( 1989, tmntua,   tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", 0 )
-GAME( 1989, tmht,     tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 4 Players)", 0 )
-GAME( 1990, tmntj,    tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", 0 )
-GAME( 1989, tmht2p,   tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 1)", 0 )
-GAME( 1989, tmht2pa,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 2)", 0 )
-GAME( 1990, tmnt2pj,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", 0 )
-GAME( 1989, tmnt2po,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", 0 )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,     tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, punkshot, 0,        punkshot, punkshot, 0,      ROT0,  "Konami", "Punk Shot (US 4 Players)", 0 )
-GAME( 1990, punkshot2,punkshot, punkshot, punksht2, 0,      ROT0,  "Konami", "Punk Shot (US 2 Players)", 0 )
-GAME( 1990, punkshotj,punkshot, punkshot, punksht2, 0,      ROT0,  "Konami", "Punk Shot (Japan 2 Players)", 0 )
+GAME( 1990, punkshot,    0,        punkshot, punkshot, 0,        ROT0,  "Konami", "Punk Shot (US 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, punkshot2,   punkshot, punkshot, punksht2, 0,        ROT0,  "Konami", "Punk Shot (US 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, punkshotj,   punkshot, punkshot, punksht2, 0,        ROT0,  "Konami", "Punk Shot (Japan 2 Players)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, lgtnfght, 0,        lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Lightning Fighters (World)", 0 )
-GAME( 1990, lgtnfghta,lgtnfght, lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Lightning Fighters (Asia)", 0 )
-GAME( 1990, lgtnfghtu,lgtnfght, lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Lightning Fighters (US)", 0 )
-GAME( 1990, trigon,   lgtnfght, lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Trigon (Japan)", 0 )
+GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght, 0,        ROT90, "Konami", "Lightning Fighters (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght, 0,        ROT90, "Konami", "Lightning Fighters (Asia)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght, 0,        ROT90, "Konami", "Lightning Fighters (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, trigon,      lgtnfght, lgtnfght, lgtnfght, 0,        ROT90, "Konami", "Trigon (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, blswhstl, 0,        blswhstl, blswhstl, 0,      ROT90, "Konami", "Bells & Whistles (Version L)", 0 )
-GAME( 1991, detatwin, blswhstl, blswhstl, blswhstl, 0,      ROT90, "Konami", "Detana!! Twin Bee (Japan ver. J)", 0 )
+GAME( 1991, blswhstl,    0,        blswhstl, blswhstl, 0,        ROT90, "Konami", "Bells & Whistles (Version L)", GAME_SUPPORTS_SAVE )
+GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl, 0,        ROT90, "Konami", "Detana!! Twin Bee (Japan ver. J)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat, 0,        glfgreat, glfgreat, 0, ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1991, glfgreatj,glfgreat, glfgreat, glfgreat, 0, ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat, 0,        ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreat, 0,        ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, 0,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", 0 ) // ver. UAA
-GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, 0,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", 0 ) // ver. ADA
-GAME( 1991, tmht22pe, tmnt2,    tmnt2,    ssriders, 0,      ROT0,  "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  0 ) // ver. EBA
-GAME( 1991, tmnt22pu, tmnt2,    tmnt2,    ssriders, 0,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", 0 ) // ver. UDA
+GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p, 0,        ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", GAME_SUPPORTS_SAVE ) // ver. UAA
+GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps, 0,        ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", GAME_SUPPORTS_SAVE ) // ver. ADA
+GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders, 0,        ROT0,  "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  GAME_SUPPORTS_SAVE ) // ver. EBA
+GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders, 0,        ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", GAME_SUPPORTS_SAVE ) // ver. UDA
 
-GAME( 1993, qgakumon, 0,        tmnt2,    qgakumon, 0,      ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", 0 )
+GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon, 0,        ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, ssriders,    0,        ssriders, ssridr4p, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersebd, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersebc, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersubc, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersabd, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, 0,      ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssriders,    0,        ssriders, ssridr4p, 0,        ROT0,  "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersebd, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersebc, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps, 0,        ROT0,  "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps, 0,        ROT0,  "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p, 0,        ROT0,  "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersubc, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersabd, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps, 0,        ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, 0,        ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  0,      ROT0,  "Konami", "Thunder Cross II (World)", 0 )
-GAME( 1991, thndrx2a, thndrx2,  thndrx2,  thndrx2,  0,      ROT0,  "Konami", "Thunder Cross II (Asia)", 0 )
-GAME( 1991, thndrx2j, thndrx2,  thndrx2,  thndrx2,  0,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,  0,        ROT0,  "Konami", "Thunder Cross II (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,  0,        ROT0,  "Konami", "Thunder Cross II (Asia)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,  0,        ROT0,  "Konami", "Thunder Cross II (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, prmrsocr, 0,        prmrsocr, prmrsocr, 0, ROT0,  "Konami", "Premier Soccer (ver EAB)", 0 )
-GAME( 1993, prmrsocrj,prmrsocr, prmrsocr, prmrsocr, 0, ROT0,  "Konami", "Premier Soccer (ver JAB)", 0 )
+GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr, 0,        ROT0,  "Konami", "Premier Soccer (ver EAB)", GAME_SUPPORTS_SAVE )
+GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr, 0,        ROT0,  "Konami", "Premier Soccer (ver JAB)", GAME_SUPPORTS_SAVE )

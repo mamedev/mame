@@ -58,27 +58,12 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-/* BG LAYER */
-
-extern UINT16 *dbz_bg1_videoram;
-extern UINT16 *dbz_bg2_videoram;
-
-WRITE16_HANDLER(dbz_bg1_videoram_w);
-WRITE16_HANDLER(dbz_bg2_videoram_w);
-
-static int dbz_control;
-
-VIDEO_START(dbz);
-VIDEO_UPDATE(dbz);
-
-extern void dbz_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
-extern void dbz_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+#include "includes/dbz.h"
 
 
 static INTERRUPT_GEN( dbz_interrupt )
 {
-	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+	dbz_state *state = (dbz_state *)device->machine->driver_data;
 
 	switch (cpu_getiloops(device))
 	{
@@ -87,7 +72,7 @@ static INTERRUPT_GEN( dbz_interrupt )
 			break;
 
 		case 1:
-			if (k053246_is_irq_enabled(k053246))
+			if (k053246_is_irq_enabled(state->k053246))
 				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 			break;
 	}
@@ -96,25 +81,22 @@ static INTERRUPT_GEN( dbz_interrupt )
 #if 0
 static READ16_HANDLER( dbzcontrol_r )
 {
-	return dbz_control;
+	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	return state->control;
 }
 #endif
 
 static WRITE16_HANDLER( dbzcontrol_w )
 {
-	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	dbz_state *state = (dbz_state *)space->machine->driver_data;
 	/* bit 10 = enable '246 readback */
 
-	COMBINE_DATA(&dbz_control);
+	COMBINE_DATA(&state->control);
 
 	if (data & 0x400)
-	{
-		k053246_set_objcha_line(k053246, ASSERT_LINE);
-	}
+		k053246_set_objcha_line(state->k053246, ASSERT_LINE);
 	else
-	{
-		k053246_set_objcha_line(k053246, CLEAR_LINE);
-	}
+		k053246_set_objcha_line(state->k053246, CLEAR_LINE);
 
 	coin_counter_w(space->machine, 0, data & 1);
 	coin_counter_w(space->machine, 1, data & 2);
@@ -122,20 +104,23 @@ static WRITE16_HANDLER( dbzcontrol_w )
 
 static WRITE16_HANDLER( dbz_sound_command_w )
 {
-	soundlatch_w(space, 0, data>>8);
+	soundlatch_w(space, 0, data >> 8);
 }
 
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void dbz_sound_irq(const device_config *device, int irq)
+static void dbz_sound_irq( const device_config *device, int irq )
 {
+	dbz_state *state = (dbz_state *)device->machine->driver_data;
+
 	if (irq)
-		cputag_set_input_line(device->machine, "audiocpu", 0, ASSERT_LINE);
+		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -164,8 +149,8 @@ static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x4f8000, 0x4f801f) AM_WRITENOP		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE("k053251", k053251_lsb_w)	// 251 #2
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_BASE(&dbz_bg2_videoram)
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_BASE(&dbz_bg1_videoram)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_BASE_MEMBER(dbz_state, bg2_videoram)
+	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_BASE_MEMBER(dbz_state, bg1_videoram)
 	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE("k053936_1", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE("k053936_2", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window
@@ -351,7 +336,43 @@ static const k053936_interface dbz_k053936_intf =
 };
 
 
+static MACHINE_START( dbz )
+{
+	dbz_state *state = (dbz_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k053936_1 = devtag_get_device(machine, "k053936_1");
+	state->k053936_2 = devtag_get_device(machine, "k053936_2");
+	state->k056832 = devtag_get_device(machine, "k056832");
+	state->k053246 = devtag_get_device(machine, "k053246");
+	state->k053251 = devtag_get_device(machine, "k053251");
+
+	state_save_register_global(machine, state->control);
+	state_save_register_global(machine, state->sprite_colorbase);
+	state_save_register_global_array(machine, state->layerpri);
+	state_save_register_global_array(machine, state->layer_colorbase);
+}
+
+static MACHINE_RESET( dbz )
+{
+	dbz_state *state = (dbz_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 5; i++)
+		state->layerpri[i] = 0;
+
+	for (i = 0; i < 6; i++)
+		state->layer_colorbase[i] = 0;
+
+	state->sprite_colorbase = 0;
+	state->control = 0;
+}
+
 static MACHINE_DRIVER_START( dbz )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dbz_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -362,7 +383,8 @@ static MACHINE_DRIVER_START( dbz )
 	MDRV_CPU_PROGRAM_MAP(dbz_sound_map)
 	MDRV_CPU_IO_MAP(dbz_sound_io_map)
 
-	MDRV_GFXDECODE(dbz)
+	MDRV_MACHINE_START(dbz)
+	MDRV_MACHINE_RESET(dbz)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -373,6 +395,8 @@ static MACHINE_DRIVER_START( dbz )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 32*8-1)
+
+	MDRV_GFXDECODE(dbz)
 
 	MDRV_VIDEO_START(dbz)
 	MDRV_VIDEO_UPDATE(dbz)
@@ -497,5 +521,5 @@ static DRIVER_INIT( dbz )
 	ROM[0x990/2] = 0x4e71;
 }
 
-GAME( 1993, dbz,  0, dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, dbz2, 0, dbz, dbz2, 0,    ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, dbz,  0, dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, dbz2, 0, dbz, dbz2, 0,    ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

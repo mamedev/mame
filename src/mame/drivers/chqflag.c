@@ -1,13 +1,14 @@
 /***************************************************************************
 
-Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
+    Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
-Notes:
-- Position counter doesn't behave correctly because of the K051733 protection.
-- 007232 volume & panning control is almost certainly wrong.
+    Notes:
+    - Position counter doesn't behave correctly because of the K051733 
+      protection.
+    - 007232 volume & panning control is almost certainly wrong.
 
-2008-07
-Dip locations and recommended settings verified with manual
+    2008-07
+    Dip locations and recommended settings verified with manual
 
 ***************************************************************************/
 
@@ -18,45 +19,38 @@ Dip locations and recommended settings verified with manual
 #include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
+#include "includes/chqflag.h"
 
 #include "chqflag.lh"
 
-static int k051316_readroms;
 
 static WRITE8_DEVICE_HANDLER( k007232_extvolume_w );
 
-/* from video/chqflag.c */
-VIDEO_START( chqflag );
-VIDEO_UPDATE( chqflag );
-
-extern void chqflag_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void chqflag_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-extern void chqflag_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
-
 static INTERRUPT_GEN( chqflag_interrupt )
 {
-	const device_config *k051960 = devtag_get_device(device->machine, "k051960");
+	chqflag_state *state = (chqflag_state *)device->machine->driver_data;
+
 	if (cpu_getiloops(device) == 0)
 	{
-		if (k051960_is_irq_enabled(k051960))
+		if (k051960_is_irq_enabled(state->k051960))
 			cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (k051960_is_nmi_enabled(k051960))
+		if (k051960_is_nmi_enabled(state->k051960))
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
-	const device_config *k051316_1 = devtag_get_device(space->machine, "k051316_1");
+	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
 	int bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
-	bankaddress = 0x10000 + (data & 0x1f)*0x4000;
-	memory_set_bankptr(space->machine, "bank4",&RAM[bankaddress]);
+	bankaddress = 0x10000 + (data & 0x1f) * 0x4000;
+	memory_set_bankptr(space->machine, "bank4", &RAM[bankaddress]);
 
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
@@ -65,10 +59,10 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 		memory_install_write8_handler(space, 0x1800, 0x1fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(space->machine, "bank5", space->machine->generic.paletteram.v);
 
-		if (k051316_readroms)
-			memory_install_readwrite8_device_handler(space, k051316_1, 0x1000, 0x17ff, 0, 0, k051316_rom_r, k051316_w);	/* 051316 #1 (ROM test) */
+		if (state->k051316_readroms)
+			memory_install_readwrite8_device_handler(space, state->k051316_1, 0x1000, 0x17ff, 0, 0, k051316_rom_r, k051316_w);	/* 051316 #1 (ROM test) */
 		else
-			memory_install_readwrite8_device_handler(space, k051316_1, 0x1000, 0x17ff, 0, 0, k051316_r, k051316_w);		/* 051316 #1 */
+			memory_install_readwrite8_device_handler(space, state->k051316_1, 0x1000, 0x17ff, 0, 0, k051316_r, k051316_w);		/* 051316 #1 */
 	}
 	else
 	{
@@ -81,19 +75,19 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 
 static WRITE8_HANDLER( chqflag_vreg_w )
 {
-	const device_config *k051316_2 = devtag_get_device(space->machine, "k051316_2");
-	static int last;
+	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(space->machine, 1, data & 0x01);
 	coin_counter_w(space->machine, 0, data & 0x02);
 
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
-	k051316_readroms = (data & 0x10);
-	if (k051316_readroms)
-		memory_install_read8_device_handler(space, k051316_2, 0x2800, 0x2fff, 0, 0, k051316_rom_r);	/* 051316 (ROM test) */
+	state->k051316_readroms = (data & 0x10);
+
+	if (state->k051316_readroms)
+		memory_install_read8_device_handler(space, state->k051316_2, 0x2800, 0x2fff, 0, 0, k051316_rom_r);	/* 051316 (ROM test) */
 	else
-		memory_install_read8_device_handler(space, k051316_2, 0x2800, 0x2fff, 0, 0, k051316_r);		/* 051316 */
+		memory_install_read8_device_handler(space, state->k051316_2, 0x2800, 0x2fff, 0, 0, k051316_r);		/* 051316 */
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
@@ -101,20 +95,20 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	if (data & 0x08)
-		palette_set_shadow_factor(space->machine,1/PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(space->machine, 1 / PALETTE_DEFAULT_SHADOW_FACTOR);
 	else
-		palette_set_shadow_factor(space->machine,PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(space->machine, PALETTE_DEFAULT_SHADOW_FACTOR);
 
-	if ((data & 0x80) != last)
+	if ((data & 0x80) != state->last_vreg)
 	{
 		double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
 		int i;
 
-		last = data & 0x80;
+		state->last_vreg = data & 0x80;
 
 		/* only affect the background */
-		for (i = 512;i < 1024;i++)
-			palette_set_pen_contrast(space->machine,i,brt);
+		for (i = 512; i < 1024; i++)
+			palette_set_pen_contrast(space->machine, i, brt);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
@@ -124,22 +118,21 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	/* other bits unknown. bit 5 is used. */
 }
 
-static int analog_ctrl;
-
 static WRITE8_HANDLER( select_analog_ctrl_w )
 {
-	analog_ctrl = data;
+	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	state->analog_ctrl = data;
 }
 
 static READ8_HANDLER( analog_read_r )
 {
-	static int accel, wheel;
-
-	switch (analog_ctrl & 0x03){
-		case 0x00: return (accel = input_port_read(space->machine, "IN3"));	/* accelerator */
-		case 0x01: return (wheel = input_port_read(space->machine, "IN4"));	/* steering */
-		case 0x02: return accel;						/* accelerator (previous?) */
-		case 0x03: return wheel;						/* steering (previous?) */
+	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	switch (state->analog_ctrl & 0x03)
+	{
+		case 0x00: return (state->accel = input_port_read(space->machine, "IN3"));	/* accelerator */
+		case 0x01: return (state->wheel = input_port_read(space->machine, "IN4"));	/* steering */
+		case 0x02: return state->accel;						/* accelerator (previous?) */
+		case 0x03: return state->wheel;						/* steering (previous?) */
 	}
 
 	return 0xff;
@@ -147,8 +140,9 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
+	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
 	soundlatch2_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -182,26 +176,27 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
 {
+	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	k007232_set_bank( devtag_get_device(space->machine, "konami1"), bank_A, bank_B );
+	k007232_set_bank(state->k007232_1, bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank( devtag_get_device(space->machine, "konami2"), bank_A, bank_B );
+	k007232_set_bank(state->k007232_2, bank_A, bank_B);
 }
 
 static ADDRESS_MAP_START( chqflag_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)	/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)	/* 007232 (chip 1) */
-	AM_RANGE(0xa01c, 0xa01c) AM_DEVWRITE("konami2", k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r, k007232_w)	/* 007232 (chip 2) */
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_r, k007232_w)	/* 007232 (chip 1) */
+	AM_RANGE(0xa01c, 0xa01c) AM_DEVWRITE("k007232_2", k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_r, k007232_w)	/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch2_r)         /* engine sound volume */
@@ -295,9 +290,10 @@ INPUT_PORTS_END
 
 
 
-static void chqflag_ym2151_irq_w(const device_config *device, int data)
+static void chqflag_ym2151_irq_w( const device_config *device, int data )
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
+	chqflag_state *state = (chqflag_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -306,20 +302,20 @@ static const ym2151_interface ym2151_config =
 	chqflag_ym2151_irq_w
 };
 
-static void volume_callback0(const device_config *device, int v)
+static void volume_callback0( const device_config *device, int v )
 {
-	k007232_set_volume(device,0,(v & 0x0f)*0x11,0);
-	k007232_set_volume(device,1,0,(v >> 4)*0x11);
+	k007232_set_volume(device, 0, (v & 0x0f) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v >> 4) * 0x11);
 }
 
 static WRITE8_DEVICE_HANDLER( k007232_extvolume_w )
 {
-	k007232_set_volume(device,1,(data & 0x0f)*0x11/2,(data >> 4)*0x11/2);
+	k007232_set_volume(device, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-static void volume_callback1(const device_config *device, int v)
+static void volume_callback1( const device_config *device, int v )
 {
-	k007232_set_volume(device,0,(v & 0x0f)*0x11/2,(v >> 4)*0x11/2);
+	k007232_set_volume(device, 0, (v & 0x0f) * 0x11/2, (v >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =
@@ -356,7 +352,43 @@ static const k051316_interface chqflag_k051316_intf_2 =
 	chqflag_zoom_callback_1
 };
 
+static MACHINE_START( chqflag )
+{
+	chqflag_state *state = (chqflag_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k051316_1 = devtag_get_device(machine, "k051316_1");
+	state->k051316_2 = devtag_get_device(machine, "k051316_2");
+	state->k051960 = devtag_get_device(machine, "k051960");
+	state->k007232_1 = devtag_get_device(machine, "k007232_1");
+	state->k007232_2 = devtag_get_device(machine, "k007232_2");
+
+	state_save_register_global(machine, state->k051316_readroms);
+	state_save_register_global(machine, state->last_vreg);
+	state_save_register_global(machine, state->analog_ctrl);
+	state_save_register_global(machine, state->accel);
+	state_save_register_global(machine, state->wheel);
+}
+
+static MACHINE_RESET( chqflag )
+{
+	chqflag_state *state = (chqflag_state *)machine->driver_data;
+
+	state->k051316_readroms = 0;
+	state->last_vreg = 0;
+	state->analog_ctrl = 0;
+	state->accel = 0;
+	state->wheel = 0;
+}
+
 static MACHINE_DRIVER_START( chqflag )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(chqflag_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
@@ -367,6 +399,9 @@ static MACHINE_DRIVER_START( chqflag )
 	MDRV_CPU_PROGRAM_MAP(chqflag_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(chqflag)
+	MDRV_MACHINE_RESET(chqflag)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -396,21 +431,21 @@ static MACHINE_DRIVER_START( chqflag )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("konami1", K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_1)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MDRV_SOUND_ADD("konami2", K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 MACHINE_DRIVER_END
 
 ROM_START( chqflag )
-	ROM_REGION( 0x58800, "maincpu", 0 )	/* 052001 code */
+	ROM_REGION( 0x58000, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "717h02",		0x050000, 0x008000, CRC(f5bd4e78) SHA1(7bab02152d055a6c3a322c88e7ee0b85a39d8ef2) )	/* banked ROM */
 	ROM_CONTINUE(			0x008000, 0x008000 )				/* fixed ROM */
 	ROM_LOAD( "717e10",		0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )	/* banked ROM */
@@ -432,15 +467,15 @@ ROM_START( chqflag )
 	ROM_LOAD( "717e11",		0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )	/* zoom/rotate (N20) */
 	ROM_LOAD( "717e12",		0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )	/* zoom/rotate (N22) */
 
-	ROM_REGION( 0x080000, "konami1", 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x080000, "k007232_1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "717e03",		0x000000, 0x080000, CRC(ebe73c22) SHA1(fad3334e5e91bf8d11b74ffdbbfd57567e6f6f8c) )
 
-	ROM_REGION( 0x080000, "konami2", 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, "k007232_2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "717e09",		0x000000, 0x080000, CRC(d74e857d) SHA1(00c851c857650d67fc4caccea4461d99be4acb3c) )
 ROM_END
 
 ROM_START( chqflagj )
-	ROM_REGION( 0x58800, "maincpu", 0 )	/* 052001 code */
+	ROM_REGION( 0x58000, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "717j02.bin",	0x050000, 0x008000, CRC(05355daa) SHA1(130ddbc289c077565e44f33c63a63963e6417e19) )	/* banked ROM */
 	ROM_CONTINUE(			0x008000, 0x008000 )				/* fixed ROM */
 	ROM_LOAD( "717e10",		0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )	/* banked ROM */
@@ -462,20 +497,13 @@ ROM_START( chqflagj )
 	ROM_LOAD( "717e11",		0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )	/* zoom/rotate (N20) */
 	ROM_LOAD( "717e12",		0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )	/* zoom/rotate (N22) */
 
-	ROM_REGION( 0x080000, "konami1", 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x080000, "k007232_1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "717e03",		0x000000, 0x080000, CRC(ebe73c22) SHA1(fad3334e5e91bf8d11b74ffdbbfd57567e6f6f8c) )
 
-	ROM_REGION( 0x080000, "konami2", 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, "k007232_2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "717e09",		0x000000, 0x080000, CRC(d74e857d) SHA1(00c851c857650d67fc4caccea4461d99be4acb3c) )
 ROM_END
 
 
-
-static DRIVER_INIT( chqflag )
-{
-	UINT8 *RAM = memory_region(machine, "maincpu");
-	machine->generic.paletteram.u8 = &RAM[0x58000];
-}
-
-GAMEL( 1988, chqflag,        0, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND, layout_chqflag )
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )

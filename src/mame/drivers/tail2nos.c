@@ -1,11 +1,11 @@
 /***************************************************************************
 
-Tail to Nose / Super Formula - (c) 1989 Video System Co.
+    Tail to Nose / Super Formula - (c) 1989 Video System Co.
 
-Driver by Nicola Salmoria
+    Driver by Nicola Salmoria
 
 
-press F1+F3 to see ROM/RAM tests and the final animation
+    press F1+F3 to see ROM/RAM tests and the final animation
 
 ***************************************************************************/
 
@@ -14,61 +14,23 @@ press F1+F3 to see ROM/RAM tests and the final animation
 #include "video/konicdev.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
-
-
-extern UINT16 *tail2nos_bgvideoram;
-extern void tail2nos_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
-
-WRITE16_HANDLER( tail2nos_bgvideoram_w );
-READ16_HANDLER( tail2nos_zoomdata_r );
-WRITE16_HANDLER( tail2nos_zoomdata_w );
-WRITE16_HANDLER( tail2nos_gfxbank_w );
-VIDEO_START( tail2nos );
-VIDEO_UPDATE( tail2nos );
-
-
-static MACHINE_RESET( tail2nos )
-{
-	/* point to the extra ROMs */
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
-	memory_set_bankptr(machine, "bank2",memory_region(machine, "user2"));
-
-	/* initialize sound bank */
-	memory_set_bankptr(machine, "bank3",memory_region(machine, "audiocpu") + 0x10000);
-}
+#include "includes/tail2nos.h"
 
 
 static WRITE16_HANDLER( sound_command_w )
 {
+	tail2nos_state *state = (tail2nos_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,offset,data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-#if 0
-static READ16_HANDLER( tail2nos_K051316_0_r )
-{
-	return K051316_0_r(space,offset);
-}
-
-static WRITE16_HANDLER( tail2nos_K051316_0_w )
-{
-	if (ACCESSING_BITS_0_7)
-		K051316_0_w(space,offset,data & 0xff);
-}
-
-static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
-{
-	if (ACCESSING_BITS_0_7)
-		K051316_ctrl_0_w(space,offset,data & 0xff);
-}
-#endif
-
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(device->machine, "bank3",memory_region(device->machine, "audiocpu") + 0x10000 + (data & 0x01) * 0x8000);
+	memory_set_bank(device->machine, "bank3", data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -79,9 +41,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_r, k051316_w, 0x00ff)
 	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work RAM */
-	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE_MEMBER(tail2nos_state, spriteram, spriteram_size)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_BASE(&tail2nos_bgvideoram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_BASE_MEMBER(tail2nos_state, bgvideoram)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
@@ -216,9 +178,10 @@ GFXDECODE_END
 
 
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	tail2nos_state *state = (tail2nos_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -243,7 +206,40 @@ static const k051316_interface tail2nos_k051316_intf =
 	tail2nos_zoom_callback
 };
 
+static MACHINE_START( tail2nos )
+{
+	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
+	memory_set_bank(machine, "bank3", 0);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k051316 = devtag_get_device(machine, "k051316");
+
+	state_save_register_global(machine, state->charbank);
+	state_save_register_global(machine, state->charpalette);
+	state_save_register_global(machine, state->video_enable);
+}
+
+static MACHINE_RESET( tail2nos )
+{
+	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+
+	/* point to the extra ROMs */
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+
+	state->charbank = 0;
+	state->charpalette = 0;
+	state->video_enable = 0;
+}
+
 static MACHINE_DRIVER_START( tail2nos )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tail2nos_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)	/* verified on pcb */
@@ -254,6 +250,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2608 */
+	MDRV_MACHINE_START(tail2nos)
 	MDRV_MACHINE_RESET(tail2nos)
 
 	/* video hardware */
@@ -356,6 +353,5 @@ ROM_START( sformula )
 ROM_END
 
 
-
-GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL )
-GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -1,7 +1,3 @@
-#define XE_DEBUG 0
-#define XE_SKIPIDLE 1
-#define XE_DMADELAY ATTOTIME_IN_USEC(256)
-
 /***************************************************************************
 
     Xexex  (c) 1991 Konami - GX067
@@ -70,25 +66,12 @@ Unresolved Issues:
 #include "sound/k054539.h"
 #include "sound/2151intf.h"
 #include "sound/flt_vol.h"
+#include "includes/xexex.h"
 #include "includes/konamipt.h"
 
-VIDEO_START( xexex );
-VIDEO_UPDATE( xexex );
-void xexex_set_alpha(int on);
-
-extern void xexex_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
-extern void xexex_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-
-static MACHINE_START( xexex );
-static MACHINE_RESET( xexex );
-
-static UINT16 *xexex_workram;
-static UINT16 cur_control2;
-static INT32 cur_sound_region, xexex_strip0x1a;
-static int suspension_active, resume_trigger;
-static emu_timer *dmadelay_timer;
-static int frame;
-
+#define XE_DEBUG      0
+#define XE_SKIPIDLE   1
+#define XE_DMADELAY   ATTOTIME_IN_USEC(256)
 
 static const eeprom_interface eeprom_intf =
 {
@@ -108,47 +91,47 @@ static const eeprom_interface eeprom_intf =
 /* A1, A5 and A6 don't go to the 053247. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
-	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
 
 	if (offset & 0x0031)
-		return space->machine->generic.spriteram.u16[offset];
+		return state->spriteram[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		return k053247_word_r(k053246, offset, mem_mask);
+		return k053247_word_r(state->k053246, offset, mem_mask);
 	}
 }
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
-	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
 
 	if (offset & 0x0031)
-		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
+		COMBINE_DATA(state->spriteram + offset);
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		k053247_word_w(k053246, offset, data, mem_mask);
+		k053247_word_w(state->k053246, offset, data, mem_mask);
 	}
 }
 
 #endif
 
 
-static void xexex_objdma(running_machine *machine, int limiter)
+static void xexex_objdma( running_machine *machine, int limiter )
 {
-	const device_config *k053246 = devtag_get_device(machine, "k053246");
+	xexex_state *state = (xexex_state *)machine->driver_data;
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
-	counter = frame;
-	frame = video_screen_get_frame_number(machine->primary_screen);
-	if (limiter && counter == frame)
+	counter = state->frame;
+	state->frame = video_screen_get_frame_number(machine->primary_screen);
+	if (limiter && counter == state->frame)
 		return; // make sure we only do DMA transfer once per frame
 
-	k053247_get_ram(k053246, &dst);
-	counter = k053247_get_dy(k053246);
-	src = machine->generic.spriteram.u16;
+	k053247_get_ram(state->k053246, &dst);
+	counter = k053247_get_dy(state->k053246);
+	src = state->spriteram;
 	num_inactive = counter = 256;
 
 	do
@@ -169,31 +152,35 @@ static void xexex_objdma(running_machine *machine, int limiter)
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-static READ16_HANDLER( spriteram16_mirror_r )
+static READ16_HANDLER( spriteram_mirror_r )
 {
-	return(space->machine->generic.spriteram.u16[offset]);
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	return state->spriteram[offset];
 }
 
-static WRITE16_HANDLER( spriteram16_mirror_w )
+static WRITE16_HANDLER( spriteram_mirror_w )
 {
-	COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	COMBINE_DATA(state->spriteram + offset);
 }
 
 static READ16_HANDLER( xexex_waitskip_r )
 {
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+
 	if (cpu_get_pc(space->cpu) == 0x1158)
 	{
-		cpu_spinuntil_trigger(space->cpu, resume_trigger);
-		suspension_active = 1;
+		cpu_spinuntil_trigger(space->cpu, state->resume_trigger);
+		state->suspension_active = 1;
 	}
 
-	return(xexex_workram[0x14/2]);
+	return state->workram[0x14/2];
 }
 
 
 static void parse_control2( running_machine *machine )
 {
-	const device_config *k053246 = devtag_get_device(machine, "k053246");
+	xexex_state *state = (xexex_state *)machine->driver_data;
 
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
@@ -201,34 +188,39 @@ static void parse_control2( running_machine *machine )
 	/* bit 5  is enable irq 6 */
 	/* bit 6  is enable irq 5 */
 	/* bit 11 is watchdog */
-	input_port_write(machine, "EEPROMOUT", cur_control2, 0xff);
+	input_port_write(machine, "EEPROMOUT", state->cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
-	k053246_set_objcha_line(k053246, (cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(state->k053246, (state->cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
-	xexex_set_alpha(!(cur_control2 & 0x200));
+	state->cur_alpha = !(state->cur_control2 & 0x200);
 }
 
 static READ16_HANDLER( control2_r )
 {
-	return cur_control2;
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	return state->cur_control2;
 }
 
 static WRITE16_HANDLER( control2_w )
 {
-	COMBINE_DATA(&cur_control2);
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->cur_control2);
 	parse_control2(space->machine);
 }
 
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+
 	if(ACCESSING_BITS_0_7)
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
-		if (xexex_strip0x1a)
-			if (soundlatch2_r(space, 0)==1 && data==0x1a) return;
+		if (state->strip_0x1a)
+			if (soundlatch2_r(space, 0) == 1 && data == 0x1a) 
+				return;
 
 		soundlatch_w(space, 0, data & 0xff);
 	}
@@ -237,14 +229,13 @@ static WRITE16_HANDLER( sound_cmd1_w )
 static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if (ACCESSING_BITS_0_7)
-	{
 		soundlatch2_w(space, 0, data & 0xff);
-	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -254,71 +245,76 @@ static READ16_HANDLER( sound_status_r )
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "audiocpu") + 0x10000 + cur_sound_region*0x4000);
+	xexex_state *state = (xexex_state *)machine->driver_data;
+	memory_set_bank(machine, "bank2", state->cur_sound_region & 0x07);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	cur_sound_region = data & 7;
+	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	state->cur_sound_region = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static void ym_set_mixing(const device_config *device, double left, double right)
 {
-	flt_volume_set_volume(devtag_get_device(device->machine, "filter1l"), (71.0*left)/55.0);
-	flt_volume_set_volume(devtag_get_device(device->machine, "filter1r"), (71.0*right)/55.0);
-	flt_volume_set_volume(devtag_get_device(device->machine, "filter2l"), (71.0*left)/55.0);
-	flt_volume_set_volume(devtag_get_device(device->machine, "filter2r"), (71.0*right)/55.0);
+	xexex_state *state = (xexex_state *)device->machine->driver_data;
+	flt_volume_set_volume(state->filter1l, (71.0 * left) / 55.0);
+	flt_volume_set_volume(state->filter1r, (71.0 * right) / 55.0);
+	flt_volume_set_volume(state->filter2l, (71.0 * left) / 55.0);
+	flt_volume_set_volume(state->filter2r, (71.0 * right) / 55.0);
 }
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	if (cur_control2 & 0x0040)
+	xexex_state *state = (xexex_state *)machine->driver_data;
+
+	if (state->cur_control2 & 0x0040)
 	{
 		// foul-proof (CPU0 could be deactivated while we wait)
-		if (suspension_active)
+		if (state->suspension_active)
 		{
-			suspension_active = 0;
-			cpuexec_trigger(machine, resume_trigger);
+			state->suspension_active = 0;
+			cpuexec_trigger(machine, state->resume_trigger);
 		}
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
-		cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 	}
 }
 
 static INTERRUPT_GEN( xexex_interrupt )
 {
-	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+	xexex_state *state = (xexex_state *)device->machine->driver_data;
 
-	if (suspension_active)
+	if (state->suspension_active)
 	{
-		suspension_active = 0;
-		cpuexec_trigger(device->machine, resume_trigger);
+		state->suspension_active = 0;
+		cpuexec_trigger(device->machine, state->resume_trigger);
 	}
 
 	switch (cpu_getiloops(device))
 	{
 		case 0:
 			// IRQ 6 is for test mode only
-			if (cur_control2 & 0x0020)
+			if (state->cur_control2 & 0x0020)
 				cpu_set_input_line(device, 6, HOLD_LINE);
 		break;
 
 		case 1:
-			if (k053246_is_irq_enabled(k053246))
+			if (k053246_is_irq_enabled(state->k053246))
 			{
 				// OBJDMA starts at the beginning of V-blank
 				xexex_objdma(device->machine, 0);
 
 				// schedule DMA end interrupt
-				timer_adjust_oneshot(dmadelay_timer, XE_DMADELAY, 0);
+				timer_adjust_oneshot(state->dmadelay_timer, XE_DMADELAY, 0);
 			}
 
 			// IRQ 4 is the V-blank interrupt. It controls color, sound and
 			// vital game logics that shouldn't be interfered by frame-drop.
-			if (cur_control2 & 0x0800)
+			if (state->cur_control2 & 0x0800)
 				cpu_set_input_line(device, 4, HOLD_LINE);
 		break;
 	}
@@ -327,14 +323,14 @@ static INTERRUPT_GEN( xexex_interrupt )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE(&xexex_workram)			// work RAM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE_MEMBER(xexex_state, workram)			// work RAM
 
 #if XE_SKIPIDLE
 	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)				// helps sound CPU by giving back control as early as possible
 #endif
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE_GENERIC(spriteram)			// K053247 sprite RAM
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram16_mirror_r, spriteram16_mirror_w)	// K053247 sprite RAM mirror read
+	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE_MEMBER(xexex_state, spriteram)			// K053247 sprite RAM
+	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)	// K053247 sprite RAM mirror read
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_word_w)				// VACSET (K054157)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053246_word_w)				// OBJSET1
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053246_word_r)				// Passthrough to sprite roms
@@ -377,7 +373,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_r, k054539_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
@@ -459,7 +455,74 @@ static const k053247_interface xexex_k053246_intf =
 	xexex_sprite_callback
 };
 
+static STATE_POSTLOAD( xexex_postload )
+{
+	parse_control2(machine);
+	reset_sound_region(machine);
+}
+
+static MACHINE_START( xexex )
+{
+	xexex_state *state = (xexex_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
+	memory_set_bank(machine, "bank2", 0);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k053246 = devtag_get_device(machine, "k053246");
+	state->k053250 = devtag_get_device(machine, "k053250");
+	state->k053251 = devtag_get_device(machine, "k053251");
+	state->k053252 = devtag_get_device(machine, "k053252");
+	state->k056832 = devtag_get_device(machine, "k056832");
+	state->k054338 = devtag_get_device(machine, "k054338");
+	state->k054539 = devtag_get_device(machine, "k054539");
+	state->filter1l = devtag_get_device(machine, "filter1l");
+	state->filter1r = devtag_get_device(machine, "filter1r");
+	state->filter2l = devtag_get_device(machine, "filter2l");
+	state->filter2r = devtag_get_device(machine, "filter2r");
+
+	state_save_register_global(machine, state->cur_alpha);
+	state_save_register_global(machine, state->sprite_colorbase);
+	state_save_register_global_array(machine, state->layer_colorbase);
+	state_save_register_global_array(machine, state->layerpri);
+
+	state_save_register_global(machine, state->suspension_active);
+	state_save_register_global(machine, state->frame);
+
+	state_save_register_global(machine, state->cur_control2);
+	state_save_register_global(machine, state->cur_sound_region);
+	state_save_register_postload(machine, xexex_postload, NULL);
+
+	state->dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
+}
+
+static MACHINE_RESET( xexex )
+{
+	xexex_state *state = (xexex_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		state->layerpri[i] = 0;
+		state->layer_colorbase[i] = 0;
+	}
+
+	state->sprite_colorbase = 0;
+
+	state->cur_control2 = 0;
+	state->cur_sound_region = 0;
+	state->suspension_active = 0;
+	state->resume_trigger = 1000;
+	state->frame = -1;
+	k054539_init_flags(devtag_get_device(machine, "k054539"), K054539_REVERSE_STEREO);
+}
+
 static MACHINE_DRIVER_START( xexex )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(xexex_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	// 16MHz (32MHz xtal)
@@ -510,7 +573,7 @@ static MACHINE_DRIVER_START( xexex )
 	MDRV_SOUND_ROUTE(1, "filter2l", 0.50)
 	MDRV_SOUND_ROUTE(1, "filter2r", 0.50)
 
-	MDRV_SOUND_ADD("konami", K054539, 48000)
+	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
@@ -552,7 +615,7 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_REGION( 0x100000, "gfx3", 0 ) // NOTE: region must be 2xROM size for unpacking
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
-	ROM_REGION( 0x300000, "konami", 0 )
+	ROM_REGION( 0x300000, "k054539", 0 )
 	ROM_LOAD( "067_b06.rom", 0x000000, 0x200000, CRC(3b12fce4) SHA1(c69172d9965b8da8a539812fac92d5f1a3c80d17) )
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 ROM_END
@@ -581,7 +644,7 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_REGION( 0x100000, "gfx3", 0 ) // NOTE: region must be 2xROM size for unpacking
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
-	ROM_REGION( 0x300000, "konami", 0 )
+	ROM_REGION( 0x300000, "k054539", 0 )
 	ROM_LOAD( "067_b06.rom", 0x000000, 0x200000, CRC(3b12fce4) SHA1(c69172d9965b8da8a539812fac92d5f1a3c80d17) )
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 ROM_END
@@ -610,50 +673,27 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_REGION( 0x100000, "gfx3", 0 ) // NOTE: region must be 2xROM size for unpacking
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
-	ROM_REGION( 0x300000, "konami", 0 )
+	ROM_REGION( 0x300000, "k054539", 0 )
 	ROM_LOAD( "067_b06.rom", 0x000000, 0x200000, CRC(3b12fce4) SHA1(c69172d9965b8da8a539812fac92d5f1a3c80d17) )
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 ROM_END
 
-static MACHINE_RESET( xexex )
-{
-	cur_control2 = 0;
-	cur_sound_region = 0;
-	suspension_active = 0;
-	resume_trigger = 0;
-	frame = -1;
-	k054539_init_flags(devtag_get_device(machine, "konami"), K054539_REVERSE_STEREO);
-}
-
-static STATE_POSTLOAD( xexex_postload )
-{
-	parse_control2(machine);
-	reset_sound_region(machine);
-}
-
-static MACHINE_START( xexex )
-{
-	state_save_register_global(machine, cur_control2);
-	state_save_register_global(machine, cur_sound_region);
-	state_save_register_postload(machine, xexex_postload, NULL);
-
-	resume_trigger = 1000;
-
-	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
-}
-
 
 static DRIVER_INIT( xexex )
 {
+	xexex_state *state = (xexex_state *)machine->driver_data;
+
+	state->strip_0x1a = 0;
+
 	if (!strcmp(machine->gamedrv->name, "xexex"))
 	{
 		// Invulnerability
 //      *(UINT16 *)(memory_region(machine, "maincpu") + 0x648d4) = 0x4a79;
 //      *(UINT16 *)(memory_region(machine, "maincpu") + 0x00008) = 0x5500;
-		xexex_strip0x1a = 1;
+		state->strip_0x1a = 1;
 	}
 }
 
-GAME( 1991, xexex,  0,     xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver EAA)", 0 )
-GAME( 1991, xexexa, xexex, xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver AAA)", 0 )
-GAME( 1991, xexexj, xexex, xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver JAA)", 0 )
+GAME( 1991, xexex,  0,     xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver EAA)", GAME_SUPPORTS_SAVE )
+GAME( 1991, xexexa, xexex, xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver AAA)", GAME_SUPPORTS_SAVE )
+GAME( 1991, xexexj, xexex, xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver JAA)", GAME_SUPPORTS_SAVE )

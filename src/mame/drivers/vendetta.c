@@ -1,88 +1,88 @@
 /***************************************************************************
 
-Vendetta (GX081) (c) 1991 Konami
+    Vendetta (GX081) (c) 1991 Konami
 
-Preliminary driver by:
-Ernesto Corvi
-someone@secureshell.com
+    Preliminary driver by:
+    Ernesto Corvi
+    someone@secureshell.com
 
-Notes:
-- collision detection is handled by a protection chip. Its emulation might
-  not be 100% accurate.
+    Notes:
+    - collision detection is handled by a protection chip. Its emulation might
+      not be 100% accurate.
 
-// ********************************************************************************
-//   Game driver for "ESCAPE KIDS (TM)"  (KONAMI, 1991)
-// --------------------------------------------------------------------------------
-//
-//            This driver was made on the basis of 'src/drivers/vendetta.c' file.
-//                                         Driver by OHSAKI Masayuki (2002/08/13)
-//
-// ********************************************************************************
+********************************************************************************
+   Game driver for "ESCAPE KIDS (TM)"  (KONAMI, 1991)
+ --------------------------------------------------------------------------------
 
+            This driver was made on the basis of 'src/drivers/vendetta.c' file.
+                                         Driver by OHSAKI Masayuki (2002/08/13)
 
-// ***** NOTES *****
-//      -------
-//  1) ESCAPE KIDS uses 053246's unknown function. (see video/konamiic.c)
-//                   (053246 register #5  UnKnown Bit #5, #3, #2 always set "1")
+ ********************************************************************************
 
 
-// ***** On the "error.log" *****
-//      --------------------
-//  1) "YM2151 Write 00 to undocumented register #xx" (xx=00-1f)
-//                Why???
-
-//  2) "xxxx: read from unknown 052109 address yyyy"
-//  3) "xxxx: write zz to unknown 052109 address yyyy"
-//                These are video/konamiic.c's message.
-//                "video/konamiic.c" checks 052109 RAM area access.
-//                If accessed over 0x1800 (0x3800), logged 2) or 3) messages.
-//                Escape Kids use 0x1800-0x19ff and 0x3800-0x39ff area.
+ ***** NOTES *****
+      -------
+  1) ESCAPE KIDS uses 053246's unknown function. (see video/konamiic.c)
+                   (053246 register #5  UnKnown Bit #5, #3, #2 always set "1")
 
 
-// ***** UnEmulated *****
-//      ------------
-//  1) 0x3fc0-0x3fcf (052109 RAM area) access (053252 ???)
-//  2) 0x7c00 (Banked ROM area) access to data WRITE (???)
-//  3) 0x3fda (053248 RAM area) access to data WRITE (Watchdog ???)
+ ***** On the "error.log" *****
+      --------------------
+  1) "YM2151 Write 00 to undocumented register #xx" (xx=00-1f)
+                Why???
+
+  2) "xxxx: read from unknown 052109 address yyyy"
+  3) "xxxx: write zz to unknown 052109 address yyyy"
+                These are video/konamiic.c's message.
+                "video/konamiic.c" checks 052109 RAM area access.
+                If accessed over 0x1800 (0x3800), logged 2) or 3) messages.
+                Escape Kids use 0x1800-0x19ff and 0x3800-0x39ff area.
 
 
-// ***** ESCAPE KIDS PCB layout/ Need to dump *****
-//      --------------------------------------
-//   (Parts side view)
-//   +-------------------------------------------------------+
-//   |   R          ROM9                               [CN1] |  CN1:Player4 Input?
-//   |   O                                             [CN2] |           (Labeled '4P')
-//   |   M          ROM8                       ROM1    [SW1] |  CN2:Player3 Input?
-//   |   7                              [CUS1]             +-+           (Labeled '3P')
-//   |        [CUS7]   [CUS8]                              +-+  CN3:Stereo sound out
-//   | R                                       [CUS2]        |
-//   | O                                                   J |  SW1:Test Switch
-//   | M                                                   A |
-//   | 6    [CUS6]                                         M | ***  Custom Chips  ***
-//   |                                                     M |      CUS1: 053248
-//   | R                                                   A |      CUS2: 053252
-//   | O    [CUS5]                                        56P|      CUS3: 053260
-//   | M                                                     |      CUS4: 053246
-//   | 5                           ROM2  [ Z80 ]           +-+      CUS5: 053247
-//   |                                                     +-+      CUS6: 053251
-//   | R    [CUS4]                     [CUS3] [YM2151] [CN3] |      CUS7: 051962
-//   | O                                                     |      CUS8: 052109
-//   | M                                 ROM3                |
-//   | 4                                         [Sound AMP] |
-//   +-------------------------------------------------------+
-//
-//  ***  Dump ROMs  ***
-//     1) ROM1 (17C)  32Pin 1Mbit UV-EPROM          -> save "975r01" file
-//     2) ROM2 ( 5F)  28Pin 512Kbit One-Time PROM   -> save "975f02" file
-//     3) ROM3 ( 1D)  40Pin 4Mbit MASK ROM          -> save "975c03" file
-//     4) ROM4 ( 3K)  42Pin 8Mbit MASK ROM          -> save "975c04" file
-//     5) ROM5 ( 8L)  42Pin 8Mbit MASK ROM          -> save "975c05" file
-//     6) ROM6 (12M)  42Pin 8Mbit MASK ROM          -> save "975c06" file
-//     7) ROM7 (16K)  42Pin 8Mbit MASK ROM          -> save "975c07" file
-//     8) ROM8 (16I)  40Pin 4Mbit MASK ROM          -> save "975c08" file
-//     9) ROM9 (18I)  40Pin 4Mbit MASK ROM          -> save "975c09" file
-//                                                        vvvvvvvvvvvv
-//                                                        esckidsj.zip
+ ***** UnEmulated *****
+      ------------
+  1) 0x3fc0-0x3fcf (052109 RAM area) access (053252 ???)
+  2) 0x7c00 (Banked ROM area) access to data WRITE (???)
+  3) 0x3fda (053248 RAM area) access to data WRITE (Watchdog ???)
+
+
+ ***** ESCAPE KIDS PCB layout/ Need to dump *****
+      --------------------------------------
+   (Parts side view)
+   +-------------------------------------------------------+
+   |   R          ROM9                               [CN1] |  CN1:Player4 Input?
+   |   O                                             [CN2] |           (Labeled '4P')
+   |   M          ROM8                       ROM1    [SW1] |  CN2:Player3 Input?
+   |   7                              [CUS1]             +-+           (Labeled '3P')
+   |        [CUS7]   [CUS8]                              +-+  CN3:Stereo sound out
+   | R                                       [CUS2]        |
+   | O                                                   J |  SW1:Test Switch
+   | M                                                   A |
+   | 6    [CUS6]                                         M | ***  Custom Chips  ***
+   |                                                     M |      CUS1: 053248
+   | R                                                   A |      CUS2: 053252
+   | O    [CUS5]                                        56P|      CUS3: 053260
+   | M                                                     |      CUS4: 053246
+   | 5                           ROM2  [ Z80 ]           +-+      CUS5: 053247
+   |                                                     +-+      CUS6: 053251
+   | R    [CUS4]                     [CUS3] [YM2151] [CN3] |      CUS7: 051962
+   | O                                                     |      CUS8: 052109
+   | M                                 ROM3                |
+   | 4                                         [Sound AMP] |
+   +-------------------------------------------------------+
+
+  ***  Dump ROMs  ***
+     1) ROM1 (17C)  32Pin 1Mbit UV-EPROM          -> save "975r01" file
+     2) ROM2 ( 5F)  28Pin 512Kbit One-Time PROM   -> save "975f02" file
+     3) ROM3 ( 1D)  40Pin 4Mbit MASK ROM          -> save "975c03" file
+     4) ROM4 ( 3K)  42Pin 8Mbit MASK ROM          -> save "975c04" file
+     5) ROM5 ( 8L)  42Pin 8Mbit MASK ROM          -> save "975c05" file
+     6) ROM6 (12M)  42Pin 8Mbit MASK ROM          -> save "975c06" file
+     7) ROM7 (16K)  42Pin 8Mbit MASK ROM          -> save "975c07" file
+     8) ROM8 (16I)  40Pin 4Mbit MASK ROM          -> save "975c08" file
+     9) ROM9 (18I)  40Pin 4Mbit MASK ROM          -> save "975c09" file
+                                                        vvvvvvvvvvvv
+                                                        esckidsj.zip
 
 ***************************************************************************/
 
@@ -94,18 +94,11 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"
+#include "includes/vendetta.h"
 
 /* prototypes */
-static MACHINE_RESET( vendetta );
 static KONAMI_SETLINES_CALLBACK( vendetta_banking );
 static void vendetta_video_banking( running_machine *machine, int select );
-
-VIDEO_UPDATE( vendetta );
-
-extern void vendetta_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void esckids_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void vendetta_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
-
 
 /***************************************************************************
 
@@ -124,9 +117,6 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-
-static int irq_enabled;
-
 static WRITE8_HANDLER( vendetta_eeprom_w )
 {
 	/* bit 0 - VOC0 - Video banking related */
@@ -138,64 +128,63 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 	/* bit 6 - IRQ enable */
 	/* bit 7 - Unused */
 
-	if ( data == 0xff ) /* this is a bug in the eeprom write code */
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
+
+	if (data == 0xff ) /* this is a bug in the eeprom write code */
 		return;
 
 	/* EEPROM */
 	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
-	irq_enabled = ( data >> 6 ) & 1;
+	state->irq_enabled = (data >> 6) & 1;
 
-	vendetta_video_banking( space->machine, data & 1 );
+	vendetta_video_banking(space->machine, data & 1);
 }
 
 /********************************************/
 
 static READ8_HANDLER( vendetta_K052109_r )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	return k052109_r(k052109, offset + 0x2000);
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
+	return k052109_r(state->k052109, offset + 0x2000);
 }
 
 static WRITE8_HANDLER( vendetta_K052109_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
 
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
-	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )
-		k052109_w(k052109, offset, data);
-	k052109_w(k052109, offset + 0x2000, data);
+	if ((offset == 0x1d80) || (offset == 0x1e00) || (offset == 0x1f00))
+		k052109_w(state->k052109, offset, data);
+	k052109_w(state->k052109, offset + 0x2000, data);
 }
 
-static offs_t video_banking_base;
 
 static void vendetta_video_banking( running_machine *machine, int select )
 {
-	const device_config *k052109 = devtag_get_device(machine, "k052109");
-	const device_config *k053246 = devtag_get_device(machine, "k053246");
+	vendetta_state *state = (vendetta_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if ( select & 1 )
+	if (select & 1)
 	{
-		memory_install_read_bank(space, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, "bank4" );
-		memory_install_write8_handler(space, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w );
-		memory_install_readwrite8_device_handler(space, k053246, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, k053247_r, k053247_w );
+		memory_install_read_bank(space, state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, 0, 0, "bank4" );
+		memory_install_write8_handler(space, state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w );
+		memory_install_readwrite8_device_handler(space, state->k053246, state->video_banking_base + 0x0000, state->video_banking_base + 0x0fff, 0, 0, k053247_r, k053247_w );
 		memory_set_bankptr(machine, "bank4", machine->generic.paletteram.v);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(space, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r, vendetta_K052109_w );
-		memory_install_readwrite8_device_handler(space, k052109, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, k052109_r, k052109_w );
+		memory_install_readwrite8_handler(space, state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r, vendetta_K052109_w );
+		memory_install_readwrite8_device_handler(space, state->k052109, state->video_banking_base + 0x0000, state->video_banking_base + 0x0fff, 0, 0, k052109_r, k052109_w );
 	}
 }
 
 static WRITE8_HANDLER( vendetta_5fe0_w )
 {
-	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
-	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
 
 	/* bit 0,1 coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
@@ -204,34 +193,38 @@ static WRITE8_HANDLER( vendetta_5fe0_w )
 	/* bit 2 = BRAMBK ?? */
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 4 = INIT ?? */
 
 	/* bit 5 = enable sprite ROM reading */
-	k053246_set_objcha_line(k053246, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(state->k053246, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( z80_nmi_callback )
 {
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE );
+	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE );
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	timer_set(space->machine, ATTOTIME_IN_USEC(25), NULL, 0, z80_nmi_callback);
 }
 
 static WRITE8_HANDLER( z80_irq_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff );
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff );
+	vendetta_state *state = (vendetta_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 	return 0x00;
 }
 
@@ -257,7 +250,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("konami", vendetta_sound_r, k053260_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("k053260", vendetta_sound_r, k053260_w)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("k053246", k053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
@@ -281,7 +274,7 @@ static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("konami", vendetta_sound_r, k053260_w)		// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("k053260", vendetta_sound_r, k053260_w)		// Sound
 	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD("k053246", k053246_r)				// 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
@@ -298,7 +291,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
@@ -418,7 +411,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vendetta_irq )
 {
-	if (irq_enabled)
+	vendetta_state *state = (vendetta_state *)device->machine->driver_data;
+	if (state->irq_enabled)
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
@@ -458,7 +452,55 @@ static const k053247_interface esckids_k053246_intf =
 	vendetta_sprite_callback
 };
 
+static MACHINE_START( vendetta )
+{
+	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
+	memory_set_bank(machine, "bank1", 0);
+
+	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k053246 = devtag_get_device(machine, "k053246");
+	state->k053251 = devtag_get_device(machine, "k053251");
+	state->k052109 = devtag_get_device(machine, "k052109");
+	state->k054000 = devtag_get_device(machine, "k054000");
+	state->k053260 = devtag_get_device(machine, "k053260");
+
+	state_save_register_global(machine, state->irq_enabled);
+	state_save_register_global(machine, state->sprite_colorbase);
+	state_save_register_global_array(machine, state->layer_colorbase);
+	state_save_register_global_array(machine, state->layerpri);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x1000);
+}
+
+static MACHINE_RESET( vendetta )
+{
+	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	int i;
+
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), vendetta_banking);
+
+	for (i = 0; i < 3; i++)
+	{
+		state->layerpri[i] = 0;
+		state->layer_colorbase[i] = 0;
+	}
+
+	state->sprite_colorbase = 0;
+	state->irq_enabled = 0;
+
+	/* init banks */
+	vendetta_video_banking(machine, 0);
+}
+
 static MACHINE_DRIVER_START( vendetta )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(vendetta_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 6000000)	/* this is strange, seems an overclock but */
@@ -470,6 +512,7 @@ static MACHINE_DRIVER_START( vendetta )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
                             /* interrupts are triggered by the main CPU */
 
+	MDRV_MACHINE_START(vendetta)
 	MDRV_MACHINE_RESET(vendetta)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
@@ -500,7 +543,7 @@ static MACHINE_DRIVER_START( vendetta )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami", K053260, 3579545)	/* verified with PCB */
+	MDRV_SOUND_ADD("k053260", K053260, 3579545)	/* verified with PCB */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
@@ -533,7 +576,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( vendetta )
-	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081t01", 0x10000, 0x38000, CRC(e76267f5) SHA1(efef6c2edb4c181374661f358dad09123741b63d) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
@@ -550,12 +593,12 @@ ROM_START( vendetta )
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendettar )
-	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081r01", 0x10000, 0x38000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
@@ -572,12 +615,12 @@ ROM_START( vendettar )
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendetta2p )
-	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081w01", 0x10000, 0x38000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
@@ -594,12 +637,12 @@ ROM_START( vendetta2p )
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendetta2pu )
-	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081u01", 0x10000, 0x38000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
@@ -616,12 +659,12 @@ ROM_START( vendetta2pu )
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendetta2pd )
-	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081d01", 0x10000, 0x38000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
@@ -638,12 +681,12 @@ ROM_START( vendetta2pd )
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendettaj )
-	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081p01", 0x10000, 0x38000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
@@ -660,12 +703,12 @@ ROM_START( vendettaj )
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( esckids )
-	ROM_REGION( 0x049000, "maincpu", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
+	ROM_REGION( 0x048000, "maincpu", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
 	ROM_LOAD( "17c.bin", 0x010000, 0x018000, CRC(9dfba99c) SHA1(dbcb89aad5a9addaf7200b2524be999877313a6e) )
 	ROM_CONTINUE(		0x008000, 0x008000 )
 
@@ -682,13 +725,13 @@ ROM_START( esckids )
 	ROM_LOAD( "975c06", 0x200000, 0x100000, CRC(36d410f9) SHA1(2b1fd93c11839480aa05a8bf27feef7591704f3d) )
 	ROM_LOAD( "975c07", 0x300000, 0x100000, CRC(97ec541e) SHA1(d1aa186b17cfe6e505f5b305703319299fa54518) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	// Samples MASK-ROM (4M x 1)
+	ROM_REGION( 0x100000, "k053260", 0 )	// Samples MASK-ROM (4M x 1)
 	ROM_LOAD( "975c03", 0x000000, 0x080000, CRC(dc4a1707) SHA1(f252d08483fd664f8fc03bf8f174efd452b4cdc5) )
 ROM_END
 
 
 ROM_START( esckidsj )
-	ROM_REGION( 0x049000, "maincpu", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
+	ROM_REGION( 0x048000, "maincpu", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
 	ROM_LOAD( "975r01", 0x010000, 0x018000, CRC(7b5c5572) SHA1(b94b58c010539926d112c2dfd80bcbad76acc986) )
 	ROM_CONTINUE(		0x008000, 0x008000 )
 
@@ -705,7 +748,7 @@ ROM_START( esckidsj )
 	ROM_LOAD( "975c06", 0x200000, 0x100000, CRC(36d410f9) SHA1(2b1fd93c11839480aa05a8bf27feef7591704f3d) )
 	ROM_LOAD( "975c07", 0x300000, 0x100000, CRC(97ec541e) SHA1(d1aa186b17cfe6e505f5b305703319299fa54518) )
 
-	ROM_REGION( 0x100000, "konami", 0 )	// Samples MASK-ROM (4M x 1)
+	ROM_REGION( 0x100000, "k053260", 0 )	// Samples MASK-ROM (4M x 1)
 	ROM_LOAD( "975c03", 0x000000, 0x080000, CRC(dc4a1707) SHA1(f252d08483fd664f8fc03bf8f174efd452b4cdc5) )
 ROM_END
 
@@ -718,46 +761,31 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "maincpu");
-
-	if ( lines >= 0x1c )
-	{
-		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines );
-	}
+	if (lines >= 0x1c)
+		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines);
 	else
-		memory_set_bankptr(device->machine,  "bank1", &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
+		memory_set_bank(device->machine, "bank1", lines);
 }
-
-static MACHINE_RESET( vendetta )
-{
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), vendetta_banking);
-
-	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x48000];
-	irq_enabled = 0;
-
-	/* init banks */
-	memory_set_bankptr(machine,  "bank1", &memory_region(machine, "maincpu")[0x10000] );
-	vendetta_video_banking( machine, 0 );
-}
-
 
 static DRIVER_INIT( vendetta )
 {
-	video_banking_base = 0x4000;
+	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	state->video_banking_base = 0x4000;
 }
 
 static DRIVER_INIT( esckids )
 {
-	video_banking_base = 0x2000;
+	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	state->video_banking_base = 0x2000;
 }
 
 
 
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. T)", 0 )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. R)", 0 )
-GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (World 2 Players ver. W)", 0 )
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. U)", 0 )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. D)", 0 )
-GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan 2 Players ver. P)", 0 )
-GAME( 1991, esckids,     0,        esckids,  esckids,  esckids,  ROT0, "Konami", "Escape Kids (Asia, 4 Players)", 0 )
-GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, esckids,  ROT0, "Konami", "Escape Kids (Japan, 2 Players)", 0 )
+GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. T)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. R)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (World 2 Players ver. W)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. U)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. D)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan 2 Players ver. P)", GAME_SUPPORTS_SAVE )
+GAME( 1991, esckids,     0,        esckids,  esckids,  esckids,  ROT0, "Konami", "Escape Kids (Asia, 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, esckids,  ROT0, "Konami", "Escape Kids (Japan, 2 Players)", GAME_SUPPORTS_SAVE )
