@@ -1083,22 +1083,22 @@ ROM_START( galpani4 )
 	ROM_LOAD16_BYTE( "gp4j1.u8",  0x000001, 0x080000, CRC(94cb1fb7) SHA1(ac90103dd43cdce6a287ffc13631c1de477a9a71) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "gp410000.u24", 0x000000, 0x200000, CRC(1df61f01) SHA1(a9e95bbb3013e8f2fd01243b1b392ff07b4f7d02) )
-	ROM_LOAD( "gp410100.u20", 0x200000, 0x100000, CRC(8e2c9349) SHA1(a58fa9bcc9684ed4558e3395d592b64a1978a902) )
+	ROM_LOAD( "gp4-100-00.u24", 0x000000, 0x200000, CRC(1df61f01) SHA1(a9e95bbb3013e8f2fd01243b1b392ff07b4f7d02) )
+	ROM_LOAD( "gp4-101-00.u20", 0x200000, 0x100000, CRC(8e2c9349) SHA1(a58fa9bcc9684ed4558e3395d592b64a1978a902) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD( "gp420000.u16", 0x000000, 0x200000, CRC(f0781376) SHA1(aeab9553a9af922524e528eb2d019cf36b6e2094) )
-	ROM_LOAD( "gp420100.u18", 0x200000, 0x200000, CRC(10c4b183) SHA1(80e05f3932495ad4fc9bf928fa66e6d2931bbb06) )
+	ROM_LOAD( "gp4-200-00.u16", 0x000000, 0x200000, CRC(f0781376) SHA1(aeab9553a9af922524e528eb2d019cf36b6e2094) )
+	ROM_LOAD( "gp4-201-00.u18", 0x200000, 0x200000, CRC(10c4b183) SHA1(80e05f3932495ad4fc9bf928fa66e6d2931bbb06) )
 
 	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) /* Tiles Plane B */
 	/* First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles */
 	/* 0x040000 - 0x3fffff empty? */
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
-	ROM_LOAD( "gp430000.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) )
+	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) )
 ROM_END
 
-ROM_START( galpani4k )
+ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sound sample rom at U7 */
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
 	ROM_LOAD       ( "sknsk1.u10",   0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) ) /* Korean BIOS */
 
@@ -1107,19 +1107,20 @@ ROM_START( galpani4k )
 	ROM_LOAD16_BYTE( "gp4k1.u8",  0x000001, 0x080000, CRC(7a95bfe2) SHA1(82e24fd4674ec25bc6608ced0921e8573fcff2c2) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "gp410000.u24", 0x000000, 0x200000, CRC(1df61f01) SHA1(a9e95bbb3013e8f2fd01243b1b392ff07b4f7d02) )
-	ROM_LOAD( "gp410100.u20", 0x200000, 0x100000, CRC(8e2c9349) SHA1(a58fa9bcc9684ed4558e3395d592b64a1978a902) )
+	ROM_LOAD( "gp4-100-00.u24", 0x000000, 0x200000, CRC(1df61f01) SHA1(a9e95bbb3013e8f2fd01243b1b392ff07b4f7d02) )
+	ROM_LOAD( "gp4-101-00.u20", 0x200000, 0x100000, CRC(8e2c9349) SHA1(a58fa9bcc9684ed4558e3395d592b64a1978a902) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD( "gp420000.u16", 0x000000, 0x200000, CRC(f0781376) SHA1(aeab9553a9af922524e528eb2d019cf36b6e2094) )
-	ROM_LOAD( "gp420100.u18", 0x200000, 0x200000, CRC(10c4b183) SHA1(80e05f3932495ad4fc9bf928fa66e6d2931bbb06) )
+	ROM_LOAD( "gp4-200-00.u16", 0x000000, 0x200000, CRC(f0781376) SHA1(aeab9553a9af922524e528eb2d019cf36b6e2094) )
+	ROM_LOAD( "gp4-201-00.u18", 0x200000, 0x200000, CRC(10c4b183) SHA1(80e05f3932495ad4fc9bf928fa66e6d2931bbb06) )
 
 	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) /* Tiles Plane B */
 	/* First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles */
 	/* 0x040000 - 0x3fffff empty? */
 
-	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */ /* Gals Panic 4 (Korea) uses different sound samples (not dumped)?? or mapped different?? */
-	ROM_LOAD( "gp430000.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) )
+	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
+	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) /* Doesn't seem to use these samples at all */
+	ROM_LOAD( "gp4-301-01.u7", 0x200000, 0x200000, CRC(886ef77f) SHA1(047d5fecf2034339c69b2cb605b623a814a18f0d) ) /* Changed some samples when compared to U4 rom  */
 ROM_END
 
 ROM_START( galpanis )
@@ -1685,7 +1686,7 @@ ROM_END
 GAME( 1996, skns,      0,        skns, skns,     0,         ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, galpani4,  skns,     skns, cyvern,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, galpani4k, galpani4, skns, cyvern,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) /* sound samples are different / missing? */
+GAME( 1996, galpani4k, galpani4, skns, cyvern,   galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, jjparads,  skns,     skns, skns_1p,  jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanis,  skns,     skns, galpanis, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanisk, galpanis, skns, galpanis, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", GAME_IMPERFECT_GRAPHICS )
