@@ -108,6 +108,7 @@ endif
 ifdef MSVC_BUILD
 
 VCONV = $(WINOBJ)/vconv$(EXE)
+VCONVPREFIX = $(subst /,\,$(VCONV))
 
 # append a 'v' prefix if nothing specified
 ifndef PREFIX
@@ -115,10 +116,10 @@ PREFIX = v
 endif
 
 # replace the various compilers with vconv.exe prefixes
-CC = @$(VCONV) gcc -I.
-LD = @$(VCONV) ld /profile
-AR = @$(VCONV) ar
-RC = @$(VCONV) windres
+CC = @$(VCONVPREFIX) gcc -I.
+LD = @$(VCONVPREFIX) ld /profile
+AR = @$(VCONVPREFIX) ar
+RC = @$(VCONVPREFIX) windres
 
 # make sure we use the multithreaded runtime
 ifdef DEBUG
@@ -140,6 +141,9 @@ CCOMFLAGS += /wd4267
 LIBS += -lbufferoverflowu
 endif
 
+# enable exception handling for C++
+CPPONLYFLAGS += /EHsc
+
 # disable function pointer warnings in C++ which are evil to work around
 CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 
@@ -147,7 +151,7 @@ CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 LDFLAGS += /ENTRY:wmainCRTStartup
 
 # add some VC++-specific defines
-DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
+DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -Dsnprintf=_snprintf
 
 # make msvcprep into a pre-build step
 OSPREBUILD = $(VCONV)
@@ -217,8 +221,10 @@ CCOMFLAGS += -include $(WINSRC)/winprefix.h
 # for 32-bit apps, add unicows for Unicode support on Win9x
 ifndef PTR64
 LIBS += -lunicows
-LDFLAGS += -static-libgcc
 endif
+
+# ensure we statically link the gcc runtime lib
+LDFLAGS += -static-libgcc
 
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8

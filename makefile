@@ -255,7 +255,7 @@ DEFS = -DCRLF=3
 endif
 
 # map the INLINE to something digestible by GCC
-DEFS += -DINLINE=inline
+DEFS += -DINLINE="static inline"
 
 # define LSB_FIRST if we are a little-endian target
 ifndef BIGENDIAN
