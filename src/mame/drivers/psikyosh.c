@@ -63,7 +63,7 @@ Gunbird 2:        PL1 Start (passes all, only if bit 0x40 is set. But then EEPRO
 Strikers 1945III: PL1 Start (passes all, only if bit 0x40 is set)
 Dragon Blaze:     PL1 Start (passes all, only if bit 0x40 is set)
 Gunbarich:        PL1 Start (passes all, only if bit 0x40 is set)
-
+Mahjong G-taste   PL1 Start (passes all)
 
 Hold PL1 Button 1 and Test Mode button to get Maintenance mode for:
 
@@ -72,9 +72,7 @@ Space Bomber, Strikers 1945 II, Sol Divide, Daraku
 
 --- Space Bomber ---
 
-Keywords, what are these for???, you earn them when you complete the game
-with different points.:
-
+Score rankings:
 DOG-1
 CAT-2
 BUTA-3
@@ -127,6 +125,12 @@ The following 4 are also tested for, but appear to be disabled:
 0-2-4-6-8
 4-1-3-7-3
 5-0-2-1-3
+
+--- Mahjong G-Taste ---
+
+1-3-5-1-0 All Data Initialised
+1-3-5-2-0 Maintenance Mode
+1-2-3-4-5 Hangs game, needs reset
 
 ----------------------------------------------------------------*/
 
@@ -398,6 +402,63 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 }
 #endif
 
+/* Mahjong Panel */
+static READ32_HANDLER( mjgtaste_input_r )
+{
+	UINT32 controls = input_port_read(space->machine, "CONTROLLER");
+	UINT32 value = input_port_read(space->machine, "INPUTS");
+	
+	if(controls) {
+		// Keys are encoded as two bits, overloading normal P1/P2 controls
+		// Clearly has ghosting, game will only recognise one key depressed at once
+		// Since the game can't accept conflicting inputs e.g. PL1 Up and 'A' or 'B' we have to 
+		// make the user choose the input method. Especially since in test mode both sets are usable.
+		// Switch top word to either Mahjong inputs or joystick depending
+		UINT16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
+			0x8080, // A
+			0x8040, // B
+			0x8010, // C
+			0x8020, // D
+			0x4080, // E
+			0x4040, // F
+			0x4010, // G
+			0x4020, // H
+			0x1080, // I
+			0x1040, // J
+			0x1010, // K
+			0x1020, // L
+			0x2080, // M
+			0x2040, // N
+			0x0880, // Kan
+			0x2020, // Pon
+			0x2010, // Chi
+			0x0840, // Reach
+			0x0810, // Ron
+			0x0480  // Start
+		};
+		UINT32 keys = input_port_read(space->machine, "MAHJONG");
+		UINT32 which_key = 0x1;
+		int count = 0;
+
+		// HACK: read IPT_START1 from "INPUTS"
+		int start_depressed = ~value & 0x01000000; 
+		keys |= start_depressed ? 1 << (sizeof(key_codes)/sizeof(key_codes[0]) - 1) : 0; // and bung it in at the end
+		
+		value |= 0xFFFF0000; // set top word
+		do {
+			// since we can't handle multiple keys, just return the first one depressed
+			if((keys & which_key) && (count < sizeof(key_codes)/sizeof(key_codes[0]))) {
+				value &= ~((UINT32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
+				break;
+			}
+			which_key <<= 1;
+			count++;
+		} while(which_key);
+	}
+
+	return value;
+}
+
 
 static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM					// program ROM (1 meg)
@@ -447,22 +508,12 @@ static INPUT_PORTS_START( common )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" )		/* Debug stuff. Resets EEPROM? */
 	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -603,9 +654,52 @@ static INPUT_PORTS_START( tgm2 )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
-	PORT_INCLUDE( common )
+static INPUT_PORTS_START( mjgtaste )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
 
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" )		/* Debug stuff. Resets EEPROM? */
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START1 ) /* start for joystick */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	// Make the user pick the input scheme since the game can't handle both simultaneously
+	PORT_START("CONTROLLER")
+	PORT_CONFNAME( 0x00000001, 0x00000001, DEF_STR ( Controller ) )
+    PORT_CONFSETTING(          0x00000000, DEF_STR( Joystick ) )
+    PORT_CONFSETTING(          0x00000001, "Mahjong Panel" )
+	
+	PORT_START("MAHJONG") /* articifial enumeration for mahjong encoder */
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_MAHJONG_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_MAHJONG_J ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_MAHJONG_K ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_MAHJONG_L ) PORT_PLAYER(1)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_PLAYER(1)
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_MAHJONG_N ) PORT_PLAYER(1)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_MAHJONG_PON ) PORT_PLAYER(1)
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_PLAYER(1)
+//	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_START1 ) /* start on panel, hacked in from the regular one to avoid duplicates in the UI */
+	
 	PORT_START("JP4")	/* jumper pads on the PCB */
 //  PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
@@ -963,7 +1057,7 @@ ROM_START( mjgtaste )
 	ROM_LOAD( "snd0.u52", 0x000000, 0x400000, CRC(0179f018) SHA1(16ae63e021230356777342ed902e02407a1a1b82) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
-	ROM_LOAD( "eeprom-mjgtaste.bin", 0x0000, 0x0100, CRC(ce898661) SHA1(00c02de89f5d185905fffd1268ace84fe8b522ec) )
+	ROM_LOAD( "eeprom-mjgtaste.bin", 0x0000, 0x0100, CRC(bbf7cfae) SHA1(34a36d5c4d273fc2a081a8f4062b45ee873eef09) )
 ROM_END
 
 ROM_START( tgm2 )
@@ -1086,14 +1180,15 @@ static DRIVER_INIT( mjgtaste )
 {
 	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x03000000, 0x03000003, 0, 0, mjgtaste_input_r);
 }
 
 
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, soldivid, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Music missing since SH2 DRC added
-GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  s1945ii,  ROT270, "Psikyo", "Strikers 1945 II", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // linescroll/zoom
+GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, soldivid, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  s1945ii,  ROT270, "Psikyo", "Strikers 1945 II", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // linescroll/zoom test
 GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   daraku,   ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", GAME_SUPPORTS_SAVE )
 GAME( 1998, sbomberb, 0,        psikyo3v1,   sbomberb, sbomberb, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
 
