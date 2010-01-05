@@ -15,9 +15,6 @@
 /* All below have 0x80 bit set, probably row/linescroll enable/toggle */
 #define BG_SCROLL_0C   0x0c /* 224 v/h scroll values in bank 0x0c; Used in daraku, for text */
 #define BG_SCROLL_0D   0x0d /* 224 v/h scroll values in bank 0x0d; Used in daraku, for alternate characters of text */
-#define BG_SCROLL_ZOOM 0x0e /* 224 v/h scroll values in bank 0x0e-0x1f; Used in s1945ii, s1945iii */
-
-enum { eeprom_0=0, eeprom_DEFAULT=1, eeprom_DARAKU, eeprom_S1945III, eeprom_DRAGNBLZ, eeprom_GNBARICH, eeprom_USER1, eeprom_MJGTASTE };
 
 
 typedef struct _psikyosh_state psikyosh_state;

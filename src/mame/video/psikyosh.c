@@ -29,7 +29,7 @@ Bank Offset Purpose
 6   3000    "
 7   3800    Sprite List
 ---
-8   4000    Pre Lineblend (0x000, 224 values) and Post Lineblend (0x400, 224 values)
+8   4000    Pre Lineblend (0x000, 224 values) and Post Lineblend (0x400, 224 values). Bank is configurable from vidregs.
 9   4800    Unknown
 a   5000    Tilemap XScroll/YScroll
 b   5800    Tilemap Priority/Zoom/AlphaBlending/Bank
@@ -50,20 +50,21 @@ Either at 0x30057f0 / 4/8 (For 0a/0c/0d), 0x3005ff0 / 4/8 (For 0b) Or per-line i
 
 Vid Regs:
 
-0x00 -- alpha values for sprites. sbomberb = 0000 3830
-0x04 --   "     "     "     "     sbomberb = 2820 1810.
+0x00 -- alpha values for sprites, 8-bits per value (0-0x3f). sbomberb = 0000 3830 2820 1810
+0x04 --   "
 
-0x08 -- 0xff00 priority values for sprites, 4-bits per value, c0 is vert game (Controls whether row/line effects?), 0x000f is priority for per-line post-blending
+0x08 -- 0xffff0000 priority values for sprites, 4-bits per value, 0x00c0 is vert game (Controls whether row/line effects?), 0x000f is priority for per-line post-blending
 
-0x0c -- ????c0?? -c0 is flip screen
-0x10 -- 00aa2000? always? -gb2 tested- 00000fff Controls gfx data available to be read by SH-2 for verification
-0x14 -- 83ff000e? always? -gb2 tested-
+0x0c -- ????c0?? -c0 is flip screen? A table of 4 8-bit values, usualy increasing from 0-0x3f again.
+0x10 -- 00aa2000? always? -gb2 tested- 00000fff Controls gfx data available to be read by SH-2 for verification. H-sync?
+0x14 -- 83ff000e? always? -gb2 tested-. V-sync?
 0x18 -- double buffer/mode for tilemaps. As follows for the different tilemaps: 112233--
         0a = normal 0b = alt buffer
         0c/0d are used by daraku for text layers. same as above except bank is still controlled by registers and seems to contain two 16x16 timemaps with alternate columns from each.
         0e-1f indicates layer uses row and/or line scroll. values come from associated bank, tiles from 2 below i.e bank c-1d
         Bit 0x80 indicates use of line effects.
-0x1c -- ????123- enable bits  8 is enable. 4 indicates 8bpp tiles. 1 is size select for tilemap
+0x1c -- ff000000 controls bank for 'pre'/'post' values
+        ????123- enable bits  8 is enable. 4 indicates 8bpp tiles. 1 is size select for tilemap
 */
 
 /*
@@ -93,6 +94,7 @@ sol divide doesn't seem to make much use of tilemaps at all, it uses them to fad
 #include "profiler.h"
 #include "drawgfxm.h"
 #include "includes/psikyosh.h"
+#include "ui.h"
 
 /* Psikyo PS6406B */
 /* --- BACKGROUNDS --- */
@@ -166,9 +168,6 @@ static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap,
 		scrollx  = (state->bgram[0x13f0 / 4 + (layer * 0x04) / 4] & 0x000001ff) >> 0;
 		scrolly  = (state->bgram[0x13f0 / 4 + (layer * 0x04) / 4] & 0x03ff0000) >> 16;
 	}
-
-	if (BG_TYPE(layer) == BG_SCROLL_0D)
-		scrollx += 0x08; /* quick kludge until using rowscroll */
 
 	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
 	size = BG_LARGE(layer) ? 32 : 16;
@@ -381,12 +380,10 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	int i;
 
 #if 0
-#ifdef MAME_DEBUG
 	popmessage	("Pri %d=%02x-%s %d=%02x-%s %d=%02x-%s",
 		0, BG_TYPE(0), BG_LAYER_ENABLE(0)?"y":"n",
 		1, BG_TYPE(1), BG_LAYER_ENABLE(1)?"y":"n",
 		2, BG_TYPE(2), BG_LAYER_ENABLE(2)?"y":"n");
-#endif
 #endif
 
 	/* 1st-3rd layers */
@@ -405,22 +402,15 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 				if (((state->bgram[0x1ff0 / 4 + (i * 0x04) / 4] & 0xff000000) >> 24) == req_pri)
 					draw_bglayer(machine, i, bitmap, cliprect);
 				break;
-			case BG_SCROLL_0C: // Using normal for now
-			case BG_SCROLL_0D: // Using normal for now
+			case BG_SCROLL_0C: // Special hack for daraku
+			case BG_SCROLL_0D: // Special hack for daraku
 				if (((state->bgram[(BG_TYPE(i) * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0xff000000) >> 24) == req_pri)
 					draw_bglayertext(machine, i, bitmap, cliprect);
 				break;
-			case BG_SCROLL_ZOOM:
-			/* 0x10 - 0x1f */
-			case 0x10: case 0x11: case 0x12: case 0x13:
-			case 0x14: case 0x15: case 0x16: case 0x17:
-			case 0x18: case 0x19: case 0x1a: case 0x1b:
-			case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+			default: // 0x0e onwards
 				if (((state->bgram[(BG_TYPE(i) * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0xff000000) >> 24) == req_pri)
 					draw_bglayerscroll(machine, i, bitmap, cliprect);
 				break;
-			default:
-				popmessage	("Unknown layer type %02x", BG_TYPE(i));
 		}
 	}
 }
@@ -976,7 +966,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 
 #define SPRITE_PRI(n) (((state->vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri)
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1008,6 +998,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     **- End Sprite Format -*/
 
+					
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	const gfx_element *gfx;
 	UINT32 *src = machine->generic.buffered_spriteram.u32; /* Use buffered spriteram */
@@ -1066,29 +1057,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				psikyosh_drawgfxzoom(machine, bitmap, cliprect, gfx, tnum, colr, flpx, flpy, xpos, ypos, alpha,
 									(UINT32)zoom_table[BYTE_XOR_BE(zoomx)], (UINT32)zoom_table[BYTE_XOR_BE(zoomy)], wide, high, listcntr);
-
-#if 0
-#ifdef MAME_DEBUG
-				if (input_code_pressed(machine, KEYCODE_Z))	/* Display some info on each sprite */
-				{
-					char buf[10];
-					int x, y;
-
-					sprintf(buf, "%X",xdim/16); /* Display Zoom in 16.16 */
-					if (machine->gamedrv->flags & ORIENTATION_SWAP_XY)
-					{
-						x = ypos;
-						y = video_screen_get_visible_area(machine->primary_screen)->max_x - xpos; /* ORIENTATION_FLIP_Y */
-					}
-					else
-					{
-						x = xpos;
-						y = ypos;
-					}
-					ui_draw_text(buf, x, y);
-				}
-#endif
-#endif
 			}
 			/* end drawing */
 		}
@@ -1111,8 +1079,9 @@ VIDEO_START( psikyosh )
 
 	{ /* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 		int i;
-		for (i = 0; i < 0xc0; i++)
+		for (i = 0; i < 0xc0; i++) {
 			alphatable[i] = 0xff;
+		}
 		for (i = 0; i < 0x40; i++)
 		{
 			int alpha = ((0x3f - i) * 0xff) / 0x3f;
@@ -1132,7 +1101,8 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
        As it's only used in testmode I'll just leave it as a toggle for now */
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	UINT32 *dstline;
-	UINT32 *linefill = state->bgram; /* Per row */
+	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (0x4000) except for daraku */
+	UINT32 *linefill = &state->bgram[(bank * 0x800) / 4 - 0x4000 / 4]; /* Per row */
 	int x, y;
 
 	assert(bitmap->bpp == 32);
@@ -1149,16 +1119,21 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
 	profiler_mark_end();
 }
 
-static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	UINT32 *dstline;
-	UINT32 *lineblend = state->bgram + 0x400 / 4; /* Per row */
+	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (i.e. 0x4000) */
+	UINT32 *lineblend = &state->bgram[(bank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; /* Per row */
 	int x, y;
 
 	assert(bitmap->bpp == 32);
 
+	if ((state->vidregs[2] & 0xf) != req_pri) {
+		return;
+	}
+	
 	profiler_mark_start(PROFILER_USER2);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
@@ -1180,20 +1155,53 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 
 VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
-	psikyosh_state *state = (psikyosh_state *)screen->machine->driver_data;
 	int i;
+	psikyosh_state *state = (psikyosh_state *)screen->machine->driver_data;
 
+	// show only the priority associated with a given keypress(s) and/or hide sprites/tilemaps
+	int pri_debug = 0;
+	int sprites = 1;
+	int backgrounds = 1;
+	int pri_keys[8] = {KEYCODE_Z, KEYCODE_X, KEYCODE_C, KEYCODE_V, KEYCODE_B, KEYCODE_N, KEYCODE_M, KEYCODE_K};
+#if 0
+	for (i = 0; i <= 7; i++)
+	{
+		if(input_code_pressed(screen->machine, pri_keys[i])) {
+			pri_debug= 1;
+		}
+	}
+	if(input_code_pressed(screen->machine, KEYCODE_G)) {
+		sprites = 0;
+	}
+	if(input_code_pressed(screen->machine, KEYCODE_H)) {
+		backgrounds = 0;
+	}
+#endif
+
+#if 0
+popmessage   ("Regs %08x %08x %08x %08x\n     %08x %08x %08x %08x",
+    state->vidregs[0], state->vidregs[1],
+    state->vidregs[2], state->vidregs[3],
+    state->vidregs[4], state->vidregs[5],
+    state->vidregs[6], state->vidregs[7]);
+#endif
+	
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(state->z_bitmap, cliprect, 0); /* z-buffer */
 
 	psikyosh_prelineblend(screen->machine, bitmap, cliprect);
-
 	for (i = 0; i <= 7; i++)
 	{
-		draw_sprites(screen->machine, bitmap, cliprect, i); // When same priority bg's have higher pri
-		draw_background(screen->machine, bitmap, cliprect, i);
-		if ((state->vidregs[2] & 0xf) == i)
-			psikyosh_postlineblend(screen->machine, bitmap, cliprect);
+		if(!pri_debug || input_code_pressed(screen->machine, pri_keys[i]))
+		{
+			if(sprites) {
+				draw_sprites(screen->machine, bitmap, cliprect, i); // When same priority bg's have higher pri
+			}
+			if(backgrounds) {
+				draw_background(screen->machine, bitmap, cliprect, i);
+			}
+			psikyosh_postlineblend(screen->machine, bitmap, cliprect, i);
+		}
 	}
 	return 0;
 }
@@ -1205,14 +1213,3 @@ VIDEO_EOF( psikyosh )
 	buffer_spriteram32_w(space, 0, 0, 0xffffffff);
 }
 
-/*popmessage   ("Regs %08x %08x %08x\n     %08x %08x %08x",
-    state->bgram[0x17f0 / 4], state->bgram[0x17f4 / 4], state->bgram[0x17f8 / 4],
-    state->bgram[0x1ff0 / 4], state->bgram[0x1ff4 / 4], state->bgram[0x1ff8 / 4]);*/
-/*popmessage   ("Regs %08x %08x %08x\n     %08x %08x %08x",
-    state->bgram[0x13f0 / 4], state->bgram[0x13f4 / 4], state->bgram[0x13f8 / 4],
-    state->bgram[0x1bf0 / 4], state->bgram[0x1bf4 / 4], state->bgram[0x1bf8 / 4]);*/
-/*popmessage   ("Regs %08x %08x %08x %08x %08x %08x %08x %08x",
-    state->vidregs[0], state->vidregs[1],
-    state->vidregs[2], state->vidregs[3],
-    state->vidregs[4], state->vidregs[5],
-    state->vidregs[6], state->vidregs[7]);*/
