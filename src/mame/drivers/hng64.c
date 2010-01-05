@@ -983,14 +983,12 @@ static READ32_HANDLER( tcram_r )
 	return hng64_tcram[offset];
 }
 
-/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high, unknown purpose (vblank? related to the display list?). */
+/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
+   unknown purpose (vblank? related to the display list?). */
 static READ32_HANDLER( unk_vreg_r )
 {
 	static UINT32 toggle;
-
-	toggle^=0x8000;
-
-	return toggle | (mame_rand(space->machine) & 2);
+	return ++toggle;
 }
 
 
