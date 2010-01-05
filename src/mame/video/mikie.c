@@ -127,8 +127,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = mikie_videoram[tile_index] + ((mikie_colorram[tile_index] & 0x20) << 3);
 	int color = (mikie_colorram[tile_index] & 0x0f) + 16 * palettebank;
 	int flags = ((mikie_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((mikie_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
-
+	if (mikie_colorram[tile_index] & 0x10)
+		tileinfo->category = 1;
+	else
+		tileinfo->category = 0;
 	SET_TILE_INFO(0, code, color, flags);
+
+
 }
 
 VIDEO_START( mikie )
@@ -168,7 +173,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( mikie )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }
