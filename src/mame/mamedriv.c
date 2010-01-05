@@ -1237,6 +1237,7 @@ const game_driver * const drivers[] =
 	DRIVER( invad2ct )	/* 851 (c) 1980 Midway */
 	DRIVER( invadpt2 )	/* 852 [1980] Taito */
 	DRIVER( invaddlx )	/* 852 [1980] Midway */
+	DRIVER( vortex )	/* 852 [1980] Zilec Electronics Ltd. */
 	DRIVER( moonbase )	/* Zeta - Nichibutsu */
 						/* 870 - Space Invaders Deluxe cocktail */
 	DRIVER( searthin )	/* bootleg */

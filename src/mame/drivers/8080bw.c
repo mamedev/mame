@@ -2181,6 +2181,17 @@ ROM_START( invaddlx )
 	ROM_LOAD( "invdelux.d",   0x4000, 0x0800, CRC(e8d5afcd) SHA1(91fde9a9e7c3dd53aac4770bd169721a79b41ed1) )
 ROM_END
 
+/* Runs on a Space Invaders Part II boardset with an epoxy module in place of the 8080 CPU */
+ROM_START( vortex )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.t36",        0x0000, 0x0800, CRC(577417a6) SHA1(13ed1b989b8ea27cea88be7872921ff9283b5dd6) )
+	ROM_LOAD( "2.t35",        0x0800, 0x0800, CRC(126d0049) SHA1(4c189a2364bca8682543d605e84d458bf81ee489) )
+	ROM_LOAD( "3.t34",        0x1000, 0x0800, CRC(4a2510b3) SHA1(1c62583b7baf8ee2b6014a6e5dfc7e2d516886d1) )
+	ROM_LOAD( "4.t33",        0x1800, 0x0800, CRC(da0274fe) SHA1(b8ab1b16d66700f9ca6a2380a5b6796eaef6e1bd) )
+	ROM_LOAD( "5.t32",        0x4000, 0x0800, CRC(a3de49d6) SHA1(e302c6fd2705c6e7f9125b52b2dcb034cc88a90e) )
+	ROM_LOAD( "6.t31",        0x4800, 0x0800, CRC(271085d0) SHA1(a772cec8135bc746f6c56aa294eb22c0604e16f9) )
+ROM_END
+
 ROM_START( moonbase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ze3-1.a4",     0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )
@@ -2847,6 +2858,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
+GAME( 1980, vortex,   0,        invaders, invadpt2, 0, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080 */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
