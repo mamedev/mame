@@ -1821,11 +1821,11 @@ static MACHINE_DRIVER_START( berlwall )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1000000)
+	MDRV_SOUND_ADD("ay1", YM2149, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_intf_dsw)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1000000)
+	MDRV_SOUND_ADD("ay2", YM2149, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
@@ -1868,10 +1868,10 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -2069,10 +2069,10 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

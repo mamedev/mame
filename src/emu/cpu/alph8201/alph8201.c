@@ -19,7 +19,7 @@ Shougi                    1982? 8201 (pcb)
 Shougi 2                  1982? 8201 (pcb)
 Talbot                    1982  8201?
 Champion Base Ball        1983  8201 (schematics)
-Exciting Soccer           1983  8301?
+Exciting Soccer           1983  8302 (pcb)
 Champion Base Ball II     1983  8302 (pcb, unofficial schematics)
 Exciting Soccer II        1984  8303 (uses 8303+ opcodes)
 Equites                   1984  8303 (post)

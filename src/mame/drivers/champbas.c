@@ -15,6 +15,7 @@ are not used.
 
 champbbj and champbb2 has Alpha8201 mcu for protection.
 champbja is a patched version of champbbj with different protection.
+exctsccr has Alpha8302 MCU for protection.
 
 main CPU
 
@@ -707,7 +708,7 @@ static MACHINE_DRIVER_START( exctsccr )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
-	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)
+	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)		/* Actually 8302 */
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_START(exctsccr)
@@ -715,7 +716,7 @@ static MACHINE_DRIVER_START( exctsccr )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(60.54)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -731,8 +732,8 @@ static MACHINE_DRIVER_START( exctsccr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	/* AY (melody) clock is specified by VR (0.9 - 3.9 MHz), which is it? */
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/8)
+	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
+	MDRV_SOUND_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
@@ -1037,6 +1038,36 @@ ROM_START( exctsccrj )
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
+ROM_START( exctsccrj2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1_10g.bin",    0x0000, 0x2000, CRC(310298a2) SHA1(b05a697ec2ed1bf4947fcc5f823ed9cb8daeee15) )
+	ROM_LOAD( "2_10h.bin",    0x2000, 0x2000, CRC(030fd0b7) SHA1(a4c57c5eb1c76dc7e5d9be48036f21331f9529d9) )
+	ROM_LOAD( "3_10j.bin",    0x4000, 0x2000, CRC(1a51ff1f) SHA1(2a657f95807bfbf172f7d22e20b9ce75f453d028) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "0_h6.bin",     0x0000, 0x2000, CRC(3babbd6b) SHA1(b81bd47c4449f4f21f2d55d01eb9cb6db10664c7) )
+	ROM_LOAD( "9_f6.bin",     0x2000, 0x2000, CRC(639998f5) SHA1(c4ff5e5e75d53dea38449f323186d08d5b57bf90) )
+	ROM_LOAD( "8_d6.bin",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )
+	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
+	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4_5a.bin",     0x0000, 0x2000, CRC(74cc71d6) SHA1(ff3d59845bc66ec3335eadf81d799a684182c66f) ) /* planes 0,1 */
+	ROM_LOAD( "6_5c.bin",     0x2000, 0x2000, CRC(7c4cd1b6) SHA1(141e67fec9b6d6b4380cb941b4d79341787680e3) ) /* plane 3 */
+
+	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5_5b.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
+
+	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_LOAD( "2.5k",         0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
+	ROM_LOAD( "3.5l",         0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "prom1.e1",     0x0000, 0x0020, CRC(d9b10bf0) SHA1(bc1263331968f4bf37eb70ec4f56a8cb763c29d2) ) /* palette */
+	ROM_LOAD( "prom3.k5",     0x0020, 0x0100, CRC(b5db1c2c) SHA1(900aaaac6b674a9c5c7b7804a4b0c3d5cce761aa) ) /* lookup table */
+	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
+ROM_END
+
 /*
 The Kazutomi bootleg board is a conversion from Champion Baseball:
 Alpha denshi co. LTD made in Japan
@@ -1186,5 +1217,6 @@ GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha D
 GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, exctsccrj2, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan set 2)", 0 )
 GAME( 1983, exctsccrb,  exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1984, exctscc2,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", GAME_SUPPORTS_SAVE )

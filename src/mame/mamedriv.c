@@ -6586,6 +6586,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( exctsccr )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccra )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccrj )	/* (c) 1983 Alpha Denshi Co. */
+	DRIVER( exctsccrj2 )/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccrb )	/* bootleg */
 	DRIVER( exctscc2 )	/* (c) 1984 Alpha Denshi Co. */
 	DRIVER( talbot )	/* Volt Electronics */
