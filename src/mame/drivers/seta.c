@@ -36,6 +36,7 @@ P0-053-A                92 Quiz Kokology                        Tecmo
 P0-055-B                89 Wit's                                Athena
 P0-055-D                90 Thunder & Lightning                  Romstar / Visco
 Promat PCB              94 Wiggie Waggie(5)                     --
+Promat PCB              94 Super Bar(5)                         --
 P0-058-C                98 Internation Toote (6)                Coinmaster
 P0-063-A                91 Rezon                                Allumer
 P0-068-B (M6100723A)    92 Block Carnival                       Visco
@@ -6667,9 +6668,11 @@ static GFXDECODE_START( orbs )
 GFXDECODE_END
 
 /***************************************************************************
-                                Wiggie Waggle
+                                Wiggie Waggle / Super Bar
 ****************************************************************************/
 
+/* these seem to have some silly address swapping, different on each game
+  we handle it here, but we could also handle it in the init instead */
 static const gfx_layout wiggie_layout =
 {
 	16,16,
@@ -6690,6 +6693,25 @@ static GFXDECODE_START( wiggie )
 	GFXDECODE_ENTRY( "gfx1", 0, wiggie_layout,   0x0, 32  ) /* bg tiles */
 GFXDECODE_END
 
+static const gfx_layout superbar_layout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7,
+	 64,65,66,67,68,69,70,71 },
+	{ 0*8, 2*8,   16*8, 18*8,
+ 	  1*8, 3*8,	  17*8, 19*8,
+	  4*8, 6*8,	  20*8, 22*8, 
+   	  5*8, 7*8,	  21*8, 23*8 },
+	16*16
+};
+
+
+static GFXDECODE_START( superbar )
+	GFXDECODE_ENTRY( "gfx1", 0, superbar_layout,   0x0, 32  ) /* bg tiles */
+GFXDECODE_END
 
 /***************************************************************************
                                 U.S. Classic
@@ -8027,6 +8049,11 @@ static MACHINE_DRIVER_START( wiggie )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( superbar )
+	MDRV_IMPORT_FROM( wiggie )
+
+	MDRV_GFXDECODE(superbar)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wits )
 
@@ -8781,25 +8808,82 @@ ROM_START( thunderl )
 	ROM_LOAD( "r27", 0x080000, 0x080000, CRC(cb8425a3) SHA1(655afa295fbe99acc79c4004f03ed832560cff5b) )
 ROM_END
 
-/* Wiggie does NOT run on a seta board, but is a hack / bootleg of Thunder & Lightning (just like
-   Promat's Perestroika Girls is a hack / bootleg of Taito's Super Qix */
+/*
+
+Wiggie Waggie & Super Bar run on a bootleg SETA board with an OKI M6295 replacing the X1-010 sound chip.
+Both games are based on Thunder & Lightning code.
+
+PCB:
+
++--------------------------------------------------------+
+| YM3012* YM2151*  2M-1                                  |
+|                  2M-2*      6116             6116      |
+| VOL  6116 M6295  2M-3*      6116             6116      |
+|       A5   16MHz                             6116      |
++-+   Z80A               6264                  6116      |
+  |                      6264                            |
++-+                                                      |
+|                6116                                    |
+|J               6116                                    |
+|A                                                       |
+|M                                    PAL                |
+|M                                       +------+        |
+|A   DSW2                                |Actel |        |
+|              +-+                       |A1020A|        |
++-+  DSW1      |6|                       |PL84C |        |
+  |            |8| 6264                  +------+        |
++-+            |0| 6264           6116     1M-4          |
+|              |0|                6116     1M-5          |
+|              |0| 512-1          6116     1M-6          |
+|              +-+ 512-2          6116     1M-7          |
++--------------------------------------------------------+
+
+  CPU: 68000P10 (8MHz)
+       Z80A (4MHz)
+Sound: OKI M6295
+  OSC: 16MHz
+Other: Actel A1020A PLC84C (used for graphics and graphic rom decode)
+
+* Denotes unpopulated sockets
+
+*/
 
 ROM_START( wiggie )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "wiggie.f19", 0x00000, 0x10000, CRC(24b58f16) SHA1(96ef92ab79258da9322dd7e706bf05ac5143f7b7) )
-	ROM_LOAD16_BYTE( "wiggie.f21", 0x00001, 0x10000, CRC(83ba6edb) SHA1(fa74fb39599ed877317db73d02d14df5b475fc35) )
+	ROM_LOAD16_BYTE( "wiggie.e19", 0x00000, 0x10000, CRC(24b58f16) SHA1(96ef92ab79258da9322dd7e706bf05ac5143f7b7) )
+	ROM_LOAD16_BYTE( "wiggie.e21", 0x00001, 0x10000, CRC(83ba6edb) SHA1(fa74fb39599ed877317db73d02d14df5b475fc35) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* sound cpu code */
 	ROM_LOAD( "wiggie.a5", 0x00000, 0x10000, CRC(8078d77b) SHA1(4e6855d396a1bace2810b13b7dd08ccf5de89bd8) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "wiggie.d1", 0x00000, 0x40000, CRC(27fbe12a) SHA1(73f476a03b321ed1ae89104f5b32d77153fabb82))
+	ROM_LOAD( "wiggie.d1", 0x00000, 0x40000, CRC(27fbe12a) SHA1(73f476a03b321ed1ae89104f5b32d77153fabb82) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "wiggie.k16", 0x00000, 0x20000, CRC(4fb40b8a) SHA1(120c9fd677071485a9f8accc2385117baf542b9c) )
-	ROM_LOAD( "wiggie.k18", 0x20000, 0x20000, CRC(ebc418e9) SHA1(a9af9bebce56608b0533d7d147191ebdceaca4e4) )
-	ROM_LOAD( "wiggie.k19", 0x40000, 0x20000, CRC(c073501b) SHA1(4b4cd0fed5efe12bcd10f98a71becc212e7e753a) )
-	ROM_LOAD( "wiggie.k21", 0x60000, 0x20000, CRC(22f6fa39) SHA1(d3e86e156434153335c5d2ce71417f35097f5ab7) )
+	ROM_LOAD( "wiggie.j16", 0x00000, 0x20000, CRC(4fb40b8a) SHA1(120c9fd677071485a9f8accc2385117baf542b9c) ) /* Drawn nude girls for the backgrounds */
+	ROM_LOAD( "wiggie.j18", 0x20000, 0x20000, CRC(ebc418e9) SHA1(a9af9bebce56608b0533d7d147191ebdceaca4e4) )
+	ROM_LOAD( "wiggie.j20", 0x40000, 0x20000, CRC(c073501b) SHA1(4b4cd0fed5efe12bcd10f98a71becc212e7e753a) )
+	ROM_LOAD( "wiggie.j21", 0x60000, 0x20000, CRC(22f6fa39) SHA1(d3e86e156434153335c5d2ce71417f35097f5ab7) )
+ROM_END
+
+ROM_START( superbar ) /* All roms had a "PROMAT" label with no other information.  Rom size was silkscreened on the PCB */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "promat_512-1.e19", 0x00000, 0x10000, CRC(cc7f9e87) SHA1(6c63ee5ac1c145a151a972a2b6bcb29036dad02d) )
+	ROM_LOAD16_BYTE( "promat_512-2.e21", 0x00001, 0x10000, CRC(5e8c7231) SHA1(16efbaa871335143490ca897e0573bbbcf16ff16) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* sound cpu code */
+	ROM_LOAD( "promat.a5", 0x00000, 0x10000, CRC(8078d77b) SHA1(4e6855d396a1bace2810b13b7dd08ccf5de89bd8) ) /* Same as Wiggie Waggie */
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "promat_2m-1.d1", 0x00000, 0x40000, CRC(27fbe12a) SHA1(73f476a03b321ed1ae89104f5b32d77153fabb82) ) /* Same as Wiggie Waggie */
+	/* 2M-2 sample rom not populated */
+	/* 2M-3 sample rom not populated */
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "promat_1m-4.j16", 0x00000, 0x20000, CRC(43dbc99f) SHA1(36ac4df9286d8661c61e0dfc9788b936c5596c31) ) /* Drawn clothed girls for the backgrounds */
+	ROM_LOAD( "promat_1m-5.j18", 0x20000, 0x20000, CRC(c09344b0) SHA1(4c54dbc602fa2ccddd232f145d3844a4d145611c) )
+	ROM_LOAD( "promat_1m-6.j20", 0x40000, 0x20000, CRC(7d83f8ba) SHA1(55d026a3b98dd0e9a6263a0c913a1d9b6c30cfd1) )
+	ROM_LOAD( "promat_1m-7.j21", 0x60000, 0x20000, CRC(734df92a) SHA1(0dfd58a3f47fa8dfa315df7adfad25ade97c2a3b) )
 ROM_END
 
 ROM_START( rezon )
@@ -9970,6 +10054,7 @@ GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, 0,        ROT0,   "Seta",   
 GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
+GAME( 1994, superbar, wiggie,   superbar, thunderl, wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "[Seta] (Visco license)", "Jockey Club", 0 )
 GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
