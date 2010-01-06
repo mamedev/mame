@@ -318,11 +318,6 @@ static READ32_HANDLER( unk_r )
 	return mame_rand(space->machine);
 }
 
-static READ32_HANDLER( input_r )
-{
-	return 0x00200000;
-}
-
 static READ32_HANDLER( watchdog_r )
 {
 	return 0xffffffff;
