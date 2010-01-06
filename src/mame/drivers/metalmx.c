@@ -690,11 +690,11 @@ static DRIVER_INIT( metalmx )
 {
 	metalmx_state *state = (metalmx_state *)machine->driver_data;
 
-	state->maincpu = cputag_get_cpu(machine, "maincpu");
-	state->adsp = cputag_get_cpu(machine, "adsp");
-	state->gsp = cputag_get_cpu(machine, "gsp");
-	state->dsp32c_1 = cputag_get_cpu(machine, "dsp32c_1");
-	state->dsp32c_2 = cputag_get_cpu(machine, "dsp32c_2");
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->adsp = devtag_get_device(machine, "adsp");
+	state->gsp = devtag_get_device(machine, "gsp");
+	state->dsp32c_1 = devtag_get_device(machine, "dsp32c_1");
+	state->dsp32c_2 = devtag_get_device(machine, "dsp32c_2");
 }
 
 static MACHINE_RESET( metalmx )
