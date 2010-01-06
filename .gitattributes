@@ -2522,6 +2522,7 @@ src/mame/includes/gomoku.h svneol=native#text/plain
 src/mame/includes/gotcha.h svneol=native#text/plain
 src/mame/includes/gottlieb.h svneol=native#text/plain
 src/mame/includes/gotya.h svneol=native#text/plain
+src/mame/includes/gradius3.h svneol=native#text/plain
 src/mame/includes/grchamp.h svneol=native#text/plain
 src/mame/includes/gridlee.h svneol=native#text/plain
 src/mame/includes/gstriker.h svneol=native#text/plain
