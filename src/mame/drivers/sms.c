@@ -858,6 +858,57 @@ ROM_START( sureshot )
 	ROM_RELOAD(               0x1000, 0x1000 )
 ROM_END
 
+/*
+Etched in copper on back	COPYRIGHT SMS 1983
+				mfg corp
+				S/N A-872		A-872 was etched
+				MADE IN USA
+
+Etched in copper on front	REV 03
+
+Silkscreened on top		P/N 1001
+
+
+.16	2764		handwritten sticker	U16
+.17	2764		handwritten sticker	U17
+.18	2764		handwritten sticker	U18
+.19	2764		handwritten sticker	U19
+.26	2732		handwritten sticker	#26
+.32	pal10l8		green dot sticker with 32 written on it
+.52	pal10l8		blue dot sticker with 52 written on it
+.58	pal10l8		3 blue dot stickers with 58 written on one
+.40	pal10l8		red dot sticker with 40 written on it
+.39	pal10l8		3 green dot stickers with 39 written on one
+.38	pal10l8		3 blue dot stickers with 38 written on one
+.80	pal10l8		2 blue dot stickers with 80 written on one
+.94	pal14h4		2 green dot stickers with 94 written on one - was getting different values for each read
+.109	pal14h4		2 brown dot stickers with 109 written on one
+.110	pal10l8		2 red dot stickers with 110 written on one
+.128	pal10h8		1 blue, 1 brown, and another blue dot sticker with 128 written on the first blue one
+.129	pal10h8		1 green and 1 red dot sticker
+.130	pal10h8		3 red dot stickers with 130 written on one
+.140	pal14h4		1 brown sticker with 140 written on it
+.141	pal14h4		1 brown sticker with 141 written on it
+.142	pal14h4		1 brown sticker with 142 written on it
+.143	pal14h4		1 brown sticker with 143 written on it
+.144	pal14h4		1 brown sticker with 144 written on it
+.145	pal14h4		1 brown sticker with 145 written on it
+*/
+
+ROM_START( secondch )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "u19.19", 0xf8000, 0x02000, CRC(5ab3d30f) SHA1(16120c6d6a9d494c12f6609e5cb1311a4b40672b) )
+	ROM_LOAD( "u18.18", 0xfa000, 0x02000, CRC(941a1401) SHA1(92934d40bb256e18b996582c1af253d06732462f) )
+	ROM_LOAD( "u17.17", 0xfc000, 0x02000, CRC(88717e9f) SHA1(01b78f3ddd78e74e799d5f8ffe2f3cbcf5e6b7a2) )
+	ROM_LOAD( "u16.16", 0xfe000, 0x02000, CRC(6c9a0224) SHA1(01152024b48461c3b9ac63a9265129dabacd0462) )
+	ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "#26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(           0x1000, 0x1000 )
+ROM_END
+
 GAME( 1984, trvhang,  0, sms,      sms, 0, ROT0, "SMS MFG CORP", "Trivia Hangup (Question Set 1)", GAME_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
 GAME( 1984, trvhanga, 0, sms,      sms, 0, ROT0, "SMS MFG CORP", "Trivia Hangup (Question Set 2)", GAME_NOT_WORKING ) /* Version Trivia-2-011586 */
 GAME( 1985, sureshot, 0, sureshot, sms, 0, ROT0, "SMS MFG CORP", "Sure Shot", GAME_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0, sureshot, sms, 0, ROT0, "SMS MFG CORP", "Second Chance", GAME_SUPPORTS_SAVE )

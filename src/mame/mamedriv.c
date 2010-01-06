@@ -9225,6 +9225,7 @@ Other Sun games
 	DRIVER( trvhang )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( trvhanga )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( sureshot )	/* (c) 1985 SMS MFG CORP */
+	DRIVER( secondch )  /* (c) 1985 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
 	DRIVER( butrfly )	/* (c) 1995 Bordun International */
 	DRIVER( madzoo )	/* (c) 1995 Bordun International */
