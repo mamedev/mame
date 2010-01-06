@@ -2605,6 +2605,7 @@ src/mame/includes/mcatadv.h svneol=native#text/plain
 src/mame/includes/mcr.h svneol=native#text/plain
 src/mame/includes/meadows.h svneol=native#text/plain
 src/mame/includes/megasys1.h svneol=native#text/plain
+src/mame/includes/metalmx.h svneol=native#text/plain
 src/mame/includes/mexico86.h svneol=native#text/plain
 src/mame/includes/mhavoc.h svneol=native#text/plain
 src/mame/includes/midtunit.h svneol=native#text/plain

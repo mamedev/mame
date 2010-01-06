@@ -1,22 +1,12 @@
-/* Metal Maniax
- skeleton driver!
+/***************************************************************************
 
- lots of CPUS.. count 'em
- 2 x TMS34020-40
- 4 x DSP32C F33 DSPs
- and 2 stacks of
- 1 x MC68EC020FG16 CPU
- 1 x ADSP-2105 KP-40 DSP
- 1 x TMS320C31PQL DSP
+    Atari Metal Maniax
 
- That's 12 CPUs for one game.
+    Preliminary driver
 
- This should make an ideal starter project for anybody wanting to get into emulation :-)
+***************************************************************************/
 
-*/
-
-
-/*
+/***************************************************************************
 
 Metal Maniax
 Atari Prototype
@@ -29,8 +19,10 @@ This is a truly insane board stack. Side view:
 +-----------------------(4)-----------------------+
 +-----------------------(5)-----------------------+
 
-The two bottom boards (4) and (5) are common. The top stack of 3 boards are duplicated twice. Here, in detail, is a list of components on each board:
+The two bottom boards (4) and (5) are common.
+The top stack of 3 boards are duplicated twice.
 
+Here, in detail, is a list of components on each board:
 
 ----------------------
 Layer 1: (1l) and (1r)
@@ -41,11 +33,27 @@ Title: "Teenage Kicks Right Through the Night"
 
 Programmable:
 16 x 27C040-10 EPROMs, labelled datametl 0-15, 10/19/94 11:08:05
- 1 x 27C040-10 EPROM, labelled bootbetl rel 34, 10/19/94 16:22:49
+ 1 x 27C040-10 EPROM, labelled bootmetl rel 34, 10/19/94 16:22:49
  1 x GAL16V8B, labelled 136103-1500
 
 Logic:
  3 x SN74F245
+
+ |------------------------------------------------------------------|
+ |                      datametl4                       datametl12  |
+ |      datametl0                       datametl8                   |
+ |                      datametl5                       datametl13  |
+ |      datametl1                       datametl9                   |
+ |                      datametl6                       datametl14  |
+ |      datametl2                       datametl10                  |
+ |                      datametl7                       datametl15  |
+ |      datametl3                       datametl11                  |
+ |                                                      bootmetl34  |
+ |              SN74F245    SN74F245                                |
+ |              136103-1500 SN74F245                                |
+ |      |------------------------------|socket                      |
+ |      |------------------------------|JROMBUS                     |
+ |------------------------------------------------------------------|
 
 
 ----------------------
@@ -56,8 +64,8 @@ ID: CH31.2 A053304 ATARI GAMES (c) 93 MADE IN U.S.A.
 Title: "Silly Putty: Thixotropic or Dilatent"
 
 Programmable:
- 4 x unpopulated 42-pin sockets
- 1 x unpopulated 32-pin socket
+ 4 x unpopulated 42-pin sockets (11B-11E)
+ 1 x unpopulated 32-pin socket (11A)
  1 x GAL16V8A-25, labelled DSP
  1 x GAL16V8A-25, labelled IRQ2
  1 x GAL16V8A-25, labelled XDEC
@@ -69,12 +77,32 @@ CPU/DSP:
 RAM:
  4 x CY7C199-20 32k*8 SRAM
 
-Unknown:
+DAC:
  2 x Asahi Kasei AK4316-VS
 
 Logic:
  1 x SN74F138
  4 x SN74LS374
+
+ |--------------------------------------------------|
+ |                                                  |
+ |                                                  |
+ |  JXBUS                                           |
+ |  ||          AK4136-VS   AK4136-VS               |
+ |  ||                                              |
+ |  ||                                              |
+ |  ||  SN74LS374   CY7C199     --------            |
+ |  ||  SN74LS374   CY7C199     |320C31|    SN74F138|
+ |  ||  SN74LS374   CY7C199     |      |            |
+ |  ||  SN74LS374   CY7C199     --------        LED |
+ |  ||                                  XDEC        |
+ |  ||  11A   11B   11C   11D   11E     IRQ2Q       |
+ |                                              LED |
+ |                                      DSP         |
+ |                                          33.8MHz |
+ |      |------------------------------|socket      |
+ |      |------------------------------|JROMBUS     |
+ |--------------------------------------------------|
 
 
 ----------------------
@@ -202,72 +230,489 @@ Logic:
  6 x 74HCT374
  1 x 74ALS164
 
-*/
 
+    The board stack drives a two-seat cabinet.
+    Each side uses the following CPUs:
+
+    Main:         68EC020
+    Network:      ADSP-2105
+    2D Engine:    TMS34020
+    3D Math:      2 x DSP32C
+    Sound (CAGE): TMS320C31 (unused)
+
+    Further machines can be linked together.
+
+***************************************************************************/
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms34010/tms34010.h"
+#include "cpu/dsp32/dsp32.h"
+#include "includes/metalmx.h"
 
-static UINT32* metalmx_fbram;
 
-static VIDEO_START(metalmx)
+/*************************************
+ *
+ *  Static globals (move to driver state!)
+ *
+ *************************************/
+
+static UINT32 *gsp_dram;
+static UINT32 *gsp_vram;
+static UINT32 *vreg_base;
+
+
+/*************************************
+ *
+ *  Forward definitions
+ *
+ *************************************/
+
+static MACHINE_RESET( metalmx );
+
+
+/*************************************
+ *
+ *  Video hardware (move to /video)
+ *
+ *************************************/
+
+static VIDEO_START( metalmx )
 {
 
 }
 
-static VIDEO_UPDATE(metalmx)
+static VIDEO_UPDATE( metalmx )
 {
-	int y, x, count;
-	static const int xxx = 256, yyy = 204;
+	UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
+	int y;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
-
-	count = 0;
-	for (y = 0; y < yyy; y++)
+	for (y = 0; y < 384; ++y)
 	{
-		for(x = 0; x < xxx; x++)
+		int x;
+		UINT32 *src = &src_base[512/2 * y];
+		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+
+		for(x = 0; x < 512; x+=2)
 		{
-			*BITMAP_ADDR16(bitmap, y, (x*4)+0) =  ((metalmx_fbram[count]>>24)&0xff);
-			*BITMAP_ADDR16(bitmap, y, (x*4)+1) =  ((metalmx_fbram[count]>>16)&0xff);
-			*BITMAP_ADDR16(bitmap, y, (x*4)+2) =  ((metalmx_fbram[count]>>8)&0xff);
-			*BITMAP_ADDR16(bitmap, y, (x*4)+3) =  ((metalmx_fbram[count]>>0)&0xff);
-			count++;
+			UINT32 src_pix = *src++;
+
+			*dst++ = (src_pix >> 16);
+			*dst++ = (src_pix >>  0);
 		}
 	}
 
 	return 0;
 }
 
-static ADDRESS_MAP_START( metalmx_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x700000, 0x71ffff) AM_RAM AM_BASE(&metalmx_fbram)
-	AM_RANGE(0x800000, 0x85ffff) AM_RAM
 
+/*************************************
+ *
+ *  Miscellany
+ *
+ *************************************/
+
+static READ32_HANDLER( unk_r )
+{
+	return mame_rand(space->machine);
+}
+
+static READ32_HANDLER( input_r )
+{
+	return 0x00200000;
+}
+
+static READ32_HANDLER( watchdog_r )
+{
+	return 0xffffffff;
+}
+
+static WRITE32_HANDLER( shifter_w )
+{
+
+}
+
+static WRITE32_HANDLER( motor_w )
+{
+
+}
+
+static WRITE32_HANDLER( reset_w )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	if (ACCESSING_BITS_16_31)
+	{
+		data >>= 16;
+		cpu_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	}
+}
+
+
+/*************************************
+ *
+ *  Host/DSP32C parallel interface
+ *
+ *************************************/
+
+static WRITE32_HANDLER( dsp32c_1_w )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	offset <<= 1;
+
+	if (ACCESSING_BITS_0_15)
+		offset += 1;
+	else if (ACCESSING_BITS_16_31)
+		data >>= 16;
+
+	dsp32c_pio_w(state->dsp32c_1, offset, data);
+}
+
+static READ32_HANDLER( dsp32c_1_r )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+	UINT32 data;
+
+	offset <<= 1;
+
+	if (ACCESSING_BITS_0_15)
+		offset += 1;
+
+	data = dsp32c_pio_r(state->dsp32c_1, offset);
+
+	if (ACCESSING_BITS_16_31)
+		data <<= 16;
+
+	return data;
+}
+
+static WRITE32_HANDLER( dsp32c_2_w )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	offset <<= 1;
+
+	if (ACCESSING_BITS_0_15)
+		offset += 1;
+	else if (ACCESSING_BITS_16_31)
+		data >>= 16;
+
+	dsp32c_pio_w(state->dsp32c_2, offset, data);
+}
+
+static READ32_HANDLER( dsp32c_2_r )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+	UINT32 data;
+
+	offset <<= 1;
+
+	if (ACCESSING_BITS_0_15)
+		offset += 1;
+
+	data = dsp32c_pio_r(state->dsp32c_2, offset);
+
+	if (ACCESSING_BITS_16_31)
+		data <<= 16;
+
+	return data;
+}
+
+
+/*************************************
+ *
+ *  Main 68EC020 Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x200000, 0x3fffff) AM_ROM
+	AM_RANGE(0x400000, 0x4000ff) AM_RAM	AM_BASE(&vreg_base)
+	AM_RANGE(0x600000, 0x6fffff) AM_RAM	AM_BASE(&gsp_dram)
+	AM_RANGE(0x700000, 0x7fffff) AM_RAM AM_BASE(&gsp_vram)
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
+	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
+	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
+	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
+	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE(motor_w)
+	AM_RANGE(0xf04000, 0xf04003) AM_READ_PORT("P2")
+	AM_RANGE(0xf1e000, 0xf1e003) AM_READ(unk_r)	/* Network status? */
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM			/* Zero power RAM */
+	AM_RANGE(0xfd0000, 0xffffff) AM_RAM			/* Scratch RAM */
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Network ADSP-2105 Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( adsp_program_map, ADDRESS_SPACE_PROGRAM, 32 )
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( adsp_data_map, ADDRESS_SPACE_DATA, 16 )
+
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  2D Engine TMS34020 Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( gsp_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE(tms34020_io_register_r, tms34020_io_register_w)
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Math Box DSP32C 1 Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( dsp32c_1_map, ADDRESS_SPACE_PROGRAM, 32 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM
+	AM_RANGE(0x600000, 0x67ffff) AM_RAM
+	AM_RANGE(0xf00000, 0xffffff) AM_RAM		/* TODO: Video registers here? */
+ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Math Box DSP32C 2 Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( dsp32c_2_map, ADDRESS_SPACE_PROGRAM, 32 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM
+	AM_RANGE(0x600000, 0x67ffff) AM_RAM
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input definitions
+ *
+ *************************************/
+
 static INPUT_PORTS_START( metalmx )
-	PORT_START("P1_P2")
+	PORT_START("P1")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE )
+
+	PORT_START("P2")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 )		// FIRE
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 )		// VIEW
+
+	PORT_DIPNAME( 0x00000001, 0x00000001, "BIT 0")
+	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000002, 0x00000002, "BIT 1")
+	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000004, 0x00000004, "BIT 2")
+	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000008, 0x00000008, "BIT 3")
+	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000010, 0x00000010, "BIT 4")
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000020, 0x00000020, "BIT 5")
+	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000040, 0x00000040, "BIT 6")
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000080, 0x00000080, "BIT 7")
+	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+
+	PORT_DIPNAME( 0x00000100, 0x00000100, "BIT 8")
+	PORT_DIPSETTING(          0x00000100, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000200, 0x00000200, "BIT 9")
+	PORT_DIPSETTING(          0x00000200, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000400, 0x00000400, "BIT 10")
+	PORT_DIPSETTING(          0x00000400, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00000800, 0x00000800, "BIT 11")
+	PORT_DIPSETTING(          0x00000800, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00001000, 0x00001000, "BIT 12")
+	PORT_DIPSETTING(          0x00001000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00002000, 0x00002000, "BIT 13")
+	PORT_DIPSETTING(          0x00002000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00004000, 0x00004000, "BIT 14")
+	PORT_DIPSETTING(          0x00004000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00008000, 0x00008000, "BIT 15")
+	PORT_DIPSETTING(          0x00008000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00010000, 0x00010000, "BIT 16 (Gear)")
+	PORT_DIPSETTING(          0x00010000, "Reverse!")
+	PORT_DIPSETTING(          0x00000000, "Forward")
+	PORT_DIPNAME( 0x00080000, 0x00080000, "BIT 19")
+	PORT_DIPSETTING(          0x00080000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00100000, 0x00100000, "BIT 20")
+	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00200000, 0x00200000, "BIT 21")
+	PORT_DIPSETTING(          0x00200000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00400000, 0x00400000, "BIT 22")
+	PORT_DIPSETTING(          0x00400000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00800000, 0x00800000, "BIT 23")
+	PORT_DIPSETTING(          0x00800000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+
+	PORT_DIPNAME( 0x01000000, 0x01000000, "BIT 24")
+	PORT_DIPSETTING(          0x01000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x02000000, 0x02000000, "BIT 25")
+	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x04000000, 0x04000000, "BIT 26")
+	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x08000000, 0x08000000, "BIT 27")
+	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x10000000, 0x10000000, "BIT 28")
+	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x20000000, 0x20000000, "BIT 29")
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x40000000, 0x40000000, "BIT 30")
+	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_DIPNAME( 0x80000000, 0x80000000, "BIT 31")
+	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ))
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  CPU configuration
+ *
+ *************************************/
+
+static const adsp21xx_config adsp_config =
+{
+	NULL,					/* callback for serial receive */
+	NULL,					/* callback for serial transmit */
+	NULL,					/* callback for timer fired */
+};
+
+static const tms34010_config gsp_config =
+{
+	TRUE,					/* halt on reset */
+	"screen",				/* the screen operated on */
+	4000000,				/* pixel clock */
+	2,						/* pixels per clock */
+	NULL,					/* scanline callback */
+	NULL,					/* generate interrupt */
+};
+
+static const dsp32_config dsp32c_config =
+{
+	NULL					/* a change has occurred on an output pin */
+};
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( metalmx )
-	MDRV_CPU_ADD("maincpu", M68EC020, 10000000) // ??
-	MDRV_CPU_PROGRAM_MAP(metalmx_map)
+	MDRV_DRIVER_DATA(metalmx_state)
+
+	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_14_31818MHz)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+
+	MDRV_CPU_ADD("adsp", ADSP2105, XTAL_10MHz)
+	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
+	MDRV_CPU_DATA_MAP(adsp_data_map)
+
+	MDRV_CPU_ADD("gsp", TMS34020, 40000000)			/* Unverified */
+	MDRV_CPU_CONFIG(gsp_config)
+	MDRV_CPU_PROGRAM_MAP(gsp_map)
+
+	MDRV_CPU_ADD("dsp32c_1", DSP32C, 40000000)		/* Unverified */
+	MDRV_CPU_CONFIG(dsp32c_config)
+	MDRV_CPU_PROGRAM_MAP(dsp32c_1_map)
+
+	MDRV_CPU_ADD("dsp32c_2", DSP32C, 40000000)		/* Unverified */
+	MDRV_CPU_CONFIG(dsp32c_config)
+	MDRV_CPU_PROGRAM_MAP(dsp32c_2_map)
+
+	MDRV_MACHINE_RESET(metalmx)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_SIZE(512, 384)
+	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_PALETTE_LENGTH(65536)
+	MDRV_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 
 	MDRV_VIDEO_START(metalmx)
 	MDRV_VIDEO_UPDATE(metalmx)
+
+	/* CAGE audio board has no ROM data */
+//	MDRV_IMPORT_FROM(cage)
 MACHINE_DRIVER_END
 
+
+static DRIVER_INIT( metalmx )
+{
+	metalmx_state *state = (metalmx_state *)machine->driver_data;
+
+	state->maincpu = cputag_get_cpu(machine, "maincpu");
+	state->adsp = cputag_get_cpu(machine, "adsp");
+	state->gsp = cputag_get_cpu(machine, "gsp");
+	state->dsp32c_1 = cputag_get_cpu(machine, "dsp32c_1");
+	state->dsp32c_2 = cputag_get_cpu(machine, "dsp32c_2");
+}
+
+static MACHINE_RESET( metalmx )
+{
+	metalmx_state *state = (metalmx_state *)machine->driver_data;
+
+	cpu_set_input_line(state->adsp, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(state->gsp, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
+}
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( metalmx )
 	/* ----------------------------------------
@@ -311,17 +756,16 @@ ROM_START( metalmx )
        Layer 3 (there are 2 of these boards)
     ---------------------------------------- */
 
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
-	ROM_LOAD32_BYTE( "st665e.0", 0x00000, 0x80000, CRC(b2a90fd0) SHA1(ae483ab0aa68493904ea8d1906e22fdaa16a8a27) )
-	ROM_LOAD32_BYTE( "st665e.1", 0x00001, 0x80000, CRC(559fecb7) SHA1(092e7e358d02f179a59849db0cafad0b4a95c0ed) )
-	ROM_LOAD32_BYTE( "st665e.2", 0x00002, 0x80000, CRC(ee64b773) SHA1(8b1f51450804f16e73045ac9198daa7bd92d993b) )
-	ROM_LOAD32_BYTE( "st665e.3", 0x00003, 0x80000, CRC(42b78cde) SHA1(a441fcd1cd34e1a8234be44ab33e56fbb73bac79) )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68020 code */
+	ROM_LOAD32_BYTE( "st665e.0",  0x000000, 0x80000, CRC(b2a90fd0) SHA1(ae483ab0aa68493904ea8d1906e22fdaa16a8a27) )
+	ROM_LOAD32_BYTE( "st665e.1",  0x000001, 0x80000, CRC(559fecb7) SHA1(092e7e358d02f179a59849db0cafad0b4a95c0ed) )
+	ROM_LOAD32_BYTE( "st665e.2",  0x000002, 0x80000, CRC(ee64b773) SHA1(8b1f51450804f16e73045ac9198daa7bd92d993b) )
+	ROM_LOAD32_BYTE( "st665e.3",  0x000003, 0x80000, CRC(42b78cde) SHA1(a441fcd1cd34e1a8234be44ab33e56fbb73bac79) )
 
-	ROM_REGION( 0x200000, "tgs", 0 )
-	ROM_LOAD32_BYTE( "tgs665e.0", 0x00000, 0x80000, CRC(2a4102f1) SHA1(2d21956b27cc9ac3d418f4595c1b8aa08a0298f6) )
-	ROM_LOAD32_BYTE( "tgs665e.1", 0x00001, 0x80000, CRC(7d0eff8f) SHA1(c815cfa55619c3363c86c843047fe8487daaa6c1) )
-	ROM_LOAD32_BYTE( "tgs665e.2", 0x00002, 0x80000, CRC(3f965f1a) SHA1(7333e1cd5a9428d78236a5532b6a60203fd1485b) )
-	ROM_LOAD32_BYTE( "tgs665e.3", 0x00003, 0x80000, CRC(bb0ea984) SHA1(92a273675b32a2e1782012d49a404c9e8658eb2d) )
+	ROM_LOAD32_BYTE( "tgs665e.0", 0x200000, 0x80000, CRC(2a4102f1) SHA1(2d21956b27cc9ac3d418f4595c1b8aa08a0298f6) )
+	ROM_LOAD32_BYTE( "tgs665e.1", 0x200001, 0x80000, CRC(7d0eff8f) SHA1(c815cfa55619c3363c86c843047fe8487daaa6c1) )
+	ROM_LOAD32_BYTE( "tgs665e.2", 0x200002, 0x80000, CRC(3f965f1a) SHA1(7333e1cd5a9428d78236a5532b6a60203fd1485b) )
+	ROM_LOAD32_BYTE( "tgs665e.3", 0x200003, 0x80000, CRC(bb0ea984) SHA1(92a273675b32a2e1782012d49a404c9e8658eb2d) )
 
 	ROM_REGION( 0x80000, "103_2308", 0 )
 	ROM_LOAD( "103-2308.bin", 0x00000, 0x10000, CRC(af1781d0) SHA1(f3f69e2fd83a949b447b71410ba9e165229e5aad) )
@@ -378,4 +822,11 @@ ROM_START( metalmx )
 	ROM_LOAD( "103-1116.bin",  0x000, 0x117, CRC(37edc36c) SHA1(be53131c52e84cb3fe055af5ca4e2f6aa5442ff0) )
 ROM_END
 
-GAME( 1994, metalmx,    0,        metalmx,    metalmx,    0, ROT0,  "Atari", "Metal Maniax (prototype)", GAME_NO_SOUND | GAME_NOT_WORKING )
+
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
+
+GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", GAME_NO_SOUND | GAME_NOT_WORKING )
