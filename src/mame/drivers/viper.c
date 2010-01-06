@@ -462,7 +462,7 @@ static UINT32 voodoo3_pci_r(const device_config *busdevice, const device_config 
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 	}
 	return 0;
 }
@@ -530,7 +530,7 @@ static void voodoo3_pci_w(const device_config *busdevice, const device_config *d
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 	}
 }
 

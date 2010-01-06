@@ -1060,7 +1060,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	workram              = auto_alloc_array(machine, UINT16, 0x04000/2);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), region_info_list[rom_board], sound_w, NULL);
+	segaic16_memory_mapper_init(devtag_get_device(machine, "maincpu"), region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
@@ -1073,13 +1073,13 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	disable_screen_blanking = 0;
 
 	/* see if we have a sound CPU and a UPD7759 chip */
-	has_sound_cpu = (cputag_get_cpu(machine, "soundcpu") != NULL);
+	has_sound_cpu = (devtag_get_device(machine, "soundcpu") != NULL);
 }
 
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpu_suspend(cputag_get_cpu(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(devtag_get_device(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -1101,7 +1101,7 @@ static MACHINE_RESET( system16b )
 		segaic16_memory_mapper_config(machine, i8751_initial_config);
 	segaic16_tilemap_reset(machine, 0);
 
-	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
+	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -1353,7 +1353,7 @@ static void upd7759_generate_nmi(const device_config *device, int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	generic_pulse_irq_line(cputag_get_cpu(space->machine, "mcu"), 1);
+	generic_pulse_irq_line(devtag_get_device(space->machine, "mcu"), 1);
 }
 #endif
 

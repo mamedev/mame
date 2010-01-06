@@ -973,10 +973,10 @@ static MACHINE_RESET(mediagx)
 {
 	UINT8 *rom = memory_region(machine, "bios");
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	timer_device_adjust_oneshot(devtag_get_device(machine, "sound_timer"), ATTOTIME_IN_MSEC(10), 0);
 

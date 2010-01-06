@@ -49,7 +49,7 @@ static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(cputag_get_cpu(screen->machine, "maincpu"));
+		atarigen_scanline_int_gen(devtag_get_device(screen->machine, "maincpu"));
 }
 
 
@@ -501,7 +501,7 @@ static DRIVER_INIT( rampart )
 
 	state->atarigen.eeprom_default = compressed_default_eeprom;
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x140000, 0x438000, 118);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x140000, 0x438000, 118);
 }
 
 

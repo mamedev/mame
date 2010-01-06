@@ -20,7 +20,7 @@ MACHINE_RESET( scramble )
 {
 	MACHINE_RESET_CALL(galaxold);
 
-	if (cputag_get_cpu(machine, "audiocpu") != NULL)
+	if (devtag_get_device(machine, "audiocpu") != NULL)
 		scramble_sh_init(machine);
 
   security_2B_counter = 0;
@@ -60,7 +60,7 @@ static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")))
+	switch (cpu_get_pc(devtag_get_device(device->machine, "maincpu")))
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;

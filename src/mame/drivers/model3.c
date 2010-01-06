@@ -1143,7 +1143,7 @@ static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
+			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(devtag_get_device(machine, "maincpu")));
 			break;
 	}
 }
@@ -1203,10 +1203,10 @@ static void model3_exit(running_machine *machine)
 static void configure_fast_ram(running_machine *machine)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, work_ram);
 }
 
 static MACHINE_START(model3_10)
@@ -1240,7 +1240,7 @@ static void model3_init(running_machine *machine, int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(model3_soundram, memory_region(machine, "audiocpu")+0x80000, 16);
-	device_reset(cputag_get_cpu(machine, "audiocpu"));
+	device_reset(devtag_get_device(machine, "audiocpu"));
 
 	model3_machine_init(step);	// step 1.5
 	model3_tap_reset();

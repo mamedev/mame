@@ -281,7 +281,7 @@ MACHINE_RESET( vsdual )
 
 MACHINE_START( vsnes )
 {
-	const address_space *ppu1_space = cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM);
+	const address_space *ppu1_space = cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM);
 
 	/* establish nametable ram */
 	nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -340,12 +340,12 @@ MACHINE_START( vsdual )
 	nt_page[1][2] = nt_ram[1] + 0x800;
 	nt_page[1][3] = nt_ram[1] + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt1_r, vsnes_nt1_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt1_r, vsnes_nt1_w);
 	// read only!
-	memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
+	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
 	// read only!
-	memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
+	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
 	memory_set_bankptr(machine, "bank2", vrom[0]);
 	memory_set_bankptr(machine, "bank3", vrom[1]);
 }
@@ -1432,16 +1432,16 @@ DRIVER_INIT( mightybj )
 
 static WRITE8_HANDLER( vstennis_vrom_banking )
 {
-	const device_config *other_cpu = (space->cpu == cputag_get_cpu(space->machine, "maincpu")) ? cputag_get_cpu(space->machine, "sub") : cputag_get_cpu(space->machine, "maincpu");
+	const device_config *other_cpu = (space->cpu == devtag_get_device(space->machine, "maincpu")) ? devtag_get_device(space->machine, "sub") : devtag_get_device(space->machine, "maincpu");
 
 	/* switch vrom */
-	(space->cpu == cputag_get_cpu(space->machine, "maincpu")) ? memory_set_bankptr(space->machine, "bank2", (data & 4) ? vrom[0] + 0x2000 : vrom[0]) : memory_set_bankptr(space->machine, "bank3", (data & 4) ? vrom[1] + 0x2000 : vrom[1]);
+	(space->cpu == devtag_get_device(space->machine, "maincpu")) ? memory_set_bankptr(space->machine, "bank2", (data & 4) ? vrom[0] + 0x2000 : vrom[0]) : memory_set_bankptr(space->machine, "bank3", (data & 4) ? vrom[1] + 0x2000 : vrom[1]);
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	cpu_set_input_line(other_cpu, 0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* move along */
-	if (space->cpu == cputag_get_cpu(space->machine, "maincpu"))
+	if (space->cpu == devtag_get_device(space->machine, "maincpu"))
 		vsnes_in0_w(space, offset, data);
 	else
 		vsnes_in0_1_w(space, offset, data);

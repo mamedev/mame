@@ -995,15 +995,15 @@ static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 static void init_skns(running_machine *machine)
 {
 	// init DRC to fastest options
-	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 
-	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6f8);
+	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6f8);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000028, 0x600002b, 0, 0, bios_skip_r );
 }
 
 static void set_drc_pcflush(running_machine *machine, UINT32 addr)
 {
-	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), addr);
+	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), addr);
 }
 
 static DRIVER_INIT( galpani4 ) { skns_sprite_kludge(-5,-1); init_skns(machine);  }

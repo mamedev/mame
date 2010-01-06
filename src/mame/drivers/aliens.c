@@ -256,7 +256,7 @@ static MACHINE_RESET( aliens )
 {
 	aliens_state *state = (aliens_state *)machine->driver_data;
 
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), aliens_banking);
+	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), aliens_banking);
 
 	state->palette_selected = 0;
 }

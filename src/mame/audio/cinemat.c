@@ -1623,7 +1623,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( qb3_sound_w )
 {
-	UINT16 rega = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), CCPU_A);
+	UINT16 rega = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), CCPU_A);
 	demon_sound_w(space->machine, 0x00 | (~rega & 0x0f), 0x10);
 }
 

@@ -165,7 +165,7 @@ WRITE8_HANDLER( frogger_filter_w )
 
 void scramble_sh_init(running_machine *machine)
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "audiocpu"), scramble_sh_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "audiocpu"), scramble_sh_irq_callback);
 
 	/* PR is always 0, D is always 1 */
 	ttl7474_d_w(devtag_get_device(machine, "konami_7474"), 1);

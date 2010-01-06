@@ -218,7 +218,7 @@ static MACHINE_RESET( atarisy1 )
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
+	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 
 	/* reset the joystick parameters */
 	state->joystick_value = 0;
@@ -2339,7 +2339,7 @@ static DRIVER_INIT( marble )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 103);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x080000, 0, 103);
 
 	state->joystick_type = 0;	/* none */
 	state->trackball_type = 1;	/* rotated */
@@ -2350,7 +2350,7 @@ static DRIVER_INIT( peterpak )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 107);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x080000, 0, 107);
 
 	state->joystick_type = 1;	/* digital */
 	state->trackball_type = 0;	/* none */
@@ -2361,7 +2361,7 @@ static DRIVER_INIT( indytemp )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 105);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x080000, 0, 105);
 
 	state->joystick_type = 1;	/* digital */
 	state->trackball_type = 0;	/* none */
@@ -2372,7 +2372,7 @@ static DRIVER_INIT( roadrunn )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 108);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x080000, 0, 108);
 
 	state->joystick_type = 2;	/* analog */
 	state->trackball_type = 0;	/* none */
@@ -2383,7 +2383,7 @@ static DRIVER_INIT( roadb109 )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 109);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x080000, 0, 109);
 
 	state->joystick_type = 3;	/* pedal */
 	state->trackball_type = 2;	/* steering wheel */
@@ -2394,7 +2394,7 @@ static DRIVER_INIT( roadb110 )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 110);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x080000, 0, 110);
 
 	state->joystick_type = 3;	/* pedal */
 	state->trackball_type = 2;	/* steering wheel */

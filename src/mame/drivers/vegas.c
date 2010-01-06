@@ -537,19 +537,19 @@ static MACHINE_START( vegas )
 	timer[3] = timer_alloc(machine, nile_timer_callback, NULL);
 
 	/* identify our sound board */
-	if (cputag_get_cpu(machine, "dsio") != NULL)
+	if (devtag_get_device(machine, "dsio") != NULL)
 		dcs_idma_cs = 6;
-	else if (cputag_get_cpu(machine, "denver") != NULL)
+	else if (devtag_get_device(machine, "denver") != NULL)
 		dcs_idma_cs = 7;
 	else
 		dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, ramsize - 1, FALSE, rambase);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, rombase);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, ramsize - 1, FALSE, rambase);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, rombase);
 
 	/* register for save states */
 	state_save_register_global(machine, nile_irq_state);
@@ -577,7 +577,7 @@ static MACHINE_RESET( vegas )
 	memset(pci_3dfx_regs, 0, sizeof(pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (cputag_get_cpu(machine, "dcs2") != NULL || cputag_get_cpu(machine, "dsio") != NULL || cputag_get_cpu(machine, "denver") != NULL)
+	if (devtag_get_device(machine, "dcs2") != NULL || devtag_get_device(machine, "dsio") != NULL || devtag_get_device(machine, "denver") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);
@@ -2487,10 +2487,10 @@ static DRIVER_INIT( gauntleg )
 	init_common(machine, MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
 }
 
 
@@ -2500,10 +2500,10 @@ static DRIVER_INIT( gauntdl )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
 }
 
 
@@ -2513,7 +2513,7 @@ static DRIVER_INIT( warfa )
 	init_common(machine, MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
 }
 
 
@@ -2523,10 +2523,10 @@ static DRIVER_INIT( tenthdeg )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
-	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
+	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
 }
 
 

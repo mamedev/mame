@@ -174,7 +174,7 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 	workram              = auto_alloc_array(machine, UINT16, 0x04000/2);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), region_info_list[rom_board], sound_w, sound_r);
+	segaic16_memory_mapper_init(devtag_get_device(machine, "maincpu"), region_info_list[rom_board], sound_w, sound_r);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
@@ -202,10 +202,10 @@ static MACHINE_RESET( system18 )
 {
 	segaic16_memory_mapper_reset(machine);
 	segaic16_tilemap_reset(machine, 0);
-	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
+	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
-	if (cputag_get_cpu(machine, "mcu") != NULL && cpu_get_type(cputag_get_cpu(machine, "mcu")) == CPU_I8751)
+	if (devtag_get_device(machine, "mcu") != NULL && cpu_get_type(devtag_get_device(machine, "mcu")) == CPU_I8751)
 		timer_call_after_resynch(machine, NULL, 0, boost_interleave);
 }
 

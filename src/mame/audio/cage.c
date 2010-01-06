@@ -163,7 +163,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	memory_set_bankptr(machine, "bank10", memory_region(machine, "cageboot"));
 	memory_set_bankptr(machine, "bank11", memory_region(machine, "cage"));
 
-	cage_cpu = cputag_get_cpu(machine, "cage");
+	cage_cpu = devtag_get_device(machine, "cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(cage_cpu));
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 

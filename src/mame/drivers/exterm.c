@@ -93,13 +93,13 @@ static UINT8 dac_value[2];
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(cputag_get_cpu(space->machine, "slave"), offset / TOWORD(0x00100000), data);
+	tms34010_host_w(devtag_get_device(space->machine, "slave"), offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(cputag_get_cpu(space->machine, "slave"), offset / TOWORD(0x00100000));
+	return tms34010_host_r(devtag_get_device(space->machine, "slave"), offset / TOWORD(0x00100000));
 }
 
 

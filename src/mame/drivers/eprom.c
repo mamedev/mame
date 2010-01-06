@@ -42,7 +42,7 @@ static void update_interrupts(running_machine *machine)
 
 	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
-	if (cputag_get_cpu(machine, "extra") != NULL)
+	if (devtag_get_device(machine, "extra") != NULL)
 		cputag_set_input_line(machine, "extra", 4, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
 	cputag_set_input_line(machine, "maincpu", 6, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -108,7 +108,7 @@ static WRITE16_HANDLER( eprom_latch_w )
 {
 	eprom_state *state = (eprom_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7 && (cputag_get_cpu(space->machine, "extra") != NULL))
+	if (ACCESSING_BITS_0_7 && (devtag_get_device(space->machine, "extra") != NULL))
 	{
 		/* bit 0: reset extra CPU */
 		if (data & 1)

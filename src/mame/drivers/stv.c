@@ -1968,14 +1968,14 @@ static WRITE32_HANDLER( minit_w )
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
-	sh2_set_frt_input(cputag_get_cpu(space->machine, "slave"), PULSE_LINE);
+	sh2_set_frt_input(devtag_get_device(space->machine, "slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	sh2_set_frt_input(cputag_get_cpu(space->machine, "maincpu"), PULSE_LINE);
+	sh2_set_frt_input(devtag_get_device(space->machine, "maincpu"), PULSE_LINE);
 }
 
 
@@ -2352,8 +2352,8 @@ DRIVER_INIT ( stv )
 	// do strict overwrite verification - maruchan and rsgun crash after coinup without this.
 	// cottonbm needs strict PCREL
 	// todo: test what games need this and don't turn it on for them...
-	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(cputag_get_cpu(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(devtag_get_device(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );

@@ -192,7 +192,7 @@ static void scanline_update(const device_config *screen, int scanline)
 	if (scanline & 32)
 		atarigen_6502_irq_ack_r(space, 0);
 	else if (!(input_port_read(screen->machine, "FE4000") & 0x40))
-		atarigen_6502_irq_gen(cputag_get_cpu(screen->machine, "audiocpu"));
+		atarigen_6502_irq_gen(devtag_get_device(screen->machine, "audiocpu"));
 }
 
 
@@ -216,7 +216,7 @@ static MACHINE_RESET( badlands )
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 
-	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
+	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 	memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
 }
 
@@ -695,7 +695,7 @@ static void scanline_update_bootleg(const device_config *screen, int scanline)
 //  if (scanline & 32)
 //      atarigen_6502_irq_ack_r(screen->machine, 0);
 //  else if (!(input_port_read(machine, "FE4000") & 0x40))
-//      atarigen_6502_irq_gen(cputag_get_cpu(screen->machine, "audiocpu"));
+//      atarigen_6502_irq_gen(devtag_get_device(screen->machine, "audiocpu"));
 }
 
 
@@ -709,7 +709,7 @@ static MACHINE_RESET( badlandb )
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts_bootleg);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update_bootleg, 32);
 
-//  atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
+//  atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 //  memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
 }
 

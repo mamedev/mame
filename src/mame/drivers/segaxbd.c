@@ -419,11 +419,11 @@ static void xboard_reset(const device_config *device)
 
 static MACHINE_RESET( xboard )
 {
-	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
+	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), xboard_reset);
+	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), xboard_reset);
 
 	/* set up the compare/timer chip */
 	segaic16_compare_timer_init(0, sound_data_w, timer_ack_callback);

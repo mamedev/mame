@@ -913,7 +913,7 @@ static MACHINE_RESET( filetto )
 	bank = -1;
 	lastvalue = -1;
 	hv_blank = 0;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 	filetto_devices.pit8253 = devtag_get_device( machine, "pit8253" );
 	filetto_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
 	filetto_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );

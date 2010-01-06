@@ -212,12 +212,12 @@ static void skimaxx_scanline_update(const device_config *screen, bitmap_t *bitma
 
 static WRITE32_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(cputag_get_cpu(space->machine, "tms"), offset, data);
+	tms34010_host_w(devtag_get_device(space->machine, "tms"), offset, data);
 }
 
 static READ32_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(cputag_get_cpu(space->machine, "tms"), offset);
+	return tms34010_host_r(devtag_get_device(space->machine, "tms"), offset);
 }
 
 

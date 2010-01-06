@@ -569,7 +569,7 @@ static DRIVER_INIT( drgnmst )
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(cputag_get_cpu(machine, "audiocpu"), data);
+			pic16c5x_set_config(devtag_get_device(machine, "audiocpu"), data);
 
 			src_pos = 0x7fff;		/* Force Exit */
 		}

@@ -196,7 +196,7 @@ static void scanline_update(const device_config *screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (state->interrupt_enable & 4)
-				atarigen_scanline_int_gen(cputag_get_cpu(screen->machine, "maincpu"));
+				atarigen_scanline_int_gen(devtag_get_device(screen->machine, "maincpu"));
 	}
 }
 
@@ -245,7 +245,7 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_eeprom_reset(&state->atarigen);
 	slapstic_reset();
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_sound_io_reset(cputag_get_cpu(machine, "soundcpu"));
+	atarigen_sound_io_reset(devtag_get_device(machine, "soundcpu"));
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
 
@@ -626,7 +626,7 @@ static WRITE8_HANDLER( sound_reset_w )
 		return;
 
 	/* a large number of signals are reset when this happens */
-	atarigen_sound_io_reset(cputag_get_cpu(space->machine, "soundcpu"));
+	atarigen_sound_io_reset(devtag_get_device(space->machine, "soundcpu"));
 	devtag_reset(space->machine, "ymsnd");
 	mixer_w(space, 0, 0);
 	state->tms5220_data = 0;

@@ -1808,7 +1808,7 @@ static DEVICE_START( ide_controller )
 	/* find the bus master space */
 	if (config->bmcpu != NULL)
 	{
-		ide->dma_space = memory_find_address_space(cputag_get_cpu(device->machine, config->bmcpu), config->bmspace);
+		ide->dma_space = memory_find_address_space(devtag_get_device(device->machine, config->bmcpu), config->bmspace);
 		assert_always(ide->dma_space != NULL, "IDE controller bus master space not found!");
 		ide->dma_address_xor = (ide->dma_space->endianness == ENDIANNESS_LITTLE) ? 0 : 3;
 	}

@@ -365,7 +365,7 @@ static CPU_INIT( cquestrot )
 	cpustate->sram = auto_alloc_array(device->machine, UINT16, 2048);   /* Private */
 
 	cpustate->device = device;
-	cpustate->lindevice = cputag_get_cpu(device->machine, rotconfig->lin_cpu_tag);
+	cpustate->lindevice = devtag_get_device(device->machine, rotconfig->lin_cpu_tag);
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	cquestrot_state_register(device);
@@ -450,7 +450,7 @@ static CPU_INIT( cquestlin )
 	cpustate->o_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
 
 	cpustate->device = device;
-	cpustate->rotdevice = cputag_get_cpu(device->machine, linconfig->rot_cpu_tag);
+	cpustate->rotdevice = devtag_get_device(device->machine, linconfig->rot_cpu_tag);
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	cquestlin_state_register(device);

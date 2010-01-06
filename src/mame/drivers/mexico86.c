@@ -386,7 +386,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_RESET( mexico86 )
 {
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
-	if (cputag_get_cpu(machine, "sub") != NULL)
+	if (devtag_get_device(machine, "sub") != NULL)
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 

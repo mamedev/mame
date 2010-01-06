@@ -83,11 +83,11 @@ static WRITE32_HANDLER( int_ack_w )
 static MACHINE_START( ultrsprt )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x80000000, 0x8007ffff, FALSE, vram);
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0xff000000, 0xff01ffff, FALSE, workram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x80000000, 0x8007ffff, FALSE, vram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0xff000000, 0xff01ffff, FALSE, workram);
 }
 
 
@@ -190,7 +190,7 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		/*generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
+		/*generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
 	else
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
 }

@@ -397,7 +397,7 @@ static MACHINE_RESET( mschamp )
 
 static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, data);
+	cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, data);
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
@@ -479,7 +479,7 @@ static WRITE8_HANDLER( piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, data );
+	cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, data );
 }
 
 
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, data );
+	cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, data );
 }
 
 

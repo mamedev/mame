@@ -225,7 +225,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG0, ASSERT_LINE);
-			sharc_set_flag_input(cputag_get_cpu(space->machine, "dsp"), 0, ASSERT_LINE);
+			sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 0, ASSERT_LINE);
 
 			if (offset == 1)
 			{

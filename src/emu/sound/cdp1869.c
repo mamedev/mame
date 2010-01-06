@@ -886,7 +886,7 @@ static DEVICE_START( cdp1869 )
 	assert(cdp1869->screen != NULL);
 
 	/* get the CPU device */
-	cdp1869->cpu = cputag_get_cpu(device->machine, cdp1869->intf->cpu_tag);
+	cdp1869->cpu = devtag_get_device(device->machine, cdp1869->intf->cpu_tag);
 	assert(cdp1869->cpu != NULL);
 
 	/* allocate predisplay timer */

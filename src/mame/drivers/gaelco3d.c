@@ -572,7 +572,7 @@ static WRITE16_HANDLER( adsp_rombank_w )
 static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 {
 	/* get the index register */
-	int reg = cpu_get_reg(cputag_get_cpu(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg);
+	int reg = cpu_get_reg(devtag_get_device(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
@@ -589,11 +589,11 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(cputag_get_cpu(timer->machine, "adsp"), ADSP2105_IRQ1);
+		generic_pulse_irq_line(devtag_get_device(timer->machine, "adsp"), ADSP2105_IRQ1);
 	}
 
 	/* store it */
-	cpu_set_reg(cputag_get_cpu(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
+	cpu_set_reg(devtag_get_device(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
 }
 
 

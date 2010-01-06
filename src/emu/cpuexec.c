@@ -231,7 +231,7 @@ void cpuexec_init(running_machine *machine)
 		min_quantum = ATTOTIME_IN_HZ(60);
 	if (machine->config->perfect_cpu_quantum != NULL)
 	{
-		const device_config *cpu = cputag_get_cpu(machine, machine->config->perfect_cpu_quantum);
+		const device_config *cpu = devtag_get_device(machine, machine->config->perfect_cpu_quantum);
 		attotime cpu_quantum;
 
 		if (cpu == NULL)

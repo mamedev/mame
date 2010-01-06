@@ -43,7 +43,7 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 
 	fd1094_state = state;
 
-	cpu_set_reg(cputag_get_cpu(machine, "sub"), M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(devtag_get_device(machine, "sub"), M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the s24_fd1094 state ready to decrypt.. */
 	state = fd1094_set_state(s24_fd1094_key,state) & 0xff;
@@ -56,7 +56,7 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 			/* copy cached state */
 			s24_fd1094_userregion = s24_fd1094_cacheregion[i];
 			memory_set_decrypted_region(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
-			m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "sub"), 0, s24_fd1094_cpuregionsize);
+			m68k_set_encrypted_opcode_range(devtag_get_device(machine, "sub"), 0, s24_fd1094_cpuregionsize);
 
 			return;
 		}
@@ -77,7 +77,7 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 	/* copy newly decrypted data to user region */
 	s24_fd1094_userregion = s24_fd1094_cacheregion[fd1094_current_cacheposition];
 	memory_set_decrypted_region(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
-	m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "sub"), 0, s24_fd1094_cpuregionsize);
+	m68k_set_encrypted_opcode_range(devtag_get_device(machine, "sub"), 0, s24_fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 
@@ -130,11 +130,11 @@ void s24_fd1094_machine_init(running_machine *machine)
 	s24_fd1094_setstate_and_decrypt(machine, FD1094_STATE_RESET);
 	s24_fd1094_kludge_reset_values();
 
-	m68k_set_cmpild_callback(cputag_get_cpu(machine, "sub"), s24_fd1094_cmp_callback);
-	m68k_set_rte_callback(cputag_get_cpu(machine, "sub"), s24_fd1094_rte_callback);
-	cpu_set_irq_callback(cputag_get_cpu(machine, "sub"), s24_fd1094_int_callback);
+	m68k_set_cmpild_callback(devtag_get_device(machine, "sub"), s24_fd1094_cmp_callback);
+	m68k_set_rte_callback(devtag_get_device(machine, "sub"), s24_fd1094_rte_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "sub"), s24_fd1094_int_callback);
 
-	device_reset(cputag_get_cpu(machine, "sub"));
+	device_reset(devtag_get_device(machine, "sub"));
 }
 
 static STATE_POSTLOAD( s24_fd1094_postload )

@@ -74,7 +74,7 @@ static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr & 0x08)
 	{
-		cpu_set_input_line_vector(cputag_get_cpu(timer->machine, "audiocpu"), 6, vector_reg);
+		cpu_set_input_line_vector(devtag_get_device(timer->machine, "audiocpu"), 6, vector_reg);
 		cputag_set_input_line(timer->machine, "audiocpu", 6, ASSERT_LINE);
 		imr_status |= 0x08;
 	}
@@ -257,7 +257,7 @@ static SOUND_RESET( taito_f3_soundsystem_reset )
 	sound_ram[3]=ROM[0x80003];
 
 	/* reset CPU to catch any banking of startup vectors */
-	device_reset(cputag_get_cpu(machine, "audiocpu"));
+	device_reset(devtag_get_device(machine, "audiocpu"));
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 

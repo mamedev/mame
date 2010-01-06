@@ -154,7 +154,7 @@ static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 		if ( (tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(cputag_get_cpu(timer->machine, "mcu"), M68705_INT_TIMER);
+			generic_pulse_irq_line(devtag_get_device(timer->machine, "mcu"), M68705_INT_TIMER);
 		}
 	}
 }

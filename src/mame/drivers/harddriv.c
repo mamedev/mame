@@ -3635,14 +3635,14 @@ ROM_END
 static void find_cpus(running_machine *machine)
 {
 	harddriv_state *state = (harddriv_state *)machine->driver_data;
-	state->maincpu = cputag_get_cpu(machine, "maincpu");
-	state->gsp = cputag_get_cpu(machine, "gsp");
-	state->msp = cputag_get_cpu(machine, "msp");
-	state->adsp = cputag_get_cpu(machine, "adsp");
-	state->soundcpu = cputag_get_cpu(machine, "soundcpu");
-	state->sounddsp = cputag_get_cpu(machine, "sounddsp");
-	state->jsacpu = cputag_get_cpu(machine, "jsa");
-	state->dsp32 = cputag_get_cpu(machine, "dsp32");
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->gsp = devtag_get_device(machine, "gsp");
+	state->msp = devtag_get_device(machine, "msp");
+	state->adsp = devtag_get_device(machine, "adsp");
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->sounddsp = devtag_get_device(machine, "sounddsp");
+	state->jsacpu = devtag_get_device(machine, "jsa");
+	state->dsp32 = devtag_get_device(machine, "dsp32");
 }
 
 

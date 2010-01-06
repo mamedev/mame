@@ -402,7 +402,7 @@ TIMER_DEVICE_CALLBACK( atarisy1_int3_callback )
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(cputag_get_cpu(timer->machine, "maincpu"));
+	atarigen_scanline_int_gen(devtag_get_device(timer->machine, "maincpu"));
 
 	/* set a timer to turn it off */
 	timer_device_adjust_oneshot(state->int3off_timer, video_screen_get_scan_period(timer->machine->primary_screen), 0);

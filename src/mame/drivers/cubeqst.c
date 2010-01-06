@@ -110,8 +110,8 @@ static VIDEO_UPDATE( cubeqst )
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(cputag_get_cpu(screen->machine, "line_cpu"), y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(cputag_get_cpu(screen->machine, "line_cpu"));
+		int num_entries = cubeqcpu_get_ptr_ram_val(devtag_get_device(screen->machine, "line_cpu"), y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(devtag_get_device(screen->machine, "line_cpu"));
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 pen;
 
@@ -240,10 +240,10 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	cubeqcpu_swap_line_banks(cputag_get_cpu(machine, "line_cpu"));
+	cubeqcpu_swap_line_banks(devtag_get_device(machine, "line_cpu"));
 
 	/* TODO: This is a little dubious */
-	cubeqcpu_clear_stack(cputag_get_cpu(machine, "line_cpu"));
+	cubeqcpu_clear_stack(devtag_get_device(machine, "line_cpu"));
 }
 
 
@@ -375,22 +375,22 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( read_rotram )
 {
-	return cubeqcpu_rotram_r(cputag_get_cpu(space->machine, "rotate_cpu"), offset, mem_mask);
+	return cubeqcpu_rotram_r(devtag_get_device(space->machine, "rotate_cpu"), offset, mem_mask);
 }
 
 static WRITE16_HANDLER( write_rotram )
 {
-	cubeqcpu_rotram_w(cputag_get_cpu(space->machine, "rotate_cpu"), offset, data, mem_mask);
+	cubeqcpu_rotram_w(devtag_get_device(space->machine, "rotate_cpu"), offset, data, mem_mask);
 }
 
 static READ16_HANDLER( read_sndram )
 {
-	return cubeqcpu_sndram_r(cputag_get_cpu(space->machine, "sound_cpu"), offset, mem_mask);
+	return cubeqcpu_sndram_r(devtag_get_device(space->machine, "sound_cpu"), offset, mem_mask);
 }
 
 static WRITE16_HANDLER( write_sndram )
 {
-	cubeqcpu_sndram_w(cputag_get_cpu(space->machine, "sound_cpu"), offset, data, mem_mask);
+	cubeqcpu_sndram_w(devtag_get_device(space->machine, "sound_cpu"), offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )

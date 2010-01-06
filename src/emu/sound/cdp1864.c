@@ -436,7 +436,7 @@ static DEVICE_START( cdp1864 )
 	devcb_resolve_write_line(&cdp1864->out_efx_func, &intf->out_efx_func, device);
 
 	/* get the cpu */
-	cdp1864->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
+	cdp1864->cpu = devtag_get_device(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
 	cdp1864->screen = devtag_get_device(device->machine, intf->screen_tag);

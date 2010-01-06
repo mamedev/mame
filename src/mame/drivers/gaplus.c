@@ -184,7 +184,7 @@ static WRITE8_DEVICE_HANDLER( gaplus_snd_sharedram_w )
 static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset, 11);
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+	cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 {
 	int bit = !BIT(offset, 13);
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub2"), bit);
+	cpu_interrupt_enable(devtag_get_device(space->machine, "sub2"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "sub2", 0, CLEAR_LINE);
 }
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
 {
 	int bit = offset & 1;
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
+	cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 }
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( gaplus_freset_w )
 static MACHINE_RESET( gaplus )
 {
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
-	cpu_interrupt_enable(cputag_get_cpu(machine, "sub"), 0);
+	cpu_interrupt_enable(devtag_get_device(machine, "sub"), 0);
 	cputag_set_input_line(machine, "sub", 0, CLEAR_LINE);
 }
 

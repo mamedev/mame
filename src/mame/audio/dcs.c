@@ -940,7 +940,7 @@ void dcs_init(running_machine *machine)
 	dcs_sram = NULL;
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = cputag_get_cpu(machine, "dcs");
+	dcs.cpu = devtag_get_device(machine, "dcs");
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
@@ -977,18 +977,18 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = cputag_get_cpu(machine, "dcs2");
+	dcs.cpu = devtag_get_device(machine, "dcs2");
 	dcs.rev = 2;
 	soundbank_words = 0x1000;
 	if (dcs.cpu == NULL)
 	{
-		dcs.cpu = cputag_get_cpu(machine, "dsio");
+		dcs.cpu = devtag_get_device(machine, "dsio");
 		dcs.rev = 3;
 		soundbank_words = 0x400;
 	}
 	if (dcs.cpu == NULL)
 	{
-		dcs.cpu = cputag_get_cpu(machine, "denver");
+		dcs.cpu = devtag_get_device(machine, "denver");
 		dcs.rev = 4;
 		soundbank_words = 0x800;
 	}

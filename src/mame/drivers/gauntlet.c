@@ -148,7 +148,7 @@ static void scanline_update(const device_config *screen, int scanline)
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(cputag_get_cpu(screen->machine, "audiocpu"));
+		atarigen_6502_irq_gen(devtag_get_device(screen->machine, "audiocpu"));
 	else
 		atarigen_6502_irq_ack_r(space, 0);
 }
@@ -173,7 +173,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
+	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 }
 
 
@@ -1617,7 +1617,7 @@ static void gauntlet_common_init(running_machine *machine, int slapstic, int vin
 	gauntlet_state *state = (gauntlet_state *)machine->driver_data;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	state->atarigen.eeprom_default = NULL;
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x038000, 0, slapstic);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);

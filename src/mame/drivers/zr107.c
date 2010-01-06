@@ -213,7 +213,7 @@ static VIDEO_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	sharc_set_flag_input(cputag_get_cpu(screen->machine, "dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(devtag_get_device(screen->machine, "dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -264,7 +264,7 @@ static VIDEO_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	sharc_set_flag_input(cputag_get_cpu(screen->machine, "dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(devtag_get_device(screen->machine, "dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -392,10 +392,10 @@ static UINT32 *workram;
 static MACHINE_START( zr107 )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, workram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )

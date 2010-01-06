@@ -504,7 +504,7 @@ static MACHINE_START(crystal)
 {
 	int i;
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), icallback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
 	for (i = 0; i < 4; i++)
 		Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
 
@@ -519,7 +519,7 @@ static MACHINE_RESET(crystal)
 	memset(vidregs, 0, 0x10000);
 	FlipCount = 0;
 	IntHigh = 0;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), icallback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
 	Bank = 0;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0);
 	FlashCmd = 0xff;

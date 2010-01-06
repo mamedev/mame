@@ -878,10 +878,10 @@ static WRITE32_HANDLER( lanc2_w )
 static MACHINE_START( nwktr )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1033,9 +1033,9 @@ static const adc12138_interface nwktr_adc_interface = {
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ1);
+		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), INPUT_LINE_IRQ1);
 	else
-		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ2);
+		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), INPUT_LINE_IRQ2);
 }
 
 static const k056800_interface nwktr_k056800_interface =

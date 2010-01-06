@@ -271,7 +271,7 @@ void williams_cvsd_init(running_machine *machine)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(machine, "cvsdcpu");
+	sound_cpu = devtag_get_device(machine, "cvsdcpu");
 	soundalt_cpu = NULL;
 
 	/* configure master CPU banks */
@@ -303,8 +303,8 @@ void williams_narc_init(running_machine *machine)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(machine, "narc1cpu");
-	soundalt_cpu = cputag_get_cpu(machine, "narc2cpu");
+	sound_cpu = devtag_get_device(machine, "narc1cpu");
+	soundalt_cpu = devtag_get_device(machine, "narc2cpu");
 
 	/* configure master CPU banks */
 	ROM = memory_region(machine, "narc1cpu");
@@ -346,7 +346,7 @@ void williams_adpcm_init(running_machine *machine)
 	UINT8 *ROM;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(machine, "adpcm");
+	sound_cpu = devtag_get_device(machine, "adpcm");
 	soundalt_cpu = NULL;
 
 	/* configure banks */

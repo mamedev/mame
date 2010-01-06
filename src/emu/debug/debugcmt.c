@@ -487,7 +487,7 @@ static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 
 	for (cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
 	{
-		const device_config *cpu = cputag_get_cpu(machine, xml_get_attribute_string(cpunode, "tag", ""));
+		const device_config *cpu = devtag_get_device(machine, xml_get_attribute_string(cpunode, "tag", ""));
 		if (cpu != NULL)
 		{
 			debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;

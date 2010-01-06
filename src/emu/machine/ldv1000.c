@@ -233,7 +233,7 @@ static void ldv1000_init(laserdisc_state *ld)
 	memset(player, 0, sizeof(*player));
 
 	/* find our devices */
-	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "ldv1000"));
+	player->cpu = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "ldv1000"));
 	player->ctc = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "ldvctc"));
 	player->multitimer = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "multitimer"));
 	timer_device_set_ptr(player->multitimer, ld);

@@ -196,7 +196,7 @@ static IRQ_CALLBACK(metro_irq_callback)
 static MACHINE_RESET( metro )
 {
 	if (irq_line == -1)
-		cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), metro_irq_callback);
+		cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), metro_irq_callback);
 }
 
 

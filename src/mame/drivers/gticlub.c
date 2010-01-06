@@ -398,10 +398,10 @@ static WRITE8_HANDLER( sysreg_w )
 static MACHINE_START( gticlub )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )

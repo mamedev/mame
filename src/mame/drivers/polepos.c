@@ -304,7 +304,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
@@ -468,8 +468,8 @@ static MACHINE_RESET( polepos )
 		polepos_latch_w(space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, Z8000_NVI);
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub2"), 0, Z8000_NVI);
+	cpu_set_input_line_vector(devtag_get_device(machine, "sub"), 0, Z8000_NVI);
+	cpu_set_input_line_vector(devtag_get_device(machine, "sub2"), 0, Z8000_NVI);
 }
 
 

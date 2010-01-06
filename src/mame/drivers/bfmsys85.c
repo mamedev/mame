@@ -226,7 +226,7 @@ static WRITE8_HANDLER( mmtr_w )
 	for (i=0; i<8; i++)
 	if ( changed & (1 << i) )	Mechmtr_update(i, cycles, data & (1 << i) );
 
-	if ( data ) generic_pulse_irq_line(cputag_get_cpu(space->machine, "maincpu"), M6809_FIRQ_LINE);
+	if ( data ) generic_pulse_irq_line(devtag_get_device(space->machine, "maincpu"), M6809_FIRQ_LINE);
 }
 ///////////////////////////////////////////////////////////////////////////
 

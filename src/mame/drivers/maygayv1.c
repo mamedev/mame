@@ -969,8 +969,8 @@ static MACHINE_START( maygayv1 )
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
-	i8051_set_serial_tx_callback(cputag_get_cpu(machine, "soundcpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(cputag_get_cpu(machine, "soundcpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(devtag_get_device(machine, "soundcpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(devtag_get_device(machine, "soundcpu"), data_to_i8031);
 }
 
 static MACHINE_RESET( maygayv1 )

@@ -2071,7 +2071,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 	for (addr = 0; addr < 0x10000; addr++)
 		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
-	if (space->cpu == cputag_get_cpu(machine, "maincpu"))
+	if (space->cpu == devtag_get_device(machine, "maincpu"))
 		decrypted = decrypt;
 }
 

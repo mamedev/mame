@@ -191,7 +191,7 @@ static TIMER_CALLBACK( setirq_callback )
 			break;
 	}
 
-	cpu = cputag_get_cpu(machine, CPUTAG_T5182);
+	cpu = devtag_get_device(machine, CPUTAG_T5182);
 
 	if (cpu == NULL)
 		return;

@@ -57,7 +57,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 		if (device->owner != NULL)
 			cpu = device_find_child_by_tag(device->owner, config->tag);
 		else
-			cpu = cputag_get_cpu(device->machine, config->tag);
+			cpu = devtag_get_device(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -144,7 +144,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		if (device->owner != NULL)
 			cpu = device_find_child_by_tag(device->owner, config->tag);
 		else
-			cpu = cputag_get_cpu(device->machine, config->tag);
+			cpu = devtag_get_device(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -165,7 +165,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		if (device->owner != NULL)
 			cpu = device_find_child_by_tag(device->owner, config->tag);
 		else
-			cpu = cputag_get_cpu(device->machine, config->tag);
+			cpu = devtag_get_device(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -244,7 +244,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 		if (device->owner != NULL)
 			cpu = device_find_child_by_tag(device->owner, config->tag);
 		else
-			cpu = cputag_get_cpu(device->machine, config->tag);
+			cpu = devtag_get_device(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_read8: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -315,7 +315,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 		if (device->owner != NULL)
 			cpu = device_find_child_by_tag(device->owner, config->tag);
 		else
-			cpu = cputag_get_cpu(device->machine, config->tag);
+			cpu = devtag_get_device(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_write8: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);

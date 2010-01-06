@@ -1812,12 +1812,12 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_START(hyperneo)
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 

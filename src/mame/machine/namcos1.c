@@ -739,7 +739,7 @@ WRITE8_HANDLER( namcos1_bankswitch_w )
 {
 //  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag, offset, data);
 
-	namcos1_bankswitch(space->machine, (space->cpu == cputag_get_cpu(space->machine, "maincpu")) ? 0 : 1, offset, data);
+	namcos1_bankswitch(space->machine, (space->cpu == devtag_get_device(space->machine, "maincpu")) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */
@@ -864,7 +864,7 @@ MACHINE_RESET( namcos1 )
 	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);

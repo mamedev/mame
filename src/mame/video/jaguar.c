@@ -655,7 +655,7 @@ static TIMER_CALLBACK( jaguar_pit )
 
 	if (gpu_regs[PIT0])
 	{
-		sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(cputag_get_cpu(machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
+		sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(devtag_get_device(machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
 //      timer_set(machine, sample_period, NULL, 0, jaguar_pit);
 	}
 }
@@ -675,7 +675,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 			case PIT1:
 				if (gpu_regs[PIT0])
 				{
-					sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(cputag_get_cpu(space->machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
+					sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(devtag_get_device(space->machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
 					timer_set(space->machine, sample_period, NULL, 0, jaguar_pit);
 				}
 				break;

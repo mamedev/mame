@@ -4542,7 +4542,7 @@ static DEVICE_START( voodoo )
 	v->index = device_list_index(&device->machine->config->devicelist, device->type, device->tag);
 	v->screen = devtag_get_device(device->machine, config->screen);
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
-	v->cpu = cputag_get_cpu(device->machine, config->cputag);
+	v->cpu = devtag_get_device(device->machine, config->cputag);
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
 	v->type = config->type;
 	v->chipmask = 0x01;

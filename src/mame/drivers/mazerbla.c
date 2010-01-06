@@ -1387,7 +1387,7 @@ static MACHINE_RESET( mazerbla )
 {
 	game_id = MAZERBLA;
 	zpu_int_vector = 0xff;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 }
 
 
@@ -1396,7 +1396,7 @@ static MACHINE_RESET( greatgun )
 	UINT8 *rom = memory_region(machine, "sub2");
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 
 
 //  patch VCU test

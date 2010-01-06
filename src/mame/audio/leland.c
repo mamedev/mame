@@ -514,7 +514,7 @@ static TIMER_CALLBACK( dma_timer_callback );
 static DEVICE_START( common_sh_start )
 {
 	running_machine *machine = device->machine;
-	const address_space *dmaspace = memory_find_address_space(cputag_get_cpu(machine, "audiocpu"), ADDRESS_SPACE_PROGRAM);
+	const address_space *dmaspace = memory_find_address_space(devtag_get_device(machine, "audiocpu"), ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
@@ -1777,8 +1777,8 @@ static READ16_HANDLER( main_to_sound_comm_r )
 static TIMER_CALLBACK( delayed_response_r )
 {
 	int checkpc = param;
-	int pc = cpu_get_reg(cputag_get_cpu(machine, "master"), Z80_PC);
-	int oldaf = cpu_get_reg(cputag_get_cpu(machine, "master"), Z80_AF);
+	int pc = cpu_get_reg(devtag_get_device(machine, "master"), Z80_PC);
+	int oldaf = cpu_get_reg(devtag_get_device(machine, "master"), Z80_AF);
 
 	/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
        synchronizing on the write to this register from the slave side does nothing.
@@ -1791,7 +1791,7 @@ static TIMER_CALLBACK( delayed_response_r )
 		if (LOG_COMM) logerror("(Updated sound response latch to %02X)\n", sound_response);
 
 		oldaf = (oldaf & 0x00ff) | (sound_response << 8);
-		cpu_set_reg(cputag_get_cpu(machine, "master"), Z80_AF, oldaf);
+		cpu_set_reg(devtag_get_device(machine, "master"), Z80_AF, oldaf);
 	}
 	else
 		logerror("ERROR: delayed_response_r - current PC = %04X, checkPC = %04X\n", pc, checkpc);

@@ -406,7 +406,7 @@ static void outrun_generic_init(running_machine *machine)
 	workram              = auto_alloc_array(machine, UINT16, 0x08000/2);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), outrun_info, sound_data_w, NULL);
+	segaic16_memory_mapper_init(devtag_get_device(machine, "maincpu"), outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
@@ -506,7 +506,7 @@ static void outrun_reset(const device_config *device)
 
 static MACHINE_RESET( outrun )
 {
-	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
+	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
 
 	/* reset misc components */
 	segaic16_memory_mapper_reset(machine);
@@ -515,7 +515,7 @@ static MACHINE_RESET( outrun )
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), outrun_reset);
+	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), outrun_reset);
 
 	/* start timers to track interrupts */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
@@ -533,7 +533,7 @@ static void log_unknown_ppi_read( running_machine *machine, unsigned port )
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), ports[port]);
+	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), ports[port]);
 }
 
 
@@ -541,7 +541,7 @@ static void log_unknown_ppi_write( running_machine *machine, unsigned port, UINT
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), data, ports[port]);
+	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), data, ports[port]);
 }
 
 

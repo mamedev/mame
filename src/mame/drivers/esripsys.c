@@ -130,7 +130,7 @@ static READ8_HANDLER( uart_r )
 
 static READ8_HANDLER( g_status_r )
 {
-	int bank4 = BIT(get_rip_status(cputag_get_cpu(space->machine, "video_cpu")), 2);
+	int bank4 = BIT(get_rip_status(devtag_get_device(space->machine, "video_cpu")), 2);
 	int vblank = video_screen_get_vblank(space->machine->primary_screen);
 
 	return (!vblank << 7) | (bank4 << 6) | (f_status & 0x2f);
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( g_status_w )
 static READ8_HANDLER( f_status_r )
 {
 	int vblank = video_screen_get_vblank(space->machine->primary_screen);
-	UINT8 rip_status = get_rip_status(cputag_get_cpu(space->machine, "video_cpu"));
+	UINT8 rip_status = get_rip_status(devtag_get_device(space->machine, "video_cpu"));
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 

@@ -110,7 +110,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* SSIO */
 	if (mcr_sound_config & MCR_SSIO)
 	{
-		ssio_sound_cpu = cputag_get_cpu(machine, "ssiocpu");
+		ssio_sound_cpu = devtag_get_device(machine, "ssiocpu");
 		ssio_compute_ay8910_modulation(machine);
 		state_save_register_global_array(machine, ssio_data);
 		state_save_register_global(machine, ssio_status);
@@ -123,28 +123,28 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Turbo Chip Squeak */
 	if (mcr_sound_config & MCR_TURBO_CHIP_SQUEAK)
 	{
-		turbocs_sound_cpu = cputag_get_cpu(machine, "tcscpu");
+		turbocs_sound_cpu = devtag_get_device(machine, "tcscpu");
 		state_save_register_global(machine, turbocs_status);
 	}
 
 	/* Chip Squeak Deluxe */
 	if (mcr_sound_config & MCR_CHIP_SQUEAK_DELUXE)
 	{
-		csdeluxe_sound_cpu = cputag_get_cpu(machine, "csdcpu");
+		csdeluxe_sound_cpu = devtag_get_device(machine, "csdcpu");
 		state_save_register_global(machine, csdeluxe_status);
 	}
 
 	/* Sounds Good */
 	if (mcr_sound_config & MCR_SOUNDS_GOOD)
 	{
-		soundsgood_sound_cpu = cputag_get_cpu(machine, "sgcpu");
+		soundsgood_sound_cpu = devtag_get_device(machine, "sgcpu");
 		state_save_register_global(machine, soundsgood_status);
 	}
 
 	/* Squawk n Talk */
 	if (mcr_sound_config & MCR_SQUAWK_N_TALK)
 	{
-		squawkntalk_sound_cpu = cputag_get_cpu(machine, "sntcpu");
+		squawkntalk_sound_cpu = devtag_get_device(machine, "sntcpu");
 		state_save_register_global(machine, squawkntalk_tms_command);
 		state_save_register_global(machine, squawkntalk_tms_strobes);
 	}

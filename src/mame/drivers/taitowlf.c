@@ -535,7 +535,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(taitowlf)
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 
 	taitowlf_devices.pit8254 = devtag_get_device( machine, "pit8254" );
 	taitowlf_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );

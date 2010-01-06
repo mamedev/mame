@@ -339,7 +339,7 @@ static WRITE16_HANDLER( ssv_lockout_inv_w )
 static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), ssv_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), ssv_irq_callback);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 }
 

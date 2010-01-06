@@ -190,12 +190,12 @@ static MACHINE_START( kinst )
 	}
 
 	/* set the fastest DRC options */
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x08000000, 0x087fffff, FALSE, rambase2);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x0007ffff, FALSE, rambase);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x08000000, 0x087fffff, FALSE, rambase2);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x0007ffff, FALSE, rambase);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 

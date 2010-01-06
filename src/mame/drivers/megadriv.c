@@ -698,7 +698,7 @@ static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(cputag_get_cpu(machine, "maincpu"), ATTOTIME_IN_NSEC(length * 1000 / 3500));
+	cpu_spinuntil_time(devtag_get_device(machine, "maincpu"), ATTOTIME_IN_NSEC(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -5768,7 +5768,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 
 
-		if (cputag_get_cpu(timer->machine, "genesis_snd_z80") != NULL)
+		if (devtag_get_device(timer->machine, "genesis_snd_z80") != NULL)
 		{
 			if (genesis_scanline_counter == megadrive_z80irq_scanline)
 			{
@@ -5856,7 +5856,7 @@ MACHINE_RESET( megadriv )
 		break;
 	}
 
-	if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL)
+	if (devtag_get_device(machine, "genesis_snd_z80") != NULL)
 	{
 		genz80.z80_is_reset = 1;
 		genz80.z80_has_bus = 1;
@@ -5882,8 +5882,8 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-		cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.9950f); /* Fatal Rewind is very fussy... */
-	//  cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.3800f); /* Fatal Rewind is very fussy... */
+		cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.9950f); /* Fatal Rewind is very fussy... */
+	//  cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.3800f); /* Fatal Rewind is very fussy... */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}
@@ -6249,7 +6249,7 @@ static void megadriv_init_common(running_machine *machine)
 	const input_port_token *ipt = machine->gamedrv->ipt;
 
 	/* Look to see if this system has the standard Sound Z80 */
-	_genesis_snd_z80_cpu = cputag_get_cpu(machine, "genesis_snd_z80");
+	_genesis_snd_z80_cpu = devtag_get_device(machine, "genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
 		//printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
@@ -6259,14 +6259,14 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu = cputag_get_cpu(machine, "32x_master_sh2");
+	_32x_master_cpu = devtag_get_device(machine, "32x_master_sh2");
 	if (_32x_master_cpu != NULL)
 	{
 		printf("32x MASTER SH2 cpu found %d\n", cpu_get_index(_32x_master_cpu) );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu = cputag_get_cpu(machine, "32x_slave_sh2");
+	_32x_slave_cpu = devtag_get_device(machine, "32x_slave_sh2");
 	if (_32x_slave_cpu != NULL)
 	{
 		printf("32x SLAVE SH2 cpu found %d\n", cpu_get_index(_32x_slave_cpu) );
@@ -6281,26 +6281,26 @@ static void megadriv_init_common(running_machine *machine)
 		_32x_is_connected = 0;
 	}
 
-	_segacd_68k_cpu = cputag_get_cpu(machine, "segacd_68k");
+	_segacd_68k_cpu = devtag_get_device(machine, "segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
 		printf("Sega CD secondary 68k cpu found %d\n", cpu_get_index(_segacd_68k_cpu) );
 	}
 
-	_svp_cpu = cputag_get_cpu(machine, "svp");
+	_svp_cpu = devtag_get_device(machine, "svp");
 	if (_svp_cpu != NULL)
 	{
 		printf("SVP (cpu) found %d\n", cpu_get_index(_svp_cpu) );
 	}
 
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), genesis_int_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	m68k_set_tas_callback(cputag_get_cpu(machine, "maincpu"), megadriv_tas_callback);
+	m68k_set_tas_callback(devtag_get_device(machine, "maincpu"), megadriv_tas_callback);
 
 	if ((ipt == INPUT_PORTS_NAME(megadri6)) || (ipt == INPUT_PORTS_NAME(ssf2ghw)))
 	{
@@ -6520,8 +6520,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	sh2drc_set_options(cputag_get_cpu(machine, "32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
-	sh2drc_set_options(cputag_get_cpu(machine, "32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(devtag_get_device(machine, "32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(devtag_get_device(machine, "32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }

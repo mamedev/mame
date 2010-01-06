@@ -594,13 +594,13 @@ static WRITE8_HANDLER( superpac_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
@@ -638,19 +638,19 @@ static WRITE8_HANDLER( phozon_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub2"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "sub2"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub2", 0, CLEAR_LINE);
 			break;
@@ -686,13 +686,13 @@ static WRITE8_HANDLER( mappy_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;

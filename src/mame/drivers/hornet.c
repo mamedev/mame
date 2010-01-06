@@ -1047,10 +1047,10 @@ static MACHINE_START( hornet )
 	jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, workram);
+	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, workram);
 
 	state_save_register_global(machine, led_reg0);
 	state_save_register_global(machine, led_reg1);
@@ -1275,19 +1275,19 @@ static int jvs_encode_data(running_machine *machine, UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xdf);
+			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xcf);
+			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), b);
+			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), b);
 		}
 	}
 	return sum;
@@ -1380,11 +1380,11 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xe0);			// sync
-	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0x00);			// node
-	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), rdata_ptr + 1);	// num of bytes
+	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xe0);			// sync
+	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0x00);			// node
+	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), rdata_ptr + 1);	// num of bytes
 	sum += jvs_encode_data(machine, rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), sum - 1);		// checksum
+	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
 }
@@ -1399,7 +1399,7 @@ static DRIVER_INIT(hornet)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(devtag_get_device(machine, "maincpu"), jamma_jvs_w);
 }
 
 static DRIVER_INIT(hornet_2board)
@@ -1410,7 +1410,7 @@ static DRIVER_INIT(hornet_2board)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(devtag_get_device(machine, "maincpu"), jamma_jvs_w);
 }
 
 /*****************************************************************************/

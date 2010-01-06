@@ -178,7 +178,7 @@ static DEVICE_START( namco_53xx )
 	assert(config != NULL);
 
 	/* find our CPU */
-	state->cpu = cputag_get_cpu(device->machine, device_build_tag(tempstring, device, "mcu"));
+	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
 	astring_free(tempstring);
 

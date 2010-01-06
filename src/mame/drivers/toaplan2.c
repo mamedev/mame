@@ -322,7 +322,7 @@ static MACHINE_RESET( toaplan2 )
       This is important for games with common RAM; the RAM test will fail
       when leaving service mode if the sound CPU is not reset.
     */
-	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), toaplan2_reset);
+	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), toaplan2_reset);
 }
 
 static MACHINE_RESET( ghox )
@@ -369,24 +369,24 @@ static void register_state_save(running_machine *machine)
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */
 {
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	sub_cpu = devtag_get_device(machine, "audiocpu");
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_Z180 )
 {
 	toaplan2_sub_cpu = CPU_2_HD647180;
-	sub_cpu = cputag_get_cpu(machine, "mcu");
+	sub_cpu = devtag_get_device(machine, "mcu");
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_V25 )
 {
 	toaplan2_sub_cpu = CPU_2_V25;
-	if (cputag_get_cpu(machine, "mcu") != NULL)
-		sub_cpu = cputag_get_cpu(machine, "mcu");
-	else if (cputag_get_cpu(machine, "audiocpu") != NULL)
-		sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	if (devtag_get_device(machine, "mcu") != NULL)
+		sub_cpu = devtag_get_device(machine, "mcu");
+	else if (devtag_get_device(machine, "audiocpu") != NULL)
+		sub_cpu = devtag_get_device(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -398,7 +398,7 @@ static DRIVER_INIT( T2_noZ80 )
 
 static DRIVER_INIT( fixeight )
 {
-	sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	sub_cpu = devtag_get_device(machine, "audiocpu");
 
 	if (fixeight_sec_cpu_mem)
 	{
@@ -497,7 +497,7 @@ static DRIVER_INIT( pipibibi )
 	}
 
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	sub_cpu = devtag_get_device(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -505,7 +505,7 @@ static DRIVER_INIT( batrider )
 {
 	raizing_sndirq_line = 4;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	sub_cpu = devtag_get_device(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -514,7 +514,7 @@ static DRIVER_INIT( bbakraid )
 	bbakraid_unlimited_ver = 0;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	sub_cpu = devtag_get_device(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -523,7 +523,7 @@ static DRIVER_INIT( bbakradu )
 	bbakraid_unlimited_ver = 1;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = cputag_get_cpu(machine, "audiocpu");
+	sub_cpu = devtag_get_device(machine, "audiocpu");
 	register_state_save(machine);
 }
 

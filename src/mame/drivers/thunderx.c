@@ -674,7 +674,7 @@ static MACHINE_RESET( scontra )
 
 static MACHINE_RESET( thunderx )
 {
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), thunderx_banking);
+	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), thunderx_banking);
 
 	MACHINE_RESET_CALL(scontra);
 }

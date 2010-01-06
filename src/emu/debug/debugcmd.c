@@ -529,7 +529,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 	}
 
 	/* first look for a tag match */
-	*result = cputag_get_cpu(machine, param);
+	*result = devtag_get_device(machine, param);
 	if (*result != NULL)
 		return TRUE;
 

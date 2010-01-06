@@ -1259,27 +1259,27 @@ static INTERRUPT_GEN(tms_sync)
 
 static READ16_HANDLER(tms57002_data_word_r)
 {
-	return tms57002_data_r(cputag_get_cpu(space->machine, "dasp"), 0);
+	return tms57002_data_r(devtag_get_device(space->machine, "dasp"), 0);
 }
 
 static WRITE16_HANDLER(tms57002_data_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		tms57002_data_w(cputag_get_cpu(space->machine, "dasp"), 0, data);
+		tms57002_data_w(devtag_get_device(space->machine, "dasp"), 0, data);
 }
 
 static READ16_HANDLER(tms57002_status_word_r)
 {
-	return (tms57002_dready_r(cputag_get_cpu(space->machine, "dasp"), 0) ? 4 : 0) |
-		(tms57002_empty_r(cputag_get_cpu(space->machine, "dasp"), 0) ? 1 : 0);
+	return (tms57002_dready_r(devtag_get_device(space->machine, "dasp"), 0) ? 4 : 0) |
+		(tms57002_empty_r(devtag_get_device(space->machine, "dasp"), 0) ? 1 : 0);
 }
 
 static WRITE16_HANDLER(tms57002_control_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		tms57002_pload_w(cputag_get_cpu(space->machine, "dasp"), 0, data & 4);
-		tms57002_cload_w(cputag_get_cpu(space->machine, "dasp"), 0, data & 8);
+		tms57002_pload_w(devtag_get_device(space->machine, "dasp"), 0, data & 4);
+		tms57002_cload_w(devtag_get_device(space->machine, "dasp"), 0, data & 8);
 		cputag_set_input_line(space->machine, "dasp", INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }

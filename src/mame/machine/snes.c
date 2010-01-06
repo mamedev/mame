@@ -390,11 +390,11 @@ READ8_HANDLER( snes_r_io )
 		return spc_port_out[offset & 0x3];
 	}
 
-	if(snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if(snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		if(offset >= 0x3000 && offset < 0x3300)
 		{
-			return superfx_mmio_read(cputag_get_cpu(space->machine, "superfx"), offset);
+			return superfx_mmio_read(devtag_get_device(space->machine, "superfx"), offset);
 		}
 	}
 	else if(snes_has_addon_chip == HAS_RTC)
@@ -765,11 +765,11 @@ WRITE8_HANDLER( snes_w_io )
 		return;
 	}
 
-	if(snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if(snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		if(offset >= 0x3000 && offset < 0x3300)
 		{
-			superfx_mmio_write(cputag_get_cpu(space->machine, "superfx"), offset, data);
+			superfx_mmio_write(devtag_get_device(space->machine, "superfx"), offset, data);
 			return;
 		}
 	}
@@ -1347,7 +1347,7 @@ WRITE8_HANDLER( snes_w_io )
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
              * Currently we are just increasing it no matter what */
-//          cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), (data & 0x1) ? 1.335820896 : 1.0 );
+//          cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), (data & 0x1) ? 1.335820896 : 1.0 );
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x1) != (snes_ram[MEMSEL] & 0x1) )
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );
@@ -1493,7 +1493,7 @@ READ8_HANDLER( snes_r_bank1 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)
 	{
-		if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+		if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 			value = snes_ram[0x700000 + (address & 0x1fff)];
 		else if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read(space, offset);
@@ -1602,7 +1602,7 @@ READ8_HANDLER( snes_r_bank4 )
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		value = snes_ram[0x600000 + offset];
 	}
@@ -1635,7 +1635,7 @@ READ8_HANDLER( snes_r_bank5 )
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		value = snes_ram[0x700000 + offset];
 	}
@@ -1668,7 +1668,7 @@ READ8_HANDLER( snes_r_bank6 )
 
 	if (address < 0x8000)
 	{
-		if(address >= 0x6000 && snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+		if(address >= 0x6000 && snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 			logerror( "snes_r_bank6 hit in Super FX mode, please fix me\n" );
 		else if (snes_cart.mode != SNES_MODE_25)
 			value = memory_read_byte(space, offset);
@@ -1717,7 +1717,7 @@ READ8_HANDLER( snes_r_bank7 )
 	{
 		return sdd1_read(space->machine, offset);
 	}
-	else if(snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	else if(snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		logerror( "snes_r_bank7 hit in Super FX mode, please fix me\n" );
 	}
@@ -1826,7 +1826,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 {
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		snes_ram[0x600000 + offset] = data;
 	}
@@ -1860,7 +1860,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 {
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		snes_ram[0x700000 + offset] = data;
 	}
@@ -1890,7 +1890,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 
 	if (address < 0x8000)
 	{
-		if (address >= 0x6000 && snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+		if (address >= 0x6000 && snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 		{
 			logerror( "snes_w_bank6 hit (RAM) in Super FX mode, please fix me\n" );
 		}
@@ -1932,7 +1932,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 		DSP3_write(address, data);
 	else if ((snes_has_addon_chip == HAS_DSP4) && (offset >= 0x300000) && (address < 0xc000))
 		DSP4_write(data);
-	else if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	else if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 		logerror( "snes_w_bank6 hit (ROM) in Super FX mode, please fix me\n" );
 	else
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x800000);
@@ -1944,7 +1944,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 {
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
+	if (snes_has_addon_chip == HAS_SUPERFX && devtag_get_device(space->machine, "superfx") != NULL)
 	{
 		if (offset >= 0x200000)
 		{

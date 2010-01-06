@@ -117,7 +117,7 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static MACHINE_RESET( hangon )
 {
-	fd1094_machine_init(cputag_get_cpu(machine, "sub"));
+	fd1094_machine_init(devtag_get_device(machine, "sub"));
 
 	/* reset misc components */
 	segaic16_tilemap_reset(machine, 0);
@@ -322,7 +322,7 @@ static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 	/* If the CPU is being Reset we also need to reset the fd1094 state */
 	if (data & 0x20)
 	{
-		fd1094_machine_init(cputag_get_cpu(device->machine, "sub"));
+		fd1094_machine_init(devtag_get_device(device->machine, "sub"));
 	}
 
 	adc_select = (data >> 2) & 3;

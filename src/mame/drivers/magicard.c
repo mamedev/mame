@@ -606,7 +606,7 @@ static MACHINE_RESET( magicard )
 	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
 	UINT16 *dst    = magicram;
 	memcpy (dst, src, 0x80000);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 

@@ -218,26 +218,26 @@ static void wiggle_i860_common(const device_config *device, UINT16 data)
 
 static WRITE16_HANDLER( wiggle_i860p0_pins_w )
 {
-	wiggle_i860_common(cputag_get_cpu(space->machine, "vid_0"), data);
+	wiggle_i860_common(devtag_get_device(space->machine, "vid_0"), data);
 }
 
 static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 {
-	wiggle_i860_common(cputag_get_cpu(space->machine, "vid_1"), data);
+	wiggle_i860_common(devtag_get_device(space->machine, "vid_1"), data);
 }
 
 static READ16_HANDLER( main_irqiack_r )
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	cpu_set_input_line(cputag_get_cpu(space->machine, "maincpu"), M68K_IRQ_1, CLEAR_LINE);
-	//cpu_set_input_line(cputag_get_cpu(space->machine, "maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), M68K_IRQ_1, CLEAR_LINE);
+	//cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( sound_resetmain_r )
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//cpu_set_input_line(cputag_get_cpu(space->machine, "maincpu"), INPUT_LINE_RESET, PULSE_LINE);
+	//cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -379,8 +379,8 @@ static MACHINE_RESET( vcombat )
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 
-	i860_set_pin(cputag_get_cpu(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
-	i860_set_pin(cputag_get_cpu(machine, "vid_1"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(devtag_get_device(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(devtag_get_device(machine, "vid_1"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
 }
@@ -390,7 +390,7 @@ static MACHINE_RESET( shadfgtr )
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 
-	i860_set_pin(cputag_get_cpu(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(devtag_get_device(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
 }
@@ -531,7 +531,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER(sound_update)
 {
 	/* Seems reasonable */
-	cpu_set_input_line(cputag_get_cpu(device->machine, "soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(devtag_get_device(device->machine, "soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

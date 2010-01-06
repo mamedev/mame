@@ -482,7 +482,7 @@ static MACHINE_RESET( vendetta )
 	vendetta_state *state = (vendetta_state *)machine->driver_data;
 	int i;
 
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), vendetta_banking);
+	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), vendetta_banking);
 
 	for (i = 0; i < 3; i++)
 	{

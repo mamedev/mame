@@ -272,7 +272,7 @@ static MACHINE_START( crimfght )
 
 static MACHINE_RESET( crimfght )
 {
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), crimfght_banking);
+	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), crimfght_banking);
 }
 
 static MACHINE_DRIVER_START( crimfght )

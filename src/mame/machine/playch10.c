@@ -84,8 +84,8 @@ MACHINE_START( pc10 )
 	/* move to individual boards as documentation of actual boards allows */
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
 
 	if (NULL != vram)
 		set_videoram_bank(machine, 0, 8, 0, 8);
@@ -104,8 +104,8 @@ MACHINE_START( playch10_hboard )
 
 	vram = auto_alloc_array(machine, UINT8, 0x2000);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
 }
 
 /*************************************
@@ -869,7 +869,7 @@ static void gboard_scanline_cb( const device_config *device, int scanline, int v
 		if (--gboard_scanline_counter == -1)
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			generic_pulse_irq_line(cputag_get_cpu(device->machine, "cart"), 0);
+			generic_pulse_irq_line(devtag_get_device(device->machine, "cart"), 0);
 		}
 	}
 }

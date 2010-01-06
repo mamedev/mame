@@ -84,7 +84,7 @@ void cinemat_vector_callback(const device_config *device, INT16 sx, INT16 sy, IN
 WRITE8_HANDLER(cinemat_vector_control_w)
 {
 	int r, g, b, i;
-	const device_config *cpu = cputag_get_cpu(space->machine, "maincpu");
+	const device_config *cpu = devtag_get_device(space->machine, "maincpu");
 
 	switch (color_mode)
 	{
@@ -226,7 +226,7 @@ VIDEO_UPDATE( cinemat )
 	VIDEO_UPDATE_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(cputag_get_cpu(screen->machine, "maincpu"));
+	ccpu_wdt_timer_trigger(devtag_get_device(screen->machine, "maincpu"));
 
 	return 0;
 }

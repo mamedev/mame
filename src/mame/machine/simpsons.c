@@ -109,7 +109,7 @@ MACHINE_RESET( simpsons )
 	simpsons_state *state = (simpsons_state *)machine->driver_data;
 	int i;
 
-	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), simpsons_banking);
+	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), simpsons_banking);
 
 	for (i = 0; i < 3; i++)
 	{

@@ -1999,15 +1999,15 @@ WRITE32_HANDLER( n64_pif_ram_w )
 
 MACHINE_START( n64 )
 {
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
 
-	rspdrc_set_options(cputag_get_cpu(machine, "rsp"), 0);
-	rspdrc_add_imem(cputag_get_cpu(machine, "rsp"), rsp_imem);
-	rspdrc_add_dmem(cputag_get_cpu(machine, "rsp"), rsp_dmem);
-	rspdrc_flush_drc_cache(cputag_get_cpu(machine, "rsp"));
+	rspdrc_set_options(devtag_get_device(machine, "rsp"), 0);
+	rspdrc_add_imem(devtag_get_device(machine, "rsp"), rsp_imem);
+	rspdrc_add_dmem(devtag_get_device(machine, "rsp"), rsp_dmem);
+	rspdrc_flush_drc_cache(devtag_get_device(machine, "rsp"));
 
 	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 }

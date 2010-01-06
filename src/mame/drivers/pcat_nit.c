@@ -541,7 +541,7 @@ static MACHINE_START( streetg2 )
 //  bank = -1;
 //  lastvalue = -1;
 //  hv_blank = 0;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 	streetg2_devices.pit8253 = devtag_get_device( machine, "pit8254" );
 	streetg2_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
 	streetg2_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );

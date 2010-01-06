@@ -228,7 +228,7 @@ static DEVICE_START( namco_06xx )
 	assert(config != NULL);
 
 	/* resolve our CPU */
-	state->nmicpu = cputag_get_cpu(device->machine, config->nmicpu);
+	state->nmicpu = devtag_get_device(device->machine, config->nmicpu);
 	assert(state->nmicpu != NULL);
 
 	/* resolve our devices */

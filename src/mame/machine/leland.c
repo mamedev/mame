@@ -407,7 +407,7 @@ MACHINE_RESET( leland )
 		memory_set_bankptr(machine, "bank3", &slave_base[0x10000]);
 
 	/* if we have an I80186 CPU, reset it */
-	if (cputag_get_cpu(machine, "audiocpu") != NULL && cpu_get_type(cputag_get_cpu(machine, "audiocpu")) == CPU_I80186)
+	if (devtag_get_device(machine, "audiocpu") != NULL && cpu_get_type(devtag_get_device(machine, "audiocpu")) == CPU_I80186)
 		leland_80186_sound_init();
 }
 
@@ -1142,7 +1142,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x01:	/* /GIN1 */
 			result = input_port_read(space->machine, "IN1");
-			if (cpu_get_reg(cputag_get_cpu(space->machine, "slave"), Z80_HALT))
+			if (cpu_get_reg(devtag_get_device(space->machine, "slave"), Z80_HALT))
 				result ^= 0x01;
 			break;
 
@@ -1224,7 +1224,7 @@ READ8_HANDLER( ataxx_master_input_r )
 
 		case 0x07:	/* /SLVBLK */
 			result = input_port_read(space->machine, "IN1");
-			if (cpu_get_reg(cputag_get_cpu(space->machine, "slave"), Z80_HALT))
+			if (cpu_get_reg(devtag_get_device(space->machine, "slave"), Z80_HALT))
 				result ^= 0x01;
 			break;
 

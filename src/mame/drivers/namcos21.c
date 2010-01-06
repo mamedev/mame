@@ -613,7 +613,7 @@ static WRITE16_HANDLER( dspram16_w )
 		}
 		else if (namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					space->cpu == cputag_get_cpu(space->machine, "maincpu"))
+					space->cpu == devtag_get_device(space->machine, "maincpu"))
 		{ /* hack; synchronization for solvalou */
 			cpu_yield(space->cpu);
 		}

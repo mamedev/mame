@@ -179,7 +179,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 static MACHINE_RESET(pk8000)
 {
 	pk8000_set_bank(machine,0);
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pk8000_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pk8000_irq_callback);
 }
 
 static VIDEO_START( photon )

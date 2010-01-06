@@ -480,12 +480,12 @@ static READ16_HANDLER( ti_uart_r )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(cputag_get_cpu(space->machine, "vgb"), offset);
+	return tms34010_host_r(devtag_get_device(space->machine, "vgb"), offset);
 }
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(cputag_get_cpu(space->machine, "vgb"), offset, data);
+	tms34010_host_w(devtag_get_device(space->machine, "vgb"), offset, data);
 }
 
 
@@ -692,8 +692,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( micro3d )
 {
-	i8051_set_serial_tx_callback(cputag_get_cpu(machine, "audiocpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(cputag_get_cpu(machine, "audiocpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(devtag_get_device(machine, "audiocpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(devtag_get_device(machine, "audiocpu"), data_to_i8031);
 
 	duart68681 = devtag_get_device( machine, "duart68681" );
 }

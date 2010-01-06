@@ -337,11 +337,11 @@ WRITE32_HANDLER( jaguar_jerry_regs32_w )
 static WRITE32_HANDLER( dsp_flags_w )
 {
 	/* write the data through */
-	jaguardsp_ctrl_w(cputag_get_cpu(space->machine, "audiocpu"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(devtag_get_device(space->machine, "audiocpu"), offset, data, mem_mask);
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
-	if (space->cpu == cputag_get_cpu(space->machine, "audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
+	if (space->cpu == devtag_get_device(space->machine, "audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
 		if (!(data & 0x04000) && cpu_get_reg(space->cpu, JAGUAR_R22) != 0)

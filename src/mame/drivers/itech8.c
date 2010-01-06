@@ -592,7 +592,7 @@ static const via6522_interface via_interface =
 
 void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
-	cpu_type main_cpu_type = cpu_get_type(cputag_get_cpu(machine, "maincpu"));
+	cpu_type main_cpu_type = cpu_get_type(devtag_get_device(machine, "maincpu"));
 
 	/* update the states */
 	if (periodic != -1) periodic_int = periodic;
@@ -671,13 +671,13 @@ static MACHINE_START( sstrike )
 
 static MACHINE_RESET( itech8 )
 {
-	cpu_type main_cpu_type = cpu_get_type(cputag_get_cpu(machine, "maincpu"));
+	cpu_type main_cpu_type = cpu_get_type(devtag_get_device(machine, "maincpu"));
 
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
-		device_reset(cputag_get_cpu(machine, "maincpu"));
+		device_reset(devtag_get_device(machine, "maincpu"));
 	}
 
 	/* reset the palette chip */
