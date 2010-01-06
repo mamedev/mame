@@ -269,8 +269,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
 				/* Counter load cycle */
-				if (elapsed_cycles > 0) --elapsed_cycles;
-				timer->phase = 2;
+				if (elapsed_cycles > 0) {
+					--elapsed_cycles;
+					timer->phase = 2;
+				}
 				load_counter_value( device, timer );
 			}
 
@@ -330,8 +332,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		if ( elapsed_cycles >= 0 && timer->phase == 1 )
 		{
 			/* Counter load cycle, output goes low */
-			if (elapsed_cycles > 0) --elapsed_cycles;
-			timer->phase = 2;
+			if (elapsed_cycles > 0) {
+				--elapsed_cycles;
+				timer->phase = 2;
+			}
 			load_counter_value( device, timer );
 			set_output( device, timer, 0 );
 		}
@@ -393,8 +397,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		{
 			if ( elapsed_cycles >= 0 && timer->phase == 1 )
 			{
-				if (elapsed_cycles > 0) --elapsed_cycles;
-				timer->phase = 2;
+				if (elapsed_cycles > 0) {
+					--elapsed_cycles;
+					timer->phase = 2;
+				}
 				load_counter_value( device, timer );
 			}
 
@@ -470,45 +476,48 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		{
 			if ( elapsed_cycles >= 0 && timer->phase == 1 )
 			{
-				--elapsed_cycles;
-				timer->phase = 2;
+				if (elapsed_cycles > 0) {
+					--elapsed_cycles;
+					timer->phase = 2;
+				}
 				load_counter_value( device, timer );
 			}
 
-			adjusted_value = adjusted_count( bcd, timer->value );
+			if (elapsed_cycles > 0) {
+				adjusted_value = adjusted_count( bcd, timer->value );
 
-			do
-			{
-				if ( timer->phase == 2 && elapsed_cycles >= ( ( adjusted_value + 1 ) >> 1 ) )
+				do
 				{
-					/* High phase expired, output goes low */
-					elapsed_cycles -= ( ( adjusted_value + 1 ) >> 1 );
-					timer->phase = 3;
-					load_counter_value( device, timer );
-					adjusted_value = adjusted_count( bcd, timer->value );
-					set_output( device, timer, 0 );
-				}
+					if ( timer->phase == 2 && elapsed_cycles >= ( ( adjusted_value + 1 ) >> 1 ) )
+					{
+						/* High phase expired, output goes low */
+						elapsed_cycles -= ( ( adjusted_value + 1 ) >> 1 );
+						timer->phase = 3;
+						load_counter_value( device, timer );
+						adjusted_value = adjusted_count( bcd, timer->value );
+						set_output( device, timer, 0 );
+					}
 
-				if ( timer->phase == 3 && elapsed_cycles >= ( adjusted_value >> 1 ) )
+					if ( timer->phase == 3 && elapsed_cycles >= ( adjusted_value >> 1 ) )
+					{
+						/* Low phase expired, output goes high */
+						elapsed_cycles -= ( adjusted_value >> 1 );
+						timer->phase = 2;
+						load_counter_value( device, timer );
+						adjusted_value = adjusted_count( bcd, timer->value );
+						set_output( device, timer, 1 );
+					}
+				}
+				while( ( timer->phase == 2 && elapsed_cycles >= ( ( adjusted_value + 1 ) >> 1 ) ) ||
+					   ( timer->phase == 3 && elapsed_cycles >= ( adjusted_value >> 1 ) ) );
+
+				decrease_counter_value(timer,elapsed_cycles<<1);
+				switch( timer->phase )
 				{
-					/* Low phase expired, output goes high */
-					elapsed_cycles -= ( adjusted_value >> 1 );
-					timer->phase = 2;
-					load_counter_value( device, timer );
-					adjusted_value = adjusted_count( bcd, timer->value );
-					set_output( device, timer, 1 );
+				case 1:		cycles_to_output = 1; break;
+				case 2:		cycles_to_output = ( adjusted_count( bcd, timer->value ) + 1 ) >> 1; break;
+				case 3:		cycles_to_output = adjusted_count( bcd, timer->value ) >> 1; break;
 				}
-			}
-			while( ( timer->phase == 2 && elapsed_cycles >= ( ( adjusted_value + 1 ) >> 1 ) ) ||
-			       ( timer->phase == 3 && elapsed_cycles >= ( adjusted_value >> 1 ) ) );
-
-			decrease_counter_value(timer,elapsed_cycles<<1);
-
-			switch( timer->phase )
-			{
-			case 1:		cycles_to_output = 1; break;
-			case 2:		cycles_to_output = ( adjusted_count( bcd, timer->value ) + 1 ) >> 1; break;
-			case 3:		cycles_to_output = adjusted_count( bcd, timer->value ) >> 1; break;
 			}
 		}
 		break;
@@ -542,14 +551,16 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 
 		if (timer->gate	== 0 &&	mode ==	4)
 		{
-			cycles_to_output = CYCLES_NEVER;
+			cycles_to_output = CYCLES_NEVER;			
 		}
 		else
 		{
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
-				if (elapsed_cycles > 0) --elapsed_cycles;
-				timer->phase = 2;
+				if (elapsed_cycles > 0) {
+					--elapsed_cycles;
+					timer->phase = 2;
+				}
 				load_counter_value( device, timer );
 			}
 
