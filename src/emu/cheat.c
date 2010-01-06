@@ -455,7 +455,13 @@ static void cheat_exit(running_machine *machine)
 int cheat_get_global_enable(running_machine *machine)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	return !cheatinfo->disabled;
+
+	if (cheatinfo != NULL)
+	{
+		return !cheatinfo->disabled;
+	}
+
+	return 0;
 }
 
 
@@ -469,26 +475,29 @@ void cheat_set_global_enable(running_machine *machine, int enable)
 	cheat_private *cheatinfo = machine->cheat_data;
 	cheat_entry *cheat;
 
-	/* if we're enabled currently and we don't want to be, turn things off */
-	if (!cheatinfo->disabled && !enable)
+	if (cheatinfo != NULL)
 	{
-		/* iterate over running cheats and execute any OFF Scripts */
-		for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
-			if (cheat->state == SCRIPT_STATE_RUN)
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-		popmessage("Cheats Disabled");
-		cheatinfo->disabled = TRUE;
-	}
+		/* if we're enabled currently and we don't want to be, turn things off */
+		if (!cheatinfo->disabled && !enable)
+		{
+			/* iterate over running cheats and execute any OFF Scripts */
+			for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
+				if (cheat->state == SCRIPT_STATE_RUN)
+					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
+			popmessage("Cheats Disabled");
+			cheatinfo->disabled = TRUE;
+		}
 
-	/* if we're disabled currently and we want to be enabled, turn things on */
-	else if (cheatinfo->disabled && enable)
-	{
-		/* iterate over running cheats and execute any ON Scripts */
-		cheatinfo->disabled = FALSE;
-		for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
-			if (cheat->state == SCRIPT_STATE_RUN)
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-		popmessage("Cheats Enabled");
+		/* if we're disabled currently and we want to be enabled, turn things on */
+		else if (cheatinfo->disabled && enable)
+		{
+			/* iterate over running cheats and execute any ON Scripts */
+			cheatinfo->disabled = FALSE;
+			for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
+				if (cheat->state == SCRIPT_STATE_RUN)
+					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
+			popmessage("Cheats Enabled");
+		}
 	}
 }
 
