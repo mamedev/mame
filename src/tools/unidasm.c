@@ -39,7 +39,7 @@
 
 #include "cpuintrf.h"
 #include <ctype.h>
-
+#include <iostream>
 
 enum _display_type
 {
@@ -335,16 +335,9 @@ static const dasm_table_entry dasm_table[] =
 };
 
 
-void CLIB_DECL fatalerror(const char *text, ...)
+void osd_break_into_debugger(const char *text)
 {
-	va_list arg;
-
-	/* dump to the buffer; assume no one writes >2k lines this way */
-	va_start(arg, text);
-	vfprintf(stderr, text, arg);
-	va_end(arg);
-
-	exit(1);
+	/* we don't have a complete debugger to break in */
 }
 
 
@@ -486,6 +479,7 @@ int main(int argc, char *argv[])
 	int numbytes;
 	void *data;
 	char *p;
+	int result = 0;
 
 	// parse options first
 	if (parse_options(argc, argv, &opts))
@@ -510,73 +504,53 @@ int main(int argc, char *argv[])
 	}
 
 	// run it
-	curpc = opts.basepc;
-	for (curbyte = 0; curbyte < length; curbyte += numbytes)
+	try 
 	{
-		UINT8 *oprom = (UINT8 *)data + curbyte;
-		char buffer[1024];
-		UINT32 pcdelta;
-		int numchunks;
-
-		// disassemble
-		pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
-		if (opts.dasm->pcshift < 0)
-			numbytes = pcdelta << -opts.dasm->pcshift;
-		else
-			numbytes = pcdelta >> opts.dasm->pcshift;
-
-		// force upper or lower
-		if (opts.lower)
+		curpc = opts.basepc;
+		for (curbyte = 0; curbyte < length; curbyte += numbytes)
 		{
-			for (p = buffer; *p != 0; p++)
-				*p = tolower((UINT8)*p);
-		}
-		else if (opts.upper)
-		{
-			for (p = buffer; *p != 0; p++)
-				*p = toupper((UINT8)*p);
-		}
+			UINT8 *oprom = (UINT8 *)data + curbyte;
+			char buffer[1024];
+			UINT32 pcdelta;
+			int numchunks;
 
-		// round to the nearest display chunk
-		numbytes = ((numbytes + displaychunk - 1) / displaychunk) * displaychunk;
-		if (numbytes == 0)
-			numbytes = displaychunk;
-		numchunks = numbytes / displaychunk;
+			// disassemble
+			pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
+				
+			if (opts.dasm->pcshift < 0)
+				numbytes = pcdelta << -opts.dasm->pcshift;
+			else
+				numbytes = pcdelta >> opts.dasm->pcshift;
 
-		// non-flipped case
-		if (!opts.flipped)
-		{
-			// output the address
-			printf("%08X: ", curpc);
-
-			// output the raw bytes
-			if (!opts.norawbytes)
+			// force upper or lower
+			if (opts.lower)
 			{
-				int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
-				int chunknum, bytenum;
-				for (chunknum = 0; chunknum < firstchunks; chunknum++)
-				{
-					for (bytenum = 0; bytenum < displaychunk; bytenum++)
-						printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
-					printf(" ");
-					oprom += displaychunk;
-				}
-				for ( ; chunknum < maxchunks; chunknum++)
-					printf("%*s ", displaychunk * 2, "");
-				printf(" ");
+				for (p = buffer; *p != 0; p++)
+					*p = tolower((UINT8)*p);
+			}
+			else if (opts.upper)
+			{
+				for (p = buffer; *p != 0; p++)
+					*p = toupper((UINT8)*p);
 			}
 
-			// output the disassembly
-			printf("%s\n", buffer);
+			// round to the nearest display chunk
+			numbytes = ((numbytes + displaychunk - 1) / displaychunk) * displaychunk;
+			if (numbytes == 0)
+				numbytes = displaychunk;
+			numchunks = numbytes / displaychunk;
 
-			// output additional raw bytes
-			if (!opts.norawbytes && numchunks > maxchunks)
+			// non-flipped case
+			if (!opts.flipped)
 			{
-				for (numchunks -= maxchunks; numchunks > 0; numchunks -= maxchunks)
+				// output the address
+				printf("%08X: ", curpc);
+
+				// output the raw bytes
+				if (!opts.norawbytes)
 				{
 					int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
 					int chunknum, bytenum;
-					printf("          ");
 					for (chunknum = 0; chunknum < firstchunks; chunknum++)
 					{
 						for (bytenum = 0; bytenum < displaychunk; bytenum++)
@@ -584,36 +558,78 @@ int main(int argc, char *argv[])
 						printf(" ");
 						oprom += displaychunk;
 					}
-					printf("\n");
-				}
-			}
-		}
-
-		// flipped case
-		else
-		{
-			// output the disassembly and address
-			printf("\t%-40s ; %08X", buffer, curpc);
-
-			// output the raw bytes
-			if (!opts.norawbytes)
-			{
-				int chunknum, bytenum;
-				printf(": ");
-				for (chunknum = 0; chunknum < numchunks; chunknum++)
-				{
-					for (bytenum = 0; bytenum < displaychunk; bytenum++)
-						printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+					for ( ; chunknum < maxchunks; chunknum++)
+						printf("%*s ", displaychunk * 2, "");
 					printf(" ");
-					oprom += displaychunk;
+				}
+
+				// output the disassembly
+				printf("%s\n", buffer);
+
+				// output additional raw bytes
+				if (!opts.norawbytes && numchunks > maxchunks)
+				{
+					for (numchunks -= maxchunks; numchunks > 0; numchunks -= maxchunks)
+					{
+						int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
+						int chunknum, bytenum;
+						printf("          ");
+						for (chunknum = 0; chunknum < firstchunks; chunknum++)
+						{
+							for (bytenum = 0; bytenum < displaychunk; bytenum++)
+								printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+							printf(" ");
+							oprom += displaychunk;
+						}
+						printf("\n");
+					}
 				}
 			}
-			printf("\n");
+
+			// flipped case
+			else
+			{
+				// output the disassembly and address
+				printf("\t%-40s ; %08X", buffer, curpc);
+
+				// output the raw bytes
+				if (!opts.norawbytes)
+				{
+					int chunknum, bytenum;
+					printf(": ");
+					for (chunknum = 0; chunknum < numchunks; chunknum++)
+					{
+						for (bytenum = 0; bytenum < displaychunk; bytenum++)
+							printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+						printf(" ");
+						oprom += displaychunk;
+					}
+				}
+				printf("\n");
+			}
+
+			// advance
+			curpc += pcdelta;
 		}
-
-		// advance
-		curpc += pcdelta;
 	}
-
-	return 0;
+	catch (emu_fatalerror &fatal)
+	{
+		fprintf(stderr, "%s\n", fatal.string());
+		if (fatal.exitcode() != 0)
+			result = fatal.exitcode();
+	}
+	catch (emu_exception &exception)
+	{
+		fprintf(stderr, "Caught unhandled emulator exception\n");
+	}
+	catch (std::bad_alloc &)
+	{
+		fprintf(stderr, "Out of memory!\n");
+	}
+	catch (...)
+	{
+		fprintf(stderr, "Caught unhandled exception\n");
+	}
+	
+	return result;
 }
