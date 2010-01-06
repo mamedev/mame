@@ -284,7 +284,7 @@ INLINE void pr8210_add_command(UINT8 command)
 
 static TIMER_CALLBACK( pr8210_bit_off_callback )
 {
-	const device_config *laserdisc = ptr;
+	const device_config *laserdisc = (const device_config *)ptr;
 
 	/* deassert the control line */
 	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
@@ -294,7 +294,7 @@ static TIMER_CALLBACK( pr8210_bit_off_callback )
 static TIMER_CALLBACK( pr8210_bit_callback )
 {
 	attotime duration = ATTOTIME_IN_MSEC(30);
-	const device_config *laserdisc = ptr;
+	const device_config *laserdisc = (const device_config *)ptr;
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
 
