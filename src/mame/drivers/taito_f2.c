@@ -1378,6 +1378,13 @@ static INPUT_PORTS_START( megab )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( megabu )
+	PORT_INCLUDE(megab)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( megabj )
 	PORT_INCLUDE(megab)
 
@@ -4184,7 +4191,7 @@ ROM_START( dondokodj )
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( megab )
+ROM_START( megablst )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) )
 	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) )
@@ -4217,12 +4224,37 @@ ROM_START( megab )
 	ROM_LOAD( "pal16l8b-c11-14.ic23",  0x0a00, 0x0104, CRC(5c740aee) SHA1(995ccf52f85260f141ce5e3697c9391448c3d69d) )  // MDEC 2
 ROM_END
 
-ROM_START( megabj )
+ROM_START( megablastu )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) )
+	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) )
+	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
+	ROM_LOAD16_BYTE( "c11-10.38",  0x40001, 0x20000, CRC(bf379a43) SHA1(2a0294e55c2ce514caa2885b728e6387311ed482) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_LOAD16_BYTE( "c11-03.32", 0x00000, 0x80000, CRC(46718c7a) SHA1(c10308a282bf0c618108e4afc7ce6f0f6cb8c6c0) )
+	ROM_LOAD16_BYTE( "c11-04.31", 0x00001, 0x80000, CRC(663f33cc) SHA1(5d3d3e77b7a84f6a3d4e744eef9b63bef91180e8) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_LOAD( "c11-12.3", 0x00000, 0x04000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
+	ROM_CONTINUE(       0x10000, 0x0c000 )	/* banked stuff */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
+ROM_END
+
+ROM_START( megablastj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) )	// c11-07.17
 	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) )	// c11-08.19
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )	// c11-06.16
-	ROM_LOAD16_BYTE( "c11-09.18",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) )	// c11-09.18
+	ROM_LOAD16_BYTE( "c11-09.38",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) )	// c11-09.18
 
 	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
@@ -5572,8 +5604,9 @@ GAME( 1988, finalbu,   finalb,   finalb,   finalbj,  finalb,   ROT0,   "Taito Am
 GAME( 1989, dondokod,  0,        dondokod, dondokod, 0,        ROT0,   "Taito Corporation Japan", "Don Doko Don (World)", 0 )
 GAME( 1989, dondokodu, dondokod, dondokod, dondokodu,0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", 0 )
 GAME( 1989, dondokodj, dondokod, dondokod, dondokodj,0,        ROT0,   "Taito Corporation", "Don Doko Don (Japan)", 0 )
-GAME( 1989, megab,     0,        megab,    megab,    0,        ROT0,   "Taito Corporation Japan", "Mega Blast (World)", 0 )
-GAME( 1989, megabj,    megab,    megab,    megabj,   0,        ROT0,   "Taito Corporation", "Mega Blast (Japan)", 0 )
+GAME( 1989, megablst,  0,        megab,    megab,    0,        ROT0,   "Taito Corporation Japan", "Mega Blast (World)", 0 )
+GAME( 1989, megablastu,megablst, megab,    megabu,   0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", 0 )
+GAME( 1989, megablastj,megablst, megab,    megabj,   0,        ROT0,   "Taito Corporation", "Mega Blast (Japan)", 0 )
 GAME( 1990, thundfox,  0,        thundfox, thundfox, 0,        ROT0,   "Taito Corporation Japan", "Thunder Fox (World)", 0 )
 GAME( 1990, thundfoxu, thundfox, thundfox, thundfoxu,0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", 0 )
 GAME( 1990, thundfoxj, thundfox, thundfox, thundfoxj,0,        ROT0,   "Taito Corporation", "Thunder Fox (Japan)", 0 )
