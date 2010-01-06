@@ -13,6 +13,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "pool.h"
+#include "timer.h"
 
 
 /***************************************************************************

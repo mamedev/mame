@@ -900,14 +900,14 @@ static INPUT_PORTS_START( schaser )
 	PORT_ADJUSTER( 70, "VR3 - Dot Volume" )
 INPUT_PORTS_END
 
-MACHINE_START( schaser )
+static MACHINE_START( schaser )
 {
 	MACHINE_START_CALL(schaser_sh);
 	MACHINE_START_CALL(extra_8080bw_vh);
 	MACHINE_START_CALL(mw8080bw);
 }
 
-MACHINE_RESET( schaser )
+static MACHINE_RESET( schaser )
 {
 	MACHINE_RESET_CALL(schaser_sh);
 	MACHINE_RESET_CALL(mw8080bw);

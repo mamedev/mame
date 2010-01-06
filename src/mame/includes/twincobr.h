@@ -39,7 +39,6 @@ extern void twincobr_driver_savestate(running_machine *machine);
 extern void wardner_driver_savestate(running_machine *machine);
 
 extern int toaplan_main_cpu;	/* Main CPU type.  0 = 68000, 1 = Z80 */
-extern int twincobr_intenable;
 extern int wardner_membank;
 
 extern UINT8 *twincobr_sharedram;

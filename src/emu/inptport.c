@@ -99,6 +99,8 @@
 #include "inputseq.h"
 #include "ui.h"
 #include "uiinput.h"
+#include "inptport.h"
+
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>

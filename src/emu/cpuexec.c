@@ -13,6 +13,7 @@
 #include "profiler.h"
 #include "eminline.h"
 #include "debugger.h"
+#include "cpuexec.h"
 
 
 /***************************************************************************

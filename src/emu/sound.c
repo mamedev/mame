@@ -15,6 +15,7 @@
 #include "config.h"
 #include "profiler.h"
 #include "sound/wavwrite.h"
+#include "sound.h"
 
 
 

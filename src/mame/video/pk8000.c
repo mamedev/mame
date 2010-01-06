@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/pk8000.h"
 
 static UINT8 pk8000_text_start;
 static UINT8 pk8000_chargen_start;

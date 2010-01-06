@@ -311,7 +311,7 @@ void toaplan1_driver_savestate(running_machine *machine)
 	state_save_register_global(machine, toaplan1_unk_reset_port);
 }
 
-MACHINE_RESET( zerozone )	/* Hack for ZeroWing and OutZone. See the video driver */
+MACHINE_RESET( zerowing )	/* Hack for ZeroWing and OutZone. See the video driver */
 {
 	MACHINE_RESET_CALL(toaplan1);
 	toaplan1_unk_reset_port = 1;

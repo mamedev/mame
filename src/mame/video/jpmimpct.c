@@ -9,7 +9,7 @@
 #include "includes/jpmimpct.h"
 
 
-UINT16 *tms_vram;
+UINT16 *jpmimpct_vram;
 
 
 /*************************************
@@ -39,7 +39,7 @@ static struct
  *  1 1 0    Command register
  */
 
-WRITE16_HANDLER( bt477_w )
+WRITE16_HANDLER( jpmimpct_bt477_w )
 {
 	UINT8 val = data & 0xff;
 
@@ -85,7 +85,7 @@ WRITE16_HANDLER( bt477_w )
 	}
 }
 
-READ16_HANDLER( bt477_r )
+READ16_HANDLER( jpmimpct_bt477_r )
 {
 	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -100,12 +100,12 @@ READ16_HANDLER( bt477_r )
 
 void jpmimpct_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	memcpy(shiftreg, &tms_vram[TOWORD(address)], 512 * sizeof(UINT16));
+	memcpy(shiftreg, &jpmimpct_vram[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
 void jpmimpct_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	memcpy(&tms_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
+	memcpy(&jpmimpct_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 
 
@@ -117,7 +117,7 @@ void jpmimpct_from_shiftreg(const address_space *space, UINT32 address, UINT16 *
 
 void jpmimpct_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *vram = &tms_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *vram = &jpmimpct_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	int coladdr = params->coladdr;
 	int x;

@@ -16,7 +16,7 @@
 
 
 int toaplan_main_cpu;	/* Main CPU type.  0 = 68000, 1 = Z80 */
-int twincobr_intenable;
+static int twincobr_intenable;
 int wardner_membank;
 static int twincobr_dsp_on;
 static int twincobr_dsp_BIO;

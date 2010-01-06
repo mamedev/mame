@@ -25,6 +25,8 @@
 
 #include "driver.h"
 #include "astring.h"
+#include "state.h"
+
 #include <zlib.h>
 
 

@@ -16,6 +16,7 @@
 #include "harddisk.h"
 #include "config.h"
 #include "ui.h"
+#include "romload.h"
 
 
 #define LOG_LOAD 0

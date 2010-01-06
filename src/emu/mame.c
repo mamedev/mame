@@ -84,8 +84,9 @@
 #include "uimenu.h"
 #include "uiinput.h"
 #include "streams.h"
+#include "validity.h"
 #include "debug/debugcon.h"
-
+#include "mame.h"
 #include <new>
 #include <stdarg.h>
 #include <time.h>
@@ -194,8 +195,6 @@ const char mame_disclaimer[] =
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-extern int mame_validitychecks(const game_driver *driver);
 
 static int parse_ini_file(core_options *options, const char *name, int priority);
 

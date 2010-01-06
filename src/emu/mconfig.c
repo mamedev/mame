@@ -11,6 +11,8 @@
 
 #include "driver.h"
 #include "devintrf.h"
+#include "mconfig.h"
+
 #include <ctype.h>
 
 #if defined(_MSC_VER)

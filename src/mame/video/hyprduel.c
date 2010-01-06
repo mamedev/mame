@@ -351,7 +351,7 @@ static STATE_POSTLOAD( hyprduel_postload )
 }
 
 
-VIDEO_START( common_14220 )
+static VIDEO_START( common_14220 )
 {
 	hyprduel_state *state = (hyprduel_state *)machine->driver_data;
 	alloc_empty_tiles(machine);

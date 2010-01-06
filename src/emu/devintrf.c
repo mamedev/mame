@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "cpuintrf.h"
+#include "devintrf.h"
 
 
 

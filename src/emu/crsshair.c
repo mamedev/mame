@@ -13,6 +13,7 @@
 #include "rendutil.h"
 #include "config.h"
 #include "xmlfile.h"
+#include "crsshair.h"
 
 
 

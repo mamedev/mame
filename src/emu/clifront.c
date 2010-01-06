@@ -11,14 +11,15 @@
 
 #include "driver.h"
 #include "emuopts.h"
-#include "clifront.h"
 #include "hash.h"
 #include "jedparse.h"
 #include "audit.h"
 #include "info.h"
 #include "unzip.h"
 #include "romload.h"
+#include "validity.h"
 #include "sound/samples.h"
+#include "clifront.h"
 
 #include <new>
 #include <ctype.h>
@@ -237,7 +238,6 @@ static int execute_simple_commands(core_options *options, const char *exename)
 	/* validate? */
 	if (options_get_bool(options, CLIOPTION_VALIDATE))
 	{
-		extern int mame_validitychecks(const game_driver *driver);
 		return mame_validitychecks(NULL);
 	}
 

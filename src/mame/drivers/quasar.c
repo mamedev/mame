@@ -333,7 +333,7 @@ static const s2636_interface s2636_2_config =
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-MACHINE_START( quasar )
+static MACHINE_START( quasar )
 {
 	cvs_state *state = (cvs_state *)machine->driver_data;
 

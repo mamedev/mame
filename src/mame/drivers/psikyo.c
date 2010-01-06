@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( psikyo_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
-READ32_DEVICE_HANDLER( s1945bl_oki_r )
+static READ32_DEVICE_HANDLER( s1945bl_oki_r )
 {
 	UINT8 dat = okim6295_r(device, 0);
 	return dat << 24;

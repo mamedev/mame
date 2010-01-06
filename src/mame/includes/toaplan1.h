@@ -29,7 +29,7 @@ WRITE16_HANDLER( samesame_coin_w );
 MACHINE_RESET( toaplan1 );
 MACHINE_RESET( demonwld );
 MACHINE_RESET( vimana );
-MACHINE_RESET( zerozone );	/* hack for ZeroWing/OutZone. See video */
+MACHINE_RESET( zerowing );	/* hack for ZeroWing/OutZone. See video */
 
 extern void toaplan1_driver_savestate(running_machine *machine);
 extern void demonwld_driver_savestate(running_machine *machine);

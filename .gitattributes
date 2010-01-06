@@ -1008,6 +1008,7 @@ src/emu/uimenu.c svneol=native#text/plain
 src/emu/uimenu.h svneol=native#text/plain
 src/emu/uismall.png -text svneol=unset#image/png
 src/emu/validity.c svneol=native#text/plain
+src/emu/validity.h svneol=native#text/plain
 src/emu/video.c svneol=native#text/plain
 src/emu/video.h svneol=native#text/plain
 src/emu/video/generic.c svneol=native#text/plain

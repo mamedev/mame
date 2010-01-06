@@ -175,6 +175,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "debug/debugcpu.h"
+#include "memory.h"
 
 
 /***************************************************************************

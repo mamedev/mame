@@ -6,10 +6,10 @@
 
 /*----------- defined in video/jpmimpct.c -----------*/
 
-extern UINT16 *tms_vram;
+extern UINT16 *jpmimpct_vram;
 
-READ16_HANDLER( bt477_r );
-WRITE16_HANDLER( bt477_w );
+READ16_HANDLER( jpmimpct_bt477_r );
+WRITE16_HANDLER( jpmimpct_bt477_w );
 
 void jpmimpct_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
 void jpmimpct_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);

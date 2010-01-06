@@ -16,6 +16,7 @@
 #include "rendutil.h"
 #include "ui.h"
 #include "aviio.h"
+#include "video.h"
 
 #include "snap.lh"
 

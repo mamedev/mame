@@ -17,6 +17,7 @@
 #include "hash.h"
 #include "unzip.h"
 #include "options.h"
+#include "fileio.h"
 
 
 /***************************************************************************

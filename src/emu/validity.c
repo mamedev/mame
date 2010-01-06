@@ -13,9 +13,11 @@
 #include "eminline.h"
 #include "driver.h"
 #include "hash.h"
+#include "unicode.h"
+#include "validity.h"
+
 #include <ctype.h>
 #include <stdarg.h>
-#include "unicode.h"
 #include <zlib.h>
 
 
