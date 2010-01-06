@@ -301,23 +301,25 @@ static WRITE16_HANDLER( ml_sub_reset_w )
 
 static WRITE16_HANDLER( ml_to_sound_w )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	if (offset == 0)
-		taitosound_port_w (space, 0, data & 0xff);
+		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
-		taitosound_comm_w (space, 0, data & 0xff);
+		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
 	}
 }
 
 static WRITE8_HANDLER( ml_sound_to_main_w )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	if (offset == 0)
-		taitosound_slave_port_w (space, 0, data & 0xff);
+		tc0140syt_slave_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-		taitosound_slave_comm_w (space, 0, data & 0xff);
+		tc0140syt_slave_comm_w(tc0140syt, 0, data & 0xff);
 	}
 }
 
@@ -442,7 +444,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
-	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8("tc0140syt", tc0140syt_comm_r, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
@@ -494,7 +496,7 @@ static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
-	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("tc0140syt", tc0140syt_slave_comm_r)
 
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
 //  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
@@ -699,6 +701,11 @@ static const ym2151_interface ym2151_config =
 	sound_bankswitch_w
 };
 
+static const tc0140syt_interface mlanding_tc0140syt_intf =
+{
+	"maincpu", "audiocpu"
+};
+
 static MACHINE_RESET( mlanding )
 {
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
@@ -761,6 +768,8 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+
+	MDRV_TC0140SYT_ADD("tc0140syt", mlanding_tc0140syt_intf)
 MACHINE_DRIVER_END
 
 ROM_START( mlanding )

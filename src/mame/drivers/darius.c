@@ -183,10 +183,11 @@ static WRITE16_HANDLER( darius_watchdog_w )
 
 static READ16_HANDLER( darius_ioc_r )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	switch (offset)
 	{
 		case 0x01:
-			return (taitosound_comm_r(space,0) & 0xff);	/* sound interface read */
+			return (tc0140syt_comm_r(tc0140syt, 0) & 0xff);	/* sound interface read */
 
 		case 0x04:
 			return input_port_read(space->machine, "P1");
@@ -211,16 +212,17 @@ logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(
 
 static WRITE16_HANDLER( darius_ioc_w )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	switch (offset)
 	{
 		case 0x00:	/* sound interface write */
 
-			taitosound_port_w (space, 0, data & 0xff);
+			tc0140syt_port_w (tc0140syt, 0, data & 0xff);
 			return;
 
 		case 0x01:	/* sound interface write */
 
-			taitosound_comm_w (space, 0, data & 0xff);
+			tc0140syt_comm_w (tc0140syt, 0, data & 0xff);
 			return;
 
 		case 0x28:	/* unknown, written by both cpus - always 0? */
@@ -476,8 +478,8 @@ static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
@@ -813,6 +815,11 @@ static const pc080sn_interface darius_pc080sn_intf =
 	-16, 8, 0, 1	/* x_offset, y_offset, y_invert, dblwidth */
 };
 
+static const tc0140syt_interface darius_tc0140syt_intf =
+{
+	"maincpu", "audiocpu"
+};
+
 static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
@@ -935,6 +942,8 @@ static MACHINE_DRIVER_START( darius )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("msm5205.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MDRV_TC0140SYT_ADD("tc0140syt", darius_tc0140syt_intf)
 MACHINE_DRIVER_END
 
 

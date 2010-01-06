@@ -1160,18 +1160,21 @@ static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	return taitosound_comm_r(space, 0)<<16;
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	return tc0140syt_comm_r(tc0140syt, 0) << 16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+
 	if (mem_mask == 0x0000ffff)
 	{
-		taitosound_port_w(space, 0, data&0xff);
+		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	}
 	else
 	{
-		taitosound_comm_w(space, 0, (data>>16)&0xff);
+		tc0140syt_comm_w(tc0140syt, 0, (data >> 16) & 0xff);
 	}
 }
 
@@ -1215,8 +1218,8 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xee00, 0xee00) AM_NOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
@@ -1232,6 +1235,11 @@ static void irq_handler(const device_config *device, int irq)
 static const ym2610_interface ym2610_config =
 {
 	irq_handler
+};
+
+static const tc0140syt_interface coh1000ta_tc0140syt_intf =
+{
+	"maincpu", "audiocpu"
 };
 
 static MACHINE_DRIVER_START( coh1000ta )
@@ -1250,6 +1258,8 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	MDRV_MB3773_ADD("mb3773")
+
+	MDRV_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
 MACHINE_DRIVER_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )

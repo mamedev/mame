@@ -370,10 +370,11 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static WRITE16_HANDLER( ninjaw_sound_w )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	if (offset == 0)
-		taitosound_port_w (space, 0, data & 0xff);
+		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (space, 0, data & 0xff);
+		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff00)
@@ -383,9 +384,11 @@ static WRITE16_HANDLER( ninjaw_sound_w )
 
 static READ16_HANDLER( ninjaw_sound_r )
 {
+	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	if (offset == 1)
-		return ((taitosound_comm_r (space, 0) & 0xff));
-	else return 0;
+		return ((tc0140syt_comm_r(tc0140syt, 0) & 0xff));
+	else 
+		return 0;
 }
 
 
@@ -490,8 +493,8 @@ static ADDRESS_MAP_START( ninjaw_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r,ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r,taitosound_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r,tc0140syt_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(ninjaw_pancontrol) /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
@@ -733,6 +736,11 @@ static const tc0220ioc_interface ninjaw_io_intf =
 	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
 };
 
+static const tc0140syt_interface ninjaw_tc0140syt_intf =
+{
+	"maincpu", "audiocpu"
+};
+
 static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
@@ -812,6 +820,8 @@ static MACHINE_DRIVER_START( ninjaw )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 //  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
+
+	MDRV_TC0140SYT_ADD("tc0140syt", ninjaw_tc0140syt_intf)
 MACHINE_DRIVER_END
 
 
@@ -894,6 +904,8 @@ static MACHINE_DRIVER_START( darius2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 //  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
+
+	MDRV_TC0140SYT_ADD("tc0140syt", ninjaw_tc0140syt_intf)
 MACHINE_DRIVER_END
 
 

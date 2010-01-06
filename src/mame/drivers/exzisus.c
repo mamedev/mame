@@ -180,8 +180,8 @@ static ADDRESS_MAP_START( cpub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc5ff) AM_READWRITE(exzisus_objectram_0_r, exzisus_objectram_0_w) AM_BASE(&exzisus_objectram0) AM_SIZE(&exzisus_objectram_size0)
 	AM_RANGE(0xc600, 0xdfff) AM_READWRITE(exzisus_videoram_0_r, exzisus_videoram_0_w) AM_BASE(&exzisus_videoram0)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITE(taitosound_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_READWRITE(taitosound_comm_r, taitosound_comm_w)
+	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_port_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(exzisus_cpub_bankswitch_w)
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
@@ -205,8 +205,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 ADDRESS_MAP_END
 
 
@@ -292,6 +292,11 @@ static const ym2151_interface ym2151_config =
 };
 
 
+static const tc0140syt_interface exzisus_tc0140syt_intf =
+{
+	"cpub", "audiocpu"
+};
+
 /* All clocks are unconfirmed */
 static MACHINE_DRIVER_START( exzisus )
 
@@ -334,6 +339,8 @@ static MACHINE_DRIVER_START( exzisus )
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
+
+	MDRV_TC0140SYT_ADD("tc0140syt", exzisus_tc0140syt_intf)
 MACHINE_DRIVER_END
 
 
