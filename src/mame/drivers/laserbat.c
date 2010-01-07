@@ -669,7 +669,7 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
-	generic_pulse_irq_line_and_vector(device, 0, 0x0a);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x0a);
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
