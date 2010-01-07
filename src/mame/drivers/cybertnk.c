@@ -244,18 +244,18 @@ static READ16_HANDLER( io_r )
 		// 0x001100D5 is controller data
 		// 0x00110004 low is controller data ready
 		case 4/2:
-			switch( (io_ram[7/2]) & 0xff )
+			switch( (io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					io_ram[0xd5/2] = input_port_read(space->machine, "TRAVERSE");
+					io_ram[0xd4/2] = input_port_read(space->machine, "TRAVERSE");
 					break;
 
 				case 0x20:
-					io_ram[0xd5/2] = input_port_read(space->machine, "ELEVATE");
+					io_ram[0xd4/2] = input_port_read(space->machine, "ELEVATE");
 					break;
 
 				case 0x40:
-					io_ram[0xd5/2] = input_port_read(space->machine, "ACCEL");
+					io_ram[0xd4/2] = input_port_read(space->machine, "ACCEL");
 					break;
 
 				case 0x42:
@@ -263,11 +263,11 @@ static READ16_HANDLER( io_r )
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
 					popmessage("unknown controller device 0x42");
-					io_ram[0xd5/2] = 0;
+					io_ram[0xd4/2] = 0;
 					break;
 
 				case 0x60:
-					io_ram[0xd5/2] = input_port_read(space->machine, "HANDLE");
+					io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
 					break;
 
 				default:
@@ -278,13 +278,13 @@ static READ16_HANDLER( io_r )
 		case 6/2:
 			return input_port_read(space->machine, "IN0"); // high half
 
-		case 9/2:
+		case 8/2:
 			return input_port_read(space->machine, "IN0"); // low half
 
-		case 0xb/2:
+		case 0xa/2:
 			return input_port_read(space->machine, "DSW2");
 
-		case 0xd5/2:
+		case 0xd4/2:
 			return io_ram[offset]; // controller data
 
 		default:
@@ -299,9 +299,9 @@ static WRITE16_HANDLER( io_w )
 {
 	COMBINE_DATA(&io_ram[offset]);
 
-	switch( offset*2 )
+	switch( offset )
 	{
-		case 0:
+		case 0/2:
 			// sound data
 			if (ACCESSING_BITS_0_7)
 				cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
@@ -309,36 +309,36 @@ static WRITE16_HANDLER( io_w )
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 2:
+		case 2/2:
 			if (ACCESSING_BITS_0_7)
 				;//watchdog ? written in similar context to CPU1 @ 0x140002
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 6:
+		case 6/2:
 			if (ACCESSING_BITS_0_7)
 				;//select controller device
 			else
 				;//blank inputs
 			break;
 
-		case 8:
+		case 8/2:
 			if (ACCESSING_BITS_8_15)
 				;//blank inputs
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 0xc:
+		case 0xc/2:
 			if (ACCESSING_BITS_0_7)
-				// This seems to only be written after each irq1 and irq2
+				// This seems to only be written after each irq1 and irq2, irq ack?
 				logerror("irq wrote %04x\n", data);
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 0xd4:
+		case 0xd4/2:
 			if ( ACCESSING_BITS_0_7 )
 				;// controller device data
 			else
@@ -349,14 +349,14 @@ static WRITE16_HANDLER( io_w )
 		// Maybe this is for lamps and stuff, or
 		// maybe just debug.
 		// They are all written in a block at 0x00000944
-		case 0x42:
-		case 0x44:
-		case 0x48:
-		case 0x4a:
-		case 0x4c:
-		case 0x80:
-		case 0x82:
-		case 0x84:
+		case 0x42/2:
+		case 0x44/2:
+		case 0x48/2:
+		case 0x4a/2:
+		case 0x4c/2:
+		case 0x80/2:
+		case 0x82/2:
+		case 0x84/2:
 			break;
 
 		default:
@@ -514,7 +514,7 @@ static const gfx_layout tile_8x8x4 =
 	8,8,
 	RGN_FRAC(1,4),
     4,
-    { RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+    { RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4) },
     { STEP8(0,1) },
     { STEP8(0,8) },
     8*8
@@ -525,7 +525,7 @@ static const gfx_layout tile_16x16x4 =
 	16,16,
 	RGN_FRAC(1,4),
     4,
-    { RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+    { RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4) },
     { STEP16(0,1) },
     { STEP16(0,16) },
     32*8
