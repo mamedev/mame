@@ -254,17 +254,6 @@ Logic:
 
 /*************************************
  *
- *  Static globals (move to driver state!)
- *
- *************************************/
-
-static UINT32 *gsp_dram;
-static UINT32 *gsp_vram;
-static UINT32 *vreg_base;
-
-
-/*************************************
- *
  *  Forward definitions
  *
  *************************************/
@@ -285,22 +274,21 @@ static VIDEO_START( metalmx )
 
 static VIDEO_UPDATE( metalmx )
 {
-	UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
+	/* TODO: TMS34020 should take care of this */
+	metalmx_state *state = (metalmx_state *)screen->machine->driver_data;
+
+//	UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
+	UINT16 *src_base = state->gsp_vram;
 	int y;
 
 	for (y = 0; y < 384; ++y)
 	{
 		int x;
-		UINT32 *src = &src_base[512/2 * y];
+		UINT16 *src = &src_base[512 * y];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
-		for(x = 0; x < 512; x+=2)
-		{
-			UINT32 src_pix = *src++;
-
-			*dst++ = (src_pix >> 16);
-			*dst++ = (src_pix >>  0);
-		}
+		for(x = 0; x < 512; x++)
+			*dst++ = *src++;
 	}
 
 	return 0;
@@ -419,6 +407,71 @@ static READ32_HANDLER( dsp32c_2_r )
 
 /*************************************
  *
+ *  Host/TMS34020 accesors
+ *
+ *************************************/
+
+static WRITE32_HANDLER( host_gsp_w )
+{
+	const address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
+
+	memory_write_word(gsp_space, (0xc0000000 + (offset << 5) + 0x10) / 8, data);
+	memory_write_word(gsp_space, (0xc0000000 + (offset << 5))/ 8 , data >> 16);
+}
+
+static READ32_HANDLER( host_gsp_r )
+{
+	const address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
+	UINT32 val;
+
+	val  = memory_read_word(gsp_space, (0xc0000000 + (offset << 5) + 0x10) / 8);
+	val |= memory_read_word(gsp_space, (0xc0000000 + (offset << 5)) / 8) << 16;
+	return val;
+}
+
+
+static READ32_HANDLER( host_dram_r )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	return (state->gsp_dram[offset * 2] << 16) | state->gsp_dram[offset * 2 + 1];
+}
+
+static WRITE32_HANDLER( host_dram_w )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	COMBINE_DATA(state->gsp_dram + offset * 2 + 1);
+	data >>= 16;
+	mem_mask >>= 16;
+	COMBINE_DATA(state->gsp_dram + offset * 2);
+}
+
+static READ32_HANDLER( host_vram_r )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	return (state->gsp_vram[offset * 2] << 16) | state->gsp_vram[offset * 2 + 1];
+}
+
+static WRITE32_HANDLER( host_vram_w )
+{
+	metalmx_state *state = (metalmx_state *)space->machine->driver_data;
+
+	COMBINE_DATA(state->gsp_vram + offset * 2 + 1);
+	data >>= 16;
+	mem_mask >>= 16;
+	COMBINE_DATA(state->gsp_vram + offset * 2);
+}
+
+static void tms_interrupt(const device_config *device, int state)
+{
+	cputag_set_input_line(device->machine, "maincpu", 4, state ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+/*************************************
+ *
  *  Main 68EC020 Memory Map
  *
  *************************************/
@@ -426,10 +479,11 @@ static READ32_HANDLER( dsp32c_2_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_RAM	AM_BASE(&vreg_base)
-	AM_RANGE(0x600000, 0x6fffff) AM_RAM	AM_BASE(&gsp_dram)
-	AM_RANGE(0x700000, 0x7fffff) AM_RAM AM_BASE(&gsp_vram)
+	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
+	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
+	AM_RANGE(0x800000, 0x85ffff) AM_NOP			/* Unknown */
 	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
 	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
 	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
@@ -463,7 +517,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( gsp_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
+	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE(tms34020_io_register_r, tms34020_io_register_w)
+	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE_MEMBER(metalmx_state, gsp_dram)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_MEMBER(metalmx_state, gsp_vram)
 ADDRESS_MAP_END
 
 
@@ -477,7 +535,7 @@ static ADDRESS_MAP_START( dsp32c_1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM		/* TODO: Video registers here? */
+	AM_RANGE(0xf00000, 0xffffff) AM_RAM		/* TODO: 3D registers here? */
 ADDRESS_MAP_END
 
 /*************************************
@@ -623,7 +681,7 @@ static const tms34010_config gsp_config =
 	4000000,				/* pixel clock */
 	2,						/* pixels per clock */
 	NULL,					/* scanline callback */
-	NULL,					/* generate interrupt */
+	tms_interrupt,			/* generate interrupt */
 };
 
 static const dsp32_config dsp32c_config =
@@ -697,7 +755,6 @@ static MACHINE_RESET( metalmx )
 	metalmx_state *state = (metalmx_state *)machine->driver_data;
 
 	cpu_set_input_line(state->adsp, INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(state->gsp, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
 }
