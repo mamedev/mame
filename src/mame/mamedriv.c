@@ -4845,6 +4845,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* UX9 1985.05 Geinoujin Shikaku Shiken */
 
 	/* Data East LD games */
+	DRIVER( begas )		/* (c) 1983 */
+	DRIVER( begas1 )	/* (c) 1983 */
 	DRIVER( cobra )		/* (c) 1984 */
 	DRIVER( rblaster )	/* (c) 1985 */
 
