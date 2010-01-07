@@ -395,8 +395,8 @@ static DEVICE_START( eeprom )
 
 	eestate->serial_count = 0;
 	eestate->latch = 0;
-	eestate->reset_line = ASSERT_LINE;
-	eestate->clock_line = ASSERT_LINE;
+	eestate->reset_line = CLEAR_LINE;
+	eestate->clock_line = CLEAR_LINE;
 	eestate->read_address = 0;
 	eestate->sending = 0;
 	if (eestate->intf->cmd_unlock) eestate->locked = 1;

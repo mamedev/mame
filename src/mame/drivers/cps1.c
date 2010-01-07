@@ -434,18 +434,6 @@ static const eeprom_interface pang3_eeprom_interface =
 };
 #endif
 
-static WRITE16_DEVICE_HANDLER( cps1_eeprom_port_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-/* FIXME: for some weird reason, the port write below breaks punisher, dino & wof eeprom (slammast, mbombrd & pang3 are not affected) */
-//		input_port_write(device->machine, "EEPROMOUT", data, 0xff);
-		eeprom_write_bit(device, data & 0x01);
-		eeprom_set_cs_line(device, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
-
 
 /*
 PAL PRG1 (16P8B @ 12H):
@@ -620,7 +608,7 @@ static ADDRESS_MAP_START( qsound_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ_PORT("IN2")			/* Player 3 controls (later games) */
 	AM_RANGE(0xf1c002, 0xf1c003) AM_READ_PORT("IN3")			/* Player 4 controls ("Muscle Bombers") */
 	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)		/* Coin control2 (later games) */
-	AM_RANGE(0xf1c006, 0xf1c007) AM_READ_PORT("EEPROMIN") AM_DEVWRITE("eeprom", cps1_eeprom_port_w)
+	AM_RANGE(0xf1c006, 0xf1c007) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0xf1e000, 0xf1ffff) AM_READWRITE(qsound_sharedram2_r, qsound_sharedram2_w)  /* Q RAM */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

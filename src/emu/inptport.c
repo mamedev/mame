@@ -1816,6 +1816,7 @@ static device_field_info *init_field_device_info(const input_field_config *field
 	else
 		info->device = (const device_config *) info;
 
+	info->oldval = field->defvalue >> info->shift;
 	return info;
 }
 
