@@ -1,3 +1,54 @@
+
+#define TAITOL_SPRITERAM_SIZE 0x400
+
+typedef struct _taitol_state taitol_state;
+struct _taitol_state
+{
+	/* memory pointers */
+	UINT8 *       rambanks;
+	UINT8 *       palette_ram;
+	UINT8 *       empty_ram;
+	UINT8 *       shared_ram;
+
+	/* video-related */
+	tilemap_t *bg18_tilemap, *bg19_tilemap, *ch1a_tilemap;
+	UINT8 buff_spriteram[TAITOL_SPRITERAM_SIZE];
+	int cur_ctrl;
+	int horshoes_gfxbank;
+	int bankc[4];
+	int flipscreen;
+
+	/* misc */
+	void (*current_notifier[4])(running_machine *, int);
+	UINT8 *current_base[4];
+
+	int cur_rombank, cur_rombank2, cur_rambank[4];
+	int irq_adr_table[3];
+	int irq_enable;
+	int adpcm_pos;
+	int adpcm_data;
+	int trackx, tracky;
+	int mux_ctrl;
+	int extport;
+	int last_irq_level;
+	int high;
+	int high2;
+	int last_data_adr, last_data;
+	int cur_bank;
+
+	const UINT8 *mcu_reply;
+	int mcu_pos, mcu_reply_len;
+
+	const char *porte0_tag;
+	const char *porte1_tag;
+	const char *portf0_tag;
+	const char *portf1_tag;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+};
+
 /*----------- defined in video/taito_l.c -----------*/
 
 VIDEO_EOF( taitol );

@@ -164,47 +164,34 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
-
-
-WRITE16_HANDLER( rastan_spritectrl_w );
-
-VIDEO_UPDATE( rastan );
-
-
-static int adpcm_pos;
-static int adpcm_data;
-
+#include "includes/rastan.h"
 
 static WRITE8_DEVICE_HANDLER( rastan_bankswitch_w )
 {
-	int offs;
-
-	data &= 3;
-	if (data == 0) offs = 0x0000;
-	else offs = (data-1) * 0x4000 + 0x10000;
-
-	memory_set_bankptr(device->machine,  "bank1", memory_region(device->machine, "audiocpu") + offs );
+	memory_set_bank(device->machine,  "bank1", data & 3);
 }
 
 
-static void rastan_msm5205_vck(const device_config *device)
+static void rastan_msm5205_vck( const device_config *device )
 {
-	if (adpcm_data != -1)
+	rastan_state *state = (rastan_state *)device->machine->driver_data;
+	if (state->adpcm_data != -1)
 	{
-		msm5205_data_w(device, adpcm_data & 0x0f);
-		adpcm_data = -1;
+		msm5205_data_w(device, state->adpcm_data & 0x0f);
+		state->adpcm_data = -1;
 	}
 	else
 	{
-		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
-		adpcm_pos = (adpcm_pos + 1) & 0xffff;
-		msm5205_data_w(device, adpcm_data >> 4);
+		state->adpcm_data = memory_region(device->machine, "adpcm")[state->adpcm_pos];
+		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
+		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
 }
 
 static WRITE8_HANDLER( rastan_msm5205_address_w )
 {
-	adpcm_pos = (adpcm_pos & 0x00ff) | (data << 8);
+	rastan_state *state = (rastan_state *)space->machine->driver_data;
+	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( rastan_msm5205_start_w )
@@ -214,8 +201,9 @@ static WRITE8_DEVICE_HANDLER( rastan_msm5205_start_w )
 
 static WRITE8_DEVICE_HANDLER( rastan_msm5205_stop_w )
 {
+	rastan_state *state = (rastan_state *)device->machine->driver_data;
 	msm5205_reset_w(device, 1);
-	adpcm_pos &= 0xff00;
+	state->adpcm_pos &= 0xff00;
 }
 
 
@@ -356,9 +344,10 @@ GFXDECODE_END
 
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	rastan_state *state = (rastan_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -373,10 +362,34 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
+static MACHINE_START( rastan )
+{
+	rastan_state *state = (rastan_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank1", 1, 3, &ROM[0x10000], 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->pc080sn = devtag_get_device(machine, "pc080sn");
+	state->pc090oj = devtag_get_device(machine, "pc090oj");
+
+	state_save_register_global(machine, state->sprite_ctrl);
+	state_save_register_global(machine, state->sprites_flipscreen);
+
+	state_save_register_global(machine, state->adpcm_pos);
+	state_save_register_global(machine, state->adpcm_data);
+}
+
 static MACHINE_RESET( rastan )
 {
-	adpcm_pos = 0;
-	adpcm_data = -1;
+	rastan_state *state = (rastan_state *)machine->driver_data;
+
+	state->sprite_ctrl = 0;
+	state->sprites_flipscreen = 0;
+	state->adpcm_pos = 0;
+	state->adpcm_data = -1;
 }
 
 
@@ -398,6 +411,9 @@ static const tc0140syt_interface rastan_tc0140syt_intf =
 
 static MACHINE_DRIVER_START( rastan )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(rastan_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rastan_map)
@@ -407,6 +423,9 @@ static MACHINE_DRIVER_START( rastan )
 	MDRV_CPU_PROGRAM_MAP(rastan_s_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+
+	MDRV_MACHINE_START(rastan)
+	MDRV_MACHINE_RESET(rastan)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -423,8 +442,6 @@ static MACHINE_DRIVER_START( rastan )
 
 	MDRV_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
 	MDRV_PC090OJ_ADD("pc090oj", rastan_pc090oj_intf)
-
-	MDRV_MACHINE_RESET(rastan)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -595,8 +612,8 @@ ROM_START( rastsaga1 )
 ROM_END
 
 
-GAME( 1987, rastan,   0,      rastan, rastan,   0, ROT0, "Taito Corporation Japan", "Rastan (World)", 0)
-GAME( 1987, rastanu,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 1)", 0)
-GAME( 1987, rastanu2, rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 2)", 0)
-GAME( 1987, rastsaga, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan)", 0)
-GAME( 1987, rastsaga1,rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan Rev 1)", 0)
+GAME( 1987, rastan,    0,      rastan, rastan,   0, ROT0, "Taito Corporation Japan",   "Rastan (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastanu,   rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastanu2,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastsaga,  rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastsaga1, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", GAME_SUPPORTS_SAVE )

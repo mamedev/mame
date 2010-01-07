@@ -2028,14 +2028,14 @@ const game_driver * const drivers[] =
 	DRIVER( dondokodu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
 	DRIVER( dondokodj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( megablst )	/* 1989.?? C11 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( megablastu )	/* 1989.?? C11 (c) 1989 Taito America Corporation (US) */
-	DRIVER( megablastj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( megablstu )	/* 1989.?? C11 (c) 1989 Taito America Corporation (US) */
+	DRIVER( megablstj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( thundfox )	/* 1990.?? C28 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( thundfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
 	DRIVER( thundfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( cameltry )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( cameltryua )/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryau )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltryj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( qtorimon )	/* 1990.02 C41 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( liquidk )	/* 1990.?? C49 (c) 1990 Taito Corporation Japan (World) */

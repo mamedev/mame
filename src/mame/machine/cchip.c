@@ -5,7 +5,7 @@
 This file contains routines to interface with the Taito Controller Chip
 (or "Command Chip") version 1. It's currently used by Superman and Mega
 Blast. [Further cchip emulation is in machine/rainbow.c, machine/volfied.c,
-drivers/opwolf.c]
+drivers/opwolf.c and drivers/taito_f2.c]
 
 According to Richard Bush, the C-Chip is an encrypted Z80 which communicates
 with the main board as a protection feature.
@@ -26,14 +26,6 @@ It is believed that the NOPs in the 68k code are there to supply the
 necessary cycles to the cchip to switch banks.
 
 This code requires that the player & coin inputs be in input ports 2-4.
-
-
-Mega Blast
-----------
-
-C-Chip simply used as RAM, the game doesn't even bother to change banks.
-It does read the chip id though. The dump is confirmed to be from an
-original board.
 
 ***************************************************************************/
 
@@ -155,30 +147,3 @@ READ16_HANDLER( cchip1_ram_r )
 logerror("cchip1_r bank: %02x offset: %04x\n",current_bank,offset);
 	return 0;
 }
-
-
-/* Mega Blast */
-
-UINT16 *cchip2_ram;
-
-WRITE16_HANDLER( cchip2_word_w )
-{
-    logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(space->cpu), offset, data);
-
-    COMBINE_DATA(&cchip2_ram[offset]);
-}
-
-READ16_HANDLER( cchip2_word_r )
-{
-	/* C-Chip ID */
-
-	if (offset == 0x401)
-	{
-		return 0x01;
-	}
-
-	logerror("cchip2_r offset: %04x\n", offset);
-
-	return cchip2_ram[offset];
-}
-

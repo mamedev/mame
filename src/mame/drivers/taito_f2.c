@@ -303,10 +303,6 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
-#include "includes/cchip.h"
-
-
-static INT32 mjnquest_input;
 
 
 /**********************************************************
@@ -390,21 +386,21 @@ static READ16_HANDLER( ninjak_input_r )
 
 static READ16_HANDLER( cameltry_paddle_r )
 {
-	static int last[2];
-	int curr,res = 0xff;
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	int curr, res = 0xff;
 
 	switch (offset)
 	{
 		case 0x00:
 			curr = input_port_read(space->machine, "PADDLE1");
-			res = curr - last[0];
-			last[0] = curr;
+			res = curr - state->last[0];
+			state->last[0] = curr;
 			return res;
 
 		case 0x02:
 			curr = input_port_read(space->machine, "PADDLE2");
-			res = curr - last[1];
-			last[1] = curr;
+			res = curr - state->last[1];
+			state->last[1] = curr;
 			return res;
 	}
 
@@ -415,53 +411,55 @@ static READ16_HANDLER( cameltry_paddle_r )
 
 static READ16_HANDLER( mjnquest_dsw_r )
 {
-    switch (offset)
-    {
-        case 0x00:
-        {
+	switch (offset)
+	{
+		case 0x00:
+		{
 			return (input_port_read(space->machine, "IN5") << 8) + input_port_read(space->machine, "DSWA");	/* DSW A + coin */
-        }
+		}
 
-        case 0x01:
-        {
+		case 0x01:
+		{
 			return (input_port_read(space->machine, "IN6") << 8) + input_port_read(space->machine, "DSWB");	/* DSW B + coin */
-        }
-    }
+		}
+	}
 
-    logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(space->cpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(space->cpu), offset);
 
-    return 0xff;
+	return 0xff;
 }
 
 static READ16_HANDLER( mjnquest_input_r )
 {
-    switch (mjnquest_input)
-    {
-         case 0x01:
-              return input_port_read(space->machine, "IN0");
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	switch (state->mjnquest_input)
+	{
+		case 0x01:
+			  return input_port_read(space->machine, "IN0");
 
-         case 0x02:
-              return input_port_read(space->machine, "IN1");
+		 case 0x02:
+			  return input_port_read(space->machine, "IN1");
 
-         case 0x04:
-              return input_port_read(space->machine, "IN2");
+		 case 0x04:
+			  return input_port_read(space->machine, "IN2");
 
-         case 0x08:
-              return input_port_read(space->machine, "IN3");
+		 case 0x08:
+			  return input_port_read(space->machine, "IN3");
 
-         case 0x10:
-              return input_port_read(space->machine, "IN4");
+		 case 0x10:
+			  return input_port_read(space->machine, "IN4");
 
-    }
+	}
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(space->cpu), mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(space->cpu), state->mjnquest_input);
 
 	return 0xff;
 }
 
 static WRITE16_HANDLER( mjnquest_inputselect_w )
 {
-    mjnquest_input = (data >> 6);
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	state->mjnquest_input = (data >> 6);
 }
 
 /******************************************************************
@@ -610,7 +608,8 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
-	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( taitof2_interrupt )
@@ -629,62 +628,95 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bank(space->machine, "bank2", (data - 1) & 7);
 
 #ifdef MAME_DEBUG
-	if (((data - 1) & 7)>2) logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",(data - 1) & 7);
+	if (((data - 1) & 7) > 2) 
+		logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",(data - 1) & 7);
 #endif
 }
 
 
-
-static INT32 driveout_sound_latch = 0;
-
-
 static READ8_HANDLER( driveout_sound_command_r)
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
-//  logerror("sound IRQ OFF (sound command=%02x)\n",driveout_sound_latch);
-	return driveout_sound_latch;
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+
+	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+//  logerror("sound IRQ OFF (sound command=%02x)\n", state->driveout_sound_latch);
+	return state->driveout_sound_latch;
 }
 
-static INT32 oki_bank = 0;
 
-static void reset_driveout_sound_region(running_machine *machine)
+static void reset_driveout_sound_region( running_machine *machine )
 {
-	okim6295_set_bank_base(devtag_get_device(machine, "oki"), oki_bank*0x40000);
+	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	okim6295_set_bank_base(state->oki, state->oki_bank * 0x40000);
 }
 
-static WRITE8_HANDLER (oki_bank_w)
+static WRITE8_HANDLER( oki_bank_w )
 {
-	if ((data&4) && (oki_bank!=(data&3)) )
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	if ((data & 4) && (state->oki_bank != (data & 3)) )
 	{
-		oki_bank = (data&3);
+		state->oki_bank = (data & 3);
 	}
+
 	reset_driveout_sound_region(space->machine);
 }
 
-static WRITE16_HANDLER ( driveout_sound_command_w )
+static WRITE16_HANDLER( driveout_sound_command_w )
 {
-	static int nibble = 0;
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
 
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 		if (offset == 0)
 		{
-			nibble = data & 1;
+			state->nibble = data & 1;
 		}
 		else
 		{
-			if (nibble==0)
+			if (state->nibble == 0)
 			{
-				driveout_sound_latch = (data & 0x0f) | (driveout_sound_latch & 0xf0);
+				state->driveout_sound_latch = (data & 0x0f) | (state->driveout_sound_latch & 0xf0);
 			}
 			else
 			{
-				driveout_sound_latch = ((data << 4) & 0xf0) | (driveout_sound_latch & 0x0f);
-				cputag_set_input_line (space->machine, "audiocpu", 0, ASSERT_LINE);
+				state->driveout_sound_latch = ((data << 4) & 0xf0) | (state->driveout_sound_latch & 0x0f);
+				cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 			}
 		}
 	}
+}
+
+/***************************************************************************
+
+    Mega Blast cchip emulation
+
+    C-Chip simply used as RAM, the game doesn't even bother to change banks.
+    It does read the chip id though. The dump is confirmed to be from an
+    original board.
+
+***************************************************************************/
+
+static WRITE16_HANDLER( cchip2_word_w )
+{
+ 	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+
+	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(space->cpu), offset, data);
+
+	COMBINE_DATA(&state->cchip2_ram[offset]);
+}
+
+static READ16_HANDLER( cchip2_word_r )
+{
+ 	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+
+	/* C-Chip ID */
+	if (offset == 0x401)
+		return 0x01;
+
+	logerror("cchip2_r offset: %04x\n", offset);
+
+	return state->cchip2_ram[offset];
 }
 
 
@@ -702,7 +734,7 @@ static ADDRESS_MAP_START( finalb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x810000, 0x81ffff) AM_WRITENOP   /* error in game init code ? */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xb00002, 0xb00003) AM_WRITENOP   /* ?? */
 ADDRESS_MAP_END
 
@@ -715,7 +747,7 @@ static ADDRESS_MAP_START( dondokod_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)	/* ROZ tilemap */
 	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE("tc0280grd", tc0280grd_ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
@@ -726,14 +758,14 @@ static ADDRESS_MAP_START( megab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x120000, 0x12000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_BASE(&cchip2_ram)
+	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_BASE_MEMBER(taitof2_state, cchip2_ram)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM   /* unused? */
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thundfox_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -747,7 +779,7 @@ static ADDRESS_MAP_START( thundfox_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x800000, 0x80001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 ADDRESS_MAP_END
 
@@ -761,7 +793,7 @@ static ADDRESS_MAP_START( cameltry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)	/* ROZ tilemap */
 	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE("tc0280grd", tc0280grd_ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
@@ -776,7 +808,7 @@ static ADDRESS_MAP_START( qtorimon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x910000, 0x9120ff) AM_WRITENOP   /* error in init code ? */
 ADDRESS_MAP_END
 
@@ -789,7 +821,7 @@ static ADDRESS_MAP_START( liquidk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -811,7 +843,7 @@ static ADDRESS_MAP_START( quizhq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x810000, 0x81ffff) AM_WRITENOP   /* error in init code ? */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssi_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -824,7 +856,7 @@ static ADDRESS_MAP_START( ssi_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ?? */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps (not used) */
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)   /* sprite ram */
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)   /* sprite ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunfront_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -836,7 +868,7 @@ static ADDRESS_MAP_START( gunfront_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 //  AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP   /* ?? */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
@@ -860,7 +892,7 @@ static ADDRESS_MAP_START( growl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x50c000, 0x50c00f) AM_READ_PORT("IN4")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -879,15 +911,15 @@ static ADDRESS_MAP_START( mjnquest_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE("tc0100scn", tc0100scn_gfxbank_w)	/* scr gfx bank select */
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( footchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w)	/* updated at $a6e, off irq5 */
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* 500002 written like a watchdog?! */
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
@@ -913,7 +945,7 @@ static ADDRESS_MAP_START( koshien_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa20000, 0xa20001) AM_WRITE(koshien_spritebank_w)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 ADDRESS_MAP_END
@@ -925,10 +957,10 @@ static ADDRESS_MAP_START( yuyugogo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb10fff) AM_RAM   /* deliberate writes to $b10xxx, I think */
-	AM_RANGE(0xc00000, 0xc01fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
+	AM_RANGE(0xc00000, 0xc01fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
 	AM_RANGE(0xd00000, 0xdfffff) AM_ROM AM_REGION("extra", 0)
 ADDRESS_MAP_END
 
@@ -944,7 +976,7 @@ static ADDRESS_MAP_START( ninjak_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(taitof2_spritebank_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* b00002 written like a watchdog?! */
 ADDRESS_MAP_END
 
@@ -965,7 +997,7 @@ static ADDRESS_MAP_START( solfigtr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x504000, 0x504001) AM_WRITENOP	/* unknown... various values */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -976,7 +1008,7 @@ static ADDRESS_MAP_START( qzquest_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
@@ -989,11 +1021,11 @@ static ADDRESS_MAP_START( pulirula_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)	/* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0430grw_ctrl_word_w)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ??? */
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
@@ -1001,9 +1033,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( metalb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 //  AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
-	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
+	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
 	AM_RANGE(0x530000, 0x53002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x600000, 0x60001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
@@ -1020,7 +1052,7 @@ static ADDRESS_MAP_START( qzchikyu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
@@ -1028,7 +1060,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( yesnoj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
@@ -1047,9 +1079,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( deadconx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
 //    AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* uses 500002 like a watchdog !? */
@@ -1068,11 +1100,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dinorex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
-	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
+	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM
 	AM_RANGE(0x700000, 0x70001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
@@ -1086,11 +1118,11 @@ static ADDRESS_MAP_START( qjinsei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* watchdog ? */
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
@@ -1102,9 +1134,9 @@ static ADDRESS_MAP_START( qcrayon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("extra", 0)   /* extra data rom */
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
@@ -1115,7 +1147,7 @@ static ADDRESS_MAP_START( qcrayon2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("extra", 0)   /* extra data rom */
@@ -1123,7 +1155,7 @@ static ADDRESS_MAP_START( qcrayon2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x90001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0xb00000, 0xb017ff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE(&f2_sprite_extension) AM_SIZE(&f2_spriteext_size)
+	AM_RANGE(0xb00000, 0xb017ff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driftout_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1136,7 +1168,7 @@ static ADDRESS_MAP_START( driftout_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00018, 0xb00019) AM_READ_PORT("PADDLE1")
@@ -1153,7 +1185,7 @@ static ADDRESS_MAP_START( driveout_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00018, 0xb00019) AM_READ_PORT("PADDLE1")
@@ -2439,7 +2471,7 @@ static INPUT_PORTS_START( dinorex )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, "Big" )
 	PORT_DIPSETTING(    0x00, "Biggest" )
-	PORT_DIPNAME( 0x10, 0x10, "Timer Speed" )	 // Appears to make little difference
+	PORT_DIPNAME( 0x10, 0x10, "Timer Speed" )	// Appears to make little difference
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x20, 0x20, "Match Type" )
@@ -3135,9 +3167,10 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	taitof2_state *state = (taitof2_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3319,10 +3352,10 @@ static const tc0480scp_interface metalb_tc0480scp_intf =
 	256		/* col_base */
 };
 
-static const tc0110pcr_interface taitof2_tc0110pcr_intf = {	0	};
+static const tc0110pcr_interface taitof2_tc0110pcr_intf = { 0 };
 
-static const tc0280grd_interface taitof2_tc0280grd_intf = {	2	};
-static const tc0280grd_interface taitof2_tc0430grw_intf = {	2	};
+static const tc0280grd_interface taitof2_tc0280grd_intf = { 2 };
+static const tc0280grd_interface taitof2_tc0430grw_intf = { 2 };
 
 static const tc0220ioc_interface taitof2_io220_intf =
 {
@@ -3342,13 +3375,32 @@ static const tc0140syt_interface taitof2_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
+static MACHINE_START( common )
+{
+	taitof2_state *state = (taitof2_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");;
+	state->oki = devtag_get_device(machine, "oki");;
+	state->tc0100scn = devtag_get_device(machine, "tc0100scn");;
+	state->tc0100scn_1 = devtag_get_device(machine, "tc0100scn_1");;
+	state->tc0100scn_2 = devtag_get_device(machine, "tc0100scn_2");;
+	state->tc0360pri = devtag_get_device(machine, "tc0360pri");;
+	state->tc0280grd = devtag_get_device(machine, "tc0280grd");;
+	state->tc0430grw = devtag_get_device(machine, "tc0430grw");;
+	state->tc0480scp = devtag_get_device(machine, "tc0480scp");;
+}
+
 static MACHINE_START( f2 )
 {
+	MACHINE_START_CALL(common);
 	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
-
 static MACHINE_DRIVER_START( taito_f2 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(taitof2_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/2)	/* 12 MHz */
@@ -3904,6 +3956,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cameltrya )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitof2_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)	/* verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(cameltry_map)
@@ -3911,6 +3966,8 @@ static MACHINE_DRIVER_START( cameltrya )
 
 	MDRV_CPU_ADD("audiocpu", Z80,24000000/4)	/* verifed on pcb */
 	MDRV_CPU_PROGRAM_MAP(cameltrya_sound_map)
+
+	MDRV_MACHINE_START(common)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
 
@@ -3953,6 +4010,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( driveout )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitof2_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_map)
@@ -3960,6 +4020,8 @@ static MACHINE_DRIVER_START( driveout )
 
 	MDRV_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_sound_map)
+
+	MDRV_MACHINE_START(common)
 
 	MDRV_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
 
@@ -4224,7 +4286,7 @@ ROM_START( megablst )
 	ROM_LOAD( "pal16l8b-c11-14.ic23",  0x0a00, 0x0104, CRC(5c740aee) SHA1(995ccf52f85260f141ce5e3697c9391448c3d69d) )  // MDEC 2
 ROM_END
 
-ROM_START( megablastu )
+ROM_START( megablstu )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) )
 	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) )
@@ -4249,7 +4311,7 @@ ROM_START( megablastu )
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 ROM_END
 
-ROM_START( megablastj )
+ROM_START( megablstj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) )	// c11-07.17
 	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) )	// c11-08.19
@@ -4394,54 +4456,6 @@ ROM_START( cameltry )
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( cameltrya )
-	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "c38-11", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
-	ROM_LOAD16_BYTE( "c38-16", 0x00001, 0x20000, CRC(66ad6164) SHA1(2df22a6a1d6e194a467e6a6c6b6c2fc9f8441852) )
-
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	/* empty! */
-
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
-	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
-
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
-	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
-	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
-	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
-
-	/* these are for a YM2203 and OKIM6295 */
-	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu (revised prog!?) */
-	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
-
-	ROM_REGION( 0x80000, "oki", 0 )	/* M6295 samples */
-	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
-ROM_END
-
-ROM_START( cameltryua )
-	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "c38-11", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
-	ROM_LOAD16_BYTE( "c38-14", 0x00001, 0x20000, CRC(ffa430de) SHA1(a3cdb35151a92ddfa2090c1f8710500925e7ad0c) )
-
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	/* empty! */
-
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
-	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
-
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
-	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
-	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
-	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
-
-	/* these are for a YM2203 and OKIM6295 */
-	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu (revised prog!?) */
-	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
-
-	ROM_REGION( 0x80000, "oki", 0 )	/* M6295 samples */
-	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
-ROM_END
-
 ROM_START( cameltryj )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c38-09.bin", 0x00000, 0x20000, CRC(2ae01120) SHA1(6da4155fde0edd76976264f929c5da3c79db5017) )
@@ -4467,6 +4481,54 @@ ROM_START( cameltryj )
 	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
 
 	/* no Delta-T samples */
+ROM_END
+
+ROM_START( cameltrya )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c38-11", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
+	ROM_LOAD16_BYTE( "c38-16", 0x00001, 0x20000, CRC(66ad6164) SHA1(2df22a6a1d6e194a467e6a6c6b6c2fc9f8441852) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+
+	/* these are for a YM2203 and OKIM6295 */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu (revised prog!?) */
+	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
+
+	ROM_REGION( 0x80000, "oki", 0 )	/* M6295 samples */
+	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
+ROM_END
+
+ROM_START( cameltryau )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c38-11", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
+	ROM_LOAD16_BYTE( "c38-14", 0x00001, 0x20000, CRC(ffa430de) SHA1(a3cdb35151a92ddfa2090c1f8710500925e7ad0c) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+
+	/* these are for a YM2203 and OKIM6295 */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu (revised prog!?) */
+	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
+
+	ROM_REGION( 0x80000, "oki", 0 )	/* M6295 samples */
+	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
 ROM_END
 
 ROM_START( qtorimon )	/* Quiz Torimonochou */
@@ -4581,7 +4643,7 @@ ROM_START( quizhq )	/* Quiz HQ */
 	ROM_LOAD16_BYTE( "c53-02.bin",  0x40000, 0x20000, CRC(d704c6f4) SHA1(9b1c47ec3abaff53d641488dece8c97438b2e809) )
 	ROM_LOAD16_BYTE( "c53-06.bin",  0x40001, 0x20000, CRC(f77f63fc) SHA1(28a509786817e88c0a5821dd68791ebd30d994c2) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c53-08.bin",    0x00000, 0x04000, CRC(25187e81) SHA1(c549fbfff6963be93aaf349b240f15b1d578d1f1) )
 	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
 
@@ -4716,7 +4778,7 @@ ROM_START( gunfront )
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
 	ROM_LOAD( "c71-03.ic19", 0x000000, 0x100000, CRC(9133c605) SHA1(fa10c60cd4ca439a273c644bbf3810824a0ca523) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c71-12.ic49", 0x00000, 0x04000, CRC(0038c7f8) SHA1(405def36e67949219b6f9394333278ec60ad5783) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
@@ -4743,7 +4805,7 @@ ROM_START( gunfrontj )
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
 	ROM_LOAD( "c71-03.ic19", 0x000000, 0x100000, CRC(9133c605) SHA1(fa10c60cd4ca439a273c644bbf3810824a0ca523) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c71-12.ic49", 0x00000, 0x04000, CRC(0038c7f8) SHA1(405def36e67949219b6f9394333278ec60ad5783) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
@@ -4998,7 +5060,7 @@ ROM_START( yuyugogo )	/* Yuuyu no QUIZ de GO!GO! */
 	ROM_LOAD16_BYTE( "c83-01.12",  0x000000, 0x100000, CRC(8bf0d416) SHA1(ec3d51422fcc8e3e822716d57adab56f639a2d02) )
 	ROM_LOAD16_BYTE( "c83-02.11",  0x000001, 0x100000, CRC(20bb1c15) SHA1(33370b665d681f765e363e5a8e79e62f59ad25f7) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c83-11.1"  , 0x00000, 0x04000, CRC(461e702a) SHA1(f1f4294a7e8acc50473df15a167ba84595c9eb15) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
@@ -5300,7 +5362,7 @@ ROM_START( deadconx )
 	ROM_LOAD( "d28-01.8", 0x000000, 0x100000, CRC(181d7b69) SHA1(fea7bd60224cf98d53d1389695f2e0d76e50b573) )
 	ROM_LOAD( "d28-02.9", 0x100000, 0x100000, CRC(d301771c) SHA1(2756bb834b50a657bbcf4e9bec02f4af595ac7e9) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "d28-10.6", 0x00000, 0x04000, CRC(40805d74) SHA1(172114be692c766622d1235e5c4aa83ad438d9d9) )
 	ROM_CONTINUE(         0x10000, 0x0c000 )	/* banked stuff */
 
@@ -5325,7 +5387,7 @@ ROM_START( deadconxj )
 	ROM_LOAD( "d28-01.8", 0x000000, 0x100000, CRC(181d7b69) SHA1(fea7bd60224cf98d53d1389695f2e0d76e50b573) )
 	ROM_LOAD( "d28-02.9", 0x100000, 0x100000, CRC(d301771c) SHA1(2756bb834b50a657bbcf4e9bec02f4af595ac7e9) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "d28-10.6", 0x00000, 0x04000, CRC(40805d74) SHA1(172114be692c766622d1235e5c4aa83ad438d9d9) )
 	ROM_CONTINUE(         0x10000, 0x0c000 )	/* banked stuff */
 
@@ -5350,7 +5412,7 @@ ROM_START( dinorex )
 	ROM_LOAD( "d39-02.28",	0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
 	ROM_LOAD( "d39-03.27",	0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
 	ROM_LOAD( "d39-12.5",	0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
 	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
 
@@ -5376,7 +5438,7 @@ ROM_START( dinorexj )
 	ROM_LOAD( "d39-02.28",	0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
 	ROM_LOAD( "d39-03.27",	0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
 	ROM_LOAD( "d39-12.5",	0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
 	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
 
@@ -5402,7 +5464,7 @@ ROM_START( dinorexu )
 	ROM_LOAD( "d39-02.28",	0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
 	ROM_LOAD( "d39-03.27",	0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
 	ROM_LOAD( "d39-12.5",	0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
 	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
 
@@ -5452,7 +5514,7 @@ ROM_START( qcrayon )	/* Quiz Crayon */
 	ROM_LOAD16_BYTE( "d55-05", 0x000000, 0x100000, CRC(f0e59902) SHA1(44d93e0e9622a98796a128a0273065947f586a1d) )
 	ROM_LOAD16_BYTE( "d55-04", 0x000001, 0x100000, CRC(412975ce) SHA1(32058a87947d6b6cdc8b147ddfcf359792f9c9fc) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "d55-15",  0x00000, 0x04000, CRC(ba782eff) SHA1(ce24654db49b9694e444e93b9a8d529a86729e03) )
 	ROM_CONTINUE(        0x10000, 0x0c000 )	/* banked stuff */
 
@@ -5526,7 +5588,7 @@ ROM_START( driveout )
 	ROM_REGION( 0x080000, "gfx3", 0 )      /* pivot gfx */
 	ROM_LOAD( "do_piv.rom",    0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	 /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "driveout.020",  0x0000,  0x8000, CRC(99aaeb2e) SHA1(c7eb174f2ddcd8fd2b73b5251f434a20a9627b49) )
 
 	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
@@ -5549,40 +5611,56 @@ static DRIVER_INIT( finalb )
 	UINT8 *gfx = memory_region(machine, "gfx2");
 
 	offset = 0x100000;
-	for (i = 0x180000; i<0x200000; i++)
+	for (i = 0x180000; i < 0x200000; i++)
 	{
 		int d1,d2,d3,d4;
 
 		/* convert from 2bits into 4bits format */
 		data = gfx[i];
-		d1 = (data>>0) & 3;
-		d2 = (data>>2) & 3;
-		d3 = (data>>4) & 3;
-		d4 = (data>>6) & 3;
+		d1 = (data >> 0) & 3;
+		d2 = (data >> 2) & 3;
+		d3 = (data >> 4) & 3;
+		d4 = (data >> 6) & 3;
 
-		gfx[offset] = (d3<<2) | (d4<<6);
+		gfx[offset] = (d3 << 2) | (d4 << 6);
 		offset++;
 
-		gfx[offset] = (d1<<2) | (d2<<6);
+		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
 	}
 }
 
+static DRIVER_INIT( cameltry )
+{
+	taitof2_state *state = (taitof2_state *)machine->driver_data;
+
+	state->last[0] = 0;
+	state->last[1] = 0;
+
+	state_save_register_global_array(machine, state->last);
+}
+
+
 static DRIVER_INIT( mjnquest )
 {
+	taitof2_state *state = (taitof2_state *)machine->driver_data;
 	int i, len = memory_region_length(machine, "gfx2");
 	UINT8 *gfx = memory_region(machine, "gfx2");
 
 	/* the bytes in each longword are in reversed order, put them in the
        order used by the other games. */
-	for (i = 0;i < len;i += 2)
+	for (i = 0; i < len; i += 2)
 	{
 		int t;
 
 		t = gfx[i];
-		gfx[i] = (gfx[i+1] >> 4) | (gfx[i+1] << 4);
-		gfx[i+1] = (t >> 4) | (t << 4);
+		gfx[i] = (gfx[i + 1] >> 4) | (gfx[i + 1] << 4);
+		gfx[i + 1] = (t >> 4) | (t << 4);
 	}
+
+	state->mjnquest_input = 0;
+
+	state_save_register_global(machine, state->mjnquest_input);
 }
 
 static STATE_POSTLOAD( driveout_postload )
@@ -5592,65 +5670,72 @@ static STATE_POSTLOAD( driveout_postload )
 
 static DRIVER_INIT( driveout )
 {
-	state_save_register_global(machine, driveout_sound_latch);
-	state_save_register_global(machine, oki_bank);
+	taitof2_state *state = (taitof2_state *)machine->driver_data;
+
+	state->driveout_sound_latch = 0;
+	state->oki_bank = 0;
+	state->nibble = 0;
+
+	state_save_register_global(machine, state->driveout_sound_latch);
+	state_save_register_global(machine, state->oki_bank);
+	state_save_register_global(machine, state->nibble);
 	state_save_register_postload(machine, driveout_postload, NULL);
 }
 
 
-GAME( 1988, finalb,    0,        finalb,   finalb,   finalb,   ROT0,   "Taito Corporation Japan", "Final Blow (World)", 0 )
-GAME( 1988, finalbj,   finalb,   finalb,   finalbj,  finalb,   ROT0,   "Taito Corporation", "Final Blow (Japan)", 0 )
-GAME( 1988, finalbu,   finalb,   finalb,   finalbj,  finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", 0 )
-GAME( 1989, dondokod,  0,        dondokod, dondokod, 0,        ROT0,   "Taito Corporation Japan", "Don Doko Don (World)", 0 )
-GAME( 1989, dondokodu, dondokod, dondokod, dondokodu,0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", 0 )
-GAME( 1989, dondokodj, dondokod, dondokod, dondokodj,0,        ROT0,   "Taito Corporation", "Don Doko Don (Japan)", 0 )
-GAME( 1989, megablst,  0,        megab,    megab,    0,        ROT0,   "Taito Corporation Japan", "Mega Blast (World)", 0 )
-GAME( 1989, megablastu,megablst, megab,    megabu,   0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", 0 )
-GAME( 1989, megablastj,megablst, megab,    megabj,   0,        ROT0,   "Taito Corporation", "Mega Blast (Japan)", 0 )
-GAME( 1990, thundfox,  0,        thundfox, thundfox, 0,        ROT0,   "Taito Corporation Japan", "Thunder Fox (World)", 0 )
-GAME( 1990, thundfoxu, thundfox, thundfox, thundfoxu,0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", 0 )
-GAME( 1990, thundfoxj, thundfox, thundfox, thundfoxj,0,        ROT0,   "Taito Corporation", "Thunder Fox (Japan)", 0 )
-GAME( 1989, cameltry,  0,        cameltry, cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", 0 )
-GAME( 1989, cameltrya, cameltry, cameltrya,cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", 0 )
-GAME( 1989, cameltryua,cameltry, cameltrya,cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", 0 )
-GAME( 1989, cameltryj, cameltry, cameltry, cameltryj,0,        ROT0,   "Taito Corporation", "Cameltry (Japan, YM2610)", 0 )
-GAME( 1990, qtorimon,  0,        qtorimon, qtorimon, 0,        ROT0,   "Taito Corporation", "Quiz Torimonochou (Japan)", 0 )
-GAME( 1990, liquidk,   0,        liquidk,  liquidk,  0,        ROT0,   "Taito Corporation Japan", "Liquid Kids (World)", 0 )
-GAME( 1990, liquidku,  liquidk,  liquidk,  liquidku, 0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", 0 )
-GAME( 1990, mizubaku,  liquidk,  liquidk,  mizubaku, 0,        ROT0,   "Taito Corporation", "Mizubaku Daibouken (Japan)", 0 )
-GAME( 1990, quizhq,    0,        quizhq,   quizhq,   0,        ROT0,   "Taito Corporation", "Quiz H.Q. (Japan)", 0 )
-GAME( 1990, ssi,       0,        ssi,      ssi,      0,        ROT270, "Taito Corporation Japan", "Super Space Invaders '91 (World)", 0 )
-GAME( 1990, majest12,  ssi,      ssi,      majest12, 0,        ROT270, "Taito Corporation", "Majestic Twelve - The Space Invaders Part IV (Japan)", 0 )
-GAME( 1990, gunfront,  0,        gunfront, gunfront, 0,        ROT270, "Taito Corporation Japan", "Gun & Frontier (World)", 0 )
-GAME( 1990, gunfrontj, gunfront, gunfront, gunfrontj,0,        ROT270, "Taito Corporation", "Gun Frontier (Japan)", 0 )
-GAME( 1990, growl,     0,        growl,    growl,    0,        ROT0,   "Taito Corporation Japan", "Growl (World)", 0 )
-GAME( 1990, growlu,    growl,    growl,    growlu,   0,        ROT0,   "Taito America Corporation", "Growl (US)", 0 )
-GAME( 1990, runark,    growl,    growl,    runark,   0,        ROT0,   "Taito Corporation", "Runark (Japan)", 0 )
-GAME( 1990, mjnquest,  0,        mjnquest, mjnquest, mjnquest, ROT0,   "Taito Corporation", "Mahjong Quest (Japan)", 0 )
-GAME( 1990, mjnquestb, mjnquest, mjnquest, mjnquest, mjnquest, ROT0,   "Taito Corporation", "Mahjong Quest (No Nudity)", 0 )
-GAME( 1990, footchmp,  0,        footchmp, footchmp, 0,        ROT0,   "Taito Corporation Japan", "Football Champ (World)", 0 )
-GAME( 1990, hthero,    footchmp, hthero,   hthero,   0,        ROT0,   "Taito Corporation", "Hat Trick Hero (Japan)", 0 )
-GAME( 1992, euroch92,  footchmp, footchmp, footchmp, 0,        ROT0,   "Taito Corporation Japan", "Euro Champ '92 (World)", 0 )
-GAME( 1990, koshien,   0,        koshien,  koshien,  0,        ROT0,   "Taito Corporation", "Ah Eikou no Koshien (Japan)", 0 )
-GAME( 1990, yuyugogo,  0,        yuyugogo, yuyugogo, 0,        ROT0,   "Taito Corporation", "Yuuyu no Quiz de GO!GO! (Japan)", 0 )
-GAME( 1990, ninjak,    0,        ninjak,   ninjak,   0,        ROT0,   "Taito Corporation Japan", "The Ninja Kids (World)", 0 )
-GAME( 1990, ninjakj,   ninjak,   ninjak,   ninjakj,  0,        ROT0,   "Taito Corporation", "The Ninja Kids (Japan)", 0 )
-GAME( 1990, ninjaku,   ninjak,   ninjak,   ninjaku,  0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", 0 )
-GAME( 1991, solfigtr,  0,        solfigtr, solfigtr, 0,        ROT0,   "Taito Corporation Japan", "Solitary Fighter (World)", 0 )
-GAME( 1991, qzquest,   0,        qzquest , qzquest,  0,        ROT0,   "Taito Corporation", "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", 0 )
-GAME( 1991, pulirula,  0,        pulirula, pulirula, 0,        ROT0,   "Taito Corporation Japan", "PuLiRuLa (World)", 0 )
-GAME( 1991, pulirulaj, pulirula, pulirula, pulirulaj,0,        ROT0,   "Taito Corporation", "PuLiRuLa (Japan)", 0 )
-GAME( 1991, metalb,    0,        metalb,   metalb,   0,        ROT0,   "Taito Corporation Japan", "Metal Black (World)", 0 )
-GAME( 1991, metalbj,   metalb,   metalb,   metalbj,  0,        ROT0,   "Taito Corporation", "Metal Black (Japan)", 0 )
-GAME( 1991, qzchikyu,  0,        qzchikyu, qzchikyu, 0,        ROT0,   "Taito Corporation", "Quiz Chikyu Bouei Gun (Japan)", 0 )
-GAME( 1992, yesnoj,    0,        yesnoj,   yesnoj,   0,        ROT0,   "Taito Corporation", "Yes/No Sinri Tokimeki Chart", 0 )
-GAME( 1992, deadconx,  0,        deadconx, deadconx, 0,        ROT0,   "Taito Corporation Japan", "Dead Connection (World)", 0 )
-GAME( 1992, deadconxj, deadconx, deadconxj,deadconxj,0,        ROT0,   "Taito Corporation", "Dead Connection (Japan)", 0 )
-GAME( 1992, dinorex,   0,        dinorex,  dinorex,  0,        ROT0,   "Taito Corporation Japan", "Dino Rex (World)", 0 )
-GAME( 1992, dinorexj,  dinorex,  dinorex,  dinorexj, 0,        ROT0,   "Taito Corporation", "Dino Rex (Japan)", 0 )
-GAME( 1992, dinorexu,  dinorex,  dinorex,  dinorex,  0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", 0 )
-GAME( 1992, qjinsei,   0,        qjinsei,  qjinsei,  0,        ROT0,   "Taito Corporation", "Quiz Jinsei Gekijoh (Japan)", 0 )
-GAME( 1993, qcrayon,   0,        qcrayon,  qcrayon,  0,        ROT0,   "Taito Corporation", "Quiz Crayon Shinchan (Japan)", 0 )
-GAME( 1993, qcrayon2,  0,        qcrayon2, qcrayon2, 0,        ROT0,   "Taito Corporation", "Crayon Shinchan Orato Asobo (Japan)", 0 )
-GAME( 1991, driftout,  0,        driftout, driftout, 0,        ROT270, "Visco", "Drift Out (Japan)", 0 )
-GAME( 1991, driveout,  driftout, driveout, driftout, driveout, ROT270, "bootleg", "Drive Out", 0 )
+GAME( 1988, finalb,     0,        finalb,    finalb,    finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, finalbj,    finalb,   finalb,    finalbj,   finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, finalbu,    finalb,   finalb,    finalbj,   finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dondokod,   0,        dondokod,  dondokod,  0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, megablst,   0,        megab,     megab,     0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, megablstu,  megablst, megab,     megabu,    0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, megablstj,  megablst, megab,     megabj,    0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, thundfox,   0,        thundfox,  thundfox,  0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltry,   0,        cameltry,  cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
+GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,  0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, liquidk,    0,        liquidk,   liquidk,   0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,  0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,  0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, quizhq,     0,        quizhq,    quizhq,    0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ssi,        0,        ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, majest12,   ssi,      ssi,       majest12,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gunfront,   0,        gunfront,  gunfront,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, growl,      0,        growl,     growl,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, growlu,     growl,    growl,     growlu,    0,        ROT0,   "Taito America Corporation", "Growl (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, runark,     growl,    growl,     runark,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", GAME_SUPPORTS_SAVE )
+GAME( 1990, footchmp,   0,        footchmp,  footchmp,  0,        ROT0,   "Taito Corporation Japan",   "Football Champ (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hthero,     footchmp, hthero,    hthero,    0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, euroch92,   footchmp, footchmp,  footchmp,  0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, koshien,    0,        koshien,   koshien,   0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo,  0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ninjak,     0,        ninjak,    ninjak,    0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj,   0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku,   0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", GAME_SUPPORTS_SAVE )
+GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,  0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, qzquest,    0,        qzquest ,  qzquest,   0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pulirula,   0,        pulirula,  pulirula,  0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, metalb,     0,        metalb,    metalb,    0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, metalbj,    metalb,   metalb,    metalbj,   0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,  0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,    0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", GAME_SUPPORTS_SAVE )
+GAME( 1992, deadconx,   0,        deadconx,  deadconx,  0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dinorex,    0,        dinorex,   dinorex,   0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj,  0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorex,   0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei,   0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,   0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,  0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driftout,   0,        driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout,  driveout, ROT270, "bootleg",                   "Drive Out", GAME_SUPPORTS_SAVE )

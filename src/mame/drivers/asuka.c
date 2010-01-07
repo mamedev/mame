@@ -222,15 +222,7 @@ DIP locations verified for:
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
-#include "includes/cchip.h"
-
-WRITE16_HANDLER( asuka_spritectrl_w );
-
-VIDEO_UPDATE( asuka );
-VIDEO_UPDATE( bonzeadv );
-
-static int adpcm_pos;
-static int adpcm_data;
+#include "includes/asuka.h"
 
 
 /***********************************************************
@@ -239,12 +231,13 @@ static int adpcm_data;
 
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+	asuka_state *state = (asuka_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device,500), NULL, 0, cadash_interrupt5);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 500), NULL, 0, cadash_interrupt5);
 	cpu_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
@@ -255,34 +248,37 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "audiocpu") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 {
-	memory_set_bankptr(device->machine,  "bank1", memory_region(device->machine, "audiocpu") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bank(device->machine,  "bank1", data & 0x03);
 }
 
 
 
-static void asuka_msm5205_vck(const device_config *device)
+static void asuka_msm5205_vck( const device_config *device )
 {
-	if (adpcm_data != -1)
+	asuka_state *state = (asuka_state *)device->machine->driver_data;
+
+	if (state->adpcm_data != -1)
 	{
-		msm5205_data_w(device, adpcm_data & 0x0f);
-		adpcm_data = -1;
+		msm5205_data_w(device, state->adpcm_data & 0x0f);
+		state->adpcm_data = -1;
 	}
 	else
 	{
-		adpcm_data = memory_region(device->machine, "ymsnd")[adpcm_pos];
-		adpcm_pos = (adpcm_pos + 1) & 0xffff;
-		msm5205_data_w(device, adpcm_data >> 4);
+		state->adpcm_data = memory_region(device->machine, "ymsnd")[state->adpcm_pos];
+		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
+		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
 }
 
 static WRITE8_HANDLER( asuka_msm5205_address_w )
 {
-	adpcm_pos = (adpcm_pos & 0x00ff) | (data << 8);
+	asuka_state *state = (asuka_state *)space->machine->driver_data;
+	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
@@ -292,27 +288,10 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
 
 static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 {
+	asuka_state *state = (asuka_state *)device->machine->driver_data;
 	msm5205_reset_w(device, 1);
-	adpcm_pos &= 0xff00;
+	state->adpcm_pos &= 0xff00;
 }
-
-
-
-static MACHINE_START( asuka )
-{
-	/* configure the banks */
-    memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "audiocpu"), 0);
-	memory_configure_bank(machine, "bank1", 1, 3, memory_region(machine, "audiocpu") + 0x10000, 0x04000);
-
-	state_save_register_global(machine, adpcm_pos);
-}
-
-static MACHINE_RESET( asuka )
-{
-	adpcm_pos = 0;
-	adpcm_data = -1;
-}
-
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -815,10 +794,52 @@ static const tc0110pcr_interface asuka_tc0110pcr_intf =
 	0
 };
 
+
+static MACHINE_START( asuka )
+{
+	asuka_state *state = (asuka_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->pc090oj = devtag_get_device(machine, "pc090oj");
+	state->tc0100scn = devtag_get_device(machine, "tc0100scn");
+
+	/* configure the banks */
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "audiocpu"), 0);
+	memory_configure_bank(machine, "bank1", 1, 3, memory_region(machine, "audiocpu") + 0x10000, 0x04000);
+
+	state_save_register_global(machine, state->adpcm_pos);
+	state_save_register_global(machine, state->adpcm_data);
+
+	state_save_register_global(machine, state->current_round);
+	state_save_register_global(machine, state->current_bank);
+	state_save_register_global(machine, state->video_ctrl);
+	state_save_register_global(machine, state->video_mask);
+	state_save_register_global(machine, state->cc_port);
+	state_save_register_global(machine, state->restart_status);
+	state_save_register_global_array(machine, state->cval);
+}
+
+static MACHINE_RESET( asuka )
+{
+	asuka_state *state = (asuka_state *)machine->driver_data;
+
+	state->adpcm_pos = 0;
+	state->adpcm_data = -1;
+	state->current_round = 0;
+	state->current_bank = 0;
+	state->video_ctrl = 0;
+	state->video_mask = 0;
+	state->cc_port = 0;
+	state->restart_status = 0;
+
+	memset(state->cval, 0, 26);
+}
+
 static VIDEO_EOF( asuka )
 {
-	const device_config *pc090oj = devtag_get_device(machine, "pc090oj");
-	pc090oj_eof_callback(pc090oj);
+	asuka_state *state = (asuka_state *)machine->driver_data;
+	pc090oj_eof_callback(state->pc090oj);
 }
 
 static const tc0220ioc_interface asuka_io_intf =
@@ -834,6 +855,9 @@ static const tc0140syt_interface asuka_tc0140syt_intf =
 };
 
 static MACHINE_DRIVER_START( bonzeadv )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(asuka_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
@@ -878,6 +902,9 @@ static MACHINE_DRIVER_START( bonzeadv )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( asuka )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(asuka_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -928,6 +955,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cadash )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(asuka_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)	/* 68000p12 running at 16Mhz, verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(cadash_map)
@@ -972,6 +1002,9 @@ static MACHINE_DRIVER_START( cadash )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mofflott )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(asuka_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
@@ -1022,6 +1055,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galmedes )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(asuka_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(asuka_map)
@@ -1066,6 +1102,9 @@ static MACHINE_DRIVER_START( galmedes )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( eto )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(asuka_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
@@ -1475,19 +1514,19 @@ ROM_START( eto )
 ROM_END
 
 
-GAME( 1988, bonzeadv, 0,        bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Newer)", GAME_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Older)", GAME_SUPPORTS_SAVE )
+GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", GAME_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", GAME_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito America Corporation", "Bonze Adventure (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, jigkmgri, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito Corporation", "Jigoku Meguri (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, asuka,    0,        asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, asukaj,   asuka,    asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mofflott, 0,        mofflott, mofflott, 0, ROT270, "Taito Corporation", "Maze of Flott (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cadash,   0,        cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (World)", 0 )
-GAME( 1989, cadashj,  cadash,   cadash,   cadashj,  0, ROT0,   "Taito Corporation", "Cadash (Japan)", 0 )
-GAME( 1989, cadashu,  cadash,   cadash,   cadashu,  0, ROT0,   "Taito America Corporation", "Cadash (US)", 0 )
-GAME( 1989, cadashi,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (Italy)", 0 )
-GAME( 1989, cadashf,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (France)", 0 )
-GAME( 1989, cadashg,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (Germany)", 0 )
-GAME( 1992, galmedes, 0,        galmedes, galmedes, 0, ROT270, "Visco", "Galmedes (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1993, earthjkr, 0,        galmedes, earthjkr, 0, ROT270, "Visco", "U.N. Defense Force: Earth Joker", GAME_SUPPORTS_SAVE )
-GAME( 1994, eto,      0,        eto,      eto,      0, ROT0,   "Visco", "Kokontouzai Eto Monogatari (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, asuka,     0,        asuka,    asuka,    0, ROT270, "Taito Corporation",         "Asuka & Asuka (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, asukaj,    asuka,    asuka,    asuka,    0, ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mofflott,  0,        mofflott, mofflott, 0, ROT270, "Taito Corporation",         "Maze of Flott (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cadash,    0,        cadash,   cadash,   0, ROT0,   "Taito Corporation Japan",   "Cadash (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cadashj,   cadash,   cadash,   cadashj,  0, ROT0,   "Taito Corporation",         "Cadash (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cadashu,   cadash,   cadash,   cadashu,  0, ROT0,   "Taito America Corporation", "Cadash (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cadashi,   cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cadashf,   cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan",   "Cadash (France)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cadashg,   cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Germany)", GAME_SUPPORTS_SAVE )
+GAME( 1992, galmedes,  0,        galmedes, galmedes, 0, ROT270, "Visco",                     "Galmedes (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        galmedes, earthjkr, 0, ROT270, "Visco",                     "U.N. Defense Force: Earth Joker", GAME_SUPPORTS_SAVE )
+GAME( 1994, eto,       0,        eto,      eto,      0, ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", GAME_SUPPORTS_SAVE )

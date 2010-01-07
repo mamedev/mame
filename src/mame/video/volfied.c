@@ -1,11 +1,6 @@
 #include "driver.h"
 #include "video/taitoic.h"
-
-static UINT16* video_ram = NULL;
-
-static UINT16 video_ctrl = 0;
-static UINT16 video_mask = 0;
-
+#include "includes/volfied.h"
 
 /******************************************************
           INITIALISATION AND CLEAN-UP
@@ -13,11 +8,15 @@ static UINT16 video_mask = 0;
 
 VIDEO_START( volfied )
 {
-	video_ram = auto_alloc_array(machine, UINT16, 0x40000);
+	volfied_state *state = (volfied_state *)machine->driver_data;
+	state->video_ram = auto_alloc_array(machine, UINT16, 0x40000);
 
-	state_save_register_global_pointer(machine, video_ram, 0x40000);
-	state_save_register_global(machine, video_ctrl);
-	state_save_register_global(machine, video_mask);
+	state->video_ctrl = 0;
+	state->video_mask = 0;
+
+	state_save_register_global_pointer(machine, state->video_ram, 0x40000);
+	state_save_register_global(machine, state->video_ctrl);
+	state_save_register_global(machine, state->video_mask);
 }
 
 
@@ -27,19 +26,23 @@ VIDEO_START( volfied )
 
 READ16_HANDLER( volfied_video_ram_r )
 {
-	return video_ram[offset];
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	return state->video_ram[offset];
 }
 
 WRITE16_HANDLER( volfied_video_ram_w )
 {
-	mem_mask &= video_mask;
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
 
-	COMBINE_DATA(&video_ram[offset]);
+	mem_mask &= state->video_mask;
+
+	COMBINE_DATA(&state->video_ram[offset]);
 }
 
 WRITE16_HANDLER( volfied_video_ctrl_w )
 {
-	COMBINE_DATA(&video_ctrl);
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->video_ctrl);
 }
 
 READ16_HANDLER( volfied_video_ctrl_r )
@@ -55,13 +58,14 @@ READ16_HANDLER( volfied_video_ctrl_r )
 
 WRITE16_HANDLER( volfied_video_mask_w )
 {
-	COMBINE_DATA(&video_mask);
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->video_mask);
 }
 
 WRITE16_HANDLER( volfied_sprite_ctrl_w )
 {
-	const device_config *pc090oj = devtag_get_device(space->machine, "pc090oj");
-	pc090oj_set_sprite_ctrl(pc090oj, (data & 0x3c) >> 2);
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	pc090oj_set_sprite_ctrl(state->pc090oj, (data & 0x3c) >> 2);
 }
 
 
@@ -69,7 +73,7 @@ WRITE16_HANDLER( volfied_sprite_ctrl_w )
                 SCREEN REFRESH
 *******************************************************/
 
-static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
+static void refresh_pixel_layer( running_machine *machine, bitmap_t *bitmap )
 {
 	int x, y;
 
@@ -93,11 +97,12 @@ static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
 
     *********************************************************/
 
-	UINT16* p = video_ram;
+	volfied_state *state = (volfied_state *)machine->driver_data;
+	UINT16* p = state->video_ram;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	if (video_ctrl & 1)
+	if (state->video_ctrl & 1)
 		p += 0x20000;
 
 	for (y = 0; y < height; y++)
@@ -125,10 +130,10 @@ static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
 
 VIDEO_UPDATE( volfied )
 {
-	const device_config *pc090oj = devtag_get_device(screen->machine, "pc090oj");
+	volfied_state *state = (volfied_state *)screen->machine->driver_data;
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	refresh_pixel_layer(screen->machine, bitmap);
-	pc090oj_draw_sprites(pc090oj, bitmap, cliprect, 0);
+	pc090oj_draw_sprites(state->pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

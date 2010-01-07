@@ -147,20 +147,7 @@ some kind of zoom table?
 #include "machine/taitoio.h"
 #include "video/taitoic.h"
 #include "sound/2610intf.h"
-
-
-/***************************************************************************
-
-  Variable
-
-***************************************************************************/
-
-static UINT16 *taitoh_68000_mainram;
-
-VIDEO_UPDATE( syvalion );
-VIDEO_UPDATE( recordbr );
-VIDEO_UPDATE( dleague );
-
+#include "includes/taito_h.h"
 
 /***************************************************************************
 
@@ -169,9 +156,10 @@ VIDEO_UPDATE( dleague );
 ***************************************************************************/
 
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	taitoh_state *state = (taitoh_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -195,8 +183,8 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
-	UINT8	port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
+	taitoh_state *state = (taitoh_state *)space->machine->driver_data;
+	UINT8	port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 
 	switch( port )
 	{
@@ -237,21 +225,20 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 				return 0x00;
 
 		default:
-			return tc0220ioc_portreg_r(tc0220ioc, offset);
+			return tc0220ioc_portreg_r(state->tc0220ioc, offset);
 	}
 }
 
-
-static INT32 banknum;
-
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000);
+	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	banknum = (data - 1) & 3;
+	taitoh_state *state = (taitoh_state *)space->machine->driver_data;
+	state->banknum = data & 3;
 	reset_sound_region(space->machine);
 }
 
@@ -264,7 +251,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static ADDRESS_MAP_START( syvalion_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(&taitoh_68000_mainram)
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE_MEMBER(taitoh_state, m68000_mainram)
 	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
@@ -275,7 +262,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( recordbr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(&taitoh_68000_mainram)
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE_MEMBER(taitoh_state, m68000_mainram)
 	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
@@ -286,7 +273,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dleague_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(&taitoh_68000_mainram)
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE_MEMBER(taitoh_state, m68000_mainram)
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
@@ -531,12 +518,22 @@ static STATE_POSTLOAD( taitoh_postload )
 
 static MACHINE_RESET( taitoh )
 {
-	banknum = -1;
+	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	state->banknum = 0;
 }
 
 static MACHINE_START( taitoh )
 {
-	state_save_register_global(machine, banknum);
+	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
+	state->tc0080vco = devtag_get_device(machine, "tc0080vco");
+
+	state_save_register_global(machine, state->banknum);
 	state_save_register_postload(machine, taitoh_postload, NULL);
 }
 
@@ -567,6 +564,9 @@ static const tc0140syt_interface taitoh_tc0140syt_intf =
 };
 
 static MACHINE_DRIVER_START( syvalion )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoh_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
@@ -613,6 +613,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( recordbr )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoh_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(recordbr_map)
@@ -657,6 +660,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dleague )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoh_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
@@ -839,7 +845,7 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY  FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation", "Syvalion (Japan)", 0 )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)", 0 )
-GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation", "Go For The Gold (Japan)", 0 )
-GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation", "Dynamite League (Japan)", 0 )
+GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation",       "Syvalion (Japan)",        GAME_SUPPORTS_SAVE )
+GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)",   GAME_SUPPORTS_SAVE )
+GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation",       "Go For The Gold (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation",       "Dynamite League (Japan)", GAME_SUPPORTS_SAVE )

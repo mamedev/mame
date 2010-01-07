@@ -34,10 +34,9 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "sound/2203intf.h"
+#include "includes/taito_o.h"
 
-static const int clear_hack=1;
-
-VIDEO_UPDATE( parentj );
+static const int clear_hack = 1;
 
 static WRITE16_HANDLER(io_w)
 {
@@ -45,18 +44,19 @@ static WRITE16_HANDLER(io_w)
 	{
 		case 2: watchdog_reset(space->machine); break;
 
-		default: logerror("IO W %x %x %x\n",offset,data,mem_mask);
+		default: logerror("IO W %x %x %x\n", offset, data, mem_mask);
 	}
 }
 
 static READ16_HANDLER(io_r)
 {
-	int retval=0;
+	int retval = 0;
+
 	switch(offset)
 	{
-		case 0: retval=input_port_read(space->machine, "IN0")&(clear_hack?0xf7ff:0xffff);break;
-		case 1: retval=input_port_read(space->machine, "IN1")&(clear_hack?0xfff7:0xffff);break;
-		default: logerror("IO R %x %x = %x @ %x\n",offset,mem_mask,retval,cpu_get_pc(space->cpu));
+		case 0: retval = input_port_read(space->machine, "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
+		case 1: retval = input_port_read(space->machine, "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
+		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(space->cpu));
 	}
 	return retval;
 }
@@ -217,7 +217,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( parentj_interrupt )
 {
-	cpu_set_input_line(device, cpu_getiloops(device)?4:5 , HOLD_LINE);
+	cpu_set_input_line(device, cpu_getiloops(device) ? 4 : 5, HOLD_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -238,12 +238,23 @@ static const tc0080vco_interface parentj_intf =
 	0
 };
 
+static MACHINE_START( taitoo )
+{
+	taitoo_state *state = (taitoo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->tc0080vco = devtag_get_device(machine, "tc0080vco");
+}
+
 static MACHINE_DRIVER_START( parentj )
 
+	MDRV_DRIVER_DATA(taitoo_state)
 
 	MDRV_CPU_ADD("maincpu", M68000,12000000 )		/*?? MHz */
 	MDRV_CPU_PROGRAM_MAP(parentj_map)
 	MDRV_CPU_VBLANK_INT_HACK(parentj_interrupt,2)
+
+	MDRV_MACHINE_START(taitoo)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -288,4 +299,4 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj,  0,        parentj,  parentj,  0,		 ROT0,    "Taito", "Parent Jack", GAME_NOT_WORKING)
+GAME( 1989, parentj,  0,        parentj,  parentj,  0,        ROT0,    "Taito", "Parent Jack", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

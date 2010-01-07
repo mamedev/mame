@@ -355,7 +355,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
 
-	state->banknum = (data - 1) & 3;
+	state->banknum = data & 3;
 	reset_sound_region(space->machine);
 }
 
@@ -614,7 +614,7 @@ static MACHINE_START( taitoair )
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	int i;
 
-	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->dsp = devtag_get_device(machine, "dsp");
@@ -643,7 +643,7 @@ static MACHINE_RESET( taitoair )
 	int i;
 
 	state->dsp_hold_signal = ASSERT_LINE;
-	state->banknum = -1;
+	state->banknum = 0;
 	state->view.x1 = 0;
 	state->view.y1 = 0;
 	state->view.x2 = 0;

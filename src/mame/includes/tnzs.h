@@ -42,6 +42,8 @@ struct _tnzs_state
 	int      insertcoin;
 	UINT8    mcu_coinage[4];
 	UINT8    mcu_coins_a, mcu_coins_b, mcu_credits;
+	int      bank1;
+	int      bank2;
 
 	/* game-specific */
 	// champbwl
@@ -53,6 +55,7 @@ struct _tnzs_state
 
 	/* devices */
 	const device_config *audiocpu;
+	const device_config *subcpu;
 	const device_config *mcu;
 };
 

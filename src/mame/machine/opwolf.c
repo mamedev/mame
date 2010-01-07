@@ -36,7 +36,7 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "includes/cchip.h"
+#include "includes/opwolf.h"
 
 /* Select how coinage data is initialised in opwolf_cchip_data_w : 0 = user-defined in function - 1 = automatic */
 #define OPWOLF_READ_COINAGE_FROM_ROM	1
@@ -50,18 +50,6 @@ enum {
 	OPWOLF_REGION_OTHER
 };
 
-extern int opwolf_region;
-
-static UINT8 current_bank=0;
-static UINT8 current_cmd=0;
-static UINT8* cchip_ram=0;
-static UINT8 cchip_last_7a=0;
-static UINT8 cchip_last_04=0;
-static UINT8 cchip_last_05=0;
-static UINT8 cchip_coins_for_credit[2];
-static UINT8 cchip_credits_for_coin[2];
-static UINT8 cchip_coins[2];
-static UINT8 c588=0, c589=0, c58a=0; // These variables derived from the bootleg
 
 static const UINT16 level_data_00[0xcc] =
 {
@@ -287,104 +275,108 @@ static const UINT16 *const level_data_lookup[] =
 
 static TIMER_CALLBACK( opwolf_timer_callback )
 {
+	opwolf_state *state = (opwolf_state *)machine->driver_data;
+
 	// Level data command
-	if (current_cmd==0xf5)
+	if (state->current_cmd == 0xf5)
 	{
-		int level=cchip_ram[0x1b];
-		const UINT16* level_data=level_data_lookup[level];
-		int i=0;
-		for (i=0; i<0xcc; i++)
+		int level = state->cchip_ram[0x1b];
+		const UINT16* level_data = level_data_lookup[level];
+		int i = 0;
+		for (i = 0; i < 0xcc; i++)
 		{
-			cchip_ram[0x200 + i*2 + 0]=level_data[i]>>8;
-			cchip_ram[0x200 + i*2 + 1]=level_data[i]&0xff;
+			state->cchip_ram[0x200 + i*2 + 0] = level_data[i]>>8;
+			state->cchip_ram[0x200 + i*2 + 1] = level_data[i]&0xff;
 		}
 
 		// The bootleg cchip writes 0 to these locations - hard to tell what the real one writes
-		cchip_ram[0x0]=0;
-		cchip_ram[0x76]=0;
-		cchip_ram[0x75]=0;
-		cchip_ram[0x74]=0;
-		cchip_ram[0x72]=0;
-		cchip_ram[0x71]=0;
-		cchip_ram[0x70]=0;
-		cchip_ram[0x66]=0;
-		cchip_ram[0x2b]=0;
-		cchip_ram[0x30]=0;
-		cchip_ram[0x31]=0;
-		cchip_ram[0x32]=0;
-		cchip_ram[0x27]=0;
-		c588=0;
-		c589=0;
-		c58a=0;
+		state->cchip_ram[0x0] = 0;
+		state->cchip_ram[0x76] = 0;
+		state->cchip_ram[0x75] = 0;
+		state->cchip_ram[0x74] = 0;
+		state->cchip_ram[0x72] = 0;
+		state->cchip_ram[0x71] = 0;
+		state->cchip_ram[0x70] = 0;
+		state->cchip_ram[0x66] = 0;
+		state->cchip_ram[0x2b] = 0;
+		state->cchip_ram[0x30] = 0;
+		state->cchip_ram[0x31] = 0;
+		state->cchip_ram[0x32] = 0;
+		state->cchip_ram[0x27] = 0;
+		state->c588 = 0;
+		state->c589 = 0;
+		state->c58a = 0;
 
-		cchip_ram[0x1a]=0;
-		cchip_ram[0x7a]=1; // Signal command complete
+		state->cchip_ram[0x1a] = 0;
+		state->cchip_ram[0x7a] = 1; // Signal command complete
 	}
 
-	current_cmd=0;
+	state->current_cmd = 0;
 }
 
-static void updateDifficulty(int mode)
+static void updateDifficulty( running_machine *machine, int mode )
 {
+	opwolf_state *state = (opwolf_state *)machine->driver_data;
+
 	// The game is made up of 6 rounds, when you complete the
 	// sixth you return to the start but with harder difficulty.
-	if (mode==0)
+	if (mode == 0)
 	{
-		switch (cchip_ram[0x15]&3) // Dipswitch B
+		switch (state->cchip_ram[0x15]&3) // Dipswitch B
 		{
 		case 3:
-			cchip_ram[0x2c]=0x31;
-			cchip_ram[0x77]=0x05;
-			cchip_ram[0x25]=0x0f;
-			cchip_ram[0x26]=0x0b;
+			state->cchip_ram[0x2c] = 0x31;
+			state->cchip_ram[0x77] = 0x05;
+			state->cchip_ram[0x25] = 0x0f;
+			state->cchip_ram[0x26] = 0x0b;
 			break;
 		case 0:
-			cchip_ram[0x2c]=0x20;
-			cchip_ram[0x77]=0x06;
-			cchip_ram[0x25]=0x07;
-			cchip_ram[0x26]=0x03;
+			state->cchip_ram[0x2c] = 0x20;
+			state->cchip_ram[0x77] = 0x06;
+			state->cchip_ram[0x25] = 0x07;
+			state->cchip_ram[0x26] = 0x03;
 			break;
 		case 1:
-			cchip_ram[0x2c]=0x31;
-			cchip_ram[0x77]=0x05;
-			cchip_ram[0x25]=0x0f;
-			cchip_ram[0x26]=0x0b;
+			state->cchip_ram[0x2c] = 0x31;
+			state->cchip_ram[0x77] = 0x05;
+			state->cchip_ram[0x25] = 0x0f;
+			state->cchip_ram[0x26] = 0x0b;
 			break;
 		case 2:
-			cchip_ram[0x2c]=0x3c;
-			cchip_ram[0x77]=0x04;
-			cchip_ram[0x25]=0x13;
-			cchip_ram[0x26]=0x0f;
+			state->cchip_ram[0x2c] = 0x3c;
+			state->cchip_ram[0x77] = 0x04;
+			state->cchip_ram[0x25] = 0x13;
+			state->cchip_ram[0x26] = 0x0f;
 			break;
 		}
 	}
 	else
 	{
-		switch (cchip_ram[0x15]&3) // Dipswitch B
+		switch (state->cchip_ram[0x15]&3) // Dipswitch B
 		{
 		case 3:
-			cchip_ram[0x2c]=0x46;
-			cchip_ram[0x77]=0x05;
-			cchip_ram[0x25]=0x11;
-			cchip_ram[0x26]=0x0e;
+			state->cchip_ram[0x2c] = 0x46;
+			state->cchip_ram[0x77] = 0x05;
+			state->cchip_ram[0x25] = 0x11;
+			state->cchip_ram[0x26] = 0x0e;
 			break;
 		case 0:
-			cchip_ram[0x2c]=0x30;
-			cchip_ram[0x77]=0x06;
-			cchip_ram[0x25]=0x0b;
-			cchip_ram[0x26]=0x03;
+			state->cchip_ram[0x2c] = 0x30;
+			state->cchip_ram[0x77] = 0x06;
+			state->cchip_ram[0x25] = 0x0b;
+			state->cchip_ram[0x26] = 0x03;
 			break;
 		case 1:
-			cchip_ram[0x2c]=0x3a;
-			cchip_ram[0x77]=0x05;
-			cchip_ram[0x25]=0x0f;
-			cchip_ram[0x26]=0x09;
+			state->cchip_ram[0x2c] = 0x3a;
+			state->cchip_ram[0x77] = 0x05;
+			state->cchip_ram[0x25] = 0x0f;
+			state->cchip_ram[0x26] = 0x09;
 			break;
 		case 2:
-			cchip_ram[0x2c]=0x4c;
-			cchip_ram[0x77]=0x04;
-			cchip_ram[0x25]=0x19;
-			cchip_ram[0x26]=0x11;
+			state->cchip_ram[0x2c] = 0x4c;
+			state->cchip_ram[0x77] = 0x04;
+			state->cchip_ram[0x25] = 0x19;
+			state->cchip_ram[0x26] = 0x11;
 			break;
 		};
 	}
@@ -402,42 +394,46 @@ WRITE16_HANDLER( opwolf_cchip_status_w )
 	// We use it to setup some initial state (it's not clear if the real
 	// c-chip sets this here, or if it's as a side-effect of the other
 	// init sequence data).
+	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
 
-	cchip_ram[0x3d]=1;
-	cchip_ram[0x7a]=1;
-	updateDifficulty(0);
+	state->cchip_ram[0x3d] = 1;
+	state->cchip_ram[0x7a] = 1;
+	updateDifficulty(space->machine, 0);
 }
 
 WRITE16_HANDLER( opwolf_cchip_bank_w )
 {
-	current_bank=data&7;
+	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( opwolf_cchip_data_w )
 {
-	cchip_ram[(current_bank * 0x400) + offset]=data&0xff;
+	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
 
-//  if (offset!=0x64 && offset!=0x65 && offset!=0x66 && offset!=0x67 && offset!=0x68 && offset!=0x69)
-//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(space->cpu), offset,data);
+	state->cchip_ram[(state->current_bank * 0x400) + offset] = data & 0xff;
 
-	if (current_bank == 0)
+//  if (offset != 0x64 && offset != 0x65 && offset != 0x66 && offset != 0x67 && offset != 0x68 && offset != 0x69)
+//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(space->cpu), offset, data);
+
+	if (state->current_bank == 0)
 	{
 		// Dip switch A is written here by the 68k - precalculate the coinage values
 		// Shouldn't we directly read the values from the ROM area ?
 		if (offset == 0x14)
 		{
 #if OPWOLF_READ_COINAGE_FROM_ROM
-			UINT16* rom=(UINT16*)memory_region(space->machine, "maincpu");
-			UINT32 coin_table[2]={0,0};
+			UINT16* rom = (UINT16*)memory_region(space->machine, "maincpu");
+			UINT32 coin_table[2] = {0, 0};
 			UINT8 coin_offset[2];
 			int slot;
 
-			if ((opwolf_region == OPWOLF_REGION_JAPAN) || (opwolf_region == OPWOLF_REGION_US))
+			if ((state->opwolf_region == OPWOLF_REGION_JAPAN) || (state->opwolf_region == OPWOLF_REGION_US))
 			{
 				coin_table[0] = 0x03ffce;
 				coin_table[1] = 0x03ffce;
 			}
-			if ((opwolf_region == OPWOLF_REGION_WORLD) || (opwolf_region == OPWOLF_REGION_OTHER))
+			if ((state->opwolf_region == OPWOLF_REGION_WORLD) || (state->opwolf_region == OPWOLF_REGION_OTHER))
 			{
 				coin_table[0] = 0x03ffde;
 				coin_table[1] = 0x03ffee;
@@ -445,30 +441,30 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 			coin_offset[0] = 12 - (4 * ((data & 0x30) >> 4));
 			coin_offset[1] = 12 - (4 * ((data & 0xc0) >> 6));
 
-			for (slot=0; slot<2; slot++)
+			for (slot = 0; slot < 2; slot++)
 			{
 				if (coin_table[slot])
 				{
-					cchip_coins_for_credit[slot] = rom[(coin_table[slot] + coin_offset[slot] + 0) / 2] & 0xff;
-					cchip_credits_for_coin[slot] = rom[(coin_table[slot] + coin_offset[slot] + 2) / 2] & 0xff;
+					state->cchip_coins_for_credit[slot] = rom[(coin_table[slot] + coin_offset[slot] + 0) / 2] & 0xff;
+					state->cchip_credits_for_coin[slot] = rom[(coin_table[slot] + coin_offset[slot] + 2) / 2] & 0xff;
 				}
 			}
 #else
-			if ((opwolf_region == OPWOLF_REGION_JAPAN) || (opwolf_region == OPWOLF_REGION_US))
+			if ((state->opwolf_region == OPWOLF_REGION_JAPAN) || (state->opwolf_region == OPWOLF_REGION_US))
 			{
 				switch (data&0x30)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: cchip_coins_for_credit[0]=2; cchip_credits_for_coin[0]=3; break;
-					case 0x10: cchip_coins_for_credit[0]=2; cchip_credits_for_coin[0]=1; break;
-					case 0x20: cchip_coins_for_credit[0]=1; cchip_credits_for_coin[0]=2; break;
-					case 0x30: cchip_coins_for_credit[0]=1; cchip_credits_for_coin[0]=1; break;
+					case 0x00: state->cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 3; break;
+					case 0x10: state->cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
+					case 0x20: state->cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 2; break;
+					case 0x30: state->cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
 				}
 				switch (data&0xc0)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: cchip_coins_for_credit[1]=2; cchip_credits_for_coin[1]=3; break;
-					case 0x40: cchip_coins_for_credit[1]=2; cchip_credits_for_coin[1]=1; break;
-					case 0x80: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=2; break;
-					case 0xc0: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=1; break;
+					case 0x00: state->cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 3; break;
+					case 0x40: state->cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 1; break;
+					case 0x80: state->cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
+					case 0xc0: state->cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 1; break;
 				}
 			}
 
@@ -476,17 +472,17 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 			{
 				switch (data&0x30)	/* table at 0x03ffde.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: cchip_coins_for_credit[0]=4; cchip_credits_for_coin[0]=1; break;
-					case 0x10: cchip_coins_for_credit[0]=3; cchip_credits_for_coin[0]=1; break;
-					case 0x20: cchip_coins_for_credit[0]=2; cchip_credits_for_coin[0]=1; break;
-					case 0x30: cchip_coins_for_credit[0]=1; cchip_credits_for_coin[0]=1; break;
+					case 0x00: state->cchip_coins_for_credit[0] = 4; cchip_credits_for_coin[0] = 1; break;
+					case 0x10: state->cchip_coins_for_credit[0] = 3; cchip_credits_for_coin[0] = 1; break;
+					case 0x20: state->cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
+					case 0x30: state->cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
 				}
-				switch (data&0xc0)	/* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
+				switch (data & 0xc0)	/* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=6; break;
-					case 0x40: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=4; break;
-					case 0x80: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=3; break;
-					case 0xc0: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=2; break;
+					case 0x00: state->cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 6; break;
+					case 0x40: state->cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 4; break;
+					case 0x80: state->cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 3; break;
+					case 0xc0: state->cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
 				}
 			}
 #endif
@@ -495,7 +491,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 		// Dip switch B
 		if (offset == 0x15)
 		{
-			updateDifficulty(0);
+			updateDifficulty(space->machine, 0);
 		}
 	}
 }
@@ -518,10 +514,12 @@ READ16_HANDLER( opwolf_cchip_status_r )
 
 READ16_HANDLER( opwolf_cchip_data_r )
 {
-//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(space->cpu)!=0xc18 && cpu_get_pc(space->cpu)!=0xc2e && cpu_get_pc(space->cpu)!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
-//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, current_bank);
+	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
 
-	return cchip_ram[(current_bank * 0x400) + offset];
+//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(space->cpu)!=0xc18 && cpu_get_pc(space->cpu)!=0xc2e && cpu_get_pc(space->cpu)!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
+//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, state->current_bank);
+
+	return state->cchip_ram[(state->current_bank * 0x400) + offset];
 }
 
 /*************************************
@@ -532,184 +530,186 @@ READ16_HANDLER( opwolf_cchip_data_r )
 
 static TIMER_CALLBACK( cchip_timer )
 {
+	opwolf_state *state = (opwolf_state *)machine->driver_data;
+
 	// Update input ports, these are used by both the 68k directly and by the c-chip
-	cchip_ram[0x4]=input_port_read(machine, "IN0");
-	cchip_ram[0x5]=input_port_read(machine, "IN1");
+	state->cchip_ram[0x4] = input_port_read(machine, "IN0");
+	state->cchip_ram[0x5] = input_port_read(machine, "IN1");
 
 	// Coin slots
-	if (cchip_ram[0x4]!=cchip_last_04)
+	if (state->cchip_ram[0x4] != state->cchip_last_04)
 	{
-		int slot=-1;
+		int slot = -1;
 
-		if (cchip_ram[0x4]&1) slot=0;
-		if (cchip_ram[0x4]&2) slot=1;
+		if (state->cchip_ram[0x4] & 1) slot = 0;
+		if (state->cchip_ram[0x4] & 2) slot = 1;
 
 		if (slot != -1)
 		{
-			cchip_coins[slot]++;
-			if (cchip_coins[slot] >= cchip_coins_for_credit[slot])
+			state->cchip_coins[slot]++;
+			if (state->cchip_coins[slot] >= state->cchip_coins_for_credit[slot])
 			{
-				cchip_ram[0x53]+=cchip_credits_for_coin[slot];
-				cchip_ram[0x51]=0x55;
-				cchip_ram[0x52]=0x55;
-				cchip_coins[slot]-=cchip_coins_for_credit[slot];
+				state->cchip_ram[0x53] += state->cchip_credits_for_coin[slot];
+				state->cchip_ram[0x51] = 0x55;
+				state->cchip_ram[0x52] = 0x55;
+				state->cchip_coins[slot] -= state->cchip_coins_for_credit[slot];
 			}
 			coin_counter_w(machine, slot, 1);
 		}
 
-		if (cchip_ram[0x53]>9)
-			cchip_ram[0x53]=9;
+		if (state->cchip_ram[0x53] > 9)
+			state->cchip_ram[0x53] = 9;
 	}
-	cchip_last_04=cchip_ram[0x4];
+	state->cchip_last_04 = state->cchip_ram[0x4];
 
 	// Service switch
-	if (cchip_ram[0x5]!=cchip_last_05)
+	if (state->cchip_ram[0x5] != state->cchip_last_05)
 	{
-		if ((cchip_ram[0x5]&4)==0)
+		if ((state->cchip_ram[0x5] & 4)==0)
 		{
-			cchip_ram[0x53]++;
-			cchip_ram[0x51]=0x55;
-			cchip_ram[0x52]=0x55;
+			state->cchip_ram[0x53]++;
+			state->cchip_ram[0x51] = 0x55;
+			state->cchip_ram[0x52] = 0x55;
 		}
 	}
-	cchip_last_05=cchip_ram[0x5];
+	state->cchip_last_05=state->cchip_ram[0x5];
 
 	// Cchip handles coin lockout (68k flags error if more than 9 coins)
-	coin_lockout_w(machine, 1, cchip_ram[0x53]==9);
-	coin_lockout_w(machine, 0, cchip_ram[0x53]==9);
+	coin_lockout_w(machine, 1, state->cchip_ram[0x53] == 9);
+	coin_lockout_w(machine, 0, state->cchip_ram[0x53] == 9);
 	coin_counter_w(machine, 0, 0);
 	coin_counter_w(machine, 1, 0);
 
 	// Special handling for last level
-	if (cchip_ram[0x1b]==0x6)
+	if (state->cchip_ram[0x1b] == 0x6)
 	{
 		// Check for triggering final helicopter (end boss)
-		if (c58a==0)
+		if (state->c58a == 0)
 		{
-			if ((cchip_ram[0x72]&0x7f) >= 8 && cchip_ram[0x74]==0 && cchip_ram[0x1c]==0 && cchip_ram[0x1d]==0 && cchip_ram[0x1f]==0)
+			if ((state->cchip_ram[0x72] & 0x7f) >= 8 && state->cchip_ram[0x74] == 0 && state->cchip_ram[0x1c] == 0 && state->cchip_ram[0x1d] == 0 && state->cchip_ram[0x1f] == 0)
 			{
-				cchip_ram[0x30]=1;
-				cchip_ram[0x74]=1;
-				c58a=1;
+				state->cchip_ram[0x30] = 1;
+				state->cchip_ram[0x74] = 1;
+				state->c58a = 1;
 			}
 		}
 
-		if (cchip_ram[0x1a]==0x90)
-			cchip_ram[0x74]=0;
+		if (state->cchip_ram[0x1a] == 0x90)
+			state->cchip_ram[0x74] = 0;
 
-		if (c58a!=0)
+		if (state->c58a != 0)
 		{
-			if (c589==0 && cchip_ram[0x27]==0 && cchip_ram[0x75]==0 && cchip_ram[0x1c]==0 && cchip_ram[0x1d]==0 && cchip_ram[0x1e]==0 && cchip_ram[0x1f]==0)
+			if (state->c589 == 0 && state->cchip_ram[0x27] == 0 && state->cchip_ram[0x75] == 0 && state->cchip_ram[0x1c] == 0 && state->cchip_ram[0x1d] == 0 && state->cchip_ram[0x1e] == 0 && state->cchip_ram[0x1f] == 0)
 			{
-				cchip_ram[0x31]=1;
-				cchip_ram[0x75]=1;
-				c589=1;
+				state->cchip_ram[0x31] = 1;
+				state->cchip_ram[0x75] = 1;
+				state->c589 = 1;
 			}
 		}
 
-		if (cchip_ram[0x2b]==0x1)
+		if (state->cchip_ram[0x2b] == 0x1)
 		{
-			cchip_ram[0x2b]=0;
+			state->cchip_ram[0x2b] = 0;
 
-			if (cchip_ram[0x30]==0x1)
+			if (state->cchip_ram[0x30] == 0x1)
 			{
-				if (cchip_ram[0x1a]!=0x90)
-					cchip_ram[0x1a]--;
+				if (state->cchip_ram[0x1a] != 0x90)
+					state->cchip_ram[0x1a]--;
 			}
 
-			if (cchip_ram[0x72]==0x9)
+			if (state->cchip_ram[0x72] == 0x9)
 			{
-				if (cchip_ram[0x76]!=0x4)
+				if (state->cchip_ram[0x76] != 0x4)
 				{
-					cchip_ram[0x76]=3;
+					state->cchip_ram[0x76] = 3;
 				}
 			}
 			else
 			{
 				// This timer is derived from the bootleg rather than the real board, I'm not 100% sure about it
-				c588|=0x80;
+				state->c588 |= 0x80;
 
-				cchip_ram[0x72]=c588;
-				c588++;
+				state->cchip_ram[0x72] = state->c588;
+				state->c588++;
 
-				cchip_ram[0x1a]--;
-				cchip_ram[0x1a]--;
-				cchip_ram[0x1a]--;
+				state->cchip_ram[0x1a]--;
+				state->cchip_ram[0x1a]--;
+				state->cchip_ram[0x1a]--;
 			}
 		}
 
 		// Update difficulty settings
-		if (cchip_ram[0x76]==0)
+		if (state->cchip_ram[0x76] == 0)
 		{
-			cchip_ram[0x76]=1;
-			updateDifficulty(1);
+			state->cchip_ram[0x76] = 1;
+			updateDifficulty(machine, 1);
 		}
 	}
 
 	// These variables are cleared every frame during attract mode and the intro.
-	if (cchip_ram[0x34] < 2)
+	if (state->cchip_ram[0x34] < 2)
 	{
-		updateDifficulty(0);
-		cchip_ram[0x76]=0;
-		cchip_ram[0x75]=0;
-		cchip_ram[0x74]=0;
-		cchip_ram[0x72]=0;
-		cchip_ram[0x71]=0;
-		cchip_ram[0x70]=0;
-		cchip_ram[0x66]=0;
-		cchip_ram[0x2b]=0;
-		cchip_ram[0x30]=0;
-		cchip_ram[0x31]=0;
-		cchip_ram[0x32]=0;
-		cchip_ram[0x27]=0;
-		c588=0;
-		c589=0;
-		c58a=0;
+		updateDifficulty(machine, 0);
+		state->cchip_ram[0x76] = 0;
+		state->cchip_ram[0x75] = 0;
+		state->cchip_ram[0x74] = 0;
+		state->cchip_ram[0x72] = 0;
+		state->cchip_ram[0x71] = 0;
+		state->cchip_ram[0x70] = 0;
+		state->cchip_ram[0x66] = 0;
+		state->cchip_ram[0x2b] = 0;
+		state->cchip_ram[0x30] = 0;
+		state->cchip_ram[0x31] = 0;
+		state->cchip_ram[0x32] = 0;
+		state->cchip_ram[0x27] = 0;
+		state->c588 = 0;
+		state->c589 = 0;
+		state->c58a = 0;
 	}
 
 	// Check for level completion (all enemies destroyed)
-	if (cchip_ram[0x1c] == 0 && cchip_ram[0x1d] == 0 && cchip_ram[0x1e] == 0 && cchip_ram[0x1f] == 0 && cchip_ram[0x20] == 0)
+	if (state->cchip_ram[0x1c] == 0 && state->cchip_ram[0x1d] == 0 && state->cchip_ram[0x1e] == 0 && state->cchip_ram[0x1f] == 0 && state->cchip_ram[0x20] == 0)
 	{
 		// Special handling for end of level 6
-		if (cchip_ram[0x1b]==0x6)
+		if (state->cchip_ram[0x1b] == 0x6)
 		{
 			// Don't signal end of level until final boss is destroyed
-			if (cchip_ram[0x27]==0x1)
-				cchip_ram[0x32]=1;
+			if (state->cchip_ram[0x27] == 0x1)
+				state->cchip_ram[0x32] = 1;
 		}
 		else
 		{
 			// Signal end of level
-			cchip_ram[0x32]=1;
+			state->cchip_ram[0x32] = 1;
 		}
 	}
 
-	if (cchip_ram[0xe] == 1)
+	if (state->cchip_ram[0xe] == 1)
 	{
-		cchip_ram[0xe]=0xfd;
-		cchip_ram[0x61]=0x04;
+		state->cchip_ram[0xe] = 0xfd;
+		state->cchip_ram[0x61] = 0x04;
 	}
 
 	// Access level data command (address 0xf5 goes from 1 -> 0)
-	if (cchip_ram[0x7a]==0 && cchip_last_7a!=0 && current_cmd!=0xf5)
+	if (state->cchip_ram[0x7a] == 0 && state->cchip_last_7a != 0 && state->current_cmd != 0xf5)
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
-		current_cmd=0xf5;
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 80000), NULL, 0, opwolf_timer_callback);
+		state->current_cmd = 0xf5;
+		timer_set(machine, cpu_clocks_to_attotime(state->maincpu, 80000), NULL, 0, opwolf_timer_callback);
 	}
-	cchip_last_7a=cchip_ram[0x7a];
+	state->cchip_last_7a = state->cchip_ram[0x7a];
 
 	// This seems to some kind of periodic counter - results are expected
 	// by the 68k when the counter reaches 0xa
-	if (cchip_ram[0x7f]==0xa)
+	if (state->cchip_ram[0x7f] == 0xa)
 	{
-		cchip_ram[0xfe]=0xf7;
-		cchip_ram[0xff]=0x6e;
+		state->cchip_ram[0xfe] = 0xf7;
+		state->cchip_ram[0xff] = 0x6e;
 	}
 
 	// These are set every frame
-	cchip_ram[0x64]=0;
-	cchip_ram[0x66]=0;
+	state->cchip_ram[0x64] = 0;
+	state->cchip_ram[0x66] = 0;
 }
 
 /*************************************
@@ -718,40 +718,39 @@ static TIMER_CALLBACK( cchip_timer )
  *
  *************************************/
 
-void opwolf_cchip_init(running_machine *machine)
+void opwolf_cchip_init( running_machine *machine )
 {
-	cchip_ram=auto_alloc_array(machine, UINT8, 0x400 * 8);
+	opwolf_state *state = (opwolf_state *)machine->driver_data;
 
-	state_save_register_global(machine, current_bank);
-	state_save_register_global(machine, current_cmd);
-	state_save_register_global(machine, cchip_last_7a);
-	state_save_register_global(machine, cchip_last_04);
-	state_save_register_global(machine, cchip_last_05);
-	state_save_register_global(machine, c588);
-	state_save_register_global(machine, c589);
-	state_save_register_global(machine, c58a);
-	state_save_register_global(machine, cchip_coins[0]);
-	state_save_register_global(machine, cchip_coins[1]);
-	state_save_register_global(machine, cchip_coins_for_credit[0]);
-	state_save_register_global(machine, cchip_credits_for_coin[0]);
-	state_save_register_global(machine, cchip_coins_for_credit[1]);
-	state_save_register_global(machine, cchip_credits_for_coin[1]);
-	state_save_register_global_pointer(machine, cchip_ram, 0x400 * 8);
+	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
 
-	current_bank=0;
-	current_cmd=0;
-	cchip_last_7a=0;
-	cchip_last_04=0xfc;
-	cchip_last_05=0xff;
-	c588=0;
-	c589=0;
-	c58a=0;
-	cchip_coins[0]=0;
-	cchip_coins[1]=0;
-	cchip_coins_for_credit[0]=1;
-	cchip_credits_for_coin[0]=1;
-	cchip_coins_for_credit[1]=1;
-	cchip_credits_for_coin[1]=1;
+	state_save_register_global(machine, state->current_bank);
+	state_save_register_global(machine, state->current_cmd);
+	state_save_register_global(machine, state->cchip_last_7a);
+	state_save_register_global(machine, state->cchip_last_04);
+	state_save_register_global(machine, state->cchip_last_05);
+	state_save_register_global(machine, state->c588);
+	state_save_register_global(machine, state->c589);
+	state_save_register_global(machine, state->c58a);
+	state_save_register_global_array(machine, state->cchip_coins);
+	state_save_register_global_array(machine, state->cchip_coins_for_credit);
+	state_save_register_global_array(machine, state->cchip_credits_for_coin);
+	state_save_register_global_pointer(machine, state->cchip_ram, 0x400 * 8);
+
+	state->current_bank = 0;
+	state->current_cmd = 0;
+	state->cchip_last_7a = 0;
+	state->cchip_last_04 = 0xfc;
+	state->cchip_last_05 = 0xff;
+	state->c588 = 0;
+	state->c589 = 0;
+	state->c58a = 0;
+	state->cchip_coins[0] = 0;
+	state->cchip_coins[1] = 0;
+	state->cchip_coins_for_credit[0] = 1;
+	state->cchip_credits_for_coin[0] = 1;
+	state->cchip_coins_for_credit[1] = 1;
+	state->cchip_credits_for_coin[1] = 1;
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
 }

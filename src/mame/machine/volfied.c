@@ -15,13 +15,7 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "includes/cchip.h"
-
-static UINT8 current_bank = 0;
-static UINT8 current_flag = 0;
-static UINT8 cc_port = 0;
-static UINT8 current_cmd=0;
-static UINT8* cchip_ram=0;
+#include "includes/volfied.h"
 
 static const UINT16 palette_data_01[0x50] =
 {
@@ -286,44 +280,46 @@ static const UINT16 *const palette_data_lookup[] =
 
 static TIMER_CALLBACK( volfied_timer_callback )
 {
+	volfied_state *state = (volfied_state *)machine->driver_data;
+
 	// Palette commands - palette data written to bank 0: $10 - $af
-	if (current_cmd>=0x1 && current_cmd<0x12)
+	if (state->current_cmd >= 0x1 && state->current_cmd < 0x12)
 	{
-		const UINT16* palette_data=palette_data_lookup[current_cmd];
-		int i=0;
-		for (i=0; i<0x50; i++)
+		const UINT16* palette_data = palette_data_lookup[state->current_cmd];
+		int i;
+		for (i = 0; i < 0x50; i++)
 		{
-			cchip_ram[0x10 + i*2 + 0]=palette_data[i]>>8;
-			cchip_ram[0x10 + i*2 + 1]=palette_data[i]&0xff;
+			state->cchip_ram[0x10 + i * 2 + 0] = palette_data[i] >> 8;
+			state->cchip_ram[0x10 + i * 2 + 1] = palette_data[i] & 0xff;
 		}
 	}
 
 	// Unknown command - result written to bank 0: $23
-	if (current_cmd>=0x81 && current_cmd<0x92)
+	if (state->current_cmd >= 0x81 && state->current_cmd < 0x92)
 	{
-		switch (current_cmd)
+		switch (state->current_cmd)
 		{
-		case 0x81: cchip_ram[0x23]=0xf; break;
-		case 0x82: cchip_ram[0x23]=0x1; break;
-		case 0x83: cchip_ram[0x23]=0x6; break;
-		case 0x84: cchip_ram[0x23]=0xf; break;
-		case 0x85: cchip_ram[0x23]=0x9; break;
-		case 0x86: cchip_ram[0x23]=0x6; break;
-		case 0x87: cchip_ram[0x23]=0x6; break;
-		case 0x88: cchip_ram[0x23]=0xf; break;
-		case 0x89: cchip_ram[0x23]=0x8; break;
-		case 0x8a: cchip_ram[0x23]=0x1; break;
-		case 0x8b: cchip_ram[0x23]=0xa; break;
-		case 0x8c: cchip_ram[0x23]=0x1; break;
-		case 0x8d: cchip_ram[0x23]=0x1; break;
-		case 0x8e: cchip_ram[0x23]=0x8; break;
-		case 0x8f: cchip_ram[0x23]=0x6; break;
-		case 0x90: cchip_ram[0x23]=0xa; break;
-		case 0x91: cchip_ram[0x23]=0x0; break;
+		case 0x81: state->cchip_ram[0x23] = 0xf; break;
+		case 0x82: state->cchip_ram[0x23] = 0x1; break;
+		case 0x83: state->cchip_ram[0x23] = 0x6; break;
+		case 0x84: state->cchip_ram[0x23] = 0xf; break;
+		case 0x85: state->cchip_ram[0x23] = 0x9; break;
+		case 0x86: state->cchip_ram[0x23] = 0x6; break;
+		case 0x87: state->cchip_ram[0x23] = 0x6; break;
+		case 0x88: state->cchip_ram[0x23] = 0xf; break;
+		case 0x89: state->cchip_ram[0x23] = 0x8; break;
+		case 0x8a: state->cchip_ram[0x23] = 0x1; break;
+		case 0x8b: state->cchip_ram[0x23] = 0xa; break;
+		case 0x8c: state->cchip_ram[0x23] = 0x1; break;
+		case 0x8d: state->cchip_ram[0x23] = 0x1; break;
+		case 0x8e: state->cchip_ram[0x23] = 0x8; break;
+		case 0x8f: state->cchip_ram[0x23] = 0x6; break;
+		case 0x90: state->cchip_ram[0x23] = 0xa; break;
+		case 0x91: state->cchip_ram[0x23] = 0x0; break;
 		}
 	}
 
-	current_cmd=0;
+	state->current_cmd = 0;
 }
 
 /*************************************
@@ -339,21 +335,24 @@ WRITE16_HANDLER( volfied_cchip_ctrl_w )
 
 WRITE16_HANDLER( volfied_cchip_bank_w )
 {
-	current_bank = data & 7;
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( volfied_cchip_ram_w )
 {
-	cchip_ram[(current_bank * 0x400) + offset]=data;
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
 
-//  if (offset!=0x8)
-//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(space->cpu), offset,data);
+	state->cchip_ram[(state->current_bank * 0x400) + offset] = data;
 
-	if (current_bank == 0)
+//  if (offset != 0x8)
+//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(space->cpu), offset, data);
+
+	if (state->current_bank == 0)
 	{
 		if (offset == 0x008)
 		{
-			cc_port = data;
+			state->cc_port = data;
 
 			coin_lockout_w(space->machine, 1, data & 0x80);
 			coin_lockout_w(space->machine, 0, data & 0x40);
@@ -388,29 +387,29 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 
             ********************/
 
-			current_cmd = data;
+			state->current_cmd = data;
 
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
-			if (current_cmd >= 0x1 && current_cmd < 0x12)
+			if (state->current_cmd >= 0x1 && state->current_cmd < 0x12)
 			{
-				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,122242), NULL, 0, volfied_timer_callback);
+				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 122242), NULL, 0, volfied_timer_callback);
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
-			else if (current_cmd >= 0x81 && current_cmd < 0x92)
+			else if (state->current_cmd >= 0x81 && state->current_cmd < 0x92)
 			{
-				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,105500), NULL, 0, volfied_timer_callback);
+				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 105500), NULL, 0, volfied_timer_callback);
 			}
 			else
 			{
 				logerror("unknown cchip cmd %02x\n", data);
-				current_cmd=0;
+				state->current_cmd = 0;
 			}
 		}
 
 		// Some kind of timer command
 		if (offset == 0x3ff)
 		{
-			current_flag = data;
+			state->current_flag = data;
 		}
 	}
 }
@@ -433,8 +432,10 @@ READ16_HANDLER( volfied_cchip_ctrl_r )
 
 READ16_HANDLER( volfied_cchip_ram_r )
 {
+	volfied_state *state = (volfied_state *)space->machine->driver_data;
+
 	/* Check for input ports */
-	if (current_bank == 0)
+	if (state->current_bank == 0)
 	{
 		switch (offset)
 		{
@@ -442,7 +443,7 @@ READ16_HANDLER( volfied_cchip_ram_r )
 		case 0x04: return input_port_read(space->machine, "F00009");    /* COINn */
 		case 0x05: return input_port_read(space->machine, "F0000B");    /* Player controls + TILT */
 		case 0x06: return input_port_read(space->machine, "F0000D");    /* Player controls (cocktail) */
-		case 0x08: return cc_port;
+		case 0x08: return state->cc_port;
 		}
 	}
 
@@ -450,7 +451,7 @@ READ16_HANDLER( volfied_cchip_ram_r )
 //      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, current_bank);
 
 	/* Unknown */
-	if (current_bank == 2 && offset == 0x005)
+	if (state->current_bank == 2 && offset == 0x005)
 	{
 		/* Not fully understood - Game writes:
             0001a0c2:  volfied c write 0005 00aa
@@ -463,18 +464,18 @@ READ16_HANDLER( volfied_cchip_ram_r )
 	}
 
 	/* Unknown - some kind of timer */
-	if (current_bank == 0 && offset == 0x3ff)
+	if (state->current_bank == 0 && offset == 0x3ff)
 	{
-		return 2 * current_flag;    /* fixes freeze after shield runs out */
+		return 2 * state->current_flag;    /* fixes freeze after shield runs out */
 	}
 
 	/* Current command status */
-	if (current_bank == 0 && offset == 0x3fe)
+	if (state->current_bank == 0 && offset == 0x3fe)
 	{
-		return current_cmd;
+		return state->current_cmd;
 	}
 
-	return cchip_ram[(current_bank * 0x400) + offset];
+	return state->cchip_ram[(state->current_bank * 0x400) + offset];
 }
 
 
@@ -484,13 +485,25 @@ READ16_HANDLER( volfied_cchip_ram_r )
  *
  *************************************/
 
-void volfied_cchip_init(running_machine *machine)
+void volfied_cchip_init( running_machine *machine )
 {
-	cchip_ram=auto_alloc_array(machine, UINT8, 0x400 * 8);
+	volfied_state *state = (volfied_state *)machine->driver_data;
 
-	state_save_register_global(machine, current_bank);
-	state_save_register_global(machine, current_cmd);
-	state_save_register_global(machine, current_flag);
-	state_save_register_global(machine, cc_port);
-	state_save_register_global_pointer(machine, cchip_ram, 0x400 * 8);
+	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
+
+	state_save_register_global(machine, state->current_bank);
+	state_save_register_global(machine, state->current_cmd);
+	state_save_register_global(machine, state->current_flag);
+	state_save_register_global(machine, state->cc_port);
+	state_save_register_global_pointer(machine, state->cchip_ram, 0x400 * 8);
+}
+
+void volfied_cchip_reset( running_machine *machine )
+{
+	volfied_state *state = (volfied_state *)machine->driver_data;
+
+	state->current_bank = 0;
+	state->current_flag = 0;
+	state->cc_port = 0;
+	state->current_cmd = 0;
 }

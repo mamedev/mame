@@ -44,8 +44,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK		(XTAL_32MHz / 4)		/* 8 MHz clock for 68000 */
-#define SOUND_CPU_CLOCK		(XTAL_32MHz / 8)		/* 4 MHz clock for Z80 sound CPU */
+#define CPU_CLOCK           (XTAL_32MHz / 4)		/* 8 MHz clock for 68000 */
+#define SOUND_CPU_CLOCK     (XTAL_32MHz / 8)		/* 4 MHz clock for Z80 sound CPU */
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -54,18 +54,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
-#include "includes/cchip.h"
+#include "includes/volfied.h"
 
-WRITE16_HANDLER( volfied_sprite_ctrl_w );
-WRITE16_HANDLER( volfied_video_ram_w );
-WRITE16_HANDLER( volfied_video_ctrl_w );
-WRITE16_HANDLER( volfied_video_mask_w );
-
-READ16_HANDLER( volfied_video_ram_r );
-READ16_HANDLER( volfied_video_ctrl_r );
-
-VIDEO_UPDATE( volfied );
-VIDEO_START( volfied );
 
 /***********************************************************
                 MEMORY STRUCTURES
@@ -217,9 +207,10 @@ GFXDECODE_END
 
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	volfied_state *state = (volfied_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -240,9 +231,20 @@ static const ym2203_interface ym2203_config =
                 MACHINE DRIVERS
 ***********************************************************/
 
-static DRIVER_INIT( volfied )
+static MACHINE_START( volfied )
 {
+	volfied_state *state = (volfied_state *)machine->driver_data;
+
 	volfied_cchip_init(machine);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->pc090oj = devtag_get_device(machine, "pc090oj");
+}
+
+static MACHINE_RESET( volfied )
+{
+	volfied_cchip_reset(machine);
 }
 
 static const pc090oj_interface volfied_pc090oj_intf =
@@ -257,6 +259,9 @@ static const tc0140syt_interface volfied_tc0140syt_intf =
 
 static MACHINE_DRIVER_START( volfied )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(volfied_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -266,6 +271,9 @@ static MACHINE_DRIVER_START( volfied )
 	MDRV_CPU_PROGRAM_MAP(z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
+
+	MDRV_MACHINE_START(volfied)
+	MDRV_MACHINE_RESET(volfied)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -418,7 +426,7 @@ ROM_START( volfiedjo )
 ROM_END
 
 
-GAME( 1989, volfied,  0,       volfied, volfied,  volfied, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", 0 )
-GAME( 1989, volfiedu, volfied, volfied, volfiedu, volfied, ROT270, "Taito America Corporation", "Volfied (US, revision 1)", 0 )
-GAME( 1989, volfiedj, volfied, volfied, volfiedj, volfied, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", 0 )
-GAME( 1989, volfiedjo,volfied, volfied, volfiedj, volfied, ROT270, "Taito Corporation",         "Volfied (Japan)", 0 )
+GAME( 1989, volfied,   0,       volfied, volfied,  0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfiedu,  volfied, volfied, volfiedu, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfiedj,  volfied, volfied, volfiedj, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfiedjo, volfied, volfied, volfiedj, 0, ROT270, "Taito Corporation",         "Volfied (Japan)", GAME_SUPPORTS_SAVE )

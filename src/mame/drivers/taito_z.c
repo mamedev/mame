@@ -885,52 +885,34 @@ J1100256A VIDEO PCB
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
 #include "machine/taitoio.h"
+#include "includes/taito_z.h"
 
 #include "contcirc.lh"
 #include "dblaxle.lh"
 
-VIDEO_START( taitoz );
-
-VIDEO_UPDATE( contcirc );
-VIDEO_UPDATE( chasehq );
-VIDEO_UPDATE( bshark );
-VIDEO_UPDATE( sci );
-VIDEO_UPDATE( aquajack );
-VIDEO_UPDATE( spacegun );
-VIDEO_UPDATE( dblaxle );
-
-WRITE16_HANDLER( contcirc_out_w );
-READ16_HANDLER ( sci_spriteframe_r );
-WRITE16_HANDLER( sci_spriteframe_w );
-
-static UINT16 cpua_ctrl;
-static INT32 sci_int6 = 0;
-static INT32 dblaxle_int6 = 0;
-static INT32 ioc220_port = 0;
-static UINT16 eep_latch = 0;
-
-//static UINT16 *taitoz_ram;
-//static UINT16 *motor_ram;
-
-static void parse_control(running_machine *machine)
+static void parse_control( running_machine *machine )
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	if ((data &0xff00) && ((data &0xff) == 0))
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
+	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
-	cpua_ctrl = data;
+
+	state->cpua_ctrl = data;
 
 	parse_control(space->machine);
 
 	// Chase HQ: handle the lights
-	if ((!strcmp(space->machine->gamedrv->name, "chasehq")) || (!strcmp(space->machine->gamedrv->name, "chasehqj")))
+	if (state->chasehq_lamps)
 	{
 		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
 		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
@@ -948,20 +930,23 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
-	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 /* 68000 B */
 
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
-	cputag_set_input_line(machine, "sub", 5, HOLD_LINE);
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	cpu_set_input_line(state->subcpu, 5, HOLD_LINE);
 }
 
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
 {
-	cputag_set_input_line(machine, "sub", 6, HOLD_LINE);
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	cpu_set_input_line(state->subcpu, 6, HOLD_LINE);
 }
 #endif
 
@@ -975,10 +960,12 @@ static INTERRUPT_GEN( sci_interrupt )
        causes all sprites to vanish! Spriteram has areas for 2 frames
        so in theory only needs updating every other frame. */
 
-	sci_int6 = !sci_int6;
+	taitoz_state *state = (taitoz_state *)device->machine->driver_data;
+	state->sci_int6 = !state->sci_int6;
 
-	if (sci_int6)
-		timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, taitoz_interrupt6);
+	if (state->sci_int6)
+		timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL, 0, taitoz_interrupt6);
+
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -990,10 +977,12 @@ static INTERRUPT_GEN( sci_interrupt )
 static INTERRUPT_GEN( dblaxle_interrupt )
 {
 	// Unsure how many int6's per frame, copy SCI for now
-	dblaxle_int6 = !dblaxle_int6;
 
-	if (dblaxle_int6)
-		timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, taitoz_interrupt6);
+	taitoz_state *state = (taitoz_state *)device->machine->driver_data;
+	state->dblaxle_int6 = !state->dblaxle_int6;
+
+	if (state->dblaxle_int6)
+		timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL, 0, taitoz_interrupt6);
 
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
@@ -1001,7 +990,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
-	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL,  0, taitoz_interrupt6);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL,  0, taitoz_interrupt6);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -1039,13 +1028,15 @@ static const eeprom_interface spacegun_eeprom_intf =
 #if 0
 static READ16_HANDLER( eep_latch_r )
 {
-	return eep_latch;
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+	return state->eep_latch;
 }
 #endif
 
 static WRITE16_HANDLER( spacegun_output_bypass_w )
 {
-	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x03:
@@ -1056,12 +1047,12 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
             0x000000    eeprom data
             x0000000    (unused)                  */
 
-			COMBINE_DATA(&eep_latch);
+			COMBINE_DATA(&state->eep_latch);
 			input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			break;
 
 		default:
-			tc0220ioc_w(tc0220ioc, offset, data);	/* might be a 510NIO ! */
+			tc0220ioc_w(state->tc0220ioc, offset, data);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1074,8 +1065,8 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
-	UINT8 port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int fake = input_port_read(space->machine, "FAKE");
 
@@ -1106,7 +1097,7 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(tc0220ioc, offset);
+			return tc0220ioc_portreg_r(state->tc0220ioc, offset);
 	}
 }
 
@@ -1115,8 +1106,8 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
-	UINT8 port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int fake = input_port_read(space->machine, "FAKE");
 
@@ -1158,7 +1149,7 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(tc0220ioc, offset);
+			return tc0220ioc_portreg_r(state->tc0220ioc, offset);
 	}
 }
 
@@ -1216,7 +1207,7 @@ static WRITE16_HANDLER( bshark_stick_w )
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, taitoz_interrupt6);
+	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 10000), NULL, 0, taitoz_interrupt6);
 }
 
 
@@ -1259,16 +1250,15 @@ static READ16_HANDLER( sci_steer_input_r )
 
 static READ16_HANDLER( spacegun_input_bypass_r )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
-	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
 
 	switch (offset)
 	{
 		case 0x03:
-			return eeprom_read_bit(eeprom) << 7;
+			return eeprom_read_bit(state->eeprom) << 7;
 
 		default:
-			return tc0220ioc_r(tc0220ioc, offset);	/* might be a 510NIO ! */
+			return tc0220ioc_r(state->tc0220ioc, offset);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1302,7 +1292,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, taitoz_cpub_interrupt5);
+	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 10000), NULL, 0, taitoz_cpub_interrupt5);
 }
 
 
@@ -1377,26 +1367,28 @@ static READ16_HANDLER( aquajack_unknown_r )
                         SOUND
 *****************************************************/
 
-static INT32 banknum;
-
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region( running_machine *machine )
 {
-	memory_set_bankptr(machine,  "bank10", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	memory_set_bank(machine,  "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	banknum = (data - 1) & 7;
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
+	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( taitoz_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 //  if (data & 0xff00)
@@ -1411,9 +1403,10 @@ static WRITE16_HANDLER( taitoz_sound_w )
 
 static READ16_HANDLER( taitoz_sound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
 	if (offset == 1)
-		return (tc0140syt_comm_r(tc0140syt, 0) & 0xff);
+		return (tc0140syt_comm_r(state->tc0140syt, 0) & 0xff);
 	else 
 		return 0;
 }
@@ -1421,11 +1414,12 @@ static READ16_HANDLER( taitoz_sound_r )
 #if 0
 static WRITE16_HANDLER( taitoz_msb_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_port_w(state->tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_comm_w(state->tc0140syt, 0, (data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -1440,10 +1434,12 @@ static WRITE16_HANDLER( taitoz_msb_sound_w )
 
 static READ16_HANDLER( taitoz_msb_sound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+
 	if (offset == 1)
-		return ((tc0140syt_comm_r(tc0140syt, 0) & 0xff) << 8);
-	else return 0;
+		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
+	else 
+		return 0;
 }
 #endif
 
@@ -1451,14 +1447,13 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 /**** sound pan control ****/
 static WRITE8_HANDLER( taitoz_pancontrol )
 {
+//	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
 	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
 
-//  static UINT8 taitoz_pandata[4];
+	offset = offset & 3;
 
-	offset = offset&3;
-
-//  taitoz_pandata[offset] = data;
-//  popmessage(" pan %02x %02x %02x %02x", taitoz_pandata[0], taitoz_pandata[1], taitoz_pandata[2], taitoz_pandata[3] );
+//  state->pandata[offset] = data;
+//  popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
 
 	flt_volume_set_volume(devtag_get_device(space->machine, fltname[offset & 3]), data / 255.0f);
 }
@@ -1467,36 +1462,6 @@ static WRITE16_HANDLER( spacegun_pancontrol )
 {
 	if (ACCESSING_BITS_0_7)
 		taitoz_pancontrol(space, offset, data & 0xff);
-}
-
-
-/***********************************************************
-                   SAVE STATES
-***********************************************************/
-
-static STATE_POSTLOAD( taitoz_postload )
-{
-	parse_control(machine);
-	reset_sound_region(machine);
-}
-
-static MACHINE_START( taitoz )
-{
-	banknum = -1;
-	cpua_ctrl = 0xff;
-	sci_int6 = 0;
-	dblaxle_int6 = 0;
-	ioc220_port = 0;
-
-	state_save_register_global(machine, cpua_ctrl);
-
-	/* these are specific to various games: we ought to split the inits */
-	state_save_register_global(machine, sci_int6);
-	state_save_register_global(machine, dblaxle_int6);
-	state_save_register_global(machine, ioc220_port);
-
-	state_save_register_global(machine, banknum);
-	state_save_register_postload(machine, taitoz_postload, NULL);
 }
 
 
@@ -1514,7 +1479,7 @@ static ADDRESS_MAP_START( contcirc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x300000, 0x301fff) AM_DEVREADWRITE("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)	/* "root ram" */
-	AM_RANGE(0x400000, 0x4006ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x4006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( contcirc_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1539,7 +1504,7 @@ static ADDRESS_MAP_START( chasehq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 	AM_RANGE(0xe00000, 0xe003ff) AM_READWRITE(chasehq_motor_r, chasehq_motor_w)	/* motor cpu */
 ADDRESS_MAP_END
 
@@ -1556,7 +1521,7 @@ static ADDRESS_MAP_START( enforce_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(cpua_ctrl_w)	// works without?
-	AM_RANGE(0x300000, 0x3006ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x300000, 0x3006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)	/* "root ram" ??? */
 	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
@@ -1581,7 +1546,7 @@ static ADDRESS_MAP_START( bshark_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
@@ -1611,7 +1576,7 @@ static ADDRESS_MAP_START( sci_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)
 ADDRESS_MAP_END
 
@@ -1633,7 +1598,7 @@ static ADDRESS_MAP_START( nightstr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* Motor 1 (left) */
 	AM_RANGE(0xe00008, 0xe00009) AM_WRITENOP    /* Motor 2 (center) */
 	AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP    /* Motor 3 (right) */
@@ -1657,7 +1622,7 @@ static ADDRESS_MAP_START( aquajack_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x801fff) AM_DEVREADWRITE("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xc40000, 0xc403ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc40000, 0xc403ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquajack_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1676,7 +1641,7 @@ static ADDRESS_MAP_START( spacegun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x30c000, 0x30ffff) AM_RAM
 	AM_RANGE(0x310000, 0x31ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x500000, 0x5005ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x500000, 0x5005ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
@@ -1708,7 +1673,7 @@ static ADDRESS_MAP_START( dblaxle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemap mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
 	AM_RANGE(0xa30000, 0xa3002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* mostly unused ? */
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size) /* mostly unused ? */
 	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* set in int6, seems to stay zero */
 ADDRESS_MAP_END
 
@@ -1732,7 +1697,7 @@ static ADDRESS_MAP_START( racingb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
 	AM_RANGE(0x930000, 0x93002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* mostly unused ? */
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size) /* mostly unused ? */
 	AM_RANGE(0xb08000, 0xb08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* alternates 0/0x100 */
 ADDRESS_MAP_END
 
@@ -2788,14 +2753,16 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	taitoz_state *state = (taitoz_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandlerb(const device_config *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
-//  cpu_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  taitoz_state *state = (taitoz_state *)device->machine->driver_data;
+//  cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -2821,9 +2788,9 @@ static DEVICE_START( subwoofer )
 	/* 150 Hz is a common top frequency played by a generic */
 	/* subwoofer, the real Arcade Machine may differs */
 
-	mixer_set_lowpass_frequency(0,20);
-	mixer_set_lowpass_frequency(1,20);
-	mixer_set_lowpass_frequency(2,20);
+	mixer_set_lowpass_frequency(0, 20);
+	mixer_set_lowpass_frequency(1, 20);
+	mixer_set_lowpass_frequency(2, 20);
 }
 
 static DEVICE_GET_INFO( subwoofer )
@@ -2914,9 +2881,9 @@ static const tc0480scp_interface taitoz_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static const tc0110pcr_interface taitoz_tc0110pcr_intf = {	0	};
+static const tc0110pcr_interface taitoz_tc0110pcr_intf = { 0 };
 
-static const tc0150rod_interface taitoz_tc0150rod_intf = {	"gfx3"	};
+static const tc0150rod_interface taitoz_tc0150rod_intf = { "gfx3" };
 
 static const tc0220ioc_interface taitoz_io220_intf =
 {
@@ -2936,9 +2903,68 @@ static const tc0140syt_interface taitoz_tc0140syt_intf =
 };
 
 
+/***********************************************************
+                   SAVE STATES
+***********************************************************/
+
+static STATE_POSTLOAD( taitoz_postload )
+{
+	parse_control(machine);
+	reset_sound_region(machine);
+}
+
+static MACHINE_START( bshark )
+{
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->tc0100scn = devtag_get_device(machine, "tc0100scn");
+	state->tc0150rod = devtag_get_device(machine, "tc0150rod");
+	state->tc0480scp = devtag_get_device(machine, "tc0480scp");
+	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
+	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+
+	state_save_register_global(machine, state->cpua_ctrl);
+
+	/* these are specific to various games: we ought to split the inits */
+	state_save_register_global(machine, state->sci_int6);
+	state_save_register_global(machine, state->dblaxle_int6);
+	state_save_register_global(machine, state->ioc220_port);
+
+	state_save_register_global(machine, state->banknum);
+}
+
+static MACHINE_START( taitoz )
+{
+	int banks = (memory_region_length(machine, "audiocpu") - 0xc000) / 0x4000;
+
+	memory_configure_bank(machine, "bank10", 0, banks, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+
+	state_save_register_postload(machine, taitoz_postload, NULL);
+
+	MACHINE_START_CALL(bshark);
+}
+
+static MACHINE_RESET( taitoz )
+{
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+
+	state->banknum = -1;
+	state->cpua_ctrl = 0xff;
+	state->sci_int6 = 0;
+	state->dblaxle_int6 = 0;
+	state->ioc220_port = 0;
+}
+
 /* Contcirc vis area seems narrower than the other games... */
 
 static MACHINE_DRIVER_START( contcirc )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -2953,6 +2979,7 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3004,6 +3031,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( chasehq )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(chasehq_map)
@@ -3017,6 +3047,7 @@ static MACHINE_DRIVER_START( chasehq )
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3066,6 +3097,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( enforce )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(enforce_map)
@@ -3079,6 +3113,7 @@ static MACHINE_DRIVER_START( enforce )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -3131,6 +3166,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bshark )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(bshark_map)
@@ -3140,7 +3178,8 @@ static MACHINE_DRIVER_START( bshark )
 	MDRV_CPU_PROGRAM_MAP(bshark_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_START(bshark)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -3190,6 +3229,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sci )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sci_map)
@@ -3203,6 +3245,7 @@ static MACHINE_DRIVER_START( sci )
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(3000))
 
@@ -3252,6 +3295,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nightstr )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(nightstr_map)
@@ -3265,6 +3311,7 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -3316,6 +3363,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( aquajack )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(aquajack_map)
@@ -3329,6 +3379,7 @@ static MACHINE_DRIVER_START( aquajack )
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
@@ -3379,6 +3430,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spacegun )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(spacegun_map)
@@ -3388,7 +3442,8 @@ static MACHINE_DRIVER_START( spacegun )
 	MDRV_CPU_PROGRAM_MAP(spacegun_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_START(bshark)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_EEPROM_ADD("eeprom", spacegun_eeprom_intf)
 	MDRV_EEPROM_DATA(spacegun_default_eeprom, 128)
@@ -3438,6 +3493,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dblaxle )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(dblaxle_map)
@@ -3451,6 +3509,7 @@ static MACHINE_DRIVER_START( dblaxle )
 	MDRV_CPU_VBLANK_INT("screen", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -3500,6 +3559,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( racingb )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitoz_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(racingb_map)
@@ -3513,6 +3575,8 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_CPU_VBLANK_INT("screen", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)
+	MDRV_MACHINE_RESET(taitoz)
+
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_TC0510NIO_ADD("tc0510nio", taitoz_io510_intf)
@@ -4779,7 +4843,8 @@ ROM_END
 
 static DRIVER_INIT( taitoz )
 {
-//  taitosnd_setz80_soundcpu( 2 );
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	state->chasehq_lamps = 0;
 }
 
 static STATE_POSTLOAD( bshark_postload )
@@ -4789,34 +4854,42 @@ static STATE_POSTLOAD( bshark_postload )
 
 static DRIVER_INIT( bshark )
 {
-	eep_latch = 0;
-	state_save_register_postload(machine, bshark_postload, NULL);
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	state->chasehq_lamps = 0;
+	state->eep_latch = 0;
 
-	state_save_register_global(machine, eep_latch);
+	state_save_register_postload(machine, bshark_postload, NULL);
+	state_save_register_global(machine, state->eep_latch);
+}
+
+static DRIVER_INIT( chasehq )
+{
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	state->chasehq_lamps = 1;
 }
 
 
 
-GAMEL(1987, contcirc,  0,        contcirc, contcirc, taitoz,   ROT0,               "Taito Corporation Japan", "Continental Circus (World)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1987, contcircu, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1987, contcircua,contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1988, chasehq,   0,        chasehq,  chasehq,  taitoz,   ROT0,               "Taito Corporation Japan", "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1988, chasehqj,  chasehq,  chasehq,  chasehqj, taitoz,   ROT0,               "Taito Corporation", "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1988, chasehqu,  chasehq,  chasehq,  chasehq,  taitoz,   ROT0,               "Taito America Corporation", "Chase H.Q. (US)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAME( 1988, enforce,   0,        enforce,  enforce,  taitoz,   ROT0,               "Taito Corporation", "Enforce (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, bshark,    0,        bshark,   bshark,   bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, bsharkj,   bshark,   bshark,   bsharkj,  bshark,   ORIENTATION_FLIP_X, "Taito Corporation", "Battle Shark (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAMEL(1989, sci,       0,        sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 1)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1989, scia,      sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1989, scij,      sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation", "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1989, sciu,      sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1991, scin,      sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Super Special Criminal Investigation (Negro Torino hack)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAME( 1989, nightstr,  0,        nightstr, nightstr, taitoz,   ROT0,               "Taito Corporation Japan", "Night Striker (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, nightstrj, nightstr, nightstr, nghtstrj, taitoz,   ROT0,               "Taito Corporation", "Night Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, nightstru, nightstr, nightstr, nghtstru, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, aquajack,  0,        aquajack, aquajack, taitoz,   ROT0,               "Taito Corporation Japan", "Aqua Jack (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, aquajackj, aquajack, aquajack, aquajckj, taitoz,   ROT0,               "Taito Corporation", "Aqua Jack (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, spacegun,  0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan", "Space Gun (World)", 0 )
-GAMEL(1991, dblaxle,   0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS, layout_dblaxle )
-GAME( 1991, pwheelsj,  dblaxle,  dblaxle,  pwheelsj, taitoz,   ROT0,               "Taito Corporation", "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, racingb,   0,        racingb,  dblaxle,  taitoz,   ROT0,               "Taito Corporation Japan", "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAMEL(1987, contcirc,   0,        contcirc, contcirc, taitoz,   ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircu,  contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircua, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehq,    0,        chasehq,  chasehq,  chasehq,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,  chasehqj, chasehq,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqu,   chasehq,  chasehq,  chasehq,  chasehq,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAME( 1988, enforce,    0,        enforce,  enforce,  taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, bshark,     0,        bshark,   bshark,   bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, bsharkj,    bshark,   bshark,   bsharkj,  bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAMEL(1989, sci,        0,        sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, scia,       sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, scij,       sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, sciu,       sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1991, scin,       sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan",   "Super Special Criminal Investigation (Negro Torino hack)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAME( 1989, nightstr,   0,        nightstr, nightstr, taitoz,   ROT0,               "Taito Corporation Japan",   "Night Striker (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, nightstrj,  nightstr, nightstr, nghtstrj, taitoz,   ROT0,               "Taito Corporation",         "Night Striker (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, nightstru,  nightstr, nightstr, nghtstru, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, aquajack,   0,        aquajack, aquajack, taitoz,   ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, aquajackj,  aquajack, aquajack, aquajckj, taitoz,   ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, spacegun,   0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", GAME_SUPPORTS_SAVE )
+GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
+GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, racingb,    0,        racingb,  dblaxle,  taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

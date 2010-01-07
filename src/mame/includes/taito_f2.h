@@ -1,7 +1,78 @@
-/*----------- defined in video/taito_f2.c -----------*/
 
-extern UINT16 *f2_sprite_extension;
-extern size_t f2_spriteext_size;
+struct f2_tempsprite
+{
+	int code, color;
+	int flipx, flipy;
+	int x, y;
+	int zoomx, zoomy;
+	int primask;
+};
+
+typedef struct _taitof2_state taitof2_state;
+struct _taitof2_state
+{
+	/* memory pointers */
+	UINT16 *        sprite_extension;
+	UINT16 *        spriteram;
+	UINT16 *        spriteram_buffered;
+	UINT16 *        spriteram_delayed;
+	UINT16 *        cchip2_ram;	// for megablst only
+//  UINT16 *        paletteram;    // currently this uses generic palette handling
+	size_t          spriteram_size;
+	size_t          spriteext_size;
+
+
+	/* video-related */
+	struct f2_tempsprite *spritelist;
+	int             sprite_type;
+
+	UINT16          spritebank[8];
+//	UINT16          spritebank_eof[8];
+	UINT16          spritebank_buffered[8];
+
+	INT32           sprites_disabled, sprites_active_area, sprites_master_scrollx, sprites_master_scrolly;
+	/* remember flip status over frames because driftout can fail to set it */
+	INT32           sprites_flipscreen;
+
+	/* On the left hand screen edge (assuming horiz screen, no
+       screenflip: in screenflip it is the right hand edge etc.)
+       there may be 0-3 unwanted pixels in both tilemaps *and*
+       sprites. To erase this we use f2_hide_pixels (0 to +3). */
+
+	INT32           hide_pixels;
+	INT32           flip_hide_pixels;	/* Different in some games */
+
+	INT32           pivot_xdisp;	/* Needed in games with a pivot layer */
+	INT32           pivot_ydisp;
+
+	INT32           game;
+
+	UINT8           tilepri[6]; // todo - move into taitoic.c
+	UINT8           spritepri[6]; // todo - move into taitoic.c
+	UINT8           spriteblendmode; // todo - move into taitoic.c
+
+	int             prepare_sprites;
+
+	/* misc */
+	INT32           mjnquest_input;
+	int             last[2], nibble;
+	INT32           driveout_sound_latch;
+	INT32           oki_bank;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+	const device_config *oki;
+	const device_config *tc0100scn;
+	const device_config *tc0100scn_1;
+	const device_config *tc0100scn_2;
+	const device_config *tc0360pri;
+	const device_config *tc0280grd;
+	const device_config *tc0430grw;
+	const device_config *tc0480scp;
+};
+
+/*----------- defined in video/taito_f2.c -----------*/
 
 VIDEO_START( taitof2_default );
 VIDEO_START( taitof2_quiz );

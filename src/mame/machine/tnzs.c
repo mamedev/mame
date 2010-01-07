@@ -664,6 +664,20 @@ MACHINE_RESET( jpopnics )
 	state->mcu_type = -1;
 }
 
+static STATE_POSTLOAD( tnzs_postload )
+{
+	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	memory_set_bank(machine, "bank1", state->bank1);
+	memory_set_bank(machine, "bank2", state->bank2);
+
+	if (state->bank1 <= 1)
+		memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank1");
+	else
+		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+}
+
 MACHINE_START( tnzs )
 {
 	tnzs_state *state = (tnzs_state *)machine->driver_data;
@@ -676,7 +690,11 @@ MACHINE_START( tnzs )
 	memory_set_bank(machine, "bank1", 2);
 	memory_set_bank(machine, "bank2", 0);
 
+	state->bank1 = 2;
+	state->bank2 = 0;
+
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->subcpu = devtag_get_device(machine, "sub");
 	state->mcu = devtag_get_device(machine, "mcu");
 
 	state_save_register_global(machine, state->screenflip);
@@ -692,6 +710,10 @@ MACHINE_START( tnzs )
 	state_save_register_global(machine, state->mcu_credits);
 	state_save_register_global(machine, state->mcu_reportcoin);
 	state_save_register_global(machine, state->mcu_command);
+	state_save_register_global(machine, state->bank1);
+	state_save_register_global(machine, state->bank2);
+
+	state_save_register_postload(machine, tnzs_postload, NULL);
 }
 
 MACHINE_START( jpopnics )
@@ -703,24 +725,40 @@ MACHINE_START( jpopnics )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 4, &SUB[0x10000], 0x2000);
 
+	state->subcpu = devtag_get_device(machine, "sub");
 	state->mcu = NULL;
 
+	state->bank1 = 2;
+	state->bank2 = 0;
+
 	state_save_register_global(machine, state->screenflip);
+	state_save_register_global(machine, state->bank1);
+	state_save_register_global(machine, state->bank2);
+
+	state_save_register_postload(machine, tnzs_postload, NULL);
 }
 
 
 WRITE8_HANDLER( tnzs_bankswitch_w )
 {
+	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+
 //  logerror("PC %04x: writing %02x to bankswitch\n", cpu_get_pc(space->cpu),data);
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	state->bank1 = data & 0x07;
+	memory_set_bank(space->machine, "bank1", state->bank1);
+
+	if (state->bank1 <= 1)
+		memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank1");
+	else
+		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 }
 
 WRITE8_HANDLER( tnzs_bankswitch1_w )
@@ -736,7 +774,7 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				if (data & 0x04)
 				{
 					if (state->mcu != NULL && cpu_get_type(state->mcu) == CPU_I8742)
-						cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);
+						cpu_set_input_line(state->mcu, INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;
@@ -771,5 +809,6 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 	}
 
 	/* bits 0-1 select ROM bank */
-	memory_set_bank(space->machine, "bank2", data & 0x03);
+	state->bank2 = data & 0x03;
+	memory_set_bank(space->machine, "bank2", state->bank2);
 }
