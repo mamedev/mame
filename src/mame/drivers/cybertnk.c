@@ -2,7 +2,9 @@
 
 Cyber Tank HW (c) 1987 Coreland Technology
 
-WIP driver by Angelo Salese
+preliminary driver by Angelo Salese
+
+Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 - Communications
 Master slave comms looks like shared RAM.
@@ -201,6 +203,90 @@ static VIDEO_START( cybertnk )
 static VIDEO_UPDATE( cybertnk )
 {
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+
+if(0) //sprite gfx debug viewer
+{
+	int x,y,count;
+	static int test_x, test_y, start_offs;
+	const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
+
+	if(input_code_pressed(screen->machine, KEYCODE_Z))
+		test_x++;
+
+	if(input_code_pressed(screen->machine, KEYCODE_X))
+		test_x--;
+
+	if(input_code_pressed(screen->machine, KEYCODE_A))
+		test_y++;
+
+	if(input_code_pressed(screen->machine, KEYCODE_S))
+		test_y--;
+
+	if(input_code_pressed(screen->machine, KEYCODE_Q))
+		start_offs+=0x200;
+
+	if(input_code_pressed(screen->machine, KEYCODE_W))
+		start_offs-=0x200;
+
+	if(input_code_pressed(screen->machine, KEYCODE_T))
+		start_offs+=0x20000;
+
+	if(input_code_pressed(screen->machine, KEYCODE_Y))
+		start_offs-=0x20000;
+
+	if(input_code_pressed(screen->machine, KEYCODE_E))
+		start_offs+=4;
+
+	if(input_code_pressed(screen->machine, KEYCODE_R))
+		start_offs-=4;
+
+	popmessage("%d %d %04x",test_x,test_y,start_offs);
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	count = (start_offs);
+
+	for(y=0;y<test_y;y++)
+	{
+		for(x=0;x<test_x;x+=8)
+		{
+			UINT32 color;
+			UINT8 dot;
+
+			color = ((blit_ram[count+0] & 0xff) << 24);
+			color|= ((blit_ram[count+1] & 0xff) << 16);
+			color|= ((blit_ram[count+2] & 0xff) << 8);
+			color|= ((blit_ram[count+3] & 0xff) << 0);
+
+			dot = (color & 0xf0000000) >> 28;
+			*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot];
+
+			dot = (color & 0x0f000000) >> 24;
+			*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot];
+
+			dot = (color & 0x00f00000) >> 20;
+			*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot];
+
+			dot = (color & 0x000f0000) >> 16;
+			*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot];
+
+			dot = (color & 0x0000f000) >> 12;
+			*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot];
+
+			dot = (color & 0x00000f00) >> 8;
+			*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot];
+
+			dot = (color & 0x000000f0) >> 4;
+			*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot];
+
+			dot = (color & 0x0000000f) >> 0;
+			*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot];
+
+			count+=4;
+		}
+	}
+}
+
 	return 0;
 }
 
@@ -653,29 +739,30 @@ ROM_START( cybertnk )
 	ROM_LOAD( "s07", 0x20000, 0x10000, CRC(70220567) SHA1(44b48ded8581a6d78b27a3af833f62413ff31c76) )
 	ROM_LOAD( "s08", 0x30000, 0x10000, CRC(988c4fcb) SHA1(68d32be70605ad5415f2b6aeabbd92e269f0c9af) )
 
-	/*The following ROM regions aren't checked yet*/
-	ROM_REGION( 0x200000, "user1", 0 )
-	ROM_LOAD( "c01" , 0x000000, 0x20000, CRC(f7021069) SHA1(67835750f39effd362ccaee381765afce8fa16b2) )
-	ROM_LOAD( "c02" , 0x020000, 0x20000, CRC(665e193c) SHA1(12c116da0a2d4e881d8598727ff63299fb98c6d2) )
-	ROM_LOAD( "c03" , 0x040000, 0x20000, CRC(f230d700) SHA1(60fdba4b0fe4df5507e999bed917da93c6cd9a9c) )
-	ROM_LOAD( "c04" , 0x060000, 0x20000, CRC(999fd57d) SHA1(3e8b8dac595555419831784a27f95420e10b58bd) )
-	ROM_LOAD( "c05" , 0x080000, 0x20000, CRC(9bafb49c) SHA1(6deddbaa44c8e11e0ac73a5330935a9a260b5d43) )
-	ROM_LOAD( "c06" , 0x0a0000, 0x20000, CRC(e60de7a2) SHA1(9daa820eefddf079e3940341acc316b1f19ba7ed) )
-	ROM_LOAD( "c07" , 0x0c0000, 0x20000, CRC(e7cf992a) SHA1(610b2c78a16d8a9d420b1513e2dcfa693f1d8b42) )
-	ROM_LOAD( "c08" , 0x0e0000, 0x20000, CRC(ce0343b9) SHA1(ef511a04709c49250b32c5b47a6f5024af8acc5b) )
-	ROM_LOAD( "c09" , 0x100000, 0x20000, CRC(63a443d1) SHA1(9c0fdca3f8e65dc984ec3c089b379c5a61066630) )
-	ROM_LOAD( "c10" , 0x120000, 0x20000, CRC(01331635) SHA1(8af7fbe2609b6d96bcd63d884cf92095593130ff) )
-	ROM_LOAD( "c11" , 0x140000, 0x20000, CRC(d46ccfa3) SHA1(c872bc5a25f0b574cb2f9d3b1dff36c3eff751b4) )
-	ROM_LOAD( "c12" , 0x160000, 0x20000, CRC(c3c39c4a) SHA1(93f3572dd62ef7a92044345249efb0d9ec99bdf9) )
-	ROM_LOAD( "c13" , 0x180000, 0x20000, CRC(0f366b92) SHA1(2361ac9b1309d5fbd1dec93ca5aecdf45deaeaed) )
-	ROM_LOAD( "c14" , 0x1a0000, 0x20000, CRC(406d5a0d) SHA1(51e4e85d9c63ef687671fbb213b14d66930070ce) )
-	ROM_LOAD( "c15" , 0x1c0000, 0x20000, CRC(ad681c70) SHA1(84c6589464103091b39f1ccdbfed10bf538452f3) )
-	ROM_LOAD( "c16" , 0x1e0000, 0x20000, CRC(1f44dbb6) SHA1(ea1368d6367a2de6d5e6764f8ab705b182d6d276) )
+	/* TODO: fix the rom loading accordingly*/
+	ROM_REGION( 0x200000, "spr_gfx", 0 )
+	ROM_LOAD32_BYTE( "c01" , 0x000000, 0x20000, CRC(f7021069) SHA1(67835750f39effd362ccaee381765afce8fa16b2) )
+	ROM_LOAD32_BYTE( "c02" , 0x000001, 0x20000, CRC(665e193c) SHA1(12c116da0a2d4e881d8598727ff63299fb98c6d2) )
+	ROM_LOAD32_BYTE( "c03" , 0x000002, 0x20000, CRC(f230d700) SHA1(60fdba4b0fe4df5507e999bed917da93c6cd9a9c) )
+	ROM_LOAD32_BYTE( "c04" , 0x000003, 0x20000, CRC(999fd57d) SHA1(3e8b8dac595555419831784a27f95420e10b58bd) )
+	ROM_LOAD32_BYTE( "c05" , 0x080000, 0x20000, CRC(9bafb49c) SHA1(6deddbaa44c8e11e0ac73a5330935a9a260b5d43) )
+	ROM_LOAD32_BYTE( "c06" , 0x080001, 0x20000, CRC(e60de7a2) SHA1(9daa820eefddf079e3940341acc316b1f19ba7ed) )
+	ROM_LOAD32_BYTE( "c07" , 0x080002, 0x20000, CRC(e7cf992a) SHA1(610b2c78a16d8a9d420b1513e2dcfa693f1d8b42) )
+	ROM_LOAD32_BYTE( "c08" , 0x080003, 0x20000, CRC(ce0343b9) SHA1(ef511a04709c49250b32c5b47a6f5024af8acc5b) )
+	ROM_LOAD32_BYTE( "c09" , 0x100000, 0x20000, CRC(63a443d1) SHA1(9c0fdca3f8e65dc984ec3c089b379c5a61066630) )
+	ROM_LOAD32_BYTE( "c10" , 0x100001, 0x20000, CRC(01331635) SHA1(8af7fbe2609b6d96bcd63d884cf92095593130ff) )
+	ROM_LOAD32_BYTE( "c11" , 0x100002, 0x20000, CRC(d46ccfa3) SHA1(c872bc5a25f0b574cb2f9d3b1dff36c3eff751b4) )
+	ROM_LOAD32_BYTE( "c12" , 0x100003, 0x20000, CRC(c3c39c4a) SHA1(93f3572dd62ef7a92044345249efb0d9ec99bdf9) )
+	ROM_LOAD32_BYTE( "c13" , 0x180000, 0x20000, CRC(0f366b92) SHA1(2361ac9b1309d5fbd1dec93ca5aecdf45deaeaed) )
+	ROM_LOAD32_BYTE( "c14" , 0x180001, 0x20000, CRC(406d5a0d) SHA1(51e4e85d9c63ef687671fbb213b14d66930070ce) )
+	ROM_LOAD32_BYTE( "c15" , 0x180002, 0x20000, CRC(ad681c70) SHA1(84c6589464103091b39f1ccdbfed10bf538452f3) )
+	ROM_LOAD32_BYTE( "c16" , 0x180003, 0x20000, CRC(1f44dbb6) SHA1(ea1368d6367a2de6d5e6764f8ab705b182d6d276) )
 
 	ROM_REGION( 0x200000, "user2", 0 )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
 	ROM_LOAD16_BYTE( "road_chh" , 0x000001, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
 
+	/*The following ROM regions aren't checked yet*/
 	ROM_REGION( 0x30000, "user3", 0 )
 	ROM_LOAD( "t1",   0x00000, 0x08000, CRC(24890512) SHA1(2a6c9d39ca0c1c8316e85d9f565f6b3922d596b2) )
 	ROM_LOAD( "t2",   0x08000, 0x08000, CRC(5a10480d) SHA1(f17598442091dae14abe3505957d94793f3ed886))
