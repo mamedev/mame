@@ -1106,6 +1106,6 @@ static DRIVER_INIT( screenpl )
 	p1 = p3 = 0xff;
 }
 
-GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9, Isle of Man)",  GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9, Isle of Man)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
