@@ -181,14 +181,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void fill_slope( running_machine *machine, bitmap_t *bitmap, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
+static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
 {
-	taitoair_state *state = (taitoair_state *)machine->driver_data;
-
-	if (y1 > state->view.y2)
+	if (y1 > cliprect->max_y)
 		return;
 
-	if (y2 <= state->view.y1) 
+	if (y2 <= cliprect->min_y)
 	{
 		int delta = y2 - y1;
 		*nx1 = x1 + delta * sl1;
@@ -199,15 +197,15 @@ static void fill_slope( running_machine *machine, bitmap_t *bitmap, int color, I
 	if (y1 < -1000000 || y1 > 1000000)
 		return;
 
-	if (y2 > state->view.y2)
-		y2 = state->view.y2 + 1;
+	if (y2 > cliprect->max_y)
+		y2 = cliprect->max_y + 1;
 
-	if (y1 < state->view.y1) 
+	if (y1 < cliprect->min_y)
 	{
-		int delta = state->view.y1 - y1;
+		int delta = cliprect->min_y - y1;
 		x1 += delta * sl1;
 		x2 += delta * sl2;
-		y1 = state->view.y1;
+		y1 = cliprect->min_y;
 	}
 
 	if (x1 > x2 || (x1==x2 && sl1 > sl2)) 
@@ -226,16 +224,16 @@ static void fill_slope( running_machine *machine, bitmap_t *bitmap, int color, I
 
 	while (y1 < y2) 
 	{
-		if (y1 >= state->view.y1) 
+		if (y1 >= cliprect->min_y)
 		{
 			int xx1 = x1 >> TAITOAIR_FRAC_SHIFT;
 			int xx2 = x2 >> TAITOAIR_FRAC_SHIFT;
-			if (xx1 <= state->view.x2 || xx2 >= state->view.x1) 
+			if (xx1 <= cliprect->max_x || xx2 >= cliprect->min_x)
 			{
-				if (xx1 < state->view.x1)
-					xx1 = state->view.x1;
-				if (xx2 > state->view.x2)
-					xx2 = state->view.x2;
+				if (xx1 < cliprect->min_x)
+					xx1 = cliprect->min_x;
+				if (xx2 > cliprect->max_x)
+					xx2 = cliprect->max_x;
 
 				while (xx1 <= xx2) 
 				{
@@ -253,9 +251,8 @@ static void fill_slope( running_machine *machine, bitmap_t *bitmap, int color, I
 	*nx2 = x2;
 }
 
-static void fill_poly( running_machine *machine, bitmap_t *bitmap, const struct taitoair_poly *q )
+static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct taitoair_poly *q )
 {
-	taitoair_state *state = (taitoair_state *)machine->driver_data;
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT * 2];
@@ -283,13 +280,13 @@ static void fill_poly( running_machine *machine, bitmap_t *bitmap, const struct 
 	if (cury == limy)
 		return;
 
-	if (cury > state->view.y2)
+	if (cury > cliprect->max_y)
 		return;
-	if (limy <= state->view.y1)
+	if (limy <= cliprect->min_y)
 		return;
 
-	if (limy > state->view.y2)
-		limy = state->view.y2;
+	if (limy > cliprect->max_y)
+		limy = cliprect->max_y;
 
 	ps1 = pmin + pcount;
 	ps2 = pmin;
@@ -300,7 +297,7 @@ static void fill_poly( running_machine *machine, bitmap_t *bitmap, const struct 
 	{
 		if (p[ps1 - 1].y == p[ps2 + 1].y) 
 		{
-			fill_slope(machine, bitmap, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
+			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
 			cury = p[ps1 - 1].y;
 			if (cury >= limy)
 				break;
@@ -319,7 +316,7 @@ static void fill_poly( running_machine *machine, bitmap_t *bitmap, const struct 
 		} 
 		else if (p[ps1 - 1].y < p[ps2 + 1].y) 
 		{
-			fill_slope(machine, bitmap, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
+			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
 			cury = p[ps1 - 1].y;
 			if (cury >= limy)
 				break;
@@ -331,7 +328,7 @@ static void fill_poly( running_machine *machine, bitmap_t *bitmap, const struct 
 		} 
 		else 
 		{
-			fill_slope(machine, bitmap, color, x1, x2, sl1, sl2, cury, p[ps2 + 1].y, &x1, &x2);
+			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps2 + 1].y, &x1, &x2);
 			cury = p[ps2 + 1].y;
 			if (cury >= limy)
 				break;
@@ -374,10 +371,6 @@ VIDEO_UPDATE( taitoair )
 	{
 		int adr = 0x3fff;
 //		struct taitoair_poly q;
-		state->view.x1 = cliprect->min_x;
-		state->view.y1 = cliprect->min_y;
-		state->view.x2 = cliprect->max_x;
-		state->view.y2 = cliprect->max_y;
 
 		while (adr >= 0 && state->line_ram[adr] && state->line_ram[adr] != 0x4000)
 		{
@@ -399,7 +392,7 @@ VIDEO_UPDATE( taitoair )
 			}
 			adr--;
 			state->q.pcount = pcount;
-			fill_poly(screen->machine, bitmap, &state->q);
+			fill_poly(bitmap, cliprect, &state->q);
 		}
 	}
 	return 0;

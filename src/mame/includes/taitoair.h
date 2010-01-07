@@ -27,10 +27,6 @@ struct _taitoair_state
 	UINT16 *      paletteram;
 
 	/* video-related */
-	struct {
-		int x1, y1, x2, y2;
-	} view;
-
 	taitoair_poly  q;
 
 	/* misc */

@@ -621,10 +621,6 @@ static MACHINE_START( taitoair )
 	state->tc0080vco = devtag_get_device(machine, "tc0080vco");
 
 	state_save_register_global(machine, state->banknum);
-	state_save_register_global(machine, state->view.x1);
-	state_save_register_global(machine, state->view.y1);
-	state_save_register_global(machine, state->view.x2);
-	state_save_register_global(machine, state->view.y2);
 	state_save_register_global(machine, state->q.col);
 	state_save_register_global(machine, state->q.pcount);
 
@@ -644,10 +640,6 @@ static MACHINE_RESET( taitoair )
 
 	state->dsp_hold_signal = ASSERT_LINE;
 	state->banknum = 0;
-	state->view.x1 = 0;
-	state->view.y1 = 0;
-	state->view.x2 = 0;
-	state->view.y2 = 0;
 
 	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
