@@ -1052,7 +1052,6 @@ MACHINE_RESET( cvs )
 	state->speech_rom_bit_address = 0;
 	state->cvs_393hz_clock = 0;
 	state->collision_register = 0;
-	state->total_stars = 0;
 	state->stars_on = 0;
 	state->scroll_reg = 0;
 	state->stars_scroll = 0;
