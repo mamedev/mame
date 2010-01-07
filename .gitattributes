@@ -2731,6 +2731,7 @@ src/mame/includes/taito_b.h svneol=native#text/plain
 src/mame/includes/taito_f2.h svneol=native#text/plain
 src/mame/includes/taito_f3.h svneol=native#text/plain
 src/mame/includes/taito_l.h svneol=native#text/plain
+src/mame/includes/taitoair.h svneol=native#text/plain
 src/mame/includes/taitoipt.h svneol=native#text/plain
 src/mame/includes/taitosj.h svneol=native#text/plain
 src/mame/includes/tank8.h svneol=native#text/plain

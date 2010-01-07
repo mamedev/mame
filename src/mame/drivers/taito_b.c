@@ -188,7 +188,8 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static TIMER_CALLBACK( rsaga2_interrupt2  )
 {
-	cputag_set_input_line(machine, "maincpu", 2, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rastansaga2_interrupt )
@@ -200,7 +201,8 @@ static INTERRUPT_GEN( rastansaga2_interrupt )
 
 static TIMER_CALLBACK( crimec_interrupt3 )
 {
-	cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( crimec_interrupt )
@@ -212,7 +214,8 @@ static INTERRUPT_GEN( crimec_interrupt )
 
 static TIMER_CALLBACK( hitice_interrupt6 )
 {
-	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hitice_interrupt )
@@ -224,7 +227,8 @@ static INTERRUPT_GEN( hitice_interrupt )
 
 static TIMER_CALLBACK( rambo3_interrupt1 )
 {
-	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rambo3_interrupt )
@@ -236,7 +240,8 @@ static INTERRUPT_GEN( rambo3_interrupt )
 
 static TIMER_CALLBACK( pbobble_interrupt5 )
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( pbobble_interrupt )
@@ -247,7 +252,8 @@ static INTERRUPT_GEN( pbobble_interrupt )
 
 static TIMER_CALLBACK( viofight_interrupt1 )
 {
-	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( viofight_interrupt )
@@ -258,7 +264,8 @@ static INTERRUPT_GEN( viofight_interrupt )
 
 static TIMER_CALLBACK( masterw_interrupt4 )
 {
-	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( masterw_interrupt )
@@ -269,7 +276,8 @@ static INTERRUPT_GEN( masterw_interrupt )
 
 static TIMER_CALLBACK( silentd_interrupt4 )
 {
-	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( silentd_interrupt )
@@ -280,7 +288,8 @@ static INTERRUPT_GEN( silentd_interrupt )
 
 static TIMER_CALLBACK( selfeena_interrupt4 )
 {
-	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( selfeena_interrupt )
@@ -291,7 +300,8 @@ static INTERRUPT_GEN( selfeena_interrupt )
 
 static TIMER_CALLBACK( sbm_interrupt5 )//4
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+	taitob_state *state = (taitob_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( sbm_interrupt )//5
@@ -306,49 +316,56 @@ static READ16_HANDLER( tracky1_hi_r )
 {
 	return input_port_read(space->machine, "TRACKX1");
 }
+
 static READ16_HANDLER( tracky1_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKX1") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKX1") & 0xff) << 8;
 }
+
 static READ16_HANDLER( trackx1_hi_r )
 {
 	return input_port_read(space->machine, "TRACKY1");
 }
+
 static READ16_HANDLER( trackx1_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKY1") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKY1") & 0xff) << 8;
 }
+
 static READ16_HANDLER( tracky2_hi_r )
 {
 	return input_port_read(space->machine, "TRACKX2");
 }
+
 static READ16_HANDLER( tracky2_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKX2") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKX2") & 0xff) << 8;
 }
+
 static READ16_HANDLER( trackx2_hi_r )
 {
 	return input_port_read(space->machine, "TRACKY2");
 }
+
 static READ16_HANDLER( trackx2_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKY2") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKY2") & 0xff) << 8;
 }
 
 
 static WRITE16_HANDLER( gain_control_w )
 {
-	const device_config *mb87078 = devtag_get_device(space->machine, "mb87078");
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset == 0)
 		{
-			mb87078_data_w(mb87078, data >> 8, 0);
+			mb87078_data_w(state->mb87078, data >> 8, 0);
     	      //logerror("MB87078 dsel=0 data=%4x\n", data);
 		}
 		else
 		{
-			mb87078_data_w(mb87078, data >> 8, 1);
+			mb87078_data_w(state->mb87078, data >> 8, 1);
 	           //logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
@@ -371,16 +388,17 @@ static const eeprom_interface taitob_eeprom_intf =
 	"0100110000"	/* unlock command*/
 };
 
-static UINT16 eep_latch = 0;
-
 static READ16_HANDLER( eep_latch_r )
 {
-	return eep_latch;
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	return state->eep_latch;
 }
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	COMBINE_DATA(&eep_latch);
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->eep_latch);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -410,53 +428,55 @@ static WRITE16_HANDLER( eeprom_w )
 
 *************************************************************************/
 
-static UINT16 coin_word=0;
 
 static READ16_HANDLER( player_34_coin_ctrl_r )
 {
-	return coin_word;
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	return state->coin_word;
 }
 
 static WRITE16_HANDLER( player_34_coin_ctrl_w )
 {
-	COMBINE_DATA(&coin_word);
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->coin_word);
 
 	/* coin counters and lockout */
-	coin_lockout_w(space->machine, 2,~data & 0x0100);
-	coin_lockout_w(space->machine, 3,~data & 0x0200);
-	coin_counter_w(space->machine, 2, data & 0x0400);
-	coin_counter_w(space->machine, 3, data & 0x0800);
+	coin_lockout_w(space->machine, 2, ~data & 0x0100);
+	coin_lockout_w(space->machine, 3, ~data & 0x0200);
+	coin_counter_w(space->machine, 2,  data & 0x0400);
+	coin_counter_w(space->machine, 3,  data & 0x0800);
 }
 
 static READ16_HANDLER( pbobble_input_bypass_r )
 {
-	const device_config *tc0640fio = devtag_get_device(space->machine, "tc0640fio");
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
 	switch (offset)
 	{
 		case 0x01:
 			return input_port_read(space->machine, "COIN") << 8;
 
 		default:
-			return tc0640fio_r(tc0640fio, offset) << 8;
+			return tc0640fio_r(state->tc0640fio, offset) << 8;
 	}
 }
 
 static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
 {
-	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	taitob_state *state = (taitob_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
-		tc0220ioc_w(tc0220ioc, offset, data & 0xff);
+		tc0220ioc_w(state->tc0220ioc, offset, data & 0xff);
 	else
 	{
 		/* spacedxo also writes here - bug? */
-		tc0220ioc_w(tc0220ioc, offset, (data >> 8) & 0xff);
+		tc0220ioc_w(state->tc0220ioc, offset, (data >> 8) & 0xff);
 	}
 }
 
 
 #define TC0180VCU_MEMRW( ADDR )											\
 	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_word_r, tc0180vcu_word_w)	\
-	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE(&taitob_spriteram)	\
+	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE_MEMBER(taitob_state, spriteram)	\
 	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM					\
 	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)	\
 	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)		\
@@ -516,7 +536,7 @@ static ADDRESS_MAP_START( hitice_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_BASE(&taitob_pixelram)
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_BASE_MEMBER(taitob_state, pixelram)
 //  { 0xbffff0, 0xbffff1, ???
 	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???
@@ -2069,9 +2089,10 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	taitob_state *state = (taitob_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -2105,12 +2126,13 @@ static const ym2203_interface ym2203_config =
 */
 static void mb87078_gain_changed( running_machine *machine, int channel, int percent )
 {
+	taitob_state *state = (taitob_state *)machine->driver_data;
+
 	if (channel == 1)
 	{
-		const device_config *ym = devtag_get_device(machine, "ymsnd");
-		sound_set_output_gain(ym, 0, percent / 100.0);
-		sound_set_output_gain(ym, 1, percent / 100.0);
-		sound_set_output_gain(ym, 2, percent / 100.0);
+		sound_set_output_gain(state->ym, 0, percent / 100.0);
+		sound_set_output_gain(state->ym, 1, percent / 100.0);
+		sound_set_output_gain(state->ym, 2, percent / 100.0);
 		//popmessage("MB87078 gain ch#%i percent=%i", channel, percent);
 	}
 }
@@ -2168,7 +2190,34 @@ static const tc0140syt_interface taitob_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
+static MACHINE_START( taitob )
+{
+	taitob_state *state = (taitob_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mb87078 = devtag_get_device(machine, "mb87078");
+	state->ym = devtag_get_device(machine, "ymsnd");
+	state->tc0180vcu = devtag_get_device(machine, "tc0180vcu");
+	state->tc0640fio = devtag_get_device(machine, "tc0640fio");
+	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
+
+	state_save_register_global(machine, state->eep_latch);
+	state_save_register_global(machine, state->coin_word);
+}
+
+static MACHINE_RESET( taitob )
+{
+	taitob_state *state = (taitob_state *)machine->driver_data;
+
+	state->eep_latch = 0;
+	state->coin_word = 0;
+}
+
 static MACHINE_DRIVER_START( rastsag2 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2179,6 +2228,9 @@ static MACHINE_DRIVER_START( rastsag2 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2214,6 +2266,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ashura )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(rastsag2_map)
@@ -2223,6 +2278,9 @@ static MACHINE_DRIVER_START( ashura )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2258,6 +2316,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( crimec )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(crimec_map)
@@ -2267,6 +2328,9 @@ static MACHINE_DRIVER_START( crimec )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2302,6 +2366,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tetrist )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ???*/
 	MDRV_CPU_PROGRAM_MAP(tetrist_map)
@@ -2311,6 +2378,9 @@ static MACHINE_DRIVER_START( tetrist )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2345,6 +2415,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tetrista )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(tetrista_map)
@@ -2354,6 +2427,9 @@ static MACHINE_DRIVER_START( tetrista )
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2389,6 +2465,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hitice )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(hitice_map)
@@ -2398,6 +2477,9 @@ static MACHINE_DRIVER_START( hitice )
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2439,6 +2521,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rambo3 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rambo3_map)
@@ -2448,6 +2533,9 @@ static MACHINE_DRIVER_START( rambo3 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2483,6 +2571,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rambo3a )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rambo3_map)
@@ -2492,6 +2583,9 @@ static MACHINE_DRIVER_START( rambo3a )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2526,6 +2620,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pbobble )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(pbobble_map)
@@ -2533,6 +2630,9 @@ static MACHINE_DRIVER_START( pbobble )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2574,6 +2674,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spacedx )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(spacedx_map)
@@ -2583,6 +2686,9 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
@@ -2622,6 +2728,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spacedxo )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(spacedxo_map)
@@ -2631,6 +2740,9 @@ static MACHINE_DRIVER_START( spacedxo )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2666,6 +2778,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( qzshowby )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz according to the readme*/
 	MDRV_CPU_PROGRAM_MAP(qzshowby_map)
@@ -2675,6 +2790,9 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
@@ -2714,6 +2832,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( viofight )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(viofight_map)
@@ -2723,6 +2844,9 @@ static MACHINE_DRIVER_START( viofight )
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2762,6 +2886,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( masterw )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(masterw_map)
@@ -2771,6 +2898,9 @@ static MACHINE_DRIVER_START( masterw )
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2807,6 +2937,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( silentd )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(silentd_map)
@@ -2816,6 +2949,9 @@ static MACHINE_DRIVER_START( silentd )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2851,6 +2987,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( selfeena )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(selfeena_map)
@@ -2860,6 +2999,9 @@ static MACHINE_DRIVER_START( selfeena )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2904,6 +3046,9 @@ static void ryujin_patch(void)
 
 static MACHINE_DRIVER_START( ryujin )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(selfeena_map)
@@ -2913,6 +3058,9 @@ static MACHINE_DRIVER_START( ryujin )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
 
@@ -2955,6 +3103,9 @@ static void sbm_patch(void)
 
 static MACHINE_DRIVER_START( sbm )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(taitob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(sbm_map)
@@ -2964,6 +3115,9 @@ static MACHINE_DRIVER_START( sbm )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(taitob)
+	MDRV_MACHINE_RESET(taitob)
 
 	MDRV_TC0510NIO_ADD("tc0510nio", sbm_io_intf)
 
