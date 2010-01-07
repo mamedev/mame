@@ -145,60 +145,60 @@ static TIMER_CALLBACK( clear_screen_done_callback )
 	gameplan_state *state = (gameplan_state *)machine->driver_data;
 
 	/* indicate that the we are done clearing the screen */
-	via_ca1_w(state->via_0, 0, 0);
+	via_ca1_w(state->via_0, 0);
 }
 
 
-static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
+static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 {
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *driver_state = (gameplan_state *)device->machine->driver_data;
 
-	if (data == 0)
+	if (state == 0)
 	{
-		switch (state->video_command)
+		switch (driver_state->video_command)
 		{
 		/* draw pixel */
 		case 0:
 			/* auto-adjust X? */
-			if (state->video_data & 0x10)
+			if (driver_state->video_data & 0x10)
 			{
-				if (state->video_data & 0x40)
-					state->video_x = state->video_x - 1;
+				if (driver_state->video_data & 0x40)
+					driver_state->video_x = driver_state->video_x - 1;
 				else
-					state->video_x = state->video_x + 1;
+					driver_state->video_x = driver_state->video_x + 1;
 			}
 
 			/* auto-adjust Y? */
-			if (state->video_data & 0x20)
+			if (driver_state->video_data & 0x20)
 			{
-				if (state->video_data & 0x80)
-					state->video_y = state->video_y - 1;
+				if (driver_state->video_data & 0x80)
+					driver_state->video_y = driver_state->video_y - 1;
 				else
-					state->video_y = state->video_y + 1;
+					driver_state->video_y = driver_state->video_y + 1;
 			}
 
-			state->videoram[state->video_y * (HBSTART - HBEND) + state->video_x] = state->video_data & 0x0f;
+			driver_state->videoram[driver_state->video_y * (HBSTART - HBEND) + driver_state->video_x] = driver_state->video_data & 0x0f;
 
 			break;
 
 		/* load X register */
 		case 1:
-			state->video_x = state->video_data;
+			driver_state->video_x = driver_state->video_data;
 			break;
 
 		/* load Y register */
 		case 2:
-			state->video_y = state->video_data;
+			driver_state->video_y = driver_state->video_data;
 			break;
 
 		/* clear screen */
 		case 3:
 			/* indicate that the we are busy */
 			{
-				via_ca1_w(state->via_0, 0, 1);
+				via_ca1_w(driver_state->via_0, 1);
 			}
 
-			memset(state->videoram, state->video_data & 0x0f, state->videoram_size);
+			memset(driver_state->videoram, driver_state->video_data & 0x0f, driver_state->videoram_size);
 
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
@@ -236,31 +236,31 @@ static READ8_DEVICE_HANDLER( vblank_r )
 
 const via6522_interface gameplan_via_0_interface =
 {
-	DEVCB_NULL, DEVCB_HANDLER(vblank_r),							/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_HANDLER(vblank_r),										/*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),	/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(video_command_trigger_w), DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
-	DEVCB_LINE(via_irq)									/*irq                  */
+	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),		/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
+	DEVCB_LINE(via_irq)															/*irq                  */
 };
 
 
 const via6522_interface leprechn_via_0_interface =
 {
-	DEVCB_NULL, DEVCB_HANDLER(vblank_r),							/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_HANDLER(vblank_r),										/*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(leprechn_video_command_w),	/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(video_command_trigger_w), DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
-	DEVCB_LINE(via_irq)									/*irq                  */
+	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(leprechn_video_command_w),		/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
+	DEVCB_LINE(via_irq)															/*irq                  */
 };
 
 
 const via6522_interface trvquest_via_0_interface =
 {
-	DEVCB_NULL, DEVCB_HANDLER(vblank_r),							/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_HANDLER(vblank_r),										/*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),	/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(video_command_trigger_w), DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
-	DEVCB_NULL										/*irq                  */
+	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),		/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
+	DEVCB_NULL																	/*irq                  */
 };
 
 
@@ -269,7 +269,7 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	gameplan_state *state = (gameplan_state *)machine->driver_data;
 
 	/* !VBLANK is connected to CA1 */
-	via_ca1_w(state->via_0, 0, (UINT8)param);
+	via_ca1_w(state->via_0, param);
 
 	if (param)
 		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);

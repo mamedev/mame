@@ -931,7 +931,7 @@ WRITE8_DEVICE_HANDLER(via_porta_w)
     CA1 input
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(via_ca1_r)
+READ_LINE_DEVICE_HANDLER(via_ca1_r)
 {
 	via6522_t *v = get_token(device);
 	return v->in_ca1;
@@ -943,20 +943,17 @@ READ8_DEVICE_HANDLER(via_ca1_r)
     CA1 input
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(via_ca1_w)
+WRITE_LINE_DEVICE_HANDLER(via_ca1_w)
 {
 	via6522_t *v = get_token(device);
 
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
 	/* handle the active transition */
-	if (data != v->in_ca1)
+	if (state != v->in_ca1)
     {
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", cpuexec_describe_context(device->machine), device->tag, data);
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", cpuexec_describe_context(device->machine), device->tag, state);
 
-		if ((CA1_LOW_TO_HIGH(v->pcr) && data) || (CA1_HIGH_TO_LOW(v->pcr) && !data))
+		if ((CA1_LOW_TO_HIGH(v->pcr) && state) || (CA1_HIGH_TO_LOW(v->pcr) && !state))
 		{
 			if (PA_LATCH_ENABLE(v->acr))
 			{
@@ -983,7 +980,7 @@ WRITE8_DEVICE_HANDLER(via_ca1_w)
 			}
 		}
 
-		v->in_ca1 = data;
+		v->in_ca1 = state;
     }
 }
 
@@ -993,7 +990,7 @@ WRITE8_DEVICE_HANDLER(via_ca1_w)
     CA2 input
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(via_ca2_r)
+READ_LINE_DEVICE_HANDLER(via_ca2_r)
 {
 	via6522_t *v = get_token(device);
 	return v->in_ca2;
@@ -1005,27 +1002,24 @@ READ8_DEVICE_HANDLER(via_ca2_r)
     CA2 input
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(via_ca2_w)
+WRITE_LINE_DEVICE_HANDLER(via_ca2_w)
 {
 	via6522_t *v = get_token(device);
-
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
 
 	/* CA2 is in input mode */
 	if (CA2_INPUT(v->pcr))
     {
 		/* the new state has caused a transition */
-		if (v->in_ca2 != data)
+		if (v->in_ca2 != state)
 		{
 			/* handle the active transition */
-			if ((data && CA2_LOW_TO_HIGH(v->pcr)) || (!data && CA2_HIGH_TO_LOW(v->pcr)))
+			if ((state && CA2_LOW_TO_HIGH(v->pcr)) || (!state && CA2_HIGH_TO_LOW(v->pcr)))
 			{
 				/* mark the IRQ */
 				via_set_int (device, INT_CA2);
 			}
 			/* set the new value for CA2 */
-			v->in_ca2 = data;
+			v->in_ca2 = state;
 		}
     }
 
@@ -1064,7 +1058,7 @@ WRITE8_DEVICE_HANDLER(via_portb_w)
     CB1 input
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(via_cb1_r)
+READ_LINE_DEVICE_HANDLER(via_cb1_r)
 {
 	via6522_t *v = get_token(device);
 	return v->in_cb1;
@@ -1076,17 +1070,14 @@ READ8_DEVICE_HANDLER(via_cb1_r)
     CB1 input
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(via_cb1_w)
+WRITE_LINE_DEVICE_HANDLER(via_cb1_w)
 {
 	via6522_t *v = get_token(device);
 
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
 	/* handle the active transition */
-	if (data != v->in_cb1)
+	if (state != v->in_cb1)
     {
-		if ((CB1_LOW_TO_HIGH(v->pcr) && data) || (CB1_HIGH_TO_LOW(v->pcr) && !data))
+		if ((CB1_LOW_TO_HIGH(v->pcr) && state) || (CB1_HIGH_TO_LOW(v->pcr) && !state))
 		{
 			if (PB_LATCH_ENABLE(v->acr))
 			{
@@ -1114,7 +1105,7 @@ WRITE8_DEVICE_HANDLER(via_cb1_w)
 				}
 			}
 		}
-		v->in_cb1 = data;
+		v->in_cb1 = state;
     }
 }
 
@@ -1124,7 +1115,7 @@ WRITE8_DEVICE_HANDLER(via_cb1_w)
     CB2 input
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(via_cb2_r)
+READ_LINE_DEVICE_HANDLER(via_cb2_r)
 {
 	via6522_t *v = get_token(device);
 	return v->in_cb2;
@@ -1136,27 +1127,24 @@ READ8_DEVICE_HANDLER(via_cb2_r)
     CB2 input
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(via_cb2_w)
+WRITE_LINE_DEVICE_HANDLER(via_cb2_w)
 {
 	via6522_t *v = get_token(device);
-
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
 
 	/* CB2 is in input mode */
 	if (CB2_INPUT(v->pcr))
     {
 		/* the new state has caused a transition */
-		if (v->in_cb2 != data)
+		if (v->in_cb2 != state)
 		{
 			/* handle the active transition */
-			if ((data && CB2_LOW_TO_HIGH(v->pcr)) || (!data && CB2_HIGH_TO_LOW(v->pcr)))
+			if ((state && CB2_LOW_TO_HIGH(v->pcr)) || (!state && CB2_HIGH_TO_LOW(v->pcr)))
 			{
 				/* mark the IRQ */
 				via_set_int (device, INT_CB2);
 			}
 			/* set the new value for CB2 */
-			v->in_cb2 = data;
+			v->in_cb2 = state;
 		}
     }
 }

@@ -211,8 +211,8 @@ static MACHINE_RESET( trvquest )
 static INTERRUPT_GEN( trvquest_interrupt )
 {
 	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
-	via_ca1_w(state->via_2, 0, 1);
-	via_ca1_w(state->via_2, 0, 0);
+	via_ca1_w(state->via_2, 1);
+	via_ca1_w(state->via_2, 0);
 }
 
 static MACHINE_DRIVER_START( trvquest )

@@ -10,7 +10,7 @@ INTERRUPT_GEN( beezer_interrupt )
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
 	scanline = (scanline + 1) % 0x80;
-	via_ca2_w (via_0, 0, scanline & 0x10);
+	via_ca2_w(via_0, (scanline & 0x10) ? 1 : 0);
 	if ((scanline & 0x78) == 0x78)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
