@@ -66,7 +66,7 @@ struct _state_entry
 	state_entry *		next;				/* pointer to next entry */
 	running_machine *	machine;			/* pointer back to the owning machine */
 	void *				data;				/* pointer to the memory to save/restore */
-	astring *			name;				/* full name */
+	astring				name;				/* full name */
 	UINT8				typesize;			/* size of the raw data type */
 	UINT32				typecount;			/* number of items */
 	UINT32				offset;				/* offset within the final structure */
@@ -229,7 +229,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 {
 	state_private *global = machine->state_data;
 	state_entry **entryptr, *next;
-	astring *totalname;
+	astring totalname;
 
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
@@ -244,23 +244,22 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	}
 
 	/* create the full name */
-	totalname = auto_astring_alloc(machine);
 	if (tag != NULL)
-		astring_printf(totalname, "%s/%s/%X/%s", module, tag, index, name);
+		totalname.printf("%s/%s/%X/%s", module, tag, index, name);
 	else
-		astring_printf(totalname, "%s/%X/%s", module, index, name);
+		totalname.printf("%s/%X/%s", module, index, name);
 
 	/* look for duplicates and an entry to insert in front of */
 	for (entryptr = &global->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next)
 	{
 		/* stop if the next guy's string is greater than ours */
-		int cmpval = astring_cmp((*entryptr)->name, totalname);
+		int cmpval = (*entryptr)->name.cmp(totalname);
 		if (cmpval > 0)
 			break;
 
 		/* error if we are equal */
 		if (cmpval == 0)
-			fatalerror("Duplicate save state registration entry (%s)", astring_c(totalname));
+			fatalerror("Duplicate save state registration entry (%s)", totalname.cstr());
 	}
 
 	/* didn't find one; allocate a new one */
@@ -375,7 +374,7 @@ static UINT32 get_signature(running_machine *machine)
 		UINT32 temp[2];
 
 		/* add the entry name to the CRC */
-		crc = crc32(crc, (UINT8 *)astring_c(entry->name), astring_len(entry->name));
+		crc = crc32(crc, (UINT8 *)entry->name.cstr(), entry->name.len());
 
 		/* add the type and size to the CRC */
 		temp[0] = LITTLE_ENDIANIZE_INT32(entry->typecount);
@@ -590,7 +589,7 @@ const char *state_save_get_indexed_item(running_machine *machine, int index, voi
 				*valsize = ss->typesize;
 			if (valcount != NULL)
 				*valcount = ss->typecount;
-			return astring_c(ss->name);
+			return ss->name;
 		}
 
 	return NULL;
@@ -608,6 +607,6 @@ void state_save_dump_registry(running_machine *machine)
 	state_entry *entry;
 
 	for (entry = global->entrylist; entry; entry=entry->next)
-		LOG(("%s: %d x %d\n", astring_c(entry->name), entry->typesize, entry->typecount));
+		LOG(("%s: %d x %d\n", entry->name.cstr(), entry->typesize, entry->typecount));
 }
 

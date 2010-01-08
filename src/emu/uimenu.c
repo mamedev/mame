@@ -1587,10 +1587,10 @@ static void menu_input_general(running_machine *machine, ui_menu *menu, void *pa
 
 static void menu_input_general_populate(running_machine *machine, ui_menu *menu, input_menu_state *menustate, int group)
 {
-	astring *tempstring = astring_alloc();
 	input_item_data *itemlist = NULL;
 	const input_type_desc *typedesc;
 	int suborder[SEQ_TYPE_TOTAL];
+	astring tempstring;
 	int sortorder = 1;
 
 	/* create a mini lookup table for sort order based on sequence type */
@@ -1631,7 +1631,6 @@ static void menu_input_general_populate(running_machine *machine, ui_menu *menu,
 
 	/* sort and populate the menu in a standard fashion */
 	menu_input_populate_and_sort(machine, menu, itemlist, menustate);
-	astring_free(tempstring);
 }
 
 
@@ -1653,11 +1652,11 @@ static void menu_input_specific(running_machine *machine, ui_menu *menu, void *p
 
 static void menu_input_specific_populate(running_machine *machine, ui_menu *menu, input_menu_state *menustate)
 {
-	astring *tempstring = astring_alloc();
 	input_item_data *itemlist = NULL;
 	const input_field_config *field;
 	const input_port_config *port;
 	int suborder[SEQ_TYPE_TOTAL];
+	astring tempstring;
 
 	/* create a mini lookup table for sort order based on sequence type */
 	suborder[SEQ_TYPE_STANDARD] = 0;
@@ -1711,7 +1710,6 @@ static void menu_input_specific_populate(running_machine *machine, ui_menu *menu
 
 	/* sort and populate the menu in a standard fashion */
 	menu_input_populate_and_sort(machine, menu, itemlist, menustate);
-	astring_free(tempstring);
 }
 
 
@@ -1859,9 +1857,9 @@ static void menu_input_populate_and_sort(running_machine *machine, ui_menu *menu
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { 0 };
 	input_item_data **itemarray, *item;
-	astring *subtext = astring_alloc();
-	astring *text = astring_alloc();
 	int numitems = 0, curitem;
+	astring subtext;
+	astring text;
 
 	/* create a mini lookup table for name format based on type */
 	nameformat[INPUT_TYPE_DIGITAL] = "%s";
@@ -1889,12 +1887,12 @@ static void menu_input_populate_and_sort(running_machine *machine, ui_menu *menu
 		/* generate the name of the item itself, based off the base name and the type */
 		item = itemarray[curitem];
 		assert(nameformat[item->type] != NULL);
-		astring_printf(text, nameformat[item->type], item->name);
+		text.printf(nameformat[item->type], item->name);
 
 		/* if we're polling this item, use some spaces with left/right arrows */
 		if (menustate->pollingref == item->ref)
 		{
-			astring_cpyc(subtext, "   ");
+			subtext.cpy("   ");
 			flags |= MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 		}
 
@@ -1906,12 +1904,8 @@ static void menu_input_populate_and_sort(running_machine *machine, ui_menu *menu
 		}
 
 		/* add the item */
-		ui_menu_item_append(menu, astring_c(text), astring_c(subtext), flags, item);
+		ui_menu_item_append(menu, text, subtext, flags, item);
 	}
-
-	/* free our temporary strings */
-	astring_free(subtext);
-	astring_free(text);
 }
 
 
@@ -2271,10 +2265,10 @@ static void menu_analog(running_machine *machine, ui_menu *menu, void *parameter
 
 static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 {
-	astring *subtext = astring_alloc();
-	astring *text = astring_alloc();
 	const input_field_config *field;
 	const input_port_config *port;
+	astring subtext;
+	astring text;
 
 	/* loop over input ports and add the items */
 	for (port = machine->portlist.head; port != NULL; port = port->next)
@@ -2325,8 +2319,8 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 						{
 							default:
 							case ANALOG_ITEM_KEYSPEED:
-								astring_printf(text, "%s Digital Speed", input_field_name(field));
-								astring_printf(subtext, "%d", settings.delta);
+								text.printf("%s Digital Speed", input_field_name(field));
+								subtext.printf("%d", settings.delta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.delta;
@@ -2334,8 +2328,8 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
-								astring_printf(text, "%s Autocenter Speed", input_field_name(field));
-								astring_printf(subtext, "%d", settings.centerdelta);
+								text.printf("%s Autocenter Speed", input_field_name(field));
+								subtext.printf("%d", settings.centerdelta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.centerdelta;
@@ -2343,8 +2337,8 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								break;
 
 							case ANALOG_ITEM_REVERSE:
-								astring_printf(text, "%s Reverse", input_field_name(field));
-								astring_cpyc(subtext, settings.reverse ? "On" : "Off");
+								text.printf("%s Reverse", input_field_name(field));
+								subtext.cpy(settings.reverse ? "On" : "Off");
 								data->min = 0;
 								data->max = 1;
 								data->cur = settings.reverse;
@@ -2352,8 +2346,8 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
-								astring_printf(text, "%s Sensitivity", input_field_name(field));
-								astring_printf(subtext, "%d", settings.sensitivity);
+								text.printf("%s Sensitivity", input_field_name(field));
+								subtext.printf("%d", settings.sensitivity);
 								data->min = 1;
 								data->max = 255;
 								data->cur = settings.sensitivity;
@@ -2368,13 +2362,9 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 							flags |= MENU_FLAG_RIGHT_ARROW;
 
 						/* append a menu item */
-						ui_menu_item_append(menu, astring_c(text), astring_c(subtext), flags, data);
+						ui_menu_item_append(menu, text, subtext, flags, data);
 					}
 			}
-
-	/* release our temporary strings */
-	astring_free(subtext);
-	astring_free(text);
 }
 
 
@@ -2418,18 +2408,18 @@ static void menu_bookkeeping(running_machine *machine, ui_menu *menu, void *para
 static void menu_bookkeeping_populate(running_machine *machine, ui_menu *menu, attotime *curtime)
 {
 	int tickets = get_dispensed_tickets(machine);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	int ctrnum;
 
 	/* show total time first */
 	if (curtime->seconds >= 60 * 60)
-		astring_catprintf(tempstring, "Uptime: %d:%02d:%02d\n\n", curtime->seconds / (60*60), (curtime->seconds / 60) % 60, curtime->seconds % 60);
+		tempstring.catprintf("Uptime: %d:%02d:%02d\n\n", curtime->seconds / (60*60), (curtime->seconds / 60) % 60, curtime->seconds % 60);
 	else
-		astring_catprintf(tempstring, "Uptime: %d:%02d\n\n", (curtime->seconds / 60) % 60, curtime->seconds % 60);
+		tempstring.catprintf("Uptime: %d:%02d\n\n", (curtime->seconds / 60) % 60, curtime->seconds % 60);
 
 	/* show tickets at the top */
 	if (tickets > 0)
-		astring_catprintf(tempstring, "Tickets dispensed: %d\n\n", tickets);
+		tempstring.catprintf("Tickets dispensed: %d\n\n", tickets);
 
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
@@ -2437,23 +2427,22 @@ static void menu_bookkeeping_populate(running_machine *machine, ui_menu *menu, a
 		int count = coin_counter_get_count(machine, ctrnum);
 
 		/* display the coin counter number */
-		astring_catprintf(tempstring, "Coin %c: ", ctrnum + 'A');
+		tempstring.catprintf("Coin %c: ", ctrnum + 'A');
 
 		/* display how many coins */
 		if (count == 0)
-			astring_catc(tempstring, "NA");
+			tempstring.cat("NA");
 		else
-			astring_catprintf(tempstring, "%d", count);
+			tempstring.catprintf("%d", count);
 
 		/* display whether or not we are locked out */
 		if (coin_lockout_get_state(machine, ctrnum))
-			astring_catc(tempstring, " (locked)");
-		astring_catc(tempstring, "\n");
+			tempstring.cat(" (locked)");
+		tempstring.cat("\n");
 	}
 
 	/* append the single item */
-	ui_menu_item_append(menu, astring_c(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
-	astring_free(tempstring);
+	ui_menu_item_append(menu, tempstring, NULL, MENU_FLAG_MULTILINE, NULL);
 }
 #endif
 
@@ -2468,9 +2457,8 @@ static void menu_game_info(running_machine *machine, ui_menu *menu, void *parame
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 	{
-		astring *tempstring = game_info_astring(machine, astring_alloc());
-		ui_menu_item_append(menu, astring_c(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
-		astring_free(tempstring);
+		astring tempstring;
+		ui_menu_item_append(menu, game_info_astring(machine, tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
 	}
 
 	/* process the menu */
@@ -2544,7 +2532,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 				case IPT_UI_UP:
 				case IPT_UI_DOWN:
 					if (cheat_get_comment(event->itemref) != NULL)
-						popmessage("Cheat Comment:\n%s", astring_c(cheat_get_comment(event->itemref)));
+						popmessage("Cheat Comment:\n%s", cheat_get_comment(event->itemref).cstr());
 					break;
 			}
 		}
@@ -2819,26 +2807,25 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 
 static void menu_sliders_populate(running_machine *machine, ui_menu *menu, int menuless_mode)
 {
-	astring *tempstring = astring_alloc();
 	const slider_state *curslider;
+	astring tempstring;
 
 	/* add all sliders */
 	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
-		INT32 curval = (*curslider->update)(machine, curslider->arg, tempstring, SLIDER_NOCHANGE);
+		INT32 curval = (*curslider->update)(machine, curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
 		if (curval > curslider->minval)
 			flags |= MENU_FLAG_LEFT_ARROW;
 		if (curval < curslider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
-		ui_menu_item_append(menu, curslider->description, astring_c(tempstring), flags, (void *)curslider);
+		ui_menu_item_append(menu, curslider->description, tempstring, flags, (void *)curslider);
 
 		if (menuless_mode)
 			break;
 	}
 
 	ui_menu_set_custom_render(menu, menu_sliders_custom_render, 0.0f, 2.0f * ui_get_line_height() + 2.0f * UI_BOX_TB_BORDER);
-	astring_free(tempstring);
 }
 
 
@@ -2854,21 +2841,20 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 	{
 		float bar_left, bar_area_top, bar_width, bar_area_height, bar_top, bar_bottom, default_x, current_x;
 		float line_height = ui_get_line_height();
-		astring *tempstring = astring_alloc();
 		float percentage, default_percentage;
+		astring tempstring;
 		float text_height;
 		INT32 curval;
 
 		/* determine the current value and text */
-		curval = (*curslider->update)(machine, curslider->arg, tempstring, SLIDER_NOCHANGE);
+		curval = (*curslider->update)(machine, curslider->arg, &tempstring, SLIDER_NOCHANGE);
 
 		/* compute the current and default percentages */
 		percentage = (float)(curval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
 		default_percentage = (float)(curslider->defval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
 
 		/* assemble the the text */
-		astring_insc(tempstring, 0, " ");
-		astring_insc(tempstring, 0, curslider->description);
+		tempstring.ins(0, " ").ins(0, curslider->description);
 
 		/* move us to the bottom of the screen, and expand to full width */
 		y2 = 1.0f - UI_BOX_TB_BORDER;
@@ -2881,7 +2867,7 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 		y1 += UI_BOX_TB_BORDER;
 
 		/* determine the text height */
-		ui_draw_text_full(astring_c(tempstring), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui_draw_text_full(tempstring, 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
 
 		/* draw the thermometer */
@@ -2908,10 +2894,8 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 		render_ui_add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw the actual text */
-		ui_draw_text_full(astring_c(tempstring), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui_draw_text_full(tempstring, x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, &text_height);
-
-		astring_free(tempstring);
 	}
 }
 
@@ -3037,8 +3021,8 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 static void menu_video_options_populate(running_machine *machine, ui_menu *menu, render_target *target)
 {
 	int layermask = render_target_get_layer_config(target);
-	astring *tempstring = astring_alloc();
 	const char *subtext = "";
+	astring tempstring;
 	int viewnum;
 	int enabled;
 
@@ -3050,8 +3034,8 @@ static void menu_video_options_populate(running_machine *machine, ui_menu *menu,
 			break;
 
 		/* create a string for the item, replacing underscores with spaces */
-		astring_replacec(astring_cpyc(tempstring, name), 0, "_", " ");
-		ui_menu_item_append(menu, astring_c(tempstring), NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		tempstring.cpy(name).replace(0, "_", " ");
+		ui_menu_item_append(menu, tempstring, NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */
@@ -3082,8 +3066,6 @@ static void menu_video_options_populate(running_machine *machine, ui_menu *menu,
 	/* cropping */
 	enabled = layermask & LAYER_CONFIG_ZOOM_TO_SCREEN;
 	ui_menu_item_append(menu, "View", enabled ? "Cropped" : "Full", enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)LAYER_CONFIG_ZOOM_TO_SCREEN);
-
-	astring_free(tempstring);
 }
 
 

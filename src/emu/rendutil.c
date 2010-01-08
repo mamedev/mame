@@ -565,16 +565,15 @@ bitmap_t *render_load_png(const char *path, const char *dirname, const char *fil
 	file_error filerr;
 	mame_file *file;
 	png_info png;
-	astring *fname;
 	png_error result;
 
 	/* open the file */
+	astring fname;
 	if (dirname == NULL)
-		fname = astring_dupc(filename);
+		fname.cpy(filename);
 	else
-		fname = astring_assemble_3(astring_alloc(), dirname, PATH_SEPARATOR, filename);
-	filerr = mame_fopen(path, astring_c(fname), OPEN_FLAG_READ, &file);
-	astring_free(fname);
+		fname.cpy(dirname).cat(PATH_SEPARATOR).cat(filename);
+	filerr = mame_fopen(path, fname, OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		return NULL;
 

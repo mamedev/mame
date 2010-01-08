@@ -62,7 +62,7 @@ enum
  *
  *************************************/
 
-static astring *filename;
+static astring filename;
 
 static input_port_value last_controls;
 static UINT8 playing;
@@ -83,7 +83,6 @@ static void (*execute_command)(const device_config *laserdisc, int command);
 
 static void free_string(running_machine *machine)
 {
-	astring_free(filename);
 }
 
 
@@ -123,7 +122,7 @@ static chd_file *get_disc(const device_config *device)
 					if (chderr == CHDERR_NONE)
 					{
 						set_disk_handle(device->machine, "laserdisc", image_file, image_chd);
-						filename = astring_dupc(dir->name);
+						filename.cpy(dir->name);
 						add_exit_callback(device->machine, free_string);
 						break;
 					}
@@ -264,7 +263,7 @@ static MACHINE_RESET( ldplayer )
 	timer_set(machine, attotime_zero, NULL, 0, autoplay);
 
 	/* indicate the name of the file we opened */
-	popmessage("Opened %s\n", astring_c(filename));
+	popmessage("Opened %s\n", filename.cstr());
 }
 
 

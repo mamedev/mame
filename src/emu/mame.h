@@ -125,7 +125,6 @@ typedef enum _output_channel output_channel;
 #define auto_alloc_array_clear(m, t, c)	pool_alloc_array_clear(static_cast<running_machine *>(m)->respool, t, c)
 #define auto_free(m, v)					pool_free(static_cast<running_machine *>(m)->respool, v)
 
-#define auto_astring_alloc(m)			auto_alloc(m, astring)
 #define auto_bitmap_alloc(m, w, h, f)	auto_alloc(m, bitmap_t(w, h, f))
 #define auto_strdup(m, s)				strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
 

@@ -783,9 +783,9 @@ static void z80sio_irq_reti(const device_config *device)
 static DEVICE_START( z80sio )
 {
 	const z80sio_interface *intf = (const z80sio_interface *)device->static_config;
-	astring *tempstring = astring_alloc();
 	z80sio *sio = get_safe_token(device);
 	void *ptr = (void *)device;
+	astring tempstring;
 
 	sio->chan[0].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
 	sio->chan[1].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
@@ -796,8 +796,6 @@ static DEVICE_START( z80sio )
 	sio->break_changed_cb = intf->break_changed_cb;
 	sio->transmit_cb = intf->transmit_cb;
 	sio->receive_poll_cb = intf->receive_poll_cb;
-
-	astring_free(tempstring);
 }
 
 

@@ -307,7 +307,7 @@ int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
 UINT32 rom_file_size(const rom_entry *romp);
 
 /* return the appropriate name for a rom region */
-astring *rom_region_name(astring *result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
+astring &rom_region_name(astring &result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
 
 
 

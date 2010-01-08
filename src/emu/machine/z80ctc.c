@@ -459,8 +459,8 @@ static void z80ctc_irq_reti(const device_config *device)
 static DEVICE_START( z80ctc )
 {
 	const z80ctc_interface *intf = (const z80ctc_interface *)device->static_config;
-	astring *tempstring = astring_alloc();
 	z80ctc *ctc = get_safe_token(device);
+	astring tempstring;
 	int ch;
 
 	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(device->clock), 16);
@@ -490,8 +490,6 @@ static DEVICE_START( z80ctc )
 	    state_save_register_device_item(device, ch, channel->extclk);
 	    state_save_register_device_item(device, ch, channel->int_state);
 	}
-
-	astring_free(tempstring);
 }
 
 

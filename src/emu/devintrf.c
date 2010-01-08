@@ -181,7 +181,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 		device->clock = device->owner->clock * ((device->clock >> 12) & 0xfff) / ((device->clock >> 0) & 0xfff);
 	}
 	device->static_config = NULL;
-	device->inline_config = (configlen == 0) ? NULL : global_alloc_array(UINT8, configlen);
+	device->inline_config = (configlen == 0) ? NULL : global_alloc_array_clear(UINT8, configlen);
 
 	/* ensure live fields are all cleared */
 	device->machine = NULL;
@@ -195,10 +195,6 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 
 	/* append the tag */
 	strcpy(device->tag, tag);
-
-	/* reset the inline_config to 0 */
-	if (configlen > 0)
-		memset(device->inline_config, 0, configlen);
 
 	/* fetch function pointers to the core functions */
 
@@ -270,17 +266,13 @@ void device_list_remove(device_list *devlist, const char *tag)
     the device's name and the given tag
 -------------------------------------------------*/
 
-const char *device_build_tag(astring *dest, const device_config *device, const char *tag)
+astring &device_build_tag(astring &dest, const device_config *device, const char *tag)
 {
 	if (device != NULL)
-	{
-		astring_cpyc(dest, device->tag);
-		astring_catc(dest, ":");
-		astring_catc(dest, tag);
-	}
+		dest.cpy(device->tag).cat(":").cat(tag);
 	else
-		astring_cpyc(dest, tag);
-	return astring_c(dest);
+		dest.cpy(tag);
+	return dest;
 }
 
 
@@ -289,17 +281,14 @@ const char *device_build_tag(astring *dest, const device_config *device, const c
     device prefix as the source tag
 -------------------------------------------------*/
 
-const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag)
+astring &device_inherit_tag(astring &dest, const char *sourcetag, const char *tag)
 {
 	const char *divider = strrchr(sourcetag, ':');
 	if (divider != NULL)
-	{
-		astring_cpych(dest, sourcetag, divider + 1 - sourcetag);
-		astring_catc(dest, tag);
-	}
+		dest.cpy(sourcetag, divider + 1 - sourcetag).cat(tag);
 	else
-		astring_cpyc(dest, tag);
-	return astring_c(dest);
+		dest.cpy(tag);
+	return dest;
 }
 
 
@@ -421,15 +410,13 @@ const device_config *device_list_find_by_tag_slow(const device_list *devlist, co
 
 const device_config *device_find_child_by_tag(const device_config *owner, const char *tag)
 {
-	astring *tempstring;
 	const device_config *child;
 
 	assert(owner != NULL);
 	assert(tag != NULL);
 
-	tempstring = astring_alloc();
+	astring tempstring;
 	child = device_list_find_by_tag(&owner->machine->config->devicelist, device_build_tag(tempstring, owner, tag));
-	astring_free(tempstring);
 
 	return child;
 }

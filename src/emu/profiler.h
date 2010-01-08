@@ -150,7 +150,7 @@ void _profiler_mark_start(int type);
 void _profiler_mark_end(void);
 
 /* return the current text in an astring */
-astring *_profiler_get_text(running_machine *machine, astring *string);
+astring &_profiler_get_text(running_machine *machine, astring &string);
 
 
 #endif	/* __PROFILER_H__ */

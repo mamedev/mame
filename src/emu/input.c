@@ -54,8 +54,8 @@ struct _input_device_item
 {
 	input_device_class		devclass;				/* device class of parent item */
 	int						devindex;				/* device index of parent item */
-	astring *				name;					/* string name of item */
-	astring *				token;					/* tokenized name for non-standard items */
+	astring					name;					/* string name of item */
+	astring					token;					/* tokenized name for non-standard items */
 	void *					internal;				/* internal callback pointer */
 	input_item_class		itemclass;				/* class of the item */
 	input_item_id			itemid;					/* originally specified item id */
@@ -82,7 +82,7 @@ struct _joystick_map
 struct _input_device
 {
 	running_machine *		machine;				/* machine we are attached to */
-	astring *				name;					/* string name of device */
+	astring					name;					/* string name of device */
 	input_device_class		devclass;				/* class of this device */
 	int						devindex;				/* device index of this device */
 	input_device_item *		item[ITEM_ID_ABSOLUTE_MAXIMUM];	/* array of pointers to items */
@@ -759,17 +759,16 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
 	/* allocate a new device */
-	input_device *newlist = auto_alloc_array(machine, input_device, devlist->count + 1);
+	input_device *newlist = auto_alloc_array_clear(machine, input_device, devlist->count + 1);
 	for (int devnum = 0; devnum < devlist->count; devnum++)
 		newlist[devnum] = devlist->list[devnum];
 	auto_free(machine, devlist->list);
 	devlist->list = newlist;
 	device = &devlist->list[devlist->count++];
-	memset(device, 0, sizeof(*device));
 
 	/* fill in the data */
 	device->machine = machine;
-	device->name = astring_cpyc(auto_astring_alloc(machine), name);
+	device->name.cpy(name);
 	device->devclass = devclass;
 	device->devindex = devlist->count - 1;
 	device->internal = internal;
@@ -781,7 +780,7 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 		device->lastmap = JOYSTICK_MAP_NEUTRAL;
 	}
 
-	mame_printf_verbose("Input: Adding %s #%d: %s\n", code_to_string(devclass_string_table, devclass), devlist->count, astring_c(device->name));
+	mame_printf_verbose("Input: Adding %s #%d: %s\n", code_to_string(devclass_string_table, devclass), devlist->count, device->name.cstr());
 	return device;
 }
 
@@ -819,8 +818,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	/* copy in the data passed in from the item list */
 	item->devclass = device->devclass;
 	item->devindex = device->devindex;
-	item->name = astring_cpyc(auto_astring_alloc(device->machine), name);
-	item->token = NULL;
+	item->name.cpy(name);
 	item->internal = internal;
 	item->itemclass = input_item_standard_class(device->devclass, itemid_std);
 	item->itemid = itemid;
@@ -830,9 +828,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	if (itemid > ITEM_ID_MAXIMUM)
 	{
 		/* copy the item name, removing spaces/underscores and making all caps */
-		item->token = astring_toupper(astring_cpyc(auto_astring_alloc(device->machine), name));
-		astring_delchr(item->token, ' ');
-		astring_delchr(item->token, '_');
+		item->token.cpy(name).toupper().delchr(' ').delchr('_');
 	}
 
 	/* otherwise, make sure we have a valid standard token */
@@ -1280,7 +1276,7 @@ input_code input_code_poll_axes(running_machine *machine, int reset)
     a friendly name
 -------------------------------------------------*/
 
-astring *input_code_name(running_machine *machine, astring *string, input_code code)
+astring &input_code_name(running_machine *machine, astring &string, input_code code)
 {
 	input_device_list *device_list = machine->input_data->device_list;
 	input_device_item *item = input_code_item(machine, code);
@@ -1291,7 +1287,7 @@ astring *input_code_name(running_machine *machine, astring *string, input_code c
 
 	/* if nothing there, return an empty string */
 	if (item == NULL)
-		return astring_reset(string);
+		return string.reset();
 
 	/* determine the devclass part */
 	devclass = code_to_string(devclass_string_table, INPUT_CODE_DEVCLASS(code));
@@ -1311,7 +1307,7 @@ astring *input_code_name(running_machine *machine, astring *string, input_code c
 	}
 
 	/* devcode part comes from the item name */
-	devcode = astring_c(item->name);
+	devcode = item->name;
 
 	/* determine the modifier part */
 	modifier = code_to_string(modifier_string_table, INPUT_CODE_MODIFIER(code));
@@ -1322,16 +1318,16 @@ astring *input_code_name(running_machine *machine, astring *string, input_code c
 			devcode = "";
 
 	/* concatenate the strings */
-	astring_cpyc(string, devclass);
+	string.cpy(devclass);
 	if (devindex[0] != 0)
-		astring_catc(astring_catc(string, " "), devindex);
+		string.cat(" ").cat(devindex);
 	if (devcode[0] != 0)
-		astring_catc(astring_catc(string, " "), devcode);
+		string.cat(" ").cat(devcode);
 	if (modifier[0] != 0)
-		astring_catc(astring_catc(string, " "), modifier);
+		string.cat(" ").cat(modifier);
 
 	/* delete any leading spaces */
-	return astring_trimspace(string);
+	return string.trimspace();
 }
 
 
@@ -1340,7 +1336,7 @@ astring *input_code_name(running_machine *machine, astring *string, input_code c
     a given code
 -------------------------------------------------*/
 
-astring *input_code_to_token(running_machine *machine, astring *string, input_code code)
+astring &input_code_to_token(running_machine *machine, astring &string, input_code code)
 {
 	input_device_item *item = input_code_item(machine, code);
 	const char *devclass;
@@ -1359,7 +1355,7 @@ astring *input_code_to_token(running_machine *machine, astring *string, input_co
 
 	/* determine the itemid part; look up in the table if we don't have a token */
 	if (item != NULL && item->token != NULL)
-		devcode = astring_c(item->token);
+		devcode = item->token;
 	else
 	{
 		devcode = code_to_string(itemid_token_table, INPUT_CODE_ITEMID(code));
@@ -1377,15 +1373,15 @@ astring *input_code_to_token(running_machine *machine, astring *string, input_co
 		itemclass = code_to_string(itemclass_token_table, INPUT_CODE_ITEMCLASS(code));
 
 	/* concatenate the strings */
-	astring_cpyc(string, devclass);
+	string.cpy(devclass);
 	if (devindex[0] != 0)
-		astring_catc(astring_catc(string, "_"), devindex);
+		string.cat("_").cat(devindex);
 	if (devcode[0] != 0)
-		astring_catc(astring_catc(string, "_"), devcode);
+		string.cat("_").cat(devcode);
 	if (modifier[0] != 0)
-		astring_catc(astring_catc(string, "_"), modifier);
+		string.cat("_").cat(modifier);
 	if (itemclass[0] != 0)
-		astring_catc(astring_catc(string, "_"), itemclass);
+		string.cat("_").cat(itemclass);
 	return string;
 }
 
@@ -1400,7 +1396,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	UINT32 devclass, itemid, devindex, modifier, standard;
 	UINT32 itemclass = ITEM_CLASS_INVALID;
 	input_code code = INPUT_CODE_INVALID;
-	astring *token[6] = { NULL };
+	astring token[6];
 	int numtokens, curtok;
 
 	/* copy the token and break it into pieces */
@@ -1408,7 +1404,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	{
 		/* make a token up to the next underscore */
 		char *score = (char *)strchr(_token, '_');
-		token[numtokens++] = astring_dupch(_token, (score == NULL) ? strlen(_token) : (score - _token));
+		token[numtokens++].cpy(_token, (score == NULL) ? strlen(_token) : (score - _token));
 
 		/* if we hit the end, we're done, else advance our pointer */
 		if (score == NULL)
@@ -1418,13 +1414,13 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 
 	/* first token should be the devclass */
 	curtok = 0;
-	devclass = string_to_code(devclass_token_table, astring_c(token[curtok++]));
+	devclass = string_to_code(devclass_token_table, token[curtok++]);
 	if (devclass == ~0)
 		goto exit;
 
 	/* second token might be index; look for number */
 	devindex = 0;
-	if (numtokens > 2 && sscanf(astring_c(token[curtok]), "%d", &devindex) == 1)
+	if (numtokens > 2 && sscanf(token[curtok], "%d", &devindex) == 1)
 	{
 		curtok++;
 		devindex--;
@@ -1433,7 +1429,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 		goto exit;
 
 	/* next token is the item ID */
-	itemid = string_to_code(itemid_token_table, astring_c(token[curtok]));
+	itemid = string_to_code(itemid_token_table, token[curtok]);
 	standard = (itemid != ~0);
 
 	/* if we're a standard code, default the itemclass based on it */
@@ -1455,7 +1451,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 		for (itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem; itemid++)
 		{
 			input_device_item *item = device->item[itemid];
-			if (item != NULL && item->token != NULL && astring_cmp(token[curtok], item->token) == 0)
+			if (item != NULL && item->token != NULL && token[curtok].cmp(item->token) == 0)
 			{
 				/* take the itemclass from the item */
 				itemclass = item->itemclass;
@@ -1473,7 +1469,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	modifier = ITEM_MODIFIER_NONE;
 	if (curtok < numtokens)
 	{
-		modifier = string_to_code(modifier_token_table, astring_c(token[curtok]));
+		modifier = string_to_code(modifier_token_table, token[curtok]);
 		if (modifier != ~0)
 			curtok++;
 		else
@@ -1483,7 +1479,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	/* if we have another token, it is the item class */
 	if (curtok < numtokens)
 	{
-		UINT32 temp = string_to_code(itemclass_token_table, astring_c(token[curtok]));
+		UINT32 temp = string_to_code(itemclass_token_table, token[curtok]);
 		if (temp != ~0)
 		{
 			curtok++;
@@ -1499,9 +1495,6 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	code = INPUT_CODE(devclass, devindex, itemclass, modifier, itemid);
 
 exit:
-	for (curtok = 0; curtok < ARRAY_LENGTH(token); curtok++)
-		if (token[curtok] != NULL)
-			astring_free(token[curtok]);
 	return code;
 }
 

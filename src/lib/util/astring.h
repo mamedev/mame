@@ -60,25 +60,11 @@ struct _astring_base
 };
 
 
+/* class for C++, direct map for C */
 #ifdef __cplusplus
-
-/* class for C++ */
-class astring : public astring_base
-{
-private:
-	astring(const astring &);
-	astring &operator=(const astring &);
-
-public:
-	astring();
-	~astring();
-};
-
+class astring;
 #else
-
-/* direct map for C */
 typedef astring_base astring;
-
 #endif
 
 
@@ -299,6 +285,91 @@ INLINE astring *astring_assemble_5(astring *dst, const char *src1, const char *s
 {
 	return astring_catc(astring_assemble_4(dst, src1, src2, src3, src4), src5);
 }
+
+
+
+/***************************************************************************
+    C++ WRAPPERS
+***************************************************************************/
+
+#ifdef __cplusplus
+
+/* derived class for C++ */
+class astring : public astring_base
+{
+private:
+	astring &init();
+	
+public:
+	astring() { init(); }
+	~astring();
+
+	astring(const char *string) { init().cpy(string); }
+	astring(const char *str1, const char *str2) { init().cpy(str1).cat(str2); }
+	astring(const char *str1, const char *str2, const char *str3) { init().cpy(str1).cat(str2).cat(str3); }
+	astring(const char *str1, const char *str2, const char *str3, const char *str4) { init().cpy(str1).cat(str2).cat(str3).cat(str4); }
+	astring(const char *str1, const char *str2, const char *str3, const char *str4, const char *str5) { init().cpy(str1).cat(str2).cat(str3).cat(str4).cat(str5); }
+	astring(const astring &string) { init().cpy(string); }
+
+	astring &operator=(const char *string) { return cpy(string); }
+	astring &operator=(const astring &string) { return cpy(string); }
+
+	astring &reset() { return cpy(""); }
+	
+	operator const char *() const { return astring_c(this); }
+	const char *cstr() const { return astring_c(this); }
+	int len() const { return astring_len(this); }
+	
+	astring &cpy(const astring &src) { return *astring_cpy(this, &src); }
+	astring &cpy(const char *src) { return *astring_cpyc(this, src); }
+	astring &cpy(const char *src, int count) { return *astring_cpych(this, src, count); }
+	astring &cpysubstr(const astring &src, int start, int count) { return *astring_cpysubstr(this, &src, start, count); }
+
+	astring &cat(const astring &src) { return ins(-1, src); }
+	astring &cat(const char *src) { return ins(-1, src); }
+	astring &cat(const char *src, int count) { return ins(-1, src, count); }
+	astring &catsubstr(const astring &src, int start, int count) { return inssubstr(-1, src, start, count); }
+
+	astring &ins(int insbefore, const astring &src) { return *astring_ins(this, insbefore, &src); }
+	astring &ins(int insbefore, const char *src) { return *astring_insc(this, insbefore, src); }
+	astring &ins(int insbefore, const char *src, int count) { return *astring_insch(this, insbefore, src, count); }
+	astring &inssubstr(int insbefore, const astring &src, int start, int count) { return *astring_inssubstr(this, insbefore, &src, start, count); }
+
+	astring &substr(int start, int count) { return *astring_substr(this, start, count); }
+	astring &del(int start, int count) { return *astring_del(this, start, count); }
+
+	int printf(const char *format, ...) { va_list ap; va_start(ap, format); int result = astring_vprintf(this, format, ap); va_end(ap); return result; }
+	int vprintf(const char *format, va_list args) { return astring_vprintf(this, format, args); }
+	int catprintf(const char *format, ...) { va_list ap; va_start(ap, format); int result = astring_catvprintf(this, format, ap); va_end(ap); return result; }
+	int catvprintf(const char *format, va_list args) { return astring_catvprintf(this, format, args); }
+
+	int cmp(const astring &str2) const { return astring_cmp(this, &str2); }
+	int cmp(const char *str2) const { return astring_cmpc(this, str2); }
+	int cmp(const char *str2, int count) const { return astring_cmpch(this, str2, count); }
+	int cmpsubstr(const astring &str2, int start, int count) const { return astring_cmpsubstr(this, &str2, start, count); }
+
+	int icmp(const astring &str2) const { return astring_icmp(this, &str2); }
+	int icmp(const char *str2) const { return astring_icmpc(this, str2); }
+	int icmp(const char *str2, int count) const { return astring_icmpch(this, str2, count); }
+	int icmpsubstr(const astring &str2, int start, int count) const { return astring_icmpsubstr(this, &str2, start, count); }
+
+	int chr(int start, int ch) const { return astring_chr(this, start, ch); }
+	int rchr(int start, int ch) const { return astring_rchr(this, start, ch); }
+
+	int find(int start, const astring &search) const { return astring_find(this, start, &search); }
+	int find(int start, const char *search) const { return astring_findc(this, start, search); }
+
+	int replace(int start, const astring &search, const astring &replace) { return astring_replace(this, start, &search, &replace); }
+	int replace(int start, const char *search, const char *replace) { return astring_replacec(this, start, search, replace); }
+
+	astring &delchr(int ch) { return *astring_delchr(this, ch); }
+	astring &replacechr(int ch, int newch) { return *astring_replacechr(this, ch, newch); }
+	astring &toupper() { return *astring_toupper(this); }
+	astring &tolower() { return *astring_tolower(this); }
+	astring &trimspace() { return *astring_trimspace(this); }
+};
+
+#endif
 
 
 #endif /* __ASTRING_H__ */

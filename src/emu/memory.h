@@ -215,7 +215,7 @@ struct _map_handler_data
 	memory_handler			handler;			/* a memory handler */
 	const char *			name;				/* name of the handler */
 	const char *			tag;				/* tag pointing to a reference */
-	astring *				derived_tag;		/* string used to hold derived names */
+	astring					derived_tag;		/* string used to hold derived names */
 };
 
 
@@ -224,7 +224,7 @@ typedef struct _address_map_entry address_map_entry;
 struct _address_map_entry
 {
 	address_map_entry *		next;				/* pointer to the next entry */
-	astring *				region_string;		/* string used to hold derived names */
+	astring					region_string;		/* string used to hold derived names */
 
 	offs_t					addrstart;			/* start address */
 	offs_t					addrend;			/* end address */

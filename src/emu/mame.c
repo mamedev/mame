@@ -101,11 +101,10 @@ typedef struct _region_info region_info;
 struct _region_info
 {
 	region_info *	next;
-	astring *		name;
+	astring			name;
 	UINT32			length;
 	UINT32			flags;
-	UINT8			padding[32 - 2 * sizeof(void *) - 2 * sizeof(UINT32)];
-	UINT8			base[1];
+	UINT8 *			base;
 };
 
 
@@ -133,7 +132,7 @@ struct _mame_private
 	UINT8			hard_reset_pending;
 	UINT8			exit_pending;
 	const game_driver *new_driver_pending;
-	astring *		saveload_pending_file;
+	astring			saveload_pending_file;
 	const char *	saveload_searchpath;
 	emu_timer *		soft_reset_timer;
 	mame_file *		logfile;
@@ -250,15 +249,14 @@ int mame_execute(core_options *options)
 		running_machine *machine;
 		mame_private *mame;
 		callback_item *cb;
-		astring *gamename;
+		astring gamename;
 
 		/* specify the mame_options */
 		mame_opts = options;
 
 		/* convert the specified gamename to a driver */
-		gamename = core_filename_extract_base(astring_alloc(), options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
-		driver = driver_get_name(astring_c(gamename));
-		astring_free(gamename);
+		core_filename_extract_base(&gamename, options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
+		driver = driver_get_name(gamename);
 
 		/* if no driver, use the internal empty driver */
 		if (driver == NULL)
@@ -321,7 +319,7 @@ int mame_execute(core_options *options)
 
 			/* run the CPUs until a reset or exit */
 			mame->hard_reset_pending = FALSE;
-			while ((!mame->hard_reset_pending && !mame->exit_pending) || mame->saveload_pending_file != NULL)
+			while ((!mame->hard_reset_pending && !mame->exit_pending) || mame->saveload_pending_file.len() != 0)
 			{
 				profiler_mark_start(PROFILER_EXTRA);
 
@@ -629,18 +627,15 @@ static void set_saveload_filename(running_machine *machine, const char *filename
 	mame_private *mame = machine->mame_data;
 
 	/* free any existing request and allocate a copy of the requested name */
-	if (mame->saveload_pending_file != NULL)
-		astring_free(mame->saveload_pending_file);
-
 	if (osd_is_absolute_path(filename))
 	{
 		mame->saveload_searchpath = NULL;
-		mame->saveload_pending_file = astring_dupc(filename);
+		mame->saveload_pending_file.cpy(filename);
 	}
 	else
 	{
 		mame->saveload_searchpath = SEARCHPATH_STATE;
-		mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
+		mame->saveload_pending_file.cpy(machine->basename).cat(PATH_SEPARATOR).cat(filename).cat(".sta");
 	}
 }
 
@@ -697,7 +692,7 @@ int mame_is_save_or_load_pending(running_machine *machine)
 	/* we can't check for saveload_pending_file here because it will bypass */
 	/* required UI screens if a state is queued from the command line */
 	mame_private *mame = machine->mame_data;
-	return (mame->saveload_pending_file != NULL);
+	return (mame->saveload_pending_file.len() != 0);
 }
 
 
@@ -764,22 +759,23 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 
     /* make sure we don't have a region of the same name; also find the end of the list */
     for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
-    	if (astring_cmpc((*infoptr)->name, name) == 0)
+    	if ((*infoptr)->name.cmp(name) == 0)
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = (region_info *)auto_alloc_array(machine, UINT8, sizeof(*info) + length);
+	info = auto_alloc(machine, region_info);
 	info->next = NULL;
-	info->name = astring_dupc(name);
+	info->name.cpy(name);
 	info->length = length;
 	info->flags = flags;
+	info->base = auto_alloc_array(machine, UINT8, length);
 
 	/* attempt to put is in the hash table */
 	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info, FALSE);
 	if (tagerr == TMERR_DUPLICATE)
 	{
 		region_info *match = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, astring_c(match->name));
+		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, match->name.cstr());
 	}
 
 	/* hook us into the list */
@@ -800,16 +796,16 @@ void memory_region_free(running_machine *machine, const char *name)
 
 	/* find the region */
 	for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
-		if (astring_cmpc((*infoptr)->name, name) == 0)
+		if ((*infoptr)->name.cmp(name) == 0)
 		{
 			region_info *info = *infoptr;
 
 			/* remove us from the list and the map */
 			*infoptr = info->next;
-			tagmap_remove(mame->regionmap, astring_c(info->name));
+			tagmap_remove(mame->regionmap, info->name);
 
 			/* free the region */
-			astring_free(info->name);
+			auto_free(machine, info->base);
 			auto_free(machine, info);
 			break;
 		}
@@ -892,11 +888,11 @@ const char *memory_region_next(running_machine *machine, const char *name)
 
 	/* NULL means return the first */
     if (name == NULL)
-    	return astring_c(mame->regionlist->name);
+    	return mame->regionlist->name;
 
     /* look up the region and return the next guy */
 	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-	return (info != NULL && info->next != NULL) ? astring_c(info->next->name) : NULL;
+	return (info != NULL && info->next != NULL) ? info->next->name.cstr() : NULL;
 }
 
 
@@ -1243,7 +1239,6 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
 		const device_config *device;
 		machine_config *config;
-		astring *sourcename;
 
 		/* parse "vertical.ini" or "horizont.ini" */
 		if (driver->flags & ORIENTATION_SWAP_XY)
@@ -1265,14 +1260,13 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		machine_config_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
-		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
-		astring_insc(sourcename, 0, "source" PATH_SEPARATOR);
-		if (!parse_ini_file(options, astring_c(sourcename), OPTION_PRIORITY_SOURCE_INI))
+		astring sourcename;
+		core_filename_extract_base(&sourcename, driver->source_file, TRUE)->ins(0, "source" PATH_SEPARATOR);
+		if (!parse_ini_file(options, sourcename, OPTION_PRIORITY_SOURCE_INI))
 		{
-			core_filename_extract_base(sourcename, driver->source_file, TRUE);
-			parse_ini_file(options, astring_c(sourcename), OPTION_PRIORITY_SOURCE_INI);
+			core_filename_extract_base(&sourcename, driver->source_file, TRUE);
+			parse_ini_file(options, sourcename, OPTION_PRIORITY_SOURCE_INI);
 		}
-		astring_free(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
 		if (gparent != NULL)
@@ -1293,16 +1287,14 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 {
 	file_error filerr;
 	mame_file *file;
-	astring *fname;
 
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(options, OPTION_READCONFIG))
 		return FALSE;
 
 	/* open the file; if we fail, that's ok */
-	fname = astring_assemble_2(astring_alloc(), name, ".ini");
-	filerr = mame_fopen_options(options, SEARCHPATH_INI, astring_c(fname), OPEN_FLAG_READ, &file);
-	astring_free(fname);
+	astring fname(name, ".ini");
+	filerr = mame_fopen_options(options, SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		return FALSE;
 
@@ -1601,7 +1593,7 @@ static void handle_save(running_machine *machine)
 	mame_file *file;
 
 	/* if no name, bail */
-	if (mame->saveload_pending_file == NULL)
+	if (mame->saveload_pending_file.len() == 0)
 	{
 		mame->saveload_schedule_callback = NULL;
 		return;
@@ -1620,10 +1612,10 @@ static void handle_save(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	filerr = mame_fopen(mame->saveload_searchpath, mame->saveload_pending_file, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
-		astring *fullname = astring_dupc(mame_file_full_name(file));
+		astring fullname(mame_file_full_name(file));
 		state_save_error staterr;
 
 		/* write the save state */
@@ -1655,17 +1647,15 @@ static void handle_save(running_machine *machine)
 		/* close and perhaps delete the file */
 		mame_fclose(file);
 		if (staterr != STATERR_NONE)
-			osd_rmfile(astring_c(fullname));
-		astring_free(fullname);
+			osd_rmfile(fullname);
 	}
 	else
 		popmessage("Error: Failed to create save state file.");
 
 	/* unschedule the save */
 cancel:
-	astring_free(mame->saveload_pending_file);
+	mame->saveload_pending_file.reset();
 	mame->saveload_searchpath = NULL;
-	mame->saveload_pending_file = NULL;
 	mame->saveload_schedule_callback = NULL;
 }
 
@@ -1681,7 +1671,7 @@ static void handle_load(running_machine *machine)
 	mame_file *file;
 
 	/* if no name, bail */
-	if (mame->saveload_pending_file == NULL)
+	if (mame->saveload_pending_file.len() == 0)
 	{
 		mame->saveload_schedule_callback = NULL;
 		return;
@@ -1701,7 +1691,7 @@ static void handle_load(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_READ, &file);
+	filerr = mame_fopen(mame->saveload_searchpath, mame->saveload_pending_file, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
 		state_save_error staterr;
@@ -1744,8 +1734,7 @@ static void handle_load(running_machine *machine)
 
 	/* unschedule the load */
 cancel:
-	astring_free(mame->saveload_pending_file);
-	mame->saveload_pending_file = NULL;
+	mame->saveload_pending_file.reset();
 	mame->saveload_schedule_callback = NULL;
 }
 

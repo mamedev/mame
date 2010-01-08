@@ -421,9 +421,9 @@ DEVICE_GET_INFO( sound )
 
 static void route_sound(running_machine *machine)
 {
-	astring *tempstring = astring_alloc();
 	const device_config *curspeak;
 	const device_config *sound;
+	astring tempstring;
 	int outputnum;
 
 	/* first count up the inputs for each speaker */
@@ -488,14 +488,14 @@ static void route_sound(running_machine *machine)
 						speaker_info *speakerinfo = get_safe_token(target_device);
 
 						/* generate text for the UI */
-						astring_printf(tempstring, "Speaker '%s': %s '%s'", target_device->tag, device_get_name(sound), sound->tag);
+						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag, device_get_name(sound), sound->tag);
 						if (numoutputs > 1)
-							astring_catprintf(tempstring, " Ch.%d", outputnum);
+							tempstring.catprintf(" Ch.%d", outputnum);
 
 						/* fill in the input data on this speaker */
 						speakerinfo->input[speakerinfo->inputs].gain = route->gain;
 						speakerinfo->input[speakerinfo->inputs].default_gain = route->gain;
-						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(machine, astring_c(tempstring));
+						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(machine, tempstring);
 
 						/* connect the output to the input */
 						if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
@@ -515,9 +515,6 @@ static void route_sound(running_machine *machine)
 				}
 		}
 	}
-
-	/* free up our temporary string */
-	astring_free(tempstring);
 }
 
 

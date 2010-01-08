@@ -70,7 +70,7 @@ static int show_profiler;
 static osd_ticks_t popup_text_end;
 
 /* messagebox buffer */
-static astring *messagebox_text;
+static astring messagebox_text;
 static rgb_t messagebox_backcolor;
 
 /* slider info */
@@ -86,8 +86,8 @@ static slider_state *slider_current;
 static void ui_exit(running_machine *machine);
 
 /* text generators */
-static astring *disclaimer_string(running_machine *machine, astring *buffer);
-static astring *warnings_string(running_machine *machine, astring *buffer);
+static astring &disclaimer_string(running_machine *machine, astring &buffer);
+static astring &warnings_string(running_machine *machine, astring &buffer);
 
 /* UI handlers */
 static UINT32 handler_messagebox(running_machine *machine, UINT32 state);
@@ -198,7 +198,6 @@ int ui_init(running_machine *machine)
 
 	/* allocate the font and messagebox string */
 	ui_font = render_font_alloc("ui.bdf");
-	messagebox_text = astring_alloc();
 
 	/* initialize the other UI bits */
 	ui_menu_init(machine);
@@ -221,11 +220,6 @@ static void ui_exit(running_machine *machine)
 	if (ui_font != NULL)
 		render_font_free(ui_font);
 	ui_font = NULL;
-
-	/* free the messagebox string */
-	if (messagebox_text != NULL)
-		astring_free(messagebox_text);
-	messagebox_text = NULL;
 }
 
 
@@ -265,12 +259,12 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 		switch (state)
 		{
 			case 0:
-				if (show_disclaimer && astring_len(disclaimer_string(machine, messagebox_text)) > 0)
+				if (show_disclaimer && disclaimer_string(machine, messagebox_text).len() > 0)
 					ui_set_handler(handler_messagebox_ok, 0);
 				break;
 
 			case 1:
-				if (show_warnings && astring_len(warnings_string(machine, messagebox_text)) > 0)
+				if (show_warnings && warnings_string(machine, messagebox_text).len() > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
 					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
@@ -281,7 +275,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				break;
 
 			case 2:
-				if (show_gameinfo && astring_len(game_info_astring(machine, messagebox_text)) > 0)
+				if (show_gameinfo && game_info_astring(machine, messagebox_text).len() > 0)
 					ui_set_handler(handler_messagebox_anykey, 0);
 				break;
 #ifdef MESS
@@ -322,7 +316,7 @@ void ui_set_startup_text(running_machine *machine, const char *text, int force)
 	osd_ticks_t curtime = osd_ticks();
 
 	/* copy in the new text */
-	astring_cpyc(messagebox_text, text);
+	messagebox_text.cpy(text);
 	messagebox_backcolor = UI_BACKGROUND_COLOR;
 
 	/* don't update more than 4 times/second */
@@ -365,7 +359,7 @@ void ui_update_and_render(running_machine *machine)
 
 	/* display any popup messages */
 	if (osd_ticks() < popup_text_end)
-		ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		ui_draw_text_box(messagebox_text, JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		popup_text_end = 0;
 
@@ -737,7 +731,7 @@ void CLIB_DECL ui_popup_time(int seconds, const char *text, ...)
 
 	/* extract the text */
 	va_start(arg,text);
-	astring_vprintf(messagebox_text, text, arg);
+	messagebox_text.vprintf(text, arg);
 	messagebox_backcolor = UI_BACKGROUND_COLOR;
 	va_end(arg);
 
@@ -845,11 +839,11 @@ int ui_is_menu_active(void)
     text to the given buffer
 -------------------------------------------------*/
 
-static astring *disclaimer_string(running_machine *machine, astring *string)
+static astring &disclaimer_string(running_machine *machine, astring &string)
 {
-	astring_cpyc(string, "Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
-	astring_catprintf(string, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->gamedrv->description);
-	astring_catc(string, "Otherwise, type OK or move the joystick left then right to continue");
+	string.cpy("Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
+	string.catprintf("IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->gamedrv->description);
+	string.cat("Otherwise, type OK or move the joystick left then right to continue");
 	return string;
 }
 
@@ -859,7 +853,7 @@ static astring *disclaimer_string(running_machine *machine, astring *string)
     text to the given buffer
 -------------------------------------------------*/
 
-static astring *warnings_string(running_machine *machine, astring *string)
+static astring &warnings_string(running_machine *machine, astring &string)
 {
 #define WARNING_FLAGS (	GAME_NOT_WORKING | \
 						GAME_UNEMULATED_PROTECTION | \
@@ -872,7 +866,7 @@ static astring *warnings_string(running_machine *machine, astring *string)
 						GAME_NO_COCKTAIL)
 	int i;
 
-	astring_reset(string);
+	string.reset();
 
 	/* if no warnings, nothing to return */
 	if (rom_load_warnings(machine) == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
@@ -881,37 +875,37 @@ static astring *warnings_string(running_machine *machine, astring *string)
 	/* add a warning if any ROMs were loaded with warnings */
 	if (rom_load_warnings(machine) > 0)
 	{
-		astring_catc(string, "One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
+		string.cat("One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
 		if (machine->gamedrv->flags & WARNING_FLAGS)
-			astring_catc(string, "\n");
+			string.cat("\n");
 	}
 
 	/* if we have at least one warning flag, print the general header */
 	if (machine->gamedrv->flags & WARNING_FLAGS)
 	{
-		astring_catc(string, "There are known problems with this " GAMENOUN "\n\n");
+		string.cat("There are known problems with this " GAMENOUN "\n\n");
 
 		/* add one line per warning flag */
 #ifdef MESS
 		if (machine->gamedrv->flags & GAME_COMPUTER)
-			astring_catc(string, "The emulated system is a computer:\n\nThe keyboard emulation may not be 100% accurate.\n");
+			string.cat("The emulated system is a computer:\n\nThe keyboard emulation may not be 100% accurate.\n");
 #endif
 		if (machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
-			astring_catc(string, "The colors aren't 100% accurate.\n");
+			string.cat("The colors aren't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_WRONG_COLORS)
-			astring_catc(string, "The colors are completely wrong.\n");
+			string.cat("The colors are completely wrong.\n");
 		if (machine->gamedrv->flags & GAME_IMPERFECT_GRAPHICS)
-			astring_catc(string, "The video emulation isn't 100% accurate.\n");
+			string.cat("The video emulation isn't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_IMPERFECT_SOUND)
-			astring_catc(string, "The sound emulation isn't 100% accurate.\n");
+			string.cat("The sound emulation isn't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_NO_SOUND)
-			astring_catc(string, "The game lacks sound.\n");
+			string.cat("The game lacks sound.\n");
 		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
-			astring_catc(string, "Screen flipping in cocktail mode is not supported.\n");
+			string.cat("Screen flipping in cocktail mode is not supported.\n");
 
 		/* check if external artwork is present before displaying this warning? */
 		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
-			astring_catc(string, "The game requires external artwork files\n");
+			string.cat("The game requires external artwork files\n");
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
@@ -922,9 +916,9 @@ static astring *warnings_string(running_machine *machine, astring *string)
 
 			/* add the strings for these warnings */
 			if (machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
-				astring_catc(string, "The game has protection which isn't fully emulated.\n");
+				string.cat("The game has protection which isn't fully emulated.\n");
 			if (machine->gamedrv->flags & GAME_NOT_WORKING)
-				astring_catc(string, "THIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
+				string.cat("THIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
 									 "There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 
 			/* find the parent of this driver */
@@ -942,20 +936,20 @@ static astring *warnings_string(running_machine *machine, astring *string)
 					{
 						/* this one works, add a header and display the name of the clone */
 						if (!foundworking)
-							astring_catc(string, "\n\nThere are working clones of this game: ");
+							string.cat("\n\nThere are working clones of this game: ");
 						else
-							astring_catc(string, ", ");
-						astring_catc(string, drivers[i]->name);
+							string.cat(", ");
+						string.cat(drivers[i]->name);
 						foundworking = TRUE;
 					}
 
 			if (foundworking)
-				astring_catc(string, "\n");
+				string.cat("\n");
 		}
 	}
 
 	/* add the 'press OK' string */
-	astring_catc(string, "\n\nType OK or move the joystick left then right to continue");
+	string.cat("\n\nType OK or move the joystick left then right to continue");
 	return string;
 }
 
@@ -965,7 +959,7 @@ static astring *warnings_string(running_machine *machine, astring *string)
     string with the game info text
 -------------------------------------------------*/
 
-astring *game_info_astring(running_machine *machine, astring *string)
+astring &game_info_astring(running_machine *machine, astring &string)
 {
 	int scrcount = video_screen_count(machine->config);
 	const device_config *scandevice;
@@ -974,7 +968,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	int count;
 
 	/* print description, manufacturer, and CPU: */
-	astring_printf(string, "%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
+	string.printf("%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
 	for (device = machine->firstcpu; device != NULL; device = scandevice)
@@ -993,14 +987,14 @@ astring *game_info_astring(running_machine *machine, astring *string)
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
-			astring_catprintf(string, "%d" UTF8_MULTIPLY, count);
-		astring_catc(string, cpu_get_name(device));
+			string.catprintf("%d" UTF8_MULTIPLY, count);
+		string.cat(cpu_get_name(device));
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)
-			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
+			string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 		else
-			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
+			string.catprintf(" %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 	}
 
 	/* loop over all sound chips */
@@ -1008,7 +1002,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	{
 		/* append the Sound: string */
 		if (!found_sound)
-			astring_catc(string, "\nSound:\n");
+			string.cat("\nSound:\n");
 		found_sound = TRUE;
 
 		/* count how many identical sound chips we have */
@@ -1022,22 +1016,22 @@ astring *game_info_astring(running_machine *machine, astring *string)
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
-			astring_catprintf(string, "%d" UTF8_MULTIPLY, count);
-		astring_catc(string, device_get_name(device));
+			string.catprintf("%d" UTF8_MULTIPLY, count);
+		string.cat(device_get_name(device));
 
 		/* display clock in kHz or MHz */
 		if (device->clock >= 1000000)
-			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", device->clock / 1000000, device->clock % 1000000);
+			string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", device->clock / 1000000, device->clock % 1000000);
 		else if (device->clock != 0)
-			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", device->clock / 1000, device->clock % 1000);
+			string.catprintf(" %d.%03d" UTF8_NBSP "kHz\n", device->clock / 1000, device->clock % 1000);
 		else
-			astring_catc(string, "\n");
+			string.cat("\n");
 	}
 
 	/* display screen information */
-	astring_catc(string, "\nVideo:\n");
+	string.cat("\nVideo:\n");
 	if (scrcount == 0)
-		astring_catc(string, "None\n");
+		string.cat("None\n");
 	else
 	{
 		const device_config *screen;
@@ -1048,17 +1042,17 @@ astring *game_info_astring(running_machine *machine, astring *string)
 
 			if (scrcount > 1)
 			{
-				astring_catc(string, slider_get_screen_desc(screen));
-				astring_catc(string, ": ");
+				string.cat(slider_get_screen_desc(screen));
+				string.cat(": ");
 			}
 
 			if (scrconfig->type == SCREEN_TYPE_VECTOR)
-				astring_catc(string, "Vector\n");
+				string.cat("Vector\n");
 			else
 			{
 				const rectangle *visarea = video_screen_get_visible_area(screen);
 
-				astring_catprintf(string, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
+				string.catprintf("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 						visarea->max_x - visarea->min_x + 1,
 						visarea->max_y - visarea->min_y + 1,
 						(machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
@@ -1083,7 +1077,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 
 static UINT32 handler_messagebox(running_machine *machine, UINT32 state)
 {
-	ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -1096,7 +1090,7 @@ static UINT32 handler_messagebox(running_machine *machine, UINT32 state)
 static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
 {
 	/* draw a standard message window */
-	ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* an 'O' or left joystick kicks us to the next state */
 	if (state == 0 && (input_code_pressed_once(machine, KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
@@ -1126,7 +1120,7 @@ static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
 static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state)
 {
 	/* draw a standard message window */
-	ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* if the user cancels, exit out completely */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
@@ -1164,9 +1158,9 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* draw the profiler if visible */
 	if (show_profiler)
 	{
-		astring *profilertext = profiler_get_text(machine, astring_alloc());
-		ui_draw_text_full(astring_c(profilertext), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-		astring_free(profilertext);
+		astring profilertext;
+		profiler_get_text(machine, profilertext);
+		ui_draw_text_full(profilertext, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
 	/* if we're single-stepping, pause now */
@@ -1425,7 +1419,7 @@ static slider_state *slider_init(running_machine *machine)
 	const device_config *device;
 	slider_state *listhead = NULL;
 	slider_state **tailptr = &listhead;
-	astring *string = astring_alloc();
+	astring string;
 	int numitems, item;
 
 	/* add overall volume */
@@ -1442,8 +1436,8 @@ static slider_state *slider_init(running_machine *machine)
 		if (defval > 1000)
 			maxval = 2 * defval;
 
-		astring_printf(string, "%s Volume", sound_get_user_gain_name(machine, item));
-		*tailptr = slider_alloc(machine, astring_c(string), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
+		string.printf("%s Volume", sound_get_user_gain_name(machine, item));
+		*tailptr = slider_alloc(machine, string, 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
 	}
 
@@ -1463,8 +1457,8 @@ static slider_state *slider_init(running_machine *machine)
 		for (device = machine->firstcpu; device != NULL; device = cpu_next(device))
 		{
 			void *param = (void *)device;
-			astring_printf(string, "Overclock CPU %s", device->tag);
-			*tailptr = slider_alloc(machine, astring_c(string), 10, 1000, 2000, 1, slider_overclock, param);
+			string.printf("Overclock CPU %s", device->tag);
+			*tailptr = slider_alloc(machine, string, 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}
 	}
@@ -1482,34 +1476,34 @@ static slider_state *slider_init(running_machine *machine)
 		/* add refresh rate tweaker */
 		if (options_get_bool(mame_options(), OPTION_CHEAT))
 		{
-			astring_printf(string, "%s Refresh Rate", slider_get_screen_desc(device));
-			*tailptr = slider_alloc(machine, astring_c(string), -10000, 0, 10000, 1000, slider_refresh, param);
+			string.printf("%s Refresh Rate", slider_get_screen_desc(device));
+			*tailptr = slider_alloc(machine, string, -10000, 0, 10000, 1000, slider_refresh, param);
 			tailptr = &(*tailptr)->next;
 		}
 
 		/* add standard brightness/contrast/gamma controls per-screen */
-		astring_printf(string, "%s Brightness", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), 100, 1000, 2000, 10, slider_brightness, param);
+		string.printf("%s Brightness", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, 100, 1000, 2000, 10, slider_brightness, param);
 		tailptr = &(*tailptr)->next;
-		astring_printf(string, "%s Contrast", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), 100, 1000, 2000, 50, slider_contrast, param);
+		string.printf("%s Contrast", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, 100, 1000, 2000, 50, slider_contrast, param);
 		tailptr = &(*tailptr)->next;
-		astring_printf(string, "%s Gamma", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), 100, 1000, 3000, 50, slider_gamma, param);
+		string.printf("%s Gamma", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, 100, 1000, 3000, 50, slider_gamma, param);
 		tailptr = &(*tailptr)->next;
 
 		/* add scale and offset controls per-screen */
-		astring_printf(string, "%s Horiz Stretch", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_xscale, param);
+		string.printf("%s Horiz Stretch", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_xscale, param);
 		tailptr = &(*tailptr)->next;
-		astring_printf(string, "%s Horiz Position", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), -500, defxoffset, 500, 2, slider_xoffset, param);
+		string.printf("%s Horiz Position", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_xoffset, param);
 		tailptr = &(*tailptr)->next;
-		astring_printf(string, "%s Vert Stretch", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_yscale, param);
+		string.printf("%s Vert Stretch", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_yscale, param);
 		tailptr = &(*tailptr)->next;
-		astring_printf(string, "%s Vert Position", slider_get_screen_desc(device));
-		*tailptr = slider_alloc(machine, astring_c(string), -500, defyoffset, 500, 2, slider_yoffset, param);
+		string.printf("%s Vert Position", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_yoffset, param);
 		tailptr = &(*tailptr)->next;
 	}
 
@@ -1525,17 +1519,17 @@ static slider_state *slider_init(running_machine *machine)
 			void *param = (void *)device;
 
 			/* add scale and offset controls per-overlay */
-			astring_printf(string, "%s Horiz Stretch", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, astring_c(string), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
+			string.printf("%s Horiz Stretch", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			tailptr = &(*tailptr)->next;
-			astring_printf(string, "%s Horiz Position", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, astring_c(string), -500, defxoffset, 500, 2, slider_overxoffset, param);
+			string.printf("%s Horiz Position", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_overxoffset, param);
 			tailptr = &(*tailptr)->next;
-			astring_printf(string, "%s Vert Stretch", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, astring_c(string), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
+			string.printf("%s Vert Stretch", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
 			tailptr = &(*tailptr)->next;
-			astring_printf(string, "%s Vert Position", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, astring_c(string), -500, defyoffset, 500, 2, slider_overyoffset, param);
+			string.printf("%s Vert Position", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_overyoffset, param);
 			tailptr = &(*tailptr)->next;
 		}
 	}
@@ -1561,16 +1555,15 @@ static slider_state *slider_init(running_machine *machine)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
 				void *param = (void *)field;
-				astring_printf(string, "Crosshair Scale %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
-				*tailptr = slider_alloc(machine, astring_c(string), -3000, 1000, 3000, 100, slider_crossscale, param);
+				string.printf("Crosshair Scale %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
+				*tailptr = slider_alloc(machine, string, -3000, 1000, 3000, 100, slider_crossscale, param);
 				tailptr = &(*tailptr)->next;
-				astring_printf(string, "Crosshair Offset %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
-				*tailptr = slider_alloc(machine, astring_c(string), -3000, 0, 3000, 100, slider_crossoffset, param);
+				string.printf("Crosshair Offset %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
+				*tailptr = slider_alloc(machine, string, -3000, 0, 3000, 100, slider_crossoffset, param);
 				tailptr = &(*tailptr)->next;
 			}
 #endif
 
-	astring_free(string);
 	return listhead;
 }
 
@@ -1584,7 +1577,7 @@ static INT32 slider_volume(running_machine *machine, void *arg, astring *string,
 	if (newval != SLIDER_NOCHANGE)
 		sound_set_attenuation(machine, newval);
 	if (string != NULL)
-		astring_printf(string, "%3ddB", sound_get_attenuation(machine));
+		string->printf("%3ddB", sound_get_attenuation(machine));
 	return sound_get_attenuation(machine);
 }
 
@@ -1600,7 +1593,7 @@ static INT32 slider_mixervol(running_machine *machine, void *arg, astring *strin
 	if (newval != SLIDER_NOCHANGE)
 		sound_set_user_gain(machine, which, (float)newval * 0.001f);
 	if (string != NULL)
-		astring_printf(string, "%4.2f", sound_get_user_gain(machine, which));
+		string->printf("%4.2f", sound_get_user_gain(machine, which));
 	return floor(sound_get_user_gain(machine, which) * 1000.0f + 0.5f);
 }
 
@@ -1622,7 +1615,7 @@ static INT32 slider_adjuster(running_machine *machine, void *arg, astring *strin
 		input_field_set_user_settings(field, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%d%%", settings.value);
+		string->printf("%d%%", settings.value);
 	return settings.value;
 }
 
@@ -1638,7 +1631,7 @@ static INT32 slider_overclock(running_machine *machine, void *arg, astring *stri
 	if (newval != SLIDER_NOCHANGE)
 		cpu_set_clockscale(cpu, (float)newval * 0.001f);
 	if (string != NULL)
-		astring_printf(string, "%3.0f%%", floor(cpu_get_clockscale(cpu) * 100.0f + 0.5f));
+		string->printf("%3.0f%%", floor(cpu_get_clockscale(cpu) * 100.0f + 0.5f));
 	return floor(cpu_get_clockscale(cpu) * 1000.0f + 0.5f);
 }
 
@@ -1663,7 +1656,7 @@ static INT32 slider_refresh(running_machine *machine, void *arg, astring *string
 		video_screen_configure(screen, width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3ffps", ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
+		string->printf("%.3ffps", ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
 	refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
@@ -1687,7 +1680,7 @@ static INT32 slider_brightness(running_machine *machine, void *arg, astring *str
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.brightness);
+		string->printf("%.3f", settings.brightness);
 	return floor(settings.brightness * 1000.0f + 0.5f);
 }
 
@@ -1710,7 +1703,7 @@ static INT32 slider_contrast(running_machine *machine, void *arg, astring *strin
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.contrast);
+		string->printf("%.3f", settings.contrast);
 	return floor(settings.contrast * 1000.0f + 0.5f);
 }
 
@@ -1732,7 +1725,7 @@ static INT32 slider_gamma(running_machine *machine, void *arg, astring *string, 
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.gamma);
+		string->printf("%.3f", settings.gamma);
 	return floor(settings.gamma * 1000.0f + 0.5f);
 }
 
@@ -1755,7 +1748,7 @@ static INT32 slider_xscale(running_machine *machine, void *arg, astring *string,
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.xscale);
+		string->printf("%.3f", settings.xscale);
 	return floor(settings.xscale * 1000.0f + 0.5f);
 }
 
@@ -1778,7 +1771,7 @@ static INT32 slider_yscale(running_machine *machine, void *arg, astring *string,
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.yscale);
+		string->printf("%.3f", settings.yscale);
 	return floor(settings.yscale * 1000.0f + 0.5f);
 }
 
@@ -1801,7 +1794,7 @@ static INT32 slider_xoffset(running_machine *machine, void *arg, astring *string
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.xoffset);
+		string->printf("%.3f", settings.xoffset);
 	return floor(settings.xoffset * 1000.0f + 0.5f);
 }
 
@@ -1824,7 +1817,7 @@ static INT32 slider_yoffset(running_machine *machine, void *arg, astring *string
 		render_container_set_user_settings(container, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.yoffset);
+		string->printf("%.3f", settings.yoffset);
 	return floor(settings.yoffset * 1000.0f + 0.5f);
 }
 
@@ -1846,7 +1839,7 @@ static INT32 slider_overxscale(running_machine *machine, void *arg, astring *str
 		laserdisc_set_config(laserdisc, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.overscalex);
+		string->printf("%.3f", settings.overscalex);
 	return floor(settings.overscalex * 1000.0f + 0.5f);
 }
 
@@ -1868,7 +1861,7 @@ static INT32 slider_overyscale(running_machine *machine, void *arg, astring *str
 		laserdisc_set_config(laserdisc, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.overscaley);
+		string->printf("%.3f", settings.overscaley);
 	return floor(settings.overscaley * 1000.0f + 0.5f);
 }
 
@@ -1890,7 +1883,7 @@ static INT32 slider_overxoffset(running_machine *machine, void *arg, astring *st
 		laserdisc_set_config(laserdisc, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.overposx);
+		string->printf("%.3f", settings.overposx);
 	return floor(settings.overposx * 1000.0f + 0.5f);
 }
 
@@ -1912,7 +1905,7 @@ static INT32 slider_overyoffset(running_machine *machine, void *arg, astring *st
 		laserdisc_set_config(laserdisc, &settings);
 	}
 	if (string != NULL)
-		astring_printf(string, "%.3f", settings.overposy);
+		string->printf("%.3f", settings.overposy);
 	return floor(settings.overposy * 1000.0f + 0.5f);
 }
 
@@ -1927,7 +1920,7 @@ static INT32 slider_flicker(running_machine *machine, void *arg, astring *string
 	if (newval != SLIDER_NOCHANGE)
 		vector_set_flicker((float)newval * 0.1f);
 	if (string != NULL)
-		astring_printf(string, "%1.2f", vector_get_flicker());
+		string->printf("%1.2f", vector_get_flicker());
 	return floor(vector_get_flicker() * 10.0f + 0.5f);
 }
 
@@ -1942,7 +1935,7 @@ static INT32 slider_beam(running_machine *machine, void *arg, astring *string, I
 	if (newval != SLIDER_NOCHANGE)
 		vector_set_beam((float)newval * 0.01f);
 	if (string != NULL)
-		astring_printf(string, "%1.2f", vector_get_beam());
+		string->printf("%1.2f", vector_get_beam());
 	return floor(vector_get_beam() * 100.0f + 0.5f);
 }
 
@@ -1998,7 +1991,7 @@ static INT32 slider_crossscale(running_machine *machine, void *arg, astring *str
 	if (newval != SLIDER_NOCHANGE)
 		field->crossscale = (float)newval * 0.001f;
 	if (string != NULL)
-		astring_printf(string, "%s %s %1.3f", "Crosshair Scale", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
+		string->printf("%s %s %1.3f", "Crosshair Scale", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	return floor(field->crossscale * 1000.0f + 0.5f);
 }
 #endif
@@ -2017,7 +2010,7 @@ static INT32 slider_crossoffset(running_machine *machine, void *arg, astring *st
 	if (newval != SLIDER_NOCHANGE)
 		field->crossoffset = (float)newval * 0.001f;
 	if (string != NULL)
-		astring_printf(string, "%s %s %1.3f", "Crosshair Offset", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
+		string->printf("%s %s %1.3f", "Crosshair Offset", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	return field->crossoffset;
 }
 #endif

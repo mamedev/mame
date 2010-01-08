@@ -150,7 +150,7 @@ static DEVICE_START( ym2610 )
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	ym2610_state *info = get_safe_token(device);
-	astring *name = astring_alloc();
+	astring name;
 	sound_type type = sound_get_type(device);
 
 	info->intf = intf;
@@ -167,10 +167,9 @@ static DEVICE_START( ym2610 )
 	/* setup adpcm buffers */
 	pcmbufa  = device->region;
 	pcmsizea = device->regionbytes;
-	astring_printf(name, "%s.deltat", device->tag);
-	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
-	pcmsizeb = memory_region_length(device->machine, astring_c(name));
-	astring_free(name);
+	name.printf("%s.deltat", device->tag);
+	pcmbufb  = (void *)(memory_region(device->machine, name));
+	pcmsizeb = memory_region_length(device->machine, name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;

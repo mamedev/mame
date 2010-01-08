@@ -108,8 +108,8 @@ void machine_config_free(machine_config *config)
 static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner, int depth)
 {
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
-	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
+	astring tempstring;
 
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
@@ -153,7 +153,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				tag = TOKEN_GET_STRING(tokens);
 				device = (device_config *)device_list_find_by_tag(&config->devicelist, device_build_tag(tempstring, owner, tag));
 				if (device == NULL)
-					fatalerror("Unable to find device: tag=%s\n", astring_c(tempstring));
+					fatalerror("Unable to find device: tag=%s\n", tempstring.cstr());
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_CLOCK:
@@ -335,6 +335,4 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			if (tokens != NULL)
 				machine_config_detokenize(config, tokens, device, depth + 1);
 		}
-
-	astring_free(tempstring);
 }

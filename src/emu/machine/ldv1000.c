@@ -226,7 +226,7 @@ const ldplayer_interface ldv1000_interface =
 
 static void ldv1000_init(laserdisc_state *ld)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	ldplayer_data *player = ld->player;
 
 	/* reset our state */
@@ -237,7 +237,6 @@ static void ldv1000_init(laserdisc_state *ld)
 	player->ctc = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "ldvctc"));
 	player->multitimer = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "multitimer"));
 	timer_device_set_ptr(player->multitimer, ld);
-	astring_free(tempstring);
 }
 
 

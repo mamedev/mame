@@ -175,7 +175,7 @@ void ui_show_menu(void);
 int ui_is_menu_active(void);
 
 /* print the game info string into a buffer */
-astring *game_info_astring(running_machine *machine, astring *string);
+astring &game_info_astring(running_machine *machine, astring &string);
 
 /* get the list of sliders */
 const slider_state *ui_get_slider_list(void);

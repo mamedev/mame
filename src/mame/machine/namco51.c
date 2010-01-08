@@ -379,14 +379,13 @@ static DEVICE_START( namco_51xx )
 {
 	const namco_51xx_interface *config = (const namco_51xx_interface *)device->static_config;
 	namco_51xx_state *state = get_safe_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	assert(config != NULL);
 
 	/* find our CPU */
 	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
-	astring_free(tempstring);
 
 	/* resolve our read callbacks */
 	devcb_resolve_read8(&state->in[0], &config->in[0], device);

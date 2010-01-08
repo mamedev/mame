@@ -406,9 +406,9 @@ int input_seq_poll(running_machine *machine, input_seq *finalseq)
     of a sequence
 -------------------------------------------------*/
 
-astring *input_seq_name(running_machine *machine, astring *string, const input_seq *seq)
+astring &input_seq_name(running_machine *machine, astring &string, const input_seq *seq)
 {
-	astring *codestr = astring_alloc();
+	astring codestr;
 	int codenum, copycodenum;
 	input_seq seqcopy;
 
@@ -418,7 +418,7 @@ astring *input_seq_name(running_machine *machine, astring *string, const input_s
 		input_code code = seq->code[codenum];
 
 		/* if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs */
-		if (!INPUT_CODE_IS_INTERNAL(code) && astring_len(input_code_name(machine, codestr, code)) == 0)
+		if (!INPUT_CODE_IS_INTERNAL(code) && input_code_name(machine, codestr, code).len() == 0)
 		{
 			while (copycodenum > 0 && INPUT_CODE_IS_INTERNAL(seqcopy.code[copycodenum - 1]))
 				copycodenum--;
@@ -430,13 +430,10 @@ astring *input_seq_name(running_machine *machine, astring *string, const input_s
 
 	/* special case: empty */
 	if (copycodenum == 0)
-	{
-		astring_free(codestr);
-		return astring_cpyc(string, (seq->code[0] == SEQCODE_END) ? "None" : "n/a");
-	}
+		return string.cpy((seq->code[0] == SEQCODE_END) ? "None" : "n/a");
 
 	/* start with an empty buffer */
-	astring_reset(string);
+	string.reset();
 
 	/* loop until we hit the end */
 	for (codenum = 0; codenum < ARRAY_LENGTH(seqcopy.code) && seqcopy.code[codenum] != SEQCODE_END; codenum++)
@@ -445,20 +442,19 @@ astring *input_seq_name(running_machine *machine, astring *string, const input_s
 
 		/* append a space if not the first code */
 		if (codenum != 0)
-			astring_catc(string, " ");
+			string.cat(" ");
 
 		/* handle OR/NOT codes here */
 		if (code == SEQCODE_OR)
-			astring_catc(string, "or");
+			string.cat("or");
 		else if (code == SEQCODE_NOT)
-			astring_catc(string, "not");
+			string.cat("not");
 
 		/* otherwise, assume it is an input code and ask the input system to generate it */
 		else
-			astring_cat(string, input_code_name(machine, codestr, code));
+			string.cat(input_code_name(machine, codestr, code));
 	}
 
-	astring_free(codestr);
 	return string;
 }
 
@@ -468,13 +464,13 @@ astring *input_seq_name(running_machine *machine, astring *string, const input_s
     form of a sequence
 -------------------------------------------------*/
 
-astring *input_seq_to_tokens(running_machine *machine, astring *string, const input_seq *seq)
+astring &input_seq_to_tokens(running_machine *machine, astring &string, const input_seq *seq)
 {
-	astring *codestr = astring_alloc();
+	astring codestr;
 	int codenum;
 
 	/* start with an empty buffer */
-	astring_reset(string);
+	string.reset();
 
 	/* loop until we hit the end */
 	for (codenum = 0; codenum < ARRAY_LENGTH(seq->code) && seq->code[codenum] != SEQCODE_END; codenum++)
@@ -483,22 +479,21 @@ astring *input_seq_to_tokens(running_machine *machine, astring *string, const in
 
 		/* append a space if not the first code */
 		if (codenum != 0)
-			astring_catc(string, " ");
+			string.cat(" ");
 
 		/* handle OR/NOT codes here */
 		if (code == SEQCODE_OR)
-			astring_catc(string, "OR");
+			string.cat("OR");
 		else if (code == SEQCODE_NOT)
-			astring_catc(string, "NOT");
+			string.cat("NOT");
 		else if (code == SEQCODE_DEFAULT)
-			astring_catc(string, "DEFAULT");
+			string.cat("DEFAULT");
 
 		/* otherwise, assume it is an input code and ask the input system to generate it */
 		else
-			astring_cat(string, input_code_to_token(machine, codestr, code));
+			string.cat(input_code_to_token(machine, codestr, code));
 	}
 
-	astring_free(codestr);
 	return string;
 }
 

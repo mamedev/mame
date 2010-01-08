@@ -359,10 +359,10 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 void device_list_remove(device_list *devlist, const char *tag);
 
 /* build a tag that combines the device's name and the given tag */
-const char *device_build_tag(astring *dest, const device_config *device, const char *tag);
+astring &device_build_tag(astring &dest, const device_config *device, const char *tag);
 
 /* build a tag with the same device prefix as the source tag*/
-const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag);
+astring &device_inherit_tag(astring &dest, const char *sourcetag, const char *tag);
 
 /* find a given contract on a device */
 const device_contract *device_get_contract(const device_config *device, const char *name);

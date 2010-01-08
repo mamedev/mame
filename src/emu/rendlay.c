@@ -1487,16 +1487,12 @@ layout_file *layout_file_load(const machine_config *config, const char *dirname,
 	{
 		file_error filerr;
 		mame_file *layoutfile;
-		astring *fname;
 
-		fname = astring_assemble_2(astring_alloc(), filename, ".lay");
+		astring fname(filename, ".lay");
 		if (dirname != NULL)
-		{
-			astring_insc(fname, 0, PATH_SEPARATOR);
-			astring_insc(fname, 0, dirname);
-		}
-		filerr = mame_fopen(SEARCHPATH_ARTWORK, astring_c(fname), OPEN_FLAG_READ, &layoutfile);
-		astring_free(fname);
+			fname.ins(0, PATH_SEPARATOR).ins(0, dirname);
+
+		filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &layoutfile);
 
 		if (filerr != FILERR_NONE)
 			return NULL;

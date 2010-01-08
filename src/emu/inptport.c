@@ -3746,20 +3746,19 @@ static void save_config_callback(running_machine *machine, int config_type, xml_
 
 static void save_sequence(running_machine *machine, xml_data_node *parentnode, int type, int porttype, const input_seq *seq)
 {
-	astring *seqstring = astring_alloc();
+	astring seqstring;
 	xml_data_node *seqnode;
 
 	/* get the string for the sequence */
 	if (input_seq_get_1(seq) == SEQCODE_END)
-		astring_cpyc(seqstring, "NONE");
+		seqstring.cpy("NONE");
 	else
 		input_seq_to_tokens(machine, seqstring, seq);
 
 	/* add the new node */
-	seqnode = xml_add_child(parentnode, "newseq", astring_c(seqstring));
+	seqnode = xml_add_child(parentnode, "newseq", seqstring);
 	if (seqnode != NULL)
 		xml_set_attribute(seqnode, "type", seqtypestrings[type]);
-	astring_free(seqstring);
 }
 
 

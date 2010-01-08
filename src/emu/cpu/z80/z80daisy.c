@@ -22,7 +22,7 @@ struct _z80_daisy_state
 
 z80_daisy_state *z80daisy_init(const device_config *cpudevice, const z80_daisy_chain *daisy)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	z80_daisy_state *head = NULL;
 	z80_daisy_state **tailptr = &head;
 
@@ -40,7 +40,6 @@ z80_daisy_state *z80daisy_init(const device_config *cpudevice, const z80_daisy_c
 		tailptr = &(*tailptr)->next;
 	}
 
-	astring_free(tempstring);
 	return head;
 }
 

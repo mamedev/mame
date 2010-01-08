@@ -2502,7 +2502,6 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 		mame_file *fp;
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
-		astring *fname;
 
 		const device_config *screen = device_list_find_by_index(&machine->config->devicelist, VIDEO_SCREEN, scrnum);
 
@@ -2512,11 +2511,10 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 			return;
 		}
 
-		fname = astring_dupc(filename);
-		if (astring_findc(fname, 0, ".png") == -1)
-			astring_catc(fname, ".png");
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
-		astring_free(fname);
+		astring fname(filename);
+		if (fname.find(0, ".png") == -1)
+			fname.cat(".png");
+		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
 
 		if (filerr != FILERR_NONE)
 		{

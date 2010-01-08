@@ -111,7 +111,7 @@ void _profiler_mark_end(void)
     in an astring
 -------------------------------------------------*/
 
-astring *_profiler_get_text(running_machine *machine, astring *string)
+astring &_profiler_get_text(running_machine *machine, astring &string)
 {
 	static const profile_string names[] =
 	{
@@ -161,7 +161,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 
 	/* this becomes the total; if we end up with 0 for anything, we were just started, so return empty */
 	total = computed;
-	astring_reset(string);
+	string.reset();
 	if (total == 0 || normalize == 0)
 		goto out;
 
@@ -179,25 +179,25 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 			int nameindex;
 
 			/* start with the un-normalized percentage */
-			astring_catprintf(string, "%02d%% ", (int)((computed * 100 + total/2) / total));
+			string.catprintf("%02d%% ", (int)((computed * 100 + total/2) / total));
 
 			/* followed by the normalized percentage for everything but profiler and idle */
 			if (curtype < PROFILER_PROFILER)
-				astring_catprintf(string, "%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
+				string.catprintf("%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
 
 			/* and then the text */
 			if (curtype >= PROFILER_CPU_FIRST && curtype <= PROFILER_CPU_MAX)
-				astring_catprintf(string, "CPU '%s'", device_list_find_by_index(&machine->config->devicelist, CPU, curtype - PROFILER_CPU_FIRST)->tag);
+				string.catprintf("CPU '%s'", device_list_find_by_index(&machine->config->devicelist, CPU, curtype - PROFILER_CPU_FIRST)->tag);
 			else
 				for (nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)
 					{
-						astring_catc(string, names[nameindex].string);
+						string.cat(names[nameindex].string);
 						break;
 					}
 
 			/* followed by a carriage return */
-			astring_catc(string, "\n");
+			string.cat("\n");
 		}
 	}
 
@@ -207,7 +207,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 		switches = 0;
 		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
 			switches += global_profiler.data[curmem].context_switches;
-		astring_catprintf(string, "%d CPU switches\n", switches / (int) ARRAY_LENGTH(global_profiler.data));
+		string.catprintf("%d CPU switches\n", switches / (int) ARRAY_LENGTH(global_profiler.data));
 	}
 
 	/* advance to the next dataset and reset it to 0 */

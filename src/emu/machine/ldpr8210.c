@@ -338,7 +338,7 @@ const ldplayer_interface pr8210_interface =
 
 static void pr8210_init(laserdisc_state *ld)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	attotime curtime = timer_get_time(ld->device->machine);
 	ldplayer_data *player = ld->player;
 
@@ -351,7 +351,6 @@ static void pr8210_init(laserdisc_state *ld)
 
 	/* find our CPU */
 	player->cpu = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "pr8210"));
-	astring_free(tempstring);
 
 	/* we don't have the Simutrek player overrides */
 	player->simutrek.cpu = NULL;
@@ -1071,7 +1070,7 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 
 static void simutrek_init(laserdisc_state *ld)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	ldplayer_data *player = ld->player;
 
 	/* standard PR-8210 initialization */
@@ -1083,7 +1082,6 @@ static void simutrek_init(laserdisc_state *ld)
 
 	/* find the Simutrek CPU */
 	player->simutrek.cpu = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "simutrek"));
-	astring_free(tempstring);
 }
 
 

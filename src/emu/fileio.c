@@ -54,7 +54,7 @@ struct _mame_file
 #ifdef DEBUG_COOKIE
 	UINT32			debug_cookie;					/* sanity checking for debugging */
 #endif
-	astring *		filename;						/* full filename */
+	astring			filename;						/* full filename */
 	core_file *		file;							/* core file pointer */
 	path_iterator	iterator;						/* iterator for paths */
 	UINT32			openflags;						/* flags we used for the open */
@@ -70,7 +70,7 @@ struct _mame_path
 {
 	path_iterator	iterator;
 	osd_directory *	curdir;
-	astring *		pathbuffer;
+	astring			pathbuffer;
 	int				buflen;
 };
 
@@ -85,15 +85,15 @@ static void fileio_exit(running_machine *machine);
 
 /* file open/close */
 static file_error fopen_internal(core_options *opts, path_iterator *iterator, const char *filename, UINT32 crc, UINT32 flags, mame_file **file);
-static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 openflags, mame_file *file);
+static file_error fopen_attempt_zipped(astring &fullname, UINT32 crc, UINT32 openflags, mame_file *file);
 
 /* path iteration */
 static void path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath);
-static int path_iterator_get_next(path_iterator *iterator, astring *buffer);
+static int path_iterator_get_next(path_iterator *iterator, astring &buffer);
 
 /* misc helpers */
 static file_error load_zipped_file(mame_file *file);
-static int zip_filename_match(const zip_file_header *header, const astring *afilename);
+static int zip_filename_match(const zip_file_header *header, const astring &afilename);
 static int zip_header_is_path(const zip_file_header *header);
 
 
@@ -191,10 +191,9 @@ file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mam
 	file_error filerr;
 
 	/* allocate the file itself */
-	*file = global_alloc(mame_file);
+	*file = global_alloc_clear(mame_file);
 
 	/* reset the file handle */
-	memset(*file, 0, sizeof(**file));
 	(*file)->openflags = openflags;
 #ifdef DEBUG_COOKIE
 	(*file)->debug_cookie = DEBUG_COOKIE;
@@ -229,26 +228,24 @@ static file_error fopen_internal(core_options *opts, path_iterator *iterator, co
 		return FILERR_INVALID_ACCESS;
 
 	/* allocate the file itself */
-	*file = global_alloc(mame_file);
+	*file = global_alloc_clear(mame_file);
 
 	/* reset the file handle */
-	memset(*file, 0, sizeof(**file));
 	(*file)->openflags = openflags;
 #ifdef DEBUG_COOKIE
 	(*file)->debug_cookie = DEBUG_COOKIE;
 #endif
 
 	/* loop over paths */
-	(*file)->filename = astring_alloc();
 	while (path_iterator_get_next(iterator, (*file)->filename))
 	{
 		/* compute the full pathname */
-		if (astring_len((*file)->filename) > 0)
-			astring_catc((*file)->filename, PATH_SEPARATOR);
-		astring_catc((*file)->filename, filename);
+		if ((*file)->filename.len() > 0)
+			(*file)->filename.cat(PATH_SEPARATOR);
+		(*file)->filename.cat(filename);
 
 		/* attempt to open the file directly */
-		filerr = core_fopen(astring_c((*file)->filename), openflags, &(*file)->file);
+		filerr = core_fopen((*file)->filename, openflags, &(*file)->file);
 		if (filerr == FILERR_NONE)
 			break;
 
@@ -280,9 +277,9 @@ static file_error fopen_internal(core_options *opts, path_iterator *iterator, co
     ZIPped file
 -------------------------------------------------*/
 
-static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 openflags, mame_file *file)
+static file_error fopen_attempt_zipped(astring &fullname, UINT32 crc, UINT32 openflags, mame_file *file)
 {
-	astring *filename = astring_alloc();
+	astring filename;
 	zip_error ziperr;
 	zip_file *zip;
 
@@ -293,27 +290,23 @@ static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 ope
 		int dirsep;
 
 		/* find the final path separator */
-		dirsep = astring_rchr(fullname, 0, PATH_SEPARATOR[0]);
+		dirsep = fullname.rchr(0, PATH_SEPARATOR[0]);
 		if (dirsep == -1)
-		{
-			astring_free(filename);
 			return FILERR_NOT_FOUND;
-		}
 
 		/* insert the part from the right of the separator into the head of the filename */
-		if (astring_len(filename) > 0)
-			astring_insc(filename, 0, "/");
-		astring_inssubstr(filename, 0, fullname, dirsep + 1, -1);
+		if (filename.len() > 0)
+			filename.ins(0, "/");
+		filename.inssubstr(0, fullname, dirsep + 1, -1);
 
 		/* remove this part of the filename and append a .zip extension */
-		astring_substr(fullname, 0, dirsep);
-		astring_catc(fullname, ".zip");
+		fullname.substr(0, dirsep).cat(".zip");
 
 		/* attempt to open the ZIP file */
-		ziperr = zip_file_open(astring_c(fullname), &zip);
+		ziperr = zip_file_open(fullname, &zip);
 
 		/* chop the .zip back off the filename before continuing */
-		astring_substr(fullname, 0, dirsep);
+		fullname.substr(0, dirsep);
 
 		/* if we failed to open this file, continue scanning */
 		if (ziperr != ZIPERR_NONE)
@@ -353,7 +346,6 @@ static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 ope
 			crcs[3] = header->crc >> 0;
 			hash_data_insert_binary_checksum(file->hash, HASH_CRC, crcs);
 
-			astring_free(filename);
 			if (openflags & OPEN_FLAG_NO_PRELOAD)
 				return FILERR_NONE;
 			else
@@ -384,8 +376,6 @@ void mame_fclose(mame_file *file)
 		core_fclose(file->file);
 	if (file->zipdata != NULL)
 		global_free(file->zipdata);
-	if (file->filename != NULL)
-		astring_free(file->filename);
 	global_free(file);
 }
 
@@ -673,8 +663,6 @@ mame_path *mame_openpath(core_options *opts, const char *searchpath)
 	/* initialize the iterator */
 	path_iterator_init(&path->iterator, opts, searchpath);
 
-	/* allocate a buffer to hold the current path */
-	path->pathbuffer = astring_alloc();
 	return path;
 }
 
@@ -699,7 +687,7 @@ const osd_directory_entry *mame_readpath(mame_path *path)
 				return NULL;
 
 			/* open the path */
-			path->curdir = osd_opendir(astring_c(path->pathbuffer));
+			path->curdir = osd_opendir(path->pathbuffer);
 		}
 
 		/* get the next entry from the current directory */
@@ -725,8 +713,6 @@ void mame_closepath(mame_path *path)
 		osd_closedir(path->curdir);
 
 	/* free memory */
-	if (path->pathbuffer != NULL)
-		astring_free(path->pathbuffer);
 	global_free(path);
 }
 
@@ -760,12 +746,9 @@ core_file *mame_core_file(mame_file *file)
     for a given mame_file
 -------------------------------------------------*/
 
-const char *mame_file_full_name(mame_file *file)
+const astring &mame_file_full_name(mame_file *file)
 {
-	/* return a pointer to the string if we have one; otherwise, return NULL */
-	if (file->filename != NULL)
-		return astring_c(file->filename);
-	return NULL;
+	return file->filename;
 }
 
 
@@ -816,9 +799,9 @@ const char *mame_fhash(mame_file *file, UINT32 functions)
 static void path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath)
 {
 	/* reset the structure */
-	memset(iterator, 0, sizeof(*iterator));
 	iterator->base = (searchpath != NULL && !osd_is_absolute_path(searchpath)) ? options_get_string(opts, searchpath) : "";
 	iterator->cur = iterator->base;
+	iterator->index = 0;
 }
 
 
@@ -827,7 +810,7 @@ static void path_iterator_init(path_iterator *iterator, core_options *opts, cons
     in a multipath sequence
 -------------------------------------------------*/
 
-static int path_iterator_get_next(path_iterator *iterator, astring *buffer)
+static int path_iterator_get_next(path_iterator *iterator, astring &buffer)
 {
 	const char *semi;
 
@@ -839,7 +822,7 @@ static int path_iterator_get_next(path_iterator *iterator, astring *buffer)
 	semi = strchr(iterator->cur, ';');
 	if (semi == NULL)
 		semi = iterator->cur + strlen(iterator->cur);
-	astring_cpych(buffer, iterator->cur, semi - iterator->cur);
+	buffer.cpy(iterator->cur, semi - iterator->cur);
 	iterator->cur = (*semi == 0) ? semi : semi + 1;
 
 	/* bump the index and return TRUE */
@@ -899,11 +882,11 @@ static file_error load_zipped_file(mame_file *file)
     to expected filename, ignoring any directory
 -------------------------------------------------*/
 
-static int zip_filename_match(const zip_file_header *header, const astring *filename)
+static int zip_filename_match(const zip_file_header *header, const astring &filename)
 {
-	const char *zipfile = header->filename + header->filename_length - astring_len(filename);
+	const char *zipfile = header->filename + header->filename_length - filename.len();
 
-	return (zipfile >= header->filename && astring_icmpc(filename, zipfile) == 0 &&
+	return (zipfile >= header->filename && filename.icmp(zipfile) == 0 &&
 		(zipfile == header->filename || zipfile[-1] == '/'));
 }
 

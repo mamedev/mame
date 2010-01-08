@@ -281,12 +281,11 @@ ROM_END
 static DEVICE_START( namco_50xx )
 {
 	namco_50xx_state *state = get_safe_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* find our CPU */
 	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
-	astring_free(tempstring);
 }
 
 

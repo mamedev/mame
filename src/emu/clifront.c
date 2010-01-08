@@ -114,11 +114,11 @@ static const options_entry cli_options[] =
 int cli_execute(int argc, char **argv, const options_entry *osd_options)
 {
 	core_options *options = NULL;
-	astring *gamename = astring_alloc();
-	astring *exename = astring_alloc();
 	const char *gamename_option;
 	const game_driver *driver;
 	int result = MAMERR_FATALERROR;
+	astring gamename;
+	astring exename;
 
 	try
 	{
@@ -134,18 +134,18 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 		}
 
 		/* parse the simple commmands before we go any further */
-		core_filename_extract_base(exename, argv[0], TRUE);
-		result = execute_simple_commands(options, astring_c(exename));
+		core_filename_extract_base(&exename, argv[0], TRUE);
+		result = execute_simple_commands(options, exename);
 		if (result != -1)
 			goto error;
 
 		/* find out what game we might be referring to */
 		gamename_option = options_get_string(options, OPTION_GAMENAME);
-		core_filename_extract_base(gamename, gamename_option, TRUE);
-		driver = driver_get_name(astring_c(gamename));
+		core_filename_extract_base(&gamename, gamename_option, TRUE);
+		driver = driver_get_name(gamename);
 
 		/* execute any commands specified */
-		result = execute_commands(options, astring_c(exename), driver);
+		result = execute_commands(options, exename, driver);
 		if (result != -1)
 			goto error;
 
@@ -196,8 +196,6 @@ error:
 	/* free our options and exit */
 	if (options != NULL)
 		options_free(options);
-	astring_free(gamename);
-	astring_free(exename);
 	
 	/* report any unfreed memory */
 	dump_unfreed_mem();
@@ -398,20 +396,19 @@ int cli_info_listfull(core_options *options, const char *gamename)
 
 int cli_info_listsource(core_options *options, const char *gamename)
 {
-	astring *filename = astring_alloc();
 	int drvindex, count = 0;
+	astring filename;
 
 	/* iterate over drivers */
 	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			/* output the remaining information */
-			mame_printf_info("%-16s %s\n", drivers[drvindex]->name, astring_c(core_filename_extract_base(filename, drivers[drvindex]->source_file, FALSE)));
+			mame_printf_info("%-16s %s\n", drivers[drvindex]->name, core_filename_extract_base(&filename, drivers[drvindex]->source_file, FALSE)->cstr());
 			count++;
 		}
 
 	/* return an error if none found */
-	astring_free(filename);
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
 
@@ -456,11 +453,9 @@ int cli_info_listclones(core_options *options, const char *gamename)
 
 int cli_info_listbrothers(core_options *options, const char *gamename)
 {
-	UINT8 *didit = global_alloc_array(UINT8, driver_list_get_count(drivers));
-	astring *filename = astring_alloc();
+	UINT8 *didit = global_alloc_array_clear(UINT8, driver_list_get_count(drivers));
 	int drvindex, count = 0;
-
-	memset(didit, 0, driver_list_get_count(drivers));
+	astring filename;
 
 	/* iterate over drivers */
 	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
@@ -471,7 +466,7 @@ int cli_info_listbrothers(core_options *options, const char *gamename)
 			didit[drvindex] = TRUE;
 			if (count > 0)
 				mame_printf_info("\n");
-			mame_printf_info("%s ... other drivers in %s:\n", drivers[drvindex]->name, astring_c(core_filename_extract_base(filename, drivers[drvindex]->source_file, FALSE)));
+			mame_printf_info("%s ... other drivers in %s:\n", drivers[drvindex]->name, core_filename_extract_base(&filename, drivers[drvindex]->source_file, FALSE)->cstr());
 
 			/* now iterate again over drivers, finding those with the same source file */
 			for (matchindex = 0; drivers[matchindex]; matchindex++)
@@ -491,7 +486,6 @@ int cli_info_listbrothers(core_options *options, const char *gamename)
 		}
 
 	/* return an error if none found */
-	astring_free(filename);
 	global_free(didit);
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
@@ -920,9 +914,8 @@ static void romident(const char *filename, romident_status *status)
 		while ((entry = osd_readdir(directory)) != NULL)
 			if (entry->type == ENTTYPE_FILE)
 			{
-				astring *curfile = astring_assemble_3(astring_alloc(), filename, PATH_SEPARATOR, entry->name);
-				identify_file(astring_c(curfile), status);
-				astring_free(curfile);
+				astring curfile(filename, PATH_SEPARATOR, entry->name);
+				identify_file(curfile, status);
 			}
 		osd_closedir(directory);
 	}
@@ -1005,7 +998,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 {
 	char hash[HASH_BUF_SIZE];
 	UINT8 *tempjed = NULL;
-	astring *basename;
+	astring basename;
 	int found = 0;
 	jed_data jed;
 
@@ -1029,9 +1022,8 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 
 	/* output the name */
 	status->total++;
-	basename = core_filename_extract_base(astring_alloc(), name, FALSE);
-	mame_printf_info("%-20s", astring_c(basename));
-	astring_free(basename);
+	core_filename_extract_base(&basename, name, FALSE);
+	mame_printf_info("%-20s", basename.cstr());
 
 	/* see if we can find a match in the ROMs */
 	match_roms(hash, length, &found);

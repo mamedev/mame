@@ -47,17 +47,20 @@ UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _region_entry region_entry;
-struct _region_entry
+class region_entry
 {
-	astring *tag;
+public:
+	region_entry()
+		: length(0) { }
+		
+	astring tag;
 	UINT32 length;
 };
 
 
-typedef struct _region_info region_info;
-struct _region_info
+class region_info
 {
+public:
 	region_entry entries[256];
 };
 
@@ -463,10 +466,11 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 				/* find any empty entry, checking for duplicates */
 				else
 				{
-					astring *fulltag = rom_region_name(astring_alloc(), driver, source, romp);
+					astring fulltag;
 					int rgnnum;
 
 					/* iterate over all regions found so far */
+					rom_region_name(fulltag, driver, source, romp);
 					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
 						/* stop when we hit an empty */
@@ -479,11 +483,10 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						}
 
 						/* fail if we hit a duplicate */
-						if (astring_cmp(fulltag, rgninfo->entries[rgnnum].tag) == 0)
+						if (fulltag.cmp(rgninfo->entries[rgnnum].tag) == 0)
 						{
-							mame_printf_error("%s: %s has duplicate ROM_REGION tag '%s'\n", driver->source_file, driver->name, astring_c(fulltag));
+							mame_printf_error("%s: %s has duplicate ROM_REGION tag '%s'\n", driver->source_file, driver->name, fulltag.cstr());
 							error = TRUE;
-							astring_free(fulltag);
 							break;
 						}
 					}
@@ -746,7 +749,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 				}
 
 				/* if we hit a match, check against the length */
-				if (astring_cmpc(rgninfo->entries[rgnnum].tag, region) == 0)
+				if (rgninfo->entries[rgnnum].tag.cmp(region) == 0)
 				{
 					/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
 					if (!IS_FRAC(total))
@@ -1367,7 +1370,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 						}
 
 						/* if we hit a match, check against the length */
-						if (astring_cmpc(rgninfo->entries[rgnnum].tag, entry->region) == 0)
+						if (rgninfo->entries[rgnnum].tag.cmp(entry->region) == 0)
 						{
 							offs_t length = rgninfo->entries[rgnnum].length;
 							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
@@ -1507,12 +1510,10 @@ int mame_validitychecks(const game_driver *curdriver)
 		input_port_list portlist;
 		machine_config *config;
 		region_info rgninfo;
-		int rgnnum;
 
 		/* non-debug builds only care about games in the same driver */
 		if (curdriver != NULL && strcmp(curdriver->source_file, driver->source_file) != 0)
 			continue;
-		memset(&rgninfo, 0, sizeof(rgninfo));
 
 		/* expand the machine driver */
 		expansion -= get_profile_ticks();
@@ -1559,9 +1560,6 @@ int mame_validitychecks(const game_driver *curdriver)
 		error = validate_devices(drivnum, config, &portlist, &rgninfo) || error;
 		device_checks += get_profile_ticks();
 
-		for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo.entries); rgnnum++)
-			if (rgninfo.entries[rgnnum].tag != NULL)
-				astring_free(rgninfo.entries[rgnnum].tag);
 		input_port_list_deinit(&portlist);
 		machine_config_free(config);
 	}

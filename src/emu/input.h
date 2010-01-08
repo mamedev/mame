@@ -631,10 +631,10 @@ input_code input_code_poll_axes(running_machine *machine, int reset);
 /* ----- strings and tokenization ----- */
 
 /* generate the friendly name of an input code, returning the length (buffer can be NULL) */
-astring *input_code_name(running_machine *machine, astring *buffer, input_code code);
+astring &input_code_name(running_machine *machine, astring &buffer, input_code code);
 
 /* convert an input code to a token, returning the length (buffer can be NULL) */
-astring *input_code_to_token(running_machine *machine, astring *buffer, input_code code);
+astring &input_code_to_token(running_machine *machine, astring &buffer, input_code code);
 
 /* convert a token back to an input code */
 input_code input_code_from_token(running_machine *machine, const char *_token);

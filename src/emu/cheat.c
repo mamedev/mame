@@ -123,10 +123,10 @@ typedef struct _parameter_item parameter_item;
 struct _parameter_item
 {
 	parameter_item *	next;							/* next item in list */
-	astring *			text;							/* name of the item */
+	astring				text;							/* name of the item */
 	UINT64				value;							/* value of the item */
 	int					valformat;						/* format of value */
-	astring *			curtext;						/* name of the current item */
+	astring				curtext;						/* name of the current item */
 };
 
 
@@ -163,7 +163,7 @@ struct _script_entry
 	script_entry *		next;							/* link to next entry */
 	parsed_expression *	condition;						/* condition under which this is executed */
 	parsed_expression *	expression;						/* expression to execute */
-	astring *			format;							/* string format to print */
+	astring				format;							/* string format to print */
 	output_argument *	arglist;						/* list of arguments */
 	INT8				line;							/* which line to print on */
 	UINT8				justify;						/* justification when printing */
@@ -184,8 +184,8 @@ typedef struct _cheat_entry cheat_entry;
 struct _cheat_entry
 {
 	cheat_entry *		next;							/* next cheat entry */
-	astring *			description;					/* string description/menu title */
-	astring *			comment;						/* comment data */
+	astring				description;					/* string description/menu title */
+	astring				comment;						/* comment data */
 	cheat_parameter *	parameter;						/* parameter */
 	cheat_script *		script[SCRIPT_STATE_COUNT];		/* up to 1 script for each state */
 	symbol_table *		symbols;						/* symbol table for this cheat */
@@ -201,7 +201,7 @@ struct _cheat_private
 {
 	cheat_entry *		cheatlist;						/* cheat list */
 	UINT64				framecount;						/* frame count */
-	astring *			output[UI_TARGET_FONT_ROWS*2];	/* array of output strings */
+	astring				output[UI_TARGET_FONT_ROWS*2];	/* array of output strings */
 	UINT8				justify[UI_TARGET_FONT_ROWS*2];	/* justification for each string */
 	UINT8				numlines;						/* number of lines available for output */
 	INT8				lastline;						/* last line used for output */
@@ -234,7 +234,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 static void script_entry_save(mame_file *cheatfile, const script_entry *entry);
 static void script_entry_free(running_machine *machine, script_entry *entry);
 
-static astring *quote_astring_expression(astring *string, int isattribute);
+static astring &quote_astring_expression(astring &string, int isattribute);
 static int validate_format(const char *filename, int line, const script_entry *entry);
 static UINT64 cheat_variable_get(void *globalref, void *ref);
 static void cheat_variable_set(void *globalref, void *ref, UINT64 value);
@@ -336,28 +336,28 @@ INLINE int is_oneshot_parameter_cheat(const cheat_entry *cheat)
     the format
 -------------------------------------------------*/
 
-INLINE const char *format_int(astring *string, UINT64 value, int format)
+INLINE const char *format_int(astring &string, UINT64 value, int format)
 {
 	switch (format)
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			astring_printf(string, "%d", (UINT32)value);
+			string.printf("%d", (UINT32)value);
 			break;
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			astring_printf(string, "#%d", (UINT32)value);
+			string.printf("#%d", (UINT32)value);
 			break;
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			astring_printf(string, "$%X", (UINT32)value);
+			string.printf("$%X", (UINT32)value);
 			break;
 
 		case XML_INT_FORMAT_HEX_C:
-			astring_printf(string, "0x%X", (UINT32)value);
+			string.printf("0x%X", (UINT32)value);
 			break;
 	}
-	return astring_c(string);
+	return string;
 }
 
 
@@ -406,7 +406,8 @@ void cheat_reload(running_machine *machine)
 	cheat_exit(machine);
 
 	/* reset our memory */
-	memset(cheatinfo, 0, sizeof(*cheatinfo));
+	auto_free(machine, cheatinfo);
+	cheatinfo = machine->cheat_data = auto_alloc_clear(machine, cheat_private);
 
 	/* load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
        and MAME will load gamename.xml */
@@ -434,16 +435,10 @@ void cheat_reload(running_machine *machine)
 static void cheat_exit(running_machine *machine)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	int linenum;
 
 	/* free the list of cheats */
 	if (cheatinfo->cheatlist != NULL)
 		cheat_list_free(machine, cheatinfo->cheatlist);
-
-	/* free any text strings */
-	for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-		if (cheatinfo->output[linenum] != NULL)
-			astring_free(cheatinfo->output[linenum]);
 }
 
 
@@ -524,7 +519,7 @@ void cheat_render_text(running_machine *machine)
 			if (cheatinfo->output[linenum] != NULL)
 			{
 				/* output the text */
-				ui_draw_text_full(astring_c(cheatinfo->output[linenum]),
+				ui_draw_text_full(cheatinfo->output[linenum],
 						0.0f, (float)linenum * ui_get_line_height(), 1.0f,
 						cheatinfo->justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
 						ARGB_WHITE, ARGB_BLACK, NULL, NULL);
@@ -552,7 +547,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 
 	/* description is standard */
 	if (description != NULL)
-		*description = astring_c(cheat->description);
+		*description = cheat->description;
 
 	/* some cheat entries are just text for display */
 	if (is_text_only_cheat(cheat))
@@ -632,7 +627,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 				if (item->value == cheat->parameter->value)
 					break;
 			if (state != NULL)
-				*state = (item != NULL) ? astring_c(item->text) : "??Invalid??";
+				*state = (item != NULL) ? item->text.cstr() : "??Invalid??";
 			if (flags != NULL)
 			{
 				*flags = MENU_FLAG_LEFT_ARROW;
@@ -667,7 +662,7 @@ int cheat_activate(running_machine *machine, void *entry)
 	{
 		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 		changed = TRUE;
-		popmessage("Activated %s", astring_c(cheat->description));
+		popmessage("Activated %s", cheat->description.cstr());
 	}
 
 	/* if we have no run or off script, but we do have parameter and change scripts and it's not in the off state, it's a oneshot list or selectable value cheat */
@@ -676,9 +671,9 @@ int cheat_activate(running_machine *machine, void *entry)
 		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 		changed = TRUE;
 		if (cheat->parameter->itemlist != NULL)
-			popmessage("Activated\n %s = %s", astring_c(cheat->description), astring_c(cheat->parameter->itemlist->curtext) );
+			popmessage("Activated\n %s = %s", cheat->description.cstr(), cheat->parameter->itemlist->curtext.cstr() );
 		else
-			popmessage("Activated\n %s = %d (0x%X)", astring_c(cheat->description), (UINT32)cheat->parameter->value, (UINT32)cheat->parameter->value );
+			popmessage("Activated\n %s = %d (0x%X)", cheat->description.cstr(), (UINT32)cheat->parameter->value, (UINT32)cheat->parameter->value );
 	}
 
 	return changed;
@@ -880,7 +875,7 @@ int cheat_select_next_state(running_machine *machine, void *entry)
     to help render displayable comments
 -------------------------------------------------*/
 
-astring *cheat_get_comment(void *entry)
+astring &cheat_get_comment(void *entry)
 {
 	cheat_entry *cheat = (cheat_entry *)entry;
 	return cheat->comment;
@@ -907,11 +902,7 @@ static void cheat_frame(running_machine *machine)
 	cheatinfo->numlines = floor(1.0f / ui_get_line_height());
 	cheatinfo->numlines = MIN(cheatinfo->numlines, ARRAY_LENGTH(cheatinfo->output));
 	for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-		if (cheatinfo->output[linenum] != NULL)
-		{
-			astring_free(cheatinfo->output[linenum]);
-			cheatinfo->output[linenum] = NULL;
-		}
+		cheatinfo->output[linenum].reset();
 
 	/* iterate over running cheats and execute them */
 	for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
@@ -963,11 +954,10 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 		}
 
 		/* if there is a string to display, compute it */
-		if (entry->format != NULL)
+		if (entry->format.len() != 0)
 		{
 			UINT64 params[MAX_ARGUMENTS];
 			output_argument *arg;
-			astring *string;
 			int curarg = 0;
 			int row;
 
@@ -990,13 +980,11 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 			row = MIN(row, cheatinfo->numlines - 1);
 
 			/* either re-use or allocate a string */
-			string = cheatinfo->output[row];
-			if (string == NULL)
-				string = cheatinfo->output[row] = astring_alloc();
+			astring &string = cheatinfo->output[row];
 			cheatinfo->justify[row] = entry->justify;
 
 			/* generate the astring */
-			astring_printf(string, astring_c(entry->format),
+			string.printf(entry->format,
 				(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
 				(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
 				(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
@@ -1027,11 +1015,10 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 	cheat_entry **cheattailptr = &cheatlist;
 	mame_file *cheatfile = NULL;
 	file_error filerr;
-	astring *fname;
 
 	/* open the file with the proper name */
-	fname = astring_assemble_2(astring_alloc(), filename, ".xml");
-	filerr = mame_fopen(SEARCHPATH_CHEAT, astring_c(fname), OPEN_FLAG_READ, &cheatfile);
+	astring fname(filename, ".xml");
+	filerr = mame_fopen(SEARCHPATH_CHEAT, fname, OPEN_FLAG_READ, &cheatfile);
 
 	/* loop over all instrances of the files found in our search paths */
 	while (filerr == FILERR_NONE)
@@ -1042,7 +1029,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 		cheat_entry *scannode;
 		int version;
 
-		mame_printf_verbose("Loading cheats file from %s\n", mame_file_full_name(cheatfile));
+		mame_printf_verbose("Loading cheats file from %s\n", mame_file_full_name(cheatfile).cstr());
 
 		/* read the XML file into internal data structures */
 		memset(&options, 0, sizeof(options));
@@ -1084,9 +1071,9 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 			scannode = NULL;
 			if (REMOVE_DUPLICATE_CHEATS)
 				for (scannode = cheatlist; scannode != NULL; scannode = scannode->next)
-					if (astring_cmp(scannode->description, curcheat->description) == 0)
+					if (scannode->description.cmp(curcheat->description) == 0)
 					{
-						mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", astring_c(curcheat->description), mame_file_full_name(cheatfile));
+						mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description.cstr(), mame_file_full_name(cheatfile).cstr());
 						break;
 					}
 
@@ -1102,11 +1089,10 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 		xml_file_free(rootnode);
 
 		/* open the next file in sequence */
-		filerr = mame_fclose_and_open_next(&cheatfile, astring_c(fname), OPEN_FLAG_READ);
+		filerr = mame_fclose_and_open_next(&cheatfile, fname, OPEN_FLAG_READ);
 	}
 
-	/* release memory and return the cheat list */
-	astring_free(fname);
+	/* return the cheat list */
 	return cheatlist;
 
 error:
@@ -1114,7 +1100,6 @@ error:
 	xml_file_free(rootnode);
 	if (cheatfile != NULL)
 		mame_fclose(cheatfile);
-	astring_free(fname);
 	return NULL;
 }
 
@@ -1128,12 +1113,10 @@ static int cheat_list_save(const char *filename, const cheat_entry *cheatlist)
 {
 	mame_file *cheatfile;
 	file_error filerr;
-	astring *fname;
 
 	/* open the file with the proper name */
-	fname = astring_assemble_2(astring_alloc(), filename, ".xml");
-	filerr = mame_fopen(SEARCHPATH_CHEAT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &cheatfile);
-	astring_free(fname);
+	astring fname(filename, ".xml");
+	filerr = mame_fopen(SEARCHPATH_CHEAT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &cheatfile);
 
 	/* if that failed, return nothing */
 	if (filerr != FILERR_NONE)
@@ -1203,7 +1186,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 		mame_printf_error("%s.xml(%d): empty or missing desc attribute on cheat\n", filename, cheatnode->line);
 		return NULL;
 	}
-	cheat->description = astring_dupc(description);
+	cheat->description.cpy(description);
 
 	/* create the symbol table */
 	cheat->symbols = symtable_alloc(NULL, machine);
@@ -1223,7 +1206,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	if (commentnode != NULL)
 	{
 		if (commentnode->value != NULL && commentnode->value[0] != 0)
-			cheat->comment = astring_dupc(commentnode->value);
+			cheat->comment.cpy(commentnode->value);
 
 		/* only one comment is kept */
 		commentnode = xml_get_sibling(commentnode->next, "comment");
@@ -1294,18 +1277,18 @@ static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
 			scriptcount++;
 
 	/* output the cheat tag */
-	mame_fprintf(cheatfile, "\t<cheat desc=\"%s\"", astring_c(cheat->description));
+	mame_fprintf(cheatfile, "\t<cheat desc=\"%s\"", cheat->description.cstr());
 	if (cheat->numtemp != DEFAULT_TEMP_VARIABLES)
 		mame_fprintf(cheatfile, " tempvariables=\"%d\"", cheat->numtemp);
-	if (cheat->comment == NULL && cheat->parameter == NULL && scriptcount == 0)
+	if (cheat->comment.len() == 0 && cheat->parameter == NULL && scriptcount == 0)
 		mame_fprintf(cheatfile, " />\n");
 	else
 	{
 		mame_fprintf(cheatfile, ">\n");
 
 		/* save the comment */
-		if (cheat->comment != NULL)
-			mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", astring_c(cheat->comment));
+		if (cheat->comment.len() != 0)
+			mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", cheat->comment.cstr());
 
 		/* output the parameter, if present */
 		if (cheat->parameter != NULL)
@@ -1329,12 +1312,6 @@ static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
 static void cheat_entry_free(running_machine *machine, cheat_entry *cheat)
 {
 	script_state state;
-
-	if (cheat->description != NULL)
-		astring_free(cheat->description);
-
-	if (cheat->comment != NULL)
-		astring_free(cheat->comment);
 
 	if (cheat->parameter != NULL)
 		cheat_parameter_free(machine, cheat->parameter);
@@ -1388,7 +1365,7 @@ static cheat_parameter *cheat_parameter_load(running_machine *machine, const cha
 			mame_printf_error("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 			goto error;
 		}
-		curitem->text = astring_dupc(itemnode->value);
+		curitem->text.cpy(itemnode->value);
 
 		/* read the attributes */
 		if (xml_get_attribute(itemnode, "value") == NULL)
@@ -1425,12 +1402,11 @@ error:
 
 static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param)
 {
-	astring *string = astring_alloc();
-
 	/* output the parameter tag */
 	mame_fprintf(cheatfile, "\t\t<parameter");
 
 	/* if no items, just output min/max/step */
+	astring string;
 	if (param->itemlist == NULL)
 	{
 		if (param->minval != 0)
@@ -1448,10 +1424,9 @@ static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *pa
 		const parameter_item *curitem;
 
 		for (curitem = param->itemlist; curitem != NULL; curitem = curitem->next)
-			mame_fprintf(cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", format_int(string, curitem->value, curitem->valformat), astring_c(curitem->text));
+			mame_fprintf(cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", format_int(string, curitem->value, curitem->valformat), curitem->text.cstr());
 		mame_fprintf(cheatfile, "\t\t</parameter>\n");
 	}
-	astring_free(string);
 }
 
 
@@ -1467,8 +1442,6 @@ static void cheat_parameter_free(running_machine *machine, cheat_parameter *para
 		parameter_item *item = param->itemlist;
 		param->itemlist = item->next;
 
-		if (item->text != NULL)
-			astring_free(item->text);
 		auto_free(machine, item);
 	}
 
@@ -1650,7 +1623,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			mame_printf_error("%s.xml(%d): missing format in output tag\n", filename, entrynode->line);
 			goto error;
 		}
-		entry->format = astring_dupc(format);
+		entry->format.cpy(format);
 
 		/* extract other attributes */
 		entry->line = xml_get_attribute_int(entrynode, "line", 0);
@@ -1724,7 +1697,7 @@ error:
 
 static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* output an action */
 	if (entry->format == NULL)
@@ -1732,21 +1705,21 @@ static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
 		mame_fprintf(cheatfile, "\t\t\t<action");
 		if (entry->condition != NULL)
 		{
-			quote_astring_expression(astring_cpyc(tempstring, expression_original_string(entry->condition)), TRUE);
-			mame_fprintf(cheatfile, " condition=\"%s\"", astring_c(tempstring));
+			quote_astring_expression(tempstring.cpy(expression_original_string(entry->condition)), TRUE);
+			mame_fprintf(cheatfile, " condition=\"%s\"", tempstring.cstr());
 		}
-		quote_astring_expression(astring_cpyc(tempstring, expression_original_string(entry->expression)), FALSE);
-		mame_fprintf(cheatfile, ">%s</action>\n", astring_c(tempstring));
+		quote_astring_expression(tempstring.cpy(expression_original_string(entry->expression)), FALSE);
+		mame_fprintf(cheatfile, ">%s</action>\n", tempstring.cstr());
 	}
 
 	/* output an output */
 	else
 	{
-		mame_fprintf(cheatfile, "\t\t\t<output format=\"%s\"", astring_c(entry->format));
+		mame_fprintf(cheatfile, "\t\t\t<output format=\"%s\"", entry->format.cstr());
 		if (entry->condition != NULL)
 		{
-			quote_astring_expression(astring_cpyc(tempstring, expression_original_string(entry->condition)), TRUE);
-			mame_fprintf(cheatfile, " condition=\"%s\"", astring_c(tempstring));
+			quote_astring_expression(tempstring.cpy(expression_original_string(entry->condition)), TRUE);
+			mame_fprintf(cheatfile, " condition=\"%s\"", tempstring.cstr());
 		}
 		if (entry->line != 0)
 			mame_fprintf(cheatfile, " line=\"%d\"", entry->line);
@@ -1768,14 +1741,12 @@ static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
 				mame_fprintf(cheatfile, "\t\t\t\t<argument");
 				if (curarg->count != 1)
 					mame_fprintf(cheatfile, " count=\"%d\"", (int)curarg->count);
-				quote_astring_expression(astring_cpyc(tempstring, expression_original_string(curarg->expression)), FALSE);
-				mame_fprintf(cheatfile, ">%s</argument>\n", astring_c(tempstring));
+				quote_astring_expression(tempstring.cpy(expression_original_string(curarg->expression)), FALSE);
+				mame_fprintf(cheatfile, ">%s</argument>\n", tempstring.cstr());
 			}
 			mame_fprintf(cheatfile, "\t\t\t</output>\n");
 		}
 	}
-
-	astring_free(tempstring);
 }
 
 
@@ -1790,8 +1761,6 @@ static void script_entry_free(running_machine *machine, script_entry *entry)
 		expression_free(entry->condition);
 	if (entry->expression != NULL)
 		expression_free(entry->expression);
-	if (entry->format != NULL)
-		astring_free(entry->format);
 
 	while (entry->arglist != NULL)
 	{
@@ -1818,32 +1787,32 @@ static void script_entry_free(running_machine *machine, script_entry *entry)
     document
 -------------------------------------------------*/
 
-static astring *quote_astring_expression(astring *string, int isattribute)
+static astring &quote_astring_expression(astring &string, int isattribute)
 {
-	astring_replacec(string, 0, " && ", " and ");
-	astring_replacec(string, 0, " &&", " and ");
-	astring_replacec(string, 0, "&& ", " and ");
-	astring_replacec(string, 0, "&&", " and ");
+	string.replace(0, " && ", " and ");
+	string.replace(0, " &&", " and ");
+	string.replace(0, "&& ", " and ");
+	string.replace(0, "&&", " and ");
 
-	astring_replacec(string, 0, " & ", " band ");
-	astring_replacec(string, 0, " &", " band ");
-	astring_replacec(string, 0, "& ", " band ");
-	astring_replacec(string, 0, "&", " band ");
+	string.replace(0, " & ", " band ");
+	string.replace(0, " &", " band ");
+	string.replace(0, "& ", " band ");
+	string.replace(0, "&", " band ");
 
-	astring_replacec(string, 0, " <= ", " le ");
-	astring_replacec(string, 0, " <=", " le ");
-	astring_replacec(string, 0, "<= ", " le ");
-	astring_replacec(string, 0, "<=", " le ");
+	string.replace(0, " <= ", " le ");
+	string.replace(0, " <=", " le ");
+	string.replace(0, "<= ", " le ");
+	string.replace(0, "<=", " le ");
 
-	astring_replacec(string, 0, " < ", " lt ");
-	astring_replacec(string, 0, " <", " lt ");
-	astring_replacec(string, 0, "< ", " lt ");
-	astring_replacec(string, 0, "<", " lt ");
+	string.replace(0, " < ", " lt ");
+	string.replace(0, " <", " lt ");
+	string.replace(0, "< ", " lt ");
+	string.replace(0, "<", " lt ");
 
-	astring_replacec(string, 0, " << ", " lshift ");
-	astring_replacec(string, 0, " <<", " lshift ");
-	astring_replacec(string, 0, "<< ", " lshift ");
-	astring_replacec(string, 0, "<<", " lshift ");
+	string.replace(0, " << ", " lshift ");
+	string.replace(0, " <<", " lshift ");
+	string.replace(0, "<< ", " lshift ");
+	string.replace(0, "<<", " lshift ");
 
 	return string;
 }
@@ -1856,7 +1825,7 @@ static astring *quote_astring_expression(astring *string, int isattribute)
 
 static int validate_format(const char *filename, int line, const script_entry *entry)
 {
-	const char *p = astring_c(entry->format);
+	const char *p = entry->format;
 	const output_argument *curarg;
 	int argsprovided;
 	int argscounted;
@@ -1879,7 +1848,7 @@ static int validate_format(const char *filename, int line, const script_entry *e
 		/* look for a valid type */
 		if (strchr("cdiouxX", *p) == NULL)
 		{
-			mame_printf_error("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, astring_c(entry->format));
+			mame_printf_error("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, entry->format.cstr());
 			return FALSE;
 		}
 		argscounted++;
@@ -1891,12 +1860,12 @@ static int validate_format(const char *filename, int line, const script_entry *e
 	/* did we match? */
 	if (argscounted < argsprovided)
 	{
-		mame_printf_error("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, astring_c(entry->format));
+		mame_printf_error("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, entry->format.cstr());
 		return FALSE;
 	}
 	if (argscounted > argsprovided)
 	{
-		mame_printf_error("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, astring_c(entry->format));
+		mame_printf_error("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, entry->format.cstr());
 		return FALSE;
 	}
 	return TRUE;

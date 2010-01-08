@@ -894,12 +894,6 @@ void address_map_free(address_map *map)
 	{
 		address_map_entry *entry = map->entrylist;
 		map->entrylist = entry->next;
-		if (entry->read.derived_tag != NULL)
-			astring_free(entry->read.derived_tag);
-		if (entry->write.derived_tag != NULL)
-			astring_free(entry->write.derived_tag);
-		if (entry->region_string != NULL)
-			astring_free(entry->region_string);
 		global_free(entry);
 	}
 
@@ -2339,11 +2333,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 					entry->read.name = TOKEN_GET_STRING(tokens);
 				}
 				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-				{
-					if (entry->read.derived_tag == NULL)
-						entry->read.derived_tag = astring_alloc();
 					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, TOKEN_GET_STRING(tokens));
-				}
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
@@ -2357,11 +2347,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 					entry->write.name = TOKEN_GET_STRING(tokens);
 				}
 				if (entry->write.type == AMH_DEVICE_HANDLER || entry->write.type == AMH_PORT || entry->write.type == AMH_BANK)
-				{
-					if (entry->write.derived_tag == NULL)
-						entry->write.derived_tag = astring_alloc();
 					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, TOKEN_GET_STRING(tokens));
-				}
 				break;
 
 			case ADDRMAP_TOKEN_READWRITE:
@@ -2382,11 +2368,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
 				{
 					const char *basetag = TOKEN_GET_STRING(tokens);
-					if (entry->read.derived_tag == NULL)
-						entry->read.derived_tag = astring_alloc();
 					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, basetag);
-					if (entry->write.derived_tag == NULL)
-						entry->write.derived_tag = astring_alloc();
 					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, basetag);
 				}
 				break;
@@ -2395,8 +2377,6 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
-				if (entry->region_string == NULL)
-					entry->region_string = astring_alloc();
 				entry->region = device_inherit_tag(entry->region_string, devtag, TOKEN_GET_STRING(tokens));
 				break;
 

@@ -138,15 +138,15 @@ INLINE void normalize_substr(int *start, int *count, int length)
 #ifdef __cplusplus
 
 /*-------------------------------------------------
-    astring - basic constructor
+    init - constructor helper
 -------------------------------------------------*/
 
-astring::astring()
+astring &astring::init()
 {
-	/* initialize base fields by hand */
 	text = smallbuf;
 	alloclen = ARRAY_LENGTH(smallbuf);
 	smallbuf[0] = 0;
+	return *this;
 }
 
 

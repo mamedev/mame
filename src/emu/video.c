@@ -1957,18 +1957,17 @@ static void recompute_speed(running_machine *machine, attotime emutime)
 	{
 		if (machine->primary_screen != NULL)
 		{
-			astring *fname = astring_assemble_2(astring_alloc(), machine->basename, PATH_SEPARATOR "final.png");
+			astring fname(machine->basename, PATH_SEPARATOR "final.png");
 			file_error filerr;
 			mame_file *file;
 
 			/* create a final screenshot */
-			filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+			filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 			if (filerr == FILERR_NONE)
 			{
 				video_screen_save_snapshot(machine, machine->primary_screen, file);
 				mame_fclose(file);
 			}
-			astring_free(fname);
 		}
 
 		/* schedule our demise */
@@ -2112,30 +2111,29 @@ static void create_snapshot_bitmap(const device_config *screen)
 static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file)
 {
 	const char *snapname = options_get_string(mame_options(), OPTION_SNAPNAME);
-	astring *snapstr = astring_alloc();
-	astring *fname = astring_alloc();
 	file_error filerr;
+	astring snapstr;
+	astring fname;
 	int index;
 
 	/* handle defaults */
 	if (snapname == NULL || snapname[0] == 0)
 		snapname = "%g/%i";
-	astring_cpyc(snapstr, snapname);
+	snapstr.cpy(snapname);
 
 	/* strip any extension in the provided name and add our own */
-	index = astring_rchr(snapstr, 0, '.');
+	index = snapstr.rchr(0, '.');
 	if (index != -1)
-		astring_substr(snapstr, 0, index);
-	astring_catc(snapstr, ".");
-	astring_catc(snapstr, extension);
+		snapstr.substr(0, index);
+	snapstr.cat(".").cat(extension);
 
 	/* substitute path and gamename up front */
-	astring_replacec(snapstr, 0, "/", PATH_SEPARATOR);
-	astring_replacec(snapstr, 0, "%g", machine->basename);
+	snapstr.replace(0, "/", PATH_SEPARATOR);
+	snapstr.replace(0, "%g", machine->basename);
 
 	/* determine if the template has an index; if not, we always use the same name */
-	if (astring_findc(snapstr, 0, "%i") == -1)
-		astring_cpy(fname, snapstr);
+	if (snapstr.find(0, "%i") == -1)
+		snapstr.cpy(snapstr);
 
 	/* otherwise, we scan for the next available filename */
 	else
@@ -2151,11 +2149,10 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 			sprintf(seqtext, "%04d", seq);
 
 			/* build up the filename */
-			astring_cpy(fname, snapstr);
-			astring_replacec(fname, 0, "%i", seqtext);
+			fname.cpy(snapstr).replace(0, "%i", seqtext);
 
 			/* try to open the file; stop when we fail */
-			filerr = mame_fopen(pathoption, astring_c(fname), OPEN_FLAG_READ, file);
+			filerr = mame_fopen(pathoption, fname, OPEN_FLAG_READ, file);
 			if (filerr != FILERR_NONE)
 				break;
 			mame_fclose(*file);
@@ -2163,12 +2160,7 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 	}
 
 	/* create the final file */
-    filerr = mame_fopen(pathoption, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, file);
-
-    /* free the name and get out */
-    astring_free(fname);
-    astring_free(snapstr);
-    return filerr;
+    return mame_fopen(pathoption, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, file);
 }
 
 
@@ -2366,12 +2358,11 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 	/* if we succeeded, make a copy of the name and create the real file over top */
 	if (filerr == FILERR_NONE)
 	{
-		astring *fullname = astring_dupc(mame_file_full_name(tempfile));
+		astring fullname(mame_file_full_name(tempfile));
 		mame_fclose(tempfile);
 
 		/* create the file and free the string */
-		avierr = avi_create(astring_c(fullname), &info, &global.avifile);
-		astring_free(fullname);
+		avierr = avi_create(fullname, &info, &global.avifile);
 	}
 }
 
@@ -2545,7 +2536,7 @@ static void video_finalize_burnin(const device_config *screen)
 	screen_state *state = get_safe_token(screen);
 	if (state->burnin != NULL)
 	{
-		astring *fname = astring_alloc();
+		astring fname;
 		rectangle scaledvis;
 		bitmap_t *finalmap;
 		UINT64 minval = ~(UINT64)0;
@@ -2591,8 +2582,8 @@ static void video_finalize_burnin(const device_config *screen)
 		/* write the final PNG */
 
 		/* compute the name and create the file */
-		astring_printf(fname, "%s" PATH_SEPARATOR "burnin-%s.png", screen->machine->basename, screen->tag);
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+		fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", screen->machine->basename, screen->tag);
+		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{
 			png_info pnginfo = { 0 };
@@ -2612,7 +2603,6 @@ static void video_finalize_burnin(const device_config *screen)
 			png_free(&pnginfo);
 			mame_fclose(file);
 		}
-		astring_free(fname);
 		bitmap_free(finalmap);
 	}
 }
