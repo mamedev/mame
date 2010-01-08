@@ -516,7 +516,7 @@ void cheat_render_text(running_machine *machine)
 
 		/* render any text and free it along the way */
 		for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-			if (cheatinfo->output[linenum] != NULL)
+			if (cheatinfo->output[linenum].len() != 0)
 			{
 				/* output the text */
 				ui_draw_text_full(cheatinfo->output[linenum],
