@@ -349,7 +349,7 @@ static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info
 	tilemap_instance = machine->tilemap_data->instance;
 
 	/* allocate the tilemap itself */
-	tmap = alloc_clear_or_die(tilemap_t);
+	tmap = auto_alloc_clear(machine, tilemap_t);
 
 	/* fill in the basic metrics */
 	tmap->machine = machine;
@@ -379,16 +379,16 @@ static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info
 	/* initialize scroll information */
 	tmap->scrollrows = 1;
 	tmap->scrollcols = 1;
-	tmap->rowscroll = alloc_array_clear_or_die(INT32, tmap->height);
-	tmap->colscroll = alloc_array_clear_or_die(INT32, tmap->width);
+	tmap->rowscroll = auto_alloc_array_clear(machine, INT32, tmap->height);
+	tmap->colscroll = auto_alloc_array_clear(machine, INT32, tmap->width);
 
 	/* allocate the pixel data cache */
-	tmap->pixmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED16);
+	tmap->pixmap = auto_bitmap_alloc(machine, tmap->width, tmap->height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate transparency mapping data */
-	tmap->tileflags = alloc_array_or_die(UINT8, tmap->max_logical_index);
-	tmap->flagsmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED8);
-	tmap->pen_to_flags = alloc_array_clear_or_die(UINT8, MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
+	tmap->tileflags = auto_alloc_array(machine, UINT8, tmap->max_logical_index);
+	tmap->flagsmap = auto_bitmap_alloc(machine, tmap->width, tmap->height, BITMAP_FORMAT_INDEXED8);
+	tmap->pen_to_flags = auto_alloc_array_clear(machine, UINT8, MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
 	for (group = 0; group < TILEMAP_NUM_GROUPS; group++)
 		tilemap_map_pens_to_layer(tmap, group, 0, 0, TILEMAP_PIXEL_LAYER0);
 
@@ -1155,15 +1155,15 @@ static void tilemap_dispose(tilemap_t *tmap)
 		}
 
 	/* free allocated memory */
-	free(tmap->pen_to_flags);
-	free(tmap->tileflags);
-	bitmap_free(tmap->flagsmap);
-	bitmap_free(tmap->pixmap);
-	free(tmap->colscroll);
-	free(tmap->rowscroll);
-	free(tmap->logical_to_memory);
-	free(tmap->memory_to_logical);
-	free(tmap);
+	auto_free(tmap->machine, tmap->pen_to_flags);
+	auto_free(tmap->machine, tmap->tileflags);
+	auto_free(tmap->machine, tmap->flagsmap);
+	auto_free(tmap->machine, tmap->pixmap);
+	auto_free(tmap->machine, tmap->colscroll);
+	auto_free(tmap->machine, tmap->rowscroll);
+	auto_free(tmap->machine, tmap->logical_to_memory);
+	auto_free(tmap->machine, tmap->memory_to_logical);
+	auto_free(tmap->machine, tmap);
 }
 
 
@@ -1195,8 +1195,8 @@ static void mappings_create(tilemap_t *tmap)
 	tmap->max_memory_index++;
 
 	/* allocate the necessary mappings */
-	tmap->memory_to_logical = alloc_array_or_die(tilemap_logical_index, tmap->max_memory_index);
-	tmap->logical_to_memory = alloc_array_or_die(tilemap_memory_index, tmap->max_logical_index);
+	tmap->memory_to_logical = auto_alloc_array(tmap->machine, tilemap_logical_index, tmap->max_memory_index);
+	tmap->logical_to_memory = auto_alloc_array(tmap->machine, tilemap_memory_index, tmap->max_logical_index);
 
 	/* update the mappings */
 	mappings_update(tmap);

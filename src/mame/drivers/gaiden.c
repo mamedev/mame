@@ -1597,7 +1597,7 @@ static void descramble_drgnbowl_gfx(running_machine *machine)
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	size_t size = memory_region_length(machine, "maincpu");
-	UINT8 *buffer = alloc_array_or_die(UINT8, size);
+	UINT8 *buffer = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(buffer, ROM, size);
 	for( i = 0; i < size; i++ )
@@ -1610,11 +1610,11 @@ static void descramble_drgnbowl_gfx(running_machine *machine)
 							 3, 2, 1, 0)];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 	ROM = memory_region(machine, "gfx2");
 	size = memory_region_length(machine, "gfx2");
-	buffer = alloc_array_or_die(UINT8, size);
+	buffer = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(buffer,ROM,size);
 	for( i = 0; i < size; i++ )
@@ -1628,7 +1628,7 @@ static void descramble_drgnbowl_gfx(running_machine *machine)
 		                             5, 2, 1, 0)];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 }
 
 static DRIVER_INIT( drgnbowl )
@@ -1639,13 +1639,13 @@ static DRIVER_INIT( drgnbowl )
 	descramble_drgnbowl_gfx(machine);
 }
 
-static void descramble_mastninj_gfx(UINT8* src)
+static void descramble_mastninj_gfx(running_machine *machine, UINT8* src)
 {
 	UINT8 *buffer;
 	int len = 0x80000;
 
 	/*  rearrange gfx */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -1659,10 +1659,10 @@ static void descramble_mastninj_gfx(UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src, buffer, len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -1676,15 +1676,15 @@ static void descramble_mastninj_gfx(UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src, buffer, len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 }
 
 static DRIVER_INIT(mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
-	descramble_mastninj_gfx(memory_region(machine,"gfx2"));
-	descramble_mastninj_gfx(memory_region(machine,"gfx3"));
+	descramble_mastninj_gfx(machine, memory_region(machine,"gfx2"));
+	descramble_mastninj_gfx(machine, memory_region(machine,"gfx3"));
 	DRIVER_INIT_CALL(shadoww);
 }
 

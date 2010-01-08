@@ -1667,7 +1667,7 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
 
-static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
+static void hng64_reorder(running_machine *machine, UINT8* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
@@ -1675,7 +1675,7 @@ static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
 	int i;
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	buffer = alloc_array_or_die(UINT8, gfxregionsize);
+	buffer = auto_alloc_array(machine, UINT8, gfxregionsize);
 
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
@@ -1685,14 +1685,14 @@ static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
 
 	memcpy(gfxregion, buffer, gfxregionsize);
 
-	free (buffer);
+	auto_free (machine, buffer);
 
 }
 
 
 static DRIVER_INIT( hng64_reorder_gfx )
 {
-	hng64_reorder(memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
+	hng64_reorder(machine, memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
 }
 
 #define HACK_REGION

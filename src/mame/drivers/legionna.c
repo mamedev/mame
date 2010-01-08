@@ -958,13 +958,13 @@ static const gfx_layout legionna_new_charlayout =
 };
 
 
-static void descramble_legionnaire_gfx(UINT8* src)
+static void descramble_legionnaire_gfx(running_machine *machine, UINT8* src)
 {
 	UINT8 *buffer;
 	int len = 0x10000;
 
 	/*  rearrange gfx */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -978,7 +978,7 @@ static void descramble_legionnaire_gfx(UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
 }
@@ -2102,7 +2102,7 @@ static DRIVER_INIT( denjinmk )
 
 static DRIVER_INIT( legiongfx )
 {
-	descramble_legionnaire_gfx( memory_region(machine, "gfx5") );
+	descramble_legionnaire_gfx( machine, memory_region(machine, "gfx5") );
 }
 
 

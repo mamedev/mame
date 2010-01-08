@@ -683,7 +683,7 @@ static void descramble_sound( running_machine *machine )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memory_region(machine, "ymz");
 	int length = memory_region_length(machine, "ymz");
-	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 
 	UINT32 x;
 
@@ -703,7 +703,7 @@ static void descramble_sound( running_machine *machine )
 
 	memcpy(rom,buf1,length);
 
-	free (buf1);
+	auto_free (machine, buf1);
 }
 
 static READ32_HANDLER( avengrgs_speedup_r )

@@ -323,19 +323,19 @@ static DEVICE_NVRAM( eeprom )
 
 	if (read_or_write)
 	{
-		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		UINT8 *buffer = auto_alloc_array(device->machine, UINT8, eeprom_bytes);
 		for (offs = 0; offs < eeprom_bytes; offs++)
 			buffer[offs] = memory_read_byte(device->space[0], offs);
 		mame_fwrite(file, buffer, eeprom_bytes);
-		free(buffer);
+		auto_free(device->machine, buffer);
 	}
 	else if (file != NULL)
 	{
-		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		UINT8 *buffer = auto_alloc_array(device->machine, UINT8, eeprom_bytes);
 		mame_fread(file, buffer, eeprom_bytes);
 		for (offs = 0; offs < eeprom_bytes; offs++)
 			memory_write_byte(device->space[0], offs, buffer[offs]);
-		free(buffer);
+		auto_free(device->machine, buffer);
 	}
 	else
 	{

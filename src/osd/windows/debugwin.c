@@ -430,7 +430,7 @@ void debugwin_init_windows(void)
 			t_face = tstring_from_utf8(options_get_string(mame_options(), WINOPTION_DEBUGGER_FONT));
 			debug_font = CreateFont(-MulDiv(size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
 						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, t_face);
-			free(t_face);
+			global_free(t_face);
 
 			// fall back to Lucida Console 8
 			if (debug_font == NULL)
@@ -535,7 +535,7 @@ static debugwin_info *debugwin_window_create(running_machine *machine, LPCSTR ti
 	RECT work_bounds;
 
 	// allocate memory
-	info = alloc_clear_or_die(debugwin_info);
+	info = global_alloc_clear(debugwin_info);
 
 	// create the window
 	info->handler = handler;
@@ -567,7 +567,7 @@ static debugwin_info *debugwin_window_create(running_machine *machine, LPCSTR ti
 cleanup:
 	if (info->wnd != NULL)
 		DestroyWindow(info->wnd);
-	free(info);
+	global_free(info);
 	return NULL;
 }
 
@@ -599,7 +599,7 @@ static void debugwin_window_free(debugwin_info *info)
 		}
 
 	// free our memory
-	free(info);
+	global_free(info);
 }
 
 
@@ -1574,7 +1574,7 @@ static LRESULT CALLBACK debugwin_edit_proc(HWND wnd, UINT message, WPARAM wparam
 							if (utf8_buffer != NULL)
 							{
 								(*info->process_string)(info, utf8_buffer);
-								free(utf8_buffer);
+								global_free(utf8_buffer);
 							}
 						}
 						break;
@@ -1777,7 +1777,7 @@ static void memory_create_window(running_machine *machine)
 	{
 		TCHAR *t_name = tstring_from_utf8(subview->name);
 		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
-		free(t_name);
+		global_free(t_name);
 		if (cursel == -1 && subview->space != NULL && subview->space->cpu == curcpu)
 			cursel = item;
 	}
@@ -2086,7 +2086,7 @@ static void disasm_create_window(running_machine *machine)
 	{
 		TCHAR *t_name = tstring_from_utf8(subview->name);
 		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
-		free(t_name);
+		global_free(t_name);
 		if (cursel == 0 && subview->space->cpu == curcpu)
 			cursel = item;
 	}

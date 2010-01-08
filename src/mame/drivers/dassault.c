@@ -808,7 +808,7 @@ static DRIVER_INIT( dassault )
 {
 	const UINT8 *src = memory_region(machine, "gfx1");
 	UINT8 *dst = memory_region(machine, "gfx2");
-	UINT8 *tmp = alloc_array_or_die(UINT8, 0x80000);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
@@ -818,7 +818,7 @@ static DRIVER_INIT( dassault )
 	memcpy(dst+0x080000,src+0x00000,0x10000);
 	memcpy(dst+0x110000,src+0x10000,0x10000);
 
-	free(tmp);
+	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
@@ -828,7 +828,7 @@ static DRIVER_INIT( thndzone )
 {
 	const UINT8 *src = memory_region(machine, "gfx1");
 	UINT8 *dst = memory_region(machine, "gfx2");
-	UINT8 *tmp = alloc_array_or_die(UINT8, 0x80000);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
@@ -838,7 +838,7 @@ static DRIVER_INIT( thndzone )
 	memcpy(dst+0x080000,src+0x00000,0x10000);
 	memcpy(dst+0x110000,src+0x10000,0x10000);
 
-	free(tmp);
+	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);

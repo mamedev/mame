@@ -90,7 +90,7 @@ PALETTE_INIT( phoenix )
 	int i;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(color_prom, &phoenix_decode_info, &phoenix_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &phoenix_decode_info, &phoenix_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
@@ -99,7 +99,7 @@ PALETTE_INIT( phoenix )
 		palette_set_color(machine,i,rgb[col]);
 	}
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
-	free(rgb);
+	auto_free(machine, rgb);
 }
 
 PALETTE_INIT( survival )
@@ -107,7 +107,7 @@ PALETTE_INIT( survival )
 	int i;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(color_prom, &phoenix_decode_info, &survival_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &phoenix_decode_info, &survival_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
@@ -116,7 +116,7 @@ PALETTE_INIT( survival )
 		palette_set_color(machine,i,rgb[col]);
 	}
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
-	free(rgb);
+	auto_free(machine, rgb);
 }
 
 PALETTE_INIT( pleiads )
@@ -124,7 +124,7 @@ PALETTE_INIT( pleiads )
 	int i;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(color_prom, &phoenix_decode_info, &pleiades_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &phoenix_decode_info, &pleiades_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
@@ -133,7 +133,7 @@ PALETTE_INIT( pleiads )
 		palette_set_color(machine,i,rgb[col]);
 	}
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
-	free(rgb);
+	auto_free(machine, rgb);
 }
 
 /***************************************************************************

@@ -528,7 +528,7 @@ INLINE void add_bank_reference(bank_info *bank, const address_space *space)
 			return;
 
 	/* allocate a new entry and fill it */
-	(*refptr) = alloc_or_die(bank_reference);
+	(*refptr) = auto_alloc(space->machine, bank_reference);
 	(*refptr)->next = NULL;
 	(*refptr)->space = space;
 }
@@ -862,7 +862,7 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	const addrmap_token *default_map;
 	address_map *map;
 
-	map = alloc_clear_or_die(address_map);
+	map = global_alloc_clear(address_map);
 
 	/* append the internal device map (first so it takes priority) */
 	internal_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
@@ -900,11 +900,11 @@ void address_map_free(address_map *map)
 			astring_free(entry->write.derived_tag);
 		if (entry->region_string != NULL)
 			astring_free(entry->region_string);
-		free(entry);
+		global_free(entry);
 	}
 
 	/* free the map */
-	free(map);
+	global_free(map);
 }
 
 
@@ -1215,8 +1215,8 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 		fatalerror("memory_set_bankptr called for unknown bank '%s'", tag);
 	if (base == NULL)
 		fatalerror("memory_set_bankptr called NULL base");
-	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
-		validate_auto_malloc_memory(base, bank->byteend - bank->bytestart + 1);
+//	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
+//		validate_auto_malloc_memory(base, bank->byteend - bank->bytestart + 1);
 
 	/* set the base */
 	memdata->bank_ptr[bank->index] = (UINT8 *)base;
@@ -1726,7 +1726,7 @@ static void memory_init_spaces(running_machine *machine)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (device_get_addrbus_width(device, spacenum) > 0)
 			{
-				address_space *space = alloc_clear_or_die(address_space);
+				address_space *space = auto_alloc_clear(machine, address_space);
 				int logbits = cpu_get_logaddr_width(device, spacenum);
 				int ashift = device_get_addrbus_shift(device, spacenum);
 				int abits = device_get_addrbus_width(device, spacenum);
@@ -1785,9 +1785,11 @@ static void memory_init_spaces(running_machine *machine)
 				space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
 				space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
 
-				/* allocate memory; these aren't auto-malloc'ed as we need to expand them */
-				space->read.table = alloc_array_or_die(UINT8, 1 << LEVEL1_BITS);
-				space->write.table = alloc_array_or_die(UINT8, 1 << LEVEL1_BITS);
+				/* allocate memory */
+				space->read.machine = machine;
+				space->read.table = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
+				space->write.machine = machine;
+				space->write.table = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
 
 				/* initialize everything to unmapped */
 				memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
@@ -2197,66 +2199,14 @@ static void memory_init_locate(running_machine *machine)
 static void memory_exit(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
-	address_space *space, *nextspace;
-
-	/* free the memory blocks */
-	while (memdata->memory_block_list != NULL)
-	{
-		memory_block *block = memdata->memory_block_list;
-		memdata->memory_block_list = block->next;
-		free(block);
-	}
-
-	/* free banks */
-	while (memdata->banklist != NULL)
-	{
-		bank_info *bank = memdata->banklist;
-
-		/* free references within each bank */
-		while (bank->reflist != NULL)
-		{
-			bank_reference *ref = bank->reflist;
-			bank->reflist = ref->next;
-			free(ref);
-		}
-
-		memdata->banklist = bank->next;
-		free(bank);
-	}
+	address_space *space;
 
 	/* free all the address spaces and tables */
-	for (space = (address_space *)memdata->spacelist; space != NULL; space = nextspace)
+	for (space = (address_space *)memdata->spacelist; space != NULL; space = space->next)
 	{
-		int entry;
-
-		nextspace = (address_space *)space->next;
-
-		/* free all direct ranges */
-		for (entry = 0; entry < ARRAY_LENGTH(space->direct.rangelist); entry++)
-			while (space->direct.rangelist[entry] != NULL)
-			{
-				direct_range *range = space->direct.rangelist[entry];
-				space->direct.rangelist[entry] = range->next;
-				free(range);
-			}
-
-		/* free the free list of direct ranges */
-		while (space->direct.freerangelist != NULL)
-		{
-			direct_range *range = space->direct.freerangelist;
-			space->direct.freerangelist = range->next;
-			free(range);
-		}
-
 		/* free the address map and tables */
 		if (space->map != NULL)
 			address_map_free(space->map);
-		if (space->read.table != NULL)
-			free(space->read.table);
-		if (space->write.table != NULL)
-			free(space->write.table);
-
-		free(space);
 	}
 
 	/* free the maps */
@@ -2356,7 +2306,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 
 			/* start a new range */
 			case ADDRMAP_TOKEN_RANGE:
-				entry = *entryptr = alloc_clear_or_die(address_map_entry);
+				entry = *entryptr = global_alloc_clear(address_map_entry);
 				entryptr = &entry->next;
 				TOKEN_GET_UINT64_UNPACK2(tokens, entry->addrstart, 32, entry->addrend, 32);
 				break;
@@ -2705,7 +2655,7 @@ static genf *bank_find_or_allocate(const address_space *space, const char *tag, 
 			sprintf(name, "Bank '%s'", tag);
 
 		/* allocate the bank */
-		bank = (bank_info *)alloc_array_clear_or_die(UINT8, sizeof(bank_info) + strlen(tag) + 1 + strlen(name));
+		bank = (bank_info *)auto_alloc_array_clear(space->machine, UINT8, sizeof(bank_info) + strlen(tag) + 1 + strlen(name));
 
 		/* populate it */
 		bank->index = banknum;
@@ -3138,10 +3088,14 @@ static UINT8 subtable_alloc(address_table *tabledata)
 				/* if this is past our allocation budget, allocate some more */
 				if (subindex >= tabledata->subtable_alloc)
 				{
+					UINT32 oldsize = (1 << LEVEL1_BITS) + (tabledata->subtable_alloc << LEVEL2_BITS);
 					tabledata->subtable_alloc += SUBTABLE_ALLOC;
-					tabledata->table = (UINT8 *)realloc(tabledata->table, (1 << LEVEL1_BITS) + (tabledata->subtable_alloc << LEVEL2_BITS));
-					if (!tabledata->table)
-						fatalerror("error: ran out of memory allocating memory subtable");
+					UINT32 newsize = (1 << LEVEL1_BITS) + (tabledata->subtable_alloc << LEVEL2_BITS);
+
+					UINT8 *newtable = auto_alloc_array(tabledata->machine, UINT8, newsize);
+					memcpy(newtable, tabledata->table, oldsize);
+					auto_free(tabledata->machine, tabledata->table);
+					tabledata->table = newtable;
 				}
 
 				/* bump the usecount and return */
@@ -3352,7 +3306,7 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 	if (range != NULL)
 		space->direct.freerangelist = range->next;
 	else
-		range = alloc_or_die(direct_range);
+		range = auto_alloc(space->machine, direct_range);
 
 	/* fill in the range */
 	table_derive_range(&space->read, byteaddress, &range->bytestart, &range->byteend);
@@ -3424,7 +3378,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 		bytestoalloc += byteend - bytestart + 1;
 
 	/* allocate and clear the memory */
-	block = (memory_block *)alloc_array_clear_or_die(UINT8, bytestoalloc);
+	block = (memory_block *)auto_alloc_array_clear(space->machine, UINT8, bytestoalloc);
 	if (allocatemem)
 		memory = block + 1;
 

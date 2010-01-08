@@ -198,11 +198,8 @@ const char mame_disclaimer[] =
 
 static int parse_ini_file(core_options *options, const char *name, int priority);
 
-static running_machine *create_machine(const game_driver *driver);
-static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
 static TIMER_CALLBACK( soft_reset );
-static void free_callback_list(callback_item **cb);
 
 static void saveload_init(running_machine *machine);
 static void handle_save(running_machine *machine);
@@ -281,7 +278,7 @@ int mame_execute(core_options *options)
 		mame_parse_ini_files(mame_options(), driver);
 
 		/* create the machine structure and driver */
-		machine = create_machine(driver);
+		machine = global_alloc(running_machine(driver));
 		mame = machine->mame_data;
 
 		/* start in the "pre-init phase" */
@@ -290,8 +287,6 @@ int mame_execute(core_options *options)
 		/* looooong term: remove this */
 		global_machine = machine;
 
-		init_resource_tracking();
-
 		/* use try/catch for deep error recovery */
 		try
 		{
@@ -299,9 +294,6 @@ int mame_execute(core_options *options)
 
 			/* move to the init phase */
 			mame->current_phase = MAME_PHASE_INIT;
-
-			/* start tracking resources for real */
-			begin_resource_tracking();
 
 			/* if we have a logfile, set up the callback */
 			mame->logerror_callback_list = NULL;
@@ -323,11 +315,6 @@ int mame_execute(core_options *options)
 			/* display the startup screens */
 			ui_display_startup_screens(machine, firstrun, !settingsloaded);
 			firstrun = FALSE;
-
-			/* start resource tracking; note that soft_reset assumes it can */
-			/* call end_resource_tracking followed by begin_resource_tracking */
-			/* to clear out resources allocated between resets */
-			begin_resource_tracking();
 
 			/* perform a soft reset -- this takes us to the running phase */
 			soft_reset(machine, NULL, 0);
@@ -356,9 +343,6 @@ int mame_execute(core_options *options)
 			/* and out via the exit phase */
 			mame->current_phase = MAME_PHASE_EXIT;
 
-			/* stop tracking resources at this level */
-			end_resource_tracking();
-
 			/* save the NVRAM and configuration */
 			sound_mute(machine, TRUE);
 			nvram_save(machine);
@@ -371,7 +355,7 @@ int mame_execute(core_options *options)
 			if (fatal.exitcode() != 0)
 				error = fatal.exitcode();
 		}
-		catch (emu_exception &exception)
+		catch (emu_exception &)
 		{
 			mame_printf_error("Caught unhandled emulator exception\n");
 			error = MAMERR_FATALERROR;
@@ -386,18 +370,9 @@ int mame_execute(core_options *options)
 		for (cb = mame->exit_callback_list; cb; cb = cb->next)
 			(*cb->func.exit)(machine);
 
-		/* close all inner resource tracking */
-		exit_resource_tracking();
-
 		/* close the logfile */
 		if (mame->logfile != NULL)
 			mame_fclose(mame->logfile);
-
-		/* free our callback lists */
-		free_callback_list(&mame->exit_callback_list);
-		free_callback_list(&mame->pause_callback_list);
-		free_callback_list(&mame->reset_callback_list);
-		free_callback_list(&mame->frame_callback_list);
 
 		/* grab data from the MAME structure before it goes away */
 		if (mame->new_driver_pending != NULL)
@@ -408,7 +383,7 @@ int mame_execute(core_options *options)
 		exit_pending = mame->exit_pending;
 
 		/* destroy the machine */
-		destroy_machine(machine);
+		global_free(machine);
 
 		/* reset the options */
 		mame_opts = NULL;
@@ -457,7 +432,7 @@ void add_frame_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_frame_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the end of the list */
 	cb->func.frame = callback;
@@ -480,7 +455,7 @@ void add_reset_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_reset_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the end of the list */
 	cb->func.reset = callback;
@@ -503,7 +478,7 @@ void add_pause_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_pause_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the end of the list */
 	cb->func.pause = callback;
@@ -526,7 +501,7 @@ void add_exit_callback(running_machine *machine, void (*callback)(running_machin
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_exit_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the head of the list */
 	cb->func.exit = callback;
@@ -793,7 +768,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = (region_info *)alloc_array_or_die(UINT8, sizeof(*info) + length);
+	info = (region_info *)auto_alloc_array(machine, UINT8, sizeof(*info) + length);
 	info->next = NULL;
 	info->name = astring_dupc(name);
 	info->length = length;
@@ -835,7 +810,7 @@ void memory_region_free(running_machine *machine, const char *name)
 
 			/* free the region */
 			astring_free(info->name);
-			free(info);
+			auto_free(machine, info);
 			break;
 		}
 }
@@ -1340,92 +1315,109 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 
 
 /*-------------------------------------------------
-    create_machine - create the running machine
+    running_machine - create the running machine
     object and initialize it based on options
 -------------------------------------------------*/
 
-static running_machine *create_machine(const game_driver *driver)
+running_machine::running_machine(const game_driver *driver)
+	: config(NULL),
+	  firstcpu(NULL),
+	  gamedrv(driver),
+	  basename(NULL),
+	  primary_screen(NULL),
+	  palette(NULL),
+	  pens(NULL),
+	  colortable(NULL),
+	  shadow_table(NULL),
+	  priority_bitmap(NULL),
+	  sample_rate(0),
+	  debug_flags(0),
+	  mame_data(NULL),
+	  cpuexec_data(NULL),
+	  timer_data(NULL),
+	  state_data(NULL),
+	  memory_data(NULL),
+	  palette_data(NULL),
+	  tilemap_data(NULL),
+	  streams_data(NULL),
+	  devices_data(NULL),
+	  romload_data(NULL),
+	  sound_data(NULL),
+	  input_data(NULL),
+	  input_port_data(NULL),
+	  ui_input_data(NULL),
+	  cheat_data(NULL),
+	  debugcpu_data(NULL),
+	  debugvw_data(NULL),
+	  generic_machine_data(NULL),
+	  generic_video_data(NULL),
+	  generic_audio_data(NULL),
+#ifdef MESS
+	  images_data(NULL),
+	  ui_mess_data(NULL),
+#endif /* MESS */
+	  driver_data(NULL)
 {
-	running_machine *machine;
-
-	/* allocate memory for the machine */
-	machine = (running_machine *)malloc(sizeof(*machine));
-	if (machine == NULL)
-		goto error;
-	memset(machine, 0, sizeof(*machine));
-
-	/* allocate memory for the internal mame_data */
-	machine->mame_data = (mame_private *)malloc(sizeof(*machine->mame_data));
-	if (machine->mame_data == NULL)
-		goto error;
-	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
-
-	/* allocate memory for the memory region map */
-	machine->mame_data->regionmap = tagmap_alloc();
-	if (machine->mame_data->regionmap == NULL)
-		goto error;
-
-	/* initialize the driver-related variables in the machine */
-	machine->gamedrv = driver;
-	machine->basename = mame_strdup(driver->name);
-	machine->config = machine_config_alloc(driver->machine_config);
-
-	/* allocate the driver data */
-	if (machine->config->driver_data_size != 0)
+	try
 	{
-		machine->driver_data = malloc(machine->config->driver_data_size);
-		if (machine->driver_data == NULL)
-			goto error;
-		memset(machine->driver_data, 0, machine->config->driver_data_size);
+		memset(&portlist, 0, sizeof(portlist));
+		memset(gfx, 0, sizeof(gfx));
+		memset(&generic, 0, sizeof(generic));
+
+		/* allocate memory for the internal mame_data */
+		mame_data = auto_alloc_clear(this, mame_private);
+
+		/* allocate memory for the memory region map */
+		mame_data->regionmap = tagmap_alloc();
+		if (mame_data->regionmap == NULL)
+			throw std::bad_alloc();
+
+		/* initialize the driver-related variables in the machine */
+		basename = mame_strdup(driver->name);
+		config = machine_config_alloc(driver->machine_config);
+
+		/* allocate the driver data */
+		if (config->driver_data_size != 0)
+			driver_data = auto_alloc_array_clear(this, UINT8, config->driver_data_size);
+
+		/* find devices */
+		firstcpu = cpu_first(config);
+		primary_screen = video_screen_first(config);
+
+		/* attach this machine to all the devices in the configuration */
+		device_list_attach_machine(this);
+
+		/* fetch core options */
+		sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
+		debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
 	}
-
-	/* find devices */
-	machine->firstcpu = cpu_first(machine->config);
-	machine->primary_screen = video_screen_first(machine->config);
-
-	/* attach this machine to all the devices in the configuration */
-	device_list_attach_machine(machine);
-
-	/* fetch core options */
-	machine->sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
-	machine->debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
-
-	return machine;
-
-error:
-	if (machine->driver_data != NULL)
-		free(machine->driver_data);
-	if (machine->config != NULL)
-		machine_config_free((machine_config *)machine->config);
-	if (machine->mame_data != NULL)
-		free(machine->mame_data);
-	if (machine != NULL)
-		free(machine);
-	return NULL;
+	catch (std::bad_alloc &)
+	{
+		if (driver_data != NULL)
+			auto_free(this, driver_data);
+		if (config != NULL)
+			machine_config_free((machine_config *)config);
+		if (mame_data != NULL)
+			auto_free(this, mame_data);
+	}
 }
 
 
 /*-------------------------------------------------
-    destroy_machine - free the machine data
+    ~running_machine - free the machine data
 -------------------------------------------------*/
 
-static void destroy_machine(running_machine *machine)
+running_machine::~running_machine()
 {
-	assert(machine == global_machine);
+	assert(this == global_machine);
 
-	if (machine->driver_data != NULL)
-		free(machine->driver_data);
-	if (machine->config != NULL)
-		machine_config_free((machine_config *)machine->config);
-	if (machine->mame_data != NULL)
-	{
-		if (machine->mame_data->regionmap != NULL)
-			tagmap_free(machine->mame_data->regionmap);
-		free(machine->mame_data);
-	}
-	if (machine->basename != NULL)
-		free((void *)machine->basename);
-	free(machine);
+	if (config != NULL)
+		machine_config_free((machine_config *)config);
+	if (mame_data != NULL && mame_data->regionmap != NULL)
+		tagmap_free(mame_data->regionmap);
+	if (basename != NULL)
+		auto_free(this, basename);
+
 	global_machine = NULL;
 }
 
@@ -1555,11 +1547,6 @@ static TIMER_CALLBACK( soft_reset )
 	/* temporarily in the reset phase */
 	mame->current_phase = MAME_PHASE_RESET;
 
-	/* a bit gross -- back off of the resource tracking, and put it back at the end */
-	assert(get_resource_tag() == 2);
-	end_resource_tracking();
-	begin_resource_tracking();
-
 	/* call all registered reset callbacks */
 	for (cb = machine->mame_data->reset_callback_list; cb; cb = cb->next)
 		(*cb->func.reset)(machine);
@@ -1577,21 +1564,6 @@ static TIMER_CALLBACK( soft_reset )
 
 	/* allow 0-time queued callbacks to run before any CPUs execute */
 	timer_execute_timers(machine);
-}
-
-
-/*-------------------------------------------------
-    free_callback_list - free a list of callbacks
--------------------------------------------------*/
-
-static void free_callback_list(callback_item **cb)
-{
-	while (*cb)
-	{
-		callback_item *temp = *cb;
-		*cb = (*cb)->next;
-		free(temp);
-	}
 }
 
 

@@ -54,40 +54,40 @@ void deco102_decrypt_cpu(running_machine *machine, const char *cputag, int addre
 	UINT16 *rom = (UINT16 *)memory_region(machine, cputag);
 	int size = memory_region_length(machine, cputag);
 	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size / 2);
-	UINT16 *buf = alloc_array_or_die(UINT16, size / 2);
+	UINT16 *buf = auto_alloc_array(machine, UINT16, size / 2);
 
-		memcpy(buf, rom, size);
+	memcpy(buf, rom, size);
 
-		memory_set_decrypted_region(space, 0, size - 1, opcodes);
-		m68k_set_encrypted_opcode_range(devtag_get_device(machine, cputag), 0, size);
+	memory_set_decrypted_region(space, 0, size - 1, opcodes);
+	m68k_set_encrypted_opcode_range(devtag_get_device(machine, cputag), 0, size);
 
-		for (i = 0; i < size / 2; i++)
-		{
-			int src;
+	for (i = 0; i < size / 2; i++)
+	{
+		int src;
 
-			// calculate address of encrypted word in ROM
-			src = i & 0xf0000;
-			if (i & 0x0001) src ^= 0xbe0b;
-			if (i & 0x0002) src ^= 0x5699;
-			if (i & 0x0004) src ^= 0x1322;
-			if (i & 0x0008) src ^= 0x0004;
-			if (i & 0x0010) src ^= 0x08a0;
-			if (i & 0x0020) src ^= 0x0089;
-			if (i & 0x0040) src ^= 0x0408;
-			if (i & 0x0080) src ^= 0x1212;
-			if (i & 0x0100) src ^= 0x08e0;
-			if (i & 0x0200) src ^= 0x5499;
-			if (i & 0x0400) src ^= 0x9a8b;
-			if (i & 0x0800) src ^= 0x1222;
-			if (i & 0x1000) src ^= 0x1200;
-			if (i & 0x2000) src ^= 0x0008;
-			if (i & 0x4000) src ^= 0x1210;
-			if (i & 0x8000) src ^= 0x00e0;
-			src ^= address_xor;
+		// calculate address of encrypted word in ROM
+		src = i & 0xf0000;
+		if (i & 0x0001) src ^= 0xbe0b;
+		if (i & 0x0002) src ^= 0x5699;
+		if (i & 0x0004) src ^= 0x1322;
+		if (i & 0x0008) src ^= 0x0004;
+		if (i & 0x0010) src ^= 0x08a0;
+		if (i & 0x0020) src ^= 0x0089;
+		if (i & 0x0040) src ^= 0x0408;
+		if (i & 0x0080) src ^= 0x1212;
+		if (i & 0x0100) src ^= 0x08e0;
+		if (i & 0x0200) src ^= 0x5499;
+		if (i & 0x0400) src ^= 0x9a8b;
+		if (i & 0x0800) src ^= 0x1222;
+		if (i & 0x1000) src ^= 0x1200;
+		if (i & 0x2000) src ^= 0x0008;
+		if (i & 0x4000) src ^= 0x1210;
+		if (i & 0x8000) src ^= 0x00e0;
+		src ^= address_xor;
 
-			rom[i]     = decrypt(buf[src], i, data_select_xor);
-			opcodes[i] = decrypt(buf[src], i, opcode_select_xor);
-		}
+		rom[i]     = decrypt(buf[src], i, data_select_xor);
+		opcodes[i] = decrypt(buf[src], i, opcode_select_xor);
+	}
 
-		free(buf);
+	auto_free(machine, buf);
 }

@@ -628,7 +628,7 @@ static void descramble_sound( running_machine *machine )
 {
 	UINT8 *rom = memory_region(machine, "ymz");
 	int length = 0x200000; // only the first rom is swapped on backfire!
-	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
 
 	for (x=0;x<length;x++)
@@ -647,7 +647,7 @@ static void descramble_sound( running_machine *machine )
 
 	memcpy(rom,buf1,length);
 
-	free (buf1);
+	auto_free (machine, buf1);
 }
 
 static READ32_HANDLER( backfire_speedup_r )

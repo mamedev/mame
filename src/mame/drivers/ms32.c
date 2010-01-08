@@ -2147,7 +2147,7 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 	source_data = memory_region       ( machine, region );
 	source_size = memory_region_length( machine, region );
 
-	result_data = alloc_array_or_die(UINT8, source_size);
+	result_data = auto_alloc_array(machine, UINT8, source_size);
 
 	for(i=0; i<source_size; i++)
 	{
@@ -2157,7 +2157,7 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 	}
 
 	memcpy (source_data, result_data, source_size);
-	free (result_data);
+	auto_free (machine, result_data);
 }
 
 
@@ -2172,7 +2172,7 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 	source_data = memory_region       ( machine, region );
 	source_size = memory_region_length( machine, region );
 
-	result_data = alloc_array_or_die(UINT8, source_size);
+	result_data = auto_alloc_array(machine, UINT8, source_size);
 
 	addr_xor ^= 0x1005d;
 
@@ -2212,7 +2212,7 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 	}
 
 	memcpy (source_data, result_data, source_size);
-	free (result_data);
+	auto_free (machine, result_data);
 }
 
 void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const char *region)
@@ -2226,7 +2226,7 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 	source_data = memory_region       ( machine, region );
 	source_size = memory_region_length( machine, region );
 
-	result_data = alloc_array_or_die(UINT8, source_size);
+	result_data = auto_alloc_array(machine, UINT8, source_size);
 
 	addr_xor ^= 0xc1c5b;
 
@@ -2267,7 +2267,7 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 	}
 
 	memcpy (source_data, result_data, source_size);
-	free (result_data);
+	auto_free (machine, result_data);
 }
 
 

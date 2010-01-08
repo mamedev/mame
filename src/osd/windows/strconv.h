@@ -42,7 +42,7 @@
 #ifndef __WIN_STRCONV__
 #define __WIN_STRCONV__
 
-#include "mamecore.h"
+#include "osdcore.h"
 
 
 

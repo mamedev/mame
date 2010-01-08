@@ -14,7 +14,7 @@
 #ifndef __UIGFX_H__
 #define __UIGFX_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 /***************************************************************************

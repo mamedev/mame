@@ -260,8 +260,8 @@ double compute_resistor_net_outputs(
 
 	/* parse input parameters */
 
-	o  = alloc_array_or_die(double, (1<<MAX_RES_PER_NET) *  MAX_NETS);
-	os = alloc_array_or_die(double, (1<<MAX_RES_PER_NET) *  MAX_NETS);
+	o  = global_alloc_array(double, (1<<MAX_RES_PER_NET) *  MAX_NETS);
+	os = global_alloc_array(double, (1<<MAX_RES_PER_NET) *  MAX_NETS);
 
 	networks_no = 0;
 	for (n = 0; n < MAX_NETS; n++)
@@ -423,8 +423,8 @@ if (VERBOSE)
 }
 /* debug end */
 
-	free(o);
-	free(os);
+	global_free(o);
+	global_free(os);
 	return (scale);
 
 }
@@ -694,13 +694,13 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	return (int) (v *255 / vcc + 0.4);
 }
 
-rgb_t *compute_res_net_all(const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di)
+rgb_t *compute_res_net_all(running_machine *machine, const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di)
 {
 	UINT8 r,g,b;
 	int i,j,k;
 	rgb_t *rgb;
 
-	rgb = alloc_array_or_die(rgb_t, rdi->end - rdi->start + 1);
+	rgb = auto_alloc_array(machine, rgb_t, rdi->end - rdi->start + 1);
 	for (i=rdi->start; i<=rdi->end; i++)
 	{
 		UINT8 t[3] = {0,0,0};

@@ -205,7 +205,7 @@ PALETTE_INIT( dkong2b)
 	rgb_t	*rgb;
 	int i;
 
-	rgb = compute_res_net_all(color_prom, &dkong_decode_info, &dkong_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &dkong_decode_info, &dkong_net_info);
 	palette_set_colors(machine, 0, rgb, 256);
 
 	/* Now treat tri-state black background generation */
@@ -225,7 +225,7 @@ PALETTE_INIT( dkong2b)
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
 	state->color_codes = color_prom;	/* we'll need it later */
-	free(rgb);
+	auto_free(machine, rgb);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -437,10 +437,10 @@ PALETTE_INIT( dkong3 )
 	dkong_state *state = (dkong_state *)machine->driver_data;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(color_prom, &dkong3_decode_info, &dkong3_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &dkong3_decode_info, &dkong3_net_info);
 	palette_set_colors(machine, 0, rgb, 256);
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
-	free(rgb);
+	auto_free(machine, rgb);
 
 	color_prom += 1024;
 	/* color_prom now points to the beginning of the character color codes */

@@ -662,7 +662,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 	rom = memory_region(machine,rom_region);
 
-	tmp = alloc_array_or_die(UINT8, 0x10000);
+	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 
 	{
 		int i;
@@ -704,7 +704,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 			rom[newaddress] = codec_data[ tmp[address] ];
 		}
-		free( tmp );
+		auto_free( machine, tmp );
 	}
 }
 // machine start (called only once) /////////////////////////////////////////////////

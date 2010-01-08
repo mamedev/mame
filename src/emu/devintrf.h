@@ -14,7 +14,7 @@
 #ifndef __DEVINTRF_H__
 #define __DEVINTRF_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "romload.h"
 #include "memory.h"
 #include "tagmap.h"

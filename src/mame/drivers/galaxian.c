@@ -2332,7 +2332,7 @@ static void decode_anteater_gfx(running_machine *machine)
 {
 	UINT32 romlength = memory_region_length(machine, "gfx1");
 	UINT8 *rombase = memory_region(machine, "gfx1");
-	UINT8 *scratch = alloc_array_or_die(UINT8, romlength);
+	UINT8 *scratch = auto_alloc_array(machine, UINT8, romlength);
 	UINT32 offs;
 
 	memcpy(scratch, rombase, romlength);
@@ -2344,7 +2344,7 @@ static void decode_anteater_gfx(running_machine *machine)
 		srcoffs |= (BIT(offs,0) ^ BIT(offs,6) ^ 1) << 10;
 		rombase[offs] = scratch[srcoffs];
 	}
-	free(scratch);
+	auto_free(machine, scratch);
 }
 
 
@@ -2352,7 +2352,7 @@ static void decode_losttomb_gfx(running_machine *machine)
 {
 	UINT32 romlength = memory_region_length(machine, "gfx1");
 	UINT8 *rombase = memory_region(machine, "gfx1");
-	UINT8 *scratch = alloc_array_or_die(UINT8, romlength);
+	UINT8 *scratch = auto_alloc_array(machine, UINT8, romlength);
 	UINT32 offs;
 
 	memcpy(scratch, rombase, romlength);
@@ -2364,7 +2364,7 @@ static void decode_losttomb_gfx(running_machine *machine)
 		srcoffs |= ((BIT(offs,1) & BIT(offs,7)) | ((1 ^ BIT(offs,1)) & (BIT(offs,8)))) << 10;
 		rombase[offs] = scratch[srcoffs];
 	}
-	free(scratch);
+	auto_free(machine, scratch);
 }
 
 

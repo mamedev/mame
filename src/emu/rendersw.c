@@ -55,7 +55,7 @@
 #ifndef FIRST_TIME
 #define FIRST_TIME
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "eminline.h"
 #include "video/rgbutil.h"
 #include "render.h"

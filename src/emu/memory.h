@@ -14,7 +14,7 @@
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "tokenize.h"
 #include "astring.h"
 
@@ -270,6 +270,7 @@ struct _address_table
 	UINT8					subtable_alloc;		/* number of subtables allocated */
 	subtable_data *			subtable;			/* info about each subtable */
 	handler_data *			handlers[256];		/* array of user-installed handlers */
+	running_machine *		machine;			/* pointer back to the machine */
 };
 
 

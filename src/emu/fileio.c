@@ -191,9 +191,7 @@ file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mam
 	file_error filerr;
 
 	/* allocate the file itself */
-	*file = (mame_file *)malloc(sizeof(**file));
-	if (*file == NULL)
-		return FILERR_OUT_OF_MEMORY;
+	*file = global_alloc(mame_file);
 
 	/* reset the file handle */
 	memset(*file, 0, sizeof(**file));
@@ -231,9 +229,7 @@ static file_error fopen_internal(core_options *opts, path_iterator *iterator, co
 		return FILERR_INVALID_ACCESS;
 
 	/* allocate the file itself */
-	*file = (mame_file *)malloc(sizeof(**file));
-	if (*file == NULL)
-		return FILERR_OUT_OF_MEMORY;
+	*file = global_alloc(mame_file);
 
 	/* reset the file handle */
 	memset(*file, 0, sizeof(**file));
@@ -387,10 +383,10 @@ void mame_fclose(mame_file *file)
 	if (file->file != NULL)
 		core_fclose(file->file);
 	if (file->zipdata != NULL)
-		free(file->zipdata);
+		global_free(file->zipdata);
 	if (file->filename != NULL)
 		astring_free(file->filename);
-	free(file);
+	global_free(file);
 }
 
 
@@ -672,10 +668,7 @@ mame_path *mame_openpath(core_options *opts, const char *searchpath)
 	mame_path *path;
 
 	/* allocate a new mame_path */
-	path = (mame_path *)malloc(sizeof(*path));
-	if (path == NULL)
-		return NULL;
-	memset(path, 0, sizeof(*path));
+	path = global_alloc_clear(mame_path);
 
 	/* initialize the iterator */
 	path_iterator_init(&path->iterator, opts, searchpath);
@@ -734,7 +727,7 @@ void mame_closepath(mame_path *path)
 	/* free memory */
 	if (path->pathbuffer != NULL)
 		astring_free(path->pathbuffer);
-	free(path);
+	global_free(path);
 }
 
 
@@ -874,15 +867,13 @@ static file_error load_zipped_file(mame_file *file)
 	assert(file->zipfile != NULL);
 
 	/* allocate some memory */
-	file->zipdata = (UINT8 *)malloc(file->ziplength);
-	if (file->zipdata == NULL)
-		return FILERR_OUT_OF_MEMORY;
+	file->zipdata = global_alloc_array(UINT8, file->ziplength);
 
 	/* read the data into our buffer and return */
 	ziperr = zip_file_decompress(file->zipfile, file->zipdata, file->ziplength);
 	if (ziperr != ZIPERR_NONE)
 	{
-		free(file->zipdata);
+		global_free(file->zipdata);
 		file->zipdata = NULL;
 		return FILERR_FAILURE;
 	}
@@ -891,7 +882,7 @@ static file_error load_zipped_file(mame_file *file)
 	filerr = core_fopen_ram(file->zipdata, file->ziplength, file->openflags, &file->file);
 	if (filerr != FILERR_NONE)
 	{
-		free(file->zipdata);
+		global_free(file->zipdata);
 		file->zipdata = NULL;
 		return FILERR_FAILURE;
 	}

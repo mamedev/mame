@@ -62,18 +62,18 @@ struct _poly_extra_data
 
 
 /* forward declarations */
-static void real3d_traverse_display_list(void);
-static void draw_model(UINT32 addr);
+static void real3d_traverse_display_list(running_machine *machine);
+static void draw_model(running_machine *machine, UINT32 addr);
 static void init_matrix_stack(void);
 static void get_top_matrix(MATRIX *out);
 static void push_matrix_stack(void);
 static void pop_matrix_stack(void);
 static void multiply_matrix_stack(MATRIX matrix);
 static void translate_matrix_stack(float x, float y, float z);
-static void traverse_list(UINT32 address);
-static void draw_block(UINT32 address);
-static void draw_viewport(int pri, UINT32 address);
-static void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
+static void traverse_list(running_machine *machine, UINT32 address);
+static void draw_block(running_machine *machine, UINT32 address);
+static void draw_viewport(running_machine *machine, int pri, UINT32 address);
+static void invalidate_texture(running_machine *machine, int page, int texx, int texy, int texwidth, int texheight);
 
 /*****************************************************************************/
 
@@ -157,8 +157,8 @@ static UINT32 matrix_base_address;
 
 static void model3_exit(running_machine *machine)
 {
-	invalidate_texture(0, 0, 0, 6, 5);
-	invalidate_texture(1, 0, 0, 6, 5);
+	invalidate_texture(machine, 0, 0, 0, 6, 5);
+	invalidate_texture(machine, 1, 0, 0, 6, 5);
 	poly_free(poly);
 }
 
@@ -435,7 +435,7 @@ VIDEO_UPDATE( model3 )
 //      if(real3d_display_list) {
 //          bitmap_fill(zbuffer, cliprect, 0);
 //          bitmap_fill(bitmap3d, cliprect, 0x8000);
-//          real3d_traverse_display_list();
+//          real3d_traverse_display_list(screen->machine);
 //      }
 		copybitmap_trans(bitmap, bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
@@ -544,7 +544,7 @@ READ64_HANDLER( model3_palette_r )
         1024 pixels / 32 pixel resolution vertically
         2048 pixels / 32 pixel resolution horizontally
 */
-static void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight)
+static void invalidate_texture(running_machine *machine, int page, int texx, int texy, int texwidth, int texheight)
 {
 	int wtiles = 1 << texwidth;
 	int htiles = 1 << texheight;
@@ -556,11 +556,11 @@ static void invalidate_texture(int page, int texx, int texy, int texwidth, int t
 			{
 				cached_texture *freeme = texcache[page][texy + y][texx + x];
 				texcache[page][texy + y][texx + x] = freeme->next;
-				free(freeme);
+				auto_free(machine, freeme);
 			}
 }
 
-static cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format)
+static cached_texture *get_texture(running_machine *machine, int page, int texx, int texy, int texwidth, int texheight, int format)
 {
 	cached_texture *tex = texcache[page][texy][texx];
 	int pixheight = 32 << texheight;
@@ -574,7 +574,7 @@ static cached_texture *get_texture(int page, int texx, int texy, int texwidth, i
 			return tex;
 
 	/* create a new texture */
-	tex = (cached_texture *)alloc_array_or_die(UINT8, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
+	tex = (cached_texture *)auto_alloc_array(machine, UINT8, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
 	tex->width = texwidth;
 	tex->height = texheight;
 	tex->format = format;
@@ -755,7 +755,7 @@ INLINE void write_texture8(int xpos, int ypos, int width, int height, int page, 
 }
 #endif
 
-static void real3d_upload_texture(UINT32 header, UINT32 *data)
+static void real3d_upload_texture(running_machine *machine, UINT32 header, UINT32 *data)
 {
 	int width	= 32 << ((header >> 14) & 0x7);
 	int height	= 32 << ((header >> 17) & 0x7);
@@ -769,7 +769,7 @@ static void real3d_upload_texture(UINT32 header, UINT32 *data)
 		case 0x00:		/* Texture with mipmaps */
 //          if(bitdepth) {
 				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
-				invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
+				invalidate_texture(machine, page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
 //          } else {
 				/* TODO: 8-bit textures are weird. need to figure out some additional bits */
 				//logerror("W: %d, H: %d, X: %d, Y: %d, P: %d, Bit: %d, : %08X, %08X\n", width, height, xpos, ypos, page, bitdepth, header & 0x00681040, header);
@@ -779,7 +779,7 @@ static void real3d_upload_texture(UINT32 header, UINT32 *data)
 		case 0x01:		/* Texture without mipmaps */
 //          if(bitdepth) {
 				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
-				invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
+				invalidate_texture(machine, page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
 //          } else {
 				/* TODO: 8-bit textures are weird. need to figure out some additional bits */
 				//logerror("W: %d, H: %d, X: %d, Y: %d, P: %d, Bit: %d, : %08X, %08X\n", width, height, xpos, ypos, page, bitdepth, header & 0x00681040, header);
@@ -796,7 +796,7 @@ static void real3d_upload_texture(UINT32 header, UINT32 *data)
 	}
 }
 
-void real3d_display_list_end(void)
+void real3d_display_list_end(running_machine *machine)
 {
 	/* upload textures if there are any in the FIFO */
 	if (texture_fifo_pos > 0)
@@ -806,14 +806,14 @@ void real3d_display_list_end(void)
 		{
 			int length = (texture_fifo[i] / 2) + 2;
 			UINT32 header = texture_fifo[i+1];
-			real3d_upload_texture(header, &texture_fifo[i+2]);
+			real3d_upload_texture(machine, header, &texture_fifo[i+2]);
 			i += length;
 		};
 	}
 	texture_fifo_pos = 0;
 	bitmap_fill(zbuffer, NULL, 0);
 	bitmap_fill(bitmap3d, NULL, 0x8000);
-	real3d_traverse_display_list();
+	real3d_traverse_display_list(machine);
 //  real3d_display_list = 1;
 }
 
@@ -862,7 +862,7 @@ void real3d_vrom_texture_dma(const address_space *space, UINT32 src, UINT32 dst,
 			address = memory_read_dword(space, (src+0));
 			header = memory_read_dword(space, (src+4));
 		}
-		real3d_upload_texture(header, (UINT32*)&model3_vrom[address]);
+		real3d_upload_texture(space->machine, header, (UINT32*)&model3_vrom[address]);
 	}
 }
 
@@ -900,7 +900,7 @@ void real3d_polygon_ram_dma(const address_space *space, UINT32 src, UINT32 dst, 
 
 WRITE64_HANDLER( real3d_cmd_w )
 {
-	real3d_display_list_end();
+	real3d_display_list_end(space->machine);
 }
 
 
@@ -1078,7 +1078,7 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 	return clip_verts;
 }
 
-static void render_one(TRIANGLE *tri)
+static void render_one(running_machine *machine, TRIANGLE *tri)
 {
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	poly_draw_scanline_func callback = NULL;
@@ -1096,7 +1096,7 @@ static void render_one(TRIANGLE *tri)
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * 256.0f;
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * 256.0f;
 
-		extra->texture = get_texture((tri->param & TRI_PARAM_TEXTURE_PAGE) ? 1 : 0, tri->texture_x, tri->texture_y, tri->texture_width, tri->texture_height, tri->texture_format);
+		extra->texture = get_texture(machine, (tri->param & TRI_PARAM_TEXTURE_PAGE) ? 1 : 0, tri->texture_x, tri->texture_y, tri->texture_width, tri->texture_height, tri->texture_format);
 		extra->texture_param		= tri->param;
 		extra->polygon_transparency = tri->transparency;
 		extra->polygon_intensity	= tri->intensity;
@@ -1119,7 +1119,7 @@ static void render_one(TRIANGLE *tri)
 	}
 }
 
-static void draw_model(UINT32 addr)
+static void draw_model(running_machine *machine, UINT32 addr)
 {
 	UINT32 *model = (addr >= 0x100000) ? &model3_vrom[addr] :  &polygon_ram[addr];
 	UINT32 header[7];
@@ -1306,7 +1306,7 @@ static void draw_model(UINT32 addr)
 				tri.param	|= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
 				tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
 
-				render_one(&tri);
+				render_one(machine, &tri);
 			}
 		}
 
@@ -1346,16 +1346,16 @@ static void load_matrix(int matrix_num, MATRIX *out)
 	(*out)[3][0] = matrix[0];	(*out)[3][1] = matrix[1];	(*out)[3][2] = matrix[2];	(*out)[3][3] = 1.0f;
 }
 
-static void traverse_list4(int lod_num, UINT32 address)
+static void traverse_list4(running_machine *machine, int lod_num, UINT32 address)
 {
 	/* does something with the LOD selection */
 	UINT32 *list = get_memory_pointer(address);
 	UINT32 link = list[0];
 
-	draw_model(link & 0xffffff);
+	draw_model(machine, link & 0xffffff);
 }
 
-static void traverse_list(UINT32 address)
+static void traverse_list(running_machine *machine, UINT32 address)
 {
 	UINT32 *list = get_memory_pointer(address);
 	int list_ptr = 0;
@@ -1384,29 +1384,29 @@ static void traverse_list(UINT32 address)
 		address = list[--list_ptr] & 0xffffff;
 		if (address != 0 && address != 0x800800)
 //      if (address != 0)
-			draw_block(address);
+			draw_block(machine, address);
 	}
 
 	list_depth--;
 }
 
-INLINE void process_link(UINT32 address, UINT32 link)
+INLINE void process_link(running_machine *machine, UINT32 address, UINT32 link)
 {
 	if (link != 0 && link != 0x0fffffff && link != 0x00800800 && link != 0x01000000)
 	{
 		switch (link >> 24)
 		{
 			case 0x00:		/* link to another node */
-				draw_block(link & 0xffffff);
+				draw_block(machine, link & 0xffffff);
 				break;
 
 			case 0x01:
 			case 0x03:		/* both of these link to models, is there any difference ? */
-				draw_model(link & 0xffffff);
+				draw_model(machine, link & 0xffffff);
 				break;
 
 			case 0x04:		/* list of links */
-				traverse_list(link & 0xffffff);
+				traverse_list(machine, link & 0xffffff);
 				break;
 
 			default:
@@ -1416,7 +1416,7 @@ INLINE void process_link(UINT32 address, UINT32 link)
 	}
 }
 
-static void draw_block(UINT32 address)
+static void draw_block(running_machine *machine, UINT32 address)
 {
 	const UINT32 *node = get_memory_pointer(address);
 	UINT32 link;
@@ -1446,18 +1446,18 @@ static void draw_block(UINT32 address)
 
 	/* bit 0x08 of word 0 indicates a pointer list */
 	if (node[0] & 0x08)
-		traverse_list4((node[3 - offset] >> 12) & 0x7f, link & 0xffffff);
+		traverse_list4(machine, (node[3 - offset] >> 12) & 0x7f, link & 0xffffff);
 	else
-		process_link(address, link);
+		process_link(machine, address, link);
 
 	pop_matrix_stack();
 
 	/* handle the second link */
 	link = node[8 - offset];
-	process_link(address, link);
+	process_link(machine, address, link);
 }
 
-static void draw_viewport(int pri, UINT32 address)
+static void draw_viewport(running_machine *machine, int pri, UINT32 address)
 {
 	const UINT32 *node = get_memory_pointer(address);
 	UINT32 link_address;
@@ -1471,7 +1471,7 @@ static void draw_viewport(int pri, UINT32 address)
 	/* traverse to the link node before drawing this viewport */
 	/* check this is correct as this affects the rendering order */
 	if (link_address != 0x01000000)
-		draw_viewport(pri, link_address);
+		draw_viewport(machine, pri, link_address);
 
 	/* skip if this isn't the right priority */
 	if (pri != ((node[0] >> 3) & 3))
@@ -1515,18 +1515,18 @@ static void draw_viewport(int pri, UINT32 address)
 	load_matrix(0, &coordinate_system);
 
 	/* process a link */
-	process_link(link_address, node[2]);
+	process_link(machine, link_address, node[2]);
 }
 
 
-static void real3d_traverse_display_list(void)
+static void real3d_traverse_display_list(running_machine *machine)
 {
 	int pri;
 
 	init_matrix_stack();
 
 	for (pri = 0; pri < 4; pri++)
-		draw_viewport(pri, 0x800000);
+		draw_viewport(machine, pri, 0x800000);
 
 	poly_wait(poly, "real3d_traverse_display_list");
 }

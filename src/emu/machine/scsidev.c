@@ -145,7 +145,7 @@ static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptr
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:
-			free( (SCSIInstance *)file );
+			auto_free( ((SCSIInstance *)file)->machine, file );
 			return 0;
 	}
 	return 0;

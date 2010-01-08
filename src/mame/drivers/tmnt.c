@@ -4068,7 +4068,7 @@ static DRIVER_INIT( mia )
 		}
 	}
 
-	temp = alloc_array_or_die(UINT8, len);
+	temp = auto_alloc_array(machine, UINT8, len);
 	memcpy(temp, gfxdata, len);
 	for (A = 0; A < len / 4; A++)
 	{
@@ -4106,7 +4106,7 @@ static DRIVER_INIT( mia )
 		gfxdata[4 * A + 2] = temp[4 * B + 2];
 		gfxdata[4 * A + 3] = temp[4 * B + 3];
 	}
-	free(temp);
+	auto_free(machine, temp);
 }
 
 
@@ -4161,7 +4161,7 @@ static DRIVER_INIT( tmnt )
 		}
 	}
 
-	temp = alloc_array_or_die(UINT8, len);
+	temp = auto_alloc_array(machine, UINT8, len);
 	memcpy(temp, gfxdata, len);
 	code_conv_table = &memory_region(machine, "proms")[0x0000];
 	for (A = 0; A < len / 4; A++)
@@ -4213,7 +4213,7 @@ static DRIVER_INIT( tmnt )
 		gfxdata[4 * A + 2] = temp[4 * B + 2];
 		gfxdata[4 * A + 3] = temp[4 * B + 3];
 	}
-	free(temp);
+	auto_free(machine, temp);
 }
 
 static DRIVER_INIT( cuebrick )

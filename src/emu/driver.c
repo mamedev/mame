@@ -114,7 +114,7 @@ void driver_list_get_approx_matches(const game_driver * const driverlist[], cons
 		int shufnum;
 
 		/* allocate a temporary list */
-		templist = alloc_array_or_die(const game_driver *, driver_list_get_count(driverlist));
+		templist = global_alloc_array(const game_driver *, driver_list_get_count(driverlist));
 
 		/* build up a list of valid entries */
 		for (drvnum = driver_count = 0; driverlist[drvnum] != NULL; drvnum++)
@@ -140,12 +140,12 @@ void driver_list_get_approx_matches(const game_driver * const driverlist[], cons
 		for (matchnum = 0; matchnum < matches; matchnum++)
 			list[matchnum] = templist[matchnum % driver_count];
 
-		free((void *)templist);
+		global_free(templist);
 		return;
 	}
 
 	/* allocate some temp memory */
-	penalty = alloc_array_or_die(int, matches);
+	penalty = global_alloc_array(int, matches);
 
 	/* initialize everyone's states */
 	for (matchnum = 0; matchnum < matches; matchnum++)
@@ -187,7 +187,7 @@ void driver_list_get_approx_matches(const game_driver * const driverlist[], cons
 	}
 
 	/* free our temp memory */
-	free(penalty);
+	global_free(penalty);
 }
 
 

@@ -281,7 +281,7 @@ static int drawdd_window_init(win_window_info *window)
 	dd_info *dd;
 
 	// allocate memory for our structures
-	dd = alloc_clear_or_die(dd_info);
+	dd = global_alloc_clear(dd_info);
 	window->drawdata = dd;
 
 	// configure the adapter for the mode we want
@@ -318,7 +318,7 @@ static void drawdd_window_destroy(win_window_info *window)
 	ddraw_delete(window);
 
 	// free the memory in the window
-	free(dd);
+	global_free(dd);
 	window->drawdata = NULL;
 }
 
@@ -600,7 +600,8 @@ static int ddraw_create_surfaces(win_window_info *window)
 	if (dd->membuffersize < dd->blitwidth * dd->blitheight * 4)
 	{
 		dd->membuffersize = dd->blitwidth * dd->blitheight * 4;
-		dd->membuffer = realloc(dd->membuffer, dd->membuffersize);
+		global_free(dd->membuffer);
+		dd->membuffer = global_alloc_array(UINT8, dd->membuffersize);
 	}
 	if (dd->membuffer == NULL)
 		goto error;
@@ -707,8 +708,7 @@ static void ddraw_delete_surfaces(win_window_info *window)
 	dd->clipper = NULL;
 
 	// free the memory buffer
-	if (dd->membuffer != NULL)
-		free(dd->membuffer);
+	global_free(dd->membuffer);
 	dd->membuffer = NULL;
 	dd->membuffersize = 0;
 

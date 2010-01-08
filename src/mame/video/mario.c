@@ -66,12 +66,12 @@ PALETTE_INIT( mario )
 {
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(color_prom, &mario_decode_info, &mario_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &mario_decode_info, &mario_net_info);
 	palette_set_colors(machine, 0, rgb, 256);
-	free(rgb);
-	rgb = compute_res_net_all(color_prom+256, &mario_decode_info, &mario_net_info_std);
+	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine, color_prom+256, &mario_decode_info, &mario_net_info_std);
 	palette_set_colors(machine, 256, rgb, 256);
-	free(rgb);
+	auto_free(machine, rgb);
 
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 	palette_normalize_range(machine->palette, 256, 511, 0, 255);

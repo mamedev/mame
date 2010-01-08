@@ -9891,7 +9891,7 @@ static DRIVER_INIT ( blandia )
 	int rpos;
 
 	rom_size = 0x80000;
-	buf = alloc_array_or_die(UINT8, rom_size);
+	buf = auto_alloc_array(machine, UINT8, rom_size);
 
 	rom = memory_region(machine, "gfx2") + 0x40000;
 
@@ -9911,7 +9911,7 @@ static DRIVER_INIT ( blandia )
 
 	memcpy( rom, buf, rom_size );
 
-	free(buf);
+	auto_free(machine, buf);
 }
 
 

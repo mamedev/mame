@@ -147,6 +147,9 @@ CPPONLYFLAGS += /EHsc
 # disable function pointer warnings in C++ which are evil to work around
 CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 
+# disable warning about exception specifications
+CPPONLYFLAGS += /wd4290
+
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
@@ -206,7 +209,6 @@ DEFS += -Dmain=utf8_main
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
 DEFS += -DMALLOC_DEBUG
-LDFLAGS += -Wl,--allow-multiple-definition
 endif
 
 
@@ -253,13 +255,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/wintime.o \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \
-	$(WINOBJ)/winwork.o \
-
-# if malloc debugging is enabled, include the necessary code
-ifneq ($(findstring MALLOC_DEBUG,$(DEFS)),)
-OSDCOREOBJS += \
-	$(WINOBJ)/winalloc.o
-endif
+	$(WINOBJ)/winwork.o
 
 
 
@@ -344,4 +340,3 @@ $(RESFILE): $(WINSRC)/mame.rc $(WINOBJ)/mamevers.rc
 $(WINOBJ)/mamevers.rc: $(BUILDOUT)/verinfo$(BUILD_EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@"$(BUILDOUT)/verinfo$(BUILD_EXE)" -b windows $(SRC)/version.c > $@
-

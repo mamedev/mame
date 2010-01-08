@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "mamecore.h"
+#include "emucore.h"
 
 #ifndef __VALIDITY_H__
 #define __VALIDITY_H__

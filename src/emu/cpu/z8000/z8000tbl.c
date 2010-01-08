@@ -545,11 +545,7 @@ void z8000_init_tables(void)
 	int i;
 
 	/* allocate the opcode execution and disassembler array */
-	z8000_exec = (Z8000_exec *)malloc(0x10000 * sizeof(Z8000_exec));
-	if( !z8000_exec )
-	{
-		fatalerror("cannot allocate Z8000 execution table\n");
-	}
+	z8000_exec = global_alloc_array(Z8000_exec, 0x10000);
 
 	/* set up the zero, sign, parity lookup table */
     for (i = 0; i < 256; i++)
@@ -586,9 +582,7 @@ void z8000_init_tables(void)
 
 void z8000_deinit_tables(void)
 {
-	if( !z8000_exec )
-		return;
-	free( z8000_exec );
+	global_free( z8000_exec );
 	z8000_exec = 0;
 }
 

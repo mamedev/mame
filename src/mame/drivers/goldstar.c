@@ -7990,7 +7990,7 @@ static DRIVER_INIT(goldstar)
 
 // this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
-static void do_blockswaps(UINT8* ROM)
+static void do_blockswaps(running_machine *machine, UINT8* ROM)
 {
 	int A;
 	UINT8 *buffer;
@@ -8009,7 +8009,7 @@ static void do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	buffer = alloc_array_or_die(UINT8, 0x10000);
+	buffer = auto_alloc_array(machine, UINT8, 0x10000);
 	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..
@@ -8018,7 +8018,7 @@ static void do_blockswaps(UINT8* ROM)
 		memcpy(ROM+A*0x800,buffer+cherry_swaptables[A],0x800);
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 }
 
 static void dump_to_file(running_machine* machine, UINT8* ROM)
@@ -8066,7 +8066,6 @@ static DRIVER_INIT( chry10 )
 	int size = memory_region_length(machine, "maincpu");
 	int start = 0;
 
-	UINT8 *buffer;
 	int i;
 
 	for (i = start; i < size; i++)
@@ -8074,12 +8073,7 @@ static DRIVER_INIT( chry10 )
 		ROM[i] = chry10_decrypt(ROM[i]);
 	}
 
-	buffer = alloc_array_or_die(UINT8, size);
-	memcpy(buffer, ROM, size);
-
-	free(buffer);
-
-	do_blockswaps(ROM);
+	do_blockswaps(machine, ROM);
 
 	/* The game has a PIC for protection.
        If the code enter to this sub, just
@@ -8096,7 +8090,6 @@ static DRIVER_INIT( cb3 )
 	int size = memory_region_length(machine, "maincpu");
 	int start = 0;
 
-	UINT8 *buffer;
 	int i;
 
 	for (i = start; i < size; i++)
@@ -8104,12 +8097,7 @@ static DRIVER_INIT( cb3 )
 		ROM[i] = decrypt(ROM[i], i);
 	}
 
-	buffer = alloc_array_or_die(UINT8, size);
-	memcpy(buffer, ROM, size);
-
-	free(buffer);
-
-	do_blockswaps(ROM);
+	do_blockswaps(machine, ROM);
 	dump_to_file(machine, ROM);
 }
 
@@ -8118,7 +8106,7 @@ static DRIVER_INIT( chrygld )
 {
 	int A;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	do_blockswaps(ROM);
+	do_blockswaps(machine, ROM);
 
 	// a data bitswap
 	for (A = 0;A < 0x10000;A++)

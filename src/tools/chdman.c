@@ -874,7 +874,7 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	}
 
 	/* build the fake bitmap */
-	*avconfig->video = *fullbitmap;
+	bitmap_clone_existing(avconfig->video, fullbitmap);
 	if (interlaced)
 	{
 		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
@@ -944,7 +944,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	}
 
 	/* build the fake bitmap */
-	*avconfig->video = *fullbitmap;
+	bitmap_clone_existing(avconfig->video, fullbitmap);
 	if (interlaced)
 	{
 		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
@@ -1827,7 +1827,7 @@ static int do_extractav(int argc, char *argv[], int param)
 		progress(framenum == 0, "Extracting hunk %d/%d...  \r", framenum, numframes);
 
 		/* set up the fake bitmap for this frame */
-		*avconfig.video = *fullbitmap;
+		bitmap_clone_existing(avconfig.video, fullbitmap);
 		if (interlaced)
 		{
 			avconfig.video->base = BITMAP_ADDR16(avconfig.video, framenum % 2, 0);
@@ -2158,7 +2158,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 		progress(framenum == 0, "Processing hunk %d/%d...  \r", framenum, header.totalhunks);
 
 		/* set up the fake bitmap for this frame */
-		*avconfig.video = *fullbitmap;
+		bitmap_clone_existing(avconfig.video, fullbitmap);
 
 		/* configure the decompressor for this frame */
 		chd_codec_config(chd, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);

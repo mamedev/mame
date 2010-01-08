@@ -268,6 +268,7 @@ typedef struct {
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
 	attotime TimerBase;			/* Timer base time (==sampling time)*/
+	const device_config *device;
 } OPL3;
 
 
@@ -2337,14 +2338,9 @@ static OPL3 *OPL3Create(const device_config *device, int clock, int rate, int ty
 	if (OPL3_LockTable(device) == -1) return NULL;
 
 	/* allocate memory block */
-	chip = (OPL3 *)malloc(sizeof(OPL3));
+	chip = auto_alloc_clear(device->machine, OPL3);
 
-	if (chip==NULL)
-		return NULL;
-
-	/* clear */
-	memset(chip, 0, sizeof(OPL3));
-
+	chip->device = device;
 	chip->type  = type;
 	chip->clock = clock;
 	chip->rate  = rate;
@@ -2361,7 +2357,7 @@ static OPL3 *OPL3Create(const device_config *device, int clock, int rate, int ty
 static void OPL3Destroy(OPL3 *chip)
 {
 	OPL3_UnLockTable();
-	free(chip);
+	auto_free(chip->device->machine, chip);
 }
 
 

@@ -42,15 +42,44 @@
 #ifndef __ASTRING_H__
 #define __ASTRING_H__
 
-#include "pool.h"
 #include <stdarg.h>
+#include "osdcomm.h"
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _astring astring;
+/* base astring structure */
+typedef struct _astring_base astring_base;
+struct _astring_base
+{
+	char *			text;
+	int				alloclen;
+	char			smallbuf[64 - sizeof(int) - sizeof(char *)];
+};
+
+
+#ifdef __cplusplus
+
+/* class for C++ */
+class astring : public astring_base
+{
+private:
+	astring(const astring &);
+	astring &operator=(const astring &);
+
+public:
+	astring();
+	~astring();
+};
+
+#else
+
+/* direct map for C */
+typedef astring_base astring;
+
+#endif
 
 
 

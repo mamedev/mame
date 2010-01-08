@@ -12,7 +12,7 @@
 #ifndef STREAMS_H
 #define STREAMS_H
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 /***************************************************************************

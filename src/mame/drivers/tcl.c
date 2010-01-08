@@ -183,7 +183,7 @@ static DRIVER_INIT(tcl)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *dest = memory_region(machine, "maincpu");
 	int len = memory_region_length(machine, "maincpu");
-	UINT8 *src = alloc_array_or_die(UINT8, len);
+	UINT8 *src = auto_alloc_array(machine, UINT8, len);
 
 	int i,idx=0;
 	memcpy(src, dest, len);
@@ -204,7 +204,7 @@ static DRIVER_INIT(tcl)
 			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
 		}
 	}
-	free(src);
+	auto_free(machine, src);
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, dest+0x10000);
 }

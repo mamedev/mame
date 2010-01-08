@@ -1652,7 +1652,7 @@ static DRIVER_INIT( gauntlet2 )
 static DRIVER_INIT( vindctr2 )
 {
 	UINT8 *gfx2_base = memory_region(machine, "gfx2");
-	UINT8 *data = alloc_array_or_die(UINT8, 0x8000);
+	UINT8 *data = auto_alloc_array(machine, UINT8, 0x8000);
 	int i;
 
 	gauntlet_common_init(machine, 118, 1);
@@ -1660,13 +1660,13 @@ static DRIVER_INIT( vindctr2 )
 	/* highly strange -- the address bits on the chip at 2J (and only that
        chip) are scrambled -- this is verified on the schematics! */
 
-		memcpy(data, &gfx2_base[0x88000], 0x8000);
-		for (i = 0; i < 0x8000; i++)
-		{
-			int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
-			gfx2_base[0x88000 + i] = data[srcoffs];
-		}
-		free(data);
+	memcpy(data, &gfx2_base[0x88000], 0x8000);
+	for (i = 0; i < 0x8000; i++)
+	{
+		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
+		gfx2_base[0x88000 + i] = data[srcoffs];
+	}
+	auto_free(machine, data);
 }
 
 

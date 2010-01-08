@@ -2378,7 +2378,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = (struct polygon*)malloc(sizeof(struct polygon) * (1024*5));
+	struct polygon* polys = auto_alloc_array(machine, struct polygon, 1024*5);
 
 	//printf("packet type : %04x\n", packet[0]);
 	switch (packet[0])
@@ -2436,7 +2436,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 	}
 
-	free(polys);
+	auto_free(machine, polys);
 }
 
 static void clear3d(running_machine *machine)

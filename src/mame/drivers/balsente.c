@@ -1995,7 +1995,7 @@ static void expand_roms(running_machine *machine, UINT8 cd_rom_mask)
 	/* load EF           from 0x2e000-0x30000 */
 	/* ROM region must be 0x40000 total */
 
-	UINT8 *temp = alloc_array_or_die(UINT8, 0x20000);
+	UINT8 *temp = auto_alloc_array(machine, UINT8, 0x20000);
 	{
 		UINT8 *rom = memory_region(machine, "maincpu");
 		UINT32 len = memory_region_length(machine, "maincpu");
@@ -2050,7 +2050,7 @@ static void expand_roms(running_machine *machine, UINT8 cd_rom_mask)
 			memcpy(&rom[base + 0x00000], &ab_base[0x0000], 0x2000);
 		}
 
-		free(temp);
+		auto_free(machine, temp);
 	}
 }
 

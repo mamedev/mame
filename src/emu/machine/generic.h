@@ -14,7 +14,7 @@
 #ifndef __MACHINE_GENERIC_H__
 #define __MACHINE_GENERIC_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 

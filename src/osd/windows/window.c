@@ -614,7 +614,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// allocate a new window object
-	window = alloc_clear_or_die(win_window_info);
+	window = global_alloc_clear(win_window_info);
 	window->maxwidth = config->width;
 	window->maxheight = config->height;
 	window->refresh = config->refresh;
@@ -709,7 +709,7 @@ static void winwindow_video_window_destroy(win_window_info *window)
 	osd_lock_free(window->render_lock);
 
 	// free the window itself
-	free(window);
+	global_free(window);
 }
 
 

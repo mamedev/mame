@@ -646,8 +646,8 @@ void drcuml_free(drcuml_state *drcuml)
 
 		/* free memory */
 		if (block->inst != NULL)
-			free(block->inst);
-		free(block);
+			auto_free(drcuml->device->machine, block->inst);
+		auto_free(drcuml->device->machine, block);
 	}
 
 	/* free all the symbols */
@@ -655,7 +655,7 @@ void drcuml_free(drcuml_state *drcuml)
 	{
 		drcuml_symbol *sym = drcuml->symlist;
 		drcuml->symlist = sym->next;
-		free(sym);
+		auto_free(drcuml->device->machine, sym);
 	}
 
 	/* close any files */
@@ -687,18 +687,13 @@ drcuml_block *drcuml_block_begin(drcuml_state *drcuml, UINT32 maxinst, jmp_buf *
 	if (bestblock == NULL)
 	{
 		/* allocate the block structure itself */
-		bestblock = (drcuml_block *)malloc(sizeof(*bestblock));
-		if (bestblock == NULL)
-			fatalerror("Out of memory allocating block in drcuml_block_begin");
-		memset(bestblock, 0, sizeof(*bestblock));
+		bestblock = auto_alloc_clear(drcuml->device->machine, drcuml_block);
 
 		/* fill in the structure */
 		bestblock->drcuml = drcuml;
 		bestblock->next = drcuml->blocklist;
 		bestblock->maxinst = maxinst * 3 / 2;
-		bestblock->inst = (drcuml_instruction *)malloc(sizeof(drcuml_instruction) * bestblock->maxinst);
-		if (bestblock->inst == NULL)
-			fatalerror("Out of memory allocating instruction array in drcuml_block_begin");
+		bestblock->inst = auto_alloc_array(drcuml->device->machine, drcuml_instruction, bestblock->maxinst);
 
 		/* hook us into the list */
 		drcuml->blocklist = bestblock;
@@ -1037,9 +1032,7 @@ void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const ch
 	drcuml_symbol *symbol;
 
 	/* allocate memory to hold the symbol */
-	symbol = (drcuml_symbol *)malloc(sizeof(*symbol) + strlen(name));
-	if (symbol == NULL)
-		fatalerror("Out of memory allocating symbol in drcuml_symbol_add");
+	symbol = (drcuml_symbol *)auto_alloc_array(drcuml->device->machine, UINT8, sizeof(*symbol) + strlen(name));
 
 	/* fill in the structure */
 	symbol->next = NULL;

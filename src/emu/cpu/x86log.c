@@ -91,7 +91,7 @@ x86log_context *x86log_create_context(const char *filename)
 	x86log_context *log;
 
 	/* allocate the log */
-	log = alloc_clear_or_die(x86log_context);
+	log = global_alloc_clear(x86log_context);
 
 	/* allocate the filename */
 	log->filename = astring_dupc(filename);
@@ -114,7 +114,7 @@ void x86log_free_context(x86log_context *log)
 
 	/* free the structure */
 	astring_free(log->filename);
-	free(log);
+	global_free(log);
 }
 
 

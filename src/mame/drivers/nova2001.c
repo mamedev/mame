@@ -989,7 +989,7 @@ static void lineswap_gfx_roms(running_machine *machine, const char *region, cons
 
 	UINT8* const src = memory_region(machine, region);
 
-	UINT8* const temp = alloc_array_or_die(UINT8, length);
+	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -1004,7 +1004,7 @@ static void lineswap_gfx_roms(running_machine *machine, const char *region, cons
 
 	memcpy(src, temp, length);
 
-	free(temp);
+	auto_free(machine, temp);
 }
 
 

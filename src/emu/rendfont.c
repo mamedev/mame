@@ -141,7 +141,7 @@ render_font *render_font_alloc(const char *filename)
 	render_font *font;
 
 	/* allocate and clear memory */
-	font = alloc_clear_or_die(render_font);
+	font = global_alloc_clear(render_font);
 
 	/* attempt to load the cached version of the font first */
 	if (filename != NULL && render_font_load_cached_bdf(font, filename) == 0)
@@ -149,7 +149,7 @@ render_font *render_font_alloc(const char *filename)
 
 	/* if we failed, clean up and realloc */
 	render_font_free(font);
-	font = alloc_clear_or_die(render_font);
+	font = global_alloc_clear(render_font);
 
 	/* load the raw data instead */
 	filerr = mame_fopen_ram(font_uismall, sizeof(font_uismall), OPEN_FLAG_READ, &ramfile);
@@ -188,13 +188,13 @@ void render_font_free(render_font *font)
 			}
 
 			/* free the subtable itself */
-			free(font->chars[tablenum]);
+			global_free(font->chars[tablenum]);
 		}
 
 	/* free the raw data and the size itself */
 	if (font->rawdata != NULL)
-		free((void *)font->rawdata);
-	free(font);
+		global_free((void *)font->rawdata);
+	global_free(font);
 }
 
 
@@ -432,7 +432,7 @@ static int render_font_load_cached_bdf(render_font *font, const char *filename)
 
 	/* determine the file size and allocate memory */
 	font->rawsize = mame_fsize(file);
-	data = alloc_array_clear_or_die(char, font->rawsize + 1);
+	data = global_alloc_array_clear(char, font->rawsize + 1);
 
 	/* read and hash the first chunk */
 	bytes = mame_fread(file, data, MIN(CACHED_BDF_HASH_SIZE, font->rawsize));
@@ -477,19 +477,19 @@ static int render_font_load_cached_bdf(render_font *font, const char *filename)
 			render_font_save_cached(font, cachedname, hash);
 	}
 	else
-		free(data);
+		global_free(data);
 
 	/* close the file */
-	free(cachedname);
+	global_free(cachedname);
 	mame_fclose(file);
 	return result;
 
 error:
 	/* close the file */
 	if (cachedname != NULL)
-		free(cachedname);
+		global_free(cachedname);
 	if (data != NULL)
-		free(data);
+		global_free(data);
 	mame_fclose(file);
 	return 1;
 }
@@ -581,7 +581,7 @@ static int render_font_load_bdf(render_font *font)
 
 				/* if we don't have a subtable yet, make one */
 				if (font->chars[charnum / 256] == NULL)
-					font->chars[charnum / 256] = alloc_array_clear_or_die(render_font_char, 256);
+					font->chars[charnum / 256] = global_alloc_array_clear(render_font_char, 256);
 
 				/* fill in the entry */
 				ch = &font->chars[charnum / 256][charnum % 256];
@@ -637,7 +637,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 		goto error;
 
 	/* now read the rest of the data */
-	data = alloc_array_or_die(UINT8, filesize - CACHED_HEADER_SIZE);
+	data = global_alloc_array(UINT8, filesize - CACHED_HEADER_SIZE);
 	bytes_read = mame_fread(file, data, filesize - CACHED_HEADER_SIZE);
 	if (bytes_read != filesize - CACHED_HEADER_SIZE)
 		goto error;
@@ -652,7 +652,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 
 		/* if we don't have a subtable yet, make one */
 		if (font->chars[chnum / 256] == NULL)
-			font->chars[chnum / 256] = alloc_array_clear_or_die(render_font_char, 256);
+			font->chars[chnum / 256] = global_alloc_array_clear(render_font_char, 256);
 
 		/* fill in the entry */
 		ch = &font->chars[chnum / 256][chnum % 256];
@@ -676,7 +676,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 
 error:
 	if (data != NULL)
-		free(data);
+		global_free(data);
 	return 1;
 }
 
@@ -720,10 +720,10 @@ static int render_font_save_cached(render_font *font, const char *filename, UINT
 	}
 
 	/* allocate an array to hold the character data */
-	chartable = alloc_array_clear_or_die(UINT8, numchars * CACHED_CHAR_SIZE);
+	chartable = global_alloc_array_clear(UINT8, numchars * CACHED_CHAR_SIZE);
 
 	/* allocate a temp buffer to compress into */
-	tempbuffer = alloc_array_or_die(UINT8, 65536);
+	tempbuffer = global_alloc_array(UINT8, 65536);
 
 	/* write the header */
 	dest = tempbuffer;
@@ -831,14 +831,14 @@ static int render_font_save_cached(render_font *font, const char *filename, UINT
 
 	/* all done */
 	mame_fclose(file);
-	free(tempbuffer);
-	free(chartable);
+	global_free(tempbuffer);
+	global_free(chartable);
 	return 0;
 
 error:
 	mame_fclose(file);
 	osd_rmfile(filename);
-	free(tempbuffer);
-	free(chartable);
+	global_free(tempbuffer);
+	global_free(chartable);
 	return 1;
 }

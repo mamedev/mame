@@ -14,7 +14,7 @@
 #ifndef __VIDEO_GENERIC_H__
 #define __VIDEO_GENERIC_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 

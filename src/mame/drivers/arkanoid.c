@@ -1304,7 +1304,7 @@ static DRIVER_INIT( block2 )
 	// the graphics on this bootleg have the data scrambled
 	int tile;
 	UINT8* srcgfx = memory_region(machine,"gfx1");
-	UINT8* buffer = alloc_array_or_die(UINT8, 0x18000);
+	UINT8* buffer = auto_alloc_array(machine, UINT8, 0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
 	{
@@ -1328,7 +1328,7 @@ static DRIVER_INIT( block2 )
 
 	memcpy(srcgfx, buffer, 0x18000);
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 	state->bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);

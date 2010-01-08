@@ -263,6 +263,7 @@ typedef struct {
 	int clock;						/* master clock  (Hz)           */
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
+	const device_config *device;
 } YM2413;
 
 /* key scale level */
@@ -2002,26 +2003,14 @@ static void OPLLResetChip(YM2413 *chip)
 /* 'rate'  is sampling rate  */
 static YM2413 *OPLLCreate(const device_config *device, int clock, int rate)
 {
-	char *ptr;
 	YM2413 *chip;
-	int state_size;
 
 	if (OPLL_LockTable(device) == -1) return NULL;
 
-	/* calculate chip state size */
-	state_size  = sizeof(YM2413);
-
 	/* allocate memory block */
-	ptr = (char *)malloc(state_size);
+	chip = auto_alloc_clear(device->machine, YM2413);
 
-	if (ptr==NULL)
-		return NULL;
-
-	/* clear */
-	memset(ptr,0,state_size);
-
-	chip  = (YM2413 *)ptr;
-
+	chip->device = device;
 	chip->clock = clock;
 	chip->rate  = rate;
 
@@ -2037,7 +2026,7 @@ static YM2413 *OPLLCreate(const device_config *device, int clock, int rate)
 static void OPLLDestroy(YM2413 *chip)
 {
 	OPLL_UnLockTable();
-	free(chip);
+	auto_free(chip->device->machine, chip);
 }
 
 /* Option handlers */

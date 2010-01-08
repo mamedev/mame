@@ -347,7 +347,7 @@ static DRIVER_INIT( fcombat )
 	UINT8 *src, *dst, *temp;
 
 	/* allocate some temporary space */
-	temp = alloc_array_or_die(UINT8, 0x10000);
+	temp = auto_alloc_array(machine, UINT8, 0x10000);
 
 	/* make a temporary copy of the character data */
 	src = temp;
@@ -431,7 +431,7 @@ static DRIVER_INIT( fcombat )
 		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
 	}
 
-	free(temp);
+	auto_free(machine, temp);
 }
 
 ROM_START( fcombat )

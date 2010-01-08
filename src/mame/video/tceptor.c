@@ -263,7 +263,7 @@ static void decode_bg(running_machine *machine, const char * region)
 	int len = 0x8000;
 	int i;
 
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 
 	/* expand rom tc2-19.10d */
 	for (i = 0; i < len / 2; i++)
@@ -273,7 +273,7 @@ static void decode_bg(running_machine *machine, const char * region)
 	}
 
 	memcpy(src, buffer, len);
-	free(buffer);
+	auto_free(machine, buffer);
 
 	/* decode the graphics */
 	machine->gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, memory_region(machine, region), 64, 2048);

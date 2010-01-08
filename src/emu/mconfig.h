@@ -113,7 +113,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* In mamecore.h: typedef struct _machine_config machine_config; */
+/* In emucore.h: typedef struct _machine_config machine_config; */
 struct _machine_config
 {
 	UINT32					driver_data_size;		/* amount of memory needed for driver_data */

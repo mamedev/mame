@@ -1303,7 +1303,7 @@ static void gfx_untangle( running_machine *machine )
 {
 	// sprite, tile data
 	int i;
-	UINT16 *temp = alloc_array_or_die(UINT16, 0x200000/2);
+	UINT16 *temp = auto_alloc_array(machine, UINT16, 0x200000/2);
 
 	twin16_gfx_rom = (UINT16 *)memory_region(machine, "gfx2");
 	memcpy( temp, twin16_gfx_rom, 0x200000 );
@@ -1313,7 +1313,7 @@ static void gfx_untangle( running_machine *machine )
 		twin16_gfx_rom[i*2+0] = temp[i+0x080000];
 		twin16_gfx_rom[i*2+1] = temp[i];
 	}
-	free( temp );
+	auto_free( machine, temp );
 }
 
 static DRIVER_INIT( twin16 )

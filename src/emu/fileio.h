@@ -14,7 +14,7 @@
 #ifndef __FILEIO_H__
 #define __FILEIO_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "osdcore.h"
 #include "corefile.h"
 #include "mame.h"

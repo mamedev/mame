@@ -9,8 +9,7 @@
 
 ***************************************************************************/
 
-#include "inputseq.h"
-#include "restrack.h"
+#include "mame.h"
 #include <ctype.h>
 
 
@@ -511,7 +510,7 @@ astring *input_seq_to_tokens(running_machine *machine, astring *string, const in
 
 int input_seq_from_tokens(running_machine *machine, const char *string, input_seq *seq)
 {
-	char *strcopy = alloc_array_or_die(char, strlen(string) + 1);
+	char *strcopy = auto_alloc_array(machine, char, strlen(string) + 1);
 	char *str = strcopy;
 	int result = FALSE;
 
@@ -565,7 +564,7 @@ int input_seq_from_tokens(running_machine *machine, const char *string, input_se
 		str = strtemp + 1;
 	}
 
-	free(strcopy);
+	auto_free(machine, strcopy);
 	return result;
 }
 

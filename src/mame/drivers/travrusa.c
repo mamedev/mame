@@ -459,18 +459,18 @@ static DRIVER_INIT( motorace )
 {
 	int A, j;
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *buffer = alloc_array_or_die(UINT8, 0x2000);
+	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x2000);
 
-		memcpy(buffer, rom, 0x2000);
+	memcpy(buffer, rom, 0x2000);
 
-		/* The first CPU ROM has the address and data lines scrambled */
-		for (A = 0; A < 0x2000; A++)
-		{
-			j = BITSWAP16(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
-			rom[j] = BITSWAP8(buffer[A],2,7,4,1,6,3,0,5);
-		}
+	/* The first CPU ROM has the address and data lines scrambled */
+	for (A = 0; A < 0x2000; A++)
+	{
+		j = BITSWAP16(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
+		rom[j] = BITSWAP8(buffer[A],2,7,4,1,6,3,0,5);
+	}
 
-		free(buffer);
+	auto_free(machine, buffer);
 }
 
 static DRIVER_INIT( shtridra )

@@ -1123,7 +1123,7 @@ static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
-			real3d_display_list_end();
+			real3d_display_list_end(machine);
 			break;
 		case 0x8c:		/* Display List RAM 2 */
 			real3d_display_list2_dma(space, src, dst, length, byteswap);

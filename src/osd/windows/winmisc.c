@@ -45,11 +45,95 @@
 #include <tchar.h>
 
 // MAME headers
-#include "osdcore.h"
+#include "emucore.h"
 
 // MAMEOS headers
 #include "winutf8.h"
 #include "strconv.h"
+
+
+//============================================================
+//  MACROS
+//============================================================
+
+// presumed size of a page of memory
+#define PAGE_SIZE			4096
+
+// allocations this size and larger get guard pages
+#define GUARD_PAGE_THRESH	32
+
+// align allocations to start or end of the page?
+#define GUARD_ALIGN_START	0
+
+
+
+//============================================================
+//  osd_malloc
+//============================================================
+
+void *osd_malloc(size_t size)
+{
+#ifndef MALLOC_DEBUG
+	return HeapAlloc(GetProcessHeap(), 0, size);
+#else
+	// add in space for the base pointer
+	size += sizeof(size_t);
+	
+	// small items just come from the heap
+	void *result;
+	if (size < GUARD_PAGE_THRESH)
+		result = HeapAlloc(GetProcessHeap(), 0, size);
+	
+	// large items get guard pages
+	else
+	{
+		// round the size up to a page boundary
+		size_t rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
+
+		// reserve that much memory, plus two guard pages
+		void *page_base = VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
+		if (page_base == NULL)
+			return NULL;
+
+		// now allow access to everything but the first and last pages
+		page_base = VirtualAlloc(reinterpret_cast<UINT8 *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
+		if (page_base == NULL)
+			return NULL;
+
+		// work backwards from the page base to get to the block base
+		result = GUARD_ALIGN_START ? page_base : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
+	}
+	
+	// store the page_base at the start
+	*reinterpret_cast<size_t *>(result) = size;
+	return reinterpret_cast<UINT8 *>(result) + sizeof(size_t);
+#endif
+}
+
+
+//============================================================
+//  osd_free
+//============================================================
+
+void osd_free(void *ptr)
+{
+#ifndef MALLOC_DEBUG
+	HeapFree(GetProcessHeap(), 0, ptr);
+#else
+	size_t size = reinterpret_cast<size_t *>(ptr)[-1];
+	
+	// small items just get freed
+	if (size < GUARD_PAGE_THRESH)
+		HeapFree(GetProcessHeap(), 0, ptr);
+		
+	// large items need more care
+	else
+	{
+		FPTR page_base = (reinterpret_cast<FPTR>(ptr) - sizeof(size_t)) & ~(PAGE_SIZE - 1);
+		VirtualFree(reinterpret_cast<void *>(page_base - PAGE_SIZE), 0, MEM_RELEASE);
+	}
+#endif
+}
 
 
 //============================================================

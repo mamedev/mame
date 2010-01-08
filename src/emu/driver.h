@@ -169,7 +169,7 @@ typedef UINT32 (*video_update_func)(const device_config *screen, bitmap_t *bitma
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* In mamecore.h: typedef struct _game_driver game_driver; */
+/* In emucore.h: typedef struct _game_driver game_driver; */
 struct _game_driver
 {
 	const char *		source_file;				/* set this to __FILE__ */

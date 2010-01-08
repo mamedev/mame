@@ -355,7 +355,7 @@ static void pirates_decrypt_68k(running_machine *machine)
 
     rom_size = memory_region_length(machine, "maincpu");
 
-    buf = alloc_array_or_die(UINT16, rom_size/2);
+    buf = auto_alloc_array(machine, UINT16, rom_size/2);
 
     rom = (UINT16 *)memory_region(machine, "maincpu");
     memcpy (buf, rom, rom_size);
@@ -373,7 +373,7 @@ static void pirates_decrypt_68k(running_machine *machine)
 
         rom[i] = (vr<<8) | vl;
     }
-    free (buf);
+    auto_free (machine, buf);
 }
 
 static void pirates_decrypt_p(running_machine *machine)
@@ -384,7 +384,7 @@ static void pirates_decrypt_p(running_machine *machine)
 
     rom_size = memory_region_length(machine, "gfx1");
 
-    buf = alloc_array_or_die(UINT8, rom_size);
+    buf = auto_alloc_array(machine, UINT8, rom_size);
 
     rom = memory_region(machine, "gfx1");
     memcpy (buf, rom, rom_size);
@@ -397,7 +397,7 @@ static void pirates_decrypt_p(running_machine *machine)
 		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
 		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
     }
-    free (buf);
+    auto_free (machine, buf);
 }
 
 static void pirates_decrypt_s(running_machine *machine)
@@ -408,7 +408,7 @@ static void pirates_decrypt_s(running_machine *machine)
 
     rom_size = memory_region_length(machine, "gfx2");
 
-    buf = alloc_array_or_die(UINT8, rom_size);
+    buf = auto_alloc_array(machine, UINT8, rom_size);
 
     rom = memory_region(machine, "gfx2");
     memcpy (buf, rom, rom_size);
@@ -421,7 +421,7 @@ static void pirates_decrypt_s(running_machine *machine)
 		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
 		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
     }
-    free (buf);
+    auto_free (machine, buf);
 }
 
 
@@ -433,7 +433,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
     rom_size = memory_region_length(machine, "oki");
 
-    buf = alloc_array_or_die(UINT8, rom_size);
+    buf = auto_alloc_array(machine, UINT8, rom_size);
 
     rom = memory_region(machine, "oki");
     memcpy (buf, rom, rom_size);
@@ -443,7 +443,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 		int adr = BITSWAP24(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
 		rom[adr] = BITSWAP8(buf[i], 2,3,4,0,7,5,1,6);
     }
-    free (buf);
+    auto_free (machine, buf);
 }
 
 

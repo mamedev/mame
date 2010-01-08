@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "mamecore.h"
+#include "osdcore.h"
 #include "textbuf.h"
 
 

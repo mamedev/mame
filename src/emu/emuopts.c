@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "mame.h"
 #include "fileio.h"
 #include "emuopts.h"

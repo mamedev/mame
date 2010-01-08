@@ -14,7 +14,7 @@
 #ifndef __UIINPUT_H__
 #define __UIINPUT_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "render.h"
 #include "unicode.h"
 

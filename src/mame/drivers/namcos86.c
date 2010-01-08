@@ -1505,7 +1505,7 @@ static DRIVER_INIT( namco86 )
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
 	gfx = memory_region(machine, "gfx1");
 	size = memory_region_length(machine, "gfx1") * 2 / 3;
-	buffer = alloc_array_or_die(UINT8,  size );
+	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
 		UINT8 *dest1 = gfx;
@@ -1525,12 +1525,12 @@ static DRIVER_INIT( namco86 )
 			*mono ^= 0xff; mono++;
 		}
 
-		free( buffer );
+		auto_free( machine, buffer );
 	}
 
 	gfx = memory_region(machine, "gfx2");
 	size = memory_region_length(machine, "gfx2") * 2 / 3;
-	buffer = alloc_array_or_die(UINT8,  size );
+	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
 		UINT8 *dest1 = gfx;
@@ -1550,7 +1550,7 @@ static DRIVER_INIT( namco86 )
 			*mono ^= 0xff; mono++;
 		}
 
-		free( buffer );
+		auto_free( machine, buffer );
 	}
 }
 

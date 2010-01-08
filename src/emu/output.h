@@ -14,7 +14,7 @@
 #ifndef __OUTPUT_H__
 #define __OUTPUT_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 /***************************************************************************

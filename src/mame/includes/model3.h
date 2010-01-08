@@ -35,7 +35,7 @@ VIDEO_UPDATE(model3);
 WRITE64_HANDLER(real3d_cmd_w);
 WRITE64_HANDLER(real3d_display_list_w);
 WRITE64_HANDLER(real3d_polygon_ram_w);
-void real3d_display_list_end(void);
+void real3d_display_list_end(running_machine *machine);
 void real3d_display_list1_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_display_list2_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_vrom_texture_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);

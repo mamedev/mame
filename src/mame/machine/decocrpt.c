@@ -602,7 +602,7 @@ static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, rgntag);
 	int len = memory_region_length(machine, rgntag)/2;
-	UINT16 *buffer = alloc_array_or_die(UINT16, len);
+	UINT16 *buffer = auto_alloc_array(machine, UINT16, len);
 	int i;
 
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
@@ -610,36 +610,36 @@ static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8
 		for (i = 0;i < len;i++)
 			rom[i] = BIG_ENDIANIZE_INT16(rom[i]);
 
-		memcpy(buffer,rom,len*2);
+	memcpy(buffer,rom,len*2);
 
-		for (i = 0;i < len;i++)
-		{
-			int addr = (i & ~0x7ff) | address_table[i & 0x7ff];
-			int pat = swap_table[i & 0x7ff];
+	for (i = 0;i < len;i++)
+	{
+		int addr = (i & ~0x7ff) | address_table[i & 0x7ff];
+		int pat = swap_table[i & 0x7ff];
 
-			if (remap_only)
-				rom[i] = buffer[addr];
-			else
-				rom[i] = BITSWAP16(buffer[addr] ^ xor_masks[xor_table[addr & 0x7ff]],
-							swap_patterns[pat][0],
-							swap_patterns[pat][1],
-							swap_patterns[pat][2],
-							swap_patterns[pat][3],
-							swap_patterns[pat][4],
-							swap_patterns[pat][5],
-							swap_patterns[pat][6],
-							swap_patterns[pat][7],
-							swap_patterns[pat][8],
-							swap_patterns[pat][9],
-							swap_patterns[pat][10],
-							swap_patterns[pat][11],
-							swap_patterns[pat][12],
-							swap_patterns[pat][13],
-							swap_patterns[pat][14],
-							swap_patterns[pat][15]);
-		}
+		if (remap_only)
+			rom[i] = buffer[addr];
+		else
+			rom[i] = BITSWAP16(buffer[addr] ^ xor_masks[xor_table[addr & 0x7ff]],
+						swap_patterns[pat][0],
+						swap_patterns[pat][1],
+						swap_patterns[pat][2],
+						swap_patterns[pat][3],
+						swap_patterns[pat][4],
+						swap_patterns[pat][5],
+						swap_patterns[pat][6],
+						swap_patterns[pat][7],
+						swap_patterns[pat][8],
+						swap_patterns[pat][9],
+						swap_patterns[pat][10],
+						swap_patterns[pat][11],
+						swap_patterns[pat][12],
+						swap_patterns[pat][13],
+						swap_patterns[pat][14],
+						swap_patterns[pat][15]);
+	}
 
-		free(buffer);
+	auto_free(machine, buffer);
 
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
 	if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)

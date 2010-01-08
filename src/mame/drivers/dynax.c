@@ -5199,11 +5199,11 @@ static DRIVER_INIT( maya )
 	}
 
 	/* Address lines scrambling on the blitter data roms */
-	rom = alloc_array_or_die(UINT8, 0xc0000);
+	rom = auto_alloc_array(machine, UINT8, 0xc0000);
 	memcpy(rom, gfx, 0xc0000);
 	for (i = 0; i < 0xc0000; i++)
 		gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
-	free(rom);
+	auto_free(machine, rom);
 }
 
 
@@ -5906,12 +5906,12 @@ static DRIVER_INIT( mjelct3 )
 	int i;
 	UINT8	*rom = memory_region(machine, "maincpu");
 	size_t  size = memory_region_length(machine, "maincpu");
-	UINT8	*rom1 = alloc_array_or_die(UINT8, size);
+	UINT8	*rom1 = auto_alloc_array(machine, UINT8, size);
 
-		memcpy(rom1,rom,size);
-		for (i = 0; i < size; i++)
-			rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
-		free(rom1);
+	memcpy(rom1,rom,size);
+	for (i = 0; i < size; i++)
+		rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
+	auto_free(machine, rom1);
 }
 
 static DRIVER_INIT( mjelct3a )
@@ -5919,37 +5919,37 @@ static DRIVER_INIT( mjelct3a )
 	int i,j;
 	UINT8	*rom = memory_region(machine, "maincpu");
 	size_t  size = memory_region_length(machine, "maincpu");
-	UINT8	*rom1 = alloc_array_or_die(UINT8, size);
+	UINT8	*rom1 = auto_alloc_array(machine, UINT8, size);
 
-		memcpy(rom1,rom,size);
-		for (i = 0; i < size; i++)
+	memcpy(rom1,rom,size);
+	for (i = 0; i < size; i++)
+	{
+		j = i & ~0x7e00;
+		switch(i & 0x7000)
 		{
-			j = i & ~0x7e00;
-			switch(i & 0x7000)
-			{
-				case 0x0000:	j |= 0x0400;	break;
-				case 0x1000:	j |= 0x4400;	break;
-				case 0x2000:	j |= 0x4200;	break;
-				case 0x3000:	j |= 0x0200;	break;
-				case 0x4000:	j |= 0x4600;	break;
-				case 0x5000:	j |= 0x4000;	break;
+			case 0x0000:	j |= 0x0400;	break;
+			case 0x1000:	j |= 0x4400;	break;
+			case 0x2000:	j |= 0x4200;	break;
+			case 0x3000:	j |= 0x0200;	break;
+			case 0x4000:	j |= 0x4600;	break;
+			case 0x5000:	j |= 0x4000;	break;
 //              case 0x6000:    j |= 0x0000;    break;
-				case 0x7000:	j |= 0x0600;	break;
-			}
-			switch(i & 0x0e00)
-			{
-				case 0x0000:	j |= 0x2000;	break;
-				case 0x0200:	j |= 0x3800;	break;
-				case 0x0400:	j |= 0x2800;	break;
-				case 0x0600:	j |= 0x0800;	break;
-				case 0x0800:	j |= 0x1800;	break;
-//              case 0x0a00:    j |= 0x0000;    break;
-				case 0x0c00:	j |= 0x1000;	break;
-				case 0x0e00:	j |= 0x3000;	break;
-			}
-			rom[j] = rom1[i];
+			case 0x7000:	j |= 0x0600;	break;
 		}
-		free(rom1);
+		switch(i & 0x0e00)
+		{
+			case 0x0000:	j |= 0x2000;	break;
+			case 0x0200:	j |= 0x3800;	break;
+			case 0x0400:	j |= 0x2800;	break;
+			case 0x0600:	j |= 0x0800;	break;
+			case 0x0800:	j |= 0x1800;	break;
+//              case 0x0a00:    j |= 0x0000;    break;
+			case 0x0c00:	j |= 0x1000;	break;
+			case 0x0e00:	j |= 0x3000;	break;
+		}
+		rom[j] = rom1[i];
+	}
+	auto_free(machine, rom1);
 
 	DRIVER_INIT_CALL(mjelct3);
 }

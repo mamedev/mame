@@ -2451,14 +2451,11 @@ void * ym2612_init(void *param, const device_config *device, int clock, int rate
 	YM2612 *F2612;
 
 	/* allocate extend state space */
-	if( (F2612 = (YM2612 *)malloc(sizeof(YM2612)))==NULL)
-		return NULL;
-	/* clear */
-	memset(F2612,0,sizeof(YM2612));
+	F2612 = auto_alloc_clear(device->machine, YM2612);
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
-		free( F2612 );
+		auto_free( device->machine, F2612 );
 		return NULL;
 	}
 
@@ -2486,7 +2483,7 @@ void ym2612_shutdown(void *chip)
 	YM2612 *F2612 = (YM2612 *)chip;
 
 	FMCloseTable();
-	free(F2612);
+	auto_free(F2612->OPN.ST.device->machine, F2612);
 }
 
 /* reset one of chip */

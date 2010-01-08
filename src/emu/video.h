@@ -14,7 +14,7 @@
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "devintrf.h"
 #include "timer.h"
 #include "render.h"

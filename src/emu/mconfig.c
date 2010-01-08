@@ -71,7 +71,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	machine_config *config;
 
 	/* allocate a new configuration object */
-	config = alloc_clear_or_die(machine_config);
+	config = global_alloc_clear(machine_config);
 
 	/* initialize the device list */
 	device_list_init(&config->devicelist, TRUE);
@@ -96,7 +96,7 @@ void machine_config_free(machine_config *config)
 	device_list_deinit(&config->devicelist);
 
 	/* release the configuration itself */
-	free(config);
+	global_free(config);
 }
 
 

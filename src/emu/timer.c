@@ -12,7 +12,6 @@
 
 #include "driver.h"
 #include "profiler.h"
-#include "pool.h"
 #include "timer.h"
 
 
@@ -648,7 +647,6 @@ INLINE emu_timer *_timer_alloc_common(running_machine *machine, timer_fired_func
 		if (!state_save_registration_allowed(machine))
 			fatalerror("timer_alloc() called after save state registration closed! (file %s, line %d)\n", file, line);
 		timer_register_save(timer);
-		restrack_register_object(OBJTYPE_TIMER, timer, 0, file, line);
 	}
 
 	/* return a handle */

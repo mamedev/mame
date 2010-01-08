@@ -759,7 +759,11 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
 	/* allocate a new device */
-	devlist->list = auto_extend_array(machine, devlist->list, input_device, devlist->count + 1);
+	input_device *newlist = auto_alloc_array(machine, input_device, devlist->count + 1);
+	for (int devnum = 0; devnum < devlist->count; devnum++)
+		newlist[devnum] = devlist->list[devnum];
+	auto_free(machine, devlist->list);
+	devlist->list = newlist;
 	device = &devlist->list[devlist->count++];
 	memset(device, 0, sizeof(*device));
 

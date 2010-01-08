@@ -148,7 +148,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
-	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag));
+	device = (device_config *)global_alloc_array(UINT8, sizeof(*device) + strlen(tag));
 
 	/* add to the map */
 	tmerr = tagmap_add_unique_hash(devlist->map, tag, device, FALSE);
@@ -181,7 +181,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 		device->clock = device->owner->clock * ((device->clock >> 12) & 0xfff) / ((device->clock >> 0) & 0xfff);
 	}
 	device->static_config = NULL;
-	device->inline_config = (configlen == 0) ? NULL : alloc_array_or_die(UINT8, configlen);
+	device->inline_config = (configlen == 0) ? NULL : global_alloc_array(UINT8, configlen);
 
 	/* ensure live fields are all cleared */
 	device->machine = NULL;
@@ -260,8 +260,8 @@ void device_list_remove(device_list *devlist, const char *tag)
 
 	/* free the device object */
 	if (device->inline_config != NULL)
-		free(device->inline_config);
-	free(device);
+		global_free(device->inline_config);
+	global_free(device);
 }
 
 
@@ -660,7 +660,7 @@ void device_list_start(running_machine *machine)
 			fatalerror("Device %s specifies a 0 token length!\n", device_get_name(device));
 
 		/* allocate memory for the token */
-		device->token = alloc_array_clear_or_die(UINT8, device->tokenbytes);
+		device->token = auto_alloc_array_clear(machine, UINT8, device->tokenbytes);
 
 		/* fill in the remaining runtime fields */
 		device->region = memory_region(machine, device->tag);
@@ -741,8 +741,7 @@ static void device_list_stop(running_machine *machine)
 			(*stop)(device);
 
 		/* free allocated memory for the token */
-		if (device->token != NULL)
-			free(device->token);
+		auto_free(machine, device->token);
 
 		/* reset all runtime fields */
 		device->token = NULL;

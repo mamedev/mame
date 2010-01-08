@@ -14,7 +14,7 @@
 #ifndef __UIMENU_H__
 #define __UIMENU_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 /***************************************************************************

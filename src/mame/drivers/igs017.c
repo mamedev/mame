@@ -534,7 +534,7 @@ static void mgcs_decrypt_tiles(running_machine *machine)
 {
 	int length = memory_region_length(machine, "tilemaps");
 	UINT8 *rom = memory_region(machine, "tilemaps");
-	UINT8 *tmp = alloc_array_or_die(UINT8, length);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
 	memcpy(tmp,rom,length);
@@ -544,7 +544,7 @@ static void mgcs_decrypt_tiles(running_machine *machine)
 		rom[i] = tmp[addr];
 	}
 
-	free(tmp);
+	auto_free(machine, tmp);
 }
 
 static void mgcs_flip_sprites(running_machine *machine)

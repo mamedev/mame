@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "unzip.h"
-#include "osdepend.h"	/* for CLIB_DECL */
 #include "osdcore.h"
 
 #include <stdarg.h>

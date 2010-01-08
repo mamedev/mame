@@ -1,4 +1,4 @@
-#include "mamecore.h"
+#include "osdcore.h"
 #include "sound/wavwrite.h"
 
 struct _wav_file

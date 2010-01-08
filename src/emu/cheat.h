@@ -14,7 +14,7 @@
 #ifndef __CHEAT_H__
 #define __CHEAT_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 

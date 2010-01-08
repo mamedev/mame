@@ -1488,8 +1488,6 @@ int mame_validitychecks(const game_driver *curdriver)
 	/* validate inline function behavior */
 	error = validate_inlines() || error;
 
-	init_resource_tracking();
-	begin_resource_tracking();
 	get_profile_ticks();
 
 	/* pre-populate the defstr tagmap with all the default strings */
@@ -1589,9 +1587,6 @@ int mame_validitychecks(const game_driver *curdriver)
 	mame_printf_info("MESS:      %8dm\n", (int)(mess_checks / 1000000));
 #endif
 #endif
-
-	end_resource_tracking();
-	exit_resource_tracking();
 
 	tagmap_free(defstr);
 	tagmap_free(roms);

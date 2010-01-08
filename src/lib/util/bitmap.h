@@ -79,8 +79,8 @@ struct _rectangle
 
 
 /* bitmaps describe a rectangular array of pixels */
-typedef struct _bitmap_t bitmap_t;
-struct _bitmap_t
+typedef struct _bitmap_base bitmap_base;
+struct _bitmap_base
 {
 	void *			alloc;			/* pointer to allocated pixel memory */
 	void *			base;			/* pointer to pixel (0,0) (adjusted for padding) */
@@ -92,6 +92,30 @@ struct _bitmap_t
 	palette_t *		palette;		/* optional palette */
 	rectangle		cliprect;		/* a clipping rectangle covering the full bitmap */
 };
+
+
+#ifdef __cplusplus
+
+/* class for C++ */
+class bitmap_t : public bitmap_base
+{
+private:
+	bitmap_t(const bitmap_t &);
+	bitmap_t &operator=(const bitmap_t &);
+
+public:
+	bitmap_t();
+	bitmap_t(int _width, int _height, bitmap_format _format, int _xslop = 0, int _yslop = 0);
+	bitmap_t(void *_base, int _width, int _height, int _rowpixels, bitmap_format _format);
+	~bitmap_t();
+};
+
+#else
+
+/* direct map for C */
+typedef bitmap_base bitmap_t;
+
+#endif
 
 
 
@@ -131,6 +155,9 @@ void bitmap_set_palette(bitmap_t *bitmap, palette_t *palette);
 
 /* free allocated data for a bitmap */
 void bitmap_free(bitmap_t *bitmap);
+
+/* clone an existing bitmap by copying its fields; the target bitmap does not own the memory */
+void bitmap_clone_existing(bitmap_t *bitmap, const bitmap_t *srcbitmap);
 
 
 

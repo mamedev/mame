@@ -48,10 +48,10 @@ PALETTE_INIT( popper )
 {
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(color_prom, &popper_decode_info, &popper_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &popper_decode_info, &popper_net_info);
 	palette_set_colors(machine, 0, rgb, 64);
 	palette_normalize_range(machine->palette, 0, 63, 0, 255);
-	free(rgb);
+	auto_free(machine, rgb);
 }
 
 WRITE8_HANDLER( popper_ol_videoram_w )

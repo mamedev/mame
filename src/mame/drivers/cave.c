@@ -4047,13 +4047,13 @@ static DRIVER_INIT( mazinger )
 	memory_configure_bank(machine, "bank2", 2, 6, &ROM[0x10000], 0x4000);
 
 	/* decrypt sprites */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
 			buffer[i ^ 0xdf88] = src[BITSWAP24(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
 		memcpy(src, buffer, len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
 	state->region_byte = 0x05;
@@ -4099,7 +4099,7 @@ static DRIVER_INIT( pwrins2j )
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 3, 5, &ROM[0x10000], 0x4000);
 
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		for(i = 0; i < len/2; i++)
 		{
@@ -4110,7 +4110,7 @@ static DRIVER_INIT( pwrins2j )
 		}
 
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
 	unpack_sprites(machine);
@@ -4149,13 +4149,13 @@ static DRIVER_INIT( sailormn )
 	memory_configure_bank(machine, "bank1", 2, 0x1e, &ROM[0x10000], 0x4000);
 
 	/* decrypt sprites */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
 			buffer[i ^ 0x950c4] = src[BITSWAP24(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
 		memcpy(src, buffer, len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
 	sailormn_unpack_tiles( machine, "gfx4" );

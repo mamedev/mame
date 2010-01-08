@@ -136,7 +136,7 @@ d3d *drawd3d8_init(void)
 	}
 
 	// allocate an object to hold our data
-	d3dptr = alloc_or_die(d3d);
+	d3dptr = global_alloc(d3d);
 	d3dptr->version = 8;
 	d3dptr->d3dobj = d3d8;
 	d3dptr->dllhandle = dllhandle;
@@ -258,7 +258,7 @@ static ULONG d3d_release(d3d *d3dptr)
 	IDirect3D8 *d3d8 = (IDirect3D8 *)d3dptr->d3dobj;
 	ULONG result = IDirect3D8_Release(d3d8);
 	FreeLibrary(d3dptr->dllhandle);
-	free(d3dptr);
+	global_free(d3dptr);
 	return result;
 }
 

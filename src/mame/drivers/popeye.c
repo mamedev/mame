@@ -644,13 +644,13 @@ static DRIVER_INIT( skyskipr )
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
 		memcpy(rom,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
     state_save_register_global(machine, prot0);
@@ -665,13 +665,13 @@ static DRIVER_INIT( popeye )
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
 		memcpy(rom,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
     state_save_register_global(machine, prot0);

@@ -3094,7 +3094,7 @@ static input_port_config *port_config_alloc(const input_port_config **listhead)
 	input_port_config *config;
 
 	/* allocate memory */
-	config = alloc_clear_or_die(input_port_config);
+	config = global_alloc_clear(input_port_config);
 
 	/* add it to the tail */
 	for (tailptr = listhead; *tailptr != NULL; tailptr = &(*tailptr)->next) ;
@@ -3121,7 +3121,7 @@ static void port_config_free(const input_port_config **portptr)
 	*portptr = port->next;
 
 	/* free ourself */
-	free(port);
+	global_free(port);
 }
 
 
@@ -3155,7 +3155,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	int seqtype;
 
 	/* allocate memory */
-	config = alloc_clear_or_die(input_field_config);
+	config = global_alloc_clear(input_field_config);
 
 	/* fill in the basic field values */
 	config->port = port;
@@ -3246,7 +3246,7 @@ static void field_config_free(input_field_config **fieldptr)
 	*fieldptr = (input_field_config *)field->next;
 
 	/* free ourself */
-	free(field);
+	global_free(field);
 }
 
 
@@ -3262,7 +3262,7 @@ static input_setting_config *setting_config_alloc(input_field_config *field, inp
 	input_setting_config *config;
 
 	/* allocate memory */
-	config = alloc_clear_or_die(input_setting_config);
+	config = global_alloc_clear(input_setting_config);
 
 	/* fill in the basic setting values */
 	config->field = field;
@@ -3290,7 +3290,7 @@ static void setting_config_free(input_setting_config **settingptr)
 	*settingptr = (input_setting_config *)setting->next;
 
 	/* free ourself */
-	free(setting);
+	global_free(setting);
 }
 
 
@@ -3321,7 +3321,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		const char *comma, *colon, *number;
 
 		/* allocate a new entry */
-		*tailptr = alloc_clear_or_die(input_field_diplocation);
+		*tailptr = global_alloc_clear(input_field_diplocation);
 		entries++;
 
 		/* find the end of this entry */
@@ -3340,7 +3340,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		/* allocate and copy the name if it is present */
 		if (colon != NULL)
 		{
-			(*tailptr)->swname = lastname = alloc_array_or_die(char, colon - tempbuf + 1);
+			(*tailptr)->swname = lastname = global_alloc_array(char, colon - tempbuf + 1);
 			strncpy(lastname, tempbuf, colon - tempbuf);
 			lastname[colon - tempbuf] = 0;
 			number = colon + 1;
@@ -3355,7 +3355,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 				error_buf_append(errorbuf, errorbuflen, "Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
 			}
-			(*tailptr)->swname = namecopy = alloc_array_or_die(char, strlen(lastname) + 1);
+			(*tailptr)->swname = namecopy = global_alloc_array(char, strlen(lastname) + 1);
 			strcpy(namecopy, lastname);
 		}
 
@@ -3400,13 +3400,13 @@ static void diplocation_free(input_field_diplocation **diplocptr)
 
 	/* free the name */
 	if (diploc->swname != NULL)
-		free((void *)diploc->swname);
+		global_free(diploc->swname);
 
 	/* remove ourself from the list */
 	*diplocptr = (input_field_diplocation *)diploc->next;
 
 	/* free ourself */
-	free(diploc);
+	global_free(diploc);
 }
 
 
@@ -3587,8 +3587,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		int remapnum;
 
 		/* allocate tables */
-		oldtable = alloc_array_or_die(input_code, count);
-		newtable = alloc_array_or_die(input_code, count);
+		oldtable = global_alloc_array(input_code, count);
+		newtable = global_alloc_array(input_code, count);
 
 		/* build up the remap table */
 		count = 0;
@@ -3625,8 +3625,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		}
 
 		/* release the tables */
-		free(oldtable);
-		free(newtable);
+		global_free(oldtable);
+		global_free(newtable);
 	}
 }
 

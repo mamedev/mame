@@ -12,10 +12,9 @@
 #ifndef __MAME_H__
 #define __MAME_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "video.h"
 #include "crsshair.h"
-#include "restrack.h"
 #include "options.h"
 #include "inptport.h"
 #include "cpuintrf.h"
@@ -25,6 +24,7 @@
 #include "image.h"
 #include "uimess.h"
 #endif /* MESS */
+
 
 
 /***************************************************************************
@@ -115,6 +115,23 @@ typedef enum _output_channel output_channel;
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+// global allocation helpers
+#define auto_alloc(m, t)				pool_alloc(static_cast<running_machine *>(m)->respool, t)
+#define auto_alloc_clear(m, t)			pool_alloc_clear(static_cast<running_machine *>(m)->respool, t)
+#define auto_alloc_array(m, t, c)		pool_alloc_array(static_cast<running_machine *>(m)->respool, t, c)
+#define auto_alloc_array_clear(m, t, c)	pool_alloc_array_clear(static_cast<running_machine *>(m)->respool, t, c)
+#define auto_free(m, v)					pool_free(static_cast<running_machine *>(m)->respool, v)
+
+#define auto_astring_alloc(m)			auto_alloc(m, astring)
+#define auto_bitmap_alloc(m, w, h, f)	auto_alloc(m, bitmap_t(w, h, f))
+#define auto_strdup(m, s)				strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -178,9 +195,16 @@ struct _generic_pointers
 
 
 /* description of the currently-running machine */
-/* typedef struct _running_machine running_machine; -- in mamecore.h */
-struct _running_machine
+class running_machine
 {
+	DISABLE_COPYING(running_machine);
+
+public:
+	running_machine(const game_driver *driver);
+	~running_machine();
+	
+	resource_pool			respool;			/* pool of resources for this machine */
+
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
 	input_port_list			portlist;			/* points to a list of input port configurations */

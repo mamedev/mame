@@ -497,11 +497,7 @@ void pool_iterate_end(object_pool_iterator *iter)
 
 void *pool_malloc_file_line(object_pool *pool, size_t size, const char *file, int line)
 {
-#ifdef MALLOC_DEBUG
-	void *ptr = malloc_file_line(size, file, line);
-#else
 	void *ptr = malloc(size);
-#endif
 	return pool_object_add_file_line(pool, OBJTYPE_MEMORY, ptr, size, file, line);
 }
 
@@ -515,11 +511,7 @@ void *pool_realloc_file_line(object_pool *pool, void *ptr, size_t size, const ch
 {
 	if (ptr != NULL)
 		pool_object_remove(pool, ptr, FALSE);
-#ifdef MALLOC_DEBUG
-	ptr = realloc_file_line(ptr, size, file, line);
-#else
 	ptr = realloc(ptr, size);
-#endif
 	if (size != 0)
 		pool_object_add_file_line(pool, OBJTYPE_MEMORY, ptr, size, file, line);
 	return ptr;

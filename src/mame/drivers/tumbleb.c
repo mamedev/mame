@@ -3591,38 +3591,36 @@ static DRIVER_INIT( htchctch )
 static void suprtrio_decrypt_code(running_machine *machine)
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	UINT16 *buf = alloc_array_or_die(UINT16, 0x80000/2);
+	UINT16 *buf = auto_alloc_array(machine, UINT16, 0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
+	memcpy(buf,rom,0x80000);
+	for (i = 0;i < 0x40000;i++)
 	{
-		memcpy(buf,rom,0x80000);
-		for (i = 0;i < 0x40000;i++)
-		{
-			int j = i ^ 0x06;
-			if ((i & 1) == 0) j ^= 0x02;
-			if ((i & 3) == 0) j ^= 0x08;
-			rom[i] = buf[j];
-		}
-		free(buf);
+		int j = i ^ 0x06;
+		if ((i & 1) == 0) j ^= 0x02;
+		if ((i & 3) == 0) j ^= 0x08;
+		rom[i] = buf[j];
 	}
+	auto_free(machine, buf);
 }
 
 static void suprtrio_decrypt_gfx(running_machine *machine)
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, "gfx1");
-	UINT16 *buf = alloc_array_or_die(UINT16, 0x100000/2);
+	UINT16 *buf = auto_alloc_array(machine, UINT16, 0x100000/2);
 	int i;
 
 	/* decrypt tiles */
-		memcpy(buf,rom,0x100000);
-		for (i = 0;i < 0x80000;i++)
-		{
-			int j = i ^ 0x02;
-			if (i & 1) j ^= 0x04;
-			rom[i] = buf[j];
-		}
-		free(buf);
+	memcpy(buf,rom,0x100000);
+	for (i = 0;i < 0x80000;i++)
+	{
+		int j = i ^ 0x02;
+		if (i & 1) j ^= 0x04;
+		rom[i] = buf[j];
+	}
+	auto_free(machine, buf);
 }
 
 static DRIVER_INIT( suprtrio )

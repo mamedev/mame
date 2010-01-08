@@ -2681,7 +2681,7 @@ static DRIVER_INIT(4in1boot)
 	int len = memory_region_length(machine, "maincpu");
 
 	/* strange order */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -2689,20 +2689,20 @@ static DRIVER_INIT(4in1boot)
 			else buffer[i] = src[i];
 
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 
 	src = memory_region(machine, "soundcpu");
 	len = memory_region_length(machine, "soundcpu");
 
 	/* strange order */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _4in1_02_read );
 }
@@ -2714,13 +2714,13 @@ static DRIVER_INIT(snowbro3)
 	int len = memory_region_length(machine, "maincpu");
 
 	/* strange order */
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 }
 

@@ -14,7 +14,7 @@
 #ifndef __ROMLOAD_H__
 #define __ROMLOAD_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "chd.h"
 #include "options.h"
 

@@ -723,15 +723,20 @@ static void allocate_resample_buffers(running_machine *machine, sound_stream *st
 	if (stream->resample_bufalloc < bufsize)
 	{
 		int inputnum;
+		int oldsize;
 
 		/* this becomes the new allocation size */
+		oldsize = stream->resample_bufalloc;
 		stream->resample_bufalloc = bufsize;
 
 		/* iterate over outputs and realloc their buffers */
 		for (inputnum = 0; inputnum < stream->inputs; inputnum++)
 		{
 			stream_input *input = &stream->input[inputnum];
-			input->resample = auto_extend_array(machine, input->resample, stream_sample_t, stream->resample_bufalloc);
+			stream_sample_t *newbuffer = auto_alloc_array(machine, stream_sample_t, stream->resample_bufalloc);
+			memcpy(newbuffer, input->resample, oldsize * sizeof(stream_sample_t));
+			delete[] input->resample;
+			input->resample = newbuffer;
 		}
 	}
 }
@@ -761,8 +766,10 @@ static void allocate_output_buffers(running_machine *machine, sound_stream *stre
 		for (outputnum = 0; outputnum < stream->outputs; outputnum++)
 		{
 			stream_output *output = &stream->output[outputnum];
-			output->buffer = auto_extend_array(machine, output->buffer, stream_sample_t, stream->output_bufalloc);
-			memset(&output->buffer[oldsize], 0, (stream->output_bufalloc - oldsize) * sizeof(output->buffer[0]));
+			stream_sample_t *newbuffer = auto_alloc_array(machine, stream_sample_t, stream->output_bufalloc);
+			memcpy(newbuffer, output->buffer, oldsize * sizeof(stream_sample_t));
+			delete[] output->buffer;
+			output->buffer = newbuffer;
 		}
 	}
 }

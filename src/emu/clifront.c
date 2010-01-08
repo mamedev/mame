@@ -179,7 +179,7 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 		if (fatal.exitcode() != 0)
 			result = fatal.exitcode();
 	}
-	catch (emu_exception &exception)
+	catch (emu_exception &)
 	{
 		fprintf(stderr, "Caught unhandled emulator exception\n");
 	}
@@ -198,6 +198,9 @@ error:
 		options_free(options);
 	astring_free(gamename);
 	astring_free(exename);
+	
+	/* report any unfreed memory */
+	dump_unfreed_mem();
 	return result;
 }
 
@@ -356,13 +359,7 @@ static void display_help(void)
 
 int cli_info_listxml(core_options *options, const char *gamename)
 {
-	/* since print_mame_xml expands the machine driver, we need to set things up */
-	init_resource_tracking();
-
 	print_mame_xml(stdout, drivers, gamename);
-
-	/* clean up our tracked resources */
-	exit_resource_tracking();
 	return MAMERR_NONE;
 }
 
@@ -459,7 +456,7 @@ int cli_info_listclones(core_options *options, const char *gamename)
 
 int cli_info_listbrothers(core_options *options, const char *gamename)
 {
-	UINT8 *didit = alloc_array_or_die(UINT8, driver_list_get_count(drivers));
+	UINT8 *didit = global_alloc_array(UINT8, driver_list_get_count(drivers));
 	astring *filename = astring_alloc();
 	int drvindex, count = 0;
 
@@ -495,7 +492,7 @@ int cli_info_listbrothers(core_options *options, const char *gamename)
 
 	/* return an error if none found */
 	astring_free(filename);
-	free(didit);
+	global_free(didit);
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
 
@@ -618,9 +615,6 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 	int count = 0;
 	int drvindex;
 
-	/* since we expand the machine driver, we need to set things up */
-	init_resource_tracking();
-
 	/* iterate over drivers */
 	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
@@ -645,9 +639,6 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 			machine_config_free(config);
 		}
 
-	/* clean up our tracked resources */
-	exit_resource_tracking();
-
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
 
@@ -662,9 +653,6 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 {
 	int count = 0;
 	int drvindex;
-
-	/* since we expand the machine driver, we need to set things up */
-	init_resource_tracking();
 
 	/* iterate over drivers */
 	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
@@ -706,9 +694,6 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 			machine_config_free(config);
 		}
 
-	/* clean up our tracked resources */
-	exit_resource_tracking();
-
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
 
@@ -737,7 +722,7 @@ static int info_verifyroms(core_options *options, const char *gamename)
 			audit_records = audit_images(options, drivers[drvindex], AUDIT_VALIDATE_FAST, &audit);
 			res = audit_summary(drivers[drvindex], audit_records, audit, TRUE);
 			if (audit_records > 0)
-				free(audit);
+				global_free(audit);
 
 			/* if not found, count that and leave it at that */
 			if (res == NOTFOUND)
@@ -821,7 +806,7 @@ static int info_verifysamples(core_options *options, const char *gamename)
 			audit_records = audit_samples(options, drivers[drvindex], &audit);
 			res = audit_summary(drivers[drvindex], audit_records, audit, TRUE);
 			if (audit_records > 0)
-				free(audit);
+				global_free(audit);
 			else
 				continue;
 
@@ -956,14 +941,14 @@ static void romident(const char *filename, romident_status *status)
 			for (entry = zip_file_first_file(zip); entry; entry = zip_file_next_file(zip))
 				if (entry->uncompressed_length != 0)
 				{
-					UINT8 *data = (UINT8 *)malloc(entry->uncompressed_length);
+					UINT8 *data = global_alloc_array(UINT8, entry->uncompressed_length);
 					if (data != NULL)
 					{
 						/* decompress data into RAM and identify it */
 						ziperr = zip_file_decompress(zip, data, entry->uncompressed_length);
 						if (ziperr == ZIPERR_NONE)
 							identify_data(entry->filename, data, entry->uncompressed_length, status);
-						free(data);
+						global_free(data);
 					}
 				}
 
@@ -994,7 +979,7 @@ static void identify_file(const char *name, romident_status *status)
 	filerr = osd_open(name, OPEN_FLAG_READ, &file, &length);
 	if (filerr == FILERR_NONE && length > 0 && (UINT32)length == length)
 	{
-		UINT8 *data = (UINT8 *)malloc(length);
+		UINT8 *data = global_alloc_array(UINT8, length);
 		if (data != NULL)
 		{
 			UINT32 bytes;
@@ -1003,7 +988,7 @@ static void identify_file(const char *name, romident_status *status)
 			filerr = osd_read(file, data, 0, length, &bytes);
 			if (filerr == FILERR_NONE)
 				identify_data(name, data, bytes, status);
-			free(data);
+			global_free(data);
 		}
 		osd_close(file);
 	}
@@ -1029,7 +1014,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 	{
 		/* now determine the new data length and allocate temporary memory for it */
 		length = jedbin_output(&jed, NULL, 0);
-		tempjed = (UINT8 *)malloc(length);
+		tempjed = global_alloc_array(UINT8, length);
 		if (tempjed == NULL)
 			return;
 
@@ -1072,7 +1057,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 
 	/* free any temporary JED data */
 	if (tempjed != NULL)
-		free(tempjed);
+		global_free(tempjed);
 }
 
 

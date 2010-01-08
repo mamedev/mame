@@ -454,7 +454,7 @@ static DRIVER_INIT( exerion )
 	UINT8 *src, *dst, *temp;
 
 	/* allocate some temporary space */
-	temp = alloc_array_or_die(UINT8, 0x10000);
+	temp = auto_alloc_array(machine, UINT8, 0x10000);
 
 	/* make a temporary copy of the character data */
 	src = temp;
@@ -493,7 +493,7 @@ static DRIVER_INIT( exerion )
 		dst[newaddr] = src[oldaddr];
 	}
 
-	free(temp);
+	auto_free(machine, temp);
 }
 
 

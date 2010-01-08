@@ -44,8 +44,7 @@
 #include <windows.h>
 
 // MAME headers
-#include "mamecore.h"
-#include "restrack.h"
+#include "emucore.h"
 
 // MAMEOS headers
 #include "window.h"
@@ -121,7 +120,7 @@ static int drawgdi_window_init(win_window_info *window)
 	int i;
 
 	// allocate memory for our structures
-	gdi = alloc_clear_or_die(gdi_info);
+	gdi = global_alloc_clear(gdi_info);
 	window->drawdata = gdi;
 
 	// fill in the bitmap info header
@@ -162,8 +161,8 @@ static void drawgdi_window_destroy(win_window_info *window)
 
 	// free the bitmap memory
 	if (gdi->bmdata != NULL)
-		free(gdi->bmdata);
-	free(gdi);
+		global_free(gdi->bmdata);
+	global_free(gdi);
 	window->drawdata = NULL;
 }
 
@@ -209,7 +208,8 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	if (pitch * height * 4 > gdi->bmsize)
 	{
 		gdi->bmsize = pitch * height * 4 * 2;
-		gdi->bmdata = (UINT8 *)realloc(gdi->bmdata, gdi->bmsize);
+		global_free(gdi->bmdata);
+		gdi->bmdata = global_alloc_array(UINT8, gdi->bmsize);
 	}
 
 	// draw the primitives to the bitmap

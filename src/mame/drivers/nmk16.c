@@ -5022,15 +5022,15 @@ static void decryptcode( running_machine *machine, int a23, int a22, int a21, in
 	int i;
 	UINT8 *RAM = memory_region( machine, "maincpu" );
 	size_t  size = memory_region_length( machine, "maincpu" );
-	UINT8 *buffer = alloc_array_or_die(UINT8,  size );
+	UINT8 *buffer = auto_alloc_array(machine, UINT8,  size );
 
-		memcpy( buffer, RAM, size );
-		for( i = 0; i < size; i++ )
-		{
-			RAM[ i ] = buffer[ BITSWAP24( i, a23, a22, a21, a20, a19, a18, a17, a16, a15, a14, a13, a12,
-				a11, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0 ) ];
-		}
-		free( buffer );
+	memcpy( buffer, RAM, size );
+	for( i = 0; i < size; i++ )
+	{
+		RAM[ i ] = buffer[ BITSWAP24( i, a23, a22, a21, a20, a19, a18, a17, a16, a15, a14, a13, a12,
+			a11, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0 ) ];
+	}
+	auto_free( machine, buffer );
 }
 
 

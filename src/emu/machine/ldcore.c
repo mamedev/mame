@@ -848,10 +848,15 @@ static void read_track_data(laserdisc_state *ld)
 	frame->lastfield = tracknum * 2 + fieldnum;
 
 	/* set the video target information */
-	ldcore->videotarget = *frame->bitmap;
-	ldcore->videotarget.base = BITMAP_ADDR16(&ldcore->videotarget, fieldnum, 0);
-	ldcore->videotarget.height /= 2;
-	ldcore->videotarget.rowpixels *= 2;
+	ldcore->videotarget.alloc = NULL;
+	ldcore->videotarget.base = BITMAP_ADDR16(frame->bitmap, fieldnum, 0);
+	ldcore->videotarget.rowpixels = frame->bitmap->rowpixels * 2;
+	ldcore->videotarget.width = frame->bitmap->width;
+	ldcore->videotarget.height = frame->bitmap->height / 2;
+	ldcore->videotarget.format = frame->bitmap->format;
+	ldcore->videotarget.bpp = frame->bitmap->bpp;
+	ldcore->videotarget.palette = frame->bitmap->palette;
+	ldcore->videotarget.cliprect = frame->bitmap->cliprect;
 	ldcore->avconfig.video = &ldcore->videotarget;
 
 	/* set the audio target information */
@@ -1397,15 +1402,14 @@ static void init_video(const device_config *device)
 		frame_data *frame = &ldcore->frame[index];
 
 		/* first allocate a YUY16 bitmap at 2x the height */
-		frame->bitmap = auto_bitmap_alloc(device->machine, ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
+		frame->bitmap = auto_alloc(device->machine, bitmap_t(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16));
 		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
 
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
-		frame->visbitmap = auto_alloc(device->machine, bitmap_t);
-		*frame->visbitmap = *frame->bitmap;
-		frame->visbitmap->base = BITMAP_ADDR16(frame->visbitmap, 44, frame->bitmap->width * 8 / 720);
-		frame->visbitmap->height -= 44;
-		frame->visbitmap->width -= 2 * frame->bitmap->width * 8 / 720;
+		frame->visbitmap = auto_alloc(device->machine, bitmap_t(BITMAP_ADDR16(frame->visbitmap, 44, frame->bitmap->width * 8 / 720), 
+																frame->bitmap->width - 2 * frame->bitmap->width * 8 / 720, 
+																frame->bitmap->height - 44, 
+																frame->bitmap->rowpixels, frame->bitmap->format));
 	}
 
 	/* allocate an empty frame of the same size */

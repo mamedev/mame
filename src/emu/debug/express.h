@@ -10,7 +10,7 @@
 #ifndef __EXPRESS_H__
 #define __EXPRESS_H__
 
-#include "mamecore.h"
+#include "osdcore.h"
 
 /***************************************************************************
     CONSTANTS

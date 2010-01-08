@@ -721,6 +721,39 @@ void osd_work_item_release(osd_work_item *item);
 ***************************************************************************/
 
 /*-----------------------------------------------------------------------------
+    osd_malloc: allocate memory that
+
+    Parameters:
+
+        size - the number of bytes to allocate
+
+    Return value:
+
+        a pointer to the allocated memory
+
+    Notes:
+
+        This is just a hook to do OS-specific allocation trickery.
+        It can be safely written as a wrapper to malloc().
+-----------------------------------------------------------------------------*/
+void *osd_malloc(size_t size);
+
+
+/*-----------------------------------------------------------------------------
+    osd_free: free memory allocated by osd_malloc
+
+    Parameters:
+
+        ptr - the pointer returned from osd_mallo
+
+    Return value:
+
+        None
+-----------------------------------------------------------------------------*/
+void osd_free(void *ptr);
+
+
+/*-----------------------------------------------------------------------------
     osd_alloc_executable: allocate memory that can contain executable code
 
     Parameters:

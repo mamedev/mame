@@ -179,7 +179,7 @@ static void winoutput_exit(running_machine *machine)
 	{
 		registered_client *temp = clientlist;
 		clientlist = temp->next;
-		free(temp);
+		global_free(temp);
 	}
 
 	// broadcast a shutdown message
@@ -260,7 +260,7 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 		}
 
 	// add us to the end
-	*client = alloc_or_die(registered_client);
+	*client = global_alloc(registered_client);
 	(*client)->next = NULL;
 	(*client)->id = id;
 	(*client)->hwnd = hwnd;
@@ -286,7 +286,7 @@ static LRESULT unregister_client(HWND hwnd, LPARAM id)
 		{
 			registered_client *temp = *client;
 			*client = (*client)->next;
-			free(temp);
+			global_free(temp);
 			found = TRUE;
 			break;
 		}
@@ -319,7 +319,7 @@ static LRESULT send_id_string(running_machine *machine, HWND hwnd, LPARAM id)
 
 	// allocate memory for the message
 	datalen = sizeof(*temp) + strlen(name);
-	temp = (copydata_id_string *)alloc_array_or_die(UINT8, datalen);
+	temp = (copydata_id_string *)global_alloc_array(UINT8, datalen);
 	temp->id = id;
 	strcpy(temp->string, name);
 
@@ -330,7 +330,7 @@ static LRESULT send_id_string(running_machine *machine, HWND hwnd, LPARAM id)
 	SendMessage(hwnd, WM_COPYDATA, (WPARAM)output_hwnd, (LPARAM)&copydata);
 
 	// free the data
-	free(temp);
+	global_free(temp);
 	return 0;
 }
 

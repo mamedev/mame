@@ -346,7 +346,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 
 			/* allocate a new route */
 			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
-			*routeptr = alloc_or_die(sound_route);
+			*routeptr = global_alloc(sound_route);
 			(*routeptr)->next = NULL;
 			(*routeptr)->output = output;
 			(*routeptr)->input = input;
@@ -361,7 +361,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 			{
 				sound_route *temp = config->routelist;
 				config->routelist = temp->next;
-				free(temp);
+				global_free(temp);
 			}
 			break;
 	}

@@ -3027,7 +3027,7 @@ static DRIVER_INIT( lockload )
 static DRIVER_INIT( tattass )
 {
 	UINT8 *RAM = memory_region(machine, "gfx1");
-	UINT8 *tmp = alloc_array_or_die(UINT8, 0x80000);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
@@ -3039,7 +3039,7 @@ static DRIVER_INIT( tattass )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	free(tmp);
+	auto_free(machine, tmp);
 
 	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
@@ -3048,7 +3048,7 @@ static DRIVER_INIT( tattass )
 static DRIVER_INIT( nslasher )
 {
 	UINT8 *RAM = memory_region(machine, "gfx1");
-	UINT8 *tmp = alloc_array_or_die(UINT8, 0x80000);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
@@ -3060,7 +3060,7 @@ static DRIVER_INIT( nslasher )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	free(tmp);
+	auto_free(machine, tmp);
 
 	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
 	deco74_decrypt_gfx(machine, "gfx2");

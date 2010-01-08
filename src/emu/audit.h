@@ -14,7 +14,7 @@
 #ifndef __AUDIT_H__
 #define __AUDIT_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "hash.h"
 
 

@@ -297,7 +297,7 @@
 #ifndef __TILEMAP_H__
 #define __TILEMAP_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "drawgfx.h"
 
 

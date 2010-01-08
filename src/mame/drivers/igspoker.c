@@ -2084,7 +2084,7 @@ static DRIVER_INIT( number10 )
 	/* Descramble graphic */
 	rom = memory_region(machine, "gfx1");
 	length = memory_region_length(machine, "gfx1");
-	tmp = alloc_array_or_die(UINT8, length);
+	tmp = auto_alloc_array(machine, UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
 	{
@@ -2092,7 +2092,7 @@ static DRIVER_INIT( number10 )
 		rom[A] = tmp[addr];
 	}
 
-	free(tmp);
+	auto_free(machine, tmp);
 }
 
 

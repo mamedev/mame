@@ -48,24 +48,16 @@
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct _astring
-{
-	char *			text;
-	int				alloclen;
-	char			smallbuf[256 - sizeof(int) - sizeof(char *)];
-};
-
-
-
-/***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
 static const char dummy_text[2] = { 0 };
+
+#ifdef __cplusplus
+static const astring dummy_astring;
+#else
 static const astring dummy_astring = { (char *)dummy_text, 1, { 0 } };
+#endif
 
 
 
@@ -143,6 +135,53 @@ INLINE void normalize_substr(int *start, int *count, int length)
     ASTRING ALLOCATION
 ***************************************************************************/
 
+#ifdef __cplusplus
+
+/*-------------------------------------------------
+    astring - basic constructor
+-------------------------------------------------*/
+
+astring::astring()
+{
+	/* initialize base fields by hand */
+	text = smallbuf;
+	alloclen = ARRAY_LENGTH(smallbuf);
+	smallbuf[0] = 0;
+}
+
+
+/*-------------------------------------------------
+    ~astring - basic destructor
+-------------------------------------------------*/
+
+astring::~astring()
+{
+	if (text != smallbuf)
+		free(text);
+}
+
+
+/*-------------------------------------------------
+    astring_alloc - allocate a new astring
+-------------------------------------------------*/
+
+astring *astring_alloc(void)
+{
+	return new astring;
+}
+
+
+/*-------------------------------------------------
+    astring_free - free an astring
+-------------------------------------------------*/
+
+void astring_free(astring *str)
+{
+	delete str;
+}
+
+#else
+
 /*-------------------------------------------------
     astring_alloc - allocate a new astring
 -------------------------------------------------*/
@@ -179,6 +218,8 @@ void astring_free(astring *str)
 		free(str->text);
 	free(str);
 }
+
+#endif
 
 
 

@@ -3105,7 +3105,7 @@ static DRIVER_INIT( saloon )
 		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
 	}
 
-	buffer = alloc_array_or_die(UINT8, size);
+	buffer = auto_alloc_array(machine, UINT8, size);
 	memcpy(buffer, rom, size);
 
 
@@ -3117,14 +3117,14 @@ static DRIVER_INIT( saloon )
 		rom[a] = buffer[i];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 
     /******************************
     *   Graphics ROM decryption   *
     ******************************/
 
-	buffer = alloc_array_or_die(UINT8, sizeg);
+	buffer = auto_alloc_array(machine, UINT8, sizeg);
 	memcpy(buffer, gfxrom, sizeg);
 
 	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
@@ -3135,7 +3135,7 @@ static DRIVER_INIT( saloon )
 		gfxrom[a] = buffer[i];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 
     /****************************
@@ -3149,7 +3149,7 @@ static DRIVER_INIT( saloon )
 		prom[i] = BITSWAP8(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
 	}
 
-	buffer = alloc_array_or_die(UINT8, sizep);
+	buffer = auto_alloc_array(machine, UINT8, sizep);
 	memcpy(buffer, prom, sizep);
 
 
@@ -3161,7 +3161,7 @@ static DRIVER_INIT( saloon )
 		prom[a] = buffer[i];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 }
 

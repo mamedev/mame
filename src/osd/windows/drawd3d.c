@@ -532,7 +532,7 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d_info *d3d;
 
 	// allocate memory for our structures
-	d3d = alloc_clear_or_die(d3d_info);
+	d3d = global_alloc_clear(d3d_info);
 	window->drawdata = d3d;
 
 	// experimental: load a PNG to use for vector rendering; it is treated
@@ -582,7 +582,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 		bitmap_free(d3d->vector_bitmap);
 
 	// free the memory in the window
-	free(d3d);
+	global_free(d3d);
 	window->drawdata = NULL;
 }
 
@@ -943,7 +943,7 @@ static void device_delete_resources(d3d_info *d3d)
 			(*d3dintf->texture.release)(tex->d3dtex);
 		if (tex->d3dsurface != NULL)
 			(*d3dintf->surface.release)(tex->d3dsurface);
-		free(tex);
+		global_free(tex);
 	}
 
 	// free the vertex buffer
@@ -1201,7 +1201,7 @@ static int config_adapter_mode(win_window_info *window)
 			if (utf8_device != NULL)
 			{
 				mame_printf_error("Device %s currently in an unsupported mode\n", utf8_device);
-				free(utf8_device);
+				global_free(utf8_device);
 			}
 			return 1;
 		}
@@ -1229,7 +1229,7 @@ static int config_adapter_mode(win_window_info *window)
 		if (utf8_device != NULL)
 		{
 			mame_printf_error("Proposed video mode not supported on device %s\n", utf8_device);
-			free(utf8_device);
+			global_free(utf8_device);
 		}
 		return 1;
 	}
@@ -1689,7 +1689,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 	HRESULT result;
 
 	// allocate a new texture
-	texture = alloc_clear_or_die(texture_info);
+	texture = global_alloc_clear(texture_info);
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);
@@ -1813,7 +1813,7 @@ error:
 		(*d3dintf->surface.release)(texture->d3dsurface);
 	if (texture->d3dtex != NULL)
 		(*d3dintf->texture.release)(texture->d3dtex);
-	free(texture);
+	global_free(texture);
 	return NULL;
 }
 

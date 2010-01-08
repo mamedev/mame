@@ -217,7 +217,7 @@ INLINE void reduce_fraction(int *num, int *den)
 
 INLINE const char *copy_string(const char *string)
 {
-	char *newstring = alloc_array_or_die(char, strlen(string) + 1);
+	char *newstring = global_alloc_array(char, strlen(string) + 1);
 	strcpy(newstring, string);
 	return newstring;
 }
@@ -1509,7 +1509,7 @@ layout_file *layout_file_load(const machine_config *config, const char *dirname,
 		return NULL;
 
 	/* allocate the layout group object first */
-	file = alloc_clear_or_die(layout_file);
+	file = global_alloc_clear(layout_file);
 
 	/* find the layout node */
 	mamelayoutnode = xml_get_sibling(rootnode->child, "mamelayout");
@@ -1578,7 +1578,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	int first;
 
 	/* allocate a new element */
-	element = alloc_clear_or_die(layout_element);
+	element = global_alloc_clear(layout_element);
 
 	/* extract the name */
 	name = xml_get_attribute_string_with_subst(config, elemnode, "name", NULL);
@@ -1640,7 +1640,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	}
 
 	/* allocate an array of element textures for the states */
-	element->elemtex = alloc_array_or_die(element_texture, element->maxstate + 1);
+	element->elemtex = global_alloc_array(element_texture, element->maxstate + 1);
 	for (state = 0; state <= element->maxstate; state++)
 	{
 		element->elemtex[state].element = element;
@@ -1666,7 +1666,7 @@ static element_component *load_element_component(const machine_config *config, x
 	element_component *component;
 
 	/* allocate memory for the component */
-	component = alloc_clear_or_die(element_component);
+	component = global_alloc_clear(element_component);
 
 	/* fetch common data */
 	component->state = xml_get_attribute_int_with_subst(config, compnode, "state", -1);
@@ -1696,7 +1696,7 @@ static element_component *load_element_component(const machine_config *config, x
 
 		/* allocate a copy of the string */
 		component->type = COMPONENT_TYPE_TEXT;
-		string = alloc_array_or_die(char, strlen(text) + 1);
+		string = global_alloc_array(char, strlen(text) + 1);
 		strcpy(string, text);
 		component->string = string;
 	}
@@ -1736,7 +1736,7 @@ static element_component *load_element_component(const machine_config *config, x
 	return component;
 
 error:
-	free(component);
+	global_free(component);
 	return NULL;
 }
 
@@ -1753,7 +1753,7 @@ static layout_view *load_layout_view(const machine_config *config, xml_data_node
 	int layer;
 
 	/* first allocate memory */
-	view = alloc_clear_or_die(layout_view);
+	view = global_alloc_clear(layout_view);
 
 	/* allocate a copy of the name */
 	view->name = copy_string(xml_get_attribute_string_with_subst(config, viewnode, "name", ""));
@@ -1806,7 +1806,7 @@ static view_item *load_view_item(const machine_config *config, xml_data_node *it
 	const char *name;
 
 	/* allocate a new item */
-	item = alloc_clear_or_die(view_item);
+	item = global_alloc_clear(view_item);
 
 	/* allocate a copy of the output name */
 	item->output_name = copy_string(xml_get_attribute_string_with_subst(config, itemnode, "name", ""));
@@ -1859,10 +1859,10 @@ static view_item *load_view_item(const machine_config *config, xml_data_node *it
 
 error:
 	if (item->output_name != NULL)
-		free((void *)item->output_name);
+		global_free(item->output_name);
 	if (item->input_tag != NULL)
-		free((void *)item->input_tag);
-	free(item);
+		global_free(item->input_tag);
+	global_free(item);
 	return NULL;
 }
 
@@ -2049,7 +2049,7 @@ void layout_file_free(layout_file *file)
 	}
 
 	/* free the file itself */
-	free(file);
+	global_free(file);
 }
 
 
@@ -2069,16 +2069,16 @@ static void layout_view_free(layout_view *view)
 			view_item *temp = view->itemlist[layer];
 			view->itemlist[layer] = temp->next;
 			if (temp->output_name != NULL)
-				free((void *)temp->output_name);
+				global_free(temp->output_name);
 			if (temp->input_tag != NULL)
-				free((void *)temp->input_tag);
-			free(temp);
+				global_free(temp->input_tag);
+			global_free(temp);
 		}
 
 	/* free the view itself */
 	if (view->name != NULL)
-		free((void *)view->name);
-	free(view);
+		global_free((void *)view->name);
+	global_free(view);
 }
 
 
@@ -2095,16 +2095,16 @@ static void layout_element_free(layout_element *element)
 		element_component *temp = element->complist;
 		element->complist = temp->next;
 		if (temp->string != NULL)
-			free((void *)temp->string);
+			global_free(temp->string);
 		if (temp->dirname != NULL)
-			free((void *)temp->dirname);
+			global_free(temp->dirname);
 		if (temp->imagefile != NULL)
-			free((void *)temp->imagefile);
+			global_free(temp->imagefile);
 		if (temp->alphafile != NULL)
-			free((void *)temp->alphafile);
+			global_free(temp->alphafile);
 		if (temp->bitmap != NULL)
 			bitmap_free(temp->bitmap);
-		free(temp);
+		global_free(temp);
 	}
 
 	/* free all textures */
@@ -2117,11 +2117,11 @@ static void layout_element_free(layout_element *element)
 			if (element->elemtex[state].texture != NULL)
 				render_texture_free(element->elemtex[state].texture);
 
-		free(element->elemtex);
+		global_free(element->elemtex);
 	}
 
 	/* free the element itself */
 	if (element->name != NULL)
-		free((void *)element->name);
-	free(element);
+		global_free(element->name);
+	global_free(element);
 }

@@ -14,7 +14,7 @@
 #ifndef __INFO_H__
 #define __INFO_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 /***************************************************************************

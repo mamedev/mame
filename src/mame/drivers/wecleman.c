@@ -1247,20 +1247,18 @@ static void wecleman_unpack_sprites(running_machine *machine)
 	}
 }
 
-static void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
+static void bitswap(running_machine *machine,UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
-	UINT8 *buffer = alloc_array_or_die(UINT8, len);
-	{
-		int i;
+	UINT8 *buffer = auto_alloc_array(machine, UINT8, len);
+	int i;
 
-		memcpy(buffer,src,len);
-		for (i = 0;i < len;i++)
-		{
-			src[i] =
-				buffer[BITSWAP24(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
-		}
-		free(buffer);
+	memcpy(buffer,src,len);
+	for (i = 0;i < len;i++)
+	{
+		src[i] =
+			buffer[BITSWAP24(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
 	}
+	auto_free(machine, buffer);
 }
 
 /* Unpack sprites data and do some patching */
@@ -1288,18 +1286,18 @@ static DRIVER_INIT( wecleman )
 		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"),
+	bitswap(machine, memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	wecleman_unpack_sprites(machine);
 
 	/* Bg & Fg & Txt */
-	bitswap(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"),
+	bitswap(machine, memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(memory_region(machine, "gfx3"), memory_region_length(machine, "gfx3"),
+	bitswap(machine, memory_region(machine, "gfx3"), memory_region_length(machine, "gfx3"),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	spr_color_offs = 0x40;
@@ -1365,7 +1363,7 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 	int i;
 
 	base = memory_region(machine, "gfx1");	// sprites
-	temp = alloc_array_or_die(UINT8,  bank_size );
+	temp = auto_alloc_array(machine, UINT8,  bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
 		UINT8 *finish   = base + 2*bank_size*i;
@@ -1403,7 +1401,7 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 			*dest++ = data & 0xF;
 		} while( dest<finish );
 	}
-	free( temp );
+	auto_free( machine, temp );
 }
 
 /* Unpack sprites data and do some patching */

@@ -97,7 +97,7 @@ INLINE opcode_desc *desc_alloc(drcfe_state *drcfe)
 	if (desc != NULL)
 		drcfe->desc_free_list = desc->next;
 	else
-		desc = alloc_or_die(opcode_desc);
+		desc = auto_alloc(drcfe->device->machine, opcode_desc);
 	return desc;
 }
 
@@ -128,10 +128,10 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe_state *drcfe;
 
 	/* allocate some memory to hold the state */
-	drcfe = alloc_clear_or_die(drcfe_state);
+	drcfe = auto_alloc_clear(cpu->machine, drcfe_state);
 
 	/* allocate the description array */
-	drcfe->desc_array = alloc_array_clear_or_die(opcode_desc *, config->window_end + config->window_start + 2);
+	drcfe->desc_array = auto_alloc_array_clear(cpu->machine, opcode_desc *, config->window_end + config->window_start + 2);
 
 	/* copy in configuration information */
 	drcfe->window_start = config->window_start;
@@ -164,15 +164,14 @@ void drcfe_exit(drcfe_state *drcfe)
 	{
 		opcode_desc *freeme = drcfe->desc_free_list;
 		drcfe->desc_free_list = drcfe->desc_free_list->next;
-		free(freeme);
+		auto_free(drcfe->device->machine, freeme);
 	}
 
 	/* free the description array */
-	if (drcfe->desc_array != NULL)
-		free(drcfe->desc_array);
+	auto_free(drcfe->device->machine, drcfe->desc_array);
 
 	/* free the object itself */
-	free(drcfe);
+	auto_free(drcfe->device->machine, drcfe);
 }
 
 

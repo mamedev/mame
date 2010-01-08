@@ -203,8 +203,7 @@ struct _poly_manager
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void **allocate_array(size_t *itemsize, UINT32 itemcount);
-static void free_array(void **array);
+static void **allocate_array(running_machine *machine, size_t *itemsize, UINT32 itemcount);
 static void *poly_item_callback(void *param, int threadid);
 static STATE_PRESAVE( poly_state_presave );
 
@@ -333,26 +332,26 @@ poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_d
 	poly_manager *poly;
 
 	/* allocate the manager itself */
-	poly = alloc_clear_or_die(poly_manager);
+	poly = auto_alloc_clear(machine, poly_manager);
 	poly->flags = flags;
 
 	/* allocate polygons */
 	poly->polygon_size = sizeof(polygon_info);
 	poly->polygon_count = MAX(max_polys, 1);
 	poly->polygon_next = 0;
-	poly->polygon = (polygon_info **)allocate_array(&poly->polygon_size, poly->polygon_count);
+	poly->polygon = (polygon_info **)allocate_array(machine, &poly->polygon_size, poly->polygon_count);
 
 	/* allocate extra data */
 	poly->extra_size = extra_data_size;
 	poly->extra_count = poly->polygon_count;
 	poly->extra_next = 1;
-	poly->extra = allocate_array(&poly->extra_size, poly->extra_count);
+	poly->extra = allocate_array(machine, &poly->extra_size, poly->extra_count);
 
 	/* allocate triangle work units */
 	poly->unit_size = (flags & POLYFLAG_ALLOW_QUADS) ? sizeof(quad_work_unit) : sizeof(tri_work_unit);
 	poly->unit_count = MIN(poly->polygon_count * UNITS_PER_POLY, 65535);
 	poly->unit_next = 0;
-	poly->unit = (work_unit **)allocate_array(&poly->unit_size, poly->unit_count);
+	poly->unit = (work_unit **)allocate_array(machine, &poly->unit_size, poly->unit_count);
 
 	/* create the work queue */
 	if (!(flags & POLYFLAG_NO_WORK_QUEUE))
@@ -394,14 +393,6 @@ void poly_free(poly_manager *poly)
 	/* free the work queue */
 	if (poly->queue != NULL)
 		osd_work_queue_free(poly->queue);
-
-	/* free the arrays */
-	free_array(poly->extra);
-	free_array((void **)poly->polygon);
-	free_array((void **)poly->unit);
-
-	/* free the manager itself */
-	free(poly);
 }
 
 
@@ -1300,7 +1291,7 @@ int poly_zclip_if_less(int numverts, const poly_vertex *v, poly_vertex *outv, in
     allocate_array - allocate an array of pointers
 -------------------------------------------------*/
 
-static void **allocate_array(size_t *itemsize, UINT32 itemcount)
+static void **allocate_array(running_machine *machine, size_t *itemsize, UINT32 itemcount)
 {
 	void **ptrarray;
 	int itemnum;
@@ -1313,30 +1304,15 @@ static void **allocate_array(size_t *itemsize, UINT32 itemcount)
 	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
 
 	/* allocate the array */
-	ptrarray = alloc_array_clear_or_die(void *, itemcount);
+	ptrarray = auto_alloc_array_clear(machine, void *, itemcount);
 
 	/* allocate the actual items */
-	ptrarray[0] = alloc_array_clear_or_die(UINT8, *itemsize * itemcount);
+	ptrarray[0] = auto_alloc_array_clear(machine, UINT8, *itemsize * itemcount);
 
 	/* initialize the pointer array */
 	for (itemnum = 1; itemnum < itemcount; itemnum++)
 		ptrarray[itemnum] = (UINT8 *)ptrarray[0] + *itemsize * itemnum;
 	return ptrarray;
-}
-
-
-/*-------------------------------------------------
-    free_array - release an array of pointers
--------------------------------------------------*/
-
-static void free_array(void **array)
-{
-	if (array != NULL)
-	{
-		if (array[0] != NULL)
-			free(array[0]);
-		free(array);
-	}
 }
 
 

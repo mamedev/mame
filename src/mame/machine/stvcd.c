@@ -140,8 +140,8 @@ static UINT32 fadstoplay = 0;
 static int buffull, sectorstore, freeblocks;
 
 // iso9660 utilities
-static void read_new_dir(UINT32 fileno);
-static void make_dir_current(UINT32 fad);
+static void read_new_dir(running_machine *machine, UINT32 fileno);
+static void make_dir_current(running_machine *machine, UINT32 fad);
 
 static direntryT curroot;		// root entry of current filesystem
 static direntryT *curdir;		// current directory
@@ -216,7 +216,7 @@ void stvcd_reset(running_machine *machine)
 	cd_stat = CD_STAT_PAUSE;
 
 	if (curdir != (direntryT *)NULL)
-		free((void *)curdir);
+		auto_free(machine, curdir);
 	curdir = (direntryT *)NULL;		// no directory yet
 
 	xfertype = XFERTYPE_INVALID;
@@ -267,7 +267,7 @@ void stvcd_reset(running_machine *machine)
 	if (cdrom)
 	{
 		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
-		read_new_dir(0xffffff);	// read root directory
+		read_new_dir(machine, 0xffffff);	// read root directory
 	}
 	else
 	{
@@ -525,7 +525,7 @@ static UINT32 cd_readLong(UINT32 addr)
 	}
 }
 
-static void cd_writeWord(UINT32 addr, UINT16 data)
+static void cd_writeWord(running_machine *machine, UINT32 addr, UINT16 data)
 {
 	UINT32 temp;
 
@@ -1171,7 +1171,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
-			read_new_dir(temp);
+			read_new_dir(machine, temp);
 			break;
 
 		case 0x7100:	// Read directory entry
@@ -1386,7 +1386,7 @@ WRITE32_HANDLER( stvcd_w )
 		case 0x90022:
 		case 0x90024:
 		case 0x90026:
-			cd_writeWord(offset, data>>16);
+			cd_writeWord(space->machine, offset, data>>16);
 			break;
 
 		default:
@@ -1396,7 +1396,7 @@ WRITE32_HANDLER( stvcd_w )
 }
 
 // iso9660 parsing
-static void read_new_dir(UINT32 fileno)
+static void read_new_dir(running_machine *machine, UINT32 fileno)
 {
 	int foundpd, i;
 	UINT32 cfad, dirfad;
@@ -1460,7 +1460,7 @@ static void read_new_dir(UINT32 fileno)
 			}
 
 			// done with all that, read the root directory now
-			make_dir_current(curroot.firstfad);
+			make_dir_current(machine, curroot.firstfad);
 		}
 	}
 	else
@@ -1469,12 +1469,12 @@ static void read_new_dir(UINT32 fileno)
 		{
 			mame_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
 		}
-		make_dir_current(curdir[fileno].firstfad);
+		make_dir_current(machine, curdir[fileno].firstfad);
 	}
 }
 
 // makes the directory pointed to by FAD current
-static void make_dir_current(UINT32 fad)
+static void make_dir_current(running_machine *machine, UINT32 fad)
 {
 	int i;
 	UINT32 nextent, numentries;
@@ -1504,10 +1504,10 @@ static void make_dir_current(UINT32 fad)
 
 	if (curdir != (direntryT *)NULL)
 	{
-		free((void *)curdir);
+		auto_free(machine, curdir);
 	}
 
-	curdir = alloc_array_or_die(direntryT, numentries);
+	curdir = auto_alloc_array(machine, direntryT, numentries);
 	curentry = curdir;
 	numfiles = numentries;
 
@@ -1543,7 +1543,7 @@ void stvcd_exit(running_machine* machine)
 {
 	if (curdir != (direntryT *)NULL)
 	{
-		free((void *)curdir);
+		auto_free(machine, curdir);
 		curdir = (direntryT *)NULL;
 	}
 

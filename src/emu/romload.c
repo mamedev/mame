@@ -760,7 +760,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
-	tempbuf = alloc_array_or_die(UINT8, tempbufsize);
+	tempbuf = auto_alloc_array(romdata->machine, UINT8, tempbufsize);
 
 	/* chunky reads for complex loads */
 	skip += groupsize;
@@ -774,7 +774,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		LOG(("  Reading %X bytes into buffer\n", bytesleft));
 		if (rom_fread(romdata, bufptr, bytesleft) != bytesleft)
 		{
-			free(tempbuf);
+			auto_free(romdata->machine, tempbuf);
 			return 0;
 		}
 		numbytes -= bytesleft;
@@ -835,7 +835,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 				}
 		}
 	}
-	free(tempbuf);
+	auto_free(romdata->machine, tempbuf);
 
 	LOG(("  All done\n"));
 	return ROM_GETLENGTH(romp);

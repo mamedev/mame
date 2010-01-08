@@ -126,9 +126,9 @@ void deco156_decrypt(running_machine *machine)
 {
 	UINT32 *rom = (UINT32 *)memory_region(machine, "maincpu");
 	int length = memory_region_length(machine, "maincpu");
-	UINT32 *buf = alloc_array_or_die(UINT32, length/4);
+	UINT32 *buf = auto_alloc_array(machine, UINT32, length/4);
 
-		memcpy(buf, rom, length);
-		decrypt(buf, rom, length);
-		free(buf);
+	memcpy(buf, rom, length);
+	decrypt(buf, rom, length);
+	auto_free(machine, buf);
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    mamecore.h
+    emucore.h
 
     General core utilities and macros used throughout MAME.
 
@@ -20,6 +20,7 @@
 #include <stdarg.h>
 #include <exception>
 #include "osdcomm.h"
+#include "emualloc.h"
 #include "bitmap.h"
 #include "coreutil.h"
 #include "corestr.h"
@@ -61,7 +62,7 @@ typedef UINT32 FPTR;
 
 /* These are forward struct declarations that are used to break
    circular dependencies in the code */
-typedef struct _running_machine running_machine;
+class running_machine;
 typedef struct _game_driver game_driver;
 typedef struct _machine_config machine_config;
 typedef struct _gfx_element gfx_element;
@@ -176,6 +177,14 @@ enum
     COMMON MACROS
 ***************************************************************************/
 
+// Macro for defining a copy constructor and assignment operator to
+// prevent copying
+#define DISABLE_COPYING(_Type) \
+private: \
+	_Type(const _Type &); \
+	_Type &operator=(const _Type &) \
+
+
 /* Macro for declaring enumerator operators for easier porting */
 #ifdef __cplusplus
 #define DECLARE_ENUM_OPERATORS(type) \
@@ -193,11 +202,11 @@ inline void operator--(type &value, int) { value = (type)((int)value - 1); }
 #undef assert_always
 
 #ifdef MAME_DEBUG
-#define assert(x)	do { if (!(x)) fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
-#define assert_always(x, msg) do { if (!(x)) fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#define assert(x)				do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define assert_always(x, msg)	do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
-#define assert(x)	do { } while (0)
-#define assert_always(x, msg) do { if (!(x)) fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
+#define assert(x)				do { } while (0)
+#define assert_always(x, msg)	do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
 #endif
 
 
@@ -325,9 +334,7 @@ inline void operator--(type &value, int) { value = (type)((int)value - 1); }
 ***************************************************************************/
 
 // emu_exception is the base class for all emu-related exceptions
-class emu_exception : public std::exception
-{
-};
+class emu_exception : public std::exception { };
 
 
 // emu_fatalerror is a generic fatal exception that provides an error string

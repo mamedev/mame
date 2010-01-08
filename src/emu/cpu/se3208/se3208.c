@@ -1705,7 +1705,7 @@ static void BuildTable(void)
 {
 	int i;
 	if(!OpTable)
-		OpTable=alloc_array_or_die(_OP, 0x10000);
+		OpTable=global_alloc_array(_OP, 0x10000);
 	for(i=0;i<0x10000;++i)
 		OpTable[i]=DecodeOp(i);
 }
@@ -1797,7 +1797,7 @@ static CPU_INIT( se3208 )
 static CPU_EXIT( se3208 )
 {
 	if(OpTable)
-		free(OpTable);
+		global_free(OpTable);
 }
 
 

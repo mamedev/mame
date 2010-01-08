@@ -313,6 +313,7 @@ typedef struct fm_opl_f {
 	UINT32 rate;					/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
 	attotime TimerBase;			/* Timer base time (==sampling time)*/
+	const device_config *device;
 } FM_OPL;
 
 
@@ -1978,13 +1979,7 @@ static FM_OPL *OPLCreate(const device_config *device, UINT32 clock, UINT32 rate,
 #endif
 
 	/* allocate memory block */
-	ptr = (char *)malloc(state_size);
-
-	if (ptr==NULL)
-		return NULL;
-
-	/* clear */
-	memset(ptr,0,state_size);
+	ptr = (char *)auto_alloc_array_clear(device->machine, UINT8, state_size);
 
 	OPL  = (FM_OPL *)ptr;
 
@@ -1998,6 +1993,7 @@ static FM_OPL *OPLCreate(const device_config *device, UINT32 clock, UINT32 rate,
 	ptr += sizeof(YM_DELTAT);
 #endif
 
+	OPL->device = device;
 	OPL->type  = type;
 	OPL->clock = clock;
 	OPL->rate  = rate;
@@ -2012,7 +2008,7 @@ static FM_OPL *OPLCreate(const device_config *device, UINT32 clock, UINT32 rate,
 static void OPLDestroy(FM_OPL *OPL)
 {
 	OPL_UnLockTable();
-	free(OPL);
+	auto_free(OPL->device->machine, OPL);
 }
 
 /* Optional handlers */

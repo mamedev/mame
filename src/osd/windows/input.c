@@ -688,7 +688,7 @@ BOOL wininput_handle_raw(HANDLE device)
 	// if necessary, allocate a temporary buffer and fetch the data
 	if (size > sizeof(small_buffer))
 	{
-		data = (LPBYTE)malloc(size);
+		data = global_alloc_array(BYTE, size);
 		if (data == NULL)
 			return result;
 	}
@@ -720,7 +720,7 @@ BOOL wininput_handle_raw(HANDLE device)
 
 	// free the temporary buffer and return the result
 	if (data != small_buffer)
-		free(data);
+		global_free(data);
 	return result;
 }
 
@@ -826,7 +826,7 @@ static device_info *generic_device_alloc(running_machine *machine, device_info *
 	device_info *devinfo;
 
 	// allocate memory for the device object
-	devinfo = alloc_clear_or_die(device_info);
+	devinfo = global_alloc_clear(device_info);
 	devinfo->head = devlist_head_ptr;
 	devinfo->machine = machine;
 
@@ -842,7 +842,7 @@ static device_info *generic_device_alloc(running_machine *machine, device_info *
 	return devinfo;
 
 error:
-	free(devinfo);
+	global_free(devinfo);
 	return NULL;
 }
 
@@ -862,11 +862,11 @@ static void generic_device_free(device_info *devinfo)
 
 	// free the copy of the name if present
 	if (devinfo->name != NULL)
-		free((void *)devinfo->name);
+		global_free((void *)devinfo->name);
 	devinfo->name = NULL;
 
 	// and now free the info
-	free(devinfo);
+	global_free(devinfo);
 }
 
 
@@ -979,7 +979,7 @@ static void win32_init(running_machine *machine)
 		{
 			const char *name = utf8_from_tstring(default_axis_name[axisnum]);
 			input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
-			free((void *)name);
+			global_free(name);
 		}
 
 		// populate the buttons
@@ -987,7 +987,7 @@ static void win32_init(running_machine *machine)
 		{
 			const char *name = utf8_from_tstring(default_button_name(butnum));
 			input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
-			free((void *)name);
+			global_free(name);
 		}
 	}
 }
@@ -1298,14 +1298,14 @@ static const char *dinput_device_item_name(device_info *devinfo, int offset, con
 		return utf8_from_tstring(namestring);
 
 	// otherwise, allocate space to add the suffix
-	combined = alloc_array_or_die(TCHAR, _tcslen(namestring) + 1 + _tcslen(suffix) + 1);
+	combined = global_alloc_array(TCHAR, _tcslen(namestring) + 1 + _tcslen(suffix) + 1);
 	_tcscpy(combined, namestring);
 	_tcscat(combined, TEXT(" "));
 	_tcscat(combined, suffix);
 
 	// convert to UTF8, free the temporary string, and return
 	utf8 = utf8_from_tstring(combined);
-	free(combined);
+	global_free(combined);
 	return utf8;
 }
 
@@ -1367,7 +1367,7 @@ static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 
 		// add the item to the device
 		input_device_item_add(devinfo->device, name, &devinfo->keyboard.state[keynum], itemid, generic_button_get_state);
-		free((void *)name);
+		global_free(name);
 	}
 
 exit:
@@ -1446,7 +1446,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 		if (guninfo != NULL && axisnum < 2)
 			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
 
-		free((void *)name);
+		global_free(name);
 	}
 
 	// populate the buttons
@@ -1461,7 +1461,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 		if (guninfo != NULL)
 			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 
-		free((void *)name);
+		global_free(name);
 	}
 
 exit:
@@ -1553,7 +1553,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 		// populate the item description as well
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], NULL);
 		input_device_item_add(devinfo->device, name, &devinfo->joystick.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
-		free((void *)name);
+		global_free(name);
 
 		axiscount++;
 	}
@@ -1566,22 +1566,22 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 		// left
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
 		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_LEFT), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
-		free((void *)name);
+		global_free(name);
 
 		// right
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
 		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_RIGHT), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
-		free((void *)name);
+		global_free(name);
 
 		// up
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
 		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_UP), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
-		free((void *)name);
+		global_free(name);
 
 		// down
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
 		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_DOWN), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
-		free((void *)name);
+		global_free(name);
 	}
 
 	// populate the buttons
@@ -1590,7 +1590,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 		FPTR offset = (FPTR)(&((DIJOYSTATE2 *)NULL)->rgbButtons[butnum]);
 		const char *name = dinput_device_item_name(devinfo, offset, default_button_name(butnum), NULL);
 		input_device_item_add(devinfo->device, name, &devinfo->joystick.state.rgbButtons[butnum], (butnum < 16) ? (input_item_id)(ITEM_ID_BUTTON1 + butnum) : ITEM_ID_OTHER_SWITCH, generic_button_get_state);
-		free((void *)name);
+		global_free(name);
 	}
 
 exit:
@@ -1683,7 +1683,7 @@ static void rawinput_init(running_machine *machine)
 		goto error;
 	if (device_count == 0)
 		goto error;
-	devlist = alloc_array_or_die(RAWINPUTDEVICELIST, device_count);
+	devlist = global_alloc_array(RAWINPUTDEVICELIST, device_count);
 	if ((*get_rawinput_device_list)(devlist, &device_count, sizeof(*devlist)) == -1)
 		goto error;
 
@@ -1725,12 +1725,12 @@ static void rawinput_init(running_machine *machine)
 		if (!(*register_rawinput_devices)(reglist, regcount, sizeof(reglist[0])))
 			goto error;
 
-	free(devlist);
+	global_free(devlist);
 	return;
 
 error:
 	if (devlist != NULL)
-		free(devlist);
+		global_free(devlist);
 }
 
 
@@ -1763,7 +1763,7 @@ static device_info *rawinput_device_create(running_machine *machine, device_info
 	// determine the length of the device name, allocate it, and fetch it
 	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
 		goto error;
-	tname = alloc_array_or_die(TCHAR, name_length);
+	tname = global_alloc_array(TCHAR, name_length);
 	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, tname, &name_length) == -1)
 		goto error;
 
@@ -1774,7 +1774,7 @@ static device_info *rawinput_device_create(running_machine *machine, device_info
 	// improve the name and then allocate a device
 	tname = rawinput_device_improve_name(tname);
 	devinfo = generic_device_alloc(machine, devlist_head_ptr, tname);
-	free(tname);
+	global_free(tname);
 
 	// copy the handle
 	devinfo->rawinput.device = device->hDevice;
@@ -1782,7 +1782,7 @@ static device_info *rawinput_device_create(running_machine *machine, device_info
 
 error:
 	if (tname != NULL)
-		free(tname);
+		global_free(tname);
 	if (devinfo != NULL)
 		rawinput_device_release(devinfo);
 	return NULL;
@@ -1827,7 +1827,7 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 		return name;
 
 	// allocate a temporary string and concatenate the base path plus the name
-	regpath = alloc_array_or_die(TCHAR, _tcslen(basepath) + 1 + _tcslen(name));
+	regpath = global_alloc_array(TCHAR, _tcslen(basepath) + 1 + _tcslen(name));
 	_tcscpy(regpath, basepath);
 	chdst = regpath + _tcslen(regpath);
 
@@ -1915,7 +1915,7 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 
 					// free memory and close the key
 					if (endparentid != NULL)
-						free(endparentid);
+						global_free(endparentid);
 					RegCloseKey(endkey);
 				}
 			}
@@ -1931,7 +1931,7 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 
 convert:
 	// replace the name with the nicer one
-	free(name);
+	global_free(name);
 
 	// remove anything prior to the final semicolon
 	chsrc = _tcsrchr(regstring, ';');
@@ -1939,14 +1939,14 @@ convert:
 		chsrc++;
 	else
 		chsrc = regstring;
-	name = alloc_array_or_die(TCHAR, _tcslen(chsrc) + 1);
+	name = global_alloc_array(TCHAR, _tcslen(chsrc) + 1);
 	_tcscpy(name, chsrc);
 
 exit:
 	if (regstring != NULL)
-		free(regstring);
+		global_free(regstring);
 	if (regpath != NULL)
-		free(regpath);
+		global_free(regpath);
 	if (regkey != NULL)
 		RegCloseKey(regkey);
 
@@ -1985,7 +1985,7 @@ static void rawinput_keyboard_enum(running_machine *machine, PRAWINPUTDEVICELIST
 
 		// add the item to the device
 		input_device_item_add(devinfo->device, name, &devinfo->keyboard.state[keynum], itemid, generic_button_get_state);
-		free((void *)name);
+		global_free(name);
 	}
 }
 
@@ -2059,7 +2059,7 @@ static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST de
 		if (guninfo != NULL && axisnum < 2)
 			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
 
-		free((void *)name);
+		global_free(name);
 	}
 
 	// populate the buttons
@@ -2072,7 +2072,7 @@ static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST de
 		if (guninfo != NULL)
 			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 
-		free((void *)name);
+		global_free(name);
 	}
 }
 
@@ -2160,7 +2160,7 @@ static TCHAR *reg_query_string(HKEY key, const TCHAR *path)
 		return NULL;
 
 	// allocate a buffer
-	buffer = alloc_array_or_die(TCHAR, datalen + sizeof(*buffer));
+	buffer = global_alloc_array(TCHAR, datalen + sizeof(*buffer));
 	buffer[datalen / sizeof(*buffer)] = 0;
 
 	// now get the actual data
@@ -2169,7 +2169,7 @@ static TCHAR *reg_query_string(HKEY key, const TCHAR *path)
 		return buffer;
 
 	// otherwise return a NULL buffer
-	free(buffer);
+	global_free(buffer);
 	return NULL;
 }
 

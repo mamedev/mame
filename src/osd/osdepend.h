@@ -66,7 +66,7 @@
 #ifndef __OSDEPEND_H__
 #define __OSDEPEND_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "osdcore.h"
 #include "inptport.h"
 #include "timer.h"

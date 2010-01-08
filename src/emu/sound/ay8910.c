@@ -348,7 +348,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 	double min = 10.0,  max = 0.0;
 	double *temp;
 
-	temp = (double *)malloc(8*32*32*32*sizeof(*temp));
+	temp = global_alloc_array(double, 8*32*32*32);
 
 	for (e=0; e < 8; e++)
 		for (j1=0; j1 < 32; j1++)
@@ -395,7 +395,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 
 	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
 
-	free(temp);
+	global_free(temp);
 }
 
 INLINE void build_single_table(double rl, const ay_ym_param *par, int normalize, INT32 *tab, int zero_is_off)

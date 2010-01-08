@@ -336,7 +336,7 @@ ROM_END
 
 static void decrypt_gfx(running_machine *machine)
 {
-	UINT8 *buf = alloc_array_or_die(UINT8, 0x40000);
+	UINT8 *buf = auto_alloc_array(machine, UINT8, 0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
@@ -409,7 +409,7 @@ static void decrypt_gfx(running_machine *machine)
 		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
 	}
 
-	free(buf);
+	auto_free(machine, buf);
 }
 
 static void decrypt_snd(running_machine *machine)
@@ -426,7 +426,7 @@ static DRIVER_INIT(darkmist)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, len;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *buffer = alloc_array_or_die(UINT8, 0x10000);
+	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	decrypt_gfx(machine);
@@ -494,7 +494,7 @@ static DRIVER_INIT(darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 }
 
 GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist, ROT270, "Taito", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS|GAME_NO_COCKTAIL )

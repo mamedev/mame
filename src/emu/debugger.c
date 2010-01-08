@@ -75,7 +75,7 @@ void debugger_init(running_machine *machine)
 
 		/* allocate a new entry for our global list */
 		add_exit_callback(machine, debugger_exit);
-		entry = alloc_or_die(machine_entry);
+		entry = global_alloc(machine_entry);
 		entry->next = machine_list;
 		entry->machine = machine;
 		machine_list = entry;
@@ -117,7 +117,7 @@ static void debugger_exit(running_machine *machine)
 		{
 			machine_entry *deleteme = *entryptr;
 			*entryptr = deleteme->next;
-			free(deleteme);
+			global_free(deleteme);
 			break;
 		}
 }
@@ -137,6 +137,6 @@ void debugger_flush_all_traces_on_abnormal_exit(void)
 		machine_entry *deleteme = machine_list;
 		debug_cpu_flush_traces(deleteme->machine);
 		machine_list = deleteme->next;
-		free(deleteme);
+		global_free(deleteme);
 	}
 }

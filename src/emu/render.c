@@ -343,7 +343,7 @@ INLINE container_item *alloc_container_item(void)
 	if (result != NULL)
 		container_item_free_list = result->next;
 	else
-		result = alloc_or_die(container_item);
+		result = global_alloc(container_item);
 
 	memset(result, 0, sizeof(*result));
 	return result;
@@ -375,7 +375,7 @@ INLINE render_primitive *alloc_render_primitive(int type)
 	if (result != NULL)
 		render_primitive_free_list = result->next;
 	else
-		result = alloc_or_die(render_primitive);
+		result = global_alloc(render_primitive);
 
 	/* clear to 0 */
 	memset(result, 0, sizeof(*result));
@@ -426,7 +426,7 @@ INLINE void add_render_ref(render_ref **list, void *refptr)
 	if (ref != NULL)
 		render_ref_free_list = ref->next;
 	else
-		ref = alloc_or_die(render_ref);
+		ref = global_alloc(render_ref);
 
 	/* set the refptr and link us into the list */
 	ref->refptr = refptr;
@@ -620,7 +620,7 @@ static void render_exit(running_machine *machine)
 	{
 		render_texture *temp = render_texture_free_list;
 		render_texture_free_list = temp->next;
-		free(temp);
+		global_free(temp);
 	}
 
 	/* free the render primitives */
@@ -628,7 +628,7 @@ static void render_exit(running_machine *machine)
 	{
 		render_primitive *temp = render_primitive_free_list;
 		render_primitive_free_list = temp->next;
-		free(temp);
+		global_free(temp);
 	}
 
 	/* free the render refs */
@@ -636,7 +636,7 @@ static void render_exit(running_machine *machine)
 	{
 		render_ref *temp = render_ref_free_list;
 		render_ref_free_list = temp->next;
-		free(temp);
+		global_free(temp);
 	}
 
 	/* free the container items */
@@ -644,7 +644,7 @@ static void render_exit(running_machine *machine)
 	{
 		container_item *temp = container_item_free_list;
 		container_item_free_list = temp->next;
-		free(temp);
+		global_free(temp);
 	}
 
 	/* free the targets */
@@ -1072,7 +1072,7 @@ render_target *render_target_alloc(running_machine *machine, const char *layoutf
 	int listnum;
 
 	/* allocate memory for the target */
-	target = alloc_clear_or_die(render_target);
+	target = global_alloc_clear(render_target);
 
 	/* add it to the end of the list */
 	for (nextptr = &targetlist; *nextptr != NULL; nextptr = &(*nextptr)->next) ;
@@ -1168,7 +1168,7 @@ void render_target_free(render_target *target)
 	}
 
 	/* free the target itself */
-	free(target);
+	global_free(target);
 }
 
 
@@ -2431,7 +2431,7 @@ render_texture *render_texture_alloc(texture_scaler_func scaler, void *param)
 		int texnum;
 
 		/* allocate a new group */
-		texture = alloc_array_clear_or_die(render_texture, TEXTURE_GROUP_SIZE);
+		texture = global_alloc_array_clear(render_texture, TEXTURE_GROUP_SIZE);
 
 		/* add them to the list */
 		for (texnum = 0; texnum < TEXTURE_GROUP_SIZE; texnum++)
@@ -2482,7 +2482,7 @@ void render_texture_free(render_texture *texture)
 
 	/* free any B/C/G lookup tables */
 	if (texture->bcglookup != NULL)
-		free(texture->bcglookup);
+		global_free(texture->bcglookup);
 
 	/* add ourself back to the free list */
 	base_save = texture->base;
@@ -2669,7 +2669,10 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			numentries = palette_get_num_colors(texture->palette) * palette_get_num_groups(texture->palette);
 			if (texture->bcglookup == NULL || texture->bcglookup_entries < numentries)
 			{
-				texture->bcglookup = (rgb_t *)realloc(texture->bcglookup, numentries * sizeof(*texture->bcglookup));
+				rgb_t *newlookup = global_alloc_array(rgb_t, numentries);
+				memcpy(newlookup, texture->bcglookup, texture->bcglookup_entries * sizeof(rgb_t));
+				delete[] texture->bcglookup;
+				texture->bcglookup = newlookup;
 				texture->bcglookup_entries = numentries;
 			}
 			for (index = 0; index < numentries; index++)
@@ -2696,7 +2699,10 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			adjusted = palette_entry_list_adjusted(texture->palette);
 			if (texture->bcglookup == NULL || texture->bcglookup_entries < 4 * 32)
 			{
-				texture->bcglookup = (rgb_t *)realloc(texture->bcglookup, 4 * 32 * sizeof(*texture->bcglookup));
+				rgb_t *newlookup = global_alloc_array(rgb_t, 4 * 32);
+				memcpy(newlookup, texture->bcglookup, texture->bcglookup_entries * sizeof(rgb_t));
+				delete[] texture->bcglookup;
+				texture->bcglookup = newlookup;
 				texture->bcglookup_entries = 4 * 32;
 			}
 
@@ -2728,7 +2734,10 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			adjusted = palette_entry_list_adjusted(texture->palette);
 			if (texture->bcglookup == NULL || texture->bcglookup_entries < 4 * 256)
 			{
-				texture->bcglookup = (rgb_t *)realloc(texture->bcglookup, 4 * 256 * sizeof(*texture->bcglookup));
+				rgb_t *newlookup = global_alloc_array(rgb_t, 4 * 256);
+				memcpy(newlookup, texture->bcglookup, texture->bcglookup_entries * sizeof(rgb_t));
+				delete[] texture->bcglookup;
+				texture->bcglookup = newlookup;
 				texture->bcglookup_entries = 4 * 256;
 			}
 
@@ -2767,7 +2776,7 @@ static render_container *render_container_alloc(running_machine *machine)
 	int color;
 
 	/* allocate and clear memory */
-	container = alloc_clear_or_die(render_container);
+	container = global_alloc_clear(render_container);
 
 	/* default values */
 	container->brightness = 1.0f;
@@ -2810,7 +2819,7 @@ static void render_container_free(render_container *container)
 		palette_client_free(container->palclient);
 
 	/* free the container itself */
-	free(container);
+	global_free(container);
 }
 
 

@@ -3362,12 +3362,8 @@ static CPU_INIT( z80 )
 		int oldval, newval, val;
 		UINT8 *padd, *padc, *psub, *psbc;
 		/* allocate big flag arrays once */
-		SZHVC_add = (UINT8 *)malloc(2*256*256);
-		SZHVC_sub = (UINT8 *)malloc(2*256*256);
-		if( !SZHVC_add || !SZHVC_sub )
-		{
-			fatalerror("Z80: failed to allocate 2 * 128K flags arrays!!!");
-		}
+		SZHVC_add = global_alloc_array(UINT8, 2*256*256);
+		SZHVC_sub = global_alloc_array(UINT8, 2*256*256);
 		padd = &SZHVC_add[	0*256];
 		padc = &SZHVC_add[256*256];
 		psub = &SZHVC_sub[	0*256];
@@ -3514,9 +3510,9 @@ static CPU_RESET( z80 )
 
 static CPU_EXIT( z80 )
 {
-	if (SZHVC_add) free(SZHVC_add);
+	global_free(SZHVC_add);
 	SZHVC_add = NULL;
-	if (SZHVC_sub) free(SZHVC_sub);
+	global_free(SZHVC_sub);
 	SZHVC_sub = NULL;
 }
 

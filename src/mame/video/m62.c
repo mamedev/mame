@@ -185,13 +185,13 @@ PALETTE_INIT( m62 )
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(color_prom, &m62_tile_decode_info, &m62_tile_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
 	palette_set_colors(machine, 0x000, rgb, 0x100);
-	free(rgb);
+	auto_free(machine, rgb);
 
-	rgb = compute_res_net_all(color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
 	palette_set_colors(machine, 0x100, rgb, 0x100);
-	free(rgb);
+	auto_free(machine, rgb);
 
 	palette_normalize_range(machine->palette, 0x000, 0x1ff, 0x00, 0xff);
 
@@ -205,13 +205,13 @@ PALETTE_INIT( lotlot )
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
 	palette_set_colors(machine, 0x000, rgb, 0x180);
-	free(rgb);
+	auto_free(machine, rgb);
 
-	rgb = compute_res_net_all(color_prom, &lotlot_sprite_decode_info, &m62_sprite_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &lotlot_sprite_decode_info, &m62_sprite_net_info);
 	palette_set_colors(machine, 0x180, rgb, 0x180);
-	free(rgb);
+	auto_free(machine, rgb);
 
 	palette_normalize_range(machine->palette, 0x000, 0x2ff, 0x00, 0xff);
 
@@ -225,17 +225,17 @@ PALETTE_INIT( battroad )
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(color_prom, &m62_tile_decode_info, &m62_tile_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
 	palette_set_colors(machine, 0x000, rgb, 0x100);
-	free(rgb);
+	auto_free(machine, rgb);
 
-	rgb = compute_res_net_all(color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
 	palette_set_colors(machine, 0x100, rgb, 0x100);
-	free(rgb);
+	auto_free(machine, rgb);
 
-	rgb = compute_res_net_all(color_prom, &battroad_char_decode_info, &m62_tile_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &battroad_char_decode_info, &m62_tile_net_info);
 	palette_set_colors(machine, 0x200, rgb, 0x020);
-	free(rgb);
+	auto_free(machine, rgb);
 
 	palette_normalize_range(machine->palette, 0x000, 0x21f, 0x00, 0xff);
 
@@ -248,13 +248,13 @@ PALETTE_INIT( spelunk2 )
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
 	palette_set_colors(machine, 0x000, rgb, 0x200);
-	free(rgb);
+	auto_free(machine, rgb);
 
-	rgb = compute_res_net_all(color_prom, &spelunk2_sprite_decode_info, &m62_sprite_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &spelunk2_sprite_decode_info, &m62_sprite_net_info);
 	palette_set_colors(machine, 0x200, rgb, 0x100);
-	free(rgb);
+	auto_free(machine, rgb);
 
 	palette_normalize_range(machine->palette, 0x000, 0x2ff, 0x00, 0xff);
 

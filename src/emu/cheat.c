@@ -220,19 +220,19 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 
 static cheat_entry *cheat_list_load(running_machine *machine, const char *filename);
 static int cheat_list_save(const char *filename, const cheat_entry *cheatlist);
-static void cheat_list_free(cheat_entry *cheat);
+static void cheat_list_free(running_machine *machine, cheat_entry *cheat);
 static cheat_entry *cheat_entry_load(running_machine *machine, const char *filename, xml_data_node *cheatnode);
 static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat);
-static void cheat_entry_free(cheat_entry *cheat);
-static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node *paramnode);
+static void cheat_entry_free(running_machine *machine, cheat_entry *cheat);
+static cheat_parameter *cheat_parameter_load(running_machine *machine, const char *filename, xml_data_node *paramnode);
 static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param);
-static void cheat_parameter_free(cheat_parameter *param);
+static void cheat_parameter_free(running_machine *machine, cheat_parameter *param);
 static cheat_script *cheat_script_load(running_machine *machine, const char *filename, xml_data_node *scriptnode, cheat_entry *cheat);
 static void cheat_script_save(mame_file *cheatfile, const cheat_script *script);
-static void cheat_script_free(cheat_script *script);
+static void cheat_script_free(running_machine *machine, cheat_script *script);
 static script_entry *script_entry_load(running_machine *machine, const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction);
 static void script_entry_save(mame_file *cheatfile, const script_entry *entry);
-static void script_entry_free(script_entry *entry);
+static void script_entry_free(running_machine *machine, script_entry *entry);
 
 static astring *quote_astring_expression(astring *string, int isattribute);
 static int validate_format(const char *filename, int line, const script_entry *entry);
@@ -438,7 +438,7 @@ static void cheat_exit(running_machine *machine)
 
 	/* free the list of cheats */
 	if (cheatinfo->cheatlist != NULL)
-		cheat_list_free(cheatinfo->cheatlist);
+		cheat_list_free(machine, cheatinfo->cheatlist);
 
 	/* free any text strings */
 	for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
@@ -1110,7 +1110,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 	return cheatlist;
 
 error:
-	cheat_list_free(cheatlist);
+	cheat_list_free(machine, cheatlist);
 	xml_file_free(rootnode);
 	if (cheatfile != NULL)
 		mame_fclose(cheatfile);
@@ -1159,13 +1159,13 @@ static int cheat_list_save(const char *filename, const cheat_entry *cheatlist)
     cheat_list_free - free a list of cheats
 -------------------------------------------------*/
 
-static void cheat_list_free(cheat_entry *cheat)
+static void cheat_list_free(running_machine *machine, cheat_entry *cheat)
 {
 	while (cheat != NULL)
 	{
 		cheat_entry *entry = cheat;
 		cheat = entry->next;
-		cheat_entry_free(entry);
+		cheat_entry_free(machine, entry);
 	}
 }
 
@@ -1193,7 +1193,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	}
 
 	/* allocate memory for the cheat */
-	cheat = (cheat_entry *)alloc_array_clear_or_die(UINT8, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
+	cheat = (cheat_entry *)auto_alloc_array_clear(machine, UINT8, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
 	cheat->numtemp = tempcount;
 
 	/* get the description */
@@ -1236,7 +1236,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	if (paramnode != NULL)
 	{
 		/* load this parameter */
-		cheat_parameter *curparam = cheat_parameter_load(filename, paramnode);
+		cheat_parameter *curparam = cheat_parameter_load(machine, filename, paramnode);
 		if (curparam == NULL)
 			goto error;
 
@@ -1272,7 +1272,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	return cheat;
 
 error:
-	cheat_entry_free(cheat);
+	cheat_entry_free(machine, cheat);
 	return NULL;
 }
 
@@ -1326,7 +1326,7 @@ static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
     cheat_entry_free - free a single cheat entry
 -------------------------------------------------*/
 
-static void cheat_entry_free(cheat_entry *cheat)
+static void cheat_entry_free(running_machine *machine, cheat_entry *cheat)
 {
 	script_state state;
 
@@ -1337,16 +1337,16 @@ static void cheat_entry_free(cheat_entry *cheat)
 		astring_free(cheat->comment);
 
 	if (cheat->parameter != NULL)
-		cheat_parameter_free(cheat->parameter);
+		cheat_parameter_free(machine, cheat->parameter);
 
 	for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
 		if (cheat->script[state] != NULL)
-			cheat_script_free(cheat->script[state]);
+			cheat_script_free(machine, cheat->script[state]);
 
 	if (cheat->symbols != NULL)
 		symtable_free(cheat->symbols);
 
-	free(cheat);
+	auto_free(machine, cheat);
 }
 
 
@@ -1356,14 +1356,14 @@ static void cheat_entry_free(cheat_entry *cheat)
     structures
 -------------------------------------------------*/
 
-static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node *paramnode)
+static cheat_parameter *cheat_parameter_load(running_machine *machine, const char *filename, xml_data_node *paramnode)
 {
 	parameter_item **itemtailptr;
 	xml_data_node *itemnode;
 	cheat_parameter *param;
 
 	/* allocate memory for it */
-	param = alloc_clear_or_die(cheat_parameter);
+	param = auto_alloc_clear(machine, cheat_parameter);
 
 	/* read the core attributes */
 	param->minval = xml_get_attribute_int(paramnode, "min", 0);
@@ -1380,7 +1380,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 		parameter_item *curitem;
 
 		/* allocate memory for it */
-		curitem = alloc_clear_or_die(parameter_item);
+		curitem = auto_alloc_clear(machine, parameter_item);
 
 		/* check for NULL text */
 		if (itemnode->value == NULL || itemnode->value[0] == 0)
@@ -1413,7 +1413,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 	return param;
 
 error:
-	cheat_parameter_free(param);
+	cheat_parameter_free(machine, param);
 	return NULL;
 }
 
@@ -1460,7 +1460,7 @@ static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *pa
     parameter
 -------------------------------------------------*/
 
-static void cheat_parameter_free(cheat_parameter *param)
+static void cheat_parameter_free(running_machine *machine, cheat_parameter *param)
 {
 	while (param->itemlist != NULL)
 	{
@@ -1469,10 +1469,10 @@ static void cheat_parameter_free(cheat_parameter *param)
 
 		if (item->text != NULL)
 			astring_free(item->text);
-		free(item);
+		auto_free(machine, item);
 	}
 
-	free(param);
+	auto_free(machine, param);
 }
 
 
@@ -1490,7 +1490,7 @@ static cheat_script *cheat_script_load(running_machine *machine, const char *fil
 	const char *state;
 
 	/* allocate memory for it */
-	script = alloc_clear_or_die(cheat_script);
+	script = auto_alloc_clear(machine, cheat_script);
 
 	/* read the core attributes */
 	script->state = SCRIPT_STATE_RUN;
@@ -1538,7 +1538,7 @@ static cheat_script *cheat_script_load(running_machine *machine, const char *fil
 	return script;
 
 error:
-	cheat_script_free(script);
+	cheat_script_free(machine, script);
 	return NULL;
 }
 
@@ -1578,16 +1578,16 @@ static void cheat_script_save(mame_file *cheatfile, const cheat_script *script)
     script
 -------------------------------------------------*/
 
-static void cheat_script_free(cheat_script *script)
+static void cheat_script_free(running_machine *machine, cheat_script *script)
 {
 	while (script->entrylist != NULL)
 	{
 		script_entry *entry = script->entrylist;
 		script->entrylist = entry->next;
-		script_entry_free(entry);
+		script_entry_free(machine, entry);
 	}
 
-	free(script);
+	auto_free(machine, script);
 }
 
 
@@ -1604,7 +1604,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 	EXPRERR experr;
 
 	/* allocate memory for it */
-	entry = alloc_clear_or_die(script_entry);
+	entry = auto_alloc_clear(machine, script_entry);
 
 	/* read the condition if present */
 	expression = xml_get_attribute_string(entrynode, "condition", NULL);
@@ -1673,7 +1673,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			output_argument *curarg;
 
 			/* allocate memory for it */
-			curarg = alloc_clear_or_die(output_argument);
+			curarg = auto_alloc_clear(machine, output_argument);
 
 			/* first extract attributes */
 			curarg->count = xml_get_attribute_int(argnode, "count", 1);
@@ -1712,7 +1712,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 	return entry;
 
 error:
-	script_entry_free(entry);
+	script_entry_free(machine, entry);
 	return NULL;
 }
 
@@ -1784,7 +1784,7 @@ static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
     entry
 -------------------------------------------------*/
 
-static void script_entry_free(script_entry *entry)
+static void script_entry_free(running_machine *machine, script_entry *entry)
 {
 	if (entry->condition != NULL)
 		expression_free(entry->condition);
@@ -1800,10 +1800,10 @@ static void script_entry_free(script_entry *entry)
 
 		if (curarg->expression != NULL)
 			expression_free(curarg->expression);
-		free(curarg);
+		auto_free(machine, curarg);
 	}
 
-	free(entry);
+	auto_free(machine, entry);
 }
 
 

@@ -385,7 +385,7 @@ void ui_menu_init(running_machine *machine)
 	ui_menu_stack_reset(machine);
 
 	/* create a texture for hilighting items */
-	hilight_bitmap = bitmap_alloc(256, 1, BITMAP_FORMAT_ARGB32);
+	hilight_bitmap = auto_bitmap_alloc(machine, 256, 1, BITMAP_FORMAT_ARGB32);
 	for (x = 0; x < 256; x++)
 	{
 		int alpha = 0xff;
@@ -416,7 +416,6 @@ static void ui_menu_exit(running_machine *machine)
 
 	/* free textures */
 	render_texture_free(hilight_texture);
-	bitmap_free(hilight_bitmap);
 	render_texture_free(arrow_texture);
 }
 
@@ -435,7 +434,7 @@ ui_menu *ui_menu_alloc(running_machine *machine, ui_menu_handler_func handler, v
 	ui_menu *menu;
 
 	/* allocate and clear memory for the menu and the state */
-	menu = alloc_clear_or_die(ui_menu);
+	menu = auto_alloc_clear(machine, ui_menu);
 
 	/* initialize the state */
 	menu->machine = machine;
@@ -459,23 +458,23 @@ void ui_menu_free(ui_menu *menu)
 	{
 		ui_menu_pool *pool = menu->pool;
 		menu->pool = pool->next;
-		free(pool);
+		auto_free(menu->machine, pool);
 	}
 
 	/* free the item array */
 	if (menu->item != NULL)
-		free(menu->item);
+		auto_free(menu->machine, menu->item);
 
 	/* free the state */
 	if (menu->state != NULL)
 	{
 		if (menu->destroy_state != NULL)
 			(*menu->destroy_state)(menu, menu->state);
-		free(menu->state);
+		auto_free(menu->machine, menu->state);
 	}
 
 	/* free the menu */
-	free(menu);
+	auto_free(menu->machine, menu);
 }
 
 
@@ -545,8 +544,13 @@ void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, U
 	/* realloc the item array if necessary */
 	if (menu->numitems >= menu->allocitems)
 	{
+		int olditems = menu->allocitems;
 		menu->allocitems += UI_MENU_ALLOC_ITEMS;
-		menu->item = (ui_menu_item *)realloc(menu->item, menu->allocitems * sizeof(*item));
+		ui_menu_item *newitems = auto_alloc_array(menu->machine, ui_menu_item, menu->allocitems);
+		for (int itemnum = 0; itemnum < olditems; itemnum++)
+			newitems[itemnum] = menu->item[itemnum];
+		delete[] menu->item;
+		menu->item = newitems;
 	}
 	index = menu->numitems++;
 
@@ -636,9 +640,9 @@ void *ui_menu_alloc_state(ui_menu *menu, size_t size, ui_menu_destroy_state_func
 	{
 		if (menu->destroy_state != NULL)
 			(*menu->destroy_state)(menu, menu->state);
-		free(menu->state);
+		auto_free(menu->machine, menu->state);
 	}
-	menu->state = alloc_array_clear_or_die(UINT8, size);
+	menu->state = auto_alloc_array_clear(menu->machine, UINT8, size);
 	menu->destroy_state = destroy_state;
 
 	return menu->state;
@@ -666,7 +670,7 @@ void *ui_menu_pool_alloc(ui_menu *menu, size_t size)
 		}
 
 	/* allocate a new pool */
-	pool = (ui_menu_pool *)alloc_array_clear_or_die(UINT8, sizeof(*pool) + UI_MENU_POOL_SIZE);
+	pool = (ui_menu_pool *)auto_alloc_array_clear(menu->machine, UINT8, sizeof(*pool) + UI_MENU_POOL_SIZE);
 
 	/* wire it up */
 	pool->next = menu->pool;
@@ -3417,7 +3421,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 				audit_records = audit_images(mame_options(), driver, AUDIT_VALIDATE_FAST, &audit);
 				audit_result = audit_summary(driver, audit_records, audit, FALSE);
 				if (audit_records > 0)
-					free(audit);
+					global_free(audit);
 
 				/* if everything looks good, schedule the new driver */
 				if (audit_result == CORRECT || audit_result == BEST_AVAILABLE)

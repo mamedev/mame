@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "mamecore.h"
+#include "emucore.h"
 #include "attotime.h"
 #include "eminline.h"
 

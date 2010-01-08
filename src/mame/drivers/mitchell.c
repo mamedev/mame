@@ -2189,7 +2189,7 @@ static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
 	int len = memory_region_length(machine, "maincpu");
-	UINT8* source = alloc_array_or_die(UINT8, len);
+	UINT8* source = auto_alloc_array(machine, UINT8, len);
 	UINT8* dst = memory_region(machine, "maincpu") ;
 	int x;
 
@@ -2226,7 +2226,7 @@ static DRIVER_INIT( mstworld )
 			memcpy(&dst[((x / 2) * 0x4000) + 0x50000],&source[tablebank[x + 1] * 0x4000], 0x4000);
 		}
 	}
-	free(source);
+	auto_free(machine, source);
 
 	bootleg_decode(machine);
 	configure_banks(machine);

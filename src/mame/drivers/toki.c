@@ -726,7 +726,7 @@ ROM_END
 static DRIVER_INIT( toki )
 {
 	UINT8 *ROM = memory_region(machine, "oki");
-	UINT8 *buffer = alloc_array_or_die(UINT8, 0x20000);
+	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 	int i;
 
 	memcpy(buffer,ROM,0x20000);
@@ -735,7 +735,7 @@ static DRIVER_INIT( toki )
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
@@ -743,7 +743,7 @@ static DRIVER_INIT( toki )
 
 static DRIVER_INIT( tokib )
 {
-	UINT8 *temp = alloc_array_or_die(UINT8, 65536 * 2);
+	UINT8 *temp = auto_alloc_array(machine, UINT8, 65536 * 2);
 	int i, offs, len;
 	UINT8 *rom;
 
@@ -754,36 +754,36 @@ static DRIVER_INIT( tokib )
 		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-		len = memory_region_length(machine, "gfx3");
-		rom = memory_region(machine, "gfx3");
-		for (offs = 0; offs < len; offs += 0x20000)
+	len = memory_region_length(machine, "gfx3");
+	rom = memory_region(machine, "gfx3");
+	for (offs = 0; offs < len; offs += 0x20000)
+	{
+		UINT8 *base = &rom[offs];
+		memcpy (temp, base, 65536 * 2);
+		for (i = 0; i < 16; i++)
 		{
-			UINT8 *base = &rom[offs];
-			memcpy (temp, base, 65536 * 2);
-			for (i = 0; i < 16; i++)
-			{
-				memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-				memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-				memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-				memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
-			}
+			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
-		len = memory_region_length(machine, "gfx4");
-		rom = memory_region(machine, "gfx4");
-		for (offs = 0; offs < len; offs += 0x20000)
+	}
+	len = memory_region_length(machine, "gfx4");
+	rom = memory_region(machine, "gfx4");
+	for (offs = 0; offs < len; offs += 0x20000)
+	{
+		UINT8 *base = &rom[offs];
+		memcpy (temp, base, 65536 * 2);
+		for (i = 0; i < 16; i++)
 		{
-			UINT8 *base = &rom[offs];
-			memcpy (temp, base, 65536 * 2);
-			for (i = 0; i < 16; i++)
-			{
-				memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-				memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-				memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-				memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
-			}
+			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
+	}
 
-		free (temp);
+	auto_free (machine, temp);
 }
 
 static DRIVER_INIT(jujub)
@@ -822,7 +822,7 @@ static DRIVER_INIT(jujub)
 
 	{
 		UINT8 *ROM = memory_region(machine, "oki");
-		UINT8 *buffer = alloc_array_or_die(UINT8, 0x20000);
+		UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 		int i;
 
 		memcpy(buffer,ROM,0x20000);
@@ -831,7 +831,7 @@ static DRIVER_INIT(jujub)
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
 
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 }
 

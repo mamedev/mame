@@ -14,7 +14,7 @@
 #ifndef __DRAWGFX_H__
 #define __DRAWGFX_H__
 
-#include "mamecore.h"
+#include "emucore.h"
 
 
 
@@ -115,7 +115,7 @@ struct _gfx_layout
 };
 
 
-/* In mamecore.h: typedef struct _gfx_element gfx_element; */
+/* In emucore.h: typedef struct _gfx_element gfx_element; */
 struct _gfx_element
 {
 	UINT16			width;				/* current pixel width of each element (changeble with source clipping) */

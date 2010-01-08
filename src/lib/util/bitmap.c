@@ -39,11 +39,151 @@
 
 #include "bitmap.h"
 
+#ifdef __cplusplus
+#include <new>
+#endif
 
 
 /***************************************************************************
     BITMAP ALLOCATION/CONFIGURATION
 ***************************************************************************/
+
+#ifdef __cplusplus
+
+/*-------------------------------------------------
+    bitmap_t - basic constructor
+-------------------------------------------------*/
+
+bitmap_t::bitmap_t()
+{
+	/* initialize base fields by hand */
+	alloc = NULL;
+	base = NULL;
+	rowpixels = 0;
+	width = 0;
+	height = 0;
+	format = BITMAP_FORMAT_INVALID;
+	bpp = 0;
+	palette = NULL;
+	cliprect.min_x = cliprect.min_y = 0;
+	cliprect.max_x = cliprect.max_y = 0;
+}
+
+
+bitmap_t::bitmap_t(int _width, int _height, bitmap_format _format, int _xslop, int _yslop)
+{
+	/* initialize base fields by hand */
+	alloc = NULL;
+	base = NULL;
+	rowpixels = (_width + 2 * _xslop + 7) & ~7;
+	width = _width;
+	height = _height;
+	format = _format;
+	bpp = bitmap_format_to_bpp(_format);
+	palette = NULL;
+	cliprect.min_x = cliprect.min_y = 0;
+	cliprect.max_x = width - 1;
+	cliprect.max_y = height - 1;
+
+	/* fail if invalid format */
+	if (bpp == 0)
+		throw std::bad_alloc();
+
+	/* allocate memory for the bitmap itself */
+	size_t allocbytes = rowpixels * (height + 2 * _yslop) * bpp / 8;
+	alloc = malloc(allocbytes);
+	if (alloc == NULL)
+		throw std::bad_alloc();
+
+	/* clear to 0 by default */
+	memset(alloc, 0, allocbytes);
+
+	/* compute the base */
+	base = (UINT8 *)alloc + (rowpixels * _yslop + _xslop) * (bpp / 8);
+}
+
+
+bitmap_t::bitmap_t(void *_base, int _width, int _height, int _rowpixels, bitmap_format _format)
+{
+	/* initialize base fields by hand */
+	alloc = NULL;
+	base = _base;
+	rowpixels = _rowpixels;
+	width = _width;
+	height = _height;
+	format = _format;
+	bpp = bitmap_format_to_bpp(_format);
+	palette = NULL;
+	cliprect.min_x = cliprect.min_y = 0;
+	cliprect.max_x = width - 1;
+	cliprect.max_y = height - 1;
+
+	/* fail if invalid format */
+	if (bpp == 0)
+		throw std::bad_alloc();
+}
+
+
+/*-------------------------------------------------
+    ~bitmap_t - basic destructor
+-------------------------------------------------*/
+
+bitmap_t::~bitmap_t()
+{
+	/* dereference the palette */
+	if (palette != NULL)
+		palette_deref(palette);
+
+	/* free any allocated memory */
+	if (alloc != NULL)
+		free(alloc);
+}
+
+
+/*-------------------------------------------------
+    bitmap_alloc -- allocate memory for a new
+    bitmap of the given format
+-------------------------------------------------*/
+
+bitmap_t *bitmap_alloc(int width, int height, bitmap_format format)
+{
+	return new bitmap_t(width, height, format);
+}
+
+
+/*-------------------------------------------------
+    bitmap_alloc_slop -- allocate a new bitmap with
+    additional slop on the borders
+-------------------------------------------------*/
+
+bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_format format)
+{
+	return new bitmap_t(width, height, format, xslop, yslop);
+}
+
+
+/*-------------------------------------------------
+    bitmap_wrap -- wrap an existing memory buffer
+    as a bitmap
+-------------------------------------------------*/
+
+bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_format format)
+{
+	return new bitmap_t(base, width, height, rowpixels, format);
+}
+
+
+/*-------------------------------------------------
+    bitmap_free -- release memory allocated for
+    a bitmap
+-------------------------------------------------*/
+
+void bitmap_free(bitmap_t *bitmap)
+{
+	delete bitmap;
+}
+
+#else
 
 /*-------------------------------------------------
     bitmap_alloc -- allocate memory for a new
@@ -146,6 +286,51 @@ bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_f
 
 
 /*-------------------------------------------------
+    bitmap_free -- release memory allocated for
+    a bitmap
+-------------------------------------------------*/
+
+void bitmap_free(bitmap_t *bitmap)
+{
+	/* dereference the palette */
+	if (bitmap->palette != NULL)
+		palette_deref(bitmap->palette);
+
+	/* free any allocated memory */
+	if (bitmap->alloc != NULL)
+		free(bitmap->alloc);
+
+	/* free the bitmap */
+	free(bitmap);
+}
+
+#endif
+
+
+/*-------------------------------------------------
+    bitmap_clone_existing -- clone an existing 
+    bitmap by copying its fields; the target 
+    bitmap does not own the memory
+-------------------------------------------------*/
+
+void bitmap_clone_existing(bitmap_t *bitmap, const bitmap_t *srcbitmap)
+{
+	if (bitmap->alloc != NULL)
+		free(bitmap->alloc);
+	bitmap->alloc = NULL;
+	
+	bitmap->base = srcbitmap->base;
+	bitmap->rowpixels = srcbitmap->rowpixels;
+	bitmap->width = srcbitmap->width;
+	bitmap->height = srcbitmap->height;
+	bitmap->format = srcbitmap->format;
+	bitmap->bpp = srcbitmap->bpp;
+	bitmap->palette = srcbitmap->palette;
+	bitmap->cliprect = srcbitmap->cliprect;
+}
+
+
+/*-------------------------------------------------
     bitmap_set_palette -- associate a palette with
     a bitmap
 -------------------------------------------------*/
@@ -165,26 +350,6 @@ void bitmap_set_palette(bitmap_t *bitmap, palette_t *palette)
 		palette_ref(palette);
 		bitmap->palette = palette;
 	}
-}
-
-
-/*-------------------------------------------------
-    bitmap_free -- release memory allocated for
-    a bitmap
--------------------------------------------------*/
-
-void bitmap_free(bitmap_t *bitmap)
-{
-	/* dereference the palette */
-	if (bitmap->palette != NULL)
-		palette_deref(bitmap->palette);
-
-	/* free any allocated memory */
-	if (bitmap->alloc != NULL)
-		free(bitmap->alloc);
-
-	/* free the bitmap */
-	free(bitmap);
 }
 
 

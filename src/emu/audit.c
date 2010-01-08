@@ -88,7 +88,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 	if (records > 0)
 	{
 		/* allocate memory for the records */
-		*audit = alloc_array_clear_or_die(audit_record, records);
+		*audit = global_alloc_array_clear(audit_record, records);
 		record = *audit;
 
 		/* iterate over ROM sources and regions */
@@ -129,7 +129,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 	/* if we found nothing, we don't have the set at all */
 	if (!anyfound && anyrequired)
 	{
-		free(*audit);
+		global_free(*audit);
 		*audit = NULL;
 		records = 0;
 	}
@@ -172,7 +172,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 		goto skip;
 
 	/* allocate memory for the records */
-	*audit = alloc_array_clear_or_die(audit_record, records);
+	*audit = global_alloc_array_clear(audit_record, records);
 	record = *audit;
 
 	/* now iterate over sample entries */

@@ -227,7 +227,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 	gfx_element *gfx;
 
 	/* allocate memory for the gfx_element structure */
-	gfx = alloc_clear_or_die(gfx_element);
+	gfx = auto_alloc_clear(machine, gfx_element);
 
 	/* fill in the data */
 	gfx->width = width;
@@ -256,7 +256,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		}
 		else
 		{
-			UINT32 *buffer = alloc_array_or_die(UINT32, gfx->layout.width);
+			UINT32 *buffer = auto_alloc_array(machine, UINT32, gfx->layout.width);
 			memcpy(buffer, gfx->layout.extxoffs, sizeof(gfx->layout.extxoffs[0]) * gfx->layout.width);
 			gfx->layout.extxoffs = buffer;
 		}
@@ -271,7 +271,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		}
 		else
 		{
-			UINT32 *buffer = alloc_array_or_die(UINT32, gfx->layout.height);
+			UINT32 *buffer = auto_alloc_array(machine, UINT32, gfx->layout.height);
 			memcpy(buffer, gfx->layout.extyoffs, sizeof(gfx->layout.extyoffs[0]) * gfx->layout.height);
 			gfx->layout.extyoffs = buffer;
 		}
@@ -279,10 +279,10 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 
 	/* allocate a pen usage array for entries with 32 pens or less */
 	if (gfx->color_depth <= 32)
-		gfx->pen_usage = alloc_array_or_die(UINT32, gfx->total_elements);
+		gfx->pen_usage = auto_alloc_array(machine, UINT32, gfx->total_elements);
 
 	/* allocate a dirty array */
-	gfx->dirty = alloc_array_or_die(UINT8, gfx->total_elements);
+	gfx->dirty = auto_alloc_array(machine, UINT8, gfx->total_elements);
 	memset(gfx->dirty, 1, gfx->total_elements * sizeof(*gfx->dirty));
 
 	/* raw graphics case */
@@ -309,7 +309,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		gfx->char_modulo = gfx->line_modulo * gfx->origheight;
 
 		/* allocate memory for the data */
-		gfx->gfxdata = alloc_array_or_die(UINT8, gfx->total_elements * gfx->char_modulo);
+		gfx->gfxdata = auto_alloc_array(machine, UINT8, gfx->total_elements * gfx->char_modulo);
 	}
 
 	return gfx;
@@ -338,17 +338,12 @@ void gfx_element_free(gfx_element *gfx)
 		return;
 
 	/* free our data */
-	if (gfx->layout.extyoffs != NULL)
-		free((void *)gfx->layout.extyoffs);
-	if (gfx->layout.extxoffs != NULL)
-		free((void *)gfx->layout.extxoffs);
-	if (gfx->pen_usage != NULL)
-		free(gfx->pen_usage);
-	if (gfx->dirty != NULL)
-		free(gfx->dirty);
-	if (!(gfx->flags & GFX_ELEMENT_DONT_FREE))
-		free(gfx->gfxdata);
-	free(gfx);
+	auto_free(gfx->machine, gfx->layout.extyoffs);
+	auto_free(gfx->machine, gfx->layout.extxoffs);
+	auto_free(gfx->machine, gfx->pen_usage);
+	auto_free(gfx->machine, gfx->dirty);
+	auto_free(gfx->machine, gfx->gfxdata);
+	auto_free(gfx->machine, gfx);
 }
 
 

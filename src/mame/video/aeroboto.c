@@ -60,13 +60,13 @@ VIDEO_START( aeroboto )
 		UINT8 *temp;
 		int i;
 
-		temp = alloc_array_or_die(UINT8, state->stars_length);
+		temp = auto_alloc_array(machine, UINT8, state->stars_length);
 		memcpy(temp, state->stars_rom, state->stars_length);
 
 		for (i = 0; i < state->stars_length; i++)
 			state->stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
 
-		free(temp);
+		auto_free(machine, temp);
 	}
 	#endif
 }

@@ -345,13 +345,13 @@ static DRIVER_INIT( silkroad )
 
 	src += tileoffset; len -=tileoffset;
 
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i-1];
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 }
 

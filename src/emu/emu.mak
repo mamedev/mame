@@ -48,6 +48,8 @@ EMUOBJS = \
 	$(EMUOBJ)/devintrf.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
+	$(EMUOBJ)/emualloc.o \
+	$(EMUOBJ)/emucore.o \
 	$(EMUOBJ)/emuopts.o \
 	$(EMUOBJ)/emupal.o \
 	$(EMUOBJ)/fileio.o \
@@ -57,7 +59,6 @@ EMUOBJS = \
 	$(EMUOBJ)/inputseq.o \
 	$(EMUOBJ)/inptport.o \
 	$(EMUOBJ)/mame.o \
-	$(EMUOBJ)/mamecore.o \
 	$(EMUOBJ)/mconfig.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/output.o \
@@ -65,7 +66,6 @@ EMUOBJS = \
 	$(EMUOBJ)/rendfont.o \
 	$(EMUOBJ)/rendlay.o \
 	$(EMUOBJ)/rendutil.o \
-	$(EMUOBJ)/restrack.o \
 	$(EMUOBJ)/romload.o \
 	$(EMUOBJ)/sound.o \
 	$(EMUOBJ)/state.o \
