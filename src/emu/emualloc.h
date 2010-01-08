@@ -154,10 +154,10 @@ private:
 #undef realloc
 #undef free
 
-#define malloc(x)		__error_use_auto_alloc_or_global_alloc_instead__
+#define malloc(x)		malloc_file_line(x, __FILE__, __LINE__)
 #define calloc(x,y)		__error_use_auto_alloc_clear_or_global_alloc_clear_instead__
 #define realloc(x,y)	__error_realloc_is_dangerous__
-#define free(x)			__error_use_auto_free_or_global_free_instead__
+#define free(x)			free_file_line(x, __FILE__, __LINE__)
 
 // pool allocation helpers
 #define pool_alloc(_pool, _type)					(_pool).add_object(new(__FILE__, __LINE__) _type)
