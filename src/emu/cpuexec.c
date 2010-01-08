@@ -1848,7 +1848,7 @@ static void get_register_string_value(const device_config *device, void *baseptr
 					*dest++ = ' ';
 					width--;
 				}
-				for (digitnum = ARRAY_LENGTH(decdivisor); digitnum >= 0; digitnum--)
+				for (digitnum = ARRAY_LENGTH(decdivisor) - 1; digitnum >= 0; digitnum--)
 				{
 					int digit = (result >= decdivisor[digitnum]) ? (result / decdivisor[digitnum]) % 10 : 0;
 					if (digit != 0)
