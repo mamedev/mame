@@ -9,4 +9,6 @@ struct _metalmx_state
 
 	UINT16				*gsp_dram;
 	UINT16				*gsp_vram;
+
+	UINT32				*adsp_internal_program_ram;
 };

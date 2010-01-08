@@ -238,9 +238,18 @@ Logic:
     Network:      ADSP-2105
     2D Engine:    TMS34020
     3D Math:      2 x DSP32C
-    Sound (CAGE): TMS320C31 (unused)
+    Sound (CAGE): TMS320C31
 
-    Further machines can be linked together.
+    Two cabinets can be linked together to support 4 players.
+
+    Interrupts:
+    IRQ2 = ?
+    IRQ3 = ?
+    IRQ4 = TMS34020
+    IRQ5 = Network
+    IRQ6 = Timer
+
+   2/3 are either CAGE or the Mathbox CPUs
 
 ***************************************************************************/
 
@@ -249,6 +258,7 @@ Logic:
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/dsp32/dsp32.h"
+#include "audio/cage.h"
 #include "includes/metalmx.h"
 
 
@@ -303,7 +313,7 @@ static VIDEO_UPDATE( metalmx )
 
 static READ32_HANDLER( unk_r )
 {
-	return mame_rand(space->machine);
+	return 0;//mame_rand(space->machine);
 }
 
 static READ32_HANDLER( watchdog_r )
@@ -333,6 +343,36 @@ static WRITE32_HANDLER( reset_w )
 	}
 }
 
+
+/*************************************
+ *
+ *  Sound I/O
+ *
+ *************************************/
+
+static READ32_HANDLER( sound_data_r )
+{
+	UINT32 result = 0;
+
+	if (ACCESSING_BITS_0_15)
+		result |= cage_control_r();
+	if (ACCESSING_BITS_16_31)
+		result |= main_from_cage_r(space) << 16;
+	return result;
+}
+
+static WRITE32_HANDLER( sound_data_w )
+{
+	if (ACCESSING_BITS_0_15)
+		cage_control_w(space->machine, data);
+	if (ACCESSING_BITS_16_31)
+		main_to_cage_w(data >> 16);
+}
+
+static void cage_irq_callback(running_machine *machine, int reason)
+{
+	/* TODO */
+}
 
 /*************************************
  *
@@ -470,6 +510,21 @@ static void tms_interrupt(const device_config *device, int state)
 }
 
 
+static WRITE32_HANDLER( timer_w )
+{
+	// Offsets
+	// 9000 with 1 changes to external clock source
+	// 1000 with 1 changes to link clock
+	// 8000 with 1 changes to 4ms clock rate
+	// 0000 with 1 changes to 1ms clock rate
+	// a000 with 1 changes to 4ms counter rate
+	// 2000 with 1 changes to 1ms counter rate
+	// 3000  ?
+	// b000  ?
+	// f08000 with 1 resets
+}
+
+
 /*************************************
  *
  *  Main 68EC020 Memory Map
@@ -486,10 +541,17 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x800000, 0x85ffff) AM_NOP			/* Unknown */
 	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
 	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
+	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)
+	AM_RANGE(0xf00000, 0xf00003) AM_RAM			/* Network message port */
 	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
 	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE(motor_w)
 	AM_RANGE(0xf04000, 0xf04003) AM_READ_PORT("P2")
-	AM_RANGE(0xf1e000, 0xf1e003) AM_READ(unk_r)	/* Network status? */
+	AM_RANGE(0xf05000, 0xf05fff) AM_WRITENOP	/* Lamps */ // f06000 = ADC  // f01xxx = ADC
+	AM_RANGE(0xf19000, 0xf19003) AM_WRITENOP	/* Network */
+	AM_RANGE(0xf1a000, 0xf1a003) AM_WRITENOP
+	AM_RANGE(0xf1b000, 0xf1b003) AM_WRITENOP
+	AM_RANGE(0xf1e000, 0xf1e003) AM_RAM			/* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
+	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE(timer_w)
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM			/* Zero power RAM */
 	AM_RANGE(0xfd0000, 0xffffff) AM_RAM			/* Scratch RAM */
 ADDRESS_MAP_END
@@ -502,11 +564,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( adsp_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(metalmx_state, adsp_internal_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, ADDRESS_SPACE_DATA, 16 )
-
+	AM_RANGE(0x3800, 0x39ff) AM_RAM
+	AM_RANGE(0x2000, 0x2007) AM_RAM
+	AM_RANGE(0x3fe0, 0x3fff) AM_RAM // TODO: CPU control registers
 ADDRESS_MAP_END
 
 
@@ -535,7 +599,11 @@ static ADDRESS_MAP_START( dsp32c_1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM		/* TODO: 3D registers here? */
+	AM_RANGE(0x700000, 0x700003) AM_WRITENOP	/* LEDs? */
+	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
+	AM_RANGE(0xc00000, 0xc00003) AM_RAM			/* FIFO? */
+	AM_RANGE(0xf00000, 0xffffff) AM_RAM			/* 3D registers */
 ADDRESS_MAP_END
 
 /*************************************
@@ -548,7 +616,11 @@ static ADDRESS_MAP_START( dsp32c_2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
+	AM_RANGE(0x700000, 0x700003) AM_WRITENOP	/* LEDs? */
+	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
+	AM_RANGE(0xc00000, 0xc00003) AM_RAM			/* FIFO? */
+	AM_RANGE(0xf00000, 0xffffff) AM_RAM			/* 3D registers */
 ADDRESS_MAP_END
 
 
@@ -560,104 +632,76 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( metalmx )
 	PORT_START("P1")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	/* COINS */
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_TOGGLE
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	/* AUX */
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 )		// FIRE
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 )		// VIEW
-
-	PORT_DIPNAME( 0x00000001, 0x00000001, "BIT 0")
-	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000002, 0x00000002, "BIT 1")
-	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000004, 0x00000004, "BIT 2")
-	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000008, 0x00000008, "BIT 3")
-	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000010, 0x00000010, "BIT 4")
-	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000020, 0x00000020, "BIT 5")
-	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000040, 0x00000040, "BIT 6")
-	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000080, 0x00000080, "BIT 7")
-	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-
-	PORT_DIPNAME( 0x00000100, 0x00000100, "BIT 8")
-	PORT_DIPSETTING(          0x00000100, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000200, 0x00000200, "BIT 9")
-	PORT_DIPSETTING(          0x00000200, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000400, 0x00000400, "BIT 10")
-	PORT_DIPSETTING(          0x00000400, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000800, 0x00000800, "BIT 11")
-	PORT_DIPSETTING(          0x00000800, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00001000, 0x00001000, "BIT 12")
-	PORT_DIPSETTING(          0x00001000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00002000, 0x00002000, "BIT 13")
-	PORT_DIPSETTING(          0x00002000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00004000, 0x00004000, "BIT 14")
-	PORT_DIPSETTING(          0x00004000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00008000, 0x00008000, "BIT 15")
-	PORT_DIPSETTING(          0x00008000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00010000, 0x00010000, "BIT 16 (Gear)")
-	PORT_DIPSETTING(          0x00010000, "Reverse!")
-	PORT_DIPSETTING(          0x00000000, "Forward")
-	PORT_DIPNAME( 0x00080000, 0x00080000, "BIT 19")
-	PORT_DIPSETTING(          0x00080000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00100000, 0x00100000, "BIT 20")
-	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00200000, 0x00200000, "BIT 21")
-	PORT_DIPSETTING(          0x00200000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00400000, 0x00400000, "BIT 22")
-	PORT_DIPSETTING(          0x00400000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00800000, 0x00800000, "BIT 23")
-	PORT_DIPSETTING(          0x00800000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-
-	PORT_DIPNAME( 0x01000000, 0x01000000, "BIT 24")
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, "BIT 25")
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x04000000, 0x04000000, "BIT 26")
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x08000000, 0x08000000, "BIT 27")
-	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x10000000, 0x10000000, "BIT 28")
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x20000000, 0x20000000, "BIT 29")
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x40000000, 0x40000000, "BIT 30")
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x80000000, 0x80000000, "BIT 31")
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Fire")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -734,13 +778,13 @@ static MACHINE_DRIVER_START( metalmx )
 	MDRV_VIDEO_START(metalmx)
 	MDRV_VIDEO_UPDATE(metalmx)
 
-	/* CAGE audio board has no ROM data */
-//	MDRV_IMPORT_FROM(cage)
+	MDRV_IMPORT_FROM(cage)
 MACHINE_DRIVER_END
 
 
 static DRIVER_INIT( metalmx )
 {
+	UINT8 *adsp_boot = (UINT8*)memory_region(machine, "adsp");
 	metalmx_state *state = (metalmx_state *)machine->driver_data;
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
@@ -748,13 +792,17 @@ static DRIVER_INIT( metalmx )
 	state->gsp = devtag_get_device(machine, "gsp");
 	state->dsp32c_1 = devtag_get_device(machine, "dsp32c_1");
 	state->dsp32c_2 = devtag_get_device(machine, "dsp32c_2");
+
+	adsp2105_load_boot_data(adsp_boot, state->adsp_internal_program_ram);
+
+	cage_init(machine, 0); // TODO: speedup address
+	cage_set_irq_handler(cage_irq_callback);
 }
 
 static MACHINE_RESET( metalmx )
 {
 	metalmx_state *state = (metalmx_state *)machine->driver_data;
 
-	cpu_set_input_line(state->adsp, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -767,14 +815,34 @@ static MACHINE_RESET( metalmx )
  *************************************/
 
 ROM_START( metalmx )
-	/* ----------------------------------------
-       Layer 1 (there are 2 of these boards)
-    ---------------------------------------- */
 
-	ROM_REGION( 0x80000, "boot", 0 )
-	ROM_LOAD( "bootmetl.r34", 0x00000, 0x80000, CRC(ec799644) SHA1(32c77abb70fee1da8e3d7141bce2032e73e0eb35) )
+/* ------------------------------------------------
+    MCUBE A052137 (there are 2 of these boards)
+-------------------------------------------------*/
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "st665e.0",  0x000000, 0x80000, CRC(b2a90fd0) SHA1(ae483ab0aa68493904ea8d1906e22fdaa16a8a27) )
+	ROM_LOAD32_BYTE( "st665e.1",  0x000001, 0x80000, CRC(559fecb7) SHA1(092e7e358d02f179a59849db0cafad0b4a95c0ed) )
+	ROM_LOAD32_BYTE( "st665e.2",  0x000002, 0x80000, CRC(ee64b773) SHA1(8b1f51450804f16e73045ac9198daa7bd92d993b) )
+	ROM_LOAD32_BYTE( "st665e.3",  0x000003, 0x80000, CRC(42b78cde) SHA1(a441fcd1cd34e1a8234be44ab33e56fbb73bac79) )
 
-	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD32_BYTE( "tgs665e.0", 0x200000, 0x80000, CRC(2a4102f1) SHA1(2d21956b27cc9ac3d418f4595c1b8aa08a0298f6) )
+	ROM_LOAD32_BYTE( "tgs665e.1", 0x200001, 0x80000, CRC(7d0eff8f) SHA1(c815cfa55619c3363c86c843047fe8487daaa6c1) )
+	ROM_LOAD32_BYTE( "tgs665e.2", 0x200002, 0x80000, CRC(3f965f1a) SHA1(7333e1cd5a9428d78236a5532b6a60203fd1485b) )
+	ROM_LOAD32_BYTE( "tgs665e.3", 0x200003, 0x80000, CRC(bb0ea984) SHA1(92a273675b32a2e1782012d49a404c9e8658eb2d) )
+
+	ROM_REGION( 0x10000, "adsp", 0 )
+	ROM_LOAD( "103-2308.bin", 0x00000, 0x10000, CRC(af1781d0) SHA1(f3f69e2fd83a949b447b71410ba9e165229e5aad) )
+
+	ROM_REGION( 0x80000, "mcube_pals", 0 )
+	ROM_LOAD( "103-1300.bin",  0x000, 0x157, CRC(eec18a29) SHA1(cc41cc921f59d385df805217f3b09bc289379f79) )
+
+/* ------------------------------------------------
+    ROMCH31 A053443 (there are 2 of these boards)
+-------------------------------------------------*/
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )
+	ROM_LOAD32_BYTE( "bootmetl.r34", 0x00000, 0x80000, CRC(ec799644) SHA1(32c77abb70fee1da8e3d7141bce2032e73e0eb35) )
+
+	ROM_REGION32_LE( 0x80000, "cage", 0 )
 	ROM_LOAD( "datametl.0", 0x00000, 0x80000, CRC(004dc445) SHA1(e52e539cc38afa917d1c769f9ad1794f4bd833b2) )
 	ROM_LOAD( "datametl.1", 0x00000, 0x80000, CRC(e0465fc5) SHA1(cd8584e48b6cf33bc103cdfdb68d32eef3f2bec5) )
 	ROM_LOAD( "datametl.2", 0x00000, 0x80000, CRC(2fb4b470) SHA1(b5ec1f9579200684cfd7e46c7774687df9330e19) )
@@ -792,54 +860,30 @@ ROM_START( metalmx )
 	ROM_LOAD( "datametl.14",0x00000, 0x80000, CRC(709df01f) SHA1(639d8d4cf79ae7e0406d11ed1c475986f3e595f6) )
 	ROM_LOAD( "datametl.15",0x00000, 0x80000, CRC(c55dbfbf) SHA1(63de1b24f5024e94601bcdffa7a3e418a195342f) )
 
-	ROM_REGION( 0x80000, "palslayer1", 0 )
+	ROM_REGION( 0x80000, "cage_rom_pals", 0 )
 	ROM_LOAD( "103-1500.bin",  0x000, 0x117, CRC(9883af90) SHA1(62b4a0cce5832628149c48e6810055ad3919cc5b) )
 
-	/* ----------------------------------------
-       Layer 2 (there are 2 of these boards)
-    ---------------------------------------- */
-
-	ROM_REGION( 0x80000, "palslayer2", 0 )
+/* ------------------------------------------------
+    CH31.2 A053304 (there are 2 of these boards)
+-------------------------------------------------*/
+	ROM_REGION( 0x80000, "cage_pals", 0 )
 	ROM_LOAD( "dsp.bin",   0x000, 0x117, CRC(321b5250) SHA1(8d9c2ed9b0375c4624ea3efa80ba0a78135b756c) )
 	ROM_LOAD( "irq2q.bin", 0x000, 0x117, CRC(983cb6e1) SHA1(0222fd2b79691b3b249f6b353f5687be83e291a7) )
 	ROM_LOAD( "xdec.bin",  0x000, 0x117, CRC(fcb37143) SHA1(c95a6714f151868d42722684c8b67e9356f70544) )
 
-	/* ----------------------------------------
-       Layer 3 (there are 2 of these boards)
-    ---------------------------------------- */
-
-	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68020 code */
-	ROM_LOAD32_BYTE( "st665e.0",  0x000000, 0x80000, CRC(b2a90fd0) SHA1(ae483ab0aa68493904ea8d1906e22fdaa16a8a27) )
-	ROM_LOAD32_BYTE( "st665e.1",  0x000001, 0x80000, CRC(559fecb7) SHA1(092e7e358d02f179a59849db0cafad0b4a95c0ed) )
-	ROM_LOAD32_BYTE( "st665e.2",  0x000002, 0x80000, CRC(ee64b773) SHA1(8b1f51450804f16e73045ac9198daa7bd92d993b) )
-	ROM_LOAD32_BYTE( "st665e.3",  0x000003, 0x80000, CRC(42b78cde) SHA1(a441fcd1cd34e1a8234be44ab33e56fbb73bac79) )
-
-	ROM_LOAD32_BYTE( "tgs665e.0", 0x200000, 0x80000, CRC(2a4102f1) SHA1(2d21956b27cc9ac3d418f4595c1b8aa08a0298f6) )
-	ROM_LOAD32_BYTE( "tgs665e.1", 0x200001, 0x80000, CRC(7d0eff8f) SHA1(c815cfa55619c3363c86c843047fe8487daaa6c1) )
-	ROM_LOAD32_BYTE( "tgs665e.2", 0x200002, 0x80000, CRC(3f965f1a) SHA1(7333e1cd5a9428d78236a5532b6a60203fd1485b) )
-	ROM_LOAD32_BYTE( "tgs665e.3", 0x200003, 0x80000, CRC(bb0ea984) SHA1(92a273675b32a2e1782012d49a404c9e8658eb2d) )
-
-	ROM_REGION( 0x80000, "103_2308", 0 )
-	ROM_LOAD( "103-2308.bin", 0x00000, 0x10000, CRC(af1781d0) SHA1(f3f69e2fd83a949b447b71410ba9e165229e5aad) )
-
-	ROM_REGION( 0x80000, "palslayer3", 0 )
-	ROM_LOAD( "103-1300.bin",  0x000, 0x157, CRC(eec18a29) SHA1(cc41cc921f59d385df805217f3b09bc289379f79) )
-
-	/* ----------------------------
-       Layer 4
-    ---------------------------- */
-
-	ROM_REGION( 0x80000, "palslayer4", 0 )
+/* ------------------------------------------------
+    TGSMATH A052043
+-------------------------------------------------*/
+	ROM_REGION( 0x80000, "tgsmath_pals", 0 )
 	ROM_LOAD( "103-1200.bin",  0x000, 0x2e5, CRC(cf1d4df4) SHA1(2ae592df2f16af070620766b7ebf60918c7f725d) )
 	ROM_LOAD( "103-1202.bin",  0x000, 0x2e5, CRC(dab3b17f) SHA1(ac825063a293a32ae6ba5cbf5cfb52aa4aea62c9) )
 	ROM_LOAD( "103-1204.bin",  0x000, 0x2e5, CRC(bb675ce0) SHA1(e3b188ebfe13e826e3d14c1cc456810d85750314) )
 	ROM_LOAD( "103-1217.bin",  0x000, 0x157, CRC(a6418db0) SHA1(5b23fcb6123f0402f7483ffd38625846b0432efa) )
 	ROM_LOAD( "103-1219.bin",  0x000, 0x117, CRC(bf08d1e8) SHA1(5710cbc941830594087320ed2b22bcbb2b5c48de) )
 
-	/* ----------------------------
-       Layer 5
-    ---------------------------- */
-
+/* ------------------------------------------------
+    TGS A051985
+-------------------------------------------------*/
 	ROM_REGION( 0x100000, "tex", 0 )
 	ROM_LOAD16_BYTE( "tex0h.bin", 0x00001, 0x80000, CRC(b4dc459e) SHA1(cd2c6616951bdedeb5bb0c81179b4eee42ed5148) )
 	ROM_LOAD16_BYTE( "tex0l.bin", 0x00000, 0x80000, CRC(370f9dca) SHA1(e26633f0f78f821fc59d8070ad927507f33d04d2) )
@@ -863,7 +907,7 @@ ROM_START( metalmx )
 	ROM_LOAD( "green.bpr", 0x000, 0x200, CRC(a80fd47d) SHA1(5bdffe022cbe2527c89c17f37e90e7e49c48be99) )
 	ROM_LOAD( "red.bpr",   0x000, 0x200, CRC(bc8a3266) SHA1(87f98ea3657ae08ae80282c7940f00f31a407035) )
 
-	ROM_REGION( 0x80000, "palslayer5", 0 )
+	ROM_REGION( 0x80000, "tgs_pals", 0 )
 	ROM_LOAD( "103-1106.bin",  0x000, 0x2e5, CRC(fd8a872e) SHA1(03f4033d77617d2c372f4656cb1cdb6ea6bd20d6) )
 	ROM_LOAD( "103-1107.bin",  0x000, 0x2e5, CRC(c16e71fe) SHA1(6d1e9fa1894778381bb6b8954023e4d1816241bb) )
 	ROM_LOAD( "103-1108.bin",  0x000, 0x2e5, CRC(b3680191) SHA1(36d006ca6bff5592a84fba812df43f2f5ddfe927) )
