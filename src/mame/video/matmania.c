@@ -155,7 +155,7 @@ VIDEO_UPDATE( matmania )
 		sy = offs % 32;
 
 		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
-				matmania_videoram3[offs] + ((matmania_colorram[offs] & 0x08) << 5),
+				matmania_videoram[offs] + ((matmania_colorram[offs] & 0x08) << 5),
 				(matmania_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
