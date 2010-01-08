@@ -151,7 +151,7 @@ void free_file_line(void *memory, const char *file, int line)
 	// warn about untracked frees
 	if (entry == NULL)
 	{
-		fprintf(stderr, "Error: attempt to free untracked memory!\n");
+		fprintf(stderr, "Error: attempt to free untracked memory in %s(%d)!\n", file, line);
 		osd_break_into_debugger("Error: attempt to free untracked memory");
 		return;
 	}
