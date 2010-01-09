@@ -8877,6 +8877,7 @@ Other Sun games
 	DRIVER( botss )		/* (c) 1992 Microprose Games Inc. */
 	DRIVER( stankatk )	/* (c) 1992 Microprose Games Inc. */
 	DRIVER( dynadice )	/* ? */
+	DRIVER( atamanot )	/* (c) 1983 Yachiyo Denki / Uni Enterprize */
 	DRIVER( ssingles )	/* Yachiyo? */
 	DRIVER( tcl )		/* (c) 1995 Uniwang */
 	DRIVER( othello )	/* (c) 1984 Success */

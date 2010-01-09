@@ -19,6 +19,127 @@
  - i/o port $8 = data read used for  $e command arg for one of AY chips (volume? - could be a sample player (based on volume changes?)
  - i/o port $1a = 1 or 0, rarely accessed, related to crt  writes
 
+==================================================================
+
+Computer Quiz Atama no Taisou
+(c)1983 Yachiyo Denki / Uni Enterprize
+
+-----------------------------------------
+TZU-093
+CPU: Z80(IC9) surface scrached Z80?(IC28)
+Sound: AY-3-8910 x2
+OSC: 14.000MHz
+RAMs:
+IC5 (probably 6116)
+IC4 (probably 6116)
+IC45 (probably 6116)
+IC44 (probably 6116)
+
+M5L5101LP-1(IC19,20,21,22)
+-----------------------------------------
+ROMs:
+TT1.2        [da9e270d] (2764)
+TT2.3        [7595ade8] /
+
+CA.49        [28d20b52] (2764)
+CC.48        [209cab0d]  |
+CB.47        [8bc85c0c]  |
+CD.46        [22e8d103] /
+
+IC36.BIN     [643e3077] (surface scrached, 27C256)
+IC35.BIN     [fe0302a0]  |
+IC34.BIN     [06e7c7da]  |
+IC33.BIN     [323a70e7] /
+
+color PROMs:
+1.52         [13f5762b] (82S129)
+2.53         [4142f525]  |
+3.54         [88acb21e] /
+
+
+-----------------------------------------
+Sub board
+CQM-082-M
+RAM:
+HM6116LP-3
+Other:
+Battery
+8-position DIPSW
+-----------------------------------------
+ROMs:
+TA.BIN       [5c61edaf] (2764)
+TB.BIN       [07bd2e6f]  |
+TC.BIN       [1e09ac09]  |
+TD.BIN       [bd514d51]  |
+TE.BIN       [825ed49f]  |
+TF.BIN       [d92b5eb9]  |
+TG.BIN       [eb25aa72]  |
+TH.BIN       [13396cfb] /
+
+TI.BIN       [60193df3] (2764)
+J.BIN        [cd16ddbf]  |
+K.BIN        [c75c7a1e]  |
+L.BIN        [dbb4ed60] /
+
+
+/////////////////////////////////////////
+DIPSW
+1: off
+2: off
+3: coinage
+    on: 1coin 2credits
+   off: 1coin 1credit
+4: Note
+    on: show notes
+   off: game
+5: Test mode
+    on: test
+   off: game
+6: Attract sound
+    on: no
+   off: yes
+7-8: Timer setting
+   off-off: quickest
+    on-off: quick
+   off- on: slow
+    on- on: slowest
+(default settings: all off)
+
+
+wiring
+GND(sw)   A01|B01 GND(speaker)
+GND(power)A02|B02 GND(power)
++5V       A03|B03 +5V
+--------  A04|B04 +5V(coin counter)
++12V      A05|B05 +12V
+--------  A06|B06 speaker
+
+    (A7-A15, B7-B15: NC)
+
+2P genre1 A16|B16 1P genre1
+2P genre2 A17|B17 1P genre2
+2P genre3 A18|B18 1P genre3
+2P genre4 A19|B19 1P genre4
+2P push A A20|B20 1P push A
+2P push B A21|B21 1P push B
+2P push C A22|B22 1P push C
+Flip/flop A23|B23 Flip/flop
+--------  A24|B24 --------
+GREEN     A25|B25 BLUE
+RED       A26|B26 SYNC
+GND       A27|B27 GND
+GND(video)A28|B28 coin sw
+
+
+/////////////////////////////////////////
+
+
+
+--- Team Japump!!! ---
+Dumped by Chack'n
+04/Nov/2009
+
+
 */
 
 #include "driver.h"
@@ -173,6 +294,18 @@ static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( atamanot_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
+	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+//	AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
+	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("question",0)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
@@ -286,6 +419,12 @@ static MACHINE_DRIVER_START( ssingles )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( atamanot )
+	MDRV_IMPORT_FROM( ssingles )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(atamanot_map)
+MACHINE_DRIVER_END
+
 ROM_START( ssingles )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "1.bin", 0x00000, 0x2000, CRC(43f02215) SHA1(9f04a7d4671ff39fd2bd8ec7afced4981ee7be05) )
@@ -307,6 +446,87 @@ ROM_START( ssingles )
 
 ROM_END
 
+/*
+atamanot kanji gfx decoding:
+
+static const gfx_layout layout_16x16 =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+	  RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+5, RGN_FRAC(1,4)+6, RGN_FRAC(1,4)+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+	  RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
+	8*8
+};
+
+
+static const gfx_layout layout_8x16 =
+{
+	8,16,
+	RGN_FRAC(1,2),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+	  RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
+	8*8
+};
+
+	GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
+	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
+	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
+
+It looks "stolen" from an unknown Japanese computer?
+*/
+
+ROM_START( atamanot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tt1.2",   0x0000, 0x2000, CRC(da9e270d) SHA1(b7408be913dad8abf022c6153f2493204dd74952) )
+	ROM_LOAD( "tt2.3",   0x8000, 0x2000, CRC(7595ade8) SHA1(71f9d6d987407f88cdd3b28bd1e35e00ac17e1f5) )
+
+	ROM_REGION( 0x18000, "question", 0 ) //question roms?
+	ROM_LOAD( "ta.bin",  0x00000, 0x2000, CRC(5c61edaf) SHA1(ea56df6b320aa7e52828aaccbb5838cd0c756f24) )
+	ROM_LOAD( "tb.bin",  0x02000, 0x2000, CRC(07bd2e6f) SHA1(bf245d8208db447572e484057b9daa6276f03683) )
+	ROM_LOAD( "tc.bin",  0x04000, 0x2000, CRC(1e09ac09) SHA1(91ec1b2c5767b5bad8915f7c9984f423fcb399c9) )
+	ROM_LOAD( "td.bin",  0x06000, 0x2000, CRC(bd514d51) SHA1(1a1e95558b2608f0103ca1b42fe9e59ccb90487f) )
+	ROM_LOAD( "te.bin",  0x08000, 0x2000, CRC(825ed49f) SHA1(775044f6d53ecbfa0ab604947a21e368bad85ce0) )
+	ROM_LOAD( "tf.bin",  0x0a000, 0x2000, CRC(d92b5eb9) SHA1(311fdefdc1f1026cb7f7cc1e1adaffbdbe7a70d9) )
+	ROM_LOAD( "tg.bin",  0x0c000, 0x2000, CRC(eb25aa72) SHA1(de3a3d87a2eb540b96947f776c321dc9a7c21e78) )
+	ROM_LOAD( "th.bin",  0x0e000, 0x2000, CRC(13396cfb) SHA1(d98ea4ff2e2175aa7003e37001664b3fa898c071) )
+	ROM_LOAD( "ti.bin",  0x10000, 0x2000, CRC(60193df3) SHA1(58840bde303a760a0458224983af0c0bbe939a2f) )
+	ROM_LOAD( "j.bin",   0x12000, 0x2000, CRC(cd16ddbf) SHA1(b418b5d73d3699697ebd42a6f4df598dcdcaf264) )
+	ROM_LOAD( "k.bin",   0x14000, 0x2000, CRC(c75c7a1e) SHA1(59b136626267fa3ba5a2e1709acb632142e1560e) )
+	ROM_LOAD( "l.bin",   0x16000, 0x2000, CRC(dbb4ed60) SHA1(b5054ba3ccd268594d22e1e67f70bb227095ca4c) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "ca.49",   0x0000, 0x2000, CRC(28d20b52) SHA1(a104ef1cd103f31803b88bd2d4804eab5a26e7fa) )
+	ROM_LOAD( "cb.47",   0x2000, 0x2000, CRC(8bc85c0c) SHA1(64701bc910c28666d15ee22f59f32888cc2302ae) )
+	ROM_LOAD( "cc.48",   0x4000, 0x2000, CRC(209cab0d) SHA1(9a89af1f7186e4845e43f9cdafd273e69d280bfb) )
+	ROM_LOAD( "cd.46",   0x6000, 0x2000, CRC(22e8d103) SHA1(f0146f7e192eef8d03404a9c5b8a9f9c9577d936) )
+
+	ROM_REGION( 0x20000, "kanji", 0 )
+	ROM_LOAD( "ic36.bin",   0x18000, 0x8000, CRC(643e3077) SHA1(fa81a3a3eebd59c6dc9c9b7eeb4a480bb1440c17) )
+	ROM_LOAD( "ic35.bin",   0x10000, 0x8000, CRC(fe0302a0) SHA1(f8d3a58da4e8dd09db240039f5216e7ebe9cc384) )
+	ROM_LOAD( "ic34.bin",   0x08000, 0x8000, CRC(06e7c7da) SHA1(a222c0b0eccfda613f916320e6afbb33385921ba) )
+	ROM_LOAD( "ic33.bin",   0x00000, 0x8000, CRC(323a70e7) SHA1(55e570f039c97d15b06bfcb1ebf03562cbcf8324) )
+
+	ROM_REGION( 0x10000, "kanji_uc", 0 ) //upper case
+	ROM_COPY( "kanji", 0x10000, 0x08000, 0x08000 )
+	ROM_COPY( "kanji", 0x00000, 0x00000, 0x08000 )
+
+	ROM_REGION( 0x10000, "kanji_lc", 0 ) //lower case
+	ROM_COPY( "kanji", 0x18000, 0x08000, 0x08000 )
+	ROM_COPY( "kanji", 0x08000, 0x00000, 0x08000 )
+
+	ROM_REGION( 0x0300,  "proms", 0 ) //NOT color proms
+	ROM_LOAD( "1.52",   0x00000, 0x0100, CRC(13f5762b) SHA1(da9cc51eda0681b0d3c17b212d23ab89af2813ff) )
+	ROM_LOAD( "2.53",   0x00100, 0x0100, CRC(4142f525) SHA1(2e2e896ba7b49df9cf3fddff6becc07a3d50d926) )
+	ROM_LOAD( "3.54",   0x00200, 0x0100, CRC(88acb21e) SHA1(18fe5280dad6687daf6bf42d37dde45157fab5e3) )
+ROM_END
+
 static DRIVER_INIT(ssingles)
 {
 	ssingles_videoram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);
@@ -315,4 +535,6 @@ static DRIVER_INIT(ssingles)
 	state_save_register_global_pointer(machine, ssingles_colorram, VMEM_SIZE);
 }
 
-GAME ( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING )
+
