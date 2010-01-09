@@ -209,6 +209,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) AM_DEVWRITE("nes1", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -222,6 +223,7 @@ static ADDRESS_MAP_START( vsnes_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_1_r, vsnes_in0_1_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_1_r) AM_DEVWRITE("nes2", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x4020, 0x4020) AM_WRITE(vsnes_coin_counter_1_w)
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
