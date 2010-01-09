@@ -880,6 +880,39 @@ ROM_START( trackfld )
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
+
+ROM_START( trackfldnz )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_LOAD( "gold.7a",  0x6000, 0x2000, CRC(77ea4509) SHA1(3f537cc674859fad385032fded59ac6e10b2ffff) )
+	ROM_LOAD( "gold.6a",  0x8000, 0x2000, CRC(a13f3131) SHA1(07617f409741b67f747fe01314147a074f462f16) )
+	ROM_LOAD( "gold.5a",  0xa000, 0x2000, CRC(b0abe171) SHA1(33360c434f1d46e6b6635c72f0c8686e627d14dd) )
+	ROM_LOAD( "gold.4a",  0xc000, 0x2000, CRC(fee9b922) SHA1(4950c0274e03622b078656405d43ddff65360eee) )
+	ROM_LOAD( "gold.2a",  0xe000, 0x2000, CRC(ad6dc048) SHA1(982cb3fa90b622f056069d2ebd9d351d5c20e44c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gold.2d",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "gold.20a",  0x0000, 0x2000, CRC(82e2185a) SHA1(1da9ea20e7af0b49c62fb39834a7ec686491af04) )
+	ROM_LOAD( "gold.21a",  0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) )
+	ROM_LOAD( "gold.17a",  0x4000, 0x2000, CRC(d9faf183) SHA1(4448b6242790783d37acf50704d597af5878c2ab) )
+	ROM_LOAD( "gold.19a",  0x6000, 0x2000, CRC(5886c802) SHA1(884a12a8f63600da4f23b29be6dbaacef37add20) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "gold.2k",  0x0000, 0x2000, CRC(50075768) SHA1(dfff92c0f59dd3d8d3d6256944bfd48792cef6a9) )
+	ROM_LOAD( "gold.4k",  0x2000, 0x2000, CRC(dda9e29f) SHA1(0f41cde82bb60c3f1591ee14dc3cff4642bbddc1) )
+	ROM_LOAD( "gold.5k",  0x4000, 0x2000, CRC(c2166a5c) SHA1(5ba25900e653ce4edcf35f1fbce758a327a715ce) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "gold.2g",    0x0000, 0x0020, CRC(d55f30b5) SHA1(4d6a851f4886778307f75771645078b97ad55f5f) ) /* palette */
+	ROM_LOAD( "gold.18d",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
+	ROM_LOAD( "gold.4j",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
+
+	ROM_REGION( 0x10000, "vlm", 0 )	/* 64k for speech rom */
+	ROM_LOAD( "gold.d9",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
+ROM_END
+
+
 ROM_START( trackfldc )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "f01.1a",       0x6000, 0x2000, CRC(4e32b360) SHA1(cafd4b9ef5548d31d894610dfd2288425d29ed58) )
@@ -1249,6 +1282,7 @@ GAME( 1983, hyprolym,  trackfld, trackfld, trackfld, trackfld, ROT0,  "Konami", 
 GAME( 1983, hyprolymb, trackfld, hyprolyb, trackfld, trackfld, ROT0,  "bootleg", "Hyper Olympic (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1996, atlantol,  trackfld, hyprolyb, atlantol, atlantol, ROT0,  "bootleg", "Atlant Olimpic", GAME_SUPPORTS_SAVE )
 GAME( 1988, mastkin,   0,        mastkin,  mastkin,  mastkin,  ROT0,  "Du Tech", "The Masters of Kin", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld, ROT0,  "Goldberg Enterprizes Inc.", "Track & Field (NZ Bootleg?)", GAME_NOT_WORKING)
 GAME( 1985, wizzquiz,  0,        wizzquiz, wizzquiz, wizzquiz, ROT0,  "Konami", "Wizz Quiz (Konami version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, wizzquiza, wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec - Zenitone", "Wizz Quiz (version 4)", GAME_SUPPORTS_SAVE )
 GAME( 1987, reaktor,   0,        reaktor,  reaktor,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", GAME_SUPPORTS_SAVE )

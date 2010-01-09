@@ -5238,6 +5238,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( venus )		/* bootleg */
 	DRIVER( trackfld )	/* GX361 (c) 1983 */
 	DRIVER( trackfldc )	/* GX361 (c) 1983 + Centuri license */
+	DRIVER( trackfldnz )/* (c) 1982 Goldberg Enterprizes Inc. */
 	DRIVER( hyprolym )	/* GX361 (c) 1983 */
 	DRIVER( hyprolymb )	/* bootleg */
 	DRIVER( atlantol )	/* bootleg */
