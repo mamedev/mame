@@ -312,42 +312,38 @@ rumbling on a subwoofer in the cabinet.)
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
+#include "includes/taitoipt.h"
+#include "includes/ninjaw.h"
 
 extern const char layout_darius[];
 
-static MACHINE_START( ninjaw );
-static MACHINE_RESET( ninjaw );
-
-VIDEO_START( ninjaw );
-VIDEO_UPDATE( ninjaw );
-
-static UINT16 cpua_ctrl;
-
-static void parse_control(running_machine *machine)	/* assumes Z80 sandwiched between 68Ks */
+static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
+	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+
 	if ((data &0xff00) && ((data &0xff) == 0))
-		data = data >> 8;	/* for Wgp */
-	cpua_ctrl = data;
+		data = data >> 8;
+	state->cpua_ctrl = data;
 
 	parse_control(space->machine);
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(space->cpu),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -355,64 +351,75 @@ static WRITE16_HANDLER( cpua_ctrl_w )
             SOUND
 *****************************************/
 
-static INT32 banknum;
-
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region( running_machine *machine )
 {
-	memory_set_bankptr(machine,  "bank10", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
+	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	banknum = (data - 1) & 7;
+	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+
+	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( ninjaw_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff00)
-		popmessage("ninjaw_sound_w to high byte: %04x",data);
+		popmessage("ninjaw_sound_w to high byte: %04x", data);
 #endif
 }
 
 static READ16_HANDLER( ninjaw_sound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+
 	if (offset == 1)
-		return ((tc0140syt_comm_r(tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
 	else 
 		return 0;
 }
 
 
 /**** sound pan control ****/
-static int ninjaw_pandata[4];
+
 static WRITE8_HANDLER( ninjaw_pancontrol )
 {
-	static const char *const fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
-	offset = offset&3;
-	ninjaw_pandata[offset] = (float)data * (100.f / 255.0f);
-	//popmessage(" pan %02x %02x %02x %02x", ninjaw_pandata[0], ninjaw_pandata[1], ninjaw_pandata[2], ninjaw_pandata[3] );
-	flt_volume_set_volume(devtag_get_device(space->machine, fltname[offset]), ninjaw_pandata[offset] / 100.0);
+	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	const device_config *flt = NULL;
+	offset &= 3;
+
+	switch (offset)
+	{
+		case 0: flt = state->_2610_1l; break;
+		case 1: flt = state->_2610_1r; break;
+		case 2: flt = state->_2610_2l; break;
+		case 3: flt = state->_2610_2r; break;
+	}
+
+	state->pandata[offset] = (float)data * (100.f / 255.0f);
+	//popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
+	flt_volume_set_volume(flt, state->pandata[offset] / 100.0);
 }
 
 
 WRITE16_HANDLER( tc0100scn_triple_screen_w )
 {
-	const device_config *tc0100scn_1 = devtag_get_device(space->machine, "tc0100scn_1");
-	const device_config *tc0100scn_2 = devtag_get_device(space->machine, "tc0100scn_2");
-	const device_config *tc0100scn_3 = devtag_get_device(space->machine, "tc0100scn_3");
+	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
 
-	tc0100scn_word_w(tc0100scn_1, offset, data, mem_mask);
-	tc0100scn_word_w(tc0100scn_2, offset, data, mem_mask);
-	tc0100scn_word_w(tc0100scn_3, offset, data, mem_mask);
+	tc0100scn_word_w(state->tc0100scn_1, offset, data, mem_mask);
+	tc0100scn_word_w(state->tc0100scn_2, offset, data, mem_mask);
+	tc0100scn_word_w(state->tc0100scn_3, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -427,7 +434,7 @@ static ADDRESS_MAP_START( ninjaw_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_MEMBER(ninjaw_state, spriteram, spriteram_size)
 	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
@@ -463,7 +470,7 @@ static ADDRESS_MAP_START( darius2_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_MEMBER(ninjaw_state, spriteram, spriteram_size)
 	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
@@ -639,9 +646,10 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	ninjaw_state *state = (ninjaw_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -662,9 +670,9 @@ static DEVICE_START( subwoofer )
 	/* The 150 Hz is a common top frequency played by a generic */
 	/* subwoofer, the real Arcade Machine may differs */
 
-	mixer_set_lowpass_frequency(0,20);
-	mixer_set_lowpass_frequency(1,20);
-	mixer_set_lowpass_frequency(2,20);
+	mixer_set_lowpass_frequency(0, 20);
+	mixer_set_lowpass_frequency(1, 20);
+	mixer_set_lowpass_frequency(2, 20);
 
 	return 0;
 }
@@ -741,7 +749,57 @@ static const tc0140syt_interface ninjaw_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
+
+static STATE_POSTLOAD( ninjaw_postload )
+{
+	parse_control(machine);
+	reset_sound_region(machine);
+}
+
+static MACHINE_START( ninjaw )
+{
+	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank10", 0, 8, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+	state->tc0100scn_1 = devtag_get_device(machine, "tc0100scn_1");
+	state->tc0100scn_2 = devtag_get_device(machine, "tc0100scn_2");
+	state->tc0100scn_3 = devtag_get_device(machine, "tc0100scn_3");
+
+	state->lscreen = devtag_get_device(machine, "lscreen");
+	state->mscreen = devtag_get_device(machine, "mscreen");
+	state->rscreen = devtag_get_device(machine, "rscreen");
+
+	state->_2610_1l = devtag_get_device(machine, "2610.1.l");
+	state->_2610_1r = devtag_get_device(machine, "2610.1.r");
+	state->_2610_2l = devtag_get_device(machine, "2610.2.l");
+	state->_2610_2r = devtag_get_device(machine, "2610.2.r");
+
+	state_save_register_global(machine, state->cpua_ctrl);
+	state_save_register_global(machine, state->banknum);
+	state_save_register_global_array(machine, state->pandata);
+	state_save_register_postload(machine, ninjaw_postload, NULL);
+}
+
+static MACHINE_RESET( ninjaw )
+{
+	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	state->cpua_ctrl = 0xff;
+	state->banknum = 0;
+	memset(state->pandata, 0, sizeof(state->pandata));
+
+	/**** mixer control enable ****/
+	sound_global_enable(machine, 1);	/* mixer enabled */
+}
+
 static MACHINE_DRIVER_START( ninjaw )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ninjaw_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
@@ -826,6 +884,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( darius2 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ninjaw_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
@@ -1067,29 +1128,6 @@ ROM_START( darius2 )
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 ROM_END
-
-static STATE_POSTLOAD( ninjaw_postload )
-{
-	parse_control(machine);
-	reset_sound_region(machine);
-}
-
-static MACHINE_START( ninjaw )
-{
-	cpua_ctrl = 0xff;
-	banknum = -1;
-	memset(ninjaw_pandata, 0, sizeof(ninjaw_pandata));
-
-	state_save_register_global(machine, cpua_ctrl);
-	state_save_register_global(machine, banknum);
-	state_save_register_postload(machine, ninjaw_postload, NULL);
-}
-
-static MACHINE_RESET( ninjaw )
-{
-  /**** mixer control enable ****/
-  sound_global_enable( machine, 1 );	/* mixer enabled */
-}
 
 
 /* Working Games */

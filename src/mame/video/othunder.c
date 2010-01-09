@@ -1,27 +1,15 @@
 #include "driver.h"
 #include "video/taitoic.h"
+#include "includes/othunder.h"
 
-struct tempsprite
-{
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
-};
-static struct tempsprite *spritelist;
-
-
-
-/**********************************************************/
 
 VIDEO_START( othunder )
 {
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
        Multiply this by 32 to give room for the number of small sprites,
        which are what actually get put in the structure. */
-	spritelist = auto_alloc_array(machine, struct tempsprite, 0x2000);
+	othunder_state *state = (othunder_state *)machine->driver_data;
+	state->spritelist = auto_alloc_array(machine, struct othunder_tempsprite, 0x2000);
 }
 
 
@@ -75,42 +63,44 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int y_offs)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int *primasks, int y_offs )
 {
+	othunder_state *state = (othunder_state *)machine->driver_data;
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
 	int zoomx, zoomy, zx, zy;
-	int sprite_chunk,map_offset,code,j,k,px,py;
+	int sprite_chunk, map_offset, code, j, k, px, py;
 	int bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
        while processing sprite ram and then draw them all at the end */
-	struct tempsprite *sprite_ptr = spritelist;
+	struct othunder_tempsprite *sprite_ptr = state->spritelist;
 
-	for (offs = (machine->generic.spriteram_size/2)-4;offs >=0;offs -= 4)
+	for (offs = (state->spriteram_size / 2) - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram16[offs+0];
+		data = spriteram16[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram16[offs+1];
+		data = spriteram16[offs + 1];
 		flipx = (data & 0x4000) >> 14;
 		priority = (data & 0x8000) >> 15;
 		x = data & 0x1ff;
 
-		data = spriteram16[offs+2];
+		data = spriteram16[offs + 2];
 		color = (data & 0xff00) >> 8;
 		zoomx = (data & 0x7f);
 
-		data = spriteram16[offs+3];
+		data = spriteram16[offs + 3];
 		tilenum = data & 0x1fff;	// $80000 spritemap rom maps up to $2000 64x64 sprites
 		flipy = (data & 0x8000) >> 15;
 
-		if (!tilenum) continue;
+		if (!tilenum) 
+			continue;
 
 		map_offset = tilenum << 5;
 
@@ -120,34 +110,34 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		y += y_offs;
 
 		/* treat coords as signed */
-		if (x>0x140) x -= 0x200;
-		if (y>0x140) y -= 0x200;
+		if (x > 0x140) x -= 0x200;
+		if (y > 0x140) y -= 0x200;
 
 		bad_chunks = 0;
 
-		for (sprite_chunk=0;sprite_chunk<32;sprite_chunk++)
+		for (sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
 		{
 			k = sprite_chunk % 4;   /* 4 chunks per row */
 			j = sprite_chunk / 4;   /* 8 rows */
 
 			px = k;
 			py = j;
-			if (flipx)  px = 3-k;	/* pick tiles back to front for x and y flips */
-			if (flipy)  py = 7-j;
+			if (flipx)  px = 3 - k;	/* pick tiles back to front for x and y flips */
+			if (flipy)  py = 7 - j;
 
-			code = spritemap[map_offset + px + (py<<2)] &tile_mask;
+			code = spritemap[map_offset + px + (py << 2)] & tile_mask;
 
-			if (code==0xffff)
+			if (code == 0xffff)
 			{
 				bad_chunks += 1;
 				continue;
 			}
 
-			curx = x + ((k*zoomx)/4);
-			cury = y + ((j*zoomy)/8);
+			curx = x + ((k * zoomx) / 4);
+			cury = y + ((j * zoomy) / 8);
 
-			zx= x + (((k+1)*zoomx)/4) - curx;
-			zy= y + (((j+1)*zoomy)/8) - cury;
+			zx= x + (((k + 1) * zoomx) / 4) - curx;
+			zy= y + (((j + 1) * zoomy) / 8) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -191,7 +181,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != spritelist)
+	while (sprite_ptr != state->spritelist)
 	{
 		sprite_ptr--;
 
@@ -212,12 +202,12 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 VIDEO_UPDATE( othunder )
 {
-	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	othunder_state *state = (othunder_state *)screen->machine->driver_data;
 	int layer[3];
 
-	tc0100scn_tilemap_update(tc0100scn);
+	tc0100scn_tilemap_update(state->tc0100scn);
 
-	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[0] = tc0100scn_bottomlayer(state->tc0100scn);
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
@@ -226,9 +216,9 @@ VIDEO_UPDATE( othunder )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 2);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 4);
+	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites can be under/over the layer below text layer */
 	{

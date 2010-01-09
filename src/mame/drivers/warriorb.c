@@ -47,7 +47,7 @@ TC0100SCN has tilemaps twice as wide as usual. The two BG tilemaps take
 up twice the usual space, $8000 bytes each. The text tilemap takes up
 the usual space, as its height is halved.
 
-The double palette generator (one for each screen) is probably just a
+The double palette generator(one for each screen) is probably just a
 result of the way the hardware works: they both have the same colors.
 
 
@@ -145,7 +145,6 @@ Colscroll effects?
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
@@ -153,71 +152,79 @@ Colscroll effects?
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
+#include "includes/warriorb.h"
+#include "includes/taitoipt.h"
 
 static MACHINE_START( warriorb );
 static MACHINE_RESET( taito_dualscreen );
 
-VIDEO_START( warriorb );
-VIDEO_UPDATE( warriorb );
 
 
 /***********************************************************
                           SOUND
 ***********************************************************/
 
-static INT32 banknum;
-
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region( running_machine *machine )
 {
-	memory_set_bankptr(machine,  "bank10", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
+	warriorb_state *state = (warriorb_state *)machine->driver_data;
+	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	banknum = (data - 1) & 7;
+	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
+
+	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( warriorb_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
+
 	if (offset == 0)
-		tc0140syt_port_w (tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w (tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
 }
 
 static READ16_HANDLER( warriorb_sound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
+
 	if (offset == 1)
-		return ((tc0140syt_comm_r (tc0140syt, 0) & 0xff));
-	else return 0;
+		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
+	else 
+		return 0;
 }
 
 
-static int ninjaw_pandata[4];		/**** sound pan control ****/
-
 static WRITE8_HANDLER( warriorb_pancontrol )
 {
-	static const char *const fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
+	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
+	const device_config *flt = NULL;
+	offset &= 3;
 
-	offset = offset&3;
-	ninjaw_pandata[offset] = (data<<1) + data;   /* original volume*3 */
+	switch (offset)
+	{
+		case 0: flt = state->_2610_1l; break;
+		case 1: flt = state->_2610_1r; break;
+		case 2: flt = state->_2610_2l; break;
+		case 3: flt = state->_2610_2r; break;
+	}
 
-//  popmessage(" pan %02x %02x %02x %02x", ninjaw_pandata[0], ninjaw_pandata[1], ninjaw_pandata[2], ninjaw_pandata[3] );
-
-	flt_volume_set_volume(devtag_get_device(space->machine, fltname[offset & 3]), ninjaw_pandata[offset] / 100.0);
+	state->pandata[offset] = (data << 1) + data;   /* original volume*3 */
+	//popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
+	flt_volume_set_volume(flt, state->pandata[offset] / 100.0);
 }
 
 
 WRITE16_HANDLER( tc0100scn_dual_screen_w )
 {
-	const device_config *tc0100scn_1 = devtag_get_device(space->machine, "tc0100scn_1");
-	const device_config *tc0100scn_2 = devtag_get_device(space->machine, "tc0100scn_2");
+	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
 
-	tc0100scn_word_w(tc0100scn_1, offset, data, mem_mask);
-	tc0100scn_word_w(tc0100scn_2, offset, data, mem_mask);
+	tc0100scn_word_w(state->tc0100scn_1, offset, data, mem_mask);
+	tc0100scn_word_w(state->tc0100scn_2, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -234,7 +241,7 @@ static ADDRESS_MAP_START( darius2d_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x26000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (2nd screen) */
-	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_MEMBER(warriorb_state, spriteram, spriteram_size)
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
@@ -249,7 +256,7 @@ static ADDRESS_MAP_START( warriorb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x36000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (2nd screen) */
-	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_MEMBER(warriorb_state, spriteram, spriteram_size)
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
@@ -410,9 +417,10 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	warriorb_state *state = (warriorb_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -422,7 +430,7 @@ static const ym2610_interface ym2610_config =
 
 
 /**************************************************************
-                         SUBWOOFER (SOUND)
+                         SUBWOOFEr(SOUND)
 **************************************************************/
 
 #if 0
@@ -430,9 +438,9 @@ static DEVICE_START( subwoofer )
 {
 	/* Adjust the lowpass filter of the first three YM2610 channels */
 
-	mixer_set_lowpass_frequency(0,20);
-	mixer_set_lowpass_frequency(1,20);
-	mixer_set_lowpass_frequency(2,20);
+	mixer_set_lowpass_frequency(0, 20);
+	mixer_set_lowpass_frequency(1, 20);
+	mixer_set_lowpass_frequency(2, 20);
 }
 
 static DEVICE_GET_INFO( subwoofer )
@@ -522,7 +530,51 @@ static const tc0140syt_interface warriorb_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
+
+static STATE_POSTLOAD( warriorb_postload )
+{
+	reset_sound_region(machine);
+}
+
+static MACHINE_START( warriorb )
+{
+	warriorb_state *state = (warriorb_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank10", 0, 8, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+	state->tc0100scn_1 = devtag_get_device(machine, "tc0100scn_1");
+	state->tc0100scn_2 = devtag_get_device(machine, "tc0100scn_2");
+
+	state->lscreen = devtag_get_device(machine, "lscreen");
+	state->rscreen = devtag_get_device(machine, "rscreen");
+
+	state->_2610_1l = devtag_get_device(machine, "2610.1.l");
+	state->_2610_1r = devtag_get_device(machine, "2610.1.r");
+	state->_2610_2l = devtag_get_device(machine, "2610.2.l");
+	state->_2610_2r = devtag_get_device(machine, "2610.2.r");
+
+	state_save_register_global(machine, state->banknum);
+	state_save_register_global_array(machine, state->pandata);
+	state_save_register_postload(machine, warriorb_postload, NULL);
+}
+
+static MACHINE_RESET( taito_dualscreen )
+{
+	warriorb_state *state = (warriorb_state *)machine->driver_data;
+
+	state->banknum = 0;
+
+	/**** mixer control enable ****/
+	sound_global_enable(machine, 1);	/* mixer enabled */
+}
+
 static MACHINE_DRIVER_START( darius2d )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(warriorb_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
@@ -590,6 +642,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( warriorb )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(warriorb_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ? */
@@ -674,7 +729,7 @@ ROM_START( darius2d )
 	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )	/* SCR (screen 1) */
+	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )	/* SCr(screen 1) */
 	ROM_LOAD( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
@@ -684,7 +739,7 @@ ROM_START( darius2d )
 	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )	/* SCR (screen 2) */
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )	/* SCr(screen 2) */
 
 /* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
 //  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
@@ -720,7 +775,7 @@ ROM_START( darius2do )
 	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )	/* SCR (screen 1) */
+	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )	/* SCr(screen 1) */
 	ROM_LOAD( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
@@ -730,7 +785,7 @@ ROM_START( darius2do )
 	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )	/* SCR (screen 2) */
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )	/* SCr(screen 2) */
 
 /* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
 //  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
@@ -789,25 +844,6 @@ ROM_START( warriorb )
 //  ROM_LOAD( "d24-15.78", 0x00000, 0xa??, NO_DUMP )    /* Pals */
 //  ROM_LOAD( "d24-16.79", 0x00000, 0xa??, NO_DUMP )
 ROM_END
-
-static STATE_POSTLOAD( warriorb_postload )
-{
-	reset_sound_region(machine);
-}
-
-static MACHINE_START( warriorb )
-{
-	state_save_register_global(machine, banknum);
-	state_save_register_postload(machine, warriorb_postload, NULL);
-}
-
-static MACHINE_RESET( taito_dualscreen )
-{
-	banknum = -1;
-
-	/**** mixer control enable ****/
-	sound_global_enable( machine, 1 );	/* mixer enabled */
-}
 
 
 /* Working Games */

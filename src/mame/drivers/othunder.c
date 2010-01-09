@@ -232,7 +232,6 @@ TODO:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "video/taitoic.h"
@@ -240,39 +239,33 @@ TODO:
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
-
-VIDEO_START( othunder );
-VIDEO_UPDATE( othunder );
+#include "includes/othunder.h"
+#include "includes/taitoipt.h"
 
 
 /***********************************************************
                 INTERRUPTS
 ***********************************************************/
 
-static int vblank_irq, ad_irq;
-
-static MACHINE_RESET( othunder )
+static void update_irq( running_machine *machine )
 {
-	vblank_irq = 0;
-	ad_irq = 0;
-}
-
-static void update_irq(running_machine *machine)
-{
-	cputag_set_input_line(machine, "maincpu", 6, ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, vblank_irq ? ASSERT_LINE : CLEAR_LINE);
+	othunder_state *state = (othunder_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 6, state->ad_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->maincpu, 5, state->vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( irq_ack_w )
 {
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0:
-			vblank_irq = 0;
+			state->vblank_irq = 0;
 			break;
 
 		case 1:
-			ad_irq = 0;
+			state->ad_irq = 0;
 			break;
 	}
 
@@ -281,13 +274,17 @@ static WRITE16_HANDLER( irq_ack_w )
 
 static INTERRUPT_GEN( vblank_interrupt )
 {
-	vblank_irq = 1;
+	othunder_state *state = (othunder_state *)device->machine->driver_data;
+
+	state->vblank_irq = 1;
 	update_irq(device->machine);
 }
 
 static TIMER_CALLBACK( ad_interrupt )
 {
-	ad_irq = 1;
+	othunder_state *state = (othunder_state *)machine->driver_data;
+
+	state->ad_irq = 1;
 	update_irq(machine);
 }
 
@@ -313,7 +310,7 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( othunder_tc0220ioc_w )
 {
-	const device_config *device;
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -333,18 +330,16 @@ static WRITE16_HANDLER( othunder_tc0220ioc_w )
 				set_led_status(space->machine, 0, data & 1);
 				set_led_status(space->machine, 1, data & 2);
 
-if (data & 4)
-	popmessage("OBPRI SET!");
+				if (data & 4)
+					popmessage("OBPRI SET!");
 
-				device = devtag_get_device(space->machine, "eeprom");
-				eeprom_write_bit(device, data & 0x40);
-				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_write_bit(state->eeprom, data & 0x40);
+				eeprom_set_clock_line(state->eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_cs_line(state->eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			default:
-				device = devtag_get_device(space->machine, "tc0220ioc");
-				tc0220ioc_w(device, offset, data & 0xff);
+				tc0220ioc_w(state->tc0220ioc, offset, data & 0xff);
 		}
 	}
 }
@@ -356,17 +351,15 @@ if (data & 4)
 
 static READ16_HANDLER( othunder_tc0220ioc_r )
 {
-	const device_config *device;
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
 
 	switch (offset)
 	{
 		case 0x03:
-			device = devtag_get_device(space->machine, "eeprom");
-			return (eeprom_read_bit(device) & 1) << 7;
+			return (eeprom_read_bit(state->eeprom) & 1) << 7;
 
 		default:
-			device = devtag_get_device(space->machine, "tc0220ioc");
-			return tc0220ioc_r(device, offset);
+			return tc0220ioc_r(state->tc0220ioc, offset);
 	}
 }
 
@@ -397,46 +390,34 @@ static WRITE16_HANDLER( othunder_lightgun_w )
             SOUND
 *****************************************/
 
-static INT32 banknum;
-
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region( running_machine *machine )
 {
-	memory_set_bankptr(machine,  "bank10", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
-}
-
-static STATE_POSTLOAD( othunder_postload )
-{
-	reset_sound_region(machine);
-}
-
-static MACHINE_START( othunder )
-{
-	banknum = -1;
-	state_save_register_global(machine, banknum);
-	state_save_register_postload(machine, othunder_postload, NULL);
+	othunder_state *state = (othunder_state *)machine->driver_data;
+	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	banknum = (data - 1) & 7;
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( othunder_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
 }
 
 static READ16_HANDLER( othunder_sound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
 	if (offset == 1)
-		return ((tc0140syt_comm_r(tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
 	else 
 		return 0;
 }
@@ -445,29 +426,29 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
        PSG output is routed to both chips. */
-	static int pan[4];
-	int voll,volr;
+	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	int voll, volr;
 
-	pan[offset] = data & 0x1f;
+	state->pan[offset] = data & 0x1f;
 
 	/* PSG output (single ANALOG OUT pin on the YM2610, but we have three channels
        because we are using the AY-3-8910 emulation. */
-	volr = (pan[0] + pan[2]) * 100 / (2 * 0x1f);
-	voll = (pan[1] + pan[3]) * 100 / (2 * 0x1f);
-	flt_volume_set_volume(devtag_get_device(space->machine, "2610.0l"), voll / 100.0);
-	flt_volume_set_volume(devtag_get_device(space->machine, "2610.0r"), volr / 100.0);
+	volr = (state->pan[0] + state->pan[2]) * 100 / (2 * 0x1f);
+	voll = (state->pan[1] + state->pan[3]) * 100 / (2 * 0x1f);
+	flt_volume_set_volume(state->_2610_0l, voll / 100.0);
+	flt_volume_set_volume(state->_2610_0r, volr / 100.0);
 
 	/* CH1 */
-	volr = pan[0] * 100 / 0x1f;
-	voll = pan[1] * 100 / 0x1f;
-	flt_volume_set_volume(devtag_get_device(space->machine, "2610.1l"), voll / 100.0);
-	flt_volume_set_volume(devtag_get_device(space->machine, "2610.1r"), volr / 100.0);
+	volr = state->pan[0] * 100 / 0x1f;
+	voll = state->pan[1] * 100 / 0x1f;
+	flt_volume_set_volume(state->_2610_1l, voll / 100.0);
+	flt_volume_set_volume(state->_2610_1r, volr / 100.0);
 
 	/* CH2 */
-	volr = pan[2] * 100 / 0x1f;
-	voll = pan[3] * 100 / 0x1f;
-	flt_volume_set_volume(devtag_get_device(space->machine, "2610.2l"), voll / 100.0);
-	flt_volume_set_volume(devtag_get_device(space->machine, "2610.2r"), volr / 100.0);
+	volr = state->pan[2] * 100 / 0x1f;
+	voll = state->pan[3] * 100 / 0x1f;
+	flt_volume_set_volume(state->_2610_2l, voll / 100.0);
+	flt_volume_set_volume(state->_2610_2r, volr / 100.0);
 }
 
 
@@ -485,7 +466,7 @@ static ADDRESS_MAP_START( othunder_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(othunder_sound_r, othunder_sound_w)
-	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE_MEMBER(othunder_state, spriteram, spriteram_size)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(othunder_lightgun_r, othunder_lightgun_w)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(irq_ack_w)
 ADDRESS_MAP_END
@@ -650,9 +631,10 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	othunder_state *state = (othunder_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -692,7 +674,51 @@ static const tc0140syt_interface othunder_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
+static STATE_POSTLOAD( othunder_postload )
+{
+	reset_sound_region(machine);
+}
+
+static MACHINE_START( othunder )
+{
+	othunder_state *state = (othunder_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
+	state->tc0100scn = devtag_get_device(machine, "tc0100scn");
+	state->tc0110pcr = devtag_get_device(machine, "tc0110pcr");
+	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+	state->_2610_0l = devtag_get_device(machine, "2610.0l");
+	state->_2610_0r = devtag_get_device(machine, "2610.0r");
+	state->_2610_1l = devtag_get_device(machine, "2610.1l");
+	state->_2610_1r = devtag_get_device(machine, "2610.1r");
+	state->_2610_2l = devtag_get_device(machine, "2610.2l");
+	state->_2610_2r = devtag_get_device(machine, "2610.2r");
+
+	state_save_register_global(machine, state->vblank_irq);
+	state_save_register_global(machine, state->ad_irq);
+	state_save_register_global(machine, state->banknum);
+	state_save_register_global_array(machine, state->pan);
+	state_save_register_postload(machine, othunder_postload, NULL);
+}
+
+static MACHINE_RESET( othunder )
+{
+	othunder_state *state = (othunder_state *)machine->driver_data;
+
+	state->vblank_irq = 0;
+	state->ad_irq = 0;
+	state->banknum = 0;
+}
+
 static MACHINE_DRIVER_START( othunder )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(othunder_state)
 
 	/* basic machine hardware */
 //  MDRV_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */

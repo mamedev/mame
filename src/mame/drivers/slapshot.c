@@ -139,16 +139,7 @@ Region byte at offset 0x031:
 #include "sound/2610intf.h"
 #include "machine/timekpr.h"
 #include "machine/taitoio.h"
-
-
-VIDEO_EOF( taito_no_buffer );
-VIDEO_START( slapshot );
-VIDEO_UPDATE( slapshot );
-
-static UINT16 *color_ram;
-
-extern UINT16 *taito_sprite_ext;
-extern size_t taito_spriteext_size;
+#include "includes/slapshot.h"
 
 
 /******************************************************
@@ -157,21 +148,23 @@ extern size_t taito_spriteext_size;
 
 static READ16_HANDLER( color_ram_word_r )
 {
-	return color_ram[offset];
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	return state->color_ram[offset];
 }
 
 static WRITE16_HANDLER( color_ram_word_w )
 {
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
 	int r,g,b;
-	COMBINE_DATA(&color_ram[offset]);
+	COMBINE_DATA(&state->color_ram[offset]);
 
 	if ((offset % 2) == 1)	/* assume words written sequentially */
 	{
-		r = (color_ram[offset-1] &0xff);
-		g = (color_ram[offset] &0xff00) >> 8;
-		b = (color_ram[offset] &0xff);
+		r = (state->color_ram[offset- 1 ] & 0xff);
+		g = (state->color_ram[offset] & 0xff00) >> 8;
+		b = (state->color_ram[offset] & 0xff);
 
-		palette_set_color(space->machine,offset/2,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine, offset / 2, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -182,7 +175,8 @@ static WRITE16_HANDLER( color_ram_word_w )
 
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
-	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 
@@ -199,7 +193,7 @@ static INTERRUPT_GEN( slapshot_interrupt )
 
 static READ16_HANDLER( slapshot_service_input_r )
 {
-	const device_config *tc0640fio = devtag_get_device(space->machine, "tc0640fio");
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
 	switch (offset)
 	{
 		case 0x03:
@@ -207,7 +201,7 @@ static READ16_HANDLER( slapshot_service_input_r )
 				  (input_port_read(space->machine, "SERVICE") & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
-			return tc0640fio_r(tc0640fio, offset) << 8;
+			return tc0640fio_r(state->tc0640fio, offset) << 8;
 	}
 }
 
@@ -220,47 +214,36 @@ static READ16_HANDLER( opwolf3_adc_r )
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )
 {
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+
 	/* 4 writes a frame - one for each analogue port */
-	cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE);
+	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
 }
 
 /*****************************************************
                 SOUND
 *****************************************************/
 
-static INT32 banknum;
-
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region( running_machine *machine )
 {
-	memory_set_bankptr(machine,  "bank10", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
+	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	memory_set_bank(machine, "bank10", state->banknum);
 }
-
-static STATE_POSTLOAD( slapshot_postload )
-{
-	reset_sound_region(machine);
-}
-
-static MACHINE_START( slapshot )
-{
-	banknum = -1;
-	state_save_register_global(machine, banknum);
-	state_save_register_postload(machine, slapshot_postload, NULL);
-}
-
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	banknum = (data - 1) & 7;
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( slapshot_msb_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_port_w(state->tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_comm_w(state->tc0140syt, 0, (data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -270,9 +253,9 @@ static WRITE16_HANDLER( slapshot_msb_sound_w )
 
 static READ16_HANDLER( slapshot_msb_sound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
 	if (offset == 1)
-		return ((tc0140syt_comm_r(tc0140syt, 0) & 0xff) << 8);
+		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
 	else 
 		return 0;
 }
@@ -285,11 +268,11 @@ static READ16_HANDLER( slapshot_msb_sound_r )
 static ADDRESS_MAP_START( slapshot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE(&taito_sprite_ext) AM_SIZE(&taito_spriteext_size)	/* debugging */
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, spriteram, spriteram_size)	/* sprite ram */
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, spriteext, spriteext_size)	/* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	/* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_BASE(&color_ram)	/* 8bpg palette */
+	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_BASE_MEMBER(slapshot_state, color_ram)	/* 8bpg palette */
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)	/* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_halfword_byteswap_r, tc0640fio_halfword_byteswap_w)
@@ -300,11 +283,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( opwolf3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE(&taito_sprite_ext) AM_SIZE(&taito_spriteext_size)	/* debugging */
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, spriteram, spriteram_size)	/* sprite ram */
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, spriteext, spriteext_size)	/* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	/* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_BASE(&color_ram)	/* 8bpg palette */
+	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_BASE_MEMBER(slapshot_state, color_ram)	/* 8bpg palette */
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)	/* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_halfword_byteswap_r, tc0640fio_halfword_byteswap_w)
@@ -483,9 +466,10 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	slapshot_state *state = (slapshot_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -519,7 +503,34 @@ static const tc0140syt_interface slapshot_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
+static STATE_POSTLOAD( slapshot_postload )
+{
+	reset_sound_region(machine);
+}
+
+static MACHINE_START( slapshot )
+{
+	slapshot_state *state = (slapshot_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+	state->tc0480scp = devtag_get_device(machine, "tc0480scp");
+	state->tc0360pri = devtag_get_device(machine, "tc0360pri");
+	state->tc0640fio = devtag_get_device(machine, "tc0640fio");
+
+	state->banknum = 0;
+	state_save_register_global(machine, state->banknum);
+	state_save_register_postload(machine, slapshot_postload, NULL);
+}
+
+
 static MACHINE_DRIVER_START( slapshot )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(slapshot_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
@@ -570,6 +581,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( opwolf3 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(slapshot_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolf3_map)
@@ -579,6 +593,8 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(slapshot)
 
 	MDRV_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
 

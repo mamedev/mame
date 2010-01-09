@@ -2154,6 +2154,13 @@ static STATE_POSTLOAD( tc0100scn_postload )
 
 	tc0100scn_set_layer_ptrs(tc0100scn);
 	tc0100scn_restore_scroll(tc0100scn);
+
+	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[0][0]);
+	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[1][0]);
+	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[2][0]);
+	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[0][1]);
+	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[1][1]);
+	tilemap_mark_all_tiles_dirty(tc0100scn->tilemap[2][1]);
 }
 
 READ16_DEVICE_HANDLER( tc0100scn_word_r )
