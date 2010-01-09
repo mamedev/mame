@@ -6,6 +6,11 @@ preliminary driver by Angelo Salese
 
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
+TODO:
+- ROM "SS5" is missing? Or it's a sound chip that's labelled SS5?
+- dual screen output.
+
+(note: the following notes are from "PS")
 - Communications
 Master slave comms looks like shared RAM.
 The slave tests these RAM banks all using the same routine at 0x000006E6
@@ -66,10 +71,6 @@ Unmapped read/write by CPU2 of 0xa005, 0xa006 This looks like loop overrun too,
 or maybe caused by the initial base offset which is the same as the loop increments it.
 Sub at CPU2:01B7, the block process starts at base 8020h and increments by 20h each time.
 It overruns the top of RAM on the last iteration.
-
-TODO:
--Rom "SS5" is missing?Or it's a sound chip that's labelled SS5?
--Paletteram is likely to be buffered,the two banks are really similar.
 
 ============================================================================================
 Cyber Tank
@@ -707,19 +708,15 @@ ROM_START( cybertnk )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "ss1",    0x0000, 0x8000, CRC(c3ba160b) SHA1(cfbfcad443ff83cd4e707f045a650417aca03d85) )
 
-	ROM_REGION( 0x80000, "ym1", 0 )
+	ROM_REGION( 0x80000, "ym1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ss2",    0x00000, 0x20000, CRC(da4b8733) SHA1(177372a53fd49629d1cda83bdd324ee90fbcdbb5) )
 	/*The following two are identical*/
 	ROM_LOAD( "ss3",    0x20000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
 	ROM_LOAD( "ss4",    0x40000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
 	//ss5?
 
-	ROM_REGION( 0x80000, "ym2", 0 )
-	ROM_LOAD( "ss2",    0x00000, 0x20000, CRC(da4b8733) SHA1(177372a53fd49629d1cda83bdd324ee90fbcdbb5) )
-	/*The following two are identical*/
-	ROM_LOAD( "ss3",    0x20000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
-	ROM_LOAD( "ss4",    0x40000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
-	//ss5?
+	ROM_REGION( 0x80000, "ym2", ROMREGION_ERASEFF )
+	ROM_COPY( "ym1", 0x00000, 0x00000, 0x60000 )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "s09", 0x00000, 0x10000, CRC(69e6470c) SHA1(8e7db6988366cae714fff72449623a7977af1db1) )
@@ -758,7 +755,7 @@ ROM_START( cybertnk )
 	ROM_LOAD32_BYTE( "c15" , 0x180002, 0x20000, CRC(ad681c70) SHA1(84c6589464103091b39f1ccdbfed10bf538452f3) )
 	ROM_LOAD32_BYTE( "c16" , 0x180003, 0x20000, CRC(1f44dbb6) SHA1(ea1368d6367a2de6d5e6764f8ab705b182d6d276) )
 
-	ROM_REGION( 0x200000, "user2", 0 )
+	ROM_REGION( 0x200000, "road_data", 0 )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
 	ROM_LOAD16_BYTE( "road_chh" , 0x000001, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
 
