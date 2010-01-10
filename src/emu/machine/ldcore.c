@@ -1407,7 +1407,7 @@ static void init_video(const device_config *device)
 		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
 
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
-		frame->visbitmap = auto_alloc(device->machine, bitmap_t(BITMAP_ADDR16(frame->visbitmap, 44, frame->bitmap->width * 8 / 720), 
+		frame->visbitmap = auto_alloc(device->machine, bitmap_t(BITMAP_ADDR16(frame->bitmap, 44, frame->bitmap->width * 8 / 720), 
 																frame->bitmap->width - 2 * frame->bitmap->width * 8 / 720, 
 																frame->bitmap->height - 44, 
 																frame->bitmap->rowpixels, frame->bitmap->format));
