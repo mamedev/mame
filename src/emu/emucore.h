@@ -272,7 +272,7 @@ public:
 	{
 		va_list ap;
 		va_start(ap, format);
-		sprintf(text, format, ap);
+		vsprintf(text, format, ap);
 		va_end(ap);
 		osd_break_into_debugger(text);
 	}
