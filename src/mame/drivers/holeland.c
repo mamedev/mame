@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crzrally_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE_MEMBER(holeland_state, colorram)
 	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_SIZE_MEMBER(holeland_state, videoram, videoram_size)
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(holeland_state, spriteram, spriteram_size)
@@ -355,6 +355,8 @@ static MACHINE_DRIVER_START( crzrally )
 	MDRV_CPU_PROGRAM_MAP(crzrally_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
