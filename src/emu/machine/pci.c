@@ -69,7 +69,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "devconv.h"
 #include "machine/pci.h"
 

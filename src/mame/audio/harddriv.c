@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms32010/tms32010.h"
 #include "sound/dac.h"
 #include "machine/atarigen.h"

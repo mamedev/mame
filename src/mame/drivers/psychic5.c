@@ -309,7 +309,7 @@ The first sprite data is located at f20b,then f21b and so on.
         C= Color palette selector
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"

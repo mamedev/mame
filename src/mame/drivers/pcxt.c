@@ -60,9 +60,8 @@ the main program is 9th October 1990.
 
 ******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/generic.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
 #include "machine/8237dma.h"

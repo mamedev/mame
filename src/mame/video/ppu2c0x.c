@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 #include "video/ppu2c0x.h"
 

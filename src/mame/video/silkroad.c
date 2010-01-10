@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 /* Sprites probably need to be delayed */
 /* Some scroll layers may need to be offset slightly? */

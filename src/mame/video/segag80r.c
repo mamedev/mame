@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/segag80r.h"
 #include "machine/rescap.h"
 #include "video/resnet.h"

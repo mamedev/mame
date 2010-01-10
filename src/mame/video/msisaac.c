@@ -2,7 +2,7 @@
 *   Video Driver for Metal Soldier Isaac II (1985)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/buggychl.h"
 
 

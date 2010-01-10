@@ -20,7 +20,7 @@ Notes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/hd6309/hd6309.h"
 #include "video/konicdev.h"

@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *thoop2_vregs;
 UINT16 *thoop2_videoram;

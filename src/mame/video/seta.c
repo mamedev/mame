@@ -135,7 +135,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/x1_010.h"
 #include "includes/seta.h"
 

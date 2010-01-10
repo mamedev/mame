@@ -3,7 +3,7 @@
     audio\dragrace.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/dragrace.h"
 #include "sound/discrete.h"
 

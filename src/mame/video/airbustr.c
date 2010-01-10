@@ -30,7 +30,7 @@
 
 
 **************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "video/kan_pand.h"
 #include "includes/airbustr.h"
 

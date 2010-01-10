@@ -83,7 +83,7 @@ all files across to new HDD, boots up fine.
 
 ************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "memconv.h"
 #include "devconv.h"

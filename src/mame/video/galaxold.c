@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/galaxold.h"
 
 static const rectangle _spritevisiblearea =

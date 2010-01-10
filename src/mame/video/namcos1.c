@@ -4,7 +4,7 @@ Namco System 1 Video Hardware
 
 *******************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/namcos1.h"
 
 

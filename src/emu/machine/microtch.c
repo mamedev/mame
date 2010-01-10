@@ -9,7 +9,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "microtch.h"
 
 static struct

@@ -59,7 +59,7 @@
 
 // MAME headers
 #include "osdepend.h"
-#include "driver.h"
+#include "emu.h"
 #include "ui.h"
 
 // MAMEOS headers

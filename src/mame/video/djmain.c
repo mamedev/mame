@@ -3,7 +3,7 @@
  *  emulate video hardware
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/konicdev.h"
 
 #define NUM_SPRITES	(0x800 / 16)

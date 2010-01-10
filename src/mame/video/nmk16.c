@@ -7,7 +7,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/nmk16.h"
 
 // the larger tilemaps on macross2, rapid hero and thunder dragon 2 appear to act like 4 'banks'

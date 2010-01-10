@@ -134,7 +134,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 #include "profiler.h"
 #include "machine/atarigen.h"

@@ -64,7 +64,7 @@ Notes:
       VSync    - 60Hz
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"

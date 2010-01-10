@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *solomon_videoram;
 UINT8 *solomon_colorram;

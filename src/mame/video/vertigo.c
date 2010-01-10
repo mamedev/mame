@@ -43,7 +43,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 #include "video/vector.h"
 #include "includes/vertigo.h"

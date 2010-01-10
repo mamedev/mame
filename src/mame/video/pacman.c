@@ -16,7 +16,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pacman.h"
 #include "video/resnet.h"
 

@@ -334,7 +334,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
   */
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"

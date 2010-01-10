@@ -4,7 +4,7 @@ Based on taito_h.c
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/taitoic.h"
 #include "includes/taito_o.h"
 

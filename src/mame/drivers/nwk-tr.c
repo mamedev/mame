@@ -212,7 +212,7 @@ Thrill Drive 713A13  -       713A14  -
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"

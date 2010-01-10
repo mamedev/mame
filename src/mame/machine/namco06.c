@@ -79,7 +79,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/namco06.h"
 #include "machine/namco50.h"
 #include "machine/namco51.h"

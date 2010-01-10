@@ -4,7 +4,7 @@ Atari Orbit video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/orbit.h"
 
 UINT8* orbit_playfield_ram;

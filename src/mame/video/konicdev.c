@@ -1149,7 +1149,7 @@ Registers (word-wise):
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/konicdev.h"
 
 #define VERBOSE 0

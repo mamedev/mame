@@ -9,7 +9,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "uimenu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/laserdsc.h"

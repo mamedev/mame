@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/atarigen.h"
 #include "includes/atarig42.h"
 

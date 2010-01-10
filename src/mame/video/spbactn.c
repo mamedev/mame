@@ -1,7 +1,7 @@
 /* video/spbactn.c - see drivers/spbactn.c for more info */
 /* rather similar to galspnbl.c */
 
-#include "driver.h"
+#include "emu.h"
 
 extern UINT16 *spbactn_bgvideoram, *spbactn_fgvideoram, *spbactn_spvideoram;
 static bitmap_t *tile_bitmap_bg, *tile_bitmap_fg;

@@ -16,7 +16,7 @@ To Do:  The background rendering is entirely guesswork
 Verified Dip locations and recommended settings with manual
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 

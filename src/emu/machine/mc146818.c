@@ -71,10 +71,10 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
-#include "machine/mc146818.h"
 #include "coreutil.h"
+#include "machine/mc146818.h"
 
 
 #define LOG_MC146818		0

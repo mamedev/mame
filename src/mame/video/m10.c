@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/m10.h"
 
 static UINT32 extyoffs[32 * 8];	// FIXME: this should be moved to m10_state, but backlayout would have problems

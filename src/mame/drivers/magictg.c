@@ -110,7 +110,7 @@ Medium size chip with heat sink on it
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/mips3.h"
 
 

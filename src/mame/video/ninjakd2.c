@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/ninjakd2.h"
 
 UINT8* ninjakd2_bg_videoram;

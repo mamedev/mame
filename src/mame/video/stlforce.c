@@ -1,6 +1,6 @@
 /* video/stlforce.c - see main driver for other notes */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *stlforce_bg_tilemap, *stlforce_mlow_tilemap, *stlforce_mhigh_tilemap, *stlforce_tx_tilemap;
 

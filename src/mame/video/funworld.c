@@ -57,7 +57,7 @@
 ***********************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "video/resnet.h"
 
 static tilemap_t *bg_tilemap;

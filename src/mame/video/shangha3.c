@@ -58,7 +58,7 @@ Word | Bit(s)           | Use
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 
 

@@ -98,7 +98,7 @@ Not all regional versions are available for each Megatouch series
   - for pbst30 only roms were found, it appears that two roms with graphics data were missing, using pitbossm roms for now
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

@@ -23,7 +23,7 @@ TS 2008.08.12:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/s2636.h"
 #include "cpu/s2650/s2650.h"
 

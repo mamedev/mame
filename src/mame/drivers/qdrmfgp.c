@@ -19,7 +19,7 @@ GP1 HDD data contents:
     0x52E-0x535 not used quiz (system music or invalid data)
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/idectrl.h"

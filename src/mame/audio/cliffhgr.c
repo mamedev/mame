@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "sound/discrete.h"
 
 #define CLIFF_ENABLE_SND_1	NODE_01

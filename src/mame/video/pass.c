@@ -1,6 +1,6 @@
 /* video/pass.c - see drivers/pass.c for more info */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *pass_bg_tilemap;
 static tilemap_t *pass_fg_tilemap;

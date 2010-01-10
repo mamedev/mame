@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 /* globals */
 UINT8 *timelimt_bg_videoram;

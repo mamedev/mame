@@ -213,7 +213,7 @@
 #define COM_CLOCK	XTAL_20MHz
 #define SND_CLOCK	XTAL_16_9344MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/ymz280b.h"
 

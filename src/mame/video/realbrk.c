@@ -19,7 +19,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/realbrk.h"
 
 UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs, *realbrk_vram_0ras, *realbrk_vram_1ras;

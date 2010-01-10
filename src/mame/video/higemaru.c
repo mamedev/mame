@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/higemaru.h"
 
 WRITE8_HANDLER( higemaru_videoram_w )

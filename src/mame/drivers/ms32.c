@@ -163,7 +163,7 @@ Super Strong Warriors
 
 /********** BITS & PIECES **********/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"

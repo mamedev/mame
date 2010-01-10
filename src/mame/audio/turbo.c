@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/turbo.h"
 #include "sound/samples.h"
 

@@ -1,6 +1,6 @@
 /* Super Slam - Video Hardware */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *sslam_bg_tilemap, *sslam_tx_tilemap, *sslam_md_tilemap;
 

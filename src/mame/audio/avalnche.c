@@ -3,7 +3,7 @@
     audio\avalnche.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/avalnche.h"
 #include "sound/discrete.h"
 

@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 
 UINT16 *prehisle_bg_videoram16;

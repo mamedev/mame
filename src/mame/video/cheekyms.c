@@ -8,7 +8,7 @@
 Functions to emulate the video hardware of the machine.
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/dac.h"
 #include "includes/cheekyms.h"
 

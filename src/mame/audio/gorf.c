@@ -17,7 +17,7 @@ gorf_sh_ update- Null
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "includes/astrocde.h"

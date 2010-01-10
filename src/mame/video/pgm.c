@@ -1,7 +1,7 @@
 /*** Video *******************************************************************/
 /* see drivers/pgm.c for notes on where improvements can be made */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pgm.h"
 
 /* Sprites - These are a pain! */

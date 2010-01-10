@@ -80,7 +80,7 @@ Compared to the real PCB, MAME is too fast, so 60fps needs to be changed to 58fp
 driver modified by Eisuke Watanabe
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

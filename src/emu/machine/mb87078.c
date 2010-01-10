@@ -68,7 +68,7 @@
 
  *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/mb87078.h"
 
 typedef struct _mb87078_state  mb87078_state;

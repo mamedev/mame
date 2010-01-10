@@ -694,7 +694,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "machine/atari_vg.h"

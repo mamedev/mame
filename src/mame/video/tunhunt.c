@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 extern UINT8 tunhunt_control;
 extern UINT8 *tunhunt_ram;

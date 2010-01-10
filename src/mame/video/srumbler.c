@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 
 UINT8 *srumbler_backgroundram,*srumbler_foregroundram;

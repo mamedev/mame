@@ -105,7 +105,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/fd1094.h"
 #include "cpu/m68000/m68kcpu.h"
 

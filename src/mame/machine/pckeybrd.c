@@ -16,7 +16,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pckeybrd.h"
 
 #ifdef MESS

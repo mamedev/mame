@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *stadhero_pf1_data;
 static UINT16 *stadhero_pf2_data;

@@ -3,7 +3,7 @@
     audio\skydiver.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/skydiver.h"
 #include "sound/discrete.h"
 

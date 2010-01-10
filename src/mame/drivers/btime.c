@@ -137,7 +137,7 @@ A few notes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"

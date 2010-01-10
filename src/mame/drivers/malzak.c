@@ -62,7 +62,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/sn76477.h"
 #include "video/s2636.h"

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/pk8000.h"
 
 static UINT8 pk8000_text_start;

@@ -349,7 +349,7 @@ Notes:
         - dangcurv needs correct controls hooking up.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms32051/tms32051.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taito_f3.h"

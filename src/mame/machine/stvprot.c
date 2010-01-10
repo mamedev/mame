@@ -98,7 +98,7 @@ encryption on the data used...
 For now I'm writing this function with a command basis so I can work better with it.
 ****************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "stvprot.h"
 
 static UINT32 a_bus[4];

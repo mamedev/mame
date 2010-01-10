@@ -3,7 +3,7 @@
     audio\canyon.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/canyon.h"
 #include "sound/discrete.h"
 

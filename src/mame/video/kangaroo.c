@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kangaroo.h"
 
 static void blitter_execute(running_machine *machine);

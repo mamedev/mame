@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/neogeo.h"
 #include "video/resnet.h"
 

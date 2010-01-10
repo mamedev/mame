@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "megadriv.h"
 
 ROM_START( ssf2ghw )

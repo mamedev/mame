@@ -33,7 +33,7 @@ Funzionamento: Non Funzionante
 Dumped: 06/04/2009 f205v
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 

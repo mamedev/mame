@@ -37,7 +37,7 @@ DASM code snippets:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "memconv.h"

@@ -34,7 +34,7 @@ lev 7 : 0x7c : 0000 0000 - x
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eeprom.h"

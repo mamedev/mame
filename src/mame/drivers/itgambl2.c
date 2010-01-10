@@ -52,7 +52,7 @@
 #define MAIN_CLOCK	XTAL_16MHz
 #define SND_CLOCK	XTAL_14_31818MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/upd7759.h"
 

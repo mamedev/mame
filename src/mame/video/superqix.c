@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *superqix_videoram;
 UINT8 *superqix_bitmapram,*superqix_bitmapram2;

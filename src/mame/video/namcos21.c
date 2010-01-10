@@ -6,7 +6,7 @@ Namco System 21 Video Hardware
 - 3d graphics are managed by DSP processors
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/namcos2.h"
 #include "includes/namcoic.h"
 #include "includes/namcos21.h"

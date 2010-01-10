@@ -4,7 +4,7 @@ Namco System 86 Video Hardware
 
 *******************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 
 UINT8 *rthunder_videoram1, *rthunder_videoram2, *rthunder_spriteram;

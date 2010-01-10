@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *splash_vregs;
 UINT16 *splash_videoram;

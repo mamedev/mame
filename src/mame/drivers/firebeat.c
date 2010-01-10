@@ -108,7 +108,7 @@
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/intelfsh.h"

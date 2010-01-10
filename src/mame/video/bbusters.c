@@ -21,7 +21,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *fix_tilemap,*pf1_tilemap,*pf2_tilemap;
 static const UINT8 *scale_table_ptr;

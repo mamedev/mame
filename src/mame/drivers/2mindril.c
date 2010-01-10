@@ -52,7 +52,7 @@ DAC               -26.6860Mhz
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 

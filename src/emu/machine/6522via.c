@@ -22,7 +22,7 @@
    timer init, reset, read changed
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "6522via.h"
 
 

@@ -95,7 +95,7 @@ CRU lines:
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 

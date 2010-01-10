@@ -52,11 +52,10 @@
 #include <mmsystem.h>
 
 // standard C headers
-#include <math.h>
 #include <process.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "emuopts.h"
 #include "uiinput.h"
 

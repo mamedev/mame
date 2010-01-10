@@ -20,7 +20,7 @@
 #define MASTER_CLOCK	20000000
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
 #include "sound/sn76496.h"

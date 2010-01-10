@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/k007232.h"

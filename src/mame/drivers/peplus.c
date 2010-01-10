@@ -160,7 +160,7 @@ Stephh's log (2007.11.28) :
 
 ***********************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/ay8910.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"

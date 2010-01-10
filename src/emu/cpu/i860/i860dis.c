@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "i860.h"
-#include <string.h>
 
 /* Macros for accessing register fields in instruction word.  */
 #define get_isrc1(bits) (((bits) >> 11) & 0x1f)

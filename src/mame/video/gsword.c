@@ -5,7 +5,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 size_t gsword_spritexy_size;
 

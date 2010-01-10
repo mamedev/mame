@@ -1,6 +1,6 @@
 /* Gumbo video */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gumbo.h"
 
 

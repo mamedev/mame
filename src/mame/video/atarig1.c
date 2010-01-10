@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/atarigen.h"
 #include "includes/atarig1.h"
 

@@ -41,7 +41,7 @@ The 2 ay-8910 read ports are responsible for reading the sound commands.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

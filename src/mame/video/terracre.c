@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 static UINT16 xscroll;
 static UINT16 yscroll;

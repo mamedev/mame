@@ -4,7 +4,7 @@ Atari Poolshark video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/poolshrk.h"
 
 UINT8* poolshrk_playfield_ram;

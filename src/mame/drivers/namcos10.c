@@ -263,7 +263,7 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 

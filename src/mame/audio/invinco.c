@@ -2,7 +2,7 @@
  *  Invinco sound routines
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "includes/vicdual.h"
 

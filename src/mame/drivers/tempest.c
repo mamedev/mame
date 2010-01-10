@@ -277,7 +277,7 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mathbox.h"
 #include "video/avgdvg.h"

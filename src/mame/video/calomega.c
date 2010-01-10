@@ -13,7 +13,7 @@
 ************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *calomega_videoram;
 UINT8 *calomega_colorram;

@@ -19,7 +19,7 @@ Up to 4096 bytes can be addressed.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/i2cmemdev.h"
 
 #define VERBOSE_LEVEL ( 0 )

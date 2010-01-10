@@ -21,7 +21,7 @@ are the same of IGS.  AMT may be previous IGS name.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/2413intf.h"
 

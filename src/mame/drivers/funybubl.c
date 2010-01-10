@@ -48,7 +48,7 @@ Note: SW2, SW3 & SW4 not populated
 
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "includes/funybubl.h"

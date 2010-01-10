@@ -12,7 +12,7 @@ VBlank duration: 1/VSYNC * (70/262) = 4368 us
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 

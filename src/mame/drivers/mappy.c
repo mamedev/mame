@@ -546,7 +546,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
 #include "sound/namco.h"

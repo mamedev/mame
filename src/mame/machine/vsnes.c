@@ -7,7 +7,7 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/ppu2c0x.h"
 #include "includes/vsnes.h"
 

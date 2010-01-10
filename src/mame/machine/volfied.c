@@ -14,7 +14,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/volfied.h"
 
 static const UINT16 palette_data_01[0x50] =

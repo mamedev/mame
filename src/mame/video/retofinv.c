@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/retofinv.h"
 
 UINT8 *retofinv_bg_videoram;

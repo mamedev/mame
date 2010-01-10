@@ -25,7 +25,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/esrip/esrip.h"
 #include "machine/6840ptm.h"

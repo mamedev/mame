@@ -94,7 +94,7 @@ p2 ink doesn't always light up in test mode
     this is correct behavior if DSW set as Upright mode
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 
 static bitmap_t *tile, *obj1, *obj2;

@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/nitedrvr.h"
 
 UINT8 *nitedrvr_hvc;

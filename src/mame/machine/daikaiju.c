@@ -97,7 +97,7 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/lsasquad.h"
 

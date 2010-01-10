@@ -6,7 +6,7 @@ enable / disable tilemap bits might be wrong
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/angelkds.h"
 
 

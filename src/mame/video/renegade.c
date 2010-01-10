@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *renegade_videoram2;
 static INT32 renegade_scrollx;

@@ -5,7 +5,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *sshangha_pf2_data,*sshangha_pf1_data;
 UINT16 *sshangha_pf1_rowscroll,*sshangha_pf2_rowscroll;

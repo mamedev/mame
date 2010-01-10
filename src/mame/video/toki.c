@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *background_layer,*foreground_layer,*text_layer;
 

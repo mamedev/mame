@@ -3,7 +3,7 @@
     prom GB09.K6 may be related to background tile-sprite priority
 */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *background, *foreground;
 extern UINT8 *shootout_textram;

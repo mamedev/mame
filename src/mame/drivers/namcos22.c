@@ -1137,7 +1137,7 @@
  *                                                     2   Ground
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "includes/namcos22.h"

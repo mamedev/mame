@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"

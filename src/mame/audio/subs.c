@@ -3,7 +3,7 @@
     audio\subs.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/subs.h"
 #include "sound/discrete.h"
 

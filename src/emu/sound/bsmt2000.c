@@ -11,8 +11,6 @@
 
 ***************************************************************************/
 
-#include <math.h>
-
 #include "emu.h"
 #include "streams.h"
 #include "bsmt2000.h"

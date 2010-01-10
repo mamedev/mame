@@ -119,7 +119,7 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #define SOUND_CPU_CLOCK		XTAL_7MHz		/* clock for sound 68000 */
 #define OKI4_SOUND_CLOCK	XTAL_4MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"

@@ -47,13 +47,12 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/slapstic.h"
 #include "includes/atetris.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
-#include "state.h"
 
 
 #define MASTER_CLOCK		XTAL_14_31818MHz

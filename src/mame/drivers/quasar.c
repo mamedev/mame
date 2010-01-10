@@ -57,7 +57,7 @@ Sound Board 1b11107
 
 ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"

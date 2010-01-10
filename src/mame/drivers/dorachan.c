@@ -8,7 +8,7 @@ Todo:
 - dips (if any) - bits 5,6,7 of input port 0 ?
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 

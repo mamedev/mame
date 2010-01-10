@@ -250,7 +250,7 @@ To Do / Unknowns:
 *****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 #include "cpu/nec/nec.h"
 #include "cpu/m68000/m68000.h"

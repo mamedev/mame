@@ -19,7 +19,7 @@ Todo:
         -what really is I/O 0x02?
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"

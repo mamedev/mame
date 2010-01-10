@@ -38,7 +38,7 @@ In test mode (c) is 2000
 
 *************************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"

@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "snescx4.h"
 
 static CX4 cx4;

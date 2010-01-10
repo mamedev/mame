@@ -11,7 +11,7 @@
     as long as the game doesn't query the maker ID.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "intelfsh.h"
 
 enum

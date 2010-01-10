@@ -6,7 +6,7 @@ Thanks to GAELCO SA for information on the algorithm.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gaelcrpt.h"
 
 static int decrypt(int const param1, int const param2, int const enc_prev_word, int const dec_prev_word, int const enc_word)

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *rollrace_videoram;
 UINT8 *rollrace_colorram;

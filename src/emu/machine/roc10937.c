@@ -5,7 +5,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "roc10937.h"
 
 static struct

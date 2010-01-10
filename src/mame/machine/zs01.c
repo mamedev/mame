@@ -7,7 +7,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/zs01.h"
 
 #define VERBOSE_LEVEL ( 0 )

@@ -55,7 +55,7 @@ and 1 SFX channel controlled by an 8039:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/konami1.h"

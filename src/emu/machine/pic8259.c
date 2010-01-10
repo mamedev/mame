@@ -11,7 +11,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pic8259.h"
 
 #define IRQ_COUNT	8

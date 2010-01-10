@@ -26,7 +26,7 @@ TODO:
  - Poizone controls are checked exactly once at bootup, breaking them.
 
 **********************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/arm/arm.h"
 
 #define NUM_PENS	(0x100)

@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/videopin.h"
 
 UINT8* videopin_video_ram;

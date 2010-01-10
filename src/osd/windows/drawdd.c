@@ -45,9 +45,6 @@
 #include <mmsystem.h>
 #include <ddraw.h>
 
-// standard C headers
-#include <math.h>
-
 // MAME headers
 #include "emu.h"
 #include "render.h"

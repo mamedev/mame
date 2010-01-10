@@ -22,7 +22,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"

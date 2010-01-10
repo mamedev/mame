@@ -163,7 +163,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"

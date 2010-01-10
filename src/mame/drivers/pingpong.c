@@ -4,7 +4,7 @@ Ping Pong (c) 1985 Konami
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"

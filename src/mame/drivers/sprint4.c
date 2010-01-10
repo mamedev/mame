@@ -4,7 +4,7 @@ Atari Sprint 4 driver
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "audio/sprint4.h"
 

@@ -3,7 +3,7 @@
     audio\nitedrvr.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/nitedrvr.h"
 #include "sound/discrete.h"
 

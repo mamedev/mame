@@ -1,6 +1,6 @@
 /* video/shangkid */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 
 static tilemap_t *background;

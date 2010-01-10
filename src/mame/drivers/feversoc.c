@@ -58,7 +58,7 @@ U0564 LH28F800SU OBJ4-1
 
 *******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/sh2/sh2.h"
 #include "includes/seibuspi.h"
 #include "sound/okim6295.h"

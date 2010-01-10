@@ -84,7 +84,7 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 

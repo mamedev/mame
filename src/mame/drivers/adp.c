@@ -144,7 +144,7 @@ Video board has additional chips:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
 #include "video/hd63484.h"

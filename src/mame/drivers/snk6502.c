@@ -262,7 +262,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"

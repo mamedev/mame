@@ -76,7 +76,7 @@ Multi monitor notes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gaelco2.h"
 
 UINT16 *gaelco2_vregs;

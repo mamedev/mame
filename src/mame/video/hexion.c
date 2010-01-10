@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 
 static UINT8 *vram[2],*unkram;

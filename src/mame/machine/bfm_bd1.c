@@ -4,7 +4,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "bfm_bd1.h"
 
 static struct

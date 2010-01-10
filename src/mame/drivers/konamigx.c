@@ -94,7 +94,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 
 #include "video/konamiic.h"

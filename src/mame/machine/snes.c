@@ -14,7 +14,7 @@
 ***************************************************************************/
 #define __MACHINE_SNES_C
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/snes.h"
 #include "cpu/superfx/superfx.h"
 #include "cpu/g65816/g65816.h"

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"

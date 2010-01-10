@@ -15,7 +15,7 @@ TODO:
 
 *******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "cpu/z80/z80.h"

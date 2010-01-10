@@ -8,7 +8,7 @@ The DS5002FP has up to 128KB undumped gameplay code making the game unplayable :
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "includes/glass.h"

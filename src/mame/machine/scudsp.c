@@ -49,7 +49,7 @@ Changelog:
 - Add control flags
 
 ******************************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
 

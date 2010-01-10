@@ -74,7 +74,7 @@ ROMS: All ROM labels say only "PROM" and a number.
       11, 12, 13 type 2732
 
 */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"

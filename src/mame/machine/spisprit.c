@@ -11,7 +11,7 @@ cpu #0 (PC=0033C315): unmapped program memory dword write to 00000524 = 9CAC0000
 #endif
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/seibuspi.h"
 
 // add two numbers generating carry from one bit to the next only if

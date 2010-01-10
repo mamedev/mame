@@ -597,7 +597,7 @@ ALL VROM ROMs are 16M MASK
     0014b110 - service routine for IRQ 0x40 (SCSP)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "cpu/powerpc/ppc.h"

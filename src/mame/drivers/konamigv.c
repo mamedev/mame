@@ -112,7 +112,7 @@ Notes:
         to that same game. It won't work with a blank EEPROM or a different games' EEPROM.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"

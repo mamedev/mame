@@ -29,7 +29,7 @@ This code requires that the player & coin inputs be in input ports 2-4.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/cchip.h"
 
 static UINT16 current_bank = 0;

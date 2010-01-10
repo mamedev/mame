@@ -27,7 +27,7 @@ needs more color combination to render its graphics.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/resnet.h"
 #include "includes/timeplt.h"
 

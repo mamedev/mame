@@ -43,7 +43,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 ***************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"

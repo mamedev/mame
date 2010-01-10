@@ -1,9 +1,7 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/hng64.h"
 
-#include <math.h>
 #include "drawgfxm.h"
-#include "tilemap.h"
 
 #define MAKE_MAME_REEEEAAALLLL_SLOW 0
 

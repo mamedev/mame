@@ -87,7 +87,7 @@ Turbo Outrun               171-5782    837-6963-61       610-0239-61         MPR
 Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR-15000A-F   (838200)      EPR-12368-62   (27256)   n/a
 
 */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "rendlay.h"

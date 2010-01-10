@@ -12,7 +12,7 @@
      -- Much of the communication is done via a 68681 DUART.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 

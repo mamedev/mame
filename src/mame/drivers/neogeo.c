@@ -191,7 +191,7 @@ NOTE: On CTRG2-B, The "A" lines start at "A1". If you trace this on an
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/neogeo.h"
 #include "machine/pd4990a.h"

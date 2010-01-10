@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/amiga.h"
 #include "cdrom.h"
 #include "coreutil.h"

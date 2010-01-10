@@ -13,7 +13,7 @@ on the 2/4p board is 053253.  This chip is also on Run n Gun which should
 likewise be a 2 screen game
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konicdev.h"

@@ -8,7 +8,7 @@
  * mike@the-coates.com
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 
 #include "tinv2650.lh"

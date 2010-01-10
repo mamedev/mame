@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konicdev.h"
 #include "sound/2151intf.h"

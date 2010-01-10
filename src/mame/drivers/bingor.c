@@ -437,7 +437,7 @@
 
 ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/saa1099.h"

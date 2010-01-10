@@ -76,7 +76,7 @@ Custom: Imagetek 15000 (2ch video & 2ch sound)
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"

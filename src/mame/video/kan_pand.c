@@ -47,7 +47,7 @@
 
 ***********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/kan_pand.h"
 
 typedef struct _kaneko_pandora_state  kaneko_pandora_state;

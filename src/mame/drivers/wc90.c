@@ -74,7 +74,7 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
 #include "includes/wc90.h"

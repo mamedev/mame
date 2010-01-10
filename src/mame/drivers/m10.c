@@ -110,7 +110,7 @@ Notes (couriersud)
     been a prototype or eventually the famous "capsule invader".
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"

@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
 

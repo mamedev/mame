@@ -233,7 +233,7 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 
 ******************************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "debugger.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/m68000/m68000.h"

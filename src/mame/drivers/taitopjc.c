@@ -54,7 +54,7 @@
    1.84320MHz osc
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/powerpc/ppc.h"
 
 

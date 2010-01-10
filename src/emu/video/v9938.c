@@ -14,7 +14,7 @@
  - make vdp engine work in exp. ram
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "v9938.h"
 
 #define VERBOSE 0

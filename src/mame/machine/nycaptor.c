@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/nycaptor.h"
 
 static UINT8 from_main,from_mcu;

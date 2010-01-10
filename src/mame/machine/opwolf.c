@@ -35,7 +35,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/opwolf.h"
 
 /* Select how coinage data is initialised in opwolf_cchip_data_w : 0 = user-defined in function - 1 = automatic */

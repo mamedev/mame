@@ -8,7 +8,7 @@ Video hardware driver by Uki
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *momoko_bg_scrollx;
 UINT8 *momoko_bg_scrolly;

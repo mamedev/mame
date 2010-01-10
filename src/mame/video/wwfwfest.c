@@ -6,7 +6,7 @@
  see (drivers/wwfwfest.c) for more notes
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/wwfwfest.h"
 
 static tilemap_t *fg0_tilemap, *bg0_tilemap, *bg1_tilemap;

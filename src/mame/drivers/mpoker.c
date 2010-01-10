@@ -167,7 +167,7 @@
 
 #define MASTER_CLOCK	XTAL_18MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "sound/dac.h"
 #include "mpoker.lh"

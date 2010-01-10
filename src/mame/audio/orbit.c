@@ -3,7 +3,7 @@
     audio\orbit.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/orbit.h"
 #include "sound/discrete.h"
 

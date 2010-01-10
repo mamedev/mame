@@ -142,7 +142,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 #include "includes/jaguar.h"
 #include "cpu/jaguar/jaguar.h"

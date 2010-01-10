@@ -16,7 +16,7 @@ Framebuffer todo:
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/scsp.h"
 #include "includes/stv.h"
 

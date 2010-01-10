@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "audio/m72.h"
 #include "includes/m72.h"
 

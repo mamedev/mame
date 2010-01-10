@@ -6,7 +6,7 @@
     Juergen Buchmueller, June 1998
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
 

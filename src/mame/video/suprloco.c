@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *suprloco_videoram;
 UINT8 *suprloco_scrollram;

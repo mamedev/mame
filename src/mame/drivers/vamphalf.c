@@ -26,7 +26,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"

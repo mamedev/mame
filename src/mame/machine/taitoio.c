@@ -42,7 +42,7 @@ Newer version of the I/O chip ?
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/taitoio.h"
 
 

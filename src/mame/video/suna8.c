@@ -69,7 +69,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/suna8.h"
 
 #define TILEMAPS 0

@@ -54,7 +54,7 @@ and two large (paddles pretending to be) guns.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/m79amb.h"
 #include "cpu/i8085/i8085.h"
 

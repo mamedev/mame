@@ -1,6 +1,6 @@
 /* LSI Logic LSI53C810A PCI to SCSI I/O Processor */
 
-#include "driver.h"
+#include "emu.h"
 #include "53c810.h"
 
 #define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */

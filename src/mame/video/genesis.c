@@ -7,7 +7,7 @@
 
 ***********************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/sn76496.h"
 
 #include "includes/genesis.h"

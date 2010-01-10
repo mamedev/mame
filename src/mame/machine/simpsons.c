@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/konicdev.h"
 #include "cpu/konami/konami.h"
 #include "machine/eeprom.h"

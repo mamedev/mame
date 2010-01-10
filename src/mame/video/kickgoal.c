@@ -1,6 +1,6 @@
 /* Kick Goal - video */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kickgoal.h"
 
 

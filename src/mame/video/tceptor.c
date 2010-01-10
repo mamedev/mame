@@ -3,7 +3,7 @@
  *  emulate video hardware
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/namcoic.h"
 
 #define TX_TILE_OFFSET_CENTER	(32 * 2)

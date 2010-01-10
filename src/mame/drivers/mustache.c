@@ -27,7 +27,7 @@ YM2151:
 . Pin 24 - 3577600.55 OSC1/4
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"	// for seibu_sound_decrypt on the MAIN cpu (not sound)
 #include "audio/t5182.h"

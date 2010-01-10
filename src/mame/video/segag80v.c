@@ -4,11 +4,10 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "avgdvg.h"
 #include "video/vector.h"
 #include "includes/segag80v.h"
-#include <math.h>
 
 #define VECTOR_CLOCK		15468480			/* master clock */
 #define U34_CLOCK			(VECTOR_CLOCK/3)	/* clock for interrupt chain */

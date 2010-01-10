@@ -118,7 +118,7 @@ Abnormalities:
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/toaplan1.h"
 #include "cpu/m68000/m68000.h"
 

@@ -27,7 +27,7 @@ CYC1399
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 static VIDEO_START( cmmb )

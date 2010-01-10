@@ -36,7 +36,7 @@ forcing all sprites on a row to have an added blue component.
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"

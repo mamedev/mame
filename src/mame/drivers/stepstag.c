@@ -15,7 +15,7 @@
 
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "rendlay.h"
 #include "stepstag.lh"

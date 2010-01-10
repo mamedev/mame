@@ -11,7 +11,7 @@
 */
 
 #define DE156CPU ARM
-#include "driver.h"
+#include "emu.h"
 #include "includes/decocrpt.h"
 #include "includes/deco32.h"
 #include "machine/eeprom.h"

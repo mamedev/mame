@@ -67,7 +67,7 @@ other supported games as well.
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/iremz80.h"
 #include "includes/iremipt.h"

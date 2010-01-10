@@ -60,7 +60,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"

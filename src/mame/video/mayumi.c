@@ -7,7 +7,7 @@ Video hardware
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *mayumi_videoram;
 static tilemap_t *mayumi_tilemap;

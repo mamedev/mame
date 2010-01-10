@@ -16,7 +16,7 @@
 ***********************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 

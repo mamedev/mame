@@ -6,7 +6,7 @@ To enter service mode, keep 1&2 pressed on reset
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"

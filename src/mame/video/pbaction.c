@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *pbaction_videoram, *pbaction_colorram;
 UINT8 *pbaction_videoram2, *pbaction_colorram2;

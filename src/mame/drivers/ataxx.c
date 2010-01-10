@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/eeprom.h"
 #include "cpu/z80/z80.h"

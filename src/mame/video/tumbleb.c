@@ -14,7 +14,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/tumbleb.h"
 
 

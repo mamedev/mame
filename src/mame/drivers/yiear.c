@@ -47,7 +47,7 @@ The 6809 NMI is used for sound timing.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"

@@ -7,7 +7,7 @@ Video hardware
 
 *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 int mjsister_screen_redraw;
 int mjsister_flip_screen;

@@ -1,4 +1,3 @@
-#include <math.h>
 #include "emu.h"
 #include "streams.h"
 #include "2203intf.h"

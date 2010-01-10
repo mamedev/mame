@@ -150,7 +150,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/x1_010.h"
 #include "includes/tnzs.h"

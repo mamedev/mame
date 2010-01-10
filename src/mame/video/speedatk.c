@@ -3,7 +3,7 @@
  Speed Attack video hardware emulation
 
 *****************************************************************************************/
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *speedatk_videoram;
 UINT8 *speedatk_colorram;

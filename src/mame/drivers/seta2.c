@@ -527,7 +527,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"

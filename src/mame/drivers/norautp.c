@@ -529,7 +529,7 @@
 #define NORAUT_CPU_CLOCK		NORAUT_MASTER_CLOCK / 8		/* 2.30275 MHz - Measured: 2.305 MHz */
 #define DPHL_CPU_CLOCK			DPHL_MASTER_CLOCK / 9		/* 2 MHz (from 8224) */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"

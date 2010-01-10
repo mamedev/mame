@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/espial.h"
 
 WRITE8_HANDLER( zodiack_videoram_w )

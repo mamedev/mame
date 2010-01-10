@@ -117,7 +117,7 @@ connector, but of course, I can be wrong.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "megadriv.h"
 
 static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */

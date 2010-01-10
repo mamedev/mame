@@ -492,7 +492,7 @@ The data bus is 16 bits wide.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "drawgfxm.h"
 #include "taitoic.h"
 

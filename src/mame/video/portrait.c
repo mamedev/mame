@@ -5,7 +5,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 int portrait_scroll;
 UINT8 *portrait_bgvideoram, *portrait_fgvideoram;

@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "jalblend.h"
 
 #define	BG_SCROLLX_LSB		0x308

@@ -58,7 +58,7 @@ ALPHA DENSHI CO.,LTD  JUNE / 24 / 1986  FOR
 SOFT  PSG & VOICE  BY M.C & S.H
 
 */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"

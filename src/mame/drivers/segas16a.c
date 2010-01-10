@@ -143,7 +143,7 @@ Shinobi        EPR11268  -         -         -         EPR11290  EPR11294  EPR11
 Tetris         -         -         -         -         EPR12169  EPR12170  -         -         -         -         -         -
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"

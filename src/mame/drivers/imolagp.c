@@ -73,7 +73,7 @@ Known issues:
 - the 8255 is not hooked up
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"

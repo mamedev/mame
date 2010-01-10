@@ -125,7 +125,7 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"

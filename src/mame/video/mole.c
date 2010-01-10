@@ -6,7 +6,7 @@
   and uses a control location (0x8400) to select the character sets
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 static int tile_bank;
 static UINT16 *tileram;

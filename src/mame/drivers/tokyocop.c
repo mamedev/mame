@@ -16,7 +16,7 @@ I/O Board with Altera Flex EPF15K50EQC240-3
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 
 static VIDEO_START(tokyocop)

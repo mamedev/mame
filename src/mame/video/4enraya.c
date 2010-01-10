@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/4enraya.h"
 
 WRITE8_HANDLER( fenraya_videoram_w )

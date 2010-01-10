@@ -41,7 +41,7 @@ Notes:
 
 ************************************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"

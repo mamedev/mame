@@ -29,7 +29,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/galivan.h"
 
 /* Layers has only bits 5-6 active.

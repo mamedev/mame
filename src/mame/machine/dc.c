@@ -4,7 +4,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "debugger.h"
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"

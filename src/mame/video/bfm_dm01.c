@@ -36,7 +36,7 @@ Standard dm01 memorymap
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"
 #include "bfm_dm01.h"

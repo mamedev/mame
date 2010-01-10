@@ -49,7 +49,7 @@
 #endif
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "uiinput.h"
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"

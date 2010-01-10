@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/poly.h"
 
 UINT8 *taitojc_texture;

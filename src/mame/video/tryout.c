@@ -5,7 +5,7 @@
 
 ****************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *fg_tilemap, *bg_tilemap;
 static UINT8 vram_bank;

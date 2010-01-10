@@ -47,7 +47,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "namco54.h"
 #include "cpu/mb88xx/mb88xx.h"
 

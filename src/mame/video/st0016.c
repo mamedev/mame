@@ -3,7 +3,7 @@
     driver by Tomasz Slanina
 ************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/st0016.h"
 
 UINT8 *st0016_charram;

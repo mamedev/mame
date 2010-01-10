@@ -18,7 +18,7 @@ TODO:
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "deprecat.h"

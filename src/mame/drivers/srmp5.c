@@ -34,7 +34,7 @@ This is not a bug (real machine behaves the same).
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mips/r3000.h"

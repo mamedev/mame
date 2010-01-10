@@ -6,8 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
-#include "timer.h"
+#include "emu.h"
 #include "6850acia.h"
 
 

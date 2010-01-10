@@ -361,7 +361,7 @@
 
 #define MASTER_CLOCK	XTAL_16MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
 #include "snookr10.lh"

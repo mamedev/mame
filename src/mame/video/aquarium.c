@@ -1,6 +1,6 @@
 /* Aquarium */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/aquarium.h"
 
 /* gcpinbal.c modified */

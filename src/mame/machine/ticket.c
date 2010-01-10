@@ -10,7 +10,7 @@
         of arguments to ticket_dispenser_init.
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/ticket.h"
 
 #define DEBUG_TICKET 0

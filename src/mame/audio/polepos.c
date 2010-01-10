@@ -2,7 +2,7 @@
     polepos.c
     Sound handler
 ****************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "sound/filter.h"
 #include "machine/rescap.h"

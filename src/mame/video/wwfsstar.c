@@ -6,7 +6,7 @@
  see (drivers/wwfsstar.c) for more notes
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *wwfsstar_fg0_videoram, *wwfsstar_bg0_videoram;
 extern int wwfsstar_scrollx, wwfsstar_scrolly;

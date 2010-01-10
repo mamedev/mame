@@ -191,7 +191,7 @@ actual code sent to the hardware.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/megasys1.h"
 
 /* Variables defined here, that have to be shared: */

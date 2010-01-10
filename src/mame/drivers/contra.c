@@ -16,7 +16,7 @@ Dip locations and factory settings verified with manual
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "video/konicdev.h"

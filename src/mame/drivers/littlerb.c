@@ -58,7 +58,7 @@ Dip sw.2
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 static UINT16 littlerb_vdp_address_low;

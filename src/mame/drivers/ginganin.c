@@ -48,7 +48,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"

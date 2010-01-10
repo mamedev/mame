@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"

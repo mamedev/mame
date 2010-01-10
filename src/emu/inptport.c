@@ -101,7 +101,6 @@
 
 #include <ctype.h>
 #include <time.h>
-#include <stdarg.h>
 
 #ifdef MESS
 #include "uimess.h"

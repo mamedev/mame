@@ -126,7 +126,7 @@ ROMs -
 
 ----------------------------------------------------------------*/
 
-#include "driver.h"
+#include "emu.h"
 
 #include "cpu/sh2/sh2.h"
 #include "machine/eeprom.h"

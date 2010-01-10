@@ -7,7 +7,7 @@
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/h6280/h6280.h"
 

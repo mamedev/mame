@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/polepos.h"
 
 UINT16 *polepos_view16_memory;

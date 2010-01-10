@@ -1,6 +1,6 @@
 /* video/mugsmash.c - see drivers/mugsmash.c for more info */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *mugsmash_tilemap1,  *mugsmash_tilemap2;
 

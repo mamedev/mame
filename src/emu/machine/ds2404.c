@@ -1,6 +1,6 @@
 /* Dallas DS2404 RTC/NVRAM */
 
-#include "driver.h"
+#include "emu.h"
 #include "ds2404.h"
 #include <time.h>
 

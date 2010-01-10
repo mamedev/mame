@@ -9,7 +9,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "am53cf96.h"
 
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;

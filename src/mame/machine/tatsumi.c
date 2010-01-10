@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/tatsumi.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"

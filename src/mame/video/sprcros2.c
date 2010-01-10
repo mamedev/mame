@@ -3,7 +3,7 @@ Super Cross II (JPN Ver.)
 (c)1986 GM Shoji
 */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *sprcros2_bgtilemap, *sprcros2_fgtilemap;
 UINT8 *sprcros2_fgvideoram, *sprcros2_spriteram, *sprcros2_bgvideoram;

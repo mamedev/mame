@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/konicdev.h"
 
 int qdrmfgp_get_palette(void);

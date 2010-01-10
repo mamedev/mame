@@ -3,7 +3,7 @@
     audio\poolshrk.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/poolshrk.h"
 #include "sound/discrete.h"
 

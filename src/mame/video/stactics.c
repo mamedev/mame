@@ -46,7 +46,7 @@ tilt the mirror up and down, and the monitor left and right.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/stactics.h"
 
 

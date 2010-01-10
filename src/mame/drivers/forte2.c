@@ -20,7 +20,7 @@ insert a new coin after the game is over if you want another play.
 According to Alexandre, there are more games for this board, but not
 found/dumped yet. */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"

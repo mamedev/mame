@@ -61,7 +61,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pacman.h"
 
 static INT8 counter=0;

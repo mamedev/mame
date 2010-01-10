@@ -116,7 +116,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/meadows.h"
 #include "sound/dac.h"

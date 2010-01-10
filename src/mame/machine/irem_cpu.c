@@ -39,7 +39,7 @@
 
 
 
-#include "driver.h"
+#include "emu.h"
 #include "irem_cpu.h"
 
 

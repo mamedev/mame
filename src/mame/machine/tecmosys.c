@@ -28,7 +28,7 @@
     You can get me at nuapete@hotmail.com
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/tecmosys.h"
 
 enum DEV_STATUS

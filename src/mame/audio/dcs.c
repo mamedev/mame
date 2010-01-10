@@ -149,7 +149,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "dcs.h"
 #include "sound/dmadac.h"

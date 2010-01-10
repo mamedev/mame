@@ -57,7 +57,7 @@ TODO:
 ===============================================================================
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pic8259.h"
 /* Insert IBM PC includes here */

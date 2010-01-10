@@ -4,7 +4,7 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/firetrk.h"
 
 

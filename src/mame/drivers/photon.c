@@ -13,7 +13,7 @@
     - Treasure/Labyrinth
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/pk8000.h"
 #include "machine/i8255a.h"

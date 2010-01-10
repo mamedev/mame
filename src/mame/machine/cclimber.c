@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/cclimber.h"
 
 /* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */

@@ -3,7 +3,7 @@
  * Sept 2009, Derrick Renaud
  ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/sprint8.h"
 
 

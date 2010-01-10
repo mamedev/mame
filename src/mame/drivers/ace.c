@@ -37,7 +37,7 @@ A1                   2101            2101
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 
 #define MASTER_CLOCK XTAL_18MHz

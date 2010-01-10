@@ -920,7 +920,7 @@ Notes:
       Point Blank 2 (GNB5/VER.A)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/psx.h"
 #include "cpu/h83002/h8.h"
 #include "includes/psx.h"

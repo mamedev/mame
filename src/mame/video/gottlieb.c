@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gottlieb.h"
 #include "machine/laserdsc.h"
 #include "video/resnet.h"

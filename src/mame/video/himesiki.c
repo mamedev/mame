@@ -7,7 +7,7 @@ Video hardware
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/himesiki.h"
 
 static TILE_GET_INFO( get_bg_tile_info )

@@ -80,11 +80,10 @@ TODO :  This is a partially working driver.  Most of the memory maps for
     ----------------------------------------------
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i860/i860.h"
-#include "video/generic.h"
 #include "video/tlc34076.h"
 #include "video/mc6845.h"
 #include "sound/dac.h"

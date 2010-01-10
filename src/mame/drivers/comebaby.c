@@ -56,7 +56,7 @@
   Easy enough to fix a broken game if you have the controls to plug into it.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 
 static VIDEO_START(comebaby)

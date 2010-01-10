@@ -99,7 +99,7 @@ $8000 - $ffff   ROM
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"

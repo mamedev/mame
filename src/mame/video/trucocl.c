@@ -32,7 +32,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *trucocl_videoram;
 UINT8 *trucocl_colorram;

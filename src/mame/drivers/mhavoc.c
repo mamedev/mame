@@ -183,7 +183,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"

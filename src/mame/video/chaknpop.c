@@ -3,7 +3,7 @@
  *  emulate video hardware
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/chaknpop.h"
 
 #define GFX_FLIP_X	0x01

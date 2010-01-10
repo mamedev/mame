@@ -142,7 +142,7 @@ REF. 970429
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"

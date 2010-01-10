@@ -7,7 +7,7 @@ Video hardware
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/drmicro.h"
 
 

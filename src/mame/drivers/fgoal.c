@@ -16,7 +16,7 @@ Differences between these sets include
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/mb14241.h"
 #include "includes/fgoal.h"

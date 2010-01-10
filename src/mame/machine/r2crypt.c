@@ -1,6 +1,6 @@
 /* Raiden 2 Sprite Decryption */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/raiden2.h"
 
 /* INIT */

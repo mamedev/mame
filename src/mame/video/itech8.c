@@ -87,7 +87,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/tms34061.h"
 #include "video/tlc34076.h"
 #include "cpu/m6809/m6809.h"

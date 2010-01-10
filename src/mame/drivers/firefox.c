@@ -25,7 +25,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"

@@ -5,7 +5,7 @@ this could get messy if games change their own code after initial loading as we'
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
 #include "includes/segas24.h"

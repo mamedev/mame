@@ -5,7 +5,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/carjmbre.h"
 
 PALETTE_INIT( carjmbre )

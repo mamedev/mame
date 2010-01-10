@@ -25,7 +25,7 @@
     company in 1981 and changed its name to IGT.
 
 ***********************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "sound/ay8910.h"
 #include "cpu/mcs48/mcs48.h"
 

@@ -2,19 +2,18 @@
 
     driver.h
 
-    Include this with all MAME files. Includes all the core system pieces.
+    Definitions relating to game drivers.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
-// temporary: redirect #include "driver.h" to #include "emu.h"
-#ifndef __EMU_H__
-#include "emu.h"
-#else
-
 #pragma once
+
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
 
 #ifndef __DRIVER_H__
 #define __DRIVER_H__
@@ -142,7 +141,5 @@ const game_driver *driver_get_clone(const game_driver *driver);
 void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list);
 int driver_list_get_count(const game_driver * const driverlist[]);
 
-
-#endif	/* __DRIVER_H__ */
 
 #endif

@@ -13,13 +13,8 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "emu.h"
 #include <ctype.h>
-#include "mame.h"
-#include "driver.h"
-#include "osdepend.h"
 
 static int interrupt_enable;
 

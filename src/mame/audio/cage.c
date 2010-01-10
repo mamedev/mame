@@ -9,7 +9,7 @@
 #define LOG_32031_IOPORTS	(0)
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms32031/tms32031.h"
 #include "sound/dmadac.h"
 #include "cage.h"

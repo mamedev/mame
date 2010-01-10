@@ -22,7 +22,7 @@ Revisions:
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "includes/aeroboto.h"

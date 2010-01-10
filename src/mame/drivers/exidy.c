@@ -125,7 +125,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "includes/exidy.h"

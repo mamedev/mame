@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"

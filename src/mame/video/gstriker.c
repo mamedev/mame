@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/gstriker.h"
 
 //UINT16 *gs_videoram3;

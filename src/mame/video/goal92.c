@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/goal92.h"
 
 READ16_HANDLER( goal92_fg_bank_r )

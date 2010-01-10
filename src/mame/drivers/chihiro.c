@@ -34,9 +34,8 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
-#include "video/generic.h"
 #include "includes/naomibd.h"
 
 static ADDRESS_MAP_START( xbox_map, ADDRESS_SPACE_PROGRAM, 32 )

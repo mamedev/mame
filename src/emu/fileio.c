@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "osdepend.h"
 #include "hash.h"
 #include "unzip.h"
 #include "options.h"

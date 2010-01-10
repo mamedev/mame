@@ -42,7 +42,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/iremipt.h"
 #include "includes/iremz80.h"
 #include "cpu/z80/z80.h"

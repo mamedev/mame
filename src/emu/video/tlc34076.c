@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "tlc34076.h"
 
 static UINT8 local_paletteram[0x300];

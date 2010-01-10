@@ -2,7 +2,7 @@
 ** Model 1 coprocessor TGP simulation
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "debugger.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"

@@ -51,7 +51,7 @@ YM2203C
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "machine/8255ppi.h"

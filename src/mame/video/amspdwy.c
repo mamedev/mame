@@ -12,7 +12,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/amspdwy.h"
 
 

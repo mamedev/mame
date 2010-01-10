@@ -1,6 +1,6 @@
 /* 8080bw.c *******************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
 #include "sound/discrete.h"

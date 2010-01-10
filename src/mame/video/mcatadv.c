@@ -10,7 +10,7 @@ Nost final boss, the priority of the arms is under the tilemaps, everything else
 ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 #include "includes/mcatadv.h"
 

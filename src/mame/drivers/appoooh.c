@@ -161,7 +161,7 @@ Language
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/appoooh.h"
 #include "machine/segacrpt.h"		// needed for robowres_decode

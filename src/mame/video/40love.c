@@ -2,7 +2,7 @@
 *   Video Driver for Forty-Love
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/buggychl.h"
 
 

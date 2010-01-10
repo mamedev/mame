@@ -9,7 +9,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/timekpr.h"
 
 typedef struct

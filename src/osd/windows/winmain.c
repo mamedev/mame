@@ -51,7 +51,7 @@
 #include <stdarg.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "clifront.h"
 #include "emuopts.h"
 

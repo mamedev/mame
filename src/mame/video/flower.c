@@ -1,6 +1,6 @@
 /* Flower Video Hardware */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/flower.h"
 
 static tilemap_t *flower_bg0_tilemap, *flower_bg1_tilemap, *flower_text_tilemap, *flower_text_right_tilemap;

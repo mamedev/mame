@@ -157,7 +157,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"

@@ -42,7 +42,7 @@ Some debug tricks (let's test this CPU as more as possible):
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"

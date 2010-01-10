@@ -6,8 +6,7 @@
     Many improvements by angrylion, Ziggy, Gonetz, Orkin
 */
 
-#include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "includes/n64.h"
 
 #define LOG_RDP_EXECUTION		0

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *usgames_videoram,*usgames_charram;
 

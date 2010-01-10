@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "render.h"
 #include "video/resnet.h"
 #include "cpu/i86/i86.h"

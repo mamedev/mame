@@ -30,7 +30,7 @@ To do:
 
 ************************************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "memconv.h"
 #include "cpu/h83002/h8.h"

@@ -86,7 +86,7 @@
 /*                                                                          */
 /****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/mb14241.h"

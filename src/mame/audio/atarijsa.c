@@ -30,7 +30,7 @@ Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"

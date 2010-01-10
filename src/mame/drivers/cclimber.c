@@ -201,7 +201,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/ay8910.h"

@@ -282,7 +282,7 @@ Notes:
 #define PGMLOGERROR 0
 #define PGMARM7LOGERROR 1
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/arm7/arm7.h"

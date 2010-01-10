@@ -3,7 +3,7 @@
     audio\triplhnt.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/triplhnt.h"
 #include "sound/discrete.h"
 

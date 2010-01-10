@@ -54,9 +54,6 @@
 #include <mmsystem.h>
 #include <d3d9.h>
 
-// standard C headers
-#include <math.h>
-
 // MAME headers
 #include "emu.h"
 #include "render.h"

@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/lockon.h"
 #include "cpu/nec/nec.h"
 #include "video/resnet.h"

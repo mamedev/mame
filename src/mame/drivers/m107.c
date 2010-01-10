@@ -23,7 +23,7 @@ confirmed for m107 games as well.
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "includes/m107.h"
 #include "includes/iremipt.h"

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "sound/ym2151.h"
 #include "sound/namco.h"
 #include "includes/namcos1.h"

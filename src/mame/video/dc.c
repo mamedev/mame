@@ -3,15 +3,13 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "render.h"
 #include "rendutil.h"
 #include "profiler.h"
 #include "video/rgbutil.h"
-
-#include <math.h>
 
 static int vblc=0;
 #define DEBUG_FIFO_POLY (0)

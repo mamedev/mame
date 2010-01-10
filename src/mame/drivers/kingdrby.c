@@ -60,7 +60,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 
 *******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"

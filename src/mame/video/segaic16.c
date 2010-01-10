@@ -350,7 +350,7 @@ Quick review of the system16 hardware:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "segaic16.h"
 #include "video/resnet.h"
 

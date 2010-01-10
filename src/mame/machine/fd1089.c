@@ -119,7 +119,7 @@ CPU #     Type  Status   Game              Seed   Unencrypted data range
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "fd1089.h"
 
 

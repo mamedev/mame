@@ -14,7 +14,7 @@ Add global sprite flip
 Tilemap flip flags were reversed
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/suprnova.h"
 
 static bitmap_t *sprite_bitmap;

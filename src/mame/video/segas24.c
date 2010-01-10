@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/segaic24.h"
 #include "includes/segas24.h"
 

@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/vector.h"
 #include "includes/aztarac.h"
 

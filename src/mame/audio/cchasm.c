@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"

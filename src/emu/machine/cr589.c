@@ -3,7 +3,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cr589.h"
 
 typedef struct

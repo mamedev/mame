@@ -319,7 +319,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/sh4/sh4.h"
 
 #define CPU_CLOCK (200000000)

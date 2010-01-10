@@ -15,7 +15,7 @@
     Raphael Nabet, 2003-2004
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "rtc65271.h"
 
 static void field_interrupts(const device_config *device);

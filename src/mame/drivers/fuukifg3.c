@@ -148,7 +148,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"

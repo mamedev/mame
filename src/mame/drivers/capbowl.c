@@ -87,7 +87,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/capbowl.h"

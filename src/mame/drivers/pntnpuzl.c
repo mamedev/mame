@@ -120,7 +120,7 @@ c 1993 Ver D3.51 LH
 CN1 standard DB15 VGA connector (15KHz)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 

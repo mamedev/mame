@@ -48,7 +48,7 @@
     2C needs DSP still
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
 #include "video/segaic24.h"

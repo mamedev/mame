@@ -137,7 +137,7 @@ lev 6 : 0x78 : 0000 11d0 - just rte
 lev 7 : 0x7c : 0000 11d0 - just rte
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"

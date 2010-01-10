@@ -170,8 +170,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "profiler.h"
 #include "machine/x76f100.h"
 #include "cdrom.h"

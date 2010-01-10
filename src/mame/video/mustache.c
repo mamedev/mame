@@ -6,7 +6,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *bg_tilemap;
 static int control_byte;

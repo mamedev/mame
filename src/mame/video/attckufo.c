@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/attckufo.h"
 
 #define MAX_LINES 261

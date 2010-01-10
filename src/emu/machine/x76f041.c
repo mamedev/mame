@@ -11,7 +11,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/x76f041.h"
 
 #define VERBOSE_LEVEL ( 0 )

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/segaic24.h"
 #include "cpu/mb86233/mb86233.h"
 #include "includes/model1.h"

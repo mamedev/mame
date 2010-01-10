@@ -4,7 +4,7 @@ Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/naomi.h"
 
 UINT64 *naomi_ram64;

@@ -62,7 +62,7 @@ out of the sprite list at that point.. (verify on real hw)
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

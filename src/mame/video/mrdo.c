@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 
 UINT8 *mrdo_bgvideoram,*mrdo_fgvideoram;

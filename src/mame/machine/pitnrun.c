@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6805/m6805.h"
 #include "includes/pitnrun.h"
 

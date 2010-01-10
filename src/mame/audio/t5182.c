@@ -144,7 +144,7 @@ rom.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "t5182.h"
 #include "sound/2151intf.h"
 

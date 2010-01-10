@@ -26,7 +26,7 @@
     Thanks to Cync and Cap for invaluable assistance.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m37710/m37710.h"
 #include "deprecat.h"
 #include "audio/namcoc7x.h"

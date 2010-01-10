@@ -8,7 +8,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 

@@ -126,7 +126,7 @@ below are simply made to the banking address to run on other boards.
 
 #define ALL_REVISIONS 0
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
 

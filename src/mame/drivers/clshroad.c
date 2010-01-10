@@ -17,7 +17,7 @@ XTAL        :   18.432 MHz
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 
 /* Variables & functions defined in video: */

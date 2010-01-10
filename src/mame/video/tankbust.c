@@ -2,7 +2,7 @@
 *   Video Driver for Tank Busters
 */
 
-#include "driver.h"
+#include "emu.h"
 
 /*
 *   variables

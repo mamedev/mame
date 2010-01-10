@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "cpu/mcs48/mcs48.h"
 #include "includes/segag80r.h"

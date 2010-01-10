@@ -20,10 +20,9 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
-#include "video/generic.h"
 
 static VIDEO_START(system246)
 {

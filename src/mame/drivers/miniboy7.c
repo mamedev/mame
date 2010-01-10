@@ -123,7 +123,7 @@
 
 #define MASTER_CLOCK	10000000	/* 10MHz */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 

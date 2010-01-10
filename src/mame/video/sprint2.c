@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/sprint2.h"
 
 UINT8* sprint2_video_ram;

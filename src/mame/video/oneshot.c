@@ -1,6 +1,6 @@
 /* One Shot One Kill Video Hardware */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/oneshot.h"
 
 static tilemap_t *oneshot_bg_tilemap;

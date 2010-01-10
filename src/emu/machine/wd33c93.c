@@ -11,8 +11,7 @@
  *
  */
 
-#include "driver.h"
-#include "state.h"
+#include "emu.h"
 #include "wd33c93.h"
 
 #define VERBOSE 0

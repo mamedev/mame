@@ -53,7 +53,7 @@ Code disassembling
 [0312]-> Eeprom init msg
 *******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/ay8910.h"

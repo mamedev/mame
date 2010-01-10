@@ -6,7 +6,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/nb1413m3.h"
 #include "includes/nbmj8991.h"
 

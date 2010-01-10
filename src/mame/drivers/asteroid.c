@@ -183,7 +183,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "rendlay.h"
 #include "video/vector.h"

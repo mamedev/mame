@@ -101,7 +101,7 @@
 #define AY_CLOCK		MASTER_CLOCK / 8
 #define OKI_CLOCK		1056000		/* unverified resonator */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"

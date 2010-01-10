@@ -5,7 +5,7 @@ Solomon's Key
 driver by Mirko Buffoni
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

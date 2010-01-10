@@ -78,7 +78,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "system1.h"
 
 static UINT8 *mix_collide;

@@ -13,7 +13,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/deco16ic.h"
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)

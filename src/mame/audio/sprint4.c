@@ -3,7 +3,7 @@
     audio\sprint4.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "sprint4.h"
 #include "sound/discrete.h"
 

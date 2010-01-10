@@ -32,7 +32,7 @@ MR_01-.3A    [a0b758aa]
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"

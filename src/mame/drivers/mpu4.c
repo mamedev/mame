@@ -243,12 +243,11 @@ IRQ line connected to CPU
 TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
       - Distinguish door switches using manual
 ***********************************************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 
 #include "deprecat.h"
-#include "timer.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"

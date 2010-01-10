@@ -5,7 +5,7 @@ Mr. F. Lea
 
 ******************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 static int mrflea_gfx_bank;
 

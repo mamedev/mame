@@ -5,7 +5,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/at28c16.h"
 
 #define SIZE_DATA ( 0x800 )

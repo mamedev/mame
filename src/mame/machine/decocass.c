@@ -4,7 +4,7 @@
 
  ***********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/decocass.h"

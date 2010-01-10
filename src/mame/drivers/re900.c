@@ -74,7 +74,7 @@
 #define VDP_CLOCK		XTAL_10_730MHz
 #define TMS_CLOCK		VDP_CLOCK / 24
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"

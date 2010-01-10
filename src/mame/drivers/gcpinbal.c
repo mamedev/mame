@@ -30,7 +30,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"

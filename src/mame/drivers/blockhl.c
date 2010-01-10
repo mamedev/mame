@@ -19,7 +19,7 @@
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konicdev.h"

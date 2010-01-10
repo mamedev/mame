@@ -141,7 +141,7 @@
                    ---- ---- ---- ---t : 1= Text layer disable
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 #include "includes/segas32.h"
 

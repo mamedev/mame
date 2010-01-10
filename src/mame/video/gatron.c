@@ -17,7 +17,7 @@
 *******************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *bg_tilemap;
 

@@ -1,4 +1,3 @@
-#include <math.h>
 #include "emu.h"
 #include "aica.h"
 #include "aicadsp.h"

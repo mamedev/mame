@@ -193,7 +193,7 @@ psoldier dip locations still need veritication.
 
 *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "includes/m92.h"
 #include "includes/iremipt.h"

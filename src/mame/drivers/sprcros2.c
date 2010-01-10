@@ -54,7 +54,7 @@ Notes:
   vertical position only, assume this is original behaviour
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"

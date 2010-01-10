@@ -10,7 +10,7 @@ Memo:
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "m68kfmly.h"
 #include "cpu/m68000/m68000.h"
 

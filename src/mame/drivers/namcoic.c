@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/namcos2.h" /* for game-specific hacks */
 #include "includes/namcoic.h"
 

@@ -23,7 +23,7 @@
  - tone played by jamma if board is not emulated
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/h6280/h6280.h"

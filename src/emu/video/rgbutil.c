@@ -10,8 +10,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "rgbutil.h"
 
 

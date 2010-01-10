@@ -161,7 +161,7 @@
 #define CLOCK_B	XTAL_8MHz
 #define CLOCK_C	XTAL_19_6608MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2413intf.h"
 

@@ -33,7 +33,7 @@ dip: 6.7 7.7
        1   1        5 lives
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/wiping.h"
 

@@ -101,8 +101,7 @@ In other words,the first three types uses the offset and not the color allocated
     \-N Stores VDP1 ram contents into a file.
 */
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "profiler.h"
 #include "includes/stv.h"
 

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 
 UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;

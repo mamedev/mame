@@ -27,7 +27,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/fuukifg3.h"
 
 

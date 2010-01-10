@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 /*defined in drivers/darkmist.c */
 extern int darkmist_hw;

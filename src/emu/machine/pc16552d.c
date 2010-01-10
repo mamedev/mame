@@ -5,7 +5,7 @@
     Written by Ville Linde
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "pc16552d.h"
 
 #define REG_RECV_BUFFER			0x0		// Read

@@ -121,7 +121,7 @@ Dip locations verified with US conversion kit manual.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/deco16ic.h"

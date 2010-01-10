@@ -12,7 +12,7 @@
 
  *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
 #include "machine/at28c16.h"

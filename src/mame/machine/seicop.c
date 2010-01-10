@@ -1357,7 +1357,7 @@ Raiden 2 / Zero Team banking doesn't make much sense, a bank address has been fo
 hardware, but the game never writes directly to it.
 
  */
-#include "driver.h"
+#include "emu.h"
 #include "audio/seibu.h"
 #include "includes/legionna.h"
 #include "includes/raiden2.h"

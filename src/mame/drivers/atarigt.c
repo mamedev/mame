@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"

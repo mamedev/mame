@@ -129,7 +129,7 @@ Dip locations added based on the notes above.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/2413intf.h"

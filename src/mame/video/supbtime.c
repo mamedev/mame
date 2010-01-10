@@ -12,7 +12,7 @@ End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/deco16ic.h"
 
 /******************************************************************************/

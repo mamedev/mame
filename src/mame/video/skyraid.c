@@ -4,7 +4,7 @@ Atari Sky Raider video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 int skyraid_scroll;
 

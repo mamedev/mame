@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/bombjack.h"
 
 WRITE8_HANDLER( bombjack_videoram_w )

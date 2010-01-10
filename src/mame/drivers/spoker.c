@@ -8,7 +8,7 @@ TODO:
 - Map Leds and Coin counters
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"

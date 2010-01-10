@@ -15,7 +15,7 @@ To enter test mode in smoto, keep F2 pressed during boot.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/8255ppi.h"
 #include "sound/okim6295.h"

@@ -4,7 +4,7 @@ Taito Super Speed Race video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/sspeedr.h"
 
 

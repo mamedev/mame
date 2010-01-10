@@ -173,7 +173,7 @@
 *********************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 
 #include "machine/pckeybrd.h"

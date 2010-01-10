@@ -4,7 +4,7 @@
 
 ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *quizpani_bg_videoram, *quizpani_txt_videoram;
 UINT16 *quizpani_scrollreg;

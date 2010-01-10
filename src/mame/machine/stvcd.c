@@ -21,13 +21,12 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #ifdef MESS
 #include "devices/chd_cd.h"
 #endif
 #include "cdrom.h"
 #include "stvcd.h"
-#include <stdio.h>
 
 // super-verbose
 #if 0

@@ -45,7 +45,7 @@ Notes:
            GP_ROM5.622   SOP44 32M MASK, OKI samples
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 
 static UINT16 *unkram;

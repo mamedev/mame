@@ -134,8 +134,7 @@ bits(7:4) and bit(24)), X, and Y:
 #ifndef EXPAND_RASTERIZERS
 #define EXPAND_RASTERIZERS
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "profiler.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"

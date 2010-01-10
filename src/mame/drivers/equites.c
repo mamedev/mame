@@ -363,7 +363,7 @@ D                                                                               
 *******************************************************************************/
 // Directives
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/alph8201/alph8201.h"
 #include "deprecat.h"

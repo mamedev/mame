@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/vertigo.h"
 #include "includes/exidy440.h"
 #include "machine/74148.h"

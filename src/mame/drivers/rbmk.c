@@ -49,7 +49,7 @@ Notes:
             S1 - Macronix MX27C2000 (OKI samples)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"

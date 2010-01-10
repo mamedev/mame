@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/irobot.h"
 
 #define BITMAP_WIDTH	256

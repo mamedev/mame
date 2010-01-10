@@ -46,7 +46,7 @@ modified by Hau
 08/09/2009
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
 

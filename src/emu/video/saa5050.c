@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/saa5050.h"
 
 #define SAA5050_DBLHI   0x0001

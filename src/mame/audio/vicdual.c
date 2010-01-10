@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/vicdual.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"

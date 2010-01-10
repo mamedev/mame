@@ -51,7 +51,7 @@ so even the Main CPU is unknown, assuming the 8085 is the sound CPU
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 
 static ADDRESS_MAP_START( rcorsair_map, ADDRESS_SPACE_PROGRAM, 8 )

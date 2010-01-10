@@ -70,7 +70,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/eeprom.h"
 #include "includes/decoprot.h"
 

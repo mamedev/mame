@@ -4,7 +4,7 @@ Atari Sprint 8 video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/sprint8.h"
 
 UINT8* sprint8_video_ram;

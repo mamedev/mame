@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/konicdev.h"
 //#include "includes/konamigx.h"
 #include "includes/bishi.h"

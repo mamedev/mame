@@ -1,6 +1,6 @@
 /* Big Striker (bootleg) Video Hardware */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *bsb_tilemap, *bsb_tilemap2, *bsb_tilemap3;
 

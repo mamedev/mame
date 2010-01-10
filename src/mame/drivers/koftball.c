@@ -28,7 +28,7 @@ ft5_v6_c4.u58 /
 
 #define NVRAM_HACK 1
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"

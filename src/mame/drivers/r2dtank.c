@@ -30,7 +30,7 @@ RAM = 4116 (x11)
 ----------------------------------------------------
 ********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/rescap.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"

@@ -9,7 +9,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/x76f100.h"
 
 #define VERBOSE_LEVEL ( 0 )

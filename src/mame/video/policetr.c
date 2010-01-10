@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/r3000.h"
 #include "includes/policetr.h"
 

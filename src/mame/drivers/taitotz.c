@@ -68,7 +68,7 @@ IC7 Panasonic MN1020819DA E68-01
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/powerpc/ppc.h"
 
 

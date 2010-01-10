@@ -5,8 +5,8 @@
   PeT mess@utanet.at
 
 ***************************************************************************/
-#include <math.h>
-#include "driver.h"
+
+#include "emu.h"
 #include "streams.h"
 #include "includes/attckufo.h"
 

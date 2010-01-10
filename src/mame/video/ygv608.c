@@ -29,7 +29,7 @@
  *    Everything else! :)
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/namcond1.h"   // only while debugging
 #include "video/ygv608.h"
 

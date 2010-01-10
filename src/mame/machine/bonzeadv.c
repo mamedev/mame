@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/asuka.h"
 
 struct cchip_mapping

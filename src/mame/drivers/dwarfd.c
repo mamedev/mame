@@ -247,7 +247,7 @@ Stamp on disk:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"

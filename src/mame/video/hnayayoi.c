@@ -9,7 +9,7 @@ The blitter reads compressed data from ROM and copies it to the bitmap RAM.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/hnayayoi.h"
 
 static void common_vh_start( running_machine *machine, int num_pixmaps )

@@ -210,7 +210,7 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/resnet.h"
 #include "includes/galaxian.h"
 

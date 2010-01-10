@@ -33,8 +33,7 @@ SPOT TABLE test
 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
 */
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "video/rgbutil.h"
 #include "includes/namcos22.h"
 #include "video/poly.h"

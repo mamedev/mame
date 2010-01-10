@@ -9,7 +9,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/mc8123.h"

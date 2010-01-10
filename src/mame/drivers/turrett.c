@@ -57,7 +57,7 @@ Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/r3000.h"
 
 

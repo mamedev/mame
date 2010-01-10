@@ -4,7 +4,7 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kncljoe.h"
 
 

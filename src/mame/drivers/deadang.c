@@ -36,7 +36,7 @@ Dip locations and factory settings verified with US manual
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "audio/seibu.h"

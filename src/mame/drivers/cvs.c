@@ -90,7 +90,7 @@ Todo & FIXME:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/tms5110.h"

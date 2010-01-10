@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/slapstic.h"
 #include "includes/atarisy2.h"
 

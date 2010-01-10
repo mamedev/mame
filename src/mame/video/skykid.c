@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
 

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 int eolith_buffer = 0;
 static UINT32 *vram;

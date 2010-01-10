@@ -289,7 +289,7 @@ Notes & Todo:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "cpu/z80/z80.h"

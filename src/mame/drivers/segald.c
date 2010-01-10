@@ -17,7 +17,7 @@ Todo:
     -Character decoding may combine the lower 0x0800 with the upper 0x0800.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
 #include "machine/laserdsc.h"

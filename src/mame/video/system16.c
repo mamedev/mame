@@ -24,7 +24,7 @@
       a coin.
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/system16.h"
 #include "video/resnet.h"
 #include "video/segaic16.h"

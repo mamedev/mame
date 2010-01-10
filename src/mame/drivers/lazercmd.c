@@ -220,7 +220,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"

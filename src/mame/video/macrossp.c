@@ -1,7 +1,7 @@
 /* Macross Plus - video
   see DRIVER file for notes */
 
-#include "driver.h"
+#include "emu.h"
 
 
 UINT32 *macrossp_scra_videoram, *macrossp_scra_videoregs;

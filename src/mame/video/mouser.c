@@ -13,7 +13,7 @@
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *mouser_videoram;
 UINT8 *mouser_colorram;

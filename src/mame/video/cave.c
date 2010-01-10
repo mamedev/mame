@@ -44,7 +44,7 @@ Note:   if MAME_DEBUG is defined, pressing:
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/cave.h"
 
 

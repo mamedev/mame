@@ -124,7 +124,7 @@ Todo:
 Find lamps/reels after UPD changes.
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/awpvid.h"
 #include "cpu/mcs51/mcs51.h"

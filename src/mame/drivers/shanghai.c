@@ -22,7 +22,7 @@ displayed.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"

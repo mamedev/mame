@@ -3,7 +3,7 @@
  * Sept 2009, Derrick Renaud & Roberto Fresca.
  ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/norautp.h"
 
 

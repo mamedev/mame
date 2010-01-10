@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *bg_tilemap,*tx_tilemap;
 static UINT16 control[2];

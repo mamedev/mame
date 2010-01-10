@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16 *targeth_spriteram;
 UINT16 *targeth_vregs;

@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 

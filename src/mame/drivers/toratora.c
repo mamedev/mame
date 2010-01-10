@@ -17,7 +17,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "sound/sn76477.h"

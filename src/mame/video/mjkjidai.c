@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/mjkjidai.h"
 
 static int display_enable;

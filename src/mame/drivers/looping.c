@@ -52,7 +52,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
                                   LOG.3     8A         "    tiles
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"

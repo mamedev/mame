@@ -186,7 +186,7 @@ Notes:
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
 

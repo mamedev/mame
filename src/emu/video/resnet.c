@@ -47,7 +47,7 @@
 *****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "resnet.h"
 
 #define VERBOSE 0

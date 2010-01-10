@@ -46,7 +46,7 @@ with a write in reg[2] the command is executed
 not handled commands with reg[3] & 0xc0 == 0x00
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "roul.lh"

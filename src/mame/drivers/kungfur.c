@@ -28,7 +28,7 @@ http://www.hoizinger.com/ed/EM.HTML
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/msm5205.h"
 #include "machine/8255ppi.h"

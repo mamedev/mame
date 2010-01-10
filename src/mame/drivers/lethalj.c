@@ -138,7 +138,7 @@ Pin #11(+) | | R               |
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "includes/lethalj.h"
 #include "machine/ticket.h"

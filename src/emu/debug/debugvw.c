@@ -9,7 +9,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "debugvw.h"
 #include "debugcmd.h"
 #include "debugcmt.h"

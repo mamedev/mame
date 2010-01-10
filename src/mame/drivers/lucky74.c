@@ -666,7 +666,7 @@
 #define C_06B49P_CLKOUT_19	(MASTER_CLOCK/200000)	/* 60 Hz. (V-Sync) */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"

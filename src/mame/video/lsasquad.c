@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/lsasquad.h"
 
 UINT8 *lsasquad_scrollram;

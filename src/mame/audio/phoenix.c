@@ -8,7 +8,7 @@
  ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"

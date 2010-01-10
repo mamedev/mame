@@ -3,7 +3,7 @@
     Capcom CPS-3 Sound Hardware
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "includes/cps3.h"
 

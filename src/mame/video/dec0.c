@@ -94,7 +94,7 @@ Todo:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/dec0.h"
 
 static tilemap_t *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;

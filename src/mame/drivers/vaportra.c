@@ -8,7 +8,7 @@
   added pal & prom-maps - Highwayman.
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"

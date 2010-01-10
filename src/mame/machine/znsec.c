@@ -82,7 +82,7 @@
                       = Shift(c[n-1, 6])^Shift(c[n-1, 7])
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "znsec.h"
 
 typedef struct {

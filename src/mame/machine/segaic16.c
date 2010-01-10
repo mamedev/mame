@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "segaic16.h"
 #include "video/resnet.h"
 #include "machine/fd1089.h"

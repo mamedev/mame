@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
 #include "includes/cidelsa.h"

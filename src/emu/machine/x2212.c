@@ -5,7 +5,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/x2212.h"
 
 #define SIZE_DATA ( 0x100 )

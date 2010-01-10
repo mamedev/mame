@@ -6,7 +6,7 @@ driver by Chris Moore
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/6522via.h"
 #include "includes/gameplan.h"
 

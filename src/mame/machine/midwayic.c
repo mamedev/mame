@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "debugger.h"
 #include "midwayic.h"
 #include "machine/idectrl.h"

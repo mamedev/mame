@@ -5,7 +5,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "mathbox.h"
 
 #define REG0 mb->reg [0x00]

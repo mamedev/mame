@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/mexico86.h"
 
 UINT8 *mexico86_videoram,*mexico86_objectram;

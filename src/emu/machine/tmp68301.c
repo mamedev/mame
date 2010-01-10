@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/tmp68301.h"
 
 UINT16 *tmp68301_regs;

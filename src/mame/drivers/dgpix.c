@@ -49,7 +49,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 
 static UINT32 *vram;

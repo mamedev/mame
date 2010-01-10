@@ -63,7 +63,7 @@
     ST ULN2064B (DIP16)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "devconv.h"
 #include "machine/8237dma.h"

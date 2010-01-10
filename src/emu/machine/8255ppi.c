@@ -90,7 +90,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "8255ppi.h"
 
 typedef struct _ppi8255 ppi8255_t;

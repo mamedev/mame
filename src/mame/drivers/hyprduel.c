@@ -34,7 +34,7 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/2151intf.h"

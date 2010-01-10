@@ -26,7 +26,7 @@
  *
  *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"

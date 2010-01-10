@@ -136,7 +136,7 @@ Adder hardware:
         * Fix RS232 protocol
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 
 #include "video/bfm_adr2.h"

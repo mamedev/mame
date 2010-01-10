@@ -94,7 +94,6 @@
 
 
 #if TEST_MODE
-#include "input.h"
 
 static const sn76477_interface empty_interface =
 {

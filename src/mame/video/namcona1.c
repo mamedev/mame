@@ -6,7 +6,7 @@ TODO:
 - non-shadow pixels for sprites flagged to enable shadows have bad colors
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/namcona1.h"
 
 #define NAMCONA1_NUM_TILEMAPS 4

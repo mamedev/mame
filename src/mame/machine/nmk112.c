@@ -7,7 +7,7 @@
     with the sample data.  This allows each of the four voices on the chip
     to play a sample from a different bank at the same time. */
 
-#include "driver.h"
+#include "emu.h"
 #include "nmk112.h"
 
 #define TABLESIZE   0x100

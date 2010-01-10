@@ -45,7 +45,7 @@
 #include <d3d9.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 
 // MAMEOS headers
 #include "d3dintf.h"

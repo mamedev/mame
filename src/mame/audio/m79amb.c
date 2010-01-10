@@ -3,7 +3,7 @@
  * Nov 2008, Derrick Renaud
  ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/m79amb.h"
 #include "sound/discrete.h"
 

@@ -396,9 +396,8 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "video/generic.h"
 #include "includes/naomibd.h"
 
 static ADDRESS_MAP_START( gc_map, ADDRESS_SPACE_PROGRAM, 32 )

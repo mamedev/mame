@@ -103,7 +103,7 @@ Main board:
                                    KDA0476BCN-66      DIP4
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"

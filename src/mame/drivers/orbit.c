@@ -17,7 +17,7 @@ Atari Orbit Driver
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "includes/orbit.h"
 #include "sound/discrete.h"

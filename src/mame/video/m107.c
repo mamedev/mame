@@ -34,7 +34,7 @@
 
 *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/m107.h"
 
 typedef struct _pf_layer_info pf_layer_info;

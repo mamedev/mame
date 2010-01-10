@@ -14,8 +14,7 @@
     0   POTSEL (rb_input_select)
 */
 
-#include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "includes/bzone.h"
 #include "sound/pokey.h"

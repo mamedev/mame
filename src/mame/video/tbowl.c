@@ -2,7 +2,7 @@
 
 /* see drivers/tbowl.c for more info */
 
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *tx_tilemap, *bg_tilemap, *bg2_tilemap;
 UINT8 *tbowl_txvideoram, *tbowl_bgvideoram, *tbowl_bg2videoram;

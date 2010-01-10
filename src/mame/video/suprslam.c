@@ -1,6 +1,6 @@
 /* Super Slams - video, see notes in driver file */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/konicdev.h"
 #include "includes/suprslam.h"
 

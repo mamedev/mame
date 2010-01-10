@@ -101,7 +101,7 @@ Sound processor - 6502
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "machine/laserdsc.h"

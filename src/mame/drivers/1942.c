@@ -63,7 +63,7 @@ correctly.
 #define SOUND_CPU_CLOCK		(XTAL_12MHz/4) /* 12MHz is the only OSC on the PCB */
 #define AUDIO_CLOCK		(XTAL_12MHz/8) /* 12MHz is the only OSC on the PCB */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"

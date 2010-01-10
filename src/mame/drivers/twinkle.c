@@ -224,7 +224,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/psx.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/psx.h"

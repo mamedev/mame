@@ -138,7 +138,7 @@ Afega stands for "Art-Fiction Electronic Game"
 
 ********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/m68000/m68000.h"

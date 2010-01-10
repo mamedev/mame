@@ -12,7 +12,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/twin16.h"
 
 static UINT16 twin16_sprite_buffer[0x800];

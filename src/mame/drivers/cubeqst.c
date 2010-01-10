@@ -17,7 +17,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
 #include "sound/dac.h"

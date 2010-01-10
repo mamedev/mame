@@ -97,7 +97,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/asap/asap.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"

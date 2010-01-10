@@ -59,7 +59,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "includes/zaxxon.h"
 

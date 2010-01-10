@@ -138,7 +138,7 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"

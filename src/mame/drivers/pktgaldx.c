@@ -52,7 +52,7 @@ bootleg todo:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"

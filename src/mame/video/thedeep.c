@@ -28,7 +28,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/thedeep.h"
 
 /* Variables only used here: */

@@ -5,7 +5,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/itech32.h"

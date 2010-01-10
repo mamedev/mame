@@ -3,7 +3,7 @@
     audio\tank8.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/tank8.h"
 #include "sound/discrete.h"
 

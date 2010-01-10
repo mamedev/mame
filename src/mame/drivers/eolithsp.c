@@ -8,7 +8,7 @@
   this could probably be done a bit better using timers
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "includes/eolithsp.h"
 

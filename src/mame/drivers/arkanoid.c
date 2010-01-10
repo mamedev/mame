@@ -503,7 +503,7 @@ DIP locations verified for:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/arkanoid.h"
 #include "sound/ay8910.h"

@@ -83,7 +83,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/r3000.h"
 #include "machine/eeprom.h"
 #include "includes/policetr.h"

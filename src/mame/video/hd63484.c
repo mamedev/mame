@@ -8,8 +8,7 @@ this chip is used in:
 
 ***************************************************************************/
 
-#include "driver.h"
-#include <math.h>
+#include "emu.h"
 #include "video/hd63484.h"
 
 #define LOG_COMMANDS 0

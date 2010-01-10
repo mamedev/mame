@@ -74,7 +74,7 @@ TODO:
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
 #include "machine/6522via.h"

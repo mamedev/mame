@@ -11,7 +11,7 @@
    3 = Tone generator
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "includes/targ.h"

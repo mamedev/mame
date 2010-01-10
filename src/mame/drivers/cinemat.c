@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/vector.h"
 #include "cpu/ccpu/ccpu.h"
 #include "includes/cinemat.h"

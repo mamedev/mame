@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/sidearms.h"
 
 WRITE8_HANDLER( sidearms_videoram_w )

@@ -15,8 +15,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "osdepend.h"
-#include "driver.h"
 #include "debugcpu.h"
 #include "debugcmd.h"
 #include "debugcmt.h"

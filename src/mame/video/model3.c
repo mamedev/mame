@@ -1,8 +1,6 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"
-#include "eminline.h"
-#include <math.h>
 #include "includes/model3.h"
 
 

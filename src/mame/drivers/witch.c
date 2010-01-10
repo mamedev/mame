@@ -189,7 +189,7 @@ TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/es8712.h"
 #include "sound/2203intf.h"

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 
 UINT16 *ohmygod_videoram;

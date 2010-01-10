@@ -65,7 +65,7 @@ U.S.A. Trivia              New Sports                 General Facts
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/ticket.h"

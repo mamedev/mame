@@ -193,7 +193,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/6532riot.h"
 #include "machine/laserdsc.h"

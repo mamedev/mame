@@ -12,7 +12,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
 

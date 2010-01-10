@@ -160,7 +160,7 @@ Added Multiple Coin Feature:
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"

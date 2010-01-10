@@ -53,7 +53,7 @@
 
 #define EJOLLYX5_MAIN_CLOCK	XTAL_16MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/okim6295.h"
 

@@ -11,7 +11,7 @@
     - I need a better comparison screenshot to be sure about the colors.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 

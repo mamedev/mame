@@ -85,8 +85,7 @@
     to display more detail when a texture is real close to the viewer. This is currently unemulated.
 
 *********************************************************************************************************************************/
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "video/segaic24.h"
 #include "video/poly.h"
 #include "includes/model2.h"

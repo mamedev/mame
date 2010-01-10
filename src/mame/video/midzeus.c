@@ -4,8 +4,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "includes/midzeus.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"

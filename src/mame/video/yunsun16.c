@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/yunsun16.h"
 
 

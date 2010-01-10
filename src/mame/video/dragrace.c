@@ -4,7 +4,7 @@ Atari Drag Race video emulation
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/dragrace.h"
 
 

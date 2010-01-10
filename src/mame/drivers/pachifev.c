@@ -21,7 +21,7 @@ Many thanks to Olivier Galibert and Wilbert Pol for the identify effort ;-)
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/msm5205.h"
 

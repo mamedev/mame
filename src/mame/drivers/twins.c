@@ -48,7 +48,7 @@ Electronic Devices was printed on rom labels
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
 

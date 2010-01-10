@@ -268,35 +268,35 @@ class emu_fatalerror : public emu_exception
 {
 public:
 	emu_fatalerror(const char *format, ...)
-		: m_exitcode(0)
+		: code(0)
 	{
 		va_list ap;
 		va_start(ap, format);
-		sprintf(m_text, format, ap);
+		sprintf(text, format, ap);
 		va_end(ap);
-		osd_break_into_debugger(m_text);
+		osd_break_into_debugger(text);
 	}
 	
 	emu_fatalerror(const char *format, va_list ap)
-		: m_exitcode(0)
+		: code(0)
 	{
-		vsprintf(m_text, format, ap);
-		osd_break_into_debugger(m_text);
+		vsprintf(text, format, ap);
+		osd_break_into_debugger(text);
 	}
 	
 	emu_fatalerror(int _exitcode, const char *format, va_list ap)
-		: m_exitcode(_exitcode)
+		: code(_exitcode)
 	{
-		vsprintf(m_text, format, ap);
-		osd_break_into_debugger(m_text);
+		vsprintf(text, format, ap);
+		osd_break_into_debugger(text);
 	}
 	
-	const char *string() const { return m_text; }
-	int exitcode() const { return m_exitcode; }
+	const char *string() const { return text; }
+	int exitcode() const { return code; }
 
 private:
-	char m_text[1024];
-	int m_exitcode;
+	char text[1024];
+	int code;
 };
 
 

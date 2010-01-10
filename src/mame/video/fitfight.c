@@ -1,6 +1,6 @@
 /* Fit of Fighting Video Hardware */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/fitfight.h"
 
 

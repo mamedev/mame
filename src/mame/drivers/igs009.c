@@ -15,7 +15,7 @@ NVRAM   :   Battery for main RAM
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/8255ppi.h"
 #include "sound/2413intf.h"

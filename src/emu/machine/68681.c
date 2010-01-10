@@ -5,7 +5,7 @@
     Updated by Jonathan Gevaryahu AKA Lord Nightmare
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "68681.h"
 
 #define VERBOSE 1

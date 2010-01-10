@@ -4,7 +4,7 @@ Atari Tank 8 driver
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "includes/tank8.h"
 #include "sound/discrete.h"

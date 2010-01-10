@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/ddragon3.h"
 
 WRITE16_HANDLER( ddragon3_scroll_w )

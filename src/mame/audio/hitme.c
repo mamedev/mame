@@ -3,7 +3,7 @@
     audio\hitme.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/hitme.h"
 #include "sound/discrete.h"
 

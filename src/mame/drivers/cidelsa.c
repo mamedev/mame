@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/cdp1869.h"

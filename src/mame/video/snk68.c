@@ -12,7 +12,7 @@ Notes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT16* pow_fg_videoram;
 

@@ -11,7 +11,7 @@ The timer seems to follow these rules:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "6532riot.h"
 
 

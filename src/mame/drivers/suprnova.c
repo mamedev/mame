@@ -186,7 +186,7 @@ NEP-16
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "cpu/sh2/sh2.h"

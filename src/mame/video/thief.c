@@ -2,7 +2,7 @@
 **  Thief/Nato Defense
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/tms9927.h"
 
 static UINT8 thief_read_mask, thief_write_mask;

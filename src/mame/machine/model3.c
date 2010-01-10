@@ -4,7 +4,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/model3.h"
 
 static int m3_step;

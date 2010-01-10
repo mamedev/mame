@@ -108,7 +108,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/namcoio.h"
 
 

@@ -1297,7 +1297,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"

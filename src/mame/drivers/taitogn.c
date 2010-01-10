@@ -317,7 +317,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
        Zooo
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"

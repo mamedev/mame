@@ -288,7 +288,7 @@ CPU68 PCB:
   JP2          /D-ST           /VBL
   JP3
 */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "deprecat.h"

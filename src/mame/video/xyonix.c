@@ -1,5 +1,5 @@
 
-#include "driver.h"
+#include "emu.h"
 
 extern UINT8 *xyonix_vidram;
 

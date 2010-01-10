@@ -7,7 +7,7 @@ Functions to emulate the video hardware of the machine.
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/srmp2.h"
 
 PALETTE_INIT( srmp2 )

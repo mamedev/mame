@@ -1,6 +1,6 @@
 /* video hardware for Namco System II */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/namcos2.h"
 #include "includes/namcoic.h"

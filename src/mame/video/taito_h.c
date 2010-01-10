@@ -45,7 +45,7 @@ sprite RAM
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/taitoic.h"
 #include "includes/taito_h.h"
 

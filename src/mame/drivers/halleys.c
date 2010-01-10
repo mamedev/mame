@@ -157,7 +157,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 //**************************************************************************
 // Compiler Directives
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "deprecat.h"

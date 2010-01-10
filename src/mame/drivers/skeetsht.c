@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/ay8910.h"

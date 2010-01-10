@@ -12,7 +12,7 @@
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "video/s2636.h"
 #include "video/saa5050.h"
 #include "includes/malzak.h"

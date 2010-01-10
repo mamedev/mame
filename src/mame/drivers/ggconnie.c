@@ -16,7 +16,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "machine/pcecommn.h"
 #include "video/vdc.h"

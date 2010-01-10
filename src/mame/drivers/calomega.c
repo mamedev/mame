@@ -629,7 +629,7 @@
 #define UART_CLOCK	(MASTER_CLOCK/16)
 #define SND_CLOCK	(MASTER_CLOCK/8)
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"

@@ -1,6 +1,6 @@
 /* Konami PowerPC-based 3D games common functions */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/k033906.h"
 #include "video/voodoo.h"

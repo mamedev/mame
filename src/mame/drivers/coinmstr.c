@@ -22,7 +22,7 @@ x
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"

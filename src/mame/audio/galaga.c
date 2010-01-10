@@ -3,7 +3,7 @@
     Sound handler
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "namco52.h"
 #include "namco54.h"
 #include "includes/galaga.h"

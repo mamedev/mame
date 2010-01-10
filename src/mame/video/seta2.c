@@ -70,7 +70,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/seta.h"
 
 UINT16 *seta2_vregs;

@@ -3,7 +3,7 @@
     audio\sprint2.c
 
 *************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/sprint2.h"
 
 

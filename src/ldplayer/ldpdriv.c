@@ -17,7 +17,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #ifndef DRIVER_RECURSIVE
 

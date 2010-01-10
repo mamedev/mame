@@ -49,7 +49,7 @@
 #include <dsound.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "osdepend.h"
 #include "emuopts.h"
 

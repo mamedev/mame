@@ -737,7 +737,7 @@ Notes:
       J105 - 64 pin connector for connection of Main PCB
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h8.h"
 #include "sound/c352.h"

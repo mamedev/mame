@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/cabal.h"
 
 static TILE_GET_INFO( get_back_tile_info )

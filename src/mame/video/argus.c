@@ -113,7 +113,7 @@ BG0 palette intensity ( $C47F, $C4FF )
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "jalblend.h"
 #include "includes/argus.h"
 

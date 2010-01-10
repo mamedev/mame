@@ -263,7 +263,7 @@ Notes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"

@@ -6,7 +6,7 @@
  *                                                                           *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *speedbal_background_videoram;
 UINT8 *speedbal_foreground_videoram;

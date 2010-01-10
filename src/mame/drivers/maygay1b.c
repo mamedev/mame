@@ -10,7 +10,7 @@
 
     This only loads the basic stuff - there needs to be more done to make this run.
 ******************************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"		//Fruit Machines Only
 #include "machine/6821pia.h"
@@ -21,7 +21,6 @@
 #include "sound/ay8910.h"
 #include "sound/2413intf.h"
 #include "sound/okim6376.h"
-#include "timer.h"
 
 #define VERBOSE 1
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)

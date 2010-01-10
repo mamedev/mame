@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/hexa.h"
 
 WRITE8_HANDLER( hexa_videoram_w )

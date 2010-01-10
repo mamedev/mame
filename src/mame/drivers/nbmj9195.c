@@ -19,7 +19,7 @@ Notes:
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "includes/nb1413m3.h"		// needed for mahjong input controller

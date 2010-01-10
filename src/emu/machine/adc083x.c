@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "adc083x.h"
 
 #define VERBOSE_LEVEL ( 0 )

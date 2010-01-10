@@ -624,7 +624,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "includes/system16.h"

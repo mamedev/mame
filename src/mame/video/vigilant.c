@@ -14,7 +14,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 
 static const rectangle bottomvisiblearea =

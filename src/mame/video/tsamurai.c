@@ -2,7 +2,7 @@
 **  Video Driver for Taito Samurai (1985)
 */
 
-#include "driver.h"
+#include "emu.h"
 
 
 /*

@@ -64,7 +64,7 @@ quaquiz2 - no inputs, needs NVRAM
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"

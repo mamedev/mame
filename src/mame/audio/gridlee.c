@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "includes/gridlee.h"
 #include "sound/samples.h"

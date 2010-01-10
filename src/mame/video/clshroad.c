@@ -30,7 +30,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 /* Variables only used here: */
 

@@ -35,7 +35,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/eeprom.h"
 #include "sound/namco.h"

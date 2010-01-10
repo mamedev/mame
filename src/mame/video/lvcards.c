@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *lvcards_videoram;
 UINT8 *lvcards_colorram;

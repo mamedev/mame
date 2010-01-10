@@ -39,7 +39,7 @@
     RAM used by Super Mario Bros 3.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "sound/nes_apu.h"

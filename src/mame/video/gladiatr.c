@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 UINT8 *gladiatr_videoram, *gladiatr_colorram, *gladiatr_textram;
 

@@ -59,7 +59,6 @@
 #include "eminline.h"
 #include "video/rgbutil.h"
 #include "render.h"
-#include <math.h>
 
 
 

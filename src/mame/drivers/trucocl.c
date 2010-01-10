@@ -32,7 +32,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 

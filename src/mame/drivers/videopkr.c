@@ -256,7 +256,7 @@
 #define VIDEO_CLOCK		(XTAL_7.8643MHz)
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"

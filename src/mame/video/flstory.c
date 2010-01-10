@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/flstory.h"
 
 static TILE_GET_INFO( get_tile_info )

@@ -153,7 +153,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

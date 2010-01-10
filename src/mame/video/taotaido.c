@@ -8,7 +8,7 @@ zooming might be wrong (only used on title logo?)
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/taotaido.h"
 
 UINT16 *taotaido_spriteram;

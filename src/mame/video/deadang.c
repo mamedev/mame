@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 static tilemap_t *pf3_layer,*pf2_layer,*pf1_layer,*text_layer;
 static int deadangle_tilebank, deadangle_oldtilebank;

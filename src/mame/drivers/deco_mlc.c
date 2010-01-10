@@ -95,7 +95,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/decocrpt.h"
 #include "machine/eeprom.h"
 #include "sound/ymz280b.h"

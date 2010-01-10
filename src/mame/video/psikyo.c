@@ -54,7 +54,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/psikyo.h"
 
 

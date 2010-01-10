@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "osdepend.h"
 #include "hash.h"
 #include "png.h"
 #include "harddisk.h"

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/vdc.h"
 
 /* VDC segments */

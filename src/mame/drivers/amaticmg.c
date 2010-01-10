@@ -381,7 +381,7 @@
 #define CRTC_CLOCK		MASTER_CLOCK/8	/* guess */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"

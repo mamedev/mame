@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/konami/konami.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"

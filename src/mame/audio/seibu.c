@@ -32,7 +32,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"

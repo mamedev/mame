@@ -33,7 +33,7 @@ TODO: Emulated sound
  its more likely just a prototype / alternate version, its hard to tell
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "includes/gotya.h"

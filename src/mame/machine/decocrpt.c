@@ -41,7 +41,7 @@ Sotsugyo Shousho        1995
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/decocrpt.h"
 
 static const UINT16 xor_masks[16] =

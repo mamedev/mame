@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/ay8910.h"
 #include "includes/dday.h"
 

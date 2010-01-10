@@ -35,7 +35,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"

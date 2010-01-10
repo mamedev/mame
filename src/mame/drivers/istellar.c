@@ -19,7 +19,7 @@ Todo:
     Make it work - this one should be close right now :/.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
 #include "machine/laserdsc.h"

@@ -37,7 +37,7 @@
 **********************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "video/resnet.h"
 
 UINT8 *snookr10_videoram;

@@ -6,9 +6,7 @@
  *
  */
 
-#include <stdarg.h>
-#include "driver.h"
-#include "state.h"
+#include "emu.h"
 #include "machine/ds2401.h"
 
 #define VERBOSE_LEVEL ( 0 )

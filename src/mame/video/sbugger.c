@@ -1,6 +1,6 @@
 /* Space Bugger - Video Hardware */
 
-#include "driver.h"
+#include "emu.h"
 
 extern UINT8* sbugger_videoram, *sbugger_videoram_attr;
 

@@ -32,7 +32,7 @@
 
 #define MASTER_CLOCK		XTAL_12MHz	/* confirmed */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"

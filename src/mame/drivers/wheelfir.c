@@ -49,7 +49,7 @@ something is missing, currently needs a hack to boot
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 
