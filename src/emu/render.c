@@ -2672,7 +2672,7 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			{
 				rgb_t *newlookup = global_alloc_array(rgb_t, numentries);
 				memcpy(newlookup, texture->bcglookup, texture->bcglookup_entries * sizeof(rgb_t));
-				delete[] texture->bcglookup;
+				global_free(texture->bcglookup);
 				texture->bcglookup = newlookup;
 				texture->bcglookup_entries = numentries;
 			}
@@ -2702,7 +2702,7 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			{
 				rgb_t *newlookup = global_alloc_array(rgb_t, 4 * 32);
 				memcpy(newlookup, texture->bcglookup, texture->bcglookup_entries * sizeof(rgb_t));
-				delete[] texture->bcglookup;
+				global_free(texture->bcglookup);
 				texture->bcglookup = newlookup;
 				texture->bcglookup_entries = 4 * 32;
 			}
@@ -2737,7 +2737,7 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			{
 				rgb_t *newlookup = global_alloc_array(rgb_t, 4 * 256);
 				memcpy(newlookup, texture->bcglookup, texture->bcglookup_entries * sizeof(rgb_t));
-				delete[] texture->bcglookup;
+				global_free(texture->bcglookup);
 				texture->bcglookup = newlookup;
 				texture->bcglookup_entries = 4 * 256;
 			}

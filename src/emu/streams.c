@@ -735,7 +735,7 @@ static void allocate_resample_buffers(running_machine *machine, sound_stream *st
 			stream_input *input = &stream->input[inputnum];
 			stream_sample_t *newbuffer = auto_alloc_array(machine, stream_sample_t, stream->resample_bufalloc);
 			memcpy(newbuffer, input->resample, oldsize * sizeof(stream_sample_t));
-			delete[] input->resample;
+			auto_free(machine, input->resample);
 			input->resample = newbuffer;
 		}
 	}
@@ -768,7 +768,7 @@ static void allocate_output_buffers(running_machine *machine, sound_stream *stre
 			stream_output *output = &stream->output[outputnum];
 			stream_sample_t *newbuffer = auto_alloc_array(machine, stream_sample_t, stream->output_bufalloc);
 			memcpy(newbuffer, output->buffer, oldsize * sizeof(stream_sample_t));
-			delete[] output->buffer;
+			auto_free(machine, output->buffer);
 			output->buffer = newbuffer;
 		}
 	}

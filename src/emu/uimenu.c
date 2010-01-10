@@ -551,7 +551,7 @@ void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, U
 		ui_menu_item *newitems = auto_alloc_array(menu->machine, ui_menu_item, menu->allocitems);
 		for (int itemnum = 0; itemnum < olditems; itemnum++)
 			newitems[itemnum] = menu->item[itemnum];
-		delete[] menu->item;
+		auto_free(menu->machine, menu->item);
 		menu->item = newitems;
 	}
 	index = menu->numitems++;
