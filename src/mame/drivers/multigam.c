@@ -37,6 +37,8 @@
 
     Multi Game 2 & III: 21 games included, hardware features MMC3 NES mapper and additional
     RAM used by Super Mario Bros 3.
+
+	Multi Game (Tung Sheng Electronics): 10 games included, selectable by dip switches.
 */
 
 #include "emu.h"
@@ -229,7 +231,7 @@ static WRITE8_HANDLER(multigam_mapper2_w)
 {
 	if (multigam_game_gfx_bank & 0x80)
 	{
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "gfx1") + (0x2000 * ((data & 0xf) + multigam_game_gfx_bank)));
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "gfx1") + (0x2000 * ((data & 0x3) + (multigam_game_gfx_bank & 0x3c))));
 	}
 	else
 	{
@@ -258,6 +260,24 @@ static ADDRESS_MAP_START( multigam_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITE(multigam_switch_prg_rom)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(multigam_switch_gfx_rom)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( multigmt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
+	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
+	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
+	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
+	AM_RANGE(0x5000, 0x5ffe) AM_ROM
+	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
 ADDRESS_MAP_END
 
@@ -588,6 +608,28 @@ static INPUT_PORTS_START( multigm3 )
 	PORT_DIPSETTING(    0x06, "5 min" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( multigmt )
+	PORT_INCLUDE( multigam_common )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0xf0, 0x00, "Game" )
+	PORT_DIPSETTING( 0x00, "Pacman" )
+	PORT_DIPSETTING( 0x10, "Super Mario Bros" )
+	PORT_DIPSETTING( 0x20, "Tetris" )
+	PORT_DIPSETTING( 0x30, "Road Fighter" )
+	PORT_DIPSETTING( 0x40, "Gorilla 3" )
+	PORT_DIPSETTING( 0x50, "Zippy Race" )
+	PORT_DIPSETTING( 0x80, "Tennis" )
+	PORT_DIPSETTING( 0x90, "Galaga" )
+	PORT_DIPSETTING( 0xa0, "Track & Field" )
+	PORT_DIPSETTING( 0xb0, "Bomb Jack" )
+
+	PORT_DIPNAME( 0x06, 0x00, "Coin/Time" )
+	PORT_DIPSETTING( 0x00, "3 min" )
+	PORT_DIPSETTING( 0x04, "5 min" )
+	PORT_DIPSETTING( 0x02, "7 min" )
+	PORT_DIPSETTING( 0x06, "10 min" )
+INPUT_PORTS_END
 
 /******************************************************
 
@@ -730,6 +772,12 @@ static MACHINE_DRIVER_START( multigm3 )
 	MDRV_MACHINE_RESET( multigm3 )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( multigmt )
+	MDRV_IMPORT_FROM(multigam)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(multigmt_map)
+MACHINE_DRIVER_END
+
 ROM_START( multigam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.bin", 0x0000, 0x8000, CRC(f0fa7cf2) SHA1(7f3b3dca796b964893197aef7f0f31dfd7a2c1a4) )
@@ -808,6 +856,25 @@ ROM_START( multigm3 )
 	ROM_LOAD( "mg3-9.bin", 0x60000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
 ROM_END
 
+ROM_START( multigmt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.24", 0x0000, 0x8000, CRC(fdc40548) SHA1(323dcfe04bff4afd7ea290c93ef466690214f2b0) )
+
+	ROM_REGION( 0x80000, "user1", 0 )
+	ROM_LOAD( "1.22",     0x00000, 0x40000, CRC(14d0509e) SHA1(9922b2bae7592f4942f5c1bb32746705d7298eb6) )
+	ROM_RELOAD(           0x40000, 0x40000)
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "5.34",     0x00000, 0x40000, CRC(cdf70463) SHA1(79b7c399ebea245a0b06f461e5d8c3291b215878) )
+	ROM_RELOAD(           0x40000, 0x40000)
+
+	ROM_REGION( 0x40000, "unknown", 0 )
+	ROM_LOAD( "r11.7", 0x00000, 0x20000, CRC(e6fdcabb) SHA1(9ff3adb61b81d5cac4e88520fe4281414d7e5311) )
+	ROM_LOAD( "4.27",  0x20000, 0x10000, CRC(e6ed25fe) SHA1(e5723efab5652da3b276b13cd72ca5dc14f37a8b) )
+	ROM_LOAD( "10.72", 0x30000, 0x10000, CRC(43f393ee) SHA1(4a307264bedfe77286a6dde47a7f1009a2698ab5) )
+
+ROM_END
+
 static DRIVER_INIT( multigam )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -837,7 +904,50 @@ static DRIVER_INIT(multigm3)
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
+static DRIVER_INIT(multigmt)
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	UINT8* buf = auto_alloc_array(machine, UINT8, 0x80000);
+	UINT8 *rom;
+	int size;
+	int i;
+	int addr;
+
+	rom = memory_region(machine, "maincpu");
+	size = 0x8000;
+	memcpy(buf, rom, size);
+	for (i = 0; i < size; i++)
+	{
+
+		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		rom[i] = buf[addr];
+	}
+
+	rom = memory_region(machine, "user1");
+	size = 0x80000;
+	memcpy(buf, rom, size);
+	for (i = 0; i < size; i++)
+	{
+		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		rom[i] = buf[addr];
+	}
+	rom = memory_region(machine, "gfx1");
+	size = 0x80000;
+	memcpy(buf, rom, size);
+	for (i = 0; i < size; i++)
+	{
+		addr = BITSWAP24(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
+		rom[i] = BITSWAP8(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
+	}
+
+	auto_free(machine, buf);
+
+	multigam_switch_prg_rom(space, 0x0, 0x01);
+};
+
 GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )
 GAME( 1992, multigm2, 0,        multigm3, multigm2, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
 GAME( 1992, multigm3, 0,        multigm3, multigm3, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
+GAME( 1992, multigmt, 0,        multigmt, multigmt, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
