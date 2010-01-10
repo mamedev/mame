@@ -224,8 +224,9 @@ INLINE void eat_all_cpu_cycles(running_machine *machine)
 {
 	const device_config *cpu;
 
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
-		cpu_eat_cycles(cpu, 1000000000);
+    if(machine->cpuexec_data)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+			cpu_eat_cycles(cpu, 1000000000);
 }
 
 
