@@ -14,9 +14,7 @@
 #ifndef __USRINTRF_H__
 #define __USRINTRF_H__
 
-#include "emucore.h"
 #include "render.h"
-#include "unicode.h"
 
 
 /***************************************************************************

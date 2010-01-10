@@ -9,8 +9,8 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "hash.h"
 #include "audit.h"
 #include "harddisk.h"

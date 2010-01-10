@@ -10,8 +10,7 @@
 
 ***************************************************************************/
 
-#include <stddef.h>
-#include "cpuintrf.h"
+#include "emu.h"
 #include "mips3fe.h"
 #include "mips3com.h"
 

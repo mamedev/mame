@@ -5,7 +5,7 @@
    Converted to NEC-V by Aaron Giles
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 typedef struct _nec_config nec_config;
 struct _nec_config

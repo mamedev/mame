@@ -12,8 +12,6 @@
 #ifndef __RENDLAY_H__
 #define __RENDLAY_H__
 
-#include "driver.h"
-#include "osdepend.h"
 #include "render.h"
 
 #include <math.h>

@@ -15,8 +15,9 @@
 
 */
 
-#include "arm.h"
+#include "emu.h"
 #include "debugger.h"
+#include "arm.h"
 
 CPU_DISASSEMBLE( arm );
 

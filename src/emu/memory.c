@@ -172,10 +172,9 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 #include "debug/debugcpu.h"
-#include "memory.h"
 
 
 /***************************************************************************
@@ -340,11 +339,11 @@ struct _memory_private
 
 	memory_block *			memory_block_list;				/* head of the list of memory blocks */
 
-	tagmap *				bankmap;						/* map for fast bank lookups */
+	tagmap_t<bank_info *> 	bankmap;						/* map for fast bank lookups */
 	bank_info * 			banklist;						/* data gathered for each bank */
 	UINT8					banknext;						/* next bank to allocate */
 
-	tagmap *				sharemap;						/* map for share lookups */
+	tagmap_t<void *>		sharemap;						/* map for share lookups */
 
 	UINT8 *					wptable;						/* watchpoint-fill table */
 };
@@ -800,10 +799,6 @@ void memory_init(running_machine *machine)
 
 	/* allocate our private data */
 	memdata = machine->memory_data = auto_alloc_clear(machine, memory_private);
-	memdata->bankmap = tagmap_alloc();
-	memdata->sharemap = tagmap_alloc();
-	if (memdata->bankmap == NULL || memdata->sharemap == NULL)
-		fatalerror("Out of memory allocating maps for memory constructs!");
 
 	/* build up the list of address spaces */
 	memory_init_spaces(machine);
@@ -940,13 +935,13 @@ void memory_set_decrypted_region(const address_space *space, offs_t addrstart, o
 
 			/* fatal error if the decrypted region straddles the bank */
 			else if (bank->bytestart < byteend && bank->byteend > bytestart)
-				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for device '%s'", bytestart, byteend, space->cpu->tag);
+				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for device '%s'", bytestart, byteend, space->cpu->tag.cstr());
 		}
 	}
 
 	/* fatal error as well if we didn't find any relevant memory banks */
 	if (!found)
-		fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for device '%s'", bytestart, byteend, space->cpu->tag);
+		fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for device '%s'", bytestart, byteend, space->cpu->tag.cstr());
 }
 
 
@@ -1008,7 +1003,7 @@ int memory_set_direct_region(const address_space *space, offs_t *byteaddress)
 		spacerw->direct.byteend = 0;
 		spacerw->direct.bytestart = 1;
 		if (!spacerw->debugger_access)
-			logerror("Device '%s': warning - attempt to direct-map address %s in %s space\n", space->cpu->tag, core_i64_hex_format(overrideaddress, space->addrchars), space->name);
+			logerror("Device '%s': warning - attempt to direct-map address %s in %s space\n", space->cpu->tag.cstr(), core_i64_hex_format(overrideaddress, space->addrchars), space->name);
 		return FALSE;
 	}
 
@@ -1097,7 +1092,7 @@ void *memory_get_write_ptr(const address_space *space, offs_t byteaddress)
 void memory_configure_bank(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = memdata->bankmap.find_hash_only(tag);
 	int entrynum;
 
 	/* validation checks */
@@ -1126,7 +1121,7 @@ void memory_configure_bank(running_machine *machine, const char *tag, int starte
 void memory_configure_bank_decrypted(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = memdata->bankmap.find_hash_only(tag);
 	int entrynum;
 
 	/* validation checks */
@@ -1155,7 +1150,7 @@ void memory_configure_bank_decrypted(running_machine *machine, const char *tag, 
 void memory_set_bank(running_machine *machine, const char *tag, int entrynum)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = memdata->bankmap.find_hash_only(tag);
 	bank_reference *ref;
 
 	/* validation checks */
@@ -1185,7 +1180,7 @@ void memory_set_bank(running_machine *machine, const char *tag, int entrynum)
 int memory_get_bank(running_machine *machine, const char *tag)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = memdata->bankmap.find_hash_only(tag);
 
 	/* validation checks */
 	if (bank == NULL)
@@ -1201,7 +1196,7 @@ int memory_get_bank(running_machine *machine, const char *tag)
 void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
+	bank_info *bank = memdata->bankmap.find_hash_only(tag);
 	bank_reference *ref;
 
 	/* validation checks */
@@ -1237,9 +1232,9 @@ void *_memory_install_handler(const address_space *space, offs_t addrstart, offs
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler >= STATIC_COUNT)
-		fatalerror("Attempted to install non-static read handler via memory_install_handler() in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install non-static read handler via memory_install_handler() in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler >= STATIC_COUNT)
-		fatalerror("Attempted to install non-static write handler via memory_install_handler() in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install non-static write handler via memory_install_handler() in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != 0)
 		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, spacerw, NULL);
 	if (whandler != 0)
@@ -1258,9 +1253,9 @@ UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, of
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 8, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
@@ -1279,9 +1274,9 @@ UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, 
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 16, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
@@ -1300,9 +1295,9 @@ UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, 
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 32, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
@@ -1321,9 +1316,9 @@ UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, 
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 64, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
@@ -1342,9 +1337,9 @@ UINT8 *_memory_install_device_handler8(const address_space *space, const device_
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 8, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
@@ -1363,9 +1358,9 @@ UINT16 *_memory_install_device_handler16(const address_space *space, const devic
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 16, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
@@ -1384,9 +1379,9 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 32, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
@@ -1405,9 +1400,9 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
-		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag.cstr(), space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 	if (rhandler != NULL)
 		space_map_range(spacerw, ROW_READ, 64, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
@@ -1440,18 +1435,18 @@ void _memory_install_port(const address_space *space, offs_t addrstart, offs_t a
 	/* assign the read handler */
 	if (rtag != NULL)
 	{
-		const input_port_config *port = input_port_by_tag(&space->machine->portlist, rtag);
+		const input_port_config *port = space->machine->port(rtag);
 		if (port == NULL)
-			fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+			fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, rhandler, (void *)port, rtag);
 	}
 
 	/* assign the write handler */
 	if (wtag != NULL)
 	{
-		const input_port_config *port = input_port_by_tag(&space->machine->portlist, wtag);
+		const input_port_config *port = space->machine->port(wtag);
 		if (port == NULL)
-			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, whandler, (void *)port, wtag);
 	}
 
@@ -1682,13 +1677,13 @@ void memory_dump(running_machine *machine, FILE *file)
 		fprintf(file, "\n\n"
 		              "====================================================\n"
 		              "Device '%s' %s address space read handler dump\n"
-		              "====================================================\n", space->cpu->tag, space->name);
+		              "====================================================\n", space->cpu->tag.cstr(), space->name);
 		dump_map(file, space, &space->read);
 
 		fprintf(file, "\n\n"
 		              "====================================================\n"
 		              "Device '%s' %s address space write handler dump\n"
-		              "====================================================\n", space->cpu->tag, space->name);
+		              "====================================================\n", space->cpu->tag.cstr(), space->name);
 		dump_map(file, space, &space->read);
 	}
 }
@@ -1868,9 +1863,9 @@ static void memory_init_preflight(running_machine *machine)
 
 				/* validate the region */
 				if (base == NULL)
-					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region);
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag.cstr(), space->name, entry->addrstart, entry->addrend, entry->region);
 				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
-					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region, length);
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag.cstr(), space->name, entry->addrstart, entry->addrend, entry->region, length);
 			}
 
 			/* convert any region-relative entries to their memory pointers */
@@ -1995,7 +1990,7 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 		case AMH_DEVICE_HANDLER:
 			device = devtag_get_device(space->machine, handler->tag);
 			if (device == NULL)
-				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", handler->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", handler->tag, space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 			switch ((handler->bits != 0) ? handler->bits : space->dbits)
 			{
 				case 8:
@@ -2202,12 +2197,6 @@ static void memory_exit(running_machine *machine)
 		if (space->map != NULL)
 			address_map_free(space->map);
 	}
-
-	/* free the maps */
-	if (memdata->bankmap != NULL)
-		tagmap_free(memdata->bankmap);
-	if (memdata->sharemap != NULL)
-		tagmap_free(memdata->sharemap);
 }
 
 
@@ -2384,7 +2373,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				check_entry_field(share);
 				entry->share = TOKEN_GET_STRING(tokens);
 				if (memdata != NULL)
-					tagmap_add(memdata->sharemap, entry->share, UNMAPPED_SHARE_PTR, FALSE);
+					memdata->sharemap.add(entry->share, UNMAPPED_SHARE_PTR, FALSE);
 				break;
 
 			case ADDRMAP_TOKEN_BASEPTR:
@@ -2520,7 +2509,7 @@ static void *space_find_backing_memory(const address_space *space, offs_t addrst
 	address_map_entry *entry;
 	memory_block *block;
 
-	VPRINTF(("space_find_backing_memory('%s',%s,%08X-%08X) -> ", space->cpu->tag, space->name, bytestart, byteend));
+	VPRINTF(("space_find_backing_memory('%s',%s,%08X-%08X) -> ", space->cpu->tag.cstr(), space->name, bytestart, byteend));
 
 	/* look in the address map first */
 	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
@@ -2600,7 +2589,7 @@ static genf *bank_find_or_allocate(const address_space *space, const char *tag, 
 
 	/* if this bank is named, look it up */
 	if (tag != NULL)
-		bank = (bank_info *)tagmap_find_hash_only(memdata->bankmap, tag);
+		bank = memdata->bankmap.find_hash_only(tag);
 
 	/* else try to find an exact match */
 	else
@@ -2654,7 +2643,7 @@ static genf *bank_find_or_allocate(const address_space *space, const char *tag, 
 		/* for named banks, add to the map and register for save states */
 		if (tag[0] != '~')
 		{
-			tagmap_add_unique_hash(memdata->bankmap, tag, bank, FALSE);
+			memdata->bankmap.add_unique_hash(tag, bank, FALSE);
 			if (state_save_registration_allowed(space->machine))
 				state_save_register_item(space->machine, "memory", bank->tag, 0, bank->curentry);
 		}
@@ -3350,7 +3339,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 	size_t bytestoalloc;
 	const char *region;
 
-	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space->cpu->tag, space->name, bytestart, byteend, memory));
+	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space->cpu->tag.cstr(), space->name, bytestart, byteend, memory));
 
 	/* determine how much memory to allocate for this */
 	bytestoalloc = sizeof(*block);
@@ -3415,7 +3404,7 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 		/* if we haven't assigned this block yet, see if we have a mapped shared pointer for it */
 		if (entry->memory == NULL && entry->share != NULL)
 		{
-			void *shareptr = tagmap_find(memdata->sharemap, entry->share);
+			void *shareptr = memdata->sharemap.find(entry->share);
 			if (shareptr != UNMAPPED_SHARE_PTR)
 			{
 				entry->memory = shareptr;
@@ -3433,9 +3422,9 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 		/* if we're the first match on a shared pointer, assign it now */
 		if (entry->memory != NULL && entry->share != NULL)
 		{
-			void *shareptr = tagmap_find(memdata->sharemap, entry->share);
+			void *shareptr = memdata->sharemap.find(entry->share);
 			if (shareptr == UNMAPPED_SHARE_PTR)
-				tagmap_add(memdata->sharemap, entry->share, entry->memory, TRUE);
+				memdata->sharemap.add(entry->share, entry->memory, TRUE);
 		}
 
 		/* keep track of the first unassigned entry */

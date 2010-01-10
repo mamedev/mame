@@ -9,7 +9,6 @@
 #ifndef __8255PPI_H_
 #define __8255PPI_H_
 
-#include "devcb.h"
 
 
 #define PPI8255		DEVICE_GET_INFO_NAME(ppi8255)

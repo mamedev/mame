@@ -6,9 +6,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "tms32031.h"
-#include "eminline.h"
 
 CPU_DISASSEMBLE( tms32031 );
 

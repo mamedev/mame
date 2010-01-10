@@ -1,8 +1,9 @@
 /* IBM/Motorola PowerPC 4xx/6xx Emulator */
 
 #include <setjmp.h>
-#include "ppc.h"
+#include "emu.h"
 #include "debugger.h"
+#include "ppc.h"
 
 // PLL Configuration based on the table in MPC603EUM page 7-31
 static const int mpc603e_pll_config[12][9] =

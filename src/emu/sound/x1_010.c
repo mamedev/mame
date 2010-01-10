@@ -48,8 +48,7 @@ Registers:
 
 ***************************************************************************/
 
-#include "sndintrf.h"
-#include "cpuintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "x1_010.h"
 

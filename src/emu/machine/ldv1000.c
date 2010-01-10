@@ -16,6 +16,7 @@
 
 *************************************************************************/
 
+#include "emu.h"
 #include "ldcore.h"
 #include "machine/8255ppi.h"
 #include "machine/z80ctc.h"

@@ -11,6 +11,7 @@
 
 #include "unzip.h"
 #include "osdcore.h"
+#include "osdcomm.h"
 
 #include <stdarg.h>
 

@@ -11,8 +11,6 @@
 #ifndef __ADSP2100_H__
 #define __ADSP2100_H__
 
-#include "cpuintrf.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS

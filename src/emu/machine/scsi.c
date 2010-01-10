@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "scsi.h"
 
 void SCSIAllocInstance( running_machine *machine, const SCSIClass *scsiClass, SCSIInstance **instance, const char *diskregion )

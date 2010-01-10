@@ -8,7 +8,7 @@
  *
  *****************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 #define OP(A)   oprom[(A) - PC]
 #define ARG(A)  opram[(A) - PC]

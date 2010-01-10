@@ -9,8 +9,7 @@
 
 ***************************************************************************/
 
-#include "output.h"
-#include "mame.h"
+#include "emu.h"
 #include <zlib.h>
 
 

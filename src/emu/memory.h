@@ -11,12 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
-
-#include "emucore.h"
-#include "tokenize.h"
-#include "astring.h"
 
 
 
@@ -84,6 +84,11 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* referenced types from other classes */
+class device_config;
+struct game_driver;
+
 
 /* handler_data and subtable_data are opaque types used to hold information about a particular handler */
 typedef struct _handler_data handler_data;

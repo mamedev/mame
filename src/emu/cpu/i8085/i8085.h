@@ -1,8 +1,6 @@
 #ifndef __I8085_H__
 #define __I8085_H__
 
-#include "cpuintrf.h"
-#include "devcb.h"
 
 /***************************************************************************
     CONSTANTS

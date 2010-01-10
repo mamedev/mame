@@ -14,7 +14,6 @@
 #ifndef __EMUOPTS_H__
 #define __EMUOPTS_H__
 
-#include "emucore.h"
 #include "options.h"
 
 

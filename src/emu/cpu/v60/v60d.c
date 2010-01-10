@@ -1,4 +1,5 @@
 
+#include "emu.h"
 #include "debugger.h"
 #include "v60.h"
 

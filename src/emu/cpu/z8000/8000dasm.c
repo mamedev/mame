@@ -44,9 +44,9 @@
  *
  *****************************************************************************/
 
+#include "emu.h"
 #include "z8000.h"
 #include "z8000cpu.h"
-#include "cpuintrf.h"
 
 static int n[12];	/* opcode nibbles */
 static int b[6];	/* opcode bytes */

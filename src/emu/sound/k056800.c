@@ -6,7 +6,7 @@
 
 ***********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/k056800.h"
 
 typedef struct _k056800_state k056800_state;

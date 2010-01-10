@@ -11,9 +11,7 @@
 #ifndef __PPCCOM_H__
 #define __PPCCOM_H__
 
-#include "cpuintrf.h"
 #include "ppc.h"
-#include "timer.h"
 #include "cpu/vtlb.h"
 
 

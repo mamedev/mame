@@ -12,7 +12,6 @@
 #ifndef __RENDUTIL_H__
 #define __RENDUTIL_H__
 
-#include "driver.h"
 #include "osdepend.h"
 #include "render.h"
 

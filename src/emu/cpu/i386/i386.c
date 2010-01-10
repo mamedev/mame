@@ -10,6 +10,7 @@
         Cyrix MediaGX
 */
 
+#include "emu.h"
 #include "debugger.h"
 #include "i386priv.h"
 #include "i386.h"

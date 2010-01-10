@@ -5,13 +5,8 @@
  *
  **********************************************************************************************/
 
-
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
-#include "cpuexec.h"
 #include "es5506.h"
 
 

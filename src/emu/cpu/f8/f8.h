@@ -24,7 +24,6 @@
 #ifndef __F8_H__
 #define _F8_H
 
-#include "cpuintrf.h"
 
 #ifdef __cplusplus
 extern "C" {

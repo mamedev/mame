@@ -1,6 +1,5 @@
 #include <math.h>
-#include "sndintrf.h"
-#include "cpuintrf.h"
+#include "emu.h"
 #include "aica.h"
 #include "aicadsp.h"
 

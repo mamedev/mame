@@ -3,7 +3,6 @@
 #ifndef __I960_H__
 #define __I960_H__
 
-#include "cpuintrf.h"
 
 enum
 {

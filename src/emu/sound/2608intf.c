@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ay8910.h"
 #include "2608intf.h"

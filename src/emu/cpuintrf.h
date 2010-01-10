@@ -11,14 +11,13 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __CPUINTRF_H__
 #define __CPUINTRF_H__
 
-#include "devintrf.h"
-#include "memory.h"
-#include "watchdog.h"
-#include "state.h"
-#include <stddef.h>
 
 
 /***************************************************************************

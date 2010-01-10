@@ -3,7 +3,6 @@
 #ifndef __SHARC_H__
 #define __SHARC_H__
 
-#include "cpuintrf.h"
 
 #define SHARC_INPUT_FLAG0		3
 #define SHARC_INPUT_FLAG1		4

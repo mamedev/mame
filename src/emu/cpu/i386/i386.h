@@ -5,7 +5,6 @@
 
 #define INPUT_LINE_A20		1
 
-#include "cpuintrf.h"
 
 // mingw has this defined for 32-bit compiles
 #undef i386

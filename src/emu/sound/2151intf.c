@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "fm.h"
 #include "2151intf.h"

@@ -1,4 +1,3 @@
-#include "cpuintrf.h"
 
 enum
 {

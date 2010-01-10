@@ -3,7 +3,6 @@
 #ifndef __SIDVOICE_H__
 #define __SIDVOICE_H__
 
-#include "sndintrf.h"
 
 /*
   approximation of the sid6581 chip

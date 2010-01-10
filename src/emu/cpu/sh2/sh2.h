@@ -30,7 +30,6 @@
 #ifndef __SH2_H__
 #define __SH2_H__
 
-#include "cpuintrf.h"
 
 #define SH2_INT_NONE	-1
 #define SH2_INT_VBLIN	0

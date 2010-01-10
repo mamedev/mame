@@ -91,15 +91,13 @@
 
 ***************************************************************************/
 
-#include "osdepend.h"
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "config.h"
 #include "xmlfile.h"
 #include "profiler.h"
-#include "inputseq.h"
 #include "ui.h"
 #include "uiinput.h"
-#include "inptport.h"
 
 #include <ctype.h>
 #include <time.h>
@@ -713,13 +711,6 @@ void input_port_list_init(input_port_list *portlist, const input_port_token *tok
 {
 	/* initialize fields */
 	portlist->head = NULL;
-	portlist->map = NULL;
-	if (allocmap)
-	{
-		portlist->map = tagmap_alloc();
-		if (portlist->map == NULL)
-			fatalerror("Out of memory for input port map");
-	}
 
 	/* no tokens, no list */
 	if (tokens == NULL)
@@ -745,11 +736,6 @@ void input_port_list_deinit(input_port_list *portlist)
 	/* iterate over all ports and free them */
 	while (portlist->head != NULL)
 		port_config_free(&portlist->head);
-
-	/* free the map if present */
-	if (portlist->map != NULL)
-		tagmap_free(portlist->map);
-	portlist->map = NULL;
 }
 
 
@@ -1290,7 +1276,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 
 input_port_value input_port_read(running_machine *machine, const char *tag)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	return input_port_read_direct(port);
@@ -1305,7 +1291,7 @@ input_port_value input_port_read(running_machine *machine, const char *tag)
 
 input_port_value input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	return (port == NULL) ? defvalue : input_port_read_direct(port);
 }
 
@@ -1479,7 +1465,7 @@ void input_port_write_direct(const input_port_config *port, input_port_value dat
 
 void input_port_write(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	input_port_write_direct(port, value, mask);
@@ -1493,7 +1479,7 @@ void input_port_write(running_machine *machine, const char *tag, input_port_valu
 
 void input_port_write_safe(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	if (port != NULL)
 		input_port_write_direct(port, value, mask);
 }
@@ -2432,6 +2418,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 	input_field_config *curfield = NULL;
 	input_port_config *curport = NULL;
 	input_port_value maskbits = 0;
+	tagmap_error err;
 	UINT16 category;	/* (MESS-specific) category */
 
 	/* loop over tokens until we hit the end */
@@ -2471,14 +2458,11 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 
 				curport = port_config_alloc(&portlist->head);
 				curport->tag = TOKEN_GET_STRING(ipt);
-				if (portlist->map != NULL)
+				err = portlist->map.add_unique_hash(curport->tag, curport, FALSE);
+				if (err == TMERR_DUPLICATE)
 				{
-					tagmap_error err = tagmap_add_unique_hash(portlist->map, curport->tag, curport, FALSE);
-					if (err == TMERR_DUPLICATE)
-					{
-						const input_port_config *match = (const input_port_config *)tagmap_find_hash_only(portlist->map, curport->tag);
-						error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
-					}
+					const input_port_config *match = portlist->map.find_hash_only(curport->tag);
+					error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
 				}
 				curfield = NULL;
 				cursetting = NULL;

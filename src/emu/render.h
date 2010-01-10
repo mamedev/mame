@@ -178,7 +178,7 @@ typedef void (*texture_scaler_func)(bitmap_t *dest, const bitmap_t *source, cons
 -------------------------------------------------*/
 
 typedef struct _render_container render_container;
-typedef struct _render_target render_target;
+class render_target;
 typedef struct _render_texture render_texture;
 typedef struct _render_font render_font;
 typedef struct _render_ref render_ref;

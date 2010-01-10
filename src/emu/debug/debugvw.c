@@ -1036,7 +1036,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 		registers_subview_item *subview;
 
 		/* determine the string and allocate a subview large enough */
-		tempstring.printf("CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
+		tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), cpu_get_name(cpu));
 		subview = (registers_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
 
 		/* populate the subview */
@@ -1500,7 +1500,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 			disasm_subview_item *subview;
 
 			/* determine the string and allocate a subview large enough */
-			tempstring.printf("CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
+			tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), cpu_get_name(cpu));
 			subview = (disasm_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
 
 			/* populate the subview */
@@ -2382,9 +2382,9 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 				/* determine the string and allocate a subview large enough */
 				if (device->type == CPU)
-					tempstring.printf("CPU '%s' (%s) %s memory", device->tag, device_get_name(device), space->name);
+					tempstring.printf("CPU '%s' (%s) %s memory", device->tag.cstr(), device_get_name(device), space->name);
 				else
-					tempstring.printf("%s '%s' space #%d memory", device_get_name(device), device->tag, spacenum);
+					tempstring.printf("%s '%s' space #%d memory", device_get_name(device), device->tag.cstr(), spacenum);
 				subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
 
 				/* populate the subview */

@@ -11,13 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
-
-#include "emucore.h"
-#include "devintrf.h"
-#include "timer.h"
-#include "render.h"
 
 
 /***************************************************************************
@@ -60,6 +59,10 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+// forward references
+class render_target;
+
 
 /*-------------------------------------------------
     screen_config - configuration of a single

@@ -1,5 +1,4 @@
-#include "driver.h"
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1869.h"

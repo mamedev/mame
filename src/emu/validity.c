@@ -9,16 +9,11 @@
 
 ***************************************************************************/
 
-#include "osdepend.h"
-#include "eminline.h"
-#include "driver.h"
+#include "emu.h"
 #include "hash.h"
-#include "unicode.h"
 #include "validity.h"
 
 #include <ctype.h>
-#include <stdarg.h>
-#include <zlib.h>
 
 
 /***************************************************************************
@@ -46,6 +41,10 @@ UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+typedef tagmap_t<const game_driver *> game_driver_map;
+
+typedef tagmap_t<FPTR> int_map;
 
 class region_entry
 {
@@ -316,7 +315,7 @@ static int validate_inlines(void)
     information
 -------------------------------------------------*/
 
-static int validate_driver(int drivnum, const machine_config *config, tagmap *names, tagmap *descriptions)
+static int validate_driver(int drivnum, const machine_config *config, game_driver_map &names, game_driver_map &descriptions)
 {
 	const game_driver *driver = drivers[drivnum];
 	const game_driver *clone_of;
@@ -326,17 +325,17 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
 	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
 
 	/* check for duplicate names */
-	if (tagmap_add(names, driver->name, (void *)driver, FALSE) == TMERR_DUPLICATE)
+	if (names.add(driver->name, driver, FALSE) == TMERR_DUPLICATE)
 	{
-		const game_driver *match = (const game_driver *)tagmap_find(names, driver->name);
+		const game_driver *match = names.find(driver->name);
 		mame_printf_error("%s: %s is a duplicate name (%s, %s)\n", driver->source_file, driver->name, match->source_file, match->name);
 		error = TRUE;
 	}
 
 	/* check for duplicate descriptions */
-	if (tagmap_add(descriptions, driver->description, (void *)driver, FALSE) == TMERR_DUPLICATE)
+	if (descriptions.add(driver->description, driver, FALSE) == TMERR_DUPLICATE)
 	{
-		const game_driver *match = (const game_driver *)tagmap_find(descriptions, driver->description);
+		const game_driver *match = descriptions.find(driver->description);
 		mame_printf_error("%s: %s is a duplicate description (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->description);
 		error = TRUE;
 	}
@@ -403,7 +402,7 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
     validate_roms - validate ROM definitions
 -------------------------------------------------*/
 
-static int validate_roms(int drivnum, const machine_config *config, region_info *rgninfo, tagmap *roms)
+static int validate_roms(int drivnum, const machine_config *config, region_info *rgninfo, game_driver_map &roms)
 {
 	const game_driver *driver = drivers[drivnum];
 	int bios_flags = 0, last_bios = 0;
@@ -420,9 +419,9 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
-		if (tagmap_add(roms, romaddr, (void *)driver, FALSE) == TMERR_DUPLICATE)
+		if (roms.add(romaddr, driver, FALSE) == TMERR_DUPLICATE)
 		{
-			const game_driver *match = (const game_driver *)tagmap_find(roms, romaddr);
+			const game_driver *match = roms.find(romaddr);
 			mame_printf_error("%s: %s uses the same ROM set as (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->name);
 			error = TRUE;
 		}
@@ -595,39 +594,39 @@ static int validate_cpu(int drivnum, const machine_config *config)
 		{
 			if (video_screen_count(config) == 0)
 			{
-				mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, device->tag.cstr());
 				error = TRUE;
 			}
 			else if (cpuconfig->vblank_interrupt_screen != NULL && cpuconfig->vblank_interrupts_per_frame != 0)
 			{
-				mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag.cstr());
 				error = TRUE;
 			}
 			else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(&config->devicelist, cpuconfig->vblank_interrupt_screen) == NULL)
 			{
-				mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag, cpuconfig->vblank_interrupt_screen);
+				mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag.cstr(), cpuconfig->vblank_interrupt_screen);
 				error = TRUE;
 			}
 			else if (cpuconfig->vblank_interrupt_screen == NULL && cpuconfig->vblank_interrupts_per_frame == 0)
 			{
-				mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, device->tag.cstr());
 				error = TRUE;
 			}
 		}
 		else if (cpuconfig->vblank_interrupts_per_frame != 0)
 		{
-			mame_printf_error("%s: %s cpu '%s' has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s cpu '%s' has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, device->tag.cstr());
 			error = TRUE;
 		}
 
 		if (cpuconfig->timed_interrupt != NULL && cpuconfig->timed_interrupt_period == 0)
 		{
-			mame_printf_error("%s: %s cpu '%s' has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s cpu '%s' has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, device->tag.cstr());
 			error = TRUE;
 		}
 		else if (cpuconfig->timed_interrupt == NULL && cpuconfig->timed_interrupt_period != 0)
 		{
-			mame_printf_error("%s: %s cpu '%s' has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s cpu '%s' has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, device->tag.cstr());
 			error = TRUE;
 		}
 	}
@@ -656,7 +655,7 @@ static int validate_display(int drivnum, const machine_config *config)
 		/* sanity check dimensions */
 		if ((scrconfig->width <= 0) || (scrconfig->height <= 0))
 		{
-			mame_printf_error("%s: %s screen '%s' has invalid display dimensions\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s screen '%s' has invalid display dimensions\n", driver->source_file, driver->name, device->tag.cstr());
 			error = TRUE;
 		}
 
@@ -668,7 +667,7 @@ static int validate_display(int drivnum, const machine_config *config)
 				(scrconfig->visarea.max_x >= scrconfig->width) ||
 				(scrconfig->visarea.max_y >= scrconfig->height))
 			{
-				mame_printf_error("%s: %s screen '%s' has an invalid display area\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s screen '%s' has an invalid display area\n", driver->source_file, driver->name, device->tag.cstr());
 				error = TRUE;
 			}
 
@@ -677,7 +676,7 @@ static int validate_display(int drivnum, const machine_config *config)
 				scrconfig->format != BITMAP_FORMAT_RGB15 &&
 				scrconfig->format != BITMAP_FORMAT_RGB32)
 			{
-				mame_printf_error("%s: %s screen '%s' has unsupported format\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s screen '%s' has unsupported format\n", driver->source_file, driver->name, device->tag.cstr());
 				error = TRUE;
 			}
 			if (scrconfig->format == BITMAP_FORMAT_INDEXED16)
@@ -687,7 +686,7 @@ static int validate_display(int drivnum, const machine_config *config)
 		/* check for zero frame rate */
 		if (scrconfig->refresh == 0)
 		{
-			mame_printf_error("%s: %s screen '%s' has a zero refresh rate\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s screen '%s' has a zero refresh rate\n", driver->source_file, driver->name, device->tag.cstr());
 			error = TRUE;
 		}
 	}
@@ -823,11 +822,10 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
     strings
 -------------------------------------------------*/
 
-static int get_defstr_index(tagmap *defstr_map, const char *name, const game_driver *driver, int *error)
+static int get_defstr_index(int_map &defstr_map, const char *name, const game_driver *driver, int *error)
 {
 	/* check for strings that should be DEF_STR */
-	void *result = tagmap_find(defstr_map, name);
-	FPTR strindex = (FPTR)result;
+	int strindex = defstr_map.find(name);
 	if (strindex != 0 && name != input_port_string_from_index(strindex) && error != NULL)
 	{
 		mame_printf_error("%s: %s must use DEF_STR( %s )\n", driver->source_file, driver->name, name);
@@ -952,7 +950,7 @@ static void validate_analog_input_field(const input_field_config *field, const g
     setting
 -------------------------------------------------*/
 
-static void validate_dip_settings(const input_field_config *field, const game_driver *driver, tagmap *defstr_map, int *error)
+static void validate_dip_settings(const input_field_config *field, const game_driver *driver, int_map &defstr_map, int *error)
 {
 	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
@@ -1043,7 +1041,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
     validate_inputs - validate input configuration
 -------------------------------------------------*/
 
-static int validate_inputs(int drivnum, const machine_config *config, tagmap *defstr_map, input_port_list *portlist)
+static int validate_inputs(int drivnum, const machine_config *config, int_map &defstr_map, input_port_list *portlist)
 {
 	const input_port_config *scanport;
 	const input_port_config *port;
@@ -1197,7 +1195,7 @@ static int validate_sound(int drivnum, const machine_config *config)
 		for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
 			if (checkspeak != curspeak && strcmp(checkspeak->tag, curspeak->tag) == 0)
 			{
-				mame_printf_error("%s: %s has multiple speakers tagged as '%s'\n", driver->source_file, driver->name, checkspeak->tag);
+				mame_printf_error("%s: %s has multiple speakers tagged as '%s'\n", driver->source_file, driver->name, checkspeak->tag.cstr());
 				error = TRUE;
 			}
 
@@ -1205,7 +1203,7 @@ static int validate_sound(int drivnum, const machine_config *config)
 		for (checksound = sound_first(config); checksound != NULL; checksound = sound_next(checksound))
 			if (strcmp(curspeak->tag, checksound->tag) == 0)
 			{
-				mame_printf_error("%s: %s has both a speaker and a sound chip tagged as '%s'\n", driver->source_file, driver->name, curspeak->tag);
+				mame_printf_error("%s: %s has both a speaker and a sound chip tagged as '%s'\n", driver->source_file, driver->name, curspeak->tag.cstr());
 				error = TRUE;
 			}
 	}
@@ -1270,7 +1268,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 		for (scandevice = device_list_first(&config->devicelist, DEVICE_TYPE_WILDCARD); scandevice != device; scandevice = device_list_next(scandevice, DEVICE_TYPE_WILDCARD))
 			if (strcmp(scandevice->tag, device->tag) == 0)
 			{
-				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver->source_file, driver->name, device->tag);
+				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver->source_file, driver->name, device->tag.cstr());
 				break;
 			}
 
@@ -1302,12 +1300,12 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 			/* validate the global map parameters */
 			if (map->spacenum != spacenum)
 			{
-				mame_printf_error("%s: %s device '%s' space %d has address space %d handlers!\n", driver->source_file, driver->name, device->tag, spacenum, map->spacenum);
+				mame_printf_error("%s: %s device '%s' space %d has address space %d handlers!\n", driver->source_file, driver->name, device->tag.cstr(), spacenum, map->spacenum);
 				error = TRUE;
 			}
 			if (map->databits != databus_width)
 			{
-				mame_printf_error("%s: %s device '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], databus_width, map->databits);
+				mame_printf_error("%s: %s device '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], databus_width, map->databits);
 				error = TRUE;
 			}
 
@@ -1326,7 +1324,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 							((entry->read.type != AMH_NONE && scan->read.type != AMH_NONE) ||
 							 (entry->write.type != AMH_NONE && scan->write.type != AMH_NONE)))
 						{
-							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->read.type, entry->write.type, scan->addrstart, scan->addrend, scan->read.type, scan->write.type);
+							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->addrstart, entry->addrend, entry->read.type, entry->write.type, scan->addrstart, scan->addrend, scan->read.type, scan->write.type);
 							detected_overlap = TRUE;
 							break;
 						}
@@ -1364,7 +1362,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 						/* stop if we hit an empty */
 						if (rgninfo->entries[rgnnum].tag == NULL)
 						{
-							mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
+							mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
 							error = TRUE;
 							break;
 						}
@@ -1375,7 +1373,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 							offs_t length = rgninfo->entries[rgnnum].length;
 							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
 							{
-								mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
+								mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
 								error = TRUE;
 							}
 							break;
@@ -1387,7 +1385,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->read.tag) == NULL) ||
 					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write.tag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->write.tag);
 					error = TRUE;
 				}
 
@@ -1395,7 +1393,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && input_port_by_tag(portlist, entry->read.tag) == NULL) ||
 					(entry->write.type == AMH_PORT && entry->write.tag != NULL && input_port_by_tag(portlist, entry->write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read.tag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->read.tag);
 					error = TRUE;
 				}
 
@@ -1410,12 +1408,12 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				/* if there are base or size members, check that they are within bounds */
 				if (entry->baseptroffs_plus1 != 0 && (entry->baseptroffs_plus1 - 1) >= config->driver_data_size)
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_BASE_MEMBER entry\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum]);
+					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_BASE_MEMBER entry\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum]);
 					error = TRUE;
 				}
 				if (entry->sizeptroffs_plus1 != 0 && (entry->sizeptroffs_plus1 - 1) >= config->driver_data_size)
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_SIZE_MEMBER entry\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum]);
+					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_SIZE_MEMBER entry\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum]);
 					error = TRUE;
 				}
 			}
@@ -1453,14 +1451,10 @@ int mame_validitychecks(const game_driver *curdriver)
 	UINT16 lsbtest;
 	UINT8 a, b;
 
-	tagmap *names = tagmap_alloc();
-	tagmap *descriptions = tagmap_alloc();
-	tagmap *roms = tagmap_alloc();
-	tagmap *defstr = tagmap_alloc();
-
-	/* check for memory */
-	if (descriptions == NULL || names == NULL || roms == NULL || defstr == NULL)
-		fatalerror("Out of memory for string maps!");
+	game_driver_map names;
+	game_driver_map descriptions;
+	game_driver_map roms;
+	int_map defstr;
 
 	/* basic system checks */
 	a = 0xff;
@@ -1499,7 +1493,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	{
 		const char *string = input_port_string_from_index(strnum);
 		if (string != NULL)
-			tagmap_add(defstr, string, (void *)(FPTR)strnum, FALSE);
+			defstr.add(string, strnum, FALSE);
 	}
 	prep += get_profile_ticks();
 
@@ -1585,11 +1579,6 @@ int mame_validitychecks(const game_driver *curdriver)
 	mame_printf_info("MESS:      %8dm\n", (int)(mess_checks / 1000000));
 #endif
 #endif
-
-	tagmap_free(defstr);
-	tagmap_free(roms);
-	tagmap_free(descriptions);
-	tagmap_free(names);
 
 	return error;
 }

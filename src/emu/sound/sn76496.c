@@ -81,7 +81,7 @@
         * Factor out common code so that the SAA1099 can share some code.
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "sn76496.h"
 

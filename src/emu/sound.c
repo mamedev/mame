@@ -9,13 +9,13 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
 #include "streams.h"
 #include "config.h"
 #include "profiler.h"
 #include "sound/wavwrite.h"
-#include "sound.h"
 
 
 
@@ -315,9 +315,9 @@ static DEVICE_START( sound )
 	/* if no state registered for saving, we can't save */
 	if (num_regs == 0)
 	{
-		logerror("Sound chip '%s' did not register any state to save!\n", device->tag);
+		logerror("Sound chip '%s' did not register any state to save!\n", device->tag.cstr());
 		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Sound chip '%s' did not register any state to save!", device->tag);
+			fatalerror("Sound chip '%s' did not register any state to save!", device->tag.cstr());
 	}
 }
 
@@ -488,7 +488,7 @@ static void route_sound(running_machine *machine)
 						speaker_info *speakerinfo = get_safe_token(target_device);
 
 						/* generate text for the UI */
-						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag, device_get_name(sound), sound->tag);
+						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag.cstr(), device_get_name(sound), sound->tag.cstr());
 						if (numoutputs > 1)
 							tempstring.catprintf(" Ch.%d", outputnum);
 

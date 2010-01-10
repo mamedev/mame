@@ -7,7 +7,7 @@ Sharp sm8500 CPU disassembly
 
 *******************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "sm8500.h"
 

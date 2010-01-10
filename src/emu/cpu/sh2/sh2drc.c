@@ -15,10 +15,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
-#include "eminline.h"
 #include "profiler.h"
 
 CPU_DISASSEMBLE( sh2 );

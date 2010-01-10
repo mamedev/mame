@@ -4,7 +4,6 @@
 #define __I386_H__
 
 #include "i386.h"
-#include "cpuintrf.h"
 
 #define I386OP(XX)		i386_##XX
 #define I486OP(XX)		i486_##XX

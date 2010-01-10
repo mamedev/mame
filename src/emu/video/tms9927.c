@@ -259,7 +259,6 @@ static DEVICE_START( tms9927 )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 
 	tms->intf = (const tms9927_interface *)device->static_config;
 

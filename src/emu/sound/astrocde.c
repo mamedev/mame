@@ -39,7 +39,7 @@
 
 ***********************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "astrocde.h"
 

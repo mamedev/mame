@@ -22,8 +22,6 @@
 #ifndef __CP1610_H__
 #define __CP1610_H__
 
-#include "cpuintrf.h"
-
 enum
 {
 	CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,

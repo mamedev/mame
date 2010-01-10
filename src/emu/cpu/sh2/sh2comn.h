@@ -11,7 +11,6 @@
 #ifndef __SH2COMN_H__
 #define __SH2COMN_H__
 
-#include "timer.h"
 
 #define USE_SH2DRC
 

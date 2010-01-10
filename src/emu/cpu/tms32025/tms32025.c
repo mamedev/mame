@@ -116,6 +116,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 */
 
 
+#include "emu.h"
 #include "debugger.h"
 #include "tms32025.h"
 

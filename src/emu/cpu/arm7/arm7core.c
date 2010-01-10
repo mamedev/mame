@@ -77,8 +77,6 @@
     By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino
 *****************************************************************************/
 
-#include <stdarg.h>
-
 #define ARM7_DEBUG_CORE 0
 
 /* Prototypes */

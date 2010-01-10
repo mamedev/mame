@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuexec.h"
 #include "jaguar.h"
 
 CPU_DISASSEMBLE( jaguargpu );

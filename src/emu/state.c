@@ -23,9 +23,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-#include "astring.h"
-#include "state.h"
+#include "emu.h"
 
 #include <zlib.h>
 

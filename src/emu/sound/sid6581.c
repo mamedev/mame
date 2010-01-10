@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "sid6581.h"
 #include "sid.h"
 

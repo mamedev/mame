@@ -10,9 +10,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "cubeqcpu.h"
-#include "driver.h"
 
 
 CPU_DISASSEMBLE( cquestsnd );

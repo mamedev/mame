@@ -10,8 +10,6 @@
 #ifndef __MC6845__
 #define __MC6845__
 
-#include "devcb.h"
-
 #define MC6845		DEVICE_GET_INFO_NAME(mc6845)
 #define MC6845_1	DEVICE_GET_INFO_NAME(mc6845_1)
 #define R6545_1		DEVICE_GET_INFO_NAME(r6545_1)

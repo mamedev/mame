@@ -7,6 +7,7 @@
  *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
+#include "emu.h"
 #include "debugger.h"
 #include "i4004.h"
 

@@ -25,7 +25,6 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 
 */
 
-#include "mame.h"
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"

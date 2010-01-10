@@ -64,8 +64,7 @@
 
 */
 
-#include "driver.h"
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "cop400.h"
 

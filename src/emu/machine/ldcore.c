@@ -9,12 +9,13 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "ldcore.h"
 #include "avcomp.h"
 #include "streams.h"
 #include "vbiparse.h"
 #include "config.h"
+#include "render.h"
 
 
 

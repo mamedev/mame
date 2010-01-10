@@ -8,7 +8,6 @@
 #ifndef _SCSI_H_
 #define _SCSI_H_
 
-#include "driver.h"
 
 typedef int (*pSCSIDispatch)( int operation, void *file, INT64 intparm, void *ptrparm );
 

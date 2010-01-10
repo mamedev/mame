@@ -11,10 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __SOUND_H__
 #define __SOUND_H__
-
-#include "driver.h"
 
 
 /***************************************************************************

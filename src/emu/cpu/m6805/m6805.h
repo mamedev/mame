@@ -5,7 +5,6 @@
 #ifndef __M6805_H__
 #define __M6805_H__
 
-#include "cpuintrf.h"
 
 enum { M6805_PC=1, M6805_S, M6805_CC, M6805_A, M6805_X, M6805_IRQ_STATE };
 

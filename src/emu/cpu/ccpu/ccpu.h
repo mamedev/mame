@@ -13,8 +13,6 @@
 #ifndef __CCPU_H__
 #define	__CCPU_H__
 
-#include "cpuintrf.h"
-
 
 /***************************************************************************
     REGISTER ENUMERATION

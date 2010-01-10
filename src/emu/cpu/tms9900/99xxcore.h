@@ -85,8 +85,6 @@ Other references can be found on spies.com:
 
 */
 
-#include "debugger.h"
-#include "cpuexec.h"
 #include "tms9900.h"
 
 

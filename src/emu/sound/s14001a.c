@@ -230,7 +230,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
  *
  */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "s14001a.h"
 

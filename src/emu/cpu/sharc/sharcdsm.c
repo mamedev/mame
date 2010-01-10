@@ -4,9 +4,8 @@
    Written by Ville Linde for use in MAME
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "sharcdsm.h"
-#include <stdarg.h>
 
 static UINT32 (* sharcdasm_table[256])(UINT32, UINT64);
 static int dasm_table_built = 0;

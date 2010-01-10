@@ -36,11 +36,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __DEVCB_H__
 #define __DEVCB_H__
-
-#include "devintrf.h"
-#include "memory.h"
 
 
 /***************************************************************************
@@ -91,6 +92,10 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* forward declarations */
+class device_config;
+
 
 /* read/write types for I/O lines (similar to read/write handlers but no offset) */
 typedef int (*read_line_device_func)(const device_config *device);

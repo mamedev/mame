@@ -15,7 +15,7 @@ the variable VotraxBaseFrequency, this is defaulted to 8000
 
 **************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "samples.h"
 #include "votrax.h"

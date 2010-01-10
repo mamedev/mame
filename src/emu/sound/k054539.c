@@ -17,10 +17,9 @@ CHANNEL_DEBUG enables the following keys:
 
 *********************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "k054539.h"
-#include <math.h>
 
 #define CHANNEL_DEBUG 0
 #define VERBOSE 0

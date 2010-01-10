@@ -74,7 +74,7 @@
 #include "driver.h"
 #include "memconv.h"
 #include "machine/mc146818.h"
-
+#include "coreutil.h"
 
 
 #define LOG_MC146818		0

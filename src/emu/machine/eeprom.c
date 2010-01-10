@@ -360,14 +360,14 @@ static DEVICE_NVRAM( eeprom )
 		/* populate from a memory region if present */
 		if (device->region != NULL)
 		{
-			UINT32 region_flags = memory_region_flags(device->machine, device->tag);
+			UINT32 region_flags = memory_region_flags(device->machine, device->tag.cstr());
 
 			if (device->regionbytes != eeprom_bytes)
-				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, eeprom_bytes);
+				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag.cstr(), eeprom_bytes);
 			if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
-				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
+				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag.cstr());
 			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
-				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
+				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag.cstr(), region_flags);
 
 			for (offs = 0; offs < eeprom_length; offs++)
 				if (eestate->intf->data_bits == 8)

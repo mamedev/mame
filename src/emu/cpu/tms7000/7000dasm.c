@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "debugger.h"
 #include "tms7000.h"
 

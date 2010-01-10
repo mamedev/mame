@@ -4,8 +4,8 @@
 ****************************************************************************/
 /* 26.March 2000 PeT changed set_irq_line */
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuintrf.h"
 
 #include "host.h"
 #include "i86priv.h"

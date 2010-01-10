@@ -24,6 +24,7 @@
 /* 10.March   2000 PeT added 6502 set overflow input line */
 /* 13.September 2000 PeT N2A03 jmp indirect */
 
+#include "emu.h"
 #include "debugger.h"
 #include "m6502.h"
 #include "ops02.h"
@@ -215,7 +216,7 @@ INLINE void m6502_take_irq(m6502_Regs *cpustate)
 		P |= F_I;		/* set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M6502 '%s' takes IRQ ($%04x)\n", cpustate->device->tag, PCD));
+		LOG(("M6502 '%s' takes IRQ ($%04x)\n", cpustate->device->tag.cstr(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
 	}
@@ -245,7 +246,7 @@ static CPU_EXECUTE( m6502 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( cpustate->after_cli )
 		{
-			LOG(("M6502 '%s' after_cli was >0", cpustate->device->tag));
+			LOG(("M6502 '%s' after_cli was >0", cpustate->device->tag.cstr()));
 			cpustate->after_cli = 0;
 			if (cpustate->irq_state != CLEAR_LINE)
 			{
@@ -283,7 +284,7 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		cpustate->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag));
+			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag.cstr()));
 			EAD = M6502_NMI_VEC;
 			cpustate->icount -= 2;
 			PUSH(PCH);
@@ -292,7 +293,7 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 			P |= F_I;		/* set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag, PCD));
+			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag.cstr(), PCD));
 		}
 	}
 	else
@@ -301,7 +302,7 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		{
 			if( cpustate->so_state && !state )
 			{
-				LOG(( "M6502 '%s' set overflow\n", cpustate->device->tag));
+				LOG(( "M6502 '%s' set overflow\n", cpustate->device->tag.cstr()));
 				P|=F_V;
 			}
 			cpustate->so_state=state;
@@ -310,7 +311,7 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		cpustate->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6502 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag));
+			LOG(( "M6502 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag.cstr()));
 			cpustate->pending_irq = 1;
 //          cpustate->pending_irq = 2;
 			cpustate->int_occured = cpustate->icount;
@@ -436,7 +437,7 @@ INLINE void m65c02_take_irq(m6502_Regs *cpustate)
 		P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M65c02 '%s' takes IRQ ($%04x)\n", cpustate->device->tag, PCD));
+		LOG(("M65c02 '%s' takes IRQ ($%04x)\n", cpustate->device->tag.cstr(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
 	}
@@ -467,7 +468,7 @@ static CPU_EXECUTE( m65c02 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( cpustate->after_cli )
 		{
-			LOG(("M6502 '%s' after_cli was >0", cpustate->device->tag));
+			LOG(("M6502 '%s' after_cli was >0", cpustate->device->tag.cstr()));
 			cpustate->after_cli = 0;
 			if (cpustate->irq_state != CLEAR_LINE)
 			{
@@ -496,7 +497,7 @@ static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		cpustate->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag));
+			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag.cstr()));
 			EAD = M6502_NMI_VEC;
 			cpustate->icount -= 2;
 			PUSH(PCH);
@@ -505,7 +506,7 @@ static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 			P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag, PCD));
+			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag.cstr(), PCD));
 		}
 	}
 	else
@@ -561,7 +562,7 @@ INLINE void deco16_take_irq(m6502_Regs *cpustate)
 		P |= F_I;		/* set I flag */
 		PCL = RDMEM(EAD+1);
 		PCH = RDMEM(EAD);
-		LOG(("M6502 '%s' takes IRQ ($%04x)\n", cpustate->device->tag, PCD));
+		LOG(("M6502 '%s' takes IRQ ($%04x)\n", cpustate->device->tag.cstr(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
 	}
@@ -576,7 +577,7 @@ static void deco16_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		cpustate->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag));
+			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag.cstr()));
 			EAD = DECO16_NMI_VEC;
 			cpustate->icount -= 7;
 			PUSH(PCH);
@@ -585,7 +586,7 @@ static void deco16_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 			P |= F_I;		/* set I flag */
 			PCL = RDMEM(EAD+1);
 			PCH = RDMEM(EAD);
-			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag, PCD));
+			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag.cstr(), PCD));
 		}
 	}
 	else
@@ -594,7 +595,7 @@ static void deco16_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		{
 			if( cpustate->so_state && !state )
 			{
-				LOG(( "M6502 '%s' set overflow\n", cpustate->device->tag));
+				LOG(( "M6502 '%s' set overflow\n", cpustate->device->tag.cstr()));
 				P|=F_V;
 			}
 			cpustate->so_state=state;
@@ -603,7 +604,7 @@ static void deco16_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 		cpustate->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6502 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag));
+			LOG(( "M6502 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag.cstr()));
 			cpustate->pending_irq = 1;
 		}
 	}
@@ -633,7 +634,7 @@ static CPU_EXECUTE( deco16 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( cpustate->after_cli )
 		{
-			LOG(("M6502 %s after_cli was >0", cpustate->device->tag));
+			LOG(("M6502 %s after_cli was >0", cpustate->device->tag.cstr()));
 			cpustate->after_cli = 0;
 			if (cpustate->irq_state != CLEAR_LINE)
 			{

@@ -294,11 +294,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __TILEMAP_H__
 #define __TILEMAP_H__
-
-#include "emucore.h"
-#include "drawgfx.h"
 
 
 /***************************************************************************

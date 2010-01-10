@@ -389,7 +389,6 @@ static DEVICE_START( i8257 )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&i8257->out_hrq_func, &intf->out_hrq_func, device);

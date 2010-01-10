@@ -3,7 +3,6 @@
 
 #define BIGCASE
 
-#include "cpuintrf.h"
 
 typedef char BOOLEAN;
 

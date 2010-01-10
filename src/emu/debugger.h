@@ -14,8 +14,6 @@
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
 
-#include "mame.h"
-#include "cpuexec.h"
 #include "debug/debugcpu.h"
 
 

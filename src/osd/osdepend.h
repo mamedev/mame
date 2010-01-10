@@ -68,8 +68,10 @@
 
 #include "emucore.h"
 #include "osdcore.h"
-#include "inptport.h"
-#include "timer.h"
+
+
+class input_type_desc;
+class device_config;
 
 
 /*-----------------------------------------------------------------------------
@@ -123,7 +125,6 @@
         instead of relying on independent callbacks from each system.
 -----------------------------------------------------------------------------*/
 void osd_init(running_machine *machine);
-
 
 void osd_wait_for_debugger(const device_config *device, int firststop);
 

@@ -1,6 +1,4 @@
-#include <math.h>
-#include "sndintrf.h"
-#include "cpuintrf.h"
+#include "emu.h"
 #include "scsp.h"
 #include "scspdsp.h"
 

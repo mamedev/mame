@@ -22,6 +22,7 @@
  *
  *****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 
 #include "saturn.h"
@@ -161,7 +162,7 @@ INLINE void saturn_take_irq(saturn_state *cpustate)
 	saturn_push(cpustate, cpustate->pc);
 	cpustate->pc=IRQ_ADDRESS;
 
-	LOG(("Saturn '%s' takes IRQ ($%04x)\n", cpustate->device->tag, cpustate->pc));
+	LOG(("Saturn '%s' takes IRQ ($%04x)\n", cpustate->device->tag.cstr(), cpustate->pc));
 
 	if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, SATURN_IRQ_LINE);
 }
@@ -205,7 +206,7 @@ static void saturn_set_nmi_line(saturn_state *cpustate, int state)
 	cpustate->nmi_state = state;
 	if ( state != CLEAR_LINE )
 	{
-		LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag));
+		LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag.cstr()));
 		cpustate->pending_irq = 1;
 	}
 }
@@ -216,7 +217,7 @@ static void saturn_set_irq_line(saturn_state *cpustate, int state)
 	cpustate->irq_state = state;
 	if ( state != CLEAR_LINE && cpustate->irq_enable )
 	{
-		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", cpustate->device->tag));
+		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", cpustate->device->tag.cstr()));
 		cpustate->pending_irq = 1;
 	}
 }
@@ -225,7 +226,7 @@ static void saturn_set_wakeup_line(saturn_state *cpustate, int state)
 {
 	if (cpustate->sleeping && state==1)
 	{
-		LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", cpustate->device->tag));
+		LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", cpustate->device->tag.cstr()));
 		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, SATURN_WAKEUP_LINE);
 		cpustate->sleeping = 0;
 	}

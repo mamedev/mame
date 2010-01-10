@@ -9,7 +9,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "config.h"
 #include "xmlfile.h"
 

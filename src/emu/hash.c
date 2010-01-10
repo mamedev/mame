@@ -116,14 +116,13 @@
  *
  */
 
-#include <stddef.h>
-#include <ctype.h>
-#include <zlib.h>
+#include "emu.h"
 #include "hash.h"
 #include "md5.h"
 #include "sha1.h"
-#include "mame.h"
-#include "romload.h"
+
+#include <ctype.h>
+#include <zlib.h>
 
 #define ASSERT(x)
 

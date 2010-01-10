@@ -2,10 +2,9 @@
 /*    ricoh RF5C68(or clone) PCM controller              */
 /*********************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "rf5c68.h"
-#include <math.h>
 
 
 #define  NUM_CHANNELS    (8)

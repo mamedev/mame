@@ -9,11 +9,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "osdepend.h"
-#include "corefile.h"
-#include "astring.h"
-#include "driver.h"
-#include "chd.h"
 #include "hash.h"
 #include "unzip.h"
 #include "options.h"

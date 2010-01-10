@@ -52,8 +52,9 @@
 #endif
 
 // MAME headers
-#include "osdepend.h"
 #include "driver.h"
+#include "emuopts.h"
+#include "osdepend.h"
 #include "video/vector.h"
 #include "render.h"
 #include "rendutil.h"

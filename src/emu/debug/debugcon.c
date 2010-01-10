@@ -471,13 +471,14 @@ const char *debug_cmderr_to_string(CMDERR error)
 
 void CLIB_DECL debug_console_printf(running_machine *machine, const char *format, ...)
 {
+	astring buffer;
 	va_list arg;
 
 	va_start(arg, format);
-	vsprintf(giant_string_buffer, format, arg);
+	buffer.vprintf(format, arg);
 	va_end(arg);
 
-	text_buffer_print(console_textbuf, giant_string_buffer);
+	text_buffer_print(console_textbuf, buffer);
 
 	/* force an update of any console views */
 	debug_view_update_type(machine, DVT_CONSOLE);
@@ -492,8 +493,10 @@ void CLIB_DECL debug_console_printf(running_machine *machine, const char *format
 
 void CLIB_DECL debug_console_vprintf(running_machine *machine, const char *format, va_list args)
 {
-	vsprintf(giant_string_buffer, format, args);
-	text_buffer_print(console_textbuf, giant_string_buffer);
+	astring buffer;
+
+	buffer.vprintf(format, args);
+	text_buffer_print(console_textbuf, buffer);
 
 	/* force an update of any console views */
 	debug_view_update_type(machine, DVT_CONSOLE);
@@ -508,13 +511,14 @@ void CLIB_DECL debug_console_vprintf(running_machine *machine, const char *forma
 
 void CLIB_DECL debug_console_printf_wrap(running_machine *machine, int wrapcol, const char *format, ...)
 {
+	astring buffer;
 	va_list arg;
 
 	va_start(arg, format);
-	vsprintf(giant_string_buffer, format, arg);
+	buffer.vprintf(format, arg);
 	va_end(arg);
 
-	text_buffer_print_wrap(console_textbuf, giant_string_buffer, wrapcol);
+	text_buffer_print_wrap(console_textbuf, buffer, wrapcol);
 
 	/* force an update of any console views */
 	debug_view_update_type(machine, DVT_CONSOLE);

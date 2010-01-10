@@ -3,7 +3,6 @@
 #ifndef __TX0_H__
 #define __TX0_H__
 
-#include "cpuintrf.h"
 
 
 /* register ids for tx0_get_reg/tx0_set_reg */

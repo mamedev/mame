@@ -4,6 +4,7 @@
     By Farfetch'd and R. Belmont
 */
 
+#include "emu.h"
 #include "i960.h"
 #include "i960dis.h"
 

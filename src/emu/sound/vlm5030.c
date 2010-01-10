@@ -73,7 +73,7 @@ chirp 12-..: vokume   0   : silent
   [DAC output value(signed 6bit)] = A9 ? A0..8 : -(A0..8)
 
 */
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "vlm5030.h"
 

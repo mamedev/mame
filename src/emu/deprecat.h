@@ -15,9 +15,6 @@
 #ifndef __DEPRECAT_H__
 #define __DEPRECAT_H__
 
-#include "emucore.h"
-#include "devintrf.h"
-
 
 /*************************************
  *

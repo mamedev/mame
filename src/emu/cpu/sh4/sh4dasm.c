@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "debugger.h"
 #include "sh4.h"
 

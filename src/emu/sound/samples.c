@@ -1,4 +1,5 @@
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "streams.h"
 #include "samples.h"
 

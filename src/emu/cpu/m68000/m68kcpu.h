@@ -27,7 +27,7 @@
 
 typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
-#include "cpuintrf.h"
+
 #include "m68000.h"
 
 #include <limits.h>

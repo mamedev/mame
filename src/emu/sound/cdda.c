@@ -3,12 +3,10 @@
     Relies on the actual CD logic and reading in cdrom.c.
 */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "cdrom.h"
 #include "cdda.h"
-#include "sound.h"
-#include "driver.h"
 
 typedef struct _cdda_info cdda_info;
 struct _cdda_info

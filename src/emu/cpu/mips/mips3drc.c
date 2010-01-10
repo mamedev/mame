@@ -25,11 +25,9 @@
 
 ***************************************************************************/
 
-#include <stddef.h>
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "profiler.h"
-#include "cpuexec.h"
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "cpu/drcfe.h"

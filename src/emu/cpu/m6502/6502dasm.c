@@ -27,6 +27,7 @@
 /* 18.April 2008 Roberto Fresca fixed bbr, bbs, rmb & smb displayment,
    showing the correct bit to operate */
 
+#include "emu.h"
 #include "debugger.h"
 #include "m6502.h"
 #include "m65ce02.h"

@@ -21,9 +21,7 @@
 */
 
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ymz280b.h"
 

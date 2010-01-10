@@ -3,6 +3,7 @@
 *               (initial work based on David Hedley's pcemu)                *
 ****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "host.h"
 

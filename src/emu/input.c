@@ -18,8 +18,7 @@
 
 ***************************************************************************/
 
-#include "input.h"
-#include "mame.h"
+#include "emu.h"
 #include "emuopts.h"
 #include "profiler.h"
 

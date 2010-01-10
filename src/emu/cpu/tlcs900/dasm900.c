@@ -4,7 +4,7 @@ Toshiba TLCS-900/H disassembly
 
 *******************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "tlcs900.h"
 

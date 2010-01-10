@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 
 static const char *const reg[32] =

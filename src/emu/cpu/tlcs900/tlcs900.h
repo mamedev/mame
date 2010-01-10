@@ -1,8 +1,6 @@
 #ifndef __TLCS900_H__
 #define __TLCS900_H__
 
-#include "cpuintrf.h"
-#include "devcb.h"
 
 
 enum tlcs900_inputs

@@ -11,10 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __INPUTSEQ_H__
 #define __INPUTSEQ_H__
-
-#include "input.h"
 
 
 /***************************************************************************

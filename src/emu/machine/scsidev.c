@@ -4,7 +4,8 @@
 
 ***************************************************************************/
 
-#include "scsidev.h"
+#include "emu.h"
+	#include "scsidev.h"
 
 typedef struct
 {

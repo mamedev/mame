@@ -1,7 +1,6 @@
 #ifndef __SUPERFX_H__
 #define __SUPERFX_H__
 
-#include "devcb.h"
 
 enum
 {

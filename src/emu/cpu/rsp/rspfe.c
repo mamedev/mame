@@ -10,8 +10,7 @@
 
 ***************************************************************************/
 
-#include <stddef.h>
-#include "cpuintrf.h"
+#include "emu.h"
 #include "rspfe.h"
 #include "rsp.h"
 

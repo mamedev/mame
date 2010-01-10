@@ -122,18 +122,7 @@
 /*    YM2610B : PSG:3ch FM:6ch ADPCM(18.5KHz):6ch DeltaT ADPCM:1ch      */
 /************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
-
-#ifndef __RAINE__
-#include "sndintrf.h"		/* use M.A.M.E. */
-#else
-#include "deftypes.h"		/* use RAINE */
-#include "support.h"		/* use RAINE */
-#endif
+#include "emu.h"
 #include "fm.h"
 
 /* shared function building option */

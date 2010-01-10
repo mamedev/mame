@@ -11,11 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __CPUEXEC_H__
 #define __CPUEXEC_H__
-
-#include "cpuintrf.h"
-#include "timer.h"
 
 
 /***************************************************************************

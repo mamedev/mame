@@ -4,7 +4,6 @@
 #ifndef __I86INTF_H__
 #define __I86INTF_H__
 
-#include "cpuintrf.h"
 
 #define INPUT_LINE_TEST 20    /* PJB 03/05 */
 

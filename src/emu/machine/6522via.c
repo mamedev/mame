@@ -306,7 +306,7 @@ static void via_set_int (const device_config *device, int data)
 
 	v->ifr |= data;
 	if (TRACE_VIA)
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(device->machine), device->tag, v->ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), v->ifr);
 
 	if (v->ier & v->ifr)
     {
@@ -327,7 +327,7 @@ static void via_clear_int (const device_config *device, int data)
 	v->ifr = (v->ifr & ~data) & 0x7f;
 
 	if (TRACE_VIA)
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(device->machine), device->tag, v->ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), v->ifr);
 
 	if (v->ifr & v->ier)
 		v->ifr |= INT_ANY;
@@ -521,7 +521,7 @@ READ8_DEVICE_HANDLER(via_r)
 			if (v->in_b_func.read != NULL)
 				v->in_b = devcb_call_read8(&v->in_b_func, 0);
 			else
-				logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+				logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag.cstr());
 		}
 
 		CLR_PB_INT(device);
@@ -540,7 +540,7 @@ READ8_DEVICE_HANDLER(via_r)
 			if (v->in_a_func.read != NULL)
 				v->in_a = devcb_call_read8(&v->in_a_func, 0);
 			else
-				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag.cstr());
 		}
 
 		/* combine input and output values */
@@ -571,7 +571,7 @@ READ8_DEVICE_HANDLER(via_r)
 			if (v->in_a_func.read != NULL)
 				v->in_a = devcb_call_read8(&v->in_a_func, 0);
 			else
-				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag.cstr());
 		}
 
 		/* combine input and output values */
@@ -839,7 +839,7 @@ WRITE8_DEVICE_HANDLER(via_w)
 		v->pcr = data;
 
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", cpuexec_describe_context(device->machine), device->tag, data);
+			logerror("%s:6522VIA chip %s: PCR = %02X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), data);
 
 		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ v->out_ca2)
 		{
@@ -951,7 +951,7 @@ WRITE_LINE_DEVICE_HANDLER(via_ca1_w)
 	if (state != v->in_ca1)
     {
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", cpuexec_describe_context(device->machine), device->tag, state);
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), state);
 
 		if ((CA1_LOW_TO_HIGH(v->pcr) && state) || (CA1_HIGH_TO_LOW(v->pcr) && !state))
 		{
@@ -960,7 +960,7 @@ WRITE_LINE_DEVICE_HANDLER(via_ca1_w)
 				if (v->in_a_func.read != NULL)
 					v->in_a = devcb_call_read8(&v->in_a_func, 0);
 				else
-					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag.cstr());
 			}
 
 			via_set_int (device, INT_CA1);
@@ -1084,7 +1084,7 @@ WRITE_LINE_DEVICE_HANDLER(via_cb1_w)
 				if (v->in_b_func.read != NULL)
 					v->in_b = devcb_call_read8(&v->in_b_func, 0);
 				else
-					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag.cstr());
 			}
 			if (SO_EXT_CONTROL(v->acr) || SI_EXT_CONTROL(v->acr))
 				via_shift (device);

@@ -8,7 +8,7 @@
     Raphael Nabet 2004
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "tx0.h"
 

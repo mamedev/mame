@@ -37,8 +37,7 @@ to do:
 
 */
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "ym2413.h"
 
 

@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "profiler.h"
 #include "rsp.h"

@@ -9,10 +9,7 @@
 #pragma once
 
 #ifndef __DSP32_H__
-#define _DSP32_H
-
-#include "cpuintrf.h"
-
+#define __DSP32_H__
 
 
 /***************************************************************************

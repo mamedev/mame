@@ -5,7 +5,6 @@
 #ifndef __HD6309_H__
 #define __HD6309_H__
 
-#include "cpuintrf.h"
 
 enum
 {

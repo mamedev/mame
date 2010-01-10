@@ -404,6 +404,7 @@ STOP            01001000  10111011          12  stop
 
 */
 
+#include "emu.h"
 #include "debugger.h"
 #include "upd7810.h"
 

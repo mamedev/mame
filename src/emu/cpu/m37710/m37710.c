@@ -51,8 +51,8 @@
         added save state support.
 */
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuexec.h"
 #include "m37710.h"
 #include "m37710cm.h"
 

@@ -14,8 +14,6 @@
 #ifndef __SOUND_GENERIC_H__
 #define __SOUND_GENERIC_H__
 
-#include "memory.h"
-
 
 
 /***************************************************************************

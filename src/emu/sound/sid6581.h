@@ -11,7 +11,6 @@
 #ifndef __SID6581_H__
 #define __SID6581_H__
 
-#include "sndintrf.h"
 
 typedef enum
 {

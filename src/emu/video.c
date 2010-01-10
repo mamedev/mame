@@ -9,14 +9,15 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "profiler.h"
 #include "png.h"
 #include "debugger.h"
 #include "rendutil.h"
 #include "ui.h"
 #include "aviio.h"
-#include "video.h"
+#include "crsshair.h"
 
 #include "snap.lh"
 
@@ -608,7 +609,7 @@ int video_screen_update_partial(const device_config *screen, int scanline)
 	/* validate arguments */
 	assert(scanline >= 0);
 
-	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%s, %d): ", screen->tag, scanline));
+	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%s, %d): ", screen->tag.cstr(), scanline));
 
 	/* these two checks only apply if we're allowed to skip frames */
 	if (!(screen->machine->config->video_attributes & VIDEO_ALWAYS_UPDATE))
@@ -2073,7 +2074,7 @@ static void create_snapshot_bitmap(const device_config *screen)
 	/* select the appropriate view in our dummy target */
 	if (global.snap_native && screen != NULL)
 	{
-		view_index = device_list_index(&screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+		view_index = device_list_index(&screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag.cstr());
 		assert(view_index != -1);
 		render_target_set_view(global.snap_target, view_index);
 	}
@@ -2582,7 +2583,7 @@ static void video_finalize_burnin(const device_config *screen)
 		/* write the final PNG */
 
 		/* compute the name and create the file */
-		fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", screen->machine->basename, screen->tag);
+		fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", screen->machine->basename, screen->tag.cstr());
 		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{

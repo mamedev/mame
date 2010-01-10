@@ -1,6 +1,5 @@
-#include "cpuintrf.h"
+#include "emu.h"
 #include "superfx.h"
-#include <stdarg.h>
 
 static char *output;
 

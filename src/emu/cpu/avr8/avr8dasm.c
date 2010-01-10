@@ -4,7 +4,7 @@
     Written by MooglyGuy
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "avr8.h"
 
 #define RD2(op)         (((op) >> 4) & 0x0003)

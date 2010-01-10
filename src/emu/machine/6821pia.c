@@ -4,6 +4,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "6821pia.h"
 
 
@@ -300,7 +301,7 @@ static UINT8 get_in_a_value(const device_config *device)
 
 			if (!p->logged_port_a_not_connected && (p->ddr_a != 0xff))
 			{
-				logerror("PIA #%s: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", device->tag, p->ddr_a ^ 0xff);
+				logerror("PIA #%s: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", device->tag.cstr(), p->ddr_a ^ 0xff);
 				p->logged_port_a_not_connected = TRUE;
 			}
 		}
@@ -344,7 +345,7 @@ static UINT8 get_in_b_value(const device_config *device)
 			{
 				if (!p->logged_port_b_not_connected && (p->ddr_b != 0xff))
 				{
-					logerror("PIA #%s: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", device->tag, p->ddr_b ^ 0xff);
+					logerror("PIA #%s: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", device->tag.cstr(), p->ddr_b ^ 0xff);
 					p->logged_port_b_not_connected = TRUE;
 				}
 
@@ -412,7 +413,7 @@ static void set_out_ca2(const device_config *device, int data)
 		else
 		{
 			if (p->out_ca2_needs_pulled)
-				logerror("PIA #%s: Warning! No port CA2 write handler. Previous value has been lost!\n", device->tag);
+				logerror("PIA #%s: Warning! No port CA2 write handler. Previous value has been lost!\n", device->tag.cstr());
 
 			p->out_ca2_needs_pulled = TRUE;
 		}
@@ -441,7 +442,7 @@ static void set_out_cb2(const device_config *device, int data)
 		else
 		{
 			if (p->out_cb2_needs_pulled)
-				logerror("PIA #%s: Warning! No port CB2 write handler. Previous value has been lost!\n", device->tag);
+				logerror("PIA #%s: Warning! No port CB2 write handler. Previous value has been lost!\n", device->tag.cstr());
 
 			p->out_cb2_needs_pulled = TRUE;
 		}
@@ -475,7 +476,7 @@ static UINT8 port_a_r(const device_config *device)
 			set_out_ca2(device, TRUE);
 	}
 
-	LOG(("PIA #%s: port A read = %02X\n", device->tag, ret));
+	LOG(("PIA #%s: port A read = %02X\n", device->tag.cstr(), ret));
 
 	return ret;
 }
@@ -491,7 +492,7 @@ static UINT8 ddr_a_r(const device_config *device)
 
 	UINT8 ret = p->ddr_a;
 
-	LOG(("PIA #%s: DDR A read = %02X\n", device->tag, ret));
+	LOG(("PIA #%s: DDR A read = %02X\n", device->tag.cstr(), ret));
 
 	return ret;
 }
@@ -519,7 +520,7 @@ static UINT8 port_b_r(const device_config *device)
 	p->irq_b2 = FALSE;
 	update_interrupts(device);
 
-	LOG(("PIA #%s: port B read = %02X\n", device->tag, ret));
+	LOG(("PIA #%s: port B read = %02X\n", device->tag.cstr(), ret));
 
 	return ret;
 }
@@ -535,7 +536,7 @@ static UINT8 ddr_b_r(const device_config *device)
 
 	UINT8 ret = p->ddr_b;
 
-	LOG(("PIA #%s: DDR B read = %02X\n", device->tag, ret));
+	LOG(("PIA #%s: DDR B read = %02X\n", device->tag.cstr(), ret));
 
 	return ret;
 }
@@ -555,7 +556,7 @@ static UINT8 control_a_r(const device_config *device)
 		pia6821_ca1_w(device, 0, devcb_call_read_line(&p->in_ca1_func));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
-		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag);
+		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag.cstr());
 		p->logged_ca1_not_connected = TRUE;
 	}
 
@@ -563,7 +564,7 @@ static UINT8 control_a_r(const device_config *device)
 		pia6821_ca2_w(device, 0, devcb_call_read_line(&p->in_ca2_func));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
-		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag);
+		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag.cstr());
 		p->logged_ca2_not_connected = TRUE;
 	}
 
@@ -577,7 +578,7 @@ static UINT8 control_a_r(const device_config *device)
 	if (p->irq_a2 && C2_INPUT(p->ctl_a))
 		ret |= PIA_IRQ2;
 
-	LOG(("PIA #%s: control A read = %02X\n", device->tag, ret));
+	LOG(("PIA #%s: control A read = %02X\n", device->tag.cstr(), ret));
 
 	return ret;
 }
@@ -597,7 +598,7 @@ static UINT8 control_b_r(const device_config *device)
 		pia6821_cb1_w(device, 0, devcb_call_read_line(&p->in_cb1_func));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
-		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag);
+		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag.cstr());
 		p->logged_cb1_not_connected = TRUE;
 	}
 
@@ -605,7 +606,7 @@ static UINT8 control_b_r(const device_config *device)
 		pia6821_cb2_w(device, 0, devcb_call_read_line(&p->in_cb2_func));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
-		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag);
+		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag.cstr());
 		p->logged_cb2_not_connected = TRUE;
 	}
 
@@ -619,7 +620,7 @@ static UINT8 control_b_r(const device_config *device)
 	if (p->irq_b2 && C2_INPUT(p->ctl_b))
 		ret |= PIA_IRQ2;
 
-	LOG(("PIA #%s: control B read = %02X\n", device->tag, ret));
+	LOG(("PIA #%s: control B read = %02X\n", device->tag.cstr(), ret));
 
 	return ret;
 }
@@ -696,14 +697,14 @@ static void send_to_out_a_func(const device_config *device, const char* message)
 	/* input pins are pulled high */
 	UINT8 data = get_out_a_value(device);
 
-	LOG(("PIA #%s: %s = %02X\n", device->tag, message, data));
+	LOG(("PIA #%s: %s = %02X\n", device->tag.cstr(), message, data));
 
 	if (p->out_a_func.write != NULL)
 		devcb_call_write8(&p->out_a_func, 0, data);
 	else
 	{
 		if (p->out_a_needs_pulled)
-			logerror("PIA #%s: Warning! No port A write handler. Previous value has been lost!\n", device->tag);
+			logerror("PIA #%s: Warning! No port A write handler. Previous value has been lost!\n", device->tag.cstr());
 
 		p->out_a_needs_pulled = TRUE;
 	}
@@ -721,14 +722,14 @@ static void send_to_out_b_func(const device_config *device, const char* message)
 	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
 	UINT8 data = get_out_b_value(device);
 
-	LOG(("PIA #%s: %s = %02X\n", device->tag, message, data));
+	LOG(("PIA #%s: %s = %02X\n", device->tag.cstr(), message, data));
 
 	if (p->out_b_func.write != NULL)
 		devcb_call_write8(&p->out_b_func, 0, data);
 	else
 	{
 		if (p->out_b_needs_pulled)
-			logerror("PIA #%s: Warning! No port B write handler. Previous value has been lost!\n", device->tag);
+			logerror("PIA #%s: Warning! No port B write handler. Previous value has been lost!\n", device->tag.cstr());
 
 		p->out_b_needs_pulled = TRUE;
 	}
@@ -759,11 +760,11 @@ static void ddr_a_w(const device_config *device, UINT8 data)
 	pia6821_state *p = get_token(device);
 
 	if (data == 0x00)
-		LOG(("PIA #%s: DDR A write = %02X (input mode)\n", device->tag, data));
+		LOG(("PIA #%s: DDR A write = %02X (input mode)\n", device->tag.cstr(), data));
 	else if (data == 0xff)
-		LOG(("PIA #%s: DDR A write = %02X (output mode)\n", device->tag, data));
+		LOG(("PIA #%s: DDR A write = %02X (output mode)\n", device->tag.cstr(), data));
 	else
-		LOG(("PIA #%s: DDR A write = %02X (mixed mode)\n", device->tag, data));
+		LOG(("PIA #%s: DDR A write = %02X (mixed mode)\n", device->tag.cstr(), data));
 
 	if (p->ddr_a != data)
 	{
@@ -810,11 +811,11 @@ static void ddr_b_w(const device_config *device, UINT8 data)
 	pia6821_state *p = get_token(device);
 
 	if (data == 0x00)
-		LOG(("PIA #%s: DDR B write = %02X (input mode)\n", device->tag, data));
+		LOG(("PIA #%s: DDR B write = %02X (input mode)\n", device->tag.cstr(), data));
 	else if (data == 0xff)
-		LOG(("PIA #%s: DDR B write = %02X (output mode)\n", device->tag, data));
+		LOG(("PIA #%s: DDR B write = %02X (output mode)\n", device->tag.cstr(), data));
 	else
-		LOG(("PIA #%s: DDR B write = %02X (mixed mode)\n", device->tag, data));
+		LOG(("PIA #%s: DDR B write = %02X (mixed mode)\n", device->tag.cstr(), data));
 
 	if (p->ddr_b != data)
 	{
@@ -837,7 +838,7 @@ static void control_a_w(const device_config *device, UINT8 data)
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
-	LOG(("PIA #%s: control A write = %02X\n", device->tag, data));
+	LOG(("PIA #%s: control A write = %02X\n", device->tag.cstr(), data));
 
 	/* update the control register */
 	p->ctl_a = data;
@@ -874,7 +875,7 @@ static void control_b_w(const device_config *device, UINT8 data)
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
-	LOG(("PIA #%s: control B write = %02X\n", device->tag, data));
+	LOG(("PIA #%s: control B write = %02X\n", device->tag.cstr(), data));
 
 	/* update the control register */
 	p->ctl_b = data;
@@ -973,7 +974,7 @@ void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
 
 	assert_always(p->in_a_func.read == NULL, "pia6821_porta_w() called when in_a_func implemented");
 
-	LOG(("PIA #%s: set input port A = %02X\n", device->tag, data));
+	LOG(("PIA #%s: set input port A = %02X\n", device->tag.cstr(), data));
 
 	p->in_a = data;
 	p->port_a_z_mask = z_mask;
@@ -1028,13 +1029,13 @@ WRITE8_DEVICE_HANDLER( pia6821_ca1_w )
 	/* limit the data to 0 or 1 */
 	data = data ? TRUE : FALSE;
 
-	LOG(("PIA #%s: set input CA1 = %d\n", device->tag, data));
+	LOG(("PIA #%s: set input CA1 = %d\n", device->tag.cstr(), data));
 
 	/* the new state has caused a transition */
 	if ((p->in_ca1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a))))
 	{
-		LOG(("PIA #%s: CA1 triggering\n", device->tag));
+		LOG(("PIA #%s: CA1 triggering\n", device->tag.cstr()));
 
 		/* mark the IRQ */
 		p->irq_a1 = TRUE;
@@ -1076,14 +1077,14 @@ WRITE8_DEVICE_HANDLER( pia6821_ca2_w )
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("PIA #%s: set input CA2 = %d\n", device->tag, data));
+	LOG(("PIA #%s: set input CA2 = %d\n", device->tag.cstr(), data));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_a) &&
 		(p->in_ca2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a))))
 	{
-		LOG(("PIA #%s: CA2 triggering\n", device->tag));
+		LOG(("PIA #%s: CA2 triggering\n", device->tag.cstr()));
 
 		/* mark the IRQ */
 		p->irq_a2 = TRUE;
@@ -1153,7 +1154,7 @@ WRITE8_DEVICE_HANDLER( pia6821_portb_w )
 
 	assert_always(p->in_b_func.read == NULL, "pia_set_input_b() called when in_b_func implemented");
 
-	LOG(("PIA #%s: set input port B = %02X\n", device->tag, data));
+	LOG(("PIA #%s: set input port B = %02X\n", device->tag.cstr(), data));
 
 	p->in_b = data;
 	p->in_b_pushed = TRUE;
@@ -1197,13 +1198,13 @@ WRITE8_DEVICE_HANDLER( pia6821_cb1_w )
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("PIA #%s: set input CB1 = %d\n", device->tag, data));
+	LOG(("PIA #%s: set input CB1 = %d\n", device->tag.cstr(), data));
 
 	/* the new state has caused a transition */
 	if ((p->in_cb1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b))))
 	{
-		LOG(("PIA #%s: CB1 triggering\n", device->tag));
+		LOG(("PIA #%s: CB1 triggering\n", device->tag.cstr()));
 
 		/* mark the IRQ */
 		p->irq_b1 = 1;
@@ -1246,14 +1247,14 @@ WRITE8_DEVICE_HANDLER( pia6821_cb2_w )
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("PIA #%s: set input CB2 = %d\n", device->tag, data));
+	LOG(("PIA #%s: set input CB2 = %d\n", device->tag.cstr(), data));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_b) &&
 		(p->in_cb2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b))))
 	{
-		LOG(("PIA #%s: CB2 triggering\n", device->tag));
+		LOG(("PIA #%s: CB2 triggering\n", device->tag.cstr()));
 
 		/* mark the IRQ */
 		p->irq_b2 = 1;

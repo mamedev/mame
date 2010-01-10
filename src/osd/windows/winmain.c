@@ -53,6 +53,7 @@
 // MAME headers
 #include "driver.h"
 #include "clifront.h"
+#include "emuopts.h"
 
 // MAMEOS headers
 #include "winmain.h"

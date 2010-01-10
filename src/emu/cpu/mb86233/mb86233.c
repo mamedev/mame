@@ -13,8 +13,9 @@
 
 ***************************************************************************/
 
-#include "mb86233.h"
+#include "emu.h"
 #include "debugger.h"
+#include "mb86233.h"
 
 CPU_DISASSEMBLE( mb86233 );
 

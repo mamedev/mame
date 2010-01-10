@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "emu.h"
 #include "cpu/pdp1/tx0.h"
 
 CPU_DISASSEMBLE( tx0_64kw )

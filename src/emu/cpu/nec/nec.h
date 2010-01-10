@@ -2,7 +2,6 @@
 #ifndef __NEC_H_
 #define __NEC_H_
 
-#include "cpuintrf.h"
 
 typedef struct _nec_config nec_config;
 struct _nec_config

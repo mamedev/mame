@@ -44,11 +44,9 @@
 
  *****************************************************************************/
 
-#include "sndintrf.h"
-#include "cpuexec.h"
+#include "emu.h"
 #include "streams.h"
 #include "nes_apu.h"
-#include "driver.h"
 #include "cpu/m6502/m6502.h"
 
 #include "nes_defs.h"

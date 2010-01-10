@@ -4,7 +4,7 @@
    Written by Ville Linde
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 enum
 {

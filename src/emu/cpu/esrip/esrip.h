@@ -9,8 +9,6 @@
 #ifndef _ESRIP_H
 #define _ESRIP_H
 
-#include "cpuintrf.h"
-
 
 /***************************************************************************
     COMPILE-TIME DEFINITIONS

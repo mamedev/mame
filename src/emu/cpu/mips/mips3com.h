@@ -11,10 +11,8 @@
 #ifndef __MIPS3COM_H__
 #define __MIPS3COM_H__
 
-#include "cpuintrf.h"
 #include "mips3.h"
 #include "cpu/vtlb.h"
-#include "timer.h"
 
 
 /***************************************************************************

@@ -53,8 +53,7 @@ differences between OPL2 and OPL3 shown in datasheets:
 
 */
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "ymf262.h"
 
 

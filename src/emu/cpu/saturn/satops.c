@@ -1,7 +1,7 @@
 #define IRQ_ADDRESS	0xf
 
 #define saturn_assert(x) \
-	do { if (!(x)) logerror("SATURN '%s' assertion failed: %s at %s:%i, pc=%05x\n", cpustate->device->tag, #x, __FILE__, __LINE__, cpustate->pc); } while (0)
+	do { if (!(x)) logerror("SATURN '%s' assertion failed: %s at %s:%i, pc=%05x\n", cpustate->device->tag.cstr(), #x, __FILE__, __LINE__, cpustate->pc); } while (0)
 
 INLINE int READ_OP(saturn_state *cpustate)
 {
@@ -186,24 +186,24 @@ INLINE void saturn_push(saturn_state *cpustate, SaturnAdr adr)
 
 INLINE void saturn_interrupt_on(saturn_state *cpustate)
 {
-	LOG(( "SATURN '%s' at %05x: INTON\n", cpustate->device->tag, cpustate->pc-4 ));
+	LOG(( "SATURN '%s' at %05x: INTON\n", cpustate->device->tag.cstr(), cpustate->pc-4 ));
 	cpustate->irq_enable=1;
 	if (cpustate->irq_state)
 	{
-		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", cpustate->device->tag));
+		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", cpustate->device->tag.cstr()));
 		cpustate->pending_irq=1;
 	}
 }
 
 INLINE void saturn_interrupt_off(saturn_state *cpustate)
 {
-	LOG(( "SATURN '%s' at %05x: INTOFF\n", cpustate->device->tag, cpustate->pc-4 ));
+	LOG(( "SATURN '%s' at %05x: INTOFF\n", cpustate->device->tag.cstr(), cpustate->pc-4 ));
 	cpustate->irq_enable=0;
 }
 
 INLINE void saturn_reset_interrupt(saturn_state *cpustate)
 {
-	LOG(( "SATURN '%s' at %05x: RSI\n", cpustate->device->tag, cpustate->pc-5 ));
+	LOG(( "SATURN '%s' at %05x: RSI\n", cpustate->device->tag.cstr(), cpustate->pc-5 ));
 	if (cpustate->config&&cpustate->config->rsi) cpustate->config->rsi(cpustate->device);
 }
 
@@ -234,27 +234,27 @@ INLINE void saturn_shutdown(saturn_state *cpustate)
 {
 	cpustate->sleeping=1;
 	cpustate->irq_enable=1;
-	LOG(( "SATURN '%s' at %05x: SHUTDN\n", cpustate->device->tag, cpustate->pc-3 ));
+	LOG(( "SATURN '%s' at %05x: SHUTDN\n", cpustate->device->tag.cstr(), cpustate->pc-3 ));
 }
 
 INLINE void saturn_bus_command_b(saturn_state *cpustate)
 {
-	logerror( "SATURN '%s' at %05x: BUSCB opcode not handled\n", cpustate->device->tag, cpustate->pc-4 );
+	logerror( "SATURN '%s' at %05x: BUSCB opcode not handled\n", cpustate->device->tag.cstr(), cpustate->pc-4 );
 }
 
 INLINE void saturn_bus_command_c(saturn_state *cpustate)
 {
-	logerror( "SATURN '%s' at %05x: BUSCC opcode not handled\n", cpustate->device->tag, cpustate->pc-3 );
+	logerror( "SATURN '%s' at %05x: BUSCC opcode not handled\n", cpustate->device->tag.cstr(), cpustate->pc-3 );
 }
 
 INLINE void saturn_bus_command_d(saturn_state *cpustate)
 {
-	logerror( "SATURN '%s' at %05x: BUSCD opcode not handled\n", cpustate->device->tag, cpustate->pc-4 );
+	logerror( "SATURN '%s' at %05x: BUSCD opcode not handled\n", cpustate->device->tag.cstr(), cpustate->pc-4 );
 }
 
 INLINE void saturn_serial_request(saturn_state *cpustate)
 {
-	logerror( "SATURN '%s' at %05x: SREQ? opcode not handled\n", cpustate->device->tag, cpustate->pc-3 );
+	logerror( "SATURN '%s' at %05x: SREQ? opcode not handled\n", cpustate->device->tag.cstr(), cpustate->pc-3 );
 }
 
 INLINE void saturn_out_c(saturn_state *cpustate)
@@ -275,7 +275,7 @@ INLINE void saturn_in(saturn_state *cpustate, int reg)
 	saturn_assert(reg>=0 && reg<9);
 	if (!(cpustate->pc&1))
 		logerror( "SATURN '%s' at %05x: reg=IN opcode at odd addresse\n",
-			  cpustate->device->tag, cpustate->pc-3 );
+			  cpustate->device->tag.cstr(), cpustate->pc-3 );
 	if (cpustate->config&&cpustate->config->in) in = cpustate->config->in(cpustate->device);
 	S64_WRITE_WORD(cpustate, reg,in);
 	cpustate->monitor_in = in;
@@ -459,7 +459,7 @@ INLINE void saturn_return_carry_clear(saturn_state *cpustate)
 
 INLINE void saturn_return_interrupt(saturn_state *cpustate)
 {
-	LOG(( "SATURN '%s' at %05x: RTI\n", cpustate->device->tag, cpustate->pc-2 ));
+	LOG(( "SATURN '%s' at %05x: RTI\n", cpustate->device->tag.cstr(), cpustate->pc-2 ));
 	cpustate->in_irq=0; /* set to 1 when an IRQ is taken */
 	cpustate->pc=saturn_pop(cpustate);
 //  cpustate->icount-=10;

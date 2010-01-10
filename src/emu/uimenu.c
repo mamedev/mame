@@ -9,13 +9,15 @@
 
 *********************************************************************/
 
+#include "emu.h"
+#include "emuopts.h"
 #include "ui.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
 #include "uimenu.h"
 #include "audit.h"
-#include "eminline.h"
+#include "crsshair.h"
 
 #ifdef MESS
 #include "uimess.h"

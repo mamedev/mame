@@ -32,6 +32,7 @@
  *  implement the ARM7TDMI guideline format is used
  ******************************************************************************/
 
+#include "emu.h"
 #include "arm7core.h"
 
 static char *WritePadding( char *pBuf, const char *pBuf0 )

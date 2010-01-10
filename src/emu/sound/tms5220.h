@@ -3,7 +3,6 @@
 #ifndef __TMS5220_H__
 #define __TMS5220_H__
 
-#include "devcb.h"
 
 /* clock rate = 80 * output sample rate,     */
 /* usually 640000 for 8000 Hz sample rate or */

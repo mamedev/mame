@@ -9,7 +9,6 @@
 #ifndef __TMS9900_H__
 #define __TMS9900_H__
 
-#include "cpuintrf.h"
 
 /*#define TI990_9_ID    0*//* early implementation, used in a few real-world applications, 1974 */
                           /* very similar to mapper-less 990/10 and tms9900, but the Load process */

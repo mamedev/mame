@@ -12,8 +12,7 @@
     You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
 */
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ymf271.h"
 

@@ -15,7 +15,6 @@
 #ifndef __H6280_H__
 #define __H6280_H__
 
-#include "cpuintrf.h"
 
 enum
 {

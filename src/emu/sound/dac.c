@@ -1,7 +1,6 @@
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "dac.h"
-#include <math.h>
 
 
 /* default to 4x oversampling */

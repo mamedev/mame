@@ -3,7 +3,6 @@
 #ifndef __G65816CM_H__
 #define __G65816CM_H__
 
-#include "cpuexec.h"
 
 #define g65816i_branching(A)
 #define g65816i_jumping(A)

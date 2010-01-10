@@ -1,5 +1,3 @@
-#include <math.h>
-
 #include "sidvoice.h"
 #include "sid.h"
 #include "sidenvel.h"

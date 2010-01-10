@@ -73,7 +73,8 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "xmlfile.h"
 #include "ui.h"
 #include "uimenu.h"

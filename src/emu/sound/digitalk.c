@@ -1,5 +1,4 @@
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "digitalk.h"
 

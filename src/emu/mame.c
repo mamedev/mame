@@ -73,8 +73,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
-#include "driver.h"
 #include "config.h"
 #include "cheat.h"
 #include "debugger.h"
@@ -84,11 +85,10 @@
 #include "uimenu.h"
 #include "uiinput.h"
 #include "streams.h"
+#include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"
-#include "mame.h"
-#include <new>
-#include <stdarg.h>
+
 #include <time.h>
 
 
@@ -150,7 +150,7 @@ struct _mame_private
 
 	/* list of memory regions, and a map for lookups */
 	region_info	*	regionlist;
-	tagmap *		regionmap;
+	tagmap_t<region_info *> regionmap;
 
 	/* random number seed */
 	UINT32			rand_seed;
@@ -188,6 +188,9 @@ const char mame_disclaimer[] =
 	"are not distributed together with MAME. Distribution of MAME together with ROM\n"
 	"images is a violation of copyright law and should be promptly reported to the\n"
 	"authors so that appropriate legal action can be taken.\n";
+
+/* a giant string buffer for temporary strings */
+static char giant_string_buffer[65536] = { 0 };
 
 
 
@@ -771,10 +774,10 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 	info->base = auto_alloc_array(machine, UINT8, length);
 
 	/* attempt to put is in the hash table */
-	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info, FALSE);
+	tagerr = mame->regionmap.add_unique_hash(name, info, FALSE);
 	if (tagerr == TMERR_DUPLICATE)
 	{
-		region_info *match = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
+		region_info *match = mame->regionmap.find_hash_only(name);
 		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, match->name.cstr());
 	}
 
@@ -802,7 +805,7 @@ void memory_region_free(running_machine *machine, const char *name)
 
 			/* remove us from the list and the map */
 			*infoptr = info->next;
-			tagmap_remove(mame->regionmap, info->name);
+			mame->regionmap.remove(info->name);
 
 			/* free the region */
 			auto_free(machine, info->base);
@@ -817,7 +820,7 @@ void memory_region_free(running_machine *machine, const char *name)
     region
 -------------------------------------------------*/
 
-UINT8 *memory_region(running_machine *machine, const char *name)
+UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length, UINT32 *flags)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
@@ -827,8 +830,14 @@ UINT8 *memory_region(running_machine *machine, const char *name)
     	return NULL;
 
     /* look up the region and return the base */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-	return (info != NULL) ? info->base : NULL;
+	info = mame->regionmap.find_hash_only(name);
+	if (info == NULL)
+		return NULL;
+	if (length != NULL)
+		*length = info->length;
+	if (flags != NULL)
+		*flags = info->flags;
+	return info->base;
 }
 
 
@@ -847,7 +856,7 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
     	return 0;
 
     /* look up the region and return the length */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
+	info = mame->regionmap.find_hash_only(name);
 	return (info != NULL) ? info->length : 0;
 }
 
@@ -867,7 +876,7 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
     	return 0;
 
     /* look up the region and return the flags */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
+	info = mame->regionmap.find_hash_only(name);
 	return (info != NULL) ? info->flags : 0;
 }
 
@@ -891,7 +900,7 @@ const char *memory_region_next(running_machine *machine, const char *name)
     	return mame->regionlist->name;
 
     /* look up the region and return the next guy */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
+	info = mame->regionmap.find_hash_only(name);
 	return (info != NULL && info->next != NULL) ? info->next->name.cstr() : NULL;
 }
 
@@ -1115,7 +1124,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 
 		/* dump to the buffer */
 		va_start(arg, format);
-		vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);
+		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, arg);
 		va_end(arg);
 
 		/* pop it in the UI */
@@ -1148,7 +1157,7 @@ void CLIB_DECL logerror(const char *format, ...)
 
 			/* dump to the buffer */
 			va_start(arg, format);
-			vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);
+			vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, arg);
 			va_end(arg);
 
 			/* log to all callbacks */
@@ -1359,11 +1368,6 @@ running_machine::running_machine(const game_driver *driver)
 		/* allocate memory for the internal mame_data */
 		mame_data = auto_alloc_clear(this, mame_private);
 
-		/* allocate memory for the memory region map */
-		mame_data->regionmap = tagmap_alloc();
-		if (mame_data->regionmap == NULL)
-			throw std::bad_alloc();
-
 		/* initialize the driver-related variables in the machine */
 		basename = mame_strdup(driver->name);
 		config = machine_config_alloc(driver->machine_config);
@@ -1405,10 +1409,6 @@ running_machine::~running_machine()
 
 	if (config != NULL)
 		machine_config_free((machine_config *)config);
-	if (mame_data != NULL && mame_data->regionmap != NULL)
-		tagmap_free(mame_data->regionmap);
-	if (basename != NULL)
-		auto_free(this, basename);
 
 	global_machine = NULL;
 }

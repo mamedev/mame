@@ -9,8 +9,8 @@
 
 *********************************************************************/
 
-#include "driver.h"
-#include "osdepend.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "profiler.h"
@@ -1457,7 +1457,7 @@ static slider_state *slider_init(running_machine *machine)
 		for (device = machine->firstcpu; device != NULL; device = cpu_next(device))
 		{
 			void *param = (void *)device;
-			string.printf("Overclock CPU %s", device->tag);
+			string.printf("Overclock CPU %s", device->tag.cstr());
 			*tailptr = slider_alloc(machine, string, 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}
@@ -1951,7 +1951,7 @@ static char *slider_get_screen_desc(const device_config *screen)
 	static char descbuf[256];
 
 	if (screen_count > 1)
-		sprintf(descbuf, "Screen '%s'", screen->tag);
+		sprintf(descbuf, "Screen '%s'", screen->tag.cstr());
 	else
 		strcpy(descbuf, "Screen");
 
@@ -1970,7 +1970,7 @@ static char *slider_get_laserdisc_desc(const device_config *laserdisc)
 	static char descbuf[256];
 
 	if (ldcount > 1)
-		sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag);
+		sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag.cstr());
 	else
 		strcpy(descbuf, "Laserdisc");
 

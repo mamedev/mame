@@ -33,12 +33,9 @@
   1.0 (RB) - properly respects the input clock
 */
 
-#include <math.h>
-#include "sndintrf.h"
-#include "cpuintrf.h"
-#include "es5503.h"
+#include "emu.h"
 #include "streams.h"
-#include "state.h"
+#include "es5503.h"
 
 typedef struct
 {

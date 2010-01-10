@@ -4,8 +4,7 @@
     Written by MooglyGuy
 */
 
-#include "cpuintrf.h"
-#include <stdarg.h>
+#include "emu.h"
 
 static char *output;
 

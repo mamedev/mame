@@ -16,9 +16,8 @@
 * NOTES
 *
 ******************************************************************************/
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "3526intf.h"
 #include "fm.h"
 #include "sound/fmopl.h"

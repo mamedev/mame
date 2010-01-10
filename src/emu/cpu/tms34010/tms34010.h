@@ -12,9 +12,6 @@
 #ifndef __TMS34010_H__
 #define __TMS34010_H__
 
-#include "cpuintrf.h"
-#include "driver.h"
-
 
 /* register indexes for get_reg and set_reg */
 enum

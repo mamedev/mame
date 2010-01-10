@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "adsp2100.h"
 
 static const char *const flag_change[] = { "", "TOGGLE %s ", "RESET %s ", "SET %s " };

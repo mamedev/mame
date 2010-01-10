@@ -3,7 +3,6 @@
 #ifndef __TLCS90_H__
 #define __TLCS90_H__
 
-#include "cpuintrf.h"
 
 CPU_GET_INFO( tmp90840 );
 CPU_GET_INFO( tmp90841 );

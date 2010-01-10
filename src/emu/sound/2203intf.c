@@ -1,5 +1,5 @@
 #include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "2203intf.h"
 #include "fm.h"

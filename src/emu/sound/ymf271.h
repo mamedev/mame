@@ -3,7 +3,6 @@
 #ifndef __YMF271_H__
 #define __YMF271_H__
 
-#include "devcb.h"
 
 typedef struct _ymf271_interface ymf271_interface;
 struct _ymf271_interface

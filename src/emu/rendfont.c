@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "rendfont.h"
 #include "rendutil.h"
+#include "emuopts.h"
 #include "zlib.h"
 
 #include "uismall.fh"

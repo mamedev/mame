@@ -103,6 +103,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 
 typedef UINT8 BOOLEAN;
@@ -257,7 +258,7 @@ INLINE UINT16 fetchword(nec_state_t *nec_state)
 
 static UINT8 parity_table[256];
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 static UINT8 fetchop(nec_state_t *nec_state)
 {

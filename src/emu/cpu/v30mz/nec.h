@@ -2,7 +2,6 @@
 #ifndef __NECINTRF_H__
 #define __NECINTRF_H__
 
-#include "cpuintrf.h"
 
 enum
 {

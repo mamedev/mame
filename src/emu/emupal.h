@@ -91,12 +91,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __EMUPAL_H__
 #define __EMUPAL_H__
-
-#include "palette.h"
-#include "memory.h"
-#include "tilemap.h"
 
 
 /***************************************************************************
@@ -112,7 +112,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _colortable_t colortable_t;
+class colortable_t;
 
 
 

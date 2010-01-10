@@ -3,8 +3,6 @@
 #ifndef __TMS57002_H__
 #define __TMS57002_H__
 
-#include "cpuintrf.h"
-#include "driver.h"
 
 enum {
 	TMS57002_PC=1

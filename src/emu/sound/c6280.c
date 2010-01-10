@@ -53,7 +53,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "c6280.h"
 
@@ -112,7 +112,7 @@ static void c6280_init(const device_config *device, c6280_t *p, double clk, doub
     p->device = device;
     p->cpudevice = devtag_get_device(device->machine, intf->cpu);
     if (p->cpudevice == NULL)
-    	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag);
+    	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag.cstr());
 
     /* Make waveform frequency table */
     for(i = 0; i < 4096; i += 1)

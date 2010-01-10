@@ -37,12 +37,13 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "emuopts.h"
 #include "render.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
 #include "config.h"
-#include "output.h"
 #include "xmlfile.h"
 
 
@@ -92,7 +93,6 @@ enum
 ***************************************************************************/
 
 /* typedef struct _render_texture render_texture; -- defined in render.h */
-/* typedef struct _render_target render_target; -- defined in render.h */
 /* typedef struct _render_container render_container; -- defined in render.h */
 typedef struct _object_transform object_transform;
 typedef struct _scaled_texture scaled_texture;
@@ -144,8 +144,9 @@ struct _render_texture
 
 
 /* a render_target describes a surface that is being rendered to */
-struct _render_target
+class render_target
 {
+public:
 	render_target *		next;				/* keep a linked list of targets */
 	running_machine *	machine;			/* pointer to the machine we are connected with */
 	layout_view *		curview;			/* current view */

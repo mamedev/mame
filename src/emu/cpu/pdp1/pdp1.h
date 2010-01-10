@@ -3,7 +3,6 @@
 #ifndef __PDP1_H__
 #define __PDP1_H__
 
-#include "cpuintrf.h"
 
 
 /* register ids for pdp1_get_reg/pdp1_set_reg */

@@ -9,27 +9,22 @@
 
 ***************************************************************************/
 
+#pragma once
+
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __MAME_H__
 #define __MAME_H__
-
-#include "emucore.h"
-#include "video.h"
-#include "crsshair.h"
-#include "options.h"
-#include "inptport.h"
-#include "cpuintrf.h"
-#include <stdarg.h>
-
-#ifdef MESS
-#include "image.h"
-#include "uimess.h"
-#endif /* MESS */
 
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+const int MAX_GFX_ELEMENTS = 32;
 
 /* return values from run_game */
 enum
@@ -67,10 +62,6 @@ enum
 #define DEBUG_FLAG_WPW_PROGRAM	0x00000100		/* watchpoints are enabled for PROGRAM memory writes */
 #define DEBUG_FLAG_WPW_DATA		0x00000200		/* watchpoints are enabled for DATA memory writes */
 #define DEBUG_FLAG_WPW_IO		0x00000400		/* watchpoints are enabled for IO memory writes */
-
-
-/* maxima */
-#define MAX_GFX_ELEMENTS		32
 
 
 /* MESS vs. MAME abstractions */
@@ -134,11 +125,10 @@ typedef enum _output_channel output_channel;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* output channel callback */
-typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
+// forward declarations
+class gfx_element;
+class colortable_t;
 
-
-/* forward type declarations */
 typedef struct _mame_private mame_private;
 typedef struct _cpuexec_private cpuexec_private;
 typedef struct _timer_private timer_private;
@@ -161,17 +151,12 @@ typedef struct _generic_video_private generic_video_private;
 typedef struct _generic_audio_private generic_audio_private;
 
 
-/* structure to hold a pointer/size pair for generic pointers */
-typedef union _generic_ptr generic_ptr;
-union _generic_ptr
-{
-	void *		v;
-	UINT8 *		u8;
-	UINT16 *	u16;
-	UINT32 *	u32;
-	UINT64 *	u64;
-};
+/* output channel callback */
+typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
 
+
+/* return a pointer to a specified memory region */
+UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length = NULL, UINT32 *flags = NULL);
 
 /* this structure holds generic pointers that are commonly used */
 typedef struct _generic_pointers generic_pointers;
@@ -202,6 +187,10 @@ public:
 	running_machine(const game_driver *driver);
 	~running_machine();
 	
+	inline const device_config *device(const char *tag);
+	inline const input_port_config *port(const char *tag);
+	template<class T> T *region(const char *tag, UINT32 *length = NULL, UINT32 *flags = NULL);
+
 	resource_pool			respool;			/* pool of resources for this machine */
 
 	/* configuration data */
@@ -222,7 +211,7 @@ public:
 
 	/* palette-related information */
 	const pen_t *			pens;				/* remapped palette pen numbers */
-	struct _colortable_t *	colortable;			/* global colortable for remapping */
+	colortable_t *			colortable;			/* global colortable for remapping */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
 	bitmap_t *				priority_bitmap;	/* priority bitmap */
 
@@ -266,6 +255,8 @@ public:
 };
 
 
+
+
 typedef struct _mame_system_tm mame_system_tm;
 struct _mame_system_tm
 {
@@ -296,7 +287,6 @@ struct _mame_system_time
 ***************************************************************************/
 
 extern const char mame_disclaimer[];
-extern char giant_string_buffer[];
 
 extern const char build_version[];
 
@@ -381,7 +371,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 void memory_region_free(running_machine *machine, const char *name);
 
 /* return a pointer to a specified memory region */
-UINT8 *memory_region(running_machine *machine, const char *name);
+//UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length = NULL, UINT32 *flags = NULL);
 
 /* return the size (in bytes) of a specified memory region */
 UINT32 memory_region_length(running_machine *machine, const char *name);
@@ -446,5 +436,27 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
 #ifdef MESS
 #include "mess.h"
 #endif /* MESS */
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+inline const device_config *running_machine::device(const char *tag)
+{
+	return device_list_find_by_tag(&config->devicelist, tag); 
+}
+
+inline const input_port_config *running_machine::port(const char *tag)
+{
+	return input_port_by_tag(&portlist, tag);
+}
+
+template<class T> T *running_machine::region(const char *tag, UINT32 *length, UINT32 *flags)
+{
+	return reinterpret_cast<T *>(memory_region(this, tag, length, flags));
+}
+
 
 #endif	/* __MAME_H__ */

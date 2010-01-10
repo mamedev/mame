@@ -57,10 +57,8 @@
             not being addressed properly, causing pitch fluctuation.
 */
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "ymf278b.h"
 
 #define VERBOSE 0

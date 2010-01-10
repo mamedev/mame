@@ -211,9 +211,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuexec.h"
-#include "eminline.h"
 #include "e132xs.h"
 
 #ifdef MAME_DEBUG

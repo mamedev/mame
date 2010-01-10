@@ -11,10 +11,9 @@
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "cem3394.h"
-#include <math.h>
 
 
 

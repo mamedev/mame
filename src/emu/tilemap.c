@@ -9,8 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-#include "tilemap.h"
+#include "emu.h"
 #include "profiler.h"
 
 

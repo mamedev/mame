@@ -33,6 +33,7 @@
  * D52 8052 Disassembler - Copyright Jeffery L. Post
  *****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "mcs51.h"
 

@@ -3,8 +3,8 @@
  *
  */
 
+#include "emu.h"
 #include "psx.h"
-#include "driver.h"
 
 static char *make_signed_hex_str_16( UINT32 value )
 {

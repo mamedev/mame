@@ -8,7 +8,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #ifdef MESS
 #include "messdrv.h"

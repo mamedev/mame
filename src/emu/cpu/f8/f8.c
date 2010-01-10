@@ -26,6 +26,7 @@
    added interrupt functionality
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "f8.h"
 

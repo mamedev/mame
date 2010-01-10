@@ -262,7 +262,7 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 			if (port->out_func.write != NULL)
 				devcb_call_write8(&port->out_func, 0, data);
 			else
-				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", cpuexec_describe_context(device->machine), device->tag, 'A' + (offset & 1), data);
+				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), 'A' + (offset & 1), data);
 		}
 
 		/* writes to port A need to update the PA7 state */
@@ -331,7 +331,7 @@ READ8_DEVICE_HANDLER( riot6532_r )
 					update_pa7_state(device);
 			}
 			else
-				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag, 'A' + (offset & 1));
+				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag.cstr(), 'A' + (offset & 1));
 
 			/* apply the DDR to the result */
 			val = apply_ddr(port);
@@ -429,7 +429,6 @@ static DEVICE_START( riot6532 )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
 
 	/* set static values */

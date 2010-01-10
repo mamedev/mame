@@ -11,8 +11,6 @@
 #ifndef __ASAP_H__
 #define __ASAP_H__
 
-#include "cpuintrf.h"
-
 
 /***************************************************************************
     REGISTER ENUMERATION

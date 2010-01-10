@@ -25,8 +25,8 @@ Revisions:
 - Cleaned up faux x86 assembly.
 
 *********************************************************/
-#include <math.h>
-#include "sndintrf.h"
+
+#include "emu.h"
 #include "streams.h"
 #include "iremga20.h"
 

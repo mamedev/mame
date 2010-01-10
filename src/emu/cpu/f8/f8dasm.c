@@ -1,4 +1,4 @@
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "f8.h"
 

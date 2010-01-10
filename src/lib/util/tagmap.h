@@ -67,6 +67,7 @@ typedef enum _tagmap_error tagmap_error;
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* an entry in a tagmap */
 typedef struct _tagmap_entry tagmap_entry;
 struct _tagmap_entry
 {
@@ -77,6 +78,7 @@ struct _tagmap_entry
 };
 
 
+/* base tagmap structure */
 typedef struct _tagmap tagmap;
 struct _tagmap
 {
@@ -102,6 +104,7 @@ void tagmap_free(tagmap *map);
 void tagmap_reset(tagmap *map);
 
 
+
 /* ----- object management ----- */
 
 /* add a new entry to a tagmap */
@@ -112,6 +115,38 @@ tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object, 
 
 /* remove an entry from a tagmap */
 void tagmap_remove(tagmap *map, const char *tag);
+
+
+
+/***************************************************************************
+    C++ WRAPPERS
+***************************************************************************/
+
+#ifdef __cplusplus
+
+/* derived class for C++ */
+template<class T> class tagmap_t : public tagmap
+{
+private:
+	tagmap_t(const tagmap &);
+	tagmap_t &operator=(const tagmap &);
+	
+public:
+	tagmap_t() { memset(table, 0, sizeof(table)); }
+	~tagmap_t() { reset(); }
+	
+	void reset() { tagmap_reset(this); }
+	
+	tagmap_error add(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add(this, tag, (void *)object, replace_if_duplicate); }
+	tagmap_error add_unique_hash(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add_unique_hash(this, tag, (void *)object, replace_if_duplicate); }
+	void remove(const char *tag) { tagmap_remove(this, tag); }
+	
+	T find(const char *tag) const { return reinterpret_cast<T>(tagmap_find(this, tag)); }
+	T find(const char *tag, UINT32 hash) const { return reinterpret_cast<T>(tagmap_find_prehashed(this, tag, hash)); }
+	T find_hash_only(const char *tag) const { return reinterpret_cast<T>(tagmap_find_hash_only(this, tag)); }
+};
+
+#endif
 
 
 
@@ -141,7 +176,7 @@ INLINE UINT32 tagmap_hash(const char *string)
     hash
 -------------------------------------------------*/
 
-INLINE void *tagmap_find_prehashed(tagmap *map, const char *tag, UINT32 fullhash)
+INLINE void *tagmap_find_prehashed(const tagmap *map, const char *tag, UINT32 fullhash)
 {
 	tagmap_entry *entry;
 
@@ -157,7 +192,7 @@ INLINE void *tagmap_find_prehashed(tagmap *map, const char *tag, UINT32 fullhash
     with a tag
 -------------------------------------------------*/
 
-INLINE void *tagmap_find(tagmap *map, const char *tag)
+INLINE void *tagmap_find(const tagmap *map, const char *tag)
 {
 	return tagmap_find_prehashed(map, tag, tagmap_hash(tag));
 }
@@ -170,7 +205,7 @@ INLINE void *tagmap_find(tagmap *map, const char *tag)
     return a false positive
 -------------------------------------------------*/
 
-INLINE void *tagmap_find_hash_only(tagmap *map, const char *tag)
+INLINE void *tagmap_find_hash_only(const tagmap *map, const char *tag)
 {
 	UINT32 fullhash = tagmap_hash(tag);
 	tagmap_entry *entry;

@@ -45,7 +45,6 @@ HP38G             09/??/95              1LT8             Yorke
 #ifndef __SATURN_H__
 #define _SATURN_H
 
-#include "cpuintrf.h"
 
 #define SATURN_INT_NONE	0
 #define SATURN_INT_IRQ	1

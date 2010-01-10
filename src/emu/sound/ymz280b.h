@@ -10,7 +10,6 @@
 #ifndef __YMZ280B_H__
 #define __YMZ280B_H__
 
-#include "devcb.h"
 
 typedef struct _ymz280b_interface ymz280b_interface;
 struct _ymz280b_interface

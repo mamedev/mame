@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 
 static UINT32 common_dasm(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int upi41)

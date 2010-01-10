@@ -42,7 +42,7 @@
  *
  *****************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 /* 8080/8085A mnemonics were more irritation than information
    What would you guess "CP $3456" to mean? It's not compare,

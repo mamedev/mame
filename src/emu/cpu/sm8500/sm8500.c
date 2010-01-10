@@ -9,6 +9,7 @@
   Code by Wilbert Pol
 */
 
+#include "emu.h"
 #include "debugger.h"
 #include "sm8500.h"
 

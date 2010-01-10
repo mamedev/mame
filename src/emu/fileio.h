@@ -14,11 +14,7 @@
 #ifndef __FILEIO_H__
 #define __FILEIO_H__
 
-#include "emucore.h"
-#include "osdcore.h"
 #include "corefile.h"
-#include "mame.h"
-#include "emuopts.h"
 
 
 
@@ -63,7 +59,10 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _mame_file mame_file;
 typedef struct _mame_path mame_path;
+
+typedef struct _core_options core_options;
 
 
 

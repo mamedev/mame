@@ -9,9 +9,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "uiinput.h"
-#include "mame.h"
-#include "inptport.h"
 #include "profiler.h"
 #include "render.h"
 

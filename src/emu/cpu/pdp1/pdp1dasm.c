@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "emu.h"
 #include "cpu/pdp1/pdp1.h"
 
 /* PDP1 registers */

@@ -6,9 +6,9 @@
 
 ****************************************************************************/
 
-#include <ctype.h>
+#include "emu.h"
 
-#include "cpuintrf.h"
+#include <ctype.h>
 
 typedef unsigned char byte;
 

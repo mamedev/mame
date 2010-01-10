@@ -70,7 +70,7 @@
  * - Generalise this approach to other DAC-based sound types if susceptible to aliasing
  */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "speaker.h"
 

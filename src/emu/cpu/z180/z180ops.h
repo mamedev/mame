@@ -236,7 +236,7 @@ INLINE UINT32 ARG16(z180_state *cpustate)
  * RETN
  ***************************************************************/
 #define RETN	{												\
-	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", cpustate->device->tag, cpustate->IFF1, cpustate->IFF2)); \
+	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", cpustate->device->tag.cstr(), cpustate->IFF1, cpustate->IFF2)); \
 	POP(cpustate, PC);													\
 	cpustate->IFF1 = cpustate->IFF2;												\
 }

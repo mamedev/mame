@@ -481,7 +481,7 @@ static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
 
 	if (cpu_get_pc(space->cpu)==0x060020E6) return_data = 0x10;//???
 
-	//if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), offset, return_data);
+	//if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset, return_data);
 
 
 	return return_data;
@@ -705,7 +705,7 @@ static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), data);
+				if(LOG_SMPC) logerror ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -895,7 +895,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			return 0xffffffff;
 		}
 		case 0x1c/4:
-		if(LOG_IOGA) logerror("(PC %s=%06x) Warning: READ from PORT_AD\n", space->cpu->tag, cpu_get_pc(space->cpu));
+		if(LOG_IOGA) logerror("(PC %s=%06x) Warning: READ from PORT_AD\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
 		popmessage("Read from PORT_AD");
 		port_i++;
 		return port_ad[port_i & 7];
@@ -1357,7 +1357,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		   stv_scu[40] != 0xffffffff)
 		{
 			if(LOG_SCU) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			space->cpu->tag, cpu_get_pc(space->cpu),
+			space->cpu->tag.cstr(), cpu_get_pc(space->cpu),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
 			stv_scu[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
@@ -1965,7 +1965,7 @@ static READ32_HANDLER( stv_sh2_soundram_r )
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
+	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
 	sh2_set_frt_input(devtag_get_device(space->machine, "slave"), PULSE_LINE);
@@ -1973,7 +1973,7 @@ static WRITE32_HANDLER( minit_w )
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
+	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
 	sh2_set_frt_input(devtag_get_device(space->machine, "maincpu"), PULSE_LINE);
 }
@@ -2315,7 +2315,7 @@ static WRITE32_HANDLER ( w60ffc44_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
 
-	logerror("cpu %s (PC=%08X): 60ffc44_write write = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), data, mem_mask);
+	logerror("cpu %s (PC=%08X): 60ffc44_write write = %08X & %08X\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, mem_mask);
 	//sinit_w(offset,data,mem_mask);
 }
 
@@ -2323,7 +2323,7 @@ static WRITE32_HANDLER ( w60ffc48_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
 
-	logerror("cpu %s (PC=%08X): 60ffc48_write write = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), data, mem_mask);
+	logerror("cpu %s (PC=%08X): 60ffc48_write write = %08X & %08X\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
 }
 

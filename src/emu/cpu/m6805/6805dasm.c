@@ -8,6 +8,7 @@
  *
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "m6805.h"
 

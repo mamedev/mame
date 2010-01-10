@@ -11,7 +11,6 @@
 #ifndef __SH4_H__
 #define __SH4_H__
 
-#include "cpuintrf.h"
 
 #define SH4_INT_NONE	-1
 enum

@@ -88,6 +88,7 @@ TODO general:
 /* ================================= DATA ================================= */
 /* ======================================================================== */
 
+#include "emu.h"
 #include "g65816.h"
 
 INLINE g65816i_cpu_struct *get_safe_token(const device_config *device)

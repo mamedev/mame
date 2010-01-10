@@ -30,6 +30,8 @@
  *
  **************************************************************************** */
 
+#include "emu.h"
+#include "emuopts.h"
 #include "rendutil.h"
 #include "vector.h"
 

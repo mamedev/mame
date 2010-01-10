@@ -56,8 +56,8 @@
 #include <process.h>
 
 // MAME headers
-#include "osdepend.h"
 #include "driver.h"
+#include "emuopts.h"
 #include "uiinput.h"
 
 // MAMEOS headers

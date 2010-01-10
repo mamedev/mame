@@ -9,6 +9,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "h8.h"
 #include "h8priv.h"

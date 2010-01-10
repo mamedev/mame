@@ -3,7 +3,6 @@
 #ifndef __S2650_H__
 #define __S2650_H__
 
-#include "cpuintrf.h"
 
 enum
 {

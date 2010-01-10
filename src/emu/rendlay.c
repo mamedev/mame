@@ -55,6 +55,9 @@
 ***************************************************************************/
 
 #include <ctype.h>
+
+#include "emu.h"
+#include "emuopts.h"
 #include "render.h"
 #include "rendfont.h"
 #include "rendlay.h"

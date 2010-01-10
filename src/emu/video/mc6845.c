@@ -860,7 +860,6 @@ static void common_start(const device_config *device, int device_type)
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 
 	mc6845->intf = (const mc6845_interface *)device->static_config;
 	mc6845->device_type = device_type;

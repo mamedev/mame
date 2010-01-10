@@ -14,7 +14,7 @@
  *  separate MSM5205 emulator form adpcm.c and some fix
  */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "msm5205.h"
 
@@ -217,7 +217,7 @@ void msm5205_vclk_w (const device_config *device, int vclk)
 
 	if( voice->prescaler != 0 )
 	{
-		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", device->tag);
+		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", device->tag.cstr());
 	}
 	else
 	{

@@ -13,6 +13,7 @@ TODO:
 
 *******************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "tlcs900.h"
 

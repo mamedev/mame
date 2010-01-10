@@ -340,9 +340,9 @@ void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 	/* locate the keyboard ports */
 	for (i = 0; i < sizeof(keyboard.ports) / sizeof(keyboard.ports[0]); i++)
 	{
-		char buf[40];
-		sprintf(buf, "pc_keyboard_%d", i);
-		keyboard.ports[i] = input_port_by_tag(&machine->portlist, buf);
+		astring buf;
+		buf.printf("pc_keyboard_%d", i);
+		keyboard.ports[i] = machine->port(buf);
 	}
 
 #ifdef MESS

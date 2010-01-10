@@ -6,9 +6,9 @@
 
 ***************************************************************************/
 
+#include "driver.h"
 #include "poly.h"
 #include "eminline.h"
-#include "mame.h"
 #include "state.h"
 #include <math.h>
 

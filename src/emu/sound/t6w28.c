@@ -29,7 +29,7 @@ Offset 0:
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "t6w28.h"
 

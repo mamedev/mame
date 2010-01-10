@@ -17,6 +17,7 @@
  *   ops not used by VR are not implemented
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "ssp1601.h"
 

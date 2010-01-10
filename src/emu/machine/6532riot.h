@@ -7,7 +7,6 @@
 #ifndef __RIOT6532_H__
 #define __RIOT6532_H__
 
-#include "devcb.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

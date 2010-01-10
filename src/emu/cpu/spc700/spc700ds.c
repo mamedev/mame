@@ -15,7 +15,7 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 */
 
-
+#include "emu.h"
 #include "spc700ds.h"
 
 

@@ -63,7 +63,6 @@ pb 8bit io
 pc 8bit
 */
 
-#include "cpuintrf.h"
 
 
 typedef UINT8 (*lh5801_in_func)(const device_config *device);

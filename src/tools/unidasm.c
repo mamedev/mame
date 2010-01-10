@@ -37,9 +37,8 @@
 
 ****************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include <ctype.h>
-#include <iostream>
 
 enum _display_type
 {
@@ -618,7 +617,7 @@ int main(int argc, char *argv[])
 		if (fatal.exitcode() != 0)
 			result = fatal.exitcode();
 	}
-	catch (emu_exception &exception)
+	catch (emu_exception &)
 	{
 		fprintf(stderr, "Caught unhandled emulator exception\n");
 	}

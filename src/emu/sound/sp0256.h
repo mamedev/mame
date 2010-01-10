@@ -49,7 +49,6 @@
 #ifndef __SP0256_H__
 #define __SP0256_H__
 
-#include "devcb.h"
 
 typedef struct _sp0256_interface sp0256_interface;
 struct _sp0256_interface

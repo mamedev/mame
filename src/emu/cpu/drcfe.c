@@ -17,9 +17,7 @@
 
 ***************************************************************************/
 
-#include <stddef.h>
-#include "cpuintrf.h"
-#include "mame.h"
+#include "emu.h"
 #include "drcfe.h"
 
 

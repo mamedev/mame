@@ -1,6 +1,5 @@
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "vrender0.h"
 
 /***********************************

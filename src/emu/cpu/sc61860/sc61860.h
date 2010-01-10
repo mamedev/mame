@@ -36,7 +36,6 @@
    only readable with special instructions and program execution
    64 kb external ram (first 8kbyte not seen for program execution?) */
 
-#include "cpuintrf.h"
 
 typedef struct _sc61860_cpu_core sc61860_cpu_core;
 struct _sc61860_cpu_core

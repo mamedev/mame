@@ -12,6 +12,7 @@
   and need to be tested on real hardware before this disassembler is considered 100% complete.
 */
 
+#include "emu.h"
 #include "dsp56k.h"
 
 /*******************/

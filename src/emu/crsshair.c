@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    crsshair.h
+    crsshair.c
 
     Crosshair handling.
 
@@ -9,7 +9,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "rendutil.h"
 #include "config.h"
 #include "xmlfile.h"

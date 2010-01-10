@@ -3,7 +3,6 @@
 #ifndef __Z180_H__
 #define __Z180_H__
 
-#include "cpuintrf.h"
 
 enum
 {

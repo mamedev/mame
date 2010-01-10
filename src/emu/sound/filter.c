@@ -1,4 +1,4 @@
-#include "sndintrf.h"
+#include "emu.h"
 #include "filter.h"
 
 static filter* filter_alloc(void) {

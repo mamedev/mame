@@ -24,14 +24,11 @@
  *                                                                          *
  \**************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "emu.h"
+#include "debugger.h"
 #include <ctype.h>
 
-#include "cpuintrf.h"
 #include "tms32010.h"
-#include "debugger.h"
 
 
 

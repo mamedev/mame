@@ -3,7 +3,6 @@
 #ifndef __MB86233_H__
 #define __MB86233_H__
 
-#include "cpuintrf.h"
 
 /***************************************************************************
     REGISTER ENUMERATION

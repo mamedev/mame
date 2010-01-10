@@ -3,7 +3,6 @@
 #ifndef __SSP1601_H__
 #define __SSP1601_H__
 
-#include "cpuintrf.h"
 
 enum
 {

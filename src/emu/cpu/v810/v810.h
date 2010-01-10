@@ -3,7 +3,6 @@
 #ifndef __V810_H__
 #define __V810_H__
 
-#include "cpuintrf.h"
 
 CPU_GET_INFO( v810 );
 #define CPU_V810 CPU_GET_INFO_NAME( v810 )

@@ -32,11 +32,12 @@ static const char copyright_notice[] =
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
+#include "emu.h"
+#include "debugger.h"
 #include <setjmp.h>
 #include "m68kcpu.h"
 #include "m68kops.h"
 #include "m68kfpu.c"
-#include "debugger.h"
 
 #include "m68kmmu.h"
 

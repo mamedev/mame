@@ -1,4 +1,4 @@
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "tms3615.h"
 

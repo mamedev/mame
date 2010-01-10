@@ -12,8 +12,6 @@
 #ifndef __ALPH8201_H__
 #define __ALPH8201_H__
 
-#include "cpuintrf.h"
-
 enum
 {
 	ALPHA8201_PC=1,

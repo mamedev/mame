@@ -58,9 +58,11 @@
 #include <math.h>
 
 // MAME headers
+#include "emu.h"
 #include "render.h"
 #include "rendutil.h"
 #include "options.h"
+#include "emuopts.h"
 
 // MAMEOS headers
 #include "d3dintf.h"

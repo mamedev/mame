@@ -21,9 +21,6 @@
 #ifndef __6821NEW_H__
 #define __6821NEW_H__
 
-#include "driver.h"
-#include "devcb.h"
-
 
 /***************************************************************************
     CONSTANTS

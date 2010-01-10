@@ -4,8 +4,7 @@
     Written by Ville Linde
 */
 
-#include "cpuintrf.h"
-#include <stdarg.h>
+#include "emu.h"
 
 static const char *const reg[32] =
 {

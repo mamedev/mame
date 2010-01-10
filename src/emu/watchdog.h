@@ -11,6 +11,10 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __WATCHDOG_H__
 #define __WATCHDOG_H__
 

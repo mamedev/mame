@@ -11,12 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __ROMLOAD_H__
 #define __ROMLOAD_H__
-
-#include "emucore.h"
-#include "chd.h"
-#include "options.h"
 
 
 
@@ -126,8 +126,7 @@ enum
 typedef struct _rom_source rom_source;
 
 
-typedef struct _rom_entry rom_entry;
-struct _rom_entry
+struct rom_entry
 {
 	const char *	_name;				/* name of the file to load */
 	const char *	_hashdata;			/* hashing informations (checksums) */

@@ -108,7 +108,6 @@ static DEVICE_START( atari_vg_earom )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
 
 	/* set static values */

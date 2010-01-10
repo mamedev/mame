@@ -3,7 +3,6 @@
 #ifndef __SPC700_H__
 #define __SPC700_H__
 
-#include "cpuintrf.h"
 
 extern CPU_GET_INFO( spc700 );
 #define CPU_SPC700 CPU_GET_INFO_NAME( spc700 )

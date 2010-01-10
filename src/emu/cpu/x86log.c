@@ -10,10 +10,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "x86log.h"
-#include "mame.h"
-
-#include <stddef.h>
 
 
 

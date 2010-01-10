@@ -41,7 +41,6 @@
 #ifndef __MCS51_H__
 #define __MCS51_H__
 
-#include "cpuintrf.h"
 
 enum
 {

@@ -16,6 +16,7 @@
 
 ********************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "v810.h"
 

@@ -3,7 +3,6 @@
 #ifndef __V60_H__
 #define __V60_H__
 
-#include "cpuintrf.h"
 
 enum
 {

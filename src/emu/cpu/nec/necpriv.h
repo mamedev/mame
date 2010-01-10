@@ -1,4 +1,3 @@
-#include "cpuintrf.h"
 
 typedef enum { DS1, PS, SS, DS0 } SREGS;
 typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;

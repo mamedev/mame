@@ -183,7 +183,7 @@ static UINT16 *tx_vram;
 static UINT16 *shared_ram;
 static UINT16 *io_ram;
 
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag, cpu_get_pc(space->cpu), offset*2, data, mem_mask);
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 #define IGNORE_MISSING_ROM 1
 
 static TILE_GET_INFO( get_tx_tile_info )

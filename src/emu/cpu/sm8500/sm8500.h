@@ -3,7 +3,6 @@
 #ifndef __SM8500_H__
 #define __SM8500_H__
 
-#include "cpuintrf.h"
 
 typedef struct {
 	void (*handle_dma)(const device_config *device, int cycles);

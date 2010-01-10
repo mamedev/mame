@@ -9,14 +9,13 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "emuopts.h"
 #include "hash.h"
 #include "jedparse.h"
 #include "audit.h"
 #include "info.h"
 #include "unzip.h"
-#include "romload.h"
 #include "validity.h"
 #include "sound/samples.h"
 #include "clifront.h"
@@ -671,7 +670,7 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 					case DEVICE_CLASS_TIMER:		printf("  Timer: ");	break;
 					default:						printf("  Other: ");	break;
 				}
-				printf("%s ('%s')", device_get_name(device), device->tag);
+				printf("%s ('%s')", device_get_name(device), device->tag.cstr());
 				if (device->clock >= 1000000000)
 					printf(" @ %d.%02d GHz\n", device->clock / 1000000000, (device->clock / 10000000) % 100);
 				else if (device->clock >= 1000000)

@@ -315,7 +315,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 		else
 			irq_vector = (*cpustate->irq_callback)(cpustate->device, 0);
 
-		LOG(("Z180 '%s' single int. irq_vector $%02x\n", cpustate->device->tag, irq_vector));
+		LOG(("Z180 '%s' single int. irq_vector $%02x\n", cpustate->device->tag.cstr(), irq_vector));
 
 		/* Interrupt mode 2. Call [cpustate->I:databyte] */
 		if( cpustate->IM == 2 )
@@ -323,7 +323,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 			irq_vector = (irq_vector & 0xff) + (cpustate->I << 8);
 			PUSH(cpustate,  PC );
 			RM16( cpustate, irq_vector, &cpustate->PC );
-			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n",cpustate->device->tag , irq_vector, cpustate->_PCD));
+			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n",cpustate->device->tag.cstr() , irq_vector, cpustate->_PCD));
 			/* CALL opcode timing */
 			cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd];
 		}
@@ -331,7 +331,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 		/* Interrupt mode 1. RST 38h */
 		if( cpustate->IM == 1 )
 		{
-			LOG(("Z180 '%s' IM1 $0038\n",cpustate->device->tag ));
+			LOG(("Z180 '%s' IM1 $0038\n",cpustate->device->tag.cstr() ));
 			PUSH(cpustate,  PC );
 			cpustate->_PCD = 0x0038;
 			/* RST $38 + 'interrupt latency' cycles */
@@ -342,7 +342,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 			/* Interrupt mode 0. We check for CALL and JP instructions, */
 			/* if neither of these were found we assume a 1 byte opcode */
 			/* was placed on the databus                                */
-			LOG(("Z180 '%s' IM0 $%04x\n",cpustate->device->tag , irq_vector));
+			LOG(("Z180 '%s' IM0 $%04x\n",cpustate->device->tag.cstr() , irq_vector));
 			switch (irq_vector & 0xff0000)
 			{
 				case 0xcd0000:	/* call */
@@ -371,7 +371,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 		irq_vector = (cpustate->I << 8) + (irq_vector & 0xff);
 		PUSH(cpustate,  PC );
 		RM16( cpustate, irq_vector, &cpustate->PC );
-		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", cpustate->device->tag, irq, irq_vector, cpustate->_PCD));
+		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", cpustate->device->tag.cstr(), irq, irq_vector, cpustate->_PCD));
 		/* CALL opcode timing */
 		cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd];
 	}

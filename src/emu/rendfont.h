@@ -13,7 +13,6 @@
 #define __RENDFONT_H__
 
 #include "render.h"
-#include "unicode.h"
 
 
 

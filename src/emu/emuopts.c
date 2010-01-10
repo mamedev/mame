@@ -9,9 +9,7 @@
 
 ***************************************************************************/
 
-#include "emucore.h"
-#include "mame.h"
-#include "fileio.h"
+#include "emu.h"
 #include "emuopts.h"
 
 #include <ctype.h>

@@ -5,7 +5,6 @@
 #ifndef __M6800_H__
 #define __M6800_H__
 
-#include "cpuintrf.h"
 
 enum
 {

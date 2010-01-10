@@ -4,8 +4,8 @@
    Written by Ville Linde
 */
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuintrf.h"
 #include "tms32051.h"
 
 #define INTERRUPT_INT1		0

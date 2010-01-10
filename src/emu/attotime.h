@@ -36,8 +36,6 @@
 #ifndef __ATTOTIME_H__
 #define __ATTOTIME_H__
 
-#include "emucore.h"
-#include "eminline.h"
 #include <math.h>
 
 

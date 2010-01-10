@@ -17,6 +17,7 @@
  *
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "m6800.h"
 

@@ -12,7 +12,6 @@
 #ifndef __34010OPS_H__
 #define __34010OPS_H__
 
-#include "cpuintrf.h"
 
 /* Size of the memory buffer allocated for the shiftr register */
 #define SHIFTREG_SIZE			(8 * 512 * sizeof(UINT16))

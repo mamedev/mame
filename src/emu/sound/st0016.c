@@ -3,10 +3,8 @@
       sound emulation by R. Belmont, Tomasz Slanina, and David Haywood
 ************************************/
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "st0016.h"
 
 #define VERBOSE (0)

@@ -19,9 +19,6 @@
 #ifndef __POKEY_H__
 #define __POKEY_H__
 
-#include "sndintrf.h"
-#include "devcb.h"
-
 /* CONSTANT DEFINITIONS */
 
 /* POKEY WRITE LOGICALS */

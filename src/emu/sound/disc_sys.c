@@ -176,7 +176,7 @@ static DISCRETE_START( dso_csvlog )
 	log_num = node_module_index(node);
 	context->sample_num = 0;
 
-	sprintf(context->name, "discrete_%s_%d.csv", node->info->device->tag, log_num);
+	sprintf(context->name, "discrete_%s_%d.csv", node->info->device->tag.cstr(), log_num);
 	context->csv_file = fopen(context->name, "w");
 	/* Output some header info */
 	fprintf(context->csv_file, "\"MAME Discrete System Node Log\"\n");
@@ -220,7 +220,7 @@ static DISCRETE_START( dso_wavelog )
 	int log_num;
 
 	log_num = node_module_index(node);
-	sprintf(context->name, "discrete_%s_%d.wav", node->info->device->tag, log_num);
+	sprintf(context->name, "discrete_%s_%d.wav", node->info->device->tag.cstr(), log_num);
 	context->wavfile = wav_open(context->name, node->info->sample_rate, node->active_inputs/2);
 }
 

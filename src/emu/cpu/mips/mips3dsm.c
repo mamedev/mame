@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 #define USE_ABI_REG_NAMES (1)
 

@@ -33,8 +33,7 @@ Registers per channel:
 
 ***************************************************************************/
 
-#include "sndintrf.h"
-#include "cpuintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "gaelco.h"
 #include "wavwrite.h"

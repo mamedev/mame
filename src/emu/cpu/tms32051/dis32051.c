@@ -1,5 +1,4 @@
-#include "cpuintrf.h"
-#include <stdarg.h>
+#include "emu.h"
 
 
 

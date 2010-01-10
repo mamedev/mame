@@ -7,6 +7,7 @@
  *
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "t11.h"
 

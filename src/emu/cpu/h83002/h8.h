@@ -9,7 +9,6 @@
 #ifndef __H83002_H__
 #define __H83002_H__
 
-#include "cpuintrf.h"
 
 #define IFLAG  0x80
 #define UIFLAG 0x40

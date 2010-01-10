@@ -29,6 +29,7 @@
     - 1-21 Vectored exception requests on the Host Interface!
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "dsp56k.h"
 

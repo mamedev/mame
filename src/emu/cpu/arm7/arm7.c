@@ -34,8 +34,9 @@
        See the notes in the arm7core.c file itself regarding issues/limitations of the arm7 core.
     **
 *****************************************************************************/
-#include "arm7.h"
+#include "emu.h"
 #include "debugger.h"
+#include "arm7.h"
 #include "arm7core.h"   //include arm7 core
 
 #if 0

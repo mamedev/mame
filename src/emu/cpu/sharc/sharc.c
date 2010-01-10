@@ -3,8 +3,9 @@
    Written by Ville Linde
 */
 
-#include "sharc.h"
+#include "emu.h"
 #include "debugger.h"
+#include "sharc.h"
 
 CPU_DISASSEMBLE( sharc );
 

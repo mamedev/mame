@@ -12,7 +12,6 @@
 #ifndef __DSP56K_H__
 #define __DSP56K_H__
 
-#include "cpuintrf.h"
 
 /***************************************************************************
     REGISTER ENUMERATION

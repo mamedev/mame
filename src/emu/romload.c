@@ -9,14 +9,14 @@
 
 *********************************************************************/
 
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
-#include "driver.h"
 #include "hash.h"
 #include "png.h"
 #include "harddisk.h"
 #include "config.h"
 #include "ui.h"
-#include "romload.h"
 
 
 #define LOG_LOAD 0
@@ -274,7 +274,7 @@ astring &rom_region_name(astring &result, const game_driver *drv, const rom_sour
 	else
 	{
 		const device_config *device = (const device_config *)source;
-		result.printf("%s:%s", device->tag, ROMREGION_GETTAG(romp));
+		result.printf("%s:%s", device->tag.cstr(), ROMREGION_GETTAG(romp));
 	}
 	return result;
 }

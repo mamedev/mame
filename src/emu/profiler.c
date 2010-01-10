@@ -9,8 +9,7 @@
 
 ***************************************************************************/
 
-#include "osdepend.h"
-#include "driver.h"
+#include "emu.h"
 #include "profiler.h"
 
 
@@ -187,7 +186,7 @@ astring &_profiler_get_text(running_machine *machine, astring &string)
 
 			/* and then the text */
 			if (curtype >= PROFILER_CPU_FIRST && curtype <= PROFILER_CPU_MAX)
-				string.catprintf("CPU '%s'", device_list_find_by_index(&machine->config->devicelist, CPU, curtype - PROFILER_CPU_FIRST)->tag);
+				string.catprintf("CPU '%s'", device_list_find_by_index(&machine->config->devicelist, CPU, curtype - PROFILER_CPU_FIRST)->tag.cstr());
 			else
 				for (nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)

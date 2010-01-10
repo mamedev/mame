@@ -8,11 +8,8 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
-#include "cpuexec.h"
 #include "psx.h"
 
 #define VERBOSE_LEVEL ( 0 )

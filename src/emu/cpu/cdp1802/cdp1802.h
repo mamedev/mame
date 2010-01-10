@@ -17,9 +17,6 @@
 
 */
 
-#include "cpuintrf.h"
-#include "devcb.h"
-
 enum
 {
 	CDP1802_INPUT_LINE_INT,

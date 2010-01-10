@@ -7,7 +7,7 @@ Based on G65C816 CPU Emulator by Karl Stenerud
 
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "m7700ds.h"
 
 #ifdef SEC

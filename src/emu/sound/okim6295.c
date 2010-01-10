@@ -21,9 +21,7 @@
  **********************************************************************************************/
 
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "okim6295.h"
 
@@ -524,13 +522,13 @@ WRITE8_DEVICE_HANDLER( okim6295_w )
 					}
 					else
 					{
-						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",device->tag,info->command);
+						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",device->tag.cstr(),info->command);
 					}
 				}
 				/* invalid samples go here */
 				else
 				{
-					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",device->tag,info->command);
+					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",device->tag.cstr(),info->command);
 					voice->playing = 0;
 				}
 			}

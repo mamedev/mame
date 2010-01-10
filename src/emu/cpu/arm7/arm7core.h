@@ -33,7 +33,6 @@
 #ifndef __ARM7CORE_H__
 #define __ARM7CORE_H__
 
-#include "cpuintrf.h"
 
 /****************************************************************************************************
  *  INTERRUPT LINES/EXCEPTIONS

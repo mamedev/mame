@@ -14,7 +14,6 @@
 #ifndef __LDCORE_H__
 #define __LDCORE_H__
 
-#include "driver.h"
 #include "laserdsc.h"
 #include "vbiparse.h"
 

@@ -19,7 +19,7 @@
  *
  *****************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 
 #include "lh5801.h"

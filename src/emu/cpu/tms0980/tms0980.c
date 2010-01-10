@@ -119,6 +119,7 @@ unknown cycle: CME, SSE, SSS
 
 */
 
+#include "emu.h"
 #include "debugger.h"
 #include "tms0980.h"
 

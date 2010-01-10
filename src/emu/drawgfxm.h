@@ -374,7 +374,7 @@ while (0)																			\
 
 #define DRAWGFX_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)								\
 do {																					\
-	profiler_mark_start(PROFILER_DRAWGFX);													\
+	profiler_mark_start(PROFILER_DRAWGFX);												\
 	do {																				\
 		const UINT8 *srcdata;															\
 		INT32 destendx, destendy;														\

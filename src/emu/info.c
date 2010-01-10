@@ -9,13 +9,13 @@
 
 ***************************************************************************/
 
-#include <ctype.h>
-
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "info.h"
 #include "xmlfile.h"
 #include "hash.h"
+
+#include <ctype.h>
 
 #ifdef MESS
 #include "infomess.h"

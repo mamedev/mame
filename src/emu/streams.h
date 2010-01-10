@@ -12,7 +12,6 @@
 #ifndef STREAMS_H
 #define STREAMS_H
 
-#include "emucore.h"
 
 
 /***************************************************************************

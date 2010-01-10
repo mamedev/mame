@@ -12,7 +12,6 @@
 #ifndef __Z8_H__
 #define __Z8_H__
 
-#include "cpuintrf.h"
 
 enum
 {

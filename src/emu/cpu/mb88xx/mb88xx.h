@@ -12,7 +12,6 @@
 #ifndef __MB88XX_H__
 #define	__MB88XX_H__
 
-#include "cpuintrf.h"
 
 /***************************************************************************
     PORT ENUMERATION

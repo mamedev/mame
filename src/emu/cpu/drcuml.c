@@ -36,11 +36,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "drcuml.h"
 #include "drcumlsh.h"
-#include "eminline.h"
-#include "mame.h"
-#include <stdarg.h>
 #include <setjmp.h>
 
 

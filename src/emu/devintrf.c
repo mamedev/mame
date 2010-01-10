@@ -9,9 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-#include "cpuintrf.h"
-#include "devintrf.h"
+#include "emu.h"
 
 
 
@@ -97,13 +95,6 @@ void device_list_init(device_list *devlist, int allocmap)
 {
 	/* initialize fields */
 	devlist->head = NULL;
-	devlist->map = NULL;
-	if (allocmap)
-	{
-		devlist->map = tagmap_alloc();
-		if (devlist->map == NULL)
-			fatalerror("Out of memory for device list map");
-	}
 }
 
 
@@ -117,10 +108,6 @@ void device_list_deinit(device_list *devlist)
 	/* release all devices */
 	while (devlist->head != NULL)
 		device_list_remove(devlist, devlist->head->tag);
-
-	/* release the map memory */
-	if (devlist->map != NULL)
-		tagmap_free(devlist->map);
 }
 
 
@@ -137,29 +124,25 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	UINT32 configlen;
 
 	assert(devlist != NULL);
-	assert(devlist->map != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
 
 	/* find the end of the list */
 	for (devptr = &devlist->head; *devptr != NULL; devptr = &(*devptr)->next) ;
 
-	/* get the size of the inline config */
-	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
-
 	/* allocate a new device */
-	device = (device_config *)global_alloc_array(UINT8, sizeof(*device) + strlen(tag));
+	device = global_alloc(device_config);
 
 	/* add to the map */
-	tmerr = tagmap_add_unique_hash(devlist->map, tag, device, FALSE);
+	tmerr = devlist->map.add_unique_hash(tag, device, FALSE);
 	if (tmerr == TMERR_DUPLICATE)
 	{
-		device_config *match = (device_config *)tagmap_find_hash_only(devlist->map, tag);
+		const device_config *match = devlist->map.find_hash_only(tag);
 		assert(match != NULL);
 		if (strcmp(tag, match->tag) == 0)
 			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);
 		else
-			fatalerror("Two devices have tags which hash to the same value: '%s' and '%s'\n", tag, match->tag);
+			fatalerror("Two devices have tags which hash to the same value: '%s' and '%s'\n", tag, match->tag.cstr());
 	}
 
 	/* populate device relationships */
@@ -181,6 +164,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 		device->clock = device->owner->clock * ((device->clock >> 12) & 0xfff) / ((device->clock >> 0) & 0xfff);
 	}
 	device->static_config = NULL;
+	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 	device->inline_config = (configlen == 0) ? NULL : global_alloc_array_clear(UINT8, configlen);
 
 	/* ensure live fields are all cleared */
@@ -194,7 +178,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	device->execute = NULL;
 
 	/* append the tag */
-	strcpy(device->tag, tag);
+	device->tag.cpy(tag);
 
 	/* fetch function pointers to the core functions */
 
@@ -251,8 +235,7 @@ void device_list_remove(device_list *devlist, const char *tag)
 	*devptr = device->next;
 
 	/* and from the map */
-	if (devlist->map != NULL)
-		tagmap_remove(devlist->map, device->tag);
+	devlist->map.remove(device->tag);
 
 	/* free the device object */
 	if (device->inline_config != NULL)

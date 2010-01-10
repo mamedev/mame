@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "debugger.h"
 #include "cdp1802.h"
 
@@ -923,7 +923,7 @@ static CPU_EXECUTE( cdp1802 )
 			{
 			case CDP1802_MODE_LOAD:
 				// RUN mode cannot be initiated from LOAD mode
-				logerror("CDP1802 '%s' Tried to initiate RUN mode from LOAD mode\n", device->tag);
+				logerror("CDP1802 '%s' Tried to initiate RUN mode from LOAD mode\n", device->tag.cstr());
 				cpustate->mode = CDP1802_MODE_LOAD;
 				break;
 

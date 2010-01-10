@@ -10,9 +10,7 @@
  **********************************************************************************************/
 
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "okim6376.h"
 
@@ -431,7 +429,7 @@ WRITE8_DEVICE_HANDLER( okim6376_w )
 					}
 					else
 					{
-						logerror("OKIM6376:'%s' requested to play sample %02x on non-stopped voice\n",device->tag,info->command);
+						logerror("OKIM6376:'%s' requested to play sample %02x on non-stopped voice\n",device->tag.cstr(),info->command);
 					}
 				}
 			}

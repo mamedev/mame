@@ -49,6 +49,7 @@
 #include <math.h>
 
 // MAME headers
+#include "emu.h"
 #include "render.h"
 #include "rendutil.h"
 #include "options.h"

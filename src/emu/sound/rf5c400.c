@@ -15,7 +15,7 @@
         fixed volume table
 */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "rf5c400.h"
 

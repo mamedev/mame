@@ -1,7 +1,6 @@
 #ifndef _TMS0980_H_
 #define _TMS0980_H_
 
-#include "cpuintrf.h"
 
 /* Registers */
 enum {

@@ -12,9 +12,7 @@
  **********************************************************************************************/
 
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "es8712.h"
 
@@ -322,7 +320,7 @@ void es8712_play(const device_config *device)
 	/* invalid samples go here */
 	else
 	{
-		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n",device->tag,chip->start,chip->end);
+		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n",device->tag.cstr(),chip->start,chip->end);
 
 		if (chip->playing)
 		{

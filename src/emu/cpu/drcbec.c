@@ -10,11 +10,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "debugger.h"
 #include "drcuml.h"
 #include "drcbeut.h"
-#include "eminline.h"
-#include "debugger.h"
-#include <math.h>
 
 #ifdef _MSC_VER
 #include <float.h>

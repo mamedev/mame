@@ -19,7 +19,6 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 */
 
-#include "cpuintrf.h"
 
 CPU_DISASSEMBLE( spc700 );
 

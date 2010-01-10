@@ -3,7 +3,6 @@
 #ifndef __MC68HC11_H__
 #define __MC68HC11_H__
 
-#include "cpuintrf.h"
 
 CPU_DISASSEMBLE( hc11 );
 

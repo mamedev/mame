@@ -11,9 +11,9 @@
 
 ****************************************************************************/
 
-#include "sndintrf.h"
-#include "sound/beep.h"
+#include "emu.h"
 #include "streams.h"
+#include "sound/beep.h"
 
 
 #define BEEP_RATE			48000

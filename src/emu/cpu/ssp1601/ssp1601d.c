@@ -6,9 +6,8 @@
 
 */
 
-#include <math.h>
+#include "emu.h"
 #include "debugger.h"
-#include "cpuintrf.h"
 
 
 static const char *const reg[16] =

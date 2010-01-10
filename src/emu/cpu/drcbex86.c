@@ -84,14 +84,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "debugger.h"
 #include "drcuml.h"
 #include "drcbeut.h"
-#include "debugger.h"
 #include "x86emit.h"
-#include "eminline.h"
 #include "x86log.h"
-#include <math.h>
-#include <stddef.h>
 
 
 

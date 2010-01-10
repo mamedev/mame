@@ -49,9 +49,9 @@
 #include <dsound.h>
 
 // MAME headers
-#include "osdepend.h"
 #include "driver.h"
 #include "osdepend.h"
+#include "emuopts.h"
 
 // MAMEOS headers
 #include "winmain.h"

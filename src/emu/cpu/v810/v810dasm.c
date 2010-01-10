@@ -3,7 +3,7 @@
   Tomasz Slanina - analog[at]op.pl
 *******************************************/
 
-#include <math.h>
+#include "emu.h"
 #include "debugger.h"
 #include "v810.h"
 

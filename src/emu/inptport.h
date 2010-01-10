@@ -11,17 +11,14 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __INPTPORT_H__
 #define __INPTPORT_H__
 
 #include <time.h>
-
-#include "devcb.h"
-#include "memory.h"
-#include "inputseq.h"
-#include "tokenize.h"
-#include "unicode.h"
-#include "tagmap.h"
 
 
 
@@ -709,14 +706,14 @@ typedef struct _input_port_list input_port_list;
 struct _input_port_list
 {
 	const input_port_config *	head;			/* head of the list */
-	tagmap *					map;			/* map for fast lookups */
+	tagmap_t<const input_port_config *> map;	/* map for fast lookups */
 };
 
 
 /* describes a fundamental input type, including default input sequences */
-typedef struct _input_type_desc input_type_desc;
-struct _input_type_desc
+class input_type_desc
 {
+public:
 	input_type_desc *			next;			/* next description in the list */
 	UINT32						type;			/* IPT_* for this entry */
 	UINT8						group;			/* which group the port belongs to */
@@ -1156,11 +1153,7 @@ const char *input_port_string_from_token(const input_port_token token);
 INLINE const input_port_config *input_port_by_tag(const input_port_list *portlist, const char *tag)
 {
 	/* use the map if we have it */
-	if (portlist->map != NULL)
-		return (const input_port_config *)tagmap_find_hash_only(portlist->map, tag);
-
-	/* otherwise, do it the slow way */
-	return input_port_by_tag_slow(portlist, tag);
+	return portlist->map.find_hash_only(tag);
 }
 
 

@@ -3,8 +3,6 @@
 #ifndef __G65816_H__
 #define __G65816_H__
 
-#include "cpuintrf.h"
-#include "debugger.h"
 #include "g65816cm.h"
 
 /* ======================================================================== */

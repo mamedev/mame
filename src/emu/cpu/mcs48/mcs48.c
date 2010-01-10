@@ -72,8 +72,8 @@ T0 output clock
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
-#include "timer.h"
 #include "mcs48.h"
 
 

@@ -11,10 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __DRAWGFX_H__
 #define __DRAWGFX_H__
-
-#include "emucore.h"
 
 
 
@@ -115,9 +117,9 @@ struct _gfx_layout
 };
 
 
-/* In emucore.h: typedef struct _gfx_element gfx_element; */
-struct _gfx_element
+class gfx_element
 {
+public:
 	UINT16			width;				/* current pixel width of each element (changeble with source clipping) */
 	UINT16			height;				/* current pixel height of each element (changeble with source clipping) */
 	UINT16			startx;				/* current source clip X offset */
@@ -147,8 +149,7 @@ struct _gfx_element
 };
 
 
-typedef struct _gfx_decode_entry gfx_decode_entry;
-struct _gfx_decode_entry
+struct gfx_decode_entry
 {
 	const char *	memory_region;		/* memory region where the data resides */
 	UINT32			start;				/* offset of beginning of data to decode */

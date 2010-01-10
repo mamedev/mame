@@ -1,8 +1,6 @@
 #ifndef __SCMP_H__
 #define __SCMP_H__
 
-#include "cpuintrf.h"
-#include "devcb.h"
 
 /***************************************************************************
     CONSTANTS

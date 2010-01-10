@@ -33,7 +33,6 @@
 #ifndef __Z80DMA__
 #define __Z80DMA__
 
-#include "devcb.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

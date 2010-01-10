@@ -3,7 +3,6 @@
 #ifndef __E132XS_H__
 #define __E132XS_H__
 
-#include "cpuintrf.h"
 
 /*
     A note about clock multipliers and dividers:

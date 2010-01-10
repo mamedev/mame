@@ -4,7 +4,7 @@
     Written by MooglyGuy
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "ssem.h"
 

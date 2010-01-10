@@ -14,7 +14,6 @@
 #ifndef __DEBUGCPU_H__
 #define __DEBUGCPU_H__
 
-#include "cpuintrf.h"
 #include "express.h"
 
 

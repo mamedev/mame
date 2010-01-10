@@ -3,7 +3,6 @@
 #ifndef __PSX_H__
 #define __PSX_H__
 
-#include "cpuintrf.h"
 
 #define PSXCPU_DELAYR_PC ( 32 )
 #define PSXCPU_DELAYR_NOTPC ( 33 )

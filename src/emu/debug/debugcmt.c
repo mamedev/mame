@@ -20,7 +20,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "xmlfile.h"
 #include "debugcmt.h"
 #include "debugcpu.h"

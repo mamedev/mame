@@ -4,9 +4,6 @@
 #define __MINX_H__
 
 
-#include "cpuintrf.h"
-#include "driver.h"
-
 enum
 {
         MINX_PC=1, MINX_SP, MINX_BA, MINX_HL, MINX_X, MINX_Y,

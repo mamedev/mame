@@ -5,7 +5,6 @@
 #ifndef __KONAMI_H__
 #define __KONAMI_H__
 
-#include "cpuintrf.h"
 
 typedef void (*konami_set_lines_func)(const device_config *device, int lines);
 

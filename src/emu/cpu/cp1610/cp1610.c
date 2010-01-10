@@ -21,7 +21,7 @@
  *
  *****************************************************************************/
 
-#include "cpuexec.h"
+#include "emu.h"
 #include "debugger.h"
 #include "cp1610.h"
 

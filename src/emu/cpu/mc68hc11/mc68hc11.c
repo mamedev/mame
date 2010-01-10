@@ -10,6 +10,7 @@ TODO:
 
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "mc68hc11.h"
 

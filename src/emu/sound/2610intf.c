@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ay8910.h"
 #include "2610intf.h"
@@ -167,7 +167,7 @@ static DEVICE_START( ym2610 )
 	/* setup adpcm buffers */
 	pcmbufa  = device->region;
 	pcmsizea = device->regionbytes;
-	name.printf("%s.deltat", device->tag);
+	name.printf("%s.deltat", device->tag.cstr());
 	pcmbufb  = (void *)(memory_region(device->machine, name));
 	pcmsizeb = memory_region_length(device->machine, name);
 	if (pcmbufb == NULL || pcmsizeb == 0)

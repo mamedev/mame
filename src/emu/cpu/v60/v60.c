@@ -3,6 +3,7 @@
 // Main hacking and coding by Farfetch'd
 // Portability fixes by Richter Belmont
 
+#include "emu.h"
 #include "debugger.h"
 #include "v60.h"
 

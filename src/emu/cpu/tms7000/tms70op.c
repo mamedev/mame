@@ -19,7 +19,7 @@
 
 //SJE: Changed all references to ICount to icount (to match MAME requirements)
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 static void illegal(tms7000_state *cpustate)
 {

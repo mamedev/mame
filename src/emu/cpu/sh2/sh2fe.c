@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "sh2.h"
 #include "sh2comn.h"
 #include "cpu/drcfe.h"

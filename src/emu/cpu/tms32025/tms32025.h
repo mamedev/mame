@@ -21,8 +21,6 @@
 #define __TMS32025_H__
 
 
-#include "cpuintrf.h"
-
 
 
 #define TMS32025_BIO		0x10000		/* BIO input  */

@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "debugger.h"
 #include "se3208.h"
 

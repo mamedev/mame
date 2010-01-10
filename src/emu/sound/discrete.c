@@ -33,12 +33,11 @@
  *
  ************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "inptport.h"
 #include "wavwrite.h"
 #include "discrete.h"
-#include "eminline.h"
+
 
 /*************************************
  *
@@ -497,7 +496,7 @@ static DEVICE_START( discrete )
 	info->total_stream_updates = 0;
 
 	/* create the logfile */
-	sprintf(name, "discrete%s.log", device->tag);
+	sprintf(name, "discrete%s.log", device->tag.cstr());
 	if (DISCRETE_DEBUGLOG)
 		info->disclogfile = fopen(name, "w");
 

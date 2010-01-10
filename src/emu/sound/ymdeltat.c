@@ -62,7 +62,7 @@
 **
 */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "ymdeltat.h"
 
 #define YM_DELTAT_DELTA_MAX (24576)

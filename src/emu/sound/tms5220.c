@@ -139,7 +139,7 @@ device), PES Speech adapter (serial port connection)
 
 ***********************************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "tms5220.h"
 

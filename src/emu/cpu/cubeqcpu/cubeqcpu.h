@@ -9,8 +9,6 @@
 #ifndef _CUBEQCPU_H
 #define _CUBEQCPU_H
 
-#include "cpuintrf.h"
-
 
 /***************************************************************************
     COMPILE-TIME DEFINITIONS

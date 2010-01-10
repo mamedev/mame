@@ -20,7 +20,7 @@
  *
  *****************************************************************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 
 #include "sc61860.h"
