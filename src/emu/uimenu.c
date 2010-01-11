@@ -2533,7 +2533,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 				case IPT_UI_DISPLAY_COMMENT:
 				case IPT_UI_UP:
 				case IPT_UI_DOWN:
-					if (cheat_get_comment(event->itemref) != NULL)
+					if (cheat_get_comment(event->itemref).len() != 0)
 						popmessage("Cheat Comment:\n%s", cheat_get_comment(event->itemref).cstr());
 					break;
 			}

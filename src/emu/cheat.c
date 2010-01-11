@@ -193,7 +193,7 @@ struct _cheat_entry
 	script_state		state;							/* current cheat state */
 	UINT32				numtemp;						/* number of temporary variables */
 	UINT64				argindex;						/* argument index variable */
-	UINT64				tempvar[1];						/* value of the temporary variables */
+	UINT64 *			tempvar;						/* value of the temporary variables */
 };
 
 
@@ -1177,7 +1177,8 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	}
 
 	/* allocate memory for the cheat */
-	cheat = (cheat_entry *)auto_alloc_array_clear(machine, UINT8, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
+	cheat = auto_alloc_clear(machine, cheat_entry);
+	cheat->tempvar = auto_alloc_array_clear(machine, UINT64, tempcount);
 	cheat->numtemp = tempcount;
 
 	/* get the description */
@@ -1324,6 +1325,7 @@ static void cheat_entry_free(running_machine *machine, cheat_entry *cheat)
 	if (cheat->symbols != NULL)
 		symtable_free(cheat->symbols);
 
+	auto_free(machine, cheat->tempvar);
 	auto_free(machine, cheat);
 }
 
