@@ -50,13 +50,35 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
+static UINT8 *blit_buffer;
+
 
 static VIDEO_START( gunpey )
 {
+	blit_buffer = auto_alloc_array(machine, UINT8, 512*512);
 }
 
 static VIDEO_UPDATE( gunpey )
 {
+	int x,y;
+	int count;
+
+	count = 0;
+
+	for(y=0;y<512;y++)
+	{
+		for(x=0;x<512;x++)
+		{
+			UINT32 color;
+			color = (blit_buffer[count] & 0xff);
+
+			if(x<video_screen_get_visible_area(screen)->max_x && y<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
@@ -89,12 +111,38 @@ static READ8_HANDLER( gunpey_inputs_r )
 static WRITE8_HANDLER( gunpey_blitter_w )
 {
 	static UINT16 blit_ram[0x10];
+	UINT8 *blit_rom = memory_region(space->machine, "blit_data");
+	int x,y;
 
 	blit_ram[offset] = data;
 
-	if(offset == 0 && data) // blitter trigger
+	if(offset == 0 && data == 2) // blitter trigger
 	{
-		// ...
+		int srcx = blit_ram[0x04]+(blit_ram[0x05]<<8);
+		int srcy = blit_ram[0x06]+(blit_ram[0x07]<<8);
+		int dstx = blit_ram[0x08]+((blit_ram[0x09] & 0x01) <<8);
+		int dsty = blit_ram[0x0a]+((blit_ram[0x0b] & 0x01) <<8);
+		int xsize = blit_ram[0x0c]+1;
+		int ysize = blit_ram[0x0e]+1;
+
+		if(blit_ram[0x01] == 8) //1bpp?
+		{
+			// ...
+		}
+		else
+		{
+			for(y=0;y<ysize;y++)
+			{
+				for(x=0;x<xsize;x++)
+				{
+					UINT32 src_index = ((srcy+y)*2048+(srcx+x)) & 0x3fffff;
+					UINT32 dst_index = ((dsty+y)*512+(dstx+x)) & 0x3ffff;
+
+					blit_buffer[dst_index] = blit_rom[src_index];
+				}
+			}
+		}
+
 
 		printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
 		,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
@@ -225,6 +273,28 @@ INPUT_PORTS_END
 
 /***************************************************************************************/
 
+/* test hack */
+static PALETTE_INIT( gunpey )
+{
+	int i,r,g,b,val;
+	UINT8 *blit_rom = memory_region(machine, "blit_data");
+
+	for (i = 0; i < 512; i+=2)
+	{
+		val = (blit_rom[i+0x3B1DFD]) | (blit_rom[i+0x3B1DFD+1]<<8);
+
+		b = (val & 0x001f) >> 0;
+		b<<=3;
+		g = (val & 0x03e0) >> 5;
+		g<<=3;
+		r = (val & 0x7c00) >> 10;
+		r<<=3;
+
+		palette_set_color(machine, i/2, MAKE_RGB(r, g, b));
+	}
+
+}
+
 static INTERRUPT_GEN( gunpey_interrupt )
 {
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x200/4);
@@ -243,24 +313,27 @@ static MACHINE_DRIVER_START( gunpey )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(512, 512)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
 
 	MDRV_PALETTE_LENGTH(0x800)
+	MDRV_PALETTE_INIT(gunpey)
 
 	MDRV_VIDEO_START(gunpey)
 	MDRV_VIDEO_UPDATE(gunpey)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16_9344MHz / 8 / 165)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_DRIVER_END
 
 
@@ -272,7 +345,7 @@ ROM_START( gunpey )
 	ROM_LOAD16_BYTE( "gp_rom1.021",  0x00000, 0x80000, CRC(07a589a7) SHA1(06c4140ffd5f74b3d3ddfc424f43fcd08d903490) )
 	ROM_LOAD16_BYTE( "gp_rom2.022",  0x00001, 0x80000, CRC(f66bc4cf) SHA1(54931d878d228c535b9e2bf22a0a3e41756f0fe5) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )
