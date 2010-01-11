@@ -470,7 +470,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
 						/* stop when we hit an empty */
-						if (rgninfo->entries[rgnnum].tag.len() == NULL)
+						if (rgninfo->entries[rgnnum].tag.len() == 0)
 						{
 							currgn = &rgninfo->entries[rgnnum];
 							currgn->tag.cpy(fulltag);

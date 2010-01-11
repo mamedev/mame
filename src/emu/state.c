@@ -163,8 +163,42 @@ INLINE void flip_data(state_entry *entry)
     all registrations
 -------------------------------------------------*/
 
+enum test_enum_type { test_val };
+
+class test_class_type { public: int dummy; };
+
 void state_init(running_machine *machine)
 {
+	bool test_bool;
+	INT8 test_INT8;
+	UINT8 test_UINT8;
+	INT16 test_INT16;
+	UINT16 test_UINT16;
+	INT32 test_INT32;
+	UINT32 test_UINT32;
+	INT64 test_INT64;
+	UINT64 test_UINT64;
+	float test_float;
+	double test_double;
+	test_enum_type test_enum;
+	test_class_type test_class;
+	
+	assert_always(IS_VALID_SAVE_TYPE(test_bool), "bool is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT8), "INT8 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT8), "UINT8 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT16), "INT16 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT16), "UINT16 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT32), "INT32 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT32), "UINT32 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT64), "INT64 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT64), "UINT64 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_float), "float is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_double), "double is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_enum), "enums are not a valid type for save");
+#ifdef __GNUC__
+	assert_always(!IS_VALID_SAVE_TYPE(test_class), "classes are a valid type for save");
+#endif
+
 	machine->state_data = auto_alloc_clear(machine, state_private);
 }
 
