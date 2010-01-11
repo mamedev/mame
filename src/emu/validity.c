@@ -410,7 +410,6 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 	const char *last_name = "???";
 	region_entry *currgn = NULL;
 	int items_since_region = 1;
-	const rom_source *source;
 	int error = FALSE;
 
 #ifndef MESS
@@ -429,12 +428,10 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 #endif
 
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
-	for (source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))
+	for (const rom_source *source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))
 	{
-		const rom_entry *romp;
-
 		/* scan the ROM entries */
-		for (romp = rom_first_region(driver, source); !ROMENTRY_ISEND(romp); romp++)
+		for (const rom_entry *romp = rom_first_region(driver, source); !ROMENTRY_ISEND(romp); romp++)
 		{
 			/* if this is a region, make sure it's valid, and record the length */
 			if (ROMENTRY_ISREGION(romp))
@@ -473,10 +470,10 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
 						/* stop when we hit an empty */
-						if (rgninfo->entries[rgnnum].tag == NULL)
+						if (rgninfo->entries[rgnnum].tag.len() == NULL)
 						{
 							currgn = &rgninfo->entries[rgnnum];
-							currgn->tag = fulltag;
+							currgn->tag.cpy(fulltag);
 							currgn->length = ROMREGION_GETLENGTH(romp);
 							break;
 						}
