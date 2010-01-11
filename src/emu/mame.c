@@ -97,17 +97,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _region_info region_info;
-struct _region_info
-{
-	region_info *	next;
-	astring			name;
-	UINT32			length;
-	UINT32			flags;
-	UINT8 *			base;
-};
-
-
 typedef struct _callback_item callback_item;
 struct _callback_item
 {
@@ -751,6 +740,31 @@ int mame_is_paused(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    region_info - constructor for a memory region
+-------------------------------------------------*/
+
+region_info::region_info(running_machine *_machine, const char *_name, UINT32 _length, UINT32 _flags)
+	: machine(_machine),
+	  next(NULL),
+	  name(_name),
+	  length(_length),
+	  flags(_flags),
+	  base(auto_alloc_array(_machine, UINT8, _length))
+{
+}
+
+
+/*-------------------------------------------------
+    ~region_info - memory region destructor
+-------------------------------------------------*/
+
+region_info::~region_info()
+{
+	auto_free(machine, base);
+}
+
+
+/*-------------------------------------------------
     memory_region_alloc - allocates memory for a
     region
 -------------------------------------------------*/
@@ -767,12 +781,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = auto_alloc(machine, region_info);
-	info->next = NULL;
-	info->name.cpy(name);
-	info->length = length;
-	info->flags = flags;
-	info->base = auto_alloc_array(machine, UINT8, length);
+	info = auto_alloc(machine, region_info(machine, name, length, flags));
 
 	/* attempt to put is in the hash table */
 	tagerr = mame->regionmap.add_unique_hash(name, info, FALSE);
@@ -784,7 +793,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 
 	/* hook us into the list */
 	*infoptr = info;
-	return info->base;
+	return reinterpret_cast<UINT8 *>(info->base);
 }
 
 
@@ -809,10 +818,27 @@ void memory_region_free(running_machine *machine, const char *name)
 			mame->regionmap.remove(info->name);
 
 			/* free the region */
-			auto_free(machine, info->base);
 			auto_free(machine, info);
 			break;
 		}
+}
+
+
+/*-------------------------------------------------
+    memory_region_info - return a pointer to the 
+    information struct for a given memory region
+-------------------------------------------------*/
+
+region_info *memory_region_info(running_machine *machine, const char *name)
+{
+	mame_private *mame = machine->mame_data;
+
+    /* NULL tag always fails */
+    if (name == NULL)
+    	return NULL;
+
+    /* look up the region and return the base */
+    return mame->regionmap.find_hash_only(name);
 }
 
 
@@ -821,24 +847,10 @@ void memory_region_free(running_machine *machine, const char *name)
     region
 -------------------------------------------------*/
 
-UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length, UINT32 *flags)
+UINT8 *memory_region(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return NULL;
-
-    /* look up the region and return the base */
-	info = mame->regionmap.find_hash_only(name);
-	if (info == NULL)
-		return NULL;
-	if (length != NULL)
-		*length = info->length;
-	if (flags != NULL)
-		*flags = info->flags;
-	return info->base;
+	const region_info *region = machine->region(name);
+	return (region != NULL) ? reinterpret_cast<UINT8 *>(region->base) : NULL;
 }
 
 
@@ -849,16 +861,8 @@ UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length,
 
 UINT32 memory_region_length(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return 0;
-
-    /* look up the region and return the length */
-	info = mame->regionmap.find_hash_only(name);
-	return (info != NULL) ? info->length : 0;
+	const region_info *region = machine->region(name);
+	return (region != NULL) ? region->length : NULL;
 }
 
 
@@ -869,16 +873,8 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
 
 UINT32 memory_region_flags(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return 0;
-
-    /* look up the region and return the flags */
-	info = mame->regionmap.find_hash_only(name);
-	return (info != NULL) ? info->flags : 0;
+	const region_info *region = machine->region(name);
+	return (region != NULL) ? region->flags : NULL;
 }
 
 
@@ -889,20 +885,8 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
 
 const char *memory_region_next(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-	/* if there's nothing in this class, fail immediately */
-	if (mame->regionlist == NULL)
-		return NULL;
-
-	/* NULL means return the first */
-    if (name == NULL)
-    	return mame->regionlist->name;
-
-    /* look up the region and return the next guy */
-	info = mame->regionmap.find_hash_only(name);
-	return (info != NULL && info->next != NULL) ? info->next->name.cstr() : NULL;
+	const region_info *region = machine->region(name);
+	return (region != NULL && region->next != NULL) ? region->next->name.cstr() : NULL;
 }
 
 

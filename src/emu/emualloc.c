@@ -54,6 +54,15 @@ const int memory_block_alloc_chunk = 256;
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+// enable deletion
+#undef delete
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -190,7 +199,8 @@ void dump_unfreed_mem(void)
 -------------------------------------------------*/
 
 resource_pool::resource_pool()
-	: listlock(osd_lock_alloc())
+	: listlock(osd_lock_alloc()),
+	  ordered_head(NULL)
 {
 	memset(hash, 0, sizeof(hash));
 }
@@ -217,9 +227,18 @@ resource_pool::~resource_pool()
 void resource_pool::add(resource_pool_item &item)
 {
 	osd_lock_acquire(listlock);
+	
+	// insert into hash table
 	int hashval = reinterpret_cast<FPTR>(item.ptr) % hash_prime;
 	item.next = hash[hashval];
 	hash[hashval] = &item;
+
+	// insert into ordered list
+	item.ordered_next = ordered_head;
+	if (ordered_head != NULL)
+		ordered_head->ordered_prev = &item;
+	ordered_head = &item;
+
 	osd_lock_release(listlock);
 }
 
@@ -244,8 +263,19 @@ void resource_pool::remove(void *ptr)
 		// must match the pointer
 		if ((*scanptr)->ptr == ptr)
 		{
+			// remove from hash table
 			resource_pool_item *deleteme = *scanptr;
 			*scanptr = deleteme->next;
+			
+			// remove from ordered list
+			if (deleteme->ordered_prev != NULL)
+				deleteme->ordered_prev->ordered_next = deleteme->ordered_next;
+			else
+				ordered_head = deleteme->ordered_next;
+			if (deleteme->ordered_next != NULL)
+				deleteme->ordered_next->ordered_prev = deleteme->ordered_prev;
+			
+			// delete the object and break
 			delete deleteme;
 			break;
 		}
@@ -290,14 +320,13 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 	osd_lock_acquire(listlock);
 
 	resource_pool_item *item = NULL;
-	for (int hashval = 0; hashval < hash_prime; hashval++)
-		for (item = hash[hashval]; item != NULL; item = item->next)
-		{
-			UINT8 *objstart = reinterpret_cast<UINT8 *>(item->ptr);
-			UINT8 *objend = objstart + item->size;
-			if (ptrstart >= objstart && ptrend <= objend)
-				goto found;
-		}
+	for (item = ordered_head; item != NULL; item = item->ordered_next)
+	{
+		UINT8 *objstart = reinterpret_cast<UINT8 *>(item->ptr);
+		UINT8 *objend = objstart + item->size;
+		if (ptrstart >= objstart && ptrend <= objend)
+			goto found;
+	}
 
 found:
 	osd_lock_release(listlock);
@@ -313,13 +342,11 @@ found:
 void resource_pool::clear()
 {
 	osd_lock_acquire(listlock);
-	for (int hashval = 0; hashval < hash_prime; hashval++)
-		while (hash[hashval] != NULL)
-		{
-			resource_pool_item *deleteme = hash[hashval];
-			hash[hashval] = deleteme->next;
-			delete deleteme;
-		}
+	
+	// important: delete in reverse order of adding
+	while (ordered_head != NULL)
+		remove(ordered_head->ptr);
+
 	osd_lock_release(listlock);
 }
 
@@ -471,8 +498,9 @@ void memory_entry::report_unfreed()
 
 	// check for leaked memory
 	UINT32 total = 0;
-	for (int hashval = 0; hashval < hash_prime; hashval++)
-		for (memory_entry *entry = hash[hashval]; entry; entry = entry->next)
+
+	for (int hashnum = 0; hashnum < hash_prime; hashnum++)
+		for (memory_entry *entry = hash[hashnum]; entry != NULL; entry = entry->next)
 			if (entry->file != NULL)
 			{
 				if (total == 0)

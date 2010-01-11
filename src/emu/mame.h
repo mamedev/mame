@@ -155,8 +155,24 @@ typedef struct _generic_audio_private generic_audio_private;
 typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
 
 
-/* return a pointer to a specified memory region */
-UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length = NULL, UINT32 *flags = NULL);
+// memory region
+class region_info
+{
+	DISABLE_COPYING(region_info);
+	
+	running_machine *machine;
+	
+public:
+	region_info(running_machine *machine, const char *_name, UINT32 _length, UINT32 _flags);
+	~region_info();
+	
+	region_info *	next;
+	astring			name;
+	UINT32			length;
+	UINT32			flags;
+	UINT8 *			base;
+};
+
 
 /* this structure holds generic pointers that are commonly used */
 typedef struct _generic_pointers generic_pointers;
@@ -189,7 +205,7 @@ public:
 	
 	inline const device_config *device(const char *tag);
 	inline const input_port_config *port(const char *tag);
-	template<class T> T *region(const char *tag, UINT32 *length = NULL, UINT32 *flags = NULL);
+	inline const region_info *region(const char *tag);
 
 	resource_pool			respool;			/* pool of resources for this machine */
 
@@ -253,8 +269,6 @@ public:
 	/* driver-specific information */
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */
 };
-
-
 
 
 typedef struct _mame_system_tm mame_system_tm;
@@ -370,8 +384,11 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 /* free an allocated memory region */
 void memory_region_free(running_machine *machine, const char *name);
 
+/* return a pointer to the information struct for a given memory region */
+region_info *memory_region_info(running_machine *machine, const char *name);
+
 /* return a pointer to a specified memory region */
-//UINT8 *memory_region(running_machine *machine, const char *name, UINT32 *length = NULL, UINT32 *flags = NULL);
+UINT8 *memory_region(running_machine *machine, const char *name);
 
 /* return the size (in bytes) of a specified memory region */
 UINT32 memory_region_length(running_machine *machine, const char *name);
@@ -453,9 +470,9 @@ inline const input_port_config *running_machine::port(const char *tag)
 	return input_port_by_tag(&portlist, tag);
 }
 
-template<class T> T *running_machine::region(const char *tag, UINT32 *length, UINT32 *flags)
+inline const region_info *running_machine::region(const char *tag)
 {
-	return reinterpret_cast<T *>(memory_region(this, tag, length, flags));
+	return memory_region_info(this, tag);
 }
 
 

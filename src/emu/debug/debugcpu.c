@@ -204,12 +204,12 @@ void debug_cpu_init(running_machine *machine)
 
 		/* add a global symbol for the current instruction pointer */
 		symtable_add_register(info->symtable, "cycles", NULL, get_cycles, NULL);
-		if (cpu->space[ADDRESS_SPACE_PROGRAM] != NULL)
-			symtable_add_register(info->symtable, "logunmap", (void *)cpu->space[ADDRESS_SPACE_PROGRAM], get_logunmap, set_logunmap);
-		if (cpu->space[ADDRESS_SPACE_DATA] != NULL)
-			symtable_add_register(info->symtable, "logunmapd", (void *)cpu->space[ADDRESS_SPACE_DATA], get_logunmap, set_logunmap);
-		if (cpu->space[ADDRESS_SPACE_IO] != NULL)
-			symtable_add_register(info->symtable, "logunmapi", (void *)cpu->space[ADDRESS_SPACE_IO], get_logunmap, set_logunmap);
+		if (cpu->space(AS_PROGRAM) != NULL)
+			symtable_add_register(info->symtable, "logunmap", (void *)cpu->space(AS_PROGRAM), get_logunmap, set_logunmap);
+		if (cpu->space(AS_DATA) != NULL)
+			symtable_add_register(info->symtable, "logunmapd", (void *)cpu->space(AS_DATA), get_logunmap, set_logunmap);
+		if (cpu->space(AS_IO) != NULL)
+			symtable_add_register(info->symtable, "logunmapi", (void *)cpu->space(AS_IO), get_logunmap, set_logunmap);
 
 		/* add all registers into it */
 		for (regnum = 0; regnum < MAX_REGS; regnum++)

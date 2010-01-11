@@ -57,7 +57,7 @@ public:
 };
 
 
-class region_info
+class region_array
 {
 public:
 	region_entry entries[256];
@@ -402,7 +402,7 @@ static int validate_driver(int drivnum, const machine_config *config, game_drive
     validate_roms - validate ROM definitions
 -------------------------------------------------*/
 
-static int validate_roms(int drivnum, const machine_config *config, region_info *rgninfo, game_driver_map &roms)
+static int validate_roms(int drivnum, const machine_config *config, region_array *rgninfo, game_driver_map &roms)
 {
 	const game_driver *driver = drivers[drivnum];
 	int bios_flags = 0, last_bios = 0;
@@ -704,7 +704,7 @@ static int validate_display(int drivnum, const machine_config *config)
     configuration
 -------------------------------------------------*/
 
-static int validate_gfx(int drivnum, const machine_config *config, region_info *rgninfo)
+static int validate_gfx(int drivnum, const machine_config *config, region_array *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
 	int error = FALSE;
@@ -1245,7 +1245,7 @@ static int validate_sound(int drivnum, const machine_config *config)
     checks
 -------------------------------------------------*/
 
-static int validate_devices(int drivnum, const machine_config *config, const input_port_list *portlist, region_info *rgninfo)
+static int validate_devices(int drivnum, const machine_config *config, const input_port_list *portlist, region_array *rgninfo)
 {
 	int error = FALSE;
 	const game_driver *driver = drivers[drivnum];
@@ -1500,7 +1500,7 @@ int mame_validitychecks(const game_driver *curdriver)
 		const game_driver *driver = drivers[drivnum];
 		input_port_list portlist;
 		machine_config *config;
-		region_info rgninfo;
+		region_array rgninfo;
 
 		/* non-debug builds only care about games in the same driver */
 		if (curdriver != NULL && strcmp(curdriver->source_file, driver->source_file) != 0)

@@ -342,10 +342,7 @@ INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
 
 INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
 {
-	/* it is faster to pull this from the pre-fetched data, but only after we've started */
-	if (device->token != NULL)
-		return device->space[spacenum];
-	return memory_find_address_space(device, spacenum);
+	return device->space(spacenum);
 }
 
 #endif	/* __CPUEXEC_H__ */

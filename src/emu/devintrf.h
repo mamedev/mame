@@ -191,7 +191,6 @@ enum
 #define devtag_get_device(mach,tag)							device_list_find_by_tag(&(mach)->config->devicelist, tag)
 
 #define devtag_reset(mach,tag)								device_reset(devtag_get_device(mach, tag))
-#define devtag_get_address_space(mach,tag,space)
 
 #define devtag_get_info_int(mach,tag,state)					device_get_info_int(devtag_get_device(mach, tag), state)
 #define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr(devtag_get_device(mach, tag), state)
@@ -299,9 +298,19 @@ union deviceinfo
 
 
 /* the configuration for a general device */
+enum device_space
+{
+	AS_PROGRAM = 0,
+	AS_DATA = 1,
+	AS_IO = 2
+};
+
 class device_config
 {
 public:
+	inline const address_space *space(int index = 0) const;
+	inline const address_space *space(device_space index) const;
+
 	/* device relationships (always valid) */
 	device_config *			next;					/* next device (of any type/class) */
 	device_config *			owner;					/* device that owns us, or NULL if nobody */
@@ -328,7 +337,7 @@ public:
 	UINT32					tokenbytes;				/* size of the token data allocated */
 	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
 	UINT32					regionbytes;			/* size of the region, in bytes */
-	const address_space *	space[ADDRESS_SPACES];	/* auto-discovered address spaces */
+	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
 	device_execute_func 	execute;				/* quick pointer to execute callback */
 };
 
@@ -479,6 +488,23 @@ INLINE const device_config *device_list_find_by_tag(const device_list *devlist, 
 	/* if we have a map, use it */
 	return devlist->map.find_hash_only(tag);
 }
+
+
+/*-------------------------------------------------
+    space - return an address space within a
+    device
+-------------------------------------------------*/
+
+inline const address_space *device_config::space(int index) const
+{
+	return (token != NULL) ? addrspace[index] : memory_find_address_space(this, index);
+}
+
+inline const address_space *device_config::space(device_space index) const
+{
+	return space(static_cast<int>(index));
+}
+
 
 
 #endif	/* __DEVINTRF_H__ */

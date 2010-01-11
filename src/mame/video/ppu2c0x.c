@@ -424,14 +424,14 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 		pos = ((index1 & 0x380) >> 4) | ((index1 & 0x1f) >> 2);
 		page = (index1 & 0x0c00) >> 10;
 		address = 0x3c0 + pos;
-		color_byte = memory_read_byte(device->space[0], (((page * 0x400) + address) & 0xfff) + 0x2000);
+		color_byte = memory_read_byte(device->space(), (((page * 0x400) + address) & 0xfff) + 0x2000);
 
 		/* figure out which bits in the color table to use */
 		color_bits = ((index1 & 0x40) >> 4) + (index1 & 0x02);
 
 		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
 		address = index1 & 0x3ff;
-		page2 = memory_read_byte(device->space[0], index1);
+		page2 = memory_read_byte(device->space(), index1);
 
 		// 27/12/2002
 		if (ppu_latch)
@@ -449,8 +449,8 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			plane1 = memory_read_byte(device->space[0], (address & 0x1fff));
-			plane2 = memory_read_byte(device->space[0], (address + 8) & 0x1fff);
+			plane1 = memory_read_byte(device->space(), (address & 0x1fff));
+			plane2 = memory_read_byte(device->space(), (address + 8) & 0x1fff);
 
 			/* render the pixel */
 			for (i = 0; i < 8; i++)
@@ -600,8 +600,8 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		if (size == 8)
 			index1 += ((sprite_page == 0) ? 0 : 0x1000);
 
-		plane1 = memory_read_byte(device->space[0], (index1 + sprite_line) & 0x1fff);
-		plane2 = memory_read_byte(device->space[0], (index1 + sprite_line + 8) & 0x1fff);
+		plane1 = memory_read_byte(device->space(), (index1 + sprite_line) & 0x1fff);
+		plane2 = memory_read_byte(device->space(), (index1 + sprite_line + 8) & 0x1fff);
 
 		/* if there are more than 8 sprites on this line, set the flag */
 		if (spriteCount == 8)
@@ -1059,14 +1059,14 @@ READ8_DEVICE_HANDLER( ppu2c0x_r )
 
 			if (this_ppu->videomem_addr >= 0x3f00)
 			{
-				this_ppu->data_latch = memory_read_byte(device->space[0], this_ppu->videomem_addr);
+				this_ppu->data_latch = memory_read_byte(device->space(), this_ppu->videomem_addr);
 				// buffer the mirrored NT data
-				this_ppu->buffered_data = memory_read_byte(device->space[0], this_ppu->videomem_addr & 0x2fff);
+				this_ppu->buffered_data = memory_read_byte(device->space(), this_ppu->videomem_addr & 0x2fff);
 			}
 			else
 			{
 				this_ppu->data_latch = this_ppu->buffered_data;
-				this_ppu->buffered_data = memory_read_byte(device->space[0], this_ppu->videomem_addr);
+				this_ppu->buffered_data = memory_read_byte(device->space(), this_ppu->videomem_addr);
 			}
 
 			this_ppu->videomem_addr += this_ppu->add;
@@ -1213,12 +1213,12 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 				if (tempAddr < 0x2000)
 				{
 					/* store the data */
-					memory_write_byte(device->space[0], tempAddr, data);
+					memory_write_byte(device->space(), tempAddr, data);
 				}
 
 				else
 				{
-					memory_write_byte(device->space[0], tempAddr, data);
+					memory_write_byte(device->space(), tempAddr, data);
 				}
 				/* increment the address */
 				this_ppu->videomem_addr += this_ppu->add;

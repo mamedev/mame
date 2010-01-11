@@ -87,12 +87,12 @@
 #include "mconfig.h"
 #include "driver.h"
 
-// the running machine
-#include "mame.h"
-
 // machine-wide utilities
 #include "romload.h"
 #include "state.h"
+
+// the running machine
+#include "mame.h"
 
 // video-related
 #include "drawgfx.h"

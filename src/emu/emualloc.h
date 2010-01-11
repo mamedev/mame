@@ -64,11 +64,15 @@ private:
 public:
 	resource_pool_item(void *_ptr, size_t _size)
 		: next(NULL),
+		  ordered_next(NULL),
+		  ordered_prev(NULL),
 		  ptr(_ptr),
 		  size(_size) { }
 	virtual ~resource_pool_item() { }
 	
 	resource_pool_item *	next;
+	resource_pool_item *	ordered_next;
+	resource_pool_item *	ordered_prev;
 	void *					ptr;
 	size_t					size;
 };
@@ -138,8 +142,9 @@ public:
 private:
 	static const int		hash_prime = 193;
 	
-	resource_pool_item *	hash[hash_prime];
 	osd_lock *				listlock;
+	resource_pool_item *	hash[hash_prime];
+	resource_pool_item *	ordered_head;
 };
 
 
@@ -217,6 +222,16 @@ void *operator new(std::size_t size, const char *file, int line, const zeromem_t
 void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc);
 void operator delete(void *ptr, const char *file, int line, const zeromem_t &);
 void operator delete[](void *ptr, const char *file, int line, const zeromem_t &);
+
+
+
+/***************************************************************************
+    ADDITIONAL MACROS
+***************************************************************************/
+
+// disable direct deletion
+#define delete			__error_use_pool_free_mechanisms__
+
 
 
 #endif	/* __EMUALLOC_H__ */

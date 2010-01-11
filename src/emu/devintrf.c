@@ -174,7 +174,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	device->tokenbytes = 0;
 	device->region = NULL;
 	device->regionbytes = 0;
-	memset((void *)device->space, 0, sizeof(device->space));
+	memset((void *)device->addrspace, 0, sizeof(device->addrspace));
 	device->execute = NULL;
 
 	/* append the tag */
@@ -636,7 +636,7 @@ void device_list_start(running_machine *machine)
 		device->region = memory_region(machine, device->tag);
 		device->regionbytes = memory_region_length(machine, device->tag);
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			device->space[spacenum] = memory_find_address_space(device, spacenum);
+			device->addrspace[spacenum] = memory_find_address_space(device, spacenum);
 		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
 	}
 

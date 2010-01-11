@@ -729,22 +729,22 @@ static void mapper9_latch( const device_config *ppu, offs_t offset )
 	if((offset & 0x1ff0) == 0x0fd0 && MMC2_bank_latch[0] != 0xfd)
 	{
 		MMC2_bank_latch[0] = 0xfd;
-		pc10_set_videorom_bank(ppu->space[0]->machine, 0, 4, MMC2_bank[0], 4);
+		pc10_set_videorom_bank(ppu->machine, 0, 4, MMC2_bank[0], 4);
 	}
 	else if((offset & 0x1ff0) == 0x0fe0 && MMC2_bank_latch[0] != 0xfe)
 	{
 		MMC2_bank_latch[0] = 0xfe;
-		pc10_set_videorom_bank(ppu->space[0]->machine, 0, 4, MMC2_bank[1], 4);
+		pc10_set_videorom_bank(ppu->machine, 0, 4, MMC2_bank[1], 4);
 	}
 	else if((offset & 0x1ff0) == 0x1fd0 && MMC2_bank_latch[1] != 0xfd)
 	{
 		MMC2_bank_latch[1] = 0xfd;
-		pc10_set_videorom_bank(ppu->space[0]->machine, 4, 4, MMC2_bank[2], 4);
+		pc10_set_videorom_bank(ppu->machine, 4, 4, MMC2_bank[2], 4);
 	}
 	else if((offset & 0x1ff0) == 0x1fe0 && MMC2_bank_latch[1] != 0xfe)
 	{
 		MMC2_bank_latch[1] = 0xfe;
-		pc10_set_videorom_bank(ppu->space[0]->machine, 4, 4, MMC2_bank[3], 4);
+		pc10_set_videorom_bank(ppu->machine, 4, 4, MMC2_bank[3], 4);
 	}
 }
 
