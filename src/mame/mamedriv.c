@@ -241,7 +241,7 @@ const game_driver * const drivers[] =
 	DRIVER( chewing )	/* ?? unknown */
 	DRIVER( catacomb )	/* 1982 MTM Games */
 	DRIVER( ckongg )	/* 1981 bootleg */
-	DRIVER( kkgalax )	/* 1981 bootleg */
+	DRIVER( ckongmc )	/* 1981 bootleg */
 	DRIVER( porter )	/* 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom) */
 	DRIVER( vstars )	/* 19?? Competitive Video? */
 	DRIVER( tdpgal )	/* 1983 Design Labs / Thomas Automatics */

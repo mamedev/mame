@@ -833,7 +833,8 @@ static ADDRESS_MAP_START( ckongg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcc00, 0xcc00) AM_READ(watchdog_reset_r) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kkgalax_map, ADDRESS_SPACE_PROGRAM, 8 )
+/* Memory map based on mooncrst_map according to Z80 code - seems to be good but needs further checking */
+static ADDRESS_MAP_START( ckongmc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(&galaxold_videoram)
@@ -842,21 +843,21 @@ static ADDRESS_MAP_START( kkgalax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(galaxold_leds_w)                                              /* GUESS */
+//  AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxold_coin_lockout_w)                                      /* not written */
+//  AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)                                      /* not written */
+	AM_RANGE(0xa004, 0xa007) AM_DEVWRITE(GAL_AUDIO, galaxian_lfo_freq_w)                            /* GUESS */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
+	AM_RANGE(0xa800, 0xa802) AM_DEVWRITE(GAL_AUDIO, galaxian_background_enable_w)                   /* GUESS */
+	AM_RANGE(0xa803, 0xa803) AM_DEVWRITE(GAL_AUDIO, galaxian_noise_enable_w)                        /* GUESS */
+	AM_RANGE(0xa805, 0xa805) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)                        /* GUESS */
+	AM_RANGE(0xa806, 0xa807) AM_DEVWRITE(GAL_AUDIO, galaxian_vol_w)                                 /* GUESS */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
-//  AM_RANGE(0xc000, 0xc001) AM_WRITE(galaxold_leds_w)
-//  AM_RANGE(0xc002, 0xc002) AM_WRITE(galaxold_coin_lockout_w)
-//  AM_RANGE(0xc003, 0xc003) AM_WRITE(galaxold_coin_counter_w)
-//  AM_RANGE(0xc004, 0xc007) AM_WRITE(galaxian_lfo_freq_w)
-//  AM_RANGE(0xc400, 0xc402) AM_WRITE(galaxian_background_enable_w)
-//  AM_RANGE(0xc403, 0xc403) AM_WRITE(galaxian_noise_enable_w)
-//  AM_RANGE(0xc405, 0xc405) AM_WRITE(galaxian)
-//  AM_RANGE(0xc406, 0xc407) AM_WRITE(galaxian_vol_w)
-//  AM_RANGE(0xc804, 0xc804) AM_WRITENOP // link cut
-//  AM_RANGE(0xc806, 0xc806) AM_WRITE(galaxold_flip_screen_x_w)
-//  AM_RANGE(0xc807, 0xc807) AM_WRITE(galaxold_flip_screen_y_w)
-//  AM_RANGE(0xcc00, 0xcc00) AM_READWRITE(watchdog_reset_r, galaxian_pitch_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITENOP                                                            /* AM_WRITE(galaxold_stars_enable_w) */
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)                                     /* GUESS */
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)                                     /* GUESS */
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)     /* GUESS */
 ADDRESS_MAP_END
 
 static READ8_HANDLER( hexpoola_data_port_r )
@@ -1833,92 +1834,117 @@ static INPUT_PORTS_START( trvchlng )
 INPUT_PORTS_END
 
 
-/* ckongg coinage DIPs are spread accross two input ports */
+/* Coinage Dips are spread accross two input ports */
 static CUSTOM_INPUT( ckongg_coinage_r )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine, "FAKE") & bit_mask) ? 0x01 : 0x00;
+
+	switch (bit_mask)
+	{
+		case 0x0c:  /* ckongg  : DSW (0xc800) bits 2 and 3 */
+			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 2);
+		case 0x40:  /* ckongg  : IN1 (0xc400) bit 6 */
+			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 6);
+
+		case 0xc0:  /* ckongmc : IN1 (0xa800) bits 6 and 7 */
+			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 6);
+		case 0x01:  /* ckongmc : DSW (0xb000) bit 0 */
+			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 0);
+
+		default:
+			logerror("ckongg_bonus_r : invalid %02X bit_mask\n",bit_mask);
+			return 0;
+	}
 }
 
+/* verified from Z80 code */
 static INPUT_PORTS_START( ckongg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("DSW0", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )
-	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_CONDITION("DSW0", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0x40)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Players ) )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "500000" )
-	PORT_DIPSETTING(    0x00, "750000" )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0x0c)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("COINAGE")
+	PORT_DIPNAME( 0x4c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x4c, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x44, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x48, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-/* not correct */
-static INPUT_PORTS_START( kkgalax )
+/* verified from Z80 code */
+static INPUT_PORTS_START( ckongmc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // button 1 and start 1
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL // button 1 and start 2?
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) /* also START1 : code at 0x5064 for BUTTON1 and 0x514d for START1 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0x01)
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0xc0)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0x02)
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "500000" )
-	PORT_DIPSETTING(    0x00, "750000" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0x01)
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("FAKE")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_START("COINAGE")
+	PORT_DIPNAME( 0xc1, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xc1, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x41, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x81, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( porter )
@@ -2418,12 +2444,12 @@ static MACHINE_DRIVER_START( ckongg )
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( kkgalax )
+static MACHINE_DRIVER_START( ckongmc )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kkgalax_map)
+	MDRV_CPU_PROGRAM_MAP(ckongmc_map)
 
 	MDRV_GFXDECODE(gmgalax)
 
@@ -2961,7 +2987,7 @@ ROM_START( ckongg )
 	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
 ROM_END
 
-ROM_START( kkgalax )
+ROM_START( ckongmc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kc1.bin",       0x0000, 0x0800, CRC(a87fc828) SHA1(f66b72427d8cdfabdf2274e22bdb10018ac7d2f9) )
 	ROM_CONTINUE( 0x2000, 0x0800)
@@ -3097,7 +3123,7 @@ GAME( 1986, racknrol, 0,        racknrol, racknrol, 0,	      ROT0,   "Status (Sh
 GAME( 1986, hexpool,  racknrol, racknrol, racknrol, 0,	      ROT90,  "Shinkai", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE )
 GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, 0,	      ROT90,  "Senko", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
 GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (Senko License)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongg,   0,        ckongg,   ckongg,   0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, kkgalax,  ckongg,   kkgalax,  kkgalax,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+GAME( 1981, ckongg,   0,        ckongg,   ckongg,   0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, ckongmc,  ckongg,   ckongmc,  ckongmc,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
 GAME( 1982, porter,   0,        mooncrst, porter,   0,        ROT90,  "[Nova Games Ltd.] (bootleg)", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS ) // missing GFX bank switch!
 GAME( 1982, vstars,   0,        mooncrst, porter,   0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
