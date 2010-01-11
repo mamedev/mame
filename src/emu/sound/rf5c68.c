@@ -32,6 +32,8 @@ struct _rf5c68_state
 	UINT8				wbank;
 	UINT8				enable;
 	UINT8				data[0x10000];
+	void				(*sample_callback)(const device_config* device,int channel);
+	const device_config* device;
 };
 
 
@@ -90,6 +92,10 @@ static STREAM_UPDATE( rf5c68_update )
 					/* if we loop to a loop point, we're effectively dead */
 					if (sample == 0xff)
 						break;
+
+					/* trigger sample callback */
+					if(chip->sample_callback)
+						chip->sample_callback(chip->device,i);
 				}
 				chan->addr += chan->step;
 
@@ -133,11 +139,21 @@ static STREAM_UPDATE( rf5c68_update )
 
 static DEVICE_START( rf5c68 )
 {
+	const rf5c68_interface* intf = (const rf5c68_interface*)device->static_config;
+
 	/* allocate memory for the chip */
 	rf5c68_state *chip = get_safe_token(device);
 
 	/* allocate the stream */
 	chip->stream = stream_create(device, 0, 2, device->clock / 384, chip, rf5c68_update);
+
+	chip->device = device;
+
+	/* set up callback */
+	if(intf != NULL)
+		chip->sample_callback = intf->sample_end_callback;
+	else
+		chip->sample_callback = NULL;
 }
 
 
