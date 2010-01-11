@@ -1132,6 +1132,7 @@ INLINE UINT8 Read##N##_8(t90_Regs *cpustate)	{ \
 INLINE UINT16 Read##N##_16(t90_Regs *cpustate)	{ \
 	switch ( cpustate->mode##N )	{ \
 		case MODE_I16:		return cpustate->r##N; \
+		case MODE_D16:		return cpustate->r##N - 1; \
 		case MODE_R16:		return r16(cpustate, cpustate->r##N); \
 		case MODE_R16D8:	return r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b; \
 		case MODE_R16R8:	return r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b); \
