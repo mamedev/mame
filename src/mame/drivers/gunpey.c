@@ -50,12 +50,11 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
-static UINT8 *blit_buffer;
-
+static UINT16 *blit_buffer;
 
 static VIDEO_START( gunpey )
 {
-	blit_buffer = auto_alloc_array(machine, UINT8, 512*512);
+	blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
 }
 
 static VIDEO_UPDATE( gunpey )
@@ -70,10 +69,16 @@ static VIDEO_UPDATE( gunpey )
 		for(x=0;x<512;x++)
 		{
 			UINT32 color;
-			color = (blit_buffer[count] & 0xff);
+			int r,g,b;
+			color = (blit_buffer[count] & 0xffff);
+
+			b = (color & 0x001f) << 3;
+			g = (color & 0x03e0) >> 2;
+			r = (color & 0x7c00) >> 7;
 
 			if(x<video_screen_get_visible_area(screen)->max_x && y<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
+
 
 			count++;
 		}
@@ -124,21 +129,28 @@ static WRITE8_HANDLER( gunpey_blitter_w )
 		int dsty = blit_ram[0x0a]+((blit_ram[0x0b] & 0x01) <<8);
 		int xsize = blit_ram[0x0c]+1;
 		int ysize = blit_ram[0x0e]+1;
+		int color,color_offs;
 
 		if(blit_ram[0x01] == 8) //1bpp?
 		{
 			// ...
 		}
-		else
+		else //4bpp
 		{
 			for(y=0;y<ysize;y++)
 			{
-				for(x=0;x<xsize;x++)
+				for(x=0;x<xsize;x+=2)
 				{
 					UINT32 src_index = ((srcy+y)*2048+(srcx+x)) & 0x3fffff;
 					UINT32 dst_index = ((dsty+y)*512+(dstx+x)) & 0x3ffff;
 
-					blit_buffer[dst_index] = blit_rom[src_index];
+					color_offs = ((blit_rom[src_index] & 0xf0)>>4) + 0x10;
+					color = (blit_rom[color_offs*2+0x3B1DFD]) | (blit_rom[color_offs*2+0x3B1DFD+1]<<8);
+					blit_buffer[dst_index+1] = color;
+
+					color_offs = ((blit_rom[src_index] & 0xf)>>0) + 0x10;
+					color = (blit_rom[color_offs*2+0x3B1DFD]) | (blit_rom[color_offs*2+0x3B1DFD+1]<<8);
+					blit_buffer[dst_index] = color;
 				}
 			}
 		}
