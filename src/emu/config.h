@@ -24,6 +24,8 @@
  *
  *************************************/
 
+#define CONFIG_VERSION			10
+
 enum
 {
 	CONFIG_TYPE_INIT = 0,					/* opportunity to initialize things first */
