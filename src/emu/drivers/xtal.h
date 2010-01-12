@@ -72,6 +72,7 @@ enum
 	XTAL_8MHz   		= 8000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_8_4672MHz		= 8467200,		/* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
+	XTAL_8_867238MHz	= 8867238,		/* ETI-660 */
 	XTAL_8_945MHz		= 8945000,		/* Hit Me */
 	XTAL_9_828MHz		= 9828000,		/* Universal PCBs */
 	XTAL_9_8304MHz		= 9830400,		/* Epson PX-8 */
