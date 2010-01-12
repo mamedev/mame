@@ -1797,8 +1797,10 @@ static CPU_INIT( se3208 )
 
 static CPU_EXIT( se3208 )
 {
-	if(OpTable)
+	if(OpTable) {
 		global_free(OpTable);
+		OpTable = NULL;
+	}
 }
 
 
