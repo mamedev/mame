@@ -286,6 +286,21 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 			for (j = 0; j < samples; j++)
 			{
+				if(slot->stepptr >= slot->endaddr)
+				{
+					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
+					// If the step is bigger than the loop, finish the sample forcibly
+					if(slot->stepptr >= slot->endaddr)
+					{
+						slot->env_vol = 256U<<23;
+						slot->env_vol_step = 0;
+						slot->env_vol_lim = 0;
+						slot->active = 0;
+						slot->stepptr = 0;
+						slot->step = 0;
+					}
+				}
+
 				switch (slot->bits)
 				{
 					case 8: 	// 8 bit
@@ -310,20 +325,6 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 				// update frequency
 				slot->stepptr += slot->step;
-				if(slot->stepptr >= slot->endaddr)
-				{
-					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
-					// If the step is bigger than the loop, finish the sample forcibly
-					if(slot->stepptr >= slot->endaddr)
-					{
-						slot->env_vol = 256U<<23;
-						slot->env_vol_step = 0;
-						slot->env_vol_lim = 0;
-						slot->active = 0;
-						slot->stepptr = 0;
-						slot->step = 0;
-					}
-				}
 
 				// update envelope
 				slot->env_vol += slot->env_vol_step;

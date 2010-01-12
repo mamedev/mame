@@ -844,11 +844,8 @@ ROM_START( s1945ii )
 	ROM_LOAD32_WORD( "3l.u1",    0x1800000, 0x400000, CRC(a6c3704e) SHA1(cb9881e4235cc8e4bcca4c6ccbd8d8d8634e3624) )
 	ROM_LOAD32_WORD( "3h.u19",   0x1800002, 0x400000, CRC(4cd3ca70) SHA1(5b0a6ea4fe0e821cebe6e840596f648e24dded51) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(ba680ca7) SHA1(b645896e297aad426784aa656bff738e1b33c2a2) )
-	ROM_RELOAD ( 0x400000, 0x400000 )
-	/* 0x400000 - 0x7fffff allocated but left blank, it randomly reads from here on the
-        Iron Casket level causing a crash otherwise, not sure why, bug in the sound emulation? */
 
 	ROM_REGION( 0x100, "eeprom", 0 )
 	ROM_LOAD( "eeprom-s1945ii.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
@@ -949,9 +946,8 @@ ROM_START( s1945iii )
 	ROM_LOAD32_WORD( "3l.u6",  0x3000000, 0x400000, CRC(f693438c) SHA1(d70e25a3f56aae6575c696d9b7b6d7a9d04f0104) )
 	ROM_LOAD32_WORD( "3h.u13", 0x3000002, 0x400000, CRC(2d0c334f) SHA1(74d94abb34484c7b79dbb989645f53124e53e3b7) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "sound.u9", 0x000000, 0x400000, CRC(c5374beb) SHA1(d13e12cbd249246d953c45bb3bfa576a0ec75595) )
-	ROM_RELOAD ( 0x400000, 0x400000 )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
 	ROM_LOAD( "eeprom-s1945iii.bin", 0x0000, 0x0100, CRC(b39f3604) SHA1(d7c66210598096fcafb20adac2f0b293755f4926) )
@@ -986,7 +982,7 @@ ROM_START( dragnblz )
 	ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) )
 	ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7fd1b225) SHA1(6aa61021ada51393bbb34fd1aea00b8feccc8197) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
@@ -1030,7 +1026,7 @@ ROM_START( gnbarich )
 //  ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) ) /* From Dragon Blaze */
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x2a00000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7b10436b) SHA1(c731fcce024e286a677ca10a91761c1ee06094a5) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
