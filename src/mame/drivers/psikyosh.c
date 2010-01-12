@@ -1026,7 +1026,7 @@ ROM_START( gnbarich )
 //  ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) ) /* From Dragon Blaze */
 
-	ROM_REGION( 0x2a00000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7b10436b) SHA1(c731fcce024e286a677ca10a91761c1ee06094a5) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
