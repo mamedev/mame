@@ -179,8 +179,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "sound/8950intf.h"
 
 static tilemap_t *tx_tilemap;
-static UINT16 *tx_vram;
-static UINT16 *shared_ram;
+static UINT16 *tx_vram,*bg_vram,*fg_vram;
 static UINT16 *io_ram;
 
 #define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
@@ -198,11 +197,54 @@ static TILE_GET_INFO( get_tx_tile_info )
 static VIDEO_START( cybertnk )
 {
 	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
+	tilemap_set_transparent_pen(tx_tilemap,0);
 }
 
 static VIDEO_UPDATE( cybertnk )
 {
+	{
+		int count,x,y;
+		const gfx_element *gfx = screen->machine->gfx[2];
+
+		count = 0;
+
+		for (y=0;y<64;y++)
+		{
+			for (x=0;x<128;x++)
+			{
+				UINT16 tile = bg_vram[count] & 0x1fff;
+
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y*8));
+
+				count++;
+
+			}
+		}
+	}
+
+	{
+		int count,x,y;
+		const gfx_element *gfx = screen->machine->gfx[1];
+
+		count = 0;
+
+		for (y=0;y<64;y++)
+		{
+			for (x=0;x<128;x++)
+			{
+				UINT16 tile = fg_vram[count] & 0x1fff;
+
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y*8),0);
+
+				count++;
+
+			}
+		}
+	}
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+
+
+
 
 if(0) //sprite gfx debug viewer
 {
@@ -299,16 +341,6 @@ static WRITE16_HANDLER( tx_vram_w )
 {
 	COMBINE_DATA(&tx_vram[offset]);
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
-}
-
-static WRITE16_HANDLER( share_w )
-{
-	COMBINE_DATA(&shared_ram[offset]);
-}
-
-static READ16_HANDLER( share_r )
-{
-	return shared_ram[offset];
 }
 
 static READ16_HANDLER( io_r )
@@ -451,10 +483,11 @@ static READ8_HANDLER( soundport_r )
 static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM //VDP-style
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
-	AM_RANGE(0x0c4000, 0x0cffff) AM_RAM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(share_r, share_w) AM_BASE(&shared_ram)
+	AM_RANGE(0x0c4000, 0x0c7fff) AM_RAM AM_BASE(&bg_vram)
+	AM_RANGE(0x0c8000, 0x0cbfff) AM_RAM AM_BASE(&fg_vram)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE(&io_ram)
 ADDRESS_MAP_END
@@ -463,7 +496,7 @@ static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(share_r, share_w)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140002, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
@@ -598,23 +631,10 @@ static const gfx_layout tile_8x8x4 =
     8*8
 };
 
-static const gfx_layout tile_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,4),
-    4,
-    { RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4) },
-    { STEP16(0,1) },
-    { STEP16(0,16) },
-    32*8
-};
-
 static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/
 	GFXDECODE_ENTRY( "gfx2", 0, tile_8x8x4,     0,      0x400 )
-	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16x4,   0,      0x400 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_8x8x4,     0,      0x400 )
-	GFXDECODE_ENTRY( "gfx3", 0, tile_16x16x4,   0,      0x400 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( master_irq )
