@@ -2655,8 +2655,8 @@ static const k054539_interface k054539_config =
 
 static MACHINE_START( prmrsocr )
 {
+	MACHINE_START_CALL(common);
 	UINT8 *ROM = memory_region(machine, "audiocpu");
-
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
