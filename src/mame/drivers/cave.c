@@ -3916,7 +3916,11 @@ static void init_cave(running_machine *machine)
 static DRIVER_INIT( agallet )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
 	init_cave(machine);
+
+	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank1", 2, 0x1e, &ROM[0x10000], 0x4000);
 
 	sailormn_unpack_tiles(machine, "gfx4");
 
