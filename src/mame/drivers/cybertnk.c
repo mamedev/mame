@@ -184,7 +184,6 @@ static UINT16 *shared_ram;
 static UINT16 *io_ram;
 
 #define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
-#define IGNORE_MISSING_ROM 1
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
@@ -293,15 +292,7 @@ if(0) //sprite gfx debug viewer
 
 static DRIVER_INIT( cybertnk )
 {
-#ifdef IGNORE_MISSING_ROM
-	UINT16 *ROM = (UINT16*)memory_region(machine, "maincpu");
 
-	/* nop the rom checksum branch */
-	ROM[0x1546/2] = 0x4e71;
-	ROM[0x1548/2] = 0x4e71;
-	ROM[0x154a/2] = 0x4e71;
-	ROM[0x154c/2] = 0x4e71;
-#endif
 }
 
 static WRITE16_HANDLER( tx_vram_w )
@@ -698,8 +689,8 @@ MACHINE_DRIVER_END
 
 ROM_START( cybertnk )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p1a",   0x00000, 0x20000, BAD_DUMP CRC(de7ff83a) SHA1(64a34443b532db24ec2c86f0e288eaf12a2212af) )
-	ROM_LOAD16_BYTE( "p2a",   0x00001, 0x20000, BAD_DUMP CRC(9b6afa26) SHA1(387a6eb6e5da9752869fcc6433cc7516a28d6d30) )
+	ROM_LOAD16_BYTE( "p1a.37",   0x00000, 0x20000, CRC(be1abd16) SHA1(6ad01516301b44899971000c36f7e21070c3d2da) )
+	ROM_LOAD16_BYTE( "p2a.36",   0x00001, 0x20000, CRC(5290c89a) SHA1(5a11671505214c20770e2938dab1ee82a030b457) )
 
 	ROM_REGION( 0x20000, "slave", 0 )
 	ROM_LOAD16_BYTE( "subl",   0x00000, 0x10000, CRC(3814a2eb) SHA1(252800b21f5cfada34ef5208cda33088daab132b) )
