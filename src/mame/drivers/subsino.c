@@ -198,6 +198,12 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
+/*
+Victor 21 protection is absolutely trivial. At every number of presetted hands, there's an animation
+that announces to the player that the card deck changes. If the protection check fails (at start-up),
+this event makes the game to reset without any money in the bank.
+*/
+
 static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
@@ -212,7 +218,7 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
 //  AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
 
-//  AM_RANGE( 0x0900b, 0x0900b ) //"flash" status, bit 0
+	AM_RANGE( 0x0900b, 0x0900b ) AM_RAM //protection
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
@@ -225,7 +231,7 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
 
-	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
+	AM_RANGE( 0x00000, 0x08fff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -285,6 +291,7 @@ static WRITE8_HANDLER( flash_w )
 static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_IMPORT_FROM( victor21_map )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE( flash_r, flash_w )
+	AM_RANGE( 0x0900b, 0x0900b ) AM_READNOP //"flash" status, bit 0
 ADDRESS_MAP_END
 
 
