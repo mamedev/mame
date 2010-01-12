@@ -886,9 +886,9 @@ static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask,
 
 	/* find address spaces */
 
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* set output pin masks */
 

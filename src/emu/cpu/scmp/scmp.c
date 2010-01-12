@@ -537,7 +537,7 @@ static CPU_INIT( scmp )
 
 	cpustate->device = device;
 
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* resolve callbacks */
 	devcb_resolve_write8(&cpustate->flag_out_func, &cpustate->config.flag_out_func, device);

@@ -695,7 +695,7 @@ static void rspcom_init(rsp_state *rsp, const device_config *device, cpu_irq_cal
 	rsp->config = (const rsp_config *)device->static_config;
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
-	rsp->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	rsp->program = device->space(AS_PROGRAM);
 
 #if 1
     // Inaccurate.  RSP registers power on to a random state...

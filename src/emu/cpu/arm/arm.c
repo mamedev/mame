@@ -316,7 +316,7 @@ static CPU_RESET( arm )
 	memset(cpustate, 0, sizeof(ARM_REGS));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
@@ -501,7 +501,7 @@ static CPU_INIT( arm )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
 	state_save_register_device_item_array(device, 0, cpustate->coproRegister);

@@ -116,7 +116,7 @@ static CPU_INIT( saturn )
 	cpustate->config = (saturn_cpu_core *) device->static_config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0,cpustate->reg[R0]);
 	state_save_register_device_item_array(device, 0,cpustate->reg[R1]);

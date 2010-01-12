@@ -1797,7 +1797,7 @@ static device_field_info *init_field_device_info(const input_field_config *field
 		info->shift++;
 
 	if (device_name != NULL)
-		info->device = devtag_get_device(field->port->machine, device_name);
+		info->device = field->port->machine->device(device_name);
 	else
 		info->device = (const device_config *) info;
 

@@ -163,8 +163,8 @@ static CPU_INIT( h6280 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_RESET( h6280 )
@@ -179,8 +179,8 @@ static CPU_RESET( h6280 )
 	memset(cpustate, 0, sizeof(h6280_Regs));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set I and B flags */
 	P = _fI | _fB;

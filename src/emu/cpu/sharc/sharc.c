@@ -427,8 +427,8 @@ static CPU_INIT( sharc )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
 
 	build_opcode_table();
 

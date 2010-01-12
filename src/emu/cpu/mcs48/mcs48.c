@@ -910,9 +910,9 @@ static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback
 	cpustate->int_rom_size = romsize;
 	cpustate->feature_mask = feature_mask;
 
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* set up the state table */
 	cpustate->state = state_table_template;

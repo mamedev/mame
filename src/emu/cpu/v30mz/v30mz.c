@@ -132,8 +132,8 @@ static CPU_RESET( nec )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sregs[CS] = 0xffff;
 
@@ -948,8 +948,8 @@ static void nec_init(const device_config *device, cpu_irq_callback irqcallback, 
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_INIT( v30mz ) { nec_init(device, irqcallback, 3); }

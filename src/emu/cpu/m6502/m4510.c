@@ -207,7 +207,7 @@ static CPU_INIT( m4510 )
 	cpustate->port_write = NULL;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->space = device->space(AS_PROGRAM);
 
 	if ( intf )
 	{

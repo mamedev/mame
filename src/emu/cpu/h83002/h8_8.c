@@ -237,8 +237,8 @@ static CPU_INIT(h8bit)
 
 	h8->mode_8bit = 1;
 
-	h8->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	h8->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	h8->program = device->space(AS_PROGRAM);
+	h8->io = device->space(AS_IO);
 
 	h8->timer[0] = timer_alloc(h8->device->machine, h8_timer_0_cb, h8);
 	h8->timer[1] = timer_alloc(h8->device->machine, h8_timer_1_cb, h8);

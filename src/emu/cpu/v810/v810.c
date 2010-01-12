@@ -1003,8 +1003,8 @@ static CPU_INIT( v810 )
 	cpustate->nmi_line = CLEAR_LINE;
 	cpustate->irq_cb = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0, cpustate->reg);
 	state_save_register_device_item(device, 0, cpustate->irq_line);

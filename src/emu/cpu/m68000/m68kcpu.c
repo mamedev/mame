@@ -697,7 +697,7 @@ static CPU_INIT( m68k )
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	m68k->device = device;
-	m68k->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->program = device->space(AS_PROGRAM);
 	m68k->int_ack_callback = irqcallback;
 
 	/* The first call to this function initializes the opcode handler jump table */

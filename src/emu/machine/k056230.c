@@ -123,7 +123,7 @@ static DEVICE_START( k056230 )
 	k056230_state *k056230 = k056230_get_safe_token(device);
 	const k056230_interface *intf = k056230_get_interface(device);
 
-	k056230->cpu = devtag_get_device(device->machine, intf->cpu);
+	k056230->cpu = device->machine->device(intf->cpu);
 	k056230->is_thunderh = intf->is_thunderh;
 
 	k056230->ram = auto_alloc_array(device->machine, UINT32, 0x2000);

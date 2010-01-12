@@ -138,7 +138,7 @@ static void tx0_init_common(const device_config *device, cpu_irq_callback irqcal
 	cpustate->ir_mask = is_64kw ? 03 : 037;
 
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_INIT( tx0_64kw )

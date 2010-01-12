@@ -137,19 +137,18 @@ struct _cpu_class_header
 #define INTERRUPT_GEN(func)		void func(const device_config *device)
 
 /* helpers for using machine/cputag instead of cpu objects */
-#define cputag_get_index(mach, tag)										cpu_get_index(devtag_get_device(mach, tag))
-#define cputag_get_address_space(mach, tag, space)						cpu_get_address_space(devtag_get_device(mach, tag), space)
-#define cputag_suspend(mach, tag, reason, eat)							cpu_suspend(devtag_get_device(mach, tag), reason, eat)
-#define cputag_resume(mach, tag, reason)								cpu_resume(devtag_get_device(mach, tag), reason)
-#define cputag_is_suspended(mach, tag, reason)							cpu_is_suspended(devtag_get_device(mach, tag), reason)
-#define cputag_get_clock(mach, tag)										cpu_get_clock(devtag_get_device(mach, tag))
-#define cputag_set_clock(mach, tag, clock)								cpu_set_clock(devtag_get_device(mach, tag), clock)
-#define cputag_clocks_to_attotime(mach, tag, clocks)					cpu_clocks_to_attotime(devtag_get_device(mach, tag), clocks)
-#define cputag_attotime_to_clocks(mach, tag, duration)					cpu_attotime_to_clocks(devtag_get_device(mach, tag), duration)
-#define cputag_get_local_time(mach, tag)								cpu_get_local_time(devtag_get_device(mach, tag))
-#define cputag_get_total_cycles(mach, tag)								cpu_get_total_cycles(devtag_get_device(mach, tag))
-#define cputag_set_input_line(mach, tag, line, state)					cpu_set_input_line(devtag_get_device(mach, tag), line, state)
-#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	cpu_set_input_line_and_vector(devtag_get_device(mach, tag), line, state, vec)
+#define cputag_get_address_space(mach, tag, spc)						(mach)->device(tag)->space(spc)
+#define cputag_suspend(mach, tag, reason, eat)							cpu_suspend((mach)->device(tag), reason, eat)
+#define cputag_resume(mach, tag, reason)								cpu_resume((mach)->device(tag), reason)
+#define cputag_is_suspended(mach, tag, reason)							cpu_is_suspended((mach)->device(tag), reason)
+#define cputag_get_clock(mach, tag)										cpu_get_clock((mach)->device(tag))
+#define cputag_set_clock(mach, tag, clock)								cpu_set_clock((mach)->device(tag), clock)
+#define cputag_clocks_to_attotime(mach, tag, clocks)					cpu_clocks_to_attotime((mach)->device(tag), clocks)
+#define cputag_attotime_to_clocks(mach, tag, duration)					cpu_attotime_to_clocks((mach)->device(tag), duration)
+#define cputag_get_local_time(mach, tag)								cpu_get_local_time((mach)->device(tag))
+#define cputag_get_total_cycles(mach, tag)								cpu_get_total_cycles((mach)->device(tag))
+#define cputag_set_input_line(mach, tag, line, state)					cpu_set_input_line((mach)->device(tag), line, state)
+#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	cpu_set_input_line_and_vector((mach)->device(tag), line, state, vec)
 
 
 

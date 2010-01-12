@@ -1343,8 +1343,8 @@ static CPU_INIT(tms57002)
 	tms57002_t *s = get_safe_token(device);
 	tms57002_cache_flush(s);
 	s->sti = S_IDLE;
-	s->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	s->data    = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	s->program = device->space(AS_PROGRAM);
+	s->data    = device->space(AS_DATA);
 }
 
 

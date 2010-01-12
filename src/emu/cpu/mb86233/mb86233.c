@@ -113,7 +113,7 @@ static CPU_INIT( mb86233 )
 
 	memset(cpustate, 0, sizeof( *cpustate ) );
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	if ( _config )
 	{

@@ -342,8 +342,8 @@ static CPU_INIT( v60 )
 	cpustate->PIR = 0x00006000;
 	cpustate->info = v60_i;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_INIT( v70 )
@@ -356,8 +356,8 @@ static CPU_INIT( v70 )
 	cpustate->PIR = 0x00007000;
 	cpustate->info = v70_i;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_RESET( v60 )

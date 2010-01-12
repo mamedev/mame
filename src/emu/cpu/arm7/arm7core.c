@@ -552,7 +552,7 @@ static void arm7_core_reset(const device_config *device)
     memset(cpustate, 0, sizeof(arm_state));
     cpustate->irq_callback = save_irqcallback;
     cpustate->device = device;
-    cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+    cpustate->program = device->space(AS_PROGRAM);
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(cpustate, eARM7_MODE_SVC);

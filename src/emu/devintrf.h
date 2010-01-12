@@ -188,14 +188,14 @@ enum
 
 
 /* shorthand for accessing devices by machine/type/tag */
-#define devtag_get_device(mach,tag)							device_list_find_by_tag(&(mach)->config->devicelist, tag)
+#define devtag_get_device(mach,tag)							(mach)->device(tag)
 
-#define devtag_reset(mach,tag)								device_reset(devtag_get_device(mach, tag))
+#define devtag_reset(mach,tag)								device_reset((mach)->device(tag))
 
-#define devtag_get_info_int(mach,tag,state)					device_get_info_int(devtag_get_device(mach, tag), state)
-#define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr(devtag_get_device(mach, tag), state)
-#define devtag_get_info_fct(mach,tag,state)					device_get_info_fct(devtag_get_device(mach, tag), state)
-#define devtag_get_info_string(mach,tag,state)				device_get_info_string(devtag_get_device(mach, tag), state)
+#define devtag_get_info_int(mach,tag,state)					device_get_info_int((mach)->device(tag), state)
+#define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr((mach)->device(tag), state)
+#define devtag_get_info_fct(mach,tag,state)					device_get_info_fct((mach)->device(tag), state)
+#define devtag_get_info_string(mach,tag,state)				device_get_info_string((mach)->device(tag), state)
 
 
 /* shorthand for getting standard data about device types */
@@ -497,7 +497,7 @@ INLINE const device_config *device_list_find_by_tag(const device_list *devlist, 
 
 inline const address_space *device_config::space(int index) const
 {
-	return (token != NULL) ? addrspace[index] : memory_find_address_space(this, index);
+	return (addrspace[index] != NULL) ? addrspace[index] : memory_find_address_space(this, index);
 }
 
 inline const address_space *device_config::space(device_space index) const

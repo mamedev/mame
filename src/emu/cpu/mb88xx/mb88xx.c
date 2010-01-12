@@ -145,9 +145,9 @@ static CPU_INIT( mb88 )
 
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->serial = timer_alloc(device->machine, serial_timer, (void *)device);
 

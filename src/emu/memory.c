@@ -1988,7 +1988,7 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 			break;
 
 		case AMH_DEVICE_HANDLER:
-			device = devtag_get_device(space->machine, handler->tag);
+			device = space->machine->device(handler->tag);
 			if (device == NULL)
 				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", handler->tag, space->name, (space->cpu != NULL) ? space->cpu->tag.cstr() : "??");
 			switch ((handler->bits != 0) ? handler->bits : space->dbits)

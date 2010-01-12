@@ -435,10 +435,10 @@ static DEVICE_START( cdp1864 )
 	devcb_resolve_write_line(&cdp1864->out_efx_func, &intf->out_efx_func, device);
 
 	/* get the cpu */
-	cdp1864->cpu = devtag_get_device(device->machine, intf->cpu_tag);
+	cdp1864->cpu = device->machine->device(intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1864->screen = devtag_get_device(device->machine, intf->screen_tag);
+	cdp1864->screen = device->machine->device(intf->screen_tag);
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */

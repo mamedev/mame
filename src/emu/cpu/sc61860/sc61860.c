@@ -107,7 +107,7 @@ static CPU_INIT( sc61860 )
 	cpustate->config = (sc61860_cpu_core *) device->static_config;
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_EXECUTE( sc61860 )

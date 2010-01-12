@@ -334,7 +334,7 @@ static CPU_INIT( g65816 )
 
 	g65816_set_irq_callback(cpustate, irqcallback);
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, cpustate->a);
 	state_save_register_device_item(device, 0, cpustate->b);

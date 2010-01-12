@@ -1552,8 +1552,8 @@ static CPU_RESET( f8 )
 	memset(cpustate, 0, sizeof(f8_Regs));
 	cpustate->irq_callback = save_callback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->iospace = device->space(AS_IO);
 	cpustate->w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
@@ -1902,8 +1902,8 @@ static CPU_INIT( f8 )
 	f8_Regs *cpustate = get_safe_token(device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->iospace = device->space(AS_IO);
 }
 
 static CPU_SET_INFO( f8 )

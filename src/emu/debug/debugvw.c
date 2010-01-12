@@ -2375,7 +2375,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	for (device = machine->config->devicelist.head; device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
-			const address_space *space = memory_find_address_space(device, spacenum);
+			const address_space *space = device->space(spacenum);
 			if (space != NULL)
 			{
 				memory_subview_item *subview;

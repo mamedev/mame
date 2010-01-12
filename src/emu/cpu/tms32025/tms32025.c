@@ -1723,9 +1723,9 @@ static CPU_INIT( tms32025 )
 	cpustate->intRAM = auto_alloc_array(device->machine, UINT16, 0x800);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->STR0);

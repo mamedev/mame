@@ -272,7 +272,7 @@ static DEVICE_START( tms9927 )
 		tms->hpixels_per_column = tms->intf->hpixels_per_column;
 
 		/* get the screen device */
-		tms->screen = devtag_get_device(device->machine, tms->intf->screen_tag);
+		tms->screen = device->machine->device(tms->intf->screen_tag);
 		assert(tms->screen != NULL);
 
 		/* get the self-load PROM */

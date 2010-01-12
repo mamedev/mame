@@ -1035,8 +1035,8 @@ static void init_808x_common(const device_config *device, cpu_irq_callback irqca
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* resolve callbacks */
 	devcb_resolve_write8(&cpustate->out_status_func, &cpustate->config.out_status_func, device);

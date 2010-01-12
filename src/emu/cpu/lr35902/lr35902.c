@@ -194,7 +194,7 @@ static CPU_INIT( lr35902 )
 	cpustate->w.config = (const lr35902_cpu_core *) device->static_config;
 	cpustate->w.irq_callback = irqcallback;
 	cpustate->w.device = device;
-	cpustate->w.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->w.program = device->space(AS_PROGRAM);
 }
 
 /*** Reset lr353902 registers: ******************************/

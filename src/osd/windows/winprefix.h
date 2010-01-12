@@ -42,6 +42,7 @@
 #define _WIN32_WINNT 0x0501
 
 #ifdef _MSC_VER
+#include <malloc.h>
 #define alloca _alloca
 #define round(x) floor((x) + 0.5)
 #if _MSC_VER < 1500

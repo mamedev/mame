@@ -703,7 +703,7 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(SCSP->device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = SCSP->device->machine->firstcpu->space(AS_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -723,7 +723,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(devtag_get_device(space->machine, "scsp"), 0, SCSP->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(space->machine->device("scsp"), 0, SCSP->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:

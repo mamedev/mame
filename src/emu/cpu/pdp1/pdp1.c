@@ -546,7 +546,7 @@ static CPU_INIT( pdp1 )
 	/* clean-up */
 	memset (cpustate, 0, sizeof (*cpustate));
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* set up params and callbacks */
 	for (i=0; i<64; i++)

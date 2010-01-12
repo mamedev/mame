@@ -292,7 +292,7 @@ static CPU_INIT( cquestsnd )
 	cpustate->sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
 
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* Allocate RAM shared with 68000 */
 	cpustate->sram = auto_alloc_array(device->machine, UINT16, 4096/2);
@@ -365,8 +365,8 @@ static CPU_INIT( cquestrot )
 	cpustate->sram = auto_alloc_array(device->machine, UINT16, 2048);   /* Private */
 
 	cpustate->device = device;
-	cpustate->lindevice = devtag_get_device(device->machine, rotconfig->lin_cpu_tag);
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->lindevice = device->machine->device(rotconfig->lin_cpu_tag);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	cquestrot_state_register(device);
 }
@@ -450,8 +450,8 @@ static CPU_INIT( cquestlin )
 	cpustate->o_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
 
 	cpustate->device = device;
-	cpustate->rotdevice = devtag_get_device(device->machine, linconfig->rot_cpu_tag);
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->rotdevice = device->machine->device(linconfig->rot_cpu_tag);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	cquestlin_state_register(device);
 }

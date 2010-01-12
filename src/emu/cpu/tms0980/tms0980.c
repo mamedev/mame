@@ -506,8 +506,8 @@ static void cpu_init_tms_common( const device_config *device, const UINT32* deco
 	cpustate->pc_size = pc_size;
 	cpustate->byte_size = byte_size;
 
-	cpustate->program = memory_find_address_space( device, ADDRESS_SPACE_PROGRAM );
-	cpustate->data = memory_find_address_space( device, ADDRESS_SPACE_DATA );
+	cpustate->program = device->space( AS_PROGRAM );
+	cpustate->data = device->space( AS_PROGRAM );
 
 	state_save_register_device_item( device, 0, cpustate->prev_pc );
 	state_save_register_device_item( device, 0, cpustate->prev_pa );

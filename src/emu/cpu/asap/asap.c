@@ -447,7 +447,7 @@ static CPU_INIT( asap )
 		asap->src2val[i] = i;
 	asap->irq_callback = irqcallback;
 	asap->device = device;
-	asap->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	asap->program = device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( asap )

@@ -313,7 +313,7 @@ static CPU_INIT( r3000 )
 
 	r3000->irq_callback = irqcallback;
 	r3000->device = device;
-	r3000->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	r3000->program = device->space(AS_PROGRAM);
 }
 
 

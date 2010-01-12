@@ -165,8 +165,8 @@ static CPU_INIT( avr8 )
     cpustate->pc = 0;
 
     cpustate->device = device;
-    cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-    cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+    cpustate->program = device->space(AS_PROGRAM);
+    cpustate->io = device->space(AS_IO);
 
     WRITE_IO_8(cpustate, AVR8_IO_SREG, 0);
 }

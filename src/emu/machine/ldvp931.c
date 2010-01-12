@@ -215,8 +215,8 @@ static void vp931_init(laserdisc_state *ld)
 	player->data_ready_cb = cbsave;
 
 	/* find our devices */
-	player->cpu = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "vp931"));
-	player->tracktimer = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "tracktimer"));
+	player->cpu = ld->device->machine->device(device_build_tag(tempstring, ld->device, "vp931"));
+	player->tracktimer = ld->device->machine->device(device_build_tag(tempstring, ld->device, "tracktimer"));
 	timer_device_set_ptr(player->tracktimer, ld);
 }
 

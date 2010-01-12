@@ -1134,8 +1134,8 @@ static void nec_init(const device_config *device, cpu_irq_callback irqcallback, 
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
-	nec_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	nec_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	nec_state->program = device->space(AS_PROGRAM);
+	nec_state->io = device->space(AS_IO);
 }
 
 

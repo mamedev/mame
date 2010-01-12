@@ -353,7 +353,7 @@ static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const de
 	/* remember our pointers */
 	drcbe->device = device;
 	for (spacenum = 0; spacenum < ARRAY_LENGTH(drcbe->space); spacenum++)
-		drcbe->space[spacenum] = memory_find_address_space(device, spacenum);
+		drcbe->space[spacenum] = device->space(spacenum);
 	drcbe->drcuml = drcuml;
 	drcbe->cache = cache;
 

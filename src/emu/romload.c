@@ -1230,7 +1230,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
-	const device_config *device = devtag_get_device(machine, rgntag);
+	const device_config *device = machine->device(rgntag);
 	if (device != NULL && device_get_databus_width(device, ADDRESS_SPACE_0) != 0)
 	{
 		int buswidth;
@@ -1282,7 +1282,7 @@ static void process_region_list(rom_load_data *romdata)
 			assert(ROMENTRY_ISREGION(region));
 
 			/* if this is a device region, override with the device width and endianness */
-			if (devtag_get_device(romdata->machine, regiontag) != NULL)
+			if (romdata->machine->device(regiontag) != NULL)
 				regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
 
 			/* remember the base and length */

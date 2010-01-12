@@ -1704,8 +1704,8 @@ static CPU_INIT( upd7810 )
 	cpustate->config = *(const UPD7810_CONFIG*) device->static_config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
 	state_save_register_device_item(device, 0, cpustate->pc.w.l);
@@ -1788,8 +1788,8 @@ static CPU_RESET( upd7810 )
 	cpustate->config = save_config;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->opXX = opXX_7810;
 	cpustate->op48 = op48;

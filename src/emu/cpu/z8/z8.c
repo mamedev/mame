@@ -696,9 +696,9 @@ static CPU_INIT( z8 )
 	cpustate->clock = device->clock;
 
 	/* find address spaces */
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* allocate timers */
 	cpustate->t0_timer = timer_alloc(device->machine, t0_tick, cpustate);

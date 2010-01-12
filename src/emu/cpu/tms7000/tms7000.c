@@ -166,8 +166,8 @@ static CPU_INIT( tms7000 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	memset(cpustate->pf, 0, 0x100);
 	memset(cpustate->rf, 0, 0x80);

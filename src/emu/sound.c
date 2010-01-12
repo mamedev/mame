@@ -436,7 +436,7 @@ static void route_sound(running_machine *machine)
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const device_config *target_device = devtag_get_device(machine, route->target);
+			const device_config *target_device = machine->device(route->target);
 
 			/* if neither found, it's fatal */
 			if (target_device == NULL)
@@ -473,7 +473,7 @@ static void route_sound(running_machine *machine)
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const device_config *target_device = devtag_get_device(machine, route->target);
+			const device_config *target_device = machine->device(route->target);
 			int inputnum = route->input;
 			sound_stream *stream;
 			int streamoutput;

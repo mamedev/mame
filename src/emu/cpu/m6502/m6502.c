@@ -136,7 +136,7 @@ static void m6502_common_init(const device_config *device, cpu_irq_callback irqc
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->space = device->space(AS_PROGRAM);
 	cpustate->subtype = subtype;
 	cpustate->insn = insn;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -529,7 +529,7 @@ static CPU_INIT( deco16 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->io = device->space(AS_IO);
 }
 
 

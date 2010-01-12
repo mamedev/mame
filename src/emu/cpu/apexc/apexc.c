@@ -800,8 +800,8 @@ static CPU_INIT( apexc )
 	apexc_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_RESET( apexc )

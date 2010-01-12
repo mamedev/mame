@@ -140,7 +140,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 
 	/* initialize the state */
 	drcfe->device = cpu;
-	drcfe->program = memory_find_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	drcfe->program = cpu->space(AS_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
 

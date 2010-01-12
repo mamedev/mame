@@ -110,7 +110,7 @@ static void c6280_init(const device_config *device, c6280_t *p, double clk, doub
     memset(p, 0, sizeof(c6280_t));
 
     p->device = device;
-    p->cpudevice = devtag_get_device(device->machine, intf->cpu);
+    p->cpudevice = device->machine->device(intf->cpu);
     if (p->cpudevice == NULL)
     	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag.cstr());
 

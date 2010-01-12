@@ -460,7 +460,7 @@ static CPU_INIT( m6805 )
 	state_register(cpustate, "m6805", device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(cpustate->device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = cpustate->device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( m6805 )
@@ -473,7 +473,7 @@ static CPU_RESET( m6805 )
 	cpustate->iCount=50000;		/* Used to be global */
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(cpustate->device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = cpustate->device->space(AS_PROGRAM);
 
 	/* Force CPU sub-type and relevant masks */
 	cpustate->subtype = SUBTYPE_M6805;

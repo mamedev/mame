@@ -3467,8 +3467,8 @@ static CPU_INIT( z80 )
 		z80->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
-	z80->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	z80->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	z80->program = device->space(AS_PROGRAM);
+	z80->io = device->space(AS_IO);
 	z80->IX = z80->IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	z80->F = ZF;			/* Zero flag is set */
 

@@ -132,9 +132,9 @@ static CPU_INIT( ccpu )
 	cpustate->external_input = configdata->external_input ? configdata->external_input : read_jmi;
 	cpustate->vector_callback = configdata->vector_callback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->A);

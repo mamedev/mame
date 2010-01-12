@@ -3395,7 +3395,7 @@ static CPU_INIT( cp1610 )
 	cpustate->intrm_pending = 0;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static void cp1610_set_irq_line(cp1610_state *cpustate, UINT32 irqline, int state)

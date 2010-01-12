@@ -222,7 +222,7 @@ static CPU_INIT( tlcs900 )
 	cpustate->intf = (const tlcs900_interface *)device->static_config;
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space( device, ADDRESS_SPACE_PROGRAM );
+	cpustate->program = device->space( AS_PROGRAM );
 
 	devcb_resolve_write8( &cpustate->to1, &cpustate->intf->to1, device );
 	devcb_resolve_write8( &cpustate->to3, &cpustate->intf->to3, device );

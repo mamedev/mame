@@ -2071,7 +2071,7 @@ static CPU_INIT( i960 )
 
 	i960->irq_cb = irqcallback;
 	i960->device = device;
-	i960->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	i960->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, i960->PIP);
 	state_save_register_device_item(device, 0, i960->SAT);

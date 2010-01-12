@@ -348,8 +348,8 @@ static CPU_INIT( z8000 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
@@ -364,8 +364,8 @@ static CPU_RESET( z8000 )
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
 	cpustate->pc	= RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
 }

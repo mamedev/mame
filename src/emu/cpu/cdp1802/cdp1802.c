@@ -978,8 +978,8 @@ static CPU_INIT( cdp1802 )
 	cpustate->state_table.subtypemask = 1;
 
 	/* find address spaces */
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set initial values */
 	cpustate->p = mame_rand(device->machine) & 0x0f;

@@ -375,7 +375,7 @@ static CPU_INIT( tms32031 )
 
 	tms->irq_callback = irqcallback;
 	tms->device = device;
-	tms->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	tms->program = device->space(AS_PROGRAM);
 
 	/* copy in the xf write routines */
 	tms->bootoffset = (configdata != NULL) ? configdata->bootoffset : 0;

@@ -230,7 +230,7 @@ void cpuexec_init(running_machine *machine)
 		min_quantum = ATTOTIME_IN_HZ(60);
 	if (machine->config->perfect_cpu_quantum != NULL)
 	{
-		const device_config *cpu = devtag_get_device(machine, machine->config->perfect_cpu_quantum);
+		const device_config *cpu = machine->device(machine->config->perfect_cpu_quantum);
 		attotime cpu_quantum;
 
 		if (cpu == NULL)
@@ -582,7 +582,7 @@ static DEVICE_RESET( cpu )
 
 		/* new style - use screen tag directly */
 		if (config->vblank_interrupt_screen != NULL)
-			screen = devtag_get_device(device->machine, config->vblank_interrupt_screen);
+			screen = device->machine->device(config->vblank_interrupt_screen);
 
 		/* old style 'hack' setup - use screen #0 */
 		else

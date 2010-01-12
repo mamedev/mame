@@ -670,7 +670,7 @@ static CPU_INIT( alpha8201 )
 	alpha8201_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->RAM);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);

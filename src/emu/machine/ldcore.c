@@ -1091,7 +1091,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 	for (ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != NULL; ldnode = xml_get_sibling(ldnode->next, "device"))
 	{
 		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
-		const device_config *device = devtag_get_device(machine, devtag);
+		const device_config *device = machine->device(devtag);
 		if (device != NULL)
 		{
 			laserdisc_state *ld = get_safe_token(device);
@@ -1454,7 +1454,7 @@ static void init_audio(const device_config *device)
 	ldcore_data *ldcore = ld->core;
 
 	/* find the custom audio */
-	ldcore->audiocustom = devtag_get_device(device->machine, ldcore->config.sound);
+	ldcore->audiocustom = device->machine->device(ldcore->config.sound);
 
 	/* allocate audio buffers */
 	ldcore->audiomaxsamples = ((UINT64)ldcore->samplerate * 1000000 + ldcore->fps_times_1million - 1) / ldcore->fps_times_1million;
@@ -1482,7 +1482,7 @@ static DEVICE_START( laserdisc )
 	int index;
 
 	/* ensure that our screen is started first */
-	ld->screen = devtag_get_device(device->machine, config->screen);
+	ld->screen = device->machine->device(config->screen);
 	assert(ld->screen != NULL);
 	if (!ld->screen->started)
 	{

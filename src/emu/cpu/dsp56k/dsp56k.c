@@ -235,8 +235,8 @@ static CPU_INIT( dsp56k )
 	//cpustate->config = device->static_config;
 	//cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
 
 	/* Setup the direct memory handler for this CPU */
 	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */

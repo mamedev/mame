@@ -2147,8 +2147,8 @@ static CPU_RESET( z180 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->state = save_table;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->iospace = device->space(AS_IO);
 	cpustate->_IX = cpustate->_IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	cpustate->_F = ZF;			/* Zero flag is set */
 	cpustate->nmi_state = CLEAR_LINE;

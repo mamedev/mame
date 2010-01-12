@@ -547,8 +547,8 @@ static CPU_INIT( i386 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0,	cpustate->reg.d);
 	state_save_register_device_item(device, 0, cpustate->sreg[ES].selector);
@@ -646,8 +646,8 @@ static CPU_RESET( i386 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -1094,8 +1094,8 @@ static CPU_RESET( i486 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -1205,8 +1205,8 @@ static CPU_RESET( pentium )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -1336,8 +1336,8 @@ static CPU_RESET( mediagx )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;

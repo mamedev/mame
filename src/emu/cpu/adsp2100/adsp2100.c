@@ -706,9 +706,9 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 
 	/* fetch device parameters */
 	adsp->device = device;
-	adsp->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	adsp->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	adsp->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	adsp->program = device->space(AS_PROGRAM);
+	adsp->data = device->space(AS_DATA);
+	adsp->io = device->space(AS_IO);
 
 	/* copy function pointers from the config */
 	if (config != NULL)

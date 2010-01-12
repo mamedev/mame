@@ -68,7 +68,7 @@ static DEVICE_START( wave )
 	assert( device->static_config != NULL );
 
 #ifdef MESS
-	image = devtag_get_device( device->machine, (const char *)device->static_config );
+	image = device->machine->device( (const char *)device->static_config );
 #endif
 	stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
 }

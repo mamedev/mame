@@ -145,7 +145,7 @@ static DEVICE_START( k033906 )
 	k033906_state *k033906 = k033906_get_safe_token(device);
 	const k033906_interface *intf = k033906_get_interface(device);
 
-	k033906->voodoo = devtag_get_device(device->machine, intf->voodoo);
+	k033906->voodoo = device->machine->device(intf->voodoo);
 
 	k033906->reg = auto_alloc_array(device->machine, UINT32, 256);
 	k033906->ram = auto_alloc_array(device->machine, UINT32, 32768);
