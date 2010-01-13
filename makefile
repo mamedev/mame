@@ -108,6 +108,9 @@ endif
 # a native backend
 # FORCE_DRC_C_BACKEND = 1
 
+# uncomment next line to build using unix-style libsdl on Mac OS X
+# (vs. the native framework port).  Normal users should not enable this.
+# MACOSX_USE_LIBSDL = 1
 
 
 #-------------------------------------------------
@@ -326,7 +329,14 @@ CCOMFLAGS += -O$(OPTIMIZE)
 # if we are optimizing, include optimization options
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
+ifneq ($(TARGETOS),os2)
+ifndef NOWERROR
 CCOMFLAGS += -Werror -fno-strict-aliasing $(ARCHOPTS)
+else
+endif
+else
+CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
+endif
 endif
 
 # add a basic set of warnings
@@ -369,7 +379,14 @@ CCOMFLAGS += \
 
 # LDFLAGS are used generally; LDFLAGSEMULATOR are additional
 # flags only used when linking the core emulator
+LDFLAGS =
+ifneq ($(TARGETOS),macosx)
+ifneq ($(TARGETOS),os2)
+ifneq ($(TARGETOS),solaris)
 LDFLAGS = -Wl,--warn-common
+endif
+endif
+endif
 LDFLAGSEMULATOR =
 
 # add profiling information for the linker
@@ -380,7 +397,9 @@ endif
 # strip symbols and other metadata in non-symbols and non profiling builds
 ifndef SYMBOLS
 ifndef PROFILE
+ifneq ($(TARGETOS),macosx)
 LDFLAGS += -s
+endif
 endif
 endif
 
@@ -527,9 +546,10 @@ $(sort $(OBJDIRS)):
 
 ifndef EXECUTABLE_DEFINED
 
-$(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 # always recompile the version string
-	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
+$(VERSIONOBJ): $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
+
+$(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 
