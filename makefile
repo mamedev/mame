@@ -40,7 +40,12 @@ endif
 #-------------------------------------------------
 
 ifndef OSD
+ifeq ($(OS),Windows_NT)
 OSD = windows
+TARGETOS = win32
+else
+OSD = sdl
+endif
 endif
 
 ifndef CROSS_BUILD_OSD
@@ -56,7 +61,7 @@ endif
 #-------------------------------------------------
 
 ifndef TARGETOS
-ifeq ($(OSD),windows)
+ifeq ($(OS),Windows_NT)
 TARGETOS = win32
 else
 TARGETOS = unix
@@ -111,6 +116,7 @@ endif
 # uncomment next line to build using unix-style libsdl on Mac OS X
 # (vs. the native framework port).  Normal users should not enable this.
 # MACOSX_USE_LIBSDL = 1
+
 
 
 #-------------------------------------------------
@@ -205,6 +211,18 @@ RM = @rm -f
 # form the name of the executable
 #-------------------------------------------------
 
+# reset all internal prefixes/suffixes
+PREFIXSDL =
+SUFFIX64 =
+SUFFIXDEBUG =
+
+# Windows SDL builds get an SDL prefix
+ifeq ($(OSD),sdl)
+ifeq ($(TARGETOS),win32)
+PREFIXSDL = sdl
+endif
+endif
+
 # 64-bit builds get a '64' suffix
 ifdef PTR64
 SUFFIX64 = 64
@@ -224,7 +242,7 @@ NAME = $(TARGET)$(SUBTARGET)
 endif
 
 # fullname is prefix+name+suffix+suffix64+suffixdebug
-FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)
+FULLNAME = $(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)
 
 # add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
