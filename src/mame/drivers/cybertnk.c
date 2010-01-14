@@ -179,7 +179,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "sound/8950intf.h"
 
 static tilemap_t *tx_tilemap;
-static UINT16 *tx_vram,*bg_vram,*fg_vram;
+static UINT16 *tx_vram,*bg_vram,*fg_vram,*spr_ram;
 static UINT16 *io_ram;
 
 #define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
@@ -202,6 +202,8 @@ static VIDEO_START( cybertnk )
 
 static VIDEO_UPDATE( cybertnk )
 {
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
 	{
 		int count,x,y;
 		const gfx_element *gfx = screen->machine->gfx[2];
@@ -243,10 +245,67 @@ static VIDEO_UPDATE( cybertnk )
 			}
 		}
 	}
+
+	/* spriteram / blitter (BARE-BONES, looks pretty complex) */
+	{
+		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
+		int offs,x,y,xsize,ysize,yi,xi;
+		UINT32 spr_offs;
+
+		for(offs=0;offs<0x1000/2;offs+=8)
+		{
+			x = spr_ram[offs+(0xa/2)] & 0x1ff;
+			y = spr_ram[offs+(0x8/2)] & 0x0ff;
+			spr_offs = 0x1000;
+			xsize = 8;
+			ysize = 8;
+
+			for(yi = 0;yi < ysize;yi++)
+			{
+				for(xi=0;xi < xsize;xi+=8)
+				{
+					UINT32 color;
+					UINT8 dot;
+
+					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
+					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
+					color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
+					color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
+
+					dot = (color & 0xf0000000) >> 28;
+					*BITMAP_ADDR16(bitmap, y+yi, x+1+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x0f000000) >> 24;
+					*BITMAP_ADDR16(bitmap, y+yi, x+5+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x00f00000) >> 20;
+					*BITMAP_ADDR16(bitmap, y+yi, x+0+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x000f0000) >> 16;
+					*BITMAP_ADDR16(bitmap, y+yi, x+4+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x0000f000) >> 12;
+					*BITMAP_ADDR16(bitmap, y+yi, x+3+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x00000f00) >> 8;
+					*BITMAP_ADDR16(bitmap, y+yi, x+7+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x000000f0) >> 4;
+					*BITMAP_ADDR16(bitmap, y+yi, x+2+xi) = screen->machine->pens[dot];
+
+					dot = (color & 0x0000000f) >> 0;
+					*BITMAP_ADDR16(bitmap, y+yi, x+6+xi) = screen->machine->pens[dot];
+
+					spr_offs+=4;
+				}
+			}
+		}
+	}
+
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
 
-
+//~11bf90
 
 if(0) //sprite gfx debug viewer
 {
@@ -485,7 +544,7 @@ static READ8_HANDLER( soundport_r )
 static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM //VDP-style
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spr_ram) // blitter sprite ram
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0c4000, 0x0c7fff) AM_RAM AM_BASE(&bg_vram)
 	AM_RANGE(0x0c8000, 0x0cbfff) AM_RAM AM_BASE(&fg_vram)
@@ -681,7 +740,7 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(cybertnk)
 	MDRV_PALETTE_LENGTH(0x4000)
