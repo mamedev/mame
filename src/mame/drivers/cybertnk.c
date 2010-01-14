@@ -247,6 +247,7 @@ static VIDEO_UPDATE( cybertnk )
 	}
 
 	/* spriteram / blitter (BARE-BONES, looks pretty complex) */
+	if(1)
 	{
 		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
 		int offs,x,y,xsize,ysize,yi,xi,col_bank;
@@ -254,12 +255,12 @@ static VIDEO_UPDATE( cybertnk )
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
-			x = spr_ram[offs+(0xa/2)] & 0x1ff;
-			y = spr_ram[offs+(0x8/2)] & 0x0ff;
-			spr_offs = spr_ram[offs+(0x2/2)] << 2;
-			xsize = 0x62;
-			ysize = 0x9a;
-			col_bank = spr_ram[offs+(0x4/2)] & 0xff;
+			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
+			y = (spr_ram[offs+(0x8/2)] & 0x0ff);
+			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
+			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
+			ysize = (spr_ram[offs+(0x0/2)] & 0x3f00) >> 6;
+			col_bank = spr_ram[offs+(0x4/2)] & 0x0ff;
 
 			for(yi = 0;yi < ysize;yi++)
 			{
@@ -267,43 +268,43 @@ static VIDEO_UPDATE( cybertnk )
 				{
 					UINT32 color;
 					UINT16 dot;
+					int shift_pen;
+					int x_dec; //helpers
 
 					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
 					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
 					color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
 					color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
 
-					dot = (color & 0xf0000000) >> 28;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+1+xi) = screen->machine->pens[dot];
+					shift_pen = 28;
+					x_dec = 0;
 
-					dot = (color & 0x0f000000) >> 24;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+5+xi) = screen->machine->pens[dot];
+					while(x_dec < 4 && x_dec+xi <= xsize)
+					{
+						dot = (color >> shift_pen) & 0xf;
+						if(dot != 0) // transparent pen
+						{
+							dot|= col_bank<<4;
+							*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+						}
+						shift_pen -= 8;
+						x_dec++;
+					}
 
-					dot = (color & 0x00f00000) >> 20;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+0+xi) = screen->machine->pens[dot];
+					shift_pen = 24;
+					x_dec = 4;
 
-					dot = (color & 0x000f0000) >> 16;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+4+xi) = screen->machine->pens[dot];
-
-					dot = (color & 0x0000f000) >> 12;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+3+xi) = screen->machine->pens[dot];
-
-					dot = (color & 0x00000f00) >> 8;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+7+xi) = screen->machine->pens[dot];
-
-					dot = (color & 0x000000f0) >> 4;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+2+xi) = screen->machine->pens[dot];
-
-					dot = (color & 0x0000000f) >> 0;
-					dot|= col_bank<<4;
-					*BITMAP_ADDR16(bitmap, y+yi, x+6+xi) = screen->machine->pens[dot];
+					while(x_dec < 8 && x_dec+xi <= xsize)
+					{
+						dot = (color >> shift_pen) & 0xf;
+						if(dot != 0) // transparent pen
+						{
+							dot|= col_bank<<4;
+							*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+						}
+						shift_pen -= 8;
+						x_dec++;
+					}
 
 					spr_offs+=4;
 				}
@@ -314,8 +315,9 @@ static VIDEO_UPDATE( cybertnk )
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
 
-//0x62 0x9a 11c2d0
-//0x62 0x9a 11e1e4
+//0x62 0x9a 1c2d0
+//0x62 0x9a 1e1e4
+//0x20 0x9c 2011c
 
 if(0) //sprite gfx debug viewer
 {
@@ -820,22 +822,22 @@ ROM_START( cybertnk )
 
 	/* TODO: fix the rom loading accordingly*/
 	ROM_REGION( 0x200000, "spr_gfx", 0 )
-	ROM_LOAD32_BYTE( "c01.93" , 0x100000, 0x20000, CRC(b5ee3de2) SHA1(77b9a2818f36826891e510e8550f1025bacfa496) )
-	ROM_LOAD32_BYTE( "c02.92" , 0x100001, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
-	ROM_LOAD32_BYTE( "c03.91" , 0x100002, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
-	ROM_LOAD32_BYTE( "c04.90" , 0x100003, 0x20000, CRC(04d6fdc2) SHA1(56f8091c1a010014e951f5f47084e1400006123e) )
-	ROM_LOAD32_BYTE( "c05.102", 0x080000, 0x20000, CRC(3f537490) SHA1(12d6545d29dda9f88019040fa33c73a22a2a213b) )
-	ROM_LOAD32_BYTE( "c06.101", 0x080001, 0x20000, CRC(ff69c6a4) SHA1(badd20d26ba771780aebf733e1fbd1d37aa66f9b) )
-	ROM_LOAD32_BYTE( "c07.100", 0x080002, 0x20000, CRC(5e8eba75) SHA1(6d0c1916517802acf808c8edc8e0b6074bdc90be) )
-	ROM_LOAD32_BYTE( "c08.98" , 0x080003, 0x20000, CRC(f0820ddd) SHA1(7fb6c7d66ff96148f14921bc8d0cc0c65ffce4c4) )
-	ROM_LOAD32_BYTE( "c09.109", 0x000000, 0x20000, CRC(080f87c3) SHA1(aedebc22ff03d4cc710e71ca14e09c7808f59c72) ) //correct
-	ROM_LOAD32_BYTE( "c10.108", 0x000001, 0x20000, CRC(777c6a62) SHA1(4684d1c5d88b37ecb20002b7aa4814bf566e7d4b) )
-	ROM_LOAD32_BYTE( "c11.107", 0x000002, 0x20000, CRC(330ca5a1) SHA1(4409da231a5abcec8c7d2d66eefdfd2019a322db) )
-	ROM_LOAD32_BYTE( "c12.106", 0x000003, 0x20000, CRC(c1ec8e61) SHA1(09f2f4ddc100e5675c9bd82c200718fb0b69655e) )
-	ROM_LOAD32_BYTE( "c13.119", 0x180000, 0x20000, CRC(4e22a7e0) SHA1(69cc7dd528b8af0c28b448285768a3ed079099ba) )
-	ROM_LOAD32_BYTE( "c14.118", 0x180001, 0x20000, CRC(bdbd6232) SHA1(94b0741d5eced558723dda32a89aa2b747cdcbbd) )
-	ROM_LOAD32_BYTE( "c15.117", 0x180002, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
-	ROM_LOAD32_BYTE( "c16.116", 0x180003, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
+	ROM_LOAD32_BYTE( "c01.93" , 0x000001, 0x20000, CRC(b5ee3de2) SHA1(77b9a2818f36826891e510e8550f1025bacfa496) )
+	ROM_LOAD32_BYTE( "c02.92" , 0x000000, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
+	ROM_LOAD32_BYTE( "c03.91" , 0x000003, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
+	ROM_LOAD32_BYTE( "c04.90" , 0x000002, 0x20000, CRC(04d6fdc2) SHA1(56f8091c1a010014e951f5f47084e1400006123e) )
+	ROM_LOAD32_BYTE( "c05.102", 0x100001, 0x20000, CRC(3f537490) SHA1(12d6545d29dda9f88019040fa33c73a22a2a213b) )
+	ROM_LOAD32_BYTE( "c06.101", 0x100000, 0x20000, CRC(ff69c6a4) SHA1(badd20d26ba771780aebf733e1fbd1d37aa66f9b) )
+	ROM_LOAD32_BYTE( "c07.100", 0x100003, 0x20000, CRC(5e8eba75) SHA1(6d0c1916517802acf808c8edc8e0b6074bdc90be) )
+	ROM_LOAD32_BYTE( "c08.98" , 0x100002, 0x20000, CRC(f0820ddd) SHA1(7fb6c7d66ff96148f14921bc8d0cc0c65ffce4c4) )
+	ROM_LOAD32_BYTE( "c09.109", 0x080001, 0x20000, CRC(080f87c3) SHA1(aedebc22ff03d4cc710e71ca14e09c7808f59c72) ) //correct
+	ROM_LOAD32_BYTE( "c10.108", 0x080000, 0x20000, CRC(777c6a62) SHA1(4684d1c5d88b37ecb20002b7aa4814bf566e7d4b) )
+	ROM_LOAD32_BYTE( "c11.107", 0x080003, 0x20000, CRC(330ca5a1) SHA1(4409da231a5abcec8c7d2d66eefdfd2019a322db) )
+	ROM_LOAD32_BYTE( "c12.106", 0x080002, 0x20000, CRC(c1ec8e61) SHA1(09f2f4ddc100e5675c9bd82c200718fb0b69655e) )
+	ROM_LOAD32_BYTE( "c13.119", 0x180001, 0x20000, CRC(4e22a7e0) SHA1(69cc7dd528b8af0c28b448285768a3ed079099ba) )
+	ROM_LOAD32_BYTE( "c14.118", 0x180000, 0x20000, CRC(bdbd6232) SHA1(94b0741d5eced558723dda32a89aa2b747cdcbbd) )
+	ROM_LOAD32_BYTE( "c15.117", 0x180003, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
+	ROM_LOAD32_BYTE( "c16.116", 0x180002, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
 
 	ROM_REGION( 0x200000, "road_data", 0 )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
