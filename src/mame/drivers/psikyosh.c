@@ -405,42 +405,107 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 /* Mahjong Panel */
 static READ32_HANDLER( mjgtaste_input_r )
 {
+/*
+Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.
+PCB contains what looks like an MCU of some description labeled "TMIBOD 4", undumped
+PCB maps keyboard lines onto JAMMA P1 controls
+Normally the demultiplexing is taken care of in hardware (e.g. metro.c, ssv.c), but here the game code has to do it.
+
+Standard Mahjong keyboard encoder
+      /---------------- KEY7
+     /    /------------ KEY10
+    /    /   /--------- KEY6
+   /    /   /   /------ KEY2
+  /    /   /   /   /--- KEY3
+ -|----D---C---B---A--- KEY4
+ -|----H---G---F---E--- KEY5
+ -|----L---K---J---I--- KEY8
+ -FLIP-PON-CHI-N---M--- KEY9
+ ----------RON-RCH-KAN- KEY11
+ ------------------STR- KEY1
+
+Standard Mahjong pinout - NOT JAMMA compatible
+  Parts         Solder
+   KEY3   1|2   KEY2
+   KEY6   3|4   KEY10
+   KEY7   7|8   Coin Counter
+    GND   9|10  GND
+         11|12
+Service  13|14  Test
+    RED  15|16  GREEN
+   BLUE  17|18  SYNC
+   SPK+  19|20  SPK- (GND)
+ P1KEY4  21|22  P2KEY4
+ P1KEY5  23|24  P2KEY5
+ P1KEY8  25|26  P2KEY8
+ P1KEY9  27|28  P2KEY9
+P1KEY11  29|30  P2KEY11
+ P1KEY1  31|32  P2KEY1
+         33|34  Coin
+         35|36
+    GND  37|38  GND
+    GND  39|40  GND
+    +5V  41|42  +5V
+    +5V  43|44  +5V
+   +12V  45|46  +12V
+         47|48
+    +5V  49|50  +5V
+    +5V  51|52  +5V
+    GND  53|54  GND
+    GND  55|56  GND
+*/
+	
 	UINT32 controls = input_port_read(space->machine, "CONTROLLER");
 	UINT32 value = input_port_read(space->machine, "INPUTS");
 	
 	if(controls) {
-		// Keys are encoded as two bits, overloading normal P1/P2 controls
-		// Clearly has ghosting, game will only recognise one key depressed at once
+		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
 		// Since the game can't accept conflicting inputs e.g. PL1 Up and 'A' or 'B' we have to 
 		// make the user choose the input method. Especially since in test mode both sets are usable.
 		// Switch top word to either Mahjong inputs or joystick depending
+		
+		enum {
+			KEY1  = 0x0400, // JAMMA P2 Button 1
+			KEY2  = 0x0040, // JAMMA P2 Down
+			KEY3  = 0x0080, // JAMMA P2 Up
+			KEY4  = 0x8000, // JAMMA P1 Up
+			KEY5  = 0x4000, // JAMMA P1 Down
+			KEY6  = 0x0010, // JAMMA P2 Left
+//			KEY7           
+			KEY8  = 0x1000, // JAMMA P1 Left
+			KEY9  = 0x2000, // JAMMA P1 Right
+			KEY10 = 0x0020, // JAMMA P2 Right
+			KEY11 = 0x0800, // JAMMA P1 Button 1
+		}; // Mahjong->JAMMA mapping specific to this game pcb
+		
 		UINT16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
-			0x8080, // A
-			0x8040, // B
-			0x8010, // C
-			0x8020, // D
-			0x4080, // E
-			0x4040, // F
-			0x4010, // G
-			0x4020, // H
-			0x1080, // I
-			0x1040, // J
-			0x1010, // K
-			0x1020, // L
-			0x2080, // M
-			0x2040, // N
-			0x0880, // Kan
-			0x2020, // Pon
-			0x2010, // Chi
-			0x0840, // Reach
-			0x0810, // Ron
-			0x0480  // Start
-		};
+//          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
+			KEY4 | KEY3,  // A
+			KEY4 | KEY2,  // B
+			KEY4 | KEY6,  // C
+			KEY4 | KEY10, // D
+			KEY5 | KEY3,  // E
+			KEY5 | KEY2,  // F
+			KEY5 | KEY6,  // G
+			KEY5 | KEY10, // H
+			KEY8 | KEY3,  // I
+			KEY8 | KEY2,  // J
+			KEY8 | KEY6,  // K
+			KEY8 | KEY10, // L
+			KEY9 | KEY3,  // M
+			KEY9 | KEY2,  // N
+			KEY11 | KEY3, // Kan
+			KEY9 | KEY10, // Pon
+			KEY9 | KEY6,  // Chi
+			KEY11 | KEY2, // Reach/Lechi
+			KEY11 | KEY6, // Ron
+			KEY1 | KEY3   // Start
+		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
 		UINT32 keys = input_port_read(space->machine, "MAHJONG");
 		UINT32 which_key = 0x1;
 		int count = 0;
 
-		// HACK: read IPT_START1 from "INPUTS"
+		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
 		int start_depressed = ~value & 0x01000000; 
 		keys |= start_depressed ? 1 << (sizeof(key_codes)/sizeof(key_codes[0]) - 1) : 0; // and bung it in at the end
 		
