@@ -68,7 +68,7 @@ DEFS += -DSDLMAME_NOASM
 endif
 
 # bring in external flags for RPM build
-CFLAGS += $(OPT_FLAGS)
+CCOMFLAGS += $(OPT_FLAGS)
 
 #-------------------------------------------------
 # distribution may change things
@@ -121,7 +121,7 @@ endif
 ifdef SYMBOLS
 ifdef BIGENDIAN
 ifeq ($(TARGETOS),macosx)
-CFLAGS += -mlong-branch
+CCOMFLAGS += -mlong-branch
 endif	# macosx
 endif	# PPC
 endif	# SYMBOLS
@@ -242,10 +242,10 @@ OSDOBJS += $(SDLOBJ)/draw13.o
 endif
 
 # add the debugger includes
-CFLAGS += -Isrc/debug
+CCOMFLAGS += -Isrc/debug
 
 # add the prefix file
-CFLAGS += -include $(SDLSRC)/sdlprefix.h
+CCOMFLAGS += -include $(SDLSRC)/sdlprefix.h
 
 ifdef NO_OPENGL
 DEFS += -DUSE_OPENGL=0
@@ -273,22 +273,22 @@ ifeq ($(TARGETOS),unix)
 
 # override for preprocessor weirdness on PPC Linux
 ifdef powerpc
-CFLAGS += -Upowerpc
+CCOMFLAGS += -Upowerpc
 endif
 
 ifndef USE_DISPATCH_GL
 ifdef MESA_INSTALL_ROOT
 LIBS += -L$(MESA_INSTALL_ROOT)/lib
 LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
-CFLAGS += -I$(MESA_INSTALL_ROOT)/include
+CCOMFLAGS += -I$(MESA_INSTALL_ROOT)/include
 endif
 endif
 
 ifndef SDL_INSTALL_ROOT
-CFLAGS += `sdl-config --cflags`
+CCOMFLAGS += `sdl-config --cflags`
 LIBS += -lm `sdl-config --libs` $(LIBGL)
 else
-CFLAGS += -I$(SDL_INSTALL_ROOT)/include -D_GNU_SOURCE=1
+CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include -D_GNU_SOURCE=1
 #LIBS += -L/opt/intel/cce/9.1.051/lib  -limf -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
 LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL -lpthread $(LIBGL)
 endif
@@ -301,15 +301,15 @@ endif
 # Non-X11 builds can not use the debugger
 ifndef NO_X11
 OSDCOREOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
-CFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
+CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
-CFLAGS += -DGTK_DISABLE_DEPRECATED
+CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
 else
 OSDCOREOBJS += $(SDLOBJ)/debugwin.o
 endif # NO_X11
 
 # make sure we can find X headers
-CFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
+CCOMFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 # some systems still put important things in a different prefix
 ifndef NO_X11
 LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
@@ -328,7 +328,7 @@ endif # Solaris
 ifeq ($(TARGETOS),win32)
 
 ifdef SDL_INSTALL_ROOT
-CFLAGS += -I$(SDL_INSTALL_ROOT)/include
+CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include
 LIBS += -L$(SDL_INSTALL_ROOT)/lib 
 # -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
 endif
@@ -366,7 +366,7 @@ else
 # Remove the "/SDL" component from the include path so that we can compile
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
-CFLAGS += `sdl-config --cflags | sed 's:/SDL::'` -DNO_SDL_GLEXT
+CCOMFLAGS += `sdl-config --cflags | sed 's:/SDL::'` -DNO_SDL_GLEXT
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
 LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
 endif
@@ -381,7 +381,7 @@ endif	# Mac OS X
 ifeq ($(TARGETOS),os2)
 OSDCOREOBJS += $(SDLOBJ)/debugwin.o
 
-CFLAGS += `sdl-config --cflags`
+CCOMFLAGS += `sdl-config --cflags`
 LIBS += `sdl-config --libs`
 
 # to avoid name clash of '_brk'
@@ -412,7 +412,7 @@ $(LIBOSD): $(OSDOBJS)
 
 $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c  
 	@echo Compiling $<...
-	$(CC)  $(CFLAGS) $(DEFS) -c $< -o $@
+	$(CC)  $(CCOMFLAGS) $(DEFS) -c $< -o $@
 	
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
