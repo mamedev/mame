@@ -262,11 +262,11 @@ static VIDEO_UPDATE( cybertnk )
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
 			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
-			y = (spr_ram[offs+(0x8/2)] & 0x0ff);
+			y = (spr_ram[offs+(0x4/2)] & 0xff);
 			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
-			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
-			ysize = (spr_ram[offs+(0x0/2)] & 0x3f00) >> 6;
-			col_bank = spr_ram[offs+(0x4/2)] & 0x0ff;
+			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
+			ysize = (spr_ram[offs+(0x0/2)] & 0x3f00) >> 6; //obviously wrong!
+			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
 			for(yi = 0;yi < ysize;yi++)
 			{
@@ -330,7 +330,7 @@ static VIDEO_UPDATE( cybertnk )
 if(0) //sprite gfx debug viewer
 {
 	int x,y,count;
-	static int test_x, test_y, start_offs;
+	static int test_x, test_y, start_offs,color_pen;
 	const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
 
 	if(input_code_pressed(screen->machine, KEYCODE_Z))
@@ -363,7 +363,13 @@ if(0) //sprite gfx debug viewer
 	if(input_code_pressed(screen->machine, KEYCODE_R))
 		start_offs-=4;
 
-	popmessage("%d %d %04x",test_x,test_y,start_offs);
+	if(input_code_pressed(screen->machine, KEYCODE_D))
+		color_pen++;
+
+	if(input_code_pressed(screen->machine, KEYCODE_F))
+		color_pen--;
+
+	popmessage("%02x %02x %04x %02x",test_x,test_y,start_offs,color_pen);
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
@@ -382,28 +388,28 @@ if(0) //sprite gfx debug viewer
 			color|= ((blit_ram[count+3] & 0xff) << 0);
 
 			dot = (color & 0xf0000000) >> 28;
-			*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x0f000000) >> 24;
-			*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x00f00000) >> 20;
-			*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x000f0000) >> 16;
-			*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x0000f000) >> 12;
-			*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x00000f00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x000000f0) >> 4;
-			*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(color_pen<<4)];
 
 			dot = (color & 0x0000000f) >> 0;
-			*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot];
+			*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(color_pen<<4)];
 
 			count+=4;
 		}
@@ -522,11 +528,11 @@ static WRITE16_HANDLER( io_w )
 			break;
 
 		case 0xc/2:
-			if (ACCESSING_BITS_0_7)
+			//if (ACCESSING_BITS_0_7)
 				// This seems to only be written after each irq1 and irq2, irq ack?
-				logerror("irq wrote %04x\n", data);
-			else
-				LOG_UNKNOWN_WRITE
+				//logerror("irq wrote %04x\n", data);
+			//else
+			//	LOG_UNKNOWN_WRITE
 			break;
 
 		case 0xd4/2:
@@ -565,9 +571,9 @@ static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spr_ram) // blitter sprite ram
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
-	AM_RANGE(0x0c4000, 0x0c7fff) AM_RAM AM_BASE(&bg_vram)
-	AM_RANGE(0x0c8000, 0x0cbfff) AM_RAM AM_BASE(&fg_vram)
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
+	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE(&bg_vram)
+	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE(&fg_vram)
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE(&io_ram)
@@ -578,13 +584,14 @@ static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x140002, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
+	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
 	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundport_r)
+	AM_RANGE(0xa005, 0xa006 ) AM_NOP
 	AM_RANGE(0xa000, 0xa001 ) AM_DEVREADWRITE("ym1", y8950_r, y8950_w)
 	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE("ym2", y8950_r, y8950_w)
 ADDRESS_MAP_END
