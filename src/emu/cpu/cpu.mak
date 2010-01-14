@@ -1317,6 +1317,21 @@ $(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
 
 
 #-------------------------------------------------
+# SunPlus u'nSP
+#-------------------------------------------------
+
+ifneq ($(filter UNSP,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/unsp
+CPUOBJS += $(CPUOBJ)/unsp/unsp.o
+DASMOBJS += $(CPUOBJ)/unsp/unspdasm.o
+endif
+
+$(CPUOBJ)/unsp/unsp.o:	$(CPUSRC)/unsp/unsp.c \
+			$(CPUSRC)/unsp/unsp.h
+
+
+
+#-------------------------------------------------
 # Atmel 8-bit AVR
 #-------------------------------------------------
 
