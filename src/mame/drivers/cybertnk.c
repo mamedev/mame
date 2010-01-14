@@ -7,8 +7,14 @@ preliminary driver by Angelo Salese
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
+- blitter (very likely that it can do zooming);
+- road emulation;
+- tilemap video registers;
+- color banking for the tilemaps;
 - ROM "SS5" is missing? Or it's a sound chip that's labelled SS5?
 - dual screen output.
+
+============================================================================================
 
 (note: the following notes are from "PS")
 - Communications
@@ -285,7 +291,8 @@ static VIDEO_UPDATE( cybertnk )
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
-							*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
 						}
 						shift_pen -= 8;
 						x_dec++;
@@ -300,7 +307,8 @@ static VIDEO_UPDATE( cybertnk )
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
-							*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
 						}
 						shift_pen -= 8;
 						x_dec++;
