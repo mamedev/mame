@@ -250,19 +250,6 @@ WRITE8_HANDLER( bnj_scroll2_w )
 	state->bnj_scroll2 = data;
 }
 
-WRITE8_HANDLER( zoar_video_control_w )
-{
-	btime_state *state = (btime_state *)space->machine->driver_data;
-	// Zoar video control
-	//
-	// Bit 0-2 = Unknown (always 0). Marked as MCOL on schematics
-	// Bit 3-4 = Palette
-	// Bit 7   = Flip Screen
-
-	state->btime_palette = (data & 0x30) >> 3;
-	flip_screen_set(space->machine, data & 0x80);
-}
-
 WRITE8_HANDLER( btime_video_control_w )
 {
 	// Btime video control
@@ -287,6 +274,21 @@ WRITE8_HANDLER( bnj_video_control_w )
 
 	if (input_port_read(space->machine, "DSW1") & 0x40) /* cocktail mode */
 		btime_video_control_w(space, offset, data);
+}
+
+WRITE8_HANDLER( zoar_video_control_w )
+{
+	btime_state *state = (btime_state *)space->machine->driver_data;
+	// Zoar video control
+	//
+	// Bit 0-2 = Unknown (always 0). Marked as MCOL on schematics
+	// Bit 3-4 = Palette
+	// Bit 7   = Flip Screen
+
+	state->btime_palette = (data & 0x30) >> 3;
+
+	if (input_port_read(space->machine, "DSW1") & 0x40) /* cocktail mode */
+		flip_screen_set(space->machine, data & 0x80);
 }
 
 WRITE8_HANDLER( disco_video_control_w )
