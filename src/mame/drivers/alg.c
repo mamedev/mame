@@ -47,8 +47,8 @@ static int get_lightgun_pos(const device_config *screen, int player, int *x, int
 {
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	int xpos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1X" : "GUN2X", -1);
-	int ypos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1Y" : "GUN2Y", -1);
+	int xpos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
+	int ypos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
