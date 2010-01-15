@@ -2912,6 +2912,8 @@ READ8_DEVICE_HANDLER( k051937_r )
 		//logerror("%04x: read unknown 051937 address %x\n", cpu_get_pc(device->cpu), offset);
 		return 0;
 	}
+
+	return 0;
 }
 
 WRITE8_DEVICE_HANDLER( k051937_w )

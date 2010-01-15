@@ -271,12 +271,12 @@ static TGP_FUNCTION( anglev )
 		if(a>=0)
 			fifoout_push(0);
 		else
-			fifoout_push(-32768);
+			fifoout_push((UINT32)-32768);
 	} else if(!a) {
 		if(b>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push(-16384);
+			fifoout_push((UINT32)-16384);
 	} else
 		fifoout_push((INT16)(atan2(b, a)*32768/M_PI));
 	next_fn();
@@ -369,12 +369,12 @@ static TGP_FUNCTION( anglep )
 		if(c>=0)
 			fifoout_push(0);
 		else
-			fifoout_push(-32768);
+			fifoout_push((UINT32)-32768);
 	} else if(!c) {
 		if(d>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push(-16384);
+			fifoout_push((UINT32)-16384);
 	} else
 		fifoout_push((INT16)(atan2(d, c)*32768/M_PI));
 	next_fn();
@@ -708,12 +708,12 @@ static TGP_FUNCTION( xyz2rqf )
 		if(a>=0)
 			fifoout_push(0);
 		else
-			fifoout_push(-32768);
+			fifoout_push((UINT32)-32768);
 	} else if(!a) {
 		if(c>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push(-16384);
+			fifoout_push((UINT32)-16384);
 	} else
 		fifoout_push((INT16)(atan2(c, a)*32768/M_PI));
 
@@ -723,7 +723,7 @@ static TGP_FUNCTION( xyz2rqf )
 		if(b>=0)
 			fifoout_push(16384);
 		else
-			fifoout_push(-16384);
+			fifoout_push((UINT32)-16384);
 	} else
 		fifoout_push((INT16)(atan2(b, norm)*32768/M_PI));
 

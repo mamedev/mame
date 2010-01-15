@@ -150,16 +150,16 @@ struct _generic_token
 /* extract a value from a fixed number of bits; if bits is negative, treat it as a signed value */
 #define UNSHIFT_AND_MASK32(src, val, bits, shift)	do { \
 	if ((bits) < 0) \
-		(val) = token_sign_extend32((src) >> (shift), -(bits)); \
+		(val) = token_sign_extend32((src) >> (shift), (UINT8)-(bits)); \
 	else \
-		(val) = token_zero_extend32((src) >> (shift), (bits)); \
+		(val) = token_zero_extend32((src) >> (shift), (UINT8)(bits)); \
 } while (0)
 
 #define UNSHIFT_AND_MASK64(src, val, bits, shift)	do { \
 	if ((bits) < 0) \
-		(val) = token_sign_extend64((src) >> (shift), -(bits)); \
+		(val) = token_sign_extend64((src) >> (shift), (UINT8)-(bits)); \
 	else \
-		(val) = token_zero_extend64((src) >> (shift), (bits)); \
+		(val) = token_zero_extend64((src) >> (shift), (UINT8)(bits)); \
 } while (0)
 
 /* cheesy inline absolute value */
