@@ -1676,6 +1676,8 @@ struct polygon
 	INT8 texIndex;				// Which texture to draw from (0x00-0x0f)
 	INT8 texType;				// How to index into the texture
 	UINT32 palOffset;			// The base offset where this object's palette starts.
+
+	UINT32 debugColor;			// Will go away someday.  Used to explicitly color polygons for debugging.
 };
 
 static void setIdentity(float *matrix);
@@ -1794,10 +1796,6 @@ static void set3dFlags(const UINT16* packet)
     // [15] - ???? ... ? ''  ''
     ////////////*/
 	paletteState3d = (packet[8] & 0xff00) >> 8;
-	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
-	/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
-	/*        But Xrally likes the offset...  */
-	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
 }
 
 // Operation 0012
@@ -1894,6 +1892,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	UINT32  threeDOffset;
 	UINT16* threeDRoms;
 	UINT16* threeDPointer;
+
+	UINT16 explicitPaletteValue = 0xffff;
 
 	UINT32 size[4];
 	UINT32 address[4];
@@ -2041,34 +2041,40 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // SINGLE POLY CHUNK FORMAT
             // [0] ??-- - ???? unused ????
             // [0] --xx - chunk type
-            // [1] x--- - 'texture type' (or UV-mapping style)?
-            // [1] -??- - ???? '18' for untextured buildings in fatfurwa ????
+            // [1] ?--- - unknown flags
+            // [1] -x-- - Explicit palette lookup in bbust2 - some geo has its palette offset baked in (lame, but true).
+            // [1] --?- - unknown
             // [1] ---x - texture index
             // [2] ???? - used in fatfurwa 'hng64' & everywhere in roadedge
             /////////////////////////*/
 			UINT8 chunkLength = 0;
 			UINT8 chunkType = threeDPointer[0] & 0x00ff;
 
+			// If there's data here, you must have an explicit palette lookup.
+			// FIXME: This only seems to work with bbust2.  There's a flag somewhere no doubt.
+			if (threeDPointer[1] & 0x0f00 && hng64_mcu_type == SHOOT_MCU)
+				explicitPaletteValue = ((threeDPointer[1] & 0x0f00) >> 8 >> 1) * 0x100;
+
+			// Debug - Colors polygons with certain flags bright blue! ajg
+			//if (threeDPointer[1] & 0x00f0)
+			//	polys[*numPolys].debugColor = 0xff0000ff;
+
 			// Debug - ajg
 			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, threeDPointer[0], threeDPointer[1], threeDPointer[2]);
 			//break;
 
 			// Debug - ajg
-			//if ((threeDPointer[0] & 0xff00) != 0x0000)
-			//{
-			//  printf("!!! Doesn't appear to be a valid chunk !!!\n");
-			//  continue;
-			//}
+			if (threeDPointer[0] & 0xff00)
+			{
+				printf("It's crazy that you got here!\n");
+				continue;
+			}
 
-			// TEXTURE TYPE
-			// In fatfur it's 0xc for the smooth-shaded earth - maybe this is for all things with alpha - check the hair at some point.
-			//                0x9 for the untextured buildings
-			//                0xd for the 'explosion' of the HNG64
-			//            and 0x8 everywhere else...
-			//        they're 0x8 in the buriki intro too (those are 66-byte chunks!)
-			polys[*numPolys].texType = ((threeDPointer[1] & 0xf000) >> 4 >> 8);
+			// TEXTURE
+			// FIXME: This is completely incorrect - these are flags, not overall 'types'
+			polys[*numPolys].texType = ((threeDPointer[1] & 0xf000) >> 12);
 
-			// TEXTURE INDEX
+			// The texture index is correct, but this texture type stuff isn't.
 			if (polys[*numPolys].texType == 0x8 || polys[*numPolys].texType == 0xc)		//  || polys[*numPolys].texType == 0x9
 			{
 				polys[*numPolys].texIndex = threeDPointer[1] & 0x000f;
@@ -2078,13 +2084,27 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].texIndex = -1;
 			}
 
-			// HACK - just to get bbust2 going until i can figure out the STs.
-			if (hng64_mcu_type == SHOOT_MCU) polys[*numPolys].texIndex = -1;
+			// PALETTE
+			/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
+			/*        There must be something set globally somewhere.  */
+			if (hng64_3dregs[0x00/4] & 0x2000)
+			{
+				polys[*numPolys].palOffset += 0x800;
+			}
 
+			// Only apply the palette offset if the palette offset flag is set
+			/* FIXME: Buriki One door colors in attract mode still aren't quite right.  BUT this flag is off for only the door! */
+			if ((packet[1] & 0x0100))
+			{
+				polys[*numPolys].palOffset += paletteState3d * 0x80;
+			}
 
-			// PALETTE OFFSET
-			// TODO: Figure this out for real.  It doesn't work like this in many games.
-			polys[*numPolys].palOffset = paletteState3d * 0x80;
+			// This gets set when the palette value is stored in the ROM.  There's gotta' be a flag for turning this on somewhere.
+			if (explicitPaletteValue != 0xffff)
+			{
+				polys[*numPolys].palOffset = explicitPaletteValue;
+			}
+
 
 			switch(chunkType)
 			{
@@ -2393,16 +2413,18 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0011:	// Palette / Model flags?
-		//printPacket(packet, 1);
+		//printPacket(packet, 1); printf("\n");
 		set3dFlags(packet);
 		break;
 
 	case 0x0012:	// Projection Matrix
+		//printPacket(packet, 1);
 		setCameraProjectionMatrix(packet);
 		break;
 
 	case 0x0100:	// Geometry
 	case 0x0101:	// Similar to 0x0100, but throws a strange packet in every now and again.
+		//printPacket(packet, 1);
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
 
 		/* Immeditately rasterize the chunk's polygons into the display buffer */
@@ -2422,7 +2444,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
-		//printPacket(packet, 1);
+		//printPacket(packet, 1); printf("\n");
 		break;
 
 	case 0x1001:	// Unknown: Some sort of global flags (a group of 4, actually)?
@@ -2820,7 +2842,7 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
-										  int textureType, int palOffset, int texIndex,
+										  int textureType, int palOffset, int texIndex, int debugColor,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
 										  float g_start, float g_delta, float b_start, float b_delta,
@@ -2847,9 +2869,15 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			t_coord = t_start / w_start;
 			s_coord = s_start / w_start;
 
-			// GET THE TEXTURE INDEX
-			if (texIndex >= 0)
+			// DEBUG COLOR MODE
+			if (debugColor != 0x00000000)
 			{
+				*cb = debugColor;
+				*db = z_start;
+			}
+			else if (texIndex >= 0)
+			{
+				// TEXTURED
 				if (textureType == 0x8 || textureType == 0xc)
 					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
 				else
@@ -2866,6 +2894,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			}
 			else
 			{
+				// UNTEXTURED
 				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*db = z_start;
 			}
@@ -2916,7 +2945,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											int textureType, int palOffset, int texIndex)
+											int textureType, int palOffset, int texIndex, int debugColor)
 {
 	// Get our order of points by increasing y-coord
 	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
@@ -3107,7 +3136,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex, debugColor,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3187,7 +3216,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex, debugColor,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3223,7 +3252,7 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										p->texType, p->palOffset, p->texIndex);
+										p->texType, p->palOffset, p->texIndex, p->debugColor);
 
 	}
 }
