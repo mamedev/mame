@@ -16,9 +16,9 @@
   ** SN76489 uses a 15-bit shift register with taps on bits D and E, output on E,
   XOR function; SN94624 is identical to SN76489.
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
-  ** SN76489A uses a 16-bit shift register with taps on bits D and E, output on F,
+  ** SN76489A uses a 15-bit shift register with taps on bits D and E, output on F,
   XNOR function
-  It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
+  It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
   ** SN76494 and SN76496 are PROBABLY identical in operation to the SN76489A
   They have an audio input line which is mixed with the 4 channels of output.
   ** Sega Master System III/MD/Genesis PSG uses a 16-bit shift register with taps
@@ -70,6 +70,11 @@
   based on testing. Got rid of R->OldNoise and fixed taps accordingly.
   Added stereo support for game gear.
 
+  11/15/2010 : Lord Nightmare
+  Fix an issue with SN76489 and SN76489A having the wrong periodic noise periods.
+  Note that properly emulating the noise cycle bit timing accurately may require
+  extensive rewriting.
+
   TODO: * Implement the TMS9919 which is an earlier version, possibly
           lacking the /8 clock divider, of the SN76489, and hence would
           have a max clock of 500Khz and 4 clocks per sample, as opposed to
@@ -79,6 +84,10 @@
         * Test the NCR7496; Smspower says the whitenoise taps are A and E,
           but this needs verification on real hardware.
         * Factor out common code so that the SAA1099 can share some code.
+        * Implement periodic noise as using a pointer to a table rather than a
+          self feeding lfsr. Kold666's recording of dorunrun proves this is the
+          right way.
+        * Fix the whitenoise bit timing so that dorunrun matches Kold666's PCB sample.
 ***************************************************************************/
 
 #include "emu.h"
@@ -403,27 +412,27 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x8000, 0x06, FALSE, FALSE, FALSE); // todo: verify; assumed to be the same as sn94624
+	generic_start(device, 0x4000, 0x03, FALSE, FALSE, FALSE); // todo: verify; assumed to be the same as sn94624
 }
 
 static DEVICE_START( sn76489a )
 {
-	generic_start(device, 0x10000, 0x0C, TRUE, FALSE, FALSE); // verified by plgdavid
+	generic_start(device, 0x4000, 0x03, TRUE, FALSE, FALSE); // verified by plgdavid
 }
 
 static DEVICE_START( sn76494 )
 {
-	generic_start(device, 0x10000, 0x0C, TRUE, FALSE, FALSE); // todo: verify; assumed to be the same as sn76489a
+	generic_start(device, 0x4000, 0x03, TRUE, FALSE, FALSE); // todo: verify; assumed to be the same as sn76489a
 }
 
 static DEVICE_START( sn76496 )
 {
-	generic_start(device, 0x10000, 0x0C, TRUE, FALSE, FALSE); // todo: verify; assumed to be the same as sn76489a
+	generic_start(device, 0x4000, 0x03, TRUE, FALSE, FALSE); // todo: verify; assumed to be the same as sn76489a
 }
 
 static DEVICE_START( sn94624 )
 {
-	generic_start(device, 0x10000, 0x0C, FALSE, FALSE, FALSE); // verified by plgdavid
+	generic_start(device, 0x4000, 0x03, FALSE, FALSE, FALSE); // verified by plgdavid
 }
 
 static DEVICE_START( ncr7496 )
