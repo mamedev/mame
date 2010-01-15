@@ -217,7 +217,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (state->gfx_bank & 1) : 0;
 
-	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, sbank, base_color, 0, bank_base, -1);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, sbank, base_color, 0, bank_base, (UINT32)-1);
 }
 
 /*****************************************************************************/

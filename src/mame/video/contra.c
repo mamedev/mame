@@ -313,7 +313,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	else
 		source = state->spriteram_2;
 
-	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, source, base_color, 40, 0, -1);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, source, base_color, 40, 0, (UINT32)-1);
 }
 
 VIDEO_UPDATE( contra )

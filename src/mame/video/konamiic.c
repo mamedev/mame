@@ -2616,6 +2616,8 @@ READ8_HANDLER( K051937_r )
 //logerror("%04x: read unknown 051937 address %x\n",cpu_get_pc(space->cpu),offset);
 		return 0;
 	}
+
+	return 0;
 }
 
 WRITE8_HANDLER( K051937_w )
@@ -3123,6 +3125,8 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 //logerror("%s: read from unknown 053244 address %x\n",cpuexec_describe_context(machine),offset);
 		return 0;
 	}
+
+	return 0;
 }
 
 READ8_HANDLER( K053244_r )
