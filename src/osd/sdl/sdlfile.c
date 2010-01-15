@@ -28,7 +28,6 @@
 #include <errno.h>
 
 // MAME headers
-//#include "osdepend.h"
 #include "osdcore.h"
 
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)

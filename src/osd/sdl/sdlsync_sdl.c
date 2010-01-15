@@ -298,7 +298,7 @@ static int worker_thread_entry(void *param)
 {
 	osd_thread *thread = (osd_thread *) param;
 	void *res;
-//#ifdef PTR64
+
 	res = thread->callback(thread->param);
 #ifdef PTR64
 	return (int) (INT64) res;

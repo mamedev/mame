@@ -26,7 +26,6 @@
 // MAME headers
 #include "osdcore.h"
 
-//#include "osinline.h"
 #include "sdlsync.h"
 
 #include <pthread.h>

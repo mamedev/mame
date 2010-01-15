@@ -22,7 +22,6 @@
 
 /* This is a simple file to encapsulate the OpenGL API headers */
  
-//#include "SDL_config.h"
 #include <SDL/SDL_config.h>
 
 #ifdef __WIN32__
