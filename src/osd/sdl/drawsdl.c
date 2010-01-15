@@ -121,6 +121,7 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 // soft rendering
 static void drawsdl_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 static void drawsdl_bgr888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawsdl_bgra888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 static void drawsdl_rgb565_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 static void drawsdl_rgb555_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
@@ -795,6 +796,10 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		}
 		switch (rmask)
 		{
+			case 0x0000ff00:
+				drawsdl_bgra888_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 4);
+				break;
+
 			case 0x00ff0000:
 				drawsdl_rgb888_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
@@ -885,6 +890,17 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 #define DSTSHIFT_R			0
 #define DSTSHIFT_G			8
 #define DSTSHIFT_B			16
+
+#include "rendersw.c"
+
+#define FUNC_PREFIX(x)		drawsdl_bgra888_##x
+#define PIXEL_TYPE			UINT32
+#define SRCSHIFT_R			0
+#define SRCSHIFT_G			0
+#define SRCSHIFT_B			0
+#define DSTSHIFT_R			8
+#define DSTSHIFT_G			16
+#define DSTSHIFT_B			24
 
 #include "rendersw.c"
 
