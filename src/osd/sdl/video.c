@@ -20,6 +20,7 @@
 #endif
 
 #ifdef SDLMAME_MACOSX
+#undef Status
 #include <Carbon/Carbon.h>
 #endif
 

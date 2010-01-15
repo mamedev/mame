@@ -21,7 +21,7 @@
 #define		SDL_USE_NIB_FILE	0
 
 /* Use this flag to determine whether we use CPS (docking) or not */
-#define		SDL_USE_CPS		1
+#define		SDL_USE_CPS		0
 #ifdef SDL_USE_CPS
 /* Portions of CPS.h */
 typedef struct CPSProcessSerNum
@@ -30,9 +30,9 @@ typedef struct CPSProcessSerNum
 	UInt32		hi;
 } CPSProcessSerNum;
 
-extern OSErr	CPSGetCurrentProcess( CPSProcessSerNum *psn);
-extern OSErr 	CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
-extern OSErr	CPSSetFrontProcess( CPSProcessSerNum *psn);
+extern "C" OSErr	CPSGetCurrentProcess( CPSProcessSerNum *psn);
+extern "C" OSErr 	CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
+extern "C" OSErr	CPSSetFrontProcess( CPSProcessSerNum *psn);
 
 #endif /* SDL_USE_CPS */
 
@@ -319,7 +319,7 @@ static void CustomApplicationMain (int argc, char **argv)
     NSString *result;
 
     bufferSize = selfLen + aStringLen - aRange.length;
-    buffer = NSAllocateMemoryPages(bufferSize*sizeof(unichar));
+    buffer = (unichar *)NSAllocateMemoryPages(bufferSize*sizeof(unichar));
     
     /* Get first part into buffer */
     localRange.location = 0;

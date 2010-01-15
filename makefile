@@ -64,10 +64,24 @@ ifndef TARGETOS
 ifeq ($(OS),Windows_NT)
 TARGETOS = win32
 else
+
+UNAME = $(shell uname -a)
+
+ifeq ($(filter Linux,$(UNAME)),Linux)
 TARGETOS = unix
 endif
+ifeq ($(filter Solaris,$(UNAME)),Solaris)
+TARGETOS = solaris
+endif
+ifeq ($(filter FreeBSD,$(UNAME)),FreeBSD)
+TARGETOS = freebsd
+endif
+ifeq ($(filter Darwin,$(UNAME)),Darwin)
+TARGETOS = macosx
 endif
 
+endif
+endif
 
 
 #-------------------------------------------------
@@ -608,5 +622,7 @@ $(OBJ)/%.a:
 ifeq ($(TARGETOS),macosx)
 $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+	#$(CC) -x objective-c++ $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
+	$(CC) -x objective-c++ $(CDEFS) $(CCOMFLAGS) -c $< -o $@
+	#$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 endif

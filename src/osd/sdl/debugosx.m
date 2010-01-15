@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
@@ -1147,7 +1147,7 @@ void console_create_window(running_machine *machine)
 
 
 - (IBAction)showRightColumn:(id)sender {
-	disasm_view_set_right_column(view, [sender tag]);
+	disasm_view_set_right_column(view, (disasm_right_column) [sender tag]);
 }
 
 
@@ -1555,7 +1555,7 @@ void console_create_window(running_machine *machine)
 
 
 - (void)showDebugger:(NSNotification *)notification {
-	const device_config *device = [[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
+	const device_config *device = (const device_config *) [[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
 	if (device->machine == machine) {
 		if (![window isVisible] && ![window isMiniaturized])
 			[window orderFront:self];
@@ -1801,7 +1801,7 @@ void console_create_window(running_machine *machine)
 
 
 - (void)showDebugger:(NSNotification *)notification {
-	const device_config *device = [[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
+	const device_config *device = (const device_config * )[[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
 	if (device->machine == machine) {
 		[self setCPU:device];
 		[window makeKeyAndOrderFront:self];

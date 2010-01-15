@@ -714,7 +714,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		/* SDL Underlays need alpha = 0 ! */
 		SDL_SetRenderDrawBlendMode(SDL_BLENDMODE_NONE);
 		SDL_SetRenderDrawColor(0,0,0,0 /*255*/);
-		SDL_RenderFill(NULL);
+		SDL_RenderFillRect(NULL);
 		sdl->blittimer--;
 	}
 
@@ -766,7 +766,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 				SDL_SetRenderDrawBlendMode(map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
 				SDL_SetRenderDrawColor(sr, sg, sb, sa);
-				SDL_RenderLine(prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
+				SDL_RenderDrawLine(prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
 						prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
 				break;
 			case RENDER_PRIMITIVE_QUAD:

@@ -724,7 +724,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		/* SDL Underlays need alpha = 0 ! */
 		SDL_SetRenderDrawColor(0,0,0,0);
-		SDL_RenderFill(NULL);
+		SDL_RenderFillRect(NULL);
 		//SDL_RenderFill(0,0,0,0 /*255*/,NULL);
 		sdl->blittimer--;
 	}
