@@ -64,25 +64,36 @@ ifndef TARGETOS
 ifeq ($(OS),Windows_NT)
 TARGETOS = win32
 else
-
+ifneq ($(CROSSBUILD),1)
 UNAME = $(shell uname -a)
 
-ifeq ($(filter Linux,$(UNAME)),Linux)
+ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
 TARGETOS = unix
 endif
-ifeq ($(filter Solaris,$(UNAME)),Solaris)
+ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
 TARGETOS = solaris
 endif
-ifeq ($(filter FreeBSD,$(UNAME)),FreeBSD)
+ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 TARGETOS = freebsd
 endif
-ifeq ($(filter Darwin,$(UNAME)),Darwin)
+ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 TARGETOS = macosx
 endif
 
+ifndef TARGETOS
+$(error Unable to detect TARGETOS from uname -a: $(UNAME))
+endif
+
+# Autodetect PTR64
+ifndef PTR64
+ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+PTR64 = 1
 endif
 endif
 
+endif # CROSS_BUILD
+endif # Windows_NT
+endif # TARGET_OS
 
 #-------------------------------------------------
 # configure name of final executable
@@ -321,11 +332,13 @@ endif
 # CCOMFLAGS are common flags
 # CONLYFLAGS are flags only used when compiling for C
 # CPPONLYFLAGS are flags only used when compiling for C++
+# COBJFLAGS are flags only used when compiling for Objective-C(++)
 #-------------------------------------------------
 
 # start with empties for everything
 CCOMFLAGS =
 CONLYFLAGS =
+COBJFLAGS =
 CPPONLYFLAGS =
 
 # CFLAGS is defined based on C or C++ targets
@@ -336,6 +349,7 @@ CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
 # we compile C++ code to C++98 standard with GNU extensions
 CONLYFLAGS += -std=gnu89
 CPPONLYFLAGS += -x c++ -std=gnu++98
+COBJFLAGS += -x objective-c++
 
 # this speeds it up a bit by piping between the preprocessor/compiler/assembler
 CCOMFLAGS += -pipe
@@ -386,6 +400,9 @@ CONLYFLAGS += \
 	-Wbad-function-cast \
 	-Wstrict-prototypes
 
+# warnings only applicable to OBJ-C compiles
+COBJFLAGS += \
+	-Wpointer-arith 
 
 
 #-------------------------------------------------
@@ -622,7 +639,5 @@ $(OBJ)/%.a:
 ifeq ($(TARGETOS),macosx)
 $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
-	#$(CC) -x objective-c++ $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
-	$(CC) -x objective-c++ $(CDEFS) $(CCOMFLAGS) -c $< -o $@
-	#$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) -c $< -o $@
 endif
