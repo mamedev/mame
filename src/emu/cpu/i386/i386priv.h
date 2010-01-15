@@ -187,6 +187,7 @@ struct _i386_state
 	UINT32 pc;
 	UINT32 prev_eip;
 	UINT32 eflags;
+	UINT32 eflags_mask;
 	UINT8 CF;
 	UINT8 DF;
 	UINT8 SF;

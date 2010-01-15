@@ -2023,6 +2023,10 @@ static void I386OP(groupF6_8)(i386_state *cpustate)			// Opcode 0xf6
 					} else {
 						REG8(AH) = (UINT8)remainder & 0xff;
 						REG8(AL) = (UINT8)result & 0xff;
+
+						// this flag is actually undefined, enable on non-cyrix
+						if (cpustate->cpuid_id0 != 0x69727943)
+							cpustate->CF = 1;
 					}
 				} else {
 					/* TODO: Divide by zero */
@@ -2051,6 +2055,10 @@ static void I386OP(groupF6_8)(i386_state *cpustate)			// Opcode 0xf6
 					} else {
 						REG8(AH) = (UINT8)remainder & 0xff;
 						REG8(AL) = (UINT8)result & 0xff;
+
+						// this flag is actually undefined, enable on non-cyrix
+						if (cpustate->cpuid_id0 != 0x69727943)
+							cpustate->CF = 1;
 					}
 				} else {
 					/* TODO: Divide by zero */
@@ -2361,6 +2369,6 @@ static void I386OP(unimplemented)(i386_state *cpustate)
 
 static void I386OP(invalid)(i386_state *cpustate)
 {
-	//i386_trap(cpustate,6);
-	fatalerror("i386: Invalid opcode %02X at %08X", cpustate->opcode, cpustate->pc - 1);
+	logerror("i386: Invalid opcode %02X at %08X\n", cpustate->opcode, cpustate->pc - 1);
+	i386_trap(cpustate, 6, 0);
 }

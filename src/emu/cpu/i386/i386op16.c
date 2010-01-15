@@ -2639,6 +2639,10 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 					} else {
 						REG16(DX) = (UINT16)remainder;
 						REG16(AX) = (UINT16)result;
+
+						// this flag is actually undefined, enable on non-cyrix
+						if (cpustate->cpuid_id0 != 0x69727943)
+							cpustate->CF = 1;
 					}
 				} else {
 					/* TODO: Divide by zero */
@@ -2667,6 +2671,10 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 					} else {
 						REG16(DX) = (UINT16)remainder;
 						REG16(AX) = (UINT16)result;
+
+						// this flag is actually undefined, enable on non-cyrix
+						if (cpustate->cpuid_id0 != 0x69727943)
+							cpustate->CF = 1;
 					}
 				} else {
 					/* TODO: Divide by zero */

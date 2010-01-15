@@ -2,24 +2,33 @@
 
 static void I486OP(cpuid)(i386_state *cpustate)				// Opcode 0x0F A2
 {
-	switch (REG32(EAX))
+	if (cpustate->cpuid_id0 == 0)
 	{
-		case 0:
+		// this 486 doesn't support the CPUID instruction
+		logerror("CPUID not supported at %08x!\n", cpustate->eip);
+		i386_trap(cpustate, 6, 0);
+	}
+	else
+	{
+		switch (REG32(EAX))
 		{
-			REG32(EAX) = cpustate->cpuid_max_input_value_eax;
-			REG32(EBX) = cpustate->cpuid_id0;
-			REG32(ECX) = cpustate->cpuid_id2;
-			REG32(EDX) = cpustate->cpuid_id1;
-			CYCLES(cpustate,CYCLES_CPUID);
-			break;
-		}
+			case 0:
+			{
+				REG32(EAX) = cpustate->cpuid_max_input_value_eax;
+				REG32(EBX) = cpustate->cpuid_id0;
+				REG32(ECX) = cpustate->cpuid_id2;
+				REG32(EDX) = cpustate->cpuid_id1;
+				CYCLES(cpustate,CYCLES_CPUID);
+				break;
+			}
 
-		case 1:
-		{
-			REG32(EAX) = cpustate->cpu_version;
-			REG32(EDX) = cpustate->feature_flags;
-			CYCLES(cpustate,CYCLES_CPUID_EAX1);
-			break;
+			case 1:
+			{
+				REG32(EAX) = cpustate->cpu_version;
+				REG32(EDX) = cpustate->feature_flags;
+				CYCLES(cpustate,CYCLES_CPUID_EAX1);
+				break;
+			}
 		}
 	}
 }
