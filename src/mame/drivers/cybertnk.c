@@ -7,7 +7,7 @@ preliminary driver by Angelo Salese
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
-- blitter (very likely that it can do zooming);
+- sprite ram (very likely that it can do zooming);
 - road emulation;
 - tilemap video registers;
 - color banking for the tilemaps;
@@ -252,20 +252,23 @@ static VIDEO_UPDATE( cybertnk )
 		}
 	}
 
-	/* spriteram / blitter (BARE-BONES, looks pretty complex) */
+	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
 	if(1)
 	{
 		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
-		int offs,x,y,xsize,ysize,yi,xi,col_bank;
+		int offs,x,y,z,xsize,ysize,yi,xi,col_bank;
 		UINT32 spr_offs;
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
+			z = (spr_ram[offs+(0x6/2)] & 0xffff);
+			if(z == 0xffff)
+				continue;
 			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
 			y = (spr_ram[offs+(0x4/2)] & 0xff);
 			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
 			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
-			ysize = (spr_ram[offs+(0x0/2)] & 0x3f00) >> 6; //obviously wrong!
+			ysize = (spr_ram[offs+(0x0/2)] & 0x0078) >> 2; //obviously wrong!
 			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
 			for(yi = 0;yi < ysize;yi++)
@@ -351,10 +354,10 @@ if(0) //sprite gfx debug viewer
 	if(input_code_pressed(screen->machine, KEYCODE_W))
 		start_offs-=0x200;
 
-	if(input_code_pressed(screen->machine, KEYCODE_T))
+	if(input_code_pressed_once(screen->machine, KEYCODE_T))
 		start_offs+=0x20000;
 
-	if(input_code_pressed(screen->machine, KEYCODE_Y))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Y))
 		start_offs-=0x20000;
 
 	if(input_code_pressed(screen->machine, KEYCODE_E))
@@ -570,7 +573,7 @@ static READ8_HANDLER( soundport_r )
 static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spr_ram) // blitter sprite ram
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spr_ram) // non-tile based sprite ram
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE(&bg_vram)
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE(&fg_vram)
@@ -837,10 +840,10 @@ ROM_START( cybertnk )
 
 	/* TODO: fix the rom loading accordingly*/
 	ROM_REGION( 0x200000, "spr_gfx", 0 )
-	ROM_LOAD32_BYTE( "c01.93" , 0x000001, 0x20000, CRC(b5ee3de2) SHA1(77b9a2818f36826891e510e8550f1025bacfa496) )
-	ROM_LOAD32_BYTE( "c02.92" , 0x000000, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
-	ROM_LOAD32_BYTE( "c03.91" , 0x000003, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
-	ROM_LOAD32_BYTE( "c04.90" , 0x000002, 0x20000, CRC(04d6fdc2) SHA1(56f8091c1a010014e951f5f47084e1400006123e) )
+	ROM_LOAD32_BYTE( "c01.93" , 0x180001, 0x20000, CRC(b5ee3de2) SHA1(77b9a2818f36826891e510e8550f1025bacfa496) )
+	ROM_LOAD32_BYTE( "c02.92" , 0x180000, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
+	ROM_LOAD32_BYTE( "c03.91" , 0x180003, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
+	ROM_LOAD32_BYTE( "c04.90" , 0x180002, 0x20000, CRC(04d6fdc2) SHA1(56f8091c1a010014e951f5f47084e1400006123e) )
 	ROM_LOAD32_BYTE( "c05.102", 0x100001, 0x20000, CRC(3f537490) SHA1(12d6545d29dda9f88019040fa33c73a22a2a213b) )
 	ROM_LOAD32_BYTE( "c06.101", 0x100000, 0x20000, CRC(ff69c6a4) SHA1(badd20d26ba771780aebf733e1fbd1d37aa66f9b) )
 	ROM_LOAD32_BYTE( "c07.100", 0x100003, 0x20000, CRC(5e8eba75) SHA1(6d0c1916517802acf808c8edc8e0b6074bdc90be) )
@@ -849,10 +852,10 @@ ROM_START( cybertnk )
 	ROM_LOAD32_BYTE( "c10.108", 0x080000, 0x20000, CRC(777c6a62) SHA1(4684d1c5d88b37ecb20002b7aa4814bf566e7d4b) )
 	ROM_LOAD32_BYTE( "c11.107", 0x080003, 0x20000, CRC(330ca5a1) SHA1(4409da231a5abcec8c7d2d66eefdfd2019a322db) )
 	ROM_LOAD32_BYTE( "c12.106", 0x080002, 0x20000, CRC(c1ec8e61) SHA1(09f2f4ddc100e5675c9bd82c200718fb0b69655e) )
-	ROM_LOAD32_BYTE( "c13.119", 0x180001, 0x20000, CRC(4e22a7e0) SHA1(69cc7dd528b8af0c28b448285768a3ed079099ba) )
-	ROM_LOAD32_BYTE( "c14.118", 0x180000, 0x20000, CRC(bdbd6232) SHA1(94b0741d5eced558723dda32a89aa2b747cdcbbd) )
-	ROM_LOAD32_BYTE( "c15.117", 0x180003, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
-	ROM_LOAD32_BYTE( "c16.116", 0x180002, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
+	ROM_LOAD32_BYTE( "c13.119", 0x000001, 0x20000, CRC(4e22a7e0) SHA1(69cc7dd528b8af0c28b448285768a3ed079099ba) )
+	ROM_LOAD32_BYTE( "c14.118", 0x000000, 0x20000, CRC(bdbd6232) SHA1(94b0741d5eced558723dda32a89aa2b747cdcbbd) )
+	ROM_LOAD32_BYTE( "c15.117", 0x000003, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
+	ROM_LOAD32_BYTE( "c16.116", 0x000002, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
 
 	ROM_REGION( 0x200000, "road_data", 0 )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
