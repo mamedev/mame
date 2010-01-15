@@ -2053,7 +2053,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// If there's data here, you must have an explicit palette lookup.
 			// FIXME: This only seems to work with bbust2.  There's a flag somewhere no doubt.
 			if (threeDPointer[1] & 0x0f00 && hng64_mcu_type == SHOOT_MCU)
-				explicitPaletteValue = ((threeDPointer[1] & 0x0f00) >> 8 >> 1) * 0x100;
+				explicitPaletteValue = (threeDPointer[1] & 0x0f00) >> 8;
 
 			// Debug - Colors polygons with certain flags bright blue! ajg
 			//if (threeDPointer[1] & 0x00f0)
@@ -2085,6 +2085,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			}
 
 			// PALETTE
+			polys[*numPolys].palOffset = 0;
+
 			/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
 			/*        There must be something set globally somewhere.  */
 			if (hng64_3dregs[0x00/4] & 0x2000)
@@ -2102,7 +2104,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// This gets set when the palette value is stored in the ROM.  There's gotta' be a flag for turning this on somewhere.
 			if (explicitPaletteValue != 0xffff)
 			{
-				polys[*numPolys].palOffset = explicitPaletteValue;
+				// These palette methods can be unified soon.
+				polys[*numPolys].palOffset = explicitPaletteValue * 0x80;
 			}
 
 
