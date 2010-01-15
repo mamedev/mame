@@ -1031,8 +1031,8 @@ INLINE int xmode(UINT32 opcode, char type)
 			return 1;
 	} else if(opcode & 0x200)
 		return 2;
-	else
-		return 1;
+
+	return 1;
 }
 
 INLINE int sfao(UINT32 st1)

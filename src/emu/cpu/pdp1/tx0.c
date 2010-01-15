@@ -108,9 +108,9 @@ static int tx0_read(tx0_state *cpustate, offs_t address)
 	else if ((cpustate->lr_sel >> address) & 1)
 		/* live register (LR) */
 		return LR;
-	else
-		/* toggle switch storage (TSS) */
-		return cpustate->tss[address];
+
+	/* toggle switch storage (TSS) */
+	return cpustate->tss[address];
 }
 
 static void tx0_write(tx0_state *cpustate, offs_t address, int data)

@@ -295,7 +295,7 @@ static void set_irq_line(i8086_state *cpustate, int irqline, int state)
 
 		/* if the IF is set, signal an interrupt */
 		if (state != CLEAR_LINE && cpustate->IF)
-			PREFIX(_interrupt)(cpustate, -1);
+			PREFIX(_interrupt)(cpustate, (UINT32)-1);
 	}
 }
 

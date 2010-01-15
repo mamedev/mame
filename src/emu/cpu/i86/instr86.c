@@ -2058,7 +2058,7 @@ static void PREFIX86(_popf)(i8086_state *cpustate)    /* Opcode 0x9d */
 
 	/* if the IF is set, and an interrupt is pending, signal an interrupt */
 	if (cpustate->IF && cpustate->irq_state)
-		PREFIX(_interrupt)(cpustate, -1);
+		PREFIX(_interrupt)(cpustate, (UINT32)-1);
 }
 
 static void PREFIX86(_sahf)(i8086_state *cpustate)    /* Opcode 0x9e */
@@ -2468,7 +2468,7 @@ static void PREFIX86(_iret)(i8086_state *cpustate)    /* Opcode 0xcf */
 
 	/* if the IF is set, and an interrupt is pending, signal an interrupt */
 	if (cpustate->IF && cpustate->irq_state)
-		PREFIX(_interrupt)(cpustate, -1);
+		PREFIX(_interrupt)(cpustate, (UINT32)-1);
 }
 
 static void PREFIX86(_rotshft_b)(i8086_state *cpustate)    /* Opcode 0xd0 */
@@ -3030,7 +3030,7 @@ static void PREFIX86(_sti)(i8086_state *cpustate)    /* Opcode 0xfb */
 
 	/* if an interrupt is pending, signal an interrupt */
 	if (cpustate->irq_state)
-		PREFIX(_interrupt)(cpustate, -1);
+		PREFIX(_interrupt)(cpustate, (UINT32)-1);
 }
 
 static void PREFIX86(_cld)(i8086_state *cpustate)    /* Opcode 0xfc */

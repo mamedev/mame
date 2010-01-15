@@ -386,7 +386,7 @@ static void external_int(nec_state_t *nec_state)
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(nec_state, -1,0);
+		nec_interrupt(nec_state, (UINT32)-1,0);
 	}
 }
 

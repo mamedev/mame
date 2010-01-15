@@ -207,7 +207,7 @@ static void external_int(v30mz_state *cpustate)
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(cpustate,-1,0);
+		nec_interrupt(cpustate,(UINT32)-1,0);
 	}
 }
 

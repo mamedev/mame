@@ -784,24 +784,24 @@ INLINE unsigned int m68k_read_pcrelative_8(m68ki_cpu_core *m68k, unsigned int ad
 {
 	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
 		return (((*m68k->memory.readimm16)(m68k->program, address&~1)>>(8*(1-(address & 1))))&0xff);
-	else
-		return (*m68k->memory.read8)(m68k->program, address);
+
+	return (*m68k->memory.read8)(m68k->program, address);
 }
 
 INLINE unsigned int m68k_read_pcrelative_16(m68ki_cpu_core *m68k, unsigned int address)
 {
 	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
 		return (*m68k->memory.readimm16)(m68k->program, address);
-	else
-		return (*m68k->memory.read16)(m68k->program, address);
+
+	return (*m68k->memory.read16)(m68k->program, address);
 }
 
 INLINE unsigned int m68k_read_pcrelative_32(m68ki_cpu_core *m68k, unsigned int address)
 {
 	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
 		return m68k_read_immediate_32(m68k, address);
-	else
-		return (*m68k->memory.read32)(m68k->program, address);
+
+	return (*m68k->memory.read32)(m68k->program, address);
 }
 
 

@@ -3024,7 +3024,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x0ea:	/* ADDMEx */
 		case 0x2ea:	/* ADDMEOx */
 			UML_CARRY(block, SPR32(SPR_XER), IMM(29));										// carry   [xer],XER_CA
-			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), IMM(-1));							// addc    rd,ra,-1
+			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), IMM((UINT32)-1));							// addc    rd,ra,-1
 			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
 			return TRUE;
@@ -3065,7 +3065,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x2e8:	/* SUBFMEOx */
 			UML_XOR(block, IREG(0), SPR32(SPR_XER), IMM(XER_CA));							// xor     i0,[xer],XER_CA
 			UML_CARRY(block, IREG(0), IMM(29));												// carry   i0,XER_CA
-			UML_SUBB(block, R32(G_RD(op)), IMM(-1), R32(G_RA(op)));							// subc    rd,-1,ra
+			UML_SUBB(block, R32(G_RD(op)), IMM((UINT32)-1), R32(G_RA(op)));							// subc    rd,-1,ra
 			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
 																							// <update flags>
 			return TRUE;
