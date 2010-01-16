@@ -60,6 +60,11 @@ else
 #SDL_INSTALL_ROOT = /usr/local/test
 endif
 
+# uncomment and change the next line to build the gtk debugger for win32
+# Get what you need here: http://www.gtk.org/download-windows.html
+# GTK_INSTALL_ROOT = y:/couriersud/win/gtk-32
+
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -190,11 +195,24 @@ endif
 ifeq ($(TARGETOS),win32)
 BASE_TARGETOS = win32
 SYNC_IMPLEMENTATION = win32
-NO_DEBUGGER = 1
 NO_X11 = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI 
-
 LIBGL = -lopengl32
+
+# do we have GTK ?
+ifndef GTK_INSTALL_ROOT
+NO_DEBUGGER = 1
+else
+DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
+LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
+	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0 
+CCOMFLAGS += -mms-bitfields \
+	-I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/glib-2.0 \
+	-I$(GTK_INSTALL_ROOT)/include/cairo -I$(GTK_INSTALL_ROOT)/include/pango-1.0 \
+	-I$(GTK_INSTALL_ROOT)/include/atk-1.0 \
+	-I$(GTK_INSTALL_ROOT)/lib/glib-2.0/include -I$(GTK_INSTALL_ROOT)/lib/gtk-2.0/include
+LDFLAGS += -L$(GTK_INSTALL_ROOT)/lib
+endif # GTK_INSTALL_ROOT
 
 SDLMAIN = $(SDLOBJ)/main.o
 DEFS += -Dmain=utf8_main

@@ -1,6 +1,8 @@
 
 #include "dview.h"
+#ifndef SDLMAME_WIN32
 #include <gconf/gconf-client.h>
+#endif
 
 G_DEFINE_TYPE(DView, dview, GTK_TYPE_CONTAINER);
 
@@ -320,6 +322,7 @@ static void dview_forall(GtkContainer *dvc, gboolean include_internals, GtkCallb
 
 static void dview_class_init(DViewClass *dvc)
 {
+#ifndef SDLMAME_WIN32
     GConfClient *conf = gconf_client_get_default();
     char *name = 0;
     dvc->fixedfont = 0;
@@ -333,6 +336,7 @@ static void dview_class_init(DViewClass *dvc)
     }
 
     if(!dvc->fixedfont)
+#endif
 		dvc->fixedfont = pango_font_description_from_string("Monospace 10");
 
     if(!dvc->fixedfont) {
