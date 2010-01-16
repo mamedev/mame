@@ -45,10 +45,7 @@ YMF278B-F (80 pin PQFP) & YAC513 (16 pin SOIC)
 ( 93c56 is a 93c46 with double the address space. )
 
 To Do:
-
   - see notes in video file -
-
-  Daraku is missing some screen blend effects
 
 
 *-----------------------------------*
@@ -232,6 +229,7 @@ Dragon Blaze, Psikyo, 2000
 Gunbarich, Psikyo, 2001
 Tetris The Grand Master 2 , Psikyo, 2000
 Tetris The Grand Master 2+, Psikyo, 2000
+Mahjong G-Taste, Psikyo, 2002
 
 PCB Layout
 ----------
@@ -369,7 +367,7 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 {
 	psikyosh_state *state = (psikyosh_state *)space->machine->driver_data;
 	int r, g, b;
-	COMBINE_DATA(&state->paletteram[offset]); /* is this ok .. */
+	COMBINE_DATA(&state->paletteram[offset]);
 
 	b = ((state->paletteram[offset] & 0x0000ff00) >>8);
 	g = ((state->paletteram[offset] & 0x00ff0000) >>16);
@@ -526,9 +524,9 @@ P1KEY11  29|30  P2KEY11
 
 
 static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM					// program ROM (1 meg)
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
-	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// sprites (might be a bit longer)
+	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // sprites (might be a bit longer)
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // backgrounds
 	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, paletteram) // palette..
 	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram) // a gradient sometimes ...
@@ -550,7 +548,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4") AM_DEVWRITE("eeprom", psh_eeprom_w)
+	AM_RANGE(0x03000004, 0x03000007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
 	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -560,7 +558,7 @@ static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, vidregs) // video registers
 	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM  AM_BASE_MEMBER(psikyosh_state, ram)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram)
 
 #if ROMTEST
 	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
@@ -722,11 +720,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tgm2 )
 	PORT_INCLUDE( common )
 
-	PORT_START("JP4")	/* jumper pads on the PCB */
-//  PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
-//  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
-//  PORT_DIPSETTING(          0x02000000, "International Ver A." )
-//  PORT_DIPSETTING(          0x01000000, "International Ver B." )
+	PORT_START("JP4")	/* jumper pads on the PCB. Checked and discarded. However, if you force word 0x6060000 to 1/2/3 you can have various effects. Disbled at compile time */
+//	PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
+//	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
+//	PORT_DIPSETTING(          0x02000000, "International Ver A." )
+//	PORT_DIPSETTING(          0x01000000, "International Ver B." )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 INPUT_PORTS_END
 
@@ -1055,13 +1053,11 @@ ROM_START( dragnblz )
 ROM_END
 
 /*
-
 Starting with Gunbarich and including Mahjong G-Taste, Psikyo started to "recycle" left over Dragon Blaze PCBs.
   Psikyo would replace some of the Dragon Blaze roms with the new game roms leaving many of the surface mounted
   roms intact.  The new games don't use or access the left over roms, but the PCB needs the roms filled to function.
 
   The hidden rom tests in Gunbarich and Mahjong G-Teste shows the games only uses the new game roms.
-
 */
 
 ROM_START( gnbarich )
@@ -1260,13 +1256,13 @@ static DRIVER_INIT( mjgtaste )
 
 /* ps3-v1 */
 GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, soldivid, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  s1945ii,  ROT270, "Psikyo", "Strikers 1945 II", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // linescroll/zoom test
+GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  s1945ii,  ROT270, "Psikyo", "Strikers 1945 II", GAME_SUPPORTS_SAVE )
 GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   daraku,   ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", GAME_SUPPORTS_SAVE )
 GAME( 1998, sbomberb, 0,        psikyo3v1,   sbomberb, sbomberb, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
 
 /* ps5 */
 GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, gunbird2, ROT270, "Psikyo", "Gunbird 2", GAME_SUPPORTS_SAVE )
-GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, s1945iii, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // linescroll/zoom
+GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, s1945iii, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", GAME_SUPPORTS_SAVE )
 
 /* ps5v2 */
 GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, dragnblz, ROT270, "Psikyo", "Dragon Blaze", GAME_SUPPORTS_SAVE )
