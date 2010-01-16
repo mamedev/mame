@@ -78,6 +78,7 @@ endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 TARGETOS = freebsd
 endif
+
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 TARGETOS = macosx
 endif
@@ -93,7 +94,19 @@ PTR64 = 1
 endif
 endif
 
-endif # CROSS_BUILD
+# Autodetect BIGENDIAN 
+# MacOSX
+ifndef BIGENDIAN
+ifneq (,$(findstring Power,$(UNAME)))
+BIGENDIAN=1
+endif
+# Linux
+ifneq (,$(findstring ppc,$(UNAME)))
+BIGENDIAN=1
+endif
+endif # BIGENDIAN
+
+endif # CROSS_BUILD	
 endif # Windows_NT
 
 endif # TARGET_OS
@@ -658,3 +671,4 @@ $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
 	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) -c $< -o $@
 endif
+
