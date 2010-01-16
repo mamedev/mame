@@ -359,10 +359,10 @@ static void check_interrupts(hyperstone_state *cpustate);
 #define EXTRA_U (decode)->extra.u
 #define EXTRA_S (decode)->extra.s
 
-#define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register(cpustate, (decode)->src, _data_) : set_global_register(cpustate, (decode)->src, _data_))
-#define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register(cpustate, (decode)->src + 1, _data_) : set_global_register(cpustate, (decode)->src + 1, _data_))
-#define SET_DREG( _data_ )  ((decode)->dst_is_local ? set_local_register(cpustate, (decode)->dst, _data_) : set_global_register(cpustate, (decode)->dst, _data_))
-#define SET_DREGF( _data_ ) ((decode)->dst_is_local ? set_local_register(cpustate, (decode)->dst + 1, _data_) : set_global_register(cpustate, (decode)->dst + 1, _data_))
+#define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register(cpustate, (decode)->src, (UINT32)_data_) : set_global_register(cpustate, (decode)->src, (UINT32)_data_))
+#define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register(cpustate, (decode)->src + 1, (UINT32)_data_) : set_global_register(cpustate, (decode)->src + 1, (UINT32)_data_))
+#define SET_DREG( _data_ )  ((decode)->dst_is_local ? set_local_register(cpustate, (decode)->dst, (UINT32)_data_) : set_global_register(cpustate, (decode)->dst, (UINT32)_data_))
+#define SET_DREGF( _data_ ) ((decode)->dst_is_local ? set_local_register(cpustate, (decode)->dst + 1, (UINT32)_data_) : set_global_register(cpustate, (decode)->dst + 1, (UINT32)_data_))
 
 #define SRC_IS_PC      (!(decode)->src_is_local && (decode)->src == PC_REGISTER)
 #define DST_IS_PC      (!(decode)->dst_is_local && (decode)->dst == PC_REGISTER)
