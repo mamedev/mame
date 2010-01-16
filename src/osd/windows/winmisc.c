@@ -124,7 +124,7 @@ void osd_free(void *ptr)
 
 	// small items just get freed
 	if (size < GUARD_PAGE_THRESH)
-		HeapFree(GetProcessHeap(), 0, ptr);
+		HeapFree(GetProcessHeap(), 0, reinterpret_cast<UINT8 *>(ptr) - sizeof(size_t));
 
 	// large items need more care
 	else
