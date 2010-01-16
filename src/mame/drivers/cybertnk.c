@@ -210,20 +210,21 @@ static VIDEO_UPDATE( cybertnk )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
+	//popmessage("%04x",test);
 	{
 		int count,x,y;
 		const gfx_element *gfx = screen->machine->gfx[2];
 
 		count = 0;
 
-		for (y=0;y<64;y++)
+		for (y=0;y<32;y++)
 		{
 			for (x=0;x<128;x++)
 			{
 				UINT16 tile = bg_vram[count] & 0x1fff;
 				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
 
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,x*8,(y*8));
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,x*8,(y*8),0);
 
 				count++;
 
@@ -237,7 +238,7 @@ static VIDEO_UPDATE( cybertnk )
 
 		count = 0;
 
-		for (y=0;y<64;y++)
+		for (y=0;y<32;y++)
 		{
 			for (x=0;x<128;x++)
 			{
@@ -463,7 +464,7 @@ static READ16_HANDLER( io_r )
 					// only once I think, during init at 0x00000410
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
-					popmessage("unknown controller device 0x42");
+					//popmessage("unknown controller device 0x42");
 					io_ram[0xd4/2] = 0;
 					break;
 
@@ -471,8 +472,8 @@ static READ16_HANDLER( io_r )
 					io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
 					break;
 
-				default:
-					popmessage("unknown controller device");
+				//default:
+					//popmessage("unknown controller device");
 			}
 			return 0;
 
@@ -490,7 +491,7 @@ static READ16_HANDLER( io_r )
 
 		default:
 		{
-			popmessage("unknown io read 0x%08x", offset);
+			//popmessage("unknown io read 0x%08x", offset);
 			return io_ram[offset];
 		}
 	}
@@ -550,6 +551,7 @@ static WRITE16_HANDLER( io_w )
 		// Maybe this is for lamps and stuff, or
 		// maybe just debug.
 		// They are all written in a block at 0x00000944
+		case 0x40/2:
 		case 0x42/2:
 		case 0x44/2:
 		case 0x48/2:
@@ -558,6 +560,7 @@ static WRITE16_HANDLER( io_w )
 		case 0x80/2:
 		case 0x82/2:
 		case 0x84/2:
+			popmessage("%02x %02x %02x %02x %02x %02x %02x",io_ram[0x40/2],io_ram[0x42/2],io_ram[0x44/2],io_ram[0x46/2],io_ram[0x48/2],io_ram[0x4a/2],io_ram[0x4c/2]);
 			break;
 
 		default:
@@ -729,6 +732,7 @@ static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_8x8x4,     0,      0x400 )
 GFXDECODE_END
 
+#if 0
 static INTERRUPT_GEN( master_irq )
 {
 	switch(cpu_getiloops(device))
@@ -746,6 +750,7 @@ static INTERRUPT_GEN( slave_irq )
 		case 1: cpu_set_input_line(device,1,HOLD_LINE); break;
 	}
 }
+#endif
 
 static const y8950_interface y8950_config = {
 	0 /* TODO */
@@ -754,11 +759,13 @@ static const y8950_interface y8950_config = {
 static MACHINE_DRIVER_START( cybertnk )
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem)
-	MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
+//	MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("slave", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(slave_mem)
-	MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
+//	MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
+	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579500)
 	MDRV_CPU_PROGRAM_MAP(sound_mem)
