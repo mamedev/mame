@@ -61,9 +61,11 @@ endif
 #-------------------------------------------------
 
 ifndef TARGETOS
+
 ifeq ($(OS),Windows_NT)
 TARGETOS = win32
 else
+
 ifneq ($(CROSSBUILD),1)
 UNAME = $(shell uname -a)
 
@@ -93,7 +95,22 @@ endif
 
 endif # CROSS_BUILD
 endif # Windows_NT
+
 endif # TARGET_OS
+
+
+ifeq ($(TARGETOS),win32)
+
+# Autodetect PTR64
+ifndef PTR64
+ifneq (,$(findstring mingw64-w64,$(PATH)))
+PTR64=1
+endif
+endif
+
+endif
+
+
 
 #-------------------------------------------------
 # configure name of final executable
