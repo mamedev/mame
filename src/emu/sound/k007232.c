@@ -311,9 +311,9 @@ static DEVICE_START( k007232 )
 
 	/* Set up the chips */
 
-	info->pcmbuf[0] = device->region;
-	info->pcmbuf[1] = device->region;
-	info->pcmlimit  = device->regionbytes;
+	info->pcmbuf[0] = *device->region;
+	info->pcmbuf[1] = *device->region;
+	info->pcmlimit  = device->region->bytes();
 
 	info->clock = device->clock;
 

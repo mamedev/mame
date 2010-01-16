@@ -3735,10 +3735,10 @@ static void init_ds3(running_machine *machine)
 
 	/* if we have a sound DSP, boot it */
 	if (state->soundcpu != NULL && cpu_get_type(state->soundcpu) == CPU_ADSP2105)
-		adsp2105_load_boot_data((UINT8 *)(state->soundcpu->region + 0x10000), (UINT32 *)state->soundcpu->region);
+		adsp2105_load_boot_data(state->soundcpu->region->base.u8 + 0x10000, state->soundcpu->region->base.u32);
 
 	if (state->sounddsp != NULL && cpu_get_type(state->sounddsp) == CPU_ADSP2105)
-		adsp2105_load_boot_data((UINT8 *)(state->sounddsp->region + 0x10000), (UINT32 *)state->sounddsp->region);
+		adsp2105_load_boot_data(state->sounddsp->region->base.u8 + 0x10000, state->sounddsp->region->base.u32);
 
 /*
 

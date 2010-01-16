@@ -165,8 +165,8 @@ static DEVICE_START( ym2610 )
 	/* stream system initialize */
 	info->stream = stream_create(device,0,2,rate,info,(type == SOUND_YM2610) ? ym2610_stream_update : ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = device->region;
-	pcmsizea = device->regionbytes;
+	pcmbufa  = *device->region;
+	pcmsizea = device->region->bytes();
 	name.printf("%s.deltat", device->tag.cstr());
 	pcmbufb  = (void *)(memory_region(device->machine, name));
 	pcmsizeb = memory_region_length(device->machine, name);

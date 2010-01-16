@@ -943,7 +943,7 @@ static DEVICE_START( tms5110 )
 	tms5110_state *tms = get_safe_token(device);
 
 	tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
-	tms->table = device->region;
+	tms->table = *device->region;
 
 	tms->device = device;
 	tms5110_set_variant(tms, TMS5110_IS_5110A);

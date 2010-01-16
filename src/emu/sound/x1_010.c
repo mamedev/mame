@@ -206,7 +206,7 @@ static DEVICE_START( x1_010 )
 	const x1_010_interface *intf = (const x1_010_interface *)device->static_config;
 	x1_010_state *info = get_safe_token(device);
 
-	info->region		= device->region;
+	info->region		= *device->region;
 	info->base_clock	= device->clock;
 	info->rate			= device->clock / 1024;
 	info->address		= intf->adr;

@@ -161,8 +161,8 @@ static DEVICE_START( ym2608 )
 	/* stream system initialize */
 	info->stream = stream_create(device,0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = device->region;
-	pcmsizea = device->regionbytes;
+	pcmbufa  = *device->region;
+	pcmsizea = device->region->bytes();
 
 	/* initialize YM2608 */
 	info->chip = ym2608_init(info,device,device->clock,rate,

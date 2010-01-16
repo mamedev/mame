@@ -665,10 +665,10 @@ static DEVICE_START( vlm5030 )
 	vlm5030_reset(chip);
 	chip->phase = PH_IDLE;
 
-	chip->rom = device->region;
+	chip->rom = *device->region;
 	/* memory size */
 	if( chip->intf->memory_size == 0)
-		chip->address_mask = device->regionbytes-1;
+		chip->address_mask = device->region->bytes()-1;
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 

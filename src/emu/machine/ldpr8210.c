@@ -351,7 +351,8 @@ static void pr8210_init(laserdisc_state *ld)
 	player->slowtrg = curtime;
 
 	/* find our CPU */
-	player->cpu = ld->device->machine->device(device_build_tag(tempstring, ld->device, "pr8210"));
+	player->cpu = ld->device->subdevice("pr8210");
+	assert(player->cpu != NULL);
 
 	/* we don't have the Simutrek player overrides */
 	player->simutrek.cpu = NULL;

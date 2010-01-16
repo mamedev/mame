@@ -305,7 +305,7 @@ static DEVICE_START( okim6376 )
 	compute_tables();
 
 	info->command = -1;
-	info->region_base = device->region;
+	info->region_base = *device->region;
 	info->master_clock = device->clock;
 
 	/* generate the name and create the stream */

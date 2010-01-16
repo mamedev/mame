@@ -388,7 +388,7 @@ static DEVICE_START( namco )
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	build_decoded_waveform(device->machine, chip, device->region);
+	build_decoded_waveform(device->machine, chip, *device->region);
 
 	/* get stream channels */
 	if (intf->stereo)

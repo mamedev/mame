@@ -305,11 +305,24 @@ enum device_space
 	AS_IO = 2
 };
 
+class region_info;
+
 class device_config
 {
+	DISABLE_COPYING(device_config);
+
+public:	// private eventually	
+	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
+
 public:
+	device_config(const device_config *owner, device_type type, const char *tag, UINT32 clock);
+	~device_config();
+
 	inline const address_space *space(int index = 0) const;
 	inline const address_space *space(device_space index) const;
+	
+	const region_info *subregion(const char *tag) const;
+	const device_config *subdevice(const char *tag) const;
 
 	/* device relationships (always valid) */
 	device_config *			next;					/* next device (of any type/class) */
@@ -335,10 +348,8 @@ public:
 	UINT8					started;				/* TRUE if the start function has succeeded */
 	void *					token;					/* token if device is live */
 	UINT32					tokenbytes;				/* size of the token data allocated */
-	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
-	UINT32					regionbytes;			/* size of the region, in bytes */
-	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
 	device_execute_func 	execute;				/* quick pointer to execute callback */
+	const region_info *		region;					/* our device-local region */
 };
 
 

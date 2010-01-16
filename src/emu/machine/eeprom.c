@@ -360,20 +360,18 @@ static DEVICE_NVRAM( eeprom )
 		/* populate from a memory region if present */
 		if (device->region != NULL)
 		{
-			UINT32 region_flags = memory_region_flags(device->machine, device->tag.cstr());
-
-			if (device->regionbytes != eeprom_bytes)
+			if (device->region->length != eeprom_bytes)
 				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag.cstr(), eeprom_bytes);
-			if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
+			if (eestate->intf->data_bits == 8 && (device->region->flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
 				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag.cstr());
-			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
-				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag.cstr(), region_flags);
+			if (eestate->intf->data_bits == 16 && ((device->region->flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (device->region->flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
+				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag.cstr(), device->region->flags);
 
 			for (offs = 0; offs < eeprom_length; offs++)
 				if (eestate->intf->data_bits == 8)
-					memory_write_byte(device->space(), offs, device->region[offs]);
+					memory_write_byte(device->space(), offs, device->region->base.u8[offs]);
 				else
-					memory_write_word(device->space(), offs * 2, ((UINT16 *)device->region)[offs]);
+					memory_write_word(device->space(), offs * 2, device->region->base.u16[offs]);
 		}
 	}
 }

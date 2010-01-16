@@ -413,7 +413,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 	if (info->bank_installed)
 	{
 		info->bank_offs = base;
-		memory_set_bankptr(device->machine, device->tag, device->region + base);
+		memory_set_bankptr(device->machine, device->tag, device->region->base.u8 + base);
 	}
 }
 

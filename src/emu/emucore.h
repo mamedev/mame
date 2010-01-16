@@ -78,9 +78,13 @@ class running_machine;
 union generic_ptr
 {
 	void *		v;
+	INT8 *		i8;
 	UINT8 *		u8;
+	INT16 *		i16;
 	UINT16 *	u16;
+	INT32 *		i32;
 	UINT32 *	u32;
+	INT64 *		i64;
 	UINT64 *	u64;
 };
 

@@ -244,8 +244,8 @@ static void rf5c400_init_chip(const device_config *device, rf5c400_state *info)
 {
 	int i;
 
-	info->rom = (INT16*)device->region;
-	info->rom_length = device->regionbytes / 2;
+	info->rom = *device->region;
+	info->rom_length = device->region->bytes() / 2;
 
 	// init volume table
 	{

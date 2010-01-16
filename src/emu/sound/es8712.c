@@ -227,7 +227,7 @@ static DEVICE_START( es8712 )
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = device->region;
+	chip->region_base = *device->region;
 
 	/* generate the name and create the stream */
 	chip->stream = stream_create(device, 0, 1, device->clock, chip, es8712_update);

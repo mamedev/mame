@@ -160,17 +160,29 @@ class region_info
 {
 	DISABLE_COPYING(region_info);
 	
-	running_machine *machine;
+	running_machine *		machine;
 	
 public:
 	region_info(running_machine *machine, const char *_name, UINT32 _length, UINT32 _flags);
 	~region_info();
 	
-	region_info *	next;
-	astring			name;
-	UINT32			length;
-	UINT32			flags;
-	UINT8 *			base;
+	operator void *() const { return (this != NULL) ? base.v : NULL; }
+	operator INT8 *() const { return (this != NULL) ? base.i8 : NULL; }
+	operator UINT8 *() const { return (this != NULL) ? base.u8 : NULL; }
+	operator INT16 *() const { return (this != NULL) ? base.i16 : NULL; }
+	operator UINT16 *() const { return (this != NULL) ? base.u16 : NULL; }
+	operator INT32 *() const { return (this != NULL) ? base.i32 : NULL; }
+	operator UINT32 *() const { return (this != NULL) ? base.u32 : NULL; }
+	operator INT64 *() const { return (this != NULL) ? base.i64 : NULL; }
+	operator UINT64 *() const { return (this != NULL) ? base.u64 : NULL; }
+	
+	UINT32 bytes() const { return (this != NULL) ? length : 0; }
+	
+	region_info *			next;
+	astring					name;
+	generic_ptr				base;
+	UINT32					length;
+	UINT32					flags;
 };
 
 

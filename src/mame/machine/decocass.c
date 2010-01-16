@@ -2105,7 +2105,7 @@ static UINT8 tape_get_status_bits(const device_config *device)
 
 		/* data block bytes are data */
 		else if (tape->bytenum >= BYTE_DATA_0 && tape->bytenum <= BYTE_DATA_255)
-			byteval = device->region[blocknum * 256 + (tape->bytenum - BYTE_DATA_0)];
+			byteval = static_cast<UINT8 *>(*device->region)[blocknum * 256 + (tape->bytenum - BYTE_DATA_0)];
 
 		/* CRC MSB */
 		else if (tape->bytenum == BYTE_CRC16_MSB)
@@ -2182,10 +2182,11 @@ static DEVICE_START( decocass_tape )
 	tape->timer = timer_alloc(device->machine, tape_clock_callback, (void *)device);
 	if (device->region == NULL)
 		return;
+	UINT8 *regionbase = *device->region;
 
 	/* scan for the first non-empty block in the image */
-	for (offs = device->regionbytes - 1; offs >= 0; offs--)
-		if (device->region[offs] != 0)
+	for (offs = device->region->bytes() - 1; offs >= 0; offs--)
+		if (regionbase[offs] != 0)
 			break;
 	numblocks = ((offs | 0xff) + 1) / 256;
 	assert(numblocks < ARRAY_LENGTH(tape->crc16));
@@ -2201,7 +2202,7 @@ static DEVICE_START( decocass_tape )
 
 		/* first CRC the 256 bytes of data */
 		for (offs = 256 * curblock; offs < 256 * curblock + 256; offs++)
-			crc = tape_crc16_byte(crc, device->region[offs]);
+			crc = tape_crc16_byte(crc, regionbase[offs]);
 
 		/* then find a pair of bytes that will bring the CRC to 0 (any better way than brute force?) */
 		for (testval = 0; testval < 0x10000; testval++)

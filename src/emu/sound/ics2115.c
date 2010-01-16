@@ -477,7 +477,7 @@ static DEVICE_START( ics2115 )
 
 	chip->device = device;
 	chip->intf = (const ics2115_interface *)device->static_config;
-	chip->rom = device->region;
+	chip->rom = *device->region;
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);
 	chip->ulaw = auto_alloc_array(device->machine, INT16, 256);

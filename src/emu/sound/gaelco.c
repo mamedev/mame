@@ -268,7 +268,7 @@ static DEVICE_START( gaelco )
 	info->stream = stream_create(device, 0, 2, 8000, info, gaelco_update);
 	info->snd_data = (UINT8 *)memory_region(device->machine, intf->gfxregion);
 	if (info->snd_data == NULL)
-		info->snd_data = device->region;
+		info->snd_data = *device->region;
 
 	/* init volume table */
 	for (vol = 0; vol < VOLUME_LEVELS; vol++){

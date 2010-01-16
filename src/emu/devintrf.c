@@ -81,6 +81,40 @@ INLINE int device_matches_type(const device_config *device, device_type type)
 }
 
 
+/*-------------------------------------------------
+    subregion - return a pointer to the region
+    info for a given region
+-------------------------------------------------*/
+
+const region_info *device_config::subregion(const char *_tag) const
+{
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// build a fully-qualified name
+	astring tempstring(tag, ":", _tag);
+	return machine->region(tempstring);
+}
+
+
+/*-------------------------------------------------
+    subdevice - return a pointer to the given 
+    device that is owned by us
+-------------------------------------------------*/
+
+const device_config *device_config::subdevice(const char *_tag) const
+{
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// build a fully-qualified name
+	astring tempstring(tag, ":", _tag);
+	return machine->device(tempstring);
+}
+
+
 
 /***************************************************************************
     DEVICE CONFIGURATION
@@ -116,12 +150,50 @@ void device_list_deinit(device_list *devlist)
     end of a device list
 -------------------------------------------------*/
 
+device_config::device_config(const device_config *_owner, device_type _type, const char *_tag, UINT32 _clock)
+	: next(NULL),
+	  owner(const_cast<device_config *>(_owner)),
+	  typenext(NULL),
+	  classnext(NULL),
+	  tag(_tag),
+	  type(_type),
+	  devclass(static_cast<device_class>(devtype_get_info_int(_type, DEVINFO_INT_CLASS))),
+	  clock(_clock),
+	  static_config(NULL),
+	  inline_config(NULL),
+	  machine(NULL),
+	  started(DEVICE_STOPPED),
+	  token(NULL),
+	  tokenbytes(NULL),
+	  execute(NULL),
+	  region(NULL)
+{
+	memset(address_map, 0, sizeof(address_map));
+	memset(addrspace, 0, sizeof(addrspace));
+
+	if ((clock & 0xff000000) == 0xff000000)
+	{
+		assert(owner != NULL);
+		clock = owner->clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
+	}
+
+	/* populate device configuration */
+	UINT32 configlen = (UINT32)devtype_get_info_int(_type, DEVINFO_INT_INLINE_CONFIG_BYTES);
+	inline_config = (configlen == 0) ? NULL : global_alloc_array_clear(UINT8, configlen);
+}
+
+
+device_config::~device_config()
+{
+	global_free(inline_config);
+}
+
+
 device_config *device_list_add(device_list *devlist, const device_config *owner, device_type type, const char *tag, UINT32 clock)
 {
 	device_config **devptr, **tempdevptr;
 	device_config *device, *tempdevice;
 	tagmap_error tmerr;
-	UINT32 configlen;
 
 	assert(devlist != NULL);
 	assert(type != NULL);
@@ -131,7 +203,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	for (devptr = &devlist->head; *devptr != NULL; devptr = &(*devptr)->next) ;
 
 	/* allocate a new device */
-	device = global_alloc(device_config);
+	device = global_alloc(device_config(owner, type, tag, clock));
 
 	/* add to the map */
 	tmerr = devlist->map.add_unique_hash(tag, device, FALSE);
@@ -144,41 +216,6 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 		else
 			fatalerror("Two devices have tags which hash to the same value: '%s' and '%s'\n", tag, match->tag.cstr());
 	}
-
-	/* populate device relationships */
-	device->next = NULL;
-	device->owner = (device_config *)owner;
-	device->typenext = NULL;
-	device->classnext = NULL;
-
-	/* populate device properties */
-	device->type = type;
-	device->devclass = (device_class)(INT32)devtype_get_info_int(type, DEVINFO_INT_CLASS);
-
-	/* populate device configuration */
-	device->clock = clock;
-	memset((void *)device->address_map, 0, sizeof(device->address_map));
-	if ((device->clock & 0xff000000) == 0xff000000)
-	{
-		assert(device->owner != NULL);
-		device->clock = device->owner->clock * ((device->clock >> 12) & 0xfff) / ((device->clock >> 0) & 0xfff);
-	}
-	device->static_config = NULL;
-	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
-	device->inline_config = (configlen == 0) ? NULL : global_alloc_array_clear(UINT8, configlen);
-
-	/* ensure live fields are all cleared */
-	device->machine = NULL;
-	device->started = DEVICE_STOPPED;
-	device->token = NULL;
-	device->tokenbytes = 0;
-	device->region = NULL;
-	device->regionbytes = 0;
-	memset((void *)device->addrspace, 0, sizeof(device->addrspace));
-	device->execute = NULL;
-
-	/* append the tag */
-	device->tag.cpy(tag);
 
 	/* fetch function pointers to the core functions */
 
@@ -238,8 +275,6 @@ void device_list_remove(device_list *devlist, const char *tag)
 	devlist->map.remove(device->tag);
 
 	/* free the device object */
-	if (device->inline_config != NULL)
-		global_free(device->inline_config);
 	global_free(device);
 }
 
@@ -633,8 +668,7 @@ void device_list_start(running_machine *machine)
 		device->token = auto_alloc_array_clear(machine, UINT8, device->tokenbytes);
 
 		/* fill in the remaining runtime fields */
-		device->region = memory_region(machine, device->tag);
-		device->regionbytes = memory_region_length(machine, device->tag);
+		device->region = machine->region(device->tag);
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			device->addrspace[spacenum] = device->space(spacenum);
 		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
@@ -718,7 +752,6 @@ static void device_list_stop(running_machine *machine)
 		device->tokenbytes = 0;
 		device->machine = NULL;
 		device->region = NULL;
-		device->regionbytes = 0;
 	}
 }
 

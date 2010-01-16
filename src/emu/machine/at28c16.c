@@ -143,7 +143,7 @@ static DEVICE_START(at28c16)
 	c->oe_12v = 0;
 	c->last_write = -1;
 	c->write_timer = timer_alloc(device->machine,  write_finished, c );
-	c->default_data = device->region;
+	c->default_data = *device->region;
 
 	config = (const at28c16_config *)device->inline_config;
 	if (config->id != NULL)

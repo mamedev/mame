@@ -537,10 +537,10 @@ static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scs
 		SCSP->Master=0;
 	}
 
-	SCSP->SCSPRAM = device->region;
+	SCSP->SCSPRAM = *device->region;
 	if (SCSP->SCSPRAM)
 	{
-		SCSP->SCSPRAM_LENGTH = device->regionbytes;
+		SCSP->SCSPRAM_LENGTH = device->region->bytes();
 		SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
 		SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
 		SCSP->SCSPRAM += intf->roffset;

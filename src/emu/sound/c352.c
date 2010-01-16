@@ -543,8 +543,8 @@ static DEVICE_START( c352 )
 {
 	c352_state *info = get_safe_token(device);
 
-	info->c352_rom_samples = device->region;
-	info->c352_rom_length = device->regionbytes;
+	info->c352_rom_samples = *device->region;
+	info->c352_rom_length = device->region->bytes();
 
 	info->sample_rate_base = device->clock / 192;
 

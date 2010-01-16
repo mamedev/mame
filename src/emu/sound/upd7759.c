@@ -656,7 +656,7 @@ static DEVICE_START( upd7759 )
 	chip->state = STATE_IDLE;
 
 	/* compute the ROM base or allocate a timer */
-	chip->rom = chip->rombase = device->region;
+	chip->rom = chip->rombase = *device->region;
 	if (chip->rom == NULL)
 		chip->timer = timer_alloc(device->machine, upd7759_slave_update, chip);
 

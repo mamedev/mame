@@ -130,7 +130,7 @@ static DEVICE_START( y8950 )
 	assert_always(info->chip != NULL, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
+	y8950_set_delta_t_memory(info->chip, *device->region, device->region->bytes());
 
 	info->stream = stream_create(device,0,1,rate,info,y8950_stream_update);
 

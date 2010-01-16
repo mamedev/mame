@@ -92,7 +92,7 @@ static DEVICE_START( segapcm )
 	int mask, rom_mask, len;
 	segapcm_state *spcm = get_safe_token(device);
 
-	spcm->rom = (const UINT8 *)device->region;
+	spcm->rom = *device->region;
 	spcm->ram = auto_alloc_array(device->machine, UINT8, 0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
@@ -102,7 +102,7 @@ static DEVICE_START( segapcm )
 	if(!mask)
 		mask = BANK_MASK7>>16;
 
-	len = device->regionbytes;
+	len = device->region->bytes();
 	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
 	rom_mask--;
 

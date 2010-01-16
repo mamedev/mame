@@ -502,7 +502,7 @@ static DEVICE_START( multipcm )
 	MultiPCM *ptChip = get_safe_token(device);
 	int i;
 
-	ptChip->ROM=(INT8 *)device->region;
+	ptChip->ROM=*device->region;
 	ptChip->Rate=(float) device->clock / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);

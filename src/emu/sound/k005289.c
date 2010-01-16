@@ -176,7 +176,7 @@ static DEVICE_START( k005289 )
 	/* build the mixer table */
 	make_mixer_table(device->machine, info, 2);
 
-	info->sound_prom = device->region;
+	info->sound_prom = *device->region;
 
 	/* reset all the voices */
 	voice[0].frequency = 0;

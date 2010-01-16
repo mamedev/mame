@@ -310,11 +310,8 @@ static DEVICE_START(timekeeper)
 	c->century = make_bcd( systime.local_time.year / 100 );
 	c->data = auto_alloc_array( device->machine, UINT8, c->size );
 
-	c->default_data = device->region;
-	if (c->default_data != NULL)
-	{
-		assert( device->regionbytes == c->size );
-	}
+	c->default_data = *device->region;
+	assert( device->region->bytes() == c->size );
 
 	state_save_register_device_item( device, 0, c->control );
 	state_save_register_device_item( device, 0, c->seconds );

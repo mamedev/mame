@@ -748,9 +748,9 @@ region_info::region_info(running_machine *_machine, const char *_name, UINT32 _l
 	  next(NULL),
 	  name(_name),
 	  length(_length),
-	  flags(_flags),
-	  base(auto_alloc_array(_machine, UINT8, _length))
+	  flags(_flags)
 {
+	base.u8 = auto_alloc_array(_machine, UINT8, _length);
 }
 
 
@@ -760,7 +760,7 @@ region_info::region_info(running_machine *_machine, const char *_name, UINT32 _l
 
 region_info::~region_info()
 {
-	auto_free(machine, base);
+	auto_free(machine, base.v);
 }
 
 
@@ -793,7 +793,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 
 	/* hook us into the list */
 	*infoptr = info;
-	return reinterpret_cast<UINT8 *>(info->base);
+	return info->base.u8;
 }
 
 
@@ -850,7 +850,7 @@ region_info *memory_region_info(running_machine *machine, const char *name)
 UINT8 *memory_region(running_machine *machine, const char *name)
 {
 	const region_info *region = machine->region(name);
-	return (region != NULL) ? reinterpret_cast<UINT8 *>(region->base) : NULL;
+	return (region != NULL) ? region->base.u8 : NULL;
 }
 
 
@@ -885,6 +885,8 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
 
 const char *memory_region_next(running_machine *machine, const char *name)
 {
+	if (name == NULL)
+		return (machine->mame_data->regionlist != NULL) ? machine->mame_data->regionlist->name : NULL;
 	const region_info *region = machine->region(name);
 	return (region != NULL && region->next != NULL) ? region->next->name.cstr() : NULL;
 }

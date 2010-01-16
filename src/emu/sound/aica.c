@@ -533,11 +533,11 @@ static void AICA_Init(const device_config *device, aica_state *AICA, const aica_
 	{
 		AICA->Master = intf->master;
 
-		AICA->AICARAM = device->region;
+		AICA->AICARAM = *device->region;
 		if (AICA->AICARAM)
 		{
 			AICA->AICARAM += intf->roffset;
-			AICA->AICARAM_LENGTH = device->regionbytes;
+			AICA->AICARAM_LENGTH = device->region->bytes();
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;

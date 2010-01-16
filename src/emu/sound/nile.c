@@ -229,7 +229,7 @@ static DEVICE_START( nile )
 {
 	nile_state *info = get_safe_token(device);
 
-	info->sound_ram = device->region;
+	info->sound_ram = *device->region;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, nile_update);
 }

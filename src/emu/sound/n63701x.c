@@ -115,7 +115,7 @@ static DEVICE_START( namco_63701x )
 {
 	namco_63701x *chip = get_safe_token(device);
 
-	chip->rom = device->region;
+	chip->rom = *device->region;
 
 	chip->stream = stream_create(device, 0, 2, device->clock/1000, chip, namco_63701x_update);
 }

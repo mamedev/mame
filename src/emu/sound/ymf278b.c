@@ -668,7 +668,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 
 static void ymf278b_init(const device_config *device, YMF278BChip *chip, void (*cb)(const device_config *, int))
 {
-	chip->rom = device->region;
+	chip->rom = *device->region;
 	chip->irq_callback = cb;
 	chip->timer_a = timer_alloc(device->machine, ymf278b_timer_a_tick, chip);
 	chip->timer_b = timer_alloc(device->machine, ymf278b_timer_b_tick, chip);
