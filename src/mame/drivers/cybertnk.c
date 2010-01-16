@@ -257,19 +257,22 @@ static VIDEO_UPDATE( cybertnk )
 	if(1)
 	{
 		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
-		int offs,x,y,z,xsize,ysize,yi,xi,col_bank;
+		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx;
 		UINT32 spr_offs;
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
 			z = (spr_ram[offs+(0x6/2)] & 0xffff);
-			if(z == 0xffff)
+			if(z == 0xffff || spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
 				continue;
 			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
 			y = (spr_ram[offs+(0x4/2)] & 0xff);
+			if(spr_ram[offs+(0x4/2)] & 0x100)
+				y = 0x100 - y;
 			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
 			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
 			ysize = (spr_ram[offs+(0x8/2)] & 0x00ff)+1;
+			fx = (spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
 
 			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
@@ -296,8 +299,16 @@ static VIDEO_UPDATE( cybertnk )
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
-							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							if(fx)
+							{
+								if(((x+xsize-(x_dec+xi)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yi, x+xsize-(x_dec+xi)) = screen->machine->pens[dot];
+							}
+							else
+							{
+								if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							}
 						}
 						shift_pen -= 8;
 						x_dec++;
@@ -312,8 +323,16 @@ static VIDEO_UPDATE( cybertnk )
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
-							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							if(fx)
+							{
+								if(((x+xsize-(x_dec+xi)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yi, x+xsize-(x_dec+xi)) = screen->machine->pens[dot];
+							}
+							else
+							{
+								if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							}
 						}
 						shift_pen -= 8;
 						x_dec++;
@@ -886,4 +905,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING )
