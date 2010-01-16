@@ -222,11 +222,7 @@ int sdlwindow_init(running_machine *machine)
 	if (multithreading_enabled)
 	{
 		// create a thread to run the windows from
-#ifndef SDLMAME_OS2
 		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
-#else
-		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
-#endif
 		if (work_queue == NULL)
 			return 1;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);

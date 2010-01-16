@@ -20,16 +20,15 @@
 // MAME headers
 #include "emu.h"
 #include "ui.h"
+#include "uiinput.h"
 #include "emuopts.h"
 #include "osdepend.h"
 
 
 // MAMEOS headers
-#include "window.h"
 #include "input.h"
 #include "osdsdl.h"
-
-#include "uiinput.h"
+#include "window.h"
 
 // winnt.h defines this
 #ifdef DELETE
