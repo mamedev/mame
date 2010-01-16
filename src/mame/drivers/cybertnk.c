@@ -268,7 +268,8 @@ static VIDEO_UPDATE( cybertnk )
 			y = (spr_ram[offs+(0x4/2)] & 0xff);
 			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
 			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
-			ysize = (spr_ram[offs+(0x0/2)] & 0x0078) >> 2; //obviously wrong!
+			ysize = (spr_ram[offs+(0x8/2)] & 0x00ff)+1;
+
 			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
 			for(yi = 0;yi < ysize;yi++)
