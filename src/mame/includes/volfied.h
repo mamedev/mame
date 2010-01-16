@@ -10,7 +10,7 @@ struct _volfied_state
 	/* memory pointers */
 	UINT16 *    video_ram;
 	UINT8  *    cchip_ram;
-//	UINT16 *    paletteram;	// this currently uses generic palette handlers
+//  UINT16 *    paletteram; // this currently uses generic palette handlers
 
 	/* video-related */
 	UINT16      video_ctrl;

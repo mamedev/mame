@@ -2,21 +2,21 @@
 #ifndef MANGLE
 
 /***************************************************************
- * 
+ *
  * Standard Header
- * 
+ *
  ***************************************************************/
 
 	#ifndef _OSD_OPENGL_H
 	#define _OSD_OPENGL_H
-	
+
 	#if USE_OPENGL
-	
+
 	/* equivalent to #include <GL/gl.h>
-	 * #include <GL/glext.h>
-	 */
+     * #include <GL/glext.h>
+     */
 	#include <SDL/SDL_version.h>
-	
+
 #if (SDL_VERSION_ATLEAST(1,2,10))
 	#if defined(SDLMAME_WIN32)
 		// Avoid that winnt.h (included via sdl_opengl.h, windows.h, windef.h includes intrin.h
@@ -25,51 +25,51 @@
 	#include <SDL/SDL_opengl.h>
 #else
 	/*
-	 * SDL 1.2.9 does not provide everything we need
-	 * We therefore distribute it ourselves
-	 */
+     * SDL 1.2.9 does not provide everything we need
+     * We therefore distribute it ourselves
+     */
 	#include "SDL1211_opengl.h"
-#endif	
+#endif
 	#ifdef USE_DISPATCH_GL
 
 	#define OSD_GL(ret,func,params) ret (APIENTRY *func) params;
 	#define OSD_GL_UNUSED(ret,func,params)
-	
+
 	typedef struct _osd_gl_dispatch osd_gl_dispatch;
-	
-	struct _osd_gl_dispatch 
+
+	struct _osd_gl_dispatch
 	{
 		#define GET_GLFUNC 1
 		#include "osd_opengl.h"
 		#undef GET_GLFUNC
 	};
-	
+
 	#undef OSD_GL
 	#undef OSD_GL_UNUSED
-	
+
 	extern osd_gl_dispatch *gl_dispatch;
-	
+
 	/*
-	 * Use gl_mangle to map function names
-	 */
-	
+     * Use gl_mangle to map function names
+     */
+
 	#define MANGLE(x) gl_dispatch->gl ## x
 	#include "osd_opengl.h"
-	
+
 	#endif /* USE_DISPATCH_GL */
-	
+
 	#endif /* USE_OPENGL */
-	
+
 	#endif /* _OSD_OPENGL_H */
 
 #else /* MANGLE */
 	/***************************************************************
-	 * 
-	 * Used to redefine opengl functions
-	 * 
-	 * Credits: taken from gl_mangle.h
-	 * 
-	 ***************************************************************/
+     *
+     * Used to redefine opengl functions
+     *
+     * Credits: taken from gl_mangle.h
+     *
+     ***************************************************************/
 
 	#define glAccum		MANGLE(Accum)
 	#define glActiveStencilFaceEXT		MANGLE(ActiveStencilFaceEXT)
@@ -1517,13 +1517,13 @@
 #endif /* MANGLE */
 #else /* GET_GLFUNC */
 	/***************************************************************
-	 * 
-	 * Used recursively for prototyping and function assignment
-	 * 
-	 * Credits: taken from sdl_glfuncs.h
-	 * 
-	 ***************************************************************/
-	
+     *
+     * Used recursively for prototyping and function assignment
+     *
+     * Credits: taken from sdl_glfuncs.h
+     *
+     ***************************************************************/
+
 	OSD_GL_UNUSED(void,glAccum,(GLenum,GLfloat))
 	OSD_GL_UNUSED(void,glAlphaFunc,(GLenum,GLclampf))
 	OSD_GL_UNUSED(GLboolean,glAreTexturesResident,(GLsizei,const GLuint*,GLboolean*))

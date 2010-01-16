@@ -130,17 +130,17 @@ template<class T> class tagmap_t : public tagmap
 private:
 	tagmap_t(const tagmap &);
 	tagmap_t &operator=(const tagmap &);
-	
+
 public:
 	tagmap_t() { memset(table, 0, sizeof(table)); }
 	~tagmap_t() { reset(); }
-	
+
 	void reset() { tagmap_reset(this); }
-	
+
 	tagmap_error add(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add(this, tag, (void *)object, replace_if_duplicate); }
 	tagmap_error add_unique_hash(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add_unique_hash(this, tag, (void *)object, replace_if_duplicate); }
 	void remove(const char *tag) { tagmap_remove(this, tag); }
-	
+
 	T find(const char *tag) const { return reinterpret_cast<T>(tagmap_find(this, tag)); }
 	T find(const char *tag, UINT32 hash) const { return reinterpret_cast<T>(tagmap_find_prehashed(this, tag, hash)); }
 	T find_hash_only(const char *tag) const { return reinterpret_cast<T>(tagmap_find_hash_only(this, tag)); }

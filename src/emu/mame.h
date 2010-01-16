@@ -159,13 +159,13 @@ typedef void (*output_callback_func)(void *param, const char *format, va_list ar
 class region_info
 {
 	DISABLE_COPYING(region_info);
-	
+
 	running_machine *		machine;
-	
+
 public:
 	region_info(running_machine *machine, const char *_name, UINT32 _length, UINT32 _flags);
 	~region_info();
-	
+
 	operator void *() const { return (this != NULL) ? base.v : NULL; }
 	operator INT8 *() const { return (this != NULL) ? base.i8 : NULL; }
 	operator UINT8 *() const { return (this != NULL) ? base.u8 : NULL; }
@@ -175,9 +175,9 @@ public:
 	operator UINT32 *() const { return (this != NULL) ? base.u32 : NULL; }
 	operator INT64 *() const { return (this != NULL) ? base.i64 : NULL; }
 	operator UINT64 *() const { return (this != NULL) ? base.u64 : NULL; }
-	
+
 	UINT32 bytes() const { return (this != NULL) ? length : 0; }
-	
+
 	region_info *			next;
 	astring					name;
 	generic_ptr				base;
@@ -214,7 +214,7 @@ class running_machine
 public:
 	running_machine(const game_driver *driver);
 	~running_machine();
-	
+
 	inline const device_config *device(const char *tag);
 	inline const input_port_config *port(const char *tag);
 	inline const region_info *region(const char *tag);
@@ -474,7 +474,7 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
 
 inline const device_config *running_machine::device(const char *tag)
 {
-	return device_list_find_by_tag(&config->devicelist, tag); 
+	return device_list_find_by_tag(&config->devicelist, tag);
 }
 
 inline const input_port_config *running_machine::port(const char *tag)

@@ -94,10 +94,10 @@ struct _sdl_video_config
 	int					novideo;				// don't draw, for pure CPU benchmarking
 
 	// global configuration
-	int					windowed;	 			// start windowed?
+	int					windowed;				// start windowed?
 	int					prescale;				// prescale factor (not currently supported)
-	int					keepaspect;	 			// keep aspect ratio?
-	int					numscreens;	 			// number of screens
+	int					keepaspect;				// keep aspect ratio?
+	int					numscreens;				// number of screens
 	int					centerh;
 	int					centerv;
 
@@ -136,7 +136,7 @@ struct _sdl_video_config
 	// X11 options
 	int					restrictonemonitor;	// in fullscreen, confine to Xinerama monitor 0
 
-	// YUV options	
+	// YUV options
 	int					scale_mode;
 };
 

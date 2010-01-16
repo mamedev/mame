@@ -27,13 +27,13 @@ void simpsons_sprite_callback( running_machine *machine, int *code, int *color, 
 	simpsons_state *state = (simpsons_state *)machine->driver_data;
 	int pri = (*color & 0x0f80) >> 6;	/* ??????? */
 
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*color = state->sprite_colorbase + (*color & 0x001f);
@@ -72,7 +72,7 @@ static READ8_HANDLER( simpsons_k053247_r )
 		else
 			return(state->spriteram[offs] >> 8);
 	}
-	else 
+	else
 		return state->xtraram[offset - 0x1000];
 }
 

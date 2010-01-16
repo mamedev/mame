@@ -204,7 +204,7 @@ static void spy_collision( running_machine *machine )
     The mad scientist's laser truck has both a high sprite center and a small height value.
     It has to be measured from the ground to detect correctly.
 */
-				if (w2 == 0x58 && d2 == 0x04 && h2 == 0x10 && y2 == 0x30) 
+				if (w2 == 0x58 && d2 == 0x04 && h2 == 0x10 && y2 == 0x30)
 					h2 = y2;
 
 				// what other sprites fall into:
@@ -229,9 +229,9 @@ static void spy_collision( running_machine *machine )
 		nearplane = (state->pmcram[2] << 8) + state->pmcram[3];
 
 		// fail safe
-		if (loopend > MAX_SPRITES) 
+		if (loopend > MAX_SPRITES)
 			loopend = MAX_SPRITES;
-		if (!nearplane) 
+		if (!nearplane)
 			nearplane = DEF_NEAR_PLANE;
 
 		loopend = (loopend << 1) + 4;

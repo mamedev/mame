@@ -53,7 +53,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		priority = (data & 0x8000) >> 15;
 //      unknown = (data & 0x2000) >> 13;
 
-		if (y == 0x180) 
+		if (y == 0x180)
 			continue;	/* dead sprite */
 
 		map_offset = tilenum << 7;

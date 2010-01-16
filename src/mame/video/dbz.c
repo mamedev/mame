@@ -24,13 +24,13 @@ void dbz_sprite_callback( running_machine *machine, int *code, int *color, int *
 	dbz_state *state = (dbz_state *)machine->driver_data;
 	int pri = (*color & 0x3c0) >> 5;
 
-	if (pri <= state->layerpri[3])					
+	if (pri <= state->layerpri[3])
 		*priority_mask = 0xff00;
 	else if (pri > state->layerpri[3] && pri <= state->layerpri[2])
 		*priority_mask = 0xfff0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xfffc;
-	else										
+	else
 		*priority_mask = 0xfffe;
 
 	*color = (state->sprite_colorbase << 1) + (*color & 0x1f);

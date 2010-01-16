@@ -638,7 +638,7 @@ static READ16_HANDLER( wgp_sound_r )
 
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
-	else 
+	else
 		return 0;
 }
 

@@ -665,7 +665,7 @@
 	P |= F_T | F_B; 											\
 	if( (cpustate->irq_state != CLEAR_LINE) && !(P & F_I) )			\
 	{															\
-		LOG(("M6502 '%s' RTI sets after_cli\n",cpustate->device->tag.cstr())); 	\
+		LOG(("M6502 '%s' RTI sets after_cli\n",cpustate->device->tag.cstr()));	\
 		cpustate->after_cli = 1;									\
 	}
 

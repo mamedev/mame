@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		tilenum = data & 0x1fff;	// $80000 spritemap rom maps up to $2000 64x64 sprites
 		flipy = (data & 0x8000) >> 15;
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		map_offset = tilenum << 5;

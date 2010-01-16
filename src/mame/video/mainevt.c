@@ -55,7 +55,7 @@ void mainevt_sprite_callback(running_machine *machine, int *code,int *color,int 
 		*priority_mask = 0xff00;
 	else if (*color & 0x40)
 		*priority_mask = 0xff00 | 0xf0f0;
-	else			
+	else
 		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
 	/* bit 7 is shadow, not used */
 

@@ -37,10 +37,10 @@ struct _sdl_window_info
 {
 	// Pointer to next window
 	sdl_window_info *	next;
-	
+
 	// Pointer to machine
 	running_machine *	machine;
-	
+
 	// Draw Callbacks
 	int (*create)(sdl_window_info *window, int width, int height);
 	void (*resize)(sdl_window_info *window, int width, int height);
@@ -58,7 +58,7 @@ struct _sdl_window_info
 	sdl_monitor_info *	monitor;
 	int					fullscreen;
 	int			index;
-	
+
 	// diverse flags
 	int					minwidth, minheight;
 	int					maxwidth, maxheight;
@@ -86,13 +86,13 @@ struct _sdl_window_info
 
 	int					totalColors;		// total colors from machine/sdl_window_config
 	int					start_viewscreen;
-	
+
 	// per window modes ...
 	int					scale_mode;
-	
+
 	// GL specific
 	int					prescale;
-	
+
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	// Needs to be here as well so we can identify window
 	SDL_WindowID		window_id;

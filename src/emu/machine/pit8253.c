@@ -551,7 +551,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 
 		if (timer->gate	== 0 &&	mode ==	4)
 		{
-			cycles_to_output = CYCLES_NEVER;			
+			cycles_to_output = CYCLES_NEVER;
 		}
 		else
 		{

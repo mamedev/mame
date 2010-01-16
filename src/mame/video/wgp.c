@@ -492,12 +492,12 @@ INLINE void bryan2_drawscanline( bitmap_t *bitmap, int x, int y, int length,
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
 	UINT8 *dstp = BITMAP_ADDR8(priority, y, x);
 
-	if (transparent) 
+	if (transparent)
 	{
-		while (length--) 
+		while (length--)
 		{
 			UINT32 spixel = *src++;
-			if (spixel < 0x7fff) 
+			if (spixel < 0x7fff)
 			{
 				*dsti = spixel;
 				*dstp = pri;
@@ -505,10 +505,10 @@ INLINE void bryan2_drawscanline( bitmap_t *bitmap, int x, int y, int length,
 			dsti++;
 			dstp++;
 		}
-	} 
+	}
 	else  /* Not transparent case */
 	{
-		while (length--) 
+		while (length--)
 		{
 			*dsti++ = *src++;
 			*dstp++ = pri;
@@ -570,9 +570,9 @@ static void wgp_piv_layer_draw( running_machine *machine, bitmap_t *bitmap, cons
 		y_index = 0;
 	}
 
-	if (!machine_flip) 
-		y = min_y; 
-	else 
+	if (!machine_flip)
+		y = min_y;
+	else
 		y = max_y;
 
 	do

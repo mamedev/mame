@@ -8,22 +8,22 @@
  * Dual license: MAME and GPL version 2
  *
  * This module has a dual license, i.e. it is compatible to MAME,
- * but I like to reserve my rights to use this module under 
+ * but I like to reserve my rights to use this module under
  * the GPL as well.
  *
  * GPL license:
  *      Visit http://www.gnu.org/copyleft/gpl.html
  *
  * MAME license:
- *	Visit http://mamedev.org for licensing and usage restrictions.
+ *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *
  * OpenGL GLSL ARB extentions:
  *
- *	GL_ARB_shader_objects
- *	GL_ARB_shading_language_100
- *	GL_ARB_vertex_shader
- *	GL_ARB_fragment_shader
+ *  GL_ARB_shader_objects
+ *  GL_ARB_shading_language_100
+ *  GL_ARB_vertex_shader
+ *  GL_ARB_fragment_shader
  *
  */
 
@@ -99,18 +99,18 @@ typedef enum {
 
 int gl_check_error(GLSLCheckMode m, const char *file, const int line);
 
-int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, 
-                          GLint border, GLenum format, GLenum type, 
+int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height,
+                          GLint border, GLenum format, GLenum type,
 			  GLsizei *avail_width, GLsizei *avail_height,
 			  int verbose);
 
 int gl_round_to_pow2(int v);
 
 /**
- * @param obj_query Can be either GL_OBJECT_TYPE_ARB, GL_OBJECT_DELETE_STATUS_ARB, GL_OBJECT_COMPILE_STATUS_ARB, 
+ * @param obj_query Can be either GL_OBJECT_TYPE_ARB, GL_OBJECT_DELETE_STATUS_ARB, GL_OBJECT_COMPILE_STATUS_ARB,
  *                                GL_OBJECT_LINK_STATUS_ARB, GL_OBJECT_VALIDATE_STATUS_ARB
- *                  Should be used after the refering action, i.e. GL_OBJECT_DELETE_STATUS_ARB after a 
- *	            glDeleteObjectARB call, etc.
+ *                  Should be used after the refering action, i.e. GL_OBJECT_DELETE_STATUS_ARB after a
+ *              glDeleteObjectARB call, etc.
  */
 int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, const char *file, const int line);
 
@@ -138,7 +138,7 @@ int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader,
 
 int gl_delete_shader( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader );
 
-#if defined(SDLMAME_MACOSX) 
+#if defined(SDLMAME_MACOSX)
 #ifndef GL_ARB_shader_objects
     typedef char GLcharARB;
     typedef unsigned int GLhandleARB;

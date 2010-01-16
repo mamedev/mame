@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( atamanot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-//	AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
+//  AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("question",0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
@@ -451,33 +451,33 @@ atamanot kanji gfx decoding:
 
 static const gfx_layout layout_16x16 =
 {
-	16,16,
-	RGN_FRAC(1,4),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+5, RGN_FRAC(1,4)+6, RGN_FRAC(1,4)+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
-	8*8
+    16,16,
+    RGN_FRAC(1,4),
+    1,
+    { 0 },
+    { 0, 1, 2, 3, 4, 5, 6, 7,
+      RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+5, RGN_FRAC(1,4)+6, RGN_FRAC(1,4)+7 },
+    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+      RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
+    8*8
 };
 
 
 static const gfx_layout layout_8x16 =
 {
-	8,16,
-	RGN_FRAC(1,2),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
-	8*8
+    8,16,
+    RGN_FRAC(1,2),
+    1,
+    { 0 },
+    { 0, 1, 2, 3, 4, 5, 6, 7 },
+    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+      RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
+    8*8
 };
 
-	GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
-	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
-	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
+    GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
+    GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
+    GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 
 It looks "stolen" from an unknown Japanese computer?
 */

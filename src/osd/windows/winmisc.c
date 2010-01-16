@@ -78,12 +78,12 @@ void *osd_malloc(size_t size)
 #else
 	// add in space for the base pointer
 	size += sizeof(size_t);
-	
+
 	// small items just come from the heap
 	void *result;
 	if (size < GUARD_PAGE_THRESH)
 		result = HeapAlloc(GetProcessHeap(), 0, size);
-	
+
 	// large items get guard pages
 	else
 	{
@@ -103,7 +103,7 @@ void *osd_malloc(size_t size)
 		// work backwards from the page base to get to the block base
 		result = GUARD_ALIGN_START ? page_base : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
 	}
-	
+
 	// store the page_base at the start
 	*reinterpret_cast<size_t *>(result) = size;
 	return reinterpret_cast<UINT8 *>(result) + sizeof(size_t);
@@ -121,11 +121,11 @@ void osd_free(void *ptr)
 	HeapFree(GetProcessHeap(), 0, ptr);
 #else
 	size_t size = reinterpret_cast<size_t *>(ptr)[-1];
-	
+
 	// small items just get freed
 	if (size < GUARD_PAGE_THRESH)
 		HeapFree(GetProcessHeap(), 0, ptr);
-		
+
 	// large items need more care
 	else
 	{

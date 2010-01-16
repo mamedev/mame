@@ -7,7 +7,7 @@
 #   Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
-#   SDLMAME by Olivier Galibert and R. Belmont 
+#   SDLMAME by Olivier Galibert and R. Belmont
 #
 ###########################################################################
 
@@ -41,8 +41,8 @@
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
 
-# uncomment the next line to build a binary using 
-# GL-dispatching. 
+# uncomment the next line to build a binary using
+# GL-dispatching.
 # This option takes precedence over MESA_INSTALL_ROOT
 
 USE_DISPATCH_GL = 1
@@ -73,19 +73,19 @@ CCOMFLAGS += $(OPT_FLAGS)
 #-------------------------------------------------
 # distribution may change things
 #-------------------------------------------------
-	
+
 ifeq ($(DISTRO),)
 DISTRO = generic
-else 
+else
 ifeq ($(DISTRO),debian-stable)
 DEFS += -DNO_AFFINITY_NP
-else 
+else
 ifeq ($(DISTRO),ubuntu-intrepid)
 # Force gcc-4.2 on ubuntu-intrepid
 CC = @gcc -V 4.2
 LD = g++-4.2
 #LDFLAGS += -lsupc++ -static-libgcc
-else 
+else
 ifeq ($(DISTRO),gcc44-generic)
 CC = @gcc -V 4.4
 LD = @g++ -V 4.4
@@ -151,7 +151,7 @@ SYNC_IMPLEMENTATION = tc
 endif
 
 ifeq ($(TARGETOS),unix)
-DEFS += -DSDLMAME_UNIX 
+DEFS += -DSDLMAME_UNIX
 ifndef NO_X11
 DEFS += -DSDLMAME_X11
 else
@@ -160,7 +160,7 @@ endif
 endif
 
 ifeq ($(TARGETOS),macosx)
-DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX 
+DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
 SYNC_IMPLEMENTATION = ntc
 MAINLDFLAGS = -Xlinker -all_load
 ifdef BIGENDIAN
@@ -215,10 +215,10 @@ SDLMAIN =
 OSDCOREOBJS = \
 	$(SDLOBJ)/strconv.o	\
 	$(SDLOBJ)/sdldir.o	\
-	$(SDLOBJ)/sdlfile.o  	\
+	$(SDLOBJ)/sdlfile.o 	\
 	$(SDLOBJ)/sdlos_$(TARGETOS).o	\
 	$(SDLOBJ)/sdlsync_$(SYNC_IMPLEMENTATION).o     \
-	$(SDLOBJ)/sdlwork.o	
+	$(SDLOBJ)/sdlwork.o
 
 # any "main" must be in LIBOSD or else the build will fail!
 # for the windows build, we just add it to libocore as well.
@@ -296,7 +296,7 @@ endif
 # Non-X11 builds can not use the debugger
 ifndef NO_X11
 OSDCOREOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
-CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
+CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0`
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
 else
@@ -324,7 +324,7 @@ ifeq ($(TARGETOS),win32)
 
 ifdef SDL_INSTALL_ROOT
 CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include
-LIBS += -L$(SDL_INSTALL_ROOT)/lib 
+LIBS += -L$(SDL_INSTALL_ROOT)/lib
 # -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
 endif
 
@@ -342,7 +342,7 @@ OSDCOREOBJS += $(SDLOBJ)/debugwin.o
 LDFLAGS += -static-libgcc
 
 # Static linking of SDL
-LIBS += -Wl,-Bstatic -lSDL -Wl,-Bdynamic 
+LIBS += -Wl,-Bstatic -lSDL -Wl,-Bdynamic
 LIBS += -lopengl32 -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 endif	# Win32
@@ -354,7 +354,7 @@ OSDOBJS += $(SDLOBJ)/SDLMain_tmpl.o
 
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
-LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread 
+LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
 else
 # Compile using installed libSDL (Fink or MacPorts):
 #
@@ -407,10 +407,10 @@ $(LIBOSD): $(OSDOBJS)
 # testkeys
 #-------------------------------------------------
 
-$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c  
+$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 	@echo Compiling $<...
 	$(CC)  $(CFLAGS) $(DEFS) -c $< -o $@
-	
+
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
@@ -420,12 +420,12 @@ testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE)
 
 sdlclean:
 	rm -f .depend
-	
+
 testlib:
 	-echo LIBS: $(LIBS)
 	-echo DEFS: $(DEFS)
 	-echo CORE: $(OSDCOREOBJS)
-	
+
 ifneq ($(TARGETOS),win32)
 depend:
 	rm -f .depend

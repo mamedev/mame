@@ -3,11 +3,11 @@
     emu.h
 
     Core header file to be included by most files.
-    
-    NOTE: The contents of this file are designed to meet the needs of 
+
+    NOTE: The contents of this file are designed to meet the needs of
     drivers and devices. In addition to this file, you will also need
     to include the headers of any CPUs or other devices that are required.
-    
+
     If you find yourself needing something outside of this file in a
     driver or device, think carefully about what you are doing.
 

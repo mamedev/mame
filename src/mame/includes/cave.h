@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-struct sprite_cave 
+struct sprite_cave
 {
 	int priority, flags;
 

@@ -301,7 +301,7 @@ static MACHINE_RESET( gbusters )
 	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), gbusters_banking);
 
 	/* mirror address for banked ROM */
-	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);	
+	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);
 
 	state->palette_selected = 0;
 	state->priority = 0;

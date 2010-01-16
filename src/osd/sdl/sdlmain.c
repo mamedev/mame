@@ -60,7 +60,7 @@ void MorphToPM()
 #endif
 
 //============================================================
-//	LOCAL VARIABLES
+//  LOCAL VARIABLES
 //============================================================
 
 #ifdef MESS
@@ -85,7 +85,7 @@ static char cwd[512];
 
 static const options_entry mame_sdl_options[] =
 {
-	{ SDLOPTION_INIPATH,                     INI_PATH,     0,                "path to ini files" },	
+	{ SDLOPTION_INIPATH,                     INI_PATH,     0,                "path to ini files" },
 
 	// debugging options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
@@ -126,30 +126,30 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_GL_VBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
 	{ SDLOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
 	{ SDLOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
- 	{ SDLOPTION_GLSL_FILTER,				  "1",    0,              "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
- 	{ SDLOPTION_SHADER_MAME("0"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 0" },
- 	{ SDLOPTION_SHADER_MAME("1"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 1" },
- 	{ SDLOPTION_SHADER_MAME("2"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 2" },
- 	{ SDLOPTION_SHADER_MAME("3"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 3" },
- 	{ SDLOPTION_SHADER_MAME("4"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 4" },
- 	{ SDLOPTION_SHADER_MAME("5"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 5" },
- 	{ SDLOPTION_SHADER_MAME("6"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 6" },
- 	{ SDLOPTION_SHADER_MAME("7"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 7" },
- 	{ SDLOPTION_SHADER_MAME("8"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 8" },
- 	{ SDLOPTION_SHADER_MAME("9"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 9" },
- 	{ SDLOPTION_SHADER_SCREEN("0"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 0" },
- 	{ SDLOPTION_SHADER_SCREEN("1"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 1" },
- 	{ SDLOPTION_SHADER_SCREEN("2"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 2" },
- 	{ SDLOPTION_SHADER_SCREEN("3"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 3" },
- 	{ SDLOPTION_SHADER_SCREEN("4"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 4" },
- 	{ SDLOPTION_SHADER_SCREEN("5"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 5" },
- 	{ SDLOPTION_SHADER_SCREEN("6"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 6" },
- 	{ SDLOPTION_SHADER_SCREEN("7"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 7" },
- 	{ SDLOPTION_SHADER_SCREEN("8"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 8" },
- 	{ SDLOPTION_SHADER_SCREEN("9"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 9" },
- 	{ SDLOPTION_GL_GLSL_VID_ATTR,			 "1",    OPTION_BOOLEAN,  "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
+	{ SDLOPTION_GLSL_FILTER,				  "1",    0,              "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+	{ SDLOPTION_SHADER_MAME("0"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 0" },
+	{ SDLOPTION_SHADER_MAME("1"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 1" },
+	{ SDLOPTION_SHADER_MAME("2"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 2" },
+	{ SDLOPTION_SHADER_MAME("3"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 3" },
+	{ SDLOPTION_SHADER_MAME("4"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 4" },
+	{ SDLOPTION_SHADER_MAME("5"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 5" },
+	{ SDLOPTION_SHADER_MAME("6"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 6" },
+	{ SDLOPTION_SHADER_MAME("7"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 7" },
+	{ SDLOPTION_SHADER_MAME("8"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 8" },
+	{ SDLOPTION_SHADER_MAME("9"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 9" },
+	{ SDLOPTION_SHADER_SCREEN("0"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 0" },
+	{ SDLOPTION_SHADER_SCREEN("1"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 1" },
+	{ SDLOPTION_SHADER_SCREEN("2"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 2" },
+	{ SDLOPTION_SHADER_SCREEN("3"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 3" },
+	{ SDLOPTION_SHADER_SCREEN("4"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 4" },
+	{ SDLOPTION_SHADER_SCREEN("5"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 5" },
+	{ SDLOPTION_SHADER_SCREEN("6"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 6" },
+	{ SDLOPTION_SHADER_SCREEN("7"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 7" },
+	{ SDLOPTION_SHADER_SCREEN("8"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 8" },
+	{ SDLOPTION_SHADER_SCREEN("9"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 9" },
+	{ SDLOPTION_GL_GLSL_VID_ATTR,			 "1",    OPTION_BOOLEAN,  "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
 #endif
- 	
+
 	// per-window options
 	{ NULL,                                   NULL, OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
 	{ SDLOPTION_SCREEN(""),                   SDLOPTVAL_AUTO,   0,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
@@ -241,7 +241,7 @@ static const options_entry mame_sdl_options[] =
 #endif
 	{ SDLOPTION_AUDIODRIVER ";ad",           SDLOPTVAL_AUTO,  0,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
 #if USE_OPENGL
- 	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, 0,        "alternative libGL.so to use; 'auto' for system default" },
+	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, 0,        "alternative libGL.so to use; 'auto' for system default" },
 #endif
 
 	// End of list
@@ -256,7 +256,7 @@ static int setenv(const char *name, const char *value, int overwrite)
 {
 	char *buf;
 	int result;
-	
+
 	if (!overwrite)
 	{
 		if (getenv(name) != NULL)
@@ -265,18 +265,18 @@ static int setenv(const char *name, const char *value, int overwrite)
 	buf = (char *) malloc(strlen(name)+strlen(value)+2);
 	sprintf(buf, "%s=%s", name, value);
 	result = putenv(buf);
-	
-	/* will be referenced by environment 
-	 * Therefore it is not freed here
-	 */
-	
+
+	/* will be referenced by environment
+     * Therefore it is not freed here
+     */
+
 	return result;
 }
 
 #endif
 
 //============================================================
-//	main
+//  main
 //============================================================
 
 // we do some special sauce on Win32...
@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 	int res = 0;
 
 #else
-	
+
 /* gee */
 extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
 		if (display)
 			XCloseDisplay(display);
 	}
-#endif 
+#endif
 
 	res = cli_execute(argc, argv, mame_sdl_options);
 
@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
 
 	// already called...
 	//SDL_Quit();
-	
+
 	exit(res);
 
 	return res;
@@ -367,7 +367,7 @@ static void output_oslog(running_machine *machine, const char *buffer)
 
 
 //============================================================
-//	osd_exit
+//  osd_exit
 //============================================================
 
 static void osd_exit(running_machine *machine)
@@ -378,10 +378,10 @@ static void osd_exit(running_machine *machine)
 }
 
 //============================================================
-//	defines_verbose
+//  defines_verbose
 //============================================================
 
-#define MAC_EXPAND_STR(_m) #_m 
+#define MAC_EXPAND_STR(_m) #_m
 #define MACRO_VERBOSE(_mac) \
 	do { \
 		if (strcmp(MAC_EXPAND_STR(_mac), #_mac) != 0) \
@@ -445,14 +445,14 @@ static void defines_verbose(void)
 }
 
 //============================================================
-//	osd_sdl_info
+//  osd_sdl_info
 //============================================================
 
 static void osd_sdl_info(void)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
 	int i, cur, num = SDL_GetNumVideoDrivers();
-	
+
 	mame_printf_verbose("Available videodrivers: ");
 	for (i=0;i<num;i++)
 	{
@@ -467,7 +467,7 @@ static void osd_sdl_info(void)
 	{
 		SDL_DisplayMode mode;
 		int j;
-		
+
 		SDL_SelectVideoDisplay(i);
 		mame_printf_verbose("\tDisplay #%d\n", i);
 		if (SDL_GetDesktopDisplayMode(&mode));
@@ -495,7 +495,7 @@ static void osd_sdl_info(void)
 
 
 //============================================================
-//	osd_init
+//  osd_init
 //============================================================
 
 void osd_init(running_machine *machine)
@@ -528,8 +528,8 @@ void osd_init(running_machine *machine)
 	}
 
 	/* Set the SDL environment variable for drivers wanting to load the
-	 * lib at startup.
-	 */
+     * lib at startup.
+     */
 	/* FIXME: move lib loading code from drawogl.c here */
 
 	stemp = options_get_string(mame_options(), SDLOPTION_GL_LIB);
@@ -578,9 +578,9 @@ void osd_init(running_machine *machine)
 		{
 			mame_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
 			osd_exit(machine);
-			exit(-1);		
+			exit(-1);
 		}
-	
+
 	if (sdlvideo_init(machine))
 	{
 		osd_exit(machine);
@@ -591,11 +591,11 @@ void osd_init(running_machine *machine)
 	}
 
 	sdlinput_init(machine);
-	
+
 	sdlaudio_init(machine);
 
 	sdloutput_init(machine);
-	
+
 	if (options_get_bool(mame_options(), SDLOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);
 

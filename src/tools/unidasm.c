@@ -503,7 +503,7 @@ int main(int argc, char *argv[])
 	}
 
 	// run it
-	try 
+	try
 	{
 		curpc = opts.basepc;
 		for (curbyte = 0; curbyte < length; curbyte += numbytes)
@@ -515,7 +515,7 @@ int main(int argc, char *argv[])
 
 			// disassemble
 			pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
-				
+
 			if (opts.dasm->pcshift < 0)
 				numbytes = pcdelta << -opts.dasm->pcshift;
 			else
@@ -629,6 +629,6 @@ int main(int argc, char *argv[])
 	{
 		fprintf(stderr, "Caught unhandled exception\n");
 	}
-	
+
 	return result;
 }

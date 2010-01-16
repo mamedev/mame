@@ -37,7 +37,7 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 	int bank = 0;
 
 	/* rom select */
-	if (!(data & 0x80))	
+	if (!(data & 0x80))
 		bank += 4;
 
 	/* coin counters */

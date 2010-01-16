@@ -80,7 +80,7 @@ typedef struct memorycombo_item
 	char					name[256];
 	UINT8					prefsize;
 	running_machine 			*machine;	// machine
-	const memory_subview_item		*subview;	// subview 
+	const memory_subview_item		*subview;	// subview
 	const device_config			*device;	// CPU device
 } memorycombo_item;
 
@@ -102,7 +102,7 @@ static void debugwin_show(int show)
 	void (*f)(GtkWidget *widget) = show ? gtk_widget_show : gtk_widget_hide;
 	if(dmain) {
 		f(dmain->win);
-		//		dview_set_updatable(dmain->console_w, show);
+		//      dview_set_updatable(dmain->console_w, show);
 	}
 	for(p1 = memorywin_list; p1; p1 = p1->next)
 		f(p1->win);
@@ -146,7 +146,7 @@ static void edit_activate(GtkEntry *item, gpointer user_data)
 	edit_add_hist(e, text);
 	e->cb(e->machine, text, e->cbp);
 	edit_set_field(e);
-	
+
 }
 
 static void edit_hist_back(edit *e)
@@ -283,14 +283,14 @@ void debugmain_comments_activate(GtkMenuItem *item, gpointer user_data)
 
 static void debugmain_set_cpu(const device_config *cpu)
 {
-	if (cpu != dmain->cpu) 
+	if (cpu != dmain->cpu)
 	{
 		char title[256];
 		const registers_subview_item *regsubitem;
 		const disasm_subview_item *dasmsubitem;
 
 		dmain->cpu = cpu;
-		
+
 		// first set all the views to the new cpu
 		for (dasmsubitem = disasm_view_get_subview_list(dmain->disasm); dasmsubitem != NULL; dasmsubitem = dasmsubitem->next)
 			if (dasmsubitem->space->cpu == cpu)
@@ -318,7 +318,7 @@ static void debugmain_set_cpu(const device_config *cpu)
 void osd_wait_for_debugger(const device_config *device, int firststop)
 {
 	// create a console window
-	if(!dmain) 
+	if(!dmain)
 	{
 		// GTK init should probably be done earlier
 		gtk_init(0, 0);
@@ -375,7 +375,7 @@ static void debugmain_init(running_machine *machine)
 
 	debug_view_begin_update(dmain->disasm);
 	disasm_view_set_expression(dmain->disasm, "curpc");
-//	debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_TRACK_LIVE, 1);
+//  debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dmain->disasm);
 
 	g_signal_connect(dmain->win, "destroy", G_CALLBACK(debugmain_destroy), dmain);
@@ -409,7 +409,7 @@ static void memorywin_zone_changed(GtkComboBox *zone_w, memorywin_i *mem)
 	memorywin_update_checks(mem);
 
 	// update the window title
-	subview = memory_view_get_current_subview(mem->memory); 
+	subview = memory_view_get_current_subview(mem->memory);
 	sprintf(title, "Memory: %s", subview->name);
 	gtk_window_set_title(GTK_WINDOW(mem->win), title);
 
@@ -507,7 +507,7 @@ static void disasmwin_cpu_changed(GtkComboBox *cpu_w, disasmwin_i *dis)
 
 	disasmwin_update_checks(dis);
 
-	subview = disasm_view_get_current_subview(dis->disasm); 
+	subview = disasm_view_get_current_subview(dis->disasm);
 	sprintf(title, "Disassembly: %s", subview->name);
 	gtk_window_set_title(GTK_WINDOW(dis->win), title);
 }
@@ -587,7 +587,7 @@ static void disasmwin_new(running_machine *machine)
 
 	debug_view_begin_update(dis->disasm);
 	disasm_view_set_expression(dis->disasm, "curpc");
-//	debug_view_set_property_UINT32(dis->disasm, DVP_DASM_TRACK_LIVE, 1);
+//  debug_view_set_property_UINT32(dis->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dis->disasm);
 
 	// populate the combobox
@@ -604,7 +604,7 @@ static void disasmwin_new(running_machine *machine)
 	gtk_combo_box_set_active(dis->cpu_w, cursel);
 	disasm_view_set_subview(dis->disasm, cursel);
 
-	subview = disasm_view_get_current_subview(dis->disasm); 
+	subview = disasm_view_get_current_subview(dis->disasm);
 	sprintf(title, "Disassembly: %s", subview->name);
 	gtk_window_set_title(GTK_WINDOW(dis->win), title);
 
@@ -613,7 +613,7 @@ static void disasmwin_new(running_machine *machine)
 	g_signal_connect(lookup_widget(dis->win, "enc_opcodes"), "activate", G_CALLBACK(disasmwin_enc_opcodes_activate), dis);
 	g_signal_connect(lookup_widget(dis->win, "comments"),    "activate", G_CALLBACK(disasmwin_comments_activate), dis);
 
-	//	g_signal_connect(dis->edit_w, "activate", G_CALLBACK(disasmwin_process_string), dis);
+	//  g_signal_connect(dis->edit_w, "activate", G_CALLBACK(disasmwin_process_string), dis);
 	g_signal_connect(dis->win, "destroy", G_CALLBACK(disasmwin_destroy), dis);
 	gtk_widget_show_all(dis->win);
 }
@@ -757,7 +757,7 @@ void on_reverse_activate(GtkMenuItem *item, gpointer user_data)
 	memorywin_i *info = (memorywin_i *) user_data;
 	debug_view_begin_update(info->memory);
 	memory_view_set_reverse(info->memory, gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "reverse"))));
-								   
+
 	debug_view_end_update(info->memory);
 }
 

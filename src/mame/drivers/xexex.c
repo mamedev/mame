@@ -219,7 +219,7 @@ static WRITE16_HANDLER( sound_cmd1_w )
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
 		if (state->strip_0x1a)
-			if (soundlatch2_r(space, 0) == 1 && data == 0x1a) 
+			if (soundlatch2_r(space, 0) == 1 && data == 0x1a)
 				return;
 
 		soundlatch_w(space, 0, data & 0xff);

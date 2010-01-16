@@ -600,7 +600,7 @@ static int render_font_load_bdf(render_font *font)
 				mame_printf_warning("Loading BDF font... (%d characters loaded)\n", charcount);
 		}
 	}
-	
+
 	/* make sure all the numbers are the same width */
 	if (font->chars[0] != NULL)
 	{
@@ -611,7 +611,7 @@ static int render_font_load_bdf(render_font *font)
 		for (int ch = '0'; ch <= '9'; ch++)
 			font->chars[0][ch].width = maxwidth;
 	}
-		
+
 	return 0;
 }
 

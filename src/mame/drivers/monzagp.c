@@ -86,9 +86,9 @@ static VIDEO_UPDATE(monzagp)
 	for(y=0;y<256;y++)
 	{
 		for(x=0;x<256;x++)
-	 	{
-	 		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[bank&1],
-	 			vram[y*screenw+x],
+		{
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[bank&1],
+				vram[y*screenw+x],
 				//(vram[y*screenw+x]&0x3f)+(bank>>1)*64,
 				0,
 				0, 0,
@@ -116,8 +116,8 @@ static WRITE8_HANDLER(port_w)
 	//vram[coordy*screenw+coordx]=data;
 	//if(output==0xfe)
 	{
-	//	if(data>='A' && data <='Z')
-	//		printf("%.2x %.2x %c %c\n",coordy, offset,data, znaki[data-'A']);
+	//  if(data>='A' && data <='Z')
+	//      printf("%.2x %.2x %c %c\n",coordy, offset,data, znaki[data-'A']);
 		//vram[coordy*screenw+coordx]=data;
 		vram[(coordx*256+coordy)&0x7ff]=data;
 	}
@@ -187,16 +187,16 @@ static WRITE8_HANDLER(port3_w)
 /*
 
 
-#define  I8039_p0	0x100
-#define  I8039_p1	0x101
-#define  I8039_p2	0x102
-#define  I8039_p4	0x104
-#define  I8039_p5	0x105
-#define  I8039_p6	0x106
-#define  I8039_p7	0x107
-#define  I8039_t0	0x110
-#define  I8039_t1	0x111
-#define  I8039_bus	0x120
+#define  I8039_p0   0x100
+#define  I8039_p1   0x101
+#define  I8039_p2   0x102
+#define  I8039_p4   0x104
+#define  I8039_p5   0x105
+#define  I8039_p6   0x106
+#define  I8039_p7   0x107
+#define  I8039_t0   0x110
+#define  I8039_t1   0x111
+#define  I8039_bus  0x120
 */
 
 static ADDRESS_MAP_START( monzagp_io, ADDRESS_SPACE_IO, 8 )
@@ -276,11 +276,11 @@ ROM_START( monzagp )
 	ROM_LOAD( "8.1f",           0x1400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
 
 	ROM_REGION( 0x10000, "unk1", 0 )
-	ROM_LOAD( "1.9c",        		0x0000, 0x0400, CRC(005d5fed) SHA1(145a860751ef7d99129b7242aacac7a4e1e14a51) )
-	ROM_LOAD( "2",           		0x0400, 0x0400, NO_DUMP )
-	ROM_LOAD( "3.12f",       		0x0800, 0x0400, CRC(e5591074) SHA1(ac756ee605d932d7c1c3eddbe2b9c6f78dad6ce8) )
-	ROM_LOAD( "4.10f",       		0x0c00, 0x0400, CRC(a426a371) SHA1(d6023bebf6924d1820e631ee53896100e5b256a5) )
-	ROM_LOAD( "5.9f",        		0x1000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
+	ROM_LOAD( "1.9c",       		0x0000, 0x0400, CRC(005d5fed) SHA1(145a860751ef7d99129b7242aacac7a4e1e14a51) )
+	ROM_LOAD( "2",          		0x0400, 0x0400, NO_DUMP )
+	ROM_LOAD( "3.12f",      		0x0800, 0x0400, CRC(e5591074) SHA1(ac756ee605d932d7c1c3eddbe2b9c6f78dad6ce8) )
+	ROM_LOAD( "4.10f",      		0x0c00, 0x0400, CRC(a426a371) SHA1(d6023bebf6924d1820e631ee53896100e5b256a5) )
+	ROM_LOAD( "5.9f",       		0x1000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
 
 	ROM_REGION( 0x0700, "proms", 0 )
 	ROM_LOAD( "63s140.1",        0x0000, 0x0100, CRC(5123c83e) SHA1(d8ff06af421d3dae65bc9b0a081ed56249ef61ab) )

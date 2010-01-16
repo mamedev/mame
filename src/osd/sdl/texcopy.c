@@ -60,7 +60,7 @@ static void init_clamp(void)
 	for (i=0;i<256;i++)
 	{
 		clamp[i + 128] = i;
-		
+
 		coff_cr[i][0] =              + 409 * i     - 56992;
 		coff_cr[i][1] =              - 208 * i;
 		coff_cb[i][0] = - 100 * i /* - 208 * cr */ + 34784;
@@ -124,7 +124,7 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 #endif
 
 //============================================================
-//  MANUAL TEXCOPY FUNCS 
+//  MANUAL TEXCOPY FUNCS
 //  (YUY format is weird and doesn't fit the assumptions of the
 //   standard macros so we handle it here
 //============================================================
@@ -155,13 +155,13 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-	
+
 			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 		}
-		
+
 		// always fill non-wrapping textures with an extra pixel on the right
-		#if 0 
+		#if 0
 		if (texture->borderpix)
 			*dst++ = 0;
 		#endif
@@ -175,14 +175,14 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 	UINT32 *dst;
 	UINT16 *src;
 	int lookup[256];
-	
+
 	if (clamp[0]>0)
 		init_clamp();
 
 	/* preprocess lookup */
 	for (x=0; x<256; x++)
 		lookup[x] = texsource->palette[x] * 298;
-	
+
 	// loop over Y
 	for (y = 0; y < texsource->height; y++)
 	{
@@ -200,23 +200,23 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			
+
 #if 0
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix1 >> 8)], cb, cr);
 #else
-			int r  = (const int) coff_cr[cr][0]; 
-			int g  = (const int) coff_cb[cb][0] + (const int) coff_cr[cr][1]; 
+			int r  = (const int) coff_cr[cr][0];
+			int g  = (const int) coff_cb[cb][0] + (const int) coff_cr[cr][1];
 			int b  = (const int) coff_cb[cb][1];
 			int y1 = (const int) lookup[(srcpix0 >> 8)];
 			int y2 = (const int) lookup[(srcpix1 >> 8)];
 
-			
+
 			*dst++ = 0xff000000 | (CLSH(r + y1)<<16) | (CLSH(g + y1)<<8) | (CLSH(b + y1));
 			*dst++ = 0xff000000 | (CLSH(r + y2)<<16) | (CLSH(g + y2)<<8) | (CLSH(b + y2));
 #endif
 		}
-		
+
 		// always fill non-wrapping textures with an extra pixel on the right
 		#if 0
 		if (texture->borderpix)
@@ -277,11 +277,11 @@ static void FUNC_NAME(texcopy)(texture_info *texture, const render_texinfo *texs
 			}
 			break;
 		}
-		
+
 		// always fill non-wrapping textures with an extra pixel on the right
 		if (texture->borderpix)
 			*dst++ = 0;
-		
+
 		/* abuse x var to act as line counter while copying */
 		for (x = 1; x < texture->yprescale; x++)
 		{

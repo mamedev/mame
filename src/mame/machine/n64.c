@@ -533,7 +533,7 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
             {
             	UINT32 oldstatus = cpu_get_reg(device, RSP_SR);
             	UINT32 newstatus = oldstatus;
-            	
+
                 // printf( "RSP_STATUS_REG Write; %08x\n", data );
                 if (data & 0x00000001)      // clear halt
                 {

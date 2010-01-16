@@ -33,7 +33,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		data = spriteram[offs + 2];
 		tilenum = data & 0x7fff;
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		data = spriteram[offs + 0];
@@ -60,7 +60,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		flipy    = (data & 0x2) >> 1;
 		priority = (data & 0x4) >> 2; // 1 = low
 		/* data&0x8 - unknown */
-		if (priority != primask) 
+		if (priority != primask)
 			continue;
 		color    = (data & 0x7f00) >> 8;
 		/* data&0x8000 - unknown */

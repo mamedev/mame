@@ -1977,7 +1977,7 @@ static void cfunc_rsp_stv(void *param)
 
 static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-//	int loopdest;
+//  int loopdest;
 	UINT32 op = desc->opptr.l[0];
 	int dest = (op >> 16) & 0x1f;
 	//int base = (op >> 21) & 0x1f;

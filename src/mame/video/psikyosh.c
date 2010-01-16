@@ -998,7 +998,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     **- End Sprite Format -*/
 
-					
+
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	const gfx_element *gfx;
 	UINT32 *src = machine->generic.buffered_spriteram.u32; /* Use buffered spriteram */
@@ -1133,7 +1133,7 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 	if ((state->vidregs[2] & 0xf) != req_pri) {
 		return;
 	}
-	
+
 	profiler_mark_start(PROFILER_USER2);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
@@ -1185,7 +1185,7 @@ popmessage   ("Regs %08x %08x %08x %08x\n     %08x %08x %08x %08x",
     state->vidregs[4], state->vidregs[5],
     state->vidregs[6], state->vidregs[7]);
 #endif
-	
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(state->z_bitmap, cliprect, 0); /* z-buffer */
 

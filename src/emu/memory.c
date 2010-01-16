@@ -339,7 +339,7 @@ struct _memory_private
 
 	memory_block *			memory_block_list;				/* head of the list of memory blocks */
 
-	tagmap_t<bank_info *> 	bankmap;						/* map for fast bank lookups */
+	tagmap_t<bank_info *>	bankmap;						/* map for fast bank lookups */
 	bank_info * 			banklist;						/* data gathered for each bank */
 	UINT8					banknext;						/* next bank to allocate */
 
@@ -1204,8 +1204,8 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 		fatalerror("memory_set_bankptr called for unknown bank '%s'", tag);
 	if (base == NULL)
 		fatalerror("memory_set_bankptr called NULL base");
-//	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
-//		validate_auto_malloc_memory(base, bank->byteend - bank->bytestart + 1);
+//  if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
+//      validate_auto_malloc_memory(base, bank->byteend - bank->bytestart + 1);
 
 	/* set the base */
 	memdata->bank_ptr[bank->index] = (UINT8 *)base;

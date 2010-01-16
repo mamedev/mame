@@ -36,10 +36,10 @@ typedef struct _hidden_mutex_t hidden_mutex_t;
 struct _hidden_mutex_t {
 	pthread_mutex_t id;
 };
- 
+
 struct _osd_event {
 	pthread_mutex_t 	mutex;
-	pthread_cond_t 		cond;
+	pthread_cond_t		cond;
 	volatile INT32		autoreset;
 	volatile INT32		signalled;
 #ifdef PTR64
@@ -69,7 +69,7 @@ struct _osd_scalable_lock
 osd_scalable_lock *osd_scalable_lock_alloc(void)
 {
 	osd_scalable_lock *lock;
-	
+
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
 
 	lock->lock = osd_lock_alloc();
@@ -122,7 +122,7 @@ void osd_lock_acquire(osd_lock *lock)
 {
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
 	int r;
-	
+
 	r =	pthread_mutex_lock(&mutex->id);
 	if (r==0)
 		return;
@@ -137,12 +137,12 @@ int osd_lock_try(osd_lock *lock)
 {
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
 	int r;
-	
+
 	r = pthread_mutex_trylock(&mutex->id);
 	if (r==0)
 		return 1;
 	//if (r!=EBUSY)
-    //	mame_printf_error("Error on trylock: %d: %s\n", r, strerror(r));
+    //  mame_printf_error("Error on trylock: %d: %s\n", r, strerror(r));
 	return 0;
 }
 
@@ -186,7 +186,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	pthread_cond_init(&ev->cond, NULL);
 	ev->signalled = initialstate;
 	ev->autoreset = !manualreset;
-		
+
 	return ev;
 }
 
@@ -253,9 +253,9 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 			struct timeval    tp;
 			UINT64 msec = timeout * 1000 / osd_ticks_per_second();
 			UINT64 nsec;
-			
+
 			gettimeofday(&tp, NULL);
-	
+
 			ts.tv_sec  = tp.tv_sec;
 			nsec = (UINT64) tp.tv_usec * (UINT64) 1000 + (msec * (UINT64) 1000000);
 			ts.tv_nsec = nsec % (UINT64) 1000000000;
@@ -279,7 +279,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 				{
 					printf("Error %d while waiting for pthread_cond_timedwait:  %s\n", ret, strerror(ret));
 				}
-				
+
 			} while (TRUE);
 		}
 	}
@@ -320,7 +320,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 {
 	struct sched_param	sched;
 	int					policy;
-			
+
 	if ( pthread_getschedparam( thread->thread, &policy, &sched ) == 0 )
 	{
 		sched.sched_priority += adjust;
@@ -348,12 +348,12 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 	for (bitnum=0; bitnum<32; bitnum++)
 		if (mask & (1<<bitnum))
 			CPU_SET(bitnum, &cmask);
-	
+
 	if (thread == NULL)
 		lthread = pthread_self();
 	else
 		lthread = thread->thread;
-    
+
 	if (pthread_setaffinity_np(lthread, sizeof(cmask), &cmask) <0)
 	{
 		/* Not available during link in all targets */

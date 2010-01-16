@@ -109,11 +109,11 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 		int bank;
 
 		/* bits 0 and 2 select char bank */
-		if (data & 0x04) 
+		if (data & 0x04)
 			bank = 2;
-		else if (data & 0x01) 
+		else if (data & 0x01)
 			bank = 1;
-		else 
+		else
 			bank = 0;
 
 		if (state->charbank != bank)
@@ -123,9 +123,9 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 		}
 
 		/* bit 5 seems to select palette bank (used on startup) */
-		if (data & 0x20) 
+		if (data & 0x20)
 			bank = 7;
-		else 
+		else
 			bank = 3;
 
 		if (state->charpalette != bank)
@@ -158,10 +158,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int sx, sy, flipx, flipy, code, color;
 
 		sx = spriteram[offs + 1];
-		if (sx >= 0x8000) 
+		if (sx >= 0x8000)
 			sx -= 0x10000;
 		sy = 0x10000 - spriteram[offs + 0];
-		if (sy >= 0x8000) 
+		if (sy >= 0x8000)
 			sy -= 0x10000;
 		code = spriteram[offs + 2] & 0x07ff;
 		color = (spriteram[offs + 2] & 0xe000) >> 13;

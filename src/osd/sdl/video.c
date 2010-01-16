@@ -179,7 +179,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 {
 	#if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_DisplayMode dmode;
-	
+
 	SDL_SelectVideoDisplay(monitor->handle);
 	SDL_GetDesktopDisplayMode(&dmode);
 	monitor->monitor_width = dmode.w;
@@ -189,7 +189,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#else
 	#if defined(SDLMAME_WIN32)	// Win32 version
 	MONITORINFOEX info;
-	info.cbSize = sizeof(info);	
+	info.cbSize = sizeof(info);
     GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
 	monitor->center_width = monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->center_height = monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
@@ -212,7 +212,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 		int screen;
 		SDL_SysWMinfo info;
 		SDL_VERSION(&info.version);
-		
+
 		if ( SDL_GetWMInfo(&info) && (info.subsystem == SDL_SYSWM_X11) )
 		{
 			screen = DefaultScreen(info.info.x11.display);
@@ -225,8 +225,8 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				XineramaScreenInfo *xineinfo;
 				int numscreens;
 
-      				xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
-			
+    				xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
+
 				monitor->center_width = xineinfo[0].width;
 				monitor->center_height = xineinfo[0].height;
 
@@ -238,18 +238,18 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				monitor->center_height = monitor->monitor_height;
 			}
 		}
- 		else
+		else
 		#endif // defined(SDLMAME_X11)
 		{
 			static int first_call=0;
 			static int cw, ch;
-			
+
 			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
-			if (first_call==0) 
+			if (first_call==0)
 			{
 				char *dimstr = getenv(SDLENV_DESKTOPDIM);
 				const SDL_VideoInfo *sdl_vi;
-				
+
 				sdl_vi = SDL_GetVideoInfo();
 				#if (SDL_VERSION_ATLEAST(1,2,10))
 				cw = sdl_vi->current_w;
@@ -277,9 +277,9 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			monitor->monitor_height = ch;
 			monitor->center_width = cw;
 			monitor->center_height = ch;
-		}	
+		}
 	}
-	#elif defined(SDLMAME_OS2) 		// OS2 version
+	#elif defined(SDLMAME_OS2)		// OS2 version
 	monitor->center_width = monitor->monitor_width = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
 	monitor->center_height = monitor->monitor_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 	strcpy(monitor->monitor_device, "OS/2 display");
@@ -289,7 +289,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 
 	{
 		static int info_shown=0;
-		if (!info_shown) 
+		if (!info_shown)
 		{
 			mame_printf_verbose("SDL Device Driver     : %s\n", monitor->monitor_device);
 			mame_printf_verbose("SDL Monitor Dimensions: %d x %d\n", monitor->monitor_width, monitor->monitor_height);
@@ -345,10 +345,10 @@ void osd_update(running_machine *machine, int skip_redraw)
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
 	{
-//		profiler_mark(PROFILER_BLIT);
+//      profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
 			sdlwindow_video_window_update(machine, window);
-//		profiler_mark(PROFILER_END);
+//      profiler_mark(PROFILER_END);
 	}
 
 	// poll the joystick values here
@@ -387,7 +387,7 @@ static void add_primary_monitor(void *data)
 	// hook us into the list
 	**tailptr = monitor;
 	*tailptr = &monitor->next;
-} 
+}
 #endif
 
 
@@ -424,12 +424,12 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 
 	// guess the aspect ratio assuming square pixels
 	monitor->aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
-	
+
 	// SDL will crash if monitors are queried here
 	// This will be done in window.c (Ughh, ugly)
-	
+
 	monitor->modes = NULL;
-	
+
 	// save the primary monitor handle
 	if (info.dwFlags & MONITORINFOF_PRIMARY)
 		primary_monitor = monitor;
@@ -466,13 +466,13 @@ static void init_monitors(void)
 		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
 		{
 			sdl_monitor_info *monitor;
-	 		SDL_DisplayMode dmode;
+			SDL_DisplayMode dmode;
 
 			// allocate a new monitor info
 			monitor = global_alloc_clear(sdl_monitor_info);
 
 			snprintf(monitor->monitor_device, sizeof(monitor->monitor_device)-1, "%s%d", SDLOPTION_SCREEN(""),i);
-	 	
+
 			SDL_SelectVideoDisplay(i);
 			SDL_GetDesktopDisplayMode(&dmode);
 			monitor->monitor_width = dmode.w;
@@ -528,7 +528,7 @@ static sdl_monitor_info *pick_monitor(int index)
 	// look for a match in the name first
 	if (scrname != NULL)
 		for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
-		{	
+		{
 			moncount++;
 			if (strcmp(scrname, monitor->monitor_device) == 0)
 				goto finishit;
@@ -584,21 +584,21 @@ static void check_osd_inputs(running_machine *machine)
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
 		sdlwindow_toggle_full_screen(machine, window);
-	
+
 	if (ui_input_pressed(machine, IPT_OSD_2))
 	{
 		//FIXME: on a per window basis
 		video_config.fullstretch = !video_config.fullstretch;
 		ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
-	
+
 	if (ui_input_pressed(machine, IPT_OSD_4))
 	{
 		//FIXME: on a per window basis
 		video_config.keepaspect = !video_config.keepaspect;
 		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
-	
+
 	if (USE_OPENGL || SDL_VERSION_ATLEAST(1,3,0))
 	{
 		//FIXME: on a per window basis
@@ -672,20 +672,20 @@ static void extract_video_config(running_machine *machine)
 		video_config.mode = VIDEO_MODE_OPENGL;
 	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0))
 	{
- 		video_config.mode = VIDEO_MODE_OPENGL;
- 		video_config.prefer16bpp_tex = 1;
+		video_config.mode = VIDEO_MODE_OPENGL;
+		video_config.prefer16bpp_tex = 1;
 	}
 	else if (SDL_VERSION_ATLEAST(1,3,0) && (strcmp(stemp, SDLOPTVAL_SDL13) == 0))
 	{
- 		video_config.mode = VIDEO_MODE_SDL13;
- 		video_config.prefer16bpp_tex = 1;
+		video_config.mode = VIDEO_MODE_SDL13;
+		video_config.prefer16bpp_tex = 1;
 	}
 	else
 	{
 		mame_printf_warning("Invalid video value %s; reverting to software\n", stemp);
 		video_config.mode = VIDEO_MODE_SOFT;
 	}
-	
+
 	video_config.switchres     = options_get_bool(mame_options(), SDLOPTION_SWITCHRES);
 	video_config.centerh       = options_get_bool(mame_options(), SDLOPTION_CENTERH);
 	video_config.centerv       = options_get_bool(mame_options(), SDLOPTION_CENTERV);
@@ -715,15 +715,15 @@ static void extract_video_config(running_machine *machine)
 		{
 			int i;
 			static char buffer[20]; // gl_glsl_filter[0..9]?
-	
+
 			video_config.glsl_filter = options_get_int (mame_options(), SDLOPTION_GLSL_FILTER);
-	
+
 			video_config.glsl_shader_mamebm_num=0;
-	
+
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
 				snprintf(buffer, 18, SDLOPTION_SHADER_MAME("%d"), i); buffer[17]=0;
-	
+
 				stemp = options_get_string(mame_options(), buffer);
 				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
@@ -734,13 +734,13 @@ static void extract_video_config(running_machine *machine)
 					video_config.glsl_shader_mamebm[i] = NULL;
 				}
 			}
-	
+
 			video_config.glsl_shader_scrn_num=0;
-	
+
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
 				snprintf(buffer, 20, SDLOPTION_SHADER_SCREEN("%d"), i); buffer[19]=0;
-	
+
 				stemp = options_get_string(mame_options(), buffer);
 				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
@@ -751,7 +751,7 @@ static void extract_video_config(running_machine *machine)
 					video_config.glsl_shader_scrn[i] = NULL;
 				}
 			}
-	
+
 			video_config.glsl_vid_attributes = options_get_int (mame_options(), SDLOPTION_GL_GLSL_VID_ATTR);
 			{
 				// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
@@ -780,7 +780,7 @@ static void extract_video_config(running_machine *machine)
 			}
 			video_config.glsl_vid_attributes = 0;
 		}
-	
+
 	}
 	// misc options: sanity check values
 
@@ -889,7 +889,7 @@ static void get_resolution(const char *name, sdl_window_config *config, int repo
 
 		data = defdata;
 	}
-	
+
 	if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
 		mame_printf_error("Illegal resolution value for %s = %s\n", name, data);
 }

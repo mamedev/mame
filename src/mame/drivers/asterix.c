@@ -60,7 +60,7 @@ static INTERRUPT_GEN( asterix_interrupt )
 	asterix_state *state = (asterix_state *)device->machine->driver_data;
 
 	// global interrupt masking
-	if (!k056832_is_irq_enabled(state->k056832, 0)) 
+	if (!k056832_is_irq_enabled(state->k056832, 0))
 		return;
 
 	cpu_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */

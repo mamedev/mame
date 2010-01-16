@@ -64,7 +64,7 @@ ROM_START( vega )
 	ROM_LOAD( "rom7.bin",	      0x0000, 0x0800, CRC(1de564cd) SHA1(7408cd29f1afc111aa695ecb00160d8f7fba7532) )
 	ROM_LOAD( "rom8.bin",	      0x0000, 0x0800, CRC(ccb8598c) SHA1(8c4a702f0653bb189db7d8ac4c2a06aacecc0de0) )
 	ROM_LOAD( "rom9.bin",	      0x0000, 0x0800, CRC(191c73cd) SHA1(17b1c3790f82b276e55d25ea8a38a3c9cf20bf12) )
-	//ROM_LOAD( "rom10.bin",	      0x0000, 0x1000, CRC(c7659222) SHA1(86df4f4afe5bfd0b67239353a344724405c32fed) ) // 1ST AND 2ND HALF IDENTICAL
+	//ROM_LOAD( "rom10.bin",          0x0000, 0x1000, CRC(c7659222) SHA1(86df4f4afe5bfd0b67239353a344724405c32fed) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_LOAD( "rom10a.bin",	      0x0000, 0x1000, CRC(fca9a570) SHA1(598772db11b32518ed6bf5155a19f4f1761a4831) ) // if you convert the ascii dump there is different data in the 2nd half unlike the above dump (it also appears in the ascii dumps of 11/12 too tho)
 	ROM_LOAD( "rom11.bin",	      0x0000, 0x0800, CRC(d1896f77) SHA1(5b80bf7aa81508edfae4fa583b4b0077575a300c) )
 	ROM_LOAD( "rom12.bin",	      0x0000, 0x0800, CRC(f5f1df2f) SHA1(5851b468702e5e4f085b64afbe7d8b797bb109b5) )
@@ -114,9 +114,9 @@ DRIVER_INIT(vegaa)
 
 			l = ascii_to_bin(l);
 			r = ascii_to_bin(r);
-					
+
 			num = l << 4 | r;
-	
+
 			buf[count] = num;
 			count++;
 		}

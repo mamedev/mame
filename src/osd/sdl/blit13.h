@@ -11,10 +11,10 @@ INLINE UINT32 premult32(UINT32 pixel)
 	UINT8 r = (pixel >> 16) & 0xff;
 	UINT8 g = (pixel >> 8) & 0xff;
 	UINT8 b = (pixel >> 0) & 0xff;
-	
+
 	return 0xFF000000 |
 		(((UINT16)r * (UINT16)a) / 255) << 16 |
-		(((UINT16)g * (UINT16)a) / 255) << 8 | 
+		(((UINT16)g * (UINT16)a) / 255) << 8 |
 		(((UINT16)b * (UINT16)a) / 255);
 }
 
@@ -85,9 +85,9 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 
 #define OP_YUV16PAL_UYVY(_src) ((texsource->palette[((_src) >> 8) & 0xff] << 8) | ((_src) & 0x00ff))
 
-#define OP_YUV16PAL_YVYU(_src) ((texsource->palette[((_src) >> 8) & 0xff] & 0xff) | ((_src & 0xff) << 8))		 
+#define OP_YUV16PAL_YVYU(_src) ((texsource->palette[((_src) >> 8) & 0xff] & 0xff) | ((_src & 0xff) << 8))
 
-#define OP_YUV16_YVYU(_src) ((((_src) >> 8) & 0xff) | ((_src & 0xff) << 8))		 
+#define OP_YUV16_YVYU(_src) ((((_src) >> 8) & 0xff) | ((_src & 0xff) << 8))
 
 #define OP_YUV16_YUY2(_src) ( ((_src) & 0xff00ff00) | \
 	(((_src)>>16)&0xff) | (((_src)<<16)&0xff0000) )

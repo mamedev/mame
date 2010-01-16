@@ -75,9 +75,9 @@ static const char * glsl_mamebm_filter_names [GLSL_SHADER_FEAT_MAX_NUMBER] =
 
 static GLhandleARB glsl_mamebm_programs [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FEAT_MAX_NUMBER+9] =
 {
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9, .. */ 
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9, .. */ 
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9, .. */ 
+ {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9, .. */
+ {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9, .. */
+ {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9, .. */
 };
 
 /**
@@ -85,31 +85,31 @@ static GLhandleARB glsl_mamebm_programs [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FE
  */
 static int glsl_mamebm_fsh2vsh[GLSL_SHADER_FEAT_MAX_NUMBER] =
 {
-	0,	// plain	-> general
-	0,	// bilinear	-> general
+	0,	// plain    -> general
+	0,	// bilinear -> general
 	1,      // custom       -> custom
 };
 
-static GLhandleARB glsl_mamebm_vsh_shader[GLSL_VERTEX_SHADER_MAX_NUMBER+9] = 
+static GLhandleARB glsl_mamebm_vsh_shader[GLSL_VERTEX_SHADER_MAX_NUMBER+9] =
 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; /* general, custom0-9 */
 
 static GLhandleARB glsl_mamebm_fsh_shader [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FEAT_MAX_NUMBER+9] =
 {
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9 */ 
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9 */ 
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9 */ 
+ {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9 */
+ {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9 */
+ {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9 */
 };
 
 static GLhandleARB glsl_scrn_programs [10] =
 {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0  /* rgb32: custom0-9, .. */ 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0  /* rgb32: custom0-9, .. */
 };
 
-static GLhandleARB glsl_scrn_vsh_shader[10] = 
+static GLhandleARB glsl_scrn_vsh_shader[10] =
 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; /* custom0-9 */
 
 static GLhandleARB glsl_scrn_fsh_shader [10] =
-{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; /* rgb32: custom0-9 */ 
+{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; /* rgb32: custom0-9 */
 
 const char * glsl_shader_get_filter_name_mamebm(int glslShaderFeature)
 {
@@ -144,16 +144,16 @@ glsl_shader_info *glsl_shader_init(void)
 
         err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)SDL_GL_GetProcAddress);
 	if(err) return NULL;
-	
+
 	for (i=0; !err && i<GLSL_VERTEX_SHADER_INT_NUMBER; i++)
 	{
 	#ifdef GLSL_SOURCE_ON_DISK
 		if(glsl_mamebm_vsh_files[i])
-			err = gl_compile_shader_file  ( &glsl_mamebm_vsh_shader[i], GL_VERTEX_SHADER_ARB, 
+			err = gl_compile_shader_file  ( &glsl_mamebm_vsh_shader[i], GL_VERTEX_SHADER_ARB,
 							glsl_mamebm_vsh_files[i], 0);
 	#else
 		if(glsl_mamebm_vsh_sources[i])
-			err = gl_compile_shader_source( &glsl_mamebm_vsh_shader[i], GL_VERTEX_SHADER_ARB, 
+			err = gl_compile_shader_source( &glsl_mamebm_vsh_shader[i], GL_VERTEX_SHADER_ARB,
 							glsl_mamebm_vsh_sources[i], 0);
 	#endif
 	}
@@ -166,14 +166,14 @@ glsl_shader_info *glsl_shader_init(void)
 		{
 		#ifdef GLSL_SOURCE_ON_DISK
 			if(glsl_mamebm_fsh_files[i][j])
-				err = gl_compile_shader_files  (&glsl_mamebm_programs[i][j], 
-								&glsl_mamebm_vsh_shader[glsl_mamebm_fsh2vsh[j]], 
+				err = gl_compile_shader_files  (&glsl_mamebm_programs[i][j],
+								&glsl_mamebm_vsh_shader[glsl_mamebm_fsh2vsh[j]],
 								&glsl_mamebmfsh_shader[i][j],
 								NULL /*precompiled*/, glsl_mamebm_fsh_files[i][j], 0);
 		#else
 			if(glsl_mamebm_fsh_sources[i][j])
-				err = gl_compile_shader_sources(&glsl_mamebm_programs[i][j], 
-								&glsl_mamebm_vsh_shader[glsl_mamebm_fsh2vsh[j]], 
+				err = gl_compile_shader_sources(&glsl_mamebm_programs[i][j],
+								&glsl_mamebm_vsh_shader[glsl_mamebm_fsh2vsh[j]],
 								&glsl_mamebm_fsh_shader[i][j],
 								NULL /*precompiled*/, glsl_mamebm_fsh_sources[i][j]);
 		#endif
@@ -193,7 +193,7 @@ int glsl_shader_free(glsl_shader_info *shinfo)
 	for (i=0; i<GLSL_VERTEX_SHADER_MAX_NUMBER+9; i++)
 	{
 		if ( glsl_mamebm_vsh_shader[i] )
-			(void) gl_delete_shader( NULL,  &glsl_mamebm_vsh_shader[i], NULL); 
+			(void) gl_delete_shader( NULL,  &glsl_mamebm_vsh_shader[i], NULL);
 	}
 
 	for (i=0; i<GLSL_SHADER_TYPE_NUMBER; i++)
@@ -217,7 +217,7 @@ int glsl_shader_free(glsl_shader_info *shinfo)
 	for (i=0; i<10; i++)
 	{
 		if ( glsl_scrn_vsh_shader[i] )
-			(void) gl_delete_shader( NULL,  &glsl_scrn_vsh_shader[i], NULL); 
+			(void) gl_delete_shader( NULL,  &glsl_scrn_vsh_shader[i], NULL);
 		if ( glsl_scrn_fsh_shader[i] )
 			(void) gl_delete_shader( NULL, NULL, &glsl_scrn_fsh_shader[i]);
 		if ( glsl_scrn_programs[i] )
@@ -253,7 +253,7 @@ int glsl_shader_add_mamebm(glsl_shader_info *shinfo, const char * custShaderPref
 				break;
 		}
 
-		err = gl_compile_shader_files  (&glsl_mamebm_programs[i][GLSL_SHADER_FEAT_CUSTOM+idx], 
+		err = gl_compile_shader_files  (&glsl_mamebm_programs[i][GLSL_SHADER_FEAT_CUSTOM+idx],
 						&glsl_mamebm_vsh_shader[GLSL_VERTEX_SHADER_CUSTOM+idx],
 						&glsl_mamebm_fsh_shader[i][GLSL_SHADER_FEAT_CUSTOM+idx],
 						NULL /*precompiled*/, fname, 0);
@@ -273,7 +273,7 @@ int glsl_shader_add_scrn(glsl_shader_info *shinfo, const char * custShaderPrefix
 
 	snprintf(fname, 8192, "%s.fsh", custShaderPrefix); fname[8191]=0;
 
-	err = gl_compile_shader_files  (&glsl_scrn_programs[idx], 
+	err = gl_compile_shader_files  (&glsl_scrn_programs[idx],
 					&glsl_scrn_vsh_shader[idx],
 					&glsl_scrn_fsh_shader[idx],
 					NULL /*precompiled*/, fname, 0);

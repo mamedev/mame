@@ -535,7 +535,7 @@ static WRITE16_HANDLER( io_w )
 				// This seems to only be written after each irq1 and irq2, irq ack?
 				//logerror("irq wrote %04x\n", data);
 			//else
-			//	LOG_UNKNOWN_WRITE
+			//  LOG_UNKNOWN_WRITE
 			break;
 
 		case 0xd4/2:

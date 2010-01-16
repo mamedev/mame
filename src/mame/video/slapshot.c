@@ -153,22 +153,22 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
 			master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (master_scrollx >= 0x800) 
+			if (master_scrollx >= 0x800)
 				master_scrollx -= 0x1000;   /* signed value */
 
 			master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (master_scrolly >= 0x800) 
+			if (master_scrolly >= 0x800)
 				master_scrolly -= 0x1000;   /* signed value */
 		}
 
 		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
 			scroll1x = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (scroll1x >= 0x800) 
+			if (scroll1x >= 0x800)
 				scroll1x -= 0x1000;   /* signed value */
 
 			scroll1y = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (scroll1y >= 0x800) 
+			if (scroll1y >= 0x800)
 				scroll1y -= 0x1000;   /* signed value */
 		}
 
@@ -418,11 +418,11 @@ static void taito_update_sprites_active_area( running_machine *machine )
 		if ((state->spriteram_buffered[(offs+4)/2] & 0xf000) == 0xa000)
 		{
 			state->sprites_master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (state->sprites_master_scrollx >= 0x800) 
+			if (state->sprites_master_scrollx >= 0x800)
 				state->sprites_master_scrollx -= 0x1000;   /* signed value */
 
 			state->sprites_master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (state->sprites_master_scrolly >= 0x800) 
+			if (state->sprites_master_scrolly >= 0x800)
 				state->sprites_master_scrolly -= 0x1000;   /* signed value */
 		}
 	}

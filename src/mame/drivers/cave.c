@@ -156,14 +156,14 @@ static READ16_HANDLER( cave_irq_cause_r )
 	cave_state *state = (cave_state *)space->machine->driver_data;
 	int result = 0x0003;
 
-	if (state->vblank_irq)		
+	if (state->vblank_irq)
 		result ^= 0x01;
-	if (state->unknown_irq)	
+	if (state->unknown_irq)
 		result ^= 0x02;
 
-	if (offset == 4/2)	
+	if (offset == 4/2)
 		state->vblank_irq = 0;
-	if (offset == 6/2)	
+	if (offset == 6/2)
 		state->unknown_irq = 0;
 
 	update_irq_state(space->machine);
@@ -917,7 +917,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hotdogst_rombank_w )
 {
-	if (data & ~0x0f)	
+	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
 
 	memory_set_bank(space->machine, "bank2", data & 0x0f);
@@ -955,7 +955,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mazinger_rombank_w )
 {
-	if (data & ~0x07)	
+	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
 
 	memory_set_bank(space->machine, "bank2", data & 0x07);
@@ -986,7 +986,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metmqstr_rombank_w )
 {
-	if (data & ~0x0f)	
+	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
 
 	memory_set_bank(space->machine, "bank1", data & 0x0f);
@@ -1036,7 +1036,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pwrinst2_rombank_w )
 {
-	if (data & ~0x07)	
+	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
 
 	memory_set_bank(space->machine, "bank1", data & 0x07);
@@ -1080,7 +1080,7 @@ static WRITE8_HANDLER( mirror_ram_w )
 
 static WRITE8_HANDLER( sailormn_rombank_w )
 {
-	if (data & ~0x1f)	
+	if (data & ~0x1f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
 
 	memory_set_bank(space->machine, "bank1", data & 0x1f);

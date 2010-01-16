@@ -299,7 +299,7 @@ class astring : public astring_base
 {
 private:
 	astring &init();
-	
+
 public:
 	astring() { init(); }
 	~astring();
@@ -315,11 +315,11 @@ public:
 	astring &operator=(const astring &string) { return cpy(string); }
 
 	astring &reset() { return cpy(""); }
-	
+
 	operator const char *() const { return astring_c(this); }
 	const char *cstr() const { return astring_c(this); }
 	int len() const { return astring_len(this); }
-	
+
 	astring &cpy(const astring &src) { return *astring_cpy(this, &src); }
 	astring &cpy(const char *src) { return *astring_cpyc(this, src); }
 	astring &cpy(const char *src, int count) { return *astring_cpych(this, src, count); }

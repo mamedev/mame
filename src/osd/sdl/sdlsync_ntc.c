@@ -35,7 +35,7 @@
 #include <sys/time.h>
 
 struct _osd_lock {
- 	volatile pthread_t	holder;
+	volatile pthread_t	holder;
 	INT32				count;
 #ifdef PTR64
 	INT8				padding[52];	// Fill a 64-byte cache line
@@ -43,10 +43,10 @@ struct _osd_lock {
 	INT8				padding[56];	// A bit more padding
 #endif
 };
- 
+
 struct _osd_event {
 	pthread_mutex_t 	mutex;
-	pthread_cond_t 		cond;
+	pthread_cond_t		cond;
 	volatile INT32		autoreset;
 	volatile INT32		signalled;
 #ifdef PTR64
@@ -69,10 +69,10 @@ struct _osd_scalable_lock
 {
 	struct
 	{
-		volatile INT32 	haslock;		// do we have the lock?
-		INT32 			filler[64/4-1];	// assumes a 64-byte cache line
+		volatile INT32	haslock;		// do we have the lock?
+		INT32			filler[64/4-1];	// assumes a 64-byte cache line
 	} slot[WORK_MAX_THREADS];			// one slot per thread
-	volatile INT32 		nextindex;		// index of next slot to use
+	volatile INT32		nextindex;		// index of next slot to use
 };
 
 
@@ -83,7 +83,7 @@ struct _osd_scalable_lock
 osd_scalable_lock *osd_scalable_lock_alloc(void)
 {
 	osd_scalable_lock *lock;
-	
+
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
 
 	memset(lock, 0, sizeof(*lock));
@@ -171,7 +171,7 @@ void osd_scalable_lock_free(osd_scalable_lock *lock)
 {
 	free(lock);
 }
- 
+
 INLINE pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread_t compare, pthread_t exchange)
 {
 #ifdef PTR64
@@ -265,9 +265,9 @@ void osd_lock_acquire(osd_lock *lock)
 #endif
 #if 0
 			/* If you mean to use locks as a blocking mechanism for extended
-			 * periods of time, you should do something like this.  However,
-			 * it kills the performance of gaelco3d.
-			 */
+             * periods of time, you should do something like this.  However,
+             * it kills the performance of gaelco3d.
+             */
 			if (spin == 0)
 			{
 				struct timespec sleep = { 0, 100000 }, remaining;
@@ -319,7 +319,7 @@ void osd_lock_release(osd_lock *lock)
 	}
 
 	// trying to release a lock you don't hold is bad!
-//	assert(lock->holder == pthread_self());
+//  assert(lock->holder == pthread_self());
 }
 
 //============================================================
@@ -347,7 +347,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	pthread_cond_init(&ev->cond, NULL);
 	ev->signalled = initialstate;
 	ev->autoreset = !manualreset;
-		
+
 	return ev;
 }
 
@@ -414,9 +414,9 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 			struct timeval    tp;
 			UINT64 msec = timeout * 1000 / osd_ticks_per_second();
 			UINT64 nsec;
-			
+
 			gettimeofday(&tp, NULL);
-	
+
 			ts.tv_sec  = tp.tv_sec;
 			nsec = (UINT64) tp.tv_usec * (UINT64) 1000 + (msec * (UINT64) 1000000);
 			ts.tv_nsec = nsec % (UINT64) 1000000000;
@@ -440,7 +440,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 				{
 					printf("Error %d while waiting for pthread_cond_timedwait:  %s\n", ret, strerror(ret));
 				}
-				
+
 			} while (TRUE);
 		}
 	}
@@ -481,7 +481,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 {
 	struct sched_param	sched;
 	int					policy;
-			
+
 	if ( pthread_getschedparam( thread->thread, &policy, &sched ) == 0 )
 	{
 		sched.sched_priority += adjust;

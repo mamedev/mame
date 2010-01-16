@@ -104,9 +104,9 @@ static void dview_hadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->dw); 
+	pos = debug_view_get_visible_position(dv->dw);
 
-	if (v != pos.x) 
+	if (v != pos.x)
 	{
 		pos.x = v;
 		debug_view_set_visible_position(dv->dw, pos);
@@ -119,9 +119,9 @@ static void dview_vadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->dw); 
+	pos = debug_view_get_visible_position(dv->dw);
 
-	if (v != pos.y) 
+	if (v != pos.y)
 	{
 		pos.y = v;
 		debug_view_set_visible_position(dv->dw, pos);
@@ -147,7 +147,7 @@ static void dview_realize(GtkWidget *wdv)
 	attributes.visual = gtk_widget_get_visual(wdv);
 	attributes.colormap = gtk_widget_get_colormap(wdv);
 	attributes.event_mask = gtk_widget_get_events(wdv) | GDK_EXPOSURE_MASK;
-	
+
 	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 
 	wdv->window = gdk_window_new(gtk_widget_get_parent_window(wdv), &attributes, attributes_mask);
@@ -166,7 +166,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	int ovs = dv->vs;
 	debug_view_xy size, pos, col, vsize;
 
-	pos = debug_view_get_visible_position(dv->dw); 
+	pos = debug_view_get_visible_position(dv->dw);
 	size = debug_view_get_total_size(dv->dw);
 
 	dv->tr = size.y;
@@ -210,7 +210,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		vsize.x = size.x-pos.x;
 	}
 
-	debug_view_set_visible_position(dv->dw, pos); 
+	debug_view_set_visible_position(dv->dw, pos);
 	debug_view_set_visible_size(dv->dw, vsize);
 
 	if(GTK_WIDGET_REALIZED(wdv))
@@ -240,7 +240,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->hadj->page_increment = span;
 		dv->hadj->page_size = span;
 		gtk_adjustment_changed(dv->hadj);
-		debug_view_set_visible_position(dv->dw, pos); 
+		debug_view_set_visible_position(dv->dw, pos);
 	} else {
 		if(ohs)
 			gtk_widget_hide(dv->hscrollbar);
@@ -268,7 +268,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->vadj->page_increment = span;
 		dv->vadj->page_size = span;
 		gtk_adjustment_changed(dv->vadj);
-		debug_view_set_visible_position(dv->dw, pos); 
+		debug_view_set_visible_position(dv->dw, pos);
 	} else {
 		if(ovs)
 			gtk_widget_hide(dv->vscrollbar);
@@ -334,7 +334,7 @@ static void dview_class_init(DViewClass *dvc)
 
     if(!dvc->fixedfont)
 		dvc->fixedfont = pango_font_description_from_string("Monospace 10");
-    
+
     if(!dvc->fixedfont) {
 		mame_printf_error("Couldn't find a monospace font, aborting\n");
 		abort();
@@ -357,7 +357,7 @@ static void dview_init(DView *dv)
 	if(!dvc->fixedfont_width) {
 		PangoFontMetrics *metrics;
 		metrics = pango_context_get_metrics(gtk_widget_get_pango_context(GTK_WIDGET(dv)), dvc->fixedfont, 0);
-  
+
 		dvc->fixedfont_width = PANGO_PIXELS(pango_font_metrics_get_approximate_char_width(metrics));
 		dvc->fixedfont_height = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics) +
 											 pango_font_metrics_get_descent(metrics));

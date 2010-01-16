@@ -51,7 +51,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate);
     Return value:
 
         TRUE:  The event was signalled
-        FALSE: A timeout occurred 
+        FALSE: A timeout occurred
 -----------------------------------------------------------------------------*/
 int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 
@@ -65,7 +65,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 
     Return value:
 
-	    None
+        None
 -----------------------------------------------------------------------------*/
 void osd_event_reset(osd_event *event);
 
@@ -79,11 +79,11 @@ void osd_event_reset(osd_event *event);
 
     Return value:
 
-	    None
-	    
-	Notes:
-	
-	    All threads waiting for the event will be signalled.
+        None
+
+    Notes:
+
+        All threads waiting for the event will be signalled.
 -----------------------------------------------------------------------------*/
 void osd_event_set(osd_event *event);
 
@@ -149,10 +149,10 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust);
 
     Parameters:
 
-        thread - A pointer to a previously created thread 
+        thread - A pointer to a previously created thread
                  or NULL for main thread
         mask   - bitmask to which cpus to bind
-        		 i.e. 0x01 1st cpu, 0x02, 2nd cpu, 0x04 3rd cpu
+                 i.e. 0x01 1st cpu, 0x02, 2nd cpu, 0x04 3rd cpu
 
     Return value:
 

@@ -156,7 +156,7 @@ static INTERRUPT_GEN( moobl_interrupt )
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	if ((data & 0x00ff0000) == 0) 
+	if ((data & 0x00ff0000) == 0)
 	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);
@@ -165,7 +165,7 @@ static WRITE16_HANDLER( sound_cmd1_w )
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	if ((data & 0x00ff0000) == 0) 
+	if ((data & 0x00ff0000) == 0)
 		soundlatch2_w(space, 0, data & 0xff);
 }
 

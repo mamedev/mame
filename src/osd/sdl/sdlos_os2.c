@@ -196,7 +196,7 @@ int osd_num_processors(void)
 void *osd_alloc_executable(size_t size)
 {
 	void *p;
-	
+
 	DosAllocMem( &p, size, fALLOC );
 	return p;
 }

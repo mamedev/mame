@@ -178,7 +178,7 @@ static void contcirc_draw_sprites_16x8( running_machine *machine, bitmap_t *bitm
 		color = (data & 0xff00) >> 8;
 		zoomx = (data & 0x7f);
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		map_offset = tilenum << 7;
@@ -205,7 +205,7 @@ static void contcirc_draw_sprites_16x8( running_machine *machine, bitmap_t *bitm
 
 			code = spritemap[map_offset + px + (py << 3)];
 
-			if (code == 0xffff)	
+			if (code == 0xffff)
 				bad_chunks++;
 
 			curx = x + ((k * zoomx) / 8);
@@ -274,7 +274,7 @@ static void chasehq_draw_sprites_16x16( running_machine *machine, bitmap_t *bitm
 		/* higher bits are sometimes used... e.g. sign over flashing enemy car...! */
 		tilenum = data & 0x7ff;
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		zoomx += 1;
@@ -303,7 +303,7 @@ static void chasehq_draw_sprites_16x16( running_machine *machine, bitmap_t *bitm
 
 				code = spritemap[map_offset + px + (py << 3)];
 
-				if (code == 0xffff)	
+				if (code == 0xffff)
 					bad_chunks++;
 
 				curx = x + ((k * zoomx) / 8);
@@ -459,7 +459,7 @@ static void bshark_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap
 		data = spriteram[offs + 3];
 		tilenum = data & 0x1fff;	/* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		map_offset = tilenum << 5;
@@ -564,7 +564,7 @@ static void sci_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, c
 		data = spriteram[offs + 3];
 		tilenum = data & 0x1fff;	/* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		map_offset = tilenum << 5;
@@ -660,7 +660,7 @@ static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 		flipy = (data & 0x8000) >> 15;	// ???
 		tilenum = data & 0x1fff;	/* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		map_offset = tilenum << 5;
@@ -755,7 +755,7 @@ static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 		flipy = (data & 0x8000) >> 15;	// ???
 		tilenum = data & 0x1fff;	/* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
-		if (!tilenum) 
+		if (!tilenum)
 			continue;
 
 		map_offset = tilenum << 5;

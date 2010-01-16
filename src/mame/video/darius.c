@@ -72,7 +72,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			data = spriteram[offs + 3];
 			priority = (data & 0x80) >> 7;  // 0 = low
-			if (priority != primask) 
+			if (priority != primask)
 				continue;
 			color = (data & 0x7f);
 

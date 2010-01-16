@@ -3,7 +3,7 @@
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
     Notes:
-    - Position counter doesn't behave correctly because of the K051733 
+    - Position counter doesn't behave correctly because of the K051733
       protection.
     - 007232 volume & panning control is almost certainly wrong.
 

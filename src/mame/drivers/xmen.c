@@ -298,9 +298,9 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( xmen_interrupt )
 {
-	if (cpu_getiloops(device) == 0) 
+	if (cpu_getiloops(device) == 0)
 		irq5_line_hold(device);
-	else 
+	else
 		irq3_line_hold(device);
 }
 

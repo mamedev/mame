@@ -317,7 +317,7 @@ static INTERRUPT_GEN( vbl_interrupt )
 	cpu_set_irq_callback(device, irq_callback);
 
 	/* kludge to make plgirls boot */
-	if (cpu_get_reg(device, Z80_IM) != 2) 
+	if (cpu_get_reg(device, Z80_IM) != 2)
 		return;
 
 	// What is really generating interrupts 0 and 1 is still to be found

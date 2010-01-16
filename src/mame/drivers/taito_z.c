@@ -1407,7 +1407,7 @@ static READ16_HANDLER( taitoz_sound_r )
 
 	if (offset == 1)
 		return (tc0140syt_comm_r(state->tc0140syt, 0) & 0xff);
-	else 
+	else
 		return 0;
 }
 
@@ -1438,7 +1438,7 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
-	else 
+	else
 		return 0;
 }
 #endif
@@ -1447,7 +1447,7 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 /**** sound pan control ****/
 static WRITE8_HANDLER( taitoz_pancontrol )
 {
-//	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+//  taitoz_state *state = (taitoz_state *)space->machine->driver_data;
 	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
 
 	offset = offset & 3;

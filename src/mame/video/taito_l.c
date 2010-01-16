@@ -260,7 +260,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		sx = state->buff_spriteram[offs + 4] | ((state->buff_spriteram[offs + 5] & 1) << 8);
 		sy = state->buff_spriteram[offs + 6];
-		if (sx >= 320) 
+		if (sx >= 320)
 			sx -= 512;
 		flipx = state->buff_spriteram[offs + 3] & 0x01;
 		flipy = state->buff_spriteram[offs + 3] & 0x02;

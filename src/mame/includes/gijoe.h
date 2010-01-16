@@ -18,8 +18,8 @@ struct _gijoe_state
 	int         avac_vrc, sprite_colorbase;
 
 	/* misc */
-	UINT16     	cur_control2;
-	emu_timer  	*dmadelay_timer;
+	UINT16  	cur_control2;
+	emu_timer	*dmadelay_timer;
 
 	/* devices */
 	const device_config *maincpu;

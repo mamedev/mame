@@ -122,13 +122,13 @@ void punkshot_sprite_callback( running_machine *machine, int *code, int *color, 
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*code |= (*color & 0x10) << 9;
@@ -139,13 +139,13 @@ void thndrx2_sprite_callback( running_machine *machine, int *code, int *color, i
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*color = state->sprite_colorbase + (*color & 0x0f);
@@ -162,13 +162,13 @@ void lgtnfght_sprite_callback( running_machine *machine, int *code, int *color, 
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*color = state->sprite_colorbase + (*color & 0x1f);
@@ -183,13 +183,13 @@ if (input_code_pressed(machine, KEYCODE_W) && (*color & 0x40)) *color = rand();
 if (input_code_pressed(machine, KEYCODE_E) && (*color & 0x80)) *color = rand();
 #endif
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*color = state->sprite_colorbase + (*color & 0x1f);
@@ -199,13 +199,13 @@ void prmrsocr_sprite_callback( running_machine *machine, int *code, int *color, 
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*code |= state->prmrsocr_sprite_bank << 14;
@@ -275,8 +275,8 @@ VIDEO_START( glfgreat )
 	state->roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 512);
 	tilemap_set_transparent_pen(state->roz_tilemap,0);
 
-	state->glfgreat_roz_rom_bank = 0; 
-	state->glfgreat_roz_char_bank = 0; 
+	state->glfgreat_roz_rom_bank = 0;
+	state->glfgreat_roz_char_bank = 0;
 	state->glfgreat_roz_rom_mode = 0;
 	state_save_register_global(machine, state->glfgreat_roz_rom_bank);
 	state_save_register_global(machine, state->glfgreat_roz_char_bank);
@@ -290,8 +290,8 @@ VIDEO_START( prmrsocr )
 	state->roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 256);
 	tilemap_set_transparent_pen(state->roz_tilemap,0);
 
-	state->prmrsocr_sprite_bank = 0; 
-	state->glfgreat_roz_char_bank = 0; 
+	state->prmrsocr_sprite_bank = 0;
+	state->glfgreat_roz_char_bank = 0;
 	state_save_register_global(machine, state->prmrsocr_sprite_bank);
 	state_save_register_global(machine, state->glfgreat_roz_char_bank);
 }
@@ -300,7 +300,7 @@ VIDEO_START( blswhstl )
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 
-	state->blswhstl_rombank = -1; 
+	state->blswhstl_rombank = -1;
 	state_save_register_global(machine, state->blswhstl_rombank);
 }
 
@@ -678,9 +678,9 @@ READ16_HANDLER( glfgreat_ball_r )
 popmessage("%04x", state->glfgreat_pixel);
 #endif
 	/* if out of the ROZ layer palette range, it's in the water - return 0 */
-	if (state->glfgreat_pixel < 0x400 || state->glfgreat_pixel >= 0x500) 
+	if (state->glfgreat_pixel < 0x400 || state->glfgreat_pixel >= 0x500)
 		return 0;
-	else 
+	else
 		return state->glfgreat_pixel & 0xff;
 }
 
@@ -750,7 +750,7 @@ VIDEO_UPDATE( tmnt2 )
 	if (newdim != state->lastdim || newen != state->lasten)
 	{
 		brt = 1.0;
-		if (newen) 
+		if (newen)
 			brt -= (1.0 - PALETTE_DEFAULT_SHADOW_FACTOR) * newdim / 8;
 		state->lastdim = newdim;
 		state->lasten = newen;

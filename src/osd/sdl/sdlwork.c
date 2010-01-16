@@ -114,7 +114,7 @@ struct _osd_work_item
 {
 	osd_work_item *		next;			// pointer to next item
 	osd_work_queue *	queue;			// pointer back to the owning queue
-	osd_work_callback 	callback;		// callback function
+	osd_work_callback	callback;		// callback function
 	void *				param;			// callback parameter
 	void *				result;			// callback result
 	osd_event *			event;			// event signalled when complete
@@ -209,13 +209,13 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		// set its priority: I/O threads get high priority because they are assumed to be
 		// blocked most of the time; other threads just match the creator's priority
 		if (flags & WORK_QUEUE_FLAG_IO)
-			osd_thread_adjust_priority(thread->handle, 1);	
+			osd_thread_adjust_priority(thread->handle, 1);
 		else
-			osd_thread_adjust_priority(thread->handle, 0);	
+			osd_thread_adjust_priority(thread->handle, 0);
 
 		// Bind main thread to cpu 0
 		osd_thread_cpu_affinity(NULL, effective_cpu_mask(0));
-		
+
 		if (flags & WORK_QUEUE_FLAG_IO)
 			osd_thread_cpu_affinity(thread->handle, effective_cpu_mask(1));
 		else
@@ -274,7 +274,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 
 			// spin until we're done
 			begin_timing(thread->spintime);
-			
+
 			do {
 				int spin = 10000;
 				while (--spin && queue->items != 0)
@@ -586,7 +586,7 @@ static int effective_num_processors(void)
 
 static UINT32 effective_cpu_mask(int index)
 {
-	char 	*s;
+	char	*s;
 	char	buf[5];
 	UINT32	mask = 0xFFFF;
 
@@ -659,7 +659,7 @@ static void *worker_thread_entry(void *param)
 				// spin for a while looking for more work
 				begin_timing(thread->spintime);
 				stopspin = osd_ticks() + SPIN_LOOP_TIME;
-				
+
 				do {
 					int spin = 10000;
 					while (--spin && queue->list == NULL)

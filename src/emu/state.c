@@ -182,7 +182,7 @@ void state_init(running_machine *machine)
 	double test_double;
 	test_enum_type test_enum;
 	test_class_type test_class;
-	
+
 	assert_always(IS_VALID_SAVE_TYPE(test_bool), "bool is not a valid type for save");
 	assert_always(IS_VALID_SAVE_TYPE(test_INT8), "INT8 is not a valid type for save");
 	assert_always(IS_VALID_SAVE_TYPE(test_UINT8), "UINT8 is not a valid type for save");

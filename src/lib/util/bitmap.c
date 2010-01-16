@@ -308,8 +308,8 @@ void bitmap_free(bitmap_t *bitmap)
 
 
 /*-------------------------------------------------
-    bitmap_clone_existing -- clone an existing 
-    bitmap by copying its fields; the target 
+    bitmap_clone_existing -- clone an existing
+    bitmap by copying its fields; the target
     bitmap does not own the memory
 -------------------------------------------------*/
 
@@ -318,7 +318,7 @@ void bitmap_clone_existing(bitmap_t *bitmap, const bitmap_t *srcbitmap)
 	if (bitmap->alloc != NULL)
 		free(bitmap->alloc);
 	bitmap->alloc = NULL;
-	
+
 	bitmap->base = srcbitmap->base;
 	bitmap->rowpixels = srcbitmap->rowpixels;
 	bitmap->width = srcbitmap->width;

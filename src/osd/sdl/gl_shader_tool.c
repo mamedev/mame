@@ -8,22 +8,22 @@
  * Dual license: MAME and GPL version 2
  *
  * This module has a dual license, i.e. it is compatible to MAME,
- * but I like to reserve my rights to use this module under 
+ * but I like to reserve my rights to use this module under
  * the GPL as well.
  *
  * GPL license:
  *      Visit http://www.gnu.org/copyleft/gpl.html
  *
  * MAME license:
- *	Visit http://mamedev.org for licensing and usage restrictions.
+ *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *
  * OpenGL GLSL ARB extentions:
  *
- *	GL_ARB_shader_objects
- *	GL_ARB_shading_language_100
- *	GL_ARB_vertex_shader
- *	GL_ARB_fragment_shader
+ *  GL_ARB_shader_objects
+ *  GL_ARB_shading_language_100
+ *  GL_ARB_vertex_shader
+ *  GL_ARB_fragment_shader
  *
  */
 
@@ -86,9 +86,9 @@ int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress)
 	if ( pfn_glGetObjectParameterivARB && pfn_glGetInfoLogARB && pfn_glDeleteObjectARB && pfn_glCreateShaderObjectARB &&
 	     pfn_glShaderSourceARB && pfn_glCompileShaderARB && pfn_glCreateProgramObjectARB && pfn_glAttachObjectARB &&
 	     pfn_glLinkProgramARB && pfn_glValidateProgramARB && pfn_glUseProgramObjectARB && pfn_glGetUniformLocationARB &&
-	     pfn_glGetUniformLocationARB && pfn_glUniform1fARB && pfn_glUniform1iARB && 
-	     pfn_glUniform1fvARB && pfn_glUniform2fvARB && pfn_glUniform3fvARB && pfn_glUniform4fvARB && 
-	     pfn_glUniform1ivARB && pfn_glUniform2ivARB && pfn_glUniform3ivARB && pfn_glUniform4ivARB 
+	     pfn_glGetUniformLocationARB && pfn_glUniform1fARB && pfn_glUniform1iARB &&
+	     pfn_glUniform1fvARB && pfn_glUniform2fvARB && pfn_glUniform3fvARB && pfn_glUniform4fvARB &&
+	     pfn_glUniform1ivARB && pfn_glUniform2ivARB && pfn_glUniform3ivARB && pfn_glUniform4ivARB
 	   )
 	{
 		return 0;
@@ -170,7 +170,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			if ( CHECK_VERBOSE <= m )
 				mame_printf_warning("%s:%d: GL Error: object type 0x%X generation failed\n", file, line, (unsigned int)obj);
 			res=-1;
-		} else if ( CHECK_ALWAYS_VERBOSE <= m ) 
+		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
 			if(param==GL_PROGRAM_OBJECT_ARB)
 				mame_printf_warning("%s:%d: GL Error: object type 0x%X is PROGRAM, successful\n", file, line, (unsigned int)obj);
@@ -183,7 +183,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 		{
 			if ( CHECK_ALWAYS_VERBOSE <= m )
 				mame_printf_warning("%s:%d: GL Info: object 0x%X not yet marked for deletion\n", file, line, (unsigned int)obj);
-		} else if ( CHECK_ALWAYS_VERBOSE <= m ) 
+		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
 			mame_printf_warning("%s:%d: GL Info: object 0x%X deletion successful\n", file, line, (unsigned int)obj);
 		}
@@ -194,7 +194,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			if ( CHECK_VERBOSE <= m )
 				mame_printf_warning("%s:%d: GL Error: object 0x%X compilation failed\n", file, line, (unsigned int)obj);
 			res=-1;
-		} else if ( CHECK_ALWAYS_VERBOSE <= m ) 
+		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
 			mame_printf_warning("%s:%d: GL Info: object 0x%X compiled successful\n", file, line, (unsigned int)obj);
 		}
@@ -205,7 +205,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			if ( CHECK_VERBOSE <= m )
 				mame_printf_warning("%s:%d: GL Error: object 0x%X linking failed\n", file, line, (unsigned int)obj);
 			res=-1;
-		} else if ( CHECK_ALWAYS_VERBOSE <= m ) 
+		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
 			mame_printf_warning("%s:%d: GL Info: object 0x%X linked successful\n", file, line, (unsigned int)obj);
 		}
@@ -216,7 +216,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			if ( CHECK_VERBOSE <= m )
 				mame_printf_warning("%s:%d: GL Error: object 0x%X validation failed\n", file, line, (unsigned int)obj);
 			res=-1;
-		} else if ( CHECK_ALWAYS_VERBOSE <= m ) 
+		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
 			mame_printf_warning("%s:%d: GL Info: object 0x%X validation successful\n", file, line, (unsigned int)obj);
 		}
@@ -250,8 +250,8 @@ int gl_round_to_pow2(int v)
 	return v;
 }
 
-int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, 
-                          GLint border, GLenum format, GLenum type, 
+int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height,
+                          GLint border, GLenum format, GLenum type,
 			  GLint *avail_width, GLint *avail_height,
 			  int verbose)
 {
@@ -265,7 +265,7 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
     *avail_height = 0;
 
     GL_CHECK_ERROR_QUIET();
-    
+
     /* Test the max texture size */
     while(err && width>=1 && height>=1 /* && width>=64 && height>=64 */)
     {
@@ -275,8 +275,8 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
 		    border, format, type, NULL);
 	if ( 0!=(err=GL_CHECK_ERROR_NORMAL() )) return err;
 
-	glGetTexLevelParameteriv( texTargetProxy, level, GL_TEXTURE_WIDTH,  avail_width); 
-	glGetTexLevelParameteriv( texTargetProxy, level, GL_TEXTURE_HEIGHT, avail_height); 
+	glGetTexLevelParameteriv( texTargetProxy, level, GL_TEXTURE_WIDTH,  avail_width);
+	glGetTexLevelParameteriv( texTargetProxy, level, GL_TEXTURE_HEIGHT, avail_height);
 	if ( 0!=(err=GL_CHECK_ERROR_NORMAL() )) return err;
 
 	if ( (*avail_width) != width || (*avail_height) != height )
@@ -286,9 +286,9 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
 		if(verbose)
 		{
 			mame_printf_warning("gl_texture_size_check: "
-			  "TexImage2D(0x%X, %d, 0x%X, %d, %d, %d, 0x%X, 0x%X): returned size does not match: %dx%d\n", 
-				(unsigned int)target, (int)level, (int)internalFormat, 
-				(int)width, (int)height, (int)border, (unsigned int)format, (unsigned int)type, 
+			  "TexImage2D(0x%X, %d, 0x%X, %d, %d, %d, 0x%X, 0x%X): returned size does not match: %dx%d\n",
+				(unsigned int)target, (int)level, (int)internalFormat,
+				(int)width, (int)height, (int)border, (unsigned int)format, (unsigned int)type,
                                 (int)*avail_width, (int)*avail_height);
 		}
 
@@ -351,7 +351,7 @@ static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader,
 
         return 0;
 }
-	
+
 int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * shader_source, int verbose )
 {
         int err = 0;

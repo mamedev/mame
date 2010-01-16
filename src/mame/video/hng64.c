@@ -1921,7 +1921,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
 	threeDPointer = &threeDRoms[threeDOffset * 3];
 
-	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU) 
+	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU)
 	{
 		printf("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
@@ -2050,7 +2050,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 			// Debug - Colors polygons with certain flags bright blue! ajg
 			//if (chunkOffset[2] & 0x00f0)
-			//	polys[*numPolys].debugColor = 0xff0000ff;
+			//  polys[*numPolys].debugColor = 0xff0000ff;
 
 			// Debug - ajg
 			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
@@ -2094,7 +2094,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				/* TODO: Does the explicit palette bit do anything when the dynamic palette flag is on? */
 			}
 			else
-            {    
+            {
 				UINT8 explicitPaletteValue = (chunkOffset[1] & 0x0f00) >> 8;
 				polys[*numPolys].palOffset += explicitPaletteValue * 0x80;
 			}

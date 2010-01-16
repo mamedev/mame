@@ -553,7 +553,7 @@ static KONAMI_SETLINES_CALLBACK( aliens_banking )
 {
 	int bank = 4;
 
-	if (lines & 0x10) 
+	if (lines & 0x10)
 		bank -= 4;
 
 	bank += (lines & 0x0f);

@@ -241,9 +241,9 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		if (offset == 0) 
+		if (offset == 0)
 			soundlatch_w(space, 0, data);
-		else 
+		else
 			soundlatch2_w(space, 0, data);
 	}
 }
@@ -276,10 +276,10 @@ static WRITE8_HANDLER( tmnt_sres_w )
 	/* bit 2 plays the title music */
 	if (data & 0x04)
 	{
-		if (!sample_playing(state->samples, 0))	
+		if (!sample_playing(state->samples, 0))
 			sample_start_raw(state->samples, 0, state->sampledata, 0x40000, 20000, 0);
 	}
-	else 	
+	else
 		sample_stop(state->samples, 0);
 	state->tmnt_soundlatch = data;
 }
@@ -797,11 +797,11 @@ INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 
-	if (addr <= 0x07ffff / 2) 
-		return(state->tmnt2_rom[addr]); 
-	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2) 
-		return(state->sunset_104000[addr - 0x104000 / 2]); 
-	else if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2) 
+	if (addr <= 0x07ffff / 2)
+		return(state->tmnt2_rom[addr]);
+	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
+		return(state->sunset_104000[addr - 0x104000 / 2]);
+	else if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
 		return(machine->generic.spriteram.u16[addr - 0x180000 / 2]);
 	return 0;
 }
@@ -821,7 +821,7 @@ static void tmnt2_put_word( const address_space *space, UINT32 addr, UINT16 data
 			k053245_word_w(state->k053245, offs, data, 0xffff);
 		}
 	}
-	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2) 
+	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
 		state->sunset_104000[addr - 0x104000 / 2] = data;
 }
 
@@ -836,11 +836,11 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 
 	COMBINE_DATA(state->tmnt2_1c0800 + offset);
 
-	if (offset != 0x18/2 || !ACCESSING_BITS_8_15) 
+	if (offset != 0x18/2 || !ACCESSING_BITS_8_15)
 		return;
 
 	mcu = state->tmnt2_1c0800;
-	if ((mcu[8] & 0xff00) != 0x8200) 
+	if ((mcu[8] & 0xff00) != 0x8200)
 		return;
 
 	src_addr = (mcu[0] | (mcu[1] & 0xff) << 16) >> 1;
@@ -848,9 +848,9 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	mod_addr = (mcu[4] | (mcu[5] & 0xff) << 16) >> 1;
 	zlock    = (mcu[8] & 0xff) == 0x0001;
 
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)
 		src[i] = tmnt2_get_word(space->machine, src_addr + i);
-	for (i = 0; i < 24; i++) mod[i] = 
+	for (i = 0; i < 24; i++) mod[i] =
 		tmnt2_get_word(space->machine, mod_addr + i);
 
 	code = src[0];			// code

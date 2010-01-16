@@ -230,7 +230,7 @@ static INTERRUPT_GEN(audio_interrupt)
 {
 	rungun_state *state = (rungun_state *)device->machine->driver_data;
 
-	if (state->z80_control & 0x80) 
+	if (state->z80_control & 0x80)
 		return;
 
 	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);

@@ -27,7 +27,7 @@ struct _taitof2_state
 	int             sprite_type;
 
 	UINT16          spritebank[8];
-//	UINT16          spritebank_eof[8];
+//  UINT16          spritebank_eof[8];
 	UINT16          spritebank_buffered[8];
 
 	INT32           sprites_disabled, sprites_active_area, sprites_master_scrollx, sprites_master_scrolly;

@@ -7,14 +7,14 @@ void gijoe_sprite_callback( running_machine *machine, int *code, int *color, int
 	gijoe_state *state = (gijoe_state *)machine->driver_data;
 	int pri = (*color & 0x03e0) >> 4;
 
-	if (pri <= state->layer_pri[3])                        
+	if (pri <= state->layer_pri[3])
 		*priority_mask = 0;
-	else if (pri >  state->layer_pri[3] && pri <= state->layer_pri[2]) 
+	else if (pri >  state->layer_pri[3] && pri <= state->layer_pri[2])
 		*priority_mask = 0xff00;
-	else if (pri >  state->layer_pri[2] && pri <= state->layer_pri[1]) 
+	else if (pri >  state->layer_pri[2] && pri <= state->layer_pri[1])
 		*priority_mask = 0xff00 | 0xf0f0;
-	else if (pri >  state->layer_pri[1] && pri <= state->layer_pri[0]) 
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc; 
+	else if (pri >  state->layer_pri[1] && pri <= state->layer_pri[0])
+		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
 	else
 		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
 
@@ -29,20 +29,20 @@ void gijoe_tile_callback( running_machine *machine, int layer, int *code, int *c
 	if (tile >= 0xf000 && tile <= 0xf4ff)
 	{
 		tile &= 0x0fff;
-		if (tile < 0x0310) 
-		{ 
-			state->avac_occupancy[layer] |= 0x0f00; 
-			tile |= state->avac_bits[0]; 
+		if (tile < 0x0310)
+		{
+			state->avac_occupancy[layer] |= 0x0f00;
+			tile |= state->avac_bits[0];
 		}
-		else if (tile < 0x0470) 
-		{ 
-			state->avac_occupancy[layer] |= 0xf000; 
-			tile |= state->avac_bits[1]; 
-		} 
+		else if (tile < 0x0470)
+		{
+			state->avac_occupancy[layer] |= 0xf000;
+			tile |= state->avac_bits[1];
+		}
 		else
-		{ 
-			state->avac_occupancy[layer] |= 0x00f0; 
-			tile |= state->avac_bits[2]; 
+		{
+			state->avac_occupancy[layer] |= 0x00f0;
+			tile |= state->avac_bits[2];
 		}
 		*code = tile;
 	}

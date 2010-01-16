@@ -287,7 +287,7 @@ static VIDEO_UPDATE( metalmx )
 	/* TODO: TMS34020 should take care of this */
 	metalmx_state *state = (metalmx_state *)screen->machine->driver_data;
 
-//	UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
+//  UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
 	UINT16 *src_base = state->gsp_vram;
 	int y;
 

@@ -280,21 +280,21 @@ public:
 		va_end(ap);
 		osd_break_into_debugger(text);
 	}
-	
+
 	emu_fatalerror(const char *format, va_list ap)
 		: code(0)
 	{
 		vsprintf(text, format, ap);
 		osd_break_into_debugger(text);
 	}
-	
+
 	emu_fatalerror(int _exitcode, const char *format, va_list ap)
 		: code(_exitcode)
 	{
 		vsprintf(text, format, ap);
 		osd_break_into_debugger(text);
 	}
-	
+
 	const char *string() const { return text; }
 	int exitcode() const { return code; }
 

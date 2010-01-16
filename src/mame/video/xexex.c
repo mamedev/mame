@@ -12,13 +12,13 @@ void xexex_sprite_callback( running_machine *machine, int *code, int *color, int
 	pri = (*color & 0x3e0) >> 4;
 
 	if (pri <= state->layerpri[3])
-		*priority_mask = 0; 
+		*priority_mask = 0;
 	else if (pri > state->layerpri[3] && pri <= state->layerpri[2])
-		*priority_mask = 0xff00; 
-	else if (pri > state->layerpri[2] && pri <= state->layerpri[1]) 
-		*priority_mask = 0xff00 | 0xf0f0; 
-	else if (pri > state->layerpri[1] && pri <= state->layerpri[0]) 
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc; 
+		*priority_mask = 0xff00;
+	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
+		*priority_mask = 0xff00 | 0xf0f0;
+	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
+		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
 	else
 		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
 

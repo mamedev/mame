@@ -41,9 +41,9 @@ void gradius3_sprite_callback( running_machine *machine, int *code, int *color, 
 	gradius3_state *state = (gradius3_state *)machine->driver_data;
 	int pri = ((*color & 0x60) >> 5);
 
-	if (state->priority == 0) 
+	if (state->priority == 0)
 		*priority_mask = primask[0][pri];
-	else 
+	else
 		*priority_mask = primask[1][pri];
 
 	*code |= (*color & 0x01) << 13;

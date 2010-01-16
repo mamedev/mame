@@ -34,7 +34,7 @@
 #define pthread_self    _gettid
 
 struct _osd_lock {
- 	volatile pthread_t	holder;
+	volatile pthread_t	holder;
 	INT32				count;
 #ifdef PTR64
 	INT8				padding[52];	// Fill a 64-byte cache line
@@ -62,10 +62,10 @@ struct _osd_scalable_lock
 {
 	struct
 	{
-		volatile INT32 	haslock;		// do we have the lock?
-		INT32 			filler[64/4-1];	// assumes a 64-byte cache line
+		volatile INT32	haslock;		// do we have the lock?
+		INT32			filler[64/4-1];	// assumes a 64-byte cache line
 	} slot[WORK_MAX_THREADS];			// one slot per thread
-	volatile INT32 		nextindex;		// index of next slot to use
+	volatile INT32		nextindex;		// index of next slot to use
 };
 
 
@@ -76,7 +76,7 @@ struct _osd_scalable_lock
 osd_scalable_lock *osd_scalable_lock_alloc(void)
 {
 	osd_scalable_lock *lock;
-	
+
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
 
 	memset(lock, 0, sizeof(*lock));
@@ -258,9 +258,9 @@ void osd_lock_acquire(osd_lock *lock)
 #endif
 #if 0
 			/* If you mean to use locks as a blocking mechanism for extended
-			 * periods of time, you should do something like this.  However,
-			 * it kills the performance of gaelco3d.
-			 */
+             * periods of time, you should do something like this.  However,
+             * it kills the performance of gaelco3d.
+             */
 			if (spin == 0)
 			{
 				struct timespec sleep = { 0, 100000 }, remaining;
@@ -312,7 +312,7 @@ void osd_lock_release(osd_lock *lock)
 	}
 
 	// trying to release a lock you don't hold is bad!
-//	assert(lock->holder == pthread_self());
+//  assert(lock->holder == pthread_self());
 }
 
 //============================================================

@@ -2361,5 +2361,5 @@ GAME( 1998, xrally,   hng64,  hng64, hng64,  hng64_race,  ROT0, "SNK", "Xtreme R
 GAME( 1998, bbust2,   hng64,  hng64, bbust2, hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare",			  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
 GAME( 1998, sams64_2, hng64,  hng64, hng64,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
 GAME( 1998, fatfurwa, hng64,  hng64, hng64,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)",		  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64,  fatfurwa,    ROT0, "SNK", "Buriki One (rev.B)",				  	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
+GAME( 1999, buriki,   hng64,  hng64, hng64,  fatfurwa,    ROT0, "SNK", "Buriki One (rev.B)",					  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
 

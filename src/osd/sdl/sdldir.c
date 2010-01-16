@@ -120,7 +120,7 @@ osd_directory *osd_opendir(const char *dirname)
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = (char *) malloc(strlen(tmpstr)+1); 
+		envstr = (char *) malloc(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -138,7 +138,7 @@ osd_directory *osd_opendir(const char *dirname)
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			free(tmpstr);
 			tmpstr = (char *) malloc(j);
-	
+
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);
 			// replace the null with a path separator again

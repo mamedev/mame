@@ -19,7 +19,7 @@ struct _spy_state
 	int        rambank, pmcbank;
 	int        video_enable;
 	int        old_3f90;
-	
+
 	/* devices */
 	const device_config *maincpu;
 	const device_config *audiocpu;

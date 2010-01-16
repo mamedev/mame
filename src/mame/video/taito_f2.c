@@ -248,7 +248,7 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	int i = 0;
 	int j = 0;
 
-	if (offset < 2) 
+	if (offset < 2)
 		return;   /* irrelevant zero writes */
 
 	if (offset < 4)   /* special bank pairs */
@@ -296,7 +296,7 @@ static void taito_f2_tc360_spritemixdraw( running_machine *machine, bitmap_t *de
 	int sprite_screen_height = (scaley * gfx->height + 0x8000) >> 16;
 	int sprite_screen_width = (scalex * gfx->width + 0x8000) >> 16;
 
-	if (!scalex || !scaley) 
+	if (!scalex || !scaley)
 		return;
 
 	if (sprite_screen_width && sprite_screen_height)
@@ -528,7 +528,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	color = 0;
 
 	f2_x_offset = state->hide_pixels;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
-	if (state->sprites_flipscreen) 
+	if (state->sprites_flipscreen)
 		f2_x_offset = -state->flip_hide_pixels;		// was -f2_x_offset
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
@@ -547,7 +547,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			/* Get rid of 0-3 unwanted pixels on edge of screen. */
 			f2_x_offset = state->hide_pixels;
-			if (state->sprites_flipscreen) 
+			if (state->sprites_flipscreen)
 				f2_x_offset = -state->flip_hide_pixels;		// was -f2_x_offset
 
 			if (state->game == FOOTCHMP)
@@ -563,22 +563,22 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
 			master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (master_scrollx >= 0x800) 
+			if (master_scrollx >= 0x800)
 				master_scrollx -= 0x1000;   /* signed value */
 
 			master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (master_scrolly >= 0x800) 
+			if (master_scrolly >= 0x800)
 				master_scrolly -= 0x1000;   /* signed value */
 		}
 
 		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
 			scroll1x = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (scroll1x >= 0x800) 
+			if (scroll1x >= 0x800)
 				scroll1x -= 0x1000;   /* signed value */
 
 			scroll1y = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (scroll1y >= 0x800) 
+			if (scroll1y >= 0x800)
 				scroll1y -= 0x1000;   /* signed value */
 		}
 

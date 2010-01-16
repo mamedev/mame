@@ -4,7 +4,7 @@ struct _tmnt_state
 {
 	/* memory pointers */
 	INT16 *    sampledata;
-	UINT16 *   tmnt2_1c0800; 
+	UINT16 *   tmnt2_1c0800;
 	UINT16 *   sunset_104000;
 	UINT16 *   tmnt2_rom;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
@@ -14,7 +14,7 @@ struct _tmnt_state
 	/* video-related */
 	int        layer_colorbase[3], sprite_colorbase;
 	int        layerpri[3];
-	int        sorted_layer[3];	// this might not be necessary, but tmnt2 uses it in a strange way... 
+	int        sorted_layer[3];	// this might not be necessary, but tmnt2 uses it in a strange way...
 
 	tilemap_t  *roz_tilemap;
 	int        glfgreat_roz_rom_bank, glfgreat_roz_char_bank, glfgreat_roz_rom_mode;

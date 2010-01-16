@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( begas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ(test_r)
 	AM_RANGE(0x1003, 0x1003) AM_READ(test_r)
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
-//	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
+//  AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
 	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data

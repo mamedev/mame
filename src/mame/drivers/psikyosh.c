@@ -454,16 +454,16 @@ P1KEY11  29|30  P2KEY11
     GND  53|54  GND
     GND  55|56  GND
 */
-	
+
 	UINT32 controls = input_port_read(space->machine, "CONTROLLER");
 	UINT32 value = input_port_read(space->machine, "INPUTS");
-	
+
 	if(controls) {
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
-		// Since the game can't accept conflicting inputs e.g. PL1 Up and 'A' or 'B' we have to 
+		// Since the game can't accept conflicting inputs e.g. PL1 Up and 'A' or 'B' we have to
 		// make the user choose the input method. Especially since in test mode both sets are usable.
 		// Switch top word to either Mahjong inputs or joystick depending
-		
+
 		enum {
 			KEY1  = 0x0400, // JAMMA P2 Button 1
 			KEY2  = 0x0040, // JAMMA P2 Down
@@ -471,13 +471,13 @@ P1KEY11  29|30  P2KEY11
 			KEY4  = 0x8000, // JAMMA P1 Up
 			KEY5  = 0x4000, // JAMMA P1 Down
 			KEY6  = 0x0010, // JAMMA P2 Left
-//			KEY7           
+//          KEY7
 			KEY8  = 0x1000, // JAMMA P1 Left
 			KEY9  = 0x2000, // JAMMA P1 Right
 			KEY10 = 0x0020, // JAMMA P2 Right
 			KEY11 = 0x0800, // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
-		
+
 		UINT16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
 //          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
 			KEY4 | KEY3,  // A
@@ -506,9 +506,9 @@ P1KEY11  29|30  P2KEY11
 		int count = 0;
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
-		int start_depressed = ~value & 0x01000000; 
+		int start_depressed = ~value & 0x01000000;
 		keys |= start_depressed ? 1 << (sizeof(key_codes)/sizeof(key_codes[0]) - 1) : 0; // and bung it in at the end
-		
+
 		value |= 0xFFFF0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
@@ -753,7 +753,7 @@ static INPUT_PORTS_START( mjgtaste )
 	PORT_CONFNAME( 0x00000001, 0x00000001, DEF_STR ( Controller ) )
     PORT_CONFSETTING(          0x00000000, DEF_STR( Joystick ) )
     PORT_CONFSETTING(          0x00000001, "Mahjong Panel" )
-	
+
 	PORT_START("MAHJONG") /* articifial enumeration for mahjong encoder */
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(1)
@@ -774,8 +774,8 @@ static INPUT_PORTS_START( mjgtaste )
 	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
 	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_PLAYER(1)
-//	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_START1 ) /* start on panel, hacked in from the regular one to avoid duplicates in the UI */
-	
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_START1 ) /* start on panel, hacked in from the regular one to avoid duplicates in the UI */
+
 	PORT_START("JP4")	/* jumper pads on the PCB */
 //  PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )

@@ -303,7 +303,7 @@ static TILE_GET_INFO( sailormn_get_tile_info_2 )
 
 INLINE void vram_w( UINT16 *VRAM, tilemap_t *TILEMAP, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask )
 {
-	if ((VRAM[offset] & mem_mask) == (data & mem_mask)) 
+	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
 			return;
 
 	COMBINE_DATA(&VRAM[offset]);
@@ -328,7 +328,7 @@ INLINE void vram_w( UINT16 *VRAM, tilemap_t *TILEMAP, ATTR_UNUSED offs_t offset,
 INLINE void vram_8x8_w( UINT16 *VRAM, tilemap_t *TILEMAP, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask )
 {
 	offset %= 0x4000 / 2;
-	if ((VRAM[offset] & mem_mask) == (data & mem_mask)) 
+	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
 		return;
 
 	COMBINE_DATA(&VRAM[offset + 0x0000 / 2]);
@@ -343,51 +343,51 @@ static TILE_GET_INFO( get_tile_info_2 )	{ cave_state *state = (cave_state *)mach
 static TILE_GET_INFO( get_tile_info_3 )	{ cave_state *state = (cave_state *)machine->driver_data; get_tile_info(machine, tileinfo, tile_index, 3, state->vram_3, state->tiledim_3); }
 
 WRITE16_HANDLER( cave_vram_0_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_w(state->vram_0, state->tilemap_0, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_w(state->vram_0, state->tilemap_0, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_0_8x8_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_8x8_w(state->vram_0, state->tilemap_0, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_8x8_w(state->vram_0, state->tilemap_0, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_1_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_w(state->vram_1, state->tilemap_1, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_w(state->vram_1, state->tilemap_1, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_1_8x8_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_8x8_w(state->vram_1, state->tilemap_1, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_8x8_w(state->vram_1, state->tilemap_1, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_2_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_w(state->vram_2, state->tilemap_2, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_w(state->vram_2, state->tilemap_2, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_2_8x8_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_8x8_w(state->vram_2, state->tilemap_2, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_8x8_w(state->vram_2, state->tilemap_2, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_3_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_w(state->vram_3, state->tilemap_3, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_w(state->vram_3, state->tilemap_3, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_3_8x8_w )
-{ 
-	cave_state *state = (cave_state *)space->machine->driver_data; 
-	vram_8x8_w(state->vram_3, state->tilemap_3, offset, data, mem_mask); 
+{
+	cave_state *state = (cave_state *)space->machine->driver_data;
+	vram_8x8_w(state->vram_3, state->tilemap_3, offset, data, mem_mask);
 }
 
 
@@ -559,7 +559,7 @@ static void get_sprite_info_cave( running_machine *machine )
 	source = state->spriteram + ((state->spriteram_size / 2) / 2) * state->spriteram_bank;
 
 	if (state->videoregs[4] & 0x02)
-		if (state->spriteram_2) 
+		if (state->spriteram_2)
 			source = state->spriteram_2 + ((state->spriteram_size / 2) / 2) * state->spriteram_bank;
 
 	finish = source + ((state->spriteram_size / 2) / 2);
@@ -689,7 +689,7 @@ static void get_sprite_info_donpachi( running_machine *machine )
 	source = state->spriteram + ((state->spriteram_size / 2) / 2) * state->spriteram_bank;
 
 	if (state->videoregs[4] & 0x02)
-		if (state->spriteram_2) 
+		if (state->spriteram_2)
 			source = state->spriteram_2 + ((state->spriteram_size / 2) / 2) * state->spriteram_bank;
 
 	finish = source + ((state->spriteram_size / 2) / 2);
@@ -887,7 +887,7 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 		x2 = sprite->x;
 		x1 = x2 + sprite->total_width;
 		dx = -1;
-		if (x2 < state->blit.clip_left) 
+		if (x2 < state->blit.clip_left)
 			x2 = state->blit.clip_left;
 
 		if (x1 > state->blit.clip_right)
@@ -896,16 +896,16 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 			x1 = state->blit.clip_right;
 			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
 			{
-				xcount0 += sprite->zoomx_re; 
+				xcount0 += sprite->zoomx_re;
 				x1--;
 			}
 		}
 
-		if (x2 >= x1) 
+		if (x2 >= x1)
 			return;
 		x1--; x2--;
 	}
-	else 
+	else
 	{
 		x1 = sprite->x;
 		x2 = x1 + sprite->total_width;
@@ -916,13 +916,13 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 			x1 = state->blit.clip_left;
 			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
 			{
-				xcount0 += sprite->zoomx_re; 
+				xcount0 += sprite->zoomx_re;
 				x1++;
 			}
 		}
-		if (x2 > state->blit.clip_right) 
+		if (x2 > state->blit.clip_right)
 			x2 = state->blit.clip_right;
-		if (x1 >= x2) 
+		if (x1 >= x2)
 			return;
 	}
 
@@ -931,7 +931,7 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 		y2 = sprite->y;
 		y1 = y2 + sprite->total_height;
 		dy = -1;
-		if (y2 < state->blit.clip_top) 
+		if (y2 < state->blit.clip_top)
 			y2 = state->blit.clip_top;
 		if (y1 > state->blit.clip_bottom)
 		{
@@ -939,15 +939,15 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 			y1 = state->blit.clip_bottom;
 			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
 			{
-				ycount0 += sprite->zoomy_re; 
+				ycount0 += sprite->zoomy_re;
 				y1--;
 			}
 		}
-		if (y2 >= y1) 
+		if (y2 >= y1)
 			return;
 		y1--; y2--;
 	}
-	else 
+	else
 	{
 		y1 = sprite->y;
 		y2 = y1 + sprite->total_height;
@@ -958,13 +958,13 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 			y1 = state->blit.clip_top;
 			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
 			{
-				ycount0 += sprite->zoomy_re; 
+				ycount0 += sprite->zoomy_re;
 				y1++;
 			}
 		}
-		if (y2 > state->blit.clip_bottom ) 
+		if (y2 > state->blit.clip_bottom )
 			y2 = state->blit.clip_bottom;
-		if (y1 >= y2) 
+		if (y1 >= y2)
 			return;
 	}
 
@@ -995,7 +995,7 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 						source += xcount >> 16;
 						xcount &= 0xffff;
 						pen = *source;
-						if (pen) 
+						if (pen)
 							dest[x] = base_pen + pen;
 					}
 					xcount += sprite->zoomx_re;
@@ -1028,15 +1028,15 @@ static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprit
 			x1 = state->blit.clip_right;
 			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
 			{
-				xcount0 += sprite->zoomx_re; 
+				xcount0 += sprite->zoomx_re;
 				x1--;
 			}
 		}
-		if (x2 >= x1) 
+		if (x2 >= x1)
 			return;
 		x1--; x2--;
 	}
-	else 
+	else
 	{
 		x1 = sprite->x;
 		x2 = x1 + sprite->total_width;
@@ -1045,15 +1045,15 @@ static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprit
 		{
 			xcount0 += (state->blit.clip_left - x1) * sprite->zoomx_re;
 			x1 = state->blit.clip_left;
-			while ((xcount0 & 0xffff) >= sprite->zoomx_re)	
+			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
 			{
-				xcount0 += sprite->zoomx_re; 
+				xcount0 += sprite->zoomx_re;
 				x1++;
 			}
 		}
-		if (x2 > state->blit.clip_right) 
+		if (x2 > state->blit.clip_right)
 			x2 = state->blit.clip_right;
-		if (x1 >= x2) 
+		if (x1 >= x2)
 			return;
 	}
 	if (sprite->flags & SPRITE_FLIPY_CAVE)
@@ -1061,7 +1061,7 @@ static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprit
 		y2 = sprite->y;
 		y1 = y2 + sprite->total_height;
 		dy = -1;
-		if (y2 < state->blit.clip_top) 
+		if (y2 < state->blit.clip_top)
 			y2 = state->blit.clip_top;
 		if (y1 > state->blit.clip_bottom)
 		{
@@ -1069,15 +1069,15 @@ static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprit
 			y1 = state->blit.clip_bottom;
 			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
 			{
-				ycount0 += sprite->zoomy_re; 
+				ycount0 += sprite->zoomy_re;
 				y1--;
 			}
 		}
-		if (y2 >= y1) 
+		if (y2 >= y1)
 			return;
 		y1--; y2--;
 	}
-	else 
+	else
 	{
 		y1 = sprite->y;
 		y2 = y1 + sprite->total_height;
@@ -1088,13 +1088,13 @@ static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprit
 			y1 = state->blit.clip_top;
 			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
 			{
-				ycount0 += sprite->zoomy_re; 
+				ycount0 += sprite->zoomy_re;
 				y1++;
 			}
 		}
-		if (y2 > state->blit.clip_bottom) 
+		if (y2 > state->blit.clip_bottom)
 			y2 = state->blit.clip_bottom;
-		if (y1 >= y2) 
+		if (y1 >= y2)
 			return;
 	}
 
@@ -1156,18 +1156,18 @@ static void do_blit_16_cave( running_machine *machine, const struct sprite_cave 
 		x2 = sprite->x;
 		x1 = x2 + sprite->total_width;
 		dx = -1;
-		if (x2 < state->blit.clip_left) 
+		if (x2 < state->blit.clip_left)
 			x2 = state->blit.clip_left;
 		if (x1 > state->blit.clip_right)
 		{
 			xcount0 = x1 - state->blit.clip_right;
 			x1 = state->blit.clip_right;
 		}
-		if (x2 >= x1) 
+		if (x2 >= x1)
 			return;
 		x1--; x2--;
 	}
-	else 
+	else
 	{
 		x1 = sprite->x;
 		x2 = x1 + sprite->total_width;
@@ -1177,9 +1177,9 @@ static void do_blit_16_cave( running_machine *machine, const struct sprite_cave 
 			xcount0 = state->blit.clip_left - x1;
 			x1 = state->blit.clip_left;
 		}
-		if (x2 > state->blit.clip_right) 
+		if (x2 > state->blit.clip_right)
 			x2 = state->blit.clip_right;
-		if (x1 >= x2) 
+		if (x1 >= x2)
 			return;
 	}
 	if (sprite->flags & SPRITE_FLIPY_CAVE)
@@ -1187,14 +1187,14 @@ static void do_blit_16_cave( running_machine *machine, const struct sprite_cave 
 		y2 = sprite->y;
 		y1 = y2 + sprite->total_height;
 		dy = -1;
-		if (y2 < state->blit.clip_top) 
+		if (y2 < state->blit.clip_top)
 			y2 = state->blit.clip_top;
 		if (y1 > state->blit.clip_bottom)
 		{
 			ycount0 = y1 - state->blit.clip_bottom;
 			y1 = state->blit.clip_bottom;
 		}
-		if (y2 >= y1) 
+		if (y2 >= y1)
 			return;
 		y1--; y2--;
 	}
@@ -1207,9 +1207,9 @@ static void do_blit_16_cave( running_machine *machine, const struct sprite_cave 
 			ycount0 = state->blit.clip_top - y1;
 			y1 = state->blit.clip_top;
 		}
-		if (y2 > state->blit.clip_bottom) 
+		if (y2 > state->blit.clip_bottom)
 			y2 = state->blit.clip_bottom;
-		if (y1 >= y2) 
+		if (y1 >= y2)
 			return;
 	}
 
@@ -1229,7 +1229,7 @@ static void do_blit_16_cave( running_machine *machine, const struct sprite_cave 
 			for (x = x1; x != x2; x += dx)
 			{
 				pen = *source;
-				if (pen) 
+				if (pen)
 					dest[x] = base_pen + pen;
 				source++;
 			}
@@ -1252,18 +1252,18 @@ static void do_blit_16_cave_zb( running_machine *machine,  const struct sprite_c
 		x2 = sprite->x;
 		x1 = x2 + sprite->total_width;
 		dx = -1;
-		if (x2 < state->blit.clip_left) 
+		if (x2 < state->blit.clip_left)
 			x2 = state->blit.clip_left;
 		if (x1 > state->blit.clip_right)
 		{
 			xcount0 = x1 - state->blit.clip_right;
 			x1 = state->blit.clip_right;
 		}
-		if (x2 >= x1) 
+		if (x2 >= x1)
 			return;
 		x1--; x2--;
 	}
-	else 
+	else
 	{
 		x1 = sprite->x;
 		x2 = x1 + sprite->total_width;
@@ -1273,9 +1273,9 @@ static void do_blit_16_cave_zb( running_machine *machine,  const struct sprite_c
 			xcount0 = state->blit.clip_left - x1;
 			x1 = state->blit.clip_left;
 		}
-		if (x2 > state->blit.clip_right) 
+		if (x2 > state->blit.clip_right)
 			x2 = state->blit.clip_right;
-		if (x1 >= x2) 
+		if (x1 >= x2)
 			return;
 	}
 	if (sprite->flags & SPRITE_FLIPY_CAVE)
@@ -1283,18 +1283,18 @@ static void do_blit_16_cave_zb( running_machine *machine,  const struct sprite_c
 		y2 = sprite->y;
 		y1 = y2 + sprite->total_height;
 		dy = -1;
-		if (y2 < state->blit.clip_top) 
+		if (y2 < state->blit.clip_top)
 			y2 = state->blit.clip_top;
 		if (y1 > state->blit.clip_bottom)
 		{
 			ycount0 = y1 - state->blit.clip_bottom;
 			y1 = state->blit.clip_bottom;
 		}
-		if (y2 >= y1) 
+		if (y2 >= y1)
 			return;
 		y1--; y2--;
 	}
-	else 
+	else
 	{
 		y1 = sprite->y;
 		y2 = y1 + sprite->total_height;
@@ -1304,7 +1304,7 @@ static void do_blit_16_cave_zb( running_machine *machine,  const struct sprite_c
 			ycount0 = state->blit.clip_top - y1;
 			y1 = state->blit.clip_top;
 		}
-		if (y2 > state->blit.clip_bottom) 
+		if (y2 > state->blit.clip_bottom)
 			y2 = state->blit.clip_bottom;
 		if (y1 >= y2)
 			return;
@@ -1568,25 +1568,25 @@ INLINE void cave_tilemap_draw(
 static void cave_tilemap_0_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
-	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_0, state->vram_0, state->vctrl_0, flags, priority, priority2);	
+	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_0, state->vram_0, state->vctrl_0, flags, priority, priority2);
 }
 
 static void cave_tilemap_1_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
-	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_1, state->vram_1, state->vctrl_1, flags, priority, priority2);	
+	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_1, state->vram_1, state->vctrl_1, flags, priority, priority2);
 }
 
 static void cave_tilemap_2_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
-	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_2, state->vram_2, state->vctrl_2, flags, priority, priority2);	
+	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_2, state->vram_2, state->vctrl_2, flags, priority, priority2);
 }
 
 static void cave_tilemap_3_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
-	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_3, state->vram_3, state->vctrl_3, flags, priority, priority2);	
+	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_3, state->vram_3, state->vctrl_3, flags, priority, priority2);
 }
 
 
@@ -1605,7 +1605,7 @@ VIDEO_UPDATE( cave )
 	if (state->tilemap_0)
 	{
 		state->tiledim_0 = state->vctrl_0[1] & 0x2000;
-		if (state->tiledim_0 != state->old_tiledim_0)	
+		if (state->tiledim_0 != state->old_tiledim_0)
 			tilemap_mark_all_tiles_dirty(state->tilemap_0);
 		state->old_tiledim_0 = state->tiledim_0;
 	}
@@ -1613,7 +1613,7 @@ VIDEO_UPDATE( cave )
 	if (state->tilemap_1)
 	{
 		state->tiledim_1 = state->vctrl_1[1] & 0x2000;
-		if (state->tiledim_1 != state->old_tiledim_1)	
+		if (state->tiledim_1 != state->old_tiledim_1)
 			tilemap_mark_all_tiles_dirty(state->tilemap_1);
 		state->old_tiledim_1 = state->tiledim_1;
 	}
@@ -1621,7 +1621,7 @@ VIDEO_UPDATE( cave )
 	if (state->tilemap_2)
 	{
 		state->tiledim_2 = state->vctrl_2[1] & 0x2000;
-		if (state->tiledim_2 != state->old_tiledim_2)	
+		if (state->tiledim_2 != state->old_tiledim_2)
 			tilemap_mark_all_tiles_dirty(state->tilemap_2);
 		state->old_tiledim_2 = state->tiledim_2;
 	}
@@ -1629,7 +1629,7 @@ VIDEO_UPDATE( cave )
 	if (state->tilemap_3)
 	{
 		state->tiledim_3 = state->vctrl_3[1] & 0x2000;
-		if (state->tiledim_3 != state->old_tiledim_3)	
+		if (state->tiledim_3 != state->old_tiledim_3)
 			tilemap_mark_all_tiles_dirty(state->tilemap_3);
 		state->old_tiledim_3 = state->tiledim_3;
 	}
@@ -1762,7 +1762,7 @@ void cave_get_sprite_info( running_machine *machine )
 
 static STATE_POSTLOAD( cave_sprite_postload )
 {
-	/* FIXME: this is probably not enough to restore sprites, but anyway saves do not 
-	currently work due to pending timers hence it is hard to test what is missing */
+	/* FIXME: this is probably not enough to restore sprites, but anyway saves do not
+    currently work due to pending timers hence it is hard to test what is missing */
 	cave_get_sprite_info(machine);
 }

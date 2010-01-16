@@ -126,7 +126,7 @@ e0033 45 01      mov al,1
 e0035 49 d3 06   mov [6d3],al
 
 0089 call 2a9d                            e0038 call e30a2
-  2a9d ld hl,d0b3                           e30a2 premov bw,[04a6]			(1e -> bb)
+  2a9d ld hl,d0b3                           e30a2 premov bw,[04a6]          (1e -> bb)
   2aa0 inc (hl)                             e30a5 inc b ptr[bw]
   2aa1 inc hl                               e30a8 inc bw
   2aa2 inc (hl)                             e30a9 inc b ptr[bw]
@@ -138,14 +138,14 @@ e0035 49 d3 06   mov [6d3],al
 0c52 or a,a                                 e003e and al,al
 0c53 ret nz                                 e0040 be e0083
 0c54 ld hl,d461                             .
-0c57 ld a,(d476)                            e0042 mov aw,[4b9]				(68 -> a1)
+0c57 ld a,(d476)                            e0042 mov aw,[4b9]              (68 -> a1)
 0c5a or a                                   e0045 and aw,aw
 0c5b jr nz,0c6d                             e0047 be e0083
 0c5d ld a,(hl)                              .
 0c5e or a                                   e0049 and al,al
 0c5f jr nz,0c71                             e004b be e0054
 0c61 inc hl                                 e004d dec al
-0c62 inc (hl)                               e004f mov [4b9],aw				(4c -> a3)
+0c62 inc (hl)                               e004f mov [4b9],aw              (4c -> a3)
 0c63 ld a,(hl)                              .
 .                                           e0052 br e0083
 .                                           e0054 and ah,ah

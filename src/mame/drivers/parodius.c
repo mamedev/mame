@@ -80,7 +80,7 @@ static WRITE8_HANDLER( parodius_videobank_w )
 {
 	parodius_state *state = (parodius_state *)space->machine->driver_data;
 
-	if (state->videobank & 0xf8) 
+	if (state->videobank & 0xf8)
 		logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( parodius_3fc0_w )
 {
 	parodius_state *state = (parodius_state *)space->machine->driver_data;
 
-	if ((data & 0xf4) != 0x10) 
+	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
@@ -399,7 +399,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( parodius_banking )
 {
-	if (lines & 0xf0) 
+	if (lines & 0xf0)
 		logerror("%04x: setlines %02x\n", cpu_get_pc(device), lines);
 
 	memory_set_bank(device->machine,  "bank1", (lines & 0x0f) ^ 0x0f);

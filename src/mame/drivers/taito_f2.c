@@ -628,7 +628,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bank(space->machine, "bank2", (data - 1) & 7);
 
 #ifdef MAME_DEBUG
-	if (((data - 1) & 7) > 2) 
+	if (((data - 1) & 7) > 2)
 		logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",(data - 1) & 7);
 #endif
 }
@@ -699,7 +699,7 @@ static WRITE16_HANDLER( driveout_sound_command_w )
 
 static WRITE16_HANDLER( cchip2_word_w )
 {
- 	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
 
 	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(space->cpu), offset, data);
 
@@ -708,7 +708,7 @@ static WRITE16_HANDLER( cchip2_word_w )
 
 static READ16_HANDLER( cchip2_word_r )
 {
- 	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
 
 	/* C-Chip ID */
 	if (offset == 0x401)

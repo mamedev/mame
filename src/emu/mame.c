@@ -825,7 +825,7 @@ void memory_region_free(running_machine *machine, const char *name)
 
 
 /*-------------------------------------------------
-    memory_region_info - return a pointer to the 
+    memory_region_info - return a pointer to the
     information struct for a given memory region
 -------------------------------------------------*/
 

@@ -195,7 +195,7 @@ error:
 	/* free our options and exit */
 	if (options != NULL)
 		options_free(options);
-	
+
 	/* report any unfreed memory */
 	dump_unfreed_mem();
 	return result;

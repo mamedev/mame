@@ -208,7 +208,7 @@ static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, 
 		y1 = cliprect->min_y;
 	}
 
-	if (x1 > x2 || (x1==x2 && sl1 > sl2)) 
+	if (x1 > x2 || (x1==x2 && sl1 > sl2))
 	{
 		INT32 t, *tp;
 		t = x1;
@@ -222,7 +222,7 @@ static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, 
 		nx2 = tp;
 	}
 
-	while (y1 < y2) 
+	while (y1 < y2)
 	{
 		if (y1 >= cliprect->min_y)
 		{
@@ -235,7 +235,7 @@ static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, 
 				if (xx2 > cliprect->max_x)
 					xx2 = cliprect->max_x;
 
-				while (xx1 <= xx2) 
+				while (xx1 <= xx2)
 				{
 					*BITMAP_ADDR16(bitmap, y1, xx1) = color;
 					xx1++;
@@ -259,14 +259,14 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 	int color = q->col;
 	int pcount = q->pcount;
 
-	for (i = 0; i < pcount; i++) 
+	for (i = 0; i < pcount; i++)
 	{
 		p[i].x = p[i + pcount].x = q->p[i].x << TAITOAIR_FRAC_SHIFT;
 		p[i].y = p[i + pcount].y = q->p[i].y;
 	}
 
 	pmin = pmax = 0;
-	for (i = 1; i < pcount; i++) 
+	for (i = 1; i < pcount; i++)
 	{
 		if (p[i].y < p[pmin].y)
 			pmin = i;
@@ -293,9 +293,9 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 
 	goto startup;
 
-	for (;;) 
+	for (;;)
 	{
-		if (p[ps1 - 1].y == p[ps2 + 1].y) 
+		if (p[ps1 - 1].y == p[ps2 + 1].y)
 		{
 			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
 			cury = p[ps1 - 1].y;
@@ -313,8 +313,8 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 			x2 = p[ps2].x;
 			sl1 = (x1 - p[ps1 - 1].x) / (cury - p[ps1 - 1].y);
 			sl2 = (x2 - p[ps2 + 1].x) / (cury - p[ps2 + 1].y);
-		} 
-		else if (p[ps1 - 1].y < p[ps2 + 1].y) 
+		}
+		else if (p[ps1 - 1].y < p[ps2 + 1].y)
 		{
 			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
 			cury = p[ps1 - 1].y;
@@ -325,8 +325,8 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 				ps1--;
 			x1 = p[ps1].x;
 			sl1 = (x1 - p[ps1 - 1].x) / (cury - p[ps1 - 1].y);
-		} 
-		else 
+		}
+		else
 		{
 			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps2 + 1].y, &x1, &x2);
 			cury = p[ps2 + 1].y;
@@ -370,7 +370,7 @@ VIDEO_UPDATE( taitoair )
 	if (state->line_ram[0x3fff])
 	{
 		int adr = 0x3fff;
-//		struct taitoair_poly q;
+//      struct taitoair_poly q;
 
 		while (adr >= 0 && state->line_ram[adr] && state->line_ram[adr] != 0x4000)
 		{

@@ -18,19 +18,19 @@ void lethalen_sprite_callback( running_machine *machine, int *code, int *color, 
 	*color += 0x400 / 64; // colourbase?
 
 	/* this isn't ideal.. shouldn't need to hardcode it? not 100% sure about it anyway*/
-	if (pri == 0x10) 
+	if (pri == 0x10)
 		*priority_mask = 0xf0; // guys on first level
-	else if (pri == 0x90) 
+	else if (pri == 0x90)
 		*priority_mask = 0xf0; // car doors
-	else if (pri == 0x20) 
+	else if (pri == 0x20)
 		*priority_mask = 0xf0 | 0xcc; // people behind glass on 1st level
-	else if (pri == 0xa0) 
+	else if (pri == 0xa0)
 		*priority_mask = 0xf0 | 0xcc; // glass on 1st/2nd level
-	else if (pri == 0x40) 
+	else if (pri == 0x40)
 		*priority_mask = 0; // blood splats?
-	else if (pri == 0x00) 
+	else if (pri == 0x00)
 		*priority_mask = 0; // gunshots etc
-	else if (pri == 0x30) 
+	else if (pri == 0x30)
 		*priority_mask = 0xf0 | 0xcc | 0xaa; // mask sprites (always in a bad colour, used to do special effects i think
 	else
 	{

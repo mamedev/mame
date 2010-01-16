@@ -311,7 +311,7 @@ class device_config
 {
 	DISABLE_COPYING(device_config);
 
-public:	// private eventually	
+public:	// private eventually
 	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
 
 public:
@@ -320,7 +320,7 @@ public:
 
 	inline const address_space *space(int index = 0) const;
 	inline const address_space *space(device_space index) const;
-	
+
 	const region_info *subregion(const char *tag) const;
 	const device_config *subdevice(const char *tag) const;
 
@@ -357,7 +357,7 @@ public:
 struct device_list
 {
 	device_config *				head;				/* head of the list */
-	tagmap_t<device_config *> 	map;		/* map for fast lookups */
+	tagmap_t<device_config *>	map;		/* map for fast lookups */
 };
 
 

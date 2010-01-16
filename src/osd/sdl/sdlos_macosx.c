@@ -156,7 +156,7 @@ int osd_num_processors(void)
 	unsigned int count;
 	kern_return_t r;
 	mach_port_t my_mach_host_self;
-	
+
 	count = HOST_BASIC_INFO_COUNT;
 	my_mach_host_self = mach_host_self();
 	if ( ( r = host_info(my_mach_host_self, HOST_BASIC_INFO, (host_info_t)(&host_basic_info), &count)) == KERN_SUCCESS )
@@ -164,7 +164,7 @@ int osd_num_processors(void)
 		processors = host_basic_info.avail_cpus;
 	}
 	mach_port_deallocate(mach_task_self(), my_mach_host_self);
-	
+
 	return processors;
 }
 
@@ -200,7 +200,7 @@ void osd_break_into_debugger(const char *message)
 	#ifdef MAME_DEBUG
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP); 
+	kill(getpid(), SIGTRAP);
 	#else
 	printf("Ignoring MAME exception: %s\n", message);
 	#endif

@@ -218,9 +218,9 @@ static DEVICE_START( k053260 )
 	ic->intf = (device->static_config != NULL) ? (const k053260_interface *)device->static_config : &defintrf;
 
 	ic->mode = 0;
-	
+
 	const region_info *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region;
-	
+
 	ic->rom = *region;
 	ic->rom_size = region->bytes();
 

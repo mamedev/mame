@@ -23,13 +23,13 @@
 #include "osdsdl.h"
 
 //============================================================
-//	DEBUGGING
+//  DEBUGGING
 //============================================================
 
 #define LOG_SOUND		0
 
 //============================================================
-//	PARAMETERS
+//  PARAMETERS
 //============================================================
 
 // number of samples per SDL callback
@@ -43,10 +43,10 @@ static int stream_loop = 0;
 #define MAX_AUDIO_LATENCY		10
 
 //============================================================
-//	LOCAL VARIABLES
+//  LOCAL VARIABLES
 //============================================================
 
-static int	 			attenuation = 0;
+static int				attenuation = 0;
 
 static int				initialized_audio = 0;
 static int				buf_locked;
@@ -69,7 +69,7 @@ static FILE *sound_log;
 static int snd_enabled;
 
 //============================================================
-//	PROTOTYPES
+//  PROTOTYPES
 //============================================================
 
 static int			sdl_init(running_machine *machine);
@@ -82,7 +82,7 @@ static void			sdl_callback(void *userdata, Uint8 *stream, int len);
 
 
 //============================================================
-//	osd_start_audio_stream
+//  osd_start_audio_stream
 //============================================================
 void sdlaudio_init(running_machine *machine)
 {
@@ -106,7 +106,7 @@ void sdlaudio_init(running_machine *machine)
 
 
 //============================================================
-//	osd_stop_audio_stream
+//  osd_stop_audio_stream
 //============================================================
 
 static void sdl_cleanup_audio(running_machine *machine)
@@ -114,11 +114,11 @@ static void sdl_cleanup_audio(running_machine *machine)
 	// if nothing to do, don't do it
 	if (machine->sample_rate == 0)
 		return;
-	
+
 	// kill the buffers and dsound
 	sdl_kill(machine);
 	sdl_destroy_buffers();
-	
+
 	// print out over/underflow stats
 	if (buffer_overflows || buffer_underflows)
 		mame_printf_verbose("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
@@ -131,7 +131,7 @@ static void sdl_cleanup_audio(running_machine *machine)
 }
 
 //============================================================
-//	lock_buffer
+//  lock_buffer
 //============================================================
 static int lock_buffer(long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2)
 {
@@ -183,7 +183,7 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 }
 
 //============================================================
-//	unlock_buffer
+//  unlock_buffer
 //============================================================
 static void unlock_buffer(void)
 {
@@ -197,23 +197,23 @@ static void unlock_buffer(void)
 }
 
 //============================================================
-//	Apply attenuation
+//  Apply attenuation
 //============================================================
 
 static void att_memcpy(void *dest, INT16 *data, int bytes_to_copy)
-{	
+{
 	int level= (int) (pow(10.0, (float) attenuation / 20.0) * 128.0);
 	INT16 *d = (INT16 *) dest;
 	int count = bytes_to_copy/2;
 	while (count>0)
-	{	
+	{
 		*d++ = (*data++ * level) >> 7; /* / 128 */
 		count--;
 	}
 }
 
 //============================================================
-//	copy_sample_data
+//  copy_sample_data
 //============================================================
 
 static void copy_sample_data(INT16 *data, int bytes_to_copy)
@@ -261,7 +261,7 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 
 
 //============================================================
-//	osd_update_audio_stream
+//  osd_update_audio_stream
 //============================================================
 
 void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
@@ -272,7 +272,7 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
 		int play_position, write_position, stream_in;
 		int orig_write; // used in LOG
-		
+
 		play_position = stream_playpos;
 
 		write_position = stream_playpos + ((machine->sample_rate / 50) * sizeof(INT16) * 2);
@@ -328,7 +328,7 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 		{
 			stream_in -= stream_buffer_size;
 			stream_loop = 1;
-			
+
 			if (LOG_SOUND)
 				fprintf(sound_log, "stream_loop set to 1 (stream_in looped)\n");
 
@@ -343,7 +343,7 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 
 
 //============================================================
-//	osd_set_mastervolume
+//  osd_set_mastervolume
 //============================================================
 
 void osd_set_mastervolume(int _attenuation)
@@ -358,7 +358,7 @@ void osd_set_mastervolume(int _attenuation)
 }
 
 //============================================================
-//	sdl_callback
+//  sdl_callback
 //============================================================
 static void sdl_callback(void *userdata, Uint8 *stream, int len)
 {
@@ -408,7 +408,7 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 	{
 		stream_playpos -= stream_buffer_size;
 		stream_loop = 0;
-		
+
 		if (LOG_SOUND)
 			fprintf(sound_log, "stream_loop set to 0 (stream_playpos looped)\n");
 	}
@@ -420,13 +420,13 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 
 
 //============================================================
-//	sdl_init
+//  sdl_init
 //============================================================
 static int sdl_init(running_machine *machine)
 {
 	int			n_channels = 2;
 	int			audio_latency;
-	SDL_AudioSpec 	aspec, obtained;
+	SDL_AudioSpec	aspec, obtained;
 	char audio_driver[16] = "";
 
 	if (initialized_audio)
@@ -450,7 +450,7 @@ static int sdl_init(running_machine *machine)
 
 	// set up the audio specs
 	aspec.freq = machine->sample_rate;
-	aspec.format = AUDIO_S16SYS;	// keep endian independant 
+	aspec.format = AUDIO_S16SYS;	// keep endian independant
 	aspec.channels = n_channels;
 	aspec.samples = sdl_xfer_samples;
 	aspec.callback = sdl_callback;
@@ -503,7 +503,7 @@ cant_start_audio:
 
 
 //============================================================
-//	sdl_kill
+//  sdl_kill
 //============================================================
 
 static void sdl_kill(running_machine *machine)
@@ -519,7 +519,7 @@ static void sdl_kill(running_machine *machine)
 
 
 //============================================================
-//	dsound_create_buffers
+//  dsound_create_buffers
 //============================================================
 
 static int sdl_create_buffers(void)
@@ -535,7 +535,7 @@ static int sdl_create_buffers(void)
 
 
 //============================================================
-//	sdl_destroy_buffers
+//  sdl_destroy_buffers
 //============================================================
 
 static void sdl_destroy_buffers(void)

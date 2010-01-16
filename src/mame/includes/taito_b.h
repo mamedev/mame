@@ -5,7 +5,7 @@ struct _taitob_state
 	/* memory pointers */
 	UINT16 *      spriteram;
 	UINT16 *      pixelram;
-//	UINT16 *      paletteram;	// this currently uses generic palette handlers
+//  UINT16 *      paletteram;   // this currently uses generic palette handlers
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */

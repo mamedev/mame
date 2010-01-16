@@ -8,7 +8,7 @@ typedef struct _asuka_state asuka_state;
 struct _asuka_state
 {
 	/* memory pointers */
-//	UINT16 *    paletteram;	// this currently uses generic palette handlers
+//  UINT16 *    paletteram; // this currently uses generic palette handlers
 
 	/* video-related */
 	UINT16      video_ctrl;

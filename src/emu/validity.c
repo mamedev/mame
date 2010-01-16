@@ -51,7 +51,7 @@ class region_entry
 public:
 	region_entry()
 		: length(0) { }
-		
+
 	astring tag;
 	UINT32 length;
 };

@@ -26,7 +26,7 @@
 #if VERBOSE
 #define LOG( x ) do { printf x; printf("\n"); } while (0)
 #else
-#define LOG( x ) 
+#define LOG( x )
 #endif
 typedef struct _hidden_mutex_t hidden_mutex_t;
 struct _hidden_mutex_t {
@@ -34,10 +34,10 @@ struct _hidden_mutex_t {
 	volatile INT32		locked;
 	volatile INT32		threadid;
 };
- 
+
 struct _osd_event {
-	SDL_mutex *		 	mutex;
-	SDL_cond *	 		cond;
+	SDL_mutex *			mutex;
+	SDL_cond *			cond;
 	volatile INT32		autoreset;
 	volatile INT32		signalled;
 };
@@ -54,7 +54,7 @@ struct _osd_thread {
 
 struct _osd_scalable_lock
 {
-	SDL_mutex *		 	mutex;
+	SDL_mutex *			mutex;
 };
 
 //============================================================
@@ -64,7 +64,7 @@ struct _osd_scalable_lock
 osd_scalable_lock *osd_scalable_lock_alloc(void)
 {
 	osd_scalable_lock *lock;
-	
+
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
 
 	lock->mutex = SDL_CreateMutex();
@@ -195,7 +195,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	ev->cond = SDL_CreateCond();
 	ev->signalled = initialstate;
 	ev->autoreset = !manualreset;
-		
+
 	return ev;
 }
 
@@ -262,7 +262,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 		if (!event->signalled)
 		{
 			UINT64 msec = (timeout * 1000) / osd_ticks_per_second();
-			
+
 			do {
 				int ret = SDL_CondWaitTimeout(event->cond, event->mutex, msec);
 				if ( ret == SDL_MUTEX_TIMEDOUT )

@@ -99,7 +99,7 @@ const region_info *device_config::subregion(const char *_tag) const
 
 
 /*-------------------------------------------------
-    subdevice - return a pointer to the given 
+    subdevice - return a pointer to the given
     device that is owned by us
 -------------------------------------------------*/
 

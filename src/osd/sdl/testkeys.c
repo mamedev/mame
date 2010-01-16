@@ -22,14 +22,14 @@
 
 // Check whether SDL has compat interface
 #if defined(SDL_AllocSurface) || (!SDL_VERSION_ATLEAST(1,3,0))
-#define SDL_HAS_COMPAT 		1
+#define SDL_HAS_COMPAT		1
 #else
-#define SDL_HAS_COMPAT 		0
+#define SDL_HAS_COMPAT		0
 #endif
 
 typedef struct _key_lookup_table key_lookup_table;
 
-struct _key_lookup_table 
+struct _key_lookup_table
 {
 	int code;
 	const char *name;
@@ -38,10 +38,10 @@ struct _key_lookup_table
 #if SDL_HAS_COMPAT
 #if (SDL_VERSION_ATLEAST(1,3,0))
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
-#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
 #define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
 #define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
-#define KE3(A, B, C) KE(A) KE(B) KE(C) 
+#define KE3(A, B, C) KE(A) KE(B) KE(C)
 
 
 static key_lookup_table sdl_lookup[] =
@@ -67,7 +67,7 @@ static key_lookup_table sdl_lookup[] =
 };
 #else
 #define KE(x) { SDLK_ ## x, "SDLK_" #x },
-#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
 
 static key_lookup_table sdl_lookup[] =
 {
@@ -101,7 +101,7 @@ static key_lookup_table sdl_lookup[] =
 	KE8(LCTRL,		RALT,		LALT,			RMETA,		LMETA,		LSUPER,		RSUPER,		MODE		)
 	KE8(COMPOSE,	HELP,		PRINT,			SYSREQ,		BREAK,		MENU,		POWER,		EURO		)
 	KE(UNDO)
-	KE(LAST)		
+	KE(LAST)
 	{-1, ""}
 };
 #endif
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
 #else
 						lookup_key_name(sdl_lookup, event.key.keysym.sym),
 #endif
-						(int) event.key.keysym.scancode, 
-						(int) event.key.keysym.unicode, 
+						(int) event.key.keysym.scancode,
+						(int) event.key.keysym.unicode,
 						buf);
 			}
 			break;
@@ -169,8 +169,8 @@ int main(int argc, char *argv[])
 #else
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
 #endif
-					(int) event.key.keysym.scancode, 
-					(int) event.key.keysym.unicode, 
+					(int) event.key.keysym.scancode,
+					(int) event.key.keysym.unicode,
 					buf);
 			break;
 		}

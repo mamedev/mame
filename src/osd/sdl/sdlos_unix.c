@@ -30,7 +30,7 @@ osd_ticks_t osd_ticks(void)
 {
 		struct timeval    tp;
 		static osd_ticks_t start_sec = 0;
-		
+
 		gettimeofday(&tp, NULL);
 		if (start_sec==0)
 			start_sec = tp.tv_sec;
@@ -49,7 +49,7 @@ osd_ticks_t osd_ticks_per_second(void)
 void osd_sleep(osd_ticks_t duration)
 {
 	UINT32 msec;
-	
+
 	// convert to milliseconds, rounding down
 	msec = (UINT32)(duration * 1000 / osd_ticks_per_second());
 
@@ -139,7 +139,7 @@ void osd_break_into_debugger(const char *message)
 	#ifdef MAME_DEBUG
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP); 
+	kill(getpid(), SIGTRAP);
 	#else
 	printf("Ignoring MAME exception: %s\n", message);
 	#endif

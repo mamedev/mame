@@ -38,7 +38,7 @@
     Multi Game 2 & III: 21 games included, hardware features MMC3 NES mapper and additional
     RAM used by Super Mario Bros 3.
 
-	Multi Game (Tung Sheng Electronics): 10 games included, selectable by dip switches.
+    Multi Game (Tung Sheng Electronics): 10 games included, selectable by dip switches.
 */
 
 #include "emu.h"

@@ -418,7 +418,7 @@ static READ16_HANDLER( othunder_sound_r )
 	othunder_state *state = (othunder_state *)space->machine->driver_data;
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
-	else 
+	else
 		return 0;
 }
 

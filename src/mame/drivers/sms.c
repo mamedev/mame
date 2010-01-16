@@ -859,40 +859,40 @@ ROM_START( sureshot )
 ROM_END
 
 /*
-Etched in copper on back	COPYRIGHT SMS 1983
-				mfg corp
-				S/N A-872		A-872 was etched
-				MADE IN USA
+Etched in copper on back    COPYRIGHT SMS 1983
+                mfg corp
+                S/N A-872       A-872 was etched
+                MADE IN USA
 
-Etched in copper on front	REV 03
+Etched in copper on front   REV 03
 
-Silkscreened on top		P/N 1001
+Silkscreened on top     P/N 1001
 
 
-.16	2764		handwritten sticker	U16
-.17	2764		handwritten sticker	U17
-.18	2764		handwritten sticker	U18
-.19	2764		handwritten sticker	U19
-.26	2732		handwritten sticker	#26
-.32	pal10l8		green dot sticker with 32 written on it
-.52	pal10l8		blue dot sticker with 52 written on it
-.58	pal10l8		3 blue dot stickers with 58 written on one
-.40	pal10l8		red dot sticker with 40 written on it
-.39	pal10l8		3 green dot stickers with 39 written on one
-.38	pal10l8		3 blue dot stickers with 38 written on one
-.80	pal10l8		2 blue dot stickers with 80 written on one
-.94	pal14h4		2 green dot stickers with 94 written on one - was getting different values for each read
-.109	pal14h4		2 brown dot stickers with 109 written on one
-.110	pal10l8		2 red dot stickers with 110 written on one
-.128	pal10h8		1 blue, 1 brown, and another blue dot sticker with 128 written on the first blue one
-.129	pal10h8		1 green and 1 red dot sticker
-.130	pal10h8		3 red dot stickers with 130 written on one
-.140	pal14h4		1 brown sticker with 140 written on it
-.141	pal14h4		1 brown sticker with 141 written on it
-.142	pal14h4		1 brown sticker with 142 written on it
-.143	pal14h4		1 brown sticker with 143 written on it
-.144	pal14h4		1 brown sticker with 144 written on it
-.145	pal14h4		1 brown sticker with 145 written on it
+.16 2764        handwritten sticker U16
+.17 2764        handwritten sticker U17
+.18 2764        handwritten sticker U18
+.19 2764        handwritten sticker U19
+.26 2732        handwritten sticker #26
+.32 pal10l8     green dot sticker with 32 written on it
+.52 pal10l8     blue dot sticker with 52 written on it
+.58 pal10l8     3 blue dot stickers with 58 written on one
+.40 pal10l8     red dot sticker with 40 written on it
+.39 pal10l8     3 green dot stickers with 39 written on one
+.38 pal10l8     3 blue dot stickers with 38 written on one
+.80 pal10l8     2 blue dot stickers with 80 written on one
+.94 pal14h4     2 green dot stickers with 94 written on one - was getting different values for each read
+.109    pal14h4     2 brown dot stickers with 109 written on one
+.110    pal10l8     2 red dot stickers with 110 written on one
+.128    pal10h8     1 blue, 1 brown, and another blue dot sticker with 128 written on the first blue one
+.129    pal10h8     1 green and 1 red dot sticker
+.130    pal10h8     3 red dot stickers with 130 written on one
+.140    pal14h4     1 brown sticker with 140 written on it
+.141    pal14h4     1 brown sticker with 141 written on it
+.142    pal14h4     1 brown sticker with 142 written on it
+.143    pal14h4     1 brown sticker with 143 written on it
+.144    pal14h4     1 brown sticker with 144 written on it
+.145    pal14h4     1 brown sticker with 145 written on it
 */
 
 ROM_START( secondch )

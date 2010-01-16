@@ -8,7 +8,7 @@ typedef struct _rastan_state rastan_state;
 struct _rastan_state
 {
 	/* memory pointers */
-//	UINT16 *    paletteram;	// this currently uses generic palette handlers
+//  UINT16 *    paletteram; // this currently uses generic palette handlers
 
 	/* video-related */
 	UINT16      sprite_ctrl;

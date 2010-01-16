@@ -31,13 +31,13 @@ void xmen_sprite_callback( running_machine *machine, int *code, int *color, int 
 	xmen_state *state = (xmen_state *)machine->driver_data;
 	int pri = (*color & 0x00e0) >> 4;	/* ??????? */
 
-	if (pri <= state->layerpri[2])						
+	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
 		*priority_mask = 0xf0;
 	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
-	else										
+	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	*color = state->sprite_colorbase + (*color & 0x001f);

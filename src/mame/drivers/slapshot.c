@@ -256,7 +256,7 @@ static READ16_HANDLER( slapshot_msb_sound_r )
 	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
-	else 
+	else
 		return 0;
 }
 

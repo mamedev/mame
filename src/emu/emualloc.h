@@ -60,7 +60,7 @@ class resource_pool_item
 private:
 	resource_pool_item(const resource_pool_item &);
 	resource_pool_item &operator=(const resource_pool_item &);
-	
+
 public:
 	resource_pool_item(void *_ptr, size_t _size)
 		: next(NULL),
@@ -69,14 +69,14 @@ public:
 		  ptr(_ptr),
 		  size(_size) { }
 	virtual ~resource_pool_item() { }
-	
+
 	resource_pool_item *	next;
 	resource_pool_item *	ordered_next;
 	resource_pool_item *	ordered_prev;
 	void *					ptr;
 	size_t					size;
 };
- 
+
 
 // a resource_pool_object is a simple object wrapper for the templatized type
 template<class T> class resource_pool_object : public resource_pool_item
@@ -84,28 +84,28 @@ template<class T> class resource_pool_object : public resource_pool_item
 private:
 	resource_pool_object<T>(const resource_pool_object<T> &);
 	resource_pool_object<T> &operator=(const resource_pool_object<T> &);
-	
+
 public:
-	resource_pool_object(T *_object) 
+	resource_pool_object(T *_object)
 		: resource_pool_item(reinterpret_cast<void *>(_object), sizeof(T)),
 		  object(_object) { }
 	virtual ~resource_pool_object() { delete object; }
- 
+
 private:
 	T *object;
 };
 
 
-// a resource_pool_array is a simple object wrapper for an allocated array of 
+// a resource_pool_array is a simple object wrapper for an allocated array of
 // the templatized type
 template<class T> class resource_pool_array : public resource_pool_item
 {
 private:
 	resource_pool_array<T>(const resource_pool_array<T> &);
 	resource_pool_array<T> &operator=(const resource_pool_array<T> &);
-	
+
 public:
-	resource_pool_array(T *_array, int _count) 
+	resource_pool_array(T *_array, int _count)
 		: resource_pool_item(reinterpret_cast<void *>(_array), sizeof(T) * _count),
 		  array(_array),
 		  count(_count) { }
@@ -123,11 +123,11 @@ class resource_pool
 private:
 	resource_pool(const resource_pool &);
 	resource_pool &operator=(const resource_pool &);
-	
+
 public:
 	resource_pool();
 	~resource_pool();
-	
+
 	void add(resource_pool_item &item);
 	void remove(resource_pool_item &item) { remove(item.ptr); }
 	void remove(void *ptr);
@@ -135,13 +135,13 @@ public:
 	resource_pool_item *find(void *ptr);
 	bool contains(void *ptrstart, void *ptrend);
 	void clear();
- 
+
 	template<class T> T *add_object(T* object) { add(*new(__FILE__, __LINE__) resource_pool_object<T>(object)); return object; }
 	template<class T> T *add_array(T* array, int count) { add(*new(__FILE__, __LINE__) resource_pool_array<T>(array, count)); return array; }
 
 private:
 	static const int		hash_prime = 193;
-	
+
 	osd_lock *				listlock;
 	resource_pool_item *	hash[hash_prime];
 	resource_pool_item *	ordered_head;
@@ -168,7 +168,7 @@ private:
 #define pool_alloc(_pool, _type)					(_pool).add_object(new(__FILE__, __LINE__) _type)
 #define pool_alloc_clear(_pool, _type)				(_pool).add_object(new(__FILE__, __LINE__, zeromem) _type)
 #define pool_alloc_array(_pool, _type, _num)		(_pool).add_array(new(__FILE__, __LINE__) _type[_num], (_num))
-#define pool_alloc_array_clear(_pool, _type, _num) 	(_pool).add_array(new(__FILE__, __LINE__, zeromem) _type[_num], (_num))
+#define pool_alloc_array_clear(_pool, _type, _num)	(_pool).add_array(new(__FILE__, __LINE__, zeromem) _type[_num], (_num))
 #define pool_free(_pool, v)							(_pool).remove(v)
 
 // global allocation helpers

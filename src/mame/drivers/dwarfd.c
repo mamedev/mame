@@ -154,16 +154,16 @@ Dumped by Grull Osgo
 
 Location    Device   File ID    Checksum
 ----------------------------------------
-CPU 10A      27C128  a1.bin	    9f26    [ CPU ROM   ]
+CPU 10A      27C128  a1.bin     9f26    [ CPU ROM   ]
 
-CPU 6H       27C128  a2.bin	    7ccc    [ Character ]
-CPU 6K       27C128  a3.bin	    ba34    [ Character ]
+CPU 6H       27C128  a2.bin     7ccc    [ Character ]
+CPU 6K       27C128  a3.bin     ba34    [ Character ]
 
 LDP O7       27c128  a4.bin     2120    [ LDP Ctrl  ] (Add-On Board "7-50A" on O7-O9-010 IC Sockets)
 
 
-Notes:	CPU - Main Board includes NTSC decoder, video Switch & Audio control.
-	No Model or Serial number on PCB.
+Notes:  CPU - Main Board includes NTSC decoder, video Switch & Audio control.
+    No Model or Serial number on PCB.
         Uses a Pioneer LD-V2000 Laserdisc player.
         The laserdisc player is modified - has a custom communication & audio cable (10 Wires Flat Cable).
 
@@ -191,18 +191,18 @@ Disk 1
 ------
 Sticker:
 
-	09-251	A
+    09-251  A
 
-	HORSE RACE I
+    HORSE RACE I
 
-	QUARTER HORSE
+    QUARTER HORSE
 
-	(C) 1981 DALE FRANK RODESCH
-	SAN DIEGO, CA USA
+    (C) 1981 DALE FRANK RODESCH
+    SAN DIEGO, CA USA
 
 Stamp on disk:
 
-	09-251A1-15
+    09-251A1-15
 
 
 
@@ -211,37 +211,37 @@ Disk 2
 Sticker:
 
 
-	09251	1
+    09251   1
 
-	QUARTER HORSE
+    QUARTER HORSE
 
-	VIDEO DISK
+    VIDEO DISK
 
-	(C) 1981 DALE FRANK RODESCH
+    (C) 1981 DALE FRANK RODESCH
 
 
 Stamp on disk:
 
-	09-251A1-01
+    09-251A1-01
 
-	09-251    A
+    09-251    A
 
 
 Disk 1
 ------
 Sticker:
 
-	09-251	A
+    09-251  A
 
-	HORSE RACE I
+    HORSE RACE I
 
-	QUARTER HORSE
+    QUARTER HORSE
 
-	(C) 1981 DALE FRANK RODESCH
+    (C) 1981 DALE FRANK RODESCH
 
 Stamp on disk:
 
-	09-251A1-06
+    09-251A1-06
 
 
 
@@ -1061,7 +1061,7 @@ ROM_START( quarterhb )
 	/* ??? colors */
 	ROM_LOAD( "3a_50-1381_63s080n.bin",0x00, 0x20, CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
 	/* memory map */
-//	ROM_LOAD( "7h_7602.bin",0x20, 0x20, BAD_DUMP CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
+//  ROM_LOAD( "7h_7602.bin",0x20, 0x20, BAD_DUMP CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
 	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, BAD_DUMP CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) ) //taken from the other set, might be bad
 
 	DISK_REGION( "laserdisc" )

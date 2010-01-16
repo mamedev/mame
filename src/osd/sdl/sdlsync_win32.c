@@ -98,10 +98,10 @@ struct _osd_scalable_lock
 #if USE_SCALABLE_LOCKS
    struct
    {
-      volatile INT32 	haslock;		// do we have the lock?
+      volatile INT32	haslock;		// do we have the lock?
       INT32 			filler[64/4-1];	// assumes a 64-byte cache line
    } slot[WORK_MAX_THREADS];			// one slot per thread
-   volatile INT32 		nextindex;		// index of next slot to use
+   volatile INT32		nextindex;		// index of next slot to use
 #else
 	CRITICAL_SECTION	section;
 #endif
@@ -110,9 +110,9 @@ struct _osd_scalable_lock
 osd_scalable_lock *osd_scalable_lock_alloc(void)
 {
 	osd_scalable_lock *lock;
-	
+
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
-	
+
 	memset(lock, 0, sizeof(*lock));
 #if USE_SCALABLE_LOCKS
 	lock->slot[0].haslock = TRUE;
@@ -179,7 +179,7 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
 	osd_thread *thread;
 	uintptr_t handle;
-	
+
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
 	thread->callback = callback;
 	thread->param = cbparam;

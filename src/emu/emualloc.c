@@ -86,7 +86,7 @@ public:
 	static bool			lock_alloc;		// set to true temporarily during lock allocation
 	static memory_entry *hash[hash_prime];// hash table based on pointer
 	static memory_entry *freehead;		// pointer to the head of the free list
-	
+
 	static memory_entry *allocate(size_t size, void *base, const char *file, int line);
 	static memory_entry *find(void *ptr);
 	static void release(memory_entry *entry);
@@ -133,7 +133,7 @@ void *malloc_file_line(size_t size, const char *file, int line)
 	void *result = osd_malloc(size);
 	if (result == NULL)
 		return NULL;
-	
+
 #ifdef MAME_DEBUG
 	// add a new entry
 	memory_entry::allocate(size, result, file, line);
@@ -156,7 +156,7 @@ void free_file_line(void *memory, const char *file, int line)
 #ifdef MAME_DEBUG
 	// find the memory entry
 	memory_entry *entry = memory_entry::find(memory);
-	
+
 	// warn about untracked frees
 	if (entry == NULL)
 	{
@@ -164,7 +164,7 @@ void free_file_line(void *memory, const char *file, int line)
 		osd_break_into_debugger("Error: attempt to free untracked memory");
 		return;
 	}
-	
+
 	// free the entry and the memory
 	if (entry != NULL)
 		memory_entry::release(entry);
@@ -175,8 +175,8 @@ void free_file_line(void *memory, const char *file, int line)
 
 
 /*-------------------------------------------------
-    dump_unfreed_mem - called from the exit path 
-    of any code that wants to check for unfreed 
+    dump_unfreed_mem - called from the exit path
+    of any code that wants to check for unfreed
     memory
 -------------------------------------------------*/
 
@@ -227,7 +227,7 @@ resource_pool::~resource_pool()
 void resource_pool::add(resource_pool_item &item)
 {
 	osd_lock_acquire(listlock);
-	
+
 	// insert into hash table
 	int hashval = reinterpret_cast<FPTR>(item.ptr) % hash_prime;
 	item.next = hash[hashval];
@@ -244,7 +244,7 @@ void resource_pool::add(resource_pool_item &item)
 
 
 /*-------------------------------------------------
-    remove - remove a specific item from the 
+    remove - remove a specific item from the
     resource pool
 -------------------------------------------------*/
 
@@ -253,7 +253,7 @@ void resource_pool::remove(void *ptr)
 	// ignore NULLs
 	if (ptr == NULL)
 		return;
-		
+
 	// search for the item
 	osd_lock_acquire(listlock);
 
@@ -266,7 +266,7 @@ void resource_pool::remove(void *ptr)
 			// remove from hash table
 			resource_pool_item *deleteme = *scanptr;
 			*scanptr = deleteme->next;
-			
+
 			// remove from ordered list
 			if (deleteme->ordered_prev != NULL)
 				deleteme->ordered_prev->ordered_next = deleteme->ordered_next;
@@ -274,7 +274,7 @@ void resource_pool::remove(void *ptr)
 				ordered_head = deleteme->ordered_next;
 			if (deleteme->ordered_next != NULL)
 				deleteme->ordered_next->ordered_prev = deleteme->ordered_prev;
-			
+
 			// delete the object and break
 			delete deleteme;
 			break;
@@ -282,10 +282,10 @@ void resource_pool::remove(void *ptr)
 
 	osd_lock_release(listlock);
 }
- 
- 
+
+
 /*-------------------------------------------------
-    find - find a specific item in the resource 
+    find - find a specific item in the resource
     pool
 -------------------------------------------------*/
 
@@ -293,7 +293,7 @@ resource_pool_item *resource_pool::find(void *ptr)
 {
 	// search for the item
 	osd_lock_acquire(listlock);
-	
+
 	int hashval = reinterpret_cast<FPTR>(ptr) % hash_prime;
 	resource_pool_item *item;
 	for (item = hash[hashval]; item != NULL; item = item->next)
@@ -310,7 +310,7 @@ resource_pool_item *resource_pool::find(void *ptr)
     contains - return true if given ptr is
     contained by one of the objects in the pool
 -------------------------------------------------*/
- 
+
 bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 {
 	UINT8 *ptrstart = reinterpret_cast<UINT8 *>(_ptrstart);
@@ -342,7 +342,7 @@ found:
 void resource_pool::clear()
 {
 	osd_lock_acquire(listlock);
-	
+
 	// important: delete in reverse order of adding
 	while (ordered_head != NULL)
 		remove(ordered_head->ptr);
@@ -395,7 +395,7 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 {
 	acquire_lock();
 
-	// if we're out of free entries, allocate a new chunk		
+	// if we're out of free entries, allocate a new chunk
 	if (freehead == NULL)
 	{
 		// create a new chunk, and fail if we can't
@@ -413,18 +413,18 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 			freehead = entry++;
 		}
 	}
-	
+
 	// grab a free entry
 	memory_entry *entry = freehead;
 	freehead = entry->next;
 
-	// populate it		
+	// populate it
 	entry->size = size;
 	entry->base = base;
 	entry->file = file;
 	entry->line = line;
 	entry->id = curid++;
-	
+
 	// add it to the alloc list
 	int hashval = reinterpret_cast<FPTR>(base) % hash_prime;
 	entry->next = hash[hashval];
@@ -432,7 +432,7 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 		entry->next->prev = entry;
 	entry->prev = NULL;
 	hash[hashval] = entry;
-	
+
 	release_lock();
 	return entry;
 }
@@ -447,10 +447,10 @@ memory_entry *memory_entry::find(void *ptr)
 	// NULL maps to nothing
 	if (ptr == NULL)
 		return NULL;
-	
+
 	// scan the list under the lock
 	acquire_lock();
-	
+
 	int hashval = reinterpret_cast<FPTR>(ptr) % hash_prime;
 	memory_entry *entry;
 	for (entry = hash[hashval]; entry != NULL; entry = entry->next)

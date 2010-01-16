@@ -74,7 +74,7 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 {
 	surpratk_state *state = (surpratk_state *)space->machine->driver_data;
 
-	if ((data & 0xf4) != 0x10) 
+	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
