@@ -138,7 +138,7 @@ VIDEO_UPDATE( spbactn )
 					screen->machine->gfx[1]->color_base + color * screen->machine->gfx[1]->color_granularity,
 					0, 0,
 					16 * sx, 8 * sy,
-					-1);
+					(UINT32)-1);
 
 		sx++;
 		if (sx > 63)
