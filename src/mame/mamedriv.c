@@ -5605,6 +5605,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( qdrmfgp )	/* 1994.12 GQ460 (Japan) */
 	DRIVER( qdrmfgp2 )	/* 1995.09 GE557 (Japan) */
 
+	/* 68000-based gambling games */
+	DRIVER( kingtut )
+	DRIVER( moneybnk )
+
 	/* DJ Main */
 	DRIVER( bm1stmix )	/* GQ753 (c) 1997 (Japan) */
 	DRIVER( bm2ndmix )	/* GX853 (c) 1998 (Japan) */
