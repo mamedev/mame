@@ -135,11 +135,6 @@ ifeq ($(TARGETOS),unix)
 SYNC_IMPLEMENTATION = tc
 endif
 
-ifeq ($(TARGETOS),linux)
-TARGETOS = unix
-SYNC_IMPLEMENTATION = tc
-endif
-
 ifeq ($(TARGETOS),freebsd)
 TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
@@ -388,6 +383,8 @@ LIBS += `sdl-config --libs`
 $(OBJ)/emu/cpu/h6280/6280dasm.o : CDEFS += -D__STRICT_ANSI__
 endif # OS2
 
+OSDCLEAN = sdlclean
+
 TOOLS += \
 	testkeys$(EXE)
 
@@ -412,17 +409,33 @@ $(LIBOSD): $(OSDOBJS)
 
 $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c  
 	@echo Compiling $<...
-	$(CC)  $(CCOMFLAGS) $(DEFS) -c $< -o $@
+	$(CC)  $(CFLAGS) $(DEFS) -c $< -o $@
 	
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL)
+testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(SDLMAIN) $(SDLOBJ)/strconv.o $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+sdlclean:
+	rm -f .depend
 	
 testlib:
 	-echo LIBS: $(LIBS)
 	-echo DEFS: $(DEFS)
 	-echo CORE: $(OSDCOREOBJS)
 	
+ifneq ($(TARGETOS),win32)
+depend:
+	rm -f .depend
+	@for i in `find src -name "*.c"` ; do \
+		echo processing $$i; \
+		mt=`echo $$i | sed -e "s/\\.c/\\.o/" -e "s!^src/!$(OBJ)/!"` ; \
+		g++ -MM -MT $$mt $(CDEFS) $(CCOMFLAGS) $$i 2>/dev/null \
+		| sed -e "s!$$i!!g" >> .depend ; \
+	done
+
+-include .depend
+
+endif
