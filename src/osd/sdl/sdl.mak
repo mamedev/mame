@@ -333,6 +333,10 @@ OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 DEFS += -Dmain=utf8_main
 
+# enable UNICODE flags
+DEFS += -DUNICODE -D_UNICODE
+LDFLAGS += -municode
+
 # at least compile some stubs to link it
 OSDCOREOBJS += $(SDLOBJ)/debugwin.o
 

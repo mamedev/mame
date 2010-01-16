@@ -32,6 +32,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+#include "strconv.h"
 #endif
 
 #ifdef SDLMAME_OS2
@@ -193,7 +195,9 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
     GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
 	monitor->center_width = monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->center_height = monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
-	strcpy(monitor->monitor_device, info.szDevice);
+	char *temp = utf8_from_wstring(info.szDevice);
+	strcpy(monitor->monitor_device, temp);
+	free(temp);
 	#elif defined(SDLMAME_MACOSX)	// Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
 	CGRect dbounds;
@@ -420,7 +424,9 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 #endif
 	monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
-	strcpy(monitor->monitor_device, info.szDevice);
+	char *temp = utf8_from_wstring(info.szDevice);
+	strcpy(monitor->monitor_device, temp);
+	free(temp);
 
 	// guess the aspect ratio assuming square pixels
 	monitor->aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);

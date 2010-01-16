@@ -271,7 +271,7 @@ void osd_break_into_debugger(const char *message)
 {
 	if (IsDebuggerPresent())
 	{
-		OutputDebugString(message);
+		OutputDebugStringA(message);
 		DebugBreak();
 	}
 }

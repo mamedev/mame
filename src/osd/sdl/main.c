@@ -32,8 +32,7 @@ extern int utf8_main(int argc, char *argv[]);
 #undef wmain
 #endif
 
-//extern "C" int _tmain(int argc, TCHAR **argv)
-int main(int argc, TCHAR **argv)
+extern "C" int _tmain(int argc, TCHAR **argv)
 {
 	int i, rc;
 	char **utf8_argv;
