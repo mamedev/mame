@@ -49,6 +49,8 @@
 // standard C headers
 #include <ctype.h>
 #include <stdarg.h>
+#include <psapi.h>
+#include <dbghelp.h>
 
 // MAME headers
 #include "emu.h"
@@ -89,6 +91,18 @@ typedef HANDLE (WINAPI *av_set_mm_thread_characteristics_ptr)(LPCTSTR TaskName, 
 typedef HANDLE (WINAPI *av_set_mm_max_thread_characteristics_ptr)(LPCTSTR FirstTask, LPCTSTR SecondTask, LPDWORD TaskIndex);
 typedef BOOL (WINAPI *av_revert_mm_thread_characteristics_ptr)(HANDLE AvrtHandle);
 
+// from dbghelp.dll
+typedef PIMAGE_NT_HEADERS (WINAPI *image_nt_header_ptr)(PVOID ImageBase);
+typedef BOOL (WINAPI *stack_walk_64_ptr)(DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord, PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine, PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress);
+typedef BOOL (WINAPI *sym_initialize_ptr)(HANDLE hProcess, PCTSTR UserSearchPath, BOOL fInvadeProcess);
+typedef PVOID (WINAPI *sym_function_table_access_64_ptr)(HANDLE hProcess, DWORD64 AddrBase);
+typedef DWORD64 (WINAPI *sym_get_module_base_64_ptr)(HANDLE hProcess, DWORD64 dwAddr);
+typedef BOOL (WINAPI *sym_from_addr_ptr)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);
+typedef BOOL (WINAPI *sym_get_line_from_addr_64_ptr)(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line);
+
+// from psapi.dll
+typedef BOOL (WINAPI *get_module_information_ptr)(HANDLE hProcess, HMODULE hModule, LPMODULEINFO lpmodinfo, DWORD cb);
+
 
 
 //============================================================
@@ -108,6 +122,16 @@ static try_enter_critical_section_ptr try_enter_critical_section;
 static av_set_mm_thread_characteristics_ptr av_set_mm_thread_characteristics;
 static av_set_mm_max_thread_characteristics_ptr av_set_mm_max_thread_characteristics;
 static av_revert_mm_thread_characteristics_ptr av_revert_mm_thread_characteristics;
+
+static image_nt_header_ptr image_nt_header;
+static stack_walk_64_ptr stack_walk_64;
+static sym_initialize_ptr sym_initialize;
+static sym_function_table_access_64_ptr sym_function_table_access_64;
+static sym_get_module_base_64_ptr sym_get_module_base_64;
+static sym_from_addr_ptr sym_from_addr;
+static sym_get_line_from_addr_64_ptr sym_get_line_from_addr_64;
+
+static get_module_information_ptr get_module_information;
 
 static char mapfile_name[MAX_PATH];
 static LPTOP_LEVEL_EXCEPTION_FILTER pass_thru_filter;
@@ -141,10 +165,7 @@ static void soft_link_functions(void);
 static int is_double_click_start(int argc);
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info);
-static const char *lookup_symbol(UINT32 address);
-#ifndef PTR64
-static int get_code_base_size(UINT32 *base, UINT32 *size);
-#endif
+static const char *lookup_symbol(FPTR address);
 
 static void start_profiler(void);
 static void stop_profiler(void);
@@ -417,21 +438,35 @@ static void soft_link_functions(void)
 	HMODULE library;
 
 	// see if we can use TryEnterCriticalSection
-	try_enter_critical_section = NULL;
 	library = LoadLibrary(TEXT("kernel32.dll"));
 	if (library != NULL)
 		try_enter_critical_section = (try_enter_critical_section_ptr)GetProcAddress(library, "TryEnterCriticalSection");
 
 	// see if we can use the multimedia scheduling functions in Vista
-	av_set_mm_thread_characteristics = NULL;
-	av_set_mm_max_thread_characteristics = NULL;
-	av_revert_mm_thread_characteristics = NULL;
 	library = LoadLibrary(TEXT("avrt.dll"));
 	if (library != NULL)
 	{
 		av_set_mm_thread_characteristics = (av_set_mm_thread_characteristics_ptr)GetProcAddress(library, "AvSetMmThreadCharacteristics" UNICODE_POSTFIX);
 		av_set_mm_max_thread_characteristics = (av_set_mm_max_thread_characteristics_ptr)GetProcAddress(library, "AvSetMmMaxThreadCharacteristics" UNICODE_POSTFIX);
 		av_revert_mm_thread_characteristics = (av_revert_mm_thread_characteristics_ptr)GetProcAddress(library, "AvRevertMmThreadCharacteristics");
+	}
+	
+	// psapi helpers (not available in win9x)
+	library = LoadLibrary(TEXT("psapi.dll"));
+	if (library != NULL)
+		get_module_information = (get_module_information_ptr)GetProcAddress(library, "GetModuleInformation");
+
+	// dbghelp helpers
+	library = LoadLibrary(TEXT("dbghelp.dll"));
+	if (library != NULL)
+	{
+		image_nt_header = (image_nt_header_ptr)GetProcAddress(library, "ImageNtHeader");
+		stack_walk_64 = (stack_walk_64_ptr)GetProcAddress(library, "StackWalk64");
+		sym_initialize = (sym_initialize_ptr)GetProcAddress(library, "SymInitialize" UNICODE_POSTFIX);
+		sym_function_table_access_64 = (sym_function_table_access_64_ptr)GetProcAddress(library, "SymFunctionTableAccess64");
+		sym_get_module_base_64 = (sym_get_module_base_64_ptr)GetProcAddress(library, "SymGetModuleBase64");
+		sym_from_addr = (sym_from_addr_ptr)GetProcAddress(library, "SymFromAddr");
+		sym_get_line_from_addr_64 = (sym_get_line_from_addr_64_ptr)GetProcAddress(library, "SymGetLineFromAddr64");
 	}
 }
 
@@ -485,7 +520,7 @@ static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
 			TerminateProcess(GetCurrentProcess(), -1);
 		}
 	}
-	return 0;
+	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
@@ -538,9 +573,6 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 		{ 0,								"UNKNOWN EXCEPTION" }
 	};
 	static int already_hit = 0;
-#ifndef PTR64
-	UINT32 code_start, code_size;
-#endif
 	int i;
 
 	// if we're hitting this recursively, just exit
@@ -563,9 +595,9 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 
 	// for access violations, print more info
 	if (info->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
-		fprintf(stderr, "While attempting to %s memory at %08X\n",
+		fprintf(stderr, "While attempting to %s memory at %p\n",
 				info->ExceptionRecord->ExceptionInformation[0] ? "write" : "read",
-				(UINT32)info->ExceptionRecord->ExceptionInformation[1]);
+				(void *)info->ExceptionRecord->ExceptionInformation[1]);
 
 	// print the state of the CPU
 	fprintf(stderr, "-----------------------------------------------------\n");
@@ -603,136 +635,189 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 			(void *)info->ContextRecord->Esp);
 #endif
 
-#ifndef PTR64
-	// crawl the stack for a while
-	if (get_code_base_size(&code_start, &code_size))
+	if (image_nt_header != NULL &&
+		stack_walk_64 != NULL &&
+		sym_initialize != NULL &&
+		sym_function_table_access_64 != NULL &&
+		sym_get_module_base_64 != NULL &&
+		sym_from_addr != NULL &&
+		get_module_information != NULL)
 	{
-		char prev_symbol[1024], curr_symbol[1024];
-		UINT32 last_call = (UINT32)info->ExceptionRecord->ExceptionAddress;
-		UINT32 esp_start = info->ContextRecord->Esp;
-		UINT32 esp_end = (esp_start | 0xffff) + 1;
-		UINT32 esp;
+		CONTEXT context = *info->ContextRecord;
+		FPTR code_start, code_size;
+		STACKFRAME64 stackframe;
+		MODULEINFO info;
+	
+		// initialize the symbol lookup
+		sym_initialize(GetCurrentProcess(), NULL, TRUE);
+	
+		// get the actual address of the image
+		HMODULE module = GetModuleHandle(NULL);
+		get_module_information(GetCurrentProcess(), module, &info, sizeof(info));
+		code_start = reinterpret_cast<FPTR>(info.lpBaseOfDll);
+		code_size = info.SizeOfImage;
+
+		// find out the linker-generated base address of the image
+		PIMAGE_NT_HEADERS header = image_nt_header(module);
+		FPTR symbol_delta = 0;
+		if (header != NULL)
+			symbol_delta = code_start - header->OptionalHeader.ImageBase;
 
 		// reprint the actual exception address
 		fprintf(stderr, "-----------------------------------------------------\n");
 		fprintf(stderr, "Stack crawl:\n");
-		fprintf(stderr, "exception-> %08X%s\n", last_call, strcpy(prev_symbol, lookup_symbol(last_call)));
 
-		// crawl the stack until we hit the next 64k boundary
-		for (esp = esp_start; esp < esp_end; esp += 4)
-		{
-			UINT32 stack_val = *(UINT32 *)esp;
-
-			// if the value on the stack points within the code block, check it out
-			if (stack_val >= code_start && stack_val < code_start + code_size)
-			{
-				UINT8 *return_addr = (UINT8 *)stack_val;
-				UINT32 call_target = 0;
-
-				// make sure the code that we think got us here is actually a CALL instruction
-				if (return_addr[-5] == 0xe8)
-					call_target = stack_val - 5 + *(INT32 *)&return_addr[-4];
-				if ((return_addr[-2] == 0xff && (return_addr[-1] & 0x38) == 0x10) ||
-					(return_addr[-3] == 0xff && (return_addr[-2] & 0x38) == 0x10) ||
-					(return_addr[-4] == 0xff && (return_addr[-3] & 0x38) == 0x10) ||
-					(return_addr[-5] == 0xff && (return_addr[-4] & 0x38) == 0x10) ||
-					(return_addr[-6] == 0xff && (return_addr[-5] & 0x38) == 0x10) ||
-					(return_addr[-7] == 0xff && (return_addr[-6] & 0x38) == 0x10))
-					call_target = 1;
-
-				// make sure it points somewhere a little before the last call
-				if (call_target == 1 || (call_target < last_call && call_target >= last_call - 0x1000))
-				{
-					char *stop_compare = strchr(prev_symbol, '+');
-
-					// don't print duplicate hits in the same routine
-					strcpy(curr_symbol, lookup_symbol(stack_val));
-					if (stop_compare == NULL || strncmp(curr_symbol, prev_symbol, stop_compare - prev_symbol))
-					{
-						strcpy(prev_symbol, curr_symbol);
-						fprintf(stderr, "  %08X: %08X%s\n", esp, stack_val, curr_symbol);
-						last_call = stack_val;
-					}
-				}
-			}
-		}
-	}
+		memset(&stackframe, 0, sizeof(stackframe));
+#ifdef PTR64
+		stackframe.AddrPC.Offset = context.Rip;
+		stackframe.AddrFrame.Offset = context.Rsp;
+		stackframe.AddrStack.Offset = context.Rsp;
+#else
+		stackframe.AddrPC.Offset = context.Eip;
+		stackframe.AddrFrame.Offset = context.Ebp;
+		stackframe.AddrStack.Offset = context.Esp;
 #endif
+		stackframe.AddrPC.Mode = AddrModeFlat;
+		stackframe.AddrFrame.Mode = AddrModeFlat;
+		stackframe.AddrStack.Mode = AddrModeFlat;
 
-	// exit
-	ExitProcess(100);
+		while (stack_walk_64(
+#ifdef PTR64
+				IMAGE_FILE_MACHINE_AMD64,
+#else
+				IMAGE_FILE_MACHINE_I386,
+#endif
+				GetCurrentProcess(),
+				GetCurrentThread(),
+				&stackframe,
+				&context,
+				NULL,
+				sym_function_table_access_64,
+				sym_get_module_base_64,
+				NULL))
+		{
+			fprintf(stderr, "  %p: %p%s\n", (void *)stackframe.AddrFrame.Offset, (void *)stackframe.AddrPC.Offset, lookup_symbol((FPTR)stackframe.AddrPC.Offset));
+		}
+
+		// exit
+		ExitProcess(100);
+	}
+	return 0;
 }
 
+
+//============================================================
+//  line_to_symbol
+//============================================================
+
+static const char *line_to_symbol(const char *line, FPTR &address)
+{
+#ifdef __GNUC__
+/*
+	32-bit gcc map line:
+                0x0089cb00                nbmj9195_palette_r(_address_space const*, unsigned int)
+
+	64-bit gcc map line:
+                0x0000000000961afc                nbmj9195_palette_r(_address_space const*, unsigned int)
+*/
+	char symbol[1024];
+	void *temp;
+	
+	// find a matching start
+	if (strncmp(line, "                0x", 18) == 0)
+		if (sscanf(line, " 0x%p %s", &temp, symbol) == 2)
+		{
+			address = reinterpret_cast<FPTR>(temp);
+			return strstr(line, symbol);
+		}
+#endif
+
+#ifdef _MSC_VER
+/*
+	32-bit MSVC map line:
+ 0001:00387890       ?nbmj9195_palette_r@@YAEPBU_address_space@@I@Z 00788890 f   nichibut:nbmj9195.o
+
+	64-bit MSVC map line:
+ 0001:004d7510       ?nbmj9195_palette_r@@YAEPEBU_address_space@@I@Z 00000001404d8510 f   nichibut:nbmj9195.o
+*/
+	static char symbol[1024];
+	int dummy1, dummy2;
+	void *temp;
+	
+	symbol[0] = 0;
+	if (line[0] == ' ' && line[5] == ':')
+		if (sscanf(line, " %04x:%08x %s %p", &dummy1, &dummy2, symbol, &temp) == 4)
+		{
+			address = reinterpret_cast<FPTR>(temp);
+			return symbol;
+		}
+#endif
+
+	// nope, not a symbol line
+	return NULL;
+}
 
 
 //============================================================
 //  lookup_symbol
 //============================================================
 
-static const char *lookup_symbol(UINT32 address)
+static const char *lookup_symbol(FPTR address)
 {
 	static char buffer[1024];
-	FILE *	map = fopen(mapfile_name, "r");
-	char	symbol[1024], best_symbol[1024];
-	UINT32	addr, best_addr = 0;
-	char	line[1024];
 
-	// if no file, return nothing
+	// first try to do it formally
+	BYTE info_buffer[sizeof(SYMBOL_INFO) + 256];
+	SYMBOL_INFO &info = *reinterpret_cast<SYMBOL_INFO *>(&info_buffer[0]);
+	DWORD64 displacement;
+
+	// even through the struct says TCHAR, we actually get back an ANSI string here
+	memset(info_buffer, 0, sizeof(info_buffer));
+	info.SizeOfStruct = sizeof(info);
+	info.MaxNameLen = sizeof(info_buffer) - sizeof(info);
+	if (sym_from_addr(GetCurrentProcess(), address, &displacement, &info))
+	{
+		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
+		DWORD linedisp;
+		
+		// try to get source info as well; again we are returned an ANSI string
+		if (sym_get_line_from_addr_64 != NULL && sym_get_line_from_addr_64(GetCurrentProcess(), address, &linedisp, &lineinfo))
+			sprintf(buffer, " (%s+0x%04x, %s:%d)", info.Name, (UINT32)displacement, lineinfo.FileName, (int)lineinfo.LineNumber);
+		else
+			sprintf(buffer, " (%s+0x%04x)", info.Name, (UINT32)displacement);
+		return buffer;
+	}
+
+	// see if we have a map file
+	FILE *map = fopen(mapfile_name, "r");
 	if (map == NULL)
 		return "";
 
 	// reset the bests
-	*best_symbol = 0;
-	best_addr = 0;
+	astring best_symbol;
+	FPTR best_addr = 0;
 
 	// parse the file, looking for map entries
+	char line[1024];
 	while (fgets(line, sizeof(line) - 1, map))
-		if (strncmp(line, "                0x", 18) == 0)
-			if (sscanf(line, "                0x%08x %s", &addr, symbol) == 2)
-				if (addr <= address && addr > best_addr)
-				{
-					best_addr = addr;
-					strcpy(best_symbol, symbol);
-				}
+	{
+		FPTR addr;
+		const char *symbol = line_to_symbol(line, addr);
+		if (symbol != NULL && addr <= address && addr > best_addr)
+		{
+			best_addr = addr;
+			best_symbol.cpy(symbol);
+		}
+	}
 	fclose(map);
 
 	// create the final result
 	if (address - best_addr > 0x10000)
 		return "";
-	sprintf(buffer, " (%s+0x%04x)", best_symbol, address - best_addr);
+	sprintf(buffer, " (%s+0x%04x)", best_symbol.trimspace().cstr(), (UINT32)(address - best_addr));
 	return buffer;
 }
 
-
-
-//============================================================
-//  get_code_base_size
-//============================================================
-
-#ifndef PTR64
-static int get_code_base_size(UINT32 *base, UINT32 *size)
-{
-	FILE *	map = fopen(mapfile_name, "r");
-	char	line[1024];
-	int result = 0;
-
-	// if no file, return nothing
-	if (map == NULL)
-		return 0;
-
-	// parse the file, looking for .text entry
-	while (fgets(line, sizeof(line) - 1, map))
-		if (!strncmp(line, ".text           0x", 18))
-			if (sscanf(line, ".text           0x%08x 0x%x", base, size) == 2)
-			{
-				result = 1;
-				break;
-			}
-
-	fclose(map);
-	return result;
-}
-#endif
 
 
 #if ENABLE_PROFILER
@@ -753,11 +838,13 @@ typedef struct _map_entry map_entry;
 
 struct _map_entry
 {
-	UINT32 start;
-	UINT32 end;
-	UINT32 hits;
+	FPTR start;
+	FPTR end;
+	UINT64 hits;
 	char *name;
 };
+
+
 
 //============================================================
 //  LOCAL VARIABLES
@@ -833,15 +920,10 @@ static void parse_map_file(void)
 		}
 
 		/* look for symbols */
-		else if (!strncmp(line, "                0x", 18))
-		{
-			char symbol[1024];
-			UINT32 addr;
-			if (sscanf(line, "                0x%08x %s", &addr, symbol) == 2)
-			{
-				add_symbol_map_entry(addr, symbol);
-			}
-		}
+		FPTR addr;
+		const char *symbol = line_to_symbol(line, addr);
+		if (symbol != NULL)
+			add_symbol_map_entry(addr, symbol);
 	}
 
 	/* add a symbol for end-of-memory */
@@ -952,22 +1034,24 @@ static void start_profiler(void)
 {
 	HANDLE currentThread;
 	BOOL result;
+	
+	assert_always(
 
 	// parse the map file, if present
 	parse_map_file();
 
-	/* do the dance to get a handle to ourself */
+	// do the dance to get a handle to ourself
 	result = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &currentThread,
 			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
 	assert_always(result, "Failed to get thread handle for main thread");
 
 	profiler_thread_exit = 0;
 
-	/* start the thread */
+	// start the thread
 	profiler_thread = CreateThread(NULL, 0, profiler_thread_entry, (LPVOID)currentThread, 0, &profiler_thread_id);
 	assert_always(profiler_thread, "Failed to create profiler thread\n");
 
-	/* max out the priority */
+	// max out the priority
 	SetThreadPriority(profiler_thread, THREAD_PRIORITY_TIME_CRITICAL);
 }
 
@@ -984,7 +1068,10 @@ static void stop_profiler(void)
 	output_symbol_list(stderr);
 	free_symbol_map();
 }
+
 #else
+
 static void start_profiler(void) {}
 static void stop_profiler(void) {}
+
 #endif

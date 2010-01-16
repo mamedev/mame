@@ -403,8 +403,8 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 
 		for(int scanline = 0; scanline < scr_height; scanline++)
 		{
-			UINT32 tilemap_line[width];
-			UINT32 scr_line[scr_width];
+			UINT32 tilemap_line[32 * 16];
+			UINT32 scr_line[64*8];
 
 			/* zoomy and 'wibbly' effects - extract an entire row from tilemap */
 			profiler_mark_start(PROFILER_USER2);

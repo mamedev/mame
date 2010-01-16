@@ -90,7 +90,7 @@ union generic_ptr
 
 
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
-typedef union
+union PAIR
 {
 #ifdef LSB_FIRST
 	struct { UINT8 l,h,h2,h3; } b;
@@ -105,11 +105,11 @@ typedef union
 #endif
 	UINT32 d;
 	INT32 sd;
-} PAIR;
+};
 
 
 // PAIR64 is a 64-bit extension of a PAIR
-typedef union
+union PAIR64
 {
 #ifdef LSB_FIRST
 	struct { UINT8 l,h,h2,h3,h4,h5,h6,h7; } b;
@@ -128,7 +128,7 @@ typedef union
 #endif
 	UINT64 q;
 	INT64 sq;
-} PAIR64;
+};
 
 
 
