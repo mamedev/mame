@@ -159,6 +159,7 @@ DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
 SYNC_IMPLEMENTATION = ntc
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
+SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
 ifdef BIGENDIAN
@@ -464,7 +465,7 @@ $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLMAIN)
+testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
