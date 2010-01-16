@@ -414,10 +414,10 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 			/* very slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
 			profiler_mark_start(PROFILER_USER3);
 			if(bg_zoom[scanline]) {
-				int jj = 0x10000 << 6; // ensure +ve for mod
+				int jj = 0x10000 << 8; // ensure +ve for mod
 				for(int ii = 0; ii < scr_width; ii++) {
-					scr_line[ii] = tilemap_line[(int)((jj>>6) - bg_scrollx[scanline]) % width];
-					jj += (1<<6) + bg_zoom[scanline]; /* This is a guess, will need to verify on my board. not 6.10 like the sprites */
+					scr_line[ii] = tilemap_line[(int)((jj>>8) - bg_scrollx[scanline]) % width];
+					jj += (1<<8) - bg_zoom[scanline]; /* This is a guess, will need to verify on my board. not 6.10 like the sprites */
 				}
 			}
 			else {
