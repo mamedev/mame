@@ -414,13 +414,6 @@ const device_contract *device_get_contract(const device_config *device, const ch
 
 
 
-/* ----- type-based device access ----- */
-
-/* retrieve a child device configuration based on a tag */
-const device_config *device_find_child_by_tag(const device_config *owner, const char *tag);
-
-
-
 /* ----- live device management ----- */
 
 /* "attach" a running_machine to its list of devices */

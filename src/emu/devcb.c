@@ -54,7 +54,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 		const device_config *cpu;
 
 		if (device->owner != NULL)
-			cpu = device_find_child_by_tag(device->owner, config->tag);
+			cpu = device->owner->subdevice(config->tag);
 		else
 			cpu = device->machine->device(config->tag);
 
@@ -75,7 +75,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
 		else if (device->owner != NULL)
-			resolved->target = device_find_child_by_tag(device->owner, config->tag);
+			resolved->target = device->owner->subdevice(config->tag);
 		else
 			resolved->target = device->machine->device(config->tag);
 
@@ -141,7 +141,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		const device_config *cpu;
 
 		if (device->owner != NULL)
-			cpu = device_find_child_by_tag(device->owner, config->tag);
+			cpu = device->owner->subdevice(config->tag);
 		else
 			cpu = device->machine->device(config->tag);
 
@@ -162,7 +162,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		const device_config *cpu;
 
 		if (device->owner != NULL)
-			cpu = device_find_child_by_tag(device->owner, config->tag);
+			cpu = device->owner->subdevice(config->tag);
 		else
 			cpu = device->machine->device(config->tag);
 
@@ -181,7 +181,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
 		else if (device->owner != NULL)
-			resolved->target = device_find_child_by_tag(device->owner, config->tag);
+			resolved->target = device->owner->subdevice(config->tag);
 		else
 			resolved->target = device->machine->device(config->tag);
 
@@ -241,7 +241,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 		const device_config *cpu;
 
 		if (device->owner != NULL)
-			cpu = device_find_child_by_tag(device->owner, config->tag);
+			cpu = device->owner->subdevice(config->tag);
 		else
 			cpu = device->machine->device(config->tag);
 
@@ -312,7 +312,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 		const device_config *cpu;
 
 		if (device->owner != NULL)
-			cpu = device_find_child_by_tag(device->owner, config->tag);
+			cpu = device->owner->subdevice(config->tag);
 		else
 			cpu = device->machine->device(config->tag);
 

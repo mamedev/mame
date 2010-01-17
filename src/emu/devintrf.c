@@ -324,22 +324,6 @@ device_config *device_list::find(device_class devclass, int index) const
 
 
 
-/*-------------------------------------------------
-    device_find_child_by_tag - retrieve a child
-    device configuration based on a tag
--------------------------------------------------*/
-
-const device_config *device_find_child_by_tag(const device_config *owner, const char *tag)
-{
-	assert(owner != NULL);
-	assert(tag != NULL);
-
-	astring tempstring;
-	return owner->machine->config->devicelist.find(device_build_tag(tempstring, owner, tag));
-}
-
-
-
 /***************************************************************************
     LIVE DEVICE MANAGEMENT
 ***************************************************************************/
