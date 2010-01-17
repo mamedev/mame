@@ -65,6 +65,7 @@ CPUS += TMS57002
 CPUS += CCPU
 CPUS += ADSP21XX
 CPUS += ASAP
+CPUS += AM29000
 CPUS += UPD7810
 CPUS += ARM
 CPUS += ARM7
@@ -1566,7 +1567,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/magictg.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
-	$(DRIVERS)/micro3d.o \
+	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/mil4000.o \
 	$(DRIVERS)/miniboy7.o \

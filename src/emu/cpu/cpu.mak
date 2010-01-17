@@ -214,6 +214,22 @@ $(CPUOBJ)/asap/asap.o:	$(CPUSRC)/asap/asap.c \
 
 
 #-------------------------------------------------
+# AMD Am29000
+#-------------------------------------------------
+
+ifneq ($(filter AM29000,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/am29000
+CPUOBJS += $(CPUOBJ)/am29000/am29000.o
+DASMOBJS += $(CPUOBJ)/am29000/am29dasm.o
+endif
+
+$(CPUOBJ)/am29000/am29000.o:	$(CPUSRC)/am29000/am29000.c \
+								$(CPUSRC)/am29000/am29000.h \
+								$(CPUSRC)/am29000/am29ops.h \
+
+
+
+#-------------------------------------------------
 # Atari Jaguar custom DSPs
 #-------------------------------------------------
 

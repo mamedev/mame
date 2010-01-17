@@ -8881,7 +8881,7 @@ Other Sun games
 	DRIVER( f15se )		/* (c) 1991 Microprose Games Inc. */
 	DRIVER( f15se21 )	/* (c) 1991 Microprose Games Inc. */
 	DRIVER( botss )		/* (c) 1992 Microprose Games Inc. */
-	DRIVER( stankatk )	/* (c) 1992 Microprose Games Inc. */
+	DRIVER( tankbatl )	/* (c) 1992 Microprose Games Inc. */
 	DRIVER( dynadice )	/* ? */
 	DRIVER( atamanot )	/* (c) 1983 Yachiyo Denki / Uni Enterprize */
 	DRIVER( ssingles )	/* Yachiyo? */

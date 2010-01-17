@@ -2,241 +2,64 @@
 
     Microprose Games 3D hardware
 
-    preliminary driver by Phil Bennett
+    driver by Phil Bennett
 
     Games supported:
         * F-15 Strike Eagle [2 sets]
         * B.O.T.S.S. - Battle of the Solar System
-        * Super Tank Attack (prototype)
+        * Tank Battle (prototype)
 
     TODO:
-        * Write Am29000 CPU core
-        * Implement 3D pipeline
-        * Borrow MC68901 implementation from MESS
-        * Controls
-        * Filtered noise sound sources
-        * Volume control
-        * NVRAM
+        * DS1215 Phantom time chip
+        * DS1267 Volume control
+
+    Known issues:
+        * F-15 controls need tweaking
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms34010/tms34010.h"
+#include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/68681.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
+#include "includes/micro3d.h"
 
 
 /*************************************
  *
- *  Defines
+ *  Port definitions
  *
  *************************************/
 
-#define M68901_CLK		XTAL_4_MHz
-#define M68901_XTAL1	XTAL_4_MHz
-#define TIMERA 250
-#define TIMERB 250
-#define TIMERC 250
-#define TIMERD 250
-#define DEBUG 1
-
-#ifdef DEBUG
-#define HOST_MONITOR_DISPLAY 1
-#define VGB_MONITOR_DISPLAY 0
-#define DRMATH_MONITOR_DISPLAY 0
-#endif
-
-/* 68901 (nuke me)*/
-enum
-{
-	TMRB=0, TXERR, TBE, RXERR, RBF, TMRA, GPIP6, GPIP7,     // A Registers
-	GPIP0, GPIP1, GPIP2, GPIP3, TMRD, TMRC, GPIP4, GPIP5    // B Registers
-};
-
-/* TI UART */
-enum
-{
-	RX, TX, STATUS, SYN1, SYN2, DLE, MODE1, MODE2, COMMAND
-};
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT16	creg;
-static UINT8	m68681_tx0;
-static UINT8	sound_port_latch[4];
-
-static UINT16 *micro3d_sprite_vram;
-static UINT16 *m68901_base;
-static const device_config *duart68681;
-
-static UINT8 ti_uart[9];
-static int ti_uart_mode_cycle=0;
-static int ti_uart_sync_cycle=0;
-
-static void m68901_int_gen(running_machine *machine, int source);
-
-
-/*************************************
- *
- *  Video Hardware
- *
- *************************************/
-
-static void micro3d_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
-{
-	UINT16 *src = &micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	int coladdr = params->coladdr;
-	int x;
-	int sd_11_7 = (creg & 0x1f) << 7;
-
-	/* Copy the non-blanked portions of this scanline */
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
-	{
-		UINT16 pix = src[coladdr++ & 0x1ff];
-
-		if (pix & 0x80)
-			dest[x + 0] = sd_11_7 | (pix & 0x7f);
-		else
-			dest[x + 0] = 0;	/* 3D data */
-
-		pix >>= 8;
-
-		if (pix & 0x80)
-			dest[x + 1] = sd_11_7 | (pix & 0x7f);
-		else
-			dest[x + 1] = 0;	/* 3D data */
-	}
-}
-
-static WRITE16_HANDLER( paletteram_w )
-{
-	UINT16 word;
-
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	word = space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine, offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
-}
-
-static WRITE16_HANDLER( creg_w )
-{
-	// TODO: Clear interrupt?
-	// GSWOP?
-	creg = data;
-}
-
-static void tms_interrupt(const device_config *device, int state)
-{
-	m68901_int_gen(device->machine, GPIP4);
-}
-
-static INTERRUPT_GEN( micro3d_vblank )
-{
-	m68901_int_gen(device->machine, GPIP7);
-}
-
-
-/*************************************
- *
- *  68681 DUART Functions
- *
- *************************************/
-
-static void duart_irq_handler(const device_config *device, UINT8 vector)
-{
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 3, HOLD_LINE, vector);
-};
-
-static void duart_tx(const device_config *device, int channel, UINT8 data)
-{
-	if (channel == 0)
-	{
-		mame_printf_debug("%c", data);
-	}
-	else
-	{
-		m68681_tx0 = data;
-		cputag_set_input_line(device->machine, "audiocpu", MCS51_RX_LINE, HOLD_LINE);
-	}
-};
-
-static int data_to_i8031(const device_config *device)
-{
-	return m68681_tx0;
-}
-
-static void data_from_i8031(const device_config *device, int data)
-{
-	duart68681_rx_data(duart68681, 1, data);
-}
-
-/*
- * 0: Monitor port P4
- * 1: 5V
- * 2: /AM29000 present
- * 3: /TMS34010 present
- * 4: -
- * 5: -
- */
-static UINT8 duart_input_r(const device_config *device)
-{
-	return 0x2;
-}
-
-/*
- * 5: /I8051 reset
- * 7: Status LED
-*/
-static void duart_output_w(const device_config *device, UINT8 data)
-{
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-/*************************************
- *
- *  Port Definitions
- *
- *************************************/
-
-static INPUT_PORTS_START( f15se )
+static INPUT_PORTS_START( micro3d )
 	PORT_START("INPUTS_A_B")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0000, DEF_STR(On) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0000, DEF_STR(On) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0004, 0x0000, "Shared Memory Handshake Test")
-	PORT_DIPSETTING(      0x0000, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0004, DEF_STR(On) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0000, "Dr. Math Monitor Mode")
-	PORT_DIPSETTING(      0x0000, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0008, DEF_STR(On) )
-	PORT_DIPNAME( 0x0010, 0x0000, "Burn-in Tests")
-	PORT_DIPSETTING(      0x0000, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0010, DEF_STR(On))
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, "Burn-in Tests" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ))
 	PORT_DIPNAME( 0x0020, 0x0000, "Manufacturing Tests")
-	PORT_DIPSETTING(      0x0000, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0020, DEF_STR(On) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0000, DEF_STR(On) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, "Host Monitor Mode")
-	PORT_DIPSETTING(      0x0000, DEF_STR(Off) )
-	PORT_DIPSETTING(      0x0080, DEF_STR(On) )
-
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
-	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNUSED ) // TODO
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 
 	PORT_START("VGB_SW")
 	PORT_DIPNAME( 0x0008, 0x0008, "VGB Monitor Mode")
@@ -246,349 +69,171 @@ static INPUT_PORTS_START( f15se )
 	PORT_START("SOUND_SW")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
 
+	PORT_START("VOLUME")
+	PORT_ADJUSTER(100, "Volume")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( f15se )
+	PORT_INCLUDE( micro3d )
+
+	PORT_MODIFY("INPUTS_A_B")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Decoy")
+	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
+	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("INPUTS_C_D")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Target Select")
+	PORT_BIT( 0x88ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* Analog Inputs... */
+	PORT_START("JOYSTICK_X")
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xc1, 0xc0) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE
+
+	PORT_START("JOYSTICK_Y")
+	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xc1, 0x0c0) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+
+	PORT_START("THROTTLE")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss )
-	PORT_INCLUDE(f15se)
-	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_INCLUDE( micro3d )
 
-	PORT_MODIFY("INPUTS_C_D")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_MODIFY("INPUTS_A_B")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Shield")
+	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+
+	PORT_START("INPUTS_C_D")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle down")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blaster")
+	PORT_BIT( 0xccf5, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( stankatk )
-	PORT_INCLUDE(f15se)
+static INPUT_PORTS_START( tankbatl )
+	PORT_INCLUDE( micro3d )
+
 	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )
+	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("INPUTS_C_D")
-	PORT_BIT( 0xf8ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-//  PORT_BITX( 0x0800, IP_ACTIVE_LOW, 0, "Unk2", KEYCODE_S, IP_JOY_NONE )
+	PORT_START("INPUTS_C_D")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 
-//  PORT_BITX( 0x0010, IP_ACTIVE_LOW, 0, "Yellow Upper Right", KEYCODE_Y, IP_JOY_NONE )
-//  PORT_BITX( 0x0020, IP_ACTIVE_LOW, 0, "Yellow Lower Right", KEYCODE_X, IP_JOY_NONE )
-//  PORT_BITX( 0x0040, IP_ACTIVE_LOW, 0, "Unk2", KEYCODE_R, IP_JOY_NONE )
-//  PORT_BITX( 0x0080, IP_ACTIVE_LOW, 0, "Unkn3", KEYCODE_T, IP_JOY_NONE )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-//  PORT_BITX( 0x0001, IP_ACTIVE_HIGH, 0, "Blue Top Right", KEYCODE_Z, IP_JOY_NONE )  // ??
-//  PORT_BITX( 0x0002, IP_ACTIVE_HIGH, 0, "Blue Top Right", KEYCODE_Z, IP_JOY_NONE )
-//  PORT_BITX( 0x0004, IP_ACTIVE_LOW, 0, "Blue Top Right", KEYCODE_D, IP_JOY_NONE )
-//  PORT_BITX( 0x0008, IP_ACTIVE_HIGH, 0, "Blue Top Right", KEYCODE_Z, IP_JOY_NONE )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
-//  PORT_BITX( 0x1000, IP_ACTIVE_LOW, 0, "Unk2", KEYCODE_I,Y IP_JOY_NONE )
-//  PORT_BITX( 0x2000, IP_ACTIVE_LOW, 0, "Blue Trigger", KEYCODE_H, IP_JOY_NONE )
-//  PORT_BITX( 0x4000, IP_ACTIVE_LOW, 0, "Unkn3", KEYCODE_J, IP_JOY_NONE )
-//  PORT_BITX( 0x8000, IP_ACTIVE_LOW, 0, "Yellow Trigger", KEYCODE_G, IP_JOY_NONE )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 /*************************************
  *
- *  Worst 68901 Implementation Ever
- *
- *************************************/
-
-static TIMER_CALLBACK( timera_int )
-{
-	timer_set(machine, ATTOTIME_IN_USEC(1000), NULL,0,timera_int);
-	m68901_int_gen(machine, TMRA);
-}
-
-static TIMER_CALLBACK( timerd_int )
-{
-	timer_set(machine, ATTOTIME_IN_USEC(250), NULL,0,timerd_int);
-	m68901_int_gen(machine, TMRD);           // Fire an interrupt.
-}
-
-static void m68901_int_gen(running_machine *machine, int source)
-{
-	/* WTF is all this... */
-	int IEN_REG=3+(int)(source / 8);
-	int IPEND_REG=5+(int)(source / 8);       // Makes things a little clearer.
-	int IMASK_REG=9+(int)(source / 8);
-	int bit = 1 << (source - 8*(int)(source / 8));
-
-	if (m68901_base[IEN_REG] & (bit << 8))                // If interrupt is enabled by MFD, set interrupt pending bit.
-	{
-		m68901_base[IPEND_REG] = m68901_base[IPEND_REG] | (bit<<8);
-		//  logerror("M68901 interrupt %d now pending (%d) \n",source, IPEND_REG);
-	}
-
-	if (m68901_base[IMASK_REG] & (bit << 8))              // If interrupt is not masked by MFD, trigger a 68k INT
-	{
-		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
-		//    logerror("M68901 interrupt %d serviced.\n",source);
-	}
-}
-
-static WRITE16_HANDLER( m68901_w )
-{
-//  UINT8 value = (data >> 8) & 0xff;
-	m68901_base[offset] = data;
-
-	switch (offset)
-	{
-		case 0x0c:
-		case 0x0d:
-		case 0x0e:
-			break;
-
-		case 0x0f:
-			/* Very dodgy */
-			timer_set(space->machine, ATTOTIME_IN_USEC(1000), NULL, 0, timera_int);
-			break;
-
-		case 0x10:
-		case 0x11:
-			break;
-
-		case 0x12:
-			/* Aargh! */
-			timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, timerd_int);
-			break;
-	}
-}
-
-
-/*************************************
- *
- *  SCN2651
- *
- *************************************/
-
-static WRITE16_HANDLER( ti_uart_w )
-{
-	// Need to initalise values to 0 on reset.
-	switch (offset)
-	{
-		case 0x0:
-		{
-			ti_uart[TX] = data;
-#if VGB_MONITOR_DISPLAY
-			mame_printf_debug("%c",data);
-#endif
-			ti_uart[STATUS] |= 1;
-			break;
-		}
-		case 0x1:
-		{
-			if (ti_uart_mode_cycle == 0)
-			{
-				ti_uart[MODE1] = data;
-				ti_uart_mode_cycle = 1;
-			}
-			else
-			{
-				ti_uart[MODE2] = data;
-				ti_uart_mode_cycle = 0;
-			}
-			break;
-		}
-		case 0x2:
-		{
-			if (ti_uart_sync_cycle == 0)
-			{
-				ti_uart[SYN1] = data;
-				ti_uart_mode_cycle = 1;
-			}
-			else if (ti_uart_sync_cycle == 1)
-			{
-				ti_uart[SYN2] = data;
-				ti_uart_mode_cycle = 2;
-			}
-			else
-			{
-				ti_uart[DLE] = data;
-				ti_uart_mode_cycle = 0;
-			}
-			break;
-		}
-		case 0x3:
-		{
-			ti_uart[COMMAND] = data;
-			ti_uart_mode_cycle = ti_uart_sync_cycle = 0;
-			break;
-		}
-	}
-}
-
-static READ16_HANDLER( ti_uart_r )
-{
-	switch (offset)
-	{
-		case 0x0:
-		{
-			ti_uart[STATUS] ^= 2;
-			return ti_uart[RX];
-		}
-		case 0x1:
-		{
-			if (ti_uart_mode_cycle == 0)
-			{
-				ti_uart_mode_cycle = 1;
-				return ti_uart[MODE1];
-			}
-			else
-			{
-				ti_uart_mode_cycle = 0;
-				return ti_uart[MODE2];
-			}
-		}
-		case 0x2:
-		{
-			return ti_uart[STATUS];
-		}
-		case 0x3:
-		{
-			ti_uart_mode_cycle = ti_uart_sync_cycle = 0;
-			return ti_uart[COMMAND];
-		}
-		default:
-		{
-			logerror("Unknown TI UART access.\n");
-			return 0;
-		}
-	}
-}
-
-
-/*************************************
- *
- *  TMS34010 Host Interface
- *
- *************************************/
-
-static READ16_HANDLER( tms_host_r )
-{
-	return tms34010_host_r(devtag_get_device(space->machine, "vgb"), offset);
-}
-
-static WRITE16_HANDLER( tms_host_w )
-{
-	tms34010_host_w(devtag_get_device(space->machine, "vgb"), offset, data);
-}
-
-
-/*************************************
- *
- *  Sound
- *
- *************************************/
-
-/***************************************************************************
-
-    8031 port mappings:
-
-    Port 1                          Port 2
-    =======                         ======
-    0: S/H sel A     (O)            0:
-    1: S/H sel B     (O)            1:
-    2: S/H sel C     (O)            2: uPD bank select (O)
-    3: S/H en        (O)            3: /uPD busy       (I)
-    4: DS1267 data   (O)            4: /uPD reset      (O)
-    5: DS1267 clock  (O)            5: Watchdog reset  (O)
-    6: /DS1267 reset (O)            6:
-    7: Test SW       (I)            7:
-
-***************************************************************************/
-
-static WRITE8_HANDLER( sound_io_w )
-{
-	sound_port_latch[offset] = data;
-
-	switch (offset)
-	{
-		case 0x01:
-		{
-			break;
-		}
-		case 0x03:
-		{
-			const device_config *upd = devtag_get_device(space->machine, "upd7759");
-			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
-			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
-			break;
-		}
-	}
-}
-
-static READ8_HANDLER( sound_io_r )
-{
-	switch (offset)
-	{
-		case 0x01:	return (sound_port_latch[offset] & 0x7f) | input_port_read_safe(space->machine, "SOUND_SW", 0);
-		case 0x03:	return (sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(devtag_get_device(space->machine, "upd7759")) ? 0x08 : 0);
-		default:	return 0;
-	}
-}
-
-static WRITE8_DEVICE_HANDLER( upd7759_port_start_w )
-{
-	upd7759_port_w(device, 0, data);
-	upd7759_start_w(device, 0);
-	upd7759_start_w(device, 1);
-}
-
-
-/*************************************
- *
- *  Memory Maps
+ *  Host memory map
  *
  *************************************/
 
 static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x13ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM					/* Battery-backed SRAM (64kB) & DS1215 */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM					/* 68000/AM29000 shared RAM (256kB) */
-	AM_RANGE(0x900000, 0x900001) AM_NOP					/* ??????? 16-bit write here. rset? */
+	AM_RANGE(0x000000, 0x143fff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(micro3d_state, shared_ram)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(host_drmath_int_w)
 	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("INPUTS_C_D")
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("INPUTS_A_B")
-	AM_RANGE(0x960000, 0x960001) AM_NOP					/* Lamps */
-	AM_RANGE(0x980000, 0x980001) AM_RAM					/* ADC0844 */
-	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(tms_host_r, tms_host_w)
-	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP					/* ????? Write: 80, A0 and 00 (8-bit high byte) */
-	AM_RANGE(0x9e0000, 0x9e00cf) AM_RAM_WRITE(m68901_w) AM_BASE(&m68901_base)
+	AM_RANGE(0x960000, 0x960001) AM_WRITE(micro3d_reset_w)
+	AM_RANGE(0x980000, 0x980001) AM_READWRITE(micro3d_adc_r, micro3d_adc_w)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
+	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP					/* Lamps */
+	AM_RANGE(0x9e0000, 0x9e002f) AM_READWRITE(micro3d_mc68901_r, micro3d_mc68901_w)
 	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff00)
-	AM_RANGE(0xa20000, 0xa20001) AM_RAM					/* XY joystick input - sign? */
-	AM_RANGE(0xa40002, 0xa40003) AM_RAM					/* XY joystick input - actual values */
+	AM_RANGE(0xa20000, 0xa20001) AM_READ(micro3d_encoder_h_r)
+	AM_RANGE(0xa40002, 0xa40003) AM_READ(micro3d_encoder_l_r)
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Video memory map
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&micro3d_sprite_vram)
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_MEMBER(micro3d_state, micro3d_sprite_vram)
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
-	AM_RANGE(0x00e00000, 0x00e0000f) AM_NOP				/* XFER3dk???? 16-bit write */
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(creg_w)
-	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)
-	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)
+	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(micro3d_clut_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(micro3d_creg_w)
+	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(micro3d_ti_uart_r)
+	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(micro3d_ti_uart_w)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION("tms_gfx", 0)
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION("tms34010", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("tms34010", 0)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Dr. Math memory map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( drmath_prg, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( drmath_data, ADDRESS_SPACE_DATA, 32 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("drmath", 0)
+	AM_RANGE(0x00800000, 0x0083ffff) AM_READWRITE(micro3d_shared_r, micro3d_shared_w)
+	AM_RANGE(0x00400000, 0x004fffff) AM_RAM
+	AM_RANGE(0x00500000, 0x005fffff) AM_RAM
+	AM_RANGE(0x00a00000, 0x00a00003) AM_WRITE(drmath_int_w)
+	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(micro3d_mac1_w)
+	AM_RANGE(0x01000004, 0x01000007) AM_READWRITE(micro3d_mac2_r, micro3d_mac2_w)
+	AM_RANGE(0x01200000, 0x01203fff) AM_RAM AM_BASE_MEMBER(micro3d_state, mac_sram)
+	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(micro3d_pipe_r, micro3d_fifo_w)
+	AM_RANGE(0x01600000, 0x01600003) AM_WRITE(drmath_intr2_ack)
+	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(micro3d_alt_fifo_w)
+	AM_RANGE(0x03fffff0, 0x03fffff7) AM_READWRITE(micro3d_scc_r, micro3d_scc_w)
+ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Sound memory map
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -597,10 +242,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0xfd00, 0xfd01) AM_DEVREADWRITE("ym2151", ym2151_r, ym2151_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("upd7759", upd7759_port_start_w)
-	AM_RANGE(0xff00, 0xff00) AM_NOP		/* DAC A */
-	AM_RANGE(0xff01, 0xff01) AM_NOP		/* DAC B */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(sound_io_r,sound_io_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("upd7759", micro3d_upd7759_w)
+	AM_RANGE(0xff00, 0xff00) AM_WRITE(micro3d_snd_dac_a)
+	AM_RANGE(0xff01, 0xff01) AM_WRITE(micro3d_snd_dac_b)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(micro3d_sound_io_r, micro3d_sound_io_w)
 ADDRESS_MAP_END
 
 
@@ -617,36 +262,29 @@ static const tms34010_config vgb_config =
 	XTAL_40MHz / 8,					/* pixel clock */
 	4,								/* pixels per clock */
 	micro3d_scanline_update,		/* scanline updater */
-	tms_interrupt,					/* Generate interrupt */
+	micro3d_tms_interrupt,			/* Generate interrupt */
 	NULL,
 	NULL
 };
 
 static const duart68681_config micro3d_duart68681_config =
 {
-	duart_irq_handler,
-	duart_tx,
-	duart_input_r,
-	duart_output_w
+	micro3d_duart_irq_handler,
+	micro3d_duart_tx,
+	micro3d_duart_input_r,
+	micro3d_duart_output_w
 };
 
 
 /*************************************
  *
- *  Machine drivers
+ *  Machine driver
  *
  *************************************/
 
-static MACHINE_RESET( micro3d )
-{
-	/* TODO: Check. Also do this for the other CPUs? */
-//  cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-
-	creg = 0;
-	ti_uart[STATUS] = 1;
-}
-
 static MACHINE_DRIVER_START( micro3d )
+	MDRV_DRIVER_DATA(micro3d_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(hostmem)
 	MDRV_CPU_VBLANK_INT("screen", micro3d_vblank)
@@ -655,6 +293,10 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_CPU_CONFIG(vgb_config)
 	MDRV_CPU_PROGRAM_MAP(vgbmem)
 
+	MDRV_CPU_ADD("drmath", AM29000, XTAL_32MHz / 2)
+	MDRV_CPU_PROGRAM_MAP(drmath_prg)
+	MDRV_CPU_DATA_MAP(drmath_data)
+
 	MDRV_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg)
 	MDRV_CPU_IO_MAP(soundmem_io)
@@ -662,6 +304,7 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
 
 	MDRV_MACHINE_RESET(micro3d)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_QUANTUM_TIME(HZ(3000))
 
 	MDRV_PALETTE_LENGTH(4096)
@@ -670,84 +313,28 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
 
+	MDRV_VIDEO_START(micro3d)
+	MDRV_VIDEO_RESET(micro3d)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("upd7759", UPD7759, XTAL_640kHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
 	MDRV_SOUND_ADD("ym2151", YM2151, XTAL_3_579545MHz)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+
+	MDRV_SOUND_ADD("noise_1", MICRO3D, 0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MDRV_SOUND_ADD("noise_2", MICRO3D, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
-
-
-/*************************************
- *
- *  Driver Initialisation
- *
- *************************************/
-
-static DRIVER_INIT( micro3d )
-{
-	i8051_set_serial_tx_callback(devtag_get_device(machine, "audiocpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(devtag_get_device(machine, "audiocpu"), data_to_i8031);
-
-	duart68681 = devtag_get_device( machine, "duart68681" );
-}
-
-static DRIVER_INIT( stankatk )
-{
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-
-	rom[0x1f543] = 0x4e71;
-	rom[0x1f546] = 0x4e71;
-	rom[0x1f596] = 0x4e71;
-	rom[0x2182b] = 0x6006; /* Skip AM2k object download */
-	rom[0x21838] = 0x4e71;
-	rom[0x1f692] = 0x4e71;
-	rom[0x21ca8] = 0x4e71; /* Lie that trig table is intact */
-	rom[0x21c60] = 0x4e71; /* Lie that tree is intact */
-	rom[0x1f581] = 0x4e71;
-	rom[0x21905] = 0x4e71;
-
-	DRIVER_INIT_CALL(micro3d);
-}
-
-static DRIVER_INIT( botss )
-{
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-
-	rom[0x1fcc0] = 0x4e71; /* Eliminate startup Am29000 timeout */
-	rom[0x1fbf0] = 0x4e71; /* Skip AM29k code version detect */
-	rom[0x1fC88] = 0x4e71;
-	rom[0x23146] = 0x4e71;
-	rom[0x17f4f] = 0x6006; /* Skip download objects */
-	rom[0x17f5b] = 0x4e71;
-
-	DRIVER_INIT_CALL(micro3d);
-}
-
-static DRIVER_INIT( f15se )
-{
-	DRIVER_INIT_CALL(micro3d);
-}
-
-static DRIVER_INIT( f15se21 )
-{
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-
-	rom[0x2a8b3] = 0x6006;
-	rom[0x2a8bf] = 0x4e71;
-	rom[0x28ad1] = 0x4e71;
-	rom[0x28a9e] = 0x4e71;
-	rom[0x28abd] = 0x4e71;
-	rom[0x28c3b] = 0x4e71;
-
-	DRIVER_INIT_CALL(micro3d);
-}
 
 
 /*************************************
@@ -756,38 +343,38 @@ static DRIVER_INIT( f15se21 )
  *
  *************************************/
 
-/* TODO: IC locations */
-/* NOTE: Dr. Math and sound PCB ROMs are not dumped and may be different to v2.1 */
 ROM_START( f15se )
 	/* Host PCB (MPG DW-00011C-0011-01) */
-	ROM_REGION( 0x140000, "maincpu", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "host.u67", 0x000001, 0x20000, CRC(8f495ceb) SHA1(90998ad67e76928ed1a6cae56038b98d1aa2e7b0) )
 	ROM_LOAD16_BYTE( "host.u91", 0x000000, 0x20000, CRC(dfae5ec3) SHA1(29306eed5047e39a0a2350e61ab7126a84cb710b) )
 	ROM_LOAD16_BYTE( "host.u68", 0x040001, 0x20000, CRC(685fc355) SHA1(5bfe015a8deccb66e3317154d715f490f00ace74) )
 	ROM_LOAD16_BYTE( "host.u92", 0x040000, 0x20000, CRC(8f7bb2eb) SHA1(1923d55d66da0fbc158b4f90bcc98c88955953ea) )
+
 	ROM_LOAD16_BYTE( "004.hst",  0x080001, 0x20000, CRC(81671ce1) SHA1(51ff641ccbc9dea640a62944910abe73d796b062) )
 	ROM_LOAD16_BYTE( "005.hst",  0x080000, 0x20000, CRC(bdaa7db5) SHA1(52cd832cdd44e609e8cd269469b806e2cd27d63d) )
 	ROM_LOAD16_BYTE( "host.u70", 0x0c0001, 0x20000, CRC(251e92d2) SHA1(a20279089af1f738ba912f90a4d048d4e58795fe) )
 	ROM_LOAD16_BYTE( "007.hst",  0x0c0000, 0x20000, CRC(36e06cba) SHA1(5ffee5da6f475978be10fa5e1a2c24f00497ea5f) )
 	ROM_LOAD16_BYTE( "008.hst",  0x100001, 0x20000, CRC(d96fd4e2) SHA1(001af758da437e955b4ee914eabeb9739ebc4454) )
 	ROM_LOAD16_BYTE( "009.hst",  0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
+	ROM_FILL(                    0x140000, 0x40000, 0xff )
 
 	/* Dr Math PCB (MPG 010-00002-001) */
-	ROM_REGION32_LE( 0x80000, "am29000", 0 )
-	ROMX_LOAD( "124.dth", 0x00000, 0x08000, CRC(7be96646) SHA1(a6733f75c0404282d71e8c1a287546ef4d9d42ad), ROM_SKIP(7) )
-	ROMX_LOAD( "123.dth", 0x00001, 0x08000, CRC(54d5544f) SHA1(d039ee39991b947a7483111359ab245fc104e060), ROM_SKIP(7) )
-	ROMX_LOAD( "125.dth", 0x00002, 0x08000, CRC(7718487c) SHA1(609106f55601f84095b64ce2484107779da89149), ROM_SKIP(7) )
-	ROMX_LOAD( "122.dth", 0x00003, 0x08000, CRC(9d2032cf) SHA1(8430816756ea92bbe86b94eaa24a6071bf0ef879), ROM_SKIP(7) )
-	ROMX_LOAD( "120.dth", 0x00004, 0x08000, CRC(5fb9836d) SHA1(d511aa9f02972a7f475c82c6f57d1f3fd4f118fa), ROM_SKIP(7) )
-	ROMX_LOAD( "119.dth", 0x00005, 0x08000, CRC(b1c966e5) SHA1(9703bb1f9bdf6a779b59daebb39df2926727fa76), ROM_SKIP(7) )
-	ROMX_LOAD( "121.dth", 0x00006, 0x08000, CRC(392e5c43) SHA1(455cf3bb3c16217e58d6eea51d8f49a5bed1955e), ROM_SKIP(7) )
-	ROMX_LOAD( "118.dth", 0x00007, 0x08000, CRC(cc895c20) SHA1(140ef47536914fe1441778e759894c2cdd893276), ROM_SKIP(7) )
+	ROM_REGION32_BE( 0x100000, "drmath", 0 )
+	ROMX_LOAD( "122.dth", 0x00000, 0x08000, CRC(9d2032cf) SHA1(8430816756ea92bbe86b94eaa24a6071bf0ef879), ROM_SKIP(7) )
+	ROMX_LOAD( "125.dth", 0x00001, 0x08000, CRC(7718487c) SHA1(609106f55601f84095b64ce2484107779da89149), ROM_SKIP(7) )
+	ROMX_LOAD( "123.dth", 0x00002, 0x08000, CRC(54d5544f) SHA1(d039ee39991b947a7483111359ab245fc104e060), ROM_SKIP(7) )
+	ROMX_LOAD( "124.dth", 0x00003, 0x08000, CRC(7be96646) SHA1(a6733f75c0404282d71e8c1a287546ef4d9d42ad), ROM_SKIP(7) )
+	ROMX_LOAD( "118.dth", 0x00004, 0x08000, CRC(cc895c20) SHA1(140ef47536914fe1441778e759894c2cdd893276), ROM_SKIP(7) )
+	ROMX_LOAD( "121.dth", 0x00005, 0x08000, CRC(392e5c43) SHA1(455cf3bb3c16217e58d6eea51d8f49a5bed1955e), ROM_SKIP(7) )
+	ROMX_LOAD( "119.dth", 0x00006, 0x08000, CRC(b1c966e5) SHA1(9703bb1f9bdf6a779b59daebb39df2926727fa76), ROM_SKIP(7) )
+	ROMX_LOAD( "120.dth", 0x00007, 0x08000, CRC(5fb9836d) SHA1(d511aa9f02972a7f475c82c6f57d1f3fd4f118fa), ROM_SKIP(7) )
 
-	ROM_REGION16_LE( 0x80000, "vertex", 0 )
-	ROM_LOAD16_BYTE( "014.dth", 0x00000, 0x20000, CRC(5ca7713f) SHA1(ac7b9629684b99ecfb1945176b06eb6be284ba93) )
-	ROM_LOAD16_BYTE( "015.dth", 0x00001, 0x20000, CRC(beae31bb) SHA1(1ab80a6b99eea6d5bf9b1bce58ecca13042c77a6) )
-	ROM_LOAD16_BYTE( "016.dth", 0x20000, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
-	ROM_LOAD16_BYTE( "017.dth", 0x20001, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
+	ROM_REGION16_BE( 0x80000, "vertex", 0 )
+	ROM_LOAD16_BYTE( "014.dth", 0x00001, 0x20000, CRC(5ca7713f) SHA1(ac7b9629684b99ecfb1945176b06eb6be284ba93) )
+	ROM_LOAD16_BYTE( "015.dth", 0x00000, 0x20000, CRC(beae31bb) SHA1(1ab80a6b99eea6d5bf9b1bce58ecca13042c77a6) )
+	ROM_LOAD16_BYTE( "016.dth", 0x40001, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
+	ROM_LOAD16_BYTE( "017.dth", 0x40000, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
 
 	/* Video Graphics PCB (MPG DW-010-00003-001) */
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
@@ -812,17 +399,19 @@ ROM_END
 
 ROM_START( f15se21 )
 	/* Host PCB (MPG DW-00011C-0011-01) */
-	ROM_REGION( 0x140000, "maincpu", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "500.hst", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
 	ROM_LOAD16_BYTE( "501.hst", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
 	ROM_LOAD16_BYTE( "502.hst", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
 	ROM_LOAD16_BYTE( "503.hst", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
+
 	ROM_LOAD16_BYTE( "004.hst", 0x080001, 0x20000, CRC(81671ce1) SHA1(51ff641ccbc9dea640a62944910abe73d796b062) )
 	ROM_LOAD16_BYTE( "005.hst", 0x080000, 0x20000, CRC(bdaa7db5) SHA1(52cd832cdd44e609e8cd269469b806e2cd27d63d) )
-	ROM_LOAD16_BYTE( "006.hst", 0x0c0001, 0x20000, CRC(8eedef6d) SHA1(a1b5b53afc9ff092d86e7c7d4e357807fae3ad85) )
+	ROM_LOAD16_BYTE( "host.u70",0x0c0001, 0x20000, CRC(251e92d2) SHA1(a20279089af1f738ba912f90a4d048d4e58795fe) )
 	ROM_LOAD16_BYTE( "007.hst", 0x0c0000, 0x20000, CRC(36e06cba) SHA1(5ffee5da6f475978be10fa5e1a2c24f00497ea5f) )
 	ROM_LOAD16_BYTE( "008.hst", 0x100001, 0x20000, CRC(d96fd4e2) SHA1(001af758da437e955b4ee914eabeb9739ebc4454) )
 	ROM_LOAD16_BYTE( "009.hst", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
+	ROM_FILL(                   0x140000, 0x40000, 0xff )
 
 	/* Video Graphics PCB (MPG DW-010-00003-001) */
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
@@ -838,113 +427,112 @@ ROM_START( f15se21 )
 	ROM_LOAD16_BYTE( "002.vgb", 0x080001, 0x20000, CRC(f6488e31) SHA1(d2f9304cc59f5523007592ae76ddd56107cc29e8) )
 
 	/* Dr Math PCB (MPG 010-00002-001) */
-	ROM_REGION32_LE( 0x80000, "am29000", 0 )
-	ROMX_LOAD( "124.dth", 0x00000, 0x08000, CRC(7be96646) SHA1(a6733f75c0404282d71e8c1a287546ef4d9d42ad), ROM_SKIP(7) )
-	ROMX_LOAD( "123.dth", 0x00001, 0x08000, CRC(54d5544f) SHA1(d039ee39991b947a7483111359ab245fc104e060), ROM_SKIP(7) )
-	ROMX_LOAD( "125.dth", 0x00002, 0x08000, CRC(7718487c) SHA1(609106f55601f84095b64ce2484107779da89149), ROM_SKIP(7) )
-	ROMX_LOAD( "122.dth", 0x00003, 0x08000, CRC(9d2032cf) SHA1(8430816756ea92bbe86b94eaa24a6071bf0ef879), ROM_SKIP(7) )
-	ROMX_LOAD( "120.dth", 0x00004, 0x08000, CRC(5fb9836d) SHA1(d511aa9f02972a7f475c82c6f57d1f3fd4f118fa), ROM_SKIP(7) )
-	ROMX_LOAD( "119.dth", 0x00005, 0x08000, CRC(b1c966e5) SHA1(9703bb1f9bdf6a779b59daebb39df2926727fa76), ROM_SKIP(7) )
-	ROMX_LOAD( "121.dth", 0x00006, 0x08000, CRC(392e5c43) SHA1(455cf3bb3c16217e58d6eea51d8f49a5bed1955e), ROM_SKIP(7) )
-	ROMX_LOAD( "118.dth", 0x00007, 0x08000, CRC(cc895c20) SHA1(140ef47536914fe1441778e759894c2cdd893276), ROM_SKIP(7) )
+	ROM_REGION32_BE( 0x100000, "drmath", 0 )
+	ROMX_LOAD( "122.dth", 0x00000, 0x08000, CRC(9d2032cf) SHA1(8430816756ea92bbe86b94eaa24a6071bf0ef879), ROM_SKIP(7) )
+	ROMX_LOAD( "125.dth", 0x00001, 0x08000, CRC(7718487c) SHA1(609106f55601f84095b64ce2484107779da89149), ROM_SKIP(7) )
+	ROMX_LOAD( "123.dth", 0x00002, 0x08000, CRC(54d5544f) SHA1(d039ee39991b947a7483111359ab245fc104e060), ROM_SKIP(7) )
+	ROMX_LOAD( "124.dth", 0x00003, 0x08000, CRC(7be96646) SHA1(a6733f75c0404282d71e8c1a287546ef4d9d42ad), ROM_SKIP(7) )
+	ROMX_LOAD( "118.dth", 0x00004, 0x08000, CRC(cc895c20) SHA1(140ef47536914fe1441778e759894c2cdd893276), ROM_SKIP(7) )
+	ROMX_LOAD( "121.dth", 0x00005, 0x08000, CRC(392e5c43) SHA1(455cf3bb3c16217e58d6eea51d8f49a5bed1955e), ROM_SKIP(7) )
+	ROMX_LOAD( "119.dth", 0x00006, 0x08000, CRC(b1c966e5) SHA1(9703bb1f9bdf6a779b59daebb39df2926727fa76), ROM_SKIP(7) )
+	ROMX_LOAD( "120.dth", 0x00007, 0x08000, CRC(5fb9836d) SHA1(d511aa9f02972a7f475c82c6f57d1f3fd4f118fa), ROM_SKIP(7) )
 
-	ROM_REGION16_LE( 0x80000, "vertex", 0 )
-	ROM_LOAD16_BYTE( "014.dth", 0x00000, 0x20000, CRC(5ca7713f) SHA1(ac7b9629684b99ecfb1945176b06eb6be284ba93) )
-	ROM_LOAD16_BYTE( "015.dth", 0x00001, 0x20000, CRC(beae31bb) SHA1(1ab80a6b99eea6d5bf9b1bce58ecca13042c77a6) )
-	ROM_LOAD16_BYTE( "016.dth", 0x20000, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
-	ROM_LOAD16_BYTE( "017.dth", 0x20001, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
+	ROM_REGION16_BE( 0x80000, "vertex", 0 )
+	ROM_LOAD16_BYTE( "014.dth", 0x00001, 0x20000, CRC(5ca7713f) SHA1(ac7b9629684b99ecfb1945176b06eb6be284ba93) )
+	ROM_LOAD16_BYTE( "015.dth", 0x00000, 0x20000, CRC(beae31bb) SHA1(1ab80a6b99eea6d5bf9b1bce58ecca13042c77a6) )
+	ROM_LOAD16_BYTE( "016.dth", 0x40001, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
+	ROM_LOAD16_BYTE( "017.dth", 0x40000, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
 
 	/* Sound PCB (MPG 010-00018-002) */
 	ROM_REGION( 0x08000, "audiocpu", 0 )
-	ROM_LOAD( "4-001.snd", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
+	ROM_LOAD( "110-00004-001.u2", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
 
 	ROM_REGION( 0x40000, "upd7759", 0 )
-	ROM_LOAD( "3-001.snd", 0x000000, 0x40000, CRC(af84b635) SHA1(844e5987a66e9e3ab2d2fe05b93a4da3512776bb) )
+	ROM_LOAD( "110-00003-001.u17", 0x000000, 0x40000, CRC(af84b635) SHA1(844e5987a66e9e3ab2d2fe05b93a4da3512776bb) )
 ROM_END
 
 ROM_START( botss )
 	/* Host PCB (MPG DW-00011C-0011-02) */
-	ROM_REGION( 0x140000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "300hst.67", 0x000001, 0x20000, CRC(7f74362a) SHA1(41611ba8e6eb5d6b3dfe88e1cede7d9fb5472e40) )
-	ROM_LOAD16_BYTE( "301hst.91", 0x000000, 0x20000, CRC(a8100d1e) SHA1(69d3cac6f67563c0796560f7b874d7660720027d) )
-	ROM_LOAD16_BYTE( "302hst.68", 0x040001, 0x20000, CRC(af865ee4) SHA1(f00bce49401431bc749208399329d9f92457186b) )
-	ROM_LOAD16_BYTE( "303hst.92", 0x040000, 0x20000, CRC(15182619) SHA1(e95dcce11c0651c8e85fc0c658029f48eea35fb8) )
-	ROM_LOAD16_BYTE( "104hst.69", 0x080001, 0x20000, CRC(72a607ca) SHA1(1afc85380be12c429808c48f1502736a4c8b98e5) )
-	ROM_LOAD16_BYTE( "105hst.93", 0x080000, 0x20000, CRC(f37680ae) SHA1(51f1ee805b7d1b2b078c612c572e12846de623b9) )
-	ROM_LOAD16_BYTE( "106hst.70", 0x0c0001, 0x20000, CRC(57a1c728) SHA1(2bdc831be739ada0f4f4adec7974da453878db0e) )
-	ROM_LOAD16_BYTE( "107hst.94", 0x0c0000, 0x20000, CRC(4c9e16af) SHA1(1f8acc9bb85fe1bf459b4358b9bf9cf9847e6a36) )
-	ROM_LOAD16_BYTE( "108hst.71", 0x100001, 0x20000, CRC(cfc0333e) SHA1(9f290769129a61189870faef45c3f061eb7b5c07) )
-	ROM_LOAD16_BYTE( "109hst.95", 0x100000, 0x20000, CRC(6c595d1e) SHA1(89fdc30166ba1e9706798547195bdf6875a02e96) )
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "110-00013-300.u67", 0x000001, 0x20000, CRC(7f74362a) SHA1(41611ba8e6eb5d6b3dfe88e1cede7d9fb5472e40) )
+	ROM_LOAD16_BYTE( "110-00013-301.u91", 0x000000, 0x20000, CRC(a8100d1e) SHA1(69d3cac6f67563c0796560f7b874d7660720027d) )
+	ROM_LOAD16_BYTE( "110-00013-302.u68", 0x040001, 0x20000, CRC(af865ee4) SHA1(f00bce49401431bc749208399329d9f92457186b) )
+	ROM_LOAD16_BYTE( "110-00013-303.u92", 0x040000, 0x20000, CRC(15182619) SHA1(e95dcce11c0651c8e85fc0c658029f48eea35fb8) )
+	ROM_LOAD16_BYTE( "110-00013-104.u69", 0x080001, 0x20000, CRC(72a607ca) SHA1(1afc85380be12c429808c48f1502736a4c8b98e5) )
+	ROM_LOAD16_BYTE( "110-00013-105.u93", 0x080000, 0x20000, CRC(f37680ae) SHA1(51f1ee805b7d1b2b078c612c572e12846de623b9) )
+	ROM_LOAD16_BYTE( "110-00013-106.u70", 0x0c0001, 0x20000, CRC(57a1c728) SHA1(2bdc831be739ada0f4f4adec7974da453878db0e) )
+	ROM_LOAD16_BYTE( "110-00013-107.u94", 0x0c0000, 0x20000, CRC(4c9e16af) SHA1(1f8acc9bb85fe1bf459b4358b9bf9cf9847e6a36) )
+	ROM_LOAD16_BYTE( "110-00013-108.u71", 0x100001, 0x20000, CRC(cfc0333e) SHA1(9f290769129a61189870faef45c3f061eb7b5c07) )
+	ROM_LOAD16_BYTE( "110-00013-109.u95", 0x100000, 0x20000, CRC(6c595d1e) SHA1(89fdc30166ba1e9706798547195bdf6875a02e96) )
+	ROM_FILL(                     0x140000, 0x40000, 0xff )
 
 	/* Dr Math PCB (MPG 010-00002-001) */
-	ROM_REGION32_LE( 0x80000, "am29000", 0 )
-	ROMX_LOAD( "124dth.107", 0x000000, 0x08000, CRC(220db5d3) SHA1(3bfbe0eb97282c4ce449fd44e8e141de74f08eb0), ROM_SKIP(7) )
-	ROMX_LOAD( "123dth.114", 0x000001, 0x08000, CRC(04ba6ed1) SHA1(012be71c6b955beda2bd0ff376dcaab51b226723), ROM_SKIP(7) )
-	ROMX_LOAD( "125dth.126", 0x000002, 0x08000, CRC(b0dccf4a) SHA1(e8bfd622c006985b724cdbd3ad14c33e9ed27c6c), ROM_SKIP(7) )
-	ROMX_LOAD( "122dth.134", 0x000003, 0x08000, CRC(bf60c487) SHA1(5ce80e89d9a24b627b0e97bf36a4e71c2eff4324), ROM_SKIP(7) )
-	ROMX_LOAD( "120dth.108", 0x000004, 0x08000, CRC(dafa173a) SHA1(a19980b92a5e74ebe395be36313701fdb527a46a), ROM_SKIP(7) )
-	ROMX_LOAD( "119dth.115", 0x000005, 0x08000, CRC(9c9dbac1) SHA1(4c66971884190598e128684ece2e15a1c80b94ed), ROM_SKIP(7) )
-	ROMX_LOAD( "121dth.127", 0x000006, 0x08000, CRC(198a636b) SHA1(356b8948aafb98cb5e6ee7b5ad6ea9e5998265e5), ROM_SKIP(7) )
-	ROMX_LOAD( "118dth.135", 0x000007, 0x08000, CRC(2903e682) SHA1(027ed6524e9d4490632f10aeb22150c2fbc4eec2), ROM_SKIP(7) )
+	ROM_REGION32_BE( 0x100000, "drmath", 0 )
+	ROMX_LOAD( "110-00013-122.u134", 0x000000, 0x08000, CRC(bf60c487) SHA1(5ce80e89d9a24b627b0e97bf36a4e71c2eff4324), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-125.u126", 0x000001, 0x08000, CRC(b0dccf4a) SHA1(e8bfd622c006985b724cdbd3ad14c33e9ed27c6c), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-123.u114", 0x000002, 0x08000, CRC(04ba6ed1) SHA1(012be71c6b955beda2bd0ff376dcaab51b226723), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-124.u107", 0x000003, 0x08000, CRC(220db5d3) SHA1(3bfbe0eb97282c4ce449fd44e8e141de74f08eb0), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-018.u135", 0x000004, 0x08000, CRC(2903e682) SHA1(027ed6524e9d4490632f10aeb22150c2fbc4eec2), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-121.u127", 0x000005, 0x08000, CRC(198a636b) SHA1(356b8948aafb98cb5e6ee7b5ad6ea9e5998265e5), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-119.u115", 0x000006, 0x08000, CRC(9c9dbac1) SHA1(4c66971884190598e128684ece2e15a1c80b94ed), ROM_SKIP(7) )
+	ROMX_LOAD( "110-00013-120.u108", 0x000007, 0x08000, CRC(dafa173a) SHA1(a19980b92a5e74ebe395be36313701fdb527a46a), ROM_SKIP(7) )
 
-	ROM_REGION16_LE( 0x80000, "vertex", 0 )
-	ROM_LOAD16_BYTE( "014dth.153", 0x00000, 0x20000, CRC(0eee0557) SHA1(8abe52cad31e59cf814fd9f64f4e42ddb4aa8c93) )
-	ROM_LOAD16_BYTE( "015dth.154", 0x00001, 0x20000, CRC(68564122) SHA1(410d2db74e574774b2eadd7fdf891feef5d8a93f) )
-	ROM_LOAD16_BYTE( "016dth.167", 0x40000, 0x20000, CRC(60c6cb26) SHA1(0e2bf65793715e12d8fd7f87fd3336a9d00ee7e6) )
-	ROM_LOAD16_BYTE( "017dth.160", 0x40001, 0x20000, CRC(d8b89379) SHA1(aa08e111c1505a4ad55b14659f8e21fd39cfcb16) )
+	ROM_REGION16_BE( 0x80000, "vertex", 0 )
+	ROM_LOAD16_BYTE( "110-00013-014.u153", 0x00001, 0x20000, CRC(0eee0557) SHA1(8abe52cad31e59cf814fd9f64f4e42ddb4aa8c93) )
+	ROM_LOAD16_BYTE( "110-00013-015.u154", 0x00000, 0x20000, CRC(68564122) SHA1(410d2db74e574774b2eadd7fdf891feef5d8a93f) )
+	ROM_LOAD16_BYTE( "110-00013-016.u167", 0x40001, 0x20000, CRC(60c6cb26) SHA1(0e2bf65793715e12d8fd7f87fd3336a9d00ee7e6) )
+	ROM_LOAD16_BYTE( "110-00013-017.u160", 0x40000, 0x20000, CRC(d8b89379) SHA1(aa08e111c1505a4ad55b14659f8e21fd39cfcb16) )
 
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
-	ROM_LOAD16_BYTE( "101vgb.101", 0x000000, 0x20000, CRC(6aada23d) SHA1(85dbf9b20e4f17cb21922637763654d6cae80dfd) )
-	ROM_LOAD16_BYTE( "104vgb.97",  0x000001, 0x20000, CRC(715cac9d) SHA1(2aa0c563dc1fe4d02fa1ecbaed16f720f899fdc4) )
+	ROM_LOAD16_BYTE( "110-00023-101.u101", 0x000000, 0x20000, CRC(6aada23d) SHA1(85dbf9b20e4f17cb21922637763654d6cae80dfd) )
+	ROM_LOAD16_BYTE( "110-00023-104.u97",  0x000001, 0x20000, CRC(715cac9d) SHA1(2aa0c563dc1fe4d02fa1ecbaed16f720f899fdc4) )
 
 	/* Video Graphics PCB (MPG DW-010-00002-002) */
 	ROM_REGION16_LE( 0xc0000, "tms_gfx", 0 )
-	ROM_LOAD16_BYTE( "105vgb.124", 0x000000, 0x20000, CRC(5482e0c4) SHA1(492afac1862f2899cd734d1e57ca978ed6a906d5) )
-	ROM_LOAD16_BYTE( "106vgb.121", 0x000001, 0x20000, CRC(a55e5d19) SHA1(86fbcb425103ae9fff381357339af349848fc3f2) )
-	ROM_LOAD16_BYTE( "107vgb.130", 0x040000, 0x20000, CRC(006487b6) SHA1(f8bc6abad13df099da1708bd22f239703e407b21) )
-	ROM_LOAD16_BYTE( "108vgb.133", 0x040001, 0x20000, CRC(e4587ba1) SHA1(1323b4be5a526ae182ee38e96fccd263a4cecc37) )
-	ROM_LOAD16_BYTE( "103vgb.114", 0x080000, 0x20000, CRC(4e486e70) SHA1(04ee16cfadd43dbe9ed5bd8330c21a718d63a8f4) )
-	ROM_LOAD16_BYTE( "102vgb.108", 0x080001, 0x20000, CRC(441e8490) SHA1(6cfe30cea3fa297b71e881fbddad6d65a96e4386) )
+	ROM_LOAD16_BYTE( "110-00023-105.u124", 0x000000, 0x20000, CRC(5482e0c4) SHA1(492afac1862f2899cd734d1e57ca978ed6a906d5) )
+	ROM_LOAD16_BYTE( "110-00023-106.u121", 0x000001, 0x20000, CRC(a55e5d19) SHA1(86fbcb425103ae9fff381357339af349848fc3f2) )
+	ROM_LOAD16_BYTE( "110-00023-107.u130", 0x040000, 0x20000, CRC(006487b6) SHA1(f8bc6abad13df099da1708bd22f239703e407b21) )
+	ROM_LOAD16_BYTE( "110-00023-108.u133", 0x040001, 0x20000, CRC(e4587ba1) SHA1(1323b4be5a526ae182ee38e96fccd263a4cecc37) )
+	ROM_LOAD16_BYTE( "110-00023-103.u114", 0x080000, 0x20000, CRC(4e486e70) SHA1(04ee16cfadd43dbe9ed5bd8330c21a718d63a8f4) )
+	ROM_LOAD16_BYTE( "110-00023-102.u108", 0x080001, 0x20000, CRC(441e8490) SHA1(6cfe30cea3fa297b71e881fbddad6d65a96e4386) )
 
 	/* Sound PCB (MPG 010-00018-002) */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "14-001snd.2", 0x000000, 0x08000, CRC(307fcb6d) SHA1(0cf63a39ac8920be6532974311804529d7218545) )
+	ROM_LOAD( "110-00014-001.u2", 0x000000, 0x08000, CRC(307fcb6d) SHA1(0cf63a39ac8920be6532974311804529d7218545) )
 
 	ROM_REGION( 0x40000, "upd7759", 0 )
-	ROM_LOAD( "13-001snd.17", 0x000000, 0x40000, CRC(015a0b17) SHA1(f229c9aa59f0e6b25b818f9513997a8685e33982) )
+	ROM_LOAD( "110-00013-001.u17", 0x000000, 0x40000, CRC(015a0b17) SHA1(f229c9aa59f0e6b25b818f9513997a8685e33982) )
 ROM_END
 
-ROM_START( stankatk )
-	ROM_REGION( 0x140000, "maincpu", 0 )
+ROM_START( tankbatl )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lo_u67",    0x000001, 0x20000, CRC(97aabac0) SHA1(12a0719d3332a63e912161200b0a942c27c1f5da) )
 	ROM_LOAD16_BYTE( "le_u91",    0x000000, 0x20000, CRC(977f90d9) SHA1(530fa5c32b1f28e2b90d20d98cc453cb290c0ad2) )
-//  ROM_LOAD16_BYTE( "host.u67",  0x000001, 0x20000, CRC(e79d9548) SHA1(84a4c181be81fff7d5e61faa32f6929fce8b62d0) ) // alt (bad?) rom
-//  ROM_LOAD16_BYTE( "host.u91",  0x000000, 0x20000, CRC(ea19d0e1) SHA1(c11e8c6bff4746e3536fc19d3a40c89ab198059f) ) // alt (bad?) rom
 	ROM_LOAD16_BYTE( "ho_u68",    0x040001, 0x20000, CRC(8f76f4ac) SHA1(f6c1d4c933a373b153eee7d9f3016c985acaa281) )
 	ROM_LOAD16_BYTE( "he_u92",    0x040000, 0x20000, CRC(1ea1db7c) SHA1(ecaa1bd3d70489a5ba0d96c6935c2959f57467b2) )
-//  ROM_LOAD16_BYTE( "host.u92",  0x040000, 0x20000, CRC(220e5a39) SHA1(d9de87bc56182c8412c11bff9616164159ced9fb) ) // alt (bad?) rom
 	ROM_LOAD16_BYTE( "b00_o.u69", 0x080001, 0x20000, CRC(393718e5) SHA1(f956f8bd946f53a032af16011dc69f66fb3f095c) )
 	ROM_LOAD16_BYTE( "b00_e.u93", 0x080000, 0x20000, CRC(aedea0ef) SHA1(a81c3518c7a1e21f2fa2ad29c30346f727069257) )
 	ROM_LOAD16_BYTE( "b01_o.u70", 0x0c0001, 0x20000, CRC(e895167d) SHA1(677cbf1be32c1f0c76a0e1527db66eb037d7e9df) )
 	ROM_LOAD16_BYTE( "b01_e.u94", 0x0c0000, 0x20000, CRC(823bba4d) SHA1(6668e972b1435aac43f9b21cc40fc3adec0d285f) )
-	ROM_LOAD16_BYTE( "host.71",   0x100001, 0x20000, CRC(cfc0333e) SHA1(9f290769129a61189870faef45c3f061eb7b5c07) ) // same as botss
-	ROM_LOAD16_BYTE( "host.95",   0x100000, 0x20000, CRC(6c595d1e) SHA1(89fdc30166ba1e9706798547195bdf6875a02e96) ) // same as botss
+	ROM_LOAD16_BYTE( "host.71",   0x100001, 0x20000, CRC(cfc0333e) SHA1(9f290769129a61189870faef45c3f061eb7b5c07) )
+	ROM_LOAD16_BYTE( "host.95",   0x100000, 0x20000, CRC(6c595d1e) SHA1(89fdc30166ba1e9706798547195bdf6875a02e96) )
+	ROM_FILL(                     0x140000, 0x40000, 0xff )
 
-	ROM_REGION32_LE( 0x80000, "am29000", 0 )
-	ROMX_LOAD( "s00e_u.107", 0x00000, 0x08000, CRC(558918cc) SHA1(7e61639ab4af88f888f4aa481dd01db7de3829da), ROM_SKIP(7) )
-	ROMX_LOAD( "s08e_u.114", 0x00001, 0x08000, CRC(765da5d7) SHA1(d489581bd12d7fca42570ee7a12d922be2528c1e), ROM_SKIP(7) )
-	ROMX_LOAD( "s16e_u.126", 0x00002, 0x08000, CRC(d24654cd) SHA1(88d3624f23c669dc902136c822b1f4732104c9c1), ROM_SKIP(7) )
-	ROMX_LOAD( "s24e_u.134", 0x00003, 0x08000, CRC(0a41756b) SHA1(8681aaf8eeda7acdff967a773290c4b2c17cbe30), ROM_SKIP(7) )
-	ROMX_LOAD( "s00o_u.108", 0x00004, 0x08000, CRC(9cadc977) SHA1(e95f60d9df422511bae6a6c4a20f813d77a894a4), ROM_SKIP(7) )
-	ROMX_LOAD( "s08o_u.115", 0x00005, 0x08000, CRC(af1eae4a) SHA1(44f272b472f546ffff7d8f82e29c5d80b472b1c3), ROM_SKIP(7) )
-	ROMX_LOAD( "s16o_u.127", 0x00006, 0x08000, CRC(53ba1a3f) SHA1(333734fff41b98abfa7b2904692cb128ab1f90a3), ROM_SKIP(7) )
-	ROMX_LOAD( "s24o_u.135", 0x00007, 0x08000, CRC(f89bab5f) SHA1(e79e71d0a5e7ba933952c5d41f6afb633da06e8a), ROM_SKIP(7) )
+	ROM_REGION32_BE( 0x100000, "drmath", 0 )
+	ROMX_LOAD( "s24e_u.134", 0x00000, 0x08000, CRC(0a41756b) SHA1(8681aaf8eeda7acdff967a773290c4b2c17cbe30), ROM_SKIP(7) )
+	ROMX_LOAD( "s16e_u.126", 0x00001, 0x08000, CRC(d24654cd) SHA1(88d3624f23c669dc902136c822b1f4732104c9c1), ROM_SKIP(7) )
+	ROMX_LOAD( "s08e_u.114", 0x00002, 0x08000, CRC(765da5d7) SHA1(d489581bd12d7fca42570ee7a12d922be2528c1e), ROM_SKIP(7) )
+	ROMX_LOAD( "s00e_u.107", 0x00003, 0x08000, CRC(558918cc) SHA1(7e61639ab4af88f888f4aa481dd01db7de3829da), ROM_SKIP(7) )
+	ROMX_LOAD( "s24o_u.135", 0x00004, 0x08000, CRC(f89bab5f) SHA1(e79e71d0a5e7ba933952c5d41f6afb633da06e8a), ROM_SKIP(7) )
+	ROMX_LOAD( "s16o_u.127", 0x00005, 0x08000, CRC(53ba1a3f) SHA1(333734fff41b98abfa7b2904692cb128ab1f90a3), ROM_SKIP(7) )
+	ROMX_LOAD( "s08o_u.115", 0x00006, 0x08000, CRC(af1eae4a) SHA1(44f272b472f546ffff7d8f82e29c5d80b472b1c3), ROM_SKIP(7) )
+	ROMX_LOAD( "s00o_u.108", 0x00007, 0x08000, CRC(9cadc977) SHA1(e95f60d9df422511bae6a6c4a20f813d77a894a4), ROM_SKIP(7) )
 
-	ROM_REGION16_LE( 0x80000, "vertex", 0 )
-	ROM_LOAD16_BYTE( "pb0o_u.153", 0x00000, 0x20000, CRC(bcd7ddad) SHA1(3982756b6f0821df77918dd0d00807a90dbfb595) )
-	ROM_LOAD16_BYTE( "pb0e_u.154", 0x00001, 0x20000, CRC(d84e7c71) SHA1(2edb13c1f96f35c7934dad380e06035335ccbb48) )
-	ROM_LOAD16_BYTE( "pb1o_u.167", 0x40000, 0x20000, CRC(e4a65313) SHA1(f2df5cc87aa388d3273705562ab2d7c937a0a866) )
-	ROM_LOAD16_BYTE( "pb1e_u.160", 0x40001, 0x20000, CRC(9d9d1395) SHA1(9d937eac8d7e7bea40a69b596ba2c01753b97565) )
+	ROM_REGION16_BE( 0x80000, "vertex", 0 )
+	ROM_LOAD16_BYTE( "pb0o_u.153", 0x00001, 0x20000, CRC(bcd7ddad) SHA1(3982756b6f0821df77918dd0d00807a90dbfb595) )
+	ROM_LOAD16_BYTE( "pb0e_u.154", 0x00000, 0x20000, CRC(d84e7c71) SHA1(2edb13c1f96f35c7934dad380e06035335ccbb48) )
+	ROM_LOAD16_BYTE( "pb1o_u.167", 0x40001, 0x20000, CRC(e4a65313) SHA1(f2df5cc87aa388d3273705562ab2d7c937a0a866) )
+	ROM_LOAD16_BYTE( "pb1e_u.160", 0x40000, 0x20000, CRC(9d9d1395) SHA1(9d937eac8d7e7bea40a69b596ba2c01753b97565) )
 
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
 	ROM_LOAD16_BYTE( "3el_u101", 0x000000, 0x20000, CRC(130e1a18) SHA1(c31af5c5a403da588142ccbea79d3aa253ac6519) )
@@ -972,7 +560,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, f15se,    0,     micro3d, f15se,    f15se,    ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)",       GAME_NOT_WORKING )
-GAME( 1991, f15se21 , f15se, micro3d, f15se,    f15se21,  ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)",       GAME_NOT_WORKING )
-GAME( 1992, botss,    0,     micro3d, botss,    botss,    ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1)",       GAME_NOT_WORKING )
-GAME( 1992, stankatk, 0,     micro3d, stankatk, stankatk, ROT0, "Microprose Games Inc.", "Super Tank Attack (prototype rev. 4/21/92 )", GAME_NOT_WORKING )
+GAME( 1991, f15se,    0,     micro3d, f15se,    micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)", GAME_IMPERFECT_SOUND )
+GAME( 1991, f15se21 , f15se, micro3d, f15se,    micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)", GAME_IMPERFECT_SOUND )
+GAME( 1992, botss,    0,     micro3d, botss,    micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1)", GAME_IMPERFECT_SOUND )
+GAME( 1992, tankbatl, 0,     micro3d, tankbatl, micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92 )", GAME_IMPERFECT_SOUND )
