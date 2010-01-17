@@ -21,6 +21,12 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+// some cleanups for Solaris for things defined in stdlib.h
+#ifdef SDLMAME_SOLARIS
+#undef si_status
+#undef WWORD
+#endif
+
 // standard C++ includes
 #include <exception>
 
