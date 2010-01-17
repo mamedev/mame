@@ -256,7 +256,7 @@ static VIDEO_UPDATE( cybertnk )
 	{
 		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
 		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
-		UINT32 spr_offs;
+		UINT32 spr_offs,spr_offs_helper;
 		int xf,yf,xz,yz;
 
 		for(offs=0;offs<0x1000/2;offs+=8)
@@ -281,12 +281,10 @@ static VIDEO_UPDATE( cybertnk )
 			xz = 0;
 			yz = 0;
 
-			if(zoom > 0x80)
-				continue;
-
 			for(yi = 0;yi < ysize;yi++)
 			{
 				xf = xz = 0;
+				spr_offs_helper = spr_offs;
 				for(xi=0;xi < xsize;xi+=8)
 				{
 					UINT32 color;
@@ -318,10 +316,18 @@ static VIDEO_UPDATE( cybertnk )
 									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
 							}
 						}
-						shift_pen -= 8;
-						x_dec++;
 						xf+=zoom;
-						if(xf >= 0x80) { xz++; xf-=0x80; }
+						if(xf >= 0x100)
+						{
+							xz++;
+							xf-=0x100;
+						}
+						else
+						{
+							shift_pen -= 8;
+							x_dec++;
+							if(xf >= 0x80) { xz++; xf-=0x80; }
+						}
 					}
 
 					shift_pen = 24;
@@ -344,15 +350,30 @@ static VIDEO_UPDATE( cybertnk )
 									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
 							}
 						}
-						shift_pen -= 8;
-						x_dec++;
 						xf+=zoom;
-						if(xf >= 0x80) { xz++; xf-=0x80; }
+						if(xf >= 0x100)
+						{
+							xz++;
+							xf-=0x100;
+						}
+						else
+						{
+							shift_pen -= 8;
+							x_dec++;
+							if(xf >= 0x80) { xz++; xf-=0x80; }
+						}
 					}
 
 					spr_offs+=4;
 				}
 				yf+=zoom;
+				if(yf >= 0x100)
+				{
+					yi--;
+					yz++;
+					spr_offs = spr_offs_helper;
+					yf-=0x100;
+				}
 				if(yf >= 0x80) { yz++; yf-=0x80; }
 			}
 		}
