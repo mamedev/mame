@@ -430,7 +430,7 @@ static void sort_quads(void)
 	int i;
 	for(i=0; i<count; i++)
 		quadind[i] = quaddb+i;
-	qsort(quadind, count, sizeof(struct quad *), comp_quads);
+	qsort(quadind, count, sizeof(struct quad_m1 *), comp_quads);
 }
 
 static void unsort_quads(void)
