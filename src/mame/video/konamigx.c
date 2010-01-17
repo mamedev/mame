@@ -99,7 +99,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 		bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
 		const rectangle *dst_cliprect, const rectangle *src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
-		int tilebpp, int blend, int alpha, int clip )
+		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output )
 {
 	static const int colormask[8]={1,3,7,0xf,0x1f,0x3f,0x7f,0xff};
 
@@ -111,7 +111,9 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	size_t src_size;
 
 	const pen_t *pal_base;
-	UINT32 *dst_ptr;
+	int dst_ptr;
+	int dst_size;
+	int dst_base2;
 
 	int tx, dst_pitch;
 	UINT32 *dst_base;
@@ -144,7 +146,8 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 
 	// adjust entry points and other loop constants
 	dst_pitch = dst_bitmap->rowpixels;
-	dst_base = (UINT32*)dst_bitmap->base + sy * dst_pitch + sx + tx;
+	dst_base = (UINT32*)dst_bitmap->base;
+	dst_base2 = sy * dst_pitch + sx + tx;
 	ecx = tx = -tx;
 
 	tilebpp = (tilebpp-1) & 7;
@@ -154,8 +157,8 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	src_pitch = src_bitmap->rowpixels;
 	src_base = (UINT16 *)src_bitmap->base;
 	src_size = src_bitmap->width * src_bitmap->height;
-
-	dst_ptr = dst_base;
+	dst_size = dst_bitmap->width * dst_bitmap->height;
+	dst_ptr = 0;//dst_base;
 	cy = starty;
 	cx = startx;
 
@@ -186,12 +189,18 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 				if (!(pixel & cmask))
 					continue;
 
-				dst_ptr[ecx] = alpha_blend_r32(pal_base[pixel], dst_ptr[ecx], alpha);
+				if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = alpha_blend_r32(pal_base[pixel], dst_base[dst_ptr+ecx+dst_base2], alpha);
+			
+				if (pixeldouble_output)
+				{
+					ecx++;
+					if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = alpha_blend_r32(pal_base[pixel], dst_base[dst_ptr+ecx+dst_base2], alpha);
+				}
 			}
-			while (++ecx);
+			while (++ecx < 0);
 
 			ecx = tx;
-			dst_ptr = dst_base; dst_base += dst_pitch;
+			dst_ptr += dst_pitch;
 			cy = starty; starty += incyy;
 			cx = startx; startx += incyx;
 		} while (--ty);
@@ -200,7 +209,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	{
 		if (blend == 0)
 		{
-			dst_base += dst_pitch;
+			dst_ptr += dst_pitch;
 			starty += incyy;
 			startx += incyx;
 		}
@@ -222,7 +231,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 				incyy <<= 1;
 				incyx <<= 1;
 
-				dst_base = dst_ptr + dst_pitch;
+				dst_ptr += dst_pitch;
 				starty = cy + incyy;
 				startx = cx + incyx;
 			}
@@ -250,12 +259,20 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 				if (!(pixel & cmask))
 					continue;
 
-				dst_ptr[ecx] = pal_base[pixel];
+
+
+				if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = pal_base[pixel];
+
+				if (pixeldouble_output)
+				{
+					ecx++;
+					if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = pal_base[pixel];
+				}
 			}
-			while (++ecx);
+			while (++ecx < 0);
 
 			ecx = tx;
-			dst_ptr = dst_base; dst_base += dst_pitch;
+			dst_ptr += dst_pitch;
 			cy = starty; starty += incyy;
 			cx = startx; startx += incyx;
 		} while (--ty);
@@ -266,7 +283,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 static void K053936GP_zoom_draw(running_machine *machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
 		bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap,
-		int tilebpp, int blend, int alpha)
+		int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	bitmap_t *src_bitmap;
 	rectangle *src_cliprect;
@@ -306,7 +323,7 @@ static void K053936GP_zoom_draw(running_machine *machine,
 			K053936GP_copyroz32clip(machine,
 					bitmap, src_bitmap, &my_clip, src_cliprect,
 					startx<<5, starty<<5, incxx<<5, incxy<<5, 0, 0,
-					tilebpp, blend, alpha, clip);
+					tilebpp, blend, alpha, clip, pixeldouble_output);
 			y++;
 		}
 	}
@@ -331,20 +348,20 @@ static void K053936GP_zoom_draw(running_machine *machine,
 		K053936GP_copyroz32clip(machine,
 				bitmap, src_bitmap, cliprect, src_cliprect,
 				startx<<5, starty<<5, incxx<<5, incxy<<5, incyx<<5, incyy<<5,
-				tilebpp, blend, alpha, clip);
+				tilebpp, blend, alpha, clip, pixeldouble_output);
 	}
 }
 
 void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-		tilemap_t *tmap, int tilebpp, int blend, int alpha)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
-	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha);
+	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 }
 
 void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-		tilemap_t *tmap, int tilebpp, int blend, int alpha)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
-	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha);
+	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 }
 
 
@@ -1552,7 +1569,14 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 					if (offs == -2)
 					{
-						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha);
+						int pixeldouble_output = 0;
+						const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+						int width = visarea->max_x - visarea->min_x + 1;
+
+						if (width>512) // vsnetscr case
+							pixeldouble_output = 1;
+
+						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output);
 					}
 					else
 					{
@@ -1596,6 +1620,8 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 							// the output size of the roz layer has to be doubled horizontally
 							// so that it aligns with the sprites and normal tilemaps.  This appears
 							// to be done as a post-processing / mixing step effect
+							//
+							// - todo, use the pixeldouble_output I just added for vsnet instead?
 							for (yy=0;yy<height;yy++)
 							{
 								UINT16* src = BITMAP_ADDR16(extra_bitmap,yy,0);
@@ -1610,8 +1636,10 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 							}
 						}
 						else
-							K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha);
-
+						{
+							int pixeldouble_output = 0;
+							K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
+						}
 					}
 					else
 						K053250_draw(machine, bitmap, cliprect, 1, vcblk[5]<<l, 0, 0);
@@ -2170,6 +2198,37 @@ VIDEO_START(konamigx_type4)
 
 	K053936_wraparound_enable(0, 0);
 	K053936GP_set_offset(0, -36, 1);
+
+	gx_rushingheroes_hack = 1;
+	konamigx_has_dual_screen = 1;
+	konamigx_palformat = 0;
+
+}
+
+VIDEO_START(konamigx_type4_vsn)
+{
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+
+	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+
+	_gxcommoninitnosprites(machine);
+
+	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, tilemap_scan_cols,  16, 16, 128, 128);
+	gx_rozenable = 0;
+	gx_specialrozenable = 3;
+
+	K056832_set_LayerOffset(0,  -52, 0);
+	K056832_set_LayerOffset(1,  -48, 0);
+	K056832_set_LayerOffset(2,  -48, 0);
+	K056832_set_LayerOffset(3,  -48, 0);
+
+	K053936_wraparound_enable(0, 1); // wraparound doesn't work properly with the custom drawing function anyway, see the crowd in vsnet and rushhero
+	K053936GP_set_offset(0, -30, 0);
 
 	gx_rushingheroes_hack = 1;
 	konamigx_has_dual_screen = 1;

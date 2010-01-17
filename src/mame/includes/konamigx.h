@@ -86,6 +86,7 @@ VIDEO_START(konamigx_6bpp_2);
 VIDEO_START(konamigx_type3);
 VIDEO_START(konamigx_type4);
 VIDEO_START(konamigx_type4_sd2);
+VIDEO_START(konamigx_type4_vsn);
 VIDEO_START(le2);
 VIDEO_START(dragoonj);
 VIDEO_START(winspike);
