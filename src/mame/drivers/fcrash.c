@@ -692,7 +692,7 @@ static const msm5205_interface msm5205_interface2 =
 static MACHINE_START( fcrash )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = memory_region(machine, "soundcpu");
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
