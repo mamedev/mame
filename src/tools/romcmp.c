@@ -14,6 +14,7 @@
 #include "osdcomm.h"
 
 #include <stdarg.h>
+#include <stdlib.h>
 
 
 #define MAX_FILES 100

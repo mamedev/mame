@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <math.h>
 #include "bitmap.h"
 #include "chd.h"

@@ -45,6 +45,7 @@
 #include "sha1.h"
 #include "vbiparse.h"
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>

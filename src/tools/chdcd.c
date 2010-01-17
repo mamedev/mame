@@ -7,10 +7,11 @@
 
 ***************************************************************************/
 
+#include <ctype.h>
+#include <stdlib.h>
 #include "osdcore.h"
 #include "chd.h"
 #include "chdcd.h"
-#include <ctype.h>
 
 
 
