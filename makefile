@@ -524,7 +524,7 @@ VERSIONOBJ = $(OBJ)/version.o
 LIBS = 
 
 # add expat XML library
-ifdef BUILD_EXPAT
+ifeq ($(BUILD_EXPAT),1)
 CCOMFLAGS += -I$(SRC)/lib/expat
 EXPAT = $(OBJ)/libexpat.a
 else
@@ -533,7 +533,7 @@ EXPAT =
 endif
 
 # add ZLIB compression library
-ifdef BUILD_ZLIB
+ifeq ($(BUILD_ZLIB),1)
 CCOMFLAGS += -I$(SRC)/lib/zlib
 ZLIB = $(OBJ)/libz.a
 else
