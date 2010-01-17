@@ -53,15 +53,15 @@ static struct lightparam
 
 enum { MOIRE = 0x00010000 };
 
-struct quad {
+struct quad_m1 {
 	struct point *p[4];
 	float z;
 	int col;
 };
 
 static struct point *pointdb, *pointpt;
-static struct quad *quaddb, *quadpt;
-static struct quad **quadind;
+static struct quad_m1 *quaddb, *quadpt;
+static struct quad_m1 **quadind;
 
 static UINT32 *poly_rom,*poly_ram;
 
@@ -244,7 +244,7 @@ static void fill_line(bitmap_t *bitmap, int color, INT32 y, INT32 x1, INT32 x2)
 	}
 }
 
-static void fill_quad(bitmap_t *bitmap, const struct quad *q)
+static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -410,15 +410,15 @@ static void draw_line(bitmap_t *bitmap, int color, int x1, int y1, int x2, int y
 #endif
 static int comp_quads(const void *q1, const void *q2)
 {
-	float z1 = (*(const struct quad **)q1)->z;
-	float z2 = (*(const struct quad **)q2)->z;
+	float z1 = (*(const struct quad_m1 **)q1)->z;
+	float z2 = (*(const struct quad_m1 **)q2)->z;
 
 	if(z1<z2)
 		return +1;
 	if(z1>z2)
 		return -1;
 
-	if (*(const struct quad **)q1 - quaddb < *(const struct quad **)q2 - quaddb)
+	if (*(const struct quad_m1 **)q1 - quaddb < *(const struct quad_m1 **)q2 - quaddb)
 		return -1;
 
 	return +1;
@@ -458,7 +458,7 @@ static void draw_quads(bitmap_t *bitmap, const rectangle *cliprect)
 	view.y2 = MIN(view.y2, cliprect->max_y);
 
 	for(i=0; i<count; i++) {
-		struct quad *q = quadind[i];
+		struct quad_m1 *q = quadind[i];
 
 		fill_quad(bitmap, q);
 #if 0
@@ -578,12 +578,12 @@ static const struct {
 	{ fclip_isc_right,  fclip_clip_right },
 };
 
-static void fclip_push_quad(int level, struct quad *q);
+static void fclip_push_quad(int level, struct quad_m1 *q);
 
-static void fclip_push_quad_next(int level, struct quad *q,
+static void fclip_push_quad_next(int level, struct quad_m1 *q,
 								 struct point *p1, struct point *p2, struct point *p3, struct point *p4)
 {
-	struct quad q2;
+	struct quad_m1 q2;
 	q2.col = q->col;
 	q2.z = q->z;
 	q2.p[0] = p1;
@@ -594,7 +594,7 @@ static void fclip_push_quad_next(int level, struct quad *q,
 	fclip_push_quad(level+1, &q2);
 }
 
-static void fclip_push_quad(int level, struct quad *q)
+static void fclip_push_quad(int level, struct quad_m1 *q)
 {
 	int i, j;
 	struct point *pt[4], *pi1, *pi2;
@@ -737,7 +737,7 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 #endif
 	int lightmode;
 	float old_z;
-	struct quad cquad;
+	struct quad_m1 cquad;
 	float *poly_data;
 
 	if(poly_adr & 0x800000)
@@ -944,7 +944,7 @@ static UINT16 *push_direct(UINT16 *list)
 	struct point *old_p0, *old_p1, *p0, *p1;
 	int link, type;
 	float z;
-	struct quad cquad;
+	struct quad_m1 cquad;
 
 	tex_adr = readi(list);
 	v1      = readi(list+2);
@@ -1448,8 +1448,8 @@ VIDEO_START(model1)
 	poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
 	tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
 	pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
-	quaddb  = auto_alloc_array_clear(machine, struct quad, 1000000);
-	quadind = auto_alloc_array_clear(machine, struct quad *, 1000000);
+	quaddb  = auto_alloc_array_clear(machine, struct quad_m1, 1000000);
+	quadind = auto_alloc_array_clear(machine, struct quad_m1 *, 1000000);
 
 	pointpt = pointdb;
 	quadpt = quaddb;
