@@ -2,9 +2,8 @@
 /* rather similar to galspnbl.c */
 
 #include "emu.h"
+#include "includes/spbactn.h"
 
-extern UINT16 *spbactn_bgvideoram, *spbactn_fgvideoram, *spbactn_spvideoram;
-static bitmap_t *tile_bitmap_bg, *tile_bitmap_fg;
 
 static void blendbitmaps(running_machine *machine,
 		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,
@@ -50,8 +49,8 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 		{42,43,46,47,58,59,62,63}
 	};
 
+	spbactn_state *state = (spbactn_state *)machine->driver_data;
 	int count = 0;
-
 	int offs;
 
 	for (offs = (0x1000 - 16) / 2; offs >= 0; offs -= 8)
@@ -59,21 +58,21 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 		int sx, sy, code, color, size, attr, flipx, flipy;
 		int col, row;
 
-		attr = spbactn_spvideoram[offs];
+		attr = state->spvideoram[offs];
 		if ((attr & 0x0004) &&
 			((attr & 0x0030) >> 4) == priority)
 		{
 			flipx = attr & 0x0001;
 			flipy = attr & 0x0002;
 
-			code = spbactn_spvideoram[offs + 1];
+			code = state->spvideoram[offs + 1];
 
-			color = spbactn_spvideoram[offs + 2];
+			color = state->spvideoram[offs + 2];
 			size = 1 << (color & 0x0003);				/* 1,2,4,8 */
 			color = (color & 0x00f0) >> 4;
 
-			sx = spbactn_spvideoram[offs + 4];
-			sy = spbactn_spvideoram[offs + 3];
+			sx = state->spvideoram[offs + 4];
+			sy = state->spvideoram[offs + 3];
 
 			attr &= ~0x0040;							/* !!! */
 
@@ -109,31 +108,34 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_START( spbactn )
 {
+	spbactn_state *state = (spbactn_state *)machine->driver_data;
+
 	/* allocate bitmaps */
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 VIDEO_UPDATE( spbactn )
 {
+	spbactn_state *state = (spbactn_state *)screen->machine->driver_data;
 	int offs, sx, sy;
 
-	bitmap_fill(tile_bitmap_fg, cliprect, 0);
+	bitmap_fill(state->tile_bitmap_fg, cliprect, 0);
 
 	/* draw table bg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 	{
 		int attr, code, color;
 
-		code = spbactn_bgvideoram[offs + 0x4000 / 2];
-		attr = spbactn_bgvideoram[offs + 0x0000 / 2];
+		code = state->bgvideoram[offs + 0x4000 / 2];
+		attr = state->bgvideoram[offs + 0x0000 / 2];
 
 		color = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx_transpen_raw(tile_bitmap_bg, cliprect, screen->machine->gfx[1],
+		drawgfx_transpen_raw(state->tile_bitmap_bg, cliprect, screen->machine->gfx[1],
 					code,
 					screen->machine->gfx[1]->color_base + color * screen->machine->gfx[1]->color_granularity,
 					0, 0,
@@ -148,19 +150,19 @@ VIDEO_UPDATE( spbactn )
 		}
 	}
 
-	if (draw_sprites(screen->machine, tile_bitmap_bg, cliprect, 0))
+	if (draw_sprites(screen->machine, state->tile_bitmap_bg, cliprect, 0))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 		{
 			int attr, code, color;
 
-			code = spbactn_bgvideoram[offs + 0x4000 / 2];
-			attr = spbactn_bgvideoram[offs + 0x0000 / 2];
+			code = state->bgvideoram[offs + 0x4000 / 2];
+			attr = state->bgvideoram[offs + 0x0000 / 2];
 
 			color = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx_transpen_raw(tile_bitmap_bg, cliprect, screen->machine->gfx[1],
+			drawgfx_transpen_raw(state->tile_bitmap_bg, cliprect, screen->machine->gfx[1],
 					code,
 					screen->machine->gfx[1]->color_base + color * screen->machine->gfx[1]->color_granularity,
 					0, 0,
@@ -176,15 +178,15 @@ VIDEO_UPDATE( spbactn )
 		}
 	}
 
-	draw_sprites(screen->machine, tile_bitmap_bg, cliprect, 1);
+	draw_sprites(screen->machine, state->tile_bitmap_bg, cliprect, 1);
 
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 	{
 		int attr, code, color;
 
-		code = spbactn_fgvideoram[offs + 0x4000 / 2];
-		attr = spbactn_fgvideoram[offs + 0x0000 / 2];
+		code = state->fgvideoram[offs + 0x4000 / 2];
+		attr = state->fgvideoram[offs + 0x0000 / 2];
 
 		color = ((attr & 0x00f0) >> 4);
 
@@ -194,7 +196,7 @@ VIDEO_UPDATE( spbactn )
 		else
 			color |= 0x0080;
 
-		drawgfx_transpen_raw(tile_bitmap_fg, cliprect, screen->machine->gfx[0],
+		drawgfx_transpen_raw(state->tile_bitmap_fg, cliprect, screen->machine->gfx[0],
 					code,
 					screen->machine->gfx[0]->color_base + color * screen->machine->gfx[0]->color_granularity,
 					0, 0,
@@ -208,10 +210,11 @@ VIDEO_UPDATE( spbactn )
 			sx = 0;
 		}
 	}
-	draw_sprites(screen->machine, tile_bitmap_fg, cliprect, 2);
-	draw_sprites(screen->machine, tile_bitmap_fg, cliprect, 3);
+
+	draw_sprites(screen->machine, state->tile_bitmap_fg, cliprect, 2);
+	draw_sprites(screen->machine, state->tile_bitmap_fg, cliprect, 3);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen->machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, cliprect);
+	blendbitmaps(screen->machine, bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, cliprect);
 	return 0;
 }

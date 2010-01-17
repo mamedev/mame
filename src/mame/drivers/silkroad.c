@@ -8,6 +8,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "includes/silkroad.h"
 
 /*
 
@@ -126,14 +127,6 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 */
 
-UINT32 *silkroad_vidram,*silkroad_vidram2,*silkroad_vidram3, *silkroad_sprram, *silkroad_regs;
-
-WRITE32_HANDLER( silkroad_fgram_w );
-WRITE32_HANDLER( silkroad_fgram2_w );
-WRITE32_HANDLER( silkroad_fgram3_w );
-VIDEO_START(silkroad);
-VIDEO_UPDATE(silkroad);
-
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
@@ -161,11 +154,11 @@ static WRITE32_HANDLER(silk_coin_counter_w)
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_BASE(&silkroad_sprram) // sprites
+	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_BASE_MEMBER(silkroad_state,sprram) // sprites
 	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram) // palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(silkroad_fgram_w) AM_BASE(&silkroad_vidram)  // lower Layer
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(silkroad_fgram2_w) AM_BASE(&silkroad_vidram2)  // mid layer
-	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // higher layer
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(silkroad_fgram_w) AM_BASE_MEMBER(silkroad_state,vidram)  // lower Layer
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(silkroad_fgram2_w) AM_BASE_MEMBER(silkroad_state,vidram2)  // mid layer
+	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE_MEMBER(silkroad_state,vidram3) // higher layer
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff0000)
@@ -173,7 +166,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff0000)
 	AM_RANGE(0xc00034, 0xc00037) AM_DEVWRITE("oki1", silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
-	AM_RANGE(0xc0010c, 0xc00123) AM_WRITEONLY AM_BASE(&silkroad_regs)
+	AM_RANGE(0xc0010c, 0xc00123) AM_WRITEONLY AM_BASE_MEMBER(silkroad_state,regs)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -250,9 +243,9 @@ static INPUT_PORTS_START( silkroad )
 	PORT_DIPNAME( 0x08000000, 0x00000000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, "Chute Type" )		    	// "Coin Box"
+	PORT_DIPNAME( 0x10000000, 0x10000000, "Chute Type" )				// "Coin Box"
 	PORT_DIPSETTING(          0x10000000, DEF_STR( Single ) )			// "1"
-	PORT_DIPSETTING(          0x00000000, "Multi" )			            // "2"
+	PORT_DIPSETTING(          0x00000000, "Multi" )						// "2"
 	PORT_DIPNAME( 0xe0000000, 0xe0000000, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR(5C_1C))
 	PORT_DIPSETTING(          0x20000000, DEF_STR(4C_1C))
@@ -286,6 +279,8 @@ static GFXDECODE_START( silkroad )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( silkroad )
+
+	MDRV_DRIVER_DATA( silkroad_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)

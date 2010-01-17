@@ -71,18 +71,8 @@ TO DO :
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
+#include "includes/stlforce.h"
 
-UINT16 *stlforce_bg_videoram, *stlforce_mlow_videoram, *stlforce_mhigh_videoram, *stlforce_tx_videoram;
-UINT16 *stlforce_bg_scrollram, *stlforce_mlow_scrollram, *stlforce_mhigh_scrollram, *stlforce_vidattrram;
-UINT16 *stlforce_spriteram;
-extern int stlforce_sprxoffs;
-
-VIDEO_START( stlforce );
-VIDEO_UPDATE( stlforce );
-WRITE16_HANDLER( stlforce_tx_videoram_w );
-WRITE16_HANDLER( stlforce_mhigh_videoram_w );
-WRITE16_HANDLER( stlforce_mlow_videoram_w );
-WRITE16_HANDLER( stlforce_bg_videoram_w );
 
 static WRITE16_DEVICE_HANDLER( eeprom_w )
 {
@@ -101,18 +91,18 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 
 static ADDRESS_MAP_START( stlforce_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_BASE(&stlforce_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_BASE(&stlforce_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(stlforce_mhigh_videoram_w) AM_BASE(&stlforce_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(stlforce_tx_videoram_w) AM_BASE(&stlforce_tx_videoram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_BASE_MEMBER(stlforce_state,bg_videoram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_BASE_MEMBER(stlforce_state,mlow_videoram)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(stlforce_mhigh_videoram_w) AM_BASE_MEMBER(stlforce_state,mhigh_videoram)
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(stlforce_tx_videoram_w) AM_BASE_MEMBER(stlforce_state,tx_videoram)
 	AM_RANGE(0x102800, 0x102fff) AM_RAM /* unknown / ram */
-	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE(&stlforce_bg_scrollram)
-	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE(&stlforce_mlow_scrollram)
-	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE(&stlforce_mhigh_scrollram)
-	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_BASE(&stlforce_vidattrram)
+	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE_MEMBER(stlforce_state,bg_scrollram)
+	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE_MEMBER(stlforce_state,mlow_scrollram)
+	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE_MEMBER(stlforce_state,mhigh_scrollram)
+	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_BASE_MEMBER(stlforce_state,vidattrram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x107fff) AM_RAM /* unknown / ram */
-	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE(&stlforce_spriteram)
+	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE_MEMBER(stlforce_state,spriteram)
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUT")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
@@ -194,6 +184,9 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( stlforce )
+
+	MDRV_DRIVER_DATA( stlforce_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(stlforce_map)
@@ -371,12 +364,16 @@ ROM_END
 
 static DRIVER_INIT(stlforce)
 {
-	stlforce_sprxoffs = 0;
+	stlforce_state *state = (stlforce_state *)machine->driver_data;
+
+	state->sprxoffs = 0;
 }
 
 static DRIVER_INIT(twinbrat)
 {
-	stlforce_sprxoffs = 9;
+	stlforce_state *state = (stlforce_state *)machine->driver_data;
+
+	state->sprxoffs = 9;
 }
 
 

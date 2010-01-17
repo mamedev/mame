@@ -52,15 +52,7 @@
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "sound/pokey.h"
-
-
-UINT8 *tunhunt_ram;
-
-extern WRITE8_HANDLER( tunhunt_videoram_w );
-
-extern PALETTE_INIT( tunhunt );
-extern VIDEO_START( tunhunt );
-extern VIDEO_UPDATE( tunhunt );
+#include "includes/tunhunt.h"
 
 
 /*************************************
@@ -68,8 +60,6 @@ extern VIDEO_UPDATE( tunhunt );
  *  Output ports
  *
  *************************************/
-
-UINT8 tunhunt_control;
 
 static WRITE8_HANDLER( tunhunt_control_w )
 {
@@ -82,7 +72,9 @@ static WRITE8_HANDLER( tunhunt_control_w )
         0x40    start LED
         0x80    in-game
     */
-	tunhunt_control = data;
+	tunhunt_state *state = (tunhunt_state *)space->machine->driver_data;
+
+	state->control = data;
 	coin_counter_w( space->machine, 0,data&0x01 );
 	coin_counter_w( space->machine, 1,data&0x02 );
 	set_led_status( space->machine, 0, data&0x40 ); /* start */
@@ -141,7 +133,7 @@ static READ8_DEVICE_HANDLER( dsw2_4r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&tunhunt_ram) /* Work RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tunhunt_state,workram) /* Work RAM */
 	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY
 	AM_RANGE(0x1200, 0x12ff) AM_WRITEONLY
 	AM_RANGE(0x1400, 0x14ff) AM_WRITEONLY
@@ -149,12 +141,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY	/* SHEL0H */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITEONLY	/* SHEL1H */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITEONLY	/* MOBJV */
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE_GENERIC(videoram)	/* ALPHA */
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE_MEMBER(tunhunt_state,videoram)	/* ALPHA */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP	/* watchdog */
 	AM_RANGE(0x2000, 0x2007) AM_READ(tunhunt_button_r)
 	AM_RANGE(0x2400, 0x2400) AM_WRITENOP	/* INT ACK */
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(tunhunt_control_w)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_BASE_MEMBER(tunhunt_state,spriteram)
 	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
@@ -310,6 +302,8 @@ static const pokey_interface pokey_interface_2 =
  *************************************/
 
 static MACHINE_DRIVER_START( tunhunt )
+
+	MDRV_DRIVER_DATA( tunhunt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,2000000)		/* ??? */

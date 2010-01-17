@@ -37,16 +37,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-
-UINT8 *shootout_textram;
-
-extern WRITE8_HANDLER( shootout_videoram_w );
-extern WRITE8_HANDLER( shootout_textram_w );
-
-extern PALETTE_INIT( shootout );
-extern VIDEO_START( shootout );
-extern VIDEO_UPDATE( shootout );
-extern VIDEO_UPDATE( shootouj );
+#include "includes/shootout.h"
 
 /*******************************************************************************/
 
@@ -80,9 +71,9 @@ static ADDRESS_MAP_START( shootout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x1004, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE_MEMBER(shootout_state,spriteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE_MEMBER(shootout_state,textram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_MEMBER(shootout_state,videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -94,10 +85,10 @@ static ADDRESS_MAP_START( shootouj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_MEMBER(shootout_state,spriteram)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE_MEMBER(shootout_state,textram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_MEMBER(shootout_state,videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -232,8 +223,8 @@ static const gfx_layout tile_layout =
 
 static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   16*4+8*8, 16 ) /* characters */
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 16*4,	 8 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,		16 ) /* tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 16*4,     8  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
 GFXDECODE_END
 
 static void shootout_snd_irq(const device_config *device, int linestate)
@@ -271,6 +262,8 @@ static const ym2203_interface ym2203_interface2 =
 
 static MACHINE_DRIVER_START( shootout )
 
+	MDRV_DRIVER_DATA( shootout_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(shootout_map)
@@ -303,6 +296,8 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( shootouj )
+
+	MDRV_DRIVER_DATA( shootout_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */

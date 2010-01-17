@@ -1,10 +1,5 @@
-
 #include "emu.h"
-
-extern UINT8 *xyonix_vidram;
-
-static tilemap_t *xyonix_tilemap;
-
+#include "includes/xyonix.h"
 
 PALETTE_INIT( xyonix )
 {
@@ -37,27 +32,34 @@ PALETTE_INIT( xyonix )
 
 static TILE_GET_INFO( get_xyonix_tile_info )
 {
+	xyonix_state *state = (xyonix_state *)machine->driver_data;
 	int tileno;
-	int attr = xyonix_vidram[tile_index+0x1000+1];
+	int attr = state->vidram[tile_index+0x1000+1];
 
-	tileno = (xyonix_vidram[tile_index+1] << 0) | ((attr & 0x0f) << 8);
+	tileno = (state->vidram[tile_index+1] << 0) | ((attr & 0x0f) << 8);
 
 	SET_TILE_INFO(0,tileno,attr >> 4,0);
 }
 
 WRITE8_HANDLER( xyonix_vidram_w )
 {
-	xyonix_vidram[offset] = data;
-	tilemap_mark_tile_dirty(xyonix_tilemap,(offset-1)&0x0fff);
+	xyonix_state *state = (xyonix_state *)space->machine->driver_data;
+
+	state->vidram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap,(offset-1)&0x0fff);
 }
 
 VIDEO_START(xyonix)
 {
-	xyonix_tilemap = tilemap_create(machine, get_xyonix_tile_info,tilemap_scan_rows, 4, 8,80,32);
+	xyonix_state *state = (xyonix_state *)machine->driver_data;
+
+	state->tilemap = tilemap_create(machine, get_xyonix_tile_info, tilemap_scan_rows, 4, 8, 80, 32);
 }
 
 VIDEO_UPDATE(xyonix)
 {
-	tilemap_draw(bitmap,cliprect,xyonix_tilemap,0,0);
+	xyonix_state *state = (xyonix_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 	return 0;
 }

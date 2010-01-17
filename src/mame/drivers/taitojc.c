@@ -357,54 +357,28 @@ Notes:
 #include "sound/es5506.h"
 #include "machine/eeprom.h"
 #include "audio/taito_en.h"
+#include "includes/taitojc.h"
 
 extern UINT32 *f3_shared_ram;
 
-static UINT32 *main_ram;
-static UINT16 *dsp_shared_ram;
-static UINT32 *palette_ram;
-
 #define POLYGON_FIFO_SIZE		100000
-static UINT16 *polygon_fifo;
-static int polygon_fifo_ptr;
-
-
-static UINT8 mcu_comm_main = 0;
-static UINT8 mcu_comm_hc11 = 0;
-static UINT8 mcu_data_main = 0;
-static UINT8 mcu_data_hc11 = 0;
-
-
-UINT32 *taitojc_vram;
-UINT32 *taitojc_objlist;
-
-// defined in video/taitojc.c
-extern READ32_HANDLER(taitojc_tile_r);
-extern WRITE32_HANDLER(taitojc_tile_w);
-extern READ32_HANDLER(taitojc_char_r);
-extern WRITE32_HANDLER(taitojc_char_w);
-extern void taitojc_clear_frame(running_machine *machine);
-extern void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int length);
-
-extern VIDEO_START(taitojc);
-extern VIDEO_UPDATE(taitojc);
-
-extern UINT8 *taitojc_texture;
-
-
 
 static READ32_HANDLER( taitojc_palette_r )
 {
-	return palette_ram[offset];
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	return state->palette_ram[offset];
 }
 
 static WRITE32_HANDLER( taitojc_palette_w )
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
 	int r, g, b;
 	UINT32 color;
-	COMBINE_DATA( palette_ram + offset );
 
-	color = palette_ram[offset];
+	COMBINE_DATA( state->palette_ram + offset );
+
+	color = state->palette_ram[offset];
 	r = (color >>  8) & 0xff;
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
@@ -507,18 +481,19 @@ static WRITE32_HANDLER (jc_control1_w)
 
 static UINT8 mcu_comm_reg_r(const address_space *space, int reg)
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
 	UINT8 r = 0;
 
 	switch (reg)
 	{
 		case 0x03:
 		{
-			r = mcu_data_main;
+			r = state->mcu_data_main;
 			break;
 		}
 		case 0x04:
 		{
-			r = mcu_comm_main | 0x14;
+			r = state->mcu_comm_main | 0x14;
 			break;
 		}
 		default:
@@ -533,13 +508,15 @@ static UINT8 mcu_comm_reg_r(const address_space *space, int reg)
 
 static void mcu_comm_reg_w(const address_space *space, int reg, UINT8 data)
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
 	switch (reg)
 	{
 		case 0x00:
 		{
-			mcu_data_hc11 = data;
-			mcu_comm_hc11 &= ~0x04;
-			mcu_comm_main &= ~0x20;
+			state->mcu_data_hc11 = data;
+			state->mcu_comm_hc11 &= ~0x04;
+			state->mcu_comm_main &= ~0x20;
 			break;
 		}
 		case 0x04:
@@ -608,7 +585,9 @@ static READ32_HANDLER(jc_unknown1_r)
 
 static READ32_HANDLER(dsp_shared_r)
 {
-	return dsp_shared_ram[offset] << 16;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	return state->dsp_shared_ram[offset] << 16;
 }
 
 #define DEBUG_DSP				0
@@ -745,19 +724,20 @@ static void debug_dsp_command(void)
 }
 #endif
 
-static int first_dsp_reset;
 static WRITE32_HANDLER(dsp_shared_w)
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
 	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(space->cpu));
 	if (ACCESSING_BITS_24_31)
 	{
-		dsp_shared_ram[offset] &= 0x00ff;
-		dsp_shared_ram[offset] |= (data >> 16) & 0xff00;
+		state->dsp_shared_ram[offset] &= 0x00ff;
+		state->dsp_shared_ram[offset] |= (data >> 16) & 0xff00;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		dsp_shared_ram[offset] &= 0xff00;
-		dsp_shared_ram[offset] |= (data >> 16) & 0x00ff;
+		state->dsp_shared_ram[offset] &= 0xff00;
+		state->dsp_shared_ram[offset] |= (data >> 16) & 0x00ff;
 	}
 
 #if DEBUG_DSP
@@ -771,11 +751,11 @@ static WRITE32_HANDLER(dsp_shared_w)
 	{
 		if ((data & 0x80000) == 0)
 		{
-			if (!first_dsp_reset)
+			if (!state->first_dsp_reset)
 			{
 				cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
 			}
-			first_dsp_reset = 0;
+			state->first_dsp_reset = 0;
 		}
 		else
 		{
@@ -819,15 +799,15 @@ static WRITE32_HANDLER(jc_output_w)
 static ADDRESS_MAP_START( taitojc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE(&taitojc_vram)
+	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,vram)
 	AM_RANGE(0x040f8000, 0x040fbfff) AM_READWRITE(taitojc_tile_r, taitojc_tile_w)
 	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE(taitojc_char_r, taitojc_char_w)
-	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_BASE(&taitojc_objlist)
+	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,objlist)
 	AM_RANGE(0x05800000, 0x05801fff) AM_READ(jc_unknown1_r)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
 	//AM_RANGE(0x05a00000, 0x05a01fff)
 	//AM_RANGE(0x05fc0000, 0x05fc3fff)
-	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_BASE(&palette_ram)
+	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_BASE_MEMBER(taitojc_state,palette_ram)
 	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
 	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w)
 	AM_RANGE(0x06600010, 0x06600013) AM_NOP		// unknown
@@ -836,7 +816,7 @@ static ADDRESS_MAP_START( taitojc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w)
 	//AM_RANGE(0x06c00000, 0x06c0ffff) AM_RAM
 	AM_RANGE(0x06e00000, 0x06e0ffff) AM_WRITE(jc_output_w)
-	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE(&main_ram)
+	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,main_ram)
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
 
@@ -845,7 +825,9 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(hc11_comm_r)
 {
-	return mcu_comm_hc11;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	return state->mcu_comm_hc11;
 }
 
 static WRITE8_HANDLER(hc11_comm_w)
@@ -854,14 +836,18 @@ static WRITE8_HANDLER(hc11_comm_w)
 
 static READ8_HANDLER(hc11_data_r)
 {
-	mcu_comm_hc11 |= 0x04;
-	mcu_comm_main |= 0x20;
-	return mcu_data_hc11;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	state->mcu_comm_hc11 |= 0x04;
+	state->mcu_comm_main |= 0x20;
+	return state->mcu_data_hc11;
 }
 
 static WRITE8_HANDLER(hc11_data_w)
 {
-	mcu_data_main = data;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	state->mcu_data_main = data;
 }
 
 static READ8_HANDLER(hc11_analog_r)
@@ -888,88 +874,83 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static int texture_x;
-static int texture_y;
-
-static UINT32 dsp_rom_pos = 0;
-static UINT16 dsp_tex_address = 0;
-static UINT16 dsp_tex_offset = 0;
-
 static READ16_HANDLER( dsp_rom_r )
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
 	UINT16 *rom = (UINT16*)memory_region(space->machine, "gfx2");
-	UINT16 data = rom[dsp_rom_pos++];
+	UINT16 data = rom[state->dsp_rom_pos++];
+
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 	return data;
 }
 
 static WRITE16_HANDLER( dsp_rom_w )
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
 	if (offset == 0)
 	{
-		dsp_rom_pos &= 0xffff;
-		dsp_rom_pos |= data << 16;
+		state->dsp_rom_pos &= 0xffff;
+		state->dsp_rom_pos |= data << 16;
 	}
 	else if (offset == 1)
 	{
-		dsp_rom_pos &= 0xffff0000;
-		dsp_rom_pos |= data;
+		state->dsp_rom_pos &= 0xffff0000;
+		state->dsp_rom_pos |= data;
 	}
 }
 
 static WRITE16_HANDLER( dsp_texture_w )
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
 	int index;
 	int x, y;
 	//mame_printf_debug("texture write %08X, %04X\n", dsp_addr1, data);
 
-	x = (dsp_tex_offset >> 0) & 0x1f;
-	y = (dsp_tex_offset >> 5) & 0x1f;
+	x = (state->dsp_tex_offset >> 0) & 0x1f;
+	y = (state->dsp_tex_offset >> 5) & 0x1f;
 
-	x += (dsp_tex_offset & 0x400) ? 0x20 : 0;
-	y += (dsp_tex_offset & 0x800) ? 0x20 : 0;
+	x += (state->dsp_tex_offset & 0x400) ? 0x20 : 0;
+	y += (state->dsp_tex_offset & 0x800) ? 0x20 : 0;
 
-	index = (((texture_y * 32) + y) * 2048) + ((texture_x * 32) + x);
-	taitojc_texture[index] = data & 0xff;
+	index = (((state->texture_y * 32) + y) * 2048) + ((state->texture_x * 32) + x);
+	state->texture[index] = data & 0xff;
 
-	dsp_tex_offset++;
+	state->dsp_tex_offset++;
 }
 
 static READ16_HANDLER( dsp_texaddr_r )
 {
-	return dsp_tex_address;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	return state->dsp_tex_address;
 }
 
 static WRITE16_HANDLER( dsp_texaddr_w )
 {
-	dsp_tex_address = data;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	state->dsp_tex_address = data;
 //  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(space->cpu));
 
-	texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
-	texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);
+	state->texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
+	state->texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);
 
-	dsp_tex_offset = 0;
+	state->dsp_tex_offset = 0;
 }
 
 static WRITE16_HANDLER( dsp_polygon_fifo_w )
 {
-	polygon_fifo[polygon_fifo_ptr++] = data;
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+	state->polygon_fifo[state->polygon_fifo_ptr++] = data;
 
-	if (polygon_fifo_ptr >= POLYGON_FIFO_SIZE)
+	if (state->polygon_fifo_ptr >= POLYGON_FIFO_SIZE)
 	{
 		fatalerror("dsp_polygon_fifo_w: fifo overflow!\n");
 	}
 }
 
 
-
-static int viewport_data[3];
-
-static INT32 projected_point_x;
-static INT32 projected_point_y;
-static INT32 projection_data[3];
-
-static INT32 intersection_data[3];
 
 static READ16_HANDLER(dsp_unk_r)
 {
@@ -978,37 +959,43 @@ static READ16_HANDLER(dsp_unk_r)
 
 static WRITE16_HANDLER(dsp_viewport_w)
 {
-	viewport_data[offset] = (INT16)(data);
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	state->viewport_data[offset] = (INT16)(data);
 }
 
 static WRITE16_HANDLER(dsp_projection_w)
 {
-	projection_data[offset] = (INT16)(data);
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	state->projection_data[offset] = (INT16)(data);
 
 	if (offset == 2)
 	{
-		if (projection_data[2] != 0)
+		if (state->projection_data[2] != 0)
 		{
-			projected_point_y = (projection_data[0] * viewport_data[0]) / (projection_data[2]);
-			projected_point_x = (projection_data[1] * viewport_data[1]) / (projection_data[2]);
+			state->projected_point_y = (state->projection_data[0] * state->viewport_data[0]) / (state->projection_data[2]);
+			state->projected_point_x = (state->projection_data[1] * state->viewport_data[1]) / (state->projection_data[2]);
 		}
 		else
 		{
-			projected_point_y = 0;
-			projected_point_x = 0;
+			state->projected_point_y = 0;
+			state->projected_point_x = 0;
 		}
 	}
 }
 
 static READ16_HANDLER(dsp_projection_r)
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
 	if (offset == 0)
 	{
-		return projected_point_y;
+		return state->projected_point_y;
 	}
 	else if (offset == 2)
 	{
-		return projected_point_x;
+		return state->projected_point_x;
 	}
 
 	return 0;
@@ -1016,23 +1003,29 @@ static READ16_HANDLER(dsp_projection_r)
 
 static WRITE16_HANDLER(dsp_unk2_w)
 {
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
 	if (offset == 0)
 	{
 		taitojc_clear_frame(space->machine);
-		taitojc_render_polygons(space->machine, polygon_fifo, polygon_fifo_ptr);
+		taitojc_render_polygons(space->machine, state->polygon_fifo, state->polygon_fifo_ptr);
 
-		polygon_fifo_ptr = 0;
+		state->polygon_fifo_ptr = 0;
 	}
 }
 
 static WRITE16_HANDLER(dsp_intersection_w)
 {
-	intersection_data[offset] = (INT32)(INT16)(data);
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	state->intersection_data[offset] = (INT32)(INT16)(data);
 }
 
 static READ16_HANDLER(dsp_intersection_r)
 {
-	return (INT16)((intersection_data[0] * intersection_data[1]) / intersection_data[2]);
+	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+
+	return (INT16)((state->intersection_data[0] * state->intersection_data[1]) / state->intersection_data[2]);
 }
 
 /*
@@ -1074,7 +1067,7 @@ static ADDRESS_MAP_START( tms_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_intersection_r)
 	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&dsp_shared_ram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,dsp_shared_ram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1277,26 +1270,28 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( taitojc )
 {
-	first_dsp_reset = 1;
+	taitojc_state *state = (taitojc_state *)machine->driver_data;
 
-	mcu_comm_main = 0;
-	mcu_comm_hc11 = 0;
-	mcu_data_main = 0;
-	mcu_data_hc11 = 0;
+	state->first_dsp_reset = 1;
 
-	texture_x = 0;
-	texture_y = 0;
+	state->mcu_comm_main = 0;
+	state->mcu_comm_hc11 = 0;
+	state->mcu_data_main = 0;
+	state->mcu_data_hc11 = 0;
 
-	dsp_rom_pos = 0;
-	dsp_tex_address = 0;
-	dsp_tex_offset = 0;
+	state->texture_x = 0;
+	state->texture_y = 0;
 
-	projected_point_x = 0;
-	projected_point_y = 0;
+	state->dsp_rom_pos = 0;
+	state->dsp_tex_address = 0;
+	state->dsp_tex_offset = 0;
 
-	memset(viewport_data, 0, sizeof(viewport_data));
-	memset(projection_data, 0, sizeof(projection_data));
-	memset(intersection_data, 0, sizeof(intersection_data));
+	state->projected_point_x = 0;
+	state->projected_point_y = 0;
+
+	memset(state->viewport_data, 0, sizeof(state->viewport_data));
+	memset(state->projection_data, 0, sizeof(state->projection_data));
+	memset(state->intersection_data, 0, sizeof(state->intersection_data));
 
 	// hold the TMS in reset until we have code
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1320,6 +1315,9 @@ static const hc11_config taitojc_config =
 
 
 static MACHINE_DRIVER_START( taitojc )
+
+	MDRV_DRIVER_DATA( taitojc_state )
+
 	MDRV_CPU_ADD("maincpu", M68040, 25000000)
 	MDRV_CPU_PROGRAM_MAP(taitojc_map)
 	MDRV_CPU_VBLANK_INT("screen", taitojc_vblank)
@@ -1357,9 +1355,11 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( taitojc )
 {
+	taitojc_state *state = (taitojc_state *)machine->driver_data;
+
 	f3_shared_ram = auto_alloc_array(machine, UINT32, 0x800/4);
 
-	polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
+	state->polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
 }
 
 ROM_START( sidebs )

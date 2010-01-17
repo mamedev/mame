@@ -5,9 +5,8 @@
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/tunhunt.h"
 
-extern UINT8 tunhunt_control;
-extern UINT8 *tunhunt_ram;
 
 /****************************************************************************************/
 
@@ -45,19 +44,22 @@ extern UINT8 *tunhunt_ram;
 #define MOBSC0	0x1080	// SCAN ROM START FOR MOBJ (unused?)
 #define MOBSC1	0x1081	// (unused?)
 
-static tilemap_t *fg_tilemap;
+
 
 /****************************************************************************************/
 
 WRITE8_HANDLER( tunhunt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	tunhunt_state *state = (tunhunt_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = machine->generic.videoram.u8[tile_index];
+	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	int attr = state->videoram[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
@@ -72,12 +74,14 @@ VIDEO_START( tunhunt )
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
+	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+
 	machine->generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, video_screen_get_format(machine->primary_screen));
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 0);
-	tilemap_set_scrollx(fg_tilemap, 0, 64);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_scrollx(state->fg_tilemap, 0, 64);
 }
 
 PALETTE_INIT( tunhunt )
@@ -140,7 +144,6 @@ Color Array Ram Assignments:
 */
 static void set_pens(running_machine *machine)
 {
-//  const UINT8 *color_prom = memory_region( machine, "proms" );
 /*
     The actual contents of the color proms (unused by this driver)
     are as follows:
@@ -153,6 +156,7 @@ static void set_pens(running_machine *machine)
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
+	//const UINT8 *color_prom = memory_region( machine, "proms" );
 	int color;
 	int shade;
 	int i;
@@ -196,7 +200,7 @@ static void set_pens(running_machine *machine)
 	}
 }
 
-static void draw_motion_object(bitmap_t *bitmap, bitmap_t *tmpbitmap, const rectangle *cliprect, UINT8 *spriteram)
+static void draw_motion_object(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -208,7 +212,12 @@ static void draw_motion_object(bitmap_t *bitmap, bitmap_t *tmpbitmap, const rect
  *      MOBSC1  0x1081
  *          always 0x00?
  */
-//  int skip = tunhunt_ram[MOBST];
+
+	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	bitmap_t *tmpbitmap = machine->generic.tmpbitmap;
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *tunhunt_ram = state->workram;
+	//int skip = tunhunt_ram[MOBST];
 	int x0 = 255-tunhunt_ram[MOBJV];
 	int y0 = 255-tunhunt_ram[MOBJH];
 	int scalex,scaley;
@@ -263,7 +272,7 @@ static void draw_motion_object(bitmap_t *bitmap, bitmap_t *tmpbitmap, const rect
 	);
 }
 
-static void draw_box(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_box(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -283,6 +292,8 @@ static void draw_box(bitmap_t *bitmap, const rectangle *cliprect)
         1280: 07 03 00      01  07 06 04 05 02 07 03 00     09 0a   0b 0c       palette select
         ->hue 06 02 ff      60  06 05 03 04 01 06 02 ff     d2 00   c2 ff
 */
+	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	UINT8 *tunhunt_ram = state->workram;
 	int span,x,y;
 	int color;
 //  rectangle bbox;
@@ -367,28 +378,29 @@ static void draw_shell(running_machine *machine,
 
 VIDEO_UPDATE( tunhunt )
 {
+	tunhunt_state *state = (tunhunt_state *)screen->machine->driver_data;
 	set_pens(screen->machine);
 
-	draw_box(bitmap, cliprect);
+	draw_box(screen->machine, bitmap, cliprect);
 
-	draw_motion_object(bitmap, screen->machine->generic.tmpbitmap, cliprect, screen->machine->generic.spriteram.u8);
-
-	draw_shell(screen->machine, bitmap, cliprect,
-		tunhunt_ram[SHL0PC],	/* picture code */
-		tunhunt_ram[SHEL0H],	/* hposition */
-		tunhunt_ram[SHL0V],	/* vstart */
-		tunhunt_ram[SHL0VS],	/* vstop */
-		tunhunt_ram[SHL0ST],	/* vstretch */
-		tunhunt_control&0x08 ); /* hstretch */
+	draw_motion_object(screen->machine, bitmap, cliprect);
 
 	draw_shell(screen->machine, bitmap, cliprect,
-		tunhunt_ram[SHL1PC],	/* picture code */
-		tunhunt_ram[SHEL1H],	/* hposition */
-		tunhunt_ram[SHL1V],	/* vstart */
-		tunhunt_ram[SHL1VS],	/* vstop */
-		tunhunt_ram[SHL1ST],	/* vstretch */
-		tunhunt_control&0x10 ); /* hstretch */
+		state->workram[SHL0PC],	/* picture code */
+		state->workram[SHEL0H],	/* hposition */
+		state->workram[SHL0V],	/* vstart */
+		state->workram[SHL0VS],	/* vstop */
+		state->workram[SHL0ST],	/* vstretch */
+		state->control&0x08 ); /* hstretch */
 
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	draw_shell(screen->machine, bitmap, cliprect,
+		state->workram[SHL1PC],	/* picture code */
+		state->workram[SHEL1H],	/* hposition */
+		state->workram[SHL1V],	/* vstart */
+		state->workram[SHL1VS],	/* vstop */
+		state->workram[SHL1ST],	/* vstretch */
+		state->control&0x10 ); /* hstretch */
+
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }

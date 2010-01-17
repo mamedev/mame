@@ -142,25 +142,16 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "includes/wwfsstar.h"
 
 #define MASTER_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			MASTER_CLOCK / 2
 #define PIXEL_CLOCK		MASTER_CLOCK / 4
 
-/* in (video/wwfsstar.c) */
-VIDEO_START( wwfsstar );
-VIDEO_UPDATE( wwfsstar );
-WRITE16_HANDLER( wwfsstar_fg0_videoram_w );
-WRITE16_HANDLER( wwfsstar_bg0_videoram_w );
-
-extern UINT16 *wwfsstar_fg0_videoram, *wwfsstar_bg0_videoram;
-
 static WRITE16_HANDLER( wwfsstar_irqack_w );
 static WRITE16_HANDLER( wwfsstar_flipscreen_w );
 static WRITE16_HANDLER ( wwfsstar_soundwrite );
 static WRITE16_HANDLER ( wwfsstar_scrollwrite );
-
-static int vblank = 0;
 
 /*******************************************************************************
  Memory Maps
@@ -170,9 +161,9 @@ static int vblank = 0;
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_BASE(&wwfsstar_fg0_videoram)	/* FG0 Ram */
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_BASE(&wwfsstar_bg0_videoram)	/* BG0 Ram */
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE_GENERIC(spriteram)		/* SPR Ram */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,fg0_videoram)	/* FG0 Ram */
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,bg0_videoram)	/* BG0 Ram */
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE_MEMBER(wwfsstar_state,spriteram)		/* SPR Ram */
 	AM_RANGE(0x140000, 0x140fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(wwfsstar_irqack_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
@@ -201,17 +192,17 @@ ADDRESS_MAP_END
  as used by the above memory map
 *******************************************************************************/
 
-int wwfsstar_scrollx, wwfsstar_scrolly; /* used in (video/wwfsstar.c) */
-
 static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 {
+	wwfsstar_state *state = (wwfsstar_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x00:
-			wwfsstar_scrollx = data;
+			state->scrollx = data;
 			break;
 		case 0x01:
-			wwfsstar_scrolly = data;
+			state->scrolly = data;
 			break;
 	}
 }
@@ -251,17 +242,18 @@ static WRITE16_HANDLER( wwfsstar_irqack_w )
 
 static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 {
+	wwfsstar_state *state = (wwfsstar_state *)timer->machine->driver_data;
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
 	if (scanline == 0)
 	{
-		vblank = 0;
+		state->vblank = 0;
 	}
 	/* Hack */
 	else if (scanline == (240-1))		/* -1 is an hack needed to avoid deadlocks */
 	{
-		vblank = 1;
+		state->vblank = 1;
 	}
 
 	/* An interrupt is generated every 16 scanlines */
@@ -282,7 +274,9 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 
 static CUSTOM_INPUT( wwfsstar_vblank_r )
 {
-	return vblank;
+	wwfsstar_state *state = (wwfsstar_state *)field->port->machine->driver_data;
+
+	return state->vblank;
 }
 
 /*******************************************************************************
@@ -434,6 +428,8 @@ static const ym2151_interface ym2151_config =
 *******************************************************************************/
 
 static MACHINE_DRIVER_START( wwfsstar )
+
+	MDRV_DRIVER_DATA( wwfsstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)

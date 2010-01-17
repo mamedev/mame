@@ -142,31 +142,12 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "includes/shadfrce.h"
+
 
 #define MASTER_CLOCK		XTAL_28MHz
 #define CPU_CLOCK			MASTER_CLOCK / 2
 #define PIXEL_CLOCK		MASTER_CLOCK / 4
-
-UINT16 *shadfrce_fgvideoram, *shadfrce_bg0videoram,  *shadfrce_bg1videoram,   *shadfrce_spvideoram;
-
-/* in video */
-WRITE16_HANDLER ( shadfrce_bg0scrollx_w );
-WRITE16_HANDLER ( shadfrce_bg1scrollx_w );
-WRITE16_HANDLER ( shadfrce_bg0scrolly_w );
-WRITE16_HANDLER ( shadfrce_bg1scrolly_w );
-VIDEO_START( shadfrce );
-VIDEO_EOF(shadfrce);
-VIDEO_UPDATE( shadfrce );
-WRITE16_HANDLER( shadfrce_fgvideoram_w );
-WRITE16_HANDLER( shadfrce_bg0videoram_w );
-WRITE16_HANDLER( shadfrce_bg1videoram_w );
-
-int shadfrce_video_enable = 0;
-static int shadfrce_irqs_enable = 0;
-static int raster_scanline = 0;
-static int raster_irq_enable = 0;
-static int vblank = 0;
-
 
 static WRITE16_HANDLER( shadfrce_flip_screen )
 {
@@ -255,6 +236,7 @@ static WRITE16_HANDLER( shadfrce_flip_screen )
 
 static READ16_HANDLER( shadfrce_input_ports_r )
 {
+	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
 	UINT16 data = 0xffff;
 
 	switch (offset)
@@ -269,7 +251,7 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 			data = (input_port_read(space->machine, "EXTRA") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (input_port_read(space->machine, "OTHER") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine, "MISC") & 0x38) << 8) | (vblank << 8);
+			data = (input_port_read(space->machine, "OTHER") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine, "MISC") & 0x38) << 8) | (state->vblank << 8);
 			break;
 	}
 
@@ -301,60 +283,63 @@ static WRITE16_HANDLER( shadfrce_irq_ack_w )
 
 static WRITE16_HANDLER( shadfrce_irq_w )
 {
-	static int prev_value = 0;
+	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
 
-	shadfrce_irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
-	shadfrce_video_enable = data & 8;	/* probably */
+	state->irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
+	state->video_enable = data & 8;	/* probably */
 
 	/* check if there's a high transition to enable the raster IRQ */
-	if((~prev_value & 4) && (data & 4))
+	if((~state->prev_value & 4) && (data & 4))
 	{
-		raster_irq_enable = 1;
+		state->raster_irq_enable = 1;
 	}
 
 	/* check if there's a low transition to disable the raster IRQ */
-	if((prev_value & 4) && (~data & 4))
+	if((state->prev_value & 4) && (~data & 4))
 	{
-		raster_irq_enable = 0;
+		state->raster_irq_enable = 0;
 	}
 
-	prev_value = data;
+	state->prev_value = data;
 }
 
 static WRITE16_HANDLER( shadfrce_scanline_w )
 {
-	raster_scanline = data; 	/* guess, 0 is always written */
+	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+
+	state->raster_scanline = data;	/* guess, 0 is always written */
 }
 
 static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 {
+	shadfrce_state *state = (shadfrce_state *)timer->machine->driver_data;
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
 	if (scanline == 0)
 	{
-		vblank = 0;
+		state->vblank = 0;
 	}
 	/* Hack */
 	else if (scanline == (248-1))		/* -1 is an hack needed to avoid deadlocks */
 	{
-		vblank = 4;
+		state->vblank = 4;
 	}
 
 	/* Raster interrupt - Perform raster effect on given scanline */
-	if (raster_irq_enable)
+	if (state->raster_irq_enable)
 	{
-		if (scanline == raster_scanline)
+		if (scanline == state->raster_scanline)
 		{
-			raster_scanline = (raster_scanline + 1) % 240;
-			if (raster_scanline > 0)
-				video_screen_update_partial(timer->machine->primary_screen, raster_scanline - 1);
+			state->raster_scanline = (state->raster_scanline + 1) % 240;
+			if (state->raster_scanline > 0)
+				video_screen_update_partial(timer->machine->primary_screen, state->raster_scanline - 1);
 			cputag_set_input_line(timer->machine, "maincpu", 1, ASSERT_LINE);
 		}
 	}
 
 	/* An interrupt is generated every 16 scanlines */
-	if (shadfrce_irqs_enable)
+	if (state->irqs_enable)
 	{
 		if (scanline % 16 == 0)
 		{
@@ -365,7 +350,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 	}
 
 	/* Vblank is raised on scanline 248 */
-	if (shadfrce_irqs_enable)
+	if (state->irqs_enable)
 	{
 		if (scanline == 248)
 		{
@@ -381,12 +366,12 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 
 static ADDRESS_MAP_START( shadfrce_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE(&shadfrce_bg0videoram) /* video */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE_MEMBER(shadfrce_state,bg0videoram) /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE(&shadfrce_bg1videoram) /* bg 2 */
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE_MEMBER(shadfrce_state,bg1videoram) /* bg 2 */
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE(&shadfrce_fgvideoram)
-	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE(&shadfrce_spvideoram) AM_SIZE_GENERIC(spriteram) /* sprites */
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE_MEMBER(shadfrce_state,fgvideoram)
+	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE_MEMBER(shadfrce_state,spvideoram) AM_SIZE_MEMBER(shadfrce_state,spvideoram_size) /* sprites */
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
 	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
@@ -572,11 +557,14 @@ static const ym2151_interface ym2151_config =
 };
 
 static MACHINE_DRIVER_START( shadfrce )
+
+	MDRV_DRIVER_DATA( shadfrce_state )
+
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", shadfrce_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 		/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

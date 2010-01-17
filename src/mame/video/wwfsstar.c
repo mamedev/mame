@@ -7,10 +7,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-
-UINT16 *wwfsstar_fg0_videoram, *wwfsstar_bg0_videoram;
-extern int wwfsstar_scrollx, wwfsstar_scrolly;
-static tilemap_t *fg0_tilemap, *bg0_tilemap;
+#include "includes/wwfsstar.h"
 
 /*******************************************************************************
  Write Handlers
@@ -20,14 +17,18 @@ static tilemap_t *fg0_tilemap, *bg0_tilemap;
 
 WRITE16_HANDLER( wwfsstar_fg0_videoram_w )
 {
-	COMBINE_DATA(&wwfsstar_fg0_videoram[offset]);
-	tilemap_mark_tile_dirty(fg0_tilemap,offset/2);
+	wwfsstar_state *state = (wwfsstar_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->fg0_videoram[offset]);
+	tilemap_mark_tile_dirty(state->fg0_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
 {
-	COMBINE_DATA(&wwfsstar_bg0_videoram[offset]);
-	tilemap_mark_tile_dirty(bg0_tilemap,offset/2);
+	wwfsstar_state *state = (wwfsstar_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->bg0_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg0_tilemap,offset/2);
 }
 
 /*******************************************************************************
@@ -51,10 +52,12 @@ static TILE_GET_INFO( get_fg0_tile_info )
 
     **- End of Comments -*/
 
+	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
 	UINT16 *tilebase;
 	int tileno;
 	int colbank;
-	tilebase =  &wwfsstar_fg0_videoram[tile_index*2];
+
+	tilebase =  &state->fg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x00f0) >> 4;
 	SET_TILE_INFO(
@@ -87,9 +90,11 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
     **- End of Comments -*/
 
+	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
 	UINT16 *tilebase;
 	int tileno, colbank, flipx;
-	tilebase =  &wwfsstar_bg0_videoram[tile_index*2];
+
+	tilebase =  &state->bg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x0070) >> 4;
 	flipx   = (tilebase[0] & 0x0080) >> 7;
@@ -129,8 +134,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     **- End of Comments -*/
 
+	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
 	const gfx_element *gfx = machine->gfx[1];
-	UINT16 *source = machine->generic.spriteram.u16;
+	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x3ff/2;
 
 	while (source < finish)
@@ -189,7 +195,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 		}
 
-	source+=5;
+		source+=5;
 	}
 }
 
@@ -205,21 +211,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( wwfsstar )
 {
-	fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	tilemap_set_transparent_pen(fg0_tilemap,0);
+	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
 
-	bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,bg0_scan, 16, 16,32,32);
-	tilemap_set_transparent_pen(fg0_tilemap,0);
+	state->fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	tilemap_set_transparent_pen(state->fg0_tilemap,0);
+
+	state->bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,bg0_scan, 16, 16,32,32);
+	tilemap_set_transparent_pen(state->fg0_tilemap,0);
 }
 
 VIDEO_UPDATE( wwfsstar )
 {
-	tilemap_set_scrolly( bg0_tilemap, 0, wwfsstar_scrolly  );
-	tilemap_set_scrollx( bg0_tilemap, 0, wwfsstar_scrollx  );
+	wwfsstar_state *state = (wwfsstar_state *)screen->machine->driver_data;
 
-	tilemap_draw(bitmap,cliprect,bg0_tilemap,0,0);
+	tilemap_set_scrolly( state->bg0_tilemap, 0, state->scrolly  );
+	tilemap_set_scrollx( state->bg0_tilemap, 0, state->scrollx  );
+
+	tilemap_draw(bitmap,cliprect,state->bg0_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect );
-	tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg0_tilemap,0,0);
 
 	return 0;
 }

@@ -4,9 +4,7 @@
 */
 
 #include "emu.h"
-
-static tilemap_t *background, *foreground;
-extern UINT8 *shootout_textram;
+#include "includes/shootout.h"
 
 
 PALETTE_INIT( shootout )
@@ -40,10 +38,13 @@ PALETTE_INIT( shootout )
 
 
 
-static TILE_GET_INFO( get_bg_tile_info ){
-	int attributes = machine->generic.videoram.u8[tile_index+0x400]; /* CCCC -TTT */
-	int tile_number = machine->generic.videoram.u8[tile_index] + 256*(attributes&7);
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	shootout_state *state = (shootout_state *)machine->driver_data;
+	int attributes = state->videoram[tile_index+0x400]; /* CCCC -TTT */
+	int tile_number = state->videoram[tile_index] + 256*(attributes&7);
 	int color = attributes>>4;
+
 	SET_TILE_INFO(
 			2,
 			tile_number,
@@ -51,10 +52,13 @@ static TILE_GET_INFO( get_bg_tile_info ){
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info ){
-	int attributes = shootout_textram[tile_index+0x400]; /* CCCC --TT */
-	int tile_number = shootout_textram[tile_index] + 256*(attributes&0x3);
+static TILE_GET_INFO( get_fg_tile_info )
+{
+	shootout_state *state = (shootout_state *)machine->driver_data;
+	int attributes = state->textram[tile_index+0x400]; /* CCCC --TT */
+	int tile_number = state->textram[tile_index] + 256*(attributes&0x3);
 	int color = attributes>>4;
+
 	SET_TILE_INFO(
 			0,
 			tile_number,
@@ -62,23 +66,35 @@ static TILE_GET_INFO( get_fg_tile_info ){
 			0);
 }
 
-WRITE8_HANDLER( shootout_videoram_w ){
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty( background, offset&0x3ff );
-}
-WRITE8_HANDLER( shootout_textram_w ){
-	shootout_textram[offset] = data;
-	tilemap_mark_tile_dirty( foreground, offset&0x3ff );
+WRITE8_HANDLER( shootout_videoram_w )
+{
+	shootout_state *state = (shootout_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty( state->background, offset&0x3ff );
 }
 
-VIDEO_START( shootout ){
-	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
-	foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
-		tilemap_set_transparent_pen( foreground, 0 );
+WRITE8_HANDLER( shootout_textram_w )
+{
+	shootout_state *state = (shootout_state *)space->machine->driver_data;
+
+	state->textram[offset] = data;
+	tilemap_mark_tile_dirty( state->foreground, offset&0x3ff );
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_bits ){
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+VIDEO_START( shootout )
+{
+	shootout_state *state = (shootout_state *)machine->driver_data;
+
+	state->background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen( state->foreground, 0 );
+}
+
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_bits )
+{
+	shootout_state *state = (shootout_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	static int bFlicker;
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source = spriteram+127*4;
@@ -86,7 +102,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	bFlicker = !bFlicker;
 
-	for( count=0; count<128; count++ ){
+	for( count=0; count<128; count++ )
+	{
 		int attributes = source[1];
 		/*
             76543210
@@ -157,20 +174,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( shootout )
 {
+	shootout_state *state = (shootout_state *)screen->machine->driver_data;
+
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	tilemap_draw(bitmap,cliprect,background,0,0);
-	tilemap_draw(bitmap,cliprect,foreground,0,1);
+	tilemap_draw(bitmap,cliprect,state->background,0,0);
+	tilemap_draw(bitmap,cliprect,state->foreground,0,1);
 	draw_sprites(screen->machine, bitmap,cliprect,3/*bank bits */);
 	return 0;
 }
 
 VIDEO_UPDATE( shootouj )
 {
+	shootout_state *state = (shootout_state *)screen->machine->driver_data;
+
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	tilemap_draw(bitmap,cliprect,background,0,0);
-	tilemap_draw(bitmap,cliprect,foreground,0,1);
+	tilemap_draw(bitmap,cliprect,state->background,0,0);
+	tilemap_draw(bitmap,cliprect,state->foreground,0,1);
 	draw_sprites(screen->machine, bitmap,cliprect,2/*bank bits*/);
 	return 0;
 }

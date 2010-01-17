@@ -1,18 +1,14 @@
 /* Super Slam - Video Hardware */
 
 #include "emu.h"
+#include "includes/sslam.h"
 
-static tilemap_t *sslam_bg_tilemap, *sslam_tx_tilemap, *sslam_md_tilemap;
-
-extern UINT16 *sslam_bg_tileram, *sslam_tx_tileram, *sslam_md_tileram;
-extern UINT16 *sslam_spriteram, *sslam_regs;
-
-static int sprites_x_offset;
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	sslam_state *state = (sslam_state *)machine->driver_data;
 	const gfx_element *gfx = machine->gfx[0];
-	UINT16 *source = sslam_spriteram;
+	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x1000/2;
 
 	source += 3; // strange
@@ -30,7 +26,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		flipx = source[0] & 0x4000;
 		number = source[3];
 
-		xpos -=16; xpos -=7; xpos += sprites_x_offset;
+		xpos -=16; xpos -=7; xpos += state->sprites_x_offset;
 		ypos = 0xff - ypos;
 		ypos -=16; ypos -=7;
 
@@ -79,138 +75,158 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static TILE_GET_INFO( get_sslam_tx_tile_info )
 {
-	int code = sslam_tx_tileram[tile_index] & 0x0fff;
-	int colr = sslam_tx_tileram[tile_index] & 0xf000;
+	sslam_state *state = (sslam_state *)machine->driver_data;
+	int code = state->tx_tileram[tile_index] & 0x0fff;
+	int colr = state->tx_tileram[tile_index] & 0xf000;
 
 	SET_TILE_INFO(3,code+0xc000 ,colr >> 12,0);
 }
 
 WRITE16_HANDLER( sslam_tx_tileram_w )
 {
-	COMBINE_DATA(&sslam_tx_tileram[offset]);
-	tilemap_mark_tile_dirty(sslam_tx_tilemap,offset);
+	sslam_state *state = (sslam_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->tx_tileram[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 /* Middle Layer */
 
 static TILE_GET_INFO( get_sslam_md_tile_info )
 {
-	int code = sslam_md_tileram[tile_index] & 0x0fff;
-	int colr = sslam_md_tileram[tile_index] & 0xf000;
+	sslam_state *state = (sslam_state *)machine->driver_data;
+	int code = state->md_tileram[tile_index] & 0x0fff;
+	int colr = state->md_tileram[tile_index] & 0xf000;
 
 	SET_TILE_INFO(2,code+0x2000 ,colr >> 12,0);
 }
 
 WRITE16_HANDLER( sslam_md_tileram_w )
 {
-	COMBINE_DATA(&sslam_md_tileram[offset]);
-	tilemap_mark_tile_dirty(sslam_md_tilemap,offset);
+	sslam_state *state = (sslam_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->md_tileram[offset]);
+	tilemap_mark_tile_dirty(state->md_tilemap,offset);
 }
 
 /* Background Layer */
 
 static TILE_GET_INFO( get_sslam_bg_tile_info )
 {
-	int code = sslam_bg_tileram[tile_index] & 0x1fff;
-	int colr = sslam_bg_tileram[tile_index] & 0xe000;
+	sslam_state *state = (sslam_state *)machine->driver_data;
+	int code = state->bg_tileram[tile_index] & 0x1fff;
+	int colr = state->bg_tileram[tile_index] & 0xe000;
 
 	SET_TILE_INFO(1,code ,colr >> 13,0);
 }
 
 WRITE16_HANDLER( sslam_bg_tileram_w )
 {
-	COMBINE_DATA(&sslam_bg_tileram[offset]);
-	tilemap_mark_tile_dirty(sslam_bg_tilemap,offset);
+	sslam_state *state = (sslam_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->bg_tileram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_powerbls_bg_tile_info )
 {
-	int code = sslam_bg_tileram[tile_index*2+1] & 0x0fff;
-	int colr = (sslam_bg_tileram[tile_index*2+1] & 0xf000) >> 12;
-	code |= (sslam_bg_tileram[tile_index*2] & 0x0f00) << 4;
+	sslam_state *state = (sslam_state *)machine->driver_data;
+	int code = state->bg_tileram[tile_index*2+1] & 0x0fff;
+	int colr = (state->bg_tileram[tile_index*2+1] & 0xf000) >> 12;
+	code |= (state->bg_tileram[tile_index*2] & 0x0f00) << 4;
 
-	//(sslam_bg_tileram[tile_index*2] & 0x0f00) == 0xf000 ???
+	//(state->bg_tileram[tile_index*2] & 0x0f00) == 0xf000 ???
 
 	SET_TILE_INFO(1,code,colr,0);
 }
 
 WRITE16_HANDLER( powerbls_bg_tileram_w )
 {
-	COMBINE_DATA(&sslam_bg_tileram[offset]);
-	tilemap_mark_tile_dirty(sslam_bg_tilemap,offset>>1);
+	sslam_state *state = (sslam_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->bg_tileram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset>>1);
 }
 
 VIDEO_START(sslam)
 {
-	sslam_bg_tilemap = tilemap_create(machine, get_sslam_bg_tile_info,tilemap_scan_rows,16,16,32,32);
-	sslam_md_tilemap = tilemap_create(machine, get_sslam_md_tile_info,tilemap_scan_rows,16,16,32,32);
-	sslam_tx_tilemap = tilemap_create(machine, get_sslam_tx_tile_info,tilemap_scan_rows,8,8,64,64);
+	sslam_state *state = (sslam_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(sslam_md_tilemap,0);
-	tilemap_set_transparent_pen(sslam_tx_tilemap,0);
+	state->bg_tilemap = tilemap_create(machine, get_sslam_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->md_tilemap = tilemap_create(machine, get_sslam_md_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->tx_tilemap = tilemap_create(machine, get_sslam_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
-	sprites_x_offset = 0;
-	state_save_register_global(machine, sprites_x_offset);
+	tilemap_set_transparent_pen(state->md_tilemap,0);
+	tilemap_set_transparent_pen(state->tx_tilemap,0);
+
+	state->sprites_x_offset = 0;
+	state_save_register_global(machine, state->sprites_x_offset);
 }
 
 VIDEO_START(powerbls)
 {
-	sslam_bg_tilemap = tilemap_create(machine, get_powerbls_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	sslam_state *state = (sslam_state *)machine->driver_data;
 
-	sprites_x_offset = -21;
-	state_save_register_global(machine, sprites_x_offset);
+	state->bg_tilemap = tilemap_create(machine, get_powerbls_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+
+	state->sprites_x_offset = -21;
+	state_save_register_global(machine, state->sprites_x_offset);
 }
 
 VIDEO_UPDATE(sslam)
 {
-	if(!(sslam_regs[6] & 1))
+	sslam_state *state = (sslam_state *)screen->machine->driver_data;
+
+	if (!(state->regs[6] & 1))
 	{
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
-	tilemap_set_scrollx(sslam_tx_tilemap,0, sslam_regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
-	tilemap_set_scrolly(sslam_tx_tilemap,0, (sslam_regs[1] & 0xff)+8);
-	tilemap_set_scrollx(sslam_md_tilemap,0, sslam_regs[2]+2);
-	tilemap_set_scrolly(sslam_md_tilemap,0, sslam_regs[3]+8);
-	tilemap_set_scrollx(sslam_bg_tilemap,0, sslam_regs[4]+4);
-	tilemap_set_scrolly(sslam_bg_tilemap,0, sslam_regs[5]+8);
+	tilemap_set_scrollx(state->tx_tilemap,0, state->regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
+	tilemap_set_scrolly(state->tx_tilemap,0, (state->regs[1] & 0xff)+8);
+	tilemap_set_scrollx(state->md_tilemap,0, state->regs[2]+2);
+	tilemap_set_scrolly(state->md_tilemap,0, state->regs[3]+8);
+	tilemap_set_scrollx(state->bg_tilemap,0, state->regs[4]+4);
+	tilemap_set_scrolly(state->bg_tilemap,0, state->regs[5]+8);
 
-	tilemap_draw(bitmap,cliprect,sslam_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 
 	/* remove wraparound from the tilemap (used on title screen) */
-	if(sslam_regs[2]+2 > 0x8c8)
+	if (state->regs[2]+2 > 0x8c8)
 	{
 		rectangle md_clip;
 		md_clip.min_x = cliprect->min_x;
-		md_clip.max_x = cliprect->max_x - (sslam_regs[2]+2 - 0x8c8);
+		md_clip.max_x = cliprect->max_x - (state->regs[2]+2 - 0x8c8);
 		md_clip.min_y = cliprect->min_y;
 		md_clip.max_y = cliprect->max_y;
 
-		tilemap_draw(bitmap,&md_clip,sslam_md_tilemap,0,0);
+		tilemap_draw(bitmap,&md_clip,state->md_tilemap,0,0);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,sslam_md_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->md_tilemap,0,0);
 	}
 
 	draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,sslam_tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }
 
 VIDEO_UPDATE(powerbls)
 {
-	if(!(sslam_regs[6] & 1))
+	sslam_state *state = (sslam_state *)screen->machine->driver_data;
+
+	if (!(state->regs[6] & 1))
 	{
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
-	tilemap_set_scrollx(sslam_bg_tilemap,0, sslam_regs[0]+21);
-	tilemap_set_scrolly(sslam_bg_tilemap,0, sslam_regs[1]-240);
+	tilemap_set_scrollx(state->bg_tilemap,0, state->regs[0]+21);
+	tilemap_set_scrolly(state->bg_tilemap,0, state->regs[1]-240);
 
-	tilemap_draw(bitmap,cliprect,sslam_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

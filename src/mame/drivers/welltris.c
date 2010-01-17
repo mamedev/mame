@@ -316,20 +316,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-
-UINT16 *welltris_spriteram;
-//size_t welltris_spriteram_size;
-UINT16 *welltris_pixelram;
-UINT16 *welltris_charvideoram;
-
-//READ16_HANDLER( welltris_spriteram_r );
-WRITE16_HANDLER( welltris_spriteram_w );
-WRITE16_HANDLER( welltris_palette_bank_w );
-WRITE16_HANDLER( welltris_gfxbank_w );
-WRITE16_HANDLER( welltris_charvideoram_w );
-WRITE16_HANDLER( welltris_scrollreg_w );
-VIDEO_START( welltris );
-VIDEO_UPDATE( welltris );
+#include "includes/welltris.h"
 
 
 
@@ -341,13 +328,13 @@ static WRITE8_HANDLER( welltris_sh_bankswitch_w )
 }
 
 
-static int pending_command;
-
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		pending_command = 1;
+		welltris_state *state = (welltris_state *)space->machine->driver_data;
+
+		state->pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -355,22 +342,25 @@ static WRITE16_HANDLER( sound_command_w )
 
 static CUSTOM_INPUT( pending_sound_r )
 {
-	return pending_command ? 1 : 0;
+	welltris_state *state = (welltris_state *)field->port->machine->driver_data;
+	return state->pending_command ? 1 : 0;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	pending_command = 0;
+	welltris_state *state = (welltris_state *)space->machine->driver_data;
+
+	state->pending_command = 0;
 }
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(&welltris_pixelram)	/* Graph_1 & 2*/
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE_MEMBER(welltris_state,pixelram)	/* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE(&welltris_spriteram)			/* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE(&welltris_charvideoram)		/* Char */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE_MEMBER(welltris_state,spriteram)			/* Sprite */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE_MEMBER(welltris_state,charvideoram)		/* Char */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")					/* Bottom Controls */
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
@@ -716,6 +706,8 @@ static DRIVER_INIT( quiz18k )
 
 
 static MACHINE_DRIVER_START( welltris )
+
+	MDRV_DRIVER_DATA( welltris_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* 10 MHz */

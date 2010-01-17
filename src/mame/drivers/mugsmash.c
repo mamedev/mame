@@ -44,21 +44,13 @@ behavior we use .
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-UINT16 *mugsmash_videoram1, *mugsmash_videoram2, *mugs_spriteram;
-UINT16 *mugsmash_regs1, *mugsmash_regs2;
-
-VIDEO_START( mugsmash );
-VIDEO_UPDATE( mugsmash );
-
-WRITE16_HANDLER( mugsmash_reg_w );
-WRITE16_HANDLER( mugsmash_videoram2_w );
-WRITE16_HANDLER( mugsmash_videoram1_w );
+#include "includes/mugsmash.h"
 
 static WRITE16_HANDLER( mugsmash_reg2_w )
 {
-	mugsmash_regs2[offset] = data;
-//  popmessage ("Regs2 %04x, %04x, %04x, %04x", mugsmash_regs2[0], mugsmash_regs2[1],mugsmash_regs2[2], mugsmash_regs2[3]);
+	mugsmash_state *state = (mugsmash_state *)space->machine->driver_data;
+	state->regs2[offset] = data;
+	//popmessage ("Regs2 %04x, %04x, %04x, %04x", state->regs2[0], state->regs2[1], state->regs2[2], state->regs2[3]);
 
 	switch (offset)
 	{
@@ -181,14 +173,14 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 
 static ADDRESS_MAP_START( mugsmash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE(&mugsmash_videoram1)
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE(&mugsmash_videoram2)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE(&mugsmash_regs1)	/* video registers*/
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE_MEMBER(mugsmash_state,videoram1)
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE_MEMBER(mugsmash_state,videoram2)
+	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE_MEMBER(mugsmash_state,regs1)	/* video registers*/
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE(&mugsmash_regs2) /* sound + ? */
+	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE_MEMBER(mugsmash_state,regs2) /* sound + ? */
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&mugs_spriteram) /* sprite ram */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(mugsmash_state,spriteram) /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
 	AM_RANGE(0x180000, 0x180007) AM_READ(mugsmash_input_ports_r)
 #else
@@ -407,6 +399,9 @@ static const ym2151_interface ym2151_config =
 };
 
 static MACHINE_DRIVER_START( mugsmash )
+
+	MDRV_DRIVER_DATA( mugsmash_state )
+
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mugsmash_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)

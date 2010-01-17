@@ -104,25 +104,15 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "includes/pass.h"
 
-UINT16 *pass_bg_videoram;
-UINT16 *pass_fg_videoram;
-
-/* in video */
-
-VIDEO_START( pass );
-VIDEO_UPDATE( pass );
-WRITE16_HANDLER( pass_fg_videoram_w );
-WRITE16_HANDLER( pass_bg_videoram_w );
-
-/* end in video */
 
 /* todo: check all memory regions actually readable / read from */
 static ADDRESS_MAP_START( pass_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_BASE(&pass_bg_videoram) // Background
-	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_BASE(&pass_fg_videoram) // Foreground
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_BASE_MEMBER(pass_state,bg_videoram) // Background
+	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_BASE_MEMBER(pass_state,fg_videoram) // Foreground
 	AM_RANGE(0x220000, 0x2203ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")
@@ -242,6 +232,9 @@ GFXDECODE_END
 
 /* todo : is this correct? */
 static MACHINE_DRIVER_START( pass )
+
+	MDRV_DRIVER_DATA( pass_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2 )
 	MDRV_CPU_PROGRAM_MAP(pass_map)

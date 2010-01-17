@@ -101,24 +101,18 @@ Sound PCB
 #include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
+#include "includes/sbugger.h"
 
 //arbitrary
 #define NUM_INTS_FRAME 24
 
-UINT8* sbugger_videoram, *sbugger_videoram_attr;
-
-PALETTE_INIT(sbugger);
-VIDEO_UPDATE(sbugger);
-VIDEO_START(sbugger);
-WRITE8_HANDLER( sbugger_videoram_attr_w );
-WRITE8_HANDLER( sbugger_videoram_w );
 
 /* memory maps */
 
 static ADDRESS_MAP_START( sbugger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE(&sbugger_videoram_attr)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE(&sbugger_videoram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE_MEMBER(sbugger_state,videoram_attr)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE_MEMBER(sbugger_state,videoram)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM /* sp is set to e0ff */
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -219,6 +213,9 @@ INPUT_PORTS_END
 /* machine driver */
 
 static MACHINE_DRIVER_START( sbugger )
+
+	MDRV_DRIVER_DATA( sbugger_state )
+
 	MDRV_CPU_ADD("maincpu", 8085A, 6000000)        /* 3.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sbugger_map)
 	MDRV_CPU_IO_MAP(sbugger_io_map)

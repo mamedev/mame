@@ -130,11 +130,8 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "includes/spbactn.h"
 
-UINT16 *spbactn_bgvideoram, *spbactn_fgvideoram, *spbactn_spvideoram;
-
-VIDEO_START( spbactn );
-VIDEO_UPDATE( spbactn );
 
 static WRITE16_HANDLER( soundcommand_w )
 {
@@ -148,9 +145,9 @@ static WRITE16_HANDLER( soundcommand_w )
 static ADDRESS_MAP_START( spbactn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
-	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE(&spbactn_spvideoram)
-	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE(&spbactn_fgvideoram)
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE(&spbactn_bgvideoram)
+	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE_MEMBER(spbactn_state,spvideoram)
+	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE_MEMBER(spbactn_state,fgvideoram)
+	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE_MEMBER(spbactn_state,bgvideoram)
 	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
@@ -339,6 +336,9 @@ static const ym3812_interface ym3812_config =
 };
 
 static MACHINE_DRIVER_START( spbactn )
+
+	MDRV_DRIVER_DATA( spbactn_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(spbactn_map)
