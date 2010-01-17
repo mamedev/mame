@@ -22,6 +22,9 @@ int sdl_num_processors = 0;
 
 #else
 
+// FIXME: remove this after malloc->osd_malloc
+#include <stdlib.h>
+
 #include "osdcore.h"
 #include "osinline.h"
 

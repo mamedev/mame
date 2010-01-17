@@ -65,6 +65,7 @@ endif
 # GTK_INSTALL_ROOT = y:/couriersud/win/gtk-32
 
 
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -154,7 +155,7 @@ endif
 
 ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
-DEFS += -DNO_AFFINITY_NP
+DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
 SYNC_IMPLEMENTATION = tc
 endif
 
@@ -198,6 +199,8 @@ SYNC_IMPLEMENTATION = win32
 NO_X11 = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI 
 LIBGL = -lopengl32
+# needed for unidasm
+LDFLAGS += -Wl,--allow-multiple-definition
 
 # do we have GTK ?
 ifndef GTK_INSTALL_ROOT
@@ -492,7 +495,7 @@ testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 #-------------------------------------------------
 
 $(OSDCLEAN):
-	rm -f .depend_*
+	@rm -f .depend_*
 
 #-------------------------------------------------
 # various support targets
@@ -511,19 +514,18 @@ EXCLUDES = -x "*/.svn/*"
 zip: 
 	zip -rq ../mame_$(BUILD_VERSION).zip $(DISTFILES) $(EXCLUDES)
 
-DEPEND = .depend_$(EMULATOR)
+DEPENDFILE = .depend_$(EMULATOR)
 
-$(DEPEND):
-	rm -f $(DEPEND)
+makedepend:
+	@echo Generating $(DEPENDFILE)
+	rm -f $(DEPENDFILE)
 	@for i in `find src -name "*.c"` ; do \
 		echo processing $$i; \
 		mt=`echo $$i | sed -e "s/\\.c/\\.o/" -e "s!^src/!$(OBJ)/!"` ; \
 		g++ -MM -MT $$mt $(CDEFS) $(CCOMFLAGS) $$i 2>/dev/null \
-		| sed -e "s!$$i!!g" >> $(DEPEND) ; \
+		| sed -e "s!$$i!!g" >> $(DEPENDFILE) ; \
 	done
 
-depend:	$(DEPEND)
-
--include $(DEPEND)
+-include $(DEPENDFILE)
 
 endif

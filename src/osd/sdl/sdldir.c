@@ -9,11 +9,17 @@
 //
 //============================================================
 
+#ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
+#endif
+
 #ifdef SDLMAME_LINUX
 #define __USE_LARGEFILE64
 #endif
 #ifndef SDLMAME_BSD
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
 #define _XOPEN_SOURCE 500
 #endif
 
@@ -70,7 +76,7 @@ static osd_dir_entry_type get_attributes_stat(const char *file)
 #else
 	struct stat64 st;
 	if(stat64(file, &st))
-		return 0;
+		return ENTTYPE_NONE;
 #endif
 
 #ifdef SDLMAME_WIN32

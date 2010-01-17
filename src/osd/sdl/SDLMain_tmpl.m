@@ -269,7 +269,7 @@ static void CustomApplicationMain (int argc, char **argv)
     if (arg == NULL)
         return FALSE;
 
-    newargv = (char **) realloc(gArgv, sizeof (char *) * (gArgc + 2));
+    newargv = (char **) SDL_realloc(gArgv, sizeof (char *) * (gArgc + 2));
     if (newargv == NULL)
     {
         SDL_free(arg);

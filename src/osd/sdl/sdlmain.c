@@ -262,7 +262,7 @@ static int setenv(const char *name, const char *value, int overwrite)
 		if (getenv(name) != NULL)
 			return 0;
 	}
-	buf = (char *) malloc(strlen(name)+strlen(value)+2);
+	buf = (char *) osd_malloc(strlen(name)+strlen(value)+2);
 	sprintf(buf, "%s=%s", name, value);
 	result = putenv(buf);
 

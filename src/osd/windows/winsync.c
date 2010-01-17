@@ -42,6 +42,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <stdlib.h>
 
 // MAME headers
 #include "osdcore.h"

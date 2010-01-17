@@ -127,7 +127,11 @@ void *osd_alloc_executable(size_t size)
 
 void osd_free_executable(void *ptr, size_t size)
 {
+#ifdef SDLMAME_SOLARIS
+	munmap((char *)ptr, size);
+#else
 	munmap(ptr, size);
+#endif
 }
 
 //============================================================

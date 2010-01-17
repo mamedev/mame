@@ -9,11 +9,17 @@
 //
 //============================================================
 
+#ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
+#endif
+
 #ifdef SDLMAME_LINUX
 #define __USE_LARGEFILE64
 #endif
 #ifndef SDLMAME_BSD
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
 #define _XOPEN_SOURCE 500
 #endif
 
