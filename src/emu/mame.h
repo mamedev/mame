@@ -151,6 +151,10 @@ typedef struct _generic_video_private generic_video_private;
 typedef struct _generic_audio_private generic_audio_private;
 
 
+// template specializations
+typedef tagged_list<region_info> region_list;
+
+
 /* output channel callback */
 typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
 
@@ -220,10 +224,11 @@ public:
 	inline const region_info *region(const char *tag);
 
 	resource_pool			respool;			/* pool of resources for this machine */
+	region_list				regionlist;			/* list of memory regions */
 
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
-	input_port_list			portlist;			/* points to a list of input port configurations */
+	ioport_list				portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
 	const device_config *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
@@ -391,13 +396,10 @@ int mame_is_paused(running_machine *machine);
 /* ----- memory region management ----- */
 
 /* allocate a new memory region */
-UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags);
+region_info *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags);
 
 /* free an allocated memory region */
 void memory_region_free(running_machine *machine, const char *name);
-
-/* return a pointer to the information struct for a given memory region */
-region_info *memory_region_info(running_machine *machine, const char *name);
 
 /* return a pointer to a specified memory region */
 UINT8 *memory_region(running_machine *machine, const char *name);
@@ -474,17 +476,17 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
 
 inline const device_config *running_machine::device(const char *tag)
 {
-	return device_list_find_by_tag(&config->devicelist, tag);
+	return config->devicelist.find(tag);
 }
 
 inline const input_port_config *running_machine::port(const char *tag)
 {
-	return input_port_by_tag(&portlist, tag);
+	return portlist.find(tag);
 }
 
 inline const region_info *running_machine::region(const char *tag)
 {
-	return memory_region_info(this, tag);
+	return regionlist.find(tag);
 }
 
 

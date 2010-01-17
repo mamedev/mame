@@ -127,7 +127,7 @@ tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object, 
 
 
 /*-------------------------------------------------
-    tagmap_remove - remove an object from a
+    tagmap_remove - remove an entr from a
     tagmap
 -------------------------------------------------*/
 
@@ -144,6 +144,31 @@ void tagmap_remove(tagmap *map, const char *tag)
 			free(entry);
 			break;
 		}
+}
+
+
+/*-------------------------------------------------
+    tagmap_remove_object - remove an entry from a 
+    tagmap by object pointer
+-------------------------------------------------*/
+
+void tagmap_remove_object(tagmap *map, void *object)
+{
+	UINT32 hashindex;
+
+	for (hashindex = 0; hashindex < ARRAY_LENGTH(map->table); hashindex++)
+	{
+		tagmap_entry **entryptr;
+
+		for (entryptr = &map->table[hashindex]; *entryptr != NULL; entryptr = &(*entryptr)->next)
+			if ((*entryptr)->object == object)
+			{
+				tagmap_entry *entry = *entryptr;
+				*entryptr = entry->next;
+				free(entry);
+				return;
+			}
+	}
 }
 
 

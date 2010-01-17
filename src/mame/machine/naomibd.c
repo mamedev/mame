@@ -1034,7 +1034,7 @@ static DEVICE_START( naomibd )
 	}
 
 	/* set the type */
-	v->index = device_list_index(&device->machine->config->devicelist, device->type, device->tag);
+	v->index = device->machine->config->devicelist.index(device->type, device->tag);
 	v->type = config->type;
 
 	/* initialize some registers */

@@ -978,7 +978,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 
 		/* count how many identical CPUs we have */
 		count = 1;
-		for (scandevice = device->typenext; scandevice != NULL; scandevice = scandevice->typenext)
+		for (scandevice = device->typenext(); scandevice != NULL; scandevice = scandevice->typenext())
 		{
 			if (cpu_get_type(device) != cpu_get_type(scandevice) || device->clock != scandevice->clock)
 				break;
@@ -1007,7 +1007,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 
 		/* count how many identical sound chips we have */
 		count = 1;
-		for (scandevice = device->typenext; scandevice != NULL; scandevice = scandevice->typenext)
+		for (scandevice = device->typenext(); scandevice != NULL; scandevice = scandevice->typenext())
 		{
 			if (sound_get_type(device) != sound_get_type(scandevice) || device->clock != scandevice->clock)
 				break;
@@ -1442,7 +1442,7 @@ static slider_state *slider_init(running_machine *machine)
 	}
 
 	/* add analog adjusters */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_ADJUSTER)
 			{
@@ -1507,7 +1507,7 @@ static slider_state *slider_init(running_machine *machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	for (device = device_list_first(&machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
+	for (device = machine->config->devicelist.first(LASERDISC); device != NULL; device = device->typenext())
 	{
 		const laserdisc_config *config = (const laserdisc_config *)device->inline_config;
 		if (config->overupdate != NULL)
@@ -1550,7 +1550,7 @@ static slider_state *slider_init(running_machine *machine)
 
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
@@ -1966,7 +1966,7 @@ static char *slider_get_screen_desc(const device_config *screen)
 
 static char *slider_get_laserdisc_desc(const device_config *laserdisc)
 {
-	int ldcount = device_list_items(&laserdisc->machine->config->devicelist, LASERDISC);
+	int ldcount = laserdisc->machine->config->devicelist.count(LASERDISC);
 	static char descbuf[256];
 
 	if (ldcount > 1)

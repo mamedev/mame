@@ -2074,7 +2074,7 @@ static void create_snapshot_bitmap(const device_config *screen)
 	/* select the appropriate view in our dummy target */
 	if (global.snap_native && screen != NULL)
 	{
-		view_index = device_list_index(&screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag.cstr());
+		view_index = screen->machine->config->devicelist.index(VIDEO_SCREEN, screen->tag.cstr());
 		assert(view_index != -1);
 		render_target_set_view(global.snap_target, view_index);
 	}

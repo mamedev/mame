@@ -2442,7 +2442,7 @@ static const device_config *expression_get_device(running_machine *machine, cons
 {
 	const device_config *device;
 
-	for (device = machine->config->devicelist.head; device != NULL; device = device->next)
+	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
 		if (mame_stricmp(device->tag, tag) == 0)
 			return device;
 

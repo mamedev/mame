@@ -963,7 +963,7 @@ int render_is_live_screen(const device_config *screen)
 	assert(screen->machine->config != NULL);
 	assert(screen->tag != NULL);
 
-	screen_index = device_list_index(&screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+	screen_index = screen->machine->config->devicelist.index(VIDEO_SCREEN, screen->tag);
 
 	assert(screen_index != -1);
 
@@ -1466,7 +1466,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 		for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			if (item->element == NULL)
 			{
-				const device_config *screen = device_list_find_by_index(&target->machine->config->devicelist, VIDEO_SCREEN, item->index);
+				const device_config *screen = target->machine->config->devicelist.find(VIDEO_SCREEN, item->index);
 				const screen_config *scrconfig = (const screen_config *)screen->inline_config;
 				const rectangle vectorvis = { 0, 639, 0, 479 };
 				const rectangle *visarea = NULL;
@@ -1598,7 +1598,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 							state = output_get_value(item->output_name);
 						else if (item->input_tag[0] != 0)
 						{
-							const input_field_config *field = input_field_by_tag_and_mask(&target->machine->portlist, item->input_tag, item->input_mask);
+							const input_field_config *field = input_field_by_tag_and_mask(target->machine->portlist, item->input_tag, item->input_mask);
 							if (field != NULL)
 								state = ((input_port_read_safe(target->machine, item->input_tag, 0) ^ field->defvalue) & item->input_mask) ? 1 : 0;
 						}

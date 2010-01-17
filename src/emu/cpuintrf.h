@@ -225,10 +225,10 @@ enum
 ***************************************************************************/
 
 /* device iteration helpers */
-#define cpu_count(config)				device_list_items(&(config)->devicelist, CPU)
-#define cpu_first(config)				device_list_first(&(config)->devicelist, CPU)
-#define cpu_next(previous)				((previous)->typenext)
-#define cpu_get_index(cpu)				device_list_index(&(cpu)->machine->config->devicelist, CPU, (cpu)->tag)
+#define cpu_count(config)				(config)->devicelist.count(CPU)
+#define cpu_first(config)				(config)->devicelist.first(CPU)
+#define cpu_next(previous)				(previous)->typenext()
+#define cpu_get_index(cpu)				(cpu)->machine->config->devicelist.index(CPU, (cpu)->tag)
 
 
 /* IRQ callback to be called by CPU cores when an IRQ is actually taken */

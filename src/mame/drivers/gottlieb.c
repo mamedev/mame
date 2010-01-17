@@ -270,7 +270,7 @@ static MACHINE_START( gottlieb )
 	state_save_register_global_array(machine, track);
 
 	/* see if we have a laserdisc */
-	laserdisc = device_list_first(&machine->config->devicelist, LASERDISC);
+	laserdisc = machine->config->devicelist.first(LASERDISC);
 	if (laserdisc != NULL)
 	{
 		/* attach to the I/O ports */

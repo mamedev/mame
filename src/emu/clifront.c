@@ -659,7 +659,7 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 			printf("Driver %s (%s):\n", drivers[drvindex]->name, drivers[drvindex]->description);
 
 			/* iterate through devices */
-			for (device = config->devicelist.head; device != NULL; device = device->next)
+			for (device = config->devicelist.first(); device != NULL; device = device->next)
 			{
 				switch (device->devclass)
 				{

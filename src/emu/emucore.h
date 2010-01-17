@@ -30,6 +30,7 @@
 #include "corestr.h"
 #include "astring.h"
 #include "bitmap.h"
+#include "tagmap.h"
 
 
 
@@ -301,6 +302,114 @@ public:
 private:
 	char text[1024];
 	int code;
+};
+
+
+
+/***************************************************************************
+    COMMON TEMPLATES
+***************************************************************************/
+
+template<class T> class tagged_list
+{
+	DISABLE_COPYING(tagged_list);
+
+	T *head;
+	T **tailptr;
+	tagmap_t<T *> map;
+
+public:
+	tagged_list() :
+		head(NULL),
+		tailptr(&head) { }
+	
+	virtual ~tagged_list()
+	{
+		while (head != NULL)
+			remove(head);
+	}
+	
+	T *first() const { return head; }
+	
+	int count() const
+	{
+		int num = 0;
+		for (T *cur = head; cur != NULL; cur = cur->next)
+			num++;
+		return num; 
+	}
+	
+	int index(T *object) const
+	{
+		int num = 0;
+		for (T *cur = head; cur != NULL; cur = cur->next)
+			if (cur == object)
+				return num;
+			else
+				num++;
+		return -1;
+	}
+	
+	int index(const char *tag) const
+	{
+		T *object = find(tag);
+		return (object != NULL) ? index(object) : -1;
+	}
+	
+	T *prepend(const char *tag, T *object, bool replace_if_duplicate = false)
+	{
+		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
+			throw emu_fatalerror("Error adding object named '%s'", tag);
+		object->next = head;
+		head = object;
+		if (tailptr == &head)
+			tailptr = &object->next;
+		return object;
+	}
+	
+	T *append(const char *tag, T *object, bool replace_if_duplicate = false)
+	{
+		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
+			throw emu_fatalerror("Error adding object named '%s'", tag);
+		*tailptr = object;
+		object->next = NULL;
+		tailptr = &object->next;
+		return object;
+	}
+	
+	void remove(T *object)
+	{
+		for (T **objectptr = &head; *objectptr != NULL; objectptr = &(*objectptr)->next)
+			if (*objectptr == object)
+			{
+				*objectptr = object->next;
+				if (tailptr == &object->next)
+					tailptr = objectptr;
+				map.remove(object);
+				global_free(object);
+				return;
+			}
+	}
+	
+	void remove(const char *tag)
+	{
+		T *object = find(tag);
+		if (object != NULL)
+			remove(object);
+	}
+	
+	T *find(const char *tag) const
+	{
+		return map.find_hash_only(tag);
+	}
+
+	T *find(int index) const
+	{
+		for (T *cur = head; cur != NULL; cur = cur->next)
+			if (index-- == 0)
+				return cur;
+		return NULL;
+	}
 };
 
 

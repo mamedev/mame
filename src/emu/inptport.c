@@ -442,7 +442,7 @@ static INT32 apply_analog_settings(INT32 current, analog_field_state *analog);
 /* initialization helpers */
 static void init_port_types(running_machine *machine);
 static void init_port_state(running_machine *machine);
-static void init_autoselect_devices(const input_port_list *portlist, int type1, int type2, int type3, const char *option, const char *ananame);
+static void init_autoselect_devices(const ioport_list &portlist, int type1, int type2, int type3, const char *option, const char *ananame);
 static device_field_info *init_field_device_info(const input_field_config *field,const char *device_name);
 static analog_field_state *init_field_analog_state(const input_field_config *field);
 
@@ -454,10 +454,7 @@ static void frame_update_analog_field(running_machine *machine, analog_field_sta
 static int frame_get_digital_field_state(const input_field_config *field, int mouse_down);
 
 /* port configuration helpers */
-static void port_config_detokenize(input_port_list *portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen);
-static input_port_config *port_config_alloc(const input_port_config **listhead);
-static void port_config_free(const input_port_config **portptr);
-static input_port_config *port_config_find(const input_port_config *listhead, const char *tag);
+static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen);
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits);
 static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen);
 static void field_config_free(input_field_config **fieldptr);
@@ -559,7 +556,7 @@ INLINE const char *get_port_tag(const input_port_config *port, char *tempbuffer)
 
 	if (port->tag != NULL)
 		return port->tag;
-	for (curport = port->machine->portlist.head; curport != NULL; curport = curport->next)
+	for (curport = port->machine->portlist.first(); curport != NULL; curport = curport->next)
 	{
 		if (curport == port)
 			break;
@@ -662,7 +659,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 	/* if we have a token list, proceed */
 	if (tokens != NULL)
 	{
-		input_port_list_init(&machine->portlist, tokens, errorbuf, sizeof(errorbuf), TRUE);
+		input_port_list_init(machine->portlist, tokens, errorbuf, sizeof(errorbuf), TRUE);
 		if (errorbuf[0] != 0)
 			mame_printf_error("Input port errors:\n%s", errorbuf);
 		init_port_state(machine);
@@ -689,9 +686,6 @@ static void input_port_exit(running_machine *machine)
 	/* close any playback or recording files */
 	playback_end(machine, NULL);
 	record_end(machine, NULL);
-
-	/* free our allocated config */
-	input_port_list_deinit(&machine->portlist);
 }
 
 
@@ -706,11 +700,8 @@ static void input_port_exit(running_machine *machine)
     according to the given tokens
 -------------------------------------------------*/
 
-void input_port_list_init(input_port_list *portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap)
+void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap)
 {
-	/* initialize fields */
-	portlist->head = NULL;
-
 	/* no tokens, no list */
 	if (tokens == NULL)
 		return;
@@ -725,52 +716,18 @@ void input_port_list_init(input_port_list *portlist, const input_port_token *tok
 
 
 /*-------------------------------------------------
-    input_port_list_deinit - free memory attached
-    to an input port list and clear out the
-    structure
--------------------------------------------------*/
-
-void input_port_list_deinit(input_port_list *portlist)
-{
-	/* iterate over all ports and free them */
-	while (portlist->head != NULL)
-		port_config_free(&portlist->head);
-}
-
-
-/*-------------------------------------------------
-    input_port_by_tag_slow - return a pointer to
-    the port_config associated with the given
-    port tag
--------------------------------------------------*/
-
-const input_port_config *input_port_by_tag_slow(const input_port_list *portlist, const char *tag)
-{
-	const input_port_config *port;
-
-	/* loop over ports until we hit the index or run out */
-	for (port = portlist->head; port != NULL; port = port->next)
-		if (port->tag != NULL && strcmp(port->tag, tag) == 0)
-			return port;
-
-	return NULL;
-}
-
-
-/*-------------------------------------------------
     input_field_by_tag_and_mask - return a pointer
     to the first field that intersects the given
     mask on the tagged port
 -------------------------------------------------*/
 
-const input_field_config *input_field_by_tag_and_mask(const input_port_list *portlist, const char *tag, input_port_value mask)
+const input_field_config *input_field_by_tag_and_mask(const ioport_list &portlist, const char *tag, input_port_value mask)
 {
-	const input_port_config *port = input_port_by_tag(portlist, tag);
-	const input_field_config *field;
+	const input_port_config *port = portlist.find(tag);
 
 	/* if we got the port, look for the field */
 	if (port != NULL)
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
 			if ((field->mask & mask) != 0)
 				return field;
 
@@ -1308,7 +1265,7 @@ int input_port_get_crosshair_position(running_machine *machine, int player, floa
 	int gotx = FALSE, goty = FALSE;
 
 	/* read all the lightgun values */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->player == player && field->crossaxis != CROSSHAIR_AXIS_NONE)
 				if (input_condition_true(machine, &field->condition))
@@ -1377,7 +1334,7 @@ void input_port_update_defaults(running_machine *machine)
 		const input_port_config *port;
 
 		/* loop over all input ports */
-		for (port = machine->portlist.head; port != NULL; port = port->next)
+		for (port = machine->portlist.first(); port != NULL; port = port->next)
 		{
 			const input_field_config *field;
 
@@ -1620,7 +1577,7 @@ static void init_port_state(running_machine *machine)
 	const input_port_config *port;
 
 	/* allocate live structures to mirror the configuration */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		analog_field_state **analogstatetail;
 		device_field_info **readdevicetail;
@@ -1698,18 +1655,18 @@ static void init_port_state(running_machine *machine)
 	}
 
 	/* handle autoselection of devices */
-	init_autoselect_devices(&machine->portlist, IPT_PADDLE,      IPT_PADDLE_V,     0,              OPTION_PADDLE_DEVICE,     "paddle");
-	init_autoselect_devices(&machine->portlist, IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z, OPTION_ADSTICK_DEVICE,    "analog joystick");
-	init_autoselect_devices(&machine->portlist, IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y,   0,              OPTION_LIGHTGUN_DEVICE,   "lightgun");
-	init_autoselect_devices(&machine->portlist, IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3,     OPTION_PEDAL_DEVICE,      "pedal");
-	init_autoselect_devices(&machine->portlist, IPT_DIAL,        IPT_DIAL_V,       0,              OPTION_DIAL_DEVICE,       "dial");
-	init_autoselect_devices(&machine->portlist, IPT_TRACKBALL_X, IPT_TRACKBALL_Y,  0,              OPTION_TRACKBALL_DEVICE,  "trackball");
-	init_autoselect_devices(&machine->portlist, IPT_POSITIONAL,  IPT_POSITIONAL_V, 0,              OPTION_POSITIONAL_DEVICE, "positional");
-	init_autoselect_devices(&machine->portlist, IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
+	init_autoselect_devices(machine->portlist, IPT_PADDLE,      IPT_PADDLE_V,     0,              OPTION_PADDLE_DEVICE,     "paddle");
+	init_autoselect_devices(machine->portlist, IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z, OPTION_ADSTICK_DEVICE,    "analog joystick");
+	init_autoselect_devices(machine->portlist, IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y,   0,              OPTION_LIGHTGUN_DEVICE,   "lightgun");
+	init_autoselect_devices(machine->portlist, IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3,     OPTION_PEDAL_DEVICE,      "pedal");
+	init_autoselect_devices(machine->portlist, IPT_DIAL,        IPT_DIAL_V,       0,              OPTION_DIAL_DEVICE,       "dial");
+	init_autoselect_devices(machine->portlist, IPT_TRACKBALL_X, IPT_TRACKBALL_Y,  0,              OPTION_TRACKBALL_DEVICE,  "trackball");
+	init_autoselect_devices(machine->portlist, IPT_POSITIONAL,  IPT_POSITIONAL_V, 0,              OPTION_POSITIONAL_DEVICE, "positional");
+	init_autoselect_devices(machine->portlist, IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
 
 	/* look for 4-way joysticks and change the default map if we find any */
 	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-		for (port = machine->portlist.head; port != NULL; port = port->next)
+		for (port = machine->portlist.first(); port != NULL; port = port->next)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 				if (field->state->joystick != NULL && field->way == 4)
 				{
@@ -1725,7 +1682,7 @@ static void init_port_state(running_machine *machine)
     in and the corresponding option
 -------------------------------------------------*/
 
-static void init_autoselect_devices(const input_port_list *portlist, int type1, int type2, int type3, const char *option, const char *ananame)
+static void init_autoselect_devices(const ioport_list &portlist, int type1, int type2, int type3, const char *option, const char *ananame)
 {
 	const char *stemp = options_get_string(mame_options(), option);
 	input_device_class autoenable = DEVICE_CLASS_KEYBOARD;
@@ -1762,8 +1719,8 @@ static void init_autoselect_devices(const input_port_list *portlist, int type1, 
 		mame_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 
 	/* only scan the list if we haven't already enabled this class of control */
-	if (portlist->head != NULL && !input_device_class_enabled(portlist->head->machine, autoenable))
-		for (port = portlist->head; port != NULL; port = port->next)
+	if (portlist.first() != NULL && !input_device_class_enabled(portlist.first()->machine, autoenable))
+		for (port = portlist.first(); port != NULL; port = port->next)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 
 				/* if this port type is in use, apply the autoselect criteria */
@@ -2036,11 +1993,11 @@ profiler_mark_start(PROFILER_INPUT);
 		const char *tag = NULL;
 		input_port_value mask;
 		if (render_target_map_point_input(mouse_target, mouse_target_x, mouse_target_y, &tag, &mask, NULL, NULL))
-			mouse_field = input_field_by_tag_and_mask(&machine->portlist, tag, mask);
+			mouse_field = input_field_by_tag_and_mask(machine->portlist, tag, mask);
 	}
 
 	/* loop over all input ports */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		const input_field_config *field;
 		device_field_info *device_field;
@@ -2410,14 +2367,13 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
     detokenize a series of input port tokens
 -------------------------------------------------*/
 
-static void port_config_detokenize(input_port_list *portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen)
+static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen)
 {
 	UINT32 entrytype = INPUT_TOKEN_INVALID;
 	input_setting_config *cursetting = NULL;
 	input_field_config *curfield = NULL;
 	input_port_config *curport = NULL;
 	input_port_value maskbits = 0;
-	tagmap_error err;
 	UINT16 category;	/* (MESS-specific) category */
 
 	/* loop over tokens until we hit the end */
@@ -2426,6 +2382,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 		UINT32 mask, defval, type, val;
 		input_port_token temptoken;
 		input_condition condition;
+		const char *string;
 		int hasdiploc;
 		int index;
 
@@ -2455,14 +2412,8 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
-				curport = port_config_alloc(&portlist->head);
-				curport->tag = TOKEN_GET_STRING(ipt);
-				err = portlist->map.add_unique_hash(curport->tag, curport, FALSE);
-				if (err == TMERR_DUPLICATE)
-				{
-					const input_port_config *match = portlist->map.find_hash_only(curport->tag);
-					error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
-				}
+				string = TOKEN_GET_STRING(ipt);
+				curport = portlist.append(string, global_alloc(input_port_config(string)));
 				curfield = NULL;
 				cursetting = NULL;
 				break;
@@ -2473,7 +2424,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
-				curport = port_config_find(portlist->head, TOKEN_GET_STRING(ipt));
+				curport = portlist.find(TOKEN_GET_STRING(ipt));
 				curfield = NULL;
 				cursetting = NULL;
 				break;
@@ -3066,65 +3017,31 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 
 
 /*-------------------------------------------------
-    port_config_alloc - allocate a new input
-    port config and append to the end of the
-    given list
+    input_port_config - constructor for an
+    I/O port configuration object
 -------------------------------------------------*/
 
-static input_port_config *port_config_alloc(const input_port_config **listhead)
+input_port_config::input_port_config(const char *_tag)
+	: next(NULL),
+	  tag(_tag),
+	  fieldlist(NULL),
+	  state(NULL),
+	  machine(NULL)
 {
-	const input_port_config * const *tailptr;
-	input_port_config *config;
-
-	/* allocate memory */
-	config = global_alloc_clear(input_port_config);
-
-	/* add it to the tail */
-	for (tailptr = listhead; *tailptr != NULL; tailptr = &(*tailptr)->next) ;
-	*(input_port_config **)tailptr = config;
-
-	return config;
 }
 
 
 /*-------------------------------------------------
-    port_config_free - free an allocated input
-    port configuration
+    ~input_port_config - destructor for an
+    I/O port configuration object
 -------------------------------------------------*/
 
-static void port_config_free(const input_port_config **portptr)
+input_port_config::~input_port_config()
 {
-	input_port_config *port = (input_port_config  *)*portptr;
-
-	/* free any field configs first */
-	while (port->fieldlist != NULL)
-		field_config_free((input_field_config **)&port->fieldlist);
-
-	/* remove ourself from the list */
-	*portptr = port->next;
-
-	/* free ourself */
-	global_free(port);
+	while (fieldlist != NULL)
+		field_config_free((input_field_config **)&fieldlist);
 }
 
-
-/*-------------------------------------------------
-    port_config_find - locate an existing port
-    configuration by tag
--------------------------------------------------*/
-
-static input_port_config *port_config_find(const input_port_config *listhead, const char *tag)
-{
-	const input_port_config *scanport;
-
-	/* scan for a matching tag and return the matching port */
-	for (scanport = listhead; scanport != NULL; scanport = scanport->next)
-		if (scanport->tag != NULL && strcmp(scanport->tag, tag) == 0)
-			return (input_port_config *)scanport;
-
-	/* failure is fatal */
-	fatalerror("port_config_find failed to find a matching port '%s'", tag);
-}
 
 
 /*-------------------------------------------------
@@ -3658,7 +3575,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 	defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
 
 	/* find the port we want; if no tag, search them all */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 		if (tag == NULL || strcmp(get_port_tag(port, tempbuffer), tag) == 0)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 
@@ -3820,7 +3737,7 @@ static void save_game_inputs(running_machine *machine, xml_data_node *parentnode
 	const input_port_config *port;
 
 	/* iterate over ports */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (save_this_input_field_type(field->type))
 			{

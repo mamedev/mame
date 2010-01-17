@@ -268,6 +268,34 @@ typedef const machine_config_token *(*device_custom_config_func)(const device_co
 typedef device_get_info_func device_type;
 
 
+// template specializations
+class device_list : public tagged_list<device_config>
+{
+	typedef tagged_list<device_config> super;
+	
+public:
+	// pull the generic forms forward
+	using super::first;
+	using super::count;
+	using super::index;
+	using super::find;
+	
+	// provide type-specific overrides
+	device_config *first(device_type type) const;
+	int count(device_type type) const;
+	int index(device_type type, device_config *object) const;
+	int index(device_type type, const char *tag) const;
+	device_config *find(device_type type, int index) const;
+
+	// provide class-specific overrides
+	device_config *first(device_class devclass) const;
+	int count(device_class devclass) const;
+	int index(device_class devclass, device_config *object) const;
+	int index(device_class devclass, const char *tag) const;
+	device_config *find(device_class devclass, int index) const;
+};
+
+
 /* the actual deviceinfo union */
 union deviceinfo
 {
@@ -310,7 +338,7 @@ class region_info;
 class device_config
 {
 	DISABLE_COPYING(device_config);
-
+	
 public:	// private eventually
 	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
 
@@ -323,12 +351,26 @@ public:
 
 	const region_info *subregion(const char *tag) const;
 	const device_config *subdevice(const char *tag) const;
+	
+	device_config *typenext() const
+	{
+		for (device_config *cur = this->next; cur != NULL; cur = cur->next)
+			if (cur->type == type)
+				return cur;
+		return NULL;
+	}
+
+	device_config *classnext() const
+	{
+		for (device_config *cur = this->next; cur != NULL; cur = cur->next)
+			if (cur->devclass == devclass)
+				return cur;
+		return NULL;
+	}
 
 	/* device relationships (always valid) */
 	device_config *			next;					/* next device (of any type/class) */
 	device_config *			owner;					/* device that owns us, or NULL if nobody */
-	device_config *			typenext;				/* next device of the same type */
-	device_config *			classnext;				/* next device of the same class */
 
 	/* device properties (always valid) */
 	astring 				tag;					/* tag for this instance */
@@ -353,14 +395,6 @@ public:
 };
 
 
-/* an object that contains a list of devices */
-struct device_list
-{
-	device_config *				head;				/* head of the list */
-	tagmap_t<device_config *>	map;		/* map for fast lookups */
-};
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -368,18 +402,6 @@ struct device_list
 
 
 /* ----- device configuration ----- */
-
-/* initialize a device list structure, optionally allocating a map for it */
-void device_list_init(device_list *devlist, int allocmap);
-
-/* free memory attached to a device list and clear out the structure */
-void device_list_deinit(device_list *devlist);
-
-/* add a new device to the end of a device list */
-device_config *device_list_add(device_list *devlist, const device_config *owner, device_type type, const char *tag, UINT32 clock);
-
-/* remove a device from a device list */
-void device_list_remove(device_list *devlist, const char *tag);
 
 /* build a tag that combines the device's name and the given tag */
 astring &device_build_tag(astring &dest, const device_config *device, const char *tag);
@@ -394,45 +416,8 @@ const device_contract *device_get_contract(const device_config *device, const ch
 
 /* ----- type-based device access ----- */
 
-/* return the number of items of a given type; DEVICE_TYPE_WILDCARD is allowed */
-int device_list_items(const device_list *devlist, device_type type);
-
-/* return the first device in the list of a given type; DEVICE_TYPE_WILDCARD is allowed */
-const device_config *device_list_first(const device_list *devlist, device_type type);
-
-/* return the next device in the list of a given type; DEVICE_TYPE_WILDCARD is allowed */
-const device_config *device_list_next(const device_config *prevdevice, device_type type);
-
-/* retrieve a device configuration based on a tag via linear search */
-const device_config *device_list_find_by_tag_slow(const device_list *devlist, const char *tag);
-
 /* retrieve a child device configuration based on a tag */
 const device_config *device_find_child_by_tag(const device_config *owner, const char *tag);
-
-/* return the index of a device based on its type and tag; DEVICE_TYPE_WILDCARD is allowed */
-int device_list_index(const device_list *devlist, device_type type, const char *tag);
-
-/* retrieve a device configuration based on a type and index; DEVICE_TYPE_WILDCARD is allowed */
-const device_config *device_list_find_by_index(const device_list *devlist, device_type type, int index);
-
-
-
-/* ----- class-based device access ----- */
-
-/* return the number of items of a given class */
-int device_list_class_items(const device_list *devlist, device_class devclass);
-
-/* return the first device in the list of a given class */
-const device_config *device_list_class_first(const device_list *devlist, device_class devclass);
-
-/* return the next device in the list of a given class */
-const device_config *device_list_class_next(const device_config *prevdevice, device_class devclass);
-
-/* return the index of a device based on its class and tag */
-int device_list_class_index(const device_list *devlist, device_class devclass, const char *tag);
-
-/* retrieve a device configuration based on a class and index */
-const device_config *device_list_class_find_by_index(const device_list *devlist, device_class devclass, int index);
 
 
 
@@ -487,19 +472,6 @@ const char *devtype_get_info_string(device_type type, UINT32 state);
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    device_list_find_by_tag - retrieve a device
-    configuration based on a type and tag;
-    DEVICE_TYPE_WILDCARD is allowed
--------------------------------------------------*/
-
-INLINE const device_config *device_list_find_by_tag(const device_list *devlist, const char *tag)
-{
-	/* if we have a map, use it */
-	return devlist->map.find_hash_only(tag);
-}
-
 
 /*-------------------------------------------------
     space - return an address space within a

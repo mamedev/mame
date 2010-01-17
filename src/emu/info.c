@@ -37,13 +37,13 @@
     settings for a game
 -------------------------------------------------*/
 
-static void print_game_switches(FILE *out, const game_driver *game, const input_port_list *portlist)
+static void print_game_switches(FILE *out, const game_driver *game, const ioport_list &portlist)
 {
 	const input_port_config *port;
 	const input_field_config *field;
 
 	/* iterate looking for DIP switches */
-	for (port = portlist->head; port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_DIPSWITCH)
 			{
@@ -75,13 +75,13 @@ static void print_game_switches(FILE *out, const game_driver *game, const input_
     settings for a game
 -------------------------------------------------*/
 
-static void print_game_configs(FILE *out, const game_driver *game, const input_port_list *portlist)
+static void print_game_configs(FILE *out, const game_driver *game, const ioport_list &portlist)
 {
 	const input_port_config *port;
 	const input_field_config *field;
 
 	/* iterate looking for configurations */
-	for (port = portlist->head; port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_CONFIG)
 			{
@@ -113,13 +113,13 @@ static void print_game_configs(FILE *out, const game_driver *game, const input_p
     Adjusters for a game
 -------------------------------------------------*/
 
-static void print_game_adjusters(FILE *out, const game_driver *game, const input_port_list *portlist)
+static void print_game_adjusters(FILE *out, const game_driver *game, const ioport_list &portlist)
 {
 	const input_port_config *port;
 	const input_field_config *field;
 
 	/* iterate looking for Adjusters */
-	for (port = portlist->head; port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_ADJUSTER)
 			{
@@ -133,7 +133,7 @@ static void print_game_adjusters(FILE *out, const game_driver *game, const input
     input
 -------------------------------------------------*/
 
-static void print_game_input(FILE *out, const game_driver *game, const input_port_list *portlist)
+static void print_game_input(FILE *out, const game_driver *game, const ioport_list &portlist)
 {
 	/* fix me -- this needs to be cleaned up to match the core style */
 
@@ -173,7 +173,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		control[i].reverse = 0;
 	}
 
-	for (port = portlist->head; port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			if (nplayer < field->player+1)
@@ -827,8 +827,8 @@ static void print_game_driver(FILE *out, const game_driver *game, const machine_
 static void print_game_info(FILE *out, const game_driver *game)
 {
 	const game_driver *clone_of;
-	input_port_list portlist;
 	machine_config *config;
+	ioport_list portlist;
 	const char *start;
 
 	/* no action if not a game */
@@ -837,7 +837,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 
 	/* start tracking resources and allocate the machine and input configs */
 	config = machine_config_alloc(game->machine_config);
-	input_port_list_init(&portlist, game->ipt, NULL, 0, FALSE);
+	input_port_list_init(portlist, game->ipt, NULL, 0, FALSE);
 
 	/* print the header and the game name */
 	fprintf(out, "\t<" XML_TOP);
@@ -887,13 +887,13 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_chips(out, game, config);
 	print_game_display(out, game, config);
 	print_game_sound(out, game, config);
-	print_game_input(out, game, &portlist);
-	print_game_switches(out, game, &portlist);
-	print_game_configs(out, game, &portlist);
+	print_game_input(out, game, portlist);
+	print_game_switches(out, game, portlist);
+	print_game_configs(out, game, portlist);
 #ifdef MESS
-	print_game_categories(out, game, &portlist);
+	print_game_categories(out, game, portlist);
 #endif /* MESS */
-	print_game_adjusters(out, game, &portlist);
+	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 #ifdef MESS
 	print_game_device(out, game, config);
@@ -903,7 +903,6 @@ static void print_game_info(FILE *out, const game_driver *game)
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
 
-	input_port_list_deinit(&portlist);
 	machine_config_free(config);
 }
 

@@ -92,8 +92,8 @@ void gfx_init(running_machine *machine)
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		UINT32 region_length = 8 * memory_region_length(machine, gfxdecode->memory_region);
-		const UINT8 *region_base = memory_region(machine, gfxdecode->memory_region);
+		UINT32 region_length = (gfxdecode->memory_region != NULL) ? (8 * memory_region_length(machine, gfxdecode->memory_region)) : 0;
+		const UINT8 *region_base = (gfxdecode->memory_region != NULL) ? memory_region(machine, gfxdecode->memory_region) : NULL;
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
 		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
 		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];

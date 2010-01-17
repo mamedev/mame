@@ -1711,7 +1711,7 @@ static void memory_init_spaces(running_machine *machine)
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over devices */
-	for (device = machine->config->devicelist.head; device != NULL; device = device->next)
+	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (device_get_addrbus_width(device, spacenum) > 0)
 			{

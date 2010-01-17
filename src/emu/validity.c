@@ -599,7 +599,7 @@ static int validate_cpu(int drivnum, const machine_config *config)
 				mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag.cstr());
 				error = TRUE;
 			}
-			else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(&config->devicelist, cpuconfig->vblank_interrupt_screen) == NULL)
+			else if (cpuconfig->vblank_interrupt_screen != NULL && config->devicelist.find(cpuconfig->vblank_interrupt_screen) == NULL)
 			{
 				mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag.cstr(), cpuconfig->vblank_interrupt_screen);
 				error = TRUE;
@@ -1038,7 +1038,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
     validate_inputs - validate input configuration
 -------------------------------------------------*/
 
-static int validate_inputs(int drivnum, const machine_config *config, int_map &defstr_map, input_port_list *portlist)
+static int validate_inputs(int drivnum, const machine_config *config, int_map &defstr_map, ioport_list &portlist)
 {
 	const input_port_config *scanport;
 	const input_port_config *port;
@@ -1061,7 +1061,7 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 	}
 
 	/* check for duplicate tags */
-	for (port = portlist->head; port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next)
 		if (port->tag != NULL)
 			for (scanport = port->next; scanport != NULL; scanport = scanport->next)
 				if (scanport->tag != NULL && strcmp(port->tag, scanport->tag) == 0)
@@ -1071,7 +1071,7 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 				}
 
 	/* iterate over the results */
-	for (port = portlist->head; port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			const input_setting_config *setting;
@@ -1134,7 +1134,7 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 			if (field->condition.tag != NULL)
 			{
 				/* find a matching port */
-				for (scanport = portlist->head; scanport != NULL; scanport = scanport->next)
+				for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next)
 					if (scanport->tag != NULL && strcmp(field->condition.tag, scanport->tag) == 0)
 						break;
 
@@ -1151,7 +1151,7 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 				if (setting->condition.tag != NULL)
 				{
 					/* find a matching port */
-					for (scanport = portlist->head; scanport != NULL; scanport = scanport->next)
+					for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next)
 						if (scanport->tag != NULL && strcmp(setting->condition.tag, scanport->tag) == 0)
 							break;
 
@@ -1245,13 +1245,13 @@ static int validate_sound(int drivnum, const machine_config *config)
     checks
 -------------------------------------------------*/
 
-static int validate_devices(int drivnum, const machine_config *config, const input_port_list *portlist, region_array *rgninfo)
+static int validate_devices(int drivnum, const machine_config *config, const ioport_list &portlist, region_array *rgninfo)
 {
 	int error = FALSE;
 	const game_driver *driver = drivers[drivnum];
 	const device_config *device;
 
-	for (device = device_list_first(&config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
+	for (device = config->devicelist.first(); device != NULL; device = device->next)
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
 		int detected_overlap = DETECT_OVERLAPPING_MEMORY ? FALSE : TRUE;
@@ -1262,7 +1262,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 		error |= validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
 
 		/* look for duplicates */
-		for (scandevice = device_list_first(&config->devicelist, DEVICE_TYPE_WILDCARD); scandevice != device; scandevice = device_list_next(scandevice, DEVICE_TYPE_WILDCARD))
+		for (scandevice = config->devicelist.first(); scandevice != device; scandevice = scandevice->next)
 			if (strcmp(scandevice->tag, device->tag) == 0)
 			{
 				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver->source_file, driver->name, device->tag.cstr());
@@ -1379,16 +1379,16 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				}
 
 				/* make sure all devices exist */
-				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->read.tag) == NULL) ||
-					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->write.tag) == NULL))
+				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && config->devicelist.find(entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && config->devicelist.find(entry->write.tag) == NULL))
 				{
 					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->write.tag);
 					error = TRUE;
 				}
 
 				/* make sure ports exist */
-				if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && input_port_by_tag(portlist, entry->read.tag) == NULL) ||
-					(entry->write.type == AMH_PORT && entry->write.tag != NULL && input_port_by_tag(portlist, entry->write.tag) == NULL))
+				if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && portlist.find(entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_PORT && entry->write.tag != NULL && portlist.find(entry->write.tag) == NULL))
 				{
 					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag.cstr(), address_space_names[spacenum], entry->read.tag);
 					error = TRUE;
@@ -1498,7 +1498,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
 	{
 		const game_driver *driver = drivers[drivnum];
-		input_port_list portlist;
+		ioport_list portlist;
 		machine_config *config;
 		region_array rgninfo;
 
@@ -1523,7 +1523,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate input ports */
 		input_checks -= get_profile_ticks();
-		error = validate_inputs(drivnum, config, defstr, &portlist) || error;
+		error = validate_inputs(drivnum, config, defstr, portlist) || error;
 		input_checks += get_profile_ticks();
 
 		/* validate the CPU information */
@@ -1548,10 +1548,9 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate devices */
 		device_checks -= get_profile_ticks();
-		error = validate_devices(drivnum, config, &portlist, &rgninfo) || error;
+		error = validate_devices(drivnum, config, portlist, &rgninfo) || error;
 		device_checks += get_profile_ticks();
 
-		input_port_list_deinit(&portlist);
 		machine_config_free(config);
 	}
 

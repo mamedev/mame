@@ -116,6 +116,9 @@ tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object, 
 /* remove an entry from a tagmap */
 void tagmap_remove(tagmap *map, const char *tag);
 
+/* remove an entry from a tagmap by object pointer */
+void tagmap_remove_object(tagmap *map, void *object);
+
 
 
 /***************************************************************************
@@ -140,6 +143,7 @@ public:
 	tagmap_error add(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add(this, tag, (void *)object, replace_if_duplicate); }
 	tagmap_error add_unique_hash(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add_unique_hash(this, tag, (void *)object, replace_if_duplicate); }
 	void remove(const char *tag) { tagmap_remove(this, tag); }
+	void remove(T object) { tagmap_remove_object(this, object); }
 
 	T find(const char *tag) const { return reinterpret_cast<T>(tagmap_find(this, tag)); }
 	T find(const char *tag, UINT32 hash) const { return reinterpret_cast<T>(tagmap_find_prehashed(this, tag, hash)); }
