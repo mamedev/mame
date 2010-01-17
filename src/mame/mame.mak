@@ -1806,6 +1806,12 @@ $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
 $(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
 
+$(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
+						$(LAYOUT)/victor21.lh \
+						$(LAYOUT)/crsbingo.lh \
+						$(LAYOUT)/sharkpy.lh \
+						$(LAYOUT)/smoto.lh
+
 $(DRIVERS)/superchs.o:	$(LAYOUT)/superchs.lh
 
 $(DRIVERS)/sfbonus.o:	$(LAYOUT)/pirpok2.lh
