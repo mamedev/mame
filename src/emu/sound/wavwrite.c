@@ -16,7 +16,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	UINT16 align, temp16;
 
 	/* allocate memory for the wav struct */
-	wav = (wav_file *) malloc(sizeof(struct _wav_file));
+	wav = (wav_file *) osd_malloc(sizeof(struct _wav_file));
 	if (!wav)
 		return NULL;
 
@@ -24,7 +24,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	wav->file = fopen(filename, "wb");
 	if (!wav->file)
 	{
-		free(wav);
+		osd_free(wav);
 		return NULL;
 	}
 
@@ -104,7 +104,7 @@ void wav_close(wav_file *wav)
 	fwrite(&temp32, 1, 4, wav->file);
 
 	fclose(wav->file);
-	free(wav);
+	osd_free(wav);
 }
 
 
@@ -126,7 +126,7 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)malloc(samples * sizeof(temp[0]));
+	temp = (INT16 *)osd_malloc(samples * sizeof(temp[0]));
 	if (!temp)
 		return;
 
@@ -142,7 +142,7 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	fflush(wav->file);
 
 	/* free memory */
-	free(temp);
+	osd_free(temp);
 }
 
 
@@ -154,7 +154,7 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)malloc(samples * 2 * sizeof(temp[0]));
+	temp = (INT16 *)osd_malloc(samples * 2 * sizeof(temp[0]));
 	if (!temp)
 		return;
 
@@ -167,7 +167,7 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	fflush(wav->file);
 
 	/* free memory */
-	free(temp);
+	osd_free(temp);
 }
 
 
@@ -179,7 +179,7 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)malloc(samples * 2 * sizeof(temp[0]));
+	temp = (INT16 *)osd_malloc(samples * 2 * sizeof(temp[0]));
 	if (!temp)
 		return;
 
@@ -196,5 +196,5 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	fflush(wav->file);
 
 	/* free memory */
-	free(temp);
+	osd_free(temp);
 }

@@ -635,7 +635,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 	expr->table = table;
 
 	/* make a copy of the original string */
-	expr->original_string = (char *)malloc(strlen(stringstart) + 1);
+	expr->original_string = (char *)osd_malloc(strlen(stringstart) + 1);
 	if (!expr->original_string)
 		return MAKE_EXPRERR_OUT_OF_MEMORY(0);
 	strcpy(expr->original_string, stringstart);
@@ -1687,7 +1687,7 @@ static char *add_expression_string(parsed_expression *expr, const char *string, 
 	expression_string *expstring;
 
 	/* allocate memory */
-	expstring = (expression_string *)malloc(sizeof(expression_string) + length);
+	expstring = (expression_string *)osd_malloc(sizeof(expression_string) + length);
 	if (expstring == NULL)
 		return NULL;
 
@@ -1735,15 +1735,15 @@ static void free_expression_strings(parsed_expression *expr)
 {
 	/* free the original expression */
 	if (expr->original_string != NULL)
-		free(expr->original_string);
+		osd_free(expr->original_string);
 	expr->original_string = NULL;
 
-	/* free all strings */
+	/* osd_free all strings */
 	while (expr->stringlist != NULL)
 	{
 		expression_string *string = expr->stringlist;
 		expr->stringlist = string->next;
-		free(string);
+		osd_free(string);
 	}
 }
 
@@ -1821,7 +1821,7 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, cons
 		goto cleanup;
 
 	/* allocate memory for the result */
-	*result = (parsed_expression *)malloc(sizeof(temp_expression));
+	*result = (parsed_expression *)osd_malloc(sizeof(temp_expression));
 	if (!*result)
 	{
 		exprerr = MAKE_EXPRERR_OUT_OF_MEMORY(0);
@@ -1860,7 +1860,7 @@ void expression_free(parsed_expression *expr)
 	if (expr != NULL)
 	{
 		free_expression_strings(expr);
-		free(expr);
+		osd_free(expr);
 	}
 }
 
@@ -1941,7 +1941,7 @@ symbol_table *symtable_alloc(symbol_table *parent, void *globalref)
 	symbol_table *table;
 
 	/* allocate memory for the table */
-	table = (symbol_table *)malloc(sizeof(*table));
+	table = (symbol_table *)osd_malloc(sizeof(*table));
 	if (!table)
 		return NULL;
 
@@ -2001,16 +2001,16 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 	}
 
 	/* otherwise, allocate a new entry */
-	symbol = (internal_symbol_entry *)malloc(sizeof(*symbol));
+	symbol = (internal_symbol_entry *)osd_malloc(sizeof(*symbol));
 	if (!symbol)
 		return 0;
 	memset(symbol, 0, sizeof(*symbol));
 
 	/* allocate space for a copy of the string */
-	newstring = (char *)malloc(strlen(name) + 1);
+	newstring = (char *)osd_malloc(strlen(name) + 1);
 	if (!newstring)
 	{
-		free(symbol);
+		osd_free(symbol);
 		return 0;
 	}
 
@@ -2151,13 +2151,13 @@ void symtable_free(symbol_table *table)
 		{
 			/* free the allocated name */
 			if (entry->name)
-				free((void *)entry->name);
+				osd_free((void *)entry->name);
 
 			/* remove from this list and put on the free list */
 			next = entry->next;
-			free(entry);
+			osd_free(entry);
 		}
 
 	/* free the structure */
-	free(table);
+	osd_free(table);
 }

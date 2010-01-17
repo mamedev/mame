@@ -88,24 +88,24 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	text_buffer *text;
 
 	/* allocate memory for the text buffer object */
-	text = (text_buffer *)malloc(sizeof(*text));
+	text = (text_buffer *)osd_malloc(sizeof(*text));
 	if (!text)
 		return NULL;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = (char *)malloc(bytes);
+	text->buffer = (char *)osd_malloc(bytes);
 	if (!text->buffer)
 	{
-		free(text);
+		osd_free(text);
 		return NULL;
 	}
 
 	/* allocate memory for the lines array */
-	text->lineoffs = (INT32 *)malloc(lines * sizeof(text->lineoffs[0]));
+	text->lineoffs = (INT32 *)osd_malloc(lines * sizeof(text->lineoffs[0]));
 	if (!text->lineoffs)
 	{
-		free(text->buffer);
-		free(text);
+		osd_free(text->buffer);
+		osd_free(text);
 		return NULL;
 	}
 
@@ -126,10 +126,10 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 void text_buffer_free(text_buffer *text)
 {
 	if (text->lineoffs)
-		free(text->lineoffs);
+		osd_free(text->lineoffs);
 	if (text->buffer)
-		free(text->buffer);
-	free(text);
+		osd_free(text->buffer);
+	osd_free(text);
 }
 
 
