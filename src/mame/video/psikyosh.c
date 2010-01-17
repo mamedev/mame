@@ -1205,10 +1205,10 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
        gnbarich sets the 0x000000ff to 0x7f in test mode whilst the others use 0x80.
-       As it's only used in testmode I'll just leave it as a toggle for now */
+       tgm2 sets it to 0x00 on warning screen. Likely has no effect. */
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	UINT32 *dstline;
-	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (0x4000) except for daraku */
+	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (0x4000) except for daraku/soldivid */
 	UINT32 *linefill = &state->bgram[(bank * 0x800) / 4 - 0x4000 / 4]; /* Per row */
 	int x, y;
 
@@ -1219,9 +1219,9 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
 
 		dstline = BITMAP_ADDR32(bitmap, y, 0);
 
-		if (linefill[y] & 0xff) /* Row */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
-					dstline[x] = linefill[y] >> 8;
+		/* linefill[y] & 0xff does what? */
+		for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
+			dstline[x] = linefill[y] >> 8;
 	}
 	profiler_mark_end();
 }
