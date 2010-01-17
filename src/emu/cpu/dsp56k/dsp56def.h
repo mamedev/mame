@@ -107,29 +107,29 @@ static void S_bits_set(dsp56k_core* cpustate, UINT8 value);
 static void I_bits_set(dsp56k_core* cpustate, UINT8 value);
 
 /* CCR setters - with macros for easy access */
-#define S_SET() (S_bit_set(cpustate, 1))
-#define S_CLEAR() (S_bit_set(cpustate, 0))
+#define DSP56K_S_SET() (S_bit_set(cpustate, 1))
+#define DSP56K_S_CLEAR() (S_bit_set(cpustate, 0))
 static void S_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define L_SET() (L_bit_set(cpustate, 1))
-#define L_CLEAR() (L_bit_set(cpustate, 0))
+#define DSP56K_L_SET() (L_bit_set(cpustate, 1))
+#define DSP56K_L_CLEAR() (L_bit_set(cpustate, 0))
 static void L_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define E_SET() (E_bit_set(cpustate, 1))
-#define E_CLEAR() (E_bit_set(cpustate, 0))
+#define DSP56K_E_SET() (E_bit_set(cpustate, 1))
+#define DSP56K_E_CLEAR() (E_bit_set(cpustate, 0))
 static void E_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define U_SET() (U_bit_set(cpustate, 1))
-#define U_CLEAR() (U_bit_set(cpustate, 0))
+#define DSP56K_U_SET() (U_bit_set(cpustate, 1))
+#define DSP56K_U_CLEAR() (U_bit_set(cpustate, 0))
 static void U_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define N_SET() (N_bit_set(cpustate, 1))
-#define N_CLEAR() (N_bit_set(cpustate, 0))
+#define DSP56K_N_SET() (N_bit_set(cpustate, 1))
+#define DSP56K_N_CLEAR() (N_bit_set(cpustate, 0))
 static void N_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define Z_SET() (Z_bit_set(cpustate, 1))
-#define Z_CLEAR() (Z_bit_set(cpustate, 0))
+#define DSP56K_Z_SET() (Z_bit_set(cpustate, 1))
+#define DSP56K_Z_CLEAR() (Z_bit_set(cpustate, 0))
 static void Z_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define V_SET() (V_bit_set(cpustate, 1))
-#define V_CLEAR() (V_bit_set(cpustate, 0))
+#define DSP56K_V_SET() (V_bit_set(cpustate, 1))
+#define DSP56K_V_CLEAR() (V_bit_set(cpustate, 0))
 static void V_bit_set(dsp56k_core* cpustate, UINT8 value);
-#define C_SET() (C_bit_set(cpustate, 1))
-#define C_CLEAR() (C_bit_set(cpustate, 0))
+#define DSP56K_C_SET() (C_bit_set(cpustate, 1))
+#define DSP56K_C_CLEAR() (C_bit_set(cpustate, 0))
 static void C_bit_set(dsp56k_core* cpustate, UINT8 value);
 
 // TODO: Maybe some functions for Interrupt Mask and Scaling Mode go here?
