@@ -3025,6 +3025,7 @@ src/mame/machine/meters.c svneol=native#text/plain
 src/mame/machine/meters.h svneol=native#text/plain
 src/mame/machine/mexico86.c svneol=native#text/plain
 src/mame/machine/mhavoc.c svneol=native#text/plain
+src/mame/machine/micro3d.c svneol=native#text/plain
 src/mame/machine/midtunit.c svneol=native#text/plain
 src/mame/machine/midwayic.c svneol=native#text/plain
 src/mame/machine/midwayic.h svneol=native#text/plain
