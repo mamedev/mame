@@ -39,6 +39,8 @@
 
 #include "bitmap.h"
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 #include <new>
 #endif

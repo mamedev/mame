@@ -39,6 +39,8 @@
 
 #include "tagmap.h"
 
+#include <stdlib.h>
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES

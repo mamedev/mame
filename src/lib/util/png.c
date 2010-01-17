@@ -38,6 +38,8 @@
 ***************************************************************************/
 
 #include <math.h>
+#include <stdlib.h>
+
 #include <zlib.h>
 #include "png.h"
 

@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include <stdarg.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include "options.h"
 #include "astring.h"
