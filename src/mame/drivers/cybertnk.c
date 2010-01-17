@@ -7,11 +7,10 @@ preliminary driver by Angelo Salese
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
-- sprite ram (very likely that it can do zooming);
+- sprite emulation (very likely that it can do zooming);
 - road emulation;
-- tilemap video registers;
-- color banking for the tilemaps;
-- ROM "SS5" is missing? Or it's a sound chip that's labelled SS5?
+- tilemap scrolling /-color banking;
+- inputs doesn't work in-game?
 - dual screen output.
 
 ============================================================================================
@@ -210,7 +209,6 @@ static VIDEO_UPDATE( cybertnk )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	//popmessage("%04x",test);
 	{
 		int count,x,y;
 		const gfx_element *gfx = screen->machine->gfx[2];
@@ -257,33 +255,43 @@ static VIDEO_UPDATE( cybertnk )
 	if(1)
 	{
 		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
-		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx;
+		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
 		UINT32 spr_offs;
+		int xf,yf,xz,yz;
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
 			z = (spr_ram[offs+(0x6/2)] & 0xffff);
 			if(z == 0xffff || spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
 				continue;
-			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
+			x = (spr_ram[offs+(0xa/2)] & 0x3ff);
 			y = (spr_ram[offs+(0x4/2)] & 0xff);
 			if(spr_ram[offs+(0x4/2)] & 0x100)
 				y = 0x100 - y;
 			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
-			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
+			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
 			ysize = (spr_ram[offs+(0x8/2)] & 0x00ff)+1;
 			fx = (spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
+			zoom = (spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
 
 			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
+			xf = 0;
+			yf = 0;
+			xz = 0;
+			yz = 0;
+
+			if(zoom > 0x80)
+				continue;
+
 			for(yi = 0;yi < ysize;yi++)
 			{
+				xf = xz = 0;
 				for(xi=0;xi < xsize;xi+=8)
 				{
 					UINT32 color;
 					UINT16 dot;
-					int shift_pen;
-					int x_dec; //helpers
+					int shift_pen, x_dec; //helpers
 
 					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
 					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
@@ -301,17 +309,19 @@ static VIDEO_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								if(((x+xsize-(x_dec+xi)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-									*BITMAP_ADDR16(bitmap, y+yi, x+xsize-(x_dec+xi)) = screen->machine->pens[dot];
+								if(((x+xsize-(xz)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
 							}
 							else
 							{
-								if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-									*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+								if(((x+xz) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
 							}
 						}
 						shift_pen -= 8;
 						x_dec++;
+						xf+=zoom;
+						if(xf >= 0x80) { xz++; xf-=0x80; }
 					}
 
 					shift_pen = 24;
@@ -325,21 +335,25 @@ static VIDEO_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								if(((x+xsize-(x_dec+xi)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-									*BITMAP_ADDR16(bitmap, y+yi, x+xsize-(x_dec+xi)) = screen->machine->pens[dot];
+								if(((x+xsize-(xz)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
 							}
 							else
 							{
 								if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-									*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
 							}
 						}
 						shift_pen -= 8;
 						x_dec++;
+						xf+=zoom;
+						if(xf >= 0x80) { xz++; xf-=0x80; }
 					}
 
 					spr_offs+=4;
 				}
+				yf+=zoom;
+				if(yf >= 0x80) { yz++; yf-=0x80; }
 			}
 		}
 	}
@@ -608,7 +622,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
