@@ -608,6 +608,11 @@ ifdef MAP
 	$(RM) $(FULLNAME).map
 endif
 
+checkautodetect:
+	@echo TARGETOS=$(TARGETOS) 
+	@echo PTR64=$(PTR64) 
+	@echo BIGENDIAN=$(BIGENDIAN) 
+	@echo UNAME="$(UNAME)"
 
 
 #-------------------------------------------------
