@@ -307,7 +307,7 @@ static void debugmain_set_cpu(running_device *cpu)
 			}
 
 		// then update the caption
-		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", cpu->machine->gamedrv->name, regsubitem->name);
+		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", cpu->machine->gamedrv->name, regsubitem->name.cstr());
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		debugmain_update_checks(dmain);
 	}
@@ -410,7 +410,7 @@ static void memorywin_zone_changed(GtkComboBox *zone_w, memorywin_i *mem)
 
 	// update the window title
 	subview = memory_view_get_current_subview(mem->memory);
-	sprintf(title, "Memory: %s", subview->name);
+	sprintf(title, "Memory: %s", subview->name.cstr());
 	gtk_window_set_title(GTK_WINDOW(mem->win), title);
 
 }
@@ -508,7 +508,7 @@ static void disasmwin_cpu_changed(GtkComboBox *cpu_w, disasmwin_i *dis)
 	disasmwin_update_checks(dis);
 
 	subview = disasm_view_get_current_subview(dis->disasm);
-	sprintf(title, "Disassembly: %s", subview->name);
+	sprintf(title, "Disassembly: %s", subview->name.cstr());
 	gtk_window_set_title(GTK_WINDOW(dis->win), title);
 }
 
@@ -605,7 +605,7 @@ static void disasmwin_new(running_machine *machine)
 	disasm_view_set_subview(dis->disasm, cursel);
 
 	subview = disasm_view_get_current_subview(dis->disasm);
-	sprintf(title, "Disassembly: %s", subview->name);
+	sprintf(title, "Disassembly: %s", subview->name.cstr());
 	gtk_window_set_title(GTK_WINDOW(dis->win), title);
 
 	g_signal_connect(dis->cpu_w, "changed", G_CALLBACK(disasmwin_cpu_changed), dis);
