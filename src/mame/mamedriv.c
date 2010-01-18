@@ -9296,6 +9296,7 @@ Other Sun games
 	DRIVER( gamecst2 )	/* MAME based bootleg, version 2.613 */
 	DRIVER( drw80pkr )	/* (c) 1982 IGT */
 	DRIVER( drw80pk2 )	/* (c) 1983 IGT */
+	DRIVER( fortune1 )	/* (c) 1984 IGT */
 	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
 	DRIVER( ggconnie )	/* (c) ???? Capcom */
 	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */

@@ -1,13 +1,16 @@
 /*************************************************************************
 
-    VIDEO POKER - INTERFLIP
+    VIDEO POKER - IGT/INTERFLIP
     -----------------------
 
     Original driver by Grull Osgo.
     Rewrite and additional work by Roberto Fresca.
+    Fortune I (IGT) added by Jim Stolis.
 
 
     Games running on this hardware:
+
+    * Draw Poker,    1984, IGT - International Game Technology
 
     * Video Poker,   1984, InterFlip.
     * Black Jack,    1984, InterFlip.
@@ -23,6 +26,27 @@
 
     History:
     ========
+
+    In 1975, Si Redd founded A1-Supply.  This was renamed to Sircoma in 1978,
+	and eventually IGT (International Game Technology) in 1981.
+
+	Along the way, in 1978, Fortune Coin Company was acquired and contained
+	the basis to their Fortune I game machines.
+
+	The Fortune I hardware consisted of the following games:
+      Regular Draw Poker
+      Progressive Draw Poker
+      Joker Wild Draw Poker
+      Double Up Draw Poker
+      Credit Draw Poker
+      Lucky 7 Poker (Seven Card Stud Poker)
+      Regular 21 (Blackjack)
+      Live 21
+      Count Down 21
+      Two Hand 21
+      In Between
+      Regular Slot
+      Credit Slot
 
     InterFlip (Spain), is a subsidiary of Recreativos Franco.
     This company was created mainly with the purpose of manufacture
@@ -388,6 +412,38 @@ static PALETTE_INIT( babypkr )
 		b = top - ((tb * top) / 0x100);
 
 		palette_set_color(machine, j, MAKE_RGB(r, g, b));
+	}
+}
+
+static PALETTE_INIT( fortune1 )
+{
+	int j;
+
+	for (j = 0; j < machine->config->total_colors; j++)
+	{
+		int r, g, b, tr, tg, tb, i, c;
+
+		i = (color_prom[j] >> 3) & 0x01;
+
+		/* red component */
+		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
+		r = tr - (i * (tr / 5));
+
+		/* green component */
+		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
+		g = tg - (i * (tg / 5));
+
+		/* blue component */
+		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
+		b = tb - (i * (tb / 5));
+
+		c = j;
+		
+		// Swap Position of Inner-most Colors on Each 4 Color Palette
+		if ((c % 4) == 1 || (c % 4) == 2)
+			c = ((int)(c / 4) * 4) + (3 - (c % 4));
+
+		palette_set_color(machine, c, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1243,6 +1299,14 @@ static MACHINE_DRIVER_START( babypkr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( fortune1 )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(videopkr)
+	MDRV_CPU_REPLACE("maincpu", I8039, CPU_CLOCK_ALT)
+
+	MDRV_PALETTE_INIT(fortune1)
+MACHINE_DRIVER_END
 
 /*************************
 *        Rom Load        *
@@ -1354,14 +1418,31 @@ ROM_START( babydad )
 	ROM_LOAD( "babydad.col",	0x0000, 0x0100,	CRC(b3358b3f) SHA1(d499a08fefaa3566de2e6fcddd237d6dfa840d8a) )
 ROM_END
 
+ROM_START( fortune1 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "pk485-s-000-7ff.c5",   0x0000, 0x0800, CRC(d74c4860) SHA1(9d151e2be5c1e9fc2e7ce5e533eb08e4b849f2c1) )
+	ROM_LOAD( "pk485-s-800-fff.c7",   0x0800, 0x0800, CRC(490da6b0) SHA1(4b7afd058aeda929821d62c58e234769d64339e1) )
+
+	ROM_REGION( 0x1000, "soundcpu", 0 )
+	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
+	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
+
+	ROM_REGION( 0x1000, "tiles", 0 )
+	ROM_LOAD( "cg073-cg0-a.b12",	 0x0000, 0x0800, CRC(fff2d7aa) SHA1(935b8623fda5b4b25ba1aaea869ebb2baded515c) )
+	ROM_LOAD( "cg073-cg1-a.b15",	 0x0800, 0x0800, CRC(a7cb05c4) SHA1(7cd76ade7cf9c50421b054ee525108829c31307c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "3140-cap8.b8", 0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
+ROM_END
 
 /*************************
 *      Game Drivers      *
 *************************/
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY               FULLNAME        FLAGS  LAYOUT      */
-GAMEL( 1984, videopkr, 0,        videopkr, videopkr, 0,    ROT0, "InterFlip",          "Video Poker",   0,     layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, 0,    ROT0, "InterFlip",          "Black Jack",    0,     layout_blckjack )
-GAMEL( 1987, videodad, videopkr, videodad, videodad, 0,    ROT0, "InterFlip",          "Video Dado",    0,     layout_videodad )
-GAMEL( 1987, videocba, videopkr, videodad, videocba, 0,    ROT0, "InterFlip",          "Video Cordoba", 0,     layout_videocba )
-GAMEL( 1987, babypkr , videopkr, babypkr , babypkr , 0,    ROT0, "Recreativos Franco", "Baby Poker",    0,     layout_babypkr  )
-GAMEL( 1987, babydad , videopkr, babypkr , babydad , 0,    ROT0, "Recreativos Franco", "Baby Dado",     0,     layout_babydad  )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY                                 FULLNAME                              FLAGS  LAYOUT      */
+GAMEL( 1984, videopkr, 0,        videopkr, videopkr, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,     layout_videopkr )
+GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, 0,    ROT0, "IGT - International Gaming Technology", "Fortune I (PK485-S) Draw Poker",     0,     layout_videopkr )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,     layout_blckjack )
+GAMEL( 1987, videodad, videopkr, videodad, videodad, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,     layout_videodad )
+GAMEL( 1987, videocba, videopkr, videodad, videocba, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,     layout_videocba )
+GAMEL( 1987, babypkr , videopkr, babypkr , babypkr , 0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,     layout_babypkr  )
+GAMEL( 1987, babydad , videopkr, babypkr , babydad , 0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,     layout_babydad  )
