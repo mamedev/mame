@@ -2829,7 +2829,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 
 	const UINT8 *gfx = memory_region(machine, "textures");
 	const UINT8 *textureOffset;
-	UINT8 paletteEntry;
+	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
 
 	if (texIndex >= 0)
