@@ -1353,7 +1353,7 @@ astring &input_code_to_token(running_machine *machine, astring &string, input_co
 		devindex[0] = 0;
 
 	/* determine the itemid part; look up in the table if we don't have a token */
-	if (item != NULL && item->token != NULL)
+	if (item != NULL && item->token.len() != 0)
 		devcode = item->token;
 	else
 	{
@@ -1450,7 +1450,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 		for (itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem; itemid++)
 		{
 			input_device_item *item = device->item[itemid];
-			if (item != NULL && item->token != NULL && token[curtok].cmp(item->token) == 0)
+			if (item != NULL && token[curtok].cmp(item->token) == 0)
 			{
 				/* take the itemclass from the item */
 				itemclass = item->itemclass;
