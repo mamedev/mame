@@ -2,46 +2,35 @@
 Psikyo PS6406B (PS3v1/PS5/PS5v2):
 See src/drivers/psikyosh.c for more info
 
-Hardware is extremely flexible (and luckily underused :). Many effects are subtle (e.g. fades, scanline effects).
-
-Mos games use bank 0x0a and 0x0b for double-buffering, and then using later banks (typically 0x0e - 0x20) when per-scanline effects are needed.
-The exception is daraku, which uses bank 0x0c and 0x0d for the text layer, with per scanline scroll values and tile banks.
-
-3 Types of tilemaps:
-1. Normal
-Used everywhere (Types 0x0a and 0x0b where 0x0b uses alternate registers to control scroll/bank/alpha/columnzoom)
-
-2. Seems to be two interleaved layers in each
-Used for text layers in daraku (Type 0x0c and 0x0d). Probably not a distinct case, but no other game uses this type/bank in a significant way.
-
-3. Has one value per scanline for rowscroll/zoom /column remapping (to achieve y-zooming and wobbly effects) /per-row priority/per-row alpha/per-row bank
-Used in S1945II test+level 7+level8 boss and S1945III levels 7+8
+Hardware is extremely flexible (and luckily underused, although we now have a relatively complete implementation :). Many effects are subtle (e.g. fades, scanline effects).
 
 There are 32 data banks of 0x800 bytes starting at 0x3000000
 The first 8 are continuous and used for sprites exclusively in every game
 
 Banks can be one of:
-* tiles, with per-layer scroll/alpha/priority values at the end
-* xscroll/yscroll, pri/xzoom/alpha/bank -> which points to another tile bank
+* a set of adjacent banks for sprites (always uses the first 8 banks, probably configurable in the vid regs somehow
+* tilemap tiles (or 2 adjacent banks for large tilemaps)
+* xscroll/yscroll, pri/xzoom/alpha/bank per-layer (of which there are three) -> which points to another tilebank per-layer
+* xscroll/yscroll, pri/xzoom/alpha/bank per-scanline (typically 224) -> which points to another tilebank per-line
+* pre (i.e. screen clear) + post (i.e. drawn with a non-zero priority) line-fill/blend layer
 
+Most games use bank 0x0a and 0x0b for the registers for double-buffering, which then refer to other banks for the tiles. If they use line-effects, they tend to populate the per-line registers into one of the other banks e.g. daraku or S1945II test+level 7+level8 boss and S1945III levels 7+8, soldivid final boss.
 */
 
 /*
 BG Scroll/Priority/Zoom/Alpha/Tilebank:
-Either at 0x30053f0 / 4/8 (For 0a), 0x3005bf0 / 4/8 (For 0b) Or per-line in a bank
+Either at 0x30053f0/4/8 (For 0a), 0x3005bf0/4/8 (For 0b) etc. (i.e. in the middle of a bank) Or per-line in a bank
    0x?vvv?xxx - v = vertical scroll - x = x scroll
-Either at 0x30057f0 / 4/8 (For 0a), 0x3005ff0 / 4/8 (For 0b) Or per-line in a bank
-   0xppzzaabb - p = priority, z = zoom/expand(00 is none), a = alpha value/effect, b = tilebank (used when register below = 0x0a)
+Either at 0x30057f0/4/8 (For 0a), 0x3005ff0/4/8 (For 0b) etc. (i.e. at the end of the bank) Or per-line in a bank
+   0xppzzaabb - p = priority, z = zoom/expand(00 is none), a = alpha value/effect, b = tilebank
 
-
-Vid Regs:
+Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
 
 0x00 -- alpha values for sprites, 8-bits per value (0-0x3f). sbomberb = 0000 3830 2820 1810
 0x04 --   "
-
 0x08 -- 0xffff0000 priority values for sprites, 4-bits per value, 0x00c0 is vert game (Controls whether row/line effects?), 0x000f is priority for per-line post-blending
-
 0x0c -- A table of 4 6-bit values (occupying a byte each), usually increasing from 0-0x3f again (unknown). 0000C000 is flipscreen (currently ignored).
+
 0x10 -- ffff0000 is always 0x00aa, 0000f000 varies, unknown. 00000fff Controls gfx data available to be read by SH-2 for verification.
 0x14 -- 83ff000e always? This and above may be related to vid timings
 0x18 -- bank for tilemaps. As follows for the different tilemaps: 112233--
@@ -53,19 +42,10 @@ Vid Regs:
 
 /*
 TODO:
-fix bgcolor of tgm2/tgm2p warning screen
-
-speedup per-line effects. currently terribly slow. how?
-
-figure out how the daraku text layers work correctly, dimensions are different (even more tilemaps needed)
-daraku seems to use tilemaps only for text layer (hi-scores, insert coin, warning message, test mode, psikyo (c)) how this is used is uncertain,
-
-flip screen, located but not implemented. wait until tilemaps.
-
-the stuff might be converted to use the tilemaps once all the features is worked out ...
-complicated by the fact that the whole tilemap will have to be marked dirty each time the bank changes (this can happen once per frame, unless a tilemap is allocated for each bank.
-18 + 9 = 27 tilemaps (including both sizes, possibly another 8 if the large tilemaps can start on odd banks).
-Would also need to support all of the logic relating to alpha table blending, row and column scroll/zoom etc.
+* Speedup per-line effects. currently terribly slow. how? Currently we have a hack for daraku to make it usable.
+* Flip screen, located but not implemented. wait until tilemaps.
+* The stuff might be converted to use the tilemaps once all the features is worked out ...
+The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and every pair of adjacent banks for large tilemaps. This is rather than having one per background layer, due to the line effects. Would also need to support all of the logic relating to alpha table blending, row and column scroll/zoom etc.
 */
 
 
@@ -75,7 +55,6 @@ Would also need to support all of the logic relating to alpha table blending, ro
 #include "includes/psikyosh.h"
 #include "ui.h"
 
-#define DARAKU_HACK
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE
 
@@ -114,12 +93,22 @@ do																									\
 while (0)																							\
 
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)								\
+#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)								\
 do																									\
 {																									\
 	UINT32 srcdata = (SOURCE);																		\
 	if (srcdata != transpen)																		\
 		(DEST) = alpha_blend_r32((DEST), srcdata, RGB_ALPHA(srcdata));								\
+}																									\
+while (0)																							\
+
+// take RGB pixel with seperate alpha and blend in to RGB32 bitmap
+#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)								\
+do																									\
+{																									\
+	UINT32 srcdata = (SOURCE);																		\
+	if (srcdata != transpen)																		\
+		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);								\
 }																									\
 while (0)																							\
 
@@ -133,7 +122,7 @@ do																									\
 }																									\
 while (0)																							\
 
-//drawgfxm.h macro to render alpha into 32-bit buffer
+// drawgfxm.h macro to render alpha into 32-bit buffer
 #define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)									\
 do																									\
 {																									\
@@ -144,10 +133,25 @@ do																									\
 while (0)																							\
 
 /*-------------------------------------------------
+    draw_scanline32_alpha - take an RGB-encoded UINT32 
+    scanline and alpha-blend it into the destination bitmap
+-------------------------------------------------*/
+static void draw_scanline32_alpha(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha)
+{
+	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	UINT32 transpen = BG_TRANSPEN;
+
+	assert(bitmap != NULL);
+	assert(bitmap->bpp == 32);
+
+	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
+}
+
+/*-------------------------------------------------
     draw_scanline32_argb - take an ARGB-encoded UINT32 
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
-void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
+static void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 	UINT32 transpen = BG_TRANSPEN;
@@ -156,14 +160,14 @@ void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 leng
 	assert(bitmap->bpp == 32);
 	assert(bitmap->format == BITMAP_FORMAT_ARGB32);
 
-	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
+	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32, NO_PRIORITY);
 }
 
 /*-------------------------------------------------
     draw_scanline32_tranpens - take an RGB-encoded UINT32 
     scanline and copy it into the destination bitmap, testing for the special ARGB transpen
 -------------------------------------------------*/
-void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
+static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 	UINT32 transpen = BG_TRANSPEN;
@@ -193,6 +197,13 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
 	assert(gfx != NULL);
 	assert(alphatable != NULL);
 
+	/* if we have a fixed alpha, call the standard drawgfx_transpen */
+	if (fixedalpha == 0xff)
+	{
+		drawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, 0);
+		return;
+	}
+
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
@@ -204,17 +215,8 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
 
 	if (fixedalpha >= 0)
 	{
-		/* special case alpha = 0xff */
 		UINT8 alpha = fixedalpha;
-		if (alpha == 0xff)
-		{
-			int transpen = 0;
-			DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
-		}
-		else
-		{
-			DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHASTORE32, NO_PRIORITY);
-		}
+		DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHASTORE32, NO_PRIORITY);
 	}
 	else
 	{
@@ -262,13 +264,14 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 /* Psikyo PS6406B */
 /* --- BACKGROUNDS --- */
 
-/* 'Normal' layers, no line/columnscroll. No per-line effects */
-static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
+/* 'Normal' layers, no line/columnscroll. No per-line effects. 
+Zooming isn't supported just because it's not used and it would be slow */
+static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	gfx_element *gfx;
 	int offs = 0, sx, sy;
-	int scrollx, scrolly, regbank, tilebank, alpha, alphamap, size, width;
+	int scrollx, scrolly, regbank, tilebank, alpha, alphamap, zoom, pri, size, width;
 
 	assert(!BG_LINE(layer));
 
@@ -278,18 +281,27 @@ static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap,
 
 	regbank = BG_TYPE(layer);
 
+	scrollx  = (state->bgram[(regbank * 0x800) / 4 + 0x3f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x000001ff) >> 0;
+	scrolly  = (state->bgram[(regbank * 0x800) / 4 + 0x3f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x03ff0000) >> 16;
+
 	tilebank = (state->bgram[(regbank * 0x800) / 4 + 0x7f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x000000ff) >> 0;
 	alpha    = (state->bgram[(regbank * 0x800) / 4 + 0x7f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x00003f00) >> 8;
 	alphamap = (state->bgram[(regbank * 0x800) / 4 + 0x7f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x00008000) >> 15;
-	scrollx  = (state->bgram[(regbank * 0x800) / 4 + 0x3f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x000001ff) >> 0;
-	scrolly  = (state->bgram[(regbank * 0x800) / 4 + 0x3f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x03ff0000) >> 16;
+	zoom     = (state->bgram[(regbank * 0x800) / 4 + 0x7f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0x00ff0000) >> 16;
+	pri      = (state->bgram[(regbank * 0x800) / 4 + 0x7f0 / 4 + (layer * 0x04) / 4 - 0x4000 / 4] & 0xff000000) >> 24;
+
+	if(pri != req_pri) return;
 
 	if (alphamap) /* alpha values are per-pen */
 		alpha = -1;
 	else
 		alpha = pal6bit(0x3f - alpha);	/* 0x3f-0x00 maps to 0x00-0xff */
 
-	if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes */
+	if(zoom) {
+		popmessage("draw_bglayer() zoom not implemented\nContact MAMEDEV");
+	}
+
+	if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes. filter garbage. */
 	{
 		for (sy = 0; sy < size; sy++)
 		{
@@ -315,186 +327,145 @@ static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap,
 	}
 }
 
-/* Row Scroll/Zoom and/or Column Zoom, has per-column Alpha/Bank/Priority
-Priority is currently taken from the first column, and handled outside the loop. Alpha and banking are currently also fixed per-bitmap
 
-Bitmap is first rendered to an ARGB image, taking into account the various alpha options. 
-From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels into the RGB32 bitmap */
-static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
+/* populate state->bg_bitmap for the given bank if it's not already */
+static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, int size, int tilebank, int alpha, int *last_bank)
 {
-	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
-	gfx_element *gfx;
-	int offs, sx, sy;
-	int linebank, tilebank, alpha, alphamap, size, width;
+	// test if the tile row is the cached one or not
+	int tile_row = scanline / 16;
 
-	assert(BG_LINE(layer));
+	assert(tile_row > 0 && tile_row < 32);
 
-	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
-	size = BG_LARGE(layer) ? 32 : 16;
-	width = size * 16;
-
-	linebank = BG_TYPE(layer);
-
-	/* Take the following details from the info for the first row, the same for every row in all cases so far */
-	tilebank = (state->bgram[(linebank * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0x000000ff) >> 0;
-	alpha    = (state->bgram[(linebank * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0x00003f00) >> 8;
-	alphamap =(state->bgram[(linebank * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0x00008000) >> 15;
-
-	if (alphamap) /* alpha values are per-pen */
-		alpha = -1;
-	else
-		alpha = pal6bit(0x3f - alpha); /* 0x3f-0x00 maps to 0x00-0xff */
-
-	if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes */
+	if(tilebank != last_bank[tile_row]) 
 	{
-		int scr_width = (cliprect->max_x-cliprect->min_x + 1); //video_screen_get_width(machine->primary_screen);
-		int scr_height = (cliprect->max_y-cliprect->min_y + 1); //video_screen_get_height(machine->primary_screen);
+		rectangle cliprect;
 
-		bitmap_fill(state->bg_bitmap, NULL, BG_TRANSPEN);
+		cliprect.min_x = 0;
+		cliprect.max_x = state->bg_bitmap->width - 1;
+		cliprect.min_y = tile_row * 16;
+		cliprect.max_y = cliprect.min_y + 16 - 1;
 
-		bool nonhomogenous_pzab = false;
-		int bg_scrollx[256], bg_scrolly[256], bg_pri[256], bg_alpha[256], bg_bank[256], bg_zoom[256];
-		for (offs = 0; offs < scr_height; offs++) /* 224 values for each */
-		{
-			bg_scrollx[offs] = (state->bgram[(linebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x000001ff) >> 0;
-			bg_scrolly[offs] = (state->bgram[(linebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x03ff0000) >> 16;
+		bitmap_fill(state->bg_bitmap, &cliprect, BG_TRANSPEN);
+		int width = size * 16;
 
-			bg_pri[offs]     = (state->bgram[(linebank * 0x800) / 4 + offs - 0x4000 / 4 + 0x400 / 4] & 0xff000000) >> 24;
-			bg_zoom[offs]    = (state->bgram[(linebank * 0x800) / 4 + offs - 0x4000 / 4 + 0x400 / 4] & 0x00ff0000) >> 16;
-			bg_alpha[offs]   = (state->bgram[(linebank * 0x800) / 4 + offs - 0x4000 / 4 + 0x400 / 4] & 0x0000ff00) >> 8;
-			bg_bank[offs]    = (state->bgram[(linebank * 0x800) / 4 + offs - 0x4000 / 4 + 0x400 / 4] & 0x000000ff) >> 0;
-
-			// check pri, alpha, bank are always the same - since we don't handle them
-			if(offs != 0) {
-				if( (bg_pri[offs]   != bg_pri[0]) ||
-					(bg_alpha[offs] != bg_alpha[0]) ||
-					(bg_bank[offs]  != bg_bank[0])) {
-					nonhomogenous_pzab = true;
-				}
-			}
-		}
-
-		if(nonhomogenous_pzab) {
-			popmessage   ("Inconsistent Pri/Alpha/Bank effect\nContact MAMEDEV");
-		}
-
-		// render tilemap to temp bitmap
-		profiler_mark_start(PROFILER_USER1);
-		offs = 0;
+		int offs = 0;
+		int sx, sy;
 		for (sy = 0; sy < size; sy++)
 		{
 			for (sx = 0; sx < 32; sx++)
 			{
-				int tileno, colour;
-
-				tileno = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
-				colour = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0xff000000) >> 24;
-
-				drawgfx_alphastore(state->bg_bitmap, NULL, gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), alpha);
-				offs++;
-			}
-		}
-		profiler_mark_end();
-
-// now, for each scanline, check priority, 
-// extract the relevant scanline from the bitmap, after applying per-scanline vscroll, 
-// stretch it and scroll it into another buffer
-// write it with alpha
-
-		for(int scanline = 0; scanline < scr_height; scanline++)
-		{
-			UINT32 tilemap_line[32 * 16];
-			UINT32 scr_line[64*8];
-
-			/* zoomy and 'wibbly' effects - extract an entire row from tilemap */
-			profiler_mark_start(PROFILER_USER2);
-			extract_scanline32(state->bg_bitmap, 0, (scanline - bg_scrolly[scanline] + 0x400) % 0x200, width, tilemap_line);
-			profiler_mark_end();
-
-			/* very slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
-			profiler_mark_start(PROFILER_USER3);
-			if(bg_zoom[scanline]) {
-				int jj = 0x10000 << 8; // ensure +ve for mod
-				for(int ii = 0; ii < scr_width; ii++) {
-					scr_line[ii] = tilemap_line[(int)((jj>>8) - bg_scrollx[scanline]) % width];
-					jj += (1<<8) - bg_zoom[scanline]; /* This is a guess, will need to verify on my board. not 6.10 like the sprites */
-				}
-			}
-			else {
-				for(int ii = 0; ii < scr_width; ii++) {
-					scr_line[ii] = tilemap_line[(ii - bg_scrollx[scanline] + 0x10000) % width];
-				}
-			}
-			profiler_mark_end();
-
-			/* blend line into output */
-			profiler_mark_start(PROFILER_USER4);
-			if(alpha == 0xff) {
-				draw_scanline32_transpen(bitmap, 0, scanline, scr_width, scr_line);
-			}
-			else if (alpha != 0) {
-				draw_scanline32_argb(bitmap, 0, scanline, scr_width, scr_line);
-			}
-			profiler_mark_end();
-		}
-	}
-}
-
-
-/* This is a complete bodge for the daraku text layers. There is not enough info to be sure how it is supposed to work */
-/* It appears that there are row/column scroll values for 2 seperate layers, just drawing it twice using one of each of the sets of values for now */
-static void draw_bglayertext( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
-{
-	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
-	gfx_element *gfx;
-	int offs, sx, sy;
-	int scrollx, scrolly, regbank, tilebank, size, width, alpha, alphamap;
-
-	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
-	size = BG_LARGE(layer) ? 32 : 16;
-	width = size * 16;
-
-	regbank = BG_TYPE(layer);
-	
-	/* use two different sets of the per-line values to compose the entire tilemap */
-	for(int offset = 0; offset <= 0x20 / 4; offset += 0x20 / 4)
-	{
-		tilebank = (state->bgram[(regbank * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4 + offset] & 0x000000ff) >> 0;
-		alpha    = (state->bgram[(regbank * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4 + offset] & 0x00003f00) >> 8;
-		alphamap = (state->bgram[(regbank * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4 + offset] & 0x00008000) >> 15;
-		scrollx  = (state->bgram[(regbank * 0x800) / 4 - 0x4000 / 4 + offset] & 0x000001ff) >> 0;
-		scrolly  = (state->bgram[(regbank * 0x800) / 4 - 0x4000 / 4 + offset] & 0x03ff0000) >> 16;
-
-		if (alphamap)	/* alpha values are per-pen */
-			alpha = -1;
-		else
-			alpha = pal6bit(0x3f - alpha); /* 0x3f-0x00 maps to 0x00-0xff */
-
-		if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes */
-		{
-			offs = 0;
-			for (sy = 0; sy < size; sy++)
-			{
-				for (sx = 0; sx < 32; sx++)
+				if(sy == tile_row)
 				{
 					int tileno, colour;
 
 					tileno = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 					colour = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0xff000000) >> 24;
+					int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
-					drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)), alpha); /* normal */
-
-					if (scrollx)
-						drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)), alpha); /* wrap x */
-					if (scrolly)
-						drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)) - width, alpha); /* wrap y */
-					if (scrollx && scrolly)
-						drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)) - width, alpha); /* wrap xy */
-
-					offs++;
+					drawgfx_alphastore(state->bg_bitmap, NULL, gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
 				}
+				offs++;
 			}
 		}
+		last_bank[tile_row] = tilebank;
+	}
+}
+
+
+/* Row Scroll/Zoom and/or Column Zoom, has per-column Alpha/Bank/Priority
+Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used). 
+From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels 
+into the RGB32 bitmap (with either the alpha information from the ARGB, or per-line alpha */
+static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+{
+	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
+	assert(BG_LINE(layer));
+
+	gfx_element *gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
+	int size = BG_LARGE(layer) ? 32 : 16;
+	int width = size * 16;
+
+	int linebank = BG_TYPE(layer);
+
+	/* cache rendered bitmap */
+	int last_bank[32]; // corresponds to bank of bitmap in state->bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
+	for(int ii = 0; ii < 32; ii++) last_bank[ii] = -1;
+
+	int scr_width = (cliprect->max_x-cliprect->min_x + 1); 
+	int scr_height = (cliprect->max_y-cliprect->min_y + 1);
+	UINT32 *scroll_reg = &state->bgram[(linebank * 0x800) / 4 - 0x4000 / 4];
+	UINT32 *pzab_reg   = &state->bgram[(linebank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; // pri, zoom, alpha, bank
+
+// now, for each scanline, check priority, 
+// extract the relevant scanline from the bitmap, after applying per-scanline vscroll, 
+// stretch it and scroll it into another buffer
+// write it with alpha
+	for(int scanline = 0; scanline < scr_height; scanline++)
+	{
+		int pri = (*pzab_reg & 0xff000000) >> 24;
+
+		if(pri == req_pri) 
+		{
+			int scrollx  = (*scroll_reg & 0x000001ff) >> 0;
+			int scrolly  = (*scroll_reg & 0x03ff0000) >> 16;
+
+			int zoom     = (*pzab_reg & 0x00ff0000) >> 16;
+			int alphamap = (*pzab_reg & 0x00008000) >> 15;
+			int alpha    = (*pzab_reg & 0x00003f00) >> 8;
+			int tilebank = (*pzab_reg & 0x000000ff) >> 0;
+
+			if(alphamap) /* alpha values are per-pen */
+				alpha = -1;
+			else
+				alpha = pal6bit(0x3f - alpha);
+
+			if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes. filter garbage. */
+			{
+				int tilemap_scanline = (scanline - scrolly + 0x400) % 0x200;
+
+				// render reelvant tiles to temp bitmap, assume bank changes infrequently/never. render alpha as per-pen
+				cache_bitmap(tilemap_scanline, state, gfx, size, tilebank, alpha, last_bank);
+
+				/* zoomy and 'wibbly' effects - extract an entire row from tilemap */
+				profiler_mark_start(PROFILER_USER2);
+				UINT32 tilemap_line[32 * 16];
+				UINT32 scr_line[64 * 8];
+				extract_scanline32(state->bg_bitmap, 0, tilemap_scanline, width, tilemap_line);
+				profiler_mark_end();
+
+				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
+				profiler_mark_start(PROFILER_USER3);
+				if(zoom) {
+					int jj = 0x10000 << 8; // ensure +ve for mod
+					for(int ii = 0; ii < scr_width; ii++) {
+						scr_line[ii] = tilemap_line[(int)((jj>>8) - scrollx) % width];
+						jj += (1<<8) - zoom; /* This is a guess, will need to verify on my board. not 6.10 like the sprites */
+					}
+				}
+				else {
+					for(int ii = 0; ii < scr_width; ii++) {
+						scr_line[ii] = tilemap_line[(ii - scrollx + 0x10000) % width];
+					}
+				}
+				profiler_mark_end();
+
+				/* blend line into output */
+				profiler_mark_start(PROFILER_USER4);
+				if(alpha == 0xff) {
+					draw_scanline32_transpen(bitmap, 0, scanline, scr_width, scr_line);
+				}
+				else if (alpha > 0) {
+					draw_scanline32_alpha(bitmap, 0, scanline, scr_width, scr_line, alpha);
+				}
+				else if (alpha < 0) {
+					draw_scanline32_argb(bitmap, 0, scanline, scr_width, scr_line);
+				}
+				profiler_mark_end();
+			}
+		}
+
+		scroll_reg++;
+		pzab_reg++;
 	}
 }
 
@@ -525,28 +496,13 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 		if (!BG_LAYER_ENABLE(i))
 			continue;
 
-#ifdef DARAKU_HACK
-		if(BG_TYPE(i) == BG_SCROLL_0C || BG_TYPE(i) == BG_SCROLL_0D) { // hack for daraku
-				int this_pri = ((state->bgram[(BG_TYPE(i) * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0xff000000) >> 24);
-				if (this_pri == req_pri) {
-					draw_bglayertext(machine, i, bitmap, cliprect);
-				}
-		}
-		else 
-#endif
 		if(BG_LINE(i)) {
-				/* per-line alpha, scroll, zoom etc. check the priority for the first scanline */
-				int this_pri = ((state->bgram[(BG_TYPE(i) * 0x800) / 4 + 0x400 / 4 - 0x4000 / 4] & 0xff000000) >> 24);
-				if (this_pri == req_pri) {
-					draw_bglayerscroll(machine, i, bitmap, cliprect);
-				}
+			/* per-line alpha, scroll, zoom etc. check the priority for the first scanline */
+			draw_bglayerscroll(machine, i, bitmap, cliprect, req_pri);
 		}
 		else {
-				/* not per-line alpha, scroll, zoom etc. */
-				int this_pri = ((state->bgram[(BG_TYPE(i) * 0x800) / 4 + 0x7f0 / 4 + (i * 0x04) / 4 - 0x4000 / 4] & 0xff000000) >> 24);
-				if (this_pri == req_pri) {
-					draw_bglayer(machine, i, bitmap, cliprect);
-				}
+			/* not per-line alpha, scroll, zoom etc. */
+			draw_bglayer(machine, i, bitmap, cliprect, req_pri);
 		}
 	}
 }
@@ -1232,7 +1188,7 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	UINT32 *dstline;
-	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (i.e. 0x4000) */
+	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (i.e. 0x4000) except for daraku/soldivid */
 	UINT32 *lineblend = &state->bgram[(bank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; /* Per row */
 	int x, y;
 
@@ -1297,6 +1253,9 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 	int i;
 	psikyosh_state *state = (psikyosh_state *)screen->machine->driver_data;
 
+				fprintf(stderr, "\nNew Frame\n");
+
+
 	// show only the priority associated with a given keypress(s) and/or hide sprites/tilemaps
 	int pri_debug = false;
 	int sprites = true;
@@ -1318,14 +1277,14 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 #endif
 
 #ifdef DEBUG_MESSAGE
-popmessage   ("Regs %08x %08x %08x %08x\n     %08x %08x %08x %08x",
+popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
     state->vidregs[0], state->vidregs[1],
     state->vidregs[2], state->vidregs[3],
     state->vidregs[4], state->vidregs[5],
     state->vidregs[6], state->vidregs[7]);
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+//	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine)); // psikyosh_prelineblend() will fill screen in all cases
 	bitmap_fill(state->z_bitmap, cliprect, 0); /* z-buffer */
 
 	psikyosh_prelineblend(screen->machine, bitmap, cliprect);
