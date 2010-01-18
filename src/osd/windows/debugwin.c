@@ -2022,7 +2022,7 @@ static void memory_update_caption(running_machine *machine, HWND wnd)
 	const memory_subview_item *subview = memory_view_get_current_subview(info->view[0].view);
 	char title[256];
 
-	sprintf(title, "Memory: %s", subview->name);
+	sprintf(title, "Memory: %s", subview->name.cstr());
 	win_set_window_text_utf8(wnd, title);
 }
 
@@ -2347,7 +2347,7 @@ static void disasm_update_caption(running_machine *machine, HWND wnd)
 	const disasm_subview_item *subview = disasm_view_get_current_subview(info->view[0].view);
 	char title[256];
 
-	sprintf(title, "Disassembly: %s", subview->name);
+	sprintf(title, "Disassembly: %s", subview->name.cstr());
 	win_set_window_text_utf8(wnd, title);
 }
 
@@ -2587,7 +2587,7 @@ static void console_set_cpu(running_device *device)
 	// then update the caption
 	if (regsubitem != NULL)
 	{
-		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", device->machine->gamedrv->name, regsubitem->name);
+		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", device->machine->gamedrv->name, regsubitem->name.cstr());
 		win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 		if (strcmp(title, curtitle) != 0)
 			win_set_window_text_utf8(main_console->wnd, title);
