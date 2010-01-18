@@ -1863,14 +1863,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	/*//////////////
     // PACKET FORMAT
     // [0]  - 0100 ... ID
-    // [1]  - xxxx ... Flags for sure (0118 for buriki characters,
-    //                                 0010 for buriki door,
-    //                                 0110 for fatfurwa hng64,
-    //                                 0118|0108 for fatfurwa building intro,
-    //                                 0118|0108 for fatfurwa fighters infight,
-    //                                 0108->0118 for fatfurwa globe (transitions when players are selected,
-    //                                 00d8 for segfaulting geo in xrally & roadedge)
-    //                                (00!0 is thought to be for lighting maybe?)
+    // [1]  - xxxx ... Flags
     // [2]  - xxxx ... offset into ROM
     // [3]  - xxxx ... offset into ROM
     // [4]  - xxxx ... Transformation matrix
@@ -1888,9 +1881,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     ////////////*/
 	int k, l, m;
 
-	UINT32  tempDWord;
-	UINT32  threeDOffset;
 	UINT16* threeDRoms;
+	UINT32  threeDOffset;
 	UINT16* threeDPointer;
 
 	UINT32 size[4];
@@ -1915,10 +1907,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	/////////////////
 
 	// 3d ROM Offset
-	tempDWord = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
-	threeDOffset = tempDWord & 0xffffffff;
-
 	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
+	threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
 	threeDPointer = &threeDRoms[threeDOffset * 3];
 
 	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU)
@@ -1930,7 +1920,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 	// Debug - ajg
 	/*
-    printf("%08x : ", tempDWord*3*2);
+    printf("%08x : ", threeDOffset*3*2);
     for (k = 0; k < 7*3; k++)
     {
         printf("%04x ", threeDPointer[k]);
@@ -2038,15 +2028,24 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			/*/////////////////////////
             // SINGLE POLY CHUNK FORMAT
             // [0] ??-- - ???? unused ????
-            // [0] --xx - chunk type
-            // [1] ?--- - unknown flags
-            // [1] -x-- - Explicit palette lookup when not dynamic.  What's it used for when dynamic is on?
-            // [1] --?- - unknown
-            // [1] ---x - texture index
-            // [2] ???? - used in fatfurwa 'hng64' & everywhere in roadedge
+            // [0] --xx - Chunk type
+            // [1] ?--- - Flags [x000 = ???
+								 0x00 = ???
+								 00x0 = ???
+								 000x = low-res texture flag]
+            // [1] -x-- - Explicit palette index.
+            // [1] --?- - Unknown
+            // [1] ---x - Texture index
+            // [2] ???? - Used in fatfurwa 'hng64' & everywhere in roadedge
             /////////////////////////*/
-			UINT8 chunkLength = 0;
 			UINT8 chunkType = chunkOffset[0] & 0x00ff;
+
+			// Debug - ajg
+			if (chunkOffset[0] & 0xff00)
+			{
+				printf("Weird!  The top byte of the chunkType has a value %04x!\n", chunkOffset[0]);
+				continue;
+			}
 
 			// Debug - Colors polygons with certain flags bright blue! ajg
 			//if (chunkOffset[2] & 0x00f0)
@@ -2056,32 +2055,18 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
-			// Debug - ajg
-			if (chunkOffset[0] & 0xff00)
-			{
-				printf("It's crazy that you got here!\n");
-				continue;
-			}
-
 			// TEXTURE
-			// FIXME: This is completely incorrect - these are flags, not overall 'types'
-			polys[*numPolys].texType = ((chunkOffset[1] & 0xf000) >> 12);
+			/* The current thought is there may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
+			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
+			else						 polys[*numPolys].texType = 0x0;
 
-			// The texture index is correct, but this texture type stuff isn't.
-			if (polys[*numPolys].texType == 0x8 || polys[*numPolys].texType == 0xc)		//  || polys[*numPolys].texType == 0x9
-			{
-				polys[*numPolys].texIndex = chunkOffset[1] & 0x000f;
-			}
-			else
-			{
-				polys[*numPolys].texIndex = -1;
-			}
+			polys[*numPolys].texIndex = chunkOffset[1] & 0x000f;
+
 
 			// PALETTE
 			polys[*numPolys].palOffset = 0;
 
 			/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
-			/*        There must be something set globally somewhere.  */
 			if (hng64_3dregs[0x00/4] & 0x2000)
 			{
 				polys[*numPolys].palOffset += 0x800;
@@ -2099,7 +2084,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].palOffset += explicitPaletteValue * 0x80;
 			}
 
-
+			UINT8 chunkLength = 0;
 			switch(chunkType)
 			{
 			/*/////////////////////////
@@ -2290,9 +2275,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				chunkLength = 0;
 				break;
 			}
-
-			// Debug - ajg
-			//printf("(chunkLength %d)\n", chunkLength);
 
 			polys[*numPolys].visible = 1;
 
@@ -2872,9 +2854,9 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			else if (texIndex >= 0)
 			{
 				// TEXTURED
-				if (textureType == 0x8 || textureType == 0xc)
+				if (textureType == 0x0)
 					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
-				else
+				else if (textureType == 0x1)
 					paletteEntry = textureOffset[(((int)(s_coord*512.0f))*1024 + (int)(t_coord*512.0f))];
 
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
