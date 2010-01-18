@@ -38,12 +38,12 @@ struct _gameplan_state
 	emu_timer *via_0_ca1_timer;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *riot;
-	const device_config *via_0;
-	const device_config *via_1;
-	const device_config *via_2;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *riot;
+	running_device *via_0;
+	running_device *via_1;
+	running_device *via_2;
 };
 
 

@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( K056800_68k_r )
 {
-	const device_config *k056800 = devtag_get_device(space->machine, "k056800");
+	running_device *k056800 = devtag_get_device(space->machine, "k056800");
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
@@ -125,7 +125,7 @@ static READ16_HANDLER( K056800_68k_r )
 
 static WRITE16_HANDLER( K056800_68k_w )
 {
-	const device_config *k056800 = devtag_get_device(space->machine, "k056800");
+	running_device *k056800 = devtag_get_device(space->machine, "k056800");
 
 	if (ACCESSING_BITS_8_15)
 		k056800_sound_w(k056800, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);

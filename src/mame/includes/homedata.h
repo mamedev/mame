@@ -27,11 +27,11 @@ struct _homedata_state
 	int      to_cpu, from_cpu;
 
 	/* device */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *dac;
-	const device_config *ym;
-	const device_config *sn;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *dac;
+	running_device *ym;
+	running_device *sn;
 };
 
 

@@ -435,7 +435,7 @@ static const UINT8 fcmp_cr_table_source[32] =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE powerpc_state *get_safe_token(const device_config *device)
+INLINE powerpc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -548,7 +548,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, cpu_irq_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, running_device *device, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -823,7 +823,7 @@ static CPU_GET_INFO( ppcdrc )
     ppcdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void ppcdrc_set_options(const device_config *device, UINT32 options)
+void ppcdrc_set_options(running_device *device, UINT32 options)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	ppc->impstate->drcoptions = options;
@@ -835,7 +835,7 @@ void ppcdrc_set_options(const device_config *device, UINT32 options)
     region
 -------------------------------------------------*/
 
-void ppcdrc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+void ppcdrc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->fastram_select < ARRAY_LENGTH(ppc->impstate->fastram))
@@ -853,7 +853,7 @@ void ppcdrc_add_fastram(const device_config *device, offs_t start, offs_t end, U
     ppcdrc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void ppcdrc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+void ppcdrc_add_hotspot(running_device *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->hotspot_select < ARRAY_LENGTH(ppc->impstate->hotspot))
@@ -1479,7 +1479,7 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
 	drcuml_state *drcuml = ppc->impstate->drcuml;
-	int fastxor = BYTE8_XOR_BE(0) >> (int)(cpu_get_databus_width(ppc->device, ADDRESS_SPACE_PROGRAM) < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (int)(device_get_databus_width(ppc->device, ADDRESS_SPACE_PROGRAM) < 64);
 	drcuml_block *block;
 	jmp_buf errorbuf;
 	int translate_type;

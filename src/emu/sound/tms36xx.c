@@ -341,7 +341,7 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 	}
 
 
-INLINE tms_state *get_safe_token(const device_config *device)
+INLINE tms_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -411,7 +411,7 @@ static void tms36xx_reset_counters(tms_state *tms)
 	memset(tms->counter, 0, sizeof(tms->counter));
 }
 
-void mm6221aa_tune_w(const device_config *device, int tune)
+void mm6221aa_tune_w(running_device *device, int tune)
 {
 	tms_state *tms = get_safe_token(device);
 
@@ -430,7 +430,7 @@ void mm6221aa_tune_w(const device_config *device, int tune)
     tms->tune_max = 96; /* fixed for now */
 }
 
-void tms36xx_note_w(const device_config *device, int octave, int note)
+void tms36xx_note_w(running_device *device, int octave, int note)
 {
 	tms_state *tms = get_safe_token(device);
 
@@ -489,7 +489,7 @@ static void tms3617_enable(tms_state *tms, int enable)
 	LOG(("%s\n", bits ? "" : " none"));
 }
 
-void tms3617_enable_w(const device_config *device, int enable)
+void tms3617_enable_w(running_device *device, int enable)
 {
 	tms_state *tms = get_safe_token(device);
 	tms3617_enable(tms, enable);
@@ -501,7 +501,7 @@ static DEVICE_START( tms36xx )
 	tms_state *tms = get_safe_token(device);
 	int enable;
 
-	tms->intf = (const tms36xx_interface *)device->static_config;
+	tms->intf = (const tms36xx_interface *)device->baseconfig().static_config;
 
    tms->channel = stream_create(device, 0, 1, device->clock * 64, tms, tms36xx_sound_update);
 	tms->samplerate = device->clock * 64;

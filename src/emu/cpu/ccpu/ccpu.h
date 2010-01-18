@@ -38,8 +38,8 @@ enum
     CONFIG STRUCTURE
 ***************************************************************************/
 
-typedef UINT8 (*ccpu_input_func)(const device_config *device);
-typedef void (*ccpu_vector_func)(const device_config *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+typedef UINT8 (*ccpu_input_func)(running_device *device);
+typedef void (*ccpu_vector_func)(running_device *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
 
 typedef struct _ccpu_config ccpu_config;
 struct _ccpu_config
@@ -57,7 +57,7 @@ struct _ccpu_config
 CPU_GET_INFO( ccpu );
 #define CPU_CCPU CPU_GET_INFO_NAME( ccpu )
 
-void ccpu_wdt_timer_trigger(const device_config *device);
+void ccpu_wdt_timer_trigger(running_device *device);
 
 CPU_DISASSEMBLE( ccpu );
 

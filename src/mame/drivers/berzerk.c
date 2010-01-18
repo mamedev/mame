@@ -468,7 +468,7 @@ static VIDEO_UPDATE( berzerk )
 
 static WRITE8_HANDLER( berzerk_audio_w )
 {
-	const device_config *device;
+	running_device *device;
 	int clock_divisor;
 
 	switch (offset)
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 static READ8_HANDLER( berzerk_audio_r )
 {
-	const device_config *device = devtag_get_device(space->machine, "speech");
+	running_device *device = devtag_get_device(space->machine, "speech");
 	return ((offset == 4) && !s14001a_bsy_r(device)) ? 0x40 : 0x00;
 }
 

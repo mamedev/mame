@@ -78,7 +78,7 @@ struct _v60_state
 	UINT8				irq_line;
 	UINT8				nmi_line;
 	cpu_irq_callback	irq_cb;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32				PPC;
@@ -111,7 +111,7 @@ struct _v60_state
 	UINT8				moddim;
 };
 
-INLINE v60_state *get_safe_token(const device_config *device)
+INLINE v60_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -312,7 +312,7 @@ static UINT32 opUNHANDLED(v60_state *cpustate)
 // Opcode jump table
 #include "optable.c"
 
-static void base_init(const device_config *device, cpu_irq_callback irqcallback)
+static void base_init(running_device *device, cpu_irq_callback irqcallback)
 {
 	v60_state *cpustate = get_safe_token(device);
 
@@ -381,7 +381,7 @@ static CPU_EXIT( v60 )
 {
 }
 
-void v60_stall(const device_config *device)
+void v60_stall(running_device *device)
 {
 	v60_state *cpustate = get_safe_token(device);
 	cpustate->stall_io = 1;

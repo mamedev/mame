@@ -21,12 +21,12 @@ struct __88games_state
 	int          speech_chip;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *k052109;
-	const device_config *k051960;
-	const device_config *k051316;
-	const device_config *upd_1;
-	const device_config *upd_2;
+	running_device *audiocpu;
+	running_device *k052109;
+	running_device *k051960;
+	running_device *k051316;
+	running_device *upd_1;
+	running_device *upd_2;
 };
 
 

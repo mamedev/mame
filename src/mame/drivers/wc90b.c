@@ -340,7 +340,7 @@ GFXDECODE_END
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	/* NMI writes to MSM ports *only*! -AS */
 	//cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -356,7 +356,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static void adpcm_int(const device_config *device)
+static void adpcm_int(running_device *device)
 {
 	static int toggle = 0;
 

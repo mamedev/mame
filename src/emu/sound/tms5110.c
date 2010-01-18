@@ -138,9 +138,9 @@ struct _tms5110_state
 	UINT8  addr_bit;
 
 	/* external callback */
-	int (*M0_callback)(const device_config *);
-	void (*set_load_address)(const device_config *, int);
-	const device_config *device;
+	int (*M0_callback)(running_device *);
+	void (*set_load_address)(running_device *, int);
+	running_device *device;
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 old_energy;
@@ -185,7 +185,7 @@ struct _tms5110_state
 
 
 
-INLINE tms5110_state *get_safe_token(const device_config *device)
+INLINE tms5110_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -908,7 +908,7 @@ static const unsigned int example_word_TEN[619]={
 #endif
 
 
-static int speech_rom_read_bit(const device_config *device)
+static int speech_rom_read_bit(running_device *device)
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -924,7 +924,7 @@ static int speech_rom_read_bit(const device_config *device)
 	return r;
 }
 
-static void speech_rom_set_addr(const device_config *device, int addr)
+static void speech_rom_set_addr(running_device *device, int addr)
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -942,7 +942,7 @@ static DEVICE_START( tms5110 )
 	static const tms5110_interface dummy = { 0 };
 	tms5110_state *tms = get_safe_token(device);
 
-	tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
+	tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
 	tms->table = *device->region;
 
 	tms->device = device;
@@ -1130,7 +1130,7 @@ READ8_DEVICE_HANDLER( m58817_status_r )
 
 static TIMER_CALLBACK( romclk_timer_cb )
 {
-	tms5110_state *tms = get_safe_token((const device_config *) ptr);
+	tms5110_state *tms = get_safe_token((running_device *) ptr);
 	tms->romclk_state = !tms->romclk_state;
 }
 
@@ -1158,7 +1158,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_r )
 
 ******************************************************************************/
 
-int tms5110_ready_r(const device_config *device)
+int tms5110_ready_r(running_device *device)
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -1205,7 +1205,7 @@ static STREAM_UPDATE( tms5110_update )
 
 ******************************************************************************/
 
-void tms5110_set_frequency(const device_config *device, int frequency)
+void tms5110_set_frequency(running_device *device, int frequency)
 {
 	tms5110_state *tms = get_safe_token(device);
 	stream_set_sample_rate(tms->stream, frequency / 80);

@@ -1335,15 +1335,15 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 
 static int get_variable_value(const machine_config *config, const char *string, char **outputptr)
 {
-	const device_config *device;
+	const device_config *devconfig;
 	int num, den;
 	char temp[100];
 
 	/* screen 0 parameters */
-	for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
+	for (devconfig = video_screen_first(config); devconfig != NULL; devconfig = video_screen_next(devconfig))
 	{
-		int scrnum = config->devicelist.index(VIDEO_SCREEN, device->tag);
-		const screen_config *scrconfig = (const screen_config *)device->inline_config;
+		int scrnum = config->devicelist.index(VIDEO_SCREEN, devconfig->tag);
+		const screen_config *scrconfig = (const screen_config *)devconfig->inline_config;
 
 		/* native X aspect factor */
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);

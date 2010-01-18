@@ -41,7 +41,7 @@ struct _rp5h01_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE rp5h01_state *get_safe_token(const device_config *device)
+INLINE rp5h01_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -49,11 +49,11 @@ INLINE rp5h01_state *get_safe_token(const device_config *device)
 	return (rp5h01_state *)device->token;
 }
 
-INLINE const rp5h01_interface *get_interface(const device_config *device)
+INLINE const rp5h01_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == RP5H01));
-	return (const rp5h01_interface *) device->static_config;
+	return (const rp5h01_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************

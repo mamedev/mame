@@ -42,13 +42,13 @@ WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_enable )
 }
 
 
-void crbaloon_audio_set_explosion_enable(const device_config *sn, int enabled)
+void crbaloon_audio_set_explosion_enable(running_device *sn, int enabled)
 {
 	sn76477_enable_w(sn, enabled);
 }
 
 
-void crbaloon_audio_set_breath_enable(const device_config *sn, int enabled)
+void crbaloon_audio_set_breath_enable(running_device *sn, int enabled)
 {
 	/* changes slf_res to 10k (middle of two 10k resistors)
        it also puts a tantal capacitor against GND on the output,
@@ -57,7 +57,7 @@ void crbaloon_audio_set_breath_enable(const device_config *sn, int enabled)
 }
 
 
-void crbaloon_audio_set_appear_enable(const device_config *sn, int enabled)
+void crbaloon_audio_set_appear_enable(running_device *sn, int enabled)
 {
 	/* APPEAR is connected to MIXER B */
 	sn76477_mixer_b_w(sn, enabled);

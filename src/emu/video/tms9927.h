@@ -51,9 +51,9 @@ WRITE8_DEVICE_HANDLER( tms9927_w );
 READ8_DEVICE_HANDLER( tms9927_r );
 
 /* other queries */
-int tms9927_screen_reset(const device_config *device);
-int tms9927_upscroll_offset(const device_config *device);
-int tms9927_cursor_bounds(const device_config *device, rectangle *bounds);
+int tms9927_screen_reset(running_device *device);
+int tms9927_upscroll_offset(running_device *device);
+int tms9927_cursor_bounds(running_device *device, rectangle *bounds);
 
 
 

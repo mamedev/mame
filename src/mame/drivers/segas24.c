@@ -790,7 +790,7 @@ static UINT16 irq_timera;
 static UINT8  irq_timerb;
 static UINT8  irq_allow0, irq_allow1;
 static int    irq_timer_pend0, irq_timer_pend1, irq_yms, irq_vblank, irq_sprite;
-static const device_config *irq_timer, *irq_timer_clear;
+static running_device *irq_timer, *irq_timer_clear;
 
 static TIMER_DEVICE_CALLBACK( irq_timer_cb )
 {
@@ -936,7 +936,7 @@ static INTERRUPT_GEN(irq_vbl)
 	}
 }
 
-static void irq_ym(const device_config *device, int irq)
+static void irq_ym(running_device *device, int irq)
 {
 	irq_yms = irq;
 	cputag_set_input_line(device->machine, "maincpu", IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);

@@ -66,7 +66,7 @@ struct _m14_state
 	UINT8 hop_mux;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

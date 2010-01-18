@@ -11,7 +11,7 @@
 #include "machine/pit8253.h"
 
 
-static const device_config *ttl74148;
+static running_device *ttl74148;
 
 
 
@@ -70,7 +70,7 @@ const struct pit8253_config vertigo_pit8254_config =
  *
  *************************************/
 
-void vertigo_update_irq(const device_config *device)
+void vertigo_update_irq(running_device *device)
 {
 	if (irq_state < 7)
 		cputag_set_input_line(device->machine, "maincpu", irq_state ^ 7, CLEAR_LINE);

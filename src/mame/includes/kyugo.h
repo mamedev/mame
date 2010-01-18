@@ -23,8 +23,8 @@ struct _kyugo_state
 	const UINT8 *color_codes;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *subcpu;
+	running_device *maincpu;
+	running_device *subcpu;
 };
 
 

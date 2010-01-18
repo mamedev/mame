@@ -131,18 +131,18 @@ struct _z80dma_t
 };
 
 static TIMER_CALLBACK( z80dma_timerproc );
-static void z80dma_update_status(const device_config *device);
+static void z80dma_update_status(running_device *device);
 
 /* ----------------------------------------------------------------------- */
 
-INLINE z80dma_t *get_safe_token(const device_config *device) {
+INLINE z80dma_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
 	assert( device->token != NULL );
 	assert( device->type == Z80DMA );
 	return ( z80dma_t * ) device->token;
 }
 
-static void z80dma_do_read(const device_config *device)
+static void z80dma_do_read(running_device *device)
 {
 	z80dma_t *cntx = get_safe_token(device);
 	UINT8 mode;
@@ -181,7 +181,7 @@ static void z80dma_do_read(const device_config *device)
 	}
 }
 
-static int z80dma_do_write(const device_config *device)
+static int z80dma_do_write(running_device *device)
 {
 	z80dma_t *cntx = get_safe_token(device);
 	int done;
@@ -249,7 +249,7 @@ static int z80dma_do_write(const device_config *device)
 
 static TIMER_CALLBACK( z80dma_timerproc )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	z80dma_t *cntx = get_safe_token(device);
 	int done;
 
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( z80dma_timerproc )
 	}
 }
 
-static void z80dma_update_status(const device_config *device)
+static void z80dma_update_status(running_device *device)
 {
 	z80dma_t *z80dma = get_safe_token(device);
 	UINT16 pending_transfer;
@@ -502,7 +502,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 
 static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	int state = param & 0x01;
 	z80dma_t *cntx = get_safe_token(device);
 
@@ -537,19 +537,19 @@ WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w )
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-static int z80dma_irq_state(const device_config *device)
+static int z80dma_irq_state(running_device *device)
 {
 	int state = 0;
 
 	return state;
 }
 
-static int z80dma_irq_ack(const device_config *device)
+static int z80dma_irq_ack(running_device *device)
 {
 	return 0;
 }
 
-static void z80dma_irq_reti(const device_config *device)
+static void z80dma_irq_reti(running_device *device)
 {
 }
 
@@ -560,7 +560,7 @@ static void z80dma_irq_reti(const device_config *device)
 static DEVICE_START( z80dma )
 {
 	z80dma_t *z80dma = get_safe_token(device);
-	z80dma_interface *intf = (z80dma_interface *)device->static_config;
+	z80dma_interface *intf = (z80dma_interface *)device->baseconfig().static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&z80dma->out_busreq_func, &intf->out_busreq_func, device);

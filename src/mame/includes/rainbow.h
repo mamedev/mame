@@ -25,10 +25,10 @@ struct _rainbow_state
 	UINT8       current_bank;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *pc080sn;
-	const device_config *pc090oj;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *pc080sn;
+	running_device *pc090oj;
 };
 
 

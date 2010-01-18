@@ -157,7 +157,7 @@ static WRITE8_HANDLER( tturfbl_msm5205_data_w )
 	sample_buffer = data;
 }
 
-static void tturfbl_msm5205_callback(const device_config *device)
+static void tturfbl_msm5205_callback(running_device *device)
 {
 	msm5205_data_w(device, (sample_buffer >> 4) & 0x0F);
 	sample_buffer <<= 4;
@@ -2716,7 +2716,7 @@ static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 	sample_buffer = data;
 }
 
-static void shdancbl_msm5205_callback(const device_config *device)
+static void shdancbl_msm5205_callback(running_device *device)
 {
 	msm5205_data_w(device, sample_buffer & 0x0F);
 	sample_buffer >>= 4;

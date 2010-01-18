@@ -78,7 +78,7 @@ struct _ddayjlc_state
 	UINT8    prot_addr;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

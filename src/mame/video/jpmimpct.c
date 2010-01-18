@@ -115,7 +115,7 @@ void jpmimpct_from_shiftreg(const address_space *space, UINT32 address, UINT16 *
  *
  *************************************/
 
-void jpmimpct_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void jpmimpct_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &jpmimpct_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);

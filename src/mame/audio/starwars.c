@@ -16,7 +16,7 @@
 static UINT8 sound_data;	/* data for the sound cpu */
 static UINT8 main_data;		/* data for the main  cpu */
 
-static const device_config *riot;
+static running_device *riot;
 
 
 SOUND_START( starwars )

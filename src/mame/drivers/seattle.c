@@ -433,7 +433,7 @@ static UINT32 *rombase;
 static galileo_data galileo;
 static widget_data widget;
 
-static const device_config *voodoo_device;
+static running_device *voodoo_device;
 static UINT8 voodoo_stalled;
 static UINT8 cpu_stalled_on_voodoo;
 static UINT32 cpu_stalled_offset;
@@ -466,12 +466,12 @@ static UINT32 cmos_write_enabled;
  *
  *************************************/
 
-static void vblank_assert(const device_config *device, int state);
+static void vblank_assert(running_device *device, int state);
 static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
 static void galileo_perform_dma(const address_space *space, int which);
-static void voodoo_stall(const device_config *device, int stall);
+static void voodoo_stall(running_device *device, int stall);
 static void widget_reset(running_machine *machine);
 static void update_widget_irq(running_machine *machine);
 
@@ -581,7 +581,7 @@ static MACHINE_RESET( seattle )
  *
  *************************************/
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", IDE_IRQ_NUM, state);
 }
@@ -607,7 +607,7 @@ static void ethernet_interrupt_machine(running_machine *machine, int state)
 		update_widget_irq(machine);
 }
 
-static void ethernet_interrupt(const device_config *device, int state)
+static void ethernet_interrupt(running_device *device, int state)
 {
 	ethernet_interrupt_machine(device->machine, state);
 }
@@ -737,7 +737,7 @@ static WRITE32_HANDLER( vblank_clear_w )
 }
 
 
-static void vblank_assert(const device_config *device, int state)
+static void vblank_assert(running_device *device, int state)
 {
 	/* cache the raw state */
 	vblank_state = state;
@@ -1318,7 +1318,7 @@ static WRITE32_HANDLER( seattle_voodoo_w )
 }
 
 
-static void voodoo_stall(const device_config *device, int stall)
+static void voodoo_stall(running_device *device, int stall)
 {
 	/* set the new state */
 	voodoo_stalled = stall;
@@ -2767,7 +2767,7 @@ ROM_END
 
 static void init_common(running_machine *machine, int ioasic, int serialnum, int yearoffs, int config)
 {
-	const device_config *device;
+	running_device *device;
 
 	/* initialize the subsystems */
 	midway_ioasic_init(machine, ioasic, serialnum, yearoffs, ioasic_irq);

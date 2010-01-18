@@ -260,7 +260,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void metlclsh_irqhandler(const device_config *device, int linestate)
+static void metlclsh_irqhandler(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, linestate);
 }

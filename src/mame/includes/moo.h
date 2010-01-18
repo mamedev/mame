@@ -23,13 +23,13 @@ struct _moo_state
 	UINT16      cur_control2;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k054539;
-	const device_config *k053246;
-	const device_config *k053251;
-	const device_config *k056832;
-	const device_config *k054338;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k054539;
+	running_device *k053246;
+	running_device *k053251;
+	running_device *k056832;
+	running_device *k054338;
 };
 
 

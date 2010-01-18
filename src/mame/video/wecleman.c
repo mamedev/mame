@@ -1125,8 +1125,8 @@ VIDEO_UPDATE ( wecleman )
 
 VIDEO_UPDATE( hotchase )
 {
-	const device_config *k051316_1 = devtag_get_device(screen->machine, "k051316_1");
-	const device_config *k051316_2 = devtag_get_device(screen->machine, "k051316_2");
+	running_device *k051316_1 = devtag_get_device(screen->machine, "k051316_1");
+	running_device *k051316_2 = devtag_get_device(screen->machine, "k051316_2");
 	int video_on;
 
 	video_on = wecleman_irqctrl & 0x40;

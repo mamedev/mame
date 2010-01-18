@@ -34,13 +34,13 @@ struct _i960_state_t {
 	int immediate_irq, immediate_vector, immediate_pri;
 
 	cpu_irq_callback irq_cb;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 
 	int icount;
 };
 
-INLINE i960_state_t *get_safe_token(const device_config *device)
+INLINE i960_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2219,13 +2219,13 @@ CPU_GET_INFO( i960 )
 
 // call from any read/write handler for a memory area that can't be bursted
 // on the real hardware (e.g. Model 2's interrupt control registers)
-void i960_noburst(const device_config *device)
+void i960_noburst(running_device *device)
 {
 	i960_state_t *i960 = get_safe_token(device);
 	i960->bursting = 0;
 }
 
-void i960_stall(const device_config *device)
+void i960_stall(running_device *device)
 {
 	i960_state_t *i960 = get_safe_token(device);
 	i960->IP = i960->PIP;

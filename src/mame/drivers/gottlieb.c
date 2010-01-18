@@ -225,7 +225,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 static UINT8 joystick_select;
 static UINT8 track[2];
 
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static emu_timer *laserdisc_bit_timer;
 static emu_timer *laserdisc_philips_timer;
 static UINT8 laserdisc_select;
@@ -270,7 +270,7 @@ static MACHINE_START( gottlieb )
 	state_save_register_global_array(machine, track);
 
 	/* see if we have a laserdisc */
-	laserdisc = machine->config->devicelist.first(LASERDISC);
+	laserdisc = machine->devicelist.first(LASERDISC);
 	if (laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
@@ -612,7 +612,7 @@ static void audio_handle_zero_crossing(attotime zerotime, int logit)
 }
 
 
-static void laserdisc_audio_process(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
+static void laserdisc_audio_process(running_device *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
 {
 	int logit = LOG_AUDIO_DECODE && input_code_pressed(device->machine, KEYCODE_L);
 	attotime time_per_sample = ATTOTIME_IN_HZ(samplerate);

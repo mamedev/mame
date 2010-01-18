@@ -33,10 +33,10 @@ struct _djboy_state
 	int        prot_mode;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *cpu1;
-	const device_config *cpu2;
-	const device_config *pandora;
+	running_device *maincpu;
+	running_device *cpu1;
+	running_device *cpu2;
+	running_device *pandora;
 };
 
 

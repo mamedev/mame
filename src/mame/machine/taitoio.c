@@ -69,7 +69,7 @@ struct _tc0220ioc_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0220ioc_state *tc0220ioc_get_safe_token( const device_config *device )
+INLINE tc0220ioc_state *tc0220ioc_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -78,11 +78,11 @@ INLINE tc0220ioc_state *tc0220ioc_get_safe_token( const device_config *device )
 	return (tc0220ioc_state *)device->token;
 }
 
-INLINE const tc0220ioc_interface *tc0220ioc_get_interface( const device_config *device )
+INLINE const tc0220ioc_interface *tc0220ioc_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0220IOC));
-	return (const tc0220ioc_interface *) device->static_config;
+	return (const tc0220ioc_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -226,7 +226,7 @@ struct _tc0510nio_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0510nio_state *tc0510nio_get_safe_token( const device_config *device )
+INLINE tc0510nio_state *tc0510nio_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -235,11 +235,11 @@ INLINE tc0510nio_state *tc0510nio_get_safe_token( const device_config *device )
 	return (tc0510nio_state *)device->token;
 }
 
-INLINE const tc0510nio_interface *tc0510nio_get_interface( const device_config *device )
+INLINE const tc0510nio_interface *tc0510nio_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0510NIO));
-	return (const tc0510nio_interface *) device->static_config;
+	return (const tc0510nio_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -378,7 +378,7 @@ struct _tc0640fio_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0640fio_state *tc0640fio_get_safe_token( const device_config *device )
+INLINE tc0640fio_state *tc0640fio_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -387,11 +387,11 @@ INLINE tc0640fio_state *tc0640fio_get_safe_token( const device_config *device )
 	return (tc0640fio_state *)device->token;
 }
 
-INLINE const tc0640fio_interface *tc0640fio_get_interface( const device_config *device )
+INLINE const tc0640fio_interface *tc0640fio_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0640FIO));
-	return (const tc0640fio_interface *) device->static_config;
+	return (const tc0640fio_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************

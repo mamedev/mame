@@ -31,8 +31,8 @@ struct _cosmic_state
 	UINT32         pixel_clock;
 
 	/* devices */
-	const device_config *samples;
-	const device_config *dac;
+	running_device *samples;
+	running_device *dac;
 };
 
 

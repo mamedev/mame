@@ -10,7 +10,7 @@
 #include "debugger.h"
 #include "unsp.h"
 
-INLINE unsp_state *get_safe_token(const device_config *device)
+INLINE unsp_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
     assert(device->token != NULL);
@@ -116,7 +116,7 @@ static CPU_INIT( unsp )
     memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
     unsp->device = device;
-    unsp->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+    unsp->program = device->space(AS_PROGRAM);
     unsp->irq = 0;
     unsp->fiq = 0;
 }

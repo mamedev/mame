@@ -107,7 +107,7 @@ struct _pia6821_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE pia6821_state *get_token(const device_config *device)
+INLINE pia6821_state *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == PIA6821) || (device->type == PIA6822));
@@ -115,11 +115,11 @@ INLINE pia6821_state *get_token(const device_config *device)
 }
 
 
-INLINE const pia6821_interface *get_interface(const device_config *device)
+INLINE const pia6821_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == PIA6821) || (device->type == PIA6822));
-	return (const pia6821_interface *) device->static_config;
+	return (const pia6821_interface *) device->baseconfig().static_config;
 }
 
 
@@ -252,7 +252,7 @@ static DEVICE_RESET( pia6821 )
     update_interrupts
 -------------------------------------------------*/
 
-static void update_interrupts(const device_config *device)
+static void update_interrupts(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	int new_state;
@@ -281,7 +281,7 @@ static void update_interrupts(const device_config *device)
     get_in_a_value
 -------------------------------------------------*/
 
-static UINT8 get_in_a_value(const device_config *device)
+static UINT8 get_in_a_value(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	UINT8 port_a_data = 0;
@@ -322,7 +322,7 @@ static UINT8 get_in_a_value(const device_config *device)
     get_in_b_value
 -------------------------------------------------*/
 
-static UINT8 get_in_b_value(const device_config *device)
+static UINT8 get_in_b_value(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	UINT8 ret;
@@ -366,7 +366,7 @@ static UINT8 get_in_b_value(const device_config *device)
     get_out_a_value
 -------------------------------------------------*/
 
-static UINT8 get_out_a_value(const device_config *device)
+static UINT8 get_out_a_value(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	UINT8 ret;
@@ -386,7 +386,7 @@ static UINT8 get_out_a_value(const device_config *device)
     get_out_b_value
 -------------------------------------------------*/
 
-static UINT8 get_out_b_value(const device_config *device)
+static UINT8 get_out_b_value(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -399,7 +399,7 @@ static UINT8 get_out_b_value(const device_config *device)
     set_out_ca2
 -------------------------------------------------*/
 
-static void set_out_ca2(const device_config *device, int data)
+static void set_out_ca2(running_device *device, int data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -425,7 +425,7 @@ static void set_out_ca2(const device_config *device, int data)
     set_out_cb2
 -------------------------------------------------*/
 
-static void set_out_cb2(const device_config *device, int data)
+static void set_out_cb2(running_device *device, int data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -454,7 +454,7 @@ static void set_out_cb2(const device_config *device, int data)
     port_a_r
 -------------------------------------------------*/
 
-static UINT8 port_a_r(const device_config *device)
+static UINT8 port_a_r(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -486,7 +486,7 @@ static UINT8 port_a_r(const device_config *device)
     ddr_a_r
 -------------------------------------------------*/
 
-static UINT8 ddr_a_r(const device_config *device)
+static UINT8 ddr_a_r(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -502,7 +502,7 @@ static UINT8 ddr_a_r(const device_config *device)
     port_b_r
 -------------------------------------------------*/
 
-static UINT8 port_b_r(const device_config *device)
+static UINT8 port_b_r(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -530,7 +530,7 @@ static UINT8 port_b_r(const device_config *device)
     ddr_b_r
 -------------------------------------------------*/
 
-static UINT8 ddr_b_r(const device_config *device)
+static UINT8 ddr_b_r(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -546,7 +546,7 @@ static UINT8 ddr_b_r(const device_config *device)
     control_a_r
 -------------------------------------------------*/
 
-static UINT8 control_a_r(const device_config *device)
+static UINT8 control_a_r(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	UINT8 ret;
@@ -588,7 +588,7 @@ static UINT8 control_a_r(const device_config *device)
     control_b_r
 -------------------------------------------------*/
 
-static UINT8 control_b_r(const device_config *device)
+static UINT8 control_b_r(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	UINT8 ret;
@@ -679,7 +679,7 @@ READ8_DEVICE_HANDLER( pia6821_alt_r )
     pia6821_get_port_b_z_mask
 -------------------------------------------------*/
 
-UINT8 pia6821_get_port_b_z_mask(const device_config *device)
+UINT8 pia6821_get_port_b_z_mask(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 	return ~p->ddr_b;
@@ -690,7 +690,7 @@ UINT8 pia6821_get_port_b_z_mask(const device_config *device)
     send_to_out_a_func
 -------------------------------------------------*/
 
-static void send_to_out_a_func(const device_config *device, const char* message)
+static void send_to_out_a_func(running_device *device, const char* message)
 {
 	pia6821_state *p = get_token(device);
 
@@ -715,7 +715,7 @@ static void send_to_out_a_func(const device_config *device, const char* message)
     send_to_out_b_func
 -------------------------------------------------*/
 
-static void send_to_out_b_func(const device_config *device, const char* message)
+static void send_to_out_b_func(running_device *device, const char* message)
 {
 	pia6821_state *p = get_token(device);
 
@@ -740,7 +740,7 @@ static void send_to_out_b_func(const device_config *device, const char* message)
     port_a_w
 -------------------------------------------------*/
 
-static void port_a_w(const device_config *device, UINT8 data)
+static void port_a_w(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -755,7 +755,7 @@ static void port_a_w(const device_config *device, UINT8 data)
     ddr_a_w
 -------------------------------------------------*/
 
-static void ddr_a_w(const device_config *device, UINT8 data)
+static void ddr_a_w(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -780,7 +780,7 @@ static void ddr_a_w(const device_config *device, UINT8 data)
     port_b_w
 -------------------------------------------------*/
 
-static void port_b_w(const device_config *device, UINT8 data)
+static void port_b_w(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -806,7 +806,7 @@ static void port_b_w(const device_config *device, UINT8 data)
     ddr_b_w
 -------------------------------------------------*/
 
-static void ddr_b_w(const device_config *device, UINT8 data)
+static void ddr_b_w(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -831,7 +831,7 @@ static void ddr_b_w(const device_config *device, UINT8 data)
     control_a_w
 -------------------------------------------------*/
 
-static void control_a_w(const device_config *device, UINT8 data)
+static void control_a_w(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -867,7 +867,7 @@ static void control_a_w(const device_config *device, UINT8 data)
     control_b_w
 -------------------------------------------------*/
 
-static void control_b_w(const device_config *device, UINT8 data)
+static void control_b_w(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 	int temp;
@@ -944,7 +944,7 @@ WRITE8_DEVICE_HANDLER( pia6821_alt_w )
     pia6821_set_port_a_z_mask
 -------------------------------------------------*/
 
-void pia6821_set_port_a_z_mask(const device_config *device, UINT8 data)
+void pia6821_set_port_a_z_mask(running_device *device, UINT8 data)
 {
 	pia6821_state *p = get_token(device);
 
@@ -968,7 +968,7 @@ READ8_DEVICE_HANDLER( pia6821_porta_r )
     pia6821_set_input_a
 -------------------------------------------------*/
 
-void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
+void pia6821_set_input_a(running_device *device, UINT8 data, UINT8 z_mask)
 {
 	pia6821_state *p = get_token(device);
 
@@ -996,7 +996,7 @@ WRITE8_DEVICE_HANDLER( pia6821_porta_w )
     pia6821_get_output_a
 -------------------------------------------------*/
 
-UINT8 pia6821_get_output_a(const device_config *device)
+UINT8 pia6821_get_output_a(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1103,7 +1103,7 @@ WRITE8_DEVICE_HANDLER( pia6821_ca2_w )
     pia6821_get_output_ca2
 -------------------------------------------------*/
 
-int pia6821_get_output_ca2(const device_config *device)
+int pia6821_get_output_ca2(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1119,7 +1119,7 @@ int pia6821_get_output_ca2(const device_config *device)
     pullup resistor
 -------------------------------------------------*/
 
-int pia6821_get_output_ca2_z(const device_config *device)
+int pia6821_get_output_ca2_z(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1165,7 +1165,7 @@ WRITE8_DEVICE_HANDLER( pia6821_portb_w )
     pia6821_get_output_b
 -------------------------------------------------*/
 
-UINT8 pia6821_get_output_b(const device_config *device)
+UINT8 pia6821_get_output_b(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1273,7 +1273,7 @@ WRITE8_DEVICE_HANDLER( pia6821_cb2_w )
     pia6821_get_output_cb2
 -------------------------------------------------*/
 
-int pia6821_get_output_cb2(const device_config *device)
+int pia6821_get_output_cb2(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1287,7 +1287,7 @@ int pia6821_get_output_cb2(const device_config *device)
     pia6821_get_output_cb2_z
 -------------------------------------------------*/
 
-int pia6821_get_output_cb2_z(const device_config *device)
+int pia6821_get_output_cb2_z(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1299,7 +1299,7 @@ int pia6821_get_output_cb2_z(const device_config *device)
     pia6821_get_irq_a
 -------------------------------------------------*/
 
-int pia6821_get_irq_a(const device_config *device)
+int pia6821_get_irq_a(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 
@@ -1311,7 +1311,7 @@ int pia6821_get_irq_a(const device_config *device)
     pia6821_get_irq_b
 -------------------------------------------------*/
 
-int pia6821_get_irq_b(const device_config *device)
+int pia6821_get_irq_b(running_device *device)
 {
 	pia6821_state *p = get_token(device);
 

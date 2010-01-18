@@ -57,7 +57,7 @@ fffe=reset e7cc
 /* FXXXXX for first field
    AXXXXX for second field */
 
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static int m_n_disc_lock;
 static int m_n_disc_data;
 static int m_n_disc_read_data;
@@ -125,8 +125,8 @@ static WRITE8_HANDLER( firefox_disc_data_w )
 static unsigned char *tileram;
 static unsigned char *tile_palette;
 static unsigned char *sprite_palette;
-static const device_config *nvram_1c;
-static const device_config *nvram_1d;
+static running_device *nvram_1c;
+static running_device *nvram_1d;
 static tilemap_t *bgtiles;
 
 static int control_num;
@@ -304,7 +304,7 @@ static READ8_DEVICE_HANDLER( riot_porta_r )
 
 static WRITE8_DEVICE_HANDLER( riot_porta_w )
 {
-	const device_config *tms = devtag_get_device(device->machine, "tms");
+	running_device *tms = devtag_get_device(device->machine, "tms");
 
 	/* handle 5220 read */
 	tms5220_rsq_w(tms, (data>>1) & 1);
@@ -420,7 +420,7 @@ static WRITE8_HANDLER( firefox_coin_counter_w )
 
 
 
-static void firq_gen(const device_config *device, int state)
+static void firq_gen(running_device *device, int state)
 {
 	if (state)
 	    cputag_set_input_line( device->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );

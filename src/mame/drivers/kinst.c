@@ -157,7 +157,7 @@ static const UINT8 *control_map;
 
 static MACHINE_START( kinst )
 {
-	const device_config *ide = devtag_get_device(machine, "ide");
+	running_device *ide = devtag_get_device(machine, "ide");
 	UINT8 *features = ide_get_features(ide);
 
 	if (strncmp(machine->gamedrv->name, "kinst2", 6) != 0)
@@ -265,7 +265,7 @@ static INTERRUPT_GEN( irq0_start )
 }
 
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 1, state);
 }

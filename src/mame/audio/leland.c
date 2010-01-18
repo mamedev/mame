@@ -514,7 +514,7 @@ static TIMER_CALLBACK( dma_timer_callback );
 static DEVICE_START( common_sh_start )
 {
 	running_machine *machine = device->machine;
-	const address_space *dmaspace = memory_find_address_space(devtag_get_device(machine, "audiocpu"), ADDRESS_SPACE_PROGRAM);
+	const address_space *dmaspace = machine->device("audiocpu")->space(AS_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */

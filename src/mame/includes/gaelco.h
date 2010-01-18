@@ -18,7 +18,7 @@ struct _gaelco_state
 	tilemap_t      *tilemap[2];
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

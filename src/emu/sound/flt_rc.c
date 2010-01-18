@@ -5,14 +5,14 @@
 typedef struct _filter_rc_state filter_rc_state;
 struct _filter_rc_state
 {
-	const device_config *device;
+	running_device *device;
 	sound_stream *	stream;
 	int				k;
 	int				memory;
 	int				type;
 };
 
-INLINE filter_rc_state *get_safe_token(const device_config *device)
+INLINE filter_rc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -93,7 +93,7 @@ static void set_RC_info(filter_rc_state *info, int type, double R1, double R2, d
 static DEVICE_START( filter_rc )
 {
 	filter_rc_state *info = get_safe_token(device);
-	const flt_rc_config *conf = (const flt_rc_config *)device->static_config;
+	const flt_rc_config *conf = (const flt_rc_config *)device->baseconfig().static_config;
 
 	info->device = device;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_rc_update);
@@ -104,7 +104,7 @@ static DEVICE_START( filter_rc )
 }
 
 
-void filter_rc_set_RC(const device_config *device, int type, double R1, double R2, double R3, double C)
+void filter_rc_set_RC(running_device *device, int type, double R1, double R2, double R3, double C)
 {
 	filter_rc_state *info = get_safe_token(device);
 

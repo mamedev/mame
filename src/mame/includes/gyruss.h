@@ -17,8 +17,8 @@ struct _gyruss_state
 	tilemap_t    *tilemap;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *audiocpu_2;
+	running_device *audiocpu;
+	running_device *audiocpu_2;
 };
 
 

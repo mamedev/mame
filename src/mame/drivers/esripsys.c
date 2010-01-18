@@ -554,7 +554,7 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		const device_config *tms = devtag_get_device(space->machine, "tms5220nl");
+		running_device *tms = devtag_get_device(space->machine, "tms5220nl");
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
@@ -567,7 +567,7 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, "tms5220nl");
+	running_device *tms = devtag_get_device(space->machine, "tms5220nl");
 	if (offset == 0)
 	{
 		tms_data = data;

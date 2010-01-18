@@ -147,7 +147,7 @@ static SAMPLES_START( pbillian_sh_start )
 
 static WRITE8_HANDLER( pbillian_sample_trigger_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	int start,end;
 
 	start = data << 7;

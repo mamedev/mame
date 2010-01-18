@@ -8,7 +8,7 @@ struct _funybubl_state
 	UINT8 *    paletteram;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

@@ -1618,7 +1618,7 @@ static DRIVER_INIT( devzone )
 
 static DRIVER_INIT( nomnlnd )
 {
-	const device_config *dac = devtag_get_device(machine, "dac");
+	running_device *dac = devtag_get_device(machine, "dac");
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
 	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0);
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);

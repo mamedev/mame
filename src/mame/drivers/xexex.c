@@ -256,7 +256,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	reset_sound_region(space->machine);
 }
 
-static void ym_set_mixing(const device_config *device, double left, double right)
+static void ym_set_mixing(running_device *device, double left, double right)
 {
 	xexex_state *state = (xexex_state *)device->machine->driver_data;
 	flt_volume_set_volume(state->filter1l, (71.0 * left) / 55.0);

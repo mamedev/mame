@@ -339,7 +339,7 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
 	UINT16 *buffered_spriteram16 = screen->machine->generic.buffered_spriteram.u16;
 	int j, x, y, ex, ey, px, py;
@@ -468,8 +468,8 @@ VIDEO_UPDATE( gaelco2_dual )
 {
 	int i;
 
-	const device_config *left_screen  = devtag_get_device(screen->machine, "lscreen");
-	const device_config *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen  = devtag_get_device(screen->machine, "lscreen");
+	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
 
 	/* read scroll values */
 	int scroll0x = gaelco2_videoram[0x2802/2] + 0x14;

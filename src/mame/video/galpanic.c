@@ -101,7 +101,7 @@ static void draw_fgbitmap(bitmap_t *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( galpanic )
 {
-	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
+	running_device *pandora = devtag_get_device(screen->machine, "pandora");
 
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect);

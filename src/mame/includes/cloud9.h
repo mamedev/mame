@@ -30,7 +30,7 @@ struct _cloud9_state
 	UINT8       irq_state;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

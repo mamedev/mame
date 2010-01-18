@@ -213,7 +213,7 @@ static GFXDECODE_START( deniam )
 GFXDECODE_END
 
 
-static void irqhandler( const device_config *device, int linestate )
+static void irqhandler( running_device *device, int linestate )
 {
 	deniam_state *state = (deniam_state *)device->machine->driver_data;
 

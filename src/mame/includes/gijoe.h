@@ -22,12 +22,12 @@ struct _gijoe_state
 	emu_timer	*dmadelay_timer;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k054539;
-	const device_config *k056832;
-	const device_config *k053246;
-	const device_config *k053251;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k054539;
+	running_device *k056832;
+	running_device *k053246;
+	running_device *k053251;
 };
 
 /*----------- defined in video/gijoe.c -----------*/

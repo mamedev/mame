@@ -40,10 +40,10 @@ struct _k053260_state {
 	UINT32					*delta_table;
 	k053260_channel		channels[4];
 	const k053260_interface			*intf;
-	const device_config *device;
+	running_device *device;
 };
 
-INLINE k053260_state *get_safe_token(const device_config *device)
+INLINE k053260_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -215,7 +215,7 @@ static DEVICE_START( k053260 )
 
 	/* Initialize our chip structure */
 	ic->device = device;
-	ic->intf = (device->static_config != NULL) ? (const k053260_interface *)device->static_config : &defintrf;
+	ic->intf = (device->baseconfig().static_config != NULL) ? (const k053260_interface *)device->baseconfig().static_config : &defintrf;
 
 	ic->mode = 0;
 

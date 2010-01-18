@@ -284,7 +284,7 @@ struct _dsio_denver_state
 typedef struct _dcs_state dcs_state;
 struct _dcs_state
 {
-	const device_config *cpu;
+	running_device *cpu;
 	const address_space *program;
 	const address_space *data;
 	UINT8		rev;
@@ -295,10 +295,10 @@ struct _dcs_state
 	UINT8		channels;
 	UINT16		size;
 	UINT16		incs;
-	const device_config *dmadac[6];
-	const device_config *reg_timer;
-	const device_config *sport_timer;
-	const device_config *internal_timer;
+	running_device *dmadac[6];
+	running_device *reg_timer;
+	running_device *sport_timer;
+	running_device *internal_timer;
 	INT32		ireg;
 	UINT16		ireg_base;
 	UINT16		control_regs[32];
@@ -323,8 +323,8 @@ struct _dcs_state
 	UINT16		progflags;
 	void		(*output_full_cb)(running_machine *, int);
 	void		(*input_empty_cb)(running_machine *, int);
-	UINT16		(*fifo_data_r)(const device_config *device);
-	UINT16		(*fifo_status_r)(const device_config *device);
+	UINT16		(*fifo_data_r)(running_device *device);
+	UINT16		(*fifo_status_r)(running_device *device);
 
 	/* timers */
 	UINT8		timer_enable;
@@ -350,7 +350,7 @@ struct _hle_transfer_state
 	INT32		writes_left;
 	UINT16		sum;
 	INT32		fifo_entries;
-	const device_config *watchdog;
+	running_device *watchdog;
 };
 
 
@@ -409,12 +409,12 @@ static WRITE16_HANDLER( output_latch_w );
 static READ16_HANDLER( output_control_r );
 static WRITE16_HANDLER( output_control_w );
 
-static void timer_enable_callback(const device_config *device, int enable);
+static void timer_enable_callback(running_device *device, int enable);
 static TIMER_DEVICE_CALLBACK( internal_timer_callback );
 static TIMER_DEVICE_CALLBACK( dcs_irq );
 static TIMER_DEVICE_CALLBACK( sport0_irq );
 static void recompute_sample_rate(running_machine *machine);
-static void sound_tx_callback(const device_config *device, int port, INT32 data);
+static void sound_tx_callback(running_device *device, int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
 static WRITE16_HANDLER( dcs_polling_w );
@@ -1493,7 +1493,7 @@ void dcs_set_io_callbacks(void (*output_full_cb)(running_machine *, int), void (
 }
 
 
-void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(const device_config *device), UINT16 (*fifo_status_r)(const device_config *device))
+void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(running_device *device), UINT16 (*fifo_status_r)(running_device *device))
 {
 	dcs.fifo_data_r = fifo_data_r;
 	dcs.fifo_status_r = fifo_status_r;
@@ -1793,7 +1793,7 @@ static void reset_timer(running_machine *machine)
 }
 
 
-static void timer_enable_callback(const device_config *device, int enable)
+static void timer_enable_callback(running_device *device, int enable)
 {
 	dcs.timer_enable = enable;
 	dcs.timer_ignore = 0;
@@ -2009,7 +2009,7 @@ static void recompute_sample_rate(running_machine *machine)
 }
 
 
-static void sound_tx_callback(const device_config *device, int port, INT32 data)
+static void sound_tx_callback(running_device *device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)

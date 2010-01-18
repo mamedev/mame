@@ -55,7 +55,7 @@ struct _k051649_state
 	int f[10];
 };
 
-INLINE k051649_state *get_safe_token(const device_config *device)
+INLINE k051649_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -3502,7 +3502,7 @@ static const ym2203_interface ym2203_nmk004_interface =
 	NMK004_irq
 };
 
-static void ym2203_irqhandler(const device_config *device, int irq)
+static void ym2203_irqhandler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -4837,7 +4837,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

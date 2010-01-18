@@ -28,7 +28,7 @@
 #include "machine/6526cia.h"
 
 
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static emu_timer *serial_timer;
 static UINT8 serial_timer_active;
 static UINT16 input_select;
@@ -43,7 +43,7 @@ static TIMER_CALLBACK( response_timer );
  *
  *************************************/
 
-static int get_lightgun_pos(const device_config *screen, int player, int *x, int *y)
+static int get_lightgun_pos(running_device *screen, int player, int *x, int *y)
 {
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 

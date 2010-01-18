@@ -62,4 +62,4 @@ WRITE16_HANDLER( midyunit_paletteram_w );
 READ16_HANDLER( midyunit_dma_r );
 WRITE16_HANDLER( midyunit_dma_w );
 
-void midyunit_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void midyunit_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);

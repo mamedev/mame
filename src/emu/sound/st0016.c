@@ -19,7 +19,7 @@ struct _st0016_state
 	UINT8 regs[0x100];
 };
 
-INLINE st0016_state *get_safe_token(const device_config *device)
+INLINE st0016_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -140,7 +140,7 @@ static STREAM_UPDATE( st0016_update )
 
 static DEVICE_START( st0016 )
 {
-	const st0016_interface *intf = (const st0016_interface *)device->static_config;
+	const st0016_interface *intf = (const st0016_interface *)device->baseconfig().static_config;
 	st0016_state *info = get_safe_token(device);
 
 	info->sound_ram = intf->p_soundram;

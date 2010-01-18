@@ -169,7 +169,7 @@ Language
 #include "sound/sn76496.h"
 
 
-static void appoooh_adpcm_int(const device_config *device)
+static void appoooh_adpcm_int(running_device *device)
 {
 	appoooh_state *state = (appoooh_state *)device->machine->driver_data;
 

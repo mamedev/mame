@@ -136,8 +136,8 @@ enum
 
 #ifdef UNUSED_DEFINITION
 /* MMU mapped memory lookup */
-extern UINT8 z180_readmem(const device_config *device, offs_t offset);
-extern void z180_writemem(const device_config *device, offs_t offset, UINT8 data);
+extern UINT8 z180_readmem(running_device *device, offs_t offset);
+extern void z180_writemem(running_device *device, offs_t offset, UINT8 data);
 #endif
 
 extern CPU_GET_INFO( z180 );

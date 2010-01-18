@@ -22,7 +22,7 @@ struct _kncljoe_state
 	UINT8      port1, port2;
 
 	/* devices */
-	const device_config *soundcpu;
+	running_device *soundcpu;
 };
 
 

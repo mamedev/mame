@@ -55,12 +55,12 @@ struct _sc61860_state
 
     struct { int t2ms, t512ms; int count;} timer;
 
-    const device_config *device;
+    running_device *device;
     const address_space *program;
     int icount;
 };
 
-INLINE sc61860_state *get_safe_token(const device_config *device)
+INLINE sc61860_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -69,7 +69,7 @@ INLINE sc61860_state *get_safe_token(const device_config *device)
 	return (sc61860_state *)device->token;
 }
 
-UINT8 *sc61860_internal_ram(const device_config *device)
+UINT8 *sc61860_internal_ram(running_device *device)
 {
 	sc61860_state *cpustate = get_safe_token(device);
 	return cpustate->ram;
@@ -104,7 +104,7 @@ static CPU_RESET( sc61860 )
 static CPU_INIT( sc61860 )
 {
 	sc61860_state *cpustate = get_safe_token(device);
-	cpustate->config = (sc61860_cpu_core *) device->static_config;
+	cpustate->config = (sc61860_cpu_core *) device->baseconfig().static_config;
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

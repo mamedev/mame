@@ -244,7 +244,7 @@ static VIDEO_START(ssingles)
 
 static VIDEO_UPDATE( ssingles )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

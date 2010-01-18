@@ -32,7 +32,7 @@ struct _ginganin_state
 	int         MC6809_FLAG;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

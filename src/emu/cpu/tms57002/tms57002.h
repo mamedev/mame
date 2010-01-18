@@ -19,7 +19,7 @@ WRITE8_DEVICE_HANDLER(tms57002_cload_w);
 READ8_DEVICE_HANDLER(tms57002_empty_r);
 READ8_DEVICE_HANDLER(tms57002_dready_r);
 
-void tms57002_sync(const device_config *cpu);
+void tms57002_sync(running_device *cpu);
 
 #endif
 

@@ -53,14 +53,14 @@ HP38G             09/??/95              1LT8             Yorke
 typedef struct _saturn_cpu_core saturn_cpu_core;
 struct _saturn_cpu_core
 {
-	void (*out)(const device_config*,int);
-	int (*in)(const device_config*);
-	void (*reset)(const device_config*);
-	void (*config)(const device_config*,int v);
-	void (*unconfig)(const device_config*,int v);
-	int (*id)(const device_config*);
-	void (*crc)(const device_config*,int addr, int data);
-	void (*rsi)(const device_config*);
+	void (*out)(running_device*,int);
+	int (*in)(running_device*);
+	void (*reset)(running_device*);
+	void (*config)(running_device*,int v);
+	void (*unconfig)(running_device*,int v);
+	int (*id)(running_device*);
+	void (*crc)(running_device*,int addr, int data);
+	void (*rsi)(running_device*);
 };
 
 enum

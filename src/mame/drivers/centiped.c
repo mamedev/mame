@@ -1977,7 +1977,7 @@ ROM_END
 static DRIVER_INIT( caterplr )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *device = devtag_get_device(machine, "pokey");
+	running_device *device = devtag_get_device(machine, "pokey");
 	memory_install_readwrite8_device_handler(space, device, 0x1000, 0x100f, 0, 0, caterplr_AY8910_r, caterplr_AY8910_w);
 	memory_install_read8_device_handler(space, device, 0x1780, 0x1780, 0, 0, caterplr_rand_r);
 }
@@ -1986,7 +1986,7 @@ static DRIVER_INIT( caterplr )
 static DRIVER_INIT( magworm )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *device = devtag_get_device(machine, "pokey");
+	running_device *device = devtag_get_device(machine, "pokey");
 	memory_install_write8_device_handler(space, device, 0x1001, 0x1001, 0, 0, ay8910_address_w);
 	memory_install_readwrite8_device_handler(space, device, 0x1003, 0x1003, 0, 0, ay8910_r, ay8910_data_w);
 }

@@ -246,7 +246,7 @@ static void disasm_update_caption(running_machine *machine, HWND wnd);
 static void console_create_window(running_machine *machine);
 static void console_recompute_children(debugwin_info *info);
 static void console_process_string(debugwin_info *info, const char *string);
-static void console_set_cpu(const device_config *device);
+static void console_set_cpu(running_device *device);
 
 static HMENU create_standard_menubar(void);
 static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
@@ -261,7 +261,7 @@ static void smart_show_all(BOOL show);
 //  osd_wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(const device_config *device, int firststop)
+void osd_wait_for_debugger(running_device *device, int firststop)
 {
 	MSG message;
 
@@ -1719,7 +1719,7 @@ static void log_create_window(running_machine *machine)
 
 static void memory_create_window(running_machine *machine)
 {
-	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
 	const memory_subview_item *subview;
 	debugwin_info *info;
 	HMENU optionsmenu;
@@ -2034,7 +2034,7 @@ static void memory_update_caption(running_machine *machine, HWND wnd)
 
 static void disasm_create_window(running_machine *machine)
 {
-	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
 	const disasm_subview_item *subview;
 	debugwin_info *info;
 	HMENU optionsmenu;
@@ -2562,7 +2562,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 //  console_set_cpu
 //============================================================
 
-static void console_set_cpu(const device_config *device)
+static void console_set_cpu(running_device *device)
 {
 	const registers_subview_item *regsubitem = NULL;
 	const disasm_subview_item *dasmsubitem;

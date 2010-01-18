@@ -693,7 +693,7 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 
 static WRITE8_HANDLER( hotchase_sound_control_w )
 {
-	const device_config *sound[3];
+	running_device *sound[3];
 
 	int reg[8];
 

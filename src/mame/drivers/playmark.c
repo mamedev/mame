@@ -88,7 +88,7 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+		running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 
 		/* bits 0-3 are coin counters? (only 0 used?) */
 		coin_counter_w(space->machine, 0,data & 0x01);
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+		running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 		coin_counter_w(space->machine, 0,data & 0x20);
 
 		eeprom_set_cs_line(eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);

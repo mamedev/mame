@@ -215,8 +215,8 @@ static WRITE8_HANDLER( gaplus_sreset_w )
 
 static WRITE8_HANDLER( gaplus_freset_w )
 {
-	const device_config *io58xx = devtag_get_device(space->machine, "58xx");
-	const device_config *io56xx = devtag_get_device(space->machine, "56xx");
+	running_device *io58xx = devtag_get_device(space->machine, "58xx");
+	running_device *io56xx = devtag_get_device(space->machine, "56xx");
 	int bit = !BIT(offset, 11);
 
 	logerror("%04x: freset %d\n",cpu_get_pc(space->cpu), bit);
@@ -234,8 +234,8 @@ static MACHINE_RESET( gaplus )
 
 static TIMER_CALLBACK( namcoio_run )
 {
-	const device_config *io58xx = devtag_get_device(machine, "58xx");
-	const device_config *io56xx = devtag_get_device(machine, "56xx");
+	running_device *io58xx = devtag_get_device(machine, "58xx");
+	running_device *io56xx = devtag_get_device(machine, "56xx");
 
 	switch (param)
 	{
@@ -250,8 +250,8 @@ static TIMER_CALLBACK( namcoio_run )
 
 static INTERRUPT_GEN( gaplus_interrupt_1 )
 {
-	const device_config *io58xx = devtag_get_device(device->machine, "58xx");
-	const device_config *io56xx = devtag_get_device(device->machine, "56xx");
+	running_device *io58xx = devtag_get_device(device->machine, "58xx");
+	running_device *io56xx = devtag_get_device(device->machine, "56xx");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);

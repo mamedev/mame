@@ -227,7 +227,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "pcm");
+	running_device *samples = devtag_get_device(space->machine, "pcm");
 	const UINT8* const rom = memory_region(space->machine, "pcm");
 
 	// only Ninja Kid II uses this
@@ -874,7 +874,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

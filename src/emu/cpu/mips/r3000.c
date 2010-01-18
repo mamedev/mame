@@ -138,7 +138,7 @@ struct _r3000_state
 	int			interrupt_cycles;
 	int			hasfpu;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 
 	/* endian-dependent load/store */
@@ -162,7 +162,7 @@ struct _r3000_state
 	size_t		dcache_size;
 };
 
-INLINE r3000_state *get_safe_token(const device_config *device)
+INLINE r3000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -300,7 +300,7 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
 
 static CPU_INIT( r3000 )
 {
-	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->static_config;
+	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->baseconfig().static_config;
 	r3000_state *r3000 = get_safe_token(device);
 
 	/* allocate memory */

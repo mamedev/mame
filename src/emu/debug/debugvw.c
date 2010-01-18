@@ -134,7 +134,7 @@ struct _debug_view_register
 typedef struct _debug_view_registers debug_view_registers;
 struct _debug_view_registers
 {
-	const device_config *device;				/* CPU device whose registers we are showing */
+	running_device *device;				/* CPU device whose registers we are showing */
 	int					divider;				/* dividing column */
 	UINT64				last_update;			/* execution counter at last update */
 	debug_view_register reg[MAX_REGS];			/* register data */
@@ -820,7 +820,7 @@ static void debug_view_expression_set(debug_view_expression *expression, const c
     changed
 -------------------------------------------------*/
 
-static int debug_view_expression_changed_value(debug_view *view, debug_view_expression *expression, const device_config *cpu)
+static int debug_view_expression_changed_value(debug_view *view, debug_view_expression *expression, running_device *cpu)
 {
 	int changed = expression->dirty;
 	EXPRERR exprerr;
@@ -1027,7 +1027,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	astring tempstring;
 	registers_subview_item *head = NULL;
 	registers_subview_item **tailptr = &head;
-	const device_config *cpu;
+	running_device *cpu;
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
@@ -1036,7 +1036,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 		registers_subview_item *subview;
 
 		/* determine the string and allocate a subview large enough */
-		tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), cpu_get_name(cpu));
+		tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), device_get_name(cpu));
 		subview = (registers_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
 
 		/* populate the subview */
@@ -1285,7 +1285,7 @@ static void registers_view_recompute(debug_view *view)
 
 static void registers_view_update(debug_view *view)
 {
-	const device_config *screen = view->machine->primary_screen;
+	running_device *screen = view->machine->primary_screen;
 	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 	debug_view_char *dest = view->viewdata;
 	UINT64 total_cycles;
@@ -1488,7 +1488,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	astring tempstring;
 	disasm_subview_item *head = NULL;
 	disasm_subview_item **tailptr = &head;
-	const device_config *cpu;
+	running_device *cpu;
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
@@ -1500,7 +1500,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 			disasm_subview_item *subview;
 
 			/* determine the string and allocate a subview large enough */
-			tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), cpu_get_name(cpu));
+			tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), device_get_name(cpu));
 			subview = (disasm_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
 
 			/* populate the subview */
@@ -1528,7 +1528,7 @@ static int disasm_view_alloc(debug_view *view)
 {
 	debug_view_disasm *dasmdata;
 	int total_comments = 0;
-	const device_config *cpu;
+	running_device *cpu;
 
 	/* fail if no available subviews */
 	if (view->machine->debugvw_data->disasm_subviews == NULL)
@@ -2365,14 +2365,14 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	astring tempstring;
 	memory_subview_item *head = NULL;
 	memory_subview_item **tailptr = &head;
-	const device_config *device;
+	running_device *device;
 	int spacenum;
 	const char *rgntag;
 	int curindex = 0;
 	int itemnum;
 
 	/* first add all the device's address spaces */
-	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space *space = device->space(spacenum);

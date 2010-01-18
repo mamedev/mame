@@ -22,7 +22,7 @@ typedef struct _psx_spu_interface psx_spu_interface;
 struct _psx_spu_interface
 {
 	UINT32 **p_psxram;
-	void (*irq_set)(const device_config *,UINT32);
+	void (*irq_set)(running_device *,UINT32);
 	void (*spu_install_read_handler)(int,spu_handler);
 	void (*spu_install_write_handler)(int,spu_handler);
 };

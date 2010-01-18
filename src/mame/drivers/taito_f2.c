@@ -3167,7 +3167,7 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler( const device_config *device, int irq )
+static void irq_handler( running_device *device, int irq )
 {
 	taitof2_state *state = (taitof2_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

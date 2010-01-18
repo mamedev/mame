@@ -243,7 +243,7 @@ static READ8_HANDLER( sound_status_r )
 	return 0xf;
 }
 
-static void sound_nmi( const device_config *device )
+static void sound_nmi( running_device *device )
 {
 	lethal_state *state = (lethal_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);

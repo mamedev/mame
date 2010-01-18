@@ -242,7 +242,7 @@ typedef struct
     UINT8   	irq_state[9];
     UINT8   	irq_latch[9];
     cpu_irq_callback irq_callback;
-    const device_config *device;
+    running_device *device;
 
 	/* other internal states */
     int			icount;
@@ -425,7 +425,7 @@ static void check_irqs(adsp2100_state *adsp);
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE adsp2100_state *get_safe_token(const device_config *device)
+INLINE adsp2100_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -691,9 +691,9 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callback irqcallback, int chiptype)
+static adsp2100_state *adsp21xx_init(running_device *device, cpu_irq_callback irqcallback, int chiptype)
 {
-	const adsp21xx_config *config = (const adsp21xx_config *)device->static_config;
+	const adsp21xx_config *config = (const adsp21xx_config *)device->baseconfig().static_config;
 	adsp2100_state *adsp = get_safe_token(device);
 
 	/* create the tables */
@@ -2171,20 +2171,20 @@ CPU_GET_INFO( adsp2181 )
 	}
 }
 
-void adsp2181_idma_addr_w(const device_config *device, UINT16 data)
+void adsp2181_idma_addr_w(running_device *device, UINT16 data)
 {
 	adsp2100_state *adsp = get_safe_token(device);
 	adsp->idma_addr = data;
 	adsp->idma_offs = 0;
 }
 
-UINT16 adsp2181_idma_addr_r(const device_config *device)
+UINT16 adsp2181_idma_addr_r(running_device *device)
 {
 	adsp2100_state *adsp = get_safe_token(device);
 	return adsp->idma_addr;
 }
 
-void adsp2181_idma_data_w(const device_config *device, UINT16 data)
+void adsp2181_idma_data_w(running_device *device, UINT16 data)
 {
 	adsp2100_state *adsp = get_safe_token(device);
 
@@ -2211,7 +2211,7 @@ void adsp2181_idma_data_w(const device_config *device, UINT16 data)
 		WWORD_DATA(adsp, adsp->idma_addr++ & 0x3fff, data);
 }
 
-UINT16 adsp2181_idma_data_r(const device_config *device)
+UINT16 adsp2181_idma_data_r(running_device *device)
 {
 	adsp2100_state *adsp = get_safe_token(device);
 	UINT16 result = 0xffff;

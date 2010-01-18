@@ -111,7 +111,7 @@ struct _registers_subview_item
 {
 	registers_subview_item *next;				/* link to next item */
 	int					index;					/* index of this item */
-	const device_config *device;				/* CPU to display */
+	running_device *device;				/* CPU to display */
 	char				name[1];				/* name of the subview item */
 };
 

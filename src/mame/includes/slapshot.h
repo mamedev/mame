@@ -38,12 +38,12 @@ struct _slapshot_state
 	INT32      banknum;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *tc0140syt;
-	const device_config *tc0480scp;
-	const device_config *tc0360pri;
-	const device_config *tc0640fio;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *tc0140syt;
+	running_device *tc0480scp;
+	running_device *tc0360pri;
+	running_device *tc0640fio;
 };
 
 

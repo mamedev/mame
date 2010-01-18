@@ -138,7 +138,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
  *
  *************************************/
 
-void vindictr_scanline_update(const device_config *screen, int scanline)
+void vindictr_scanline_update(running_device *screen, int scanline)
 {
 	vindictr_state *state = (vindictr_state *)screen->machine->driver_data;
 	UINT16 *base = &state->atarigen.alpha[((scanline - 8) / 8) * 64 + 42];

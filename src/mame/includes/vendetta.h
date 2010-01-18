@@ -20,13 +20,13 @@ struct _vendetta_state
 	offs_t     video_banking_base;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k053260;
-	const device_config *k052109;
-	const device_config *k053246;
-	const device_config *k053251;
-	const device_config *k054000;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k053260;
+	running_device *k052109;
+	running_device *k053246;
+	running_device *k053251;
+	running_device *k054000;
 };
 
 /*----------- defined in video/vendetta.c -----------*/

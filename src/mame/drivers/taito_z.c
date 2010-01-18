@@ -2751,14 +2751,14 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	taitoz_state *state = (taitoz_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandlerb(const device_config *device, int irq)
+static void irqhandlerb(running_device *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
 //  taitoz_state *state = (taitoz_state *)device->machine->driver_data;

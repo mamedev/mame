@@ -624,7 +624,7 @@ struct _m68ki_cpu_core
 	m68k_rte_func rte_instr_callback;             /* Called when a RTE instruction is encountered */
 	m68k_tas_func tas_instr_callback;             /* Called when a TAS instruction is encountered, allows / disallows writeback */
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	m68k_memory_interface memory;
 	offs_t encrypted_start;

@@ -37,8 +37,8 @@ struct _btime_state
 	int      protection_ret;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

@@ -266,7 +266,7 @@ static VIDEO_UPDATE( onetwo )
 	return 0;
 }
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }

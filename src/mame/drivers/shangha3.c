@@ -465,7 +465,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }

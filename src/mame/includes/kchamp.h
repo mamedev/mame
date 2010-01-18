@@ -24,7 +24,7 @@ struct _kchamp_state
 	int        counter;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

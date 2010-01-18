@@ -58,7 +58,7 @@ struct _i80286_state
 		UINT8 rights;
 	} ldtr, tr;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	INT32	AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
@@ -81,7 +81,7 @@ struct _i80286_state
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
 };
 
-INLINE i80286_state *get_safe_token(const device_config *device)
+INLINE i80286_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -298,8 +298,8 @@ static CPU_INIT( i80286 )
 	cpustate->io = device->space(AS_IO);
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
-	if( device->static_config )
-		cpustate->amask = *(unsigned*)device->static_config;
+	if( device->baseconfig().static_config )
+		cpustate->amask = *(unsigned*)device->baseconfig().static_config;
 	else
 		cpustate->amask = 0x00ffff;
 

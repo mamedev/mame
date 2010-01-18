@@ -107,7 +107,7 @@ Sound processor - 6502
 #include "machine/laserdsc.h"
 
 static UINT8 vram_bank;
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static UINT8 laserdisc_data;
 
 static VIDEO_UPDATE( rblaster )

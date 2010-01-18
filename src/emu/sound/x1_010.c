@@ -98,7 +98,7 @@ struct _x1_010_state
 /* mixer tables and internal buffers */
 //static short  *mixer_buffer = NULL;
 
-INLINE x1_010_state *get_safe_token(const device_config *device)
+INLINE x1_010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -203,7 +203,7 @@ static STREAM_UPDATE( seta_update )
 static DEVICE_START( x1_010 )
 {
 	int i;
-	const x1_010_interface *intf = (const x1_010_interface *)device->static_config;
+	const x1_010_interface *intf = (const x1_010_interface *)device->baseconfig().static_config;
 	x1_010_state *info = get_safe_token(device);
 
 	info->region		= *device->region;
@@ -223,7 +223,7 @@ static DEVICE_START( x1_010 )
 }
 
 
-void seta_sound_enable_w(const device_config *device, int data)
+void seta_sound_enable_w(running_device *device, int data)
 {
 	x1_010_state *info = get_safe_token(device);
 	info->sound_enable = data;

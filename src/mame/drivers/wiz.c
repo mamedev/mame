@@ -189,7 +189,7 @@ static int dsc0, dsc1;
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 
 	switch (offset)
 	{

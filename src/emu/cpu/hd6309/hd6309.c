@@ -132,7 +132,7 @@ struct _m68_state_t
 
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	int		icount;
 	PAIR	ea; 		/* effective address */
 
@@ -151,7 +151,7 @@ struct _m68_state_t
 	UINT8 const *index_cycle;
 };
 
-INLINE m68_state_t *get_safe_token(const device_config *device)
+INLINE m68_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -506,7 +506,7 @@ static void check_irq_lines( m68_state_t *m68_state )
 
 static STATE_POSTLOAD( hd6309_postload )
 {
-	const device_config *device = (const device_config *)param;
+	running_device *device = (running_device *)param;
 	m68_state_t *m68_state = get_safe_token(device);
 
 	UpdateState(m68_state);

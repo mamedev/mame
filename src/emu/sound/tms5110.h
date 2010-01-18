@@ -21,8 +21,8 @@
 typedef struct _tms5110_interface tms5110_interface;
 struct _tms5110_interface
 {
-	int (*M0_callback)(const device_config *device);	/* function to be called when chip requests another bit */
-	void (*load_address)(const device_config *device, int addr);	/* speech ROM load address callback */
+	int (*M0_callback)(running_device *device);	/* function to be called when chip requests another bit */
+	void (*load_address)(running_device *device, int addr);	/* speech ROM load address callback */
 };
 
 WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
@@ -34,9 +34,9 @@ READ8_DEVICE_HANDLER( tms5110_romclk_r );
 /* m58817 status line */
 READ8_DEVICE_HANDLER( m58817_status_r );
 
-int tms5110_ready_r(const device_config *device);
+int tms5110_ready_r(running_device *device);
 
-void tms5110_set_frequency(const device_config *device, int frequency);
+void tms5110_set_frequency(running_device *device, int frequency);
 
 DEVICE_GET_INFO( tms5110 );
 DEVICE_GET_INFO( tms5100 );

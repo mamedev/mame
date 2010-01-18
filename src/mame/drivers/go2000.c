@@ -43,7 +43,7 @@ struct _go2000_state
 //  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* devices */
-	const device_config *soundcpu;
+	running_device *soundcpu;
 };
 
 

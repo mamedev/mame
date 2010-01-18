@@ -50,7 +50,7 @@ struct _mb86233_state
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 
@@ -65,7 +65,7 @@ struct _mb86233_state
 	UINT32			*Tables;
 };
 
-INLINE mb86233_state *get_safe_token(const device_config *device)
+INLINE mb86233_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -108,7 +108,7 @@ INLINE mb86233_state *get_safe_token(const device_config *device)
 static CPU_INIT( mb86233 )
 {
 	mb86233_state *cpustate = get_safe_token(device);
-	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config;
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->baseconfig().static_config;
 	(void)irqcallback;
 
 	memset(cpustate, 0, sizeof( *cpustate ) );

@@ -41,7 +41,7 @@ static UINT8 adc_shift;
 static UINT16 last_port0;
 static UINT8 shifter_state;
 
-static const device_config *timer[2];
+static running_device *timer[2];
 static double timer_rate;
 
 static UINT32 *tms32031_control;
@@ -459,7 +459,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
  *
  *************************************/
 
-static void midvplus_xf1_w(const device_config *device, UINT8 val)
+static void midvplus_xf1_w(running_device *device, UINT8 val)
 {
 	static int lastval;
 //  mame_printf_debug("xf1_w = %d\n", val);

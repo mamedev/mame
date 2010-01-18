@@ -128,7 +128,7 @@ static VIDEO_START( tickee )
  *
  *************************************/
 
-static void scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -153,7 +153,7 @@ static void scanline_update(const device_config *screen, bitmap_t *bitmap, int s
 }
 
 
-static void rapidfir_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void rapidfir_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);

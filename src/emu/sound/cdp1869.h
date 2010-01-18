@@ -108,9 +108,9 @@
 #define CDP1869_INTERFACE(_name) \
 	const cdp1869_interface (_name) =
 
-#define CDP1869_CHAR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma, UINT8 cma)
-#define CDP1869_CHAR_RAM_WRITE(name) void name(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data)
-#define CDP1869_PCB_READ(name) int name(const device_config *device, UINT16 pma, UINT8 cma)
+#define CDP1869_CHAR_RAM_READ(name) UINT8 name(running_device *device, UINT16 pma, UINT8 cma)
+#define CDP1869_CHAR_RAM_WRITE(name) void name(running_device *device, UINT16 pma, UINT8 cma, UINT8 data)
+#define CDP1869_PCB_READ(name) int name(running_device *device, UINT16 pma, UINT8 cma)
 
 #define CDP1869_PAL \
 	DEVCB_LINE_VCC
@@ -122,9 +122,9 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*cdp1869_char_ram_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
-typedef void (*cdp1869_char_ram_write_func)(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data);
-typedef int (*cdp1869_pcb_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
+typedef UINT8 (*cdp1869_char_ram_read_func)(running_device *device, UINT16 pma, UINT8 cma);
+typedef void (*cdp1869_char_ram_write_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 data);
+typedef int (*cdp1869_pcb_read_func)(running_device *device, UINT16 pma, UINT8 cma);
 
 /* interface */
 typedef struct _cdp1869_interface cdp1869_interface;
@@ -187,6 +187,6 @@ WRITE8_DEVICE_HANDLER ( cdp1869_pageram_w );
 READ_LINE_DEVICE_HANDLER( cdp1869_predisplay_r );
 
 /* screen update */
-void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void cdp1869_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

@@ -28,7 +28,7 @@ struct _ashnojoe_state
 	int         msm5205_vclk_toggle;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

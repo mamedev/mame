@@ -45,8 +45,8 @@ struct _taitol_state
 	const char *portf1_tag;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 /*----------- defined in video/taito_l.c -----------*/

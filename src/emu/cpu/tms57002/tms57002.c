@@ -109,7 +109,7 @@ typedef struct {
 	int unsupported_inst_warning;
 } tms57002_t;
 
-INLINE tms57002_t *get_safe_token(const device_config *device)
+INLINE tms57002_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -254,7 +254,7 @@ READ8_DEVICE_HANDLER(tms57002_dready_r)
 	return s->sti & S_HOST ? 0 : 1;
 }
 
-void tms57002_sync(const device_config *device)
+void tms57002_sync(running_device *device)
 {
 	tms57002_t *s = get_safe_token(device);
 

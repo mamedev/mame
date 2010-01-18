@@ -109,7 +109,7 @@ static const char *const ethernet_regname[64] =
 typedef struct _smc91c9x_state smc91c9x_state;
 struct _smc91c9x_state
 {
-	const device_config *device;
+	running_device *device;
 	smc91c9x_irq_func irq_handler;
 
 	/* raw register data and masks */
@@ -151,7 +151,7 @@ static void update_ethernet_irq(smc91c9x_state *smc);
     in device is, in fact, an IDE controller
 -------------------------------------------------*/
 
-INLINE smc91c9x_state *get_safe_token(const device_config *device)
+INLINE smc91c9x_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -510,13 +510,13 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 
 static DEVICE_START( smc91c9x )
 {
-	const smc91c9x_config *config = (const smc91c9x_config *)device->inline_config;
+	const smc91c9x_config *config = (const smc91c9x_config *)device->baseconfig().inline_config;
 	smc91c9x_state *smc = get_safe_token(device);
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config == NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 

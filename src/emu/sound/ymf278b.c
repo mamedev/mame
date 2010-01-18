@@ -116,8 +116,8 @@ typedef struct
 	int irq_line;
 
 	UINT8 port_A, port_B, port_C;
-	void (*irq_callback)(const device_config *, int);
-	const device_config *device;
+	void (*irq_callback)(running_device *, int);
+	running_device *device;
 
 	const UINT8 *rom;
 	int clock;
@@ -129,7 +129,7 @@ typedef struct
 	sound_stream * stream;
 } YMF278BChip;
 
-INLINE YMF278BChip *get_safe_token(const device_config *device)
+INLINE YMF278BChip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -666,7 +666,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	}
 }
 
-static void ymf278b_init(const device_config *device, YMF278BChip *chip, void (*cb)(const device_config *, int))
+static void ymf278b_init(running_device *device, YMF278BChip *chip, void (*cb)(running_device *, int))
 {
 	chip->rom = *device->region;
 	chip->irq_callback = cb;
@@ -686,7 +686,7 @@ static DEVICE_START( ymf278b )
 	YMF278BChip *chip = get_safe_token(device);
 
 	chip->device = device;
-	intf = (device->static_config != NULL) ? (const ymf278b_interface *)device->static_config : &defintrf;
+	intf = (device->baseconfig().static_config != NULL) ? (const ymf278b_interface *)device->baseconfig().static_config : &defintrf;
 
 	ymf278b_init(device, chip, intf->irq_callback);
 	chip->stream = stream_create(device, 0, 2, device->clock/768, chip, ymf278b_pcm_update);

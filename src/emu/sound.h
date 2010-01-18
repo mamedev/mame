@@ -172,7 +172,7 @@ const char *sound_get_user_gain_name(running_machine *machine, int index);
 
 
 /* driver gain controls on chip outputs */
-void sound_set_output_gain(const device_config *device, int output, float gain);
+void sound_set_output_gain(running_device *device, int output, float gain);
 
 
 /* ----- sound speaker device interface ----- */
@@ -192,10 +192,15 @@ DEVICE_GET_INFO( speaker_output );
     specified sound chip
 -------------------------------------------------*/
 
-INLINE sound_type sound_get_type(const device_config *device)
+INLINE sound_type sound_get_type(const device_config *devconfig)
 {
-	const sound_config *config = (const sound_config *)device->inline_config;
+	const sound_config *config = (const sound_config *)devconfig->inline_config;
 	return config->type;
+}
+
+INLINE sound_type sound_get_type(running_device *device)
+{
+	return sound_get_type(&device->baseconfig());
 }
 
 

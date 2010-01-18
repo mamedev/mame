@@ -22,7 +22,7 @@ struct _yunsun16_state
 	int         sprites_scrolldx, sprites_scrolldy;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

@@ -122,7 +122,7 @@ struct _sn76496_state
 };
 
 
-INLINE sn76496_state *get_safe_token(const device_config *device)
+INLINE sn76496_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -340,7 +340,7 @@ static void SN76496_set_gain(sn76496_state *R,int gain)
 
 
 
-static int SN76496_init(const device_config *device, sn76496_state *R, int stereo)
+static int SN76496_init(running_device *device, sn76496_state *R, int stereo)
 {
 	int sample_rate = device->clock/16;
 	int i;
@@ -377,7 +377,7 @@ static int SN76496_init(const device_config *device, sn76496_state *R, int stere
 }
 
 
-static void generic_start(const device_config *device, int feedbackmask, int noisetaps, int feedbackinvert, int negate, int stereo)
+static void generic_start(running_device *device, int feedbackmask, int noisetaps, int feedbackinvert, int negate, int stereo)
 {
 	sn76496_state *chip = get_safe_token(device);
 

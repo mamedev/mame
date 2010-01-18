@@ -67,36 +67,36 @@ WRITE8_DEVICE_HANDLER( pia6821_w );
 READ8_DEVICE_HANDLER( pia6821_alt_r );
 WRITE8_DEVICE_HANDLER( pia6821_alt_w );
 
-UINT8 pia6821_get_port_b_z_mask(const device_config *device);  /* see first note */
-void pia6821_set_port_a_z_mask(const device_config *device, UINT8 data);  /* see second note */
+UINT8 pia6821_get_port_b_z_mask(running_device *device);  /* see first note */
+void pia6821_set_port_a_z_mask(running_device *device, UINT8 data);  /* see second note */
 
 READ8_DEVICE_HANDLER( pia6821_porta_r );
 WRITE8_DEVICE_HANDLER( pia6821_porta_w );
-void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask);
-UINT8 pia6821_get_output_a(const device_config *device);
+void pia6821_set_input_a(running_device *device, UINT8 data, UINT8 z_mask);
+UINT8 pia6821_get_output_a(running_device *device);
 
 READ8_DEVICE_HANDLER( pia6821_ca1_r );
 WRITE8_DEVICE_HANDLER( pia6821_ca1_w );
 
 READ8_DEVICE_HANDLER( pia6821_ca2_r );
 WRITE8_DEVICE_HANDLER( pia6821_ca2_w );
-int pia6821_get_output_ca2(const device_config *device);
-int pia6821_get_output_ca2_z(const device_config *device);
+int pia6821_get_output_ca2(running_device *device);
+int pia6821_get_output_ca2_z(running_device *device);
 
 READ8_DEVICE_HANDLER( pia6821_portb_r );
 WRITE8_DEVICE_HANDLER( pia6821_portb_w );
-UINT8 pia6821_get_output_b(const device_config *device);
+UINT8 pia6821_get_output_b(running_device *device);
 
 READ8_DEVICE_HANDLER( pia6821_cb1_r );
 WRITE8_DEVICE_HANDLER( pia6821_cb1_w );
 
 READ8_DEVICE_HANDLER( pia6821_cb2_r );
 WRITE8_DEVICE_HANDLER( pia6821_cb2_w );
-int pia6821_get_output_cb2(const device_config *device);
-int pia6821_get_output_cb2_z(const device_config *device);
+int pia6821_get_output_cb2(running_device *device);
+int pia6821_get_output_cb2_z(running_device *device);
 
-int pia6821_get_irq_a(const device_config *device);
-int pia6821_get_irq_b(const device_config *device);
+int pia6821_get_irq_a(running_device *device);
+int pia6821_get_irq_b(running_device *device);
 
 
 /***************************************************************************

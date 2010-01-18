@@ -34,11 +34,11 @@ struct _equites_state
 #endif
 
 	/* devices */
-	const device_config *mcu;
-	const device_config *audio_cpu;
-	const device_config *msm;
-	const device_config *dac_1;
-	const device_config *dac_2;
+	running_device *mcu;
+	running_device *audio_cpu;
+	running_device *msm;
+	running_device *dac_1;
+	running_device *dac_2;
 };
 
 

@@ -30,7 +30,7 @@
 
 typedef void (*atarigen_int_func)(running_machine *machine);
 
-typedef void (*atarigen_scanline_func)(const device_config *screen, int scanline);
+typedef void (*atarigen_scanline_func)(running_device *screen, int scanline);
 
 typedef struct _atarivc_state_desc atarivc_state_desc;
 struct _atarivc_state_desc
@@ -53,7 +53,7 @@ struct _atarivc_state_desc
 typedef struct _atarigen_screen_timer atarigen_screen_timer;
 struct _atarigen_screen_timer
 {
-	const device_config *screen;
+	running_device *screen;
 	emu_timer *			scanline_interrupt_timer;
 	emu_timer *			scanline_timer;
 	emu_timer *			atarivc_eof_update_timer;
@@ -108,7 +108,7 @@ struct _atarigen_state
 	offs_t					slapstic_base;
 	offs_t					slapstic_mirror;
 
-	const device_config *	sound_cpu;
+	running_device *	sound_cpu;
 	UINT8					cpu_to_sound;
 	UINT8					sound_to_cpu;
 	UINT8					timed_int;
@@ -147,7 +147,7 @@ void atarigen_init(running_machine *machine);
 void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int);
 void atarigen_update_interrupts(running_machine *machine);
 
-void atarigen_scanline_int_set(const device_config *screen, int scanline);
+void atarigen_scanline_int_set(running_device *screen, int scanline);
 INTERRUPT_GEN( atarigen_scanline_int_gen );
 WRITE16_HANDLER( atarigen_scanline_int_ack_w );
 WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
@@ -183,7 +183,7 @@ NVRAM_HANDLER( atarigen );
     SLAPSTIC HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(const device_config *device, offs_t base, offs_t mirror, int chipnum);
+void atarigen_slapstic_init(running_device *device, offs_t base, offs_t mirror, int chipnum);
 void atarigen_slapstic_reset(atarigen_state *state);
 
 WRITE16_HANDLER( atarigen_slapstic_w );
@@ -194,13 +194,13 @@ READ16_HANDLER( atarigen_slapstic_r );
     SOUND I/O
 ---------------------------------------------------------------*/
 
-void atarigen_sound_io_reset(const device_config *device);
+void atarigen_sound_io_reset(running_device *device);
 
 INTERRUPT_GEN( atarigen_6502_irq_gen );
 READ8_HANDLER( atarigen_6502_irq_ack_r );
 WRITE8_HANDLER( atarigen_6502_irq_ack_w );
 
-void atarigen_ym2151_irq_gen(const device_config *device, int irq);
+void atarigen_ym2151_irq_gen(running_device *device, int irq);
 
 WRITE16_HANDLER( atarigen_sound_w );
 READ16_HANDLER( atarigen_sound_r );
@@ -231,10 +231,10 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume);
     VIDEO CONTROLLER
 ---------------------------------------------------------------*/
 
-void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields);
+void atarivc_reset(running_device *screen, UINT16 *eof_data, int playfields);
 
-void atarivc_w(const device_config *screen, offs_t offset, UINT16 data, UINT16 mem_mask);
-UINT16 atarivc_r(const device_config *screen, offs_t offset);
+void atarivc_w(running_device *screen, offs_t offset, UINT16 data, UINT16 mem_mask);
+UINT16 atarivc_r(running_device *screen, offs_t offset);
 
 INLINE void atarivc_update_pf_xscrolls(atarigen_state *state)
 {
@@ -267,9 +267,9 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
     VIDEO HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanline_func update_graphics, int frequency);
-int atarigen_get_hblank(const device_config *screen);
-void atarigen_halt_until_hblank_0(const device_config *screen);
+void atarigen_scanline_timer_reset(running_device *screen, atarigen_scanline_func update_graphics, int frequency);
+int atarigen_get_hblank(running_device *screen);
+void atarigen_halt_until_hblank_0(running_device *screen);
 WRITE16_HANDLER( atarigen_666_paletteram_w );
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
 WRITE32_HANDLER( atarigen_666_paletteram32_w );

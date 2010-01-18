@@ -18,7 +18,7 @@ struct _namco_53xx_interface
 	MDRV_DEVICE_CONFIG(_interface)
 
 
-void namco_53xx_read_request(const device_config *device);
+void namco_53xx_read_request(running_device *device);
 READ8_DEVICE_HANDLER( namco_53xx_read );
 
 

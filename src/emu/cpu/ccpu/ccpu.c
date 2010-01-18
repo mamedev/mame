@@ -43,14 +43,14 @@ struct _ccpu_state
 
 	int					icount;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
 };
 
 
-INLINE ccpu_state *get_safe_token(const device_config *device)
+INLINE ccpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -104,7 +104,7 @@ do { \
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static UINT8 read_jmi(const device_config *device)
+static UINT8 read_jmi(running_device *device)
 {
 	/* this routine is called when there is no external input */
 	/* and the JMI jumper is present */
@@ -113,7 +113,7 @@ static UINT8 read_jmi(const device_config *device)
 }
 
 
-void ccpu_wdt_timer_trigger(const device_config *device)
+void ccpu_wdt_timer_trigger(running_device *device)
 {
 	ccpu_state *cpustate = get_safe_token(device);
 	cpustate->waiting = FALSE;
@@ -125,7 +125,7 @@ void ccpu_wdt_timer_trigger(const device_config *device)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = (const ccpu_config *)device->static_config;
+	const ccpu_config *configdata = (const ccpu_config *)device->baseconfig().static_config;
 	ccpu_state *cpustate = get_safe_token(device);
 
 	/* copy input params */

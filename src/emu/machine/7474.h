@@ -44,7 +44,7 @@
 typedef struct _ttl7474_config ttl7474_config;
 struct _ttl7474_config
 {
-	void (*output_cb)(const device_config *device);
+	void (*output_cb)(running_device *device);
 };
 
 
@@ -55,14 +55,14 @@ struct _ttl7474_config
 
 
 /* must call TTL7474_update() after setting the inputs */
-void ttl7474_update(const device_config *device);
+void ttl7474_update(running_device *device);
 
-void ttl7474_clear_w(const device_config *device, int data);
-void ttl7474_preset_w(const device_config *device, int data);
-void ttl7474_clock_w(const device_config *device, int data);
-void ttl7474_d_w(const device_config *device, int data);
-int  ttl7474_output_r(const device_config *device);
-int  ttl7474_output_comp_r(const device_config *device);	/* NOT strictly the same as !ttl7474_output_r() */
+void ttl7474_clear_w(running_device *device, int data);
+void ttl7474_preset_w(running_device *device, int data);
+void ttl7474_clock_w(running_device *device, int data);
+void ttl7474_d_w(running_device *device, int data);
+int  ttl7474_output_r(running_device *device);
+int  ttl7474_output_comp_r(running_device *device);	/* NOT strictly the same as !ttl7474_output_r() */
 
 /* device get info callback */
 #define TTL7474 DEVICE_GET_INFO_NAME(ttl7474)

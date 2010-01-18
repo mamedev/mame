@@ -599,7 +599,7 @@ static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
 	laserbat_state *state = (laserbat_state *)device->machine->driver_data;
-	const device_config *ay = (state->active_8910 == 0) ? state->ay1 : state->ay2;
+	running_device *ay = (state->active_8910 == 0) ? state->ay1 : state->ay2;
 	return ay8910_r(ay, 0);
 }
 

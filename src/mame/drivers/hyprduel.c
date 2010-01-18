@@ -621,7 +621,7 @@ GFXDECODE_END
                             Sound Communication
 ***************************************************************************/
 
-static void sound_irq( const device_config *device, int state )
+static void sound_irq( running_device *device, int state )
 {
 	hyprduel_state *hyprduel = (hyprduel_state *)device->machine->driver_data;
 	cpu_set_input_line(hyprduel->subcpu, 1, HOLD_LINE);

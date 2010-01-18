@@ -31,7 +31,7 @@ struct _ticket_state
 	emu_timer *timer;
 };
 
-INLINE ticket_state *get_safe_token(const device_config *device)
+INLINE ticket_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -43,7 +43,7 @@ INLINE ticket_state *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( ticket_dispenser_toggle )
 {
-	ticket_state *state = get_safe_token((const device_config *)ptr);
+	ticket_state *state = get_safe_token((running_device *)ptr);
 
 	/* If we still have power, keep toggling ticket states. */
 	if (state->power)
@@ -122,7 +122,7 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 
 static DEVICE_START( ticket )
 {
-	const ticket_config *config = (const ticket_config *)device->inline_config;
+	const ticket_config *config = (const ticket_config *)device->baseconfig().inline_config;
 	ticket_state *state = get_safe_token(device);
 
 	assert(config != NULL);

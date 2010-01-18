@@ -117,14 +117,14 @@ static UINT8 ad1847_regs[16];
 static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
 
-static const device_config *dmadac[2];
+static running_device *dmadac[2];
 
 static struct {
-	const device_config	*pit8254;
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	running_device	*pit8254;
+	running_device	*pic8259_1;
+	running_device	*pic8259_2;
+	running_device	*dma8237_1;
+	running_device	*dma8237_2;
 } mediagx_devices;
 
 
@@ -157,7 +157,7 @@ static struct {
 #define DC_CFIFO_DIAG			0x7c/4
 
 
-static void ide_interrupt(const device_config *device, int state);
+static void ide_interrupt(running_device *device, int state);
 
 
 
@@ -614,7 +614,7 @@ static WRITE32_HANDLER( parallel_port_w )
 	}
 }
 
-static UINT32 cx5510_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+static UINT32 cx5510_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 
@@ -626,7 +626,7 @@ static UINT32 cx5510_pci_r(const device_config *busdevice, const device_config *
 	return cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(cx5510_regs + (reg/4));
@@ -801,7 +801,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	memory_write_byte(space, page_offset + offset, data);
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }
@@ -1105,7 +1105,7 @@ static void keyboard_interrupt(running_machine *machine, int state)
 	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 	pic8259_set_irq_line(mediagx_devices.pic8259_2, 6, state);
 }

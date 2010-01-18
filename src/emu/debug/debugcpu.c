@@ -50,9 +50,9 @@ enum
 /* in mame.h: typedef struct _debugcpu_private debugcpu_private; */
 struct _debugcpu_private
 {
-	const device_config *livecpu;
-	const device_config *visiblecpu;
-	const device_config *breakcpu;
+	running_device *livecpu;
+	running_device *visiblecpu;
+	running_device *breakcpu;
 
 	FILE *			source_file;				/* script source file */
 
@@ -83,9 +83,9 @@ struct _debugcpu_private
 
 /* internal helpers */
 static void debug_cpu_exit(running_machine *machine);
-static void on_vblank(const device_config *device, void *param, int vblank_state);
+static void on_vblank(running_device *device, void *param, int vblank_state);
 static void reset_transient_flags(running_machine *machine);
-static void compute_debug_flags(const device_config *device);
+static void compute_debug_flags(running_device *device);
 static void perform_trace(cpu_debug_data *info);
 static void prepare_for_step_overout(cpu_debug_data *info);
 static void process_source_file(running_machine *machine);
@@ -94,7 +94,7 @@ static void breakpoint_check(running_machine *machine, cpu_debug_data *info, off
 static void watchpoint_update_flags(const address_space *space);
 static void watchpoint_check(const address_space *space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
 static void check_hotspots(const address_space *space, offs_t address);
-static UINT32 dasm_wrapped(const device_config *device, char *buffer, offs_t pc);
+static UINT32 dasm_wrapped(running_device *device, char *buffer, offs_t pc);
 
 /* expression handlers */
 static UINT64 expression_read_memory(void *param, const char *name, int space, UINT32 address, int size);
@@ -147,9 +147,9 @@ const express_callbacks debug_expression_callbacks =
 
 void debug_cpu_init(running_machine *machine)
 {
-	const device_config *first_screen = video_screen_first(machine->config);
+	running_device *first_screen = video_screen_first(machine);
 	debugcpu_private *global;
-	const device_config *cpu;
+	running_device *cpu;
 	int regnum;
 
 	/* allocate and reset globals */
@@ -193,11 +193,11 @@ void debug_cpu_init(running_machine *machine)
 		info->opwidth = cpu_get_min_opcode_bytes(info->device);
 
 		/* fetch the memory accessors */
-		info->read = (cpu_read_func)device_get_info_fct(info->device, CPUINFO_FCT_READ);
-		info->write = (cpu_write_func)device_get_info_fct(info->device, CPUINFO_FCT_WRITE);
-		info->readop = (cpu_readop_func)device_get_info_fct(info->device, CPUINFO_FCT_READOP);
-		info->translate = (cpu_translate_func)device_get_info_fct(info->device, CPUINFO_FCT_TRANSLATE);
-		info->disassemble = (cpu_disassemble_func)device_get_info_fct(info->device, CPUINFO_FCT_DISASSEMBLE);
+		info->read = (cpu_read_func)info->device->get_config_fct(CPUINFO_FCT_READ);
+		info->write = (cpu_write_func)info->device->get_config_fct(CPUINFO_FCT_WRITE);
+		info->readop = (cpu_readop_func)info->device->get_config_fct(CPUINFO_FCT_READOP);
+		info->translate = (cpu_translate_func)info->device->get_config_fct(CPUINFO_FCT_TRANSLATE);
+		info->disassemble = (cpu_disassemble_func)info->device->get_config_fct(CPUINFO_FCT_DISASSEMBLE);
 
 		/* allocate a symbol table */
 		info->symtable = symtable_alloc(global->symtable, (void *)cpu);
@@ -262,7 +262,7 @@ void debug_cpu_init(running_machine *machine)
 
 void debug_cpu_flush_traces(running_machine *machine)
 {
-	const device_config *cpu;
+	running_device *cpu;
 
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
@@ -286,7 +286,7 @@ void debug_cpu_flush_traces(running_machine *machine)
     device (the one that commands should apply to)
 -------------------------------------------------*/
 
-const device_config *debug_cpu_get_visible_cpu(running_machine *machine)
+running_device *debug_cpu_get_visible_cpu(running_machine *machine)
 {
 	return machine->debugcpu_data->visiblecpu;
 }
@@ -347,7 +347,7 @@ symbol_table *debug_cpu_get_visible_symtable(running_machine *machine)
     CPU's symbol table
 -------------------------------------------------*/
 
-symbol_table *debug_cpu_get_symtable(const device_config *device)
+symbol_table *debug_cpu_get_symtable(running_device *device)
 {
 	return cpu_get_debug_data(device)->symtable;
 }
@@ -381,7 +381,7 @@ int debug_cpu_translate(const address_space *space, int intention, offs_t *addre
     a given PC on a given CPU
 -------------------------------------------------*/
 
-offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+offs_t debug_cpu_disassemble(running_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
 	offs_t result = 0;
@@ -440,7 +440,7 @@ offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t p
     handler for disassembly
 -------------------------------------------------*/
 
-void debug_cpu_set_dasm_override(const device_config *device, cpu_disassemble_func dasm_override)
+void debug_cpu_set_dasm_override(running_device *device, cpu_disassemble_func dasm_override)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
 	if (info != NULL)
@@ -459,7 +459,7 @@ void debug_cpu_set_dasm_override(const device_config *device, cpu_disassemble_fu
     execution for the given CPU
 -------------------------------------------------*/
 
-void debug_cpu_start_hook(const device_config *device, attotime endtime)
+void debug_cpu_start_hook(running_device *device, attotime endtime)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -520,7 +520,7 @@ void debug_cpu_start_hook(const device_config *device, attotime endtime)
     for the given CPU
 -------------------------------------------------*/
 
-void debug_cpu_stop_hook(const device_config *device)
+void debug_cpu_stop_hook(running_device *device)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -544,7 +544,7 @@ void debug_cpu_stop_hook(const device_config *device)
     interrupt is acknowledged
 -------------------------------------------------*/
 
-void debug_cpu_interrupt_hook(const device_config *device, int irqline)
+void debug_cpu_interrupt_hook(running_device *device, int irqline)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -564,7 +564,7 @@ void debug_cpu_interrupt_hook(const device_config *device, int irqline)
     exception is generated
 -------------------------------------------------*/
 
-void debug_cpu_exception_hook(const device_config *device, int exception)
+void debug_cpu_exception_hook(running_device *device, int exception)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -584,7 +584,7 @@ void debug_cpu_exception_hook(const device_config *device, int exception)
     CPU cores before executing each instruction
 -------------------------------------------------*/
 
-void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
+void debug_cpu_instruction_hook(running_device *device, offs_t curpc)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -747,7 +747,7 @@ void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UIN
     the debugger on the next instruction
 -------------------------------------------------*/
 
-void debug_cpu_halt_on_next_instruction(const device_config *device, const char *fmt, ...)
+void debug_cpu_halt_on_next_instruction(running_device *device, const char *fmt, ...)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -779,7 +779,7 @@ void debug_cpu_halt_on_next_instruction(const device_config *device, const char 
     CPU
 -------------------------------------------------*/
 
-void debug_cpu_ignore_cpu(const device_config *device, int ignore)
+void debug_cpu_ignore_cpu(running_device *device, int ignore)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -969,7 +969,7 @@ void debug_cpu_next_cpu(running_machine *machine)
     breakpoint, returning its index
 -------------------------------------------------*/
 
-int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed_expression *condition, const char *action)
+int debug_cpu_breakpoint_set(running_device *device, offs_t address, parsed_expression *condition, const char *action)
 {
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
@@ -1008,7 +1008,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 {
 	debug_cpu_breakpoint *bp, *pbp;
-	const device_config *cpu;
+	running_device *cpu;
 
 	/* loop over CPUs and find the requested breakpoint */
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -1049,7 +1049,7 @@ int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
 {
 	debug_cpu_breakpoint *bp;
-	const device_config *cpu;
+	running_device *cpu;
 
 	/* loop over CPUs and find the requested breakpoint */
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -1116,7 +1116,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 {
 	debug_cpu_watchpoint *wp, *pwp;
-	const device_config *cpu;
+	running_device *cpu;
 	int spacenum;
 
 	/* loop over CPUs and find the requested watchpoint */
@@ -1159,7 +1159,7 @@ int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 {
 	debug_cpu_watchpoint *wp;
-	const device_config *cpu;
+	running_device *cpu;
 	int spacenum;
 
 	/* loop over CPUs and address spaces and find the requested watchpoint */
@@ -1221,7 +1221,7 @@ void debug_cpu_source_script(running_machine *machine, const char *file)
     CPU
 -------------------------------------------------*/
 
-void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, const char *action)
+void debug_cpu_trace(running_device *device, FILE *file, int trace_over, const char *action)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
 
@@ -1257,7 +1257,7 @@ void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, co
     given CPU's tracefile, if tracing
 -------------------------------------------------*/
 
-void debug_cpu_trace_printf(const device_config *device, const char *fmt, ...)
+void debug_cpu_trace_printf(running_device *device, const char *fmt, ...)
 {
 	va_list va;
 
@@ -1277,7 +1277,7 @@ void debug_cpu_trace_printf(const device_config *device, const char *fmt, ...)
     be called on each instruction for a given CPU
 -------------------------------------------------*/
 
-void debug_cpu_set_instruction_hook(const device_config *device, debug_instruction_hook_func hook)
+void debug_cpu_set_instruction_hook(running_device *device, debug_instruction_hook_func hook)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
 
@@ -1295,7 +1295,7 @@ void debug_cpu_set_instruction_hook(const device_config *device, debug_instructi
     tracking of hotspots
 -------------------------------------------------*/
 
-int debug_cpu_hotspot_track(const device_config *device, int numspots, int threshhold)
+int debug_cpu_hotspot_track(running_device *device, int numspots, int threshhold)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
 
@@ -1925,7 +1925,7 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 static void debug_cpu_exit(running_machine *machine)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	const device_config *cpu;
+	running_device *cpu;
 	int spacenum;
 
 	/* loop over all watchpoints and breakpoints to free their memory */
@@ -1966,7 +1966,7 @@ static void debug_cpu_exit(running_machine *machine)
     on_vblank - called when a VBLANK hits
 -------------------------------------------------*/
 
-static void on_vblank(const device_config *device, void *param, int vblank_state)
+static void on_vblank(running_device *device, void *param, int vblank_state)
 {
 	/* just set a global flag to be consumed later */
 	if (vblank_state)
@@ -1981,7 +1981,7 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 
 static void reset_transient_flags(running_machine *machine)
 {
-	const device_config *cpu;
+	running_device *cpu;
 
 	/* loop over CPUs and reset the transient flags */
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -1994,7 +1994,7 @@ static void reset_transient_flags(running_machine *machine)
     debug flags for optimal efficiency
 -------------------------------------------------*/
 
-static void compute_debug_flags(const device_config *device)
+static void compute_debug_flags(running_device *device)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
 	running_machine *machine = device->machine;
@@ -2408,7 +2408,7 @@ static void check_hotspots(const address_space *space, offs_t address)
     buffer and then disassembling them
 -------------------------------------------------*/
 
-static UINT32 dasm_wrapped(const device_config *device, char *buffer, offs_t pc)
+static UINT32 dasm_wrapped(running_device *device, char *buffer, offs_t pc)
 {
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int maxbytes = cpu_get_max_opcode_bytes(device);
@@ -2438,11 +2438,11 @@ static UINT32 dasm_wrapped(const device_config *device, char *buffer, offs_t pc)
     based on a case insensitive tag search
 -------------------------------------------------*/
 
-static const device_config *expression_get_device(running_machine *machine, const char *tag)
+static running_device *expression_get_device(running_machine *machine, const char *tag)
 {
-	const device_config *device;
+	running_device *device;
 
-	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 		if (mame_stricmp(device->tag, tag) == 0)
 			return device;
 
@@ -2460,7 +2460,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 {
 	running_machine *machine = (running_machine *)param;
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
-	const device_config *device = NULL;
+	running_device *device = NULL;
 	const address_space *space;
 
 	switch (spacenum)
@@ -2630,7 +2630,7 @@ static UINT64 expression_read_memory_region(running_machine *machine, const char
 static void expression_write_memory(void *param, const char *name, int spacenum, UINT32 address, int size, UINT64 data)
 {
 	running_machine *machine = (running_machine *)param;
-	const device_config *device = NULL;
+	running_device *device = NULL;
 	const address_space *space;
 
 	switch (spacenum)
@@ -2812,7 +2812,7 @@ static void expression_write_memory_region(running_machine *machine, const char 
 static EXPRERR expression_validate(void *param, const char *name, int space)
 {
 	running_machine *machine = (running_machine *)param;
-	const device_config *device = NULL;
+	running_device *device = NULL;
 
 	switch (space)
 	{
@@ -2942,7 +2942,7 @@ static void set_tempvar(void *globalref, void *ref, UINT64 value)
 
 static UINT64 get_beamx(void *globalref, void *ref)
 {
-	const device_config *screen = (const device_config *)ref;
+	running_device *screen = (running_device *)ref;
 	return (screen != NULL) ? video_screen_get_hpos(screen) : 0;
 }
 
@@ -2953,7 +2953,7 @@ static UINT64 get_beamx(void *globalref, void *ref)
 
 static UINT64 get_beamy(void *globalref, void *ref)
 {
-	const device_config *screen = (const device_config *)ref;
+	running_device *screen = (running_device *)ref;
 	return (screen != NULL) ? video_screen_get_vpos(screen) : 0;
 }
 
@@ -2964,7 +2964,7 @@ static UINT64 get_beamy(void *globalref, void *ref)
 
 static UINT64 get_frame(void *globalref, void *ref)
 {
-	const device_config *screen = (const device_config *)ref;
+	running_device *screen = (running_device *)ref;
 	return (screen != NULL) ? video_screen_get_frame_number(screen) : 0;
 }
 
@@ -2976,7 +2976,7 @@ static UINT64 get_frame(void *globalref, void *ref)
 
 static UINT64 get_current_pc(void *globalref, void *ref)
 {
-	const device_config *device = (const device_config *)globalref;
+	running_device *device = (running_device *)globalref;
 	return cpu_get_pc(device);
 }
 
@@ -2988,7 +2988,7 @@ static UINT64 get_current_pc(void *globalref, void *ref)
 
 static UINT64 get_cycles(void *globalref, void *ref)
 {
-	const device_config *device = (const device_config *)globalref;
+	running_device *device = (running_device *)globalref;
 	return *cpu_get_icount_ptr(device);
 }
 
@@ -3025,7 +3025,7 @@ static void set_logunmap(void *globalref, void *ref, UINT64 value)
 
 static UINT64 get_cpu_reg(void *globalref, void *ref)
 {
-	const device_config *device = (const device_config *)globalref;
+	running_device *device = (running_device *)globalref;
 	return cpu_get_reg(device, (FPTR)ref);
 }
 
@@ -3037,6 +3037,6 @@ static UINT64 get_cpu_reg(void *globalref, void *ref)
 
 static void set_cpu_reg(void *globalref, void *ref, UINT64 value)
 {
-	const device_config *device = (const device_config *)globalref;
+	running_device *device = (running_device *)globalref;
 	cpu_set_reg(device, (FPTR)ref, value);
 }

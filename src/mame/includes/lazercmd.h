@@ -31,7 +31,7 @@ struct _lazercmd_state
 	int      timer_count, sense_state, dac_data;
 
 	/* device */
-	const device_config *dac;
+	running_device *dac;
 };
 
 

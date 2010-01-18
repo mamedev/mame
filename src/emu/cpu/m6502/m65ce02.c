@@ -75,13 +75,13 @@ struct	_m65ce02_Regs {
 	UINT8	irq_state;
 	int		icount;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *space;
 	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
-INLINE m65ce02_Regs *get_safe_token(const device_config *device)
+INLINE m65ce02_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -102,7 +102,7 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m65ce02 )
 {
 	m65ce02_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
 
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;

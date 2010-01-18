@@ -75,7 +75,7 @@ struct _i2cmem_state
     in device is, in fact, an I2C memory
 -------------------------------------------------*/
 
-INLINE i2cmem_state *get_safe_token( const device_config *device )
+INLINE i2cmem_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -102,7 +102,7 @@ static int data_offset( i2cmem_state *c )
 	return ( ( ( c->devsel << 7 ) & 0xff00 ) | ( c->byteaddr & 0xff ) ) & ( c->data_size - 1 );
 }
 
-void i2cmemdev_write( const device_config *device, int line, int data )
+void i2cmemdev_write( running_device *device, int line, int data )
 {
 	i2cmem_state *c = get_safe_token( device );
 
@@ -326,7 +326,7 @@ void i2cmemdev_write( const device_config *device, int line, int data )
 	}
 }
 
-int i2cmemdev_read( const device_config *device, int line )
+int i2cmemdev_read( running_device *device, int line )
 {
 	i2cmem_state *c = get_safe_token( device );
 
@@ -352,7 +352,7 @@ int i2cmemdev_read( const device_config *device, int line )
 	return 0;
 }
 
-void i2cmemdev_set_read_mode( const device_config *device, int mode )
+void i2cmemdev_set_read_mode( running_device *device, int mode )
 {
 	i2cmem_state *c = get_safe_token( device );
 
@@ -371,11 +371,11 @@ static DEVICE_START( i2cmem )
 
 	/* validate some basic stuff */
 	assert( device != NULL );
-	assert( device->inline_config != NULL );
+	assert( device->baseconfig().inline_config != NULL );
 	assert( device->machine != NULL );
 	assert( device->machine->config != NULL );
 
-	config = (const i2cmem_config *)device->inline_config;
+	config = (const i2cmem_config *)device->baseconfig().inline_config;
 
 	c->scl = 0;
 	c->sdaw = 0;
@@ -431,7 +431,7 @@ static DEVICE_RESET( i2cmem )
 
 static DEVICE_NVRAM( i2cmem )
 {
-	const i2cmem_config *config = (const i2cmem_config *)device->inline_config;
+	const i2cmem_config *config = (const i2cmem_config *)device->baseconfig().inline_config;
 	i2cmem_state *c = get_safe_token( device );
 
 	if( read_or_write )

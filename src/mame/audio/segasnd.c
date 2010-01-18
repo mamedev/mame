@@ -81,7 +81,7 @@ typedef struct _usb_state usb_state;
 struct _usb_state
 {
 	sound_stream *		stream;				/* output stream */
-	const device_config *cpu;				/* CPU index of the 8035 */
+	running_device *cpu;				/* CPU index of the 8035 */
 	UINT8				in_latch;			/* input latch */
 	UINT8				out_latch;			/* output latch */
 	UINT8				last_p2_value;		/* current P2 output value */
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( speech_p2_w )
  *
  *************************************/
 
-static void speech_drq_w(const device_config *device, int level)
+static void speech_drq_w(running_device *device, int level)
 {
 	speech_drq = (level == ASSERT_LINE);
 }

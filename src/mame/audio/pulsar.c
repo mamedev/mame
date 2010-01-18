@@ -88,7 +88,7 @@ static int port1State = 0;
 
 WRITE8_HANDLER( pulsar_audio_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;
@@ -139,7 +139,7 @@ WRITE8_HANDLER( pulsar_audio_1_w )
 
 WRITE8_HANDLER( pulsar_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	static int port2State = 0;
 	int bitsChanged;
 	int bitsGoneHigh;

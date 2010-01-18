@@ -48,7 +48,7 @@ void polyplay_set_channel2(int active)
 
 void polyplay_play_channel1(running_machine *machine, int data)
 {
-	const device_config *samples = devtag_get_device(machine, "samples");
+	running_device *samples = devtag_get_device(machine, "samples");
 	if (data) {
 		freq1 = 2457600 / 16 / data / 8;
 		sample_set_volume(samples, 0, channel_playing1 * 1.0);
@@ -62,7 +62,7 @@ void polyplay_play_channel1(running_machine *machine, int data)
 
 void polyplay_play_channel2(running_machine *machine, int data)
 {
-	const device_config *samples = devtag_get_device(machine, "samples");
+	running_device *samples = devtag_get_device(machine, "samples");
 	if (data) {
 		freq2 = 2457600 / 16 / data / 8;
 		sample_set_volume(samples, 1, channel_playing2 * 1.0);

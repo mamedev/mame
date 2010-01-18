@@ -446,7 +446,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static void yunsung8_adpcm_int( const device_config *device )
+static void yunsung8_adpcm_int( running_device *device )
 {
 	yunsung8_state *state = (yunsung8_state *)device->machine->driver_data;
 

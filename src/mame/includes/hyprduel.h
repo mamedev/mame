@@ -40,8 +40,8 @@ struct _hyprduel_state
 	int       int_num;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *subcpu;
+	running_device *maincpu;
+	running_device *subcpu;
 };
 
 

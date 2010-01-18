@@ -46,7 +46,7 @@ enum
 };
 
 /* PUBLIC FUNCTIONS */
-extern void tms7000_A6EC1( const device_config *device ); /* External event counter */
+extern void tms7000_A6EC1( running_device *device ); /* External event counter */
 extern CPU_GET_INFO( tms7000 );
 extern CPU_GET_INFO( tms7000_exl );
 

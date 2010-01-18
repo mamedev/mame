@@ -84,7 +84,7 @@ typedef struct {
 	UINT8	halted;
 	UINT8	interrupt_pending;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 } minx_state;
@@ -93,7 +93,7 @@ typedef struct {
 #define WR(offset,data)	memory_write_byte_8be( minx->program, offset, data )
 #define GET_MINX_PC		( ( minx->PC & 0x8000 ) ? ( minx->V << 15 ) | (minx->PC & 0x7FFF ) : minx->PC )
 
-INLINE minx_state *get_safe_token(const device_config *device)
+INLINE minx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -122,7 +122,7 @@ static CPU_INIT( minx )
 	minx->irq_callback = irqcallback;
 	minx->device = device;
 	minx->program = device->space(AS_PROGRAM);
-	if ( device->static_config != NULL )
+	if ( device->baseconfig().static_config != NULL )
 	{
 	}
 	else

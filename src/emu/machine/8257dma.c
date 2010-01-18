@@ -78,19 +78,19 @@ struct _dma8257_t
 
 static TIMER_CALLBACK( dma8257_timerproc );
 static TIMER_CALLBACK( dma8257_msbflip_timerproc );
-static void dma8257_update_status(const device_config *device);
+static void dma8257_update_status(running_device *device);
 
 
 /* ----------------------------------------------------------------------- */
 
-INLINE i8257_t *get_safe_token(const device_config *device) {
+INLINE i8257_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
 	assert( device->token != NULL );
 	assert( device->type == I8257 );
 	return ( i8257_t * ) device->token;
 }
 
-static int dma8257_do_operation(const device_config *device, int channel)
+static int dma8257_do_operation(running_device *device, int channel)
 {
 	i8257_t *i8257 = get_safe_token(device);
 	int done;
@@ -167,7 +167,7 @@ static int dma8257_do_operation(const device_config *device, int channel)
 
 static TIMER_CALLBACK( dma8257_timerproc )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	i8257_t *i8257 = get_safe_token(device);
 	int i, channel = 0, rr;
 	int done;
@@ -200,14 +200,14 @@ static TIMER_CALLBACK( dma8257_timerproc )
 
 static TIMER_CALLBACK( dma8257_msbflip_timerproc )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	i8257_t *i8257 = get_safe_token(device);
 	i8257->msb ^= 1;
 }
 
 
 
-static void dma8257_update_status(const device_config *device)
+static void dma8257_update_status(running_device *device)
 {
 	i8257_t *i8257 = get_safe_token(device);
 	UINT16 pending_transfer;
@@ -333,7 +333,7 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 
 static TIMER_CALLBACK( dma8257_drq_write_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	i8257_t *i8257 = get_safe_token(device);
 	int channel = param >> 1;
 	int state = param & 0x01;
@@ -384,7 +384,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w ) { dma8257_drq_w(device, 3, state); }
 static DEVICE_START( i8257 )
 {
 	i8257_t *i8257 = get_safe_token(device);
-	i8257_interface *intf = (i8257_interface *)device->static_config;
+	i8257_interface *intf = (i8257_interface *)device->baseconfig().static_config;
 	int i;
 
 	/* validate arguments */

@@ -18,7 +18,7 @@ struct _lemmings_state
 	UINT8 *vram_buffer;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

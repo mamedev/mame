@@ -38,9 +38,9 @@ static VIDEO_UPDATE( galaxia )
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
 
-	const device_config *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
-	const device_config *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
-	const device_config *s2636_2 = devtag_get_device(screen->machine, "s2636_2");
+	running_device *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
+	running_device *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
+	running_device *s2636_2 = devtag_get_device(screen->machine, "s2636_2");
 
 	count = 0;
 

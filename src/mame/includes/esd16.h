@@ -25,8 +25,8 @@ struct _esd16_state
 	int           tilemap0_color;
 
 	/* devices */
-	const device_config *audio_cpu;
-	const device_config *eeprom;
+	running_device *audio_cpu;
+	running_device *eeprom;
 };
 
 

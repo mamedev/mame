@@ -21,7 +21,7 @@ struct _sonson_state
 	int        last_irq;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

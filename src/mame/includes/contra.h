@@ -24,9 +24,9 @@ struct _contra_state
 	rectangle bg_clip, fg_clip, tx_clip;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *k007121_1;
-	const device_config *k007121_2;
+	running_device *audiocpu;
+	running_device *k007121_1;
+	running_device *k007121_2;
 };
 
 

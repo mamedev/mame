@@ -12,7 +12,7 @@
 
 
 
-static SID6581 *get_sid(const device_config *device)
+static SID6581 *get_sid(running_device *device)
 {
 	assert(device != NULL);
 	assert((sound_get_type(device) == SOUND_SID6581) || (sound_get_type(device) == SOUND_SID8580));
@@ -29,10 +29,10 @@ static STREAM_UPDATE( sid_update )
 
 
 
-static void sid_start(const device_config *device, SIDTYPE sidtype)
+static void sid_start(running_device *device, SIDTYPE sidtype)
 {
 	SID6581 *sid = get_sid(device);
-	const sid6581_interface *iface = (const sid6581_interface*) device->static_config;
+	const sid6581_interface *iface = (const sid6581_interface*) device->baseconfig().static_config;
 
 	sid->device = device;
 	sid->mixer_channel = stream_create (device, 0, 1,  device->machine->sample_rate, (void *) sid, sid_update);

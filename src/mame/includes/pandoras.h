@@ -21,10 +21,10 @@ struct _pandoras_state
 	int i8039_status;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *subcpu;
-	const device_config *audiocpu;
-	const device_config *mcu;
+	running_device *maincpu;
+	running_device *subcpu;
+	running_device *audiocpu;
+	running_device *mcu;
 };
 
 

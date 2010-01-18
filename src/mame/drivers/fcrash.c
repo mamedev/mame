@@ -61,7 +61,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
-static void m5205_int1( const device_config *device )
+static void m5205_int1( running_device *device )
 {
 	cps_state *state = (cps_state *)device->machine->driver_data;
 
@@ -72,7 +72,7 @@ static void m5205_int1( const device_config *device )
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void m5205_int2( const device_config *device )
+static void m5205_int2( running_device *device )
 {
 	cps_state *state = (cps_state *)device->machine->driver_data;
 

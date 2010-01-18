@@ -15,9 +15,9 @@
 #define LOG 0
 #define LOG_EXTRA 0
 
-static void execute_instruction_64kw(const device_config *device);
-static void execute_instruction_8kw(const device_config *device);
-static void pulse_reset(const device_config *device);
+static void execute_instruction_64kw(running_device *device);
+static void execute_instruction_8kw(running_device *device);
+static void pulse_reset(running_device *device);
 
 
 /* TX-0 Registers */
@@ -64,11 +64,11 @@ struct _tx0_state
 
 	int icount;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 };
 
-INLINE tx0_state *get_safe_token(const device_config *device)
+INLINE tx0_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -127,12 +127,12 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(const device_config *device, cpu_irq_callback irqcallback, int is_64kw)
+static void tx0_init_common(running_device *device, cpu_irq_callback irqcallback, int is_64kw)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
 	/* clean-up */
-	cpustate->iface = (const tx0_reset_param_t *)device->static_config;
+	cpustate->iface = (const tx0_reset_param_t *)device->baseconfig().static_config;
 
 	cpustate->address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
 	cpustate->ir_mask = is_64kw ? 03 : 037;
@@ -687,7 +687,7 @@ CPU_GET_INFO( tx0_8kw )
 
 
 /* execute one instruction */
-static void execute_instruction_64kw(const device_config *device)
+static void execute_instruction_64kw(running_device *device)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
@@ -878,7 +878,7 @@ static void indexed_address_eval(tx0_state *cpustate)
 }
 
 /* execute one instruction */
-static void execute_instruction_8kw(const device_config *device)
+static void execute_instruction_8kw(running_device *device)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
@@ -1284,7 +1284,7 @@ static void execute_instruction_8kw(const device_config *device)
     reset most registers and flip-flops, and initialize a few emulator state
     variables.
 */
-static void pulse_reset(const device_config *device)
+static void pulse_reset(running_device *device)
 {
 	tx0_state *cpustate = get_safe_token(device);
 

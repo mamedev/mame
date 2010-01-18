@@ -21,7 +21,7 @@ struct _appoooh_state
 	UINT32   adpcm_address;
 
 	/* devices */
-	const device_config *adpcm;
+	running_device *adpcm;
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

@@ -161,7 +161,7 @@ struct _nec_state_t
 	UINT8	no_interrupt;
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int		icount;
@@ -181,7 +181,7 @@ struct _nec_state_t
 
 };
 
-INLINE nec_state_t *get_safe_token(const device_config *device)
+INLINE nec_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1104,9 +1104,9 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
+static void nec_init(running_device *device, cpu_irq_callback irqcallback, int type)
 {
-	const nec_config *config = device->static_config ? (const nec_config *)device->static_config : &default_config;
+	const nec_config *config = device->baseconfig().static_config ? (const nec_config *)device->baseconfig().static_config : &default_config;
 	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_state->config = config;

@@ -30,7 +30,7 @@
 /* VTLB state */
 struct _vtlb_state
 {
-	const device_config *device;			/* CPU device */
+	running_device *device;			/* CPU device */
 	int					space;				/* address space */
 	int 				dynamic;			/* number of dynamic entries */
 	int					fixed;				/* number of fixed entries */
@@ -55,7 +55,7 @@ struct _vtlb_state
     given CPU
 -------------------------------------------------*/
 
-vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, int dynamic_entries)
+vtlb_state *vtlb_alloc(running_device *cpu, int space, int fixed_entries, int dynamic_entries)
 {
 	vtlb_state *vtlb;
 
@@ -69,7 +69,7 @@ vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, i
 	vtlb->fixed = fixed_entries;
 	vtlb->pageshift = cpu_get_page_shift(cpu, space);
 	vtlb->addrwidth = cpu_get_logaddr_width(cpu, space);
-	vtlb->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
+	vtlb->translate = (cpu_translate_func)cpu->get_config_fct(CPUINFO_FCT_TRANSLATE);
 
 	/* validate CPU information */
 	assert((1 << vtlb->pageshift) > VTLB_FLAGS_MASK);

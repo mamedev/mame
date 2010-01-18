@@ -12,14 +12,14 @@ struct _harddriv_state
 {
 	atarigen_state			atarigen;
 
-	const device_config *	maincpu;
-	const device_config *	gsp;
-	const device_config *	msp;
-	const device_config *	adsp;
-	const device_config *	soundcpu;
-	const device_config *	sounddsp;
-	const device_config *	jsacpu;
-	const device_config *	dsp32;
+	running_device *	maincpu;
+	running_device *	gsp;
+	running_device *	msp;
+	running_device *	adsp;
+	running_device *	soundcpu;
+	running_device *	sounddsp;
+	running_device *	jsacpu;
+	running_device *	dsp32;
 
 	UINT8					hd34010_host_access;
 	UINT8					dsk_pio_access;
@@ -77,7 +77,7 @@ struct _harddriv_state
 	UINT8					duart_read_data[16];
 	UINT8					duart_write_data[16];
 	UINT8					duart_output_port;
-	const device_config *	duart_timer;
+	running_device *	duart_timer;
 
 	UINT8					last_gsp_shiftreg;
 
@@ -166,8 +166,8 @@ MACHINE_RESET( harddriv );
 
 INTERRUPT_GEN( hd68k_irq_gen );
 WRITE16_HANDLER( hd68k_irq_ack_w );
-void hdgsp_irq_gen(const device_config *device, int state);
-void hdmsp_irq_gen(const device_config *device, int state);
+void hdgsp_irq_gen(running_device *device, int state);
+void hdmsp_irq_gen(running_device *device, int state);
 
 READ16_HANDLER( hd68k_gsp_io_r );
 WRITE16_HANDLER( hd68k_gsp_io_w );
@@ -240,7 +240,7 @@ READ16_HANDLER( hd68k_ds3_program_r );
 WRITE16_HANDLER( hd68k_ds3_program_w );
 
 /* DSK board */
-void hddsk_update_pif(const device_config *device, UINT32 pins);
+void hddsk_update_pif(running_device *device, UINT32 pins);
 WRITE16_HANDLER( hd68k_dsk_control_w );
 READ16_HANDLER( hd68k_dsk_ram_r );
 WRITE16_HANDLER( hd68k_dsk_ram_w );
@@ -343,5 +343,5 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w );
 READ16_HANDLER( hdgsp_paletteram_hi_r );
 WRITE16_HANDLER( hdgsp_paletteram_hi_w );
 
-void harddriv_scanline_driver(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
-void harddriv_scanline_multisync(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_driver(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_multisync(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);

@@ -37,7 +37,7 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(const device_config *screen, int scanline)
+static void scanline_update(running_device *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !(input_port_read(screen->machine, "P1") & 0x800))

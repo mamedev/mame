@@ -33,12 +33,12 @@ struct _t11_state
     UINT8				irq_state;
     int					icount;
 	cpu_irq_callback	irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 };
 
 
-INLINE t11_state *get_safe_token(const device_config *device)
+INLINE t11_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -259,7 +259,7 @@ static CPU_INIT( t11 )
 		0xc000, 0x8000, 0x4000, 0x2000,
 		0x1000, 0x0000, 0xf600, 0xf400
 	};
-	const struct t11_setup *setup = (const struct t11_setup *)device->static_config;
+	const struct t11_setup *setup = (const struct t11_setup *)device->baseconfig().static_config;
 	t11_state *cpustate = get_safe_token(device);
 
 	cpustate->initial_pc = initial_pc[setup->mode >> 13];

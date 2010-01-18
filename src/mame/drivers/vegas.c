@@ -475,7 +475,7 @@ static UINT8 cmos_unlocked;
 static UINT32 *timekeeper_nvram;
 static size_t timekeeper_nvram_size;
 
-static const device_config *voodoo_device;
+static running_device *voodoo_device;
 static UINT8 dcs_idma_cs;
 
 static int dynamic_count;
@@ -487,7 +487,7 @@ static struct dynamic_address
 	write32_space_func mwrite;
 	read32_device_func	dread;
 	write32_device_func dwrite;
-	const device_config *device;
+	running_device *device;
 	const char *	rdname;
 	const char *	wrname;
 } dynamic[MAX_DYNAMIC_ADDRESSES];
@@ -503,7 +503,7 @@ static struct dynamic_address
 
 static STATE_POSTLOAD( vegas_postload );
 static TIMER_CALLBACK( nile_timer_callback );
-static void ide_interrupt(const device_config *device, int state);
+static void ide_interrupt(running_device *device, int state);
 static void remap_dynamic_addresses(running_machine *machine);
 
 
@@ -1246,7 +1246,7 @@ static WRITE32_HANDLER( nile_w )
  *
  *************************************/
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 	ide_irq_state = state;
 	if (state)
@@ -1274,7 +1274,7 @@ static void update_sio_irqs(running_machine *machine)
 }
 
 
-static void vblank_assert(const device_config *device, int state)
+static void vblank_assert(running_device *device, int state)
 {
 	if (!vblank_state && state)
 	{
@@ -1301,7 +1301,7 @@ static void ioasic_irq(running_machine *machine, int state)
 }
 
 
-static void ethernet_interrupt(const device_config *device, int state)
+static void ethernet_interrupt(running_device *device, int state)
 {
 	if (state)
 		sio_irq_state |= 0x10;
@@ -1534,7 +1534,7 @@ INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_space_func rea
 	dynamic_count++;
 }
 
-INLINE void _add_dynamic_device_address(const device_config *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
+INLINE void _add_dynamic_device_address(running_device *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
 {
 	dynamic[dynamic_count].start = start;
 	dynamic[dynamic_count].end = end;
@@ -1551,8 +1551,8 @@ INLINE void _add_dynamic_device_address(const device_config *device, offs_t star
 
 static void remap_dynamic_addresses(running_machine *machine)
 {
-	const device_config *ethernet = devtag_get_device(machine, "ethernet");
-	const device_config *ide = devtag_get_device(machine, "ide");
+	running_device *ethernet = devtag_get_device(machine, "ethernet");
+	running_device *ide = devtag_get_device(machine, "ide");
 	int voodoo_type = voodoo_get_type(voodoo_device);
 	offs_t base;
 	int addr;

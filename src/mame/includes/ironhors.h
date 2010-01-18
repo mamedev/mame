@@ -21,7 +21,7 @@ struct _ironhors_state
 	int        palettebank, charbank, spriterambank;
 
 	/* devices */
-	const device_config *soundcpu;
+	running_device *soundcpu;
 };
 
 

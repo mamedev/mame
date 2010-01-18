@@ -105,7 +105,7 @@ static WRITE8_HANDLER( gyruss_irq_clear_w )
 	cpu_set_input_line(state->audiocpu_2, 0, CLEAR_LINE);
 }
 
-static void filter_w( const device_config *device, int chip, int data )
+static void filter_w( running_device *device, int chip, int data )
 {
 	int i;
 

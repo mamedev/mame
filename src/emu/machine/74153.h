@@ -40,7 +40,7 @@
 typedef struct _ttl74153_config ttl74153_config;
 struct _ttl74153_config
 {
-	void (*output_cb)(const device_config *device);
+	void (*output_cb)(running_device *device);
 };
 
 
@@ -51,13 +51,13 @@ struct _ttl74153_config
 
 
 /* must call TTL74153_update() after setting the inputs */
-void ttl74153_update(const device_config *device);
+void ttl74153_update(running_device *device);
 
-void ttl74153_a_w(const device_config *device, int data);
-void ttl74153_b_w(const device_config *device, int data);
-void ttl74153_input_line_w(const device_config *device, int section, int input_line, int data);
-void ttl74153_enable_w(const device_config *device, int section, int data);
-int ttl74153_output_r(const device_config *device, int section);
+void ttl74153_a_w(running_device *device, int data);
+void ttl74153_b_w(running_device *device, int data);
+void ttl74153_input_line_w(running_device *device, int section, int input_line, int data);
+void ttl74153_enable_w(running_device *device, int section, int data);
+int ttl74153_output_r(running_device *device, int section);
 
 /* device get info callback */
 #define TTL74153 DEVICE_GET_INFO_NAME(ttl74153)

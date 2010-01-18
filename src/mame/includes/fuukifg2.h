@@ -22,8 +22,8 @@ struct _fuuki16_state
 	emu_timer   *raster_interrupt_timer;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

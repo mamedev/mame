@@ -68,7 +68,7 @@ enum
     STRUCTURES
 ***************************************************************************/
 
-typedef void (*rsp_set_status_func)(const device_config *device, UINT32 status);
+typedef void (*rsp_set_status_func)(running_device *device, UINT32 status);
 
 typedef struct _rsp_config rsp_config;
 struct _rsp_config
@@ -86,10 +86,10 @@ struct _rsp_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-void rspdrc_flush_drc_cache(const device_config *device);
-void rspdrc_set_options(const device_config *device, UINT32 options);
-void rspdrc_add_imem(const device_config *device, void *base);
-void rspdrc_add_dmem(const device_config *device, void *base);
+void rspdrc_flush_drc_cache(running_device *device);
+void rspdrc_set_options(running_device *device, UINT32 options);
+void rspdrc_add_imem(running_device *device, void *base);
+void rspdrc_add_dmem(running_device *device, void *base);
 
 /***************************************************************************
     HELPER MACROS
@@ -209,7 +209,7 @@ struct _rsp_state
 	UINT32 nextpc;
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 

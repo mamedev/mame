@@ -698,8 +698,8 @@ static WRITE8_HANDLER( volume_override_w )
 
 	if ( old != volume_override )
 	{
-		const device_config *ym = devtag_get_device(space->machine, "ymsnd");
-		const device_config *upd = devtag_get_device(space->machine, "upd");
+		running_device *ym = devtag_get_device(space->machine, "ymsnd");
+		running_device *upd = devtag_get_device(space->machine, "upd");
 		float percent = volume_override? 1.0f : (32-global_volume)/32.0f;
 
 		sound_set_output_gain(ym, 0, percent);
@@ -812,8 +812,8 @@ static WRITE8_HANDLER( expansion_latch_w )
 			}
 
 			{
-				const device_config *ym = devtag_get_device(space->machine, "ymsnd");
-				const device_config *upd = devtag_get_device(space->machine, "upd");
+				running_device *ym = devtag_get_device(space->machine, "ymsnd");
+				running_device *upd = devtag_get_device(space->machine, "upd");
 				float percent = volume_override ? 1.0f : (32-global_volume)/32.0f;
 
 				sound_set_output_gain(ym, 0, percent);

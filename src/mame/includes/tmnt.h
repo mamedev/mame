@@ -30,19 +30,19 @@ struct _tmnt_state
 	int        toggle, last;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k007232;
-	const device_config *k053260;
-	const device_config *k054539;
-	const device_config *k052109;
-	const device_config *k051960;
-	const device_config *k053245;
-	const device_config *k053251;
-	const device_config *k053936;
-	const device_config *k054000;
-	const device_config *upd;
-	const device_config *samples;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k007232;
+	running_device *k053260;
+	running_device *k054539;
+	running_device *k052109;
+	running_device *k051960;
+	running_device *k053245;
+	running_device *k053251;
+	running_device *k053936;
+	running_device *k054000;
+	running_device *upd;
+	running_device *samples;
 };
 
 

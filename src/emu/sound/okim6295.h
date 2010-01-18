@@ -20,8 +20,8 @@ extern const okim6295_interface okim6295_interface_pin7low;
 
 
 
-void okim6295_set_bank_base(const device_config *device, int base);
-void okim6295_set_pin7(const device_config *device, int pin7);
+void okim6295_set_bank_base(running_device *device, int base);
+void okim6295_set_pin7(running_device *device, int pin7);
 
 READ8_DEVICE_HANDLER( okim6295_r );
 WRITE8_DEVICE_HANDLER( okim6295_w );

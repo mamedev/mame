@@ -43,7 +43,7 @@ struct _fcombat_state
 	int        tx, ty;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

@@ -18,11 +18,11 @@ struct _ymf262_state
 	emu_timer *		timer[2];
 	void *			chip;
 	const ymf262_interface *intf;
-	const device_config *device;
+	running_device *device;
 };
 
 
-INLINE ymf262_state *get_safe_token(const device_config *device)
+INLINE ymf262_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -84,7 +84,7 @@ static DEVICE_START( ymf262 )
 	ymf262_state *info = get_safe_token(device);
 	int rate = device->clock/288;
 
-	info->intf = device->static_config ? (const ymf262_interface *)device->static_config : &dummy;
+	info->intf = device->baseconfig().static_config ? (const ymf262_interface *)device->baseconfig().static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

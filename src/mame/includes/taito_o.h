@@ -11,8 +11,8 @@ struct _taitoo_state
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *tc0080vco;
+	running_device *maincpu;
+	running_device *tc0080vco;
 };
 
 /*----------- defined in video/taito_o.c -----------*/

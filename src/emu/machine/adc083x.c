@@ -71,7 +71,7 @@ struct _adc0831_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE adc0831_state *get_safe_token( const device_config *device )
+INLINE adc0831_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -79,11 +79,11 @@ INLINE adc0831_state *get_safe_token( const device_config *device )
 	return (adc0831_state *) device->token;
 }
 
-INLINE const adc083x_interface *get_interface( const device_config *device )
+INLINE const adc083x_interface *get_interface( running_device *device )
 {
 	assert( device != NULL );
 	assert( ( device->type == ADC0831 ) || ( device->type == ADC0832 ) || ( device->type == ADC0834 ) || ( device->type == ADC0838 ) );
-	return (const adc083x_interface *) device->static_config;
+	return (const adc083x_interface *) device->baseconfig().static_config;
 }
 
 
@@ -95,7 +95,7 @@ INLINE const adc083x_interface *get_interface( const device_config *device )
     adc083x_clear_sars
 -------------------------------------------------*/
 
-static void adc083x_clear_sars( const device_config *device, adc0831_state *adc083x )
+static void adc083x_clear_sars( running_device *device, adc0831_state *adc083x )
 {
 	if( device->type == ADC0834 ||device->type == ADC0838 )
 	{
@@ -149,7 +149,7 @@ WRITE_LINE_DEVICE_HANDLER( adc083x_cs_write )
     adc083x_conversion
 -------------------------------------------------*/
 
-static UINT8 adc083x_conversion( const device_config *device )
+static UINT8 adc083x_conversion( running_device *device )
 {
 	adc0831_state *adc083x = get_safe_token( device );
 	int result;

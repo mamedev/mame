@@ -890,7 +890,7 @@ static READ32_HANDLER( spi_unknown_r )
 
 static WRITE32_DEVICE_HANDLER( eeprom_w )
 {
-	const device_config *oki2 = devtag_get_device(device->machine, "oki2");
+	running_device *oki2 = devtag_get_device(device->machine, "oki2");
 
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
@@ -1113,7 +1113,7 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 	}
 }
 
-static void irqhandler(const device_config *device, int state)
+static void irqhandler(running_device *device, int state)
 {
 	if (state)
 		cputag_set_input_line_and_vector(device->machine, "soundcpu", 0, ASSERT_LINE, 0xd7);	// IRQ is RST10

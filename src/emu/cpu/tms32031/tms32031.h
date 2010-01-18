@@ -16,8 +16,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*tms32031_xf_func)(const device_config *device, UINT8 val);
-typedef void (*tms32031_iack_func)(const device_config *device, UINT8 val, offs_t address);
+typedef void (*tms32031_xf_func)(running_device *device, UINT8 val);
+typedef void (*tms32031_iack_func)(running_device *device, UINT8 val, offs_t address);
 
 
 typedef struct _tms32031_config tms32031_config;

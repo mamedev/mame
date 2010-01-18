@@ -102,7 +102,7 @@ struct _es5506_state
 	UINT32		write_latch;			/* currently accumulated data for write */
 	UINT32		read_latch;				/* currently accumulated data for read */
 	UINT32		master_clock;			/* master clock frequency */
-	void		(*irq_callback)(const device_config *, int);	/* IRQ callback */
+	void		(*irq_callback)(running_device *, int);	/* IRQ callback */
 	UINT16		(*port_read)(void);		/* input port read */
 
 	UINT8		current_page;			/* current register page */
@@ -119,7 +119,7 @@ struct _es5506_state
 
 	INT16 *		ulaw_lookup;
 	UINT16 *	volume_lookup;
-	const device_config *device;
+	running_device *device;
 
 #if MAKE_WAVS
 	void *		wavraw;					/* raw waveform */
@@ -127,7 +127,7 @@ struct _es5506_state
 };
 
 
-INLINE es5506_state *get_safe_token(const device_config *device)
+INLINE es5506_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -826,7 +826,7 @@ static STREAM_UPDATE( es5506_update )
 
 ***********************************************************************************************/
 
-static void es5506_start_common(const device_config *device, const void *config, sound_type sndtype)
+static void es5506_start_common(running_device *device, const void *config, sound_type sndtype)
 {
 	const es5506_interface *intf = (const es5506_interface *)config;
 	es5506_state *chip = get_safe_token(device);
@@ -876,7 +876,7 @@ static void es5506_start_common(const device_config *device, const void *config,
 
 static DEVICE_START( es5506 )
 {
-	es5506_start_common(device, device->static_config, SOUND_ES5506);
+	es5506_start_common(device, device->baseconfig().static_config, SOUND_ES5506);
 }
 
 
@@ -1426,7 +1426,7 @@ READ8_DEVICE_HANDLER( es5506_r )
 
 
 
-void es5506_voice_bank_w(const device_config *device, int voice, int bank)
+void es5506_voice_bank_w(running_device *device, int voice, int bank)
 {
 	es5506_state *chip = get_safe_token(device);
 	chip->voice[voice].exbank=bank;
@@ -1441,7 +1441,7 @@ void es5506_voice_bank_w(const device_config *device, int voice, int bank)
 
 static DEVICE_START( es5505 )
 {
-	const es5505_interface *intf = (const es5505_interface *)device->static_config;
+	const es5505_interface *intf = (const es5505_interface *)device->baseconfig().static_config;
 	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));
@@ -2028,7 +2028,7 @@ READ16_DEVICE_HANDLER( es5505_r )
 
 
 
-void es5505_voice_bank_w(const device_config *device, int voice, int bank)
+void es5505_voice_bank_w(running_device *device, int voice, int bank)
 {
 	es5506_state *chip = get_safe_token(device);
 #if RAINE_CHECK

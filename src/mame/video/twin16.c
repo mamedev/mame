@@ -156,7 +156,7 @@ static int twin16_set_sprite_timer( running_machine *machine )
 
 	// sprite system busy, maybe a dma? time is guessed, assume 4 scanlines
 	twin16_sprite_busy = 1;
-	timer_adjust_oneshot(twin16_sprite_timer, attotime_make(0,(((screen_config *)(machine->primary_screen)->inline_config)->refresh) / video_screen_get_height(machine->primary_screen) * 4), 0);
+	timer_adjust_oneshot(twin16_sprite_timer, attotime_make(0,(((screen_config *)(machine->primary_screen->baseconfig()).inline_config)->refresh) / video_screen_get_height(machine->primary_screen) * 4), 0);
 
 	return 0;
 }

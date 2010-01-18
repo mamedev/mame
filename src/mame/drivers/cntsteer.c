@@ -51,9 +51,9 @@ struct _cntsteer_state
 	int      nmimask;	// zerotrgt only
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *subcpu;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *subcpu;
 };
 
 

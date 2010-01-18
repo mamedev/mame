@@ -105,7 +105,7 @@ typedef enum
 } trans32T;
 
 // local variables
-static const device_config *sector_timer;
+static running_device *sector_timer;
 static partitionT partitions[MAX_FILTERS];
 static partitionT *transpart;
 

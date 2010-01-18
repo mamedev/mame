@@ -207,7 +207,7 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 
 INLINE void eat_all_cpu_cycles(running_machine *machine)
 {
-	const device_config *cpu;
+	running_device *cpu;
 
     if(machine->cpuexec_data)
 		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -1308,12 +1308,12 @@ running_machine::running_machine(const game_driver *driver)
 		if (config->driver_data_size != 0)
 			driver_data = auto_alloc_array_clear(this, UINT8, config->driver_data_size);
 
-		/* find devices */
-		firstcpu = cpu_first(config);
-		primary_screen = video_screen_first(config);
-
 		/* attach this machine to all the devices in the configuration */
-		device_list_attach_machine(this);
+		devicelist.import_config_list(config->devicelist, *this);
+
+		/* find devices */
+		firstcpu = cpu_first(this);
+		primary_screen = video_screen_first(this);
 
 		/* fetch core options */
 		sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);

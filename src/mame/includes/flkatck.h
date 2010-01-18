@@ -20,8 +20,8 @@ struct _flkatck_state
 	int        multiply_reg[2];
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *k007121;
+	running_device *audiocpu;
+	running_device *k007121;
 };
 
 

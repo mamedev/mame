@@ -51,7 +51,7 @@ static WRITE8_HANDLER( pcktgal_sound_w )
 
 static int msm5205next;
 
-static void pcktgal_adpcm_int(const device_config *device)
+static void pcktgal_adpcm_int(running_device *device)
 {
 	static int toggle;
 

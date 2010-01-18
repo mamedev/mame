@@ -109,7 +109,7 @@ typedef struct
 	UINT16	*ipt_ram;
 	UINT8	*lbrm;
 
-	const	device_config *device;
+	running_device *device;
 	const	address_space *program;
 	int		icount;
 
@@ -120,7 +120,7 @@ typedef struct
 } esrip_state;
 
 
-INLINE esrip_state *get_safe_token(const device_config *device)
+INLINE esrip_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -134,7 +134,7 @@ INLINE esrip_state *get_safe_token(const device_config *device)
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-UINT8 get_rip_status(const device_config *cpu)
+UINT8 get_rip_status(running_device *cpu)
 {
 	esrip_state *cpustate = get_safe_token(cpu);
 	return cpustate->status_out;
@@ -250,7 +250,7 @@ static void make_ops(esrip_state *cpustate)
 static CPU_INIT( esrip )
 {
 	esrip_state *cpustate = get_safe_token(device);
-	esrip_config* _config = (esrip_config*)device->static_config;
+	esrip_config* _config = (esrip_config*)device->baseconfig().static_config;
 
 	memset(cpustate, 0, sizeof(cpustate));
 
@@ -1891,7 +1891,7 @@ static CPU_SET_INFO( esrip )
 
 CPU_GET_INFO( esrip )
 {
-	esrip_state *cpustate = (device->token != NULL) ? get_safe_token(device) : NULL;
+	esrip_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

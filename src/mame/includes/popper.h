@@ -22,7 +22,7 @@ struct _popper_state
 	rectangle tilemap_clip;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

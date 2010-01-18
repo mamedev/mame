@@ -20,7 +20,7 @@ struct _aquarium_state
 	int aquarium_snd_ack;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

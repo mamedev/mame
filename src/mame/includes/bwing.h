@@ -34,9 +34,9 @@ struct _bwing_state
 	int coin;
 
 	/* device */
-	const device_config *maincpu;
-	const device_config *subcpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *subcpu;
+	running_device *audiocpu;
 };
 
 

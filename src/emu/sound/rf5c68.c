@@ -32,12 +32,12 @@ struct _rf5c68_state
 	UINT8				wbank;
 	UINT8				enable;
 	UINT8				data[0x10000];
-	void				(*sample_callback)(const device_config* device,int channel);
-	const device_config* device;
+	void				(*sample_callback)(running_device* device,int channel);
+	running_device* device;
 };
 
 
-INLINE rf5c68_state *get_safe_token(const device_config *device)
+INLINE rf5c68_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -139,7 +139,7 @@ static STREAM_UPDATE( rf5c68_update )
 
 static DEVICE_START( rf5c68 )
 {
-	const rf5c68_interface* intf = (const rf5c68_interface*)device->static_config;
+	const rf5c68_interface* intf = (const rf5c68_interface*)device->baseconfig().static_config;
 
 	/* allocate memory for the chip */
 	rf5c68_state *chip = get_safe_token(device);

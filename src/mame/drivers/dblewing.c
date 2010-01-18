@@ -601,7 +601,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)

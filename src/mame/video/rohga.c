@@ -432,7 +432,7 @@ sprite 2:
 
 /******************************************************************************/
 
-static void update_rohga(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr)
+static void update_rohga(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr)
 {
 	/* Update playfields */
 	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );

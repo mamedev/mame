@@ -62,7 +62,7 @@ static void update_irq_state(running_machine *machine)
 }
 
 
-static void m68k_gen_int(const device_config *device, int state)
+static void m68k_gen_int(running_device *device, int state)
 {
 	tms_irq = state;
 	update_irq_state(device->machine);

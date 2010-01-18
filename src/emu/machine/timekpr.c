@@ -25,7 +25,7 @@ typedef struct
 	UINT8 century;
 	UINT8 *data;
 	UINT8 *default_data;
-	const device_config *device;
+	running_device *device;
 	int size;
 	int offset_control;
 	int offset_seconds;
@@ -222,7 +222,7 @@ static TIMER_CALLBACK( timekeeper_tick )
     in device is the right type
 -------------------------------------------------*/
 
-INLINE timekeeper_state *get_safe_token(const device_config *device)
+INLINE timekeeper_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -291,8 +291,8 @@ static DEVICE_START(timekeeper)
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-//  assert(device->static_config != NULL);
-	assert(device->inline_config == NULL);
+//  assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 

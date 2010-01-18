@@ -149,7 +149,7 @@ VIDEO_START( fuuki32 )
 
 ***************************************************************************/
 
-static void draw_sprites( const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	fuuki32_state *state = (fuuki32_state *)screen->machine->driver_data;
 	int offs;

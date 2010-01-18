@@ -12,20 +12,20 @@
 #include "includes/galaxold.h"
 
 static int irq_line;
-static const device_config *int_timer;
+static running_device *int_timer;
 
 static UINT8 _4in1_bank;
 
-void galaxold_7474_9m_2_callback(const device_config *device)
+void galaxold_7474_9m_2_callback(running_device *device)
 {
 	/* Q bar clocks the other flip-flop,
        Q is VBLANK (not visible to the CPU) */
-    const device_config *target = devtag_get_device(device->machine, "7474_9m_1");
+    running_device *target = devtag_get_device(device->machine, "7474_9m_1");
 	ttl7474_clock_w(target, ttl7474_output_comp_r(device));
 	ttl7474_update(target);
 }
 
-void galaxold_7474_9m_1_callback(const device_config *device)
+void galaxold_7474_9m_1_callback(running_device *device)
 {
 	/* Q goes to the NMI line */
 	cputag_set_input_line(device->machine, "maincpu", irq_line, ttl7474_output_r(device) ? CLEAR_LINE : ASSERT_LINE);
@@ -33,7 +33,7 @@ void galaxold_7474_9m_1_callback(const device_config *device)
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
-    const device_config *target = devtag_get_device(space->machine, "7474_9m_1");
+    running_device *target = devtag_get_device(space->machine, "7474_9m_1");
 	ttl7474_preset_w(target, data);
 	ttl7474_update(target);
 }
@@ -41,7 +41,7 @@ WRITE8_HANDLER( galaxold_nmi_enable_w )
 
 TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 {
-    const device_config *target = devtag_get_device(timer->machine, "7474_9m_2");
+    running_device *target = devtag_get_device(timer->machine, "7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	ttl7474_d_w(target, (param & 0xe0) != 0xe0);
@@ -59,8 +59,8 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 
 static void machine_reset_common(running_machine *machine, int line)
 {
-    const device_config *ttl7474_9m_1 = devtag_get_device(machine, "7474_9m_1");
-    const device_config *ttl7474_9m_2 = devtag_get_device(machine, "7474_9m_2");
+    running_device *ttl7474_9m_1 = devtag_get_device(machine, "7474_9m_1");
+    running_device *ttl7474_9m_2 = devtag_get_device(machine, "7474_9m_2");
 	irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */

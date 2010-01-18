@@ -453,8 +453,8 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 
 VIDEO_UPDATE( galastrm )
 {
-	const device_config *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
-	const device_config *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
+	running_device *tc0100scn = devtag_get_device(screen->machine, "tc0100scn");
+	running_device *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;

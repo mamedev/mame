@@ -1342,7 +1342,7 @@ static READ8_DEVICE_HANDLER( upd7759_status_r )
 }
 
 
-static void upd7759_generate_nmi(const device_config *device, int state)
+static void upd7759_generate_nmi(running_device *device, int state)
 {
 	if (state)
 		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);

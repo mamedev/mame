@@ -21,12 +21,12 @@ struct _spy_state
 	int        old_3f90;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k007232_1;
-	const device_config *k007232_2;
-	const device_config *k052109;
-	const device_config *k051960;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k007232_1;
+	running_device *k007232_2;
+	running_device *k052109;
+	running_device *k051960;
 };
 
 

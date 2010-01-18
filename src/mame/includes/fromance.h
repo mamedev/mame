@@ -37,7 +37,7 @@ struct _fromance_state
 	UINT8    pending_command, sound_command;
 
 	/* devices */
-	const device_config *subcpu;
+	running_device *subcpu;
 };
 
 

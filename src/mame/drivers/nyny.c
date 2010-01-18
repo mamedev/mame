@@ -113,8 +113,8 @@ static WRITE8_HANDLER( audio_2_command_w );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
-	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
+	running_device *pia1 = devtag_get_device(device->machine, "pia1");
+	running_device *pia2 = devtag_get_device(device->machine, "pia2");
 	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) | pia6821_get_irq_b(pia2);
 
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -136,7 +136,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
+	running_device *pia1 = devtag_get_device(device->machine, "pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
@@ -227,7 +227,7 @@ static const pia6821_interface pia_2_intf =
 
 static WRITE8_DEVICE_HANDLER(ic48_1_74123_output_changed)
 {
-	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
+	running_device *pia2 = devtag_get_device(device->machine, "pia2");
 	pia6821_ca1_w(pia2, 0, data);
 }
 
@@ -420,7 +420,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( nyny )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -501,8 +501,8 @@ static WRITE8_HANDLER( audio_2_command_w )
 
 static READ8_HANDLER( nyny_pia_1_2_r )
 {
-	const device_config *pia1 = devtag_get_device(space->machine, "pia1");
-	const device_config *pia2 = devtag_get_device(space->machine, "pia2");
+	running_device *pia1 = devtag_get_device(space->machine, "pia1");
+	running_device *pia2 = devtag_get_device(space->machine, "pia2");
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
@@ -515,8 +515,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 
 static WRITE8_HANDLER( nyny_pia_1_2_w )
 {
-	const device_config *pia1 = devtag_get_device(space->machine, "pia1");
-	const device_config *pia2 = devtag_get_device(space->machine, "pia2");
+	running_device *pia1 = devtag_get_device(space->machine, "pia1");
+	running_device *pia2 = devtag_get_device(space->machine, "pia2");
 
 	/* the address bits are directly connected to the chip selects */
 	if (offset & 0x04)  pia6821_w(pia1, offset & 0x03, data);

@@ -18,8 +18,8 @@ struct _cheekyms_state
 	bitmap_t       *bitmap_buffer;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *dac;
+	running_device *maincpu;
+	running_device *dac;
 };
 
 

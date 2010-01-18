@@ -25,7 +25,7 @@ struct _h83xx_state
 	UINT8  h8uflag, h8uiflag;
 
 	cpu_irq_callback irq_cb;
-	const device_config *device;
+	running_device *device;
 
 	const address_space *program;
 	const address_space *io;
@@ -46,7 +46,7 @@ struct _h83xx_state
 };
 extern h83xx_state h8;
 
-INLINE h83xx_state *get_safe_token(const device_config *device)
+INLINE h83xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

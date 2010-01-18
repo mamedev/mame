@@ -6,7 +6,7 @@
 typedef struct _y8950_interface y8950_interface;
 struct _y8950_interface
 {
-	void (*handler)(const device_config *device, int linestate);
+	void (*handler)(running_device *device, int linestate);
 
 	read8_device_func keyboardread;
 	write8_device_func keyboardwrite;

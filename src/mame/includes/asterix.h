@@ -22,12 +22,12 @@ struct _asterix_state
 	UINT16      prot[2];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k053260;
-	const device_config *k056832;
-	const device_config *k053244;
-	const device_config *k053251;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k053260;
+	running_device *k056832;
+	running_device *k053244;
+	running_device *k053251;
 };
 
 

@@ -341,7 +341,7 @@ static WRITE8_HANDLER( ddragon2_sub_irq_w )
 }
 
 
-static void irq_handler( const device_config *device, int irq )
+static void irq_handler( running_device *device, int irq )
 {
 	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
 	cpu_set_input_line(state->snd_cpu, state->ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
@@ -436,7 +436,7 @@ static WRITE8_HANDLER( ddragon_spriteram_w )
 static WRITE8_HANDLER( dd_adpcm_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
-	const device_config *adpcm = (offset & 1) ? state->adpcm_2 : state->adpcm_1;
+	running_device *adpcm = (offset & 1) ? state->adpcm_2 : state->adpcm_1;
 	int chip = (adpcm == state->adpcm_1) ? 0 : 1;
 
 	switch (offset / 2)
@@ -462,7 +462,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 }
 
 
-static void dd_adpcm_int( const device_config *device )
+static void dd_adpcm_int( running_device *device )
 {
 	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
 	int chip = (device == state->adpcm_1) ? 0 : 1;

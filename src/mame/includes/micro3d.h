@@ -52,7 +52,7 @@ struct _micro3d_state
 	} mc68901;
 
 	UINT16				*shared_ram;
-	const device_config *duart68681;
+	running_device *duart68681;
 	UINT8				m68681_tx0;
 
 	/* Sound */
@@ -145,10 +145,10 @@ WRITE32_HANDLER( micro3d_mac1_w );
 WRITE32_HANDLER( micro3d_mac2_w );
 READ32_HANDLER( micro3d_mac2_r );
 
-void micro3d_duart_irq_handler(const device_config *device, UINT8 vector);
-UINT8 micro3d_duart_input_r(const device_config *device);
-void micro3d_duart_output_w(const device_config *device, UINT8 data);
-void micro3d_duart_tx(const device_config *device, int channel, UINT8 data);
+void micro3d_duart_irq_handler(running_device *device, UINT8 vector);
+UINT8 micro3d_duart_input_r(running_device *device);
+void micro3d_duart_output_w(running_device *device, UINT8 data);
+void micro3d_duart_tx(running_device *device, int channel, UINT8 data);
 
 MACHINE_RESET( micro3d );
 DRIVER_INIT( micro3d );
@@ -169,8 +169,8 @@ VIDEO_START( micro3d );
 VIDEO_UPDATE( micro3d );
 VIDEO_RESET( micro3d );
 
-void micro3d_tms_interrupt(const device_config *device, int state);
-void micro3d_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void micro3d_tms_interrupt(running_device *device, int state);
+void micro3d_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
 
 WRITE16_HANDLER( micro3d_clut_w );
 WRITE16_HANDLER( micro3d_creg_w );

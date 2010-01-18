@@ -48,7 +48,7 @@
    handlers to synchronize their operation. If you call this from outside
    an interrupt handler, add 1 to the result, i.e. if it returns 0, it means
    that the interrupt handler will be called once. */
-int cpu_getiloops(const device_config *device);
+int cpu_getiloops(running_device *device);
 
 
 

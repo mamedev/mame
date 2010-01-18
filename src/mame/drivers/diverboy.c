@@ -62,7 +62,7 @@ struct _diverboy_state
 	size_t    spriteram_size;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

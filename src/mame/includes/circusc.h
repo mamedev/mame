@@ -23,11 +23,11 @@ struct _circusc_state
 	UINT8          sn_latch;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *sn1;
-	const device_config *sn2;
-	const device_config *dac;
-	const device_config *discrete;
+	running_device *audiocpu;
+	running_device *sn1;
+	running_device *sn2;
+	running_device *dac;
+	running_device *discrete;
 };
 
 

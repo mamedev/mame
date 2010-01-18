@@ -30,7 +30,7 @@
 
 static struct
 {
-	const device_config *duart68681;
+	running_device *duart68681;
 } maygaym1_devices;
 
 static UINT8  lamppos;
@@ -462,7 +462,7 @@ static MACHINE_RESET( m1 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void duart_irq_handler(const device_config *device, UINT8 state)
+static void duart_irq_handler(running_device *device, UINT8 state)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 irq%d \n",state));
@@ -698,7 +698,7 @@ static WRITE8_HANDLER( reel56_w )
 	awp_draw_reel(5);
 }
 
-static UINT8 m1_duart_r (const device_config *device)
+static UINT8 m1_duart_r (running_device *device)
 {
 	return (optic_pattern);
 }

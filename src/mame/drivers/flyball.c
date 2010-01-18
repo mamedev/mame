@@ -31,7 +31,7 @@ struct _flyball_state
 	UINT8    potsense;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

@@ -35,7 +35,7 @@ struct _ladybug_state
 	UINT8      sraider_0x30, sraider_0x38;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

@@ -31,7 +31,7 @@ struct _mb3773_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mb3773_state *get_safe_token(const device_config *device)
+INLINE mb3773_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -56,7 +56,7 @@ static TIMER_CALLBACK( watchdog_timeout )
     reset_timer
 -------------------------------------------------*/
 
-static void reset_timer( const device_config *device )
+static void reset_timer( running_device *device )
 {
 	mb3773_state *mb3773 = get_safe_token(device);
 	timer_adjust_oneshot(mb3773->watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0);

@@ -32,7 +32,7 @@ typedef struct _msm5205_state msm5205_state;
 struct _msm5205_state
 {
 	const msm5205_interface *intf;
-	const device_config *device;
+	running_device *device;
 	sound_stream * stream;  /* number of stream system      */
 	INT32 clock;				/* clock rate */
 	emu_timer *timer;        /* VCLK callback timer          */
@@ -46,7 +46,7 @@ struct _msm5205_state
 	int diff_lookup[49*16];
 };
 
-INLINE msm5205_state *get_safe_token(const device_config *device)
+INLINE msm5205_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -182,7 +182,7 @@ static DEVICE_START( msm5205 )
 	msm5205_state *voice = get_safe_token(device);
 
 	/* save a global pointer to our interface */
-	voice->intf = (const msm5205_interface *)device->static_config;
+	voice->intf = (const msm5205_interface *)device->baseconfig().static_config;
 	voice->device = device;
 	voice->clock = device->clock;
 
@@ -211,7 +211,7 @@ static DEVICE_START( msm5205 )
  *    Handle an update of the vclk status of a chip (1 is reset ON, 0 is reset OFF)
  *    This function can use selector = MSM5205_SEX only
  */
-void msm5205_vclk_w (const device_config *device, int vclk)
+void msm5205_vclk_w (running_device *device, int vclk)
 {
 	msm5205_state *voice = get_safe_token(device);
 
@@ -233,7 +233,7 @@ void msm5205_vclk_w (const device_config *device, int vclk)
  *    Handle an update of the reset status of a chip (1 is reset ON, 0 is reset OFF)
  */
 
-void msm5205_reset_w (const device_config *device, int reset)
+void msm5205_reset_w (running_device *device, int reset)
 {
 	msm5205_state *voice = get_safe_token(device);
 	voice->reset = reset;
@@ -243,7 +243,7 @@ void msm5205_reset_w (const device_config *device, int reset)
  *    Handle an update of the data to the chip
  */
 
-void msm5205_data_w (const device_config *device, int data)
+void msm5205_data_w (running_device *device, int data)
 {
 	msm5205_state *voice = get_safe_token(device);
 	if( voice->bitwidth == 4)
@@ -256,7 +256,7 @@ void msm5205_data_w (const device_config *device, int data)
  *    Handle an change of the selector
  */
 
-void msm5205_playmode_w(const device_config *device, int select)
+void msm5205_playmode_w(running_device *device, int select)
 {
 	msm5205_state *voice = get_safe_token(device);
 	msm5205_playmode(voice,select);
@@ -293,7 +293,7 @@ static void msm5205_playmode(msm5205_state *voice,int select)
 }
 
 
-void msm5205_set_volume(const device_config *device,int volume)
+void msm5205_set_volume(running_device *device,int volume)
 {
 	msm5205_state *voice = get_safe_token(device);
 

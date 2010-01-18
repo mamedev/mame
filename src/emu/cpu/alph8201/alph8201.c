@@ -197,7 +197,7 @@ struct _alpha8201_state
 	UINT8 halt;     /* halt input line                        */
 #endif
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 	int inst_cycles;
@@ -224,7 +224,7 @@ typedef struct {
 #define LP1				lp1
 #define LP2				lp2
 
-INLINE alpha8201_state *get_safe_token(const device_config *device)
+INLINE alpha8201_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -730,7 +730,7 @@ static CPU_EXIT( alpha8201 )
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static int alpha8xxx_execute(const device_config *device,const s_opcode *op_map,int cycles)
+static int alpha8xxx_execute(running_device *device,const s_opcode *op_map,int cycles)
 {
 	alpha8201_state *cpustate = get_safe_token(device);
 	unsigned opcode;

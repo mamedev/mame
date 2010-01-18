@@ -61,9 +61,9 @@ struct _pgm_state
 	mame_system_time systime;
 
 	/* devices */
-	const device_config *soundcpu;
-	const device_config *prot;
-	const device_config *ics;
+	running_device *soundcpu;
+	running_device *prot;
+	running_device *ics;
 };
 
 extern UINT16 *pgm_mainram;	// used by nvram handler, we cannot move it to driver data struct

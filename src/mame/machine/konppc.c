@@ -142,8 +142,8 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 {
 	const char *dsptag = (cgboard_id == 0) ? "dsp" : "dsp2";
 	const char *pcitag = (cgboard_id == 0) ? "k033906_1" : "k033906_2";
-	const device_config *dsp = devtag_get_device(space->machine, dsptag);
-	const device_config *k033906 = devtag_get_device(space->machine, pcitag);
+	running_device *dsp = devtag_get_device(space->machine, dsptag);
+	running_device *k033906 = devtag_get_device(space->machine, pcitag);
 //  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if (cgboard_id < MAX_CG_BOARDS)
@@ -239,7 +239,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		case CGBOARD_TYPE_HANGPLT:
 		{
 			const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-			const device_config *device = devtag_get_device(space->machine, dsptag);
+			running_device *device = devtag_get_device(space->machine, dsptag);
 
 			if (offset == 1)
 			{
@@ -354,7 +354,7 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 static UINT32 nwk_fifo_r(const address_space *space, int board)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-	const device_config *device = devtag_get_device(space->machine, dsptag);
+	running_device *device = devtag_get_device(space->machine, dsptag);
 	UINT32 data;
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
@@ -385,7 +385,7 @@ static UINT32 nwk_fifo_r(const address_space *space, int board)
 static void nwk_fifo_w(running_machine *machine, int board, UINT32 data)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-	const device_config *device = devtag_get_device(machine, dsptag);
+	running_device *device = devtag_get_device(machine, dsptag);
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
@@ -409,7 +409,7 @@ static void nwk_fifo_w(running_machine *machine, int board, UINT32 data)
 
 READ32_HANDLER( K033906_0_r )
 {
-	const device_config *k033906_1 = devtag_get_device(space->machine, "k033906_1");
+	running_device *k033906_1 = devtag_get_device(space->machine, "k033906_1");
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
@@ -418,13 +418,13 @@ READ32_HANDLER( K033906_0_r )
 
 WRITE32_HANDLER( K033906_0_w )
 {
-	const device_config *k033906_1 = devtag_get_device(space->machine, "k033906_1");
+	running_device *k033906_1 = devtag_get_device(space->machine, "k033906_1");
 	k033906_w(k033906_1, offset, data, mem_mask);
 }
 
 READ32_HANDLER( K033906_1_r )
 {
-	const device_config *k033906_2 = devtag_get_device(space->machine, "k033906_2");
+	running_device *k033906_2 = devtag_get_device(space->machine, "k033906_2");
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
@@ -433,7 +433,7 @@ READ32_HANDLER( K033906_1_r )
 
 WRITE32_HANDLER(K033906_1_w)
 {
-	const device_config *k033906_2 = devtag_get_device(space->machine, "k033906_2");
+	running_device *k033906_2 = devtag_get_device(space->machine, "k033906_2");
 	k033906_w(k033906_2, offset, data, mem_mask);
 }
 

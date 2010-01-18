@@ -42,12 +42,12 @@ struct _s2650_regs {
 
 	int		icount;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 };
 
-INLINE s2650_regs *get_safe_token(const device_config *device)
+INLINE s2650_regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

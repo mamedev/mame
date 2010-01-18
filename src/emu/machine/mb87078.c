@@ -111,7 +111,7 @@ static const int mb87078_gain_percent[66] = {
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE mb87078_state *get_safe_token( const device_config *device )
+INLINE mb87078_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -120,11 +120,11 @@ INLINE mb87078_state *get_safe_token( const device_config *device )
 	return (mb87078_state *)device->token;
 }
 
-INLINE const mb87078_interface *get_interface( const device_config *device )
+INLINE const mb87078_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == MB87078));
-	return (const mb87078_interface *) device->static_config;
+	return (const mb87078_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -166,7 +166,7 @@ static int calc_gain_index( int data0, int data1 )
 }
 
 
-static void gain_recalc( const device_config *device )
+static void gain_recalc( running_device *device )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 	int i;
@@ -182,7 +182,7 @@ static void gain_recalc( const device_config *device )
 
 
 
-void mb87078_data_w( const device_config *device, int data, int dsel )
+void mb87078_data_w( running_device *device, int data, int dsel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 
@@ -202,20 +202,20 @@ void mb87078_data_w( const device_config *device, int data, int dsel )
 }
 
 
-float mb87078_gain_decibel_r( const device_config *device, int channel )
+float mb87078_gain_decibel_r( running_device *device, int channel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 	return mb87078_gain_decibel[mb87078->gain[channel]];
 }
 
 
-int mb87078_gain_percent_r( const device_config *device, int channel )
+int mb87078_gain_percent_r( running_device *device, int channel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 	return mb87078_gain_percent[mb87078->gain[channel]];
 }
 
-void mb87078_reset_comp_w( const device_config *device, int level )
+void mb87078_reset_comp_w( running_device *device, int level )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 

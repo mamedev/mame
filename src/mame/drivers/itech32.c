@@ -4005,7 +4005,7 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 
 static void install_timekeeper(running_machine *machine)
 {
-	const device_config *device = devtag_get_device(machine, "m48t02");
+	running_device *device = devtag_get_device(machine, "m48t02");
 	memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
 }
 

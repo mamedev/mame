@@ -122,7 +122,7 @@ void system18_set_vdp_mixing(running_machine *machine, int mixing)
  *
  *************************************/
 
-static void draw_vdp(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void draw_vdp(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int x, y;
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;

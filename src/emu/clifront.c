@@ -613,13 +613,13 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
-			const device_config *device;
+			const device_config *devconfig;
 
 			/* find samples interfaces */
-			for (device = sound_first(config); device != NULL; device = sound_next(device))
-				if (sound_get_type(device) == SOUND_SAMPLES)
+			for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
+				if (sound_get_type(devconfig) == SOUND_SAMPLES)
 				{
-					const char *const *samplenames = ((const samples_interface *)device->static_config)->samplenames;
+					const char *const *samplenames = ((const samples_interface *)devconfig->static_config)->samplenames;
 					int sampnum;
 
 					/* if the list is legit, walk it and print the sample info */
@@ -652,16 +652,16 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
-			const device_config *device;
+			const device_config *devconfig;
 
 			if (count != 0)
 				printf("\n");
 			printf("Driver %s (%s):\n", drivers[drvindex]->name, drivers[drvindex]->description);
 
 			/* iterate through devices */
-			for (device = config->devicelist.first(); device != NULL; device = device->next)
+			for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next)
 			{
-				switch (device->devclass)
+				switch (devconfig->devclass)
 				{
 					case DEVICE_CLASS_AUDIO:		printf("  Audio: ");	break;
 					case DEVICE_CLASS_VIDEO:		printf("  Video: ");	break;
@@ -670,15 +670,15 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 					case DEVICE_CLASS_TIMER:		printf("  Timer: ");	break;
 					default:						printf("  Other: ");	break;
 				}
-				printf("%s ('%s')", device_get_name(device), device->tag.cstr());
-				if (device->clock >= 1000000000)
-					printf(" @ %d.%02d GHz\n", device->clock / 1000000000, (device->clock / 10000000) % 100);
-				else if (device->clock >= 1000000)
-					printf(" @ %d.%02d MHz\n", device->clock / 1000000, (device->clock / 10000) % 100);
-				else if (device->clock >= 1000)
-					printf(" @ %d.%02d kHz\n", device->clock / 1000, (device->clock / 10) % 100);
-				else if (device->clock > 0)
-					printf(" @ %d Hz\n", device->clock);
+				printf("%s ('%s')", device_get_name(devconfig), devconfig->tag.cstr());
+				if (devconfig->clock >= 1000000000)
+					printf(" @ %d.%02d GHz\n", devconfig->clock / 1000000000, (devconfig->clock / 10000000) % 100);
+				else if (devconfig->clock >= 1000000)
+					printf(" @ %d.%02d MHz\n", devconfig->clock / 1000000, (devconfig->clock / 10000) % 100);
+				else if (devconfig->clock >= 1000)
+					printf(" @ %d.%02d kHz\n", devconfig->clock / 1000, (devconfig->clock / 10) % 100);
+				else if (devconfig->clock > 0)
+					printf(" @ %d Hz\n", devconfig->clock);
 				else
 					printf("\n");
 			}

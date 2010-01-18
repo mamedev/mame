@@ -5,9 +5,9 @@
 
 /* An interface for the ES8712 ADPCM chip */
 
-void es8712_play(const device_config *device);
-void es8712_set_bank_base(const device_config *device, int base);
-void es8712_set_frequency(const device_config *device, int frequency);
+void es8712_play(running_device *device);
+void es8712_set_bank_base(running_device *device, int base);
+void es8712_set_frequency(running_device *device, int frequency);
 
 WRITE8_DEVICE_HANDLER( es8712_w );
 

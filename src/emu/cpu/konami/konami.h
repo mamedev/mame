@@ -6,7 +6,7 @@
 #define __KONAMI_H__
 
 
-typedef void (*konami_set_lines_func)(const device_config *device, int lines);
+typedef void (*konami_set_lines_func)(running_device *device, int lines);
 
 enum
 {
@@ -14,7 +14,7 @@ enum
 	KONAMI_DP
 };
 
-#define KONAMI_SETLINES_CALLBACK(name) void name(const device_config *device, int lines)
+#define KONAMI_SETLINES_CALLBACK(name) void name(running_device *device, int lines)
 
 #define KONAMI_IRQ_LINE	0	/* IRQ line number */
 #define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
@@ -25,7 +25,7 @@ CPU_GET_INFO( konami );
 
 CPU_DISASSEMBLE( konami );
 
-void konami_configure_set_lines(const device_config *device, konami_set_lines_func func);
+void konami_configure_set_lines(running_device *device, konami_set_lines_func func);
 
 
 #endif /* __KONAMI_H__ */

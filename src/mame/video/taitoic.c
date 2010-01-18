@@ -567,7 +567,7 @@ struct _pc080sn_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE pc080sn_state *pc080sn_get_safe_token( const device_config *device )
+INLINE pc080sn_state *pc080sn_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -576,18 +576,18 @@ INLINE pc080sn_state *pc080sn_get_safe_token( const device_config *device )
 	return (pc080sn_state *)device->token;
 }
 
-INLINE const pc080sn_interface *pc080sn_get_interface( const device_config *device )
+INLINE const pc080sn_interface *pc080sn_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == PC080SN));
-	return (const pc080sn_interface *) device->static_config;
+	return (const pc080sn_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-INLINE void common_get_pc080sn_bg_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_pc080sn_bg_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	UINT16 code, attr;
@@ -610,7 +610,7 @@ INLINE void common_get_pc080sn_bg_tile_info( const device_config *device, tile_d
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_pc080sn_fg_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_pc080sn_fg_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	UINT16 code,attr;
@@ -745,7 +745,7 @@ WRITE16_DEVICE_HANDLER( pc080sn_ctrl_word_w )
 /* This routine is needed as an override by Jumping, which
    doesn't set proper scroll values for foreground tilemap */
 
-void pc080sn_set_scroll( const device_config *device, int tilemap_num, int scrollx, int scrolly )
+void pc080sn_set_scroll( running_device *device, int tilemap_num, int scrollx, int scrolly )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 
@@ -755,14 +755,14 @@ void pc080sn_set_scroll( const device_config *device, int tilemap_num, int scrol
 
 /* This routine is needed as an override by Jumping */
 
-void pc080sn_set_trans_pen( const device_config *device, int tilemap_num, int pen )
+void pc080sn_set_trans_pen( running_device *device, int tilemap_num, int pen )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	tilemap_set_transparent_pen(pc080sn->tilemap[tilemap_num], pen);
 }
 
 
-void pc080sn_tilemap_update( const device_config *device )
+void pc080sn_tilemap_update( running_device *device )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	int j;
@@ -835,7 +835,7 @@ static UINT16 topspeed_get_road_pixel_color( UINT16 pixel, UINT16 color )
 }
 
 
-static void topspeed_custom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags,
+static void topspeed_custom_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags,
 							UINT32 priority, UINT16 *color_ctrl_ram )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
@@ -929,13 +929,13 @@ static void topspeed_custom_draw( const device_config *device, bitmap_t *bitmap,
 	while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
 }
 
-void pc080sn_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+void pc080sn_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	tilemap_draw(bitmap, cliprect, pc080sn->tilemap[layer], flags, priority);
 }
 
-void pc080sn_tilemap_draw_offset( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs )
+void pc080sn_tilemap_draw_offset( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	int basedx = -16 - pc080sn->xoffs;
@@ -950,7 +950,7 @@ void pc080sn_tilemap_draw_offset( const device_config *device, bitmap_t *bitmap,
 	tilemap_set_scrolldy(pc080sn->tilemap[layer], basedy, basedyflip);
 }
 
-void pc080sn_tilemap_draw_special( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority, UINT16 *ram )
+void pc080sn_tilemap_draw_special( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority, UINT16 *ram )
 {
 	topspeed_custom_draw(device, bitmap, cliprect, layer, flags, priority, ram);
 }
@@ -1061,7 +1061,7 @@ struct _pc090oj_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE pc090oj_state *pc090oj_get_safe_token( const device_config *device )
+INLINE pc090oj_state *pc090oj_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1070,18 +1070,18 @@ INLINE pc090oj_state *pc090oj_get_safe_token( const device_config *device )
 	return (pc090oj_state *)device->token;
 }
 
-INLINE const pc090oj_interface *pc090oj_get_interface( const device_config *device )
+INLINE const pc090oj_interface *pc090oj_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == PC090OJ));
-	return (const pc090oj_interface *) device->static_config;
+	return (const pc090oj_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-void pc090oj_set_sprite_ctrl( const device_config *device, UINT16 sprctrl )
+void pc090oj_set_sprite_ctrl( running_device *device, UINT16 sprctrl )
 {
 	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
 	pc090oj->sprite_ctrl = sprctrl;
@@ -1113,7 +1113,7 @@ WRITE16_DEVICE_HANDLER( pc090oj_word_w )
 	}
 }
 
-void pc090oj_eof_callback( const device_config *device )
+void pc090oj_eof_callback( running_device *device )
 {
 	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
 	if (pc090oj->buffer)
@@ -1125,7 +1125,7 @@ void pc090oj_eof_callback( const device_config *device )
 }
 
 
-void pc090oj_draw_sprites( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int pri_type )
+void pc090oj_draw_sprites( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int pri_type )
 {
 	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
 	int offs, priority = 0;
@@ -1270,7 +1270,7 @@ struct _tc0080vco_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0080vco_state *tc0080vco_get_safe_token( const device_config *device )
+INLINE tc0080vco_state *tc0080vco_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1279,11 +1279,11 @@ INLINE tc0080vco_state *tc0080vco_get_safe_token( const device_config *device )
 	return (tc0080vco_state *)device->token;
 }
 
-INLINE const tc0080vco_interface *tc0080vco_get_interface( const device_config *device )
+INLINE const tc0080vco_interface *tc0080vco_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0080VCO));
-	return (const tc0080vco_interface *) device->static_config;
+	return (const tc0080vco_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -1506,7 +1506,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 		tc0080vco_scrollram_w(device, offset - (0x20800 / 2), tc0080vco->ram[offset], mem_mask);
 }
 
-void tc0080vco_tilemap_update( const device_config *device )
+void tc0080vco_tilemap_update( running_device *device )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
 	int j;
@@ -1532,7 +1532,7 @@ void tc0080vco_tilemap_update( const device_config *device )
 
 /* NB: orientation_flipx code in following routine has not been tested */
 
-static void tc0080vco_bg0_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
+static void tc0080vco_bg0_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
 	UINT16 zoom = tc0080vco->scroll_ram[6];
@@ -1685,7 +1685,7 @@ do																					\
 }																					\
 while (0)																			\
 
-static void tc0080vco_bg1_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
+static void tc0080vco_bg1_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
 	UINT8 layer = 1;
@@ -1771,7 +1771,7 @@ static void tc0080vco_bg1_tilemap_draw( const device_config *device, bitmap_t *b
 }
 
 
-void tc0080vco_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+void tc0080vco_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
 	int disable = 0x00;	/* possibly layer disable bits do exist ?? */
@@ -1945,7 +1945,7 @@ struct _tc0100scn_state
 	INT32        bg0_colbank, bg1_colbank, tx_colbank;
 	int          dblwidth;
 
-	const device_config *screen;
+	running_device *screen;
 };
 
 #define TC0100SCN_RAM_SIZE        0x14000	/* enough for double-width tilemaps */
@@ -1955,7 +1955,7 @@ struct _tc0100scn_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0100scn_state *tc0100scn_get_safe_token( const device_config *device )
+INLINE tc0100scn_state *tc0100scn_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1964,18 +1964,18 @@ INLINE tc0100scn_state *tc0100scn_get_safe_token( const device_config *device )
 	return (tc0100scn_state *)device->token;
 }
 
-INLINE const tc0100scn_interface *tc0100scn_get_interface( const device_config *device )
+INLINE const tc0100scn_interface *tc0100scn_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0100SCN));
-	return (const tc0100scn_interface *) device->static_config;
+	return (const tc0100scn_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-INLINE void common_get_bg0_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+INLINE void common_get_bg0_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int code, attr;
@@ -1999,7 +1999,7 @@ INLINE void common_get_bg0_tile_info( const device_config *device, tile_data *ti
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_bg1_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+INLINE void common_get_bg1_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int code, attr;
@@ -2023,7 +2023,7 @@ INLINE void common_get_bg1_tile_info( const device_config *device, tile_data *ti
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_tx_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+INLINE void common_get_tx_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int attr = ram[tile_index];
@@ -2065,13 +2065,13 @@ static const gfx_layout tc0100scn_charlayout =
 };
 
 
-void tc0100scn_set_colbank( const device_config *device, int col )
+void tc0100scn_set_colbank( running_device *device, int col )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	tc0100scn->colbank = col;
 }
 
-void tc0100scn_set_colbanks( const device_config *device, int bg0, int bg1, int tx )
+void tc0100scn_set_colbanks( running_device *device, int bg0, int bg1, int tx )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	tc0100scn->bg0_colbank = bg0;
@@ -2079,7 +2079,7 @@ void tc0100scn_set_colbanks( const device_config *device, int bg0, int bg1, int 
 	tc0100scn->tx_colbank = tx;
 }
 
-void tc0100scn_set_bg_tilemask( const device_config *device, int mask )
+void tc0100scn_set_bg_tilemask( running_device *device, int mask )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	tc0100scn->bg_tilemask = mask;
@@ -2115,7 +2115,7 @@ static void tc0100scn_set_layer_ptrs( tc0100scn_state *tc0100scn )
 	}
 }
 
-static void tc0100scn_dirty_tilemaps( const device_config *device )
+static void tc0100scn_dirty_tilemaps( running_device *device )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 
@@ -2320,7 +2320,7 @@ WRITE32_DEVICE_HANDLER( tc0100scn_long_w )
 }
 
 
-void tc0100scn_tilemap_update( const device_config *device )
+void tc0100scn_tilemap_update( running_device *device )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int j;
@@ -2334,7 +2334,7 @@ void tc0100scn_tilemap_update( const device_config *device )
 		tilemap_set_scrollx(tc0100scn->tilemap[1][tc0100scn->dblwidth], (j + tc0100scn->fgscrolly) & 0x1ff, tc0100scn->fgscrollx - tc0100scn->fgscroll_ram[j]);
 }
 
-static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t* tmap, int flags, UINT32 priority )
+static void tc0100scn_tilemap_draw_fg( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t* tmap, int flags, UINT32 priority )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
@@ -2380,7 +2380,7 @@ static void tc0100scn_tilemap_draw_fg( const device_config *device, bitmap_t *bi
 	}
 }
 
-int tc0100scn_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+int tc0100scn_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int disable = tc0100scn->ctrl[6] & 0xf7;
@@ -2413,7 +2413,7 @@ if (disable != 0 && disable != 3 && disable != 7)
 	return 0;
 }
 
-int tc0100scn_bottomlayer( const device_config *device )
+int tc0100scn_bottomlayer( running_device *device )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	return (tc0100scn->ctrl[6] & 0x8) >> 3;
@@ -2562,7 +2562,7 @@ struct _tc0280grd_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0280grd_state *tc0280grd_get_safe_token( const device_config *device )
+INLINE tc0280grd_state *tc0280grd_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2571,11 +2571,11 @@ INLINE tc0280grd_state *tc0280grd_get_safe_token( const device_config *device )
 	return (tc0280grd_state *)device->token;
 }
 
-INLINE const tc0280grd_interface *tc0280grd_get_interface( const device_config *device )
+INLINE const tc0280grd_interface *tc0280grd_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0280GRD) || (device->type == TC0430GRW));
-	return (const tc0280grd_interface *) device->static_config;
+	return (const tc0280grd_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -2627,7 +2627,7 @@ WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w )
 	tc0280grd_ctrl_word_w(device, offset, data, mem_mask);
 }
 
-void tc0280grd_tilemap_update( const device_config *device, int base_color )
+void tc0280grd_tilemap_update( running_device *device, int base_color )
 {
 	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
 	if (tc0280grd->base_color != base_color)
@@ -2637,12 +2637,12 @@ void tc0280grd_tilemap_update( const device_config *device, int base_color )
 	}
 }
 
-void tc0430grw_tilemap_update( const device_config *device, int base_color )
+void tc0430grw_tilemap_update( running_device *device, int base_color )
 {
 	tc0280grd_tilemap_update(device, base_color);
 }
 
-static void zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
+static void zoom_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
 {
 	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
 	UINT32 startx, starty;
@@ -2677,12 +2677,12 @@ static void zoom_draw( const device_config *device, bitmap_t *bitmap, const rect
 			0, priority);
 }
 
-void tc0280grd_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority )
+void tc0280grd_zoom_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority )
 {
 	zoom_draw(device, bitmap, cliprect, xoffset, yoffset, priority, 2);
 }
 
-void tc0430grw_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority )
+void tc0430grw_zoom_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority )
 {
 	zoom_draw(device, bitmap, cliprect, xoffset, yoffset, priority, 1);
 }
@@ -2733,7 +2733,7 @@ struct _tc0360pri_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0360pri_state *tc0360pri_get_safe_token( const device_config *device )
+INLINE tc0360pri_state *tc0360pri_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2826,7 +2826,7 @@ struct _tc0480scp_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0480scp_state *tc0480scp_get_safe_token( const device_config *device )
+INLINE tc0480scp_state *tc0480scp_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2835,11 +2835,11 @@ INLINE tc0480scp_state *tc0480scp_get_safe_token( const device_config *device )
 	return (tc0480scp_state *)device->token;
 }
 
-INLINE const tc0480scp_interface *tc0480scp_get_interface( const device_config *device )
+INLINE const tc0480scp_interface *tc0480scp_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0480SCP));
-	return (const tc0480scp_interface *) device->static_config;
+	return (const tc0480scp_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -2847,7 +2847,7 @@ INLINE const tc0480scp_interface *tc0480scp_get_interface( const device_config *
 *****************************************************************************/
 
 
-INLINE void common_get_tc0480bg_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_tc0480bg_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	int code = ram[2 * tile_index + 1] & 0x7fff;
@@ -2859,7 +2859,7 @@ INLINE void common_get_tc0480bg_tile_info( const device_config *device, tile_dat
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_tc0480tx_tile_info( const device_config *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_tc0480tx_tile_info( running_device *device, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	int attr = ram[tile_index];
@@ -3180,7 +3180,7 @@ WRITE32_DEVICE_HANDLER( tc0480scp_long_w )
 }
 
 
-void tc0480scp_tilemap_update( const device_config *device )
+void tc0480scp_tilemap_update( running_device *device )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	int layer, zoom, i, j;
@@ -3247,7 +3247,7 @@ Historical Issues
 
 **********************************************************************/
 
-static void tc0480scp_bg01_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+static void tc0480scp_bg01_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
        Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
@@ -3396,7 +3396,7 @@ flipscreen.
 
 ****************************************************************/
 
-static void tc0480scp_bg23_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+static void tc0480scp_bg23_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tc0480scp->tilemap[layer][tc0480scp->dblwidth]);
@@ -3518,7 +3518,7 @@ static void tc0480scp_bg23_draw( const device_config *device, bitmap_t *bitmap, 
 }
 
 
-void tc0480scp_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+void tc0480scp_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 
@@ -3557,7 +3557,7 @@ static const UINT16 tc0480scp_bg_pri_lookup[8] =
 	0x0321
 };
 
-int tc0480scp_get_bg_priority( const device_config *device )
+int tc0480scp_get_bg_priority( running_device *device )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	return tc0480scp_bg_pri_lookup[(tc0480scp->pri_reg & 0x1c) >> 2];
@@ -3769,7 +3769,7 @@ struct _tc0150rod_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0150rod_state *tc0150rod_get_safe_token( const device_config *device )
+INLINE tc0150rod_state *tc0150rod_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -3778,11 +3778,11 @@ INLINE tc0150rod_state *tc0150rod_get_safe_token( const device_config *device )
 	return (tc0150rod_state *)device->token;
 }
 
-INLINE const tc0150rod_interface *tc0150rod_get_interface( const device_config *device )
+INLINE const tc0150rod_interface *tc0150rod_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0150ROD));
-	return (const tc0150rod_interface *) device->static_config;
+	return (const tc0150rod_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -3964,7 +3964,7 @@ lookup table from rom for the TaitoZ sprites.
 
 ******************************************************************************/
 
-void tc0150rod_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority )
+void tc0150rod_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority )
 {
 	tc0150rod_state *tc0150rod = tc0150rod_get_safe_token(device);
 
@@ -4577,7 +4577,7 @@ struct _tc0110pcr_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0110pcr_state *tc0110pcr_get_safe_token( const device_config *device )
+INLINE tc0110pcr_state *tc0110pcr_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -4586,11 +4586,11 @@ INLINE tc0110pcr_state *tc0110pcr_get_safe_token( const device_config *device )
 	return (tc0110pcr_state *)device->token;
 }
 
-INLINE const tc0110pcr_interface *tc0110pcr_get_interface( const device_config *device )
+INLINE const tc0110pcr_interface *tc0110pcr_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0110PCR));
-	return (const tc0110pcr_interface *) device->static_config;
+	return (const tc0110pcr_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -4808,7 +4808,7 @@ struct _tc0180vcu_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0180vcu_state *tc0180vcu_get_safe_token( const device_config *device )
+INLINE tc0180vcu_state *tc0180vcu_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -4817,11 +4817,11 @@ INLINE tc0180vcu_state *tc0180vcu_get_safe_token( const device_config *device )
 	return (tc0180vcu_state *)device->token;
 }
 
-INLINE const tc0180vcu_interface *tc0180vcu_get_interface( const device_config *device )
+INLINE const tc0180vcu_interface *tc0180vcu_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0180VCU));
-	return (const tc0180vcu_interface *) device->static_config;
+	return (const tc0180vcu_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -4889,7 +4889,7 @@ READ8_DEVICE_HANDLER( tc0180vcu_get_videoctrl )
 	return tc0180vcu->video_control;
 }
 
-static void tc0180vcu_video_control( const device_config *device, UINT8 data )
+static void tc0180vcu_video_control( running_device *device, UINT8 data )
 {
 	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
 #if 0
@@ -5023,7 +5023,7 @@ WRITE16_DEVICE_HANDLER( tc0180vcu_word_w )
 		tilemap_mark_tile_dirty(tc0180vcu->tilemap[2], offset & 0x7ff);
 }
 
-void tc0180vcu_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, int plane )
+void tc0180vcu_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, int plane )
 {
 	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
 

@@ -24,7 +24,7 @@ struct _angelkds_state
 	UINT8      layer_ctrl;
 
 	/* devices */
-	const device_config *subcpu;
+	running_device *subcpu;
 };
 
 

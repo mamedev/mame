@@ -18,8 +18,8 @@ struct _battlane_state
 	int         cpu_control;	/* CPU interrupt control register */
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *subcpu;
+	running_device *maincpu;
+	running_device *subcpu;
 };
 
 

@@ -70,7 +70,7 @@ struct pic8259
 };
 
 
-INLINE pic8259_t *get_safe_token(const device_config *device) {
+INLINE pic8259_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
 	assert( device->token != NULL );
 	assert( device->type == DEVICE_GET_INFO_NAME(pic8259) );
@@ -80,7 +80,7 @@ INLINE pic8259_t *get_safe_token(const device_config *device) {
 
 static TIMER_CALLBACK( pic8259_timerproc )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	pic8259_t	*pic8259 = get_safe_token(device);
 	int irq;
 	UINT8 mask;
@@ -119,7 +119,7 @@ INLINE void pic8259_set_timer(pic8259_t *pic8259)
 }
 
 
-void pic8259_set_irq_line(const device_config *device, int irq, int state)
+void pic8259_set_irq_line(running_device *device, int irq, int state)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
 	UINT8		old_irq_lines = pic8259->irq_lines;
@@ -151,7 +151,7 @@ void pic8259_set_irq_line(const device_config *device, int irq, int state)
 
 
 
-int pic8259_acknowledge(const device_config *device)
+int pic8259_acknowledge(running_device *device)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
 	UINT8 mask;
@@ -394,7 +394,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 static DEVICE_START( pic8259 ) {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
-	pic8259->intf = (const struct pic8259_interface *)device->static_config;
+	pic8259->intf = (const struct pic8259_interface *)device->baseconfig().static_config;
 
 	pic8259->timer = timer_alloc( device->machine, pic8259_timerproc, (void *)device );
 }

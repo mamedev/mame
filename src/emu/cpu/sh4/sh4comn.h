@@ -62,7 +62,7 @@ typedef struct
 
 	INT8	irq_line_state[17];
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *internal;
 	const address_space *program;
 	const address_space *io;
@@ -148,7 +148,7 @@ void sh4_set_irq_line(SH4 *sh4, int irqline, int state); // set state of externa
 #ifdef LSB_FIRST
 void sh4_swap_fp_couples(SH4 *sh4);
 #endif
-void sh4_common_init(const device_config *device);
+void sh4_common_init(running_device *device);
 
 INLINE void sh4_check_pending_irq(SH4 *sh4, const char *message) // look for highest priority active exception and handle it
 {

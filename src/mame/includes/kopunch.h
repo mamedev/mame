@@ -19,7 +19,7 @@ struct _kopunch_state
 	int        gfxbank;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 /*----------- defined in video/kopunch.c -----------*/

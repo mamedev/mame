@@ -56,7 +56,7 @@ struct _dmadac_state
 };
 
 
-INLINE dmadac_state *get_safe_token(const device_config *device)
+INLINE dmadac_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -134,7 +134,7 @@ static DEVICE_START( dmadac )
  *
  *************************************/
 
-void dmadac_transfer(const device_config **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
+void dmadac_transfer(running_device **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
 {
 	int i, j;
 
@@ -181,7 +181,7 @@ void dmadac_transfer(const device_config **devlist, UINT8 num_channels, offs_t c
  *
  *************************************/
 
-void dmadac_enable(const device_config **devlist, UINT8 num_channels, UINT8 enable)
+void dmadac_enable(running_device **devlist, UINT8 num_channels, UINT8 enable)
 {
 	int i;
 
@@ -204,7 +204,7 @@ void dmadac_enable(const device_config **devlist, UINT8 num_channels, UINT8 enab
  *
  *************************************/
 
-void dmadac_set_frequency(const device_config **devlist, UINT8 num_channels, double frequency)
+void dmadac_set_frequency(running_device **devlist, UINT8 num_channels, double frequency)
 {
 	int i;
 
@@ -224,7 +224,7 @@ void dmadac_set_frequency(const device_config **devlist, UINT8 num_channels, dou
  *
  *************************************/
 
-void dmadac_set_volume(const device_config **devlist, UINT8 num_channels, UINT16 volume)
+void dmadac_set_volume(running_device **devlist, UINT8 num_channels, UINT16 volume)
 {
 	int i;
 

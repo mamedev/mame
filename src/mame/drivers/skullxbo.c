@@ -45,7 +45,7 @@ static TIMER_CALLBACK( irq_gen )
 }
 
 
-static void alpha_row_update(const device_config *screen, int scanline)
+static void alpha_row_update(running_device *screen, int scanline)
 {
 	skullxbo_state *state = (skullxbo_state *)screen->machine->driver_data;
 	UINT16 *check = &state->atarigen.alpha[(scanline / 8) * 64 + 42];

@@ -6,7 +6,7 @@
 typedef struct _ym3526_interface ym3526_interface;
 struct _ym3526_interface
 {
-	void (*handler)(const device_config *device, int linestate);
+	void (*handler)(running_device *device, int linestate);
 };
 
 READ8_DEVICE_HANDLER( ym3526_r );

@@ -21,12 +21,12 @@ struct _ssem_state
     UINT32 a;
     UINT32 halt;
 
-    const device_config *device;
+    running_device *device;
     const address_space *program;
     int icount;
 };
 
-INLINE ssem_state *get_safe_token(const device_config *device)
+INLINE ssem_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
     assert(device->token != NULL);

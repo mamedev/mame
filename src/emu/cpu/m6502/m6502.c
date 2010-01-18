@@ -69,7 +69,7 @@ struct _m6502_Regs
 	UINT8   so_state;
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *space;
 	const address_space *io;
 	int		int_occured;
@@ -84,7 +84,7 @@ struct _m6502_Regs
 	m6510_port_write_func port_write;
 };
 
-INLINE m6502_Regs *get_safe_token(const device_config *device)
+INLINE m6502_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -129,10 +129,10 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(const device_config *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(running_device *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -334,7 +334,7 @@ static CPU_INIT( n2a03 )
    Bit 7 of address $4011 (the PSG's DPCM control register), when set,
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
-void n2a03_irq(const device_config *device)
+void n2a03_irq(running_device *device)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 

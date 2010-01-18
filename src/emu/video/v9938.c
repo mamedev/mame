@@ -50,7 +50,7 @@ typedef struct {
 	UINT16 pal_ind16[16];
 	UINT16 pal_ind256[256];
 	/* render screen */
-	const device_config *screen;
+	running_device *screen;
 	/* render bitmap */
 	bitmap_t *bitmap;
 	/* Command unit */
@@ -478,7 +478,7 @@ WRITE8_HANDLER (v9938_1_command_w)
 
 ***************************************************************************/
 
-void v9938_init (running_machine *machine, int which, const device_config *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine *, int) )
+void v9938_init (running_machine *machine, int which, running_device *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine *, int) )
 {
 	vdp = &vdps[which];
 

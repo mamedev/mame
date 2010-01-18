@@ -13,12 +13,12 @@
 extern const pia6821_interface carpolo_pia0_intf;
 extern const pia6821_interface carpolo_pia1_intf;
 
-void carpolo_74148_3s_cb(const device_config *device);
+void carpolo_74148_3s_cb(running_device *device);
 
-void carpolo_7474_2s_1_cb(const device_config *device);
-void carpolo_7474_2s_2_cb(const device_config *device);
-void carpolo_7474_2u_1_cb(const device_config *device);
-void carpolo_7474_2u_2_cb(const device_config *device);
+void carpolo_7474_2s_1_cb(running_device *device);
+void carpolo_7474_2s_2_cb(running_device *device);
+void carpolo_7474_2u_1_cb(running_device *device);
+void carpolo_7474_2u_2_cb(running_device *device);
 
 MACHINE_START( carpolo );
 MACHINE_RESET( carpolo );

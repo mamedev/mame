@@ -552,7 +552,7 @@ static const cpu_state_table state_table_template =
 
 
 
-INLINE m68ki_cpu_core *get_safe_token(const device_config *device)
+INLINE m68ki_cpu_core *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -952,7 +952,7 @@ static CPU_GET_INFO( m68k )
 
 /* global access */
 
-void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, offs_t end)
+void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_t end)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->encrypted_start = start;
@@ -1221,25 +1221,25 @@ static const m68k_memory_interface interface_d32_mmu =
 };
 
 
-void m68k_set_reset_callback(const device_config *device, m68k_reset_func callback)
+void m68k_set_reset_callback(running_device *device, m68k_reset_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->reset_instr_callback = callback;
 }
 
-void m68k_set_cmpild_callback(const device_config *device, m68k_cmpild_func callback)
+void m68k_set_cmpild_callback(running_device *device, m68k_cmpild_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->cmpild_instr_callback = callback;
 }
 
-void m68k_set_rte_callback(const device_config *device, m68k_rte_func callback)
+void m68k_set_rte_callback(running_device *device, m68k_rte_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->rte_instr_callback = callback;
 }
 
-void m68k_set_tas_callback(const device_config *device, m68k_tas_func callback)
+void m68k_set_tas_callback(running_device *device, m68k_tas_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->tas_instr_callback = callback;

@@ -46,7 +46,7 @@ typedef struct _ttl74148_state ttl74148_state;
 struct _ttl74148_state
 {
 	/* callback */
-	void (*output_cb)(const device_config *device);
+	void (*output_cb)(running_device *device);
 
 	/* inputs */
 	int input_lines[8];	/* pins 1-4,10-13 */
@@ -64,7 +64,7 @@ struct _ttl74148_state
 };
 
 
-INLINE ttl74148_state *get_safe_token(const device_config *device)
+INLINE ttl74148_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -73,7 +73,7 @@ INLINE ttl74148_state *get_safe_token(const device_config *device)
 	return (ttl74148_state *)device->token;
 }
 
-void ttl74148_update(const device_config *device)
+void ttl74148_update(running_device *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 
@@ -144,35 +144,35 @@ void ttl74148_update(const device_config *device)
 }
 
 
-void ttl74148_input_line_w(const device_config *device, int input_line, int data)
+void ttl74148_input_line_w(running_device *device, int input_line, int data)
 {
 	ttl74148_state *state = get_safe_token(device);
 	state->input_lines[input_line] = data ? 1 : 0;
 }
 
 
-void ttl74148_enable_input_w(const device_config *device, int data)
+void ttl74148_enable_input_w(running_device *device, int data)
 {
 	ttl74148_state *state = get_safe_token(device);
 	state->enable_input = data ? 1 : 0;
 }
 
 
-int ttl74148_output_r(const device_config *device)
+int ttl74148_output_r(running_device *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 	return state->output;
 }
 
 
-int ttl74148_output_valid_r(const device_config *device)
+int ttl74148_output_valid_r(running_device *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 	return state->output_valid;
 }
 
 
-int ttl74148_enable_output_r(const device_config *device)
+int ttl74148_enable_output_r(running_device *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 	return state->enable_output;
@@ -181,7 +181,7 @@ int ttl74148_enable_output_r(const device_config *device)
 
 static DEVICE_START( ttl74148 )
 {
-	ttl74148_config *config = (ttl74148_config *)device->inline_config;
+	ttl74148_config *config = (ttl74148_config *)device->baseconfig().inline_config;
 	ttl74148_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 

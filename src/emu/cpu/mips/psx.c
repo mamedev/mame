@@ -185,7 +185,7 @@ struct _psxcpu_state
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int bus_attached;
 	UINT32 bad_byte_address_mask;
@@ -193,7 +193,7 @@ struct _psxcpu_state
 	UINT32 bad_word_address_mask;
 };
 
-INLINE psxcpu_state *get_safe_token(const device_config *device)
+INLINE psxcpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1606,7 +1606,7 @@ static STATE_POSTLOAD( mips_postload )
 	mips_update_scratchpad( psxcpu->program );
 }
 
-static void mips_state_register( const char *type, const device_config *device )
+static void mips_state_register( const char *type, running_device *device )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
 
@@ -1633,7 +1633,7 @@ static void mips_state_register( const char *type, const device_config *device )
 static CPU_INIT( psxcpu )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
-//  psxcpu->intf = (psxcpu_interface *) device->static_config;
+//  psxcpu->intf = (psxcpu_interface *) device->baseconfig().static_config;
 
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;

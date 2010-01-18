@@ -173,7 +173,7 @@ struct _tms32025_state
 	int		mHackIgnoreARP;			 /* special handling for lst, lst1 instructions */
 	int		waiting_for_serial_frame;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -182,7 +182,7 @@ struct _tms32025_state
 	UINT16 *datamap[0x200];
 };
 
-INLINE tms32025_state *get_safe_token(const device_config *device)
+INLINE tms32025_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

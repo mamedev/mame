@@ -364,8 +364,8 @@ static void init_ports_systeme(running_machine *machine)
 	/* INIT THE PORTS *********************************************************************************************/
 
 	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	const device_config *sn1 = devtag_get_device(machine, "sn1");
-	const device_config *sn2 = devtag_get_device(machine, "sn2");
+	running_device *sn1 = devtag_get_device(machine, "sn1");
+	running_device *sn2 = devtag_get_device(machine, "sn2");
 
 	memory_install_write8_device_handler(io, sn2, 0x7b, 0x7b, 0, 0, sn76496_w);
 	memory_install_write8_device_handler(io, sn1, 0x7e, 0x7f, 0, 0, sn76496_w);

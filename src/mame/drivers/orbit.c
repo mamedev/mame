@@ -66,7 +66,7 @@ static INTERRUPT_GEN( orbit_interrupt )
 
 static void update_misc_flags(running_machine *machine, UINT8 val)
 {
-	const device_config *discrete = devtag_get_device(machine, "discrete");
+	running_device *discrete = devtag_get_device(machine, "discrete");
 
 	orbit_misc_flags = val;
 

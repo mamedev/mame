@@ -446,7 +446,7 @@ static const UINT32 tms1100_default_decode[256] = {
 };
 
 
-INLINE tms0980_state *get_safe_token(const device_config *device)
+INLINE tms0980_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -492,11 +492,11 @@ static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
 ADDRESS_MAP_END
 
 
-static void cpu_init_tms_common( const device_config *device, const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size )
+static void cpu_init_tms_common( running_device *device, const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
-	cpustate->config = (const tms0980_config *) device->static_config;
+	cpustate->config = (const tms0980_config *) device->baseconfig().static_config;
 
 	assert( cpustate->config != NULL );
 
@@ -760,7 +760,7 @@ static const UINT8 tms1000_pc_decode[64] =
 };
 
 
-static void tms0980_set_cki_bus( const device_config *device )
+static void tms0980_set_cki_bus( running_device *device )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 

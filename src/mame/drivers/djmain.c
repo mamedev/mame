@@ -246,7 +246,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 
 static READ32_HANDLER( v_rom_r )
 {
-	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = devtag_get_device(space->machine, "k056832");
 	UINT8 *mem8 = memory_region(space->machine, "gfx2");
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
@@ -447,7 +447,7 @@ static INTERRUPT_GEN( vb_interrupt )
 }
 
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 	if (state != CLEAR_LINE)
 	{
@@ -1437,7 +1437,7 @@ static STATE_POSTLOAD( djmain_postload )
 
 static MACHINE_START( djmain )
 {
-	const device_config *ide = devtag_get_device(machine, "ide");
+	running_device *ide = devtag_get_device(machine, "ide");
 
 	if (ide != NULL && ide_master_password != NULL)
 		ide_set_master_password(ide, ide_master_password);

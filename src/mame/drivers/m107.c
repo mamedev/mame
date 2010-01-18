@@ -418,7 +418,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 	if (state)
 		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setvector_callback);

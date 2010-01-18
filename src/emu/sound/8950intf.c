@@ -30,11 +30,11 @@ struct _y8950_state
 	emu_timer *		timer[2];
 	void *			chip;
 	const y8950_interface *intf;
-	const device_config *device;
+	running_device *device;
 };
 
 
-INLINE y8950_state *get_safe_token(const device_config *device)
+INLINE y8950_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -122,7 +122,7 @@ static DEVICE_START( y8950 )
 	y8950_state *info = get_safe_token(device);
 	int rate = device->clock/72;
 
-	info->intf = device->static_config ? (const y8950_interface *)device->static_config : &dummy;
+	info->intf = device->baseconfig().static_config ? (const y8950_interface *)device->baseconfig().static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

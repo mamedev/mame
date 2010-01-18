@@ -224,9 +224,9 @@ struct _mips3_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-void mips3drc_set_options(const device_config *device, UINT32 options);
-void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base);
-void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles);
+void mips3drc_set_options(running_device *device, UINT32 options);
+void mips3drc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base);
+void mips3drc_add_hotspot(running_device *device, offs_t pc, UINT32 opcode, UINT32 cycles);
 
 CPU_GET_INFO( vr4300be );
 CPU_GET_INFO( vr4300le );

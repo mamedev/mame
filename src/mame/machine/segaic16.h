@@ -24,7 +24,7 @@ struct _segaic16_memory_map_entry
 	const char *	name;				/* friendly name for debugging */
 };
 
-void segaic16_memory_mapper_init(const device_config *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *));
+void segaic16_memory_mapper_init(running_device *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *));
 void segaic16_memory_mapper_reset(running_machine *machine);
 void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_data);
 void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted);

@@ -96,10 +96,10 @@ extern CPU_GET_INFO( sh4 );
 WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );
 
-void sh4_set_frt_input(const device_config *device, int state);
-void sh4_set_irln_input(const device_config *device, int value);
-void sh4_set_ftcsr_callback(const device_config *device, sh4_ftcsr_callback callback);
-void sh4_dma_ddt(const device_config *device, struct sh4_ddt_dma *s);
+void sh4_set_frt_input(running_device *device, int state);
+void sh4_set_irln_input(running_device *device, int value);
+void sh4_set_ftcsr_callback(running_device *device, sh4_ftcsr_callback callback);
+void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s);
 
 #endif /* __SH4_H__ */
 

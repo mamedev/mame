@@ -235,7 +235,7 @@ INPUT_PORTS_END
  *************************************/
 
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
-static void blockout_irq_handler(const device_config *device, int irq)
+static void blockout_irq_handler(running_device *device, int irq)
 {
 	blockout_state *state = (blockout_state *)device->machine->driver_data;
 	cpu_set_input_line_and_vector(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);

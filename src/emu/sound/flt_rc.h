@@ -56,7 +56,7 @@ struct _flt_rc_config
 
 extern const flt_rc_config flt_rc_ac_default;
 
-void filter_rc_set_RC(const device_config *device, int type, double R1, double R2, double R3, double C);
+void filter_rc_set_RC(running_device *device, int type, double R1, double R2, double R3, double C);
 
 DEVICE_GET_INFO( filter_rc );
 #define SOUND_FILTER_RC DEVICE_GET_INFO_NAME( filter_rc )

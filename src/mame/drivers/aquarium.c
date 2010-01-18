@@ -326,7 +326,7 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-static void irq_handler( const device_config *device, int irq )
+static void irq_handler( running_device *device, int irq )
 {
 	aquarium_state *state = (aquarium_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);

@@ -115,7 +115,7 @@ struct _z180_state
 	UINT32	ea;
 	z80_daisy_state *daisy;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	cpu_state_table state;
@@ -125,7 +125,7 @@ struct _z180_state
 	UINT8 *cc[6];
 };
 
-INLINE z180_state *get_safe_token(const device_config *device)
+INLINE z180_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2015,8 +2015,8 @@ static CPU_INIT( z180 )
 {
 	z180_state *cpustate = get_safe_token(device);
 	cpustate->daisy = NULL;
-	if (device->static_config)
-		cpustate->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
+	if (device->baseconfig().static_config)
+		cpustate->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->baseconfig().static_config);
 	cpustate->irq_callback = irqcallback;
 
 	SZHVC_add = auto_alloc_array(device->machine, UINT8, 2*256*256);

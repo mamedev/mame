@@ -236,7 +236,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z8_state *get_safe_token(const device_config *device)
+INLINE z8_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

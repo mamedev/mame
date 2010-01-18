@@ -920,7 +920,7 @@ MACHINE_DRIVER_END
                             Best Of Best
 ***************************************************************************/
 
-static void bestbest_ym3526_irqhandler(const device_config *device, int state)
+static void bestbest_ym3526_irqhandler(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
 }

@@ -3825,7 +3825,7 @@ struct _discrete_source_node
 
 struct _discrete_info
 {
-	const device_config *device;
+	running_device *device;
 
 	/* emulation info */
 	int					sample_rate;

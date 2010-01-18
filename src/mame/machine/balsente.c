@@ -222,7 +222,7 @@ static void poly17_init(running_machine *machine)
 }
 
 
-void balsente_noise_gen(const device_config *device, int count, short *buffer)
+void balsente_noise_gen(running_device *device, int count, short *buffer)
 {
 	balsente_state *state = (balsente_state *)device->machine->driver_data;
 	int chip;
@@ -884,7 +884,7 @@ WRITE8_HANDLER( balsente_counter_8253_w )
  *
  *************************************/
 
-static void set_counter_0_ff(const device_config *timer, int newstate)
+static void set_counter_0_ff(running_device *timer, int newstate)
 {
 	balsente_state *state = (balsente_state *)timer->machine->driver_data;
 

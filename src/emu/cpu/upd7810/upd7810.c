@@ -499,13 +499,13 @@ struct _upd7810_state
 	void (*handle_timers)(upd7810_state *cpustate, int cycles);
 	UPD7810_CONFIG config;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
 };
 
-INLINE upd7810_state *get_safe_token(const device_config *device)
+INLINE upd7810_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1701,7 +1701,7 @@ static CPU_INIT( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
 
-	cpustate->config = *(const UPD7810_CONFIG*) device->static_config;
+	cpustate->config = *(const UPD7810_CONFIG*) device->baseconfig().static_config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

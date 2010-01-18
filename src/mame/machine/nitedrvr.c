@@ -211,7 +211,7 @@ D5 = SKID2
 ***************************************************************************/
 WRITE8_HANDLER( nitedrvr_out0_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 	discrete_sound_w(discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
 	discrete_sound_w(discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
 	discrete_sound_w(discrete, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
@@ -229,7 +229,7 @@ D5 = Spare (Not used)
 ***************************************************************************/
 WRITE8_HANDLER( nitedrvr_out1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 
 	set_led_status(space->machine, 0,data & 0x10);
 
@@ -254,7 +254,7 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 {
 	if (nitedrvr_crash_en && nitedrvr_crash_data_en)
 	{
-		const device_config *discrete = devtag_get_device(timer->machine, "discrete");
+		running_device *discrete = devtag_get_device(timer->machine, "discrete");
 
 		nitedrvr_crash_data--;
 		discrete_sound_w(discrete, NITEDRVR_BANG_DATA, nitedrvr_crash_data);	// Crash Volume

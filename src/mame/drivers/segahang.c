@@ -375,7 +375,7 @@ static void sharrier_i8751_sim(running_machine *machine)
  *
  *************************************/
 
-static void sound_irq(const device_config *device, int irq)
+static void sound_irq(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

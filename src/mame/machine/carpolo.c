@@ -69,50 +69,50 @@ static UINT8 car_border_collision_cause;
 static UINT8 priority_0_extension;
 static UINT8 last_wheel_value[4];
 
-static const device_config *ttl74148_3s;
+static running_device *ttl74148_3s;
 
-static const device_config *ttl74153_1k;
+static running_device *ttl74153_1k;
 
-static const device_config *ttl7474_2s_1;
-static const device_config *ttl7474_2s_2;
-static const device_config *ttl7474_2u_1;
-static const device_config *ttl7474_2u_2;
-static const device_config *ttl7474_1f_1;
-static const device_config *ttl7474_1f_2;
-static const device_config *ttl7474_1d_1;
-static const device_config *ttl7474_1d_2;
-static const device_config *ttl7474_1c_1;
-static const device_config *ttl7474_1c_2;
-static const device_config *ttl7474_1a_1;
-static const device_config *ttl7474_1a_2;
+static running_device *ttl7474_2s_1;
+static running_device *ttl7474_2s_2;
+static running_device *ttl7474_2u_1;
+static running_device *ttl7474_2u_2;
+static running_device *ttl7474_1f_1;
+static running_device *ttl7474_1f_2;
+static running_device *ttl7474_1d_1;
+static running_device *ttl7474_1d_2;
+static running_device *ttl7474_1c_1;
+static running_device *ttl7474_1c_2;
+static running_device *ttl7474_1a_1;
+static running_device *ttl7474_1a_2;
 
 
-void carpolo_74148_3s_cb(const device_config *device)
+void carpolo_74148_3s_cb(running_device *device)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, ttl74148_output_valid_r(device) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 /* the outputs of the flip-flops are connected to the priority encoder */
-void carpolo_7474_2s_1_cb(const device_config *device)
+void carpolo_7474_2s_1_cb(running_device *device)
 {
 	ttl74148_input_line_w(ttl74148_3s, COIN1_PRIORITY_LINE, ttl7474_output_comp_r(device));
 	ttl74148_update(ttl74148_3s);
 }
 
-void carpolo_7474_2s_2_cb(const device_config *device)
+void carpolo_7474_2s_2_cb(running_device *device)
 {
 	ttl74148_input_line_w(ttl74148_3s, COIN2_PRIORITY_LINE, ttl7474_output_comp_r(device));
 	ttl74148_update(ttl74148_3s);
 }
 
-void carpolo_7474_2u_1_cb(const device_config *device)
+void carpolo_7474_2u_1_cb(running_device *device)
 {
 	ttl74148_input_line_w(ttl74148_3s, COIN3_PRIORITY_LINE, ttl7474_output_comp_r(device));
 	ttl74148_update(ttl74148_3s);
 }
 
-void carpolo_7474_2u_2_cb(const device_config *device)
+void carpolo_7474_2u_2_cb(running_device *device)
 {
 	ttl74148_input_line_w(ttl74148_3s, COIN4_PRIORITY_LINE, ttl7474_output_comp_r(device));
 	ttl74148_update(ttl74148_3s);
@@ -257,8 +257,8 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	for (player = 0; player < 4; player++)
 	{
 		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
-		const device_config *movement_flip_flop;
-		const device_config *dir_flip_flop;
+		running_device *movement_flip_flop;
+		running_device *dir_flip_flop;
 
 		switch (player)
 		{

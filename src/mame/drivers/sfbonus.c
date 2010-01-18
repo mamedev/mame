@@ -547,7 +547,7 @@ static VIDEO_START(sfbonus)
 
 }
 
-static void sfbonus_draw_reel_layer(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
+static void sfbonus_draw_reel_layer(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
 {
 	int zz;
 	int i;

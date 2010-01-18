@@ -466,7 +466,7 @@ static void set_ea(const address_space *space, int ea)
 static SOUND_START( mario )
 {
 	mario_state	*state = (mario_state *)machine->driver_data;
-	const device_config *audiocpu = devtag_get_device(machine, "audiocpu");
+	running_device *audiocpu = devtag_get_device(machine, "audiocpu");
 #if USE_8039
 	UINT8 *SND = memory_region(machine, "audiocpu");
 

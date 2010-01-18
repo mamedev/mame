@@ -16,17 +16,17 @@ struct _warriorb_state
 	int        pandata[4];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *tc0140syt;
-	const device_config *tc0100scn_1;
-	const device_config *tc0100scn_2;
-	const device_config *lscreen;
-	const device_config *rscreen;
-	const device_config *_2610_1l;
-	const device_config *_2610_1r;
-	const device_config *_2610_2l;
-	const device_config *_2610_2r;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *tc0140syt;
+	running_device *tc0100scn_1;
+	running_device *tc0100scn_2;
+	running_device *lscreen;
+	running_device *rscreen;
+	running_device *_2610_1l;
+	running_device *_2610_1r;
+	running_device *_2610_2l;
+	running_device *_2610_2r;
 };
 
 

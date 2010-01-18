@@ -119,7 +119,7 @@ static WRITE16_HANDLER( pirates_out_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+		running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 
 		/* bits 0-2 control EEPROM */
 		eeprom_write_bit(eeprom, data & 0x04);

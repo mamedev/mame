@@ -15,12 +15,12 @@ struct _ultraman_state
 	int        bank0, bank1, bank2;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k051316_1;
-	const device_config *k051316_2;
-	const device_config *k051316_3;
-	const device_config *k051960;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k051316_1;
+	running_device *k051316_2;
+	running_device *k051316_3;
+	running_device *k051960;
 };
 
 

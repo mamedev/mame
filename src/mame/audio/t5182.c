@@ -166,7 +166,7 @@ static int irqstate;
 
 static TIMER_CALLBACK( setirq_callback )
 {
-	const device_config *cpu;
+	running_device *cpu;
 
 	switch(param)
 	{
@@ -219,7 +219,7 @@ static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 	timer_call_after_resynch(space->machine, NULL, CPU_CLEAR,setirq_callback);
 }
 
-static void t5182_ym2151_irq_handler(const device_config *device, int irq)
+static void t5182_ym2151_irq_handler(running_device *device, int irq)
 {
 	if (irq)
 		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setirq_callback);

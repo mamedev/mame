@@ -28,7 +28,7 @@
 DEVICE_GET_INFO( upd4990a );
 
 /* this should be refactored, once RTCs get unified */
-extern void upd4990a_addretrace( const device_config *device );
+extern void upd4990a_addretrace( running_device *device );
 
 extern READ8_DEVICE_HANDLER( upd4990a_testbit_r );
 extern READ8_DEVICE_HANDLER( upd4990a_databit_r );

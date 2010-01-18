@@ -219,19 +219,20 @@ public:
 	running_machine(const game_driver *driver);
 	~running_machine();
 
-	inline const device_config *device(const char *tag);
+	inline running_device *device(const char *tag);
 	inline const input_port_config *port(const char *tag);
 	inline const region_info *region(const char *tag);
 
 	resource_pool			respool;			/* pool of resources for this machine */
 	region_list				regionlist;			/* list of memory regions */
+	device_list				devicelist;			/* list of running devices */
 
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
 	ioport_list				portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
-	const device_config *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
+	running_device *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */
@@ -239,7 +240,7 @@ public:
 
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
-	const device_config *	primary_screen;		/* the primary screen device, or NULL if screenless */
+	running_device *	primary_screen;		/* the primary screen device, or NULL if screenless */
 	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */
@@ -474,9 +475,9 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline const device_config *running_machine::device(const char *tag)
+inline running_device *running_machine::device(const char *tag)
 {
-	return config->devicelist.find(tag);
+	return devicelist.find(tag);
 }
 
 inline const input_port_config *running_machine::port(const char *tag)

@@ -106,7 +106,7 @@ static const UINT8 rp2c05004_colortable[] =
 
 
 /* remap callback */
-static int remap_colors( const device_config *device, int addr, int data )
+static int remap_colors( running_device *device, int addr, int data )
 {
 	/* this is the protection. color codes are shuffled around */
 	/* the ones with value 0xff are unknown */
@@ -239,7 +239,7 @@ READ8_HANDLER( vsnes_in1_1_r )
 
 MACHINE_RESET( vsnes )
 {
-	const device_config *ppu = devtag_get_device(machine, "ppu1");
+	running_device *ppu = devtag_get_device(machine, "ppu1");
 
 	last_bank = 0xff;
 	sound_fix = 0;
@@ -259,8 +259,8 @@ MACHINE_RESET( vsnes )
 
 MACHINE_RESET( vsdual )
 {
-	const device_config *ppu1 = devtag_get_device(machine, "ppu1");
-	const device_config *ppu2 = devtag_get_device(machine, "ppu2");
+	running_device *ppu1 = devtag_get_device(machine, "ppu1");
+	running_device *ppu2 = devtag_get_device(machine, "ppu2");
 
 	input_latch[0] = input_latch[1] = 0;
 	input_latch[2] = input_latch[3] = 0;
@@ -469,7 +469,7 @@ DRIVER_INIT( vsnormal )
 
 static WRITE8_HANDLER( ppuRC2C05_protection )
 {
-	const device_config *ppu1 = devtag_get_device(space->machine, "ppu1");
+	running_device *ppu1 = devtag_get_device(space->machine, "ppu1");
 
 	/* This PPU has registers mapped at $2000 and $2001 inverted */
 	/* and no remapped color */
@@ -507,7 +507,7 @@ DRIVER_INIT( suprmrio )
 
 static WRITE8_HANDLER( gun_in0_w )
 {
-	const device_config *ppu1 = devtag_get_device(space->machine, "ppu1");
+	running_device *ppu1 = devtag_get_device(space->machine, "ppu1");
 	static int zapstore;
 
 	if (vsnes_do_vrom_bank)
@@ -1006,7 +1006,7 @@ static void mapper4_set_chr( running_machine *machine )
 #define BOTTOM_VISIBLE_SCANLINE	239		/* The bottommost visible scanline */
 #define NUM_SCANLINE 262
 
-static void mapper4_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper4_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -1027,7 +1027,7 @@ static void mapper4_irq( const device_config *device, int scanline, int vblank, 
 
 static WRITE8_HANDLER( mapper4_w )
 {
-	const device_config *ppu1 = devtag_get_device(space->machine, "ppu1");
+	running_device *ppu1 = devtag_get_device(space->machine, "ppu1");
 	UINT8 MMC3_helper, cmd;
 
 	switch (offset & 0x6001)
@@ -1417,7 +1417,7 @@ DRIVER_INIT( mightybj )
 
 static WRITE8_HANDLER( vstennis_vrom_banking )
 {
-	const device_config *other_cpu = (space->cpu == devtag_get_device(space->machine, "maincpu")) ? devtag_get_device(space->machine, "sub") : devtag_get_device(space->machine, "maincpu");
+	running_device *other_cpu = (space->cpu == devtag_get_device(space->machine, "maincpu")) ? devtag_get_device(space->machine, "sub") : devtag_get_device(space->machine, "maincpu");
 
 	/* switch vrom */
 	(space->cpu == devtag_get_device(space->machine, "maincpu")) ? memory_set_bankptr(space->machine, "bank2", (data & 4) ? vrom[0] + 0x2000 : vrom[0]) : memory_set_bankptr(space->machine, "bank3", (data & 4) ? vrom[1] + 0x2000 : vrom[1]);

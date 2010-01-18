@@ -47,7 +47,7 @@
  *
  *************************************/
 
-static void update_irq_state( const device_config *cpu )
+static void update_irq_state( running_device *cpu )
 {
 	dcheese_state *state = (dcheese_state *)cpu->machine->driver_data;
 

@@ -41,9 +41,9 @@ static int score_sample;
 static int random_offset;
 
 
-static void gottlieb1_sh_w(const device_config *riot, UINT8 data);
+static void gottlieb1_sh_w(running_device *riot, UINT8 data);
 static void gottlieb2_sh_w(const address_space *space, UINT8 data);
-static void trigger_sample(const device_config *samples, UINT8 data);
+static void trigger_sample(running_device *samples, UINT8 data);
 
 
 
@@ -55,7 +55,7 @@ static void trigger_sample(const device_config *samples, UINT8 data);
 
 WRITE8_HANDLER( gottlieb_sh_w )
 {
-	const device_config *riot = devtag_get_device(space->machine, "riot");
+	running_device *riot = devtag_get_device(space->machine, "riot");
 
 	/* identify rev1 boards by the presence of a 6532 RIOT device */
 	if (riot != NULL)
@@ -72,9 +72,9 @@ WRITE8_HANDLER( gottlieb_sh_w )
  *
  *************************************/
 
-static void gottlieb1_sh_w(const device_config *riot, UINT8 data)
+static void gottlieb1_sh_w(running_device *riot, UINT8 data)
 {
-	const device_config *samples = devtag_get_device(riot->machine, "samples");
+	running_device *samples = devtag_get_device(riot->machine, "samples");
 	int pa7 = (data & 0x0f) != 0xf;
 	int pa0_5 = ~data & 0x3f;
 
@@ -124,7 +124,7 @@ static const riot6532_interface gottlieb_riot6532_intf =
  *
  *************************************/
 
-static void play_sample(const device_config *samples, const char *phonemes)
+static void play_sample(running_device *samples, const char *phonemes)
 {
 	if (strcmp(phonemes, " HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
 		sample_start(samples, 0, 42, 0);
@@ -141,7 +141,7 @@ static void play_sample(const device_config *samples, const char *phonemes)
 }
 
 
-static void trigger_sample(const device_config *samples, UINT8 data)
+static void trigger_sample(running_device *samples, UINT8 data)
 {
 	/* Reactor samples */
 	if (strcmp(samples->machine->gamedrv->name, "reactor") == 0)
@@ -196,7 +196,7 @@ static void trigger_sample(const device_config *samples, UINT8 data)
 #ifdef UNUSED_FUNCTION
 void gottlieb_knocker(running_machine *machine)
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
 	{
 	}
@@ -244,7 +244,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	{
 		if (votrax_queuepos > 1)
 		{
-			const device_config *samples = devtag_get_device(space->machine, "samples");
+			running_device *samples = devtag_get_device(space->machine, "samples");
 			int last = -1;
 			int i;
 			char phonemes[200];
@@ -497,7 +497,7 @@ static WRITE8_HANDLER( speech_control_w )
 	{
 		/* bit 3 selects which of the two 8913 to enable */
 		/* bit 4 goes to the 8913 BC1 pin */
-		const device_config *ay = devtag_get_device(space->machine, (data & 0x08) ? "ay1" : "ay2");
+		running_device *ay = devtag_get_device(space->machine, (data & 0x08) ? "ay1" : "ay2");
 		ay8910_data_address_w(ay, data >> 4, *psg_latch);
 	}
 
@@ -506,14 +506,14 @@ static WRITE8_HANDLER( speech_control_w )
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
 	{
-		const device_config *sp = devtag_get_device(space->machine, "spsnd");
+		running_device *sp = devtag_get_device(space->machine, "spsnd");
 		sp0250_w(sp, 0, *sp0250_latch);
 	}
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)
 	{
-		const device_config *sp = devtag_get_device(space->machine, "spsnd");
+		running_device *sp = devtag_get_device(space->machine, "spsnd");
 		device_reset(sp);
 	}
 }

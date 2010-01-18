@@ -116,13 +116,13 @@ typedef struct
     PROTOTYPES
 ***************************************************************************/
 
-static void update_scanline( const device_config *device );
+static void update_scanline( running_device *device );
 
 static TIMER_CALLBACK( scanline_callback );
 static TIMER_CALLBACK( hblank_callback );
 static TIMER_CALLBACK( nmi_callback );
 
-void (*ppu_latch)( const device_config *device, offs_t offset );
+void (*ppu_latch)( running_device *device, offs_t offset );
 
 /* palette handlers */
 static WRITE8_HANDLER( ppu2c0x_palette_write );
@@ -133,7 +133,7 @@ static READ8_HANDLER( ppu2c0x_palette_read );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE ppu2c0x_chip *get_token( const device_config *device )
+INLINE ppu2c0x_chip *get_token( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == PPU_2C02) || (device->type == PPU_2C03B)
@@ -143,13 +143,13 @@ INLINE ppu2c0x_chip *get_token( const device_config *device )
 }
 
 
-INLINE const ppu2c0x_interface *get_interface( const device_config *device )
+INLINE const ppu2c0x_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == PPU_2C02) || (device->type == PPU_2C03B)
 		 || (device->type == PPU_2C04) || (device->type == PPU_2C05)
 		 || (device->type == PPU_2C07));
-	return (const ppu2c0x_interface *) device->static_config;
+	return (const ppu2c0x_interface *) device->baseconfig().static_config;
 }
 
 
@@ -307,7 +307,7 @@ static DEVICE_START( ppu2c0x )
 	ppu2c0x_chip *chip = get_token(device);
 
 	memset(chip, 0, sizeof(*chip));
-	chip->scanlines_per_frame = (int) device_get_info_int(device, PPU2C0XINFO_INT_SCANLINES_PER_FRAME);
+	chip->scanlines_per_frame = (int) device->get_config_int(PPU2C0XINFO_INT_SCANLINES_PER_FRAME);
 
 	/* initialize the scanline handling portion */
 	chip->scanline_timer = timer_alloc(device->machine, scanline_callback, (void *) device);
@@ -325,7 +325,7 @@ static DEVICE_START( ppu2c0x )
 
 static TIMER_CALLBACK( hblank_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	int *ppu_regs = &this_ppu->regs[0];
 
@@ -342,7 +342,7 @@ static TIMER_CALLBACK( hblank_callback )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	const ppu2c0x_interface *intf = get_interface(device);
 	int *ppu_regs = &this_ppu->regs[0];
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( nmi_callback )
 	timer_adjust_oneshot(this_ppu->nmi_timer, attotime_never, 0);
 }
 
-static void draw_background( const device_config *device, UINT8 *line_priority )
+static void draw_background( running_device *device, UINT8 *line_priority )
 {
 	const ppu2c0x_interface *intf = get_interface(device);
 	ppu2c0x_chip *this_ppu = get_token(device);
@@ -501,7 +501,7 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 	}
 }
 
-static void draw_sprites( const device_config *device, UINT8 *line_priority )
+static void draw_sprites( running_device *device, UINT8 *line_priority )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 
@@ -712,7 +712,7 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
  *
  *************************************/
 
-static void render_scanline( const device_config *device )
+static void render_scanline( running_device *device )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	const ppu2c0x_interface *intf = get_interface(device);
@@ -757,7 +757,7 @@ static void render_scanline( const device_config *device )
 	profiler_mark_end();
 }
 
-static void update_scanline( const device_config *device )
+static void update_scanline( running_device *device )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	const ppu2c0x_interface *intf = get_interface(device);
@@ -839,7 +839,7 @@ static void update_scanline( const device_config *device )
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	int *ppu_regs = &this_ppu->regs[0];
 	int blanked = (ppu_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
@@ -1103,7 +1103,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 #ifdef MAME_DEBUG
 	if (this_ppu->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		const device_config *screen = device->machine->primary_screen;
+		running_device *screen = device->machine->primary_screen;
 		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, video_screen_get_vpos(screen), video_screen_get_hpos(screen));
 	}
 #endif
@@ -1237,7 +1237,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
  *
  *************************************/
 
-void ppu2c0x_spriteram_dma( const address_space *space, const device_config *device, const UINT8 page )
+void ppu2c0x_spriteram_dma( const address_space *space, running_device *device, const UINT8 page )
 {
 	int i;
 	int address = page << 8;
@@ -1258,7 +1258,7 @@ void ppu2c0x_spriteram_dma( const address_space *space, const device_config *dev
  *
  *************************************/
 
-void ppu2c0x_render( const device_config *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
+void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	copybitmap(bitmap, this_ppu->bitmap, flipx, flipy, sx, sy, 0);
@@ -1270,7 +1270,7 @@ void ppu2c0x_render( const device_config *device, bitmap_t *bitmap, int flipx, i
  *
  *************************************/
 
-int ppu2c0x_get_pixel( const device_config *device, int x, int y )
+int ppu2c0x_get_pixel( running_device *device, int x, int y )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 
@@ -1283,37 +1283,37 @@ int ppu2c0x_get_pixel( const device_config *device, int x, int y )
 	return *BITMAP_ADDR16(this_ppu->bitmap, y, x);
 }
 
-int ppu2c0x_get_colorbase( const device_config *device )
+int ppu2c0x_get_colorbase( running_device *device )
 {
 	const ppu2c0x_interface *intf = get_interface(device);
 	return intf->color_base;
 }
 
-int ppu2c0x_get_current_scanline( const device_config *device )
+int ppu2c0x_get_current_scanline( running_device *device )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	return this_ppu->scanline;
 }
 
-void ppu2c0x_set_scanline_callback( const device_config *device, ppu2c0x_scanline_cb cb )
+void ppu2c0x_set_scanline_callback( running_device *device, ppu2c0x_scanline_cb cb )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	this_ppu->scanline_callback_proc = cb;
 }
 
-void ppu2c0x_set_hblank_callback( const device_config *device, ppu2c0x_hblank_cb cb )
+void ppu2c0x_set_hblank_callback( running_device *device, ppu2c0x_hblank_cb cb )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	this_ppu->hblank_callback_proc = cb;
 }
 
-void ppu2c0x_set_vidaccess_callback( const device_config *device, ppu2c0x_vidaccess_cb cb )
+void ppu2c0x_set_vidaccess_callback( running_device *device, ppu2c0x_vidaccess_cb cb )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	this_ppu->vidaccess_callback_proc = cb;
 }
 
-void ppu2c0x_set_scanlines_per_frame( const device_config *device, int scanlines )
+void ppu2c0x_set_scanlines_per_frame( running_device *device, int scanlines )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	this_ppu->scanlines_per_frame = scanlines;

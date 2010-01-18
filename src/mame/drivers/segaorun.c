@@ -498,7 +498,7 @@ static TIMER_CALLBACK( scanline_callback )
  *
  *************************************/
 
-static void outrun_reset(const device_config *device)
+static void outrun_reset(running_device *device)
 {
 	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 }

@@ -237,7 +237,7 @@ static void game_tile_callback(running_machine *machine, int layer, int *code, i
 
 static VIDEO_START( zr107 )
 {
-	const device_config *k056832 = devtag_get_device(machine, "k056832");
+	running_device *k056832 = devtag_get_device(machine, "k056832");
 
 	k056832_set_layer_offs(k056832, 0, -29, -27);
 	k056832_set_layer_offs(k056832, 1, -29, -27);
@@ -254,7 +254,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
-	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	running_device *k056832 = devtag_get_device(screen->machine, "k056832");
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
@@ -644,7 +644,7 @@ static const sharc_config sharc_cfg =
 
 /* ADC0838 Interface */
 
-static double adc0838_callback( const device_config *device, UINT8 input )
+static double adc0838_callback( running_device *device, UINT8 input )
 {
 	switch (input)
 	{

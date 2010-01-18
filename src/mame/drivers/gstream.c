@@ -144,8 +144,8 @@ struct _gstream_state
 	int       oki_bank_0, oki_bank_1;
 
 	/* devices */
-	const device_config *oki_1;
-	const device_config *oki_2;
+	running_device *oki_1;
+	running_device *oki_2;
 };
 
 

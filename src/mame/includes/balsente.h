@@ -39,7 +39,7 @@ struct _balsente_state
 	/* 8253 counter state */
 	struct
 	{
-		const device_config *timer;
+		running_device *timer;
 		UINT8 timer_active;
 		INT32 initial;
 		INT32 count;
@@ -50,12 +50,12 @@ struct _balsente_state
 		UINT8 writebyte;
 	} counter[3];
 
-	const device_config *scanline_timer;
+	running_device *scanline_timer;
 
 	/* manually clocked counter 0 states */
 	UINT8 counter_control;
 	UINT8 counter_0_ff;
-	const device_config *counter_0_timer;
+	running_device *counter_0_timer;
 	UINT8 counter_0_timer_active;
 
 	/* random number generator states */
@@ -86,7 +86,7 @@ struct _balsente_state
 
 	/* noise generator states */
 	UINT32 noise_position[6];
-	const device_config *cem_device[6];
+	running_device *cem_device[6];
 
 	/* game-specific states */
 	UINT8 nstocker_bits;
@@ -113,7 +113,7 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer );
 MACHINE_START( balsente );
 MACHINE_RESET( balsente );
 
-void balsente_noise_gen(const device_config *device, int count, short *buffer);
+void balsente_noise_gen(running_device *device, int count, short *buffer);
 
 WRITE8_HANDLER( balsente_random_reset_w );
 READ8_HANDLER( balsente_random_num_r );

@@ -35,10 +35,10 @@ struct _bublbobl_state
 	int      ic43_a, ic43_b;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *mcu;
-	const device_config *audiocpu;
-	const device_config *slave;
+	running_device *maincpu;
+	running_device *mcu;
+	running_device *audiocpu;
+	running_device *slave;
 };
 
 

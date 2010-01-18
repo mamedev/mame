@@ -20,13 +20,13 @@ struct _dbz_state
 	int           control;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k053246;
-	const device_config *k053251;
-	const device_config *k056832;
-	const device_config *k053936_1;
-	const device_config *k053936_2;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k053246;
+	running_device *k053251;
+	running_device *k056832;
+	running_device *k053936_1;
+	running_device *k053936_2;
 };
 
 

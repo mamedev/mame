@@ -22,7 +22,7 @@ struct _blueprnt_state
 	int     dipsw;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

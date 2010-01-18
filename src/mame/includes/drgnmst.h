@@ -26,8 +26,8 @@ struct _drgnmst_state
 	UINT8       oki1_bank;
 
 	/* devices */
-	const device_config *oki_1;
-	const device_config *oki_2;
+	running_device *oki_1;
+	running_device *oki_2;
 };
 
 

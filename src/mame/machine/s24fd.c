@@ -89,7 +89,7 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-static void s24_fd1094_cmp_callback(const device_config *device, UINT32 val, UINT8 reg)
+static void s24_fd1094_cmp_callback(running_device *device, UINT32 val, UINT8 reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -104,7 +104,7 @@ static IRQ_CALLBACK(s24_fd1094_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static void s24_fd1094_rte_callback (const device_config *device)
+static void s24_fd1094_rte_callback (running_device *device)
 {
 	s24_fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_RTE);
 }

@@ -23,14 +23,14 @@ struct _xmen_state
 	UINT8       sound_curbank;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k054539;
-	const device_config *k052109;
-	const device_config *k053246;
-	const device_config *k053251;
-	const device_config *lscreen;
-	const device_config *rscreen;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k054539;
+	running_device *k052109;
+	running_device *k053246;
+	running_device *k053251;
+	running_device *lscreen;
+	running_device *rscreen;
 };
 
 /*----------- defined in video/xmen.c -----------*/

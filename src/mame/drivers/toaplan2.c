@@ -301,13 +301,13 @@ static READ16_HANDLER( batsugun_share2_r );
 static WRITE16_HANDLER( batsugun_share2_w );
 #endif
 
-static const device_config *sub_cpu = NULL;
+static running_device *sub_cpu = NULL;
 
 /***************************************************************************
   Initialisation handlers
 ***************************************************************************/
 
-static void toaplan2_reset(const device_config *device)
+static void toaplan2_reset(running_device *device)
 {
 	if (sub_cpu != NULL)
 		cpu_set_input_line(sub_cpu, INPUT_LINE_RESET, PULSE_LINE);
@@ -1087,7 +1087,7 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
 
 	nmk112_okibank_w(nmk112, 0,  data		& 0x0f);	// chip 0 bank 0
 	nmk112_okibank_w(nmk112, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
@@ -1095,7 +1095,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
 
 	nmk112_okibank_w(nmk112, 2,  data		& 0x0f);	// chip 0 bank 2
 	nmk112_okibank_w(nmk112, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
@@ -1103,7 +1103,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
 
 	nmk112_okibank_w(nmk112, 4,  data		& 0x0f);	// chip 1 bank 0
 	nmk112_okibank_w(nmk112, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
@@ -1111,7 +1111,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
 
 	nmk112_okibank_w(nmk112, 6,  data		& 0x0f);	// chip 1 bank 2
 	nmk112_okibank_w(nmk112, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
@@ -1270,7 +1270,7 @@ static const eeprom_interface bbakraid_93C66_intf =
 
 static READ16_HANDLER( bbakraid_nvram_r )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	/* Bit 1 returns the status of BUSAK from the Z80.
        BUSRQ is activated via bit 0x10 on the NVRAM write port.
@@ -1298,7 +1298,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 }
 
 
-static void bbakraid_irqhandler(const device_config *device, int state)
+static void bbakraid_irqhandler(running_device *device, int state)
 {
 	/* Not used ???  Connected to a test pin (TP082) */
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
@@ -3391,7 +3391,7 @@ static GFXDECODE_START( fixeighb )
 	GFXDECODE_ENTRY( "gfx2", 0, fixeighblayout , 0, 128 )
 GFXDECODE_END
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler(running_device *device, int linestate)
 {
 	if (sub_cpu != NULL)		// wouldn't tekipaki have problem without this? "mcu" is not generally added
 		cpu_set_input_line(sub_cpu, 0, linestate);
@@ -4013,7 +4013,7 @@ static MACHINE_RESET(batsugun)
 
 
 
-static void batsugun_ym2151_irqhandler(const device_config *device, int linestate)
+static void batsugun_ym2151_irqhandler(running_device *device, int linestate)
 {
 	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
 //  update_irq_lines(machine, linestate ? assert : clear);

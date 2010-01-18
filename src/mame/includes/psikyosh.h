@@ -40,7 +40,7 @@ struct _psikyosh_state
 	UINT32         sample_offs;	// only used if ROMTEST = 1
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 /*----------- defined in video/psikyosh.c -----------*/

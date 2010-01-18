@@ -78,9 +78,9 @@
 typedef struct _pci_bus_state pci_bus_state;
 struct _pci_bus_state
 {
-	const device_config *	busdevice;
+	running_device *	busdevice;
 	const pci_bus_config *	config;
-	const device_config *	device[32];
+	running_device *	device[32];
 	offs_t					address;
 	INT8					devicenum;
 };
@@ -96,7 +96,7 @@ struct _pci_bus_state
     in device is, in fact, an IDE controller
 -------------------------------------------------*/
 
-INLINE pci_bus_state *get_safe_token(const device_config *device)
+INLINE pci_bus_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -205,13 +205,13 @@ static DEVICE_START( pci_bus )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config == NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
 	/* store a pointer back to the device */
-	pcibus->config = (const pci_bus_config *)device->inline_config;
+	pcibus->config = (const pci_bus_config *)device->baseconfig().inline_config;
 	pcibus->busdevice = device;
 	pcibus->devicenum = -1;
 

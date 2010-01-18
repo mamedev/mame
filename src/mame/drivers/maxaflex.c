@@ -31,7 +31,7 @@ static UINT8 portA_in,portA_out,ddrA;
 static UINT8 portB_in,portB_out,ddrB;
 static UINT8 portC_in,portC_out,ddrC;
 static UINT8 tdr,tcr;
-static const device_config *mcu_timer;
+static running_device *mcu_timer;
 
 /* Port A:
     0   (in)  DSW

@@ -30,14 +30,14 @@ struct _v810_state
 	UINT8 irq_line;
 	UINT8 nmi_line;
 	cpu_irq_callback irq_cb;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 PPC;
 	int icount;
 };
 
-INLINE v810_state *get_safe_token(const device_config *device)
+INLINE v810_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

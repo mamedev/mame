@@ -2583,7 +2583,7 @@ static void cps2_render_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 
 
-static void cps1_render_stars( const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps1_render_stars( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	cps_state *state = (cps_state *)screen->machine->driver_data;
 	int offs;

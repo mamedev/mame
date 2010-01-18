@@ -109,7 +109,7 @@ struct _i8237_t
 
 /* ----------------------------------------------------------------------- */
 
-INLINE i8237_t *get_safe_token(const device_config *device) {
+INLINE i8237_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
 	assert( device->token != NULL );
 	assert( device->type == I8237 );
@@ -120,7 +120,7 @@ INLINE i8237_t *get_safe_token(const device_config *device) {
 /* ----------------------------------------------------------------------- */
 
 
-INLINE void dma8237_do_read( const device_config *device )
+INLINE void dma8237_do_read( running_device *device )
 {
 	i8237_t	*i8237 = get_safe_token( device );
 	int			channel = i8237->service_channel;
@@ -140,7 +140,7 @@ INLINE void dma8237_do_read( const device_config *device )
 }
 
 
-INLINE void dma8237_do_write( const device_config *device )
+INLINE void dma8237_do_write( running_device *device )
 {
 	i8237_t	*i8237 = get_safe_token( device );
 	int			channel = i8237->service_channel;
@@ -160,7 +160,7 @@ INLINE void dma8237_do_write( const device_config *device )
 }
 
 
-INLINE void dma8237_advance( const device_config *device )
+INLINE void dma8237_advance( running_device *device )
 {
 	i8237_t	*i8237 = get_safe_token( device );
 	int			channel = i8237->service_channel;
@@ -225,7 +225,7 @@ static void set_dack(i8237_t *i8237, int channel)
 
 static TIMER_CALLBACK( dma8237_timerproc )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	i8237_t	*i8237 = get_safe_token(device);
 
 	/* Check if operation is disabled */
@@ -575,7 +575,7 @@ WRITE8_DEVICE_HANDLER( i8237_w )
 
 
 
-static void dma8237_drq_write(const device_config *device, int channel, int state)
+static void dma8237_drq_write(running_device *device, int channel, int state)
 {
 	i8237_t	*i8237 = get_safe_token( device );
 
@@ -610,7 +610,7 @@ WRITE_LINE_DEVICE_HANDLER( i8237_eop_w )
 
 static DEVICE_START( i8237 ) {
 	i8237_t	*i8237 = get_safe_token(device);
-	i8237_interface *intf = (i8237_interface *)device->static_config;
+	i8237_interface *intf = (i8237_interface *)device->baseconfig().static_config;
 	int i;
 
 	/* resolve callbacks */

@@ -35,7 +35,7 @@ struct tms34061_data
 	UINT8 *				shiftreg;
 	emu_timer *			timer;
 	struct tms34061_interface intf;
-	const device_config *screen;
+	running_device *screen;
 };
 
 

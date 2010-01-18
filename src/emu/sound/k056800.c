@@ -24,7 +24,7 @@ struct _k056800_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k056800_state *k056800_get_safe_token( const device_config *device )
+INLINE k056800_state *k056800_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -33,11 +33,11 @@ INLINE k056800_state *k056800_get_safe_token( const device_config *device )
 	return (k056800_state *)device->token;
 }
 
-INLINE const k056800_interface *k056800_get_interface( const device_config *device )
+INLINE const k056800_interface *k056800_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == K056800));
-	return (const k056800_interface *) device->static_config;
+	return (const k056800_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
@@ -45,7 +45,7 @@ INLINE const k056800_interface *k056800_get_interface( const device_config *devi
 *****************************************************************************/
 
 
-static UINT8 k056800_host_reg_r( const device_config *device, int reg )
+static UINT8 k056800_host_reg_r( running_device *device, int reg )
 {
 	k056800_state *k056800 = k056800_get_safe_token(device);
 	UINT8 value = k056800->host_reg[reg];
@@ -55,7 +55,7 @@ static UINT8 k056800_host_reg_r( const device_config *device, int reg )
 	return value;
 }
 
-static void k056800_host_reg_w( const device_config *device, int reg, UINT8 data )
+static void k056800_host_reg_w( running_device *device, int reg, UINT8 data )
 {
 	k056800_state *k056800 = k056800_get_safe_token(device);
 
@@ -65,13 +65,13 @@ static void k056800_host_reg_w( const device_config *device, int reg, UINT8 data
 		k056800->irq_cb(device->machine, 1);
 }
 
-static UINT8 k056800_sound_reg_r( const device_config *device, int reg )
+static UINT8 k056800_sound_reg_r( running_device *device, int reg )
 {
 	k056800_state *k056800 = k056800_get_safe_token(device);
 	return k056800->sound_reg[reg];
 }
 
-static void k056800_sound_reg_w( const device_config *device, int reg, UINT8 data )
+static void k056800_sound_reg_w( running_device *device, int reg, UINT8 data )
 {
 	k056800_state *k056800 = k056800_get_safe_token(device);
 

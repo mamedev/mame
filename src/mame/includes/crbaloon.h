@@ -12,9 +12,9 @@ Crazy Ballooon
 
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_freq );
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_enable );
-void crbaloon_audio_set_explosion_enable(const device_config *sn, int enabled);
-void crbaloon_audio_set_breath_enable(const device_config *sn, int enabled);
-void crbaloon_audio_set_appear_enable(const device_config *sn, int enabled);
+void crbaloon_audio_set_explosion_enable(running_device *sn, int enabled);
+void crbaloon_audio_set_breath_enable(running_device *sn, int enabled);
+void crbaloon_audio_set_appear_enable(running_device *sn, int enabled);
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_laugh_enable );
 
 MACHINE_DRIVER_EXTERN( crbaloon_audio );

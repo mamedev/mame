@@ -91,13 +91,13 @@ struct _tms32010_state
 	UINT16	memaccess;
 	int		addr_mask;
 
-	const	device_config *device;
+	running_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
 };
 
-INLINE tms32010_state *get_safe_token(const device_config *device)
+INLINE tms32010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

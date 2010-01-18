@@ -20,7 +20,7 @@ struct _citycon_state
 	int            bg_image;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

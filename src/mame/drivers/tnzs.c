@@ -1552,7 +1552,7 @@ static const ym2203_interface ym2203_config =
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);

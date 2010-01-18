@@ -96,9 +96,9 @@ static struct
 	int protection_check;
 
 	running_machine *machine;
-	const device_config *ymdevice;
-	const device_config *oki1device;
-	const device_config *oki2device;
+	running_device *ymdevice;
+	running_device *oki1device;
+	running_device *oki2device;
 
 	/* C001      */	UINT8 last_command;		// last command received
 	/* C016      */	UINT8 oki_playing;		// bitmap of active Oki channels
@@ -144,7 +144,7 @@ static void oki_play_sample(int sample_no)
 	UINT8 byte1 = read8(table_start + 2 * (sample_no & 0x7f) + 0);
 	UINT8 byte2 = read8(table_start + 2 * (sample_no & 0x7f) + 1);
 	int chip = (byte1 & 0x80) >> 7;
-	const device_config *okidevice = (chip) ? NMK004_state.oki2device : NMK004_state.oki1device;
+	running_device *okidevice = (chip) ? NMK004_state.oki2device : NMK004_state.oki1device;
 
 	if ((byte1 & 0x7f) == 0)
 	{
@@ -988,7 +988,7 @@ static void update_music(void)
 
 
 
-void NMK004_irq(const device_config *device, int irq)
+void NMK004_irq(running_device *device, int irq)
 {
 	if (irq)
 	{

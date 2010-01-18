@@ -52,7 +52,7 @@ GFXDECODE_END
 
 /* sound */
 
-static void sound_cause_nmi( const device_config *device, int chip )
+static void sound_cause_nmi( running_device *device, int chip )
 {
 	/* upd7759 callback */
 	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);

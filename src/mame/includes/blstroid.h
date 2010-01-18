@@ -20,4 +20,4 @@ struct _blstroid_state
 VIDEO_START( blstroid );
 VIDEO_UPDATE( blstroid );
 
-void blstroid_scanline_update(const device_config *screen, int scanline);
+void blstroid_scanline_update(running_device *screen, int scanline);

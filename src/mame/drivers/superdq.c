@@ -27,7 +27,7 @@
 #include "machine/laserdsc.h"
 #include "video/resnet.h"
 
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static UINT8 superdq_ld_in_latch;
 static UINT8 superdq_ld_out_latch;
 

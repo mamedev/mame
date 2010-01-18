@@ -358,7 +358,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
         D1 : Coin meter #2
         D0 : Coin meter #1
     */
-	const device_config *mcu = devtag_get_device(device->machine, "mcu");
+	running_device *mcu = devtag_get_device(device->machine, "mcu");
 
 	if (((video_control ^ data) & 0x0c) && lamp_changed_w)
 		(*lamp_changed_w)(video_control ^ data, data);
@@ -835,7 +835,7 @@ INLINE void maincpu_byte_w(running_machine *machine, offs_t offset, UINT8 data)
 
 static WRITE8_HANDLER( mcu_control_w )
 {
-	const device_config *maincpu = devtag_get_device(space->machine, "maincpu");
+	running_device *maincpu = devtag_get_device(space->machine, "maincpu");
 	int irqline;
 
 	cpu_set_input_line(maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);

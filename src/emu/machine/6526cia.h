@@ -59,15 +59,15 @@ DEVICE_GET_INFO(cia6526r2);
 DEVICE_GET_INFO(cia8520);
 
 /* configuration */
-void cia_set_port_mask_value(const device_config *device, int port, int data);
+void cia_set_port_mask_value(running_device *device, int port, int data);
 
 /* reading and writing */
 READ8_DEVICE_HANDLER( cia_r );
 WRITE8_DEVICE_HANDLER( cia_w );
-void cia_clock_tod(const device_config *device);
-void cia_issue_index(const device_config *device);
-void cia_set_input_cnt(const device_config *device, int data);
-void cia_set_input_sp(const device_config *device, int data);
+void cia_clock_tod(running_device *device);
+void cia_issue_index(running_device *device);
+void cia_set_input_cnt(running_device *device, int data);
+void cia_set_input_sp(running_device *device, int data);
 
 WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w );
 WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w );
@@ -75,8 +75,8 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
 WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w );
 
 /* accessors */
-UINT8 cia_get_output_a(const device_config *device);
-UINT8 cia_get_output_b(const device_config *device);
-int cia_get_irq(const device_config *device);
+UINT8 cia_get_output_a(running_device *device);
+UINT8 cia_get_output_b(running_device *device);
+int cia_get_irq(running_device *device);
 
 #endif /* __6526CIA_H__ */

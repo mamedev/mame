@@ -23,9 +23,9 @@ struct _gcpinbal_state
 	UINT8       adpcm_trigger, adpcm_data;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *oki;
-	const device_config *msm;
+	running_device *maincpu;
+	running_device *oki;
+	running_device *msm;
 };
 
 

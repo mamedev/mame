@@ -216,7 +216,7 @@ static UINT8 port_last2;
 
 static WRITE8_HANDLER( safarir_audio_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_last;
 
 	if (rising_bits == 0x12) sample_start(samples, CHANNEL_SOUND1, SAMPLE_SOUND1_1, 0);

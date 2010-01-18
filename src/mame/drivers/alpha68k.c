@@ -1831,7 +1831,7 @@ static const ym2203_interface ym2203_config =
 	}
 };
 
-static void YM3812_irq( const device_config *device, int param )
+static void YM3812_irq( running_device *device, int param )
 {
 	alpha68k_state *state = (alpha68k_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);

@@ -22,7 +22,7 @@ struct _inufuku_state
 	UINT16    pending_command;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

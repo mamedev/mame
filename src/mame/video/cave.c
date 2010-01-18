@@ -797,7 +797,7 @@ static void sprite_init_cave( running_machine *machine )
 	state_save_register_postload(machine, cave_sprite_postload, NULL);
 }
 
-static void cave_sprite_check( const device_config *screen, const rectangle *clip )
+static void cave_sprite_check( running_device *screen, const rectangle *clip )
 {
 	cave_state *state = (cave_state *)screen->machine->driver_data;
 

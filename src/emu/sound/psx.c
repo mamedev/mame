@@ -37,7 +37,7 @@ typedef enum { e_attack = 0, e_decay, e_sustain, e_sustainEnd, e_release, e_rele
 struct psxinfo
 {
 	const psx_spu_interface *intf;
-	const device_config *device;
+	running_device *device;
 
 	UINT32 *g_p_n_psxram;
 	UINT16 m_n_mainvolumeleft;
@@ -84,7 +84,7 @@ struct psxinfo
 	int installHack;
 };
 
-INLINE struct psxinfo *get_safe_token(const device_config *device)
+INLINE struct psxinfo *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -279,7 +279,7 @@ static DEVICE_START( psxspu )
 	int n_effect;
 	int n_channel;
 
-	chip->intf = (const psx_spu_interface *)device->static_config;
+	chip->intf = (const psx_spu_interface *)device->baseconfig().static_config;
 	chip->device = device;
 	chip->g_p_n_psxram = *(chip->intf->p_psxram);
 

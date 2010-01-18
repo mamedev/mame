@@ -1335,7 +1335,7 @@ static struct st_chip {
 /*------------------------------
     uppdate timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine *machine, const device_config *cpu, int no )
+static void uPD71054_update_timer( running_machine *machine, running_device *cpu, int no )
 {
 	UINT16 max = uPD71054.max[no]&0xffff;
 
@@ -1437,7 +1437,7 @@ static const x1_010_interface seta_sound_intf2 =
 	0x1000,		/* address */
 };
 
-static void utoukond_ym3438_interrupt(const device_config *device, int linestate)
+static void utoukond_ym3438_interrupt(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }

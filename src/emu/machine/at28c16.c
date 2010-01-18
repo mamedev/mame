@@ -35,7 +35,7 @@ static TIMER_CALLBACK( write_finished )
     in device is, in fact, an AT28C16
 -------------------------------------------------*/
 
-INLINE at28c16_state *get_safe_token(const device_config *device)
+INLINE at28c16_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -107,14 +107,14 @@ READ8_DEVICE_HANDLER( at28c16_r )
 	}
 }
 
-void at28c16_a9_12v( const device_config *device, int a9_12v )
+void at28c16_a9_12v( running_device *device, int a9_12v )
 {
 	at28c16_state *c = get_safe_token(device);
 
 	c->a9_12v = a9_12v;
 }
 
-void at28c16_oe_12v( const device_config *device, int oe_12v )
+void at28c16_oe_12v( running_device *device, int oe_12v )
 {
 	at28c16_state *c = get_safe_token(device);
 
@@ -132,8 +132,8 @@ static DEVICE_START(at28c16)
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-//  assert(device->static_config != NULL);
-//  assert(device->inline_config == NULL);
+//  assert(device->baseconfig().static_config != NULL);
+//  assert(device->baseconfig().inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -145,7 +145,7 @@ static DEVICE_START(at28c16)
 	c->write_timer = timer_alloc(device->machine,  write_finished, c );
 	c->default_data = *device->region;
 
-	config = (const at28c16_config *)device->inline_config;
+	config = (const at28c16_config *)device->baseconfig().inline_config;
 	if (config->id != NULL)
 		c->default_id = memory_region( device->machine, config->id );
 

@@ -766,7 +766,7 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *device = devtag_get_device(space->machine, "ensoniq");
+		running_device *device = devtag_get_device(space->machine, "ensoniq");
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)

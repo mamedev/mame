@@ -202,7 +202,7 @@ static READ16_HANDLER( warriorb_sound_r )
 static WRITE8_HANDLER( warriorb_pancontrol )
 {
 	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
-	const device_config *flt = NULL;
+	running_device *flt = NULL;
 	offset &= 3;
 
 	switch (offset)
@@ -417,7 +417,7 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	warriorb_state *state = (warriorb_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

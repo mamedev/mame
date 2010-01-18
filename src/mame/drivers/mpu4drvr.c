@@ -378,8 +378,8 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		const device_config *acia_0 = devtag_get_device(device->machine, "acia6850_0");
-		const device_config *acia_1 = devtag_get_device(device->machine, "acia6850_1");
+		running_device *acia_0 = devtag_get_device(device->machine, "acia6850_0");
+		running_device *acia_1 = devtag_get_device(device->machine, "acia6850_1");
 		acia6850_tx_clock_in(acia_0);
 		acia6850_rx_clock_in(acia_0);
 		acia6850_tx_clock_in(acia_1);

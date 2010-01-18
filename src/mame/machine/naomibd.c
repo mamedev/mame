@@ -204,7 +204,7 @@ struct _naomibd_state
 {
 	UINT8				index;					/* index of board */
 	UINT8				type;
-	const device_config *device;				/* pointer to our containing device */
+	running_device *device;				/* pointer to our containing device */
 
 	UINT8 *				memory;
 	UINT8 *				protdata;
@@ -299,7 +299,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
     in device is, in fact, a naomibd device
 -------------------------------------------------*/
 
-INLINE naomibd_state *get_safe_token(const device_config *device)
+INLINE naomibd_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -316,16 +316,16 @@ INLINE naomibd_state *get_safe_token(const device_config *device)
  *
  *************************************/
 
-int naomibd_interrupt_callback(const device_config *device, naomibd_interrupt_func callback)
+int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback)
 {
-	naomibd_config *config = (naomibd_config *)device->inline_config;
+	naomibd_config *config = (naomibd_config *)device->baseconfig().inline_config;
 	//naomibd_state *v = get_safe_token(device);
 
 	config->interrupt = callback;
 	return 0;
 }
 
-int naomibd_get_type(const device_config *device)
+int naomibd_get_type(running_device *device)
 {
 	naomibd_state *v = get_safe_token(device);
 	return v->type;
@@ -347,7 +347,7 @@ static STATE_POSTLOAD( naomibd_postload )
 }
 
 
-static void init_save_state(const device_config *device)
+static void init_save_state(running_device *device)
 {
 	naomibd_state *v = get_safe_token(device);
 
@@ -977,13 +977,13 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 
 static DEVICE_START( naomibd )
 {
-	const naomibd_config *config = (const naomibd_config *)device->inline_config;
+	const naomibd_config *config = (const naomibd_config *)device->baseconfig().inline_config;
 	naomibd_state *v = get_safe_token(device);
 	int i;
 
 	/* validate some basic stuff */
-	assert(device->static_config == NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -1034,7 +1034,7 @@ static DEVICE_START( naomibd )
 	}
 
 	/* set the type */
-	v->index = device->machine->config->devicelist.index(device->type, device->tag);
+	v->index = device->machine->devicelist.index(device->type, device->tag);
 	v->type = config->type;
 
 	/* initialize some registers */
@@ -1118,15 +1118,11 @@ static DEVICE_NVRAM( naomibd )
     device get info callback
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( naomibd )
+DEVICE_GET_RUNTIME_INFO( naomibd )
 {
-	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)device->inline_config : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(naomibd_state);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(naomibd_config);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
 		case DEVINFO_INT_DMAOFFSET:
 			#if NAOMIBD_PRINTF_PROTECTION
 		        printf("DMA source %08x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
@@ -1168,15 +1164,33 @@ DEVICE_GET_INFO( naomibd )
 			break;
 
 		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MEMORY:				info->p = get_safe_token(device)->memory;		break;
+		
+		/* default to the standard info */
+		default:								DEVICE_GET_INFO_NAME(naomibd)(&device->baseconfig(), state, info);	break;
+	}
+}
+
+DEVICE_GET_INFO( naomibd )
+{
+	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)device->inline_config : NULL;
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(naomibd_state);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(naomibd_config);				break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
+
+		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = NULL;							break;
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = NULL;					break;
-		case DEVINFO_PTR_MEMORY:				info->p = get_safe_token(device)->memory;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(naomibd);		break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(naomibd);			break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(naomibd);		break;
 		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(naomibd);		break;
+		case DEVINFO_FCT_GET_RUNTIME_INFO:		info->get_runtime_info = DEVICE_GET_RUNTIME_INFO_NAME(naomibd);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:

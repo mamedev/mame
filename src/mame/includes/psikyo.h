@@ -29,7 +29,7 @@ struct _psikyo_state
 	int            z80_nmi, mcu_status;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 
 	/* game-specific */
 	// 1945 MCU

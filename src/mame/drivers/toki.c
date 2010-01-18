@@ -71,7 +71,7 @@ static READ16_HANDLER( pip16_r )
 
 static int msm5205next;
 
-static void toki_adpcm_int (const device_config *device)
+static void toki_adpcm_int (running_device *device)
 {
 	static int toggle = 0;
 

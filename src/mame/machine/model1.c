@@ -1987,7 +1987,7 @@ void model1_vr_tgp_reset( running_machine *machine )
 }
 
 /* FIFO */
-static int copro_fifoin_pop(const device_config *device, UINT32 *result)
+static int copro_fifoin_pop(running_device *device, UINT32 *result)
 {
 	UINT32 r;
 
@@ -2054,7 +2054,7 @@ static UINT32 copro_fifoout_pop(const address_space *space)
 	return r;
 }
 
-static void copro_fifoout_push(const device_config *device, UINT32 data)
+static void copro_fifoout_push(running_device *device, UINT32 data)
 {
 	if (copro_fifoout_num == FIFO_SIZE)
 	{

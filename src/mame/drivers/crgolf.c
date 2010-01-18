@@ -190,7 +190,7 @@ static READ8_HANDLER( sound_to_main_r )
  *
  *************************************/
 
-static void vck_callback( const device_config *device )
+static void vck_callback( running_device *device )
 {
 	crgolf_state *state = (crgolf_state *)device->machine->driver_data;
 
@@ -603,7 +603,7 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	const device_config *msm = devtag_get_device(machine, "msm");
+	running_device *msm = devtag_get_device(machine, "msm");
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 

@@ -5,13 +5,13 @@
 
 
 /* sets the digit (0 or 1) */
-void hc55516_digit_w(const device_config *device, int digit);
+void hc55516_digit_w(running_device *device, int digit);
 
 /* sets the clock state (0 or 1, clocked on the rising edge) */
-void hc55516_clock_w(const device_config *device, int state);
+void hc55516_clock_w(running_device *device, int state);
 
 /* returns whether the clock is currently LO or HI */
-int hc55516_clock_state_r(const device_config *device);
+int hc55516_clock_state_r(running_device *device);
 
 DEVICE_GET_INFO( hc55516 );
 DEVICE_GET_INFO( mc3417 );

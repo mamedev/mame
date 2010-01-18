@@ -201,7 +201,7 @@ struct _device_field_info
 {
 	device_field_info *			next;				/* linked list of info for this port */
 	const input_field_config *	field;				/* pointer to the input field referenced */
-	const device_config *		device;				/* device */
+	running_device *		device;				/* device */
 	UINT8						shift;				/* shift to apply to the final result */
 	input_port_value			oldval;				/* last value */
 };
@@ -1756,7 +1756,7 @@ static device_field_info *init_field_device_info(const input_field_config *field
 	if (device_name != NULL)
 		info->device = field->port->machine->device(device_name);
 	else
-		info->device = (const device_config *) info;
+		info->device = (running_device *) info;
 
 	info->oldval = field->defvalue >> info->shift;
 	return info;

@@ -388,8 +388,8 @@ void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_devic
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
 
-void amiga_cia_0_irq(const device_config *device, int state);
-void amiga_cia_1_irq(const device_config *device, int state);
+void amiga_cia_0_irq(running_device *device, int state);
+void amiga_cia_1_irq(running_device *device, int state);
 
 const amiga_machine_interface *amiga_get_interface(void);
 
@@ -409,7 +409,7 @@ PALETTE_INIT( amiga );
 VIDEO_START( amiga );
 VIDEO_UPDATE( amiga );
 
-UINT32 amiga_gethvpos(const device_config *screen);
+UINT32 amiga_gethvpos(running_device *screen);
 void copper_setpc(UINT32 pc);
 void amiga_set_genlock_color(UINT16 color);
 void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
@@ -421,7 +421,7 @@ void amiga_sprite_enable_comparitor(int which, int enable);
 VIDEO_START( amiga_aga );
 VIDEO_UPDATE( amiga_aga );
 
-UINT32 amiga_aga_gethvpos(const device_config *screen);
+UINT32 amiga_aga_gethvpos(running_device *screen);
 void aga_copper_setpc(UINT32 pc);
 void amiga_aga_set_genlock_color(UINT16 color);
 void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);

@@ -2455,12 +2455,12 @@ CPU_GET_INFO( sh1 )
 	}
 }
 
-void sh2drc_set_options(const device_config *device, UINT32 options)
+void sh2drc_set_options(running_device *device, UINT32 options)
 {
 	/* doesn't apply here */
 }
 
-void sh2drc_add_pcflush(const device_config *device, offs_t address)
+void sh2drc_add_pcflush(running_device *device, offs_t address)
 {
 	/* doesn't apply here */
 }

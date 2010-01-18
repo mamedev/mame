@@ -212,7 +212,7 @@ enum
 /* internal backend-specific state */
 struct _drcbe_state
 {
-	const device_config *	device;					/* CPU device we are associated with */
+	running_device *	device;					/* CPU device we are associated with */
 	const address_space *	space[ADDRESS_SPACES];	/* pointers to CPU's address space */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
@@ -254,7 +254,7 @@ union _drcbec_instruction
 ***************************************************************************/
 
 /* primary back-end callbacks */
-static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits);
+static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, running_device *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 static void drcbec_free(drcbe_state *drcbe);
 static void drcbec_reset(drcbe_state *drcbe);
 static int drcbec_execute(drcbe_state *state, drcuml_codehandle *entry);
@@ -340,7 +340,7 @@ extern const drcbe_interface drcbe_c_be_interface =
     state
 -------------------------------------------------*/
 
-static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits)
+static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, running_device *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	int spacenum;
 

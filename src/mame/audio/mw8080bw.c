@@ -577,7 +577,7 @@ MACHINE_DRIVER_START( maze_audio )
 MACHINE_DRIVER_END
 
 
-void maze_write_discrete(const device_config *device, UINT8 maze_tone_timing_state)
+void maze_write_discrete(running_device *device, UINT8 maze_tone_timing_state)
 {
 	/* controls need to be active low */
 	int controls = ~input_port_read(device->machine, "IN0") & 0xff;

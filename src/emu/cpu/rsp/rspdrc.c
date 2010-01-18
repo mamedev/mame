@@ -348,7 +348,7 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 #define SET_ZERO_FLAG(x)			{ rsp->flag[0] |= (0x100 << (x)); }
 #define CLEAR_ZERO_FLAG(x)			{ rsp->flag[0] &= ~(0x100 << (x)); }
 
-INLINE rsp_state *get_safe_token(const device_config *device)
+INLINE rsp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -514,7 +514,7 @@ INLINE void WRITE64(rsp_state *rsp, UINT32 address, UINT64 data)
     rspdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void rspdrc_set_options(const device_config *device, UINT32 options)
+void rspdrc_set_options(running_device *device, UINT32 options)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->drcoptions = options;
@@ -525,7 +525,7 @@ void rspdrc_set_options(const device_config *device, UINT32 options)
     rspdrc_add_imem - register an imem region
 -------------------------------------------------*/
 
-void rspdrc_add_imem(const device_config *device, void *base)
+void rspdrc_add_imem(running_device *device, void *base)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->imem = base;
@@ -536,7 +536,7 @@ void rspdrc_add_imem(const device_config *device, void *base)
     rspdrc_add_dmem - register a dmem region
 -------------------------------------------------*/
 
-void rspdrc_add_dmem(const device_config *device, void *base)
+void rspdrc_add_dmem(running_device *device, void *base)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->dmem = base;
@@ -685,14 +685,14 @@ static const int vector_elements_2[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },		// 7
 };
 
-static void rspcom_init(rsp_state *rsp, const device_config *device, cpu_irq_callback irqcallback)
+static void rspcom_init(rsp_state *rsp, running_device *device, cpu_irq_callback irqcallback)
 {
 	int regIdx = 0;
     int accumIdx;
 
 	memset(rsp, 0, sizeof(*rsp));
 
-	rsp->config = (const rsp_config *)device->static_config;
+	rsp->config = (const rsp_config *)device->baseconfig().static_config;
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
 	rsp->program = device->space(AS_PROGRAM);
@@ -7161,7 +7161,7 @@ static CPU_EXECUTE( rsp )
     accessor to code_flush_cache
 -------------------------------------------------*/
 
-void rspdrc_flush_drc_cache(const device_config *device)
+void rspdrc_flush_drc_cache(running_device *device)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->cache_dirty = TRUE;

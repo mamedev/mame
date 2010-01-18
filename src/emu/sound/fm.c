@@ -587,7 +587,7 @@ typedef struct
 
 typedef struct
 {
-	const device_config *device;
+	running_device *device;
 	void *		param;				/* this chip parameter  */
 	int			clock;				/* master clock  (Hz)   */
 	int			rate;				/* sampling rate (Hz)   */
@@ -1675,7 +1675,7 @@ INLINE void CSMKeyControll(UINT8 type, FM_CH *CH)
 
 #ifdef __STATE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_channel(const device_config *device,FM_CH *CH,int num_ch)
+static void FMsave_state_channel(running_device *device,FM_CH *CH,int num_ch)
 {
 	int slot , ch;
 
@@ -1695,7 +1695,7 @@ static void FMsave_state_channel(const device_config *device,FM_CH *CH,int num_c
 	}
 }
 
-static void FMsave_state_st(const device_config *device,FM_ST *ST)
+static void FMsave_state_st(running_device *device,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
 	state_save_register_device_item(device, 0, ST->busy_expiry_time.seconds );
@@ -2230,7 +2230,7 @@ void ym2203_postload(void *chip)
 	}
 }
 
-static void YM2203_save_state(YM2203 *F2203, const device_config *device)
+static void YM2203_save_state(YM2203 *F2203, running_device *device)
 {
 	state_save_register_device_item_array(device, 0, F2203->REGS);
 	FMsave_state_st(device,&F2203->OPN.ST);
@@ -2247,7 +2247,7 @@ static void YM2203_save_state(YM2203 *F2203, const device_config *device)
    'clock' is the chip clock in Hz
    'rate' is sampling rate
 */
-void * ym2203_init(void *param, const device_config *device, int clock, int rate,
+void * ym2203_init(void *param, running_device *device, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	YM2203 *F2203;
@@ -2638,7 +2638,7 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 
 #ifdef __STATE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_adpcma(const device_config *device,ADPCM_CH *adpcm)
+static void FMsave_state_adpcma(running_device *device,ADPCM_CH *adpcm)
 {
 	int ch;
 
@@ -3437,7 +3437,7 @@ void ym2608_postload(void *chip)
 	}
 }
 
-static void YM2608_save_state(YM2608 *F2608, const device_config *device)
+static void YM2608_save_state(YM2608 *F2608, running_device *device)
 {
 	state_save_register_device_item_array(device, 0, F2608->REGS);
 	FMsave_state_st(device,&F2608->OPN.ST);
@@ -3466,7 +3466,7 @@ static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 	FM_STATUS_RESET(&(F2608->OPN.ST), changebits);
 }
 /* YM2608(OPNA) */
-void * ym2608_init(void *param, const device_config *device, int clock, int rate,
+void * ym2608_init(void *param, running_device *device, int clock, int rate,
                void *pcmrom,int pcmsize,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
@@ -4116,7 +4116,7 @@ void ym2610_postload(void *chip)
 	}
 }
 
-static void YM2610_save_state(YM2610 *F2610, const device_config *device)
+static void YM2610_save_state(YM2610 *F2610, running_device *device)
 {
 	state_save_register_device_item_array(device, 0, F2610->REGS);
 	FMsave_state_st(device,&F2610->OPN.ST);
@@ -4147,7 +4147,7 @@ static void YM2610_deltat_status_reset(void *chip, UINT8 changebits)
 	F2610->adpcm_arrivedEndAddress &= (~changebits);
 }
 
-void *ym2610_init(void *param, const device_config *device, int clock, int rate,
+void *ym2610_init(void *param, running_device *device, int clock, int rate,
                void *pcmroma,int pcmsizea,void *pcmromb,int pcmsizeb,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 

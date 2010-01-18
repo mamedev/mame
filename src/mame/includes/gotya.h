@@ -17,7 +17,7 @@ struct _gotya_state
 	int      theme_playing;
 
 	/* devices */
-	const device_config *samples;
+	running_device *samples;
 };
 
 

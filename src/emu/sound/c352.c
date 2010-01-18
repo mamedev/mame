@@ -82,7 +82,7 @@ struct _c352_state
 	unsigned int mseq_reg;
 };
 
-INLINE c352_state *get_safe_token(const device_config *device)
+INLINE c352_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -490,7 +490,7 @@ static void c352_write_reg16(c352_state *info, unsigned long address, unsigned s
 	}
 }
 
-static void c352_init(c352_state *info, const device_config *device)
+static void c352_init(c352_state *info, running_device *device)
 {
 	int i;
 	double x_max = 32752.0;

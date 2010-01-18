@@ -132,14 +132,14 @@ struct _namcoio_state
 	INT32          creds_per_coin[2];
 	INT32          in_count;
 
-	const device_config *device;
+	running_device *device;
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE namcoio_state *get_safe_token( const device_config *device )
+INLINE namcoio_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -148,11 +148,11 @@ INLINE namcoio_state *get_safe_token( const device_config *device )
 	return (namcoio_state *)device->token;
 }
 
-INLINE const namcoio_interface *get_interface( const device_config *device )
+INLINE const namcoio_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->type == NAMCO56XX || device->type == NAMCO58XX || device->type == NAMCO59XX);
-	return (const namcoio_interface *) device->static_config;
+	return (const namcoio_interface *) device->baseconfig().static_config;
 }
 
 
@@ -166,7 +166,7 @@ INLINE const namcoio_interface *get_interface( const device_config *device )
 #define IORAM_READ(offset) (namcoio->ram[offset] & 0x0f)
 #define IORAM_WRITE(offset,data) {namcoio->ram[offset] = (data) & 0x0f;}
 
-static void handle_coins( const device_config *device, int swap )
+static void handle_coins( running_device *device, int swap )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 	int val, toggled;
@@ -241,7 +241,7 @@ static void handle_coins( const device_config *device, int swap )
 }
 
 
-void namco_customio_56xx_run( const device_config *device )
+void namco_customio_56xx_run( running_device *device )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 
@@ -323,7 +323,7 @@ void namco_customio_56xx_run( const device_config *device )
 
 
 
-void namco_customio_59xx_run( const device_config *device )
+void namco_customio_59xx_run( running_device *device )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 
@@ -348,7 +348,7 @@ void namco_customio_59xx_run( const device_config *device )
 
 
 
-void namco_customio_58xx_run( const device_config *device )
+void namco_customio_58xx_run( running_device *device )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 

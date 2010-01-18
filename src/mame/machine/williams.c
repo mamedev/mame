@@ -26,9 +26,9 @@ static UINT8 vram_bank;
 static UINT16 joust2_current_sound_data;
 
 /* older-Williams routines */
-static void williams_main_irq(const device_config *device, int state);
-static void williams_main_firq(const device_config *device, int state);
-static void williams_snd_irq(const device_config *device, int state);
+static void williams_main_irq(running_device *device, int state);
+static void williams_main_firq(running_device *device, int state);
+static void williams_snd_irq(running_device *device, int state);
 static WRITE8_DEVICE_HANDLER( williams_snd_cmd_w );
 static WRITE8_DEVICE_HANDLER( playball_snd_cmd_w );
 
@@ -40,8 +40,8 @@ static READ8_DEVICE_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
 static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w );
-static void mysticm_main_irq(const device_config *device, int state);
-static void tshoot_main_irq(const device_config *device, int state);
+static void mysticm_main_irq(running_device *device, int state);
+static void tshoot_main_irq(running_device *device, int state);
 
 /* Lotto Fun-specific code */
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
@@ -250,7 +250,7 @@ const pia6821_interface joust2_pia_1_intf =
 
 TIMER_DEVICE_CALLBACK( williams_va11_callback )
 {
-	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
+	running_device *pia_1 = devtag_get_device(timer->machine, "pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -265,7 +265,7 @@ TIMER_DEVICE_CALLBACK( williams_va11_callback )
 
 static TIMER_CALLBACK( williams_count240_off_callback )
 {
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	running_device *pia_1 = devtag_get_device(machine, "pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia6821_ca1_w(pia_1, 0, 0);
@@ -274,7 +274,7 @@ static TIMER_CALLBACK( williams_count240_off_callback )
 
 TIMER_DEVICE_CALLBACK( williams_count240_callback )
 {
-	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
+	running_device *pia_1 = devtag_get_device(timer->machine, "pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia6821_ca1_w(pia_1, 0, 1);
@@ -287,9 +287,9 @@ TIMER_DEVICE_CALLBACK( williams_count240_callback )
 }
 
 
-static void williams_main_irq(const device_config *device, int state)
+static void williams_main_irq(running_device *device, int state)
 {
-	const device_config *pia_1 = devtag_get_device(device->machine, "pia_1");
+	running_device *pia_1 = devtag_get_device(device->machine, "pia_1");
 	int combined_state = pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
@@ -297,16 +297,16 @@ static void williams_main_irq(const device_config *device, int state)
 }
 
 
-static void williams_main_firq(const device_config *device, int state)
+static void williams_main_firq(running_device *device, int state)
 {
 	/* FIRQ to the main CPU */
 	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void williams_snd_irq(const device_config *device, int state)
+static void williams_snd_irq(running_device *device, int state)
 {
-	const device_config *pia_2 = devtag_get_device(device->machine, "pia_2");
+	running_device *pia_2 = devtag_get_device(device->machine, "pia_2");
 	int combined_state = pia6821_get_irq_a(pia_2) | pia6821_get_irq_b(pia_2);
 
 	/* IRQ to the sound CPU */
@@ -321,10 +321,10 @@ static void williams_snd_irq(const device_config *device, int state)
  *
  *************************************/
 
-static void mysticm_main_irq(const device_config *device, int state)
+static void mysticm_main_irq(running_device *device, int state)
 {
-	const device_config *pia_0 = devtag_get_device(device->machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(device->machine, "pia_1");
+	running_device *pia_0 = devtag_get_device(device->machine, "pia_0");
+	running_device *pia_1 = devtag_get_device(device->machine, "pia_1");
 	int combined_state = pia6821_get_irq_b(pia_0) | pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
@@ -332,10 +332,10 @@ static void mysticm_main_irq(const device_config *device, int state)
 }
 
 
-static void tshoot_main_irq(const device_config *device, int state)
+static void tshoot_main_irq(running_device *device, int state)
 {
-	const device_config *pia_0 = devtag_get_device(device->machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(device->machine, "pia_1");
+	running_device *pia_0 = devtag_get_device(device->machine, "pia_0");
+	running_device *pia_1 = devtag_get_device(device->machine, "pia_1");
 	int combined_state = pia6821_get_irq_a(pia_0) | pia6821_get_irq_b(pia_0) | pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
@@ -391,8 +391,8 @@ MACHINE_RESET( williams )
 
 TIMER_DEVICE_CALLBACK( williams2_va11_callback )
 {
-	const device_config *pia_0 = devtag_get_device(timer->machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
+	running_device *pia_0 = devtag_get_device(timer->machine, "pia_0");
+	running_device *pia_1 = devtag_get_device(timer->machine, "pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -408,7 +408,7 @@ TIMER_DEVICE_CALLBACK( williams2_va11_callback )
 
 static TIMER_CALLBACK( williams2_endscreen_off_callback )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
+	running_device *pia_0 = devtag_get_device(machine, "pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia6821_ca1_w(pia_0, 0, 1);
@@ -417,7 +417,7 @@ static TIMER_CALLBACK( williams2_endscreen_off_callback )
 
 TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 {
-	const device_config *pia_0 = devtag_get_device(timer->machine, "pia_0");
+	running_device *pia_0 = devtag_get_device(timer->machine, "pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia6821_ca1_w(pia_0, 0, 0);
@@ -533,7 +533,7 @@ WRITE8_HANDLER( williams2_bank_select_w )
 
 static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 {
-	const device_config *pia_2 = devtag_get_device(machine, "pia_2");
+	running_device *pia_2 = devtag_get_device(machine, "pia_2");
 
 	pia6821_portb_w(pia_2, 0, param);
 	pia6821_cb1_w(pia_2, 0, (param == 0xff) ? 0 : 1);
@@ -553,7 +553,7 @@ WRITE8_DEVICE_HANDLER( playball_snd_cmd_w )
 
 static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 {
-	const device_config *pia_2 = devtag_get_device(machine, "pia_2");
+	running_device *pia_2 = devtag_get_device(machine, "pia_2");
 
 	pia6821_porta_w(pia_2, 0, param);
 }
@@ -961,7 +961,7 @@ MACHINE_START( joust2 )
 
 MACHINE_RESET( joust2 )
 {
-	const device_config *pia_3 = devtag_get_device(machine, "cvsdpia");
+	running_device *pia_3 = devtag_get_device(machine, "cvsdpia");
 
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
@@ -971,14 +971,14 @@ MACHINE_RESET( joust2 )
 
 static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 {
-	const device_config *pia_2 = devtag_get_device(machine, "pia_2");
+	running_device *pia_2 = devtag_get_device(machine, "pia_2");
 	pia6821_porta_w(pia_2, 0, param & 0xff);
 }
 
 
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 {
-	const device_config *pia_3 = devtag_get_device(device->machine, "cvsdpia");
+	running_device *pia_3 = devtag_get_device(device->machine, "cvsdpia");
 
 	joust2_current_sound_data = (joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
 	pia6821_cb1_w(pia_3, offset, data);

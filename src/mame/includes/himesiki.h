@@ -18,7 +18,7 @@ struct _himesiki_state
 	int        flipscreen;
 
 	/* devices */
-	const device_config *subcpu;
+	running_device *subcpu;
 };
 
 

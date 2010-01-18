@@ -102,7 +102,7 @@ static WRITE8_HANDLER( ojankohs_msm5205_w )
 	ojankohs_vclk_left = 2;
 }
 
-static void ojankohs_adpcm_int(const device_config *device)
+static void ojankohs_adpcm_int(running_device *device)
 {
 	/* skip if we're reset */
 	if (!ojankohs_adpcm_reset)

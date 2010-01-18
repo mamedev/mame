@@ -51,7 +51,7 @@ static chr_bank chr_page[8];	// Simple wrapper for ROM/RAM, since we could be ba
 
 MACHINE_RESET( pc10 )
 {
-	const device_config *rp5h01 = devtag_get_device(machine, "rp5h01");
+	running_device *rp5h01 = devtag_get_device(machine, "rp5h01");
 
 	/* initialize latches and flip-flops */
 	pc10_nmi_enable = pc10_dog_di = pc10_dispmask = pc10_sdcs = pc10_int_detect = 0;
@@ -193,7 +193,7 @@ WRITE8_HANDLER( pc10_CARTSEL_w )
 
 READ8_HANDLER( pc10_prot_r )
 {
-	const device_config *rp5h01 = devtag_get_device(space->machine, "rp5h01");
+	running_device *rp5h01 = devtag_get_device(space->machine, "rp5h01");
 	int data = 0xe7;
 
 	/* we only support a single cart connected at slot 0 */
@@ -209,7 +209,7 @@ READ8_HANDLER( pc10_prot_r )
 
 WRITE8_HANDLER( pc10_prot_w )
 {
-	const device_config *rp5h01 = devtag_get_device(space->machine, "rp5h01");
+	running_device *rp5h01 = devtag_get_device(space->machine, "rp5h01");
 	/* we only support a single cart connected at slot 0 */
 	if (cart_sel == 0)
 	{
@@ -277,7 +277,7 @@ READ8_HANDLER( pc10_in1_r )
 	/* do the gun thing */
 	if (pc10_gun_controller)
 	{
-		const device_config *ppu = devtag_get_device(space->machine, "ppu");
+		running_device *ppu = devtag_get_device(space->machine, "ppu");
 		int trigger = input_port_read(space->machine, "P1");
 		int x = input_port_read(space->machine, "GUNX");
 		int y = input_port_read(space->machine, "GUNY");
@@ -723,7 +723,7 @@ DRIVER_INIT( pcdboard_2 )
 /* E Board games (Mike Tyson's Punchout) - BROKEN - FIX ME */
 
 /* callback for the ppu_latch */
-static void mapper9_latch( const device_config *ppu, offs_t offset )
+static void mapper9_latch( running_device *ppu, offs_t offset )
 {
 
 	if((offset & 0x1ff0) == 0x0fd0 && MMC2_bank_latch[0] != 0xfd)
@@ -862,7 +862,7 @@ static int gboard_4screen;
 static int gboard_last_bank;
 static int gboard_command;
 
-static void gboard_scanline_cb( const device_config *device, int scanline, int vblank, int blanked )
+static void gboard_scanline_cb( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (!vblank && !blanked)
 	{
@@ -876,7 +876,7 @@ static void gboard_scanline_cb( const device_config *device, int scanline, int v
 
 static WRITE8_HANDLER( gboard_rom_switch_w )
 {
-	const device_config *ppu = devtag_get_device(space->machine, "ppu");
+	running_device *ppu = devtag_get_device(space->machine, "ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 

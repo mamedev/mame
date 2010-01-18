@@ -21,7 +21,7 @@ struct _yunsung8_state
 	int         toggle;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

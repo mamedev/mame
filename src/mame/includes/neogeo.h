@@ -102,9 +102,9 @@ struct _neogeo_state
 	int        fixed_layer_bank_type;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *upd4990a;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *upd4990a;
 };
 
 

@@ -17,7 +17,7 @@ struct _segapcm_state
 	sound_stream * stream;
 };
 
-INLINE segapcm_state *get_safe_token(const device_config *device)
+INLINE segapcm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -88,7 +88,7 @@ static STREAM_UPDATE( SEGAPCM_update )
 
 static DEVICE_START( segapcm )
 {
-	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->static_config;
+	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->baseconfig().static_config;
 	int mask, rom_mask, len;
 	segapcm_state *spcm = get_safe_token(device);
 

@@ -319,7 +319,7 @@ struct _hyperstone_state
 	struct _delay delay;
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 opcodexor;
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( e132_16k_iram_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-INLINE hyperstone_state *get_safe_token(const device_config *device)
+INLINE hyperstone_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -638,7 +638,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 
 static TIMER_CALLBACK( e132xs_timer_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	hyperstone_state *cpustate = get_safe_token(device);
 	int update = param;
 
@@ -1528,7 +1528,7 @@ static void set_irq_line(hyperstone_state *cpustate, int irqline, int state)
 		ISR &= ~(1 << irqline);
 }
 
-static void hyperstone_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
+static void hyperstone_init(running_device *device, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
@@ -1550,7 +1550,7 @@ static void hyperstone_init(const device_config *device, cpu_irq_callback irqcal
 	cpustate->clock_scale_mask = scale_mask;
 }
 
-static void e116_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
+static void e116_init(running_device *device, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1587,7 +1587,7 @@ static CPU_INIT( gms30c2216 )
 	e116_init(device, irqcallback, 0);
 }
 
-static void e132_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
+static void e132_init(running_device *device, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);

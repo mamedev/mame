@@ -127,7 +127,7 @@ static INTERRUPT_GEN( sprtmtch_vblank_interrupt )
 	sprtmtch_update_irq(device->machine);
 }
 
-static void sprtmtch_sound_callback(const device_config *device, int state)
+static void sprtmtch_sound_callback(running_device *device, int state)
 {
 	dynax_sound_irq = state;
 	sprtmtch_update_irq(device->machine);
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
 	jantouki_sound_update_irq(space->machine);
 }
 
-static void jantouki_sound_callback(const device_config *device, int state)
+static void jantouki_sound_callback(running_device *device, int state)
 {
 	dynax_sound_irq = state;
 	jantouki_sound_update_irq(device->machine);
@@ -348,7 +348,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 
 		case 0x1c:	// RTC
 		{
-			const device_config *rtc = devtag_get_device(space->machine, "rtc");
+			running_device *rtc = devtag_get_device(space->machine, "rtc");
 			msm6242_w(rtc, offset, data);
 		}
 		return;
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( nanajign_palette_w )
 static int msm5205next;
 static int resetkludge;
 
-static void adpcm_int(const device_config *device)
+static void adpcm_int(running_device *device)
 {
 	static int toggle;
 
@@ -412,7 +412,7 @@ static void adpcm_int(const device_config *device)
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
-static void adpcm_int_cpu1(const device_config *device)
+static void adpcm_int_cpu1(running_device *device)
 {
 	static int toggle;
 
@@ -1426,7 +1426,7 @@ static READ8_HANDLER( tenkai_8000_r )
 	}
 	else if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		const device_config *rtc = devtag_get_device(space->machine, "rtc");
+		running_device *rtc = devtag_get_device(space->machine, "rtc");
 		return msm6242_r(rtc, offset);
 	}
 	else if (rombank == 0x12)
@@ -1442,7 +1442,7 @@ static WRITE8_HANDLER( tenkai_8000_w )
 {
 	if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		const device_config *rtc = devtag_get_device(space->machine, "rtc");
+		running_device *rtc = devtag_get_device(space->machine, "rtc");
 		msm6242_w(rtc, offset, data);
 		return;
 	}

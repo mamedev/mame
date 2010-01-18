@@ -17,8 +17,8 @@ struct _crshrace_state
 	int pending_command;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *k053936;
+	running_device *audiocpu;
+	running_device *k053936;
 };
 
 /*----------- defined in video/crshrace.c -----------*/

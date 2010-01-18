@@ -219,7 +219,7 @@ static TIMER_CALLBACK( music_playback )
 {
 	sslam_state *state = (sslam_state *)machine->driver_data;
 	int pattern = 0;
-	const device_config *device = devtag_get_device(machine, "oki");
+	running_device *device = devtag_get_device(machine, "oki");
 
 	if ((okim6295_r(device,0) & 0x08) == 0)
 	{
@@ -255,7 +255,7 @@ static TIMER_CALLBACK( music_playback )
 }
 
 
-static void sslam_play(const device_config *device, int track, int data)
+static void sslam_play(running_device *device, int track, int data)
 {
 	sslam_state *state = (sslam_state *)device->machine->driver_data;
 	int status = okim6295_r(device,0);

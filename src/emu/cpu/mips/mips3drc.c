@@ -273,7 +273,7 @@ static const UINT8 fpmode_source[4] =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mips3_state *get_safe_token(const device_config *device)
+INLINE mips3_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -360,7 +360,7 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *device, cpu_irq_callback irqcallback)
+static void mips3_init(mips3_flavor flavor, int bigendian, running_device *device, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -631,7 +631,7 @@ static CPU_GET_INFO( mips3 )
     mips3drc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void mips3drc_set_options(const device_config *device, UINT32 options)
+void mips3drc_set_options(running_device *device, UINT32 options)
 {
 	mips3_state *mips3 = get_safe_token(device);
 	mips3->impstate->drcoptions = options;
@@ -643,7 +643,7 @@ void mips3drc_set_options(const device_config *device, UINT32 options)
     region
 -------------------------------------------------*/
 
-void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+void mips3drc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
 	mips3_state *mips3 = get_safe_token(device);
 	if (mips3->impstate->fastram_select < ARRAY_LENGTH(mips3->impstate->fastram))
@@ -661,7 +661,7 @@ void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end,
     mips3drc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+void mips3drc_add_hotspot(running_device *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
 	mips3_state *mips3 = get_safe_token(device);
 	if (mips3->impstate->hotspot_select < ARRAY_LENGTH(mips3->impstate->hotspot))

@@ -17,9 +17,9 @@ struct _malzak_state
 	int collision_counter;
 
 	/* devices */
-	const device_config *s2636_0;
-	const device_config *s2636_1;
-	const device_config *saa5050;
+	running_device *s2636_0;
+	running_device *s2636_1;
+	running_device *saa5050;
 };
 
 

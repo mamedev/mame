@@ -437,7 +437,7 @@ static void zn_driver_init( running_machine *machine )
 	dip_timer = timer_alloc(machine,  dip_timer_fired, NULL );
 }
 
-static void psx_spu_irq(const device_config *device, UINT32 data)
+static void psx_spu_irq(running_device *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -1147,7 +1147,7 @@ static UINT8 *taitofx1_eeprom2 = NULL;
 
 static WRITE32_HANDLER( bank_coh1000t_w )
 {
-	const device_config *mb3773 = devtag_get_device(space->machine, "mb3773");
+	running_device *mb3773 = devtag_get_device(space->machine, "mb3773");
 	mb3773_set_ck(mb3773, 0, (data & 0x20) >> 5);
 	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	memory_set_bankptr(space->machine,  "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
@@ -1160,13 +1160,13 @@ static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	return tc0140syt_comm_r(tc0140syt, 0) << 16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 
 	if (mem_mask == 0x0000ffff)
 	{
@@ -1227,7 +1227,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1447,7 +1447,7 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-static void atpsx_interrupt(const device_config *device, int state)
+static void atpsx_interrupt(running_device *device, int state)
 {
 	if (state)
 	{
@@ -1457,7 +1457,7 @@ static void atpsx_interrupt(const device_config *device, int state)
 
 static void atpsx_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	const device_config *ide = devtag_get_device(machine, "ide");
+	running_device *ide = devtag_get_device(machine, "ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1485,7 +1485,7 @@ static void atpsx_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 
 static DRIVER_INIT( coh1000w )
 {
-	const device_config *ide = devtag_get_device(machine, "ide");
+	running_device *ide = devtag_get_device(machine, "ide");
 
 	memory_install_read_bank         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f1fffff, 0, 0, "bank1" );
 	memory_nop_write                         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f000003, 0, 0 );
@@ -2014,7 +2014,7 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-static void jdredd_ide_interrupt(const device_config *device, int state)
+static void jdredd_ide_interrupt(running_device *device, int state)
 {
 	if (state)
 	{
@@ -2158,7 +2158,7 @@ static DRIVER_INIT( coh1000a )
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
-		const device_config *ide = devtag_get_device(machine, "ide");
+		running_device *ide = devtag_get_device(machine, "ide");
 
 		memory_install_read32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1fbfff8c, 0x1fbfff8f, 0, 0, jdredd_idestat_r );
 		memory_nop_write                    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbfff8c, 0x1fbfff8f, 0, 0 );

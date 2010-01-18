@@ -31,7 +31,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*naomibd_interrupt_func)(const device_config *device, int state);
+typedef void (*naomibd_interrupt_func)(running_device *device, int state);
 
 typedef struct _naomibd_config naomibd_config;
 struct _naomibd_config
@@ -89,8 +89,8 @@ struct _naomibd_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int naomibd_interrupt_callback(const device_config *device, naomibd_interrupt_func callback);
-int naomibd_get_type(const device_config *device);
+int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback);
+int naomibd_get_type(running_device *device);
 
 READ64_DEVICE_HANDLER( naomibd_r );
 WRITE64_DEVICE_HANDLER( naomibd_w );

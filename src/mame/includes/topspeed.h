@@ -24,12 +24,12 @@ struct _topspeed_state
 	int        adpcm_data;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *subcpu;
-	const device_config *pc080sn_1;
-	const device_config *pc080sn_2;
-	const device_config *tc0220ioc;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *subcpu;
+	running_device *pc080sn_1;
+	running_device *pc080sn_2;
+	running_device *tc0220ioc;
 };
 
 

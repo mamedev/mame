@@ -104,7 +104,7 @@ struct _imolagp_state
 	int   oldsteer;
 
 	/* devices */
-	const device_config *slavecpu;
+	running_device *slavecpu;
 };
 
 

@@ -76,7 +76,7 @@ struct lpc12_t
 typedef struct _sp0256_state sp0256_state;
 struct _sp0256_state
 {
-	const device_config *device;
+	running_device *device;
 	sound_stream  *stream;	        /* MAME core sound stream                       */
 	devcb_resolved_write_line drq;	/* Data request callback                        */
 	devcb_resolved_write_line sby;	/* Standby callback                             */
@@ -132,7 +132,7 @@ static const INT16 qtbl[128] =
     504,    505,    506,    507,    508,    509,    510,    511
 };
 
-INLINE sp0256_state *get_safe_token(const device_config *device)
+INLINE sp0256_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1180,7 +1180,7 @@ static STREAM_UPDATE( sp0256_update )
 
 static DEVICE_START( sp0256 )
 {
-	const sp0256_interface *intf = (const sp0256_interface *)device->static_config;
+	const sp0256_interface *intf = (const sp0256_interface *)device->baseconfig().static_config;
 	sp0256_state *sp = get_safe_token(device);
 
 	sp->device = device;

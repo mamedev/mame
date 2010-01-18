@@ -258,7 +258,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 
 
 
-static void asuka_msm5205_vck( const device_config *device )
+static void asuka_msm5205_vck( running_device *device )
 {
 	asuka_state *state = (asuka_state *)device->machine->driver_data;
 
@@ -731,7 +731,7 @@ GFXDECODE_END
                 SOUND
 **************************************************************/
 
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

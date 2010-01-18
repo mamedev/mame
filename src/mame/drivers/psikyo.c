@@ -388,7 +388,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static void sound_irq( const device_config *device, int irq )
+static void sound_irq( running_device *device, int irq )
 {
 	psikyo_state *state = (psikyo_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -1199,7 +1199,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static void irqhandler( const device_config *device, int linestate )
+static void irqhandler( running_device *device, int linestate )
 {
 	psikyo_state *state = (psikyo_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, linestate ? ASSERT_LINE : CLEAR_LINE);

@@ -61,11 +61,11 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef chd_file *(*laserdisc_get_disc_func)(const device_config *device);
+typedef chd_file *(*laserdisc_get_disc_func)(running_device *device);
 
-typedef void (*laserdisc_audio_func)(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
+typedef void (*laserdisc_audio_func)(running_device *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
 
-typedef void (*vp931_data_ready_func)(const device_config *device, int state);
+typedef void (*vp931_data_ready_func)(running_device *device, int state);
 
 typedef struct _laserdisc_config laserdisc_config;
 struct _laserdisc_config
@@ -151,49 +151,49 @@ struct _laserdisc_config
 /* ----- core control and status ----- */
 
 /* get a bitmap for the current frame; return TRUE if valid or FALSE if video off */
-int laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
+int laserdisc_get_video(running_device *device, bitmap_t **bitmap);
 
 /* return the raw philips or white flag codes */
-UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code, UINT8 zero_if_squelched);
+UINT32 laserdisc_get_field_code(running_device *device, UINT32 code, UINT8 zero_if_squelched);
 
 
 
 /* ----- input and output ----- */
 
 /* write to the parallel data port of the player */
-void laserdisc_data_w(const device_config *device, UINT8 data);
+void laserdisc_data_w(running_device *device, UINT8 data);
 
 /* assert or clear a signal line connected to the player */
-void laserdisc_line_w(const device_config *device, UINT8 line, UINT8 newstate);
+void laserdisc_line_w(running_device *device, UINT8 line, UINT8 newstate);
 
 /* read from the parallel data port of the player */
-UINT8 laserdisc_data_r(const device_config *device);
+UINT8 laserdisc_data_r(running_device *device);
 
 /* read the state of a signal line connected to the player */
-UINT8 laserdisc_line_r(const device_config *device, UINT8 line);
+UINT8 laserdisc_line_r(running_device *device, UINT8 line);
 
 
 
 /* ----- player specifics ----- */
 
 /* specify the "slow" speed of the Pioneer PR-7820 */
-void pr7820_set_slow_speed(const device_config *device, double frame_rate_scaler);
+void pr7820_set_slow_speed(running_device *device, double frame_rate_scaler);
 
 /* set a callback for data ready on the Phillips 22VP931 */
-void vp931_set_data_ready_callback(const device_config *device, vp931_data_ready_func callback);
+void vp931_set_data_ready_callback(running_device *device, vp931_data_ready_func callback);
 
 /* control the audio squelch of the Simutrek modified players */
-void simutrek_set_audio_squelch(const device_config *device, int state);
+void simutrek_set_audio_squelch(running_device *device, int state);
 
 
 
 /* ----- video interface ----- */
 
 /* enable/disable the video */
-void laserdisc_video_enable(const device_config *device, int enable);
+void laserdisc_video_enable(running_device *device, int enable);
 
 /* enable/disable the overlay */
-void laserdisc_overlay_enable(const device_config *device, int enable);
+void laserdisc_overlay_enable(running_device *device, int enable);
 
 /* video update callback */
 VIDEO_UPDATE( laserdisc );
@@ -203,10 +203,10 @@ VIDEO_UPDATE( laserdisc );
 /* ----- configuration ----- */
 
 /* return a copy of the current live configuration settings */
-void laserdisc_get_config(const device_config *device, laserdisc_config *config);
+void laserdisc_get_config(running_device *device, laserdisc_config *config);
 
 /* change the current live configuration settings */
-void laserdisc_set_config(const device_config *device, const laserdisc_config *config);
+void laserdisc_set_config(running_device *device, const laserdisc_config *config);
 
 
 
@@ -221,8 +221,8 @@ DEVICE_GET_INFO( laserdisc );
 DEVICE_GET_INFO( laserdisc_sound );
 
 /* type setter */
-int laserdisc_get_type(const device_config *device);
-void laserdisc_set_type(const device_config *device, int type);
+int laserdisc_get_type(running_device *device);
+void laserdisc_set_type(running_device *device, int type);
 
 
 #endif	/* __LASERDSC_H__ */

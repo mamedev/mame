@@ -95,7 +95,7 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE bsmt2000_chip *get_safe_token(const device_config *device)
+INLINE bsmt2000_chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

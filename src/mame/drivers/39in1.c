@@ -29,7 +29,7 @@
 
 static UINT32* ram;
 
-static const device_config *dmadac[2];
+static running_device *dmadac[2];
 
 static void pxa255_dma_irq_check(running_machine* machine);
 static READ32_HANDLER( pxa255_dma_r );
@@ -838,7 +838,7 @@ static READ32_HANDLER( pxa255_gpio_r )
 
 static WRITE32_HANDLER( pxa255_gpio_w )
 {
-	const device_config *device;
+	running_device *device;
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
@@ -1431,7 +1431,7 @@ static void pxa255_start(running_machine* machine)
 
     //pxa255_t* pxa255 = pxa255_get_safe_token( device );
 
-    //pxa255->iface = device->static_config;
+    //pxa255->iface = device->baseconfig().static_config;
 
 	for(index = 0; index < 16; index++)
 	{

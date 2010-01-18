@@ -31,11 +31,11 @@ struct _wgp_state
 	INT32       banknum;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *subcpu;
-	const device_config *tc0100scn;
-	const device_config *tc0140syt;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *subcpu;
+	running_device *tc0100scn;
+	running_device *tc0140syt;
 };
 
 

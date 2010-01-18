@@ -13,7 +13,7 @@ struct _namcoio_interface
 	devcb_read8 in[4];
 	devcb_write8 out[2];
 
-	const device_config *device;
+	running_device *device;
 };
 
 /***************************************************************************
@@ -55,9 +55,9 @@ READ_LINE_DEVICE_HANDLER( namcoio_read_reset_line );
 
 
 /* these must be used in the single drivers, inside a timer */
-void namco_customio_56xx_run(const device_config *device);
-void namco_customio_58xx_run(const device_config *device);
-void namco_customio_59xx_run(const device_config *device);
+void namco_customio_56xx_run(running_device *device);
+void namco_customio_58xx_run(running_device *device);
+void namco_customio_59xx_run(running_device *device);
 
 
 #endif	/* __NAMCOIO_H__ */

@@ -172,7 +172,7 @@ static WRITE8_DEVICE_HANDLER( rastan_bankswitch_w )
 }
 
 
-static void rastan_msm5205_vck( const device_config *device )
+static void rastan_msm5205_vck( running_device *device )
 {
 	rastan_state *state = (rastan_state *)device->machine->driver_data;
 	if (state->adpcm_data != -1)
@@ -344,7 +344,7 @@ GFXDECODE_END
 
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	rastan_state *state = (rastan_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

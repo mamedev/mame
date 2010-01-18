@@ -17,11 +17,11 @@ struct _fantland_state
 	int        adpcm_nibble[4];
 
 	/* devices */
-	const device_config *audio_cpu;
-	const device_config *msm1;
-	const device_config *msm2;
-	const device_config *msm3;
-	const device_config *msm4;
+	running_device *audio_cpu;
+	running_device *msm1;
+	running_device *msm2;
+	running_device *msm3;
+	running_device *msm4;
 };
 
 

@@ -584,7 +584,7 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	logerror("ES5506 irq %d\n",irq);
 

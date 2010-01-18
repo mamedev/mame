@@ -19,8 +19,8 @@ struct _sf_state
 	UINT16      bgscroll, fgscroll;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

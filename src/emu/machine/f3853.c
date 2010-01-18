@@ -46,7 +46,7 @@ static TIMER_CALLBACK( f3853_timer_callback );
 					: ( f3853->low | ( f3853->high << 8 ) ) & ~0x80 )
 
 
-INLINE f3853_t *get_safe_token(const device_config *device)
+INLINE f3853_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -55,7 +55,7 @@ INLINE f3853_t *get_safe_token(const device_config *device)
 }
 
 
-static void f3853_set_interrupt_request_line(const device_config *device)
+static void f3853_set_interrupt_request_line(running_device *device)
 {
 	f3853_t	*f3853 = get_safe_token( device );
 
@@ -71,7 +71,7 @@ static void f3853_set_interrupt_request_line(const device_config *device)
 }
 
 
-static void f3853_timer_start(const device_config *device, UINT8 value)
+static void f3853_timer_start(running_device *device, UINT8 value)
 {
 	f3853_t	*f3853 = get_safe_token( device );
 
@@ -83,7 +83,7 @@ static void f3853_timer_start(const device_config *device, UINT8 value)
 
 static TIMER_CALLBACK( f3853_timer_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	f3853_t	*f3853 = get_safe_token( device );
 
     if (f3853->timer_enable)
@@ -95,7 +95,7 @@ static TIMER_CALLBACK( f3853_timer_callback )
 }
 
 
-void f3853_set_external_interrupt_in_line(const device_config *device, int level)
+void f3853_set_external_interrupt_in_line(running_device *device, int level)
 {
 	f3853_t	*f3853 = get_safe_token( device );
 
@@ -106,7 +106,7 @@ void f3853_set_external_interrupt_in_line(const device_config *device, int level
 }
 
 
-void f3853_set_priority_in_line(const device_config *device, int level)
+void f3853_set_priority_in_line(running_device *device, int level)
 {
 	f3853_t	*f3853 = get_safe_token( device );
 
@@ -167,7 +167,7 @@ static DEVICE_START( f3853 )
 	UINT8 reg=0xfe;
 	int i;
 
-	f3853->config = (const f3853_config *)device->static_config;
+	f3853->config = (const f3853_config *)device->baseconfig().static_config;
 
 	for (i=254/*known to get 0xfe after 255 cycles*/; i>=0; i--)
 	{

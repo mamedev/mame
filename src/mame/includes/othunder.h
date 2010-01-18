@@ -31,19 +31,19 @@ struct _othunder_state
 	int        pan[4];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *eeprom;
-	const device_config *tc0220ioc;
-	const device_config *tc0100scn;
-	const device_config *tc0110pcr;
-	const device_config *tc0140syt;
-	const device_config *_2610_0l;
-	const device_config *_2610_0r;
-	const device_config *_2610_1l;
-	const device_config *_2610_1r;
-	const device_config *_2610_2l;
-	const device_config *_2610_2r;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *eeprom;
+	running_device *tc0220ioc;
+	running_device *tc0100scn;
+	running_device *tc0110pcr;
+	running_device *tc0140syt;
+	running_device *_2610_0l;
+	running_device *_2610_0r;
+	running_device *_2610_1l;
+	running_device *_2610_1r;
+	running_device *_2610_2l;
+	running_device *_2610_2r;
 };
 
 

@@ -27,7 +27,7 @@ CPU_DISASSEMBLE( rsp );
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
-INLINE rsp_state *get_safe_token(const device_config *device)
+INLINE rsp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -302,7 +302,7 @@ static CPU_INIT( rsp )
 	rsp_state *rsp = get_safe_token(device);
     int regIdx;
     int accumIdx;
-	rsp->config = (const rsp_config *)device->static_config;
+	rsp->config = (const rsp_config *)device->baseconfig().static_config;
 
 	if (LOG_INSTRUCTION_EXECUTION)
 		rsp->exec_output = fopen("rsp_execute.txt", "wt");

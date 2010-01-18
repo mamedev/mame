@@ -61,12 +61,12 @@ struct _superfx_state
 	cache_t cache;
 	pixelcache_t pixelcache[2];
 
-    const device_config *device;
+    running_device *device;
     const address_space *program;
     int icount;
 };
 
-INLINE superfx_state *get_safe_token(const device_config *device)
+INLINE superfx_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
     assert(device->token != NULL);
@@ -472,7 +472,7 @@ INLINE UINT8 superfx_pipe(superfx_state *cpustate)
 
 /*****************************************************************************/
 
-UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr)
+UINT8 superfx_mmio_read(running_device *cpu, UINT32 addr)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -524,7 +524,7 @@ UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr)
 	return 0;
 }
 
-void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
+void superfx_mmio_write(running_device *cpu, UINT32 addr, UINT8 data)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -639,7 +639,7 @@ static void superfx_timing_reset(superfx_state *cpustate)
 	cpustate->ramdr = 0;
 }
 
-void superfx_add_clocks(const device_config *cpu, INT32 clocks)
+void superfx_add_clocks(running_device *cpu, INT32 clocks)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -682,9 +682,9 @@ static CPU_INIT( superfx )
     cpustate->device = device;
     cpustate->program = device->space(AS_PROGRAM);
 
-	if (device->static_config != NULL)
+	if (device->baseconfig().static_config != NULL)
 	{
-		cpustate->config = *(superfx_config *)device->static_config;
+		cpustate->config = *(superfx_config *)device->baseconfig().static_config;
 	}
 
 	devcb_resolve_write_line(&cpustate->out_irq_func, &cpustate->config.out_irq_func, device);

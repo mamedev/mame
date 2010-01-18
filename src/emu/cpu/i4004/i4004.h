@@ -31,5 +31,5 @@ CPU_GET_INFO( i4004 );
 
 CPU_DISASSEMBLE( i4004 );
 
-void i4004_set_test(const device_config *device, UINT8 val);
+void i4004_set_test(running_device *device, UINT8 val);
 #endif

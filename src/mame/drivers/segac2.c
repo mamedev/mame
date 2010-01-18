@@ -428,7 +428,7 @@ static WRITE16_HANDLER( io_chip_w )
 			}
 			if (sound_banks > 1)
 			{
-				const device_config *upd = devtag_get_device(space->machine, "upd");
+				running_device *upd = devtag_get_device(space->machine, "upd");
 				newbank = (data >> 2) & (sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
@@ -438,7 +438,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x1c/2:
 			if (sound_banks > 1)
 			{
-				const device_config *upd = devtag_get_device(space->machine, "upd");
+				running_device *upd = devtag_get_device(space->machine, "upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
 			}
 			break;
@@ -1312,7 +1312,7 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-static void  segac2_irq2_interrupt(const device_config *device, int state)
+static void  segac2_irq2_interrupt(running_device *device, int state)
 {
 	//printf("sound irq %d\n", state);
 	cputag_set_input_line(device->machine, "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1821,7 +1821,7 @@ it should be, otherwise I don't see how the formula could be computed.
 
 static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {
-	const device_config *upd = devtag_get_device(machine, "upd");
+	running_device *upd = devtag_get_device(machine, "upd");
 
 	DRIVER_INIT_CALL( megadriv_c2 );
 

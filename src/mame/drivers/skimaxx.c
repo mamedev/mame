@@ -167,7 +167,7 @@ static void skimaxx_from_shiftreg(const address_space *space, UINT32 address, UI
  *
  *************************************/
 
-static void skimaxx_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void skimaxx_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	// TODO: This isn't correct. I just hacked it together quickly so I could see something!
 
@@ -274,7 +274,7 @@ static WRITE32_HANDLER( skimaxx_sub_ctrl_w )
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *subcpu = devtag_get_device(space->machine, "subcpu");
+		running_device *subcpu = devtag_get_device(space->machine, "subcpu");
 
 		cpu_set_input_line(subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 		cpu_set_input_line(subcpu, INPUT_LINE_HALT,  (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -468,7 +468,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void skimaxx_tms_irq(const device_config *device, int state)
+static void skimaxx_tms_irq(running_device *device, int state)
 {
 	// TODO
 }

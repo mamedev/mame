@@ -33,7 +33,7 @@ struct _arkanoid_state
 	UINT8    bootleg_cmd;
 
 	/* devices */
-	const device_config *mcu;
+	running_device *mcu;
 };
 
 

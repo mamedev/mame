@@ -19,10 +19,10 @@ struct _rastan_state
 	int         adpcm_data;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *pc090oj;
-	const device_config *pc080sn;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *pc090oj;
+	running_device *pc080sn;
 };
 
 

@@ -529,7 +529,7 @@ static int storeDec(arm_state *cpustate, UINT32 pat, UINT32 rbv)
  ***************************************************************************/
 
 // CPU INIT
-static void arm7_core_init(const device_config *device, const char *cpuname)
+static void arm7_core_init(running_device *device, const char *cpuname)
 {
     arm_state *cpustate = get_safe_token(device);
 
@@ -543,7 +543,7 @@ static void arm7_core_init(const device_config *device, const char *cpuname)
 }
 
 // CPU RESET
-static void arm7_core_reset(const device_config *device)
+static void arm7_core_reset(running_device *device)
 {
     arm_state *cpustate = get_safe_token(device);
 

@@ -20,7 +20,7 @@ struct _lastduel_state
 	int         sprite_flipy_mask, sprite_pri_mask, tilemap_priority;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 /*----------- defined in video/lastduel.c -----------*/

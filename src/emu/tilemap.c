@@ -322,7 +322,7 @@ tilemap_t *tilemap_create(running_machine *machine, tile_get_info_func tile_get_
     is owned by a device
 -------------------------------------------------*/
 
-tilemap_t *tilemap_create_device(const device_config *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t *tilemap_create_device(running_device *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	return tilemap_create_common(device->machine, (void *)device, (tile_get_info_func)tile_get_info, mapper, tilewidth, tileheight, cols, rows);
 }

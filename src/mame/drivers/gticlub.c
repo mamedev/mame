@@ -257,12 +257,12 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(const device_config *device, int param)
+static void voodoo_vblank_0(running_device *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void voodoo_vblank_1(const device_config *device, int param)
+static void voodoo_vblank_1(running_device *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -280,7 +280,7 @@ static VIDEO_UPDATE( hangplt )
 
 	if (strcmp(screen->tag, "lscreen") == 0)
 	{
-		const device_config *voodoo = devtag_get_device(screen->machine, "voodoo0");
+		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
 
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
@@ -290,7 +290,7 @@ static VIDEO_UPDATE( hangplt )
 	}
 	else if (strcmp(screen->tag, "rscreen") == 0)
 	{
-		const device_config *voodoo = devtag_get_device(screen->machine, "voodoo1");
+		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");
 
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
@@ -324,8 +324,8 @@ static const eeprom_interface eeprom_intf =
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	const device_config *adc1038 = devtag_get_device(space->machine, "adc1038");
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *adc1038 = devtag_get_device(space->machine, "adc1038");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -359,8 +359,8 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	const device_config *adc1038 = devtag_get_device(space->machine, "adc1038");
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *adc1038 = devtag_get_device(space->machine, "adc1038");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -715,7 +715,7 @@ static const k056800_interface gticlub_k056800_interface =
 };
 
 
-static int adc1038_input_callback( const device_config *device, int input )
+static int adc1038_input_callback( running_device *device, int input )
 {
 	int value = 0;
 	switch (input)

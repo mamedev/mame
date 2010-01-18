@@ -62,7 +62,7 @@ WRITE8_DEVICE_HANDLER( cdp1863_str_w );
 WRITE_LINE_DEVICE_HANDLER( cdp1863_oe_w );
 
 /* clock setters */
-void cdp1863_set_clk1(const device_config *device, int frequency) ATTR_NONNULL(1);
-void cdp1863_set_clk2(const device_config *device, int frequency) ATTR_NONNULL(1);
+void cdp1863_set_clk1(running_device *device, int frequency) ATTR_NONNULL(1);
+void cdp1863_set_clk2(running_device *device, int frequency) ATTR_NONNULL(1);
 
 #endif

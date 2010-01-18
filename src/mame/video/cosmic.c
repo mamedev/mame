@@ -317,7 +317,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-static void cosmica_draw_starfield( const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void cosmica_draw_starfield( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
@@ -424,7 +424,7 @@ static void devzone_draw_grid( running_machine *machine, bitmap_t *bitmap, const
 }
 
 
-static void nomnlnd_draw_background( const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void nomnlnd_draw_background( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 y = 0;
 	UINT8 water = video_screen_get_frame_number(screen);

@@ -42,7 +42,7 @@ struct _atarifb_state
 	int counter_x_in2b, counter_y_in2b;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

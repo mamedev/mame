@@ -119,11 +119,11 @@ struct _tms32031_state
 	tms32031_xf_func	xf1_w;
 	tms32031_iack_func	iack_w;
 	cpu_irq_callback	irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 };
 
-INLINE tms32031_state *get_safe_token(const device_config *device)
+INLINE tms32031_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -369,7 +369,7 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
 
 static CPU_INIT( tms32031 )
 {
-	const tms32031_config *configdata = (const tms32031_config *)device->static_config;
+	const tms32031_config *configdata = (const tms32031_config *)device->baseconfig().static_config;
 	tms32031_state *tms = get_safe_token(device);
 	int i;
 

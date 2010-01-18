@@ -262,7 +262,7 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
 
-	const device_config *vlm = devtag_get_device(device->machine, "vlm");
+	running_device *vlm = devtag_get_device(device->machine, "vlm");
 	int res = (cputag_get_total_cycles(device->machine, "audiocpu") / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
@@ -1598,7 +1598,7 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_DEVICE_HANDLER("konami", k005289_control_B_w)
 };
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
 /*cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE);*/
@@ -1614,7 +1614,7 @@ static const ym3812_interface ym3812_config =
 	sound_irq
 };
 
-static void volume_callback(const device_config *device, int v)
+static void volume_callback(running_device *device, int v)
 {
 	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
 	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);

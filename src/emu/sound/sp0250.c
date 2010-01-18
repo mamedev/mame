@@ -47,8 +47,8 @@ struct _sp0250_state
 	UINT8 fifo[15];
 	int fifo_pos;
 
-	const device_config *device;
-	void (*drq)(const device_config *device, int state);
+	running_device *device;
+	void (*drq)(running_device *device, int state);
 
 	struct
 	{
@@ -57,7 +57,7 @@ struct _sp0250_state
 	} filter[6];
 };
 
-INLINE sp0250_state *get_safe_token(const device_config *device)
+INLINE sp0250_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -202,7 +202,7 @@ static STREAM_UPDATE( sp0250_update )
 
 static DEVICE_START( sp0250 )
 {
-	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->static_config;
+	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->baseconfig().static_config;
 	sp0250_state *sp = get_safe_token(device);
 
 	sp->device = device;
@@ -233,7 +233,7 @@ WRITE8_DEVICE_HANDLER( sp0250_w )
 }
 
 
-UINT8 sp0250_drq_r(const device_config *device)
+UINT8 sp0250_drq_r(running_device *device)
 {
 	sp0250_state *sp = get_safe_token(device);
 	stream_update(sp->stream);

@@ -73,8 +73,8 @@ extern CPU_GET_INFO( sh2 );
 WRITE32_HANDLER( sh2_internal_w );
 READ32_HANDLER( sh2_internal_r );
 
-void sh2_set_ftcsr_read_callback(const device_config *device, void (*callback)(UINT32));
-void sh2_set_frt_input(const device_config *device, int state);
+void sh2_set_ftcsr_read_callback(running_device *device, void (*callback)(UINT32));
+void sh2_set_frt_input(running_device *device, int state);
 
 /***************************************************************************
     COMPILER-SPECIFIC OPTIONS
@@ -87,7 +87,7 @@ void sh2_set_frt_input(const device_config *device, int state);
 #define SH2DRC_COMPATIBLE_OPTIONS	(SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
 #define SH2DRC_FASTEST_OPTIONS	(0)
 
-void sh2drc_set_options(const device_config *device, UINT32 options);
-void sh2drc_add_pcflush(const device_config *device, offs_t address);
+void sh2drc_set_options(running_device *device, UINT32 options);
+void sh2drc_add_pcflush(running_device *device, offs_t address);
 
 #endif /* __SH2_H__ */

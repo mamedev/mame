@@ -48,7 +48,7 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 static int diff_lookup[49*16];
 
 
-INLINE es8712_state *get_safe_token(const device_config *device)
+INLINE es8712_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -191,7 +191,7 @@ static STREAM_UPDATE( es8712_update )
 
 ***********************************************************************************************/
 
-static void es8712_state_save_register(es8712_state *chip, const device_config *device)
+static void es8712_state_save_register(es8712_state *chip, running_device *device)
 {
 	state_save_register_device_item(device, 0, chip->bank_offset);
 
@@ -266,7 +266,7 @@ static DEVICE_RESET( es8712 )
 
 *****************************************************************************/
 
-void es8712_set_bank_base(const device_config *device, int base)
+void es8712_set_bank_base(running_device *device, int base)
 {
 	es8712_state *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -280,7 +280,7 @@ void es8712_set_bank_base(const device_config *device, int base)
 
 *****************************************************************************/
 
-void es8712_set_frequency(const device_config *device, int frequency)
+void es8712_set_frequency(running_device *device, int frequency)
 {
 	es8712_state *chip = get_safe_token(device);
 
@@ -297,7 +297,7 @@ void es8712_set_frequency(const device_config *device, int frequency)
 
 ***********************************************************************************************/
 
-void es8712_play(const device_config *device)
+void es8712_play(running_device *device)
 {
 	es8712_state *chip = get_safe_token(device);
 

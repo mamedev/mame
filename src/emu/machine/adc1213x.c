@@ -54,7 +54,7 @@ struct _adc12138_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE adc12138_state *get_safe_token(const device_config *device)
+INLINE adc12138_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -62,11 +62,11 @@ INLINE adc12138_state *get_safe_token(const device_config *device)
 	return (adc12138_state *)device->token;
 }
 
-INLINE const adc12138_interface *get_interface(const device_config *device)
+INLINE const adc12138_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == ADC12130) || (device->type == ADC12132) || (device->type == ADC12138));
-	return (const adc12138_interface *) device->static_config;
+	return (const adc12138_interface *) device->baseconfig().static_config;
 }
 
 
@@ -88,7 +88,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_di_w )
     adc1213x_convert
 -------------------------------------------------*/
 
-static void adc1213x_convert(const device_config *device, int channel, int bits16, int lsbfirst)
+static void adc1213x_convert(running_device *device, int channel, int bits16, int lsbfirst)
 {
 	adc12138_state *adc1213x = get_safe_token(device);
 	int i;

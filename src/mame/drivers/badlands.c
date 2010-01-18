@@ -184,7 +184,7 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(const device_config *screen, int scanline)
+static void scanline_update(running_device *screen, int scanline)
 {
 	const address_space *space = cputag_get_address_space(screen->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
@@ -689,7 +689,7 @@ static void update_interrupts_bootleg(running_machine *machine)
 }
 
 
-static void scanline_update_bootleg(const device_config *screen, int scanline)
+static void scanline_update_bootleg(running_device *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 //  if (scanline & 32)

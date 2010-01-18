@@ -39,7 +39,7 @@ struct _crosshair_global
 	UINT8				visible[MAX_PLAYERS];	/* visibility per player */
 	bitmap_t *			bitmap[MAX_PLAYERS];	/* bitmap per player */
 	render_texture *	texture[MAX_PLAYERS];	/* texture per player */
-	const device_config *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
+	running_device *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
 	float				x[MAX_PLAYERS];			/* current X position */
 	float				y[MAX_PLAYERS];			/* current Y position */
 	float				last_x[MAX_PLAYERS];	/* last X position */
@@ -135,7 +135,7 @@ static void crosshair_exit(running_machine *machine);
 static void crosshair_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void crosshair_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
-static void animate(const device_config *device, void *param, int vblank_state);
+static void animate(running_device *device, void *param, int vblank_state);
 
 
 /***************************************************************************
@@ -331,7 +331,7 @@ void crosshair_set_user_settings(running_machine *machine, UINT8 player, crossha
     animate - animates the crosshair once a frame
 -------------------------------------------------*/
 
-static void animate(const device_config *device, void *param, int vblank_state)
+static void animate(running_device *device, void *param, int vblank_state)
 {
 	int player;
 
@@ -388,7 +388,7 @@ static void animate(const device_config *device, void *param, int vblank_state)
     for the given screen
 -------------------------------------------------*/
 
-void crosshair_render(const device_config *screen)
+void crosshair_render(running_device *screen)
 {
 	int player;
 
@@ -412,7 +412,7 @@ void crosshair_render(const device_config *screen)
     given player's crosshair
 -------------------------------------------------*/
 
-void crosshair_set_screen(running_machine *machine, int player, const device_config *screen)
+void crosshair_set_screen(running_machine *machine, int player, running_device *screen)
 {
 	global.screen[player] = screen;
 }

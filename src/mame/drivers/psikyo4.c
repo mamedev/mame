@@ -685,7 +685,7 @@ static INPUT_PORTS_START( hotdebut )
 INPUT_PORTS_END
 
 
-static void irqhandler( const device_config *device, int linestate )
+static void irqhandler( running_device *device, int linestate )
 {
 	psikyo4_state *state = (psikyo4_state *)device->machine->driver_data;
 	cpu_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);

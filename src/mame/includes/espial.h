@@ -36,8 +36,8 @@ struct _espial_state
 	int       percuss_hardware;	// zodiack
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 /*----------- defined in drivers/espial.c -----------*/

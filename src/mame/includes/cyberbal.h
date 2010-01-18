@@ -58,4 +58,4 @@ VIDEO_START( cyberbal );
 VIDEO_START( cyberb2p );
 VIDEO_UPDATE( cyberbal );
 
-void cyberbal_scanline_update(const device_config *screen, int scanline);
+void cyberbal_scanline_update(running_device *screen, int scanline);

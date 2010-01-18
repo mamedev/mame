@@ -291,7 +291,7 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 }
 
 
-static void amiga_m68k_reset(const device_config *device)
+static void amiga_m68k_reset(running_device *device)
 {
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
@@ -341,8 +341,8 @@ MACHINE_RESET( amiga )
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
-	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
-	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *cia_0 = devtag_get_device(machine, "cia_0");
+	running_device *cia_1 = devtag_get_device(machine, "cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
@@ -1041,7 +1041,7 @@ READ16_HANDLER( amiga_cia_r )
 {
 	UINT8 data;
 	int shift;
-	const device_config *cia;
+	running_device *cia;
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1076,7 +1076,7 @@ READ16_HANDLER( amiga_cia_r )
 
 WRITE16_HANDLER( amiga_cia_w )
 {
-	const device_config *cia;
+	running_device *cia;
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
@@ -1111,13 +1111,13 @@ WRITE16_HANDLER( amiga_cia_w )
  *
  *************************************/
 
-void amiga_cia_0_irq(const device_config *device, int state)
+void amiga_cia_0_irq(running_device *device, int state)
 {
 	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
-void amiga_cia_1_irq(const device_config *device, int state)
+void amiga_cia_1_irq(running_device *device, int state)
 {
 	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
@@ -1281,8 +1281,8 @@ static TIMER_CALLBACK( finish_serial_write )
 
 WRITE16_HANDLER( amiga_custom_w )
 {
-	const device_config *cia_0;
-	const device_config *cia_1;
+	running_device *cia_0;
+	running_device *cia_1;
 	UINT16 temp;
 	offset &= 0xff;
 

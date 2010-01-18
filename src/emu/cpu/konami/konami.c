@@ -61,12 +61,12 @@ struct _konami_state
 	UINT8	nmi_state;
 	UINT8	nmi_pending;
 	int		icount;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	konami_set_lines_func setlines_callback;
 };
 
-INLINE konami_state *get_safe_token(const device_config *device)
+INLINE konami_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -505,7 +505,7 @@ static CPU_EXECUTE( konami )
 }
 
 
-void konami_configure_set_lines(const device_config *device, konami_set_lines_func func)
+void konami_configure_set_lines(running_device *device, konami_set_lines_func func)
 {
 	konami_state *cpustate = get_safe_token(device);
 	cpustate->setlines_callback = func;

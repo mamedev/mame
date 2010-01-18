@@ -69,13 +69,13 @@ typedef struct {
 	int		rate;		/* sample rate in Hz */
 
 	double	external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
-	const device_config *device;
-	void (*gate_handler)(const device_config *device, int state);	/* callback called when the GATE output pin changes state */
+	running_device *device;
+	void (*gate_handler)(running_device *device, int state);	/* callback called when the GATE output pin changes state */
 
 } MSM5232;
 
 
-INLINE MSM5232 *get_safe_token(const device_config *device)
+INLINE MSM5232 *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -785,7 +785,7 @@ static STREAM_UPDATE( MSM5232_update_one )
 
 static DEVICE_START( msm5232 )
 {
-	const msm5232_interface *intf = (const msm5232_interface *)device->static_config;
+	const msm5232_interface *intf = (const msm5232_interface *)device->baseconfig().static_config;
 	int rate = device->clock/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip = get_safe_token(device);
 
@@ -796,7 +796,7 @@ static DEVICE_START( msm5232 )
 	chip->stream = stream_create(device,0,11,rate,chip,MSM5232_update_one);
 }
 
-void msm5232_set_clock(const device_config *device, int clock)
+void msm5232_set_clock(running_device *device, int clock)
 {
 	MSM5232 *chip = get_safe_token(device);
 

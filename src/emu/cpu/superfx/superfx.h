@@ -96,8 +96,8 @@ CPU_GET_INFO( superfx );
 CPU_DISASSEMBLE( superfx );
 extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt);
 
-UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr);
-void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data);
-void superfx_add_clocks(const device_config *cpu, INT32 clocks);
+UINT8 superfx_mmio_read(running_device *cpu, UINT32 addr);
+void superfx_mmio_write(running_device *cpu, UINT32 addr, UINT8 data);
+void superfx_add_clocks(running_device *cpu, INT32 clocks);
 
 #endif /* __SUPERFX_H__ */

@@ -1763,7 +1763,7 @@ static WRITE8_DEVICE_HANDLER( kaneko16_eeprom_reset_w )
 {
 	// FIXME: the device line cannot be directly put in the interface due to inverse value!
 	// we might want to define a "reversed" set_cs_line handler
-	const device_config *eeprom = devtag_get_device(device->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(device->machine, "eeprom");
 	// reset line asserted: reset.
 	eeprom_set_cs_line(eeprom, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }

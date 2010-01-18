@@ -33,7 +33,7 @@
  *
  *************************************/
 
-static const device_config *cage_cpu;
+static running_device *cage_cpu;
 static attotime cage_cpu_h1_clock_period;
 
 static UINT8 cpu_to_cage_ready;
@@ -45,10 +45,10 @@ static attotime serial_period_per_word;
 
 static UINT8 dma_enabled;
 static UINT8 dma_timer_enabled;
-static const device_config *dma_timer;
+static running_device *dma_timer;
 
 static UINT8 cage_timer_enabled[2];
-static const device_config *timer[2];
+static running_device *timer[2];
 
 static UINT32 *tms32031_io_regs;
 
@@ -57,7 +57,7 @@ static UINT16 cage_control;
 
 static UINT32 *speedup_ram;
 
-static const device_config *dmadac[DAC_BUFFER_CHANNELS];
+static running_device *dmadac[DAC_BUFFER_CHANNELS];
 
 
 

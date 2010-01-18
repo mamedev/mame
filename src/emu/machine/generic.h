@@ -118,9 +118,9 @@ void set_led_status(running_machine *machine, int num, int value);
 
 /* ----- interrupt enable and vector helpers ----- */
 
-void generic_pulse_irq_line(const device_config *device, int irqline);
-void generic_pulse_irq_line_and_vector(const device_config *device, int irqline, int vector);
-void cpu_interrupt_enable(const device_config *device, int enabled);
+void generic_pulse_irq_line(running_device *device, int irqline);
+void generic_pulse_irq_line_and_vector(running_device *device, int irqline, int vector);
+void cpu_interrupt_enable(running_device *device, int enabled);
 READ8_HANDLER( interrupt_enable_r );
 WRITE8_HANDLER( interrupt_enable_w );
 

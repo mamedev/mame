@@ -35,11 +35,11 @@ struct _tx0_reset_param_t
         5: reserved (for unimplemented typ instruction?)
         6: p6h
         7: p7h */
-	void (*io_handlers[8])(const device_config *device);
+	void (*io_handlers[8])(running_device *device);
 	/* select instruction handler */
-	void (*sel_handler)(const device_config *device);
+	void (*sel_handler)(running_device *device);
 	/* callback called when reset line is pulsed: IO devices should reset */
-	void (*io_reset_callback)(const device_config *device);
+	void (*io_reset_callback)(running_device *device);
 };
 
 /* PUBLIC FUNCTIONS */

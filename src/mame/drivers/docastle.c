@@ -162,7 +162,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 
 /* Read/Write Handlers */
-static void idsoccer_adpcm_int( const device_config *device )
+static void idsoccer_adpcm_int( running_device *device )
 {
 	docastle_state *state = (docastle_state *)device->machine->driver_data;
 

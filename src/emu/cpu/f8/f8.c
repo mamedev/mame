@@ -53,7 +53,7 @@ struct _f8_Regs
 	UINT16	io; 	/* last I/O address */
 	UINT16  irq_vector;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	int icount;
@@ -61,7 +61,7 @@ struct _f8_Regs
 	int     irq_request;
 };
 
-INLINE f8_Regs *get_safe_token(const device_config *device)
+INLINE f8_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

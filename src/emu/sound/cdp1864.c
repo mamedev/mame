@@ -53,7 +53,7 @@ struct _cdp1864_t
 	devcb_resolved_write_line		out_dmao_func;
 	devcb_resolved_write_line		out_efx_func;
 
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 	sound_stream *stream;			/* sound output */
 
@@ -74,14 +74,14 @@ struct _cdp1864_t
 	emu_timer *efx_timer;			/* EFx timer */
 	emu_timer *dma_timer;			/* DMA timer */
 
-	const device_config *cpu;
+	running_device *cpu;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1864_t *get_safe_token(const device_config *device)
+INLINE cdp1864_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -98,7 +98,7 @@ INLINE cdp1864_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( cdp1864_int_tick )
 {
-	const device_config *device = (const device_config *) ptr;
+	running_device *device = (running_device *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1864->screen);
@@ -129,7 +129,7 @@ static TIMER_CALLBACK( cdp1864_int_tick )
 
 static TIMER_CALLBACK( cdp1864_efx_tick )
 {
-	const device_config *device = (const device_config *) ptr;
+	running_device *device = (running_device *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1864->screen);
@@ -164,7 +164,7 @@ static TIMER_CALLBACK( cdp1864_efx_tick )
 
 static TIMER_CALLBACK( cdp1864_dma_tick )
 {
-	const device_config *device = (const device_config *) ptr;
+	running_device *device = (running_device *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1864->screen);
@@ -203,7 +203,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
     cdp1864_init_palette - initialize palette
 -------------------------------------------------*/
 
-static void cdp1864_init_palette(const device_config *device, const cdp1864_interface *intf)
+static void cdp1864_init_palette(running_device *device, const cdp1864_interface *intf)
 {
 	int i;
 
@@ -402,7 +402,7 @@ static STREAM_UPDATE( cdp1864_stream_update )
     cdp1864_update - update screen
 -------------------------------------------------*/
 
-void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1864_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
@@ -424,7 +424,7 @@ void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( cdp1864 )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
-	const cdp1864_interface *intf = (const cdp1864_interface *) device->static_config;
+	const cdp1864_interface *intf = (const cdp1864_interface *) device->baseconfig().static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&cdp1864->in_rdata_func, &intf->in_rdata_func, device);

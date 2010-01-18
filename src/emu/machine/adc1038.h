@@ -15,7 +15,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*adc1038_input_read_func)(const device_config *device, int input);
+typedef int (*adc1038_input_read_func)(running_device *device, int input);
 
 typedef struct _adc1038_interface adc1038_interface;
 struct _adc1038_interface

@@ -45,7 +45,7 @@
 typedef struct _ttl74148_config ttl74148_config;
 struct _ttl74148_config
 {
-	void (*output_cb)(const device_config *device);
+	void (*output_cb)(running_device *device);
 };
 
 
@@ -55,13 +55,13 @@ struct _ttl74148_config
 
 
 /* must call ttl74148_update() after setting the inputs */
-void ttl74148_update(const device_config *device);
+void ttl74148_update(running_device *device);
 
-void ttl74148_input_line_w(const device_config *device, int input_line, int data);
-void ttl74148_enable_input_w(const device_config *device, int data);
-int  ttl74148_output_r(const device_config *device);
-int  ttl74148_output_valid_r(const device_config *device);
-int  ttl74148_enable_output_r(const device_config *device);
+void ttl74148_input_line_w(running_device *device, int input_line, int data);
+void ttl74148_enable_input_w(running_device *device, int data);
+int  ttl74148_output_r(running_device *device);
+int  ttl74148_output_valid_r(running_device *device);
+int  ttl74148_enable_output_r(running_device *device);
 
 /* device get info callback */
 #define TTL74148 DEVICE_GET_INFO_NAME(ttl74148)

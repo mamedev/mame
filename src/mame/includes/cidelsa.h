@@ -45,8 +45,8 @@ struct _cidelsa_state
 	int draco_ay_latch;
 
 	/* devices */
-	const device_config *cdp1802;
-	const device_config *cdp1869;
+	running_device *cdp1802;
+	running_device *cdp1869;
 };
 
 /*----------- defined in video/cidelsa.c -----------*/

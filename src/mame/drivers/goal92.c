@@ -210,7 +210,7 @@ static INPUT_PORTS_START( goal92 )
 INPUT_PORTS_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
 	//goal92_state *state = (goal92_state *)device->machine->driver_data;
@@ -227,7 +227,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static void goal92_adpcm_int( const device_config *device )
+static void goal92_adpcm_int( running_device *device )
 {
 	goal92_state *state = (goal92_state *)device->machine->driver_data;
 	msm5205_data_w(device, state->msm5205next);

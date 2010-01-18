@@ -16,7 +16,7 @@ WRITE8_DEVICE_HANDLER( rf5c68_mem_w );
 typedef struct _rf5c68_interface rf5c68_interface;
 struct _rf5c68_interface
 {
-	void (*sample_end_callback)(const device_config* device, int channel);
+	void (*sample_end_callback)(running_device* device, int channel);
 };
 
 DEVICE_GET_INFO( rf5c68 );

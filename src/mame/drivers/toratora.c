@@ -36,10 +36,10 @@ struct _toratora_state
 	UINT8      clear_tv;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *pia_u1;
-	const device_config *pia_u2;
-	const device_config *pia_u3;
+	running_device *maincpu;
+	running_device *pia_u1;
+	running_device *pia_u2;
+	running_device *pia_u3;
 };
 
 

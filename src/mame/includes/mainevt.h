@@ -17,12 +17,12 @@ struct _mainevt_state
 	int        nmi_enable;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *upd;
-	const device_config *k007232;
-	const device_config *k052109;
-	const device_config *k051960;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *upd;
+	running_device *k007232;
+	running_device *k052109;
+	running_device *k051960;
 };
 
 /*----------- defined in video/mainevt.c -----------*/

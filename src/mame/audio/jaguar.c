@@ -212,7 +212,7 @@ static void update_gpu_irq(running_machine *machine)
 }
 
 
-void jaguar_external_int(const device_config *device, int state)
+void jaguar_external_int(running_device *device, int state)
 {
 	if (state != CLEAR_LINE)
 		gpu_irq_state |= 1;

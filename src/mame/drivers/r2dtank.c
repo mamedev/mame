@@ -73,8 +73,8 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	const device_config *pia0 = devtag_get_device(device->machine, "pia_main");
-	const device_config *pia1 = devtag_get_device(device->machine, "pia_audio");
+	running_device *pia0 = devtag_get_device(device->machine, "pia_main");
+	running_device *pia1 = devtag_get_device(device->machine, "pia_audio");
 	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) |
 						 pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
@@ -206,7 +206,7 @@ static const ay8910_interface ay8910_2_interface =
 
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	const device_config *pia = devtag_get_device(device->machine, "pia_main");
+	running_device *pia = devtag_get_device(device->machine, "pia_main");
 	pia6821_ca1_w(pia, 0, data);
 	ttl74123_output = data;
 }
@@ -383,7 +383,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( r2dtank )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

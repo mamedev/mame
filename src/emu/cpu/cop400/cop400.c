@@ -253,7 +253,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cop400_state *get_safe_token(const device_config *device)
+INLINE cop400_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -878,11 +878,11 @@ static TIMER_CALLBACK( microbus_tick )
     INITIALIZATION
 ***************************************************************************/
 
-static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
+static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
 {
 	cop400_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (cop400_interface *) device->static_config;
+	cpustate->intf = (cop400_interface *) device->baseconfig().static_config;
 
 	/* find address spaces */
 
@@ -955,7 +955,7 @@ static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask,
 	state_save_register_device_item(device, 0, cpustate->idle);
 }
 
-static void cop410_init_opcodes(const device_config *device)
+static void cop410_init_opcodes(running_device *device)
 {
 	cop400_state *cpustate = get_safe_token(device);
 	int i;
@@ -986,7 +986,7 @@ static void cop410_init_opcodes(const device_config *device)
 	cpustate->opcode_map = COP410_OPCODE_MAP;
 }
 
-static void cop420_init_opcodes(const device_config *device)
+static void cop420_init_opcodes(running_device *device)
 {
 	cop400_state *cpustate = get_safe_token(device);
 	int i;
@@ -1021,7 +1021,7 @@ static void cop420_init_opcodes(const device_config *device)
 	cpustate->opcode_map = COP420_OPCODE_MAP;
 }
 
-static void cop444_init_opcodes(const device_config *device)
+static void cop444_init_opcodes(running_device *device)
 {
 	cop400_state *cpustate = get_safe_token(device);
 	int i;
@@ -1355,7 +1355,7 @@ static CPU_SET_INFO( cop400 )
 static CPU_GET_INFO( cop400 )
 {
 	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	cop400_interface *intf = (device != NULL && device->static_config != NULL) ? (cop400_interface *)device->static_config : NULL;
+	cop400_interface *intf = (devconfig->static_config != NULL) ? (cop400_interface *)devconfig->static_config : NULL;
 
 	switch (state)
 	{

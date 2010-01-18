@@ -183,7 +183,7 @@ static GFXDECODE_START( flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
-static void volume_callback0(const device_config *device, int v)
+static void volume_callback0(running_device *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);

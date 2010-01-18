@@ -25,11 +25,11 @@ struct _ym2608_state
 	void *			chip;
 	void *			psg;
 	const ym2608_interface *intf;
-	const device_config *device;
+	running_device *device;
 };
 
 
-INLINE ym2608_state *get_safe_token(const device_config *device)
+INLINE ym2608_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -140,7 +140,7 @@ static DEVICE_START( ym2608 )
 		},
 		NULL
 	};
-	const ym2608_interface *intf = device->static_config ? (const ym2608_interface *)device->static_config : &generic_2608;
+	const ym2608_interface *intf = device->baseconfig().static_config ? (const ym2608_interface *)device->baseconfig().static_config : &generic_2608;
 	int rate = device->clock/72;
 	void *pcmbufa;
 	int  pcmsizea;

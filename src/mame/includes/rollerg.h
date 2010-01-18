@@ -17,11 +17,11 @@ struct _rollerg_state
 	int        readzoomroms;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k053260;
-	const device_config *k053244;
-	const device_config *k051316;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k053260;
+	running_device *k053244;
+	running_device *k051316;
 };
 
 /*----------- defined in video/rollerg.c -----------*/

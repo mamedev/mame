@@ -30,7 +30,7 @@ struct _eeprom_state
     in device is, in fact, an I2C memory
 -------------------------------------------------*/
 
-INLINE eeprom_state *get_safe_token(const device_config *device)
+INLINE eeprom_state *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -125,7 +125,7 @@ const eeprom_interface eeprom_interface_93C66B =
 //  "*10010xxxxxx", /* erase all */
 };
 
-static void eeprom_write(const device_config *device, int bit)
+static void eeprom_write(running_device *device, int bit)
 {
 	eeprom_state *eestate = get_safe_token(device);
 
@@ -339,7 +339,7 @@ static DEVICE_NVRAM( eeprom )
 	}
 	else
 	{
-		const eeprom_config *config = (const eeprom_config *)device->inline_config;
+		const eeprom_config *config = (const eeprom_config *)device->baseconfig().inline_config;
 		UINT16 default_value = 0xffff;
 		int offs;
 
@@ -383,11 +383,11 @@ static DEVICE_START( eeprom )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	config = (const eeprom_config *)device->inline_config;
+	config = (const eeprom_config *)device->baseconfig().inline_config;
 
 	eestate->intf = config->pinterface;
 

@@ -262,7 +262,7 @@ typedef struct {
 	int clock;						/* master clock  (Hz)           */
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
-	const device_config *device;
+	running_device *device;
 } YM2413;
 
 /* key scale level */
@@ -1248,7 +1248,7 @@ static void OPLCloseTable( void )
 }
 
 
-static void OPLL_init_save(YM2413 *chip, const device_config *device)
+static void OPLL_init_save(YM2413 *chip, running_device *device)
 {
 	int chnum;
 
@@ -1320,7 +1320,7 @@ static void OPLL_init_save(YM2413 *chip, const device_config *device)
 }
 
 
-static void OPLL_initalize(YM2413 *chip, const device_config *device)
+static void OPLL_initalize(YM2413 *chip, running_device *device)
 {
 	int i;
 
@@ -1916,7 +1916,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 /* lock/unlock for common table */
-static int OPLL_LockTable(const device_config *device)
+static int OPLL_LockTable(running_device *device)
 {
 	num_lock++;
 	if(num_lock>1) return 0;
@@ -2000,7 +2000,7 @@ static void OPLLResetChip(YM2413 *chip)
 /* Create one of virtual YM2413 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static YM2413 *OPLLCreate(const device_config *device, int clock, int rate)
+static YM2413 *OPLLCreate(running_device *device, int clock, int rate)
 {
 	YM2413 *chip;
 
@@ -2064,7 +2064,7 @@ static unsigned char OPLLRead(YM2413 *chip,int a)
 
 
 
-void * ym2413_init(const device_config *device, int clock, int rate)
+void * ym2413_init(running_device *device, int clock, int rate)
 {
 	/* emulator create */
 	return OPLLCreate(device, clock, rate);

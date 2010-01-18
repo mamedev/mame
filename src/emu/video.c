@@ -176,7 +176,7 @@ static const UINT8 skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 static void video_exit(running_machine *machine);
 static void init_buffered_spriteram(running_machine *machine);
 
-static void realloc_screen_bitmaps(const device_config *screen);
+static void realloc_screen_bitmaps(running_device *screen);
 static STATE_POSTLOAD( video_screen_postload );
 
 /* global rendering */
@@ -195,7 +195,7 @@ static void recompute_speed(running_machine *machine, attotime emutime);
 static void update_refresh_speed(running_machine *machine);
 
 /* screen snapshots */
-static void create_snapshot_bitmap(const device_config *screen);
+static void create_snapshot_bitmap(running_device *screen);
 static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file);
 
 /* movie recording */
@@ -204,7 +204,7 @@ static void video_avi_record_frame(running_machine *machine);
 
 /* burn-in generation */
 static void video_update_burnin(running_machine *machine);
-static void video_finalize_burnin(const device_config *screen);
+static void video_finalize_burnin(running_device *screen);
 
 /* software rendering */
 static void rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
@@ -220,7 +220,7 @@ static void rgb888_draw_primitives(const render_primitive *primlist, void *dstda
     in device is, in fact, a screen
 -------------------------------------------------*/
 
-INLINE screen_state *get_safe_token(const device_config *device)
+INLINE screen_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -454,10 +454,10 @@ static void init_buffered_spriteram(running_machine *machine)
     of a screen
 -------------------------------------------------*/
 
-void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
+void video_screen_configure(running_device *screen, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
 {
 	screen_state *state = get_safe_token(screen);
-	screen_config *config = (screen_config *)screen->inline_config;
+	screen_config *config = (screen_config *)screen->baseconfig().inline_config;
 
 	/* validate arguments */
 	assert(width > 0);
@@ -509,10 +509,10 @@ void video_screen_configure(const device_config *screen, int width, int height, 
     bitmaps as necessary
 -------------------------------------------------*/
 
-static void realloc_screen_bitmaps(const device_config *screen)
+static void realloc_screen_bitmaps(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
-	screen_config *config = (screen_config *)screen->inline_config;
+	screen_config *config = (screen_config *)screen->baseconfig().inline_config;
 	if (config->type != SCREEN_TYPE_VECTOR)
 	{
 		int curwidth = 0, curheight = 0;
@@ -574,7 +574,7 @@ static void realloc_screen_bitmaps(const device_config *screen)
     of a screen
 -------------------------------------------------*/
 
-void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y)
+void video_screen_set_visarea(running_device *screen, int min_x, int max_x, int min_y, int max_y)
 {
 	screen_state *state = get_safe_token(screen);
 	rectangle visarea;
@@ -600,7 +600,7 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
     including the specified scanline
 -------------------------------------------------*/
 
-int video_screen_update_partial(const device_config *screen, int scanline)
+int video_screen_update_partial(running_device *screen, int scanline)
 {
 	screen_state *state = get_safe_token(screen);
 	rectangle clip = state->visarea;
@@ -672,7 +672,7 @@ int video_screen_update_partial(const device_config *screen, int scanline)
     beam position
 -------------------------------------------------*/
 
-void video_screen_update_now(const device_config *screen)
+void video_screen_update_now(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	int current_vpos = video_screen_get_vpos(screen);
@@ -699,7 +699,7 @@ void video_screen_update_now(const device_config *screen)
     screen
 -------------------------------------------------*/
 
-int video_screen_get_vpos(const device_config *screen)
+int video_screen_get_vpos(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(screen->machine), state->vblank_start_time));
@@ -722,7 +722,7 @@ int video_screen_get_vpos(const device_config *screen)
     screen
 -------------------------------------------------*/
 
-int video_screen_get_hpos(const device_config *screen)
+int video_screen_get_hpos(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(screen->machine), state->vblank_start_time));
@@ -748,7 +748,7 @@ int video_screen_get_hpos(const device_config *screen)
     state of a given screen
 -------------------------------------------------*/
 
-int video_screen_get_vblank(const device_config *screen)
+int video_screen_get_vblank(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 
@@ -764,7 +764,7 @@ int video_screen_get_vblank(const device_config *screen)
     state of a given screen
 -------------------------------------------------*/
 
-int video_screen_get_hblank(const device_config *screen)
+int video_screen_get_hblank(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	int hpos = video_screen_get_hpos(screen);
@@ -776,7 +776,7 @@ int video_screen_get_hblank(const device_config *screen)
     video_screen_get_width - returns the width
     of a given screen
 -------------------------------------------------*/
-int video_screen_get_width(const device_config *screen)
+int video_screen_get_width(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	return state->width;
@@ -787,7 +787,7 @@ int video_screen_get_width(const device_config *screen)
     video_screen_get_height - returns the height
     of a given screen
 -------------------------------------------------*/
-int video_screen_get_height(const device_config *screen)
+int video_screen_get_height(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	return state->height;
@@ -798,7 +798,7 @@ int video_screen_get_height(const device_config *screen)
     video_screen_get_visible_area - returns the
     visible area of a given screen
 -------------------------------------------------*/
-const rectangle *video_screen_get_visible_area(const device_config *screen)
+const rectangle *video_screen_get_visible_area(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	return &state->visarea;
@@ -811,7 +811,7 @@ const rectangle *video_screen_get_visible_area(const device_config *screen)
     at the given hpos,vpos
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos)
+attotime video_screen_get_time_until_pos(running_device *screen, int vpos, int hpos)
 {
 	screen_state *state = get_safe_token(screen);
 	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(screen->machine), state->vblank_start_time));
@@ -845,7 +845,7 @@ attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, 
     the next VBLANK period start
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_vblank_start(const device_config *screen)
+attotime video_screen_get_time_until_vblank_start(running_device *screen)
 {
 	return video_screen_get_time_until_pos(screen, video_screen_get_visible_area(screen)->max_y + 1, 0);
 }
@@ -858,7 +858,7 @@ attotime video_screen_get_time_until_vblank_start(const device_config *screen)
     or the end of the next VBLANK
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_vblank_end(const device_config *screen)
+attotime video_screen_get_time_until_vblank_end(running_device *screen)
 {
 	attotime ret;
 	screen_state *state = get_safe_token(screen);
@@ -882,7 +882,7 @@ attotime video_screen_get_time_until_vblank_end(const device_config *screen)
     the next VBLANK period start
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_update(const device_config *screen)
+attotime video_screen_get_time_until_update(running_device *screen)
 {
 	if (screen->machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
 		return video_screen_get_time_until_vblank_end(screen);
@@ -897,7 +897,7 @@ attotime video_screen_get_time_until_update(const device_config *screen)
     scanline
 -------------------------------------------------*/
 
-attotime video_screen_get_scan_period(const device_config *screen)
+attotime video_screen_get_scan_period(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	return attotime_make(0, state->scantime);
@@ -910,7 +910,7 @@ attotime video_screen_get_scan_period(const device_config *screen)
     complete frame
 -------------------------------------------------*/
 
-attotime video_screen_get_frame_period(const device_config *screen)
+attotime video_screen_get_frame_period(running_device *screen)
 {
 	attotime ret;
 
@@ -936,7 +936,7 @@ attotime video_screen_get_frame_period(const device_config *screen)
     emulated machine
 -------------------------------------------------*/
 
-UINT64 video_screen_get_frame_number(const device_config *screen)
+UINT64 video_screen_get_frame_number(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	return state->frame_number;
@@ -948,7 +948,7 @@ UINT64 video_screen_get_frame_number(const device_config *screen)
     VBLANK callback for a specific screen
 -------------------------------------------------*/
 
-void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback, void *param)
+void video_screen_register_vblank_callback(running_device *screen, vblank_state_changed_func vblank_callback, void *param)
 {
 	screen_state *state = get_safe_token(screen);
 	int i, found;
@@ -990,7 +990,7 @@ void video_screen_register_vblank_callback(const device_config *screen, vblank_s
 
 static DEVICE_START( video_screen )
 {
-	const device_config *screen = device;
+	running_device *screen = device;
 	screen_state *state = get_safe_token(screen);
 	render_container_user_settings settings;
 	render_container *container;
@@ -998,8 +998,8 @@ static DEVICE_START( video_screen )
 
 	/* validate some basic stuff */
 	assert(screen != NULL);
-	assert(screen->static_config == NULL);
-	assert(screen->inline_config != NULL);
+	assert(screen->baseconfig().static_config == NULL);
+	assert(screen->baseconfig().inline_config != NULL);
 	assert(screen->machine != NULL);
 	assert(screen->machine->config != NULL);
 
@@ -1008,7 +1008,7 @@ static DEVICE_START( video_screen )
 	assert(container != NULL);
 
 	/* get and validate the configuration */
-	config = (screen_config *)screen->inline_config;
+	config = (screen_config *)screen->baseconfig().inline_config;
 	assert(config->width > 0);
 	assert(config->height > 0);
 	assert(config->refresh > 0);
@@ -1092,7 +1092,7 @@ static DEVICE_START( video_screen )
 
 static STATE_POSTLOAD( video_screen_postload )
 {
-	const device_config *screen = (const device_config *)param;
+	running_device *screen = (running_device *)param;
 	realloc_screen_bitmaps(screen);
 	global.movie_next_frame_time = timer_get_time(machine);
 }
@@ -1105,7 +1105,7 @@ static STATE_POSTLOAD( video_screen_postload )
 
 static DEVICE_STOP( video_screen )
 {
-	const device_config *screen = device;
+	running_device *screen = device;
 	screen_state *state = get_safe_token(screen);
 
 	if (state->texture[0] != NULL)
@@ -1166,7 +1166,7 @@ DEVICE_GET_INFO( video_screen )
 static TIMER_CALLBACK( vblank_begin_callback )
 {
 	int i;
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* reset the starting VBLANK time */
@@ -1200,7 +1200,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 static TIMER_CALLBACK( vblank_end_callback )
 {
 	int i;
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* call the screen specific callbacks */
@@ -1235,7 +1235,7 @@ static TIMER_CALLBACK( screenless_update_callback )
 
 static TIMER_CALLBACK( scanline0_callback )
 {
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* reset partial updates */
@@ -1253,7 +1253,7 @@ static TIMER_CALLBACK( scanline0_callback )
 
 static TIMER_CALLBACK( scanline_update_callback )
 {
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	screen_state *state = get_safe_token(screen);
 	int scanline = param;
 
@@ -1350,22 +1350,22 @@ void video_frame_update(running_machine *machine, int debug)
 
 static int finish_screen_updates(running_machine *machine)
 {
-	const device_config *screen;
+	running_device *screen;
 	int anything_changed = FALSE;
 
 	/* finish updating the screens */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen = video_screen_first(machine); screen != NULL; screen = video_screen_next(screen))
 		video_screen_update_partial(screen, video_screen_get_visible_area(screen)->max_y);
 
 	/* now add the quads for all the screens */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen = video_screen_first(machine); screen != NULL; screen = video_screen_next(screen))
 	{
 		screen_state *state = get_safe_token(screen);
 
 		/* only update if live */
 		if (render_is_live_screen(screen))
 		{
-			const screen_config *config = (const screen_config *)screen->inline_config;
+			const screen_config *config = (const screen_config *)screen->baseconfig().inline_config;
 
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
 			if (config->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
@@ -1405,7 +1405,7 @@ static int finish_screen_updates(running_machine *machine)
 	}
 
 	/* draw any crosshairs */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen = video_screen_first(machine); screen != NULL; screen = video_screen_next(screen))
 		crosshair_render(screen);
 
 	return anything_changed;
@@ -1872,12 +1872,12 @@ static void update_refresh_speed(running_machine *machine)
 		{
 			attoseconds_t min_frame_period = ATTOSECONDS_PER_SECOND;
 			UINT32 original_speed = original_speed_setting();
-			const device_config *screen;
+			running_device *screen;
 			UINT32 target_speed;
 
 			/* find the screen with the shortest frame period (max refresh rate) */
 			/* note that we first check the token since this can get called before all screens are created */
-			for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+			for (screen = video_screen_first(machine); screen != NULL; screen = video_screen_next(screen))
 				if (screen->token != NULL)
 				{
 					screen_state *state = get_safe_token(screen);
@@ -1987,7 +1987,7 @@ static void recompute_speed(running_machine *machine, attotime emutime)
     to  the given file handle
 -------------------------------------------------*/
 
-void video_screen_save_snapshot(running_machine *machine, const device_config *screen, mame_file *fp)
+void video_screen_save_snapshot(running_machine *machine, running_device *screen, mame_file *fp)
 {
 	png_info pnginfo = { 0 };
 	const rgb_t *palette;
@@ -2024,7 +2024,7 @@ void video_screen_save_snapshot(running_machine *machine, const device_config *s
 void video_save_active_screen_snapshots(running_machine *machine)
 {
 	mame_file *fp;
-	const device_config *screen;
+	running_device *screen;
 
 	/* validate */
 	assert(machine != NULL);
@@ -2034,7 +2034,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
 	if (global.snap_native)
 	{
 		/* write one snapshot per visible screen */
-		for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+		for (screen = video_screen_first(machine); screen != NULL; screen = video_screen_next(screen))
 			if (render_is_live_screen(screen))
 			{
 				file_error filerr = mame_fopen_next(machine, SEARCHPATH_SCREENSHOT, "png", &fp);
@@ -2065,7 +2065,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
     given screen
 -------------------------------------------------*/
 
-static void create_snapshot_bitmap(const device_config *screen)
+static void create_snapshot_bitmap(running_device *screen)
 {
 	const render_primitive_list *primlist;
 	INT32 width, height;
@@ -2074,7 +2074,7 @@ static void create_snapshot_bitmap(const device_config *screen)
 	/* select the appropriate view in our dummy target */
 	if (global.snap_native && screen != NULL)
 	{
-		view_index = screen->machine->config->devicelist.index(VIDEO_SCREEN, screen->tag.cstr());
+		view_index = screen->machine->devicelist.index(VIDEO_SCREEN, screen->tag.cstr());
 		assert(view_index != -1);
 		render_target_set_view(global.snap_target, view_index);
 	}
@@ -2463,10 +2463,10 @@ void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsa
 #undef rand
 static void video_update_burnin(running_machine *machine)
 {
-	const device_config *screen;
+	running_device *screen;
 
 	/* iterate over screens and update the burnin for the ones that care */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen = video_screen_first(machine); screen != NULL; screen = video_screen_next(screen))
 	{
 		screen_state *state = get_safe_token(screen);
 		if (state->burnin != NULL)
@@ -2532,7 +2532,7 @@ static void video_update_burnin(running_machine *machine)
     bitmaps for all screens
 -------------------------------------------------*/
 
-static void video_finalize_burnin(const device_config *screen)
+static void video_finalize_burnin(running_device *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	if (state->burnin != NULL)

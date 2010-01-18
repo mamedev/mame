@@ -70,7 +70,7 @@
 typedef struct _namco_51xx_state namco_51xx_state;
 struct _namco_51xx_state
 {
-	const device_config *	cpu;
+	running_device *	cpu;
 	devcb_resolved_read8 in[4];
 	devcb_resolved_write8 out[2];
 	INT32 lastcoins,lastbuttons;
@@ -82,7 +82,7 @@ struct _namco_51xx_state
 	INT32 mode,coincred_mode,remap_joy;
 };
 
-INLINE namco_51xx_state *get_safe_token(const device_config *device)
+INLINE namco_51xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -377,14 +377,14 @@ ROM_END
 
 static DEVICE_START( namco_51xx )
 {
-	const namco_51xx_interface *config = (const namco_51xx_interface *)device->static_config;
+	const namco_51xx_interface *config = (const namco_51xx_interface *)device->baseconfig().static_config;
 	namco_51xx_state *state = get_safe_token(device);
 	astring tempstring;
 
 	assert(config != NULL);
 
 	/* find our CPU */
-	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
+	state->cpu = device->subdevice("mcu");
 	assert(state->cpu != NULL);
 
 	/* resolve our read callbacks */

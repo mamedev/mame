@@ -357,7 +357,7 @@ struct _apexc_state
 	int running;	/* 1 flag: */
 				/* running: flag implied by the existence of the stop instruction */
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -367,7 +367,7 @@ struct _apexc_state
 #define DELAY(n)	{cpustate->icount -= (n); cpustate->current_word = (cpustate->current_word + (n)) & 0x1f;}
 
 
-INLINE apexc_state *get_safe_token(const device_config *device)
+INLINE apexc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

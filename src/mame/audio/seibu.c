@@ -253,7 +253,7 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 
 /***************************************************************************/
 
-static const device_config *sound_cpu;
+static running_device *sound_cpu;
 
 enum
 {
@@ -312,17 +312,17 @@ WRITE8_HANDLER( seibu_rst18_ack_w )
 	update_irq_lines(space->machine, RST18_CLEAR);
 }
 
-void seibu_ym3812_irqhandler(const device_config *device, int linestate)
+void seibu_ym3812_irqhandler(running_device *device, int linestate)
 {
 	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2151_irqhandler(const device_config *device, int linestate)
+void seibu_ym2151_irqhandler(running_device *device, int linestate)
 {
 	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2203_irqhandler(const device_config *device, int linestate)
+void seibu_ym2203_irqhandler(running_device *device, int linestate)
 {
 	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }

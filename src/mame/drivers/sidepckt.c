@@ -247,7 +247,7 @@ GFXDECODE_END
 
 
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }

@@ -69,7 +69,7 @@ static const sn76477_interface spacefev_sn76477_interface =
 };
 
 
-static void spacefev_update_SN76477_status( const device_config *sn )
+static void spacefev_update_SN76477_status( running_device *sn )
 {
 	n8080_state *state = (n8080_state *)sn->machine->driver_data;
 	double dblR0 = RES_M(1.0);
@@ -99,7 +99,7 @@ static void spacefev_update_SN76477_status( const device_config *sn )
 }
 
 
-static void sheriff_update_SN76477_status( const device_config *sn )
+static void sheriff_update_SN76477_status( running_device *sn )
 {
 	n8080_state *state = (n8080_state *)sn->machine->driver_data;
 	if (state->mono_flop[1])
@@ -121,7 +121,7 @@ static void sheriff_update_SN76477_status( const device_config *sn )
 }
 
 
-static void update_SN76477_status( const device_config *device )
+static void update_SN76477_status( running_device *device )
 {
 	n8080_state *state = (n8080_state *)device->machine->driver_data;
 	if (state->n8080_hardware == 1)
@@ -135,7 +135,7 @@ static void update_SN76477_status( const device_config *device )
 }
 
 
-static void start_mono_flop( const device_config *sn, int n, attotime expire )
+static void start_mono_flop( running_device *sn, int n, attotime expire )
 {
 	n8080_state *state = (n8080_state *)sn->machine->driver_data;
 	state->mono_flop[n] = 1;
@@ -146,7 +146,7 @@ static void start_mono_flop( const device_config *sn, int n, attotime expire )
 }
 
 
-static void stop_mono_flop( const device_config *sn, int n )
+static void stop_mono_flop( running_device *sn, int n )
 {
 	n8080_state *state = (n8080_state *)sn->machine->driver_data;
 	state->mono_flop[n] = 0;
@@ -165,7 +165,7 @@ static TIMER_CALLBACK( stop_mono_flop_callback )
 
 static void spacefev_sound_pins_changed( running_machine *machine )
 {
-	const device_config *sn = devtag_get_device(machine, "snsnd");
+	running_device *sn = devtag_get_device(machine, "snsnd");
 	n8080_state *state = (n8080_state *)machine->driver_data;
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
@@ -198,7 +198,7 @@ static void spacefev_sound_pins_changed( running_machine *machine )
 
 static void sheriff_sound_pins_changed( running_machine *machine )
 {
-	const device_config *sn = devtag_get_device(machine, "snsnd");
+	running_device *sn = devtag_get_device(machine, "snsnd");
 	n8080_state *state = (n8080_state *)machine->driver_data;
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
@@ -437,7 +437,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 
 static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 {
-	const device_config *sn = devtag_get_device(timer->machine, "snsnd");
+	running_device *sn = devtag_get_device(timer->machine, "snsnd");
 	n8080_state *state = (n8080_state *)timer->machine->driver_data;
 	double voltage = 0;
 

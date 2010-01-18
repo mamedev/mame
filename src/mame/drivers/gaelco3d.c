@@ -164,14 +164,14 @@ static offs_t tms_offset_xor;
 static UINT8 analog_ports[4];
 static UINT8 framenum;
 
-static const device_config *adsp_autobuffer_timer;
+static running_device *adsp_autobuffer_timer;
 static UINT16 *adsp_control_regs;
 static UINT16 *adsp_fastram_base;
 static UINT8 adsp_ireg;
 static offs_t adsp_ireg_base, adsp_incs, adsp_size;
-static const device_config *dmadac[SOUND_CHANNELS];
+static running_device *dmadac[SOUND_CHANNELS];
 
-static void adsp_tx_callback(const device_config *device, int port, INT32 data);
+static void adsp_tx_callback(running_device *device, int port, INT32 data);
 
 
 /*************************************
@@ -429,7 +429,7 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 }
 
 
-static void iack_w(const device_config *device, UINT8 state, offs_t addr)
+static void iack_w(running_device *device, UINT8 state, offs_t addr)
 {
 	if (LOG)
 		logerror("iack_w(%d) - %06X\n", state, addr);
@@ -597,7 +597,7 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 }
 
 
-static void adsp_tx_callback(const device_config *device, int port, INT32 data)
+static void adsp_tx_callback(running_device *device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)

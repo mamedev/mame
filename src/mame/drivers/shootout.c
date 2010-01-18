@@ -227,12 +227,12 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
 GFXDECODE_END
 
-static void shootout_snd_irq(const device_config *device, int linestate)
+static void shootout_snd_irq(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
-static void shootout_snd2_irq(const device_config *device, int linestate)
+static void shootout_snd2_irq(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }

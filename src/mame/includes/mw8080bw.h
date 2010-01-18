@@ -78,16 +78,16 @@ struct _mw8080bw_state
 	emu_timer   *interrupt_timer;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *mb14241;
-	const device_config *samples;
-	const device_config *samples1;
-	const device_config *samples2;
-	const device_config *speaker;
-	const device_config *sn1;
-	const device_config *sn2;
-	const device_config *sn;
-	const device_config *discrete;
+	running_device *maincpu;
+	running_device *mb14241;
+	running_device *samples;
+	running_device *samples1;
+	running_device *samples2;
+	running_device *speaker;
+	running_device *sn1;
+	running_device *sn2;
+	running_device *sn;
+	running_device *discrete;
 };
 
 
@@ -168,7 +168,7 @@ WRITE8_HANDLER( zzzap_audio_1_w );
 WRITE8_HANDLER( zzzap_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( maze_audio );
-void maze_write_discrete(const device_config *device, UINT8 maze_tone_timing_state);
+void maze_write_discrete(running_device *device, UINT8 maze_tone_timing_state);
 
 MACHINE_DRIVER_EXTERN( boothill_audio );
 WRITE8_DEVICE_HANDLER( boothill_audio_w );

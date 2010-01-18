@@ -34,7 +34,7 @@ struct _n8080_state
 	int inte;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

@@ -154,23 +154,23 @@ enum
 	CPUINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
 
 		/* CPU-specific additions */
-		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
-		CPUINFO_FCT_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
-		CPUINFO_FCT_RESET,									/* R/O: void (*reset)(const device_config *device) */
-		CPUINFO_FCT_EXIT,									/* R/O: void (*exit)(const device_config *device) */
-		CPUINFO_FCT_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
-		CPUINFO_FCT_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
-		CPUINFO_FCT_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options) */
-		CPUINFO_FCT_TRANSLATE,								/* R/O: int (*translate)(const device_config *device, int space, int intention, offs_t *address) */
-		CPUINFO_FCT_READ,									/* R/O: int (*read)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value) */
-		CPUINFO_FCT_WRITE,									/* R/O: int (*write)(const device_config *device, int space, UINT32 offset, int size, UINT64 value) */
-		CPUINFO_FCT_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
-		CPUINFO_FCT_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
+		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(running_device *device, UINT32 state, INT64 data, void *ptr) */
+		CPUINFO_FCT_INIT,									/* R/O: void (*init)(running_device *device, int index, int clock, int (*irqcallback)(running_device *device, int)) */
+		CPUINFO_FCT_RESET,									/* R/O: void (*reset)(running_device *device) */
+		CPUINFO_FCT_EXIT,									/* R/O: void (*exit)(running_device *device) */
+		CPUINFO_FCT_EXECUTE,								/* R/O: int (*execute)(running_device *device, int cycles) */
+		CPUINFO_FCT_BURN,									/* R/O: void (*burn)(running_device *device, int cycles) */
+		CPUINFO_FCT_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(running_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options) */
+		CPUINFO_FCT_TRANSLATE,								/* R/O: int (*translate)(running_device *device, int space, int intention, offs_t *address) */
+		CPUINFO_FCT_READ,									/* R/O: int (*read)(running_device *device, int space, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_FCT_WRITE,									/* R/O: int (*write)(running_device *device, int space, UINT32 offset, int size, UINT64 value) */
+		CPUINFO_FCT_READOP,									/* R/O: int (*readop)(running_device *device, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_FCT_DEBUG_INIT,								/* R/O: void (*debug_init)(running_device *device) */
 		CPUINFO_FCT_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
-		CPUINFO_FCT_IMPORT_STATE,							/* R/O: void (*import_state)(const device_config *device, void *baseptr, const cpu_state_entry *entry) */
-		CPUINFO_FCT_EXPORT_STATE,							/* R/O: void (*export_state)(const device_config *device, void *baseptr, const cpu_state_entry *entry) */
-		CPUINFO_FCT_IMPORT_STRING,							/* R/O: void (*import_string)(const device_config *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
-		CPUINFO_FCT_EXPORT_STRING,							/* R/O: void (*export_string)(const device_config *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
+		CPUINFO_FCT_IMPORT_STATE,							/* R/O: void (*import_state)(running_device *device, void *baseptr, const cpu_state_entry *entry) */
+		CPUINFO_FCT_EXPORT_STATE,							/* R/O: void (*export_state)(running_device *device, void *baseptr, const cpu_state_entry *entry) */
+		CPUINFO_FCT_IMPORT_STRING,							/* R/O: void (*import_string)(running_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
+		CPUINFO_FCT_EXPORT_STRING,							/* R/O: void (*export_string)(running_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
 
 	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
 
@@ -228,64 +228,64 @@ enum
 #define cpu_count(config)				(config)->devicelist.count(CPU)
 #define cpu_first(config)				(config)->devicelist.first(CPU)
 #define cpu_next(previous)				(previous)->typenext()
-#define cpu_get_index(cpu)				(cpu)->machine->config->devicelist.index(CPU, (cpu)->tag)
+#define cpu_get_index(cpu)				(cpu)->machine->devicelist.index(CPU, (cpu)->tag)
 
 
 /* IRQ callback to be called by CPU cores when an IRQ is actually taken */
-#define IRQ_CALLBACK(func)				int func(const device_config *device, int irqline)
+#define IRQ_CALLBACK(func)				int func(running_device *device, int irqline)
 
 
 /* CPU interface functions */
 #define CPU_GET_INFO_NAME(name)			cpu_get_info_##name
-#define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
-#define CPU_GET_INFO_CALL(name)			CPU_GET_INFO_NAME(name)(device, state, info)
+#define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info)
+#define CPU_GET_INFO_CALL(name)			CPU_GET_INFO_NAME(name)(devconfig, device, state, info)
 
 #define CPU_SET_INFO_NAME(name)			cpu_set_info_##name
-#define CPU_SET_INFO(name)				void CPU_SET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
+#define CPU_SET_INFO(name)				void CPU_SET_INFO_NAME(name)(running_device *device, UINT32 state, cpuinfo *info)
 #define CPU_SET_INFO_CALL(name)			CPU_SET_INFO_NAME(name)(device, state, info)
 
 #define CPU_INIT_NAME(name)				cpu_init_##name
-#define CPU_INIT(name)					void CPU_INIT_NAME(name)(const device_config *device, cpu_irq_callback irqcallback)
+#define CPU_INIT(name)					void CPU_INIT_NAME(name)(running_device *device, cpu_irq_callback irqcallback)
 #define CPU_INIT_CALL(name)				CPU_INIT_NAME(name)(device, irqcallback)
 
 #define CPU_RESET_NAME(name)			cpu_reset_##name
-#define CPU_RESET(name)					void CPU_RESET_NAME(name)(const device_config *device)
+#define CPU_RESET(name)					void CPU_RESET_NAME(name)(running_device *device)
 #define CPU_RESET_CALL(name)			CPU_RESET_NAME(name)(device)
 
 #define CPU_EXIT_NAME(name)				cpu_exit_##name
-#define CPU_EXIT(name)					void CPU_EXIT_NAME(name)(const device_config *device)
+#define CPU_EXIT(name)					void CPU_EXIT_NAME(name)(running_device *device)
 #define CPU_EXIT_CALL(name)				CPU_EXIT_NAME(name)(device)
 
 #define CPU_EXECUTE_NAME(name)			cpu_execute_##name
-#define CPU_EXECUTE(name)				int CPU_EXECUTE_NAME(name)(const device_config *device, int cycles)
+#define CPU_EXECUTE(name)				int CPU_EXECUTE_NAME(name)(running_device *device, int cycles)
 #define CPU_EXECUTE_CALL(name)			CPU_EXECUTE_NAME(name)(device, cycles)
 
 #define CPU_BURN_NAME(name)				cpu_burn_##name
-#define CPU_BURN(name)					void CPU_BURN_NAME(name)(const device_config *device, int cycles)
+#define CPU_BURN(name)					void CPU_BURN_NAME(name)(running_device *device, int cycles)
 #define CPU_BURN_CALL(name)				CPU_BURN_NAME(name)(device, cycles)
 
 #define CPU_TRANSLATE_NAME(name)		cpu_translate_##name
-#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(const device_config *device, int space, int intention, offs_t *address)
+#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(running_device *device, int space, int intention, offs_t *address)
 #define CPU_TRANSLATE_CALL(name)		CPU_TRANSLATE_NAME(name)(device, space, intention, address)
 
 #define CPU_READ_NAME(name)				cpu_read_##name
-#define CPU_READ(name)					int CPU_READ_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value)
+#define CPU_READ(name)					int CPU_READ_NAME(name)(running_device *device, int space, UINT32 offset, int size, UINT64 *value)
 #define CPU_READ_CALL(name)				CPU_READ_NAME(name)(device, space, offset, size, value)
 
 #define CPU_WRITE_NAME(name)			cpu_write_##name
-#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 value)
+#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(running_device *device, int space, UINT32 offset, int size, UINT64 value)
 #define CPU_WRITE_CALL(name)			CPU_WRITE_NAME(name)(device, space, offset, size, value)
 
 #define CPU_READOP_NAME(name)			cpu_readop_##name
-#define CPU_READOP(name)				int CPU_READOP_NAME(name)(const device_config *device, UINT32 offset, int size, UINT64 *value)
+#define CPU_READOP(name)				int CPU_READOP_NAME(name)(running_device *device, UINT32 offset, int size, UINT64 *value)
 #define CPU_READOP_CALL(name)			CPU_READOP_NAME(name)(device, offset, size, value)
 
 #define CPU_DEBUG_INIT_NAME(name)		cpu_debug_init_##name
-#define CPU_DEBUG_INIT(name)			void CPU_DEBUG_INIT_NAME(name)(const device_config *device)
+#define CPU_DEBUG_INIT(name)			void CPU_DEBUG_INIT_NAME(name)(running_device *device)
 #define CPU_DEBUG_INIT_CALL(name)		CPU_DEBUG_INIT_NAME(name)(device)
 
 #define CPU_DISASSEMBLE_NAME(name)		cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)			offs_t CPU_DISASSEMBLE_NAME(name)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+#define CPU_DISASSEMBLE(name)			offs_t CPU_DISASSEMBLE_NAME(name)(running_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 #define CPU_DISASSEMBLE_CALL(name)		CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
 
 #define CPU_VALIDITY_CHECK_NAME(name)	cpu_validity_check_##name
@@ -293,19 +293,19 @@ enum
 #define CPU_VALIDITY_CHECK_CALL(name)	CPU_VALIDITY_CHECK_NAME(name)(driver, config)
 
 #define CPU_IMPORT_STATE_NAME(name)		cpu_state_import_##name
-#define CPU_IMPORT_STATE(name)			void CPU_IMPORT_STATE_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry)
+#define CPU_IMPORT_STATE(name)			void CPU_IMPORT_STATE_NAME(name)(running_device *device, void *baseptr, const cpu_state_entry *entry)
 #define CPU_IMPORT_STATE_CALL(name)		CPU_IMPORT_STATE_NAME(name)(device, baseptr, entry)
 
 #define CPU_EXPORT_STATE_NAME(name)		cpu_state_export_##name
-#define CPU_EXPORT_STATE(name)			void CPU_EXPORT_STATE_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry)
+#define CPU_EXPORT_STATE(name)			void CPU_EXPORT_STATE_NAME(name)(running_device *device, void *baseptr, const cpu_state_entry *entry)
 #define CPU_EXPORT_STATE_CALL(name)		CPU_EXPORT_STATE_NAME(name)(device, baseptr, entry)
 
 #define CPU_IMPORT_STRING_NAME(name)	cpu_string_import_##name
-#define CPU_IMPORT_STRING(name)			void CPU_IMPORT_STRING_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string)
+#define CPU_IMPORT_STRING(name)			void CPU_IMPORT_STRING_NAME(name)(running_device *device, void *baseptr, const cpu_state_entry *entry, char *string)
 #define CPU_IMPORT_STRING_CALL(name)	CPU_IMPORT_STRING_NAME(name)(device, baseptr, entry, string)
 
 #define CPU_EXPORT_STRING_NAME(name)	cpu_string_export_##name
-#define CPU_EXPORT_STRING(name)			void CPU_EXPORT_STRING_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string)
+#define CPU_EXPORT_STRING(name)			void CPU_EXPORT_STRING_NAME(name)(running_device *device, void *baseptr, const cpu_state_entry *entry, char *string)
 #define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, baseptr, entry, string)
 
 
@@ -315,40 +315,29 @@ enum
 
 
 /* helpers for accessing common CPU state */
-#define cpu_get_context_size(cpu)			device_get_info_int(cpu, CPUINFO_INT_CONTEXT_SIZE)
-#define cpu_get_input_lines(cpu)			device_get_info_int(cpu, CPUINFO_INT_INPUT_LINES)
-#define cpu_get_output_lines(cpu)			device_get_info_int(cpu, CPUINFO_INT_OUTPUT_LINES)
-#define cpu_get_default_irq_vector(cpu)		device_get_info_int(cpu, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
-#define cpu_get_clock_multiplier(cpu)		device_get_info_int(cpu, CPUINFO_INT_CLOCK_MULTIPLIER)
-#define cpu_get_clock_divider(cpu)			device_get_info_int(cpu, CPUINFO_INT_CLOCK_DIVIDER)
-#define cpu_get_min_opcode_bytes(cpu)		device_get_info_int(cpu, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
-#define cpu_get_max_opcode_bytes(cpu)		device_get_info_int(cpu, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
-#define cpu_get_min_cycles(cpu)				device_get_info_int(cpu, CPUINFO_INT_MIN_CYCLES)
-#define cpu_get_max_cycles(cpu)				device_get_info_int(cpu, CPUINFO_INT_MAX_CYCLES)
-#define cpu_get_logaddr_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_LOGADDR_WIDTH + (space))
-#define cpu_get_page_shift(cpu, space)		device_get_info_int(cpu, CPUINFO_INT_PAGE_SHIFT + (space))
-#define cpu_get_reg(cpu, reg)				device_get_info_int(cpu, CPUINFO_INT_REGISTER + (reg))
+#define cpu_get_context_size(cpu)			(cpu)->get_config_int(CPUINFO_INT_CONTEXT_SIZE)
+#define cpu_get_input_lines(cpu)			(cpu)->get_config_int(CPUINFO_INT_INPUT_LINES)
+#define cpu_get_output_lines(cpu)			(cpu)->get_config_int(CPUINFO_INT_OUTPUT_LINES)
+#define cpu_get_default_irq_vector(cpu)		(cpu)->get_config_int(CPUINFO_INT_DEFAULT_IRQ_VECTOR)
+#define cpu_get_clock_multiplier(cpu)		(cpu)->get_config_int(CPUINFO_INT_CLOCK_MULTIPLIER)
+#define cpu_get_clock_divider(cpu)			(cpu)->get_config_int(CPUINFO_INT_CLOCK_DIVIDER)
+#define cpu_get_min_opcode_bytes(cpu)		(cpu)->get_config_int(CPUINFO_INT_MIN_INSTRUCTION_BYTES)
+#define cpu_get_max_opcode_bytes(cpu)		(cpu)->get_config_int(CPUINFO_INT_MAX_INSTRUCTION_BYTES)
+#define cpu_get_min_cycles(cpu)				(cpu)->get_config_int(CPUINFO_INT_MIN_CYCLES)
+#define cpu_get_max_cycles(cpu)				(cpu)->get_config_int(CPUINFO_INT_MAX_CYCLES)
+#define cpu_get_logaddr_width(cpu, space)	(cpu)->get_config_int(CPUINFO_INT_LOGADDR_WIDTH + (space))
+#define cpu_get_page_shift(cpu, space)		(cpu)->get_config_int(CPUINFO_INT_PAGE_SHIFT + (space))
+#define cpu_get_reg(cpu, reg)				(cpu)->get_runtime_int(CPUINFO_INT_REGISTER + (reg))
 #define	cpu_get_previouspc(cpu)				((offs_t)cpu_get_reg(cpu, REG_GENPCBASE))
 #define	cpu_get_pc(cpu)						((offs_t)cpu_get_reg(cpu, REG_GENPC))
 #define	cpu_get_sp(cpu)						cpu_get_reg(cpu, REG_GENSP)
-#define cpu_get_icount_ptr(cpu)				(int *)device_get_info_ptr(cpu, CPUINFO_PTR_INSTRUCTION_COUNTER)
-#define cpu_get_state_table(cpu)			(const cpu_state_table *)device_get_info_ptr(cpu, CPUINFO_PTR_STATE_TABLE)
-#define cpu_get_flags_string(cpu)			device_get_info_string(cpu, CPUINFO_STR_FLAGS)
-#define cpu_get_irq_string(cpu, irq)		device_get_info_string(cpu, CPUINFO_STR_IRQ_STATE + (irq))
-#define cpu_get_reg_string(cpu, reg)		device_get_info_string(cpu, CPUINFO_STR_REGISTER + (reg))
+#define cpu_get_icount_ptr(cpu)				(int *)(cpu)->get_runtime_ptr(CPUINFO_PTR_INSTRUCTION_COUNTER)
+#define cpu_get_state_table(cpu)			(const cpu_state_table *)(cpu)->get_runtime_ptr(CPUINFO_PTR_STATE_TABLE)
+#define cpu_get_flags_string(cpu)			(cpu)->get_runtime_string(CPUINFO_STR_FLAGS)
+#define cpu_get_irq_string(cpu, irq)		(cpu)->get_runtime_string(CPUINFO_STR_IRQ_STATE + (irq))
+#define cpu_get_reg_string(cpu, reg)		(cpu)->get_runtime_string(CPUINFO_STR_REGISTER + (reg))
 
 #define cpu_set_reg(cpu, reg, val)			cpu_set_info(cpu, CPUINFO_INT_REGISTER + (reg), (val))
-
-/* helpers that map directly to device helpers */
-#define cpu_get_endianness(cpu)				device_get_endianness(cpu)
-#define cpu_get_databus_width(cpu, space)	device_get_databus_width(cpu, space)
-#define cpu_get_addrbus_width(cpu, space)	device_get_addrbus_width(cpu, space)
-#define cpu_get_addrbus_shift(cpu, space)	device_get_addrbus_shift(cpu, space)
-#define cpu_get_name(cpu)					device_get_name(cpu)
-#define cpu_get_core_family(cpu)			device_get_family(cpu)
-#define cpu_get_core_version(cpu)			device_get_version(cpu)
-#define cpu_get_core_file(cpu)				device_get_source_file(cpu)
-#define cpu_get_core_credits(cpu)			device_get_credits(cpu)
 
 
 
@@ -362,26 +351,26 @@ typedef struct _cpu_state_entry cpu_state_entry;
 
 
 /* IRQ callback to be called by CPU cores when an IRQ is actually taken */
-typedef int (*cpu_irq_callback)(const device_config *device, int irqnum);
+typedef int (*cpu_irq_callback)(running_device *device, int irqnum);
 
 
 /* CPU interface functions */
-typedef void (*cpu_get_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
-typedef void (*cpu_set_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
-typedef void (*cpu_init_func)(const device_config *device, cpu_irq_callback irqcallback);
-typedef void (*cpu_reset_func)(const device_config *device);
-typedef void (*cpu_exit_func)(const device_config *device);
-typedef int	(*cpu_execute_func)(const device_config *device, int cycles);
-typedef void (*cpu_burn_func)(const device_config *device, int cycles);
-typedef int	(*cpu_translate_func)(const device_config *device, int space, int intention, offs_t *address);
-typedef int	(*cpu_read_func)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value);
-typedef int	(*cpu_write_func)(const device_config *device, int space, UINT32 offset, int size, UINT64 value);
-typedef int	(*cpu_readop_func)(const device_config *device, UINT32 offset, int size, UINT64 *value);
-typedef void (*cpu_debug_init_func)(const device_config *device);
-typedef offs_t (*cpu_disassemble_func)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+typedef void (*cpu_get_info_func)(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info);
+typedef void (*cpu_set_info_func)(running_device *device, UINT32 state, cpuinfo *info);
+typedef void (*cpu_init_func)(running_device *device, cpu_irq_callback irqcallback);
+typedef void (*cpu_reset_func)(running_device *device);
+typedef void (*cpu_exit_func)(running_device *device);
+typedef int	(*cpu_execute_func)(running_device *device, int cycles);
+typedef void (*cpu_burn_func)(running_device *device, int cycles);
+typedef int	(*cpu_translate_func)(running_device *device, int space, int intention, offs_t *address);
+typedef int	(*cpu_read_func)(running_device *device, int space, UINT32 offset, int size, UINT64 *value);
+typedef int	(*cpu_write_func)(running_device *device, int space, UINT32 offset, int size, UINT64 value);
+typedef int	(*cpu_readop_func)(running_device *device, UINT32 offset, int size, UINT64 *value);
+typedef void (*cpu_debug_init_func)(running_device *device);
+typedef offs_t (*cpu_disassemble_func)(running_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
-typedef void (*cpu_state_io_func)(const device_config *device, void *baseptr, const cpu_state_entry *entry);
-typedef void (*cpu_string_io_func)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string);
+typedef void (*cpu_state_io_func)(running_device *device, void *baseptr, const cpu_state_entry *entry);
+typedef void (*cpu_string_io_func)(running_device *device, void *baseptr, const cpu_state_entry *entry, char *string);
 
 
 /* a cpu_type is just a pointer to the CPU's get_info function */
@@ -451,6 +440,6 @@ union _cpuinfo
 };
 
 
-void cpu_set_info(const device_config *device, UINT32 state, UINT64 value);
+void cpu_set_info(running_device *device, UINT32 state, UINT64 value);
 
 #endif	/* __CPUINTRF_H__ */

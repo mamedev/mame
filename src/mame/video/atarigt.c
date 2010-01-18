@@ -186,7 +186,7 @@ UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address)
  *
  *************************************/
 
-void atarigt_scanline_update(const device_config *screen, int scanline)
+void atarigt_scanline_update(running_device *screen, int scanline)
 {
 	atarigt_state *state = (atarigt_state *)screen->machine->driver_data;
 	UINT32 *base = &state->atarigen.alpha32[(scanline / 8) * 32 + 24];

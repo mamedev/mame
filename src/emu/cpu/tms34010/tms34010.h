@@ -196,8 +196,8 @@ struct _tms34010_config
 	const char *screen_tag;						/* the screen operated on */
 	UINT32	pixclock;							/* the pixel clock (0 means don't adjust screen size) */
 	int		pixperclock;						/* pixels per clock */
-	void	(*scanline_callback)(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
-	void	(*output_int)(const device_config *device, int state);			/* output interrupt callback */
+	void	(*scanline_callback)(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+	void	(*output_int)(running_device *device, int state);			/* output interrupt callback */
 	void	(*to_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register write */
 	void	(*from_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register read */
 };
@@ -205,7 +205,7 @@ struct _tms34010_config
 
 /* PUBLIC FUNCTIONS - 34010 */
 VIDEO_UPDATE( tms340x0 );
-void tms34010_get_display_params(const device_config *cpu, tms34010_display_params *params);
+void tms34010_get_display_params(running_device *cpu, tms34010_display_params *params);
 
 CPU_GET_INFO( tms34010 );
 #define CPU_TMS34010 CPU_GET_INFO_NAME( tms34010 )
@@ -221,8 +221,8 @@ CPU_GET_INFO( tms34020 );
 #define TMS34010_HOST_DATA			2
 #define TMS34010_HOST_CONTROL		3
 
-void		tms34010_host_w(const device_config *cpu, int reg, int data);
-int			tms34010_host_r(const device_config *cpu, int reg);
+void		tms34010_host_w(running_device *cpu, int reg, int data);
+int			tms34010_host_r(running_device *cpu, int reg);
 
 
 /* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */

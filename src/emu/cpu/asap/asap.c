@@ -87,7 +87,7 @@ struct _asap_state
 	int			icount;
 	cpu_irq_callback irq_callback;
 	const address_space *program;
-	const device_config *device;
+	running_device *device;
 
 	/* src2val table, registers are at the end */
 	UINT32		src2val[65536];
@@ -268,7 +268,7 @@ static void (*const conditiontable[16])(asap_state *) =
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE asap_state *get_safe_token(const device_config *device)
+INLINE asap_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -306,7 +306,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect,
+static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect,
 						 int scroll_offset, int check_collision)
 {
 	int i;
@@ -406,7 +406,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
  *
  *************************************/
 
-static void update_screen(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect,
+static void update_screen(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect,
 						  int scroll_offset, int check_collision)
 {
 	int y, sy;

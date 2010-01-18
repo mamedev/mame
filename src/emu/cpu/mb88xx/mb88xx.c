@@ -74,14 +74,14 @@ struct _mb88_state
     /* IRQ handling */
     UINT8 pending_interrupt;
     cpu_irq_callback irqcallback;
-    const device_config *device;
+    running_device *device;
     const address_space *program;
     const address_space *data;
     const address_space *io;
     int icount;
 };
 
-INLINE mb88_state *get_safe_token(const device_config *device)
+INLINE mb88_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -137,9 +137,9 @@ static CPU_INIT( mb88 )
 {
 	mb88_state *cpustate = get_safe_token(device);
 
-	if ( device->static_config )
+	if ( device->baseconfig().static_config )
 	{
-		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->static_config;
+		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->baseconfig().static_config;
 		cpustate->PLA = _config->PLA_config;
 	}
 
@@ -210,7 +210,7 @@ static CPU_RESET( mb88 )
 
 static TIMER_CALLBACK( serial_timer )
 {
-	mb88_state *cpustate = get_safe_token((const device_config *)ptr);
+	mb88_state *cpustate = get_safe_token((running_device *)ptr);
 
 	cpustate->SBcount++;
 
@@ -322,7 +322,7 @@ static void update_pio( mb88_state *cpustate, int cycles )
 	}
 }
 
-void mb88_external_clock_w(const device_config *device, int state)
+void mb88_external_clock_w(running_device *device, int state)
 {
 	mb88_state *cpustate = get_safe_token(device);
 	if (state != cpustate->ctr)

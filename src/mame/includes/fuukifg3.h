@@ -35,8 +35,8 @@ struct _fuuki32_state
 	UINT8       shared_ram[16];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

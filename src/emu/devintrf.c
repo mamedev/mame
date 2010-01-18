@@ -75,7 +75,7 @@ static char *get_temp_string_buffer(void)
     effect?
 -------------------------------------------------*/
 
-INLINE int device_matches_type(const device_config *device, device_type type)
+INLINE int device_matches_type(running_device *device, device_type type)
 {
 	return (type == DEVICE_TYPE_WILDCARD) ? TRUE : (device->type == type);
 }
@@ -86,7 +86,7 @@ INLINE int device_matches_type(const device_config *device, device_type type)
     info for a given region
 -------------------------------------------------*/
 
-const region_info *device_config::subregion(const char *_tag) const
+const region_info *running_device::subregion(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)
@@ -103,7 +103,7 @@ const region_info *device_config::subregion(const char *_tag) const
     device that is owned by us
 -------------------------------------------------*/
 
-const device_config *device_config::subdevice(const char *_tag) const
+running_device *running_device::subdevice(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)
@@ -130,19 +130,14 @@ device_config::device_config(const device_config *_owner, device_type _type, con
 	  owner(const_cast<device_config *>(_owner)),
 	  tag(_tag),
 	  type(_type),
-	  devclass(static_cast<device_class>(devtype_get_info_int(_type, DEVINFO_INT_CLASS))),
+	  devclass(DEVICE_CLASS_GENERAL),
 	  clock(_clock),
 	  static_config(NULL),
-	  inline_config(NULL),
-	  machine(NULL),
-	  started(DEVICE_STOPPED),
-	  token(NULL),
-	  tokenbytes(NULL),
-	  execute(NULL),
-	  region(NULL)
+	  inline_config(NULL)
 {
 	memset(address_map, 0, sizeof(address_map));
-	memset(addrspace, 0, sizeof(addrspace));
+
+	devclass = (device_class)get_config_int(DEVINFO_INT_CLASS);
 
 	if ((clock & 0xff000000) == 0xff000000)
 	{
@@ -151,7 +146,7 @@ device_config::device_config(const device_config *_owner, device_type _type, con
 	}
 
 	/* populate device configuration */
-	UINT32 configlen = (UINT32)devtype_get_info_int(_type, DEVINFO_INT_INLINE_CONFIG_BYTES);
+	UINT32 configlen = (UINT32)get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES);
 	inline_config = (configlen == 0) ? NULL : global_alloc_array_clear(UINT8, configlen);
 }
 
@@ -159,11 +154,55 @@ device_config::device_config(const device_config *_owner, device_type _type, con
 device_config::~device_config()
 {
 	/* call the custom config free function first */
-	device_custom_config_func custom = reinterpret_cast<device_custom_config_func>(devtype_get_info_fct(type, DEVINFO_FCT_CUSTOM_CONFIG));
+	device_custom_config_func custom = reinterpret_cast<device_custom_config_func>(get_config_fct(DEVINFO_FCT_CUSTOM_CONFIG));
 	if (custom != NULL)
 		(*custom)(this, MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, NULL);
 
 	global_free(inline_config);
+}
+
+
+running_device::running_device(running_machine &_machine, const device_config &_config)
+	: _baseconfig(_config),
+	  machine(&_machine),
+	  next(NULL),
+	  owner((_config.owner != NULL) ? _machine.devicelist.find(_config.owner->tag) : NULL),
+	  tag(_config.tag),
+	  type(_config.type),
+	  devclass(_config.devclass),
+	  clock(_config.clock),
+	  started(DEVICE_STOPPED),
+	  token(NULL),
+	  tokenbytes(_config.get_config_int(DEVINFO_INT_TOKEN_BYTES)),
+	  region(NULL),
+	  execute(NULL),
+	  get_runtime_info(NULL)
+{
+	/* get the size of the token data; we do it directly because we can't call device_get_config_* with no token */
+	if (tokenbytes == 0)
+		throw emu_fatalerror("Device %s specifies a 0 token length!\n", tag.cstr());
+
+	/* allocate memory for the token */
+	token = auto_alloc_array_clear(machine, UINT8, tokenbytes);
+
+	/* fill in the remaining runtime fields */
+	memset(addrspace, 0, sizeof(addrspace));
+		
+	// get function pointers
+	execute = (device_execute_func)get_config_fct(DEVINFO_FCT_EXECUTE);
+	get_runtime_info = (device_get_runtime_info_func)get_config_fct(DEVINFO_FCT_GET_RUNTIME_INFO);
+}
+
+
+running_device::~running_device()
+{
+	auto_free(machine, token);
+}
+
+
+void running_device::set_address_space(int spacenum, const address_space *space)
+{
+	addrspace[spacenum] = space;
 }
 
 
@@ -172,10 +211,10 @@ device_config::~device_config()
     the device's name and the given tag
 -------------------------------------------------*/
 
-astring &device_build_tag(astring &dest, const device_config *device, const char *tag)
+astring &device_build_tag(astring &dest, const device_config *devconfig, const char *tag)
 {
-	if (device != NULL)
-		dest.cpy(device->tag).cat(":").cat(tag);
+	if (devconfig != NULL)
+		dest.cpy(devconfig->tag).cat(":").cat(tag);
 	else
 		dest.cpy(tag);
 	return dest;
@@ -203,9 +242,9 @@ astring &device_inherit_tag(astring &dest, const char *sourcetag, const char *ta
     on a device
 -------------------------------------------------*/
 
-const device_contract *device_get_contract(const device_config *device, const char *name)
+const device_contract *device_get_contract(running_device *device, const char *name)
 {
-	const device_contract *contract = (const device_contract *)device_get_info_ptr(device, DEVINFO_PTR_CONTRACT_LIST);
+	const device_contract *contract = (const device_contract *)device->get_config_ptr(DEVINFO_PTR_CONTRACT_LIST);
 
 	/* if no contracts, obviously we don't have it */
 	if (contract == NULL)
@@ -222,109 +261,6 @@ const device_contract *device_get_contract(const device_config *device, const ch
 
 
 /***************************************************************************
-    TYPE-BASED DEVICE ACCESS
-***************************************************************************/
-
-device_config *device_list::first(device_type type) const
-{
-	/* first of a given type */
-	for (device_config *curdev = super::first(); curdev != NULL; curdev = curdev->next)
-		if (curdev->type == type)
-			return curdev;
-	return NULL;
-}
-
-
-int device_list::count(device_type type) const
-{
-	int num = 0;
-
-	for (const device_config *curdev = first(type); curdev != NULL; curdev = curdev->typenext())
-		num++;
-	
-	return num;
-}
-
-
-int device_list::index(device_type type, device_config *object) const
-{
-	int num = 0;
-	for (device_config *cur = first(type); cur != NULL; cur = cur->typenext())
-		if (cur == object)
-			return num;
-		else
-			num++;
-	return -1;
-}
-
-
-int device_list::index(device_type type, const char *tag) const
-{
-	device_config *object = find(tag);
-	return (object != NULL && object->type == type) ? index(type, object) : -1;
-}
-	
-
-device_config *device_list::find(device_type type, int index) const
-{
-	for (device_config *cur = first(type); cur != NULL; cur = cur->typenext())
-		if (index-- == 0)
-			return cur;
-	return NULL;
-}
-
-
-device_config *device_list::first(device_class devclass) const
-{
-	/* first of a given devclass */
-	for (device_config *curdev = super::first(); curdev != NULL; curdev = curdev->next)
-		if (curdev->devclass == devclass)
-			return curdev;
-	return NULL;
-}
-
-
-int device_list::count(device_class devclass) const
-{
-	int num = 0;
-
-	for (const device_config *curdev = first(devclass); curdev != NULL; curdev = curdev->classnext())
-		num++;
-	
-	return num;
-}
-
-
-int device_list::index(device_class devclass, device_config *object) const
-{
-	int num = 0;
-	for (device_config *cur = first(devclass); cur != NULL; cur = cur->classnext())
-		if (cur == object)
-			return num;
-		else
-			num++;
-	return -1;
-}
-
-
-int device_list::index(device_class devclass, const char *tag) const
-{
-	device_config *object = find(tag);
-	return (object != NULL && object->devclass == devclass) ? index(devclass, object) : -1;
-}
-	
-
-device_config *device_list::find(device_class devclass, int index) const
-{
-	for (device_config *cur = first(devclass); cur != NULL; cur = cur->classnext())
-		if (index-- == 0)
-			return cur;
-	return NULL;
-}
-
-
-
-/***************************************************************************
     LIVE DEVICE MANAGEMENT
 ***************************************************************************/
 
@@ -333,15 +269,10 @@ device_config *device_list::find(device_class devclass, int index) const
     running_machine to its list of devices
 -------------------------------------------------*/
 
-void device_list_attach_machine(running_machine *machine)
+void device_list::import_config_list(const device_config_list &list, running_machine &machine)
 {
-	device_config *device;
-
-	assert(machine != NULL);
-
-	/* iterate over devices and assign the machine to them */
-	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
-		device->machine = machine;
+	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next)
+		append(devconfig->tag, new running_device(machine, *devconfig));
 }
 
 
@@ -352,9 +283,9 @@ void device_list_attach_machine(running_machine *machine)
 
 void device_list_start(running_machine *machine)
 {
-	device_config *device;
+	running_device *device;
 	int numstarted = 0;
-	int devcount = 0;
+	int devcount = machine->devicelist.count();
 
 	assert(machine != NULL);
 
@@ -362,46 +293,21 @@ void device_list_start(running_machine *machine)
 	add_reset_callback(machine, device_list_reset);
 	add_exit_callback(machine, device_list_stop);
 
-	/* iterate over devices and allocate memory for them */
-	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
-	{
-		int spacenum;
-
-		assert(!device->started);
-		assert(device->machine == machine);
-		assert(device->token == NULL);
-		assert(device->type != NULL);
-
-		devcount++;
-
-		/* get the size of the token data; we do it directly because we can't call device_get_info_* with no token */
-		device->tokenbytes = device_get_info_int(device, DEVINFO_INT_TOKEN_BYTES);
-		if (device->tokenbytes == 0)
-			fatalerror("Device %s specifies a 0 token length!\n", device_get_name(device));
-
-		/* allocate memory for the token */
-		device->token = auto_alloc_array_clear(machine, UINT8, device->tokenbytes);
-
-		/* fill in the remaining runtime fields */
-		device->region = machine->region(device->tag);
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			device->addrspace[spacenum] = device->space(spacenum);
-		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
-	}
-
 	/* iterate until we've started everything */
 	while (numstarted < devcount)
 	{
 		int prevstarted = numstarted;
 
 		/* iterate over devices and start them */
-		for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
+		for (device = machine->devicelist.first(); device != NULL; device = device->next)
 		{
-			device_start_func start = (device_start_func)device_get_info_fct(device, DEVINFO_FCT_START);
+			device_start_func start = (device_start_func)device->get_config_fct(DEVINFO_FCT_START);
 			assert(start != NULL);
 
 			if (!device->started)
 			{
+				device->region = machine->regionlist.find(device->baseconfig().tag);
+			
 				device->started = DEVICE_STARTING;
 				(*start)(device);
 
@@ -428,11 +334,11 @@ void device_list_start(running_machine *machine)
     given device for dependency reasons
 -------------------------------------------------*/
 
-void device_delay_init(const device_config *device)
+void device_delay_init(running_device *device)
 {
 	if (device->started != DEVICE_STARTING && device->started != DEVICE_DELAYED)
 		fatalerror("Error: Calling device_delay_init on a device not in the process of starting.");
-	((device_config *)device)->started = DEVICE_DELAYED;
+	device->started = DEVICE_DELAYED;
 }
 
 
@@ -443,14 +349,14 @@ void device_delay_init(const device_config *device)
 
 static void device_list_stop(running_machine *machine)
 {
-	device_config *device;
+	running_device *device;
 
 	assert(machine != NULL);
 
 	/* iterate over devices and stop them */
-	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 	{
-		device_stop_func stop = (device_stop_func)device_get_info_fct(device, DEVINFO_FCT_STOP);
+		device_stop_func stop = (device_stop_func)device->get_config_fct(DEVINFO_FCT_STOP);
 
 		assert(device->token != NULL);
 		assert(device->type != NULL);
@@ -478,12 +384,12 @@ static void device_list_stop(running_machine *machine)
 
 static void device_list_reset(running_machine *machine)
 {
-	const device_config *device;
+	running_device *device;
 
 	assert(machine != NULL);
 
 	/* iterate over devices and stop them */
-	for (device = machine->config->devicelist.first(); device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 		device_reset(device);
 }
 
@@ -493,7 +399,7 @@ static void device_list_reset(running_machine *machine)
     allocated device_config
 -------------------------------------------------*/
 
-void device_reset(const device_config *device)
+void device_reset(running_device *device)
 {
 	device_reset_func reset;
 
@@ -502,7 +408,7 @@ void device_reset(const device_config *device)
 	assert(device->type != NULL);
 
 	/* if we have a reset function, call it */
-	reset = (device_reset_func)device_get_info_fct(device, DEVINFO_FCT_RESET);
+	reset = (device_reset_func)device->get_config_fct(DEVINFO_FCT_RESET);
 	if (reset != NULL)
 		(*reset)(device);
 }
@@ -513,7 +419,7 @@ void device_reset(const device_config *device)
     device
 -------------------------------------------------*/
 
-void device_set_clock(const device_config *device, UINT32 clock)
+void device_set_clock(running_device *device, UINT32 clock)
 {
 	device_config *devicerw = (device_config *)device;
 
@@ -528,81 +434,81 @@ void device_set_clock(const device_config *device, UINT32 clock)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    device_get_info_int - return an integer state
+    device_get_config_int - return an integer state
     value from an allocated device
 -------------------------------------------------*/
 
-INT64 device_get_info_int(const device_config *device, UINT32 state)
+INT64 device_config::get_config_int(UINT32 state) const
 {
 	deviceinfo info;
 
-	assert(device != NULL);
-	assert(device->type != NULL);
+	assert(this != NULL);
+	assert(type != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
 
 	/* retrieve the value */
 	info.i = 0;
-	(*device->type)(device, state, &info);
+	(*type)(this, state, &info);
 	return info.i;
 }
 
 
 /*-------------------------------------------------
-    device_get_info_ptr - return a pointer state
+    device_get_config_ptr - return a pointer state
     value from an allocated device
 -------------------------------------------------*/
 
-void *device_get_info_ptr(const device_config *device, UINT32 state)
+void *device_config::get_config_ptr(UINT32 state) const
 {
 	deviceinfo info;
 
-	assert(device != NULL);
-	assert(device->type != NULL);
+	assert(this != NULL);
+	assert(type != NULL);
 	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
 
 	/* retrieve the value */
 	info.p = NULL;
-	(*device->type)(device, state, &info);
+	(*type)(this, state, &info);
 	return info.p;
 }
 
 
 /*-------------------------------------------------
-    device_get_info_fct - return a function
+    device_get_config_fct - return a function
     pointer state value from an allocated device
 -------------------------------------------------*/
 
-genf *device_get_info_fct(const device_config *device, UINT32 state)
+genf *device_config::get_config_fct(UINT32 state) const
 {
 	deviceinfo info;
 
-	assert(device != NULL);
-	assert(device->type != NULL);
+	assert(this != NULL);
+	assert(type != NULL);
 	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
 
 	/* retrieve the value */
 	info.f = 0;
-	(*device->type)(device, state, &info);
+	(*type)(this, state, &info);
 	return info.f;
 }
 
 
 /*-------------------------------------------------
-    device_get_info_string - return a string value
+    device_get_config_string - return a string value
     from an allocated device
 -------------------------------------------------*/
 
-const char *device_get_info_string(const device_config *device, UINT32 state)
+const char *device_config::get_config_string(UINT32 state) const
 {
 	deviceinfo info;
 
-	assert(device != NULL);
-	assert(device->type != NULL);
+	assert(this != NULL);
+	assert(type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
 
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
-	(*device->type)(device, state, &info);
+	(*type)(this, state, &info);
 	if (info.s[0] == 0)
 		set_default_string(state, info.s);
 	return info.s;
@@ -610,66 +516,62 @@ const char *device_get_info_string(const device_config *device, UINT32 state)
 
 
 
-/***************************************************************************
-    DEVICE TYPE INFORMATION SETTERS
-***************************************************************************/
-
 /*-------------------------------------------------
-    devtype_get_info_int - return an integer value
-    from a device type (does not need to be
-    allocated)
+    device_get_runtime_int - return an integer state
+    value from an allocated device
 -------------------------------------------------*/
 
-INT64 devtype_get_info_int(device_type type, UINT32 state)
+INT64 running_device::get_runtime_int(UINT32 state)
 {
 	deviceinfo info;
 
-	assert(type != NULL);
+	assert(this != NULL);
+	assert(get_runtime_info != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
 
 	/* retrieve the value */
 	info.i = 0;
-	(*type)(NULL, state, &info);
+	(*get_runtime_info)(this, state, &info);
 	return info.i;
 }
 
 
 /*-------------------------------------------------
-    devtype_get_info_int - return a function
-    pointer from a device type (does not need to
-    be allocated)
+    device_get_runtime_ptr - return a pointer state
+    value from an allocated device
 -------------------------------------------------*/
 
-genf *devtype_get_info_fct(device_type type, UINT32 state)
+void *running_device::get_runtime_ptr(UINT32 state)
 {
 	deviceinfo info;
 
-	assert(type != NULL);
-	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
+	assert(this != NULL);
+	assert(get_runtime_info != NULL);
+	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
 
 	/* retrieve the value */
-	info.f = 0;
-	(*type)(NULL, state, &info);
-	return info.f;
+	info.p = NULL;
+	(*get_runtime_info)(this, state, &info);
+	return info.p;
 }
 
 
 /*-------------------------------------------------
-    devtype_get_info_string - return a string value
-    from a device type (does not need to be
-    allocated)
+    device_get_runtime_string - return a string value
+    from an allocated device
 -------------------------------------------------*/
 
-const char *devtype_get_info_string(device_type type, UINT32 state)
+const char *running_device::get_runtime_string(UINT32 state)
 {
 	deviceinfo info;
 
-	assert(type != NULL);
+	assert(this != NULL);
+	assert(get_runtime_info != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
 
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
-	(*type)(NULL, state, &info);
+	(*get_runtime_info)(this, state, &info);
 	if (info.s[0] == 0)
 		set_default_string(state, info.s);
 	return info.s;

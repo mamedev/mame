@@ -57,7 +57,7 @@ struct _ga20_state
 };
 
 
-INLINE ga20_state *get_safe_token(const device_config *device)
+INLINE ga20_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

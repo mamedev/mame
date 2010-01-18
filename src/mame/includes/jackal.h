@@ -21,8 +21,8 @@ struct _jackal_state
 	UINT8    *spritebank;
 
 	/* devices */
-	const device_config *mastercpu;
-	const device_config *slavecpu;
+	running_device *mastercpu;
+	running_device *slavecpu;
 };
 
 

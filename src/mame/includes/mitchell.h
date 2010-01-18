@@ -31,8 +31,8 @@ struct _mitchell_state
 	int        keymatrix;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *oki;
+	running_device *audiocpu;
+	running_device *oki;
 };
 
 

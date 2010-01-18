@@ -25,19 +25,19 @@ struct _xexex_state
 	int        frame;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k054539;
-	const device_config *filter1l;
-	const device_config *filter1r;
-	const device_config *filter2l;
-	const device_config *filter2r;
-	const device_config *k056832;
-	const device_config *k053246;
-	const device_config *k053250;
-	const device_config *k053251;
-	const device_config *k053252;
-	const device_config *k054338;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k054539;
+	running_device *filter1l;
+	running_device *filter1r;
+	running_device *filter2l;
+	running_device *filter2r;
+	running_device *k056832;
+	running_device *k053246;
+	running_device *k053250;
+	running_device *k053251;
+	running_device *k053252;
+	running_device *k054338;
 };
 
 

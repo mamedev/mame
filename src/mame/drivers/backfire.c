@@ -169,8 +169,8 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 static VIDEO_UPDATE(backfire)
 {
-	const device_config *left_screen = devtag_get_device(screen->machine, "lscreen");
-	const device_config *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen = devtag_get_device(screen->machine, "lscreen");
+	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -445,7 +445,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-static void sound_irq_gen(const device_config *device, int state)
+static void sound_irq_gen(running_device *device, int state)
 {
 	logerror("sound irq\n");
 }

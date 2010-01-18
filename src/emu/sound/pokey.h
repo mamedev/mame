@@ -73,7 +73,7 @@ struct _pokey_interface
 	devcb_read8 allpot_r;
 	devcb_read8 serin_r;
 	devcb_write8 serout_w;
-	void (*interrupt_cb)(const device_config *device, int mask);
+	void (*interrupt_cb)(running_device *device, int mask);
 };
 
 
@@ -84,9 +84,9 @@ WRITE8_DEVICE_HANDLER( pokey_w );
 READ8_HANDLER( quad_pokey_r );
 WRITE8_HANDLER( quad_pokey_w );
 
-void pokey_serin_ready (const device_config *device, int after);
-void pokey_break_w (const device_config *device, int shift);
-void pokey_kbcode_w (const device_config *device, int kbcode, int make);
+void pokey_serin_ready (running_device *device, int after);
+void pokey_break_w (running_device *device, int shift);
+void pokey_kbcode_w (running_device *device, int kbcode, int make);
 
 DEVICE_GET_INFO( pokey );
 #define SOUND_POKEY DEVICE_GET_INFO_NAME( pokey )

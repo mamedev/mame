@@ -11,10 +11,10 @@ struct _aica_interface
 {
 	int master;
 	int roffset;				/* offset in the region */
-	void (*irq_callback)(const device_config *device, int state);	/* irq callback */
+	void (*irq_callback)(running_device *device, int state);	/* irq callback */
 };
 
-void aica_set_ram_base(const device_config *device, void *base, int size);
+void aica_set_ram_base(running_device *device, void *base, int size);
 
 // AICA register access
 READ16_DEVICE_HANDLER( aica_r );

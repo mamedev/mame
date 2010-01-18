@@ -256,7 +256,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static void kfr_adpcm1_int(const device_config *device)
+static void kfr_adpcm1_int(running_device *device)
 {
 	static UINT8 trigger,adpcm_data;
 
@@ -282,7 +282,7 @@ static void kfr_adpcm1_int(const device_config *device)
 }
 
 
-static void kfr_adpcm2_int(const device_config *device)
+static void kfr_adpcm2_int(running_device *device)
 {
 	static UINT8 trigger,adpcm_data;
 

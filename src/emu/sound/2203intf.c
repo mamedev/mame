@@ -12,11 +12,11 @@ struct _ym2203_state
 	void *			chip;
 	void *			psg;
 	const ym2203_interface *intf;
-	const device_config *device;
+	running_device *device;
 };
 
 
-INLINE ym2203_state *get_safe_token(const device_config *device)
+INLINE ym2203_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -127,7 +127,7 @@ static DEVICE_START( ym2203 )
 		},
 		NULL
 	};
-	const ym2203_interface *intf = device->static_config ? (const ym2203_interface *)device->static_config : &generic_2203;
+	const ym2203_interface *intf = device->baseconfig().static_config ? (const ym2203_interface *)device->baseconfig().static_config : &generic_2203;
 	ym2203_state *info = get_safe_token(device);
 	int rate = device->clock/72; /* ??? */
 

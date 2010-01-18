@@ -24,10 +24,10 @@ struct _lasso_state
 	UINT8    track_enable;	/* used by wwjgtin */
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *sn_1;
-	const device_config *sn_2;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *sn_1;
+	running_device *sn_2;
 };
 
 

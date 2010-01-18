@@ -952,7 +952,7 @@ static void render_save(running_machine *machine, int config_type, xml_data_node
     is 'live'
 -------------------------------------------------*/
 
-int render_is_live_screen(const device_config *screen)
+int render_is_live_screen(running_device *screen)
 {
 	render_target *target;
 	int screen_index;
@@ -963,7 +963,7 @@ int render_is_live_screen(const device_config *screen)
 	assert(screen->machine->config != NULL);
 	assert(screen->tag != NULL);
 
-	screen_index = screen->machine->config->devicelist.index(VIDEO_SCREEN, screen->tag);
+	screen_index = screen->machine->devicelist.index(VIDEO_SCREEN, screen->tag);
 
 	assert(screen_index != -1);
 
@@ -1468,6 +1468,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 			{
 				const device_config *screen = target->machine->config->devicelist.find(VIDEO_SCREEN, item->index);
 				const screen_config *scrconfig = (const screen_config *)screen->inline_config;
+				running_device *screendev = target->machine->device(screen->tag);
 				const rectangle vectorvis = { 0, 639, 0, 479 };
 				const rectangle *visarea = NULL;
 				render_container *container = get_screen_container_by_index(item->index);
@@ -1477,8 +1478,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				/* we may be called very early, before machine->visible_area is initialized; handle that case */
 				if (scrconfig->type == SCREEN_TYPE_VECTOR)
 					visarea = &vectorvis;
-				else if (screen->token != NULL)
-					visarea = video_screen_get_visible_area(screen);
+				else if (screendev != NULL && screendev->token != NULL)
+					visarea = video_screen_get_visible_area(screendev);
 				else
 					visarea = &scrconfig->visarea;
 
@@ -2943,6 +2944,12 @@ render_container *render_container_get_screen(const device_config *screen)
 	assert(container != NULL);
 
 	return container;
+}
+
+
+render_container *render_container_get_screen(running_device *screen)
+{
+	return render_container_get_screen(&screen->baseconfig());
 }
 
 

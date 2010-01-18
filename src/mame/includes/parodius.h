@@ -20,12 +20,12 @@ struct _parodius_state
 	//int        nmi_enabled;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k053260;
-	const device_config *k052109;
-	const device_config *k053245;
-	const device_config *k053251;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k053260;
+	running_device *k052109;
+	running_device *k053245;
+	running_device *k053251;
 };
 
 /*----------- defined in video/parodius.c -----------*/

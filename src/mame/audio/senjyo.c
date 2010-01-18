@@ -46,7 +46,7 @@ Z80CTC_INTERFACE( senjyo_ctc_intf )
 
 WRITE8_HANDLER( senjyo_volume_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	single_volume = data & 0x0f;
 	sample_set_volume(samples,0,single_volume / 15.0);
 }
@@ -54,7 +54,7 @@ WRITE8_HANDLER( senjyo_volume_w )
 
 static TIMER_CALLBACK( senjyo_sh_update )
 {
-	const device_config *samples = devtag_get_device(machine, "samples");
+	running_device *samples = devtag_get_device(machine, "samples");
 
 	/* ctc2 timer single tone generator frequency */
 	attotime period = z80ctc_getperiod (devtag_get_device(machine, "z80ctc"), 2);

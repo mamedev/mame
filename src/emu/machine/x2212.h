@@ -21,9 +21,9 @@ DEVICE_GET_INFO(x2212);
 	MDRV_DEVICE_ADD(_tag, X2212, 0)
 
 
-extern void x2212_write( const device_config *device, int offset, int data );
-extern int x2212_read( const device_config *device, int offset );
-extern void x2212_store( const device_config *device, int store );
-extern void x2212_array_recall( const device_config *device, int array_recall );
+extern void x2212_write( running_device *device, int offset, int data );
+extern int x2212_read( running_device *device, int offset );
+extern void x2212_store( running_device *device, int store );
+extern void x2212_array_recall( running_device *device, int array_recall );
 
 #endif

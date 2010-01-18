@@ -35,4 +35,4 @@ WRITE16_HANDLER( atarig1_mo_control_w );
 VIDEO_START( atarig1 );
 VIDEO_UPDATE( atarig1 );
 
-void atarig1_scanline_update(const device_config *screen, int scanline);
+void atarig1_scanline_update(running_device *screen, int scanline);

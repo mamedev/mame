@@ -45,7 +45,7 @@ typedef struct _ttl7474_state ttl7474_state;
 struct _ttl7474_state
 {
 	/* callback */
-	void (*output_cb)(const device_config *);
+	void (*output_cb)(running_device *);
 
 	/* inputs */
 	UINT8 clear;			/* pin 1/13 */
@@ -63,7 +63,7 @@ struct _ttl7474_state
 	UINT8 last_output_comp;
 };
 
-INLINE ttl7474_state *get_safe_token(const device_config *device)
+INLINE ttl7474_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -73,7 +73,7 @@ INLINE ttl7474_state *get_safe_token(const device_config *device)
 }
 
 
-void ttl7474_update(const device_config *device)
+void ttl7474_update(running_device *device)
 {
 	ttl7474_state *state = get_safe_token(device);
 
@@ -114,38 +114,38 @@ void ttl7474_update(const device_config *device)
 }
 
 
-void ttl7474_clear_w(const device_config *device, int data)
+void ttl7474_clear_w(running_device *device, int data)
 {
 	ttl7474_state *state = get_safe_token(device);
 	state->clear = data ? 1 : 0;
 }
 
-void ttl7474_preset_w(const device_config *device, int data)
+void ttl7474_preset_w(running_device *device, int data)
 {
 	ttl7474_state *state = get_safe_token(device);
 	state->preset = data ? 1 : 0;
 }
 
-void ttl7474_clock_w(const device_config *device, int data)
+void ttl7474_clock_w(running_device *device, int data)
 {
 	ttl7474_state *state = get_safe_token(device);
 	state->clock = data ? 1 : 0;
 }
 
-void ttl7474_d_w(const device_config *device, int data)
+void ttl7474_d_w(running_device *device, int data)
 {
 	ttl7474_state *state = get_safe_token(device);
 	state->d = data ? 1 : 0;
 }
 
 
-int ttl7474_output_r(const device_config *device)
+int ttl7474_output_r(running_device *device)
 {
 	ttl7474_state *state = get_safe_token(device);
 	return state->output;
 }
 
-int ttl7474_output_comp_r(const device_config *device)
+int ttl7474_output_comp_r(running_device *device)
 {
 	ttl7474_state *state = get_safe_token(device);
 	return state->output_comp;
@@ -154,7 +154,7 @@ int ttl7474_output_comp_r(const device_config *device)
 
 static DEVICE_START( ttl7474 )
 {
-	ttl7474_config *config = (ttl7474_config *)device->inline_config;
+	ttl7474_config *config = (ttl7474_config *)device->baseconfig().inline_config;
 	ttl7474_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 

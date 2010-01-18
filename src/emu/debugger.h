@@ -43,7 +43,7 @@ void debugger_flush_all_traces_on_abnormal_exit(void);
     this once per instruction from CPU cores
 -------------------------------------------------*/
 
-INLINE void debugger_instruction_hook(const device_config *device, offs_t curpc)
+INLINE void debugger_instruction_hook(running_device *device, offs_t curpc)
 {
 	if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 		debug_cpu_instruction_hook(device, curpc);
@@ -55,7 +55,7 @@ INLINE void debugger_instruction_hook(const device_config *device, offs_t curpc)
     anytime an exception is generated
 -------------------------------------------------*/
 
-INLINE void debugger_exception_hook(const device_config *device, int exception)
+INLINE void debugger_exception_hook(running_device *device, int exception)
 {
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_cpu_exception_hook(device, exception);
@@ -73,7 +73,7 @@ INLINE void debugger_exception_hook(const device_config *device, int exception)
     execution for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_start_cpu_hook(const device_config *device, attotime endtime)
+INLINE void debugger_start_cpu_hook(running_device *device, attotime endtime)
 {
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_cpu_start_hook(device, endtime);
@@ -86,7 +86,7 @@ INLINE void debugger_start_cpu_hook(const device_config *device, attotime endtim
     for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_stop_cpu_hook(const device_config *device)
+INLINE void debugger_stop_cpu_hook(running_device *device)
 {
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_cpu_stop_hook(device);
@@ -99,7 +99,7 @@ INLINE void debugger_stop_cpu_hook(const device_config *device)
     acknowledged
 -------------------------------------------------*/
 
-INLINE void debugger_interrupt_hook(const device_config *device, int irqline)
+INLINE void debugger_interrupt_hook(running_device *device, int irqline)
 {
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_cpu_interrupt_hook(device, irqline);

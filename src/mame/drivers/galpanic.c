@@ -137,7 +137,7 @@ VIDEO_UPDATE( comad );
 
 static VIDEO_EOF( galpanic )
 {
-	const device_config *pandora = devtag_get_device(machine, "pandora");
+	running_device *pandora = devtag_get_device(machine, "pandora");
 	pandora_eof(pandora);
 }
 
@@ -163,7 +163,7 @@ static INTERRUPT_GEN( galhustl_interrupt )
 
 static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
-	const device_config *pandora = devtag_get_device(space->machine, "pandora");
+	running_device *pandora = devtag_get_device(space->machine, "pandora");
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -189,7 +189,7 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( galpania_misc_w )
 {
-	const device_config *pandora = devtag_get_device(machine, "pandora");
+	running_device *pandora = devtag_get_device(machine, "pandora");
 
 	if (ACCESSING_BITS_0_7)
 	{

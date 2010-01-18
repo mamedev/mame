@@ -49,8 +49,8 @@
 struct _ldplayer_data
 {
 	/* low-level emulation data */
-	const device_config *cpu;					/* CPU index of the 8049 */
-	const device_config *tracktimer;			/* timer device */
+	running_device *cpu;					/* CPU index of the 8049 */
+	running_device *tracktimer;			/* timer device */
 	vp931_data_ready_func data_ready_cb;		/* data ready callback */
 
 	/* I/O port states */
@@ -187,7 +187,7 @@ const ldplayer_interface vp931_interface =
     ready callback
 -------------------------------------------------*/
 
-void vp931_set_data_ready_callback(const device_config *device, vp931_data_ready_func callback)
+void vp931_set_data_ready_callback(running_device *device, vp931_data_ready_func callback)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ld->player->data_ready_cb = callback;
@@ -215,8 +215,8 @@ static void vp931_init(laserdisc_state *ld)
 	player->data_ready_cb = cbsave;
 
 	/* find our devices */
-	player->cpu = ld->device->machine->device(device_build_tag(tempstring, ld->device, "vp931"));
-	player->tracktimer = ld->device->machine->device(device_build_tag(tempstring, ld->device, "tracktimer"));
+	player->cpu = ld->device->subdevice("vp931");
+	player->tracktimer = ld->device->subdevice("tracktimer");
 	timer_device_set_ptr(player->tracktimer, ld);
 }
 

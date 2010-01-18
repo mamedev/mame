@@ -523,7 +523,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void chin_adpcm_int( const device_config *device )
+static void chin_adpcm_int( running_device *device )
 {
 	chinsan_state *state = (chinsan_state *)device->machine->driver_data;
 

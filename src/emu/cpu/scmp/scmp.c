@@ -32,7 +32,7 @@ struct _scmp_state
 	UINT8	ER;
 	UINT8	SR;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	cpu_state_table 	state;
@@ -82,7 +82,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE scmp_state *get_safe_token(const device_config *device)
+INLINE scmp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -528,8 +528,8 @@ static CPU_INIT( scmp )
 {
 	scmp_state *cpustate = get_safe_token(device);
 
-	if (device->static_config != NULL)
-		cpustate->config = *(scmp_config *)device->static_config;
+	if (device->baseconfig().static_config != NULL)
+		cpustate->config = *(scmp_config *)device->baseconfig().static_config;
 	/* set up the state table */
 	cpustate->state = state_table_template;
 	cpustate->state.baseptr = cpustate;

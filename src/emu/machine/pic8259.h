@@ -13,8 +13,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*pic8259_set_int_line_func)(const device_config *device, int interrupt);
-#define PIC8259_SET_INT_LINE(name)	void name(const device_config *device, int interrupt)
+typedef void (*pic8259_set_int_line_func)(running_device *device, int interrupt);
+#define PIC8259_SET_INT_LINE(name)	void name(running_device *device, int interrupt)
 
 
 struct pic8259_interface {
@@ -36,7 +36,7 @@ struct pic8259_interface {
 DEVICE_GET_INFO(pic8259);
 READ8_DEVICE_HANDLER( pic8259_r );
 WRITE8_DEVICE_HANDLER( pic8259_w );
-int pic8259_acknowledge(const device_config *device);
-void pic8259_set_irq_line(const device_config *device, int irq, int state);
+int pic8259_acknowledge(running_device *device);
+void pic8259_set_irq_line(running_device *device, int irq, int state);
 
 #endif /* __PIC8259_H_ */

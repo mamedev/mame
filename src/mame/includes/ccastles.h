@@ -32,7 +32,7 @@ struct _ccastles_state
 	UINT8    nvram_store[2];
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

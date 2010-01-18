@@ -17,8 +17,8 @@ struct _fgoal_state
 	int        prev_coin;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *mb14241;
+	running_device *maincpu;
+	running_device *mb14241;
 };
 
 

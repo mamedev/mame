@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	const device_config *pia0 = devtag_get_device(device->machine, "pia0");
+	running_device *pia0 = devtag_get_device(device->machine, "pia0");
 	static int toggle;
 
 	pia6821_cb1_w(pia0,0, toggle & 1);
@@ -172,7 +172,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
-	const device_config *tms = devtag_get_device(device->machine, "tms");
+	running_device *tms = devtag_get_device(device->machine, "tms");
 
 	// bit 0 = /RS
 	tms5220_rsq_w(tms, (data >> 0) & 0x01);
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	const device_config *pia0 = devtag_get_device(space->machine, "pia0");
+	running_device *pia0 = devtag_get_device(space->machine, "pia0");
 	pia6821_ca1_w(pia0, 0, data & 0x80);
 	soundlatch2_w(space, 0, data);
 }

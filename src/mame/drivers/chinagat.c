@@ -299,7 +299,7 @@ static READ8_HANDLER( saiyugb1_m5205_irq_r )
 	return 0;
 }
 
-static void saiyugb1_m5205_irq_w( const device_config *device )
+static void saiyugb1_m5205_irq_w( running_device *device )
 {
 	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
 	state->adpcm_sound_irq = 1;
@@ -492,7 +492,7 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 
-static void chinagat_irq_handler( const device_config *device, int irq )
+static void chinagat_irq_handler( running_device *device, int irq )
 {
 	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
 	cpu_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );

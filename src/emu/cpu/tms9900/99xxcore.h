@@ -92,19 +92,19 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX ti990_10
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10 )
-	#define TMS99XX_cpu_get_name "TI990/10"
+	#define TMS99XX_device_get_name "TI990/10"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900 )
-	#define TMS99XX_cpu_get_name "TMS9900"
+	#define TMS99XX_device_get_name "TMS9900"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940 )
-	#define TMS99XX_cpu_get_name "TMS9940"
+	#define TMS99XX_device_get_name "TMS9940"
 
 	#error "tms9940 is not yet supported"
 
@@ -112,13 +112,13 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9980a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980a )
-	#define TMS99XX_cpu_get_name "TMS9980A/TMS9981"
+	#define TMS99XX_device_get_name "TMS9980A/TMS9981"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985 )
-	#define TMS99XX_cpu_get_name "TMS9985"
+	#define TMS99XX_device_get_name "TMS9985"
 
 	#error "tms9985 is not yet supported"
 
@@ -126,7 +126,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9989
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989 )
-	#define TMS99XX_cpu_get_name "TMS9989"
+	#define TMS99XX_device_get_name "TMS9989"
 
 	#error "tms9989 is not yet supported"
 
@@ -134,13 +134,13 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9995
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995 )
-	#define TMS99XX_cpu_get_name "TMS9995"
+	#define TMS99XX_device_get_name "TMS9995"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000 )
-	#define TMS99XX_cpu_get_name "TMS99000"
+	#define TMS99XX_device_get_name "TMS99000"
 
 	#error "tms99000 is not yet supported"
 
@@ -148,7 +148,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms99105a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105a )
-	#define TMS99XX_cpu_get_name "TMS99105A"
+	#define TMS99XX_device_get_name "TMS99105A"
 
 	#error "tms99105a is not yet supported"
 
@@ -156,7 +156,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms99110a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110a )
-	#define TMS99XX_cpu_get_name "TMS99110A"
+	#define TMS99XX_device_get_name "TMS99110A"
 
 	#error "tms99110a is not yet supported"
 
@@ -436,7 +436,7 @@ struct _tms99xx_state
 	/* note that this callback is used by tms9900_set_irq_line(cpustate) and tms9980a_set_irq_line(cpustate) to
     retreive the value on IC0-IC3 (non-standard behaviour) */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -509,7 +509,7 @@ struct _tms99xx_state
 	int extra_byte;	/* buffer holding the unused byte in a word read */
 };
 
-INLINE tms99xx_state *get_safe_token(const device_config *device)
+INLINE tms99xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1210,7 +1210,7 @@ static void set_flag1(tms99xx_state *cpustate, int val);
 
 /**************************************************************************/
 
-static void register_for_save_state(const device_config *device)
+static void register_for_save_state(running_device *device)
 {
 	tms99xx_state *cpustate = get_safe_token(device);
 	state_save_register_device_item(device, 0, cpustate->WP);
@@ -1288,7 +1288,7 @@ static void register_for_save_state(const device_config *device)
 
 static CPU_INIT( tms99xx )
 {
-	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->static_config;
+	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->baseconfig().static_config;
 	tms99xx_state *cpustate = get_safe_token(device);
 
 	register_for_save_state(device);
@@ -4635,7 +4635,7 @@ static CPU_SET_INFO( tms99xx )
  * Generic get_info
  **************************************************************************/
 
-void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
+void TMS99XX_GET_INFO(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info)
 {
 	tms99xx_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
@@ -4770,7 +4770,7 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, TMS99XX_cpu_get_name);		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, TMS99XX_device_get_name);		break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 9900"); break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;

@@ -78,10 +78,10 @@ struct _dkong_state
 	size_t            sprite_ram_size;
 
 	/* devices */
-	const device_config *dev_n2a03a;
-	const device_config *dev_n2a03b;
-	const device_config *dev_vp2;		/* virtual port 2 */
-	const device_config *dev_6h;
+	running_device *dev_n2a03a;
+	running_device *dev_n2a03b;
+	running_device *dev_vp2;		/* virtual port 2 */
+	running_device *dev_6h;
 
 #if 0
 	/* machine states */

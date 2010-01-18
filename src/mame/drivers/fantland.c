@@ -311,7 +311,7 @@ ADDRESS_MAP_END
                            Born To Fight
 ***************************************************************************/
 
-static void borntofi_adpcm_start( const device_config *device, int voice )
+static void borntofi_adpcm_start( running_device *device, int voice )
 {
 	fantland_state *state = (fantland_state *)device->machine->driver_data;
 	msm5205_reset_w(device, 0);
@@ -320,7 +320,7 @@ static void borntofi_adpcm_start( const device_config *device, int voice )
 //  logerror("%s: adpcm start = %06x, stop = %06x\n", cpuexec_describe_context(device->machine), state->adpcm_addr[0][voice], state->adpcm_addr[1][voice]);
 }
 
-static void borntofi_adpcm_stop( const device_config *device, int voice )
+static void borntofi_adpcm_stop( running_device *device, int voice )
 {
 	fantland_state *state = (fantland_state *)device->machine->driver_data;
 	msm5205_reset_w(device, 1);
@@ -332,7 +332,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 	fantland_state *state = (fantland_state *)space->machine->driver_data;
 	int voice = offset / 8;
 	int reg = offset % 8;
-	const device_config *msm;
+	running_device *msm;
 
 	switch (voice)
 	{
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 	}
 }
 
-static void borntofi_adpcm_int( const device_config *device, int voice )
+static void borntofi_adpcm_int( running_device *device, int voice )
 {
 	fantland_state *state = (fantland_state *)device->machine->driver_data;
 	UINT8 *rom;
@@ -397,10 +397,10 @@ static void borntofi_adpcm_int( const device_config *device, int voice )
 	}
 }
 
-static void borntofi_adpcm_int_0(const device_config *device) { borntofi_adpcm_int(device, 0); }
-static void borntofi_adpcm_int_1(const device_config *device) { borntofi_adpcm_int(device, 1); }
-static void borntofi_adpcm_int_2(const device_config *device) { borntofi_adpcm_int(device, 2); }
-static void borntofi_adpcm_int_3(const device_config *device) { borntofi_adpcm_int(device, 3); }
+static void borntofi_adpcm_int_0(running_device *device) { borntofi_adpcm_int(device, 0); }
+static void borntofi_adpcm_int_1(running_device *device) { borntofi_adpcm_int(device, 1); }
+static void borntofi_adpcm_int_2(running_device *device) { borntofi_adpcm_int(device, 2); }
+static void borntofi_adpcm_int_3(running_device *device) { borntofi_adpcm_int(device, 3); }
 
 
 static ADDRESS_MAP_START( borntofi_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -898,7 +898,7 @@ static MACHINE_DRIVER_START( fantland )
 MACHINE_DRIVER_END
 
 
-static void galaxygn_sound_irq( const device_config *device, int line )
+static void galaxygn_sound_irq( running_device *device, int line )
 {
 	fantland_state *state = (fantland_state *)device->machine->driver_data;
 	cpu_set_input_line_and_vector(state->audio_cpu, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
@@ -1062,7 +1062,7 @@ MACHINE_DRIVER_END
 
 
 
-static void wheelrun_ym3526_irqhandler( const device_config *device, int state )
+static void wheelrun_ym3526_irqhandler( running_device *device, int state )
 {
 	fantland_state *driver = (fantland_state *)device->machine->driver_data;
 	cpu_set_input_line(driver->audio_cpu, INPUT_LINE_IRQ0, state);

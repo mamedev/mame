@@ -156,7 +156,7 @@ some kind of zoom table?
 ***************************************************************************/
 
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	taitoh_state *state = (taitoh_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

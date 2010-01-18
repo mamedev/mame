@@ -58,7 +58,7 @@ struct _t6w28_state
 };
 
 
-INLINE t6w28_state *get_safe_token(const device_config *device)
+INLINE t6w28_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -307,7 +307,7 @@ static void t6w28_set_gain(t6w28_state *R,int gain)
 
 
 
-static int t6w28_init(const device_config *device, t6w28_state *R)
+static int t6w28_init(running_device *device, t6w28_state *R)
 {
 	int sample_rate = device->clock/16;
 	int i;

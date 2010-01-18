@@ -20,7 +20,7 @@ struct _gotcha_state
 	UINT16      scroll[4];
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

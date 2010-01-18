@@ -29,35 +29,35 @@ struct _darius_state
 	UINT8      pan[DARIUS_PAN_MAX];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *cpub;
-	const device_config *adpcm;
-	const device_config *tc0140syt;
-	const device_config *pc080sn;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *cpub;
+	running_device *adpcm;
+	running_device *tc0140syt;
+	running_device *pc080sn;
 
-	const device_config *lscreen;
-	const device_config *mscreen;
-	const device_config *rscreen;
+	running_device *lscreen;
+	running_device *mscreen;
+	running_device *rscreen;
 
-	const device_config *filter0_0l;
-	const device_config *filter0_0r;
-	const device_config *filter0_1l;
-	const device_config *filter0_1r;
-	const device_config *filter0_2l;
-	const device_config *filter0_2r;
-	const device_config *filter0_3l;
-	const device_config *filter0_3r;
-	const device_config *filter1_0l;
-	const device_config *filter1_0r;
-	const device_config *filter1_1l;
-	const device_config *filter1_1r;
-	const device_config *filter1_2l;
-	const device_config *filter1_2r;
-	const device_config *filter1_3l;
-	const device_config *filter1_3r;
-	const device_config *msm5205_l;
-	const device_config *msm5205_r;
+	running_device *filter0_0l;
+	running_device *filter0_0r;
+	running_device *filter0_1l;
+	running_device *filter0_1r;
+	running_device *filter0_2l;
+	running_device *filter0_2r;
+	running_device *filter0_3l;
+	running_device *filter0_3r;
+	running_device *filter1_0l;
+	running_device *filter1_0r;
+	running_device *filter1_1l;
+	running_device *filter1_1r;
+	running_device *filter1_2l;
+	running_device *filter1_2r;
+	running_device *filter1_3l;
+	running_device *filter1_3r;
+	running_device *msm5205_l;
+	running_device *msm5205_r;
 };
 
 

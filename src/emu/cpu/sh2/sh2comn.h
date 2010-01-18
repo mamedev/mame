@@ -115,7 +115,7 @@ typedef struct
 
 	INT8	irq_line_state[17];
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *internal;
 	UINT32	*m;
@@ -172,7 +172,7 @@ typedef struct
 #endif
 } SH2;
 
-void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irqcallback);
+void sh2_common_init(SH2 *sh2, running_device *device, cpu_irq_callback irqcallback);
 void sh2_recalc_irq(SH2 *sh2);
 void sh2_set_irq_line(SH2 *sh2, int irqline, int state);
 void sh2_exception(SH2 *sh2, const char *message, int irqline);

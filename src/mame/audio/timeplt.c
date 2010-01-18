@@ -87,7 +87,7 @@ static READ8_DEVICE_HANDLER( timeplt_portB_r )
  *
  *************************************/
 
-static void filter_w( const device_config *device, int data )
+static void filter_w( running_device *device, int data )
 {
 	int C = 0;
 

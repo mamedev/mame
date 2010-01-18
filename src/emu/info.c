@@ -552,12 +552,12 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 
 static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *device;
+	const device_config *devconfig;
 
-	for (device = sound_first(config); device != NULL; device = sound_next(device))
-		if (sound_get_type(device) == SOUND_SAMPLES)
+	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
+		if (sound_get_type(devconfig) == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const samples_interface *)device->static_config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)devconfig->static_config)->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -583,13 +583,13 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 
 static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *device;
+	const device_config *devconfig;
 
 	/* iterate over sound chips looking for samples */
-	for (device = sound_first(config); device != NULL; device = sound_next(device))
-		if (sound_get_type(device) == SOUND_SAMPLES)
+	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
+		if (sound_get_type(devconfig) == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const samples_interface *)device->static_config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)devconfig->static_config)->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -626,28 +626,28 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 
 static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *device;
+	const device_config *devconfig;
 
 	/* iterate over CPUs */
-	for (device = cpu_first(config); device != NULL; device = cpu_next(device))
+	for (devconfig = cpu_first(config); devconfig != NULL; devconfig = cpu_next(devconfig))
 	{
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"cpu\"");
-		fprintf(out, " tag=\"%s\"", xml_normalize_string(device->tag));
-		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(device)));
-		fprintf(out, " clock=\"%d\"", device->clock);
+		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(devconfig)));
+		fprintf(out, " clock=\"%d\"", devconfig->clock);
 		fprintf(out, "/>\n");
 	}
 
 	/* iterate over sound chips */
-	for (device = sound_first(config); device != NULL; device = sound_next(device))
+	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
 	{
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"audio\"");
-		fprintf(out, " tag=\"%s\"", xml_normalize_string(device->tag));
-		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(device)));
-		if (device->clock != 0)
-			fprintf(out, " clock=\"%d\"", device->clock);
+		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(devconfig)));
+		if (devconfig->clock != 0)
+			fprintf(out, " clock=\"%d\"", devconfig->clock);
 		fprintf(out, "/>\n");
 	}
 }
@@ -660,12 +660,12 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 
 static void print_game_display(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *screen;
+	const device_config *devconfig;
 
 	/* iterate over screens */
-	for (screen = video_screen_first(config); screen != NULL; screen = video_screen_next(screen))
+	for (devconfig = video_screen_first(config); devconfig != NULL; devconfig = video_screen_next(devconfig))
 	{
-		const screen_config *scrconfig = (const screen_config *)screen->inline_config;
+		const screen_config *scrconfig = (const screen_config *)devconfig->inline_config;
 
 		fprintf(out, "\t\t<display");
 

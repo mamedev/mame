@@ -384,7 +384,7 @@ static WRITE8_DEVICE_HANDLER( suprgolf_writeB )
 	mame_printf_debug("ymwA\n");
 }
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	//cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -402,7 +402,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static void adpcm_int(const device_config *device)
+static void adpcm_int(running_device *device)
 {
 	static int toggle = 0;
 

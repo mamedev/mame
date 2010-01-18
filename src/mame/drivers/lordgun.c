@@ -90,7 +90,7 @@ static WRITE8_DEVICE_HANDLER(fake2_w)
 
 static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
-	const device_config *eeprom = devtag_get_device(device->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(device->machine, "eeprom");
 	static UINT8 old;
 	int i;
 
@@ -400,7 +400,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static void soundirq(const device_config *device, int state)
+static void soundirq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }

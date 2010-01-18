@@ -135,7 +135,7 @@ struct _drcuml_symbol
 /* structure describing UML generation state */
 struct _drcuml_state
 {
-	const device_config *	device;				/* CPU device we are associated with */
+	running_device *	device;				/* CPU device we are associated with */
 	drccache *				cache;				/* pointer to the codegen cache */
 	drcuml_block *			blocklist;			/* list of active blocks */
 	const drcbe_interface *	beintf;				/* backend interface pointer */
@@ -538,7 +538,7 @@ INLINE void convert_to_mov_param(drcuml_instruction *inst, int pnum)
     generator and initialize the back-end
 -------------------------------------------------*/
 
-drcuml_state *drcuml_alloc(const device_config *device, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+drcuml_state *drcuml_alloc(running_device *device, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	drcuml_state *drcuml;
 	int opnum;

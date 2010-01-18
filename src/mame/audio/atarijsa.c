@@ -49,15 +49,15 @@ static UINT8 *bank_source_data;
 static UINT8 speech_data;
 static UINT8 last_ctl;
 
-static const device_config *jsacpu;
+static running_device *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
 
-static const device_config *pokey;
-static const device_config *ym2151;
-static const device_config *tms5220;
-static const device_config *oki6295;
-static const device_config *oki6295_l, *oki6295_r;
+static running_device *pokey;
+static running_device *ym2151;
+static running_device *tms5220;
+static running_device *oki6295;
+static running_device *oki6295_l, *oki6295_r;
 
 static UINT8 overall_volume;
 static UINT8 pokey_volume;

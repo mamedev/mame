@@ -239,7 +239,7 @@ Notes:
 
 static UINT32 *deco32_ram;
 static int raster_enable;
-static const device_config *raster_irq_timer;
+static running_device *raster_irq_timer;
 static UINT8 nslasher_sound_irq;
 
 /**********************************************************************************/
@@ -372,7 +372,7 @@ static READ32_HANDLER( fghthist_control_r )
 static WRITE32_HANDLER( fghthist_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
-		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		running_device *device = devtag_get_device(space->machine, "eeprom");
 		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, data & 0x10);
 		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -642,7 +642,7 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		running_device *device = devtag_get_device(space->machine, "eeprom");
 		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, data & 0x10);
 		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -1596,12 +1596,12 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
-static void sound_irq_nslasher(const device_config *device, int state)
+static void sound_irq_nslasher(running_device *device, int state)
 {
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)

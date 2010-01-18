@@ -32,8 +32,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*voodoo_vblank_func)(const device_config *device, int state);
-typedef void (*voodoo_stall_func)(const device_config *device, int state);
+typedef void (*voodoo_vblank_func)(running_device *device, int state);
+typedef void (*voodoo_stall_func)(running_device *device, int state);
 
 
 typedef struct _voodoo_config voodoo_config;
@@ -94,10 +94,10 @@ struct _voodoo_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int voodoo_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
-int voodoo_get_type(const device_config *device);
-int voodoo_is_stalled(const device_config *device);
-void voodoo_set_init_enable(const device_config *device, UINT32 newval);
+int voodoo_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+int voodoo_get_type(running_device *device);
+int voodoo_is_stalled(running_device *device);
+void voodoo_set_init_enable(running_device *device, UINT32 newval);
 
 READ32_DEVICE_HANDLER( voodoo_r );
 WRITE32_DEVICE_HANDLER( voodoo_w );

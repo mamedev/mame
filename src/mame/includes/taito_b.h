@@ -21,13 +21,13 @@ struct _taitob_state
 	UINT16        coin_word;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *mb87078;
-	const device_config *ym;
-	const device_config *tc0180vcu;
-	const device_config *tc0640fio;
-	const device_config *tc0220ioc;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *mb87078;
+	running_device *ym;
+	running_device *tc0180vcu;
+	running_device *tc0640fio;
+	running_device *tc0220ioc;
 };
 
 

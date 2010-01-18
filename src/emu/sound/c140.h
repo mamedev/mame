@@ -8,7 +8,7 @@
 READ8_DEVICE_HANDLER( c140_r );
 WRITE8_DEVICE_HANDLER( c140_w );
 
-void c140_set_base(const device_config *device, void *base);
+void c140_set_base(running_device *device, void *base);
 
 enum
 {

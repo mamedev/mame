@@ -32,7 +32,7 @@ struct _boxer_state
 	UINT8 pot_latch;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 /*************************************

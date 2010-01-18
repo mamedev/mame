@@ -94,7 +94,7 @@ VIDEO_EOF( sprint4 )
 
 	/* check for sprite-playfield collisions */
 
-	const device_config *discrete = devtag_get_device(machine, "discrete");
+	running_device *discrete = devtag_get_device(machine, "discrete");
 
 	for (i = 0; i < 4; i++)
 	{

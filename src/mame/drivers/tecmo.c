@@ -97,7 +97,7 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 {
 	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
 }
-static void tecmo_adpcm_int(const device_config *device)
+static void tecmo_adpcm_int(running_device *device)
 {
 	if (adpcm_pos >= adpcm_end ||
 				adpcm_pos >= memory_region_length(device->machine, "adpcm"))
@@ -651,7 +651,7 @@ GFXDECODE_END
 
 
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, linestate);
 }

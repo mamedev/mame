@@ -89,7 +89,7 @@ chirp 12-..: vokume   0   : silent
 typedef struct _vlm5030_state vlm5030_state;
 struct _vlm5030_state
 {
-	const device_config *device;
+	running_device *device;
 	const vlm5030_interface *intf;
 
 	sound_stream * channel;
@@ -219,7 +219,7 @@ static const INT16 K5_table[] = {
        0,   -8127,  -16384,  -24511,   32638,   24511,   16254,    8127
 };
 
-INLINE vlm5030_state *get_safe_token(const device_config *device)
+INLINE vlm5030_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -532,14 +532,14 @@ static DEVICE_RESET( vlm5030 )
 
 
 /* set speech rom address */
-void vlm5030_set_rom(const device_config *device, void *speech_rom)
+void vlm5030_set_rom(running_device *device, void *speech_rom)
 {
 	vlm5030_state *chip = get_safe_token(device);
 	chip->rom = (UINT8 *)speech_rom;
 }
 
 /* get BSY pin level */
-int vlm5030_bsy(const device_config *device)
+int vlm5030_bsy(running_device *device)
 {
 	vlm5030_state *chip = get_safe_token(device);
 	vlm5030_update(chip);
@@ -554,7 +554,7 @@ WRITE8_DEVICE_HANDLER( vlm5030_data_w )
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
-void vlm5030_rst (const device_config *device, int pin )
+void vlm5030_rst (running_device *device, int pin )
 {
 	vlm5030_state *chip = get_safe_token(device);
 	if( chip->pin_RST )
@@ -579,7 +579,7 @@ void vlm5030_rst (const device_config *device, int pin )
 }
 
 /* set VCU pin level : ?? unknown */
-void vlm5030_vcu(const device_config *device, int pin)
+void vlm5030_vcu(running_device *device, int pin)
 {
 	vlm5030_state *chip = get_safe_token(device);
 	/* direct mode / indirect mode */
@@ -588,7 +588,7 @@ void vlm5030_vcu(const device_config *device, int pin)
 }
 
 /* set ST pin level  : set table address A0-A7 / start speech */
-void vlm5030_st(const device_config *device, int pin )
+void vlm5030_st(running_device *device, int pin )
 {
 	vlm5030_state *chip = get_safe_token(device);
 	int table;
@@ -654,7 +654,7 @@ static DEVICE_START( vlm5030 )
 	vlm5030_state *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->intf = (device->static_config != NULL) ? (const vlm5030_interface *)device->static_config : &defintrf;
+	chip->intf = (device->baseconfig().static_config != NULL) ? (const vlm5030_interface *)device->baseconfig().static_config : &defintrf;
 
 	emulation_rate = device->clock / 440;
 

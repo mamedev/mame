@@ -17,14 +17,14 @@ struct _k056230_state
 	UINT32  *    ram;
 	int          is_thunderh;
 
-	const device_config *cpu;
+	running_device *cpu;
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k056230_state *k056230_get_safe_token( const device_config *device )
+INLINE k056230_state *k056230_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -33,11 +33,11 @@ INLINE k056230_state *k056230_get_safe_token( const device_config *device )
 	return (k056230_state *)device->token;
 }
 
-INLINE const k056230_interface *k056230_get_interface( const device_config *device )
+INLINE const k056230_interface *k056230_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == K056230));
-	return (const k056230_interface *) device->static_config;
+	return (const k056230_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************

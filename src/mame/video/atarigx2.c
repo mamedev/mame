@@ -136,7 +136,7 @@ WRITE16_HANDLER( atarigx2_mo_control_w )
 }
 
 
-void atarigx2_scanline_update(const device_config *screen, int scanline)
+void atarigx2_scanline_update(running_device *screen, int scanline)
 {
 	atarigx2_state *state = (atarigx2_state *)screen->machine->driver_data;
 	UINT32 *base = &state->atarigen.alpha32[(scanline / 8) * 32 + 24];

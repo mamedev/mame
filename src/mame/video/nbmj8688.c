@@ -717,9 +717,9 @@ VIDEO_UPDATE( mbmj8688_LCD )
 {
 	int x, y, b;
 
-	const device_config *main_screen = devtag_get_device(screen->machine, "screen");
-	const device_config *lcd0_screen = devtag_get_device(screen->machine, "lcd0");
-	const device_config *lcd1_screen = devtag_get_device(screen->machine, "lcd1");
+	running_device *main_screen = devtag_get_device(screen->machine, "screen");
+	running_device *lcd0_screen = devtag_get_device(screen->machine, "lcd0");
+	running_device *lcd1_screen = devtag_get_device(screen->machine, "lcd1");
 
 	if (screen == main_screen) VIDEO_UPDATE_CALL(mbmj8688);
 

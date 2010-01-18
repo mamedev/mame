@@ -1307,7 +1307,7 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
  *
  *************************************/
 
-void segaic16_tilemap_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
 {
 	running_machine *machine = screen->machine;
 	struct tilemap_info *info = &bg_tilemap[which];
@@ -1351,7 +1351,7 @@ void segaic16_tilemap_set_bank(running_machine *machine, int which, int banknum,
 
 	if (info->bank[banknum] != offset)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->bank[banknum] = offset;
 		tilemap_mark_all_tiles_dirty_all(machine);
@@ -1374,7 +1374,7 @@ void segaic16_tilemap_set_flip(running_machine *machine, int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->flip = flip;
 		tilemap_set_flip(info->textmap, flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
@@ -1398,7 +1398,7 @@ void segaic16_tilemap_set_rowscroll(running_machine *machine, int which, int ena
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->rowscroll = enable;
 	}
@@ -1419,7 +1419,7 @@ void segaic16_tilemap_set_colscroll(running_machine *machine, int which, int ena
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->colscroll = enable;
 	}
@@ -2973,7 +2973,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
  *
  *************************************/
 
-void segaic16_sprites_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
+void segaic16_sprites_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
 {
 	struct sprite_info *info = &sprites[which];
 	(*info->draw)(screen->machine, info, bitmap, cliprect);
@@ -2993,7 +2993,7 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
 
 	if (info->bank[banknum] != offset)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->bank[banknum] = offset;
 	}
@@ -3014,7 +3014,7 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->flip = flip;
 	}
@@ -3035,7 +3035,7 @@ void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow
 	shadow = (shadow != 0);
 	if (info->shadow != shadow)
 	{
-		const device_config *screen = machine->primary_screen;
+		running_device *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->shadow = shadow;
 	}

@@ -44,11 +44,11 @@ struct _ptm6840_interface
 /* device interface */
 DEVICE_GET_INFO( ptm6840 );
 
-int ptm6840_get_status( const device_config *device, int clock );	// get whether timer is enabled
-int ptm6840_get_irq( const device_config *device );					// get IRQ state
-UINT16 ptm6840_get_count( const device_config *device, int counter );// get counter value
-void ptm6840_set_ext_clock( const device_config *device, int counter, int clock ); // set clock frequency
-int ptm6840_get_ext_clock( const device_config *device, int counter );// get clock frequency
+int ptm6840_get_status( running_device *device, int clock );	// get whether timer is enabled
+int ptm6840_get_irq( running_device *device );					// get IRQ state
+UINT16 ptm6840_get_count( running_device *device, int counter );// get counter value
+void ptm6840_set_ext_clock( running_device *device, int counter, int clock ); // set clock frequency
+int ptm6840_get_ext_clock( running_device *device, int counter );// get clock frequency
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_g1 );	// set gate1 state
 WRITE8_DEVICE_HANDLER( ptm6840_set_g2 );	// set gate2 state

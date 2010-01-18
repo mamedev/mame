@@ -26,7 +26,7 @@ struct _deniam_state
 	UINT16         coinctrl;
 
 	/* devices */
-	const device_config *audio_cpu;	// system 16c does not have sound CPU
+	running_device *audio_cpu;	// system 16c does not have sound CPU
 };
 
 

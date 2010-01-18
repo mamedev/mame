@@ -139,7 +139,7 @@ void osd_init(running_machine *machine)
 //  osd_wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(const device_config *device, int firststop)
+void osd_wait_for_debugger(running_device *device, int firststop)
 {
 	// we don't have a debugger, so we just return here
 }

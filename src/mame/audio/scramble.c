@@ -79,7 +79,7 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	const device_config *target = devtag_get_device(device->machine, "konami_7474");
+	running_device *target = devtag_get_device(device->machine, "konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, ~data & 0x08);
@@ -91,7 +91,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	const device_config *target = devtag_get_device(device->machine, "konami_7474");
+	running_device *target = devtag_get_device(device->machine, "konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, ~data & 0x08);
@@ -100,7 +100,7 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
-	const device_config *target = devtag_get_device(device->machine, "konami_7474");
+	running_device *target = devtag_get_device(device->machine, "konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
@@ -114,7 +114,7 @@ static IRQ_CALLBACK(scramble_sh_irq_callback)
 	return 0xff;
 }
 
-void scramble_sh_7474_callback(const device_config *device)
+void scramble_sh_7474_callback(running_device *device)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
@@ -132,7 +132,7 @@ READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 	return soundlatch_r(cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM),0);
 }
 
-static void filter_w(const device_config *device, int data)
+static void filter_w(running_device *device, int data)
 {
 	int C;
 
@@ -243,7 +243,7 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
-	const device_config *tms = devtag_get_device(machine, "tms");
+	running_device *tms = devtag_get_device(machine, "tms");
 
 	/* only 16 bytes needed ... The original dump is bad. This
      * is what is needed to get speech to work. The prom data has
@@ -278,7 +278,7 @@ static TIMER_CALLBACK( ad2083_step )
 		timer_set(machine, ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
 }
 
-static int ad2083_speech_rom_read_bit(const device_config *device)
+static int ad2083_speech_rom_read_bit(running_device *device)
 {
 	UINT8 *ROM = memory_region(device->machine, "tms5110");
 	int bit;

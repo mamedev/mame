@@ -32,7 +32,7 @@ struct _i8008_state
 	UINT8	SF; // Sign flag
 	UINT8	PF; // Parity flag
 	UINT8	HALT;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	cpu_state_table 	state;
@@ -90,7 +90,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8008_state *get_safe_token(const device_config *device)
+INLINE i8008_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

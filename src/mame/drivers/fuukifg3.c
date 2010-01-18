@@ -536,7 +536,7 @@ static MACHINE_RESET( fuuki32 )
 }
 
 
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	fuuki32_state *state = (fuuki32_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

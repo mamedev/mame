@@ -43,7 +43,7 @@ struct _changela_state
 	UINT8    mcu_pc_0;
 
 	/* devices */
-	const device_config *mcu;
+	running_device *mcu;
 };
 
 /*----------- defined in video/changela.c -----------*/

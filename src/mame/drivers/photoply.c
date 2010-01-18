@@ -103,11 +103,11 @@ static VIDEO_UPDATE(photoply)
 }
 
 static struct {
-	const device_config	*pit8253;
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	running_device	*pit8253;
+	running_device	*pic8259_1;
+	running_device	*pic8259_2;
+	running_device	*dma8237_1;
+	running_device	*dma8237_2;
 } photoply_devices;
 
 /******************
@@ -188,7 +188,7 @@ static WRITE8_HANDLER(dma_page_select_w)
 	}
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }

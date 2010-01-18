@@ -279,7 +279,7 @@ static const char* get_akiko_reg_name(int reg)
 
 static void akiko_cdda_stop( running_machine *machine )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, akiko.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, akiko.cdrom);
 
 	if (cdda != NULL)
 	{
@@ -290,7 +290,7 @@ static void akiko_cdda_stop( running_machine *machine )
 
 static void akiko_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_blocks )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, akiko.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, akiko.cdrom);
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
@@ -300,7 +300,7 @@ static void akiko_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_bl
 
 static void akiko_cdda_pause( running_machine *machine, int pause )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, akiko.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, akiko.cdrom);
 	if (cdda != NULL)
 	{
 		if (cdda_audio_active(cdda) && cdda_audio_paused(cdda) != pause )
@@ -321,7 +321,7 @@ static void akiko_cdda_pause( running_machine *machine, int pause )
 
 static UINT8 akiko_cdda_getstatus( running_machine *machine, UINT32 *lba )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, akiko.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, akiko.cdrom);
 
 	if ( lba ) *lba = 0;
 
@@ -362,7 +362,7 @@ static void akiko_set_cd_status( running_machine *machine, UINT32 status )
 
 static TIMER_CALLBACK(akiko_frame_proc)
 {
-	const device_config *cdda = cdda_from_cdrom(machine, akiko.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, akiko.cdrom);
 
 	(void)param;
 

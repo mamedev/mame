@@ -25,11 +25,11 @@ struct _ym2610_state
 	void *			chip;
 	void *			psg;
 	const ym2610_interface *intf;
-	const device_config *device;
+	running_device *device;
 };
 
 
-INLINE ym2610_state *get_safe_token(const device_config *device)
+INLINE ym2610_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -145,7 +145,7 @@ static DEVICE_START( ym2610 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ym2610_interface *intf = device->static_config ? (const ym2610_interface *)device->static_config : &generic_2610;
+	const ym2610_interface *intf = device->baseconfig().static_config ? (const ym2610_interface *)device->baseconfig().static_config : &generic_2610;
 	int rate = device->clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;

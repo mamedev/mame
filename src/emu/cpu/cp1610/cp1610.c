@@ -46,12 +46,12 @@ struct _cp1610_state
 	int		intr_pending;
 	int		intrm_pending;
 	int		mask_interrupts;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 };
 
-INLINE cp1610_state *get_safe_token(const device_config *device)
+INLINE cp1610_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

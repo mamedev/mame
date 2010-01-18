@@ -201,7 +201,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void sound_irq(const device_config *device, int linestate)
+static void sound_irq(running_device *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }

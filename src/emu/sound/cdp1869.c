@@ -53,10 +53,10 @@ struct _cdp1869_t
 	devcb_resolved_write_line	out_prd_func;
 	devcb_resolved_read_line	in_pal_ntsc_func;
 
-	const device_config *device;
+	running_device *device;
 	const cdp1869_interface *intf;	/* interface */
-	const device_config *screen;	/* screen */
-	const device_config *cpu;		/* CPU */
+	running_device *screen;	/* screen */
+	running_device *cpu;		/* CPU */
 	sound_stream *stream;			/* sound output */
 	int color_clock;
 
@@ -94,7 +94,7 @@ struct _cdp1869_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1869_t *get_safe_token(const device_config *device)
+INLINE cdp1869_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -165,7 +165,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 
 static TIMER_CALLBACK( prd_changed_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	devcb_call_write_line(&cdp1869->out_prd_func, param);
@@ -217,7 +217,7 @@ static rgb_t get_rgb(int i, int c, int l)
     get_lines - get number of character lines
 -------------------------------------------------*/
 
-static int get_lines(const device_config *device)
+static int get_lines(running_device *device)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -239,7 +239,7 @@ static int get_lines(const device_config *device)
     get_pmemsize - get page memory size
 -------------------------------------------------*/
 
-static UINT16 get_pmemsize(const device_config *device, int cols, int rows)
+static UINT16 get_pmemsize(running_device *device, int cols, int rows)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -255,7 +255,7 @@ static UINT16 get_pmemsize(const device_config *device, int cols, int rows)
     get_pma - get page memory address
 -------------------------------------------------*/
 
-static UINT16 get_pma(const device_config *device)
+static UINT16 get_pma(running_device *device)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -273,7 +273,7 @@ static UINT16 get_pma(const device_config *device)
     get_pen - get pen for color bits
 -------------------------------------------------*/
 
-static int get_pen(const device_config *device, int ccb0, int ccb1, int pcb)
+static int get_pen(running_device *device, int ccb0, int ccb1, int pcb)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -317,7 +317,7 @@ static int get_pen(const device_config *device, int ccb0, int ccb1, int pcb)
     draw_line - draw character line
 -------------------------------------------------*/
 
-static void draw_line(const device_config *device, bitmap_t *bitmap, int x, int y, int data, int color)
+static void draw_line(running_device *device, bitmap_t *bitmap, int x, int y, int data, int color)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -362,7 +362,7 @@ static void draw_line(const device_config *device, bitmap_t *bitmap, int x, int 
     draw_char - draw character
 -------------------------------------------------*/
 
-static void draw_char(const device_config *device, bitmap_t *bitmap, int x, int y, UINT16 pma, const rectangle *screenrect)
+static void draw_char(running_device *device, bitmap_t *bitmap, int x, int y, UINT16 pma, const rectangle *screenrect)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -717,7 +717,7 @@ READ_LINE_DEVICE_HANDLER( cdp1869_predisplay_r )
     cdp1869_update - screen update
 -------------------------------------------------*/
 
-void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1869_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
@@ -861,7 +861,7 @@ static DEVICE_START( cdp1869 )
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	/* validate arguments */
-	cdp1869->intf = (const cdp1869_interface *)device->static_config;
+	cdp1869->intf = (const cdp1869_interface *)device->baseconfig().static_config;
 
 	assert(cdp1869->intf->pcb_r != NULL);
 	assert(cdp1869->intf->char_ram_r != NULL);

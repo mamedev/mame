@@ -44,7 +44,7 @@ struct dss_input_context
 	sound_stream *buffer_stream;
 };
 
-INLINE discrete_info *get_safe_token(const device_config *device)
+INLINE discrete_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

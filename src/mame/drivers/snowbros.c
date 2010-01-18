@@ -82,7 +82,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 
 static VIDEO_UPDATE( snowbros )
 {
-	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
+	running_device *pandora = devtag_get_device(screen->machine, "pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
@@ -93,7 +93,7 @@ static VIDEO_UPDATE( snowbros )
 
 static VIDEO_EOF( snowbros )
 {
-	const device_config *pandora = devtag_get_device(machine, "pandora");
+	running_device *pandora = devtag_get_device(machine, "pandora");
 	pandora_eof(pandora);
 }
 
@@ -124,7 +124,7 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	const device_config *adpcm = devtag_get_device(device->machine, "oki");
+	running_device *adpcm = devtag_get_device(device->machine, "oki");
 	int status = okim6295_r(adpcm,0);
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
@@ -426,7 +426,7 @@ static void sb3_play_music(running_machine *machine, int data)
 	}
 }
 
-static void sb3_play_sound (const device_config *device, int data)
+static void sb3_play_sound (running_device *device, int data)
 {
 	int status = okim6295_r(device,0);
 
@@ -1474,7 +1474,7 @@ static GFXDECODE_START( hyperpac )
 GFXDECODE_END
 
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

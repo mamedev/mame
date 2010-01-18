@@ -90,7 +90,7 @@ static UINT8 SE_bit(dsp56k_core* cpustate) { return ((SP & 0x0010) != 0); }
 /***************************************************************************
     INITIALIZATION AND RESET
 ***************************************************************************/
-static void pcu_init(dsp56k_core* cpustate, const device_config *device)
+static void pcu_init(dsp56k_core* cpustate, running_device *device)
 {
 	/* Init the irq table */
 	dsp56k_irq_table_init();

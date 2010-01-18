@@ -1484,7 +1484,7 @@ ADDRESS_MAP_END
 /*
  * Aica
  */
-static void aica_irq(const device_config *device, int irq)
+static void aica_irq(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }

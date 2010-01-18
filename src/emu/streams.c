@@ -112,7 +112,7 @@ struct _stream_output
 struct _sound_stream
 {
 	/* linking information */
-	const device_config *	device;				/* owning device */
+	running_device *	device;				/* owning device */
 	sound_stream *		next;					/* next stream in the chain */
 	int					index;					/* index for save states */
 
@@ -333,7 +333,7 @@ void streams_update(running_machine *machine)
     stream_create - create a new stream
 -------------------------------------------------*/
 
-sound_stream *stream_create(const device_config *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
+sound_stream *stream_create(running_device *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
 {
 	running_machine *machine = device->machine;
 	streams_private *strdata = machine->streams_data;
@@ -411,7 +411,7 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
     output pair
 -------------------------------------------------*/
 
-int stream_device_output_to_stream_output(const device_config *device, int outputnum, sound_stream **streamptr, int *streamoutputptr)
+int stream_device_output_to_stream_output(running_device *device, int outputnum, sound_stream **streamptr, int *streamoutputptr)
 {
 	streams_private *strdata = device->machine->streams_data;
 	sound_stream *stream;
@@ -438,7 +438,7 @@ int stream_device_output_to_stream_output(const device_config *device, int outpu
     input pair
 -------------------------------------------------*/
 
-int stream_device_input_to_stream_input(const device_config *device, int inputnum, sound_stream **streamptr, int *streaminputptr)
+int stream_device_input_to_stream_input(running_device *device, int inputnum, sound_stream **streamptr, int *streaminputptr)
 {
 	streams_private *strdata = device->machine->streams_data;
 	sound_stream *stream;
@@ -602,7 +602,7 @@ attotime stream_get_sample_period(sound_stream *stream)
     number of outputs for the given device
 -------------------------------------------------*/
 
-int stream_get_device_outputs(const device_config *device)
+int stream_get_device_outputs(running_device *device)
 {
 	streams_private *strdata = device->machine->streams_data;
 	sound_stream *stream;
@@ -621,7 +621,7 @@ int stream_get_device_outputs(const device_config *device)
     device and index
 -------------------------------------------------*/
 
-sound_stream *stream_find_by_device(const device_config *device, int streamindex)
+sound_stream *stream_find_by_device(running_device *device, int streamindex)
 {
 	streams_private *strdata = device->machine->streams_data;
 	sound_stream *stream;

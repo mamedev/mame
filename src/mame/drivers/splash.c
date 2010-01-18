@@ -127,7 +127,7 @@ static WRITE8_HANDLER( splash_adpcm_data_w )
 	adpcm_data = data;
 }
 
-static void splash_msm5205_int(const device_config *device)
+static void splash_msm5205_int(running_device *device)
 {
 	msm5205_data_w(device,adpcm_data >> 4);
 	adpcm_data = (adpcm_data << 4) & 0xf0;
@@ -429,7 +429,7 @@ static MACHINE_DRIVER_START( splash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
-static void ym_irq(const device_config *device, int state)
+static void ym_irq(running_device *device, int state)
 {
 	logerror("2203 IRQ: %d\n", state);
 }

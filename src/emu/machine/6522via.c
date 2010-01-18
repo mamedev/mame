@@ -180,7 +180,7 @@ static TIMER_CALLBACK( via_t2_timeout );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE via6522_t *get_token(const device_config *device)
+INLINE via6522_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == VIA6522));
@@ -188,27 +188,27 @@ INLINE via6522_t *get_token(const device_config *device)
 }
 
 
-INLINE const via6522_interface *get_interface(const device_config *device)
+INLINE const via6522_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == VIA6522));
-	return (const via6522_interface *) device->static_config;
+	return (const via6522_interface *) device->baseconfig().static_config;
 }
 
 
-INLINE attotime v_cycles_to_time(const device_config *device, int c)
+INLINE attotime v_cycles_to_time(running_device *device, int c)
 {
 	return attotime_mul(ATTOTIME_IN_HZ(device->clock), c);
 }
 
 
-INLINE UINT32 v_time_to_cycles(const device_config *device, attotime t)
+INLINE UINT32 v_time_to_cycles(running_device *device, attotime t)
 {
 	return attotime_to_double(attotime_mul(t, device->clock));
 }
 
 
-INLINE UINT16 v_get_counter1_value(const device_config *device)
+INLINE UINT16 v_get_counter1_value(running_device *device)
 {
 	via6522_t *v = get_token(device);
 	UINT16 val;
@@ -300,7 +300,7 @@ static DEVICE_START( via6522 )
     via_set_int - external interrupt check
 -------------------------------------------------*/
 
-static void via_set_int (const device_config *device, int data)
+static void via_set_int (running_device *device, int data)
 {
 	via6522_t *v = get_token(device);
 
@@ -320,7 +320,7 @@ static void via_set_int (const device_config *device, int data)
     via_clear_int - external interrupt check
 -------------------------------------------------*/
 
-static void via_clear_int (const device_config *device, int data)
+static void via_clear_int (running_device *device, int data)
 {
 	via6522_t *v = get_token(device);
 
@@ -342,7 +342,7 @@ static void via_clear_int (const device_config *device, int data)
     via_shift
 -------------------------------------------------*/
 
-static void via_shift(const device_config *device)
+static void via_shift(running_device *device)
 {
 	via6522_t *v = get_token(device);
 
@@ -410,7 +410,7 @@ static void via_shift(const device_config *device)
 
 static TIMER_CALLBACK( via_shift_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	via_shift(device);
 }
 
@@ -421,7 +421,7 @@ static TIMER_CALLBACK( via_shift_callback )
 
 static TIMER_CALLBACK( via_t1_timeout )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	via6522_t *v = get_token(device);
 
 	if (T1_CONTINUOUS (v->acr))
@@ -454,7 +454,7 @@ static TIMER_CALLBACK( via_t1_timeout )
 
 static TIMER_CALLBACK( via_t2_timeout )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	via6522_t *v = get_token(device);
 
 	v->t2_active = 0;

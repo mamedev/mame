@@ -95,8 +95,8 @@ static int megadrive_irq6_pending = 0;
 static int megadrive_irq4_pending = 0;
 
 /* 32x! */
-static const device_config *_32x_master_cpu;
-static const device_config *_32x_slave_cpu;
+static running_device *_32x_master_cpu;
+static running_device *_32x_slave_cpu;
 static int _32x_is_connected;
 
 static int sh2_are_running;
@@ -129,12 +129,12 @@ static UINT16 *_32x_display_dram, *_32x_access_dram;
 static UINT16* _32x_palette;
 static UINT16* _32x_palette_lookup;
 /* SegaCD! */
-static const device_config *_segacd_68k_cpu;
+static running_device *_segacd_68k_cpu;
 /* SVP (virtua racing) */
-static const device_config *_svp_cpu;
+static running_device *_svp_cpu;
 
 
-static const device_config *_genesis_snd_z80_cpu;
+static running_device *_genesis_snd_z80_cpu;
 
 int segac2_bg_pal_lookup[4];
 int segac2_sp_pal_lookup[4];
@@ -163,10 +163,10 @@ static int megadrive_region_pal;
 static int megadrive_max_hposition;
 
 
-static const device_config* frame_timer;
-static const device_config* scanline_timer;
-static const device_config* irq6_on_timer;
-static const device_config* irq4_on_timer;
+static running_device* frame_timer;
+static running_device* scanline_timer;
+static running_device* irq6_on_timer;
+static running_device* irq4_on_timer;
 static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
@@ -5680,7 +5680,7 @@ INLINE UINT16 get_hposition(void)
 
 static int irq4counter;
 
-static const device_config* render_timer;
+static running_device* render_timer;
 
 static TIMER_DEVICE_CALLBACK( render_timer_callback )
 {
@@ -6239,7 +6239,7 @@ static IRQ_CALLBACK(genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static int megadriv_tas_callback(const device_config *device)
+static int megadriv_tas_callback(running_device *device)
 {
 	return 0; // writeback not allowed
 }
@@ -6427,7 +6427,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
 {
-	const device_config *ym = devtag_get_device(machine, "ymsnd");
+	running_device *ym = devtag_get_device(machine, "ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);

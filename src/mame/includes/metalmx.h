@@ -1,11 +1,11 @@
 typedef struct _metalmx_state metalmx_state;
 struct _metalmx_state
 {
-	const device_config *maincpu;
-	const device_config *gsp;
-	const device_config *adsp;
-	const device_config *dsp32c_1;
-	const device_config *dsp32c_2;
+	running_device *maincpu;
+	running_device *gsp;
+	running_device *adsp;
+	running_device *dsp32c_1;
+	running_device *dsp32c_2;
 
 	UINT16				*gsp_dram;
 	UINT16				*gsp_vram;

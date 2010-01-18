@@ -235,7 +235,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 	memory_set_bankptr(device->machine,  "bank1", memory_region(device->machine, "audiocpu") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
-static void ml_msm5205_vck(const device_config *device)
+static void ml_msm5205_vck(running_device *device)
 {
 	static UINT8 trigger;
 
@@ -301,7 +301,7 @@ static WRITE16_HANDLER( ml_sub_reset_w )
 
 static WRITE16_HANDLER( ml_to_sound_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	if (offset == 0)
 		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
@@ -313,7 +313,7 @@ static WRITE16_HANDLER( ml_to_sound_w )
 
 static WRITE8_HANDLER( ml_sound_to_main_w )
 {
-	const device_config *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
 	if (offset == 0)
 		tc0140syt_slave_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
@@ -684,7 +684,7 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

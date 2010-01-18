@@ -413,7 +413,7 @@ static WRITE8_HANDLER( kroozr_op4_w )
 
 static WRITE8_HANDLER( journey_op4_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 
 	/* if we're not playing the sample yet, start it */
 	if (!sample_playing(samples, 0))
@@ -534,7 +534,7 @@ static READ8_HANDLER( nflfoot_ip2_r )
 
 static WRITE8_HANDLER( nflfoot_op4_w )
 {
-	const device_config *sio = devtag_get_device(space->machine, "ipu_sio");
+	running_device *sio = devtag_get_device(space->machine, "ipu_sio");
 
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(space->cpu), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);

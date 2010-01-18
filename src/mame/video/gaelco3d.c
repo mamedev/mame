@@ -129,7 +129,7 @@ VIDEO_START( gaelco3d )
     (repeat these two for each additional point in the fan)
 */
 
-static void render_poly(const device_config *screen, UINT32 *polydata)
+static void render_poly(running_device *screen, UINT32 *polydata)
 {
 	float midx = video_screen_get_width(screen) / 2;
 	float midy = video_screen_get_height(screen) / 2;
@@ -371,7 +371,7 @@ static void render_alphablend(void *destbase, INT32 scanline, const poly_extent 
  *
  *************************************/
 
-void gaelco3d_render(const device_config *screen)
+void gaelco3d_render(running_device *screen)
 {
 	/* wait for any queued stuff to complete */
 	poly_wait(poly, "Time to render");

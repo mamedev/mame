@@ -251,7 +251,7 @@ static PALETTE_INIT( cham24 )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void ppu_irq( const device_config *device, int *ppu_regs )
+static void ppu_irq( running_device *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }

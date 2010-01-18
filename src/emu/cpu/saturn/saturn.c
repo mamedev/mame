@@ -82,12 +82,12 @@ struct _saturn_state
 	int 	monitor_id;
 	int		monitor_in;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 };
 
-INLINE saturn_state *get_safe_token(const device_config *device)
+INLINE saturn_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -113,7 +113,7 @@ static CPU_INIT( saturn )
 {
 	saturn_state *cpustate = get_safe_token(device);
 
-	cpustate->config = (saturn_cpu_core *) device->static_config;
+	cpustate->config = (saturn_cpu_core *) device->baseconfig().static_config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

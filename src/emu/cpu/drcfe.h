@@ -149,7 +149,7 @@ struct _drcfe_config
 ***************************************************************************/
 
 /* initializate the drcfe state */
-drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, void *param);
+drcfe_state *drcfe_init(running_device *cpu, const drcfe_config *config, void *param);
 
 /* clean up after ourselves */
 void drcfe_exit(drcfe_state *drcfe);

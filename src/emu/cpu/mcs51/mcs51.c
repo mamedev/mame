@@ -282,7 +282,7 @@ struct _mcs51_state_t
 
 	/* Interrupt Callback */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 
 	/* Memory spaces */
     const address_space *program;
@@ -648,7 +648,7 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mcs51_state_t *get_safe_token(const device_config *device)
+INLINE mcs51_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1283,13 +1283,13 @@ INLINE void	update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
 ***************************************************************************/
 
 
-void i8051_set_serial_tx_callback(const device_config *device, mcs51_serial_tx_func tx_func)
+void i8051_set_serial_tx_callback(running_device *device, mcs51_serial_tx_func tx_func)
 {
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_tx_callback = tx_func;
 }
 
-void i8051_set_serial_rx_callback(const device_config *device, mcs51_serial_rx_func rx_func)
+void i8051_set_serial_rx_callback(running_device *device, mcs51_serial_rx_func rx_func)
 {
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_rx_callback = rx_func;
@@ -2389,7 +2389,7 @@ static CPU_INIT( ds5002fp )
 {
 	/* default configuration */
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
-	const ds5002fp_config *sconfig = device->static_config ? (const ds5002fp_config *)device->static_config : &default_config;
+	const ds5002fp_config *sconfig = device->baseconfig().static_config ? (const ds5002fp_config *)device->baseconfig().static_config : &default_config;
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	CPU_INIT_CALL( mcs51 );

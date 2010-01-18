@@ -98,6 +98,6 @@ CPU_GET_INFO( esrip );
 
 #define CPU_ESRIP CPU_GET_INFO_NAME( esrip )
 
-extern UINT8 get_rip_status(const device_config *cpu);
+extern UINT8 get_rip_status(running_device *cpu);
 
 #endif /* _ESRIP_H */

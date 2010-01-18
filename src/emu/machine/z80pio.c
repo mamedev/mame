@@ -77,9 +77,9 @@ struct _z80pio
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int z80pio_irq_state(const device_config *device);
-static int z80pio_irq_ack(const device_config *device);
-static void z80pio_irq_reti(const device_config *device);
+static int z80pio_irq_state(running_device *device);
+static int z80pio_irq_ack(running_device *device);
+static void z80pio_irq_reti(running_device *device);
 
 
 
@@ -87,7 +87,7 @@ static void z80pio_irq_reti(const device_config *device);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z80pio_t *get_safe_token(const device_config *device)
+INLINE z80pio_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -100,7 +100,7 @@ INLINE z80pio_t *get_safe_token(const device_config *device)
     INTERNAL STATE MANAGEMENT
 ***************************************************************************/
 
-INLINE void set_rdy(const device_config *device, int ch, int state)
+INLINE void set_rdy(running_device *device, int ch, int state)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	/* set state */
@@ -111,7 +111,7 @@ INLINE void set_rdy(const device_config *device, int ch, int state)
 }
 
 
-INLINE void interrupt_check(const device_config *device)
+INLINE void interrupt_check(running_device *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 
@@ -120,7 +120,7 @@ INLINE void interrupt_check(const device_config *device)
 }
 
 
-static void update_irq_state(const device_config *device, int ch)
+static void update_irq_state(running_device *device, int ch)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int old_state = z80pio->int_state[ch];
@@ -392,7 +392,7 @@ READ8_DEVICE_HANDLER( z80pio_p_r )
     STROBE STATE MANAGEMENT
 ***************************************************************************/
 
-static void z80pio_update_strobe(const device_config *device, int ch, int state)
+static void z80pio_update_strobe(running_device *device, int ch, int state)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 
@@ -443,8 +443,8 @@ static void z80pio_update_strobe(const device_config *device, int ch, int state)
 }
 
 
-void z80pio_astb_w(const device_config *device, int state) { z80pio_update_strobe(device, 0, state); }
-void z80pio_bstb_w(const device_config *device, int state) { z80pio_update_strobe(device, 1, state); }
+void z80pio_astb_w(running_device *device, int state) { z80pio_update_strobe(device, 0, state); }
+void z80pio_bstb_w(running_device *device, int state) { z80pio_update_strobe(device, 1, state); }
 
 
 
@@ -452,7 +452,7 @@ void z80pio_bstb_w(const device_config *device, int state) { z80pio_update_strob
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-static int z80pio_irq_state(const device_config *device)
+static int z80pio_irq_state(running_device *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int state = 0;
@@ -473,7 +473,7 @@ static int z80pio_irq_state(const device_config *device)
 }
 
 
-static int z80pio_irq_ack(const device_config *device)
+static int z80pio_irq_ack(running_device *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int ch;
@@ -495,7 +495,7 @@ static int z80pio_irq_ack(const device_config *device)
 }
 
 
-static void z80pio_irq_reti(const device_config *device)
+static void z80pio_irq_reti(running_device *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int ch;
@@ -549,7 +549,7 @@ WRITE8_DEVICE_HANDLER(z80pio_alt_w)
 
 static DEVICE_START( z80pio )
 {
-	const z80pio_interface *intf = (const z80pio_interface *)device->static_config;
+	const z80pio_interface *intf = (const z80pio_interface *)device->baseconfig().static_config;
 	z80pio_t *z80pio = get_safe_token( device );
 
 	devcb_resolve_write_line(&z80pio->intr, &intf->intr, device);

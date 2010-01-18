@@ -23,7 +23,7 @@ struct _vr0_state
 	sound_stream * stream;
 };
 
-INLINE vr0_state *get_safe_token(const device_config *device)
+INLINE vr0_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -96,7 +96,7 @@ static const unsigned short ULawTo16[]=
 #define LOOPEND(chan)   (GETSOUNDREG32(chan,0x10)&0x3fffff)
 #define ENVVOL(chan)    (GETSOUNDREG32(chan,0x04)&0xffffff)
 */
-void vr0_snd_set_areas(const device_config *device,UINT32 *texture,UINT32 *frame)
+void vr0_snd_set_areas(running_device *device,UINT32 *texture,UINT32 *frame)
 {
 	vr0_state *VR0 = get_safe_token(device);
 	VR0->TexBase=texture;
@@ -108,7 +108,7 @@ static DEVICE_START( vrender0 )
 	const vr0_interface *intf;
 	vr0_state *VR0 = get_safe_token(device);
 
-	intf=(const vr0_interface *)device->static_config;
+	intf=(const vr0_interface *)device->baseconfig().static_config;
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));

@@ -159,8 +159,8 @@ static READ8_HANDLER( pc3259_r )
 
 static WRITE8_HANDLER( port_sound_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
-	const device_config *sn = devtag_get_device(space->machine, "snsnd");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *sn = devtag_get_device(space->machine, "snsnd");
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), (data & 0x01) ? TRUE : FALSE);
@@ -343,7 +343,7 @@ GFXDECODE_END
 static MACHINE_RESET( crballoon )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	const device_config *discrete = devtag_get_device(machine, "discrete");
+	running_device *discrete = devtag_get_device(machine, "discrete");
 
 	pc3092_reset();
 	port_sound_w(space, 0, 0);

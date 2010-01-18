@@ -98,14 +98,14 @@ struct _namco_06xx_state
 {
 	UINT8 control;
 	emu_timer *nmi_timer;
-	const device_config *nmicpu;
-	const device_config *device[4];
+	running_device *nmicpu;
+	running_device *device[4];
 	read8_device_func read[4];
-	void (*readreq[4])(const device_config *device);
+	void (*readreq[4])(running_device *device);
 	write8_device_func write[4];
 };
 
-INLINE namco_06xx_state *get_safe_token(const device_config *device)
+INLINE namco_06xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -118,7 +118,7 @@ INLINE namco_06xx_state *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( nmi_generate )
 {
-	namco_06xx_state *state = get_safe_token((const device_config *)ptr);
+	namco_06xx_state *state = get_safe_token((running_device *)ptr);
 
 	if (!cpu_is_suspended(state->nmicpu, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
@@ -221,7 +221,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 
 static DEVICE_START( namco_06xx )
 {
-	const namco_06xx_config *config = (const namco_06xx_config *)device->inline_config;
+	const namco_06xx_config *config = (const namco_06xx_config *)device->baseconfig().inline_config;
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
@@ -268,7 +268,7 @@ static DEVICE_START( namco_06xx )
 			else if (type == NAMCO_54XX)
 				state->write[devnum] = namco_54xx_write;
 			else
-				fatalerror("Unknown device type %s connected to Namco 06xx", devtype_get_name(type));
+				fatalerror("Unknown device type %s connected to Namco 06xx", device_get_name(state->device[devnum]));
 		}
 
 	/* allocate a timer */

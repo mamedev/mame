@@ -143,7 +143,7 @@ struct _m4510_Regs {
 	UINT32	mem[8];
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *space;
 	int 	icount;
 
@@ -156,7 +156,7 @@ struct _m4510_Regs {
 	m6510_port_write_func port_write;
 };
 
-INLINE m4510_Regs *get_safe_token(const device_config *device)
+INLINE m4510_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -198,7 +198,7 @@ static void default_wrmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;

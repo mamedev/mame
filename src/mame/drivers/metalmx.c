@@ -504,7 +504,7 @@ static WRITE32_HANDLER( host_vram_w )
 	COMBINE_DATA(state->gsp_vram + offset * 2);
 }
 
-static void tms_interrupt(const device_config *device, int state)
+static void tms_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 4, state ? HOLD_LINE : CLEAR_LINE);
 }

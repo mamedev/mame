@@ -261,14 +261,14 @@ READ16_HANDLER( cyberbal_paletteram_1_r )
  *
  *************************************/
 
-void cyberbal_scanline_update(const device_config *screen, int scanline)
+void cyberbal_scanline_update(running_device *screen, int scanline)
 {
 	cyberbal_state *state = (cyberbal_state *)screen->machine->driver_data;
 	int i;
-	const device_config *update_screen;
+	running_device *update_screen;
 
 	/* loop over screens */
-	for (i = 0, update_screen = video_screen_first(screen->machine->config); update_screen != NULL; i++, update_screen = video_screen_next(update_screen))
+	for (i = 0, update_screen = video_screen_first(screen->machine); update_screen != NULL; i++, update_screen = video_screen_next(update_screen))
 	{
 		UINT16 *vram = i ? state->atarigen.alpha2 : state->atarigen.alpha;
 		UINT16 *base = &vram[((scanline - 8) / 8) * 64 + 47];
@@ -333,7 +333,7 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
  *
  *************************************/
 
-static void update_one_screen(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_one_screen(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cyberbal_state *state = (cyberbal_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
@@ -343,7 +343,7 @@ static void update_one_screen(const device_config *screen, bitmap_t *bitmap, con
 	rectangle *visarea = (rectangle *)video_screen_get_visible_area(screen);
 
 	/* for 2p games, the left screen is the main screen */
-	const device_config *left_screen = devtag_get_device(screen->machine, "lscreen");
+	running_device *left_screen = devtag_get_device(screen->machine, "lscreen");
 	if (left_screen == NULL)
 		left_screen = devtag_get_device(screen->machine, "screen");
 

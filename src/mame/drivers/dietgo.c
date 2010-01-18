@@ -162,7 +162,7 @@ static GFXDECODE_START( dietgo )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 16 )	/* Sprites (16x16) */
 GFXDECODE_END
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }

@@ -108,11 +108,11 @@ typedef struct
 	const UINT8 *rom;
 	devcb_resolved_read8 ext_mem_read;
 	devcb_resolved_write8 ext_mem_write;
-	void (*irq_callback)(const device_config *, int);
+	void (*irq_callback)(running_device *, int);
 
 	UINT32 clock;
 	sound_stream * stream;
-	const device_config *device;
+	running_device *device;
 } YMF271Chip;
 
 // slot mapping assists
@@ -273,7 +273,7 @@ static int channel_attenuation[16];
 static int total_level[128];
 static int env_volume_table[256];
 
-INLINE YMF271Chip *get_safe_token(const device_config *device)
+INLINE YMF271Chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1677,7 +1677,7 @@ static void init_tables(running_machine *machine)
 	mix = auto_alloc_array(machine, INT32, 48000*2);
 }
 
-static void init_state(YMF271Chip *chip, const device_config *device)
+static void init_state(YMF271Chip *chip, running_device *device)
 {
 	int i;
 
@@ -1752,7 +1752,7 @@ static void init_state(YMF271Chip *chip, const device_config *device)
 	state_save_register_device_item(device, 0, chip->ext_read);
 }
 
-static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(const device_config *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
+static void ymf271_init(running_device *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_device *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
 {
 	chip->timA = timer_alloc(device->machine, ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(device->machine, ymf271_timer_b_tick, chip);
@@ -1777,7 +1777,7 @@ static DEVICE_START( ymf271 )
 	chip->device = device;
 	chip->clock = device->clock;
 
-	intf = (device->static_config != NULL) ? (const ymf271_interface *)device->static_config : &defintrf;
+	intf = (device->baseconfig().static_config != NULL) ? (const ymf271_interface *)device->baseconfig().static_config : &defintrf;
 
 	ymf271_init(device, chip, *device->region, intf->irq_callback, &intf->ext_read, &intf->ext_write);
 	chip->stream = stream_create(device, 0, 2, device->clock/384, chip, ymf271_update);

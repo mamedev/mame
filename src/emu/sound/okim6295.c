@@ -46,7 +46,7 @@ struct _okim6295_state
 {
 	#define OKIM6295_VOICES		4
 	struct ADPCMVoice voice[OKIM6295_VOICES];
-	const device_config *device;
+	running_device *device;
 	INT32 command;
 	UINT8 bank_installed;
 	INT32 bank_offs;
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( okim6295, 0, 8 )
 ADDRESS_MAP_END
 
 
-INLINE okim6295_state *get_safe_token(const device_config *device)
+INLINE okim6295_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -302,7 +302,7 @@ static STREAM_UPDATE( okim6295_update )
 
 ***********************************************************************************************/
 
-static void adpcm_state_save_register(struct ADPCMVoice *voice, const device_config *device, int index)
+static void adpcm_state_save_register(struct ADPCMVoice *voice, running_device *device, int index)
 {
 	state_save_register_device_item(device, index, voice->playing);
 	state_save_register_device_item(device, index, voice->sample);
@@ -315,12 +315,12 @@ static void adpcm_state_save_register(struct ADPCMVoice *voice, const device_con
 
 static STATE_POSTLOAD( okim6295_postload )
 {
-	const device_config *device = (const device_config *)param;
+	running_device *device = (running_device *)param;
 	okim6295_state *info = get_safe_token(device);
 	okim6295_set_bank_base(device, info->bank_offs);
 }
 
-static void okim6295_state_save_register(okim6295_state *info, const device_config *device)
+static void okim6295_state_save_register(okim6295_state *info, running_device *device)
 {
 	int j;
 
@@ -342,7 +342,7 @@ static void okim6295_state_save_register(okim6295_state *info, const device_conf
 
 static DEVICE_START( okim6295 )
 {
-	const okim6295_interface *intf = (const okim6295_interface *)device->static_config;
+	const okim6295_interface *intf = (const okim6295_interface *)device->baseconfig().static_config;
 	okim6295_state *info = get_safe_token(device);
 	int divisor = intf->pin7 ? 132 : 165;
 	int voice;
@@ -396,7 +396,7 @@ static DEVICE_RESET( okim6295 )
 
 ***********************************************************************************************/
 
-void okim6295_set_bank_base(const device_config *device, int base)
+void okim6295_set_bank_base(running_device *device, int base)
 {
 	okim6295_state *info = get_safe_token(device);
 	stream_update(info->stream);
@@ -425,7 +425,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 
 ***********************************************************************************************/
 
-void okim6295_set_pin7(const device_config *device, int pin7)
+void okim6295_set_pin7(running_device *device, int pin7)
 {
 	okim6295_state *info = get_safe_token(device);
 	int divisor = pin7 ? 132 : 165;

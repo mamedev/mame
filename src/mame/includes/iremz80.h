@@ -56,10 +56,10 @@ struct _irem_z80_state
 	int                 bankcontrol[2]; 	//ldrun2
 
 	/* sound devices */
-	const device_config *ay1;
-	const device_config *ay2;
-	const device_config *adpcm1;
-	const device_config *adpcm2;
+	running_device *ay1;
+	running_device *ay2;
+	running_device *adpcm1;
+	running_device *adpcm2;
 };
 
 

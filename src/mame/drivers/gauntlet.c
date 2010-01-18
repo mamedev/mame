@@ -142,7 +142,7 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(const device_config *screen, int scanline)
+static void scanline_update(running_device *screen, int scanline)
 {
 	const address_space *space = cputag_get_address_space(screen->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
@@ -247,7 +247,7 @@ static READ8_HANDLER( switch_6502_r )
 
 static WRITE8_HANDLER( sound_ctl_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, "tms");
+	running_device *tms = devtag_get_device(space->machine, "tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */

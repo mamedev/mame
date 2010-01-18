@@ -23,7 +23,7 @@ struct _speaker_interface
 	const INT16 *levels;	/* optional: pointer to level lookup table */
 };
 
-void speaker_level_w (const device_config *device, int new_level);
+void speaker_level_w (running_device *device, int new_level);
 
 DEVICE_GET_INFO( speaker );
 #define SOUND_SPEAKER DEVICE_GET_INFO_NAME( speaker )

@@ -60,11 +60,11 @@ struct _acia6850_interface
 
 DEVICE_GET_INFO( acia6850 );
 
-void acia6850_tx_clock_in(const device_config *device) ATTR_NONNULL(1);
-void acia6850_rx_clock_in(const device_config *device) ATTR_NONNULL(1);
+void acia6850_tx_clock_in(running_device *device) ATTR_NONNULL(1);
+void acia6850_rx_clock_in(running_device *device) ATTR_NONNULL(1);
 
-void acia6850_set_rx_clock(const device_config *device, int clock) ATTR_NONNULL(1);
-void acia6850_set_tx_clock(const device_config *device, int clock) ATTR_NONNULL(1);
+void acia6850_set_rx_clock(running_device *device, int clock) ATTR_NONNULL(1);
+void acia6850_set_tx_clock(running_device *device, int clock) ATTR_NONNULL(1);
 
 WRITE8_DEVICE_HANDLER( acia6850_ctrl_w );
 READ8_DEVICE_HANDLER( acia6850_stat_r );

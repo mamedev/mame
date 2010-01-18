@@ -69,7 +69,7 @@ struct _beaminv_state
 	UINT8      controller_select;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

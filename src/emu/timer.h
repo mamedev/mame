@@ -57,7 +57,7 @@ enum
 
 /* macros for a timer callback functions */
 #define TIMER_CALLBACK(name)			void name(running_machine *machine, void *ptr, int param)
-#define TIMER_DEVICE_CALLBACK(name)		void name(const device_config *timer, void *ptr, INT32 param)
+#define TIMER_DEVICE_CALLBACK(name)		void name(running_device *timer, void *ptr, INT32 param)
 
 
 
@@ -67,7 +67,7 @@ enum
 
 /* a timer callback looks like this */
 typedef void (*timer_fired_func)(running_machine *machine, void *ptr, INT32 param);
-typedef void (*timer_device_fired_func)(const device_config *timer, void *ptr, INT32 param);
+typedef void (*timer_device_fired_func)(running_device *timer, void *ptr, INT32 param);
 
 
 /*-------------------------------------------------
@@ -193,11 +193,11 @@ emu_timer *_timer_alloc_internal(running_machine *machine, timer_fired_func call
 
 /* adjust the time when this timer will fire and disable any periodic firings */
 void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param);
-void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param);
+void timer_device_adjust_oneshot(running_device *timer, attotime duration, INT32 param);
 
 /* adjust the time when this timer will fire and specify a period for subsequent firings */
 void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period);
-void timer_device_adjust_periodic(const device_config *timer, attotime start_delay, INT32 param, attotime period);
+void timer_device_adjust_periodic(running_device *timer, attotime start_delay, INT32 param, attotime period);
 
 
 
@@ -215,31 +215,31 @@ void _timer_pulse_internal(running_machine *machine, attotime period, void *ptr,
 
 /* reset the timing on a timer */
 void timer_reset(emu_timer *which, attotime duration);
-void timer_device_reset(const device_config *timer);
+void timer_device_reset(running_device *timer);
 
 /* enable/disable a timer */
 int timer_enable(emu_timer *which, int enable);
-int timer_device_enable(const device_config *timer, int enable);
+int timer_device_enable(running_device *timer, int enable);
 
 /* determine if a timer is enabled */
 int timer_enabled(emu_timer *which);
-int timer_device_enabled(const device_config *timer);
+int timer_device_enabled(running_device *timer);
 
 /* returns the callback parameter of a timer */
 int timer_get_param(emu_timer *which);
-int timer_device_get_param(const device_config *timer);
+int timer_device_get_param(running_device *timer);
 
 /* changes the callback parameter of a timer */
 void timer_set_param(emu_timer *which, int param);
-void timer_device_set_param(const device_config *timer, int param);
+void timer_device_set_param(running_device *timer, int param);
 
 /* returns the callback pointer of a timer */
 void *timer_get_ptr(emu_timer *which);
-void *timer_device_get_ptr(const device_config *timer);
+void *timer_device_get_ptr(running_device *timer);
 
 /* changes the callback pointer of a timer */
 void timer_set_ptr(emu_timer *which, void *ptr);
-void timer_device_set_ptr(const device_config *timer, void *ptr);
+void timer_device_set_ptr(running_device *timer, void *ptr);
 
 
 
@@ -247,22 +247,22 @@ void timer_device_set_ptr(const device_config *timer, void *ptr);
 
 /* return the time since the last trigger */
 attotime timer_timeelapsed(emu_timer *which);
-attotime timer_device_timeelapsed(const device_config *timer);
+attotime timer_device_timeelapsed(running_device *timer);
 
 /* return the time until the next trigger */
 attotime timer_timeleft(emu_timer *which);
-attotime timer_device_timeleft(const device_config *timer);
+attotime timer_device_timeleft(running_device *timer);
 
 /* return the current time */
 attotime timer_get_time(running_machine *machine);
 
 /* return the time when this timer started counting */
 attotime timer_starttime(emu_timer *which);
-attotime timer_device_starttime(const device_config *timer);
+attotime timer_device_starttime(running_device *timer);
 
 /* return the time when this timer will fire next */
 attotime timer_firetime(emu_timer *which);
-attotime timer_device_firetime(const device_config *timer);
+attotime timer_device_firetime(running_device *timer);
 
 
 /* ----- timer device interface ----- */

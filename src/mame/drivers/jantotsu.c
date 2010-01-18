@@ -286,7 +286,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 	}
 }
 
-static void jan_adpcm_int( const device_config *device )
+static void jan_adpcm_int( running_device *device )
 {
 	jantotsu_state *state = (jantotsu_state *)device->machine->driver_data;
 

@@ -24,9 +24,9 @@ struct _dcheese_state
 	UINT8    sound_msb_latch;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *bsmt;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *bsmt;
 };
 
 

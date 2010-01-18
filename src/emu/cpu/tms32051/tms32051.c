@@ -143,13 +143,13 @@ struct _tms32051_state
 	} shadow;
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	int icount;
 };
 
-INLINE tms32051_state *get_safe_token(const device_config *device)
+INLINE tms32051_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -147,7 +147,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_9:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE:
 				assert(device != NULL);
-				custom = (device_custom_config_func)devtype_get_info_fct(device->type, DEVINFO_FCT_CUSTOM_CONFIG);
+				custom = (device_custom_config_func)device->get_config_fct(DEVINFO_FCT_CUSTOM_CONFIG);
 				assert(custom != NULL);
 				tokens = (*custom)(device, entrytype, tokens);
 				break;
@@ -293,7 +293,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	if (depth == 0)
 		for (device = config->devicelist.first(); device != NULL; device = device->next)
 		{
-			tokens = (const machine_config_token *)device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
+			tokens = (const machine_config_token *)device->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)
 				machine_config_detokenize(config, tokens, device, depth + 1);
 		}

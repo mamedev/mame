@@ -10,7 +10,7 @@ READ8_HANDLER( stfight_coin_r );
 WRITE8_HANDLER( stfight_coin_w );
 WRITE8_HANDLER( stfight_e800_w );
 READ8_HANDLER( stfight_fm_r );
-void stfight_adpcm_int(const device_config *device);
+void stfight_adpcm_int(running_device *device);
 WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 
 

@@ -124,10 +124,10 @@ struct _cps_state
 	int          cps_version;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *msm_1;	// fcrash
-	const device_config *msm_2;	// fcrash
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *msm_1;	// fcrash
+	running_device *msm_2;	// fcrash
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

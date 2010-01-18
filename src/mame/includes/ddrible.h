@@ -25,9 +25,9 @@ struct _ddrible_state
 	int         int_enable_0, int_enable_1;
 
 	/* devices */
-	const device_config *filter1;
-	const device_config *filter2;
-	const device_config *filter3;
+	running_device *filter1;
+	running_device *filter2;
+	running_device *filter3;
 };
 
 /*----------- defined in video/ddrible.c -----------*/

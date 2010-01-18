@@ -23,8 +23,8 @@ struct _brkthru_state
 	//UINT8 *brkthru_nmi_enable; /* needs to be tracked down */
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

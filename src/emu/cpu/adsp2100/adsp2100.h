@@ -17,9 +17,9 @@
 ***************************************************************************/
 
 /* transmit and receive data callbacks types */
-typedef INT32 (*adsp21xx_rx_func)(const device_config *device, int port);
-typedef void  (*adsp21xx_tx_func)(const device_config *device, int port, INT32 data);
-typedef void  (*adsp21xx_timer_func)(const device_config *device, int enable);
+typedef INT32 (*adsp21xx_rx_func)(running_device *device, int port);
+typedef void  (*adsp21xx_tx_func)(running_device *device, int port, INT32 data);
+typedef void  (*adsp21xx_timer_func)(running_device *device, int enable);
 
 typedef struct _adsp21xx_config adsp21xx_config;
 struct _adsp21xx_config
@@ -166,10 +166,10 @@ CPU_GET_INFO( adsp2181 );
 #define CPU_ADSP2181 CPU_GET_INFO_NAME( adsp2181 )
 
 void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
-void adsp2181_idma_addr_w(const device_config *device, UINT16 data);
-UINT16 adsp2181_idma_addr_r(const device_config *device);
-void adsp2181_idma_data_w(const device_config *device, UINT16 data);
-UINT16 adsp2181_idma_data_r(const device_config *device);
+void adsp2181_idma_addr_w(running_device *device, UINT16 data);
+UINT16 adsp2181_idma_addr_r(running_device *device);
+void adsp2181_idma_data_w(running_device *device, UINT16 data);
+UINT16 adsp2181_idma_data_r(running_device *device);
 
 
 #endif /* __ADSP2100_H__ */

@@ -107,8 +107,8 @@ struct _cave_state
 	int          hopper;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 /*----------- defined in video/cave.c -----------*/

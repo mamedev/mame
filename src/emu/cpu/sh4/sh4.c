@@ -30,7 +30,7 @@
 
 CPU_DISASSEMBLE( sh4 );
 
-INLINE SH4 *get_safe_token(const device_config *device)
+INLINE SH4 *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -3384,7 +3384,7 @@ static CPU_EXECUTE( sh4 )
 
 static CPU_INIT( sh4 )
 {
-	const struct sh4_config *conf = (const struct sh4_config *)device->static_config;
+	const struct sh4_config *conf = (const struct sh4_config *)device->baseconfig().static_config;
 	SH4 *sh4 = get_safe_token(device);
 
 	sh4_common_init(device);
@@ -3607,7 +3607,7 @@ static CPU_SET_INFO( sh4 )
 	}
 }
 
-void sh4_set_ftcsr_callback(const device_config *device, sh4_ftcsr_callback callback)
+void sh4_set_ftcsr_callback(running_device *device, sh4_ftcsr_callback callback)
 {
 	SH4 *sh4 = get_safe_token(device);
 	sh4->ftcsr_read_callback = callback;

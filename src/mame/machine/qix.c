@@ -252,7 +252,7 @@ MACHINE_START( qixmcu )
 
 WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed )
 {
-	const device_config *pia = devtag_get_device(device->machine, "sndpia0");
+	running_device *pia = devtag_get_device(device->machine, "sndpia0");
 	pia6821_cb1_w(pia, 0, state);
 }
 
@@ -471,7 +471,7 @@ WRITE8_HANDLER( qix_68705_portC_w )
 
 static TIMER_CALLBACK( pia_w_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	pia6821_w(device, param >> 8, param & 0xff);
 }
 

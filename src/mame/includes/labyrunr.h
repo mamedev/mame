@@ -19,7 +19,7 @@ struct _labyrunr_state
 	rectangle  clip0, clip1;
 
 	/* devices */
-	const device_config *k007121;
+	running_device *k007121;
 };
 
 

@@ -1055,7 +1055,7 @@ GFXDECODE_END
 
 
 
-static void namcos1_sound_interrupt( const device_config *device, int irq )
+static void namcos1_sound_interrupt( running_device *device, int irq )
 {
 	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }

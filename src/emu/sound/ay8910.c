@@ -164,7 +164,7 @@ struct _ay_ym_param
 typedef struct _ay8910_context ay8910_context;
 struct _ay8910_context
 {
-	const device_config *device;
+	running_device *device;
 	int streams;
 	int ready;
 	sound_stream *channel;
@@ -197,7 +197,7 @@ struct _ay8910_context
 	devcb_resolved_write8 portBwrite;
 };
 
-INLINE ay8910_context *get_safe_token(const device_config *device)
+INLINE ay8910_context *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -705,7 +705,7 @@ static void build_mixer_table(ay8910_context *psg)
 	build_3D_table(psg->intf->res_load[0], psg->par, psg->par_env, normalize, 3, psg->zero_is_off, psg->vol3d_table);
 }
 
-static void ay8910_statesave(ay8910_context *psg, const device_config *device)
+static void ay8910_statesave(ay8910_context *psg, running_device *device)
 {
 	state_save_register_device_item(device, 0, psg->register_latch);
 	state_save_register_device_item_array(device, 0, psg->regs);
@@ -736,7 +736,7 @@ static void ay8910_statesave(ay8910_context *psg, const device_config *device)
  *
  *************************************/
 
-void *ay8910_start_ym(void *infoptr, sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(void *infoptr, sound_type chip_type, running_device *device, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info = (ay8910_context *)infoptr;
 
@@ -828,7 +828,7 @@ void ay8910_reset_ym(void *chip)
 #endif
 }
 
-void ay8910_set_volume(const device_config *device,int channel,int volume)
+void ay8910_set_volume(running_device *device,int channel,int volume)
 {
 	ay8910_context *psg = get_safe_token(device);
 	int ch;
@@ -917,7 +917,7 @@ static DEVICE_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config ? (const ay8910_interface *)device->static_config : &generic_ay8910);
+	const ay8910_interface *intf = (device->baseconfig().static_config ? (const ay8910_interface *)device->baseconfig().static_config : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), SOUND_AY8910, device, device->clock, intf);
 }
 
@@ -929,7 +929,7 @@ static DEVICE_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config ? (const ay8910_interface *)device->static_config : &generic_ay8910);
+	const ay8910_interface *intf = (device->baseconfig().static_config ? (const ay8910_interface *)device->baseconfig().static_config : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), SOUND_YM2149, device, device->clock, intf);
 }
 

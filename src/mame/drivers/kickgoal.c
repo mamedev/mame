@@ -116,7 +116,7 @@ Hollywood Action
 //static int state->melody;
 //static int kickgoal_snd_bank;
 
-static void kickgoal_play(const device_config *device, int melody, int data)
+static void kickgoal_play(running_device *device, int melody, int data)
 {
 	int status = okim6295_r(device,0);
 

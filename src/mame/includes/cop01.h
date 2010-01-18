@@ -22,7 +22,7 @@ struct _cop01_state
 	int            timer;	// kludge for ym3526 in mightguy
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

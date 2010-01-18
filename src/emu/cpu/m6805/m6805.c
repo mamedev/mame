@@ -61,13 +61,13 @@ typedef struct
 
 	UINT16	pending_interrupts; /* MB */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
 
-INLINE m6805_Regs *get_safe_token(const device_config *device)
+INLINE m6805_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -442,7 +442,7 @@ static void Interrupt( m6805_Regs *cpustate )
 	}
 }
 
-static void state_register(m6805_Regs *cpustate, const char *type, const device_config *device)
+static void state_register(m6805_Regs *cpustate, const char *type, running_device *device)
 {
 	state_save_register_device_item(device, 0, A);
 	state_save_register_device_item(device, 0, PC);

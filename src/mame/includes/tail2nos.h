@@ -19,9 +19,9 @@ struct _tail2nos_state
 	int         charbank, charpalette, video_enable;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k051316;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k051316;
 };
 
 

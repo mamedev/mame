@@ -17,7 +17,7 @@ struct _blockout_state
 	UINT16   color;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

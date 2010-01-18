@@ -560,7 +560,7 @@ static WRITE8_DEVICE_HANDLER( rjammer_voice_frequency_select_w )
 }
 
 
-static void rjammer_adpcm_vck (const device_config *device)
+static void rjammer_adpcm_vck (running_device *device)
 {
 	ls74 = (ls74 + 1) & 1;
 

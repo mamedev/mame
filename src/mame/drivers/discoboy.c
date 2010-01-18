@@ -60,7 +60,7 @@ struct _discoboy_state
 	int      adpcm_data;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 
@@ -318,7 +318,7 @@ ADDRESS_MAP_END
 //  state->adpcm_data = data;
 //}
 
-static void splash_msm5205_int( const device_config *device )
+static void splash_msm5205_int( running_device *device )
 {
 	discoboy_state *state = (discoboy_state *)device->machine->driver_data;
 	msm5205_data_w(device, state->adpcm_data >> 4);

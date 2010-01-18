@@ -99,7 +99,7 @@ struct _m68_state_t
 
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const m6809_config *config;
 	int		icount;
 	PAIR	ea;			/* effective address */
@@ -111,7 +111,7 @@ struct _m68_state_t
 	UINT8	nmi_state;
 };
 
-INLINE m68_state_t *get_safe_token(const device_config *device)
+INLINE m68_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -377,7 +377,7 @@ static CPU_INIT( m6809 )
 		0
 	};
 
-	const m6809_config *configdata = device->static_config ? (const m6809_config *)device->static_config : &default_config;
+	const m6809_config *configdata = device->baseconfig().static_config ? (const m6809_config *)device->baseconfig().static_config : &default_config;
 	m68_state_t *m68_state = get_safe_token(device);
 
 	m68_state->config = configdata;

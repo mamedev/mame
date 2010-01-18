@@ -239,7 +239,7 @@ INLINE void timer_list_insert(emu_timer *timer)
     in device is, in fact, a timer
 -------------------------------------------------*/
 
-INLINE timer_state *get_safe_token(const device_config *device)
+INLINE timer_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -700,10 +700,10 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 }
 
 
-void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
+void timer_device_adjust_oneshot(running_device *timer, attotime duration, INT32 param)
 {
 #ifdef MAME_DEBUG
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -752,11 +752,11 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 }
 
 
-void timer_device_adjust_periodic(const device_config *timer, attotime start_delay, INT32 param, attotime period)
+void timer_device_adjust_periodic(running_device *timer, attotime start_delay, INT32 param, attotime period)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -816,11 +816,11 @@ void timer_reset(emu_timer *which, attotime duration)
 }
 
 
-void timer_device_reset(const device_config *timer)
+void timer_device_reset(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -850,7 +850,7 @@ int timer_enable(emu_timer *which, int enable)
 }
 
 
-int timer_device_enable(const device_config *timer, int enable)
+int timer_device_enable(running_device *timer, int enable)
 {
 	timer_state *state = get_safe_token(timer);
 	return timer_enable(state->timer, enable);
@@ -868,7 +868,7 @@ int timer_enabled(emu_timer *which)
 }
 
 
-int timer_device_enabled(const device_config *timer)
+int timer_device_enabled(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return timer_enabled(state->timer);
@@ -886,11 +886,11 @@ int timer_get_param(emu_timer *which)
 }
 
 
-int timer_device_get_param(const device_config *timer)
+int timer_device_get_param(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -911,11 +911,11 @@ void timer_set_param(emu_timer *which, int param)
 }
 
 
-void timer_device_set_param(const device_config *timer, int param)
+void timer_device_set_param(running_device *timer, int param)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -936,7 +936,7 @@ void *timer_get_ptr(emu_timer *which)
 }
 
 
-void *timer_device_get_ptr(const device_config *timer)
+void *timer_device_get_ptr(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return state->ptr;
@@ -954,7 +954,7 @@ void timer_set_ptr(emu_timer *which, void *ptr)
 }
 
 
-void timer_device_set_ptr(const device_config *timer, void *ptr)
+void timer_device_set_ptr(running_device *timer, void *ptr)
 {
 	timer_state *state = get_safe_token(timer);
 	state->ptr = ptr;
@@ -977,7 +977,7 @@ attotime timer_timeelapsed(emu_timer *which)
 }
 
 
-attotime timer_device_timeelapsed(const device_config *timer)
+attotime timer_device_timeelapsed(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return timer_timeelapsed(state->timer);
@@ -995,7 +995,7 @@ attotime timer_timeleft(emu_timer *which)
 }
 
 
-attotime timer_device_timeleft(const device_config *timer)
+attotime timer_device_timeleft(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return timer_timeleft(state->timer);
@@ -1023,7 +1023,7 @@ attotime timer_starttime(emu_timer *which)
 }
 
 
-attotime timer_device_starttime(const device_config *timer)
+attotime timer_device_starttime(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return timer_starttime(state->timer);
@@ -1041,7 +1041,7 @@ attotime timer_firetime(emu_timer *which)
 }
 
 
-attotime timer_device_firetime(const device_config *timer)
+attotime timer_device_firetime(running_device *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return timer_firetime(state->timer);
@@ -1055,9 +1055,9 @@ attotime timer_device_firetime(const device_config *timer)
 
 static TIMER_CALLBACK( periodic_timer_device_timer_callback )
 {
-	const device_config *timer = (const device_config *)ptr;
+	running_device *timer = (running_device *)ptr;
 	timer_state *state = get_safe_token(timer);
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* call the real callback */
 	config->callback(timer, state->ptr, state->param);
@@ -1073,12 +1073,12 @@ static TIMER_CALLBACK( periodic_timer_device_timer_callback )
 static TIMER_CALLBACK( scanline_timer_device_timer_callback )
 {
 	int next_vpos;
-	const device_config *timer = (const device_config *)ptr;
+	running_device *timer = (running_device *)ptr;
 	timer_state *state = get_safe_token(timer);
-	timer_config *config = (timer_config *)timer->inline_config;
+	timer_config *config = (timer_config *)timer->baseconfig().inline_config;
 
 	/* get the screen device and verify it */
-	const device_config *screen = timer->machine->device(config->screen);
+	running_device *screen = timer->machine->device(config->screen);
 	assert(screen != NULL);
 
 	/* first time, start with the first scanline, but do not call the callback */
@@ -1166,13 +1166,13 @@ static DEVICE_START( timer )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config == NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
 	/* get and validate the configuration */
-	config = (timer_config *)device->inline_config;
+	config = (timer_config *)device->baseconfig().inline_config;
 	assert(config->type == TIMER_TYPE_PERIODIC || config->type == TIMER_TYPE_SCANLINE || config->type == TIMER_TYPE_GENERIC);
 
 	/* copy the pointer parameter */

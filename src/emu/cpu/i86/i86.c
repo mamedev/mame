@@ -59,7 +59,7 @@ struct _i8086_state
 
 	memory_interface	mem;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -71,7 +71,7 @@ struct _i8086_state
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
 };
 
-INLINE i8086_state *get_safe_token(const device_config *device)
+INLINE i8086_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -162,7 +162,7 @@ static UINT8 parity_table[256];
 
 
 /***************************************************************************/
-static void i8086_state_register(const device_config *device)
+static void i8086_state_register(running_device *device)
 {
 	i8086_state *cpustate = get_safe_token(device);
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);

@@ -23,6 +23,6 @@ CPU_GET_INFO( z80 );
 
 CPU_DISASSEMBLE( z80 );
 
-void z80_set_cycle_tables(const device_config *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);
+void z80_set_cycle_tables(running_device *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);
 
 #endif /* __Z80_H__ */

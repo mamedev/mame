@@ -141,7 +141,7 @@ typedef struct _am29000_state
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE am29000_state *get_safe_token(const device_config *device)
+INLINE am29000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -154,9 +154,9 @@ static CPU_INIT( am29000 )
 {
 	am29000_state *am29000 = get_safe_token(device);
 
-	am29000->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	am29000->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	am29000->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	am29000->program = device->space(AS_PROGRAM);
+	am29000->data = device->space(AS_DATA);
+	am29000->io = device->space(AS_IO);
 	am29000->cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
 	/* Register state for saving */

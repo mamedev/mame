@@ -72,7 +72,7 @@ static int speech_rom_address = 0;
 static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
 
 
-static void start_talking (const device_config *tms)
+static void start_talking (running_device *tms)
 {
 	speech_rom_address = 0x0;
 	tms5110_ctl_w(tms,0,TMS5110_CMD_SPEAK);
@@ -81,7 +81,7 @@ static void start_talking (const device_config *tms)
 	tms5110_pdc_w(tms,0,0);
 }
 
-static void reset_talking (const device_config *tms)
+static void reset_talking (running_device *tms)
 {
 /*To be extremely accurate there should be a delays between each of
   the function calls below. In real they happen with the frequency of 160 kHz.
@@ -104,7 +104,7 @@ static void reset_talking (const device_config *tms)
 }
 
 
-static int bagman_speech_rom_read_bit(const device_config *device)
+static int bagman_speech_rom_read_bit(running_device *device)
 {
 	UINT8 *ROM = memory_region(device->machine, "speech");
 	int bit_no = (ls259_buf[0]<<2) | (ls259_buf[1]<<1) | (ls259_buf[2]<<0);
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( bagman_ls259_w )
 
 		if (offset==3)
 		{
-			const device_config *tms = devtag_get_device(space->machine, "tms");
+			running_device *tms = devtag_get_device(space->machine, "tms");
 			if (ls259_buf[3] == 0)	/* 1->0 transition */
 			{
 				reset_talking(tms);

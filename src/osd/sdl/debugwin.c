@@ -41,7 +41,7 @@ typedef struct {
 	debug_view *console;
 	debug_view *disasm;
 	debug_view *registers;
-	const device_config *cpu;	// current CPU
+	running_device *cpu;	// current CPU
 	running_machine *machine;	// machine
 } debugmain_i;
 
@@ -81,7 +81,7 @@ typedef struct memorycombo_item
 	UINT8					prefsize;
 	running_machine 			*machine;	// machine
 	const memory_subview_item		*subview;	// subview
-	const device_config			*device;	// CPU device
+	running_device			*device;	// CPU device
 } memorycombo_item;
 
 
@@ -281,7 +281,7 @@ void debugmain_comments_activate(GtkMenuItem *item, gpointer user_data)
 	}
 }
 
-static void debugmain_set_cpu(const device_config *cpu)
+static void debugmain_set_cpu(running_device *cpu)
 {
 	if (cpu != dmain->cpu)
 	{
@@ -315,7 +315,7 @@ static void debugmain_set_cpu(const device_config *cpu)
 
 // The entry point
 
-void osd_wait_for_debugger(const device_config *device, int firststop)
+void osd_wait_for_debugger(running_device *device, int firststop)
 {
 	// create a console window
 	if(!dmain)
@@ -439,7 +439,7 @@ static void memorywin_new(running_machine *machine)
 {
 	memorywin_i *mem;
 	int item, cursel;
-	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
 	const memory_subview_item *subview;
 
 	mem = (memorywin_i *) malloc(sizeof(*mem));
@@ -566,7 +566,7 @@ static void disasmwin_new(running_machine *machine)
 {
 	disasmwin_i *dis;
 	int item, cursel;
-	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
 	const disasm_subview_item *subview;
 	char title[256];
 
@@ -782,7 +782,7 @@ void on_dbpl_activate(GtkMenuItem *item, gpointer user_data)
 #include "emu.h"
 
 // win32 stubs for linking
-void osd_wait_for_debugger(const device_config *device, int firststop)
+void osd_wait_for_debugger(running_device *device, int firststop)
 {
 }
 

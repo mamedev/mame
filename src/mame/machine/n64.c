@@ -135,7 +135,7 @@ WRITE32_HANDLER( n64_mi_reg_w )
 	}
 }
 
-static const device_config *dmadac[2];
+static running_device *dmadac[2];
 
 void signal_rcp_interrupt(running_machine *machine, int interrupt)
 {
@@ -421,7 +421,7 @@ static void sp_dma(int direction)
 	}
 }
 
-static void sp_set_status(const device_config *device, UINT32 status)
+static void sp_set_status(running_device *device, UINT32 status)
 {
 	if (status & 0x1)
 	{

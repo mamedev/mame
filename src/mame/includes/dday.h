@@ -23,7 +23,7 @@ struct _dday_state
 	int            timer_value;
 
 	/* devices */
-	const device_config *ay1;
+	running_device *ay1;
 };
 
 

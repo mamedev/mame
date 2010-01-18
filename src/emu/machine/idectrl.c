@@ -104,7 +104,7 @@
 typedef struct _ide_state ide_state;
 struct _ide_state
 {
-	const device_config *device;
+	running_device *device;
 
 	UINT8			adapter_control;
 	UINT8			status;
@@ -178,8 +178,8 @@ static TIMER_CALLBACK( read_sector_done_callback );
 static void read_first_sector(ide_state *ide);
 static void read_next_sector(ide_state *ide);
 
-static UINT32 ide_controller_read(const device_config *device, int bank, offs_t offset, int size);
-static void ide_controller_write(const device_config *device, int bank, offs_t offset, int size, UINT32 data);
+static UINT32 ide_controller_read(running_device *device, int bank, offs_t offset, int size);
+static void ide_controller_write(running_device *device, int bank, offs_t offset, int size, UINT32 data);
 
 
 
@@ -192,7 +192,7 @@ static void ide_controller_write(const device_config *device, int bank, offs_t o
     in device is, in fact, an IDE controller
 -------------------------------------------------*/
 
-INLINE ide_state *get_safe_token(const device_config *device)
+INLINE ide_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -204,7 +204,7 @@ INLINE ide_state *get_safe_token(const device_config *device)
 
 INLINE void signal_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)ide->device->inline_config;
+	const ide_config *config = (const ide_config *)ide->device->baseconfig().inline_config;
 
 	LOG(("IDE interrupt assert\n"));
 
@@ -218,7 +218,7 @@ INLINE void signal_interrupt(ide_state *ide)
 
 INLINE void clear_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)ide->device->inline_config;
+	const ide_config *config = (const ide_config *)ide->device->baseconfig().inline_config;
 
 	LOG(("IDE interrupt clear\n"));
 
@@ -270,19 +270,19 @@ INLINE void signal_delayed_interrupt(ide_state *ide, attotime time, int buffer_r
     INITIALIZATION AND RESET
 ***************************************************************************/
 
-UINT8 *ide_get_features(const device_config *device)
+UINT8 *ide_get_features(running_device *device)
 {
 	ide_state *ide = get_safe_token(device);
 	return ide->features;
 }
 
-void ide_set_gnet_readlock(const device_config *device, const UINT8 onoff)
+void ide_set_gnet_readlock(running_device *device, const UINT8 onoff)
 {
 	ide_state *ide = get_safe_token(device);
 	ide->gnetreadlock = onoff;
 }
 
-void ide_set_master_password(const device_config *device, const UINT8 *password)
+void ide_set_master_password(running_device *device, const UINT8 *password)
 {
 	ide_state *ide = get_safe_token(device);
 
@@ -291,7 +291,7 @@ void ide_set_master_password(const device_config *device, const UINT8 *password)
 }
 
 
-void ide_set_user_password(const device_config *device, const UINT8 *password)
+void ide_set_user_password(running_device *device, const UINT8 *password)
 {
 	ide_state *ide = get_safe_token(device);
 
@@ -302,7 +302,7 @@ void ide_set_user_password(const device_config *device, const UINT8 *password)
 
 static TIMER_CALLBACK( reset_callback )
 {
-	device_reset((const device_config *)ptr);
+	device_reset((running_device *)ptr);
 }
 
 
@@ -1238,7 +1238,7 @@ static void handle_command(ide_state *ide, UINT8 command)
  *
  *************************************/
 
-static UINT32 ide_controller_read(const device_config *device, int bank, offs_t offset, int size)
+static UINT32 ide_controller_read(running_device *device, int bank, offs_t offset, int size)
 {
 	ide_state *ide = get_safe_token(device);
 	UINT32 result = 0;
@@ -1347,7 +1347,7 @@ static UINT32 ide_controller_read(const device_config *device, int bank, offs_t 
  *
  *************************************/
 
-static void ide_controller_write(const device_config *device, int bank, offs_t offset, int size, UINT32 data)
+static void ide_controller_write(running_device *device, int bank, offs_t offset, int size, UINT32 data)
 {
 	ide_state *ide = get_safe_token(device);
 
@@ -1515,7 +1515,7 @@ static void ide_controller_write(const device_config *device, int bank, offs_t o
  *
  *************************************/
 
-static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, int size)
+static UINT32 ide_bus_master_read(running_device *device, offs_t offset, int size)
 {
 	ide_state *ide = get_safe_token(device);
 
@@ -1544,7 +1544,7 @@ static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, in
  *
  *************************************/
 
-static void ide_bus_master_write(const device_config *device, offs_t offset, int size, UINT32 data)
+static void ide_bus_master_write(running_device *device, offs_t offset, int size, UINT32 data)
 {
 	ide_state *ide = get_safe_token(device);
 
@@ -1619,7 +1619,7 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
     select: 0->CS1Fx active, 1->CS3Fx active
     offset: register offset (state of DA2-DA0)
 */
-int ide_bus_r(const device_config *device, int select, int offset)
+int ide_bus_r(running_device *device, int select, int offset)
 {
 	return ide_controller_read(device, select ? 1 : 0, offset, select == 0 && offset == 0 ? 2 : 1);
 }
@@ -1633,7 +1633,7 @@ int ide_bus_r(const device_config *device, int select, int offset)
     offset: register offset (state of DA2-DA0)
     data: data written (state of D0-D15 or D0-D7)
 */
-void ide_bus_w(const device_config *device, int select, int offset, int data)
+void ide_bus_w(running_device *device, int select, int offset, int data)
 {
 	if (select == 0 && offset == 0)
 		ide_controller_write(device, 0, 0, 2, data);
@@ -1641,7 +1641,7 @@ void ide_bus_w(const device_config *device, int select, int offset, int data)
 		ide_controller_write(device, select ? 1 : 0, offset, 1, data & 0xff);
 }
 
-UINT32 ide_controller_r(const device_config *device, int reg, int size)
+UINT32 ide_controller_r(running_device *device, int reg, int size)
 {
 	if (reg >= 0x1f0 && reg < 0x1f8)
 		return ide_controller_read(device, 0, reg & 7, size);
@@ -1652,7 +1652,7 @@ UINT32 ide_controller_r(const device_config *device, int reg, int size)
 	return 0xffffffff;
 }
 
-void ide_controller_w(const device_config *device, int reg, int size, UINT32 data)
+void ide_controller_w(running_device *device, int reg, int size, UINT32 data)
 {
 	if (reg >= 0x1f0 && reg < 0x1f8)
 		ide_controller_write(device, 0, reg & 7, size, data);
@@ -1791,8 +1791,8 @@ static DEVICE_START( ide_controller )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config == NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -1800,7 +1800,7 @@ static DEVICE_START( ide_controller )
 	ide->device = device;
 
 	/* set MAME harddisk handle */
-	config = (const ide_config *)device->inline_config;
+	config = (const ide_config *)device->baseconfig().inline_config;
 	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag.cstr());
 	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");

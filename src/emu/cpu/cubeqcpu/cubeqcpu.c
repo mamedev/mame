@@ -97,7 +97,7 @@ typedef struct
 	cubeqst_dac_w_func dac_w;
 	UINT16 *sound_data;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 } cquestsnd_state;
@@ -137,8 +137,8 @@ typedef struct
 	UINT8 rc;
 	UINT8 clkcnt;
 
-	const device_config *device;
-	const device_config *lindevice;
+	running_device *device;
+	running_device *lindevice;
 	const address_space *program;
 	int icount;
 } cquestrot_state;
@@ -183,8 +183,8 @@ typedef struct
 	UINT32	*e_stack;
 	UINT32	*o_stack;
 
-	const device_config *device;
-	const device_config *rotdevice;
+	running_device *device;
+	running_device *rotdevice;
 	const address_space *program;
 	int icount;
 } cquestlin_state;
@@ -193,7 +193,7 @@ typedef struct
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE cquestsnd_state *get_safe_token_snd(const device_config *device)
+INLINE cquestsnd_state *get_safe_token_snd(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -202,7 +202,7 @@ INLINE cquestsnd_state *get_safe_token_snd(const device_config *device)
 	return (cquestsnd_state *)device->token;
 }
 
-INLINE cquestrot_state *get_safe_token_rot(const device_config *device)
+INLINE cquestrot_state *get_safe_token_rot(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -211,7 +211,7 @@ INLINE cquestrot_state *get_safe_token_rot(const device_config *device)
 	return (cquestrot_state *)device->token;
 }
 
-INLINE cquestlin_state *get_safe_token_lin(const device_config *device)
+INLINE cquestlin_state *get_safe_token_lin(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -258,7 +258,7 @@ static STATE_POSTLOAD( cquestsnd_postload )
 
 }
 
-static void cquestsnd_state_register(const device_config *device)
+static void cquestsnd_state_register(running_device *device)
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
 	state_save_register_device_item_array(device, 0, cpustate->ram);
@@ -284,7 +284,7 @@ static void cquestsnd_state_register(const device_config *device)
 static CPU_INIT( cquestsnd )
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
-	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->static_config;
+	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->baseconfig().static_config;
 
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -322,7 +322,7 @@ static STATE_POSTLOAD( cquestrot_postload )
 
 }
 
-static void cquestrot_state_register(const device_config *device)
+static void cquestrot_state_register(running_device *device)
 {
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	state_save_register_device_item_array(device, 0, cpustate->ram);
@@ -356,7 +356,7 @@ static void cquestrot_state_register(const device_config *device)
 
 static CPU_INIT( cquestrot )
 {
-	const cubeqst_rot_config *rotconfig = (const cubeqst_rot_config *)device->static_config;
+	const cubeqst_rot_config *rotconfig = (const cubeqst_rot_config *)device->baseconfig().static_config;
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -400,7 +400,7 @@ static STATE_POSTLOAD( cquestlin_postload )
 
 }
 
-static void cquestlin_state_register(const device_config *device)
+static void cquestlin_state_register(running_device *device)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 
@@ -439,7 +439,7 @@ static void cquestlin_state_register(const device_config *device)
 
 static CPU_INIT( cquestlin )
 {
-	const cubeqst_lin_config *linconfig = (const cubeqst_lin_config *)device->static_config;
+	const cubeqst_lin_config *linconfig = (const cubeqst_lin_config *)device->baseconfig().static_config;
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -1150,26 +1150,26 @@ INLINE int do_linjmp(cquestlin_state *cpustate, int jmp)
 
 
 
-void cubeqcpu_swap_line_banks(const device_config *device)
+void cubeqcpu_swap_line_banks(running_device *device)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	cpustate->field = cpustate->field ^ 1;
 }
 
 
-void cubeqcpu_clear_stack(const device_config *device)
+void cubeqcpu_clear_stack(running_device *device)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	memset(&cpustate->ptr_ram[cpustate->field * 256], 0, 256);
 }
 
-UINT8 cubeqcpu_get_ptr_ram_val(const device_config *device, int i)
+UINT8 cubeqcpu_get_ptr_ram_val(running_device *device, int i)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	return cpustate->ptr_ram[(VISIBLE_FIELD * 256) + i];
 }
 
-UINT32* cubeqcpu_get_stack_ram(const device_config *device)
+UINT32* cubeqcpu_get_stack_ram(running_device *device)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	if (VISIBLE_FIELD == ODD_FIELD)

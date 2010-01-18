@@ -279,7 +279,7 @@ struct _tms5220_state
        resolution of the output data.
      */
 	UINT8 digital_select;
-	const device_config *device;
+	running_device *device;
 
 	const tms5220_interface *intf;
 	sound_stream *stream;
@@ -287,7 +287,7 @@ struct _tms5220_state
 };
 
 
-INLINE tms5220_state *get_safe_token(const device_config *device)
+INLINE tms5220_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1220,7 +1220,7 @@ static DEVICE_START( tms5220 )
 	tms5220_state *tms = get_safe_token(device);
 
 	/* set the interface and device */
-	tms->intf = device->static_config ? (const tms5220_interface *)device->static_config : &dummy;
+	tms->intf = device->baseconfig().static_config ? (const tms5220_interface *)device->baseconfig().static_config : &dummy;
 	tms->device = device;
 	tms->clock = device->clock;
 
@@ -1495,7 +1495,7 @@ READ_LINE_DEVICE_HANDLER( tms5220_readyq_r )
 
 ***********************************************************************************************/
 
-double tms5220_time_to_ready(const device_config *device)
+double tms5220_time_to_ready(running_device *device)
 {
 	tms5220_state *tms = get_safe_token(device);
 	double cycles;
@@ -1560,7 +1560,7 @@ static STREAM_UPDATE( tms5220_update )
 
 ***********************************************************************************************/
 
-void tms5220_set_frequency(const device_config *device, int frequency)
+void tms5220_set_frequency(running_device *device, int frequency)
 {
 	tms5220_state *tms = get_safe_token(device);
 	stream_set_sample_rate(tms->stream, frequency / 80);

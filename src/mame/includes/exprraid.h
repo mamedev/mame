@@ -23,8 +23,8 @@ struct _exprraid_state
 	//int          coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *slave;
+	running_device *maincpu;
+	running_device *slave;
 };
 
 

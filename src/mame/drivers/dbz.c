@@ -113,7 +113,7 @@ static WRITE16_HANDLER( dbz_sound_cause_nmi )
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void dbz_sound_irq( const device_config *device, int irq )
+static void dbz_sound_irq( running_device *device, int irq )
 {
 	dbz_state *state = (dbz_state *)device->machine->driver_data;
 

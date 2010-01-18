@@ -74,7 +74,7 @@ struct _mc6845_t
 
 	int device_type;
 	const mc6845_interface *intf;
-	const device_config *screen;
+	running_device *screen;
 
 	/* register file */
 	UINT8	horiz_char_total;	/* 0x00 */
@@ -142,7 +142,7 @@ mc6845_interface mc6845_null_interface = { 0 };
 
 
 /* makes sure that the passed in device is the right type */
-INLINE mc6845_t *get_safe_token(const device_config *device)
+INLINE mc6845_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -166,7 +166,7 @@ static STATE_POSTLOAD( mc6845_state_save_postload )
 
 static TIMER_CALLBACK( on_update_address_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 	int addr = (param >> 8);
 	int strobe = (param & 0xff);
@@ -182,7 +182,7 @@ static TIMER_CALLBACK( on_update_address_cb )
 	}
 }
 
-INLINE void call_on_update_address(const device_config *device, int strobe)
+INLINE void call_on_update_address(running_device *device, int strobe)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -548,7 +548,7 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 
 static TIMER_CALLBACK( upd_adr_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 
 	/* fire a update address strobe */
 	call_on_update_address(device, 0);
@@ -557,7 +557,7 @@ static TIMER_CALLBACK( upd_adr_timer_cb )
 
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -569,7 +569,7 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 
 static TIMER_CALLBACK( cur_on_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -579,7 +579,7 @@ static TIMER_CALLBACK( cur_on_timer_cb )
 
 static TIMER_CALLBACK( cur_off_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -591,7 +591,7 @@ static TIMER_CALLBACK( cur_off_timer_cb )
 
 static TIMER_CALLBACK( vsync_on_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -601,7 +601,7 @@ static TIMER_CALLBACK( vsync_on_timer_cb )
 
 static TIMER_CALLBACK( vsync_off_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -613,7 +613,7 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -623,7 +623,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -634,7 +634,7 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 
 
 
-UINT16 mc6845_get_ma(const device_config *device)
+UINT16 mc6845_get_ma(running_device *device)
 {
 	UINT16 ret;
 	mc6845_t *mc6845 = get_safe_token(device);
@@ -664,7 +664,7 @@ UINT16 mc6845_get_ma(const device_config *device)
 }
 
 
-UINT8 mc6845_get_ra(const device_config *device)
+UINT8 mc6845_get_ra(running_device *device)
 {
 	UINT8 ret;
 	mc6845_t *mc6845 = get_safe_token(device);
@@ -688,7 +688,7 @@ UINT8 mc6845_get_ra(const device_config *device)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845->light_pen_addr = mc6845_get_ma(device);
@@ -696,7 +696,7 @@ static TIMER_CALLBACK( light_pen_latch_timer_cb )
 }
 
 
-void mc6845_assert_light_pen_input(const device_config *device)
+void mc6845_assert_light_pen_input(running_device *device)
 {
 	int y, x;
 	int char_x;
@@ -729,7 +729,7 @@ void mc6845_assert_light_pen_input(const device_config *device)
 }
 
 
-void mc6845_set_clock(const device_config *device, int clock)
+void mc6845_set_clock(running_device *device, int clock)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -744,7 +744,7 @@ void mc6845_set_clock(const device_config *device, int clock)
 }
 
 
-void mc6845_set_hpixels_per_column(const device_config *device, int hpixels_per_column)
+void mc6845_set_hpixels_per_column(running_device *device, int hpixels_per_column)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -790,7 +790,7 @@ static void update_cursor_state(mc6845_t *mc6845)
 }
 
 
-void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void mc6845_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 	assert(bitmap != NULL);
@@ -854,14 +854,14 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 
 
 /* device interface */
-static void common_start(const device_config *device, int device_type)
+static void common_start(running_device *device, int device_type)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* validate arguments */
 	assert(device != NULL);
 
-	mc6845->intf = (const mc6845_interface *)device->static_config;
+	mc6845->intf = (const mc6845_interface *)device->baseconfig().static_config;
 	mc6845->device_type = device_type;
 
 	if (mc6845->intf != NULL)

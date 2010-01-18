@@ -103,7 +103,7 @@ static VIDEO_UPDATE( vcombat )
 {
 	int y;
 	const rgb_t *const pens = tlc34076_get_pens();
-	const device_config *aux = devtag_get_device(screen->machine, "aux");
+	running_device *aux = devtag_get_device(screen->machine, "aux");
 
 	UINT16 *m68k_buf = m68k_framebuffer[(*framebuffer_ctrl & 0x20) ? 1 : 0];
 	UINT16 *i860_buf = i860_framebuffer[(screen == aux) ? 1 : 0][0];
@@ -188,7 +188,7 @@ static READ16_HANDLER( control_3_r )
 	return (input_port_read(space->machine, "IN2") << 8);
 }
 
-static void wiggle_i860_common(const device_config *device, UINT16 data)
+static void wiggle_i860_common(running_device *device, UINT16 data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
@@ -286,7 +286,7 @@ static WRITE64_HANDLER( v1_fb_w )
 
 static WRITE16_HANDLER( crtc_w )
 {
-	const device_config *crtc = devtag_get_device(space->machine, "crtc");
+	running_device *crtc = devtag_get_device(space->machine, "crtc");
 
 	if (crtc == NULL)
 		return;

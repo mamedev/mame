@@ -130,7 +130,7 @@ static TIMER_CALLBACK( transmit_event );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE acia6850_t *get_token(const device_config *device)
+INLINE acia6850_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == ACIA6850);
@@ -138,11 +138,11 @@ INLINE acia6850_t *get_token(const device_config *device)
 }
 
 
-INLINE acia6850_interface *get_interface(const device_config *device)
+INLINE acia6850_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == ACIA6850);
-	return (acia6850_interface *) device->static_config;
+	return (acia6850_interface *) device->baseconfig().static_config;
 }
 
 
@@ -362,7 +362,7 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
     acia6850_check_interrupts
 -------------------------------------------------*/
 
-static void acia6850_check_interrupts(const device_config *device)
+static void acia6850_check_interrupts(running_device *device)
 {
 	acia6850_t *acia_p = get_token(device);
 
@@ -442,7 +442,7 @@ READ8_DEVICE_HANDLER( acia6850_data_r )
     tx_tick - Transmit a bit
 -------------------------------------------------*/
 
-static void tx_tick(const device_config *device)
+static void tx_tick(running_device *device)
 {
 	acia6850_t *acia_p = get_token(device);
 
@@ -565,7 +565,7 @@ static void tx_tick(const device_config *device)
 
 static TIMER_CALLBACK( transmit_event )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	acia6850_t *acia_p = get_token(device);
 	tx_tick(device);
 	acia_p->tx_counter = 0;
@@ -576,7 +576,7 @@ static TIMER_CALLBACK( transmit_event )
     acia6850_tx_clock_in - As above, but using the tx pin
 -------------------------------------------------*/
 
-void acia6850_tx_clock_in(const device_config *device)
+void acia6850_tx_clock_in(running_device *device)
 {
 	acia6850_t *acia_p = get_token(device);
 
@@ -606,7 +606,7 @@ void acia6850_tx_clock_in(const device_config *device)
     rx_tick - Receive a bit
 -------------------------------------------------*/
 
-static void rx_tick(const device_config *device)
+static void rx_tick(running_device *device)
 {
 	acia6850_t *acia_p = get_token(device);
 
@@ -756,7 +756,7 @@ static void rx_tick(const device_config *device)
 
 static TIMER_CALLBACK( receive_event )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	acia6850_t *acia_p = get_token(device);
 	rx_tick(device);
 	acia_p->rx_counter = 0;
@@ -767,7 +767,7 @@ static TIMER_CALLBACK( receive_event )
     acia6850_rx_clock_in - As above, but using the rx pin
 -------------------------------------------------*/
 
-void acia6850_rx_clock_in(const device_config *device)
+void acia6850_rx_clock_in(running_device *device)
 {
 	acia6850_t *acia_p = get_token(device);
 
@@ -798,7 +798,7 @@ void acia6850_rx_clock_in(const device_config *device)
     dynamically
 -------------------------------------------------*/
 
-void acia6850_set_rx_clock(const device_config *device, int clock)
+void acia6850_set_rx_clock(running_device *device, int clock)
 {
 	acia6850_t *acia_p = get_token(device);
 	acia_p->rx_clock = clock;
@@ -810,7 +810,7 @@ void acia6850_set_rx_clock(const device_config *device, int clock)
     dynamically
 -------------------------------------------------*/
 
-void acia6850_set_tx_clock(const device_config *device, int clock)
+void acia6850_set_tx_clock(running_device *device, int clock)
 {
 	acia6850_t *acia_p = get_token(device);
 	acia_p->tx_clock = clock;

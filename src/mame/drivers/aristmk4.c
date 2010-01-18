@@ -163,7 +163,7 @@ static UINT8 rtc_get_reg(running_machine *machine,int address_register)
 // datain
 static WRITE8_HANDLER(mkiv_datain_pia_w)
 {
-    const device_config *pia_0 = devtag_get_device(space->machine, "pia6821_0");
+    running_device *pia_0 = devtag_get_device(space->machine, "pia6821_0");
     //logerror("CPU ===> PIA: %02X\n", data);
     pia6821_w(pia_0, offset, data);
 

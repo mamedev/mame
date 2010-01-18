@@ -41,8 +41,8 @@ struct _trackfld_state
 	int      yiear_nmi_enable;		// yiear
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *vlm;
+	running_device *audiocpu;
+	running_device *vlm;
 };
 
 

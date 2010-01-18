@@ -78,7 +78,7 @@ struct _gaelco_sound_state
 
 static wav_file *	wavraw;					/* raw waveform */
 
-INLINE gaelco_sound_state *get_safe_token(const device_config *device)
+INLINE gaelco_sound_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -255,7 +255,7 @@ WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 static DEVICE_START( gaelco )
 {
 	int j, vol;
-	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->static_config;
+	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->baseconfig().static_config;
 
 	gaelco_sound_state *info = get_safe_token(device);
 

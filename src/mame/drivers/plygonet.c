@@ -369,7 +369,7 @@ static DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 */
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
-static UINT8 dsp56k_bank_group(const device_config* cpu)
+static UINT8 dsp56k_bank_group(running_device* cpu)
 {
 	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 
@@ -382,7 +382,7 @@ static UINT8 dsp56k_bank_group(const device_config* cpu)
 	return INVALID_BANK_GROUP;
 }
 
-static UINT8 dsp56k_bank_num(const device_config* cpu, UINT8 bank_group)
+static UINT8 dsp56k_bank_num(running_device* cpu, UINT8 bank_group)
 {
 	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 

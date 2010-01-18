@@ -49,7 +49,7 @@ DASM code snippets:
 
 static VIDEO_UPDATE(viper)
 {
-	const device_config *device = devtag_get_device(screen->machine, "voodoo");
+	running_device *device = devtag_get_device(screen->machine, "voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
@@ -57,7 +57,7 @@ static VIDEO_UPDATE(viper)
 /*****************************************************************************/
 
 static UINT32 mpc8240_regs[256/4];
-static UINT32 mpc8240_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+static UINT32 mpc8240_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
 {
 	#ifdef VIPER_DEBUG_LOG
 	printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
@@ -70,7 +70,7 @@ static UINT32 mpc8240_pci_r(const device_config *busdevice, const device_config 
 	return mpc8240_regs[reg/4];
 }
 
-static void mpc8240_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void mpc8240_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	#ifdef VIPER_DEBUG_LOG
 	printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
@@ -428,7 +428,7 @@ static WRITE64_HANDLER(unk1b_w)
 }
 
 static UINT32 voodoo3_pci_reg[0x100];
-static UINT32 voodoo3_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+static UINT32 voodoo3_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
 {
 	switch (reg)
 	{
@@ -467,7 +467,7 @@ static UINT32 voodoo3_pci_r(const device_config *busdevice, const device_config 
 	return 0;
 }
 
-static void voodoo3_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo3_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 //  printf("voodoo3_pci_w: %08X, %08X\n", reg, data);
 
@@ -605,7 +605,7 @@ static INTERRUPT_GEN(viper_vblank)
 
 }
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 }
 
@@ -658,7 +658,7 @@ static DRIVER_INIT(viper)
 
 static DRIVER_INIT(vipercf)
 {
-	const device_config *ide = devtag_get_device(machine, "ide");
+	running_device *ide = devtag_get_device(machine, "ide");
 
 	DRIVER_INIT_CALL(viper);
 

@@ -498,7 +498,7 @@ static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 
 	if(offset == 0x75)
 	{
-		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		running_device *device = devtag_get_device(space->machine, "eeprom");
 		eeprom_set_clock_line(device, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, data & 0x10);
 		eeprom_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
@@ -2494,7 +2494,7 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(const device_config *device, int irq)
+static void scsp_irq(running_device *device, int irq)
 {
 	// don't bother the 68k if it's off
 	if (!en_68k)
@@ -2575,7 +2575,7 @@ SCU register[40] is for IRQ masking.
 
 /* to do, update bios idle skips so they work better with this arrangement.. */
 
-static const device_config *vblank_out_timer,*scan_timer,*t1_timer;
+static running_device *vblank_out_timer,*scan_timer,*t1_timer;
 static int h_sync,v_sync;
 static int cur_scan;
 

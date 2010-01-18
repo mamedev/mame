@@ -88,7 +88,7 @@ struct _qsound_state
 	FILE *fpRawDataR;
 };
 
-INLINE qsound_state *get_safe_token(const device_config *device)
+INLINE qsound_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

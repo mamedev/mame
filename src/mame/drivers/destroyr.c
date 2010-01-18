@@ -29,7 +29,7 @@ struct _destroyr_state
 	int            noise;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

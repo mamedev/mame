@@ -513,7 +513,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void dd3_ymirq_handler(const device_config *device, int irq)
+static void dd3_ymirq_handler(running_device *device, int irq)
 {
 	ddragon3_state *state = (ddragon3_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );

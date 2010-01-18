@@ -805,7 +805,7 @@ static TILE_GET_INFO( get_tile_info )
  *
  *************************************/
 
-static int compute_clipping_extents(const device_config *screen, int enable, int clipout, int clipmask, const rectangle *cliprect, struct extents_list *list)
+static int compute_clipping_extents(running_device *screen, int enable, int clipout, int clipmask, const rectangle *cliprect, struct extents_list *list)
 {
 	int flip = (system32_videoram[0x1ff00/2] >> 9) & 1;
 	rectangle tempclip;
@@ -936,7 +936,7 @@ INLINE void get_tilemaps(int bgnum, tilemap_t **tilemaps)
 }
 
 
-static void update_tilemap_zoom(const device_config *screen, struct layer_info *layer, const rectangle *cliprect, int bgnum)
+static void update_tilemap_zoom(running_device *screen, struct layer_info *layer, const rectangle *cliprect, int bgnum)
 {
 	int clipenable, clipout, clips, clipdraw_start;
 	bitmap_t *bitmap = layer->bitmap;
@@ -1089,7 +1089,7 @@ static void update_tilemap_zoom(const device_config *screen, struct layer_info *
  *
  *************************************/
 
-static void update_tilemap_rowscroll(const device_config *screen, struct layer_info *layer, const rectangle *cliprect, int bgnum)
+static void update_tilemap_rowscroll(running_device *screen, struct layer_info *layer, const rectangle *cliprect, int bgnum)
 {
 	int clipenable, clipout, clips, clipdraw_start;
 	bitmap_t *bitmap = layer->bitmap;
@@ -1241,7 +1241,7 @@ static void update_tilemap_rowscroll(const device_config *screen, struct layer_i
  *
  *************************************/
 
-static void update_tilemap_text(const device_config *screen, struct layer_info *layer, const rectangle *cliprect)
+static void update_tilemap_text(running_device *screen, struct layer_info *layer, const rectangle *cliprect)
 {
 	bitmap_t *bitmap = layer->bitmap;
 	UINT16 *tilebase;
@@ -1400,7 +1400,7 @@ static void update_tilemap_text(const device_config *screen, struct layer_info *
  *
  *************************************/
 
-static void update_bitmap(const device_config *screen, struct layer_info *layer, const rectangle *cliprect)
+static void update_bitmap(running_device *screen, struct layer_info *layer, const rectangle *cliprect)
 {
 	int clipenable, clipout, clips, clipdraw_start;
 	bitmap_t *bitmap = layer->bitmap;
@@ -1527,7 +1527,7 @@ static void update_background(struct layer_info *layer, const rectangle *cliprec
 }
 
 
-static UINT8 update_tilemaps(const device_config *screen, const rectangle *cliprect)
+static UINT8 update_tilemaps(running_device *screen, const rectangle *cliprect)
 {
 	int enable0 = !(system32_videoram[0x1ff02/2] & 0x0001) && !(system32_videoram[0x1ff8e/2] & 0x0002);
 	int enable1 = !(system32_videoram[0x1ff02/2] & 0x0002) && !(system32_videoram[0x1ff8e/2] & 0x0004);
@@ -2624,7 +2624,7 @@ VIDEO_UPDATE( multi32 )
 {
 	UINT8 enablemask;
 
-	const device_config *left_screen  = devtag_get_device(screen->machine, "lscreen");
+	running_device *left_screen  = devtag_get_device(screen->machine, "lscreen");
 
 	/* update the visible area */
 	if (system32_videoram[0x1ff00/2] & 0x8000)

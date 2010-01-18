@@ -5,8 +5,8 @@
 
 
 typedef struct {
-	void (*handle_dma)(const device_config *device, int cycles);
-	void (*handle_timers)(const device_config *device, int cycles);
+	void (*handle_dma)(running_device *device, int cycles);
+	void (*handle_timers)(running_device *device, int cycles);
 } SM8500_CONFIG;
 
 /* interrupts */

@@ -60,16 +60,16 @@ struct _taitof2_state
 	INT32           oki_bank;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *oki;
-	const device_config *tc0100scn;
-	const device_config *tc0100scn_1;
-	const device_config *tc0100scn_2;
-	const device_config *tc0360pri;
-	const device_config *tc0280grd;
-	const device_config *tc0430grw;
-	const device_config *tc0480scp;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *oki;
+	running_device *tc0100scn;
+	running_device *tc0100scn_1;
+	running_device *tc0100scn_2;
+	running_device *tc0360pri;
+	running_device *tc0280grd;
+	running_device *tc0430grw;
+	running_device *tc0480scp;
 };
 
 /*----------- defined in video/taito_f2.c -----------*/

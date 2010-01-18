@@ -406,7 +406,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched bet
 	reset_sound_region(device->machine);
 }
 
-static void topspeed_msm5205_vck( const device_config *device )
+static void topspeed_msm5205_vck( running_device *device )
 {
 	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
 	if (state->adpcm_data != -1)
@@ -617,7 +617,7 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler( const device_config *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
+static void irq_handler( running_device *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

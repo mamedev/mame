@@ -142,10 +142,10 @@ struct _m63_state
 	INT16    *samplebuf;
 
 	/* sound devices */
-	const device_config *soundcpu;
-	const device_config *ay1;
-	const device_config *ay2;
-	const device_config *samples;
+	running_device *soundcpu;
+	running_device *ay1;
+	running_device *ay2;
+	running_device *samples;
 };
 
 

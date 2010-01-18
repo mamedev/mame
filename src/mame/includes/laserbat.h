@@ -31,16 +31,16 @@ struct _laserbat_state
 	int        degr, filt, a, us, bit14;
 
 	/* device */
-	const device_config *audiocpu;
-	const device_config *s2636_1;
-	const device_config *s2636_2;
-	const device_config *s2636_3;
-	const device_config *pia;
-	const device_config *sn;
-	const device_config *tms1;
-	const device_config *tms2;
-	const device_config *ay1;
-	const device_config *ay2;
+	running_device *audiocpu;
+	running_device *s2636_1;
+	running_device *s2636_2;
+	running_device *s2636_3;
+	running_device *pia;
+	running_device *sn;
+	running_device *tms1;
+	running_device *tms2;
+	running_device *ay1;
+	running_device *ay2;
 };
 
 

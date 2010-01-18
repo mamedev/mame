@@ -37,7 +37,7 @@ struct _dragrace_state
 	int       gear[2];
 
 	/* devices */
-	const device_config *discrete;
+	running_device *discrete;
 };
 
 

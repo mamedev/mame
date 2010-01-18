@@ -72,7 +72,7 @@ struct _tlcs900_state
 	int icount;
 	int regbank;
 	cpu_irq_callback irqcallback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 };
 
@@ -204,7 +204,7 @@ struct _tlcs900_state
 #define WRMEML(addr,data)		{ UINT32 dl = data; WRMEMW(addr,dl); WRMEMW(addr+2,(dl >> 16)); }
 
 
-INLINE tlcs900_state *get_safe_token( const device_config *device )
+INLINE tlcs900_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -219,7 +219,7 @@ static CPU_INIT( tlcs900 )
 {
 	tlcs900_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (const tlcs900_interface *)device->static_config;
+	cpustate->intf = (const tlcs900_interface *)device->baseconfig().static_config;
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space( AS_PROGRAM );

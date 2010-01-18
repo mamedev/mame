@@ -22,7 +22,7 @@ struct _cdda_info
 	UINT32				audio_bptr;
 };
 
-INLINE cdda_info *get_safe_token(const device_config *device)
+INLINE cdda_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -59,7 +59,7 @@ static DEVICE_START( cdda )
 	/* allocate an audio cache */
 	info->audio_cache = auto_alloc_array( device->machine, UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	intf = (const struct CDDAinterface *)device->static_config;
+	intf = (const struct CDDAinterface *)device->baseconfig().static_config;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 
@@ -79,7 +79,7 @@ static DEVICE_START( cdda )
     given CDDA stream
 -------------------------------------------------*/
 
-void cdda_set_cdrom(const device_config *device, void *file)
+void cdda_set_cdrom(running_device *device, void *file)
 {
 	cdda_info *info = get_safe_token(device);
 	info->disc = (cdrom_file *)file;
@@ -91,11 +91,11 @@ void cdda_set_cdrom(const device_config *device, void *file)
     that references the given CD-ROM file
 -------------------------------------------------*/
 
-const device_config *cdda_from_cdrom(running_machine *machine, void *file)
+running_device *cdda_from_cdrom(running_machine *machine, void *file)
 {
-	const device_config *device;
+	running_device *device;
 
-	for (device = sound_first(machine->config); device != NULL; device = sound_next(device))
+	for (device = sound_first(machine); device != NULL; device = sound_next(device))
 		if (sound_get_type(device) == SOUND_CDDA)
 		{
 			cdda_info *info = get_safe_token(device);
@@ -112,7 +112,7 @@ const device_config *cdda_from_cdrom(running_machine *machine, void *file)
     Book audio track
 -------------------------------------------------*/
 
-void cdda_start_audio(const device_config *device, UINT32 startlba, UINT32 numblocks)
+void cdda_start_audio(running_device *device, UINT32 startlba, UINT32 numblocks)
 {
 	cdda_info *info = get_safe_token(device);
 
@@ -130,7 +130,7 @@ void cdda_start_audio(const device_config *device, UINT32 startlba, UINT32 numbl
     audio track
 -------------------------------------------------*/
 
-void cdda_stop_audio(const device_config *device)
+void cdda_stop_audio(running_device *device)
 {
 	cdda_info *info = get_safe_token(device);
 
@@ -145,7 +145,7 @@ void cdda_stop_audio(const device_config *device)
     a Red Book audio track
 -------------------------------------------------*/
 
-void cdda_pause_audio(const device_config *device, int pause)
+void cdda_pause_audio(running_device *device, int pause)
 {
 	cdda_info *info = get_safe_token(device);
 
@@ -159,7 +159,7 @@ void cdda_pause_audio(const device_config *device, int pause)
     (physical sector) during Red Book playback
 -------------------------------------------------*/
 
-UINT32 cdda_get_audio_lba(const device_config *device)
+UINT32 cdda_get_audio_lba(running_device *device)
 {
 	cdda_info *info = get_safe_token(device);
 
@@ -173,7 +173,7 @@ UINT32 cdda_get_audio_lba(const device_config *device)
     playback status
 -------------------------------------------------*/
 
-int cdda_audio_active(const device_config *device)
+int cdda_audio_active(running_device *device)
 {
 	cdda_info *info = get_safe_token(device);
 
@@ -187,7 +187,7 @@ int cdda_audio_active(const device_config *device)
     playback is paused
 -------------------------------------------------*/
 
-int cdda_audio_paused(const device_config *device)
+int cdda_audio_paused(running_device *device)
 {
 	cdda_info *info = get_safe_token(device);
 	return info->audio_pause;
@@ -199,7 +199,7 @@ int cdda_audio_paused(const device_config *device)
     track reached it's natural end
 -------------------------------------------------*/
 
-int cdda_audio_ended(const device_config *device)
+int cdda_audio_ended(running_device *device)
 {
 	cdda_info *info = get_safe_token(device);
 	return info->audio_ended_normally;

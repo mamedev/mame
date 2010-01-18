@@ -29,9 +29,9 @@ struct _firetrap_state
 	int           coin_command_pending;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *msm;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *msm;
 };
 
 

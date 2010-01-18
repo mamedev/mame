@@ -36,7 +36,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef double (*adc1213x_input_convert_func)(const device_config *device, UINT8 input);
+typedef double (*adc1213x_input_convert_func)(running_device *device, UINT8 input);
 
 typedef struct _adc12138_interface adc12138_interface;
 struct _adc12138_interface

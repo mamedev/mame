@@ -147,16 +147,16 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit)
 {
 	machine_config *config = machine_config_alloc(gamedrv->machine_config);
-	const device_config *device;
+	const device_config *devconfig;
 	audit_record *record;
 	int records = 0;
 	int sampnum;
 
 	/* count the number of sample records attached to this driver */
-	for (device = sound_first(config); device != NULL; device = sound_next(device))
-		if (sound_get_type(device) == SOUND_SAMPLES)
+	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
+		if (sound_get_type(devconfig) == SOUND_SAMPLES)
 		{
-			const samples_interface *intf = (const samples_interface *)device->static_config;
+			const samples_interface *intf = (const samples_interface *)devconfig->static_config;
 
 			if (intf->samplenames != NULL)
 			{
@@ -176,10 +176,10 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 	record = *audit;
 
 	/* now iterate over sample entries */
-	for (device = sound_first(config); device != NULL; device = sound_next(device))
-		if (sound_get_type(device) == SOUND_SAMPLES)
+	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
+		if (sound_get_type(devconfig) == SOUND_SAMPLES)
 		{
-			const samples_interface *intf = (const samples_interface *)device->static_config;
+			const samples_interface *intf = (const samples_interface *)devconfig->static_config;
 			const char *sharedname = NULL;
 
 			if (intf->samplenames != NULL)

@@ -17,7 +17,7 @@ struct _zerozone_state
 	tilemap_t     *zz_tilemap;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 /*----------- defined in video/zerozone.c -----------*/

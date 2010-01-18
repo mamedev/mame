@@ -26,8 +26,8 @@ struct _blktiger_state
 	UINT8   z80_latch, i8751_latch;
 
 	/* devices */
-	const device_config *mcu;
-	const device_config *audiocpu;
+	running_device *mcu;
+	running_device *audiocpu;
 };
 
 

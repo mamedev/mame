@@ -55,7 +55,7 @@ typedef struct _cpu_debug_data cpu_debug_data;
 
 
 /* interrupt callback for VBLANK and timed interrupts */
-typedef void (*cpu_interrupt_func)(const device_config *device);
+typedef void (*cpu_interrupt_func)(running_device *device);
 
 
 /* CPU description for drivers */
@@ -134,7 +134,7 @@ struct _cpu_class_header
     MACROS
 ***************************************************************************/
 
-#define INTERRUPT_GEN(func)		void func(const device_config *device)
+#define INTERRUPT_GEN(func)		void func(running_device *device)
 
 /* helpers for using machine/cputag instead of cpu objects */
 #define cputag_get_address_space(mach, tag, spc)						(mach)->device(tag)->space(spc)
@@ -191,76 +191,76 @@ const char *cpuexec_describe_context(running_machine *machine);
 /* ----- CPU scheduling----- */
 
 /* suspend the given CPU for a specific reason */
-void cpu_suspend(const device_config *device, int reason, int eatcycles);
+void cpu_suspend(running_device *device, int reason, int eatcycles);
 
 /* resume the given CPU for a specific reason */
-void cpu_resume(const device_config *device, int reason);
+void cpu_resume(running_device *device, int reason);
 
 /* return TRUE if the given CPU is within its execute function */
-int cpu_is_executing(const device_config *device);
+int cpu_is_executing(running_device *device);
 
 /* returns TRUE if the given CPU is suspended for any of the given reasons */
-int cpu_is_suspended(const device_config *device, int reason);
+int cpu_is_suspended(running_device *device, int reason);
 
 
 
 /* ----- CPU clock management ----- */
 
 /* returns the current CPU's unscaled running clock speed */
-int cpu_get_clock(const device_config *device);
+int cpu_get_clock(running_device *device);
 
 /* sets the current CPU's clock speed and then adjusts for scaling */
-void cpu_set_clock(const device_config *device, int clock);
+void cpu_set_clock(running_device *device, int clock);
 
 /* returns the current scaling factor for a CPU's clock speed */
-double cpu_get_clockscale(const device_config *device);
+double cpu_get_clockscale(running_device *device);
 
 /* sets the current scaling factor for a CPU's clock speed */
-void cpu_set_clockscale(const device_config *device, double clockscale);
+void cpu_set_clockscale(running_device *device, double clockscale);
 
 /* converts a number of clock ticks to an attotime */
-attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks);
+attotime cpu_clocks_to_attotime(running_device *device, UINT64 clocks);
 
 /* converts a duration as attotime to CPU clock ticks */
-UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration);
+UINT64 cpu_attotime_to_clocks(running_device *device, attotime duration);
 
 
 
 /* ----- CPU timing ----- */
 
 /* returns the current local time for a CPU */
-attotime cpu_get_local_time(const device_config *device);
+attotime cpu_get_local_time(running_device *device);
 
 /* returns the total number of CPU cycles for a given CPU */
-UINT64 cpu_get_total_cycles(const device_config *device);
+UINT64 cpu_get_total_cycles(running_device *device);
 
 /* safely eats cycles so we don't cross a timeslice boundary */
-void cpu_eat_cycles(const device_config *device, int cycles);
+void cpu_eat_cycles(running_device *device, int cycles);
 
 /* apply a +/- to the current icount */
-void cpu_adjust_icount(const device_config *device, int delta);
+void cpu_adjust_icount(running_device *device, int delta);
 
 /* abort execution for the current timeslice, allowing other CPUs to run before we run again */
-void cpu_abort_timeslice(const device_config *device);
+void cpu_abort_timeslice(running_device *device);
 
 
 
 /* ----- synchronization helpers ----- */
 
 /* yield the given CPU until the end of the current timeslice */
-void cpu_yield(const device_config *device);
+void cpu_yield(running_device *device);
 
 /* burn CPU cycles until the end of the current timeslice */
-void cpu_spin(const device_config *device);
+void cpu_spin(running_device *device);
 
 /* burn specified CPU cycles until a trigger */
-void cpu_spinuntil_trigger(const device_config *device, int trigger);
+void cpu_spinuntil_trigger(running_device *device, int trigger);
 
 /* burn CPU cycles until the next interrupt */
-void cpu_spinuntil_int(const device_config *device);
+void cpu_spinuntil_int(running_device *device);
 
 /* burn CPU cycles for a specific period of time */
-void cpu_spinuntil_time(const device_config *device, attotime duration);
+void cpu_spinuntil_time(running_device *device, attotime duration);
 
 
 
@@ -273,23 +273,23 @@ void cpuexec_trigger(running_machine *machine, int trigger);
 void cpuexec_triggertime(running_machine *machine, int trigger, attotime duration);
 
 /* generate a trigger corresponding to an interrupt on the given CPU */
-void cpu_triggerint(const device_config *device);
+void cpu_triggerint(running_device *device);
 
 
 
 /* ----- interrupts ----- */
 
 /* set the logical state (ASSERT_LINE/CLEAR_LINE) of the an input line on a CPU */
-void cpu_set_input_line(const device_config *cpu, int line, int state);
+void cpu_set_input_line(running_device *cpu, int line, int state);
 
 /* set the vector to be returned during a CPU's interrupt acknowledge cycle */
-void cpu_set_input_line_vector(const device_config *cpu, int irqline, int vector);
+void cpu_set_input_line_vector(running_device *cpu, int irqline, int vector);
 
 /* set the logical state (ASSERT_LINE/CLEAR_LINE) of the an input line on a CPU and its associated vector */
-void cpu_set_input_line_and_vector(const device_config *cpu, int line, int state, int vector);
+void cpu_set_input_line_and_vector(running_device *cpu, int line, int state, int vector);
 
 /* install a driver-specific callback for IRQ acknowledge */
-void cpu_set_irq_callback(const device_config *cpu, cpu_irq_callback callback);
+void cpu_set_irq_callback(running_device *cpu, cpu_irq_callback callback);
 
 
 
@@ -302,9 +302,9 @@ void cpu_set_irq_callback(const device_config *cpu, cpu_irq_callback callback);
     specified CPU
 -------------------------------------------------*/
 
-INLINE cpu_type cpu_get_type(const device_config *device)
+INLINE cpu_type cpu_get_type(running_device *device)
 {
-	const cpu_config *config = (const cpu_config *)device->inline_config;
+	const cpu_config *config = (const cpu_config *)device->baseconfig().inline_config;
 	return config->type;
 }
 
@@ -314,7 +314,7 @@ INLINE cpu_type cpu_get_type(const device_config *device)
     the class header
 -------------------------------------------------*/
 
-INLINE cpu_class_header *cpu_get_class_header(const device_config *device)
+INLINE cpu_class_header *cpu_get_class_header(running_device *device)
 {
 	if (device->token != NULL)
 		return (cpu_class_header *)((UINT8 *)device->token + device->tokenbytes) - 1;
@@ -327,7 +327,7 @@ INLINE cpu_class_header *cpu_get_class_header(const device_config *device)
     the given CPU's debugger data
 -------------------------------------------------*/
 
-INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
+INLINE cpu_debug_data *cpu_get_debug_data(running_device *device)
 {
 	cpu_class_header *classheader = cpu_get_class_header(device);
 	return classheader->debug;
@@ -339,7 +339,7 @@ INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
     the given CPU's address space
 -------------------------------------------------*/
 
-INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
+INLINE const address_space *cpu_get_address_space(running_device *device, int spacenum)
 {
 	return device->space(spacenum);
 }

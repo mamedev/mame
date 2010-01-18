@@ -27,7 +27,7 @@ struct _dorachan_state
 	UINT8    flip_screen;
 
 	/* devices */
-	const device_config *main_cpu;
+	running_device *main_cpu;
 };
 
 

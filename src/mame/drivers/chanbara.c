@@ -66,7 +66,7 @@ struct _chanbara_state
 	UINT8    scroll, scrollhi;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 
@@ -340,7 +340,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
 
-static void sound_irq( const device_config *device, int linestate )
+static void sound_irq( running_device *device, int linestate )
 {
 	chanbara_state *state = (chanbara_state *)device->machine->driver_data;
 	cpu_set_input_line(state->maincpu, 0, linestate);

@@ -111,7 +111,7 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-static void fd1094_cmp_callback(const device_config *device, UINT32 val, UINT8 reg)
+static void fd1094_cmp_callback(running_device *device, UINT32 val, UINT8 reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -126,7 +126,7 @@ static IRQ_CALLBACK(fd1094_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static void fd1094_rte_callback (const device_config *device)
+static void fd1094_rte_callback (running_device *device)
 {
 	fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_RTE);
 }
@@ -143,7 +143,7 @@ static void fd1094_kludge_reset_values(void)
 
 
 /* function, to be called from MACHINE_RESET (every reset) */
-void fd1094_machine_init(const device_config *device)
+void fd1094_machine_init(running_device *device)
 {
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)

@@ -104,9 +104,9 @@ struct _z80ctc
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int z80ctc_irq_state(const device_config *device);
-static int z80ctc_irq_ack(const device_config *device);
-static void z80ctc_irq_reti(const device_config *device);
+static int z80ctc_irq_state(running_device *device);
+static int z80ctc_irq_ack(running_device *device);
+static void z80ctc_irq_reti(running_device *device);
 
 
 
@@ -114,7 +114,7 @@ static void z80ctc_irq_reti(const device_config *device);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z80ctc *get_safe_token(const device_config *device)
+INLINE z80ctc *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -128,7 +128,7 @@ INLINE z80ctc *get_safe_token(const device_config *device)
     INTERNAL STATE MANAGEMENT
 ***************************************************************************/
 
-static void interrupt_check(const device_config *device)
+static void interrupt_check(running_device *device)
 {
 	z80ctc *ctc = get_safe_token(device);
 	int state = (z80ctc_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
@@ -138,7 +138,7 @@ static void interrupt_check(const device_config *device)
 
 static TIMER_CALLBACK( timercallback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	z80ctc *ctc = get_safe_token(device);
 	ctc_channel *channel = &ctc->channel[param];
 
@@ -164,7 +164,7 @@ static TIMER_CALLBACK( timercallback )
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-attotime z80ctc_getperiod(const device_config *device, int ch)
+attotime z80ctc_getperiod(running_device *device, int ch)
 {
 	z80ctc *ctc = get_safe_token(device);
 	ctc_channel *channel = &ctc->channel[ch];
@@ -314,7 +314,7 @@ READ8_DEVICE_HANDLER( z80ctc_r )
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-static void z80ctc_trg_w(const device_config *device, int ch, UINT8 data)
+static void z80ctc_trg_w(running_device *device, int ch, UINT8 data)
 {
 	z80ctc *ctc = get_safe_token(device);
 	ctc_channel *channel = &ctc->channel[ch];
@@ -378,7 +378,7 @@ WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w ) { z80ctc_trg_w(device, 3, state); }
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-static int z80ctc_irq_state(const device_config *device)
+static int z80ctc_irq_state(running_device *device)
 {
 	z80ctc *ctc = get_safe_token(device);
 	int state = 0;
@@ -404,7 +404,7 @@ static int z80ctc_irq_state(const device_config *device)
 }
 
 
-static int z80ctc_irq_ack(const device_config *device)
+static int z80ctc_irq_ack(running_device *device)
 {
 	z80ctc *ctc = get_safe_token(device);
 	int ch;
@@ -431,7 +431,7 @@ static int z80ctc_irq_ack(const device_config *device)
 }
 
 
-static void z80ctc_irq_reti(const device_config *device)
+static void z80ctc_irq_reti(running_device *device)
 {
 	z80ctc *ctc = get_safe_token(device);
 	int ch;
@@ -458,7 +458,7 @@ static void z80ctc_irq_reti(const device_config *device)
 
 static DEVICE_START( z80ctc )
 {
-	const z80ctc_interface *intf = (const z80ctc_interface *)device->static_config;
+	const z80ctc_interface *intf = (const z80ctc_interface *)device->baseconfig().static_config;
 	z80ctc *ctc = get_safe_token(device);
 	astring tempstring;
 	int ch;

@@ -22,13 +22,13 @@ struct _rungun_state
 	int         sound_status;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k054539_1;
-	const device_config *k054539_2;
-	const device_config *k053936;
-	const device_config *k055673;
-	const device_config *k053252;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k054539_1;
+	running_device *k054539_2;
+	running_device *k053936;
+	running_device *k055673;
+	running_device *k053252;
 };
 
 

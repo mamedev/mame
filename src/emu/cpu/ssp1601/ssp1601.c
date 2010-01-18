@@ -52,12 +52,12 @@ struct _ssp1601_state_t
 
 	int g_cycles;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 };
 
-INLINE ssp1601_state_t *get_safe_token(const device_config *device)
+INLINE ssp1601_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -27,10 +27,10 @@ struct _asuka_state
 	int         adpcm_data;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *pc090oj;
-	const device_config *tc0100scn;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *pc090oj;
+	running_device *tc0100scn;
 };
 
 

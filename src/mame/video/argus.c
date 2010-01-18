@@ -913,7 +913,7 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 }
 
 #if 1
-static void valtric_draw_mosaic(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	static int mosaic=0;
 
@@ -964,7 +964,7 @@ static void valtric_draw_mosaic(const device_config *screen, bitmap_t *bitmap, c
 	}
 }
 #else
-static void valtric_draw_mosaic(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int step = 0x10 - (valtric_mosaic & 0x0f);
 

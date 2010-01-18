@@ -339,7 +339,7 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
-static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
+static void draw_sprites(running_device *screen, bitmap_t *bitmap)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT32 cnt;
@@ -412,7 +412,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 	}
 }
 
-static void draw_sprites_aoh(const device_config *screen, bitmap_t *bitmap)
+static void draw_sprites_aoh(running_device *screen, bitmap_t *bitmap)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT32 cnt;

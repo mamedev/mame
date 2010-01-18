@@ -138,8 +138,8 @@ CPU_GET_INFO( m58715 );			/* 8049 clone */
 
 
 /* functions for talking to the input/output buffers on the UPI41-class chips */
-UINT8 upi41_master_r(const device_config *device, UINT8 a0);
-void upi41_master_w(const device_config *device, UINT8 a0, UINT8 data);
+UINT8 upi41_master_r(running_device *device, UINT8 a0);
+void upi41_master_w(running_device *device, UINT8 a0, UINT8 data);
 
 
 /* disassemblers */

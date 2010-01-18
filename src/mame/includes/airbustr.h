@@ -26,10 +26,10 @@ struct _airbustr_state
 	int        slave_addr;
 
 	/* devices */
-	const device_config *master;
-	const device_config *slave;
-	const device_config *audiocpu;
-	const device_config *pandora;
+	running_device *master;
+	running_device *slave;
+	running_device *audiocpu;
+	running_device *pandora;
 };
 
 

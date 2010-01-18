@@ -423,7 +423,7 @@ static WRITE8_HANDLER( sound_vol )
 	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.3r"), rgain);
 }
 
-static void ym2203_irq(const device_config *device, int irq)
+static void ym2203_irq(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }

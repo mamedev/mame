@@ -412,7 +412,7 @@ static void PCDDR_set(dsp56k_core* cpustate, UINT16 value);
 static void PCD_set(dsp56k_core* cpustate, UINT16 value);
 
 
-INLINE dsp56k_core *get_safe_token(const device_config *device)
+INLINE dsp56k_core *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

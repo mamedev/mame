@@ -77,7 +77,7 @@ struct _i8255a_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8255a_t *get_safe_token(const device_config *device)
+INLINE i8255a_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -85,11 +85,11 @@ INLINE i8255a_t *get_safe_token(const device_config *device)
 	return (i8255a_t *)device->token;
 }
 
-INLINE const i8255a_interface *get_interface(const device_config *device)
+INLINE const i8255a_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == I8255A));
-	return (const i8255a_interface *) device->static_config;
+	return (const i8255a_interface *) device->baseconfig().static_config;
 }
 
 INLINE int group_mode(i8255a_t *i8255a, int group)
@@ -564,7 +564,7 @@ static void write_pc(i8255a_t *i8255a, UINT8 data)
 	}
 }
 
-static void set_mode(const device_config *device, UINT8 data)
+static void set_mode(running_device *device, UINT8 data)
 {
 	i8255a_t *i8255a = get_safe_token(device);
 
@@ -599,7 +599,7 @@ static void set_mode(const device_config *device, UINT8 data)
 	output_pc(i8255a);
 }
 
-static void set_pc_bit(const device_config *device, int bit, int state)
+static void set_pc_bit(running_device *device, int bit, int state)
 {
 	i8255a_t *i8255a = get_safe_token(device);
 

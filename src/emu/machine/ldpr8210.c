@@ -88,7 +88,7 @@ struct _pioneer_pia
 typedef struct _simutrek_data simutrek_data;
 struct _simutrek_data
 {
-	const device_config *cpu;					/* 8748 CPU device */
+	running_device *cpu;					/* 8748 CPU device */
 	UINT8				audio_squelch;			/* audio squelch value */
 	UINT8				data;					/* parallel data for simutrek */
 	UINT8				data_ready;				/* ready flag for simutrek data */
@@ -109,7 +109,7 @@ struct _ldplayer_data
 	attotime			firstbittime;			/* time of first bit in command */
 
 	/* low-level emulation data */
-	const device_config *cpu;					/* 8049 CPU device */
+	running_device *cpu;					/* 8049 CPU device */
 	attotime			slowtrg;				/* time of the last SLOW TRG */
 	pioneer_pia			pia;					/* PIA state */
 	UINT8				vsync;					/* live VSYNC state */
@@ -1054,7 +1054,7 @@ const ldplayer_interface simutrek_interface =
     command to enable/disable audio squelch
 -------------------------------------------------*/
 
-void simutrek_set_audio_squelch(const device_config *device, int state)
+void simutrek_set_audio_squelch(running_device *device, int state)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ldplayer_data *player = ld->player;
@@ -1083,7 +1083,7 @@ static void simutrek_init(laserdisc_state *ld)
 	player->simutrek.data_ready = 1;
 
 	/* find the Simutrek CPU */
-	player->simutrek.cpu = ld->device->machine->device(device_build_tag(tempstring, ld->device, "simutrek"));
+	player->simutrek.cpu = ld->device->subdevice("simutrek");
 }
 
 

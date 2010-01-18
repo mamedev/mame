@@ -55,10 +55,10 @@ struct _astinvad_state
 	UINT8      flip_yoffs;
 	UINT8      color_latch;
 
-	const device_config *maincpu;
-	const device_config *ppi8255_0;
-	const device_config *ppi8255_1;
-	const device_config *samples;
+	running_device *maincpu;
+	running_device *ppi8255_0;
+	running_device *ppi8255_1;
+	running_device *samples;
 };
 
 

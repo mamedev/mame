@@ -336,7 +336,7 @@ static void update_fm1( running_machine *machine )
 static void update_psg0( running_machine *machine, int port )
 {
 	darius_state *state = (darius_state *)machine->driver_data;
-	const device_config *lvol = NULL, *rvol = NULL;
+	running_device *lvol = NULL, *rvol = NULL;
 	int left, right;
 
 	switch (port)
@@ -359,7 +359,7 @@ static void update_psg0( running_machine *machine, int port )
 static void update_psg1( running_machine *machine, int port )
 {
 	darius_state *state = (darius_state *)machine->driver_data;
-	const device_config *lvol = NULL, *rvol = NULL;
+	running_device *lvol = NULL, *rvol = NULL;
 	int left, right;
 
 	switch (port)
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( darius_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static void darius_adpcm_int( const device_config *device )
+static void darius_adpcm_int( running_device *device )
 {
 	darius_state *state = (darius_state *)device->machine->driver_data;
 
@@ -798,7 +798,7 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
+static void irqhandler( running_device *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	darius_state *state = (darius_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

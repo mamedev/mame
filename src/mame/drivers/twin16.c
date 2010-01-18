@@ -670,7 +670,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static void volume_callback(const device_config *device, int v)
+static void volume_callback(running_device *device, int v)
 {
 	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
 	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);

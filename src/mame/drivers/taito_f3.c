@@ -3669,7 +3669,7 @@ static WRITE32_DEVICE_HANDLER( bubsympb_oki_w )
 
 static DRIVER_INIT( bubsympb )
 {
-	const device_config *oki = devtag_get_device(machine, "oki");
+	running_device *oki = devtag_get_device(machine, "oki");
 	f3_game=BUBSYMPH;
 	//tile_decode(machine);
 

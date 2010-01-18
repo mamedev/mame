@@ -207,7 +207,7 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 	port_1_last = data;
 
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 	port_2_last = data;
 

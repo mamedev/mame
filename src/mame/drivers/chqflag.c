@@ -290,7 +290,7 @@ INPUT_PORTS_END
 
 
 
-static void chqflag_ym2151_irq_w( const device_config *device, int data )
+static void chqflag_ym2151_irq_w( running_device *device, int data )
 {
 	chqflag_state *state = (chqflag_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
@@ -302,7 +302,7 @@ static const ym2151_interface ym2151_config =
 	chqflag_ym2151_irq_w
 };
 
-static void volume_callback0( const device_config *device, int v )
+static void volume_callback0( running_device *device, int v )
 {
 	k007232_set_volume(device, 0, (v & 0x0f) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v >> 4) * 0x11);
@@ -313,7 +313,7 @@ static WRITE8_DEVICE_HANDLER( k007232_extvolume_w )
 	k007232_set_volume(device, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-static void volume_callback1( const device_config *device, int v )
+static void volume_callback1( running_device *device, int v )
 {
 	k007232_set_volume(device, 0, (v & 0x0f) * 0x11/2, (v >> 4) * 0x11/2);
 }

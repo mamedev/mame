@@ -45,7 +45,7 @@ struct _dacholer_state
 	UINT8 snd_ack;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 
@@ -406,7 +406,7 @@ static INTERRUPT_GEN( sound_irq )
 	}
 }
 
-static void adpcm_int( const device_config *device )
+static void adpcm_int( running_device *device )
 {
 	dacholer_state *state = (dacholer_state *)device->machine->driver_data;
 	if (state->snd_interrupt_enable == 1 || (state->snd_interrupt_enable == 0 && state->msm_toggle == 1))

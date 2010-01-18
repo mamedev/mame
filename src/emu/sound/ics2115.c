@@ -42,7 +42,7 @@ typedef struct _ics2115_state ics2115_state;
 struct _ics2115_state
 {
 	const ics2115_interface *intf;
-	const device_config *device;
+	running_device *device;
 	UINT8 *rom;
 	INT16 *ulaw;
 
@@ -65,7 +65,7 @@ struct _ics2115_state
 	sound_stream * stream;
 };
 
-INLINE ics2115_state *get_safe_token(const device_config *device)
+INLINE ics2115_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -476,7 +476,7 @@ static DEVICE_START( ics2115 )
 	int i, vv;
 
 	chip->device = device;
-	chip->intf = (const ics2115_interface *)device->static_config;
+	chip->intf = (const ics2115_interface *)device->baseconfig().static_config;
 	chip->rom = *device->region;
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);

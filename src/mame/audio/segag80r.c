@@ -244,7 +244,7 @@ WRITE8_HANDLER( astrob_sound_w )
 	{
 		120.0f, 82.0f, 62.0f, 56.0f, 47.0f, 39.0f, 33.0f, 27.0f, 24.0f, 22.0f
 	};
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	float freq_factor;
 
 	UINT8 diff = data ^ sound_state[offset];
@@ -476,7 +476,7 @@ static SOUND_START( 005 )
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, "samples");
+	running_device *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
 
@@ -704,7 +704,7 @@ static SOUND_START( spaceod )
 
 WRITE8_HANDLER( spaceod_sound_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	UINT8 diff = data ^ sound_state[offset];
 	sound_state[offset] = data;
 
@@ -889,7 +889,7 @@ static SOUND_START( monsterb )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 {
-	const device_config *tms = devtag_get_device(device->machine, "music");
+	running_device *tms = devtag_get_device(device->machine, "music");
 	int enable_val;
 
 	/* Lower four data lines get decoded into 13 control lines */
@@ -910,7 +910,7 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, "samples");
+	running_device *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
 

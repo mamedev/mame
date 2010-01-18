@@ -568,12 +568,12 @@ static WRITE32_HANDLER(K037122_reg_w)
 	COMBINE_DATA( K037122_reg[chip] + offset );
 }
 
-static void voodoo_vblank_0(const device_config *device, int param)
+static void voodoo_vblank_0(running_device *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static void voodoo_vblank_1(const device_config *device, int param)
+static void voodoo_vblank_1(running_device *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
@@ -592,7 +592,7 @@ static VIDEO_START( hornet_2board )
 
 static VIDEO_UPDATE( hornet )
 {
-	const device_config *voodoo = devtag_get_device(screen->machine, "voodoo0");
+	running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -607,7 +607,7 @@ static VIDEO_UPDATE( hornet_2board )
 {
 	if (strcmp(screen->tag, "lscreen") == 0)
 	{
-		const device_config *voodoo = devtag_get_device(screen->machine, "voodoo0");
+		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -615,7 +615,7 @@ static VIDEO_UPDATE( hornet_2board )
 	}
 	else if (strcmp(screen->tag, "rscreen") == 0)
 	{
-		const device_config *voodoo = devtag_get_device(screen->machine, "voodoo1");
+		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -633,8 +633,8 @@ static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -667,7 +667,7 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
 
 	switch (offset)
 	{
@@ -1074,7 +1074,7 @@ static MACHINE_RESET( hornet )
 		memory_set_bankptr(machine, "bank5", usr5);
 }
 
-static double adc12138_input_callback( const device_config *device, UINT8 input )
+static double adc12138_input_callback( running_device *device, UINT8 input )
 {
 	return (double)0.0;
 }
@@ -1253,7 +1253,7 @@ MACHINE_DRIVER_END
 
 static void jamma_jvs_cmd_exec(running_machine *machine);
 
-static void jamma_jvs_w(const device_config *device, UINT8 data)
+static void jamma_jvs_w(running_device *device, UINT8 data)
 {
 	if (jvs_sdata_ptr == 0 && data != 0xe0)
 		return;

@@ -21,12 +21,12 @@ struct _bishi_state
 	UINT16     cur_control, cur_control2;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k007232;
-	const device_config *k056832;
-	const device_config *k054338;
-	const device_config *k055555;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k007232;
+	running_device *k056832;
+	running_device *k054338;
+	running_device *k055555;
 };
 
 /*----------- defined in video/bishi.c -----------*/

@@ -55,10 +55,10 @@ struct _jangou_state
 	UINT8        nsc_latch, z80_latch;
 
 	/* devices */
-	const device_config *cpu_0;
-	const device_config *cpu_1;
-	const device_config *cvsd;
-	const device_config *nsc;
+	running_device *cpu_0;
+	running_device *cpu_1;
+	running_device *cvsd;
+	running_device *nsc;
 };
 
 
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( adpcm_w )
 	state->adpcm_byte = data;
 }
 
-static void jngolady_vclk_cb( const device_config *device )
+static void jngolady_vclk_cb( running_device *device )
 {
 	jangou_state *state = (jangou_state *)device->machine->driver_data;
 

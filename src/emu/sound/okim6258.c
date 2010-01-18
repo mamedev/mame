@@ -49,7 +49,7 @@ static int diff_lookup[49*16];
 /* tables computed? */
 static int tables_computed = 0;
 
-INLINE okim6258_state *get_safe_token(const device_config *device)
+INLINE okim6258_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -172,7 +172,7 @@ static STREAM_UPDATE( okim6258_update )
 
 ***********************************************************************************************/
 
-static void okim6258_state_save_register(okim6258_state *info, const device_config *device)
+static void okim6258_state_save_register(okim6258_state *info, running_device *device)
 {
 	state_save_register_device_item(device, 0, info->status);
 	state_save_register_device_item(device, 0, info->master_clock);
@@ -192,7 +192,7 @@ static void okim6258_state_save_register(okim6258_state *info, const device_conf
 
 static DEVICE_START( okim6258 )
 {
-	const okim6258_interface *intf = (const okim6258_interface *)device->static_config;
+	const okim6258_interface *intf = (const okim6258_interface *)device->baseconfig().static_config;
 	okim6258_state *info = get_safe_token(device);
 
 	compute_tables();
@@ -237,7 +237,7 @@ static DEVICE_RESET( okim6258 )
 
 ***********************************************************************************************/
 
-void okim6258_set_divider(const device_config *device, int val)
+void okim6258_set_divider(running_device *device, int val)
 {
 	okim6258_state *info = get_safe_token(device);
 	int divider = dividers[val];
@@ -253,7 +253,7 @@ void okim6258_set_divider(const device_config *device, int val)
 
 ***********************************************************************************************/
 
-void okim6258_set_clock(const device_config *device, int val)
+void okim6258_set_clock(running_device *device, int val)
 {
 	okim6258_state *info = get_safe_token(device);
 
@@ -268,7 +268,7 @@ void okim6258_set_clock(const device_config *device, int val)
 
 ***********************************************************************************************/
 
-int okim6258_get_vclk(const device_config *device)
+int okim6258_get_vclk(running_device *device)
 {
 	okim6258_state *info = get_safe_token(device);
 

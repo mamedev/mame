@@ -46,9 +46,9 @@ DEVICE_GET_INFO( kaneko_pandora );
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-void pandora_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
-void pandora_eof(const device_config *device);
-void pandora_set_clear_bitmap(const device_config *device, int clear);
+void pandora_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void pandora_eof(running_device *device);
+void pandora_set_clear_bitmap(running_device *device, int clear);
 
 WRITE8_DEVICE_HANDLER ( pandora_spriteram_w );
 READ8_DEVICE_HANDLER( pandora_spriteram_r );

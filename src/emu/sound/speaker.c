@@ -126,7 +126,7 @@ static double make_fraction(attotime a, attotime b, double timediv);
 static double get_filtered_volume(speaker_state *sp);
 
 
-INLINE speaker_state *get_safe_token(const device_config *device)
+INLINE speaker_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -139,7 +139,7 @@ INLINE speaker_state *get_safe_token(const device_config *device)
 static DEVICE_START( speaker )
 {
 	speaker_state *sp = get_safe_token(device);
-	const speaker_interface *intf = (const speaker_interface *) device->static_config;
+	const speaker_interface *intf = (const speaker_interface *) device->baseconfig().static_config;
 	int i;
 	double x;
 
@@ -262,7 +262,7 @@ static STREAM_UPDATE( speaker_sound_update )
 } /* speaker_sound_update */
 
 
-void speaker_level_w(const device_config *device, int new_level)
+void speaker_level_w(running_device *device, int new_level)
 {
 	speaker_state *sp = get_safe_token(device);
 	int volume;

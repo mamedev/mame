@@ -390,7 +390,7 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 }
 
 
-static void sound_cpu_irq(const device_config *device, int state)
+static void sound_cpu_irq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }
@@ -410,7 +410,7 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static void xboard_reset(const device_config *device)
+static void xboard_reset(running_device *device)
 {
 	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));

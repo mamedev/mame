@@ -31,7 +31,7 @@ static struct _asic65_t
 	UINT8	last_bank;
 
 	/* ROM-based interface states */
-	const device_config *cpu;
+	running_device *cpu;
 	UINT8	tfull;
 	UINT8	_68full;
 	UINT8	cmd;

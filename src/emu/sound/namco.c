@@ -77,7 +77,7 @@ struct _namco_sound
 };
 
 
-INLINE namco_sound *get_safe_token(const device_config *device)
+INLINE namco_sound *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -366,7 +366,7 @@ static STREAM_UPDATE( namco_update_stereo )
 static DEVICE_START( namco )
 {
 	sound_channel *voice;
-	const namco_interface *intf = (const namco_interface *)device->static_config;
+	const namco_interface *intf = (const namco_interface *)device->baseconfig().static_config;
 	int clock_multiple;
 	namco_sound *chip = get_safe_token(device);
 
@@ -549,7 +549,7 @@ it select the 54XX/52XX outputs on those channels
     0x3f        ch 7
 */
 
-void polepos_sound_enable(const device_config *device, int enable)
+void polepos_sound_enable(running_device *device, int enable)
 {
 	namco_sound *chip = get_safe_token(device);
 	chip->sound_enable = enable;
@@ -627,7 +627,7 @@ WRITE8_DEVICE_HANDLER( polepos_sound_w )
     0x3e        ch 7    waveform select & frequency
 */
 
-void mappy_sound_enable(const device_config *device, int enable)
+void mappy_sound_enable(running_device *device, int enable)
 {
 	namco_sound *chip = get_safe_token(device);
 	chip->sound_enable = enable;

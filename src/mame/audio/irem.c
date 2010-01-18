@@ -183,7 +183,7 @@ static WRITE8_HANDLER( m62_adpcm_w )
 {
 	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
 
-	const device_config *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
+	running_device *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
 	if (adpcm != NULL)
 		msm5205_data_w(adpcm, data);
 }
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( m62_adpcm_w )
  *
  *************************************/
 
-static void adpcm_int(const device_config *device)
+static void adpcm_int(running_device *device)
 {
 	irem_z80_state *state = (irem_z80_state *)device->machine->driver_data;
 

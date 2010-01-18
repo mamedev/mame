@@ -33,7 +33,7 @@ struct _snkwave_state
 	INT16 waveform[WAVEFORM_LENGTH];
 };
 
-INLINE snkwave_state *get_safe_token(const device_config *device)
+INLINE snkwave_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -113,7 +113,7 @@ static DEVICE_START( snkwave )
 {
 	snkwave_state *chip = get_safe_token(device);
 
-	assert(device->static_config == 0);
+	assert(device->baseconfig().static_config == 0);
 
 	/* adjust internal clock */
 	chip->external_clock = device->clock;

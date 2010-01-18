@@ -75,7 +75,7 @@ struct __2mindril_state
 	UINT16        defender_sensor, shutter_sensor;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 
@@ -417,7 +417,7 @@ static INTERRUPT_GEN( drill_interrupt )
 }
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 //  _2mindril_state *state = (_2mindril_state *)machine->driver_data;
 //  cpu_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);

@@ -678,7 +678,7 @@ static GFXDECODE_START( trackfld )
 GFXDECODE_END
 
 
-static void adpcm_vck_callback( const device_config *device )
+static void adpcm_vck_callback( running_device *device )
 {
 	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
 	state->hyprolyb_vck_ready = 0x80;

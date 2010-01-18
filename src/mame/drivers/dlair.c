@@ -65,7 +65,7 @@
  *
  *************************************/
 
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static UINT8 last_misc;
 
 static UINT8 laserdisc_type;
@@ -82,7 +82,7 @@ static const UINT8 led_map[16] =
  *
  *************************************/
 
-static void dleuro_interrupt(const device_config *device, int state)
+static void dleuro_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( serial_transmit )
 }
 
 
-static int serial_receive(const device_config *device, int channel)
+static int serial_receive(running_device *device, int channel)
 {
 	/* if we still have data to send, do it now */
 	if (channel == 0 && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
@@ -209,10 +209,10 @@ static MACHINE_RESET( dlair )
 static INTERRUPT_GEN( vblank_callback )
 {
 	/* also update the speaker on the European version */
-	const device_config *beep = devtag_get_device(device->machine, "beep");
+	running_device *beep = devtag_get_device(device->machine, "beep");
 	if (beep != NULL)
 	{
-		const device_config *ctc = devtag_get_device(device->machine, "ctc");
+		running_device *ctc = devtag_get_device(device->machine, "ctc");
 		beep_set_state(beep, 1);
 		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(z80ctc_getperiod(ctc, 0).attoseconds));
 	}

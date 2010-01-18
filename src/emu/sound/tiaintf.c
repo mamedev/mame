@@ -10,7 +10,7 @@ struct _tia_state
 	void *chip;
 };
 
-INLINE tia_state *get_safe_token(const device_config *device)
+INLINE tia_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -30,7 +30,7 @@ struct _ds2404_state {
 	int state_ptr;
 };
 
-INLINE ds2404_state *get_safe_token(const device_config *device)
+INLINE ds2404_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -285,7 +285,7 @@ WRITE8_DEVICE_HANDLER( ds2404_clk_w )
 
 static TIMER_CALLBACK( ds2404_tick )
 {
-	ds2404_state *state = get_safe_token((const device_config *)ptr);
+	ds2404_state *state = get_safe_token((running_device *)ptr);
 	int i;
 	for( i = 0; i < 5; i++ )
 	{
@@ -300,7 +300,7 @@ static TIMER_CALLBACK( ds2404_tick )
 
 static DEVICE_START( ds2404 )
 {
-	ds2404_config *config = (ds2404_config *)device->inline_config;
+	ds2404_config *config = (ds2404_config *)device->baseconfig().inline_config;
 	ds2404_state *state = get_safe_token(device);
 
 	struct tm ref_tm;

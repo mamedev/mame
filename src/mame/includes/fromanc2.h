@@ -18,11 +18,11 @@ struct _fromanc2_state
 	UINT8    datalatch_2h, datalatch_2l;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *subcpu;
-	const device_config *eeprom;
-	const device_config *left_screen;
-	const device_config *right_screen;
+	running_device *audiocpu;
+	running_device *subcpu;
+	running_device *eeprom;
+	running_device *left_screen;
+	running_device *right_screen;
 };
 
 

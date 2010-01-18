@@ -27,7 +27,7 @@ struct _gaiden_state
 	const int   *raiga_jumppoints;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

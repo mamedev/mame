@@ -29,7 +29,7 @@ struct _beep_state
 };
 
 
-INLINE beep_state *get_safe_token(const device_config *device)
+INLINE beep_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -110,7 +110,7 @@ static DEVICE_START( beep )
  *
  *************************************/
 
-void beep_set_state(const device_config *device, int on)
+void beep_set_state(running_device *device, int on)
 {
 	beep_state *info = get_safe_token(device);
 
@@ -134,7 +134,7 @@ void beep_set_state(const device_config *device, int on)
  *
  *************************************/
 
-void beep_set_frequency(const device_config *device,int frequency)
+void beep_set_frequency(running_device *device,int frequency)
 {
 	beep_state *info = get_safe_token(device);
 
@@ -155,7 +155,7 @@ void beep_set_frequency(const device_config *device,int frequency)
  *
  *************************************/
 
-void beep_set_volume(const device_config *device, int volume)
+void beep_set_volume(running_device *device, int volume)
 {
 	beep_state *info = get_safe_token(device);
 

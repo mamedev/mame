@@ -48,7 +48,7 @@ static void atarigen_set_vol(running_machine *machine, int volume, sound_type ty
 
 static TIMER_CALLBACK( scanline_timer_callback );
 
-static void atarivc_common_w(const device_config *screen, offs_t offset, UINT16 newword);
+static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newword);
 
 static TIMER_CALLBACK( unhalt_cpu );
 
@@ -60,7 +60,7 @@ static TIMER_CALLBACK( atarivc_eof_update );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE const atarigen_screen_timer *get_screen_timer(const device_config *screen)
+INLINE const atarigen_screen_timer *get_screen_timer(running_device *screen)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
 	int i;
@@ -83,12 +83,12 @@ INLINE const atarigen_screen_timer *get_screen_timer(const device_config *screen
 void atarigen_init(running_machine *machine)
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
-	const device_config *screen;
+	running_device *screen;
 	int i;
 
 	/* allocate timers for all screens */
 	assert(video_screen_count(machine->config) <= ARRAY_LENGTH(state->screen_timer));
-	for (i = 0, screen = video_screen_first(machine->config); screen != NULL; i++, screen = video_screen_next(screen))
+	for (i = 0, screen = video_screen_first(machine); screen != NULL; i++, screen = video_screen_next(screen))
 	{
 		state->screen_timer[i].screen = screen;
 		state->screen_timer[i].scanline_interrupt_timer = timer_alloc(machine, scanline_interrupt_callback, (void *)screen);
@@ -179,7 +179,7 @@ void atarigen_update_interrupts(running_machine *machine)
     scanline interrupt should be generated.
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_int_set(const device_config *screen, int scanline)
+void atarigen_scanline_int_set(running_device *screen, int scanline)
 {
 	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
 	timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, scanline, 0), 0);
@@ -291,7 +291,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 
 static TIMER_CALLBACK( scanline_interrupt_callback )
 {
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
 
 	/* generate the interrupt */
@@ -521,7 +521,7 @@ static DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
     slapstic and sets the chip number.
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(const device_config *device, offs_t base, offs_t mirror, int chipnum)
+void atarigen_slapstic_init(running_device *device, offs_t base, offs_t mirror, int chipnum)
 {
 	atarigen_state *state = (atarigen_state *)device->machine->driver_data;
 
@@ -607,7 +607,7 @@ READ16_HANDLER( atarigen_slapstic_r )
     atarigen_sound_io_reset: Resets the state of the sound I/O.
 ---------------------------------------------------------------*/
 
-void atarigen_sound_io_reset(const device_config *device)
+void atarigen_sound_io_reset(running_device *device)
 {
 	atarigen_state *state = (atarigen_state *)device->machine->driver_data;
 
@@ -662,7 +662,7 @@ WRITE8_HANDLER( atarigen_6502_irq_ack_w )
     IRQ line.
 ---------------------------------------------------------------*/
 
-void atarigen_ym2151_irq_gen(const device_config *device, int irq)
+void atarigen_ym2151_irq_gen(running_device *device, int irq)
 {
 	atarigen_state *state = (atarigen_state *)device->machine->driver_data;
 	state->ym2151_int = irq;
@@ -875,9 +875,7 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 
 void atarigen_set_vol(running_machine *machine, int volume, sound_type type)
 {
-	const device_config *device;
-
-	for (device = sound_first(machine->config); device != NULL; device = sound_next(device))
+	for (running_device *device = sound_first(machine); device != NULL; device = sound_next(device))
 		if (sound_get_type(device) == type)
 			sound_set_output_gain(device, ALL_OUTPUTS, volume / 100.0);
 }
@@ -923,7 +921,7 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume)
     atarigen_scanline_timer_reset: Sets up the scanline timer.
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanline_func update_graphics, int frequency)
+void atarigen_scanline_timer_reset(running_device *screen, atarigen_scanline_func update_graphics, int frequency)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
 
@@ -948,7 +946,7 @@ void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanlin
 static TIMER_CALLBACK( scanline_timer_callback )
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	int scanline = param;
 
 	/* callback */
@@ -978,7 +976,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 static TIMER_CALLBACK( atarivc_eof_update )
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
-	const device_config *screen = (const device_config *)ptr;
+	running_device *screen = (running_device *)ptr;
 	emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
 	int i;
 
@@ -1022,7 +1020,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
     atarivc_reset: Initializes the video controller.
 ---------------------------------------------------------------*/
 
-void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields)
+void atarivc_reset(running_device *screen, UINT16 *eof_data, int playfields)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
 
@@ -1052,7 +1050,7 @@ void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields
     atarivc_w: Handles an I/O write to the video controller.
 ---------------------------------------------------------------*/
 
-void atarivc_w(const device_config *screen, offs_t offset, UINT16 data, UINT16 mem_mask)
+void atarivc_w(running_device *screen, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
 	int oldword = state->atarivc_data[offset];
@@ -1069,7 +1067,7 @@ void atarivc_w(const device_config *screen, offs_t offset, UINT16 data, UINT16 m
     write.
 ---------------------------------------------------------------*/
 
-static void atarivc_common_w(const device_config *screen, offs_t offset, UINT16 newword)
+static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newword)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
 	int oldword = state->atarivc_data[offset];
@@ -1179,7 +1177,7 @@ static void atarivc_common_w(const device_config *screen, offs_t offset, UINT16 
     atarivc_r: Handles an I/O read from the video controller.
 ---------------------------------------------------------------*/
 
-UINT16 atarivc_r(const device_config *screen, offs_t offset)
+UINT16 atarivc_r(running_device *screen, offs_t offset)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
 
@@ -1396,7 +1394,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
     10% of the scanline period.
 ---------------------------------------------------------------*/
 
-int atarigen_get_hblank(const device_config *screen)
+int atarigen_get_hblank(running_device *screen)
 {
 	return (video_screen_get_hpos(screen) > (video_screen_get_width(screen) * 9 / 10));
 }
@@ -1407,9 +1405,9 @@ int atarigen_get_hblank(const device_config *screen)
     next HBLANK.
 ---------------------------------------------------------------*/
 
-void atarigen_halt_until_hblank_0(const device_config *screen)
+void atarigen_halt_until_hblank_0(running_device *screen)
 {
-	const device_config *cpu = devtag_get_device(screen->machine, "maincpu");
+	running_device *cpu = devtag_get_device(screen->machine, "maincpu");
 
 	/* halt the CPU until the next HBLANK */
 	int hpos = video_screen_get_hpos(screen);
@@ -1512,7 +1510,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 static TIMER_CALLBACK( unhalt_cpu )
 {
-	const device_config *cpu = (const device_config *)ptr;
+	running_device *cpu = (running_device *)ptr;
 	cpu_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 

@@ -14,12 +14,12 @@ PALETTE_INIT( vsdual )
 	ppu2c0x_init_palette(machine, 8*4*16 );
 }
 
-static void ppu_irq_1( const device_config *device, int *ppu_regs )
+static void ppu_irq_1( running_device *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static void ppu_irq_2( const device_config *device, int *ppu_regs )
+static void ppu_irq_2( running_device *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE );
 }
@@ -65,8 +65,8 @@ VIDEO_UPDATE( vsnes )
 
 VIDEO_UPDATE( vsdual )
 {
-	const device_config *top_screen = devtag_get_device(screen->machine, "top");
-	const device_config *bottom_screen = devtag_get_device(screen->machine, "bottom");
+	running_device *top_screen = devtag_get_device(screen->machine, "top");
+	running_device *bottom_screen = devtag_get_device(screen->machine, "bottom");
 
 	/* render the ppu's */
 	if (screen == top_screen)

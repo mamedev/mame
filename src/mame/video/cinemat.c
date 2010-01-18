@@ -46,7 +46,7 @@ static UINT8 last_control;
  *
  *************************************/
 
-void cinemat_vector_callback(const device_config *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
+void cinemat_vector_callback(running_device *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
 	const rectangle *visarea = video_screen_get_visible_area(device->machine->primary_screen);
 	int intensity = 0xff;
@@ -84,7 +84,7 @@ void cinemat_vector_callback(const device_config *device, INT16 sx, INT16 sy, IN
 WRITE8_HANDLER(cinemat_vector_control_w)
 {
 	int r, g, b, i;
-	const device_config *cpu = devtag_get_device(space->machine, "maincpu");
+	running_device *cpu = devtag_get_device(space->machine, "maincpu");
 
 	switch (color_mode)
 	{

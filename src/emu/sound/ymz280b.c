@@ -87,7 +87,7 @@ struct _ymz280b_state
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
 	double master_clock;			/* master clock frequency */
-	void (*irq_callback)(const device_config *, int);		/* IRQ callback */
+	void (*irq_callback)(running_device *, int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
 	devcb_resolved_read8 ext_ram_read;		/* external RAM read handler */
@@ -98,7 +98,7 @@ struct _ymz280b_state
 #endif
 
 	INT16 *scratch;
-	const device_config *device;
+	running_device *device;
 };
 
 /* step size index shift table */
@@ -130,7 +130,7 @@ static const timer_fired_func update_irq_state_cb[] =
 };
 
 
-INLINE ymz280b_state *get_safe_token(const device_config *device)
+INLINE ymz280b_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -638,7 +638,7 @@ static STREAM_UPDATE( ymz280b_update )
 static DEVICE_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
-	const ymz280b_interface *intf = (device->static_config != NULL) ? (const ymz280b_interface *)device->static_config : &defintrf;
+	const ymz280b_interface *intf = (device->baseconfig().static_config != NULL) ? (const ymz280b_interface *)device->baseconfig().static_config : &defintrf;
 	ymz280b_state *chip = get_safe_token(device);
 
 	chip->device = device;

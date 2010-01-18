@@ -24,7 +24,7 @@ struct _goal92_state
 	int         adpcm_toggle;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

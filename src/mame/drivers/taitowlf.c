@@ -17,17 +17,17 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 
-static void ide_interrupt(const device_config *device, int state);
+static void ide_interrupt(running_device *device, int state);
 
 static UINT32 *cga_ram;
 static UINT32 *bios_ram;
 
 static struct {
-	const device_config	*pit8254;
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	running_device	*pit8254;
+	running_device	*pic8259_1;
+	running_device	*pic8259_2;
+	running_device	*dma8237_1;
+	running_device	*dma8237_2;
 } taitowlf_devices;
 
 
@@ -120,14 +120,14 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 // Intel 82439TX System Controller (MXTC)
 static UINT8 mxtc_config_reg[256];
 
-static UINT8 mxtc_config_r(const device_config *busdevice, const device_config *device, int function, int reg)
+static UINT8 mxtc_config_r(running_device *busdevice, running_device *device, int function, int reg)
 {
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
 	return mxtc_config_reg[reg];
 }
 
-static void mxtc_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
+static void mxtc_config_w(running_device *busdevice, running_device *device, int function, int reg, UINT8 data)
 {
 //  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
 
@@ -160,7 +160,7 @@ static void intel82439tx_init(void)
 	mxtc_config_reg[0x65] = 0x02;
 }
 
-static UINT32 intel82439tx_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+static UINT32 intel82439tx_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
@@ -182,7 +182,7 @@ static UINT32 intel82439tx_pci_r(const device_config *busdevice, const device_co
 	return r;
 }
 
-static void intel82439tx_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82439tx_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -205,19 +205,19 @@ static void intel82439tx_pci_w(const device_config *busdevice, const device_conf
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 static UINT8 piix4_config_reg[4][256];
 
-static UINT8 piix4_config_r(const device_config *busdevice, const device_config *device, int function, int reg)
+static UINT8 piix4_config_r(running_device *busdevice, running_device *device, int function, int reg)
 {
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
 	return piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
+static void piix4_config_w(running_device *busdevice, running_device *device, int function, int reg, UINT8 data)
 {
 //  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
 	piix4_config_reg[function][reg] = data;
 }
 
-static UINT32 intel82371ab_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+static UINT32 intel82371ab_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
@@ -239,7 +239,7 @@ static UINT32 intel82371ab_pci_r(const device_config *busdevice, const device_co
 	return r;
 }
 
-static void intel82371ab_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82371ab_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -659,7 +659,7 @@ static void keyboard_interrupt(running_machine *machine, int state)
 	pic8259_set_irq_line(taitowlf_devices.pic8259_1, 1, state);
 }
 
-static void ide_interrupt(const device_config *device, int state)
+static void ide_interrupt(running_device *device, int state)
 {
 	pic8259_set_irq_line(taitowlf_devices.pic8259_2, 6, state);
 }

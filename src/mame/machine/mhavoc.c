@@ -328,7 +328,7 @@ static WRITE8_HANDLER( mhavocrv_speech_data_w )
 
 static WRITE8_HANDLER( mhavocrv_speech_strobe_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, "tms");
+	running_device *tms = devtag_get_device(space->machine, "tms");
 	tms5220_data_w(tms, 0, speech_write_buffer);
 }
 

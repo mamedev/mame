@@ -19,10 +19,10 @@ struct _surpratk_state
 	int        videobank;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *k052109;
-	const device_config *k053244;
-	const device_config *k053251;
+	running_device *maincpu;
+	running_device *k052109;
+	running_device *k053244;
+	running_device *k053251;
 };
 
 /*----------- defined in video/surpratk.c -----------*/

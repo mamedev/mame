@@ -420,7 +420,7 @@ MACHINE_RESET( zwackery )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
-	const device_config *ctc = devtag_get_device(device->machine, "ctc");
+	running_device *ctc = devtag_get_device(device->machine, "ctc");
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
@@ -439,7 +439,7 @@ INTERRUPT_GEN( mcr_interrupt )
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
-	const device_config *ctc = devtag_get_device(device->machine, "ipu_ctc");
+	running_device *ctc = devtag_get_device(device->machine, "ipu_ctc");
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
@@ -606,14 +606,14 @@ static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	const device_config *pia = devtag_get_device(machine, "pia0");
+	running_device *pia = devtag_get_device(machine, "pia0");
 	pia6821_ca1_w(pia, 0, 0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	const device_config *pia = devtag_get_device(machine, "pia0");
+	running_device *pia = devtag_get_device(machine, "pia0");
 
 	pia6821_ca1_w(pia, 0, 1);
 	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);

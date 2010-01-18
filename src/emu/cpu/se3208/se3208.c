@@ -23,7 +23,7 @@ struct _se3208_state_t
 	UINT32 PPC;
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	UINT8 IRQ;
 	UINT8 NMI;
@@ -58,7 +58,7 @@ typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
 #define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
 static _OP *OpTable=NULL;
 
-INLINE se3208_state_t *get_safe_token(const device_config *device)
+INLINE se3208_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

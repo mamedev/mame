@@ -20,7 +20,7 @@ struct _commando_state
 	UINT8 scroll_y[2];
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

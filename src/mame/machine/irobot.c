@@ -35,8 +35,8 @@ static UINT8 irvg_running;
 static UINT8 irmb_running;
 
 #if IR_TIMING
-static const device_config *irvg_timer;
-static const device_config *irmb_timer;
+static running_device *irvg_timer;
+static running_device *irmb_timer;
 #endif
 
 static UINT8 *comRAM[2], *mbRAM, *mbROM;

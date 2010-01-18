@@ -91,8 +91,8 @@ READ8_DEVICE_HANDLER( z80pio_p_r );
     STROBE STATE MANAGEMENT
 ***************************************************************************/
 
-void z80pio_astb_w(const device_config *device, int state);
-void z80pio_bstb_w(const device_config *device, int state);
+void z80pio_astb_w(running_device *device, int state);
+void z80pio_bstb_w(running_device *device, int state);
 
 
 /***************************************************************************

@@ -108,7 +108,7 @@ typedef struct _cem3394_state cem3394_state;
 struct _cem3394_state
 {
 	sound_stream * stream;			/* our stream */
-	void (*external)(const device_config *, int, short *);/* callback to generate external samples */
+	void (*external)(running_device *, int, short *);/* callback to generate external samples */
 	double vco_zero_freq;			/* frequency of VCO at 0.0V */
 	double filter_zero_freq;		/* frequency of filter at 0.0V */
 
@@ -131,14 +131,14 @@ struct _cem3394_state
 
 	double inv_sample_rate;
 	int sample_rate;
-	const device_config *device;
+	running_device *device;
 
 	INT16 *mixer_buffer;
 	INT16 *external_buffer;
 };
 
 
-INLINE cem3394_state *get_safe_token(const device_config *device)
+INLINE cem3394_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -327,7 +327,7 @@ static STREAM_UPDATE( cem3394_update )
 
 static DEVICE_START( cem3394 )
 {
-	const cem3394_interface *intf = (const cem3394_interface *)device->static_config;
+	const cem3394_interface *intf = (const cem3394_interface *)device->baseconfig().static_config;
 	cem3394_state *chip = get_safe_token(device);
 
 	chip->device = device;
@@ -417,7 +417,7 @@ INLINE UINT32 compute_db_volume(double voltage)
 }
 
 
-void cem3394_set_voltage(const device_config *device, int input, double voltage)
+void cem3394_set_voltage(running_device *device, int input, double voltage)
 {
 	cem3394_state *chip = get_safe_token(device);
 	double temp;
@@ -511,7 +511,7 @@ void cem3394_set_voltage(const device_config *device, int input, double voltage)
 }
 
 
-double cem3394_get_parameter(const device_config *device, int input)
+double cem3394_get_parameter(running_device *device, int input)
 {
 	cem3394_state *chip = get_safe_token(device);
 	double voltage = chip->values[input];

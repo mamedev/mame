@@ -71,7 +71,7 @@ static const UINT8 fixeight_cmd_snd[128] =
 /*78*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void play_oki_sound(const device_config *device, int game_sound, int data)
+static void play_oki_sound(running_device *device, int game_sound, int data)
 {
 	int status = okim6295_r(device,0);
 
@@ -98,13 +98,13 @@ static void play_oki_sound(const device_config *device, int game_sound, int data
 	}
 }
 
-void dogyuun_okisnd_w(const device_config *device, int data)
+void dogyuun_okisnd_w(running_device *device, int data)
 {
 	/* Need a board to determine the sound commands */
 //  popmessage("Writing %04x to Sound CPU",data);
 }
 
-void kbash_okisnd_w(const device_config *device, int data)
+void kbash_okisnd_w(running_device *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
@@ -118,7 +118,7 @@ void kbash_okisnd_w(const device_config *device, int data)
 	}
 }
 
-void fixeight_okisnd_w(const device_config *device, int data)
+void fixeight_okisnd_w(running_device *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
@@ -132,7 +132,7 @@ void fixeight_okisnd_w(const device_config *device, int data)
 	}
 }
 
-void batsugun_okisnd_w(const device_config *device, int data)
+void batsugun_okisnd_w(running_device *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 

@@ -23,20 +23,20 @@ struct _samples_interface
 {
     int         channels;   /* number of discrete audio channels needed */
     const char *const *samplenames;
-    void        (*start)(const device_config *device);
+    void        (*start)(running_device *device);
 };
 
-#define SAMPLES_START(name) void name(const device_config *device)
+#define SAMPLES_START(name) void name(running_device *device)
 
 
-void sample_start(const device_config *device,int channel,int samplenum,int loop);
-void sample_start_raw(const device_config *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop);
-void sample_set_freq(const device_config *device,int channel,int freq);
-void sample_set_volume(const device_config *device,int channel,float volume);
-void sample_set_pause(const device_config *device,int channel,int pause);
-void sample_stop(const device_config *device,int channel);
-int sample_get_base_freq(const device_config *device,int channel);
-int sample_playing(const device_config *device,int channel);
+void sample_start(running_device *device,int channel,int samplenum,int loop);
+void sample_start_raw(running_device *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop);
+void sample_set_freq(running_device *device,int channel,int freq);
+void sample_set_volume(running_device *device,int channel,float volume);
+void sample_set_pause(running_device *device,int channel,int pause);
+void sample_stop(running_device *device,int channel);
+int sample_get_base_freq(running_device *device,int channel);
+int sample_playing(running_device *device,int channel);
 
 /* helper function that reads samples from disk - this can be used by other */
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */

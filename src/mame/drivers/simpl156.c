@@ -175,7 +175,7 @@ static READ32_HANDLER(  simpl156_system_r )
 
 static WRITE32_HANDLER( simpl156_eeprom_w )
 {
-	const device_config *device = devtag_get_device(space->machine, "eeprom");
+	running_device *device = devtag_get_device(space->machine, "eeprom");
 	//int okibank;
 
 	//okibank = data & 0x07;

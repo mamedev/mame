@@ -55,7 +55,7 @@ static UINT8 timer_irq_state;
 
 static UINT16 *backupram;
 
-static const device_config *interrupt_timer;
+static running_device *interrupt_timer;
 
 
 
@@ -211,7 +211,7 @@ static MACHINE_RESET( yboard )
  *
  *************************************/
 
-static void sound_cpu_irq(const device_config *device, int state)
+static void sound_cpu_irq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }

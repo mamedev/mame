@@ -5,7 +5,7 @@
 
 typedef struct _ics2115_interface ics2115_interface;
 struct _ics2115_interface {
-	void (*irq_cb)(const device_config *, int);
+	void (*irq_cb)(running_device *, int);
 };
 
 READ8_DEVICE_HANDLER( ics2115_r );

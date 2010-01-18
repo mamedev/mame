@@ -27,7 +27,7 @@ struct _finalizr_state
 	UINT8         nmi_enable, irq_enable;
 
 	/* devices */
-	const device_config *audio_cpu;
+	running_device *audio_cpu;
 };
 
 

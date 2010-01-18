@@ -210,7 +210,7 @@ VIDEO_START( guts )
  *
  *************************************/
 
-void eprom_scanline_update(const device_config *screen, int scanline)
+void eprom_scanline_update(running_device *screen, int scanline)
 {
 	eprom_state *state = (eprom_state *)screen->machine->driver_data;
 

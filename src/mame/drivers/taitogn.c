@@ -548,7 +548,7 @@ static WRITE32_HANDLER(control_w)
 	// selection too, but they're always 0.
 
 	UINT32 p = control;
-	const device_config *mb3773 = devtag_get_device(space->machine, "mb3773");
+	running_device *mb3773 = devtag_get_device(space->machine, "mb3773");
 
 	COMBINE_DATA(&control);
 
@@ -900,7 +900,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static void psx_spu_irq(const device_config *device, UINT32 data)
+static void psx_spu_irq(running_device *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }

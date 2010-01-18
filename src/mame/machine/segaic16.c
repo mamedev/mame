@@ -33,7 +33,7 @@
 struct memory_mapper_chip
 {
 	UINT8	regs[0x20];
-	const device_config *cpu;
+	running_device *cpu;
 	const segaic16_memory_map_entry *map;
 	void	(*sound_w)(running_machine *, UINT8);
 	UINT8	(*sound_r)(running_machine *);
@@ -124,7 +124,7 @@ READ16_HANDLER( segaic16_open_bus_r )
  *
  *************************************/
 
-void segaic16_memory_mapper_init(const device_config *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *))
+void segaic16_memory_mapper_init(running_device *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *))
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 

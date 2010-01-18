@@ -20,7 +20,7 @@ struct _crospang_state
 	int       bestri_tilebank;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

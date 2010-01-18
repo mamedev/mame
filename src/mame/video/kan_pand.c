@@ -53,7 +53,7 @@
 typedef struct _kaneko_pandora_state  kaneko_pandora_state;
 struct _kaneko_pandora_state
 {
-	const device_config *screen;
+	running_device *screen;
 	UINT8 *      spriteram;
 	bitmap_t     *sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int          clear_bitmap;
@@ -65,7 +65,7 @@ struct _kaneko_pandora_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE kaneko_pandora_state *get_safe_token( const device_config *device )
+INLINE kaneko_pandora_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -74,24 +74,24 @@ INLINE kaneko_pandora_state *get_safe_token( const device_config *device )
 	return (kaneko_pandora_state *)device->token;
 }
 
-INLINE const kaneko_pandora_interface *get_interface( const device_config *device )
+INLINE const kaneko_pandora_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == KANEKO_PANDORA));
-	return (const kaneko_pandora_interface *) device->static_config;
+	return (const kaneko_pandora_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
     IMPLEMENTATION
 *****************************************************************************/
 
-void pandora_set_clear_bitmap( const device_config *device, int clear )
+void pandora_set_clear_bitmap( running_device *device, int clear )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	pandora->clear_bitmap = clear;
 }
 
-void pandora_update( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+void pandora_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 
@@ -105,7 +105,7 @@ void pandora_update( const device_config *device, bitmap_t *bitmap, const rectan
 }
 
 
-static void pandora_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+static void pandora_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	int sx = 0, sy = 0, x = 0, y = 0, offs;
@@ -189,7 +189,7 @@ static void pandora_draw( const device_config *device, bitmap_t *bitmap, const r
 	}
 }
 
-void pandora_eof( const device_config *device )
+void pandora_eof( running_device *device )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	assert(pandora->spriteram != NULL);

@@ -56,7 +56,7 @@ struct _z80ctc_interface
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-attotime z80ctc_getperiod(const device_config *device, int ch);
+attotime z80ctc_getperiod(running_device *device, int ch);
 
 
 

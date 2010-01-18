@@ -11,8 +11,8 @@
 #define PIT8254		DEVICE_GET_INFO_NAME(pit8254)
 
 
-typedef void (*pit8253_output_changed_func)(const device_config *device, int state);
-#define PIT8253_OUTPUT_CHANGED(name)	void name(const device_config *device, int state )
+typedef void (*pit8253_output_changed_func)(running_device *device, int state);
+#define PIT8253_OUTPUT_CHANGED(name)	void name(running_device *device, int state )
 
 
 struct pit8253_config
@@ -63,9 +63,9 @@ WRITE8_DEVICE_HANDLER( pit8253_gate_w );
    to 0 with pit8253_set_clockin and call pit8253_set_clock_signal to change
    the state of the input CLKx signal.
  */
-int pit8253_get_output(const device_config *device, int timer);
-void pit8253_set_clockin(const device_config *device, int timer, double new_clockin);
-void pit8253_set_clock_signal(const device_config *device, int timer, int state);
+int pit8253_get_output(running_device *device, int timer);
+void pit8253_set_clockin(running_device *device, int timer, double new_clockin);
+void pit8253_set_clock_signal(running_device *device, int timer, int state);
 
 
 #endif	/* __PIT8253_H_ */

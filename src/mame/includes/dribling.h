@@ -20,9 +20,9 @@ struct _dribling_state
 	UINT8    di;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *ppi_0;
-	const device_config *ppi_1;
+	running_device *maincpu;
+	running_device *ppi_0;
+	running_device *ppi_1;
 };
 
 

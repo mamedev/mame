@@ -819,7 +819,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void jpmimpct_tms_irq(const device_config *device, int state)
+static void jpmimpct_tms_irq(running_device *device, int state)
 {
 	tms_irq = state;
 	update_irqs(device->machine);

@@ -23,7 +23,7 @@ WRITE16_HANDLER( brival_protection_w );
 
 READ16_HANDLER( darkedge_protection_r );
 WRITE16_HANDLER( darkedge_protection_w );
-void darkedge_fd1149_vblank(const device_config *device);
+void darkedge_fd1149_vblank(running_device *device);
 WRITE16_HANDLER( jleague_protection_w );
 
 READ16_HANDLER( dbzvrvs_protection_r );

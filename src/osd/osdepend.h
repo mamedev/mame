@@ -71,7 +71,7 @@
 
 
 class input_type_desc;
-class device_config;
+class running_device;
 
 
 /*-----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ class device_config;
 -----------------------------------------------------------------------------*/
 void osd_init(running_machine *machine);
 
-void osd_wait_for_debugger(const device_config *device, int firststop);
+void osd_wait_for_debugger(running_device *device, int firststop);
 
 
 

@@ -68,7 +68,7 @@ struct _k054539_channel {
 typedef struct _k054539_state k054539_state;
 struct _k054539_state {
 	const k054539_interface *intf;
-	const device_config *device;
+	running_device *device;
 	double voltab[256];
 	double pantab[0xf];
 
@@ -91,7 +91,7 @@ struct _k054539_state {
 	k054539_channel channels[8];
 };
 
-INLINE k054539_state *get_safe_token(const device_config *device)
+INLINE k054539_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -102,13 +102,13 @@ INLINE k054539_state *get_safe_token(const device_config *device)
 
 //*
 
-void k054539_init_flags(const device_config *device, int flags)
+void k054539_init_flags(running_device *device, int flags)
 {
 	k054539_state *info = get_safe_token(device);
 	info->k054539_flags = flags;
 }
 
-void k054539_set_gain(const device_config *device, int channel, double gain)
+void k054539_set_gain(running_device *device, int channel, double gain)
 {
 	k054539_state *info = get_safe_token(device);
 	if (gain >= 0) info->k054539_gain[channel] = gain;
@@ -445,7 +445,7 @@ static TIMER_CALLBACK( k054539_irq )
 		info->intf->irq(info->device);
 }
 
-static void k054539_init_chip(const device_config *device, k054539_state *info)
+static void k054539_init_chip(running_device *device, k054539_state *info)
 {
 	int i;
 
@@ -651,7 +651,7 @@ static DEVICE_START( k054539 )
 		info->k054539_gain[i] = 1.0;
 	info->k054539_flags = K054539_RESET_FLAGS;
 
-	info->intf = (device->static_config != NULL) ? (const k054539_interface *)device->static_config : &defintrf;
+	info->intf = (device->baseconfig().static_config != NULL) ? (const k054539_interface *)device->baseconfig().static_config : &defintrf;
 
 	/*
         I've tried various equations on volume control but none worked consistently.

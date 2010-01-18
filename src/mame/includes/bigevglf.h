@@ -32,8 +32,8 @@ struct _bigevglf_state
 	UINT8    port_select;     /* for muxed controls */
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *mcu;
+	running_device *audiocpu;
+	running_device *mcu;
 };
 
 

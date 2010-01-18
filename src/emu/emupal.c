@@ -97,13 +97,13 @@ static void configure_rgb_shadows(running_machine *machine, int mode, float fact
 void palette_init(running_machine *machine)
 {
 	palette_private *palette = auto_alloc_clear(machine, palette_private);
-	const device_config *device = video_screen_first(machine->config);
+	running_device *device = video_screen_first(machine);
 	bitmap_format format;
 
 	/* get the format from the first screen, or use BITMAP_FORMAT_INVALID, if screenless */
 	if (device != NULL)
 	{
-		screen_config *config = (screen_config *)device->inline_config;
+		screen_config *config = (screen_config *)device->baseconfig().inline_config;
 		format = config->format;
 	}
 	else

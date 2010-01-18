@@ -286,9 +286,9 @@ INLINE int sign_double(double x)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, cpu_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, running_device *device, cpu_irq_callback irqcallback)
 {
-	const powerpc_config *config = (const powerpc_config *)device->static_config;
+	const powerpc_config *config = (const powerpc_config *)device->baseconfig().static_config;
 
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
@@ -303,7 +303,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : device->clock;
 	ppc->tb_divisor = (ppc->tb_divisor * device->clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 	ppc->codexor = 0;
-	if (!(cap & PPCCAP_4XX) && cpu_get_endianness(device) != ENDIANNESS_NATIVE)
+	if (!(cap & PPCCAP_4XX) && device_get_endianness(device) != ENDIANNESS_NATIVE)
 		ppc->codexor = 4;
 
 	/* allocate the virtual TLB */
@@ -2082,7 +2082,7 @@ ADDRESS_MAP_END
     specific TX handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_spu_set_tx_handler(const device_config *device, ppc4xx_spu_tx_handler handler)
+void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler handler)
 {
 	powerpc_state *ppc = *(powerpc_state **)device->token;
 	ppc->spu.tx_handler = handler;
@@ -2094,7 +2094,7 @@ void ppc4xx_spu_set_tx_handler(const device_config *device, ppc4xx_spu_tx_handle
     specific serial byte receive
 -------------------------------------------------*/
 
-void ppc4xx_spu_receive_byte(const device_config *device, UINT8 byteval)
+void ppc4xx_spu_receive_byte(running_device *device, UINT8 byteval)
 {
 	powerpc_state *ppc = *(powerpc_state **)device->token;
 	ppc4xx_spu_rx_data(ppc, byteval);

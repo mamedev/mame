@@ -69,7 +69,7 @@ struct ioasic_state
 	UINT32	reg[16];
 	UINT8	has_dcs;
 	UINT8	has_cage;
-	const device_config *dcs_cpu;
+	running_device *dcs_cpu;
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
 	const UINT8 *	shuffle_map;
@@ -558,8 +558,8 @@ enum
 	IOASIC_INTCTL		/* f: interrupt control */
 };
 
-static UINT16 ioasic_fifo_r(const device_config *device);
-static UINT16 ioasic_fifo_status_r(const device_config *device);
+static UINT16 ioasic_fifo_r(running_device *device);
+static UINT16 ioasic_fifo_status_r(running_device *device);
 static void ioasic_input_empty(running_machine *machine, int state);
 static void ioasic_output_full(running_machine *machine, int state);
 static void update_ioasic_irq(running_machine *machine);
@@ -724,7 +724,7 @@ static void ioasic_output_full(running_machine *machine, int state)
  *
  *************************************/
 
-static UINT16 ioasic_fifo_r(const device_config *device)
+static UINT16 ioasic_fifo_r(running_device *device)
 {
 	UINT16 result = 0;
 
@@ -759,7 +759,7 @@ static UINT16 ioasic_fifo_r(const device_config *device)
 }
 
 
-static UINT16 ioasic_fifo_status_r(const device_config *device)
+static UINT16 ioasic_fifo_status_r(running_device *device)
 {
 	UINT16 result = 0;
 

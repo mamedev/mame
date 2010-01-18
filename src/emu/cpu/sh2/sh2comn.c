@@ -500,13 +500,13 @@ READ32_HANDLER( sh2_internal_r )
 	return sh2->m[offset];
 }
 
-void sh2_set_ftcsr_read_callback(const device_config *device, void (*callback)(UINT32))
+void sh2_set_ftcsr_read_callback(running_device *device, void (*callback)(UINT32))
 {
 	SH2 *sh2 = GET_SH2(device);
 	sh2->ftcsr_read_callback = callback;
 }
 
-void sh2_set_frt_input(const device_config *device, int state)
+void sh2_set_frt_input(running_device *device, int state)
 {
 	SH2 *sh2 = GET_SH2(device);
 
@@ -699,9 +699,9 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irqcallback)
+void sh2_common_init(SH2 *sh2, running_device *device, cpu_irq_callback irqcallback)
 {
-	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->static_config;
+	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config;
 
 	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);

@@ -25,7 +25,7 @@ struct _dogfgt_state
 	int       soundlatch, last_snd_ctrl;
 
 	/* devices */
-	const device_config *subcpu;
+	running_device *subcpu;
 };
 
 

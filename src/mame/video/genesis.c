@@ -13,7 +13,7 @@
 #include "includes/genesis.h"
 
 
-static const device_config *genesis_screen;
+static running_device *genesis_screen;
 
 
 /******************************************************************************
@@ -120,7 +120,7 @@ static UINT8		window_width;				/* window width */
 ******************************************************************************/
 
 
-static void start_genesis_vdp(const device_config *screen)
+static void start_genesis_vdp(running_device *screen)
 {
 	static const UINT8 vdp_init[24] =
 	{
@@ -362,7 +362,7 @@ READ16_HANDLER( genesis_vdp_r )
 
 WRITE16_HANDLER( genesis_vdp_w )
 {
-	const device_config *device;
+	running_device *device;
 	switch (offset)
 	{
 		case 0x00:	/* Write data */

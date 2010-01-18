@@ -367,7 +367,7 @@ static INPUT_PORTS_START( bishi2p )
 INPUT_PORTS_END
 
 
-static void sound_irq_gen(const device_config *device, int state)
+static void sound_irq_gen(running_device *device, int state)
 {
 	bishi_state *bishi = (bishi_state *)device->machine->driver_data;
 	if (state)

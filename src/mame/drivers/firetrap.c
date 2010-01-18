@@ -197,7 +197,7 @@ static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 	memory_set_bank(space->machine, "bank2", data & 0x01);
 }
 
-static void firetrap_adpcm_int( const device_config *device )
+static void firetrap_adpcm_int( running_device *device )
 {
 	firetrap_state *state = (firetrap_state *)device->machine->driver_data;
 

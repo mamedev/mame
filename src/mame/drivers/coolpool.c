@@ -63,7 +63,7 @@ static UINT8 nvram_write_enable;
  *
  *************************************/
 
-static void amerdart_scanline(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -90,7 +90,7 @@ static void amerdart_scanline(const device_config *screen, bitmap_t *bitmap, int
 }
 
 
-static void coolpool_scanline(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);

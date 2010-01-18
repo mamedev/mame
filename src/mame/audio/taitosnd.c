@@ -34,15 +34,15 @@ struct _tc0140syt_state
 	UINT8     nmi_enabled;   /* 1 if slave cpu has nmi's enabled */
 	UINT8     nmi_req;       /* 1 if slave cpu has a pending nmi */
 
-	const device_config *mastercpu;	/* this is the maincpu */
-	const device_config *slavecpu;	/* this is the audiocpu */
+	running_device *mastercpu;	/* this is the maincpu */
+	running_device *slavecpu;	/* this is the audiocpu */
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0140syt_state *get_safe_token( const device_config *device )
+INLINE tc0140syt_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -51,18 +51,18 @@ INLINE tc0140syt_state *get_safe_token( const device_config *device )
 	return (tc0140syt_state *)device->token;
 }
 
-INLINE const tc0140syt_interface *get_interface( const device_config *device )
+INLINE const tc0140syt_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == TC0140SYT));
-	return (const tc0140syt_interface *) device->static_config;
+	return (const tc0140syt_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-static void interrupt_controller( const device_config *device )
+static void interrupt_controller( running_device *device )
 {
 	tc0140syt_state *tc0140syt = get_safe_token(device);
 

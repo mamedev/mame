@@ -7,7 +7,7 @@
 typedef struct _ymf262_interface ymf262_interface;
 struct _ymf262_interface
 {
-	void (*handler)(const device_config *device, int irq);
+	void (*handler)(running_device *device, int irq);
 };
 
 

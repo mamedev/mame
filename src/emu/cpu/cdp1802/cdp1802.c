@@ -116,7 +116,7 @@ static const cpu_state_table state_table_template =
 	state_array					/* array of entries */
 };
 
-INLINE cdp1802_state *get_safe_token(const device_config *device)
+INLINE cdp1802_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -224,7 +224,7 @@ INLINE void cdp1802_long_skip(cdp1802_state *cpustate, int taken)
 	}
 }
 
-static void cdp1802_sample_ef(const device_config *device)
+static void cdp1802_sample_ef(running_device *device)
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
@@ -238,7 +238,7 @@ static void cdp1802_sample_ef(const device_config *device)
 	}
 }
 
-static void cdp1802_output_state_code(const device_config *device)
+static void cdp1802_output_state_code(running_device *device)
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
@@ -276,7 +276,7 @@ static void cdp1802_output_state_code(const device_config *device)
 	}
 }
 
-static void cdp1802_run(const device_config *device)
+static void cdp1802_run(running_device *device)
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
@@ -965,7 +965,7 @@ static CPU_INIT( cdp1802 )
 	cdp1802_state *cpustate = get_safe_token(device);
 	int i;
 
-	cpustate->intf = (cdp1802_interface *) device->static_config;
+	cpustate->intf = (cdp1802_interface *) device->baseconfig().static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&cpustate->out_q_func, &cpustate->intf->out_q_func, device);

@@ -6,7 +6,7 @@
 
 SOUND_START( m72 );
 SOUND_RESET( m72 );
-void m72_ym2151_irq_handler(const device_config *device, int irq);
+void m72_ym2151_irq_handler(running_device *device, int irq);
 WRITE8_HANDLER( m72_sound_command_byte_w );
 WRITE16_HANDLER( m72_sound_command_w );
 WRITE8_HANDLER( m72_sound_irq_ack_w );

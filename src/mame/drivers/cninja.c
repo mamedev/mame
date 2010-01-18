@@ -53,7 +53,7 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/okim6295.h"
 
 static int cninja_scanline, cninja_irq_mask;
-static const device_config *raster_irq_timer;
+static running_device *raster_irq_timer;
 static UINT16 *cninja_ram;
 
 /**********************************************************************************/
@@ -717,12 +717,12 @@ static MACHINE_RESET( cninja )
 	cninja_irq_mask=0;
 }
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
-static void sound_irq2(const device_config *device, int state)
+static void sound_irq2(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }

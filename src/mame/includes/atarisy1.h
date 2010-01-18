@@ -16,7 +16,7 @@ struct _atarisy1_state
 	UINT8			joystick_type;
 	UINT8			trackball_type;
 
-	const device_config *joystick_timer;
+	running_device *joystick_timer;
 	UINT8			joystick_int;
 	UINT8			joystick_int_enable;
 	UINT8			joystick_value;
@@ -29,12 +29,12 @@ struct _atarisy1_state
 	UINT16			playfield_lookup[256];
 	UINT8			playfield_tile_bank;
 	UINT16			playfield_priority_pens;
-	const device_config *yscroll_reset_timer;
+	running_device *yscroll_reset_timer;
 
 	/* INT3 tracking */
 	int 			next_timer_scanline;
-	const device_config *scanline_timer;
-	const device_config *int3off_timer;
+	running_device *scanline_timer;
+	running_device *int3off_timer;
 
 	/* graphics bank tracking */
 	UINT8			bank_gfx[3][8];

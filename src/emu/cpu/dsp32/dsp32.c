@@ -183,8 +183,8 @@ struct _dsp32_state
 	int				icount;
 	UINT8			lastpins;
 	UINT32			ppc;
-	void			(*output_pins_changed)(const device_config *device, UINT32 pins);
-	const device_config *device;
+	void			(*output_pins_changed)(running_device *device, UINT32 pins);
+	running_device *device;
 	const address_space *program;
 };
 
@@ -202,7 +202,7 @@ static CPU_RESET( dsp32c );
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE dsp32_state *get_safe_token(const device_config *device)
+INLINE dsp32_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -313,7 +313,7 @@ static void update_pcr(dsp32_state *cpustate, UINT16 newval)
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = (const dsp32_config *)device->static_config;
+	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config;
 	dsp32_state *cpustate = get_safe_token(device);
 
 	/* copy in config data */
@@ -499,7 +499,7 @@ INLINE void dma_store(dsp32_state *cpustate)
 }
 
 
-void dsp32c_pio_w(const device_config *device, int reg, int data)
+void dsp32c_pio_w(running_device *device, int reg, int data)
 {
 	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask;
@@ -578,7 +578,7 @@ void dsp32c_pio_w(const device_config *device, int reg, int data)
     PARALLEL INTERFACE READS
 ***************************************************************************/
 
-int dsp32c_pio_r(const device_config *device, int reg)
+int dsp32c_pio_r(running_device *device, int reg)
 {
 	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask, result = 0xffff;

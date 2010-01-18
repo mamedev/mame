@@ -20,14 +20,14 @@ struct _k033906_state
 
 	int          reg_set;	// 1 = access reg / 0 = access ram
 
-	const device_config *voodoo;
+	running_device *voodoo;
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k033906_state *k033906_get_safe_token( const device_config *device )
+INLINE k033906_state *k033906_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -36,24 +36,24 @@ INLINE k033906_state *k033906_get_safe_token( const device_config *device )
 	return (k033906_state *)device->token;
 }
 
-INLINE const k033906_interface *k033906_get_interface( const device_config *device )
+INLINE const k033906_interface *k033906_get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == K033906));
-	return (const k033906_interface *) device->static_config;
+	return (const k033906_interface *) device->baseconfig().static_config;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k033906_set_reg( const device_config *device, int state )
+void k033906_set_reg( running_device *device, int state )
 {
 	k033906_state *k033906 = k033906_get_safe_token(device);
 	k033906->reg_set = state;
 }
 
-static UINT32 k033906_reg_r( const device_config *device, int reg )
+static UINT32 k033906_reg_r( running_device *device, int reg )
 {
 	k033906_state *k033906 = k033906_get_safe_token(device);
 
@@ -70,7 +70,7 @@ static UINT32 k033906_reg_r( const device_config *device, int reg )
 	return 0;
 }
 
-static void k033906_reg_w( const device_config *device, int reg, UINT32 data )
+static void k033906_reg_w( running_device *device, int reg, UINT32 data )
 {
 	k033906_state *k033906 = k033906_get_safe_token(device);
 

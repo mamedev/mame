@@ -29,7 +29,7 @@ struct _aerofgt_state
 	int       pending_command;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

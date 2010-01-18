@@ -53,10 +53,10 @@ struct _m10_state
 	int                 last;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *ic8j1;
-	const device_config *ic8j2;
-	const device_config *samples;
+	running_device *maincpu;
+	running_device *ic8j1;
+	running_device *ic8j2;
+	running_device *samples;
 };
 
 

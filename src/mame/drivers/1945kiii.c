@@ -73,8 +73,8 @@ struct _k3_state
 	tilemap_t  *bg_tilemap;
 
 	/* devices */
-	const device_config *oki1;
-	const device_config *oki2;
+	running_device *oki1;
+	running_device *oki2;
 };
 
 

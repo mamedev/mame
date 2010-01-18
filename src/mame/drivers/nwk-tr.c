@@ -648,7 +648,7 @@ READ32_HANDLER(K001604_reg_r)
 
 
 
-static void voodoo_vblank_0(const device_config *device, int param)
+static void voodoo_vblank_0(running_device *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -661,7 +661,7 @@ static VIDEO_START( nwktr )
 
 static VIDEO_UPDATE( nwktr )
 {
-	const device_config *voodoo = devtag_get_device(screen->machine, "voodoo");
+	running_device *voodoo = devtag_get_device(screen->machine, "voodoo");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -678,7 +678,7 @@ static VIDEO_UPDATE( nwktr )
 
 static READ32_HANDLER( sysreg_r )
 {
-	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
@@ -711,7 +711,7 @@ static READ32_HANDLER( sysreg_r )
 
 static WRITE32_HANDLER( sysreg_w )
 {
-	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
@@ -1011,7 +1011,7 @@ static const sharc_config sharc_cfg =
 };
 
 
-static double adc12138_input_callback( const device_config *device, UINT8 input )
+static double adc12138_input_callback( running_device *device, UINT8 input )
 {
 	int value = 0;
 	switch (input)

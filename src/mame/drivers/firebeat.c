@@ -470,7 +470,7 @@ static VIDEO_UPDATE(firebeat)
 {
 	int chip;
 
-	if (screen == screen->machine->config->devicelist.find(VIDEO_SCREEN, 0))
+	if (screen == screen->machine->devicelist.find(VIDEO_SCREEN, 0))
 		chip = 0;
 	else
 		chip = 1;
@@ -599,7 +599,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				const device_config *screen = machine->config->devicelist.find(VIDEO_SCREEN, chip);
+				running_device *screen = machine->devicelist.find(VIDEO_SCREEN, chip);
 
 				if (screen != NULL)
 				{
@@ -1733,7 +1733,7 @@ static READ8_DEVICE_HANDLER( soundram_r )
 	return 0;
 }
 
-static void sound_irq_callback(const device_config *device, int state)
+static void sound_irq_callback(running_device *device, int state)
 {
 }
 
@@ -2153,7 +2153,7 @@ static int ibutton_w(UINT8 data)
 	return r;
 }
 
-static void security_w(const device_config *device, UINT8 data)
+static void security_w(running_device *device, UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)

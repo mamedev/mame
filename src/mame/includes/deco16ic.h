@@ -29,12 +29,12 @@ void deco16_set_tilemap_colour_base(int tmap, int base);
 void deco16_set_tilemap_colour_mask(int tmap, int mask);
 void deco16_set_tilemap_transparency_mask(int tmap, int mask);
 
-void deco16_tilemap_1_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
-void deco16_tilemap_2_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
-void deco16_tilemap_3_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
-void deco16_tilemap_4_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_1_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_2_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_3_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_4_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
-void deco16_tilemap_34_combine_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_34_combine_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
 void deco16_clear_sprite_priority_bitmap(void);
 void deco16_pdrawgfx(

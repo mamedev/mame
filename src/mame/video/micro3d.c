@@ -64,7 +64,7 @@ VIDEO_RESET( micro3d )
  *
  *************************************/
 
-void micro3d_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void micro3d_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	micro3d_state *state = (micro3d_state*)screen->machine->driver_data;
 
@@ -133,7 +133,7 @@ WRITE16_HANDLER( micro3d_xfer3dk_w )
 	state->xfer3dk = data;
 }
 
-void micro3d_tms_interrupt(const device_config *device, int state)
+void micro3d_tms_interrupt(running_device *device, int state)
 {
 //	mc68901_int_gen(device->machine, GPIP4);
 }

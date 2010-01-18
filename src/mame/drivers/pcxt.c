@@ -316,11 +316,11 @@ static WRITE8_HANDLER( vga_vram_w )
 /*end of Video HW file*/
 
 static struct {
-	const device_config	*pit8253;
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	running_device	*pit8253;
+	running_device	*pic8259_1;
+	running_device	*pic8259_2;
+	running_device	*dma8237_1;
+	running_device	*dma8237_2;
 } filetto_devices;
 
 
@@ -456,8 +456,8 @@ static READ8_DEVICE_HANDLER( port_c_r )
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
-// const device_config *beep = devtag_get_device(device->machine, "beep");
-// const device_config *cvsd = devtag_get_device(device->machine, "cvsd");
+// running_device *beep = devtag_get_device(device->machine, "beep");
+// running_device *cvsd = devtag_get_device(device->machine, "cvsd");
 //  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
 //  beep_set_state(beep, 0);
@@ -619,7 +619,7 @@ static WRITE8_HANDLER(dma_page_select_w)
 	}
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }

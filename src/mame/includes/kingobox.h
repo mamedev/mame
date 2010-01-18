@@ -24,9 +24,9 @@ struct _kingofb_state
 	int        nmi_enable;
 
 	/* devices */
-	const device_config *video_cpu;
-	const device_config *sprite_cpu;
-	const device_config *audio_cpu;
+	running_device *video_cpu;
+	running_device *sprite_cpu;
+	running_device *audio_cpu;
 };
 
 

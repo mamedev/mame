@@ -164,6 +164,11 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+// forward definitions
+class running_device;
+class device_config;
+
+
 /*-------------------------------------------------
     callbacks
 -------------------------------------------------*/
@@ -325,7 +330,7 @@ struct _render_container_user_settings
 void render_init(running_machine *machine);
 
 /* return a boolean indicating if the screen is live */
-int render_is_live_screen(const device_config *screen);
+int render_is_live_screen(running_device *screen);
 
 /* return the smallest maximum update rate across all targets */
 float render_get_max_update_rate(void);
@@ -447,6 +452,7 @@ render_container *render_container_get_ui(void);
 
 /* return a pointer to the container for the given screen */
 render_container *render_container_get_screen(const device_config *screen);
+render_container *render_container_get_screen(running_device *screen);
 
 /* add a line item to the specified container */
 void render_container_add_line(render_container *container, float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags);

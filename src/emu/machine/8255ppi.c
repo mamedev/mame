@@ -129,11 +129,11 @@ struct _ppi8255
 };
 
 
-static void set_mode(const device_config *device, int data, int call_handlers);
-static void ppi8255_write_port(const device_config *device, int port);
+static void set_mode(running_device *device, int data, int call_handlers);
+static void ppi8255_write_port(running_device *device, int port);
 
 
-INLINE ppi8255_t *get_safe_token(const device_config *device) {
+INLINE ppi8255_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
 	assert( device->token != NULL );
 	assert( device->type == DEVICE_GET_INFO_NAME(ppi8255) );
@@ -193,7 +193,7 @@ INLINE void ppi8255_get_handshake_signals(ppi8255_t *ppi8255, int is_read, UINT8
 
 
 
-static void ppi8255_input(const device_config *device, int port, UINT8 data)
+static void ppi8255_input(running_device *device, int port, UINT8 data)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	int changed = 0;
@@ -250,7 +250,7 @@ static void ppi8255_input(const device_config *device, int port, UINT8 data)
 
 
 
-static UINT8 ppi8255_read_port(const device_config *device, int port)
+static UINT8 ppi8255_read_port(running_device *device, int port)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	UINT8 result = 0x00;
@@ -312,7 +312,7 @@ READ8_DEVICE_HANDLER( ppi8255_r )
 
 
 
-static void ppi8255_write_port(const device_config *device, int port)
+static void ppi8255_write_port(running_device *device, int port)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	UINT8 write_data;
@@ -406,45 +406,45 @@ WRITE8_DEVICE_HANDLER( ppi8255_w )
 }
 
 
-void ppi8255_set_port_a_read(const device_config *device, const devcb_read8 *config)
+void ppi8255_set_port_a_read(running_device *device, const devcb_read8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	devcb_resolve_read8(&ppi8255->port_read[0], config, device);
 }
 
-void ppi8255_set_port_b_read(const device_config *device, const devcb_read8 *config)
+void ppi8255_set_port_b_read(running_device *device, const devcb_read8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	devcb_resolve_read8(&ppi8255->port_read[1], config, device);
 }
 
-void ppi8255_set_port_c_read(const device_config *device, const devcb_read8 *config)
+void ppi8255_set_port_c_read(running_device *device, const devcb_read8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	devcb_resolve_read8(&ppi8255->port_read[2], config, device);
 }
 
 
-void ppi8255_set_port_a_write(const device_config *device, const devcb_write8 *config)
+void ppi8255_set_port_a_write(running_device *device, const devcb_write8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	devcb_resolve_write8(&ppi8255->port_write[0], config, device);
 }
 
-void ppi8255_set_port_b_write(const device_config *device, const devcb_write8 *config)
+void ppi8255_set_port_b_write(running_device *device, const devcb_write8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	devcb_resolve_write8(&ppi8255->port_write[1], config, device);
 }
 
-void ppi8255_set_port_c_write(const device_config *device, const devcb_write8 *config)
+void ppi8255_set_port_c_write(running_device *device, const devcb_write8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	devcb_resolve_write8(&ppi8255->port_write[2], config, device);
 }
 
 
-static void set_mode(const device_config *device, int data, int call_handlers)
+static void set_mode(running_device *device, int data, int call_handlers)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 	int i;
@@ -541,23 +541,23 @@ static void set_mode(const device_config *device, int data, int call_handlers)
 }
 
 
-void ppi8255_set_port_a( const device_config *device, UINT8 data ) { ppi8255_input(device, 0, data); }
-void ppi8255_set_port_b( const device_config *device, UINT8 data ) { ppi8255_input(device, 1, data); }
-void ppi8255_set_port_c( const device_config *device, UINT8 data ) { ppi8255_input(device, 2, data); }
+void ppi8255_set_port_a( running_device *device, UINT8 data ) { ppi8255_input(device, 0, data); }
+void ppi8255_set_port_b( running_device *device, UINT8 data ) { ppi8255_input(device, 1, data); }
+void ppi8255_set_port_c( running_device *device, UINT8 data ) { ppi8255_input(device, 2, data); }
 
-UINT8 ppi8255_get_port_a( const device_config *device ) {
+UINT8 ppi8255_get_port_a( running_device *device ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 
 	return ppi8255->output[0];
 }
 
-UINT8 ppi8255_get_port_b( const device_config *device ) {
+UINT8 ppi8255_get_port_b( running_device *device ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 
 	return ppi8255->output[1];
 }
 
-UINT8 ppi8255_get_port_c( const device_config *device ) {
+UINT8 ppi8255_get_port_c( running_device *device ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 
 	return ppi8255->output[2];
@@ -567,7 +567,7 @@ UINT8 ppi8255_get_port_c( const device_config *device ) {
 static DEVICE_START( ppi8255 ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 
-	ppi8255->intf = (const ppi8255_interface *)device->static_config;
+	ppi8255->intf = (const ppi8255_interface *)device->baseconfig().static_config;
 
 	devcb_resolve_read8(&ppi8255->port_read[0], &ppi8255->intf->port_a_read, device);
 	devcb_resolve_read8(&ppi8255->port_read[1], &ppi8255->intf->port_b_read, device);

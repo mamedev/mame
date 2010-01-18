@@ -294,7 +294,7 @@ static int multigam3_mmc3_4screen;
 static int multigam3_mmc3_last_bank;
 static UINT8* multigmc_mmc3_6000_ram;
 
-static void multigam3_mmc3_scanline_cb( const device_config *device, int scanline, int vblank, int blanked )
+static void multigam3_mmc3_scanline_cb( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (!vblank && !blanked)
 	{
@@ -308,7 +308,7 @@ static void multigam3_mmc3_scanline_cb( const device_config *device, int scanlin
 
 static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 {
-	const device_config *ppu = devtag_get_device(space->machine, "ppu");
+	running_device *ppu = devtag_get_device(space->machine, "ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 	static int multigam3_mmc3_command;
@@ -647,7 +647,7 @@ static PALETTE_INIT( multigam )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void ppu_irq( const device_config *device, int *ppu_regs )
+static void ppu_irq( running_device *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }

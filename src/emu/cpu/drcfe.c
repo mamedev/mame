@@ -54,7 +54,7 @@ struct _drcfe_state
 	void *				param;						/* parameter for the callback */
 
 	/* CPU parameters */
-	const device_config *device;					/* CPU device object */
+	running_device *device;					/* CPU device object */
 	const address_space *program;					/* program address space for this CPU */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 	cpu_translate_func	translate;					/* pointer to translation function */
@@ -121,7 +121,7 @@ INLINE void desc_free(drcfe_state *drcfe, opcode_desc *desc)
     drcfe_init - initializate the drcfe state
 -------------------------------------------------*/
 
-drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, void *param)
+drcfe_state *drcfe_init(running_device *cpu, const drcfe_config *config, void *param)
 {
 	drcfe_state *drcfe;
 
@@ -142,7 +142,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe->device = cpu;
 	drcfe->program = cpu->space(AS_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
-	drcfe->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
+	drcfe->translate = (cpu_translate_func)cpu->get_config_fct(CPUINFO_FCT_TRANSLATE);
 
 	return drcfe;
 }

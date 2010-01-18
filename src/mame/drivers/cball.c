@@ -18,7 +18,7 @@ struct _cball_state
 	tilemap_t* bg_tilemap;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

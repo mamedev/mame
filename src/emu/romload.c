@@ -156,7 +156,7 @@ int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source)
 
 const rom_source *rom_first_source(const game_driver *drv, const machine_config *config)
 {
-	const device_config *device;
+	const device_config *devconfig;
 
 	/* if the driver has a ROM pointer, that's what we want */
 	if (drv->rom != NULL)
@@ -164,11 +164,11 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 
 	/* otherwise, look through devices */
 	if (config != NULL)
-		for (device = config->devicelist.first(); device != NULL; device = device->next)
+		for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next)
 		{
-			const rom_entry *devromp = (const rom_entry *)device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+			const rom_entry *devromp = (const rom_entry *)devconfig->get_config_ptr(DEVINFO_PTR_ROM_REGION);
 			if (devromp != NULL)
-				return (rom_source *)device;
+				return (rom_source *)devconfig;
 		}
 	return NULL;
 }
@@ -181,20 +181,20 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 
 const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous)
 {
-	const device_config *device;
+	const device_config *devconfig;
 
 	/* if the previous was the driver, we want the first device */
 	if (rom_source_is_gamedrv(drv, previous))
-		device = (config != NULL) ? config->devicelist.first() : NULL;
+		devconfig = (config != NULL) ? config->devicelist.first() : NULL;
 	else
-		device = ((const device_config *)previous)->next;
+		devconfig = ((const device_config *)previous)->next;
 
 	/* look for further devices with ROM definitions */
-	for ( ; device != NULL; device = device->next)
+	for ( ; devconfig != NULL; devconfig = devconfig->next)
 	{
-		const rom_entry *devromp = (const rom_entry *)device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+		const rom_entry *devromp = (const rom_entry *)devconfig->get_config_ptr(DEVINFO_PTR_ROM_REGION);
 		if (devromp != NULL)
-			return (rom_source *)device;
+			return (rom_source *)devconfig;
 	}
 	return NULL;
 }
@@ -212,7 +212,7 @@ const rom_entry *rom_first_region(const game_driver *drv, const rom_source *sour
 	if (source == NULL || rom_source_is_gamedrv(drv, source))
 		romp = drv->rom;
 	else
-		romp = (const rom_entry *)device_get_info_ptr((const device_config *)source, DEVINFO_PTR_ROM_REGION);
+		romp = (const rom_entry *)((const device_config *)source)->get_config_ptr(DEVINFO_PTR_ROM_REGION);
 
 	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
 }
@@ -271,8 +271,8 @@ astring &rom_region_name(astring &result, const game_driver *drv, const rom_sour
 		result.cpy(ROMREGION_GETTAG(romp));
 	else
 	{
-		const device_config *device = (const device_config *)source;
-		result.printf("%s:%s", device->tag.cstr(), ROMREGION_GETTAG(romp));
+		const device_config *devconfig = (const device_config *)source;
+		result.printf("%s:%s", devconfig->tag.cstr(), ROMREGION_GETTAG(romp));
 	}
 	return result;
 }
@@ -1229,7 +1229,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
-	const device_config *device = machine->device(rgntag);
+	running_device *device = machine->device(rgntag);
 	if (device != NULL && device_get_databus_width(device, ADDRESS_SPACE_0) != 0)
 	{
 		int buswidth;

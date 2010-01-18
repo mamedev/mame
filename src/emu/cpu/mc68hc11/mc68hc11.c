@@ -61,7 +61,7 @@ struct _hc11_state
 
 	cpu_irq_callback irq_callback;
 	UINT8 irq_state[2];
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -78,7 +78,7 @@ struct _hc11_state
 	UINT8 tflg1;
 };
 
-INLINE hc11_state *get_safe_token(const device_config *device)
+INLINE hc11_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -370,7 +370,7 @@ static CPU_INIT( hc11 )
 	hc11_state *cpustate = get_safe_token(device);
 	int i;
 
-	const hc11_config *conf = (const hc11_config *)device->static_config;
+	const hc11_config *conf = (const hc11_config *)device->baseconfig().static_config;
 
 	/* clear the opcode tables */
 	for(i=0; i < 256; i++) {

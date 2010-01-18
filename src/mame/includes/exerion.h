@@ -41,7 +41,7 @@ struct _exerion_state
 	UINT8 portb;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

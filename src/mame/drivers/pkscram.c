@@ -25,7 +25,7 @@ static UINT16* pkscramble_mdtilemap_ram;
 static UINT16* pkscramble_bgtilemap_ram;
 
 static tilemap_t *fg_tilemap, *md_tilemap, *bg_tilemap;
-static const device_config *scanline_timer;
+static running_device *scanline_timer;
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )
 {
@@ -243,7 +243,7 @@ static GFXDECODE_START( pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler(running_device *device, int irq)
 {
 	if(out & 0x10)
 		cputag_set_input_line(device->machine, "maincpu", 2, irq ? ASSERT_LINE : CLEAR_LINE);

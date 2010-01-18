@@ -84,7 +84,7 @@ struct _lastfght_state
 	UINT16 c00006;
 
 	/* devices */
-	const device_config *maincpu;
+	running_device *maincpu;
 };
 
 

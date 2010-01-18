@@ -22,4 +22,4 @@ struct _batman_state
 VIDEO_START( batman );
 VIDEO_UPDATE( batman );
 
-void batman_scanline_update(const device_config *screen, int scanline);
+void batman_scanline_update(running_device *screen, int scanline);

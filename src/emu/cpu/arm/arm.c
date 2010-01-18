@@ -234,7 +234,7 @@ typedef struct
 	UINT8 pendingIrq;
 	UINT8 pendingFiq;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 } ARM_REGS;
 
@@ -250,7 +250,7 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 
 /***************************************************************************/
 
-INLINE ARM_REGS *get_safe_token(const device_config *device)
+INLINE ARM_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

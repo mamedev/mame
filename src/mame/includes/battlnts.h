@@ -16,9 +16,9 @@ struct _battlnts_state
 
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *k007342;
-	const device_config *k007420;
+	running_device *audiocpu;
+	running_device *k007342;
+	running_device *k007420;
 };
 
 /*----------- defined in video/battlnts.c -----------*/

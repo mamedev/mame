@@ -27,8 +27,8 @@ struct _ddragon3_state
 	UINT16          io_reg[8];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

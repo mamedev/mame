@@ -26,7 +26,7 @@ struct _ladyfrog_state
 	UINT8      snd_data;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

@@ -19,7 +19,7 @@ struct _docastle_state
 	UINT8    buffer0[9], buffer1[9];
 
 	/* devices */
-	const device_config *slave;
+	running_device *slave;
 };
 
 

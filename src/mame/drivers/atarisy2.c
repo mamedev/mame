@@ -188,7 +188,7 @@ static void update_interrupts(running_machine *machine)
  *
  *************************************/
 
-static void scanline_update(const device_config *screen, int scanline)
+static void scanline_update(running_device *screen, int scanline)
 {
 	atarisy2_state *state = (atarisy2_state *)screen->machine->driver_data;
 	if (scanline <= video_screen_get_height(screen))
@@ -692,7 +692,7 @@ static WRITE8_HANDLER( tms5220_strobe_w )
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
 	if (!(offset & 1) && state->tms5220_data_strobe && state->has_tms5220)
 	{
-		const device_config *tms = devtag_get_device(space->machine, "tms");
+		running_device *tms = devtag_get_device(space->machine, "tms");
 		tms5220_data_w(tms, 0, state->tms5220_data);
 	}
 	state->tms5220_data_strobe = offset & 1;

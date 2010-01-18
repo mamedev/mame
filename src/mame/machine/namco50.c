@@ -138,13 +138,13 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 typedef struct _namco_50xx_state namco_50xx_state;
 struct _namco_50xx_state
 {
-	const device_config *	cpu;
+	running_device *	cpu;
 	UINT8					latched_cmd;
 	UINT8					latched_rw;
 	UINT8					portO;
 };
 
-INLINE namco_50xx_state *get_safe_token(const device_config *device)
+INLINE namco_50xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -157,7 +157,7 @@ INLINE namco_50xx_state *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( namco_50xx_latch_callback )
 {
-	namco_50xx_state *state = get_safe_token((const device_config *)ptr);
+	namco_50xx_state *state = get_safe_token((running_device *)ptr);
 	state->latched_cmd = param;
 	state->latched_rw = 1;
 }
@@ -165,7 +165,7 @@ static TIMER_CALLBACK( namco_50xx_latch_callback )
 
 static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 {
-	namco_50xx_state *state = get_safe_token((const device_config *)ptr);
+	namco_50xx_state *state = get_safe_token((running_device *)ptr);
 	state->latched_rw = 0;
 }
 
@@ -205,11 +205,11 @@ static WRITE8_HANDLER( namco_50xx_O_w )
 
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
-	namco_50xx_state *state = get_safe_token((const device_config *)ptr);
+	namco_50xx_state *state = get_safe_token((running_device *)ptr);
 	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
-static void namco_50xx_irq_set(const device_config *device)
+static void namco_50xx_irq_set(running_device *device)
 {
 	namco_50xx_state *state = get_safe_token(device);
 
@@ -231,7 +231,7 @@ WRITE8_DEVICE_HANDLER( namco_50xx_write )
 }
 
 
-void namco_50xx_read_request(const device_config *device)
+void namco_50xx_read_request(running_device *device)
 {
 	timer_call_after_resynch(device->machine, (void *)device, 0, namco_50xx_readrequest_callback);
 
@@ -284,7 +284,7 @@ static DEVICE_START( namco_50xx )
 	astring tempstring;
 
 	/* find our CPU */
-	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
+	state->cpu = device->subdevice("mcu");
 	assert(state->cpu != NULL);
 }
 

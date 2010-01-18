@@ -72,7 +72,7 @@ static UINT16 *model2_soundram = NULL;
 
 static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
-static const device_config *model2_timers[4];
+static running_device *model2_timers[4];
 static int model2_ctrlmode;
 static int analog_channel;
 
@@ -92,7 +92,7 @@ static int dsp_type;
 static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
 static int copro_fifoin_num = 0;
-static int copro_fifoin_pop(const device_config *device, UINT32 *result)
+static int copro_fifoin_pop(running_device *device, UINT32 *result)
 {
 	UINT32 r;
 
@@ -130,7 +130,7 @@ static int copro_fifoin_pop(const device_config *device, UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(const device_config *device, UINT32 data)
+static void copro_fifoin_push(running_device *device, UINT32 data)
 {
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
@@ -202,7 +202,7 @@ static UINT32 copro_fifoout_pop(const address_space *space)
 	return r;
 }
 
-static void copro_fifoout_push(const device_config *device, UINT32 data)
+static void copro_fifoout_push(running_device *device, UINT32 data)
 {
 	//if (copro_fifoout_wpos == copro_fifoout_rpos)
 	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
@@ -408,7 +408,7 @@ static WRITE32_HANDLER( ctrl0_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		running_device *device = devtag_get_device(space->machine, "eeprom");
 		model2_ctrlmode = data & 0x01;
 		eeprom_write_bit(device, data & 0x20);
 		eeprom_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -1737,7 +1737,7 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(const device_config *device, int irq)
+static void scsp_irq(running_device *device, int irq)
 {
 	if (irq > 0)
 	{

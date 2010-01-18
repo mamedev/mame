@@ -244,7 +244,7 @@ WRITE8_HANDLER( system1_sprite_collision_reset_w )
  *
  *************************************/
 
-INLINE void videoram_wait_states(const device_config *cpu)
+INLINE void videoram_wait_states(running_device *cpu)
 {
 	/* The main Z80's CPU clock is halted whenever an access to VRAM happens,
        and is only restarted by the FIXST signal, which occurs once every
@@ -486,7 +486,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-static void video_update_common(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *fgpixmap, bitmap_t **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
+static void video_update_common(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *fgpixmap, bitmap_t **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
 {
 	const UINT8 *lookup = memory_region(screen->machine, "proms");
 	int x, y;

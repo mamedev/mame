@@ -54,14 +54,14 @@ struct _cvs_state
 	UINT8      page, io_page;	// quasar
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *speech;
-	const device_config *dac3;
-	const device_config *tms;
-	const device_config *s2636_0;
-	const device_config *s2636_1;
-	const device_config *s2636_2;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *speech;
+	running_device *dac3;
+	running_device *tms;
+	running_device *s2636_0;
+	running_device *s2636_1;
+	running_device *s2636_2;
 };
 
 /*----------- defined in drivers/cvs.c -----------*/

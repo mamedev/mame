@@ -24,7 +24,7 @@ static void a600xl_mmu(running_machine *machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine *machine);
 
-void atari_interrupt_cb(const device_config *device, int mask)
+void atari_interrupt_cb(running_device *device, int mask)
 {
 
 	if (VERBOSE_POKEY)
@@ -159,7 +159,7 @@ static int atari_last;
 
 void a800_handle_keyboard(running_machine *machine)
 {
-	const device_config *pokey = devtag_get_device(machine, "pokey");
+	running_device *pokey = devtag_get_device(machine, "pokey");
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = {
 		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
@@ -244,7 +244,7 @@ void a800_handle_keyboard(running_machine *machine)
 
 void a5200_handle_keypads(running_machine *machine)
 {
-	const device_config *pokey = devtag_get_device(machine, "pokey");
+	running_device *pokey = devtag_get_device(machine, "pokey");
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
 
@@ -308,7 +308,7 @@ void a5200_handle_keypads(running_machine *machine)
 
 static void pokey_reset(running_machine *machine)
 {
-	const device_config *pokey = devtag_get_device(machine, "pokey");
+	running_device *pokey = devtag_get_device(machine, "pokey");
 	pokey_w(pokey,15,0);
 	atari_last = 0xff;
 }
@@ -322,7 +322,7 @@ static UINT8 console_read(const address_space *space)
 
 static void console_write(const address_space *space, UINT8 data)
 {
-	const device_config *dac = devtag_get_device(space->machine, "dac");
+	running_device *dac = devtag_get_device(space->machine, "dac");
 	if (data & 0x08)
 		dac_data_w(dac, (UINT8)-120);
 	else

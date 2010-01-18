@@ -1586,7 +1586,7 @@ static MACHINE_RESET( konami573 )
 	flash_bank = -1;
 }
 
-static void spu_irq(const device_config *device, UINT32 data)
+static void spu_irq(running_device *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -1661,7 +1661,7 @@ todo:
 
 static READ32_HANDLER( ge765pwbba_r )
 {
-	const device_config *upd4701 = devtag_get_device(space->machine, "upd4701");
+	running_device *upd4701 = devtag_get_device(space->machine, "upd4701");
 	UINT32 data = 0;
 
 	switch (offset)
@@ -1699,7 +1699,7 @@ static READ32_HANDLER( ge765pwbba_r )
 
 static WRITE32_HANDLER( ge765pwbba_w )
 {
-	const device_config *upd4701 = devtag_get_device(space->machine, "upd4701");
+	running_device *upd4701 = devtag_get_device(space->machine, "upd4701");
 	switch (offset)
 	{
 	case 0x04:
@@ -2816,7 +2816,7 @@ static DRIVER_INIT( hyperbbc )
 
 /* ADC0834 Interface */
 
-static double analogue_inputs_callback( const device_config *device, UINT8 input )
+static double analogue_inputs_callback( running_device *device, UINT8 input )
 {
 	switch (input)
 	{

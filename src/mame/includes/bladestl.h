@@ -18,9 +18,9 @@ struct _bladestl_state
 	int        last_track[4];
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *k007342;
-	const device_config *k007420;
+	running_device *audiocpu;
+	running_device *k007342;
+	running_device *k007420;
 };
 
 

@@ -55,16 +55,16 @@ struct _timeplt_state
 	struct jungler_star stars[JUNGLER_MAX_STARS];	// jungler
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *soundcpu;
-	const device_config *i8039;		// junofrst
-	const device_config *samples;		// rallyx
-	const device_config *filter_0_0;
-	const device_config *filter_0_1;
-	const device_config *filter_0_2;
-	const device_config *filter_1_0;
-	const device_config *filter_1_1;
-	const device_config *filter_1_2;
+	running_device *maincpu;
+	running_device *soundcpu;
+	running_device *i8039;		// junofrst
+	running_device *samples;		// rallyx
+	running_device *filter_0_0;
+	running_device *filter_0_1;
+	running_device *filter_0_2;
+	running_device *filter_1_0;
+	running_device *filter_1_1;
+	running_device *filter_1_2;
 };
 
 

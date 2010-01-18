@@ -36,8 +36,8 @@ DEVICE_GET_INFO(i2cmem);
 	MDRV_DEVICE_CONFIG_DATAPTR(i2cmem_config, data, _data)
 
 
-void i2cmemdev_write( const device_config *device, int line, int data );
-int i2cmemdev_read( const device_config *device, int line );
-void i2cmemdev_set_read_mode( const device_config *device, int mode );
+void i2cmemdev_write( running_device *device, int line, int data );
+int i2cmemdev_read( running_device *device, int line );
+void i2cmemdev_set_read_mode( running_device *device, int mode );
 
 #endif

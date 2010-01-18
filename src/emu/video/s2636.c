@@ -113,7 +113,7 @@ struct _s2636_state
  *
  *************************************/
 
-INLINE s2636_state *get_safe_token( const device_config *device )
+INLINE s2636_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -122,11 +122,11 @@ INLINE s2636_state *get_safe_token( const device_config *device )
 	return (s2636_state *)device->token;
 }
 
-INLINE const s2636_interface *get_interface( const device_config *device )
+INLINE const s2636_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
 	assert((device->type == S2636));
-	return (const s2636_interface *) device->static_config;
+	return (const s2636_interface *) device->baseconfig().static_config;
 }
 
 
@@ -190,7 +190,7 @@ static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or
  *
  *************************************/
 
-static int check_collision( const device_config *device, int spriteno1, int spriteno2, const rectangle *cliprect )
+static int check_collision( running_device *device, int spriteno1, int spriteno2, const rectangle *cliprect )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	int checksum = 0;
@@ -254,7 +254,7 @@ static int check_collision( const device_config *device, int spriteno1, int spri
  *
  *************************************/
 
-bitmap_t *s2636_update( const device_config *device, const rectangle *cliprect )
+bitmap_t *s2636_update( running_device *device, const rectangle *cliprect )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	UINT8 collision = 0;
@@ -342,7 +342,7 @@ static DEVICE_START( s2636 )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	const s2636_interface *intf = get_interface(device);
-	const device_config *screen = device->machine->device(intf->screen);
+	running_device *screen = device->machine->device(intf->screen);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

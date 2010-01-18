@@ -409,7 +409,7 @@ static void bank0c_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata
 
 static WRITE8_HANDLER( videomode_w )
 {
-	const device_config *i8751 = devtag_get_device(space->machine, "mcu");
+	running_device *i8751 = devtag_get_device(space->machine, "mcu");
 
 	/* bit 6 is connected to the 8751 IRQ */
 	if (i8751 != NULL)
@@ -484,8 +484,8 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	const device_config *ppi = devtag_get_device(space->machine, "ppi");
-	const device_config *pio = devtag_get_device(space->machine, "pio");
+	running_device *ppi = devtag_get_device(space->machine, "ppi");
+	running_device *pio = devtag_get_device(space->machine, "pio");
 
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (ppi != NULL)
@@ -608,7 +608,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        enough, the MCU will fail; on shtngmst this happens after 3
        VBLANKs without a tick */
 
-	const device_config *mcu = devtag_get_device(timer->machine, "mcu");
+	running_device *mcu = devtag_get_device(timer->machine, "mcu");
 	cpu_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
 	cpu_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
 }

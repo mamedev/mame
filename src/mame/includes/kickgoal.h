@@ -26,8 +26,8 @@ struct _kickgoal_state
 	UINT16      m6295_key_delay;
 
 	/* devices */
-	const device_config *adpcm;
-	const device_config *eeprom;
+	running_device *adpcm;
+	running_device *eeprom;
 };
 
 

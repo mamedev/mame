@@ -208,7 +208,7 @@ VIDEO_START( amiga_aga )
  *
  *************************************/
 
-UINT32 amiga_aga_gethvpos(const device_config *screen)
+UINT32 amiga_aga_gethvpos(running_device *screen)
 {
 	UINT32 hvpos = (last_scanline << 8) | (video_screen_get_hpos(screen) >> 2);
 	UINT32 latchedpos = input_port_read_safe(screen->machine, "HVPOS", 0);

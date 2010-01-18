@@ -26,7 +26,7 @@ struct _avr8_state
 {
     UINT32 pc;
 
-    const device_config *device;
+    running_device *device;
     const address_space *program;
     const address_space *io;
     int icount;
@@ -75,7 +75,7 @@ enum
 #define ZREG            ((READ_IO_8(cpustate, 31) << 8) | READ_IO_8(cpustate, 30))
 #define SPREG           ((READ_IO_8(cpustate, AVR8_IO_SPH) << 8) | READ_IO_8(cpustate, AVR8_IO_SPL))
 
-INLINE avr8_state *get_safe_token(const device_config *device)
+INLINE avr8_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
     assert(device->token != NULL);

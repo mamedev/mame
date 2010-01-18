@@ -151,7 +151,7 @@ static WRITE8_HANDLER( sound_bank_w )
 	k007232_set_bank(state->k007232_2, bank_A, bank_B);
 }
 
-static void volume_callback0(const device_config *device, int v)
+static void volume_callback0(running_device *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( k007232_extvol_w )
 	k007232_set_volume(device, 0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
 }
 
-static void volume_callback1(const device_config *device, int v)
+static void volume_callback1(running_device *device, int v)
 {
 	/* channel B volume/pan */
 	k007232_set_volume(device, 1, (v & 0x0f) * 0x11/2, (v >> 4) * 0x11/2);

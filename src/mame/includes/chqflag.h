@@ -21,13 +21,13 @@ struct _chqflag_state
 	int        accel, wheel;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *k007232_1;
-	const device_config *k007232_2;
-	const device_config *k051960;
-	const device_config *k051316_1;
-	const device_config *k051316_2;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *k007232_1;
+	running_device *k007232_2;
+	running_device *k051960;
+	running_device *k051316_1;
+	running_device *k051316_2;
 };
 
 /*----------- defined in video/chqflag.c -----------*/

@@ -121,14 +121,14 @@ static WRITE8_HANDLER( tankbatt_sh_expl_w )
 {
 	if (tankbatt_sound_enable)
 	{
-		const device_config *samples = devtag_get_device(space->machine, "samples");
+		running_device *samples = devtag_get_device(space->machine, "samples");
 		sample_start (samples, 1, 3, 0);
 	}
 }
 
 static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	if (tankbatt_sound_enable)
 	{
 		if (data)
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( tankbatt_sh_fire_w )
 {
 	if (tankbatt_sound_enable)
 	{
-		const device_config *samples = devtag_get_device(space->machine, "samples");
+		running_device *samples = devtag_get_device(space->machine, "samples");
 		sample_start (samples, 0, 0, 0);
 	}
 }

@@ -430,7 +430,7 @@ static WRITE8_HANDLER( dec8_sound_w )
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void csilver_adpcm_int( const device_config *device )
+static void csilver_adpcm_int( running_device *device )
 {
 	dec8_state *state = (dec8_state *)device->machine->driver_data;
 	state->toggle ^= 1;
@@ -1930,7 +1930,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler( const device_config *device, int linestate )
+static void irqhandler( running_device *device, int linestate )
 {
 	dec8_state *state = (dec8_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, linestate); /* M6502_IRQ_LINE */

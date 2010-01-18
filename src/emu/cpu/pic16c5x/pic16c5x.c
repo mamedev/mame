@@ -97,13 +97,13 @@ struct _pic16c5x_state
 	int		inst_cycles;
 
 
-	const	device_config *device;
+	running_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
 };
 
-INLINE pic16c5x_state *get_safe_token(const device_config *device)
+INLINE pic16c5x_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -798,7 +798,7 @@ static void pic16c5x_soft_reset(pic16c5x_state *cpustate)
 	pic16c5x_reset_regs(cpustate);
 }
 
-void pic16c5x_set_config(const device_config *cpu, int data)
+void pic16c5x_set_config(running_device *cpu, int data)
 {
 	pic16c5x_state *cpustate = get_safe_token(cpu);
 

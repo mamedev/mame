@@ -39,7 +39,7 @@ static INPUT_CHANGED( service_mode_switch_changed )
 
 static INPUT_CHANGED( firetrk_horn_changed )
 {
-	const device_config *discrete = devtag_get_device(field->port->machine, "discrete");
+	running_device *discrete = devtag_get_device(field->port->machine, "discrete");
 	discrete_sound_w(discrete, FIRETRUCK_HORN_EN, newval);
 }
 
@@ -80,7 +80,7 @@ static TIMER_CALLBACK( periodic_callback )
 
 static WRITE8_HANDLER( firetrk_output_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* BIT0 => START1 LAMP */
 	set_led_status(space->machine, 0, !(data & 0x01));
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 
 static WRITE8_HANDLER( superbug_output_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* BIT0 => START LAMP */
 	set_led_status(space->machine, 0, offset & 0x01);
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( superbug_output_w )
 
 static WRITE8_HANDLER( montecar_output_1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* BIT0 => START LAMP    */
 	set_led_status(space->machine, 0, !(data & 0x01));
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( montecar_output_1_w )
 
 static WRITE8_HANDLER( montecar_output_2_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 
 	firetrk_flash = data & 0x80;
 

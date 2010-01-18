@@ -420,7 +420,7 @@ static INPUT_PORTS_START( livequiz )
 INPUT_PORTS_END
 
 
-static void livequiz_irqhandler(const device_config *device, int state)
+static void livequiz_irqhandler(running_device *device, int state)
 {
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }

@@ -456,7 +456,7 @@ static int tumblep_music_command;
 static int tumblep_music_bank;
 static int tumbleb2_music_is_playing;
 
-static void tumbleb2_playmusic(const device_config *device)
+static void tumbleb2_playmusic(running_device *device)
 {
 	int status = okim6295_r(device,0);
 
@@ -504,7 +504,7 @@ static void tumbleb2_set_music_bank(running_machine *machine, int bank)
 	memcpy(&oki[0x38000], &oki[0x80000+0x38000+0x8000*bank],0x8000);
 }
 
-static void tumbleb2_play_sound (const device_config *device, int data)
+static void tumbleb2_play_sound (running_device *device, int data)
 {
 	int status = okim6295_r(device,0);
 
@@ -537,7 +537,7 @@ static void tumbleb2_play_sound (const device_config *device, int data)
 // bank 7 = how to play?
 // bank 8 = boss???
 
-static void process_tumbleb2_music_command(const device_config *device, int data)
+static void process_tumbleb2_music_command(running_device *device, int data)
 {
 	int status = okim6295_r(device,0);
 
@@ -2115,7 +2115,7 @@ MACHINE_DRIVER_END
 
 
 
-static void semicom_irqhandler(const device_config *device, int irq)
+static void semicom_irqhandler(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -3280,7 +3280,7 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
-	const device_config *oki = devtag_get_device(machine, "oki");
+	running_device *oki = devtag_get_device(machine, "oki");
 
 	tumblepb_gfx1_rearrange(machine);
 

@@ -79,10 +79,10 @@ enum
 #define PPU_2C07	DEVICE_GET_INFO_NAME(ppu2c07)	// PAL NES
 
 /* callback datatypes */
-typedef void (*ppu2c0x_scanline_cb)( const device_config *device, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_hblank_cb)( const device_config *device, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_nmi_cb)( const device_config *device, int *ppu_regs );
-typedef int  (*ppu2c0x_vidaccess_cb)( const device_config *device, int address, int data );
+typedef void (*ppu2c0x_scanline_cb)( running_device *device, int scanline, int vblank, int blanked );
+typedef void (*ppu2c0x_hblank_cb)( running_device *device, int scanline, int vblank, int blanked );
+typedef void (*ppu2c0x_nmi_cb)( running_device *device, int *ppu_regs );
+typedef int  (*ppu2c0x_vidaccess_cb)( running_device *device, int address, int data );
 
 typedef struct _ppu2c0x_interface ppu2c0x_interface;
 struct _ppu2c0x_interface
@@ -107,18 +107,18 @@ DEVICE_GET_INFO(ppu2c07);
 /* routines */
 void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 
-void ppu2c0x_spriteram_dma(const address_space *space, const device_config *device, const UINT8 page ) ATTR_NONNULL(1);
-void ppu2c0x_render( const device_config *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
-int ppu2c0x_get_pixel( const device_config *device, int x, int y ) ATTR_NONNULL(1);
-int ppu2c0x_get_colorbase( const device_config *device ) ATTR_NONNULL(1);
-int ppu2c0x_get_current_scanline( const device_config *device ) ATTR_NONNULL(1);
-void ppu2c0x_set_scanline_callback( const device_config *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
-void ppu2c0x_set_hblank_callback( const device_config *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
-void ppu2c0x_set_vidaccess_callback( const device_config *device, ppu2c0x_vidaccess_cb cb ) ATTR_NONNULL(1);
-void ppu2c0x_set_scanlines_per_frame( const device_config *device, int scanlines ) ATTR_NONNULL(1);
+void ppu2c0x_spriteram_dma(const address_space *space, running_device *device, const UINT8 page ) ATTR_NONNULL(1);
+void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
+int ppu2c0x_get_pixel( running_device *device, int x, int y ) ATTR_NONNULL(1);
+int ppu2c0x_get_colorbase( running_device *device ) ATTR_NONNULL(1);
+int ppu2c0x_get_current_scanline( running_device *device ) ATTR_NONNULL(1);
+void ppu2c0x_set_scanline_callback( running_device *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
+void ppu2c0x_set_hblank_callback( running_device *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
+void ppu2c0x_set_vidaccess_callback( running_device *device, ppu2c0x_vidaccess_cb cb ) ATTR_NONNULL(1);
+void ppu2c0x_set_scanlines_per_frame( running_device *device, int scanlines ) ATTR_NONNULL(1);
 
 //27/12/2002 (HACK!)
-extern void (*ppu_latch)( const device_config *device, offs_t offset );
+extern void (*ppu_latch)( running_device *device, offs_t offset );
 
 WRITE8_DEVICE_HANDLER( ppu2c0x_w );
 READ8_DEVICE_HANDLER( ppu2c0x_r );

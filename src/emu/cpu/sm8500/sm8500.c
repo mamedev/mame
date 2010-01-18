@@ -51,12 +51,12 @@ struct _sm8500_state
 	int halted;
 	int icount;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	UINT8 internal_ram[0x500];
 };
 
-INLINE sm8500_state *get_safe_token(const device_config *device)
+INLINE sm8500_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -101,9 +101,9 @@ static CPU_INIT( sm8500 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
-	if ( device->static_config != NULL ) {
-		cpustate->config.handle_dma = ((SM8500_CONFIG *)device->static_config)->handle_dma;
-		cpustate->config.handle_timers = ((SM8500_CONFIG *)device->static_config)->handle_timers;
+	if ( device->baseconfig().static_config != NULL ) {
+		cpustate->config.handle_dma = ((SM8500_CONFIG *)device->baseconfig().static_config)->handle_dma;
+		cpustate->config.handle_timers = ((SM8500_CONFIG *)device->baseconfig().static_config)->handle_timers;
 	} else {
 		cpustate->config.handle_dma = NULL;
 		cpustate->config.handle_timers = NULL;

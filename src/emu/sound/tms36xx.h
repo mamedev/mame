@@ -18,13 +18,13 @@ struct _tms36xx_interface
 };
 
 /* MM6221AA interface functions */
-extern void mm6221aa_tune_w(const device_config *device, int tune);
+extern void mm6221aa_tune_w(running_device *device, int tune);
 
 /* TMS3615/17 interface functions */
-extern void tms36xx_note_w(const device_config *device, int octave, int note);
+extern void tms36xx_note_w(running_device *device, int octave, int note);
 
 /* TMS3617 interface functions */
-extern void tms3617_enable_w(const device_config *device, int enable);
+extern void tms3617_enable_w(running_device *device, int enable);
 
 DEVICE_GET_INFO( tms36xx );
 #define SOUND_TMS36XX DEVICE_GET_INFO_NAME( tms36xx )

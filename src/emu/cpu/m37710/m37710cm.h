@@ -109,7 +109,7 @@ struct _m37710i_cpu_struct
 	uint source;		/* temp register */
 	uint destination;	/* temp register */
 	cpu_irq_callback int_ack;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	uint stopped;		/* Sets how the CPU is stopped */
@@ -127,7 +127,7 @@ struct _m37710i_cpu_struct
 	emu_timer *timers[8];
 };
 
-INLINE m37710i_cpu_struct *get_safe_token(const device_config *device)
+INLINE m37710i_cpu_struct *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -6,7 +6,7 @@
 
 /*----------- defined in machine/vertigo.c -----------*/
 
-void vertigo_update_irq(const device_config *device);
+void vertigo_update_irq(running_device *device);
 
 extern const struct pit8253_config vertigo_pit8254_config;
 

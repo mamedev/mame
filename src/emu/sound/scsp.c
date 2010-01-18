@@ -193,7 +193,7 @@ struct _SCSP
 	unsigned char *SCSPRAM;
 	UINT32 SCSPRAM_LENGTH;
 	char Master;
-	void (*Int68kCB)(const device_config *device, int irq);
+	void (*Int68kCB)(running_device *device, int irq);
 	sound_stream * stream;
 
 	INT32 *buffertmpl,*buffertmpr;
@@ -224,7 +224,7 @@ struct _SCSP
 
 	struct _SCSPDSP DSP;
 
-	const device_config *device;
+	running_device *device;
 };
 
 static void dma_scsp(const address_space *space, struct _SCSP *SCSP);		/*SCSP DMA transfer function*/
@@ -244,7 +244,7 @@ static int length;
 static signed short *RBUFDST;	//this points to where the sample will be stored in the RingBuf
 
 
-INLINE SCSP *get_safe_token(const device_config *device)
+INLINE SCSP *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -516,7 +516,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((double)(n))/log(2.0))
 
-static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scsp_interface *intf)
+static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_interface *intf)
 {
 	int i;
 
@@ -1206,7 +1206,7 @@ static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-		cpu_set_input_line(space->machine->config->devicelist.find(CPU, 2),dma_transfer_end,HOLD_LINE);
+		cpu_set_input_line(space->machine->devicelist.find(CPU, 2),dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1232,7 +1232,7 @@ static DEVICE_START( scsp )
 
 	struct _SCSP *SCSP = get_safe_token(device);
 
-	intf = (const scsp_interface *)device->static_config;
+	intf = (const scsp_interface *)device->baseconfig().static_config;
 
 	// init the emulation
 	SCSP_Init(device, SCSP, intf);
@@ -1246,7 +1246,7 @@ static DEVICE_START( scsp )
 }
 
 
-void scsp_set_ram_base(const device_config *device, void *base)
+void scsp_set_ram_base(running_device *device, void *base)
 {
 	struct _SCSP *SCSP = get_safe_token(device);
 	if (SCSP)

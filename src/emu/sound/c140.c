@@ -106,7 +106,7 @@ struct _c140_state
 	VOICE voi[MAX_VOICE];
 };
 
-INLINE c140_state *get_safe_token(const device_config *device)
+INLINE c140_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -256,7 +256,7 @@ WRITE8_DEVICE_HANDLER( c140_w )
 	}
 }
 
-void c140_set_base(const device_config *device, void *base)
+void c140_set_base(running_device *device, void *base)
 {
 	c140_state *info = get_safe_token(device);
 	info->pRom = base;
@@ -466,7 +466,7 @@ static STREAM_UPDATE( update_stereo )
 
 static DEVICE_START( c140 )
 {
-	const c140_interface *intf = (const c140_interface *)device->static_config;
+	const c140_interface *intf = (const c140_interface *)device->baseconfig().static_config;
 	c140_state *info = get_safe_token(device);
 
 	info->sample_rate=info->baserate=device->clock;

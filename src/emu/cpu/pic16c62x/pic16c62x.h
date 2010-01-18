@@ -46,7 +46,7 @@ enum
  *  the value if known (available in HEX dumps of the ROM).
  */
 
-void pic16c62x_set_config(const device_config *cpu, int data);
+void pic16c62x_set_config(running_device *cpu, int data);
 
 
 

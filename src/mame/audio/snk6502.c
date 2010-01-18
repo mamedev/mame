@@ -652,7 +652,7 @@ int snk6502_music0_playing(void)
 
 WRITE8_HANDLER( sasuke_sound_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	switch (offset)
 	{
 	case 0:
@@ -718,7 +718,7 @@ WRITE8_HANDLER( sasuke_sound_w )
 
 WRITE8_HANDLER( satansat_sound_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	switch (offset)
 	{
 	case 0:
@@ -781,7 +781,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 WRITE8_HANDLER( vanguard_sound_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = devtag_get_device(space->machine, "samples");
 	switch (offset)
 	{
 	case 0:
@@ -1034,7 +1034,7 @@ static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 
 
 	if ((data & HD38880_CTP) && (data & HD38880_CMV))
 	{
-		const device_config *samples = devtag_get_device(machine, "samples");
+		running_device *samples = devtag_get_device(machine, "samples");
 		data &= HD68880_SYBS;
 
 		switch (hd38880_cmd)
@@ -1053,7 +1053,7 @@ static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 
 					{
 						if (table[i] && table[i] == hd38880_addr)
 						{
-							const device_config *samples = devtag_get_device(machine, "samples");
+							running_device *samples = devtag_get_device(machine, "samples");
 							sample_start(samples, 0, start + i, 0);
 							break;
 						}

@@ -2607,7 +2607,7 @@ MACHINE_DRIVER_END
 
 
 
-static void sound_irq(const device_config *device, int state)
+static void sound_irq(running_device *device, int state)
 {
 //   cputag_set_input_line(machine, "maincpu", 3, state);
 }

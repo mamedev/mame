@@ -48,7 +48,7 @@ enum
 #define video_screen_first(config)		(config)->devicelist.first(VIDEO_SCREEN)
 #define video_screen_next(previous)		(previous)->typenext()
 
-#define video_screen_get_format(screen)	(((screen_config *)(screen)->inline_config)->format)
+#define video_screen_get_format(screen)	(((screen_config *)(screen)->baseconfig().inline_config)->format)
 
 /* allocates a bitmap that has the same dimensions and format as the passed in screen */
 #define video_screen_auto_bitmap_alloc(screen)	auto_bitmap_alloc(screen->machine, video_screen_get_width(screen), video_screen_get_height(screen), video_screen_get_format(screen))
@@ -90,7 +90,7 @@ struct _screen_config
     in the VBLANK state
 -------------------------------------------------*/
 
-typedef void (*vblank_state_changed_func)(const device_config *device, void *param, int vblank_state);
+typedef void (*vblank_state_changed_func)(running_device *device, void *param, int vblank_state);
 
 
 
@@ -159,57 +159,57 @@ void video_init(running_machine *machine);
 /* ----- screen management ----- */
 
 /* set the resolution of a screen */
-void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t refresh);
+void video_screen_configure(running_device *screen, int width, int height, const rectangle *visarea, attoseconds_t refresh);
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
-void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y);
+void video_screen_set_visarea(running_device *screen, int min_x, int max_x, int min_y, int max_y);
 
 /* force a partial update of the screen up to and including the requested scanline */
-int video_screen_update_partial(const device_config *screen, int scanline);
+int video_screen_update_partial(running_device *screen, int scanline);
 
 /* force an update from the last beam position up to the current beam position */
-void video_screen_update_now(const device_config *screen);
+void video_screen_update_now(running_device *screen);
 
 /* return the current vertical or horizontal position of the beam for a screen */
-int video_screen_get_vpos(const device_config *screen);
-int video_screen_get_hpos(const device_config *screen);
+int video_screen_get_vpos(running_device *screen);
+int video_screen_get_hpos(running_device *screen);
 
 /* return the current vertical or horizontal blanking state for a screen */
-int video_screen_get_vblank(const device_config *screen);
-int video_screen_get_hblank(const device_config *screen);
+int video_screen_get_vblank(running_device *screen);
+int video_screen_get_hblank(running_device *screen);
 
 /* return the current width for a screen */
-int video_screen_get_width(const device_config *screen);
+int video_screen_get_width(running_device *screen);
 
 /* return the current height for a screen */
-int video_screen_get_height(const device_config *screen);
+int video_screen_get_height(running_device *screen);
 
 /* return the current visible area for a screen */
-const rectangle *video_screen_get_visible_area(const device_config *screen);
+const rectangle *video_screen_get_visible_area(running_device *screen);
 
 /* return the time when the beam will reach a particular H,V position */
-attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos);
+attotime video_screen_get_time_until_pos(running_device *screen, int vpos, int hpos);
 
 /* return the time when the beam will reach the start of VBLANK */
-attotime video_screen_get_time_until_vblank_start(const device_config *screen);
+attotime video_screen_get_time_until_vblank_start(running_device *screen);
 
 /* return the time when the beam will reach the end of VBLANK */
-attotime video_screen_get_time_until_vblank_end(const device_config *screen);
+attotime video_screen_get_time_until_vblank_end(running_device *screen);
 
 /* return the time when the VIDEO_UPDATE function will be called */
-attotime video_screen_get_time_until_update(const device_config *screen);
+attotime video_screen_get_time_until_update(running_device *screen);
 
 /* return the amount of time the beam takes to draw one scan line */
-attotime video_screen_get_scan_period(const device_config *screen);
+attotime video_screen_get_scan_period(running_device *screen);
 
 /* return the amount of time the beam takes to draw one complete frame */
-attotime video_screen_get_frame_period(const device_config *screen);
+attotime video_screen_get_frame_period(running_device *screen);
 
 /* return the current frame number -- this is always increasing */
-UINT64 video_screen_get_frame_number(const device_config *screen);
+UINT64 video_screen_get_frame_number(running_device *screen);
 
 /* registers a VBLANK callback for the given screen */
-void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback, void *param);
+void video_screen_register_vblank_callback(running_device *screen, vblank_state_changed_func vblank_callback, void *param);
 
 
 /* ----- video screen device interface ----- */
@@ -256,7 +256,7 @@ void video_set_fastforward(int fastforward);
 /* ----- snapshots ----- */
 
 /* save a snapshot of a given screen */
-void video_screen_save_snapshot(running_machine *machine, const device_config *screen, mame_file *fp);
+void video_screen_save_snapshot(running_machine *machine, running_device *screen, mame_file *fp);
 
 /* save a snapshot of all the active screens */
 void video_save_active_screen_snapshots(running_machine *machine);

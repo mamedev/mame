@@ -87,7 +87,7 @@ typedef struct
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
 	cpu_irq_callback int_ack;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	uint stopped;	/* stopped status */
 	int ICount;
@@ -98,7 +98,7 @@ typedef struct
 	int spc_int32;
 } spc700i_cpu;
 
-INLINE spc700i_cpu *get_safe_token(const device_config *device)
+INLINE spc700i_cpu *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

@@ -144,7 +144,7 @@ WRITE16_HANDLER( rpunch_crtc_register_w );
  *
  *************************************/
 
-static void ym2151_irq_gen(const device_config *device, int state)
+static void ym2151_irq_gen(running_device *device, int state)
 {
 	ym2151_irq = state;
 	cputag_set_input_line(device->machine, "audiocpu", 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);

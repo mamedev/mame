@@ -45,11 +45,11 @@ struct _ddragon_state
 #endif
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *snd_cpu;
-	const device_config *sub_cpu;
-	const device_config *adpcm_1;
-	const device_config *adpcm_2;
+	running_device *maincpu;
+	running_device *snd_cpu;
+	running_device *sub_cpu;
+	running_device *adpcm_1;
+	running_device *adpcm_2;
 };
 
 

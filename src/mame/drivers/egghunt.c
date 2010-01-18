@@ -63,7 +63,7 @@ struct _egghunt_state
 	UINT8     gfx_banking;
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

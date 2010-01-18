@@ -117,7 +117,7 @@ To Do:
 
 static struct
 {
-	const device_config *duart68681;
+	running_device *duart68681;
 } tmaster_devices;
 
 /***************************************************************************
@@ -148,12 +148,12 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 
 ***************************************************************************/
 
-static void duart_irq_handler(const device_config *device, UINT8 vector)
+static void duart_irq_handler(running_device *device, UINT8 vector)
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
 };
 
-static void duart_tx(const device_config *device, int channel, UINT8 data)
+static void duart_tx(running_device *device, int channel, UINT8 data)
 {
 	if ( channel == 0 )
 	{
@@ -545,7 +545,7 @@ static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALG
 
 static READ16_HANDLER( galgames_eeprom_r )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
+	running_device *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
 
 	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
 }
@@ -557,7 +557,7 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 
 	if ( ACCESSING_BITS_0_7 )
 	{
-		const device_config *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
+		running_device *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
 
 		// latch the bit
 		eeprom_write_bit(eeprom, data & 0x0001);

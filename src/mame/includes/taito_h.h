@@ -15,10 +15,10 @@ struct _taitoh_state
 	INT32       banknum;
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *tc0080vco;
-	const device_config *tc0220ioc;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *tc0080vco;
+	running_device *tc0220ioc;
 };
 
 /*----------- defined in video/taito_h.c -----------*/

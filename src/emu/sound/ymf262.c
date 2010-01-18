@@ -267,7 +267,7 @@ typedef struct {
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
 	attotime TimerBase;			/* Timer base time (==sampling time)*/
-	const device_config *device;
+	running_device *device;
 } OPL3;
 
 
@@ -2243,7 +2243,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 /* lock/unlock for common table */
-static int OPL3_LockTable(const device_config *device)
+static int OPL3_LockTable(running_device *device)
 {
 	num_lock++;
 	if(num_lock>1) return 0;
@@ -2330,7 +2330,7 @@ static void OPL3ResetChip(OPL3 *chip)
 /* Create one of virtual YMF262 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static OPL3 *OPL3Create(const device_config *device, int clock, int rate, int type)
+static OPL3 *OPL3Create(running_device *device, int clock, int rate, int type)
 {
 	OPL3 *chip;
 
@@ -2457,7 +2457,7 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 
 
 
-void * ymf262_init(const device_config *device, int clock, int rate)
+void * ymf262_init(running_device *device, int clock, int rate)
 {
 	return OPL3Create(device,clock,rate,OPL3_TYPE_YMF262);
 }

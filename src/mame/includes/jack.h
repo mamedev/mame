@@ -26,7 +26,7 @@ struct _jack_state
 
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

@@ -297,7 +297,7 @@ static WRITE32_HANDLER( undrfire_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				running_device *device = devtag_get_device(space->machine, "eeprom");
 				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(device, data & 0x40);
 				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);

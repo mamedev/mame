@@ -54,9 +54,9 @@ struct _tnzs_state
 
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *subcpu;
-	const device_config *mcu;
+	running_device *audiocpu;
+	running_device *subcpu;
+	running_device *mcu;
 };
 
 

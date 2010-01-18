@@ -32,7 +32,7 @@ struct _i4004_state
 	UINT8	TEST; // Test PIN status
 	PAIR	PC; // It is in fact one of ADDR regs
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -86,7 +86,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i4004_state *get_safe_token(const device_config *device)
+INLINE i4004_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -191,7 +191,7 @@ INLINE void POP_STACK(i4004_state *cpustate)
 	cpustate->pc_pos = (cpustate->pc_pos - 1) & cpustate->addr_mask;
 }
 
-void i4004_set_test(const device_config *device, UINT8 val)
+void i4004_set_test(running_device *device, UINT8 val)
 {
 	i4004_state *cpustate = get_safe_token(device);
 	cpustate->TEST = val;

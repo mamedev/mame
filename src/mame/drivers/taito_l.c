@@ -614,7 +614,7 @@ static WRITE8_HANDLER( mux_ctrl_w )
 }
 
 
-static void champwr_msm5205_vck( const device_config *device )
+static void champwr_msm5205_vck( running_device *device )
 {
 	taitol_state *state = (taitol_state *)device->machine->driver_data;
 
@@ -1940,7 +1940,7 @@ GFXDECODE_END
 
 
 
-static void irqhandler( const device_config *device, int irq )
+static void irqhandler( running_device *device, int irq )
 {
 	taitol_state *state = (taitol_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

@@ -105,7 +105,7 @@ static TIMER_CALLBACK( irq_on )
 }
 
 
-void blstroid_scanline_update(const device_config *screen, int scanline)
+void blstroid_scanline_update(running_device *screen, int scanline)
 {
 	blstroid_state *state = (blstroid_state *)screen->machine->driver_data;
 	int offset = (scanline / 8) * 64 + 40;

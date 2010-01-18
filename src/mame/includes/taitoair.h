@@ -34,9 +34,9 @@ struct _taitoair_state
 	INT32         banknum;
 
 	/* devices */
-	const device_config *audiocpu;
-	const device_config *dsp;
-	const device_config *tc0080vco;
+	running_device *audiocpu;
+	running_device *dsp;
+	running_device *tc0080vco;
 };
 
 

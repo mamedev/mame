@@ -47,9 +47,9 @@ enum {
 
 
 
-static UINT8 tape_get_status_bits(const device_config *device);
-static UINT8 tape_is_present(const device_config *device);
-static void tape_change_speed(const device_config *device, INT8 newspeed);
+static UINT8 tape_get_status_bits(running_device *device);
+static UINT8 tape_is_present(running_device *device);
+static void tape_change_speed(running_device *device, INT8 newspeed);
 
 
 WRITE8_HANDLER( decocass_coin_counter_w )
@@ -1906,7 +1906,7 @@ struct _tape_state
     in device is, in fact, an IDE controller
 -------------------------------------------------*/
 
-INLINE tape_state *get_safe_token(const device_config *device)
+INLINE tape_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2014,7 +2014,7 @@ static const char *tape_describe_state(tape_state *tape)
 
 static TIMER_CALLBACK( tape_clock_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	tape_state *tape = get_safe_token(device);
 
 	/* advance by one clock in the desired direction */
@@ -2071,7 +2071,7 @@ static TIMER_CALLBACK( tape_clock_callback )
     bits from the tape
 -------------------------------------------------*/
 
-static UINT8 tape_get_status_bits(const device_config *device)
+static UINT8 tape_get_status_bits(running_device *device)
 {
 	tape_state *tape = get_safe_token(device);
 	UINT8 tape_bits = 0;
@@ -2128,7 +2128,7 @@ static UINT8 tape_get_status_bits(const device_config *device)
     present
 -------------------------------------------------*/
 
-static UINT8 tape_is_present(const device_config *device)
+static UINT8 tape_is_present(running_device *device)
 {
 	return device->region != NULL;
 }
@@ -2139,7 +2139,7 @@ static UINT8 tape_is_present(const device_config *device)
     playback
 -------------------------------------------------*/
 
-static void tape_change_speed(const device_config *device, INT8 newspeed)
+static void tape_change_speed(running_device *device, INT8 newspeed)
 {
 	tape_state *tape = get_safe_token(device);
 	attotime newperiod;
@@ -2173,8 +2173,8 @@ static DEVICE_START( decocass_tape )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config == NULL);
-	assert(device->inline_config == NULL);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 

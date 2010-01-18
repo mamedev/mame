@@ -147,7 +147,7 @@ static WRITE8_HANDLER( skydiver_nmion_w )
 
 static INTERRUPT_GEN( skydiver_interrupt )
 {
-	const device_config *discrete = devtag_get_device(device->machine, "discrete");
+	running_device *discrete = devtag_get_device(device->machine, "discrete");
 
 	/* Convert range data to divide value and write to sound */
 	discrete_sound_w(discrete, SKYDIVER_RANGE_DATA, (0x01 << (~skydiver_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2

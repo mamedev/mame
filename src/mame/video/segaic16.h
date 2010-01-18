@@ -35,7 +35,7 @@ WRITE16_HANDLER( segaic16_paletteram_w );
 
 void segaic16_tilemap_init(running_machine *machine, int which, int type, int colorbase, int xoffs, int numbanks);
 void segaic16_tilemap_reset(running_machine *machine, int which);
-void segaic16_tilemap_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark);
+void segaic16_tilemap_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark);
 void segaic16_tilemap_set_bank(running_machine *machine, int which, int banknum, int offset);
 void segaic16_tilemap_set_flip(running_machine *machine, int which, int flip);
 void segaic16_tilemap_set_rowscroll(running_machine *machine, int which, int enable);
@@ -60,7 +60,7 @@ WRITE16_HANDLER( segaic16_textram_0_w );
 #define SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD 10
 
 void segaic16_sprites_init(running_machine *machine, int which, int type, int colorbase, int xoffs);
-void segaic16_sprites_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which);
+void segaic16_sprites_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int which);
 void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum, int offset);
 void segaic16_sprites_set_flip(running_machine *machine, int which, int flip);
 void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow);

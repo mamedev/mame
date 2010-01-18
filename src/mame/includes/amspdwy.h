@@ -23,7 +23,7 @@ struct _amspdwy_state
 	UINT8      wheel_return[2];
 
 	/* devices */
-	const device_config *audiocpu;
+	running_device *audiocpu;
 };
 
 

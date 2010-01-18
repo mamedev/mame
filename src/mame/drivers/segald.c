@@ -31,7 +31,7 @@ static UINT8* color_RAM;
 static UINT8* fix_RAM;
 static UINT8* out_RAM;
 
-static const device_config *laserdisc;
+static running_device *laserdisc;
 static UINT8 ldv1000_input_latch;
 static UINT8 ldv1000_output_latch;
 

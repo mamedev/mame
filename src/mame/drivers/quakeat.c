@@ -72,8 +72,8 @@ static VIDEO_UPDATE(quake)
 }
 
 static struct {
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
+	running_device	*pic8259_1;
+	running_device	*pic8259_2;
 } quakeat_devices;
 
 static ADDRESS_MAP_START( quake_map, ADDRESS_SPACE_PROGRAM, 32 )

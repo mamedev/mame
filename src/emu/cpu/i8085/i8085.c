@@ -183,7 +183,7 @@ struct _i8085_state
 	UINT8				ietemp;			/* import/export temp space */
 
 	cpu_irq_callback	irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	cpu_state_table 	state;
@@ -318,7 +318,7 @@ static void execute_one(i8085_state *cpustate, int opcode);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8085_state *get_safe_token(const device_config *device)
+INLINE i8085_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1018,7 +1018,7 @@ static void init_tables (int type)
 }
 
 
-static void init_808x_common(const device_config *device, cpu_irq_callback irqcallback, int type)
+static void init_808x_common(running_device *device, cpu_irq_callback irqcallback, int type)
 {
 	i8085_state *cpustate = get_safe_token(device);
 
@@ -1029,8 +1029,8 @@ static void init_808x_common(const device_config *device, cpu_irq_callback irqca
 	cpustate->state.baseptr = cpustate;
 	cpustate->state.subtypemask = 1 << type;
 
-	if (device->static_config != NULL)
-		cpustate->config = *(i8085_config *)device->static_config;
+	if (device->baseconfig().static_config != NULL)
+		cpustate->config = *(i8085_config *)device->baseconfig().static_config;
 	cpustate->cputype = type;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

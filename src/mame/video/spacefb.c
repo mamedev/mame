@@ -147,7 +147,7 @@ static void get_starfield_pens(pen_t *pens)
 }
 
 
-static void draw_starfield(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_starfield(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
 	pen_t pens[NUM_STARFIELD_PENS];

@@ -62,10 +62,10 @@ struct _tms34010_state
 	UINT8				external_host_access;
 	UINT8				executing;
 	cpu_irq_callback	irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const tms34010_config *config;
-	const device_config *screen;
+	running_device *screen;
 	emu_timer *			scantimer;
 	int					icount;
 
@@ -82,7 +82,7 @@ struct _tms34010_state
 	cpu_state_table		state;
 };
 
-INLINE tms34010_state *get_safe_token(const device_config *device)
+INLINE tms34010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -683,7 +683,7 @@ static void check_interrupt(tms34010_state *tms)
 
 static CPU_INIT( tms34010 )
 {
-	const tms34010_config *configdata = device->static_config ? (const tms34010_config *)device->static_config : &default_config;
+	const tms34010_config *configdata = device->baseconfig().static_config ? (const tms34010_config *)device->baseconfig().static_config : &default_config;
 	tms34010_state *tms = get_safe_token(device);
 
 	tms->external_host_access = FALSE;
@@ -725,7 +725,7 @@ static CPU_RESET( tms34010 )
 	/* zap the state and copy in the config pointer */
 	tms34010_state *tms = get_safe_token(device);
 	const tms34010_config *config = tms->config;
-	const device_config *screen = tms->screen;
+	running_device *screen = tms->screen;
 	UINT16 *shiftreg = tms->shiftreg;
 	cpu_irq_callback save_irqcallback = tms->irq_callback;
 	emu_timer *save_scantimer = tms->scantimer;
@@ -1096,7 +1096,7 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-void tms34010_get_display_params(const device_config *cpu, tms34010_display_params *params)
+void tms34010_get_display_params(running_device *cpu, tms34010_display_params *params)
 {
 	tms34010_state *tms = get_safe_token(cpu);
 
@@ -1135,7 +1135,7 @@ VIDEO_UPDATE( tms340x0 )
 	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
-	const device_config *cpu;
+	running_device *cpu;
 	int x;
 
 	/* find the owning CPU */
@@ -1609,7 +1609,7 @@ static STATE_POSTLOAD( tms34010_state_postload )
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-void tms34010_host_w(const device_config *cpu, int reg, int data)
+void tms34010_host_w(running_device *cpu, int reg, int data)
 {
 	const address_space *space;
 	tms34010_state *tms = get_safe_token(cpu);
@@ -1665,7 +1665,7 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
     HOST INTERFACE READS
 ***************************************************************************/
 
-int tms34010_host_r(const device_config *cpu, int reg)
+int tms34010_host_r(running_device *cpu, int reg)
 {
 	tms34010_state *tms = get_safe_token(cpu);
 	unsigned int addr;

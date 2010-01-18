@@ -27,15 +27,15 @@ struct _taitoz_state
 //  UINT8       pandata[4];
 
 	/* devices */
-	const device_config *maincpu;
-	const device_config *audiocpu;
-	const device_config *subcpu;
-	const device_config *eeprom;
-	const device_config *tc0480scp;
-	const device_config *tc0150rod;
-	const device_config *tc0100scn;
-	const device_config *tc0220ioc;
-	const device_config *tc0140syt;
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *subcpu;
+	running_device *eeprom;
+	running_device *tc0480scp;
+	running_device *tc0150rod;
+	running_device *tc0100scn;
+	running_device *tc0220ioc;
+	running_device *tc0140syt;
 };
 
 /*----------- defined in video/taito_z.c -----------*/

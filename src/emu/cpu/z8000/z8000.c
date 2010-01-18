@@ -78,7 +78,7 @@ struct _z8000_state
 	int nmi_state;		/* NMI line state */
 	int irq_state[2];	/* IRQ line states (NVI, VI) */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -86,7 +86,7 @@ struct _z8000_state
 
 #include "z8000cpu.h"
 
-INLINE z8000_state *get_safe_token(const device_config *device)
+INLINE z8000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

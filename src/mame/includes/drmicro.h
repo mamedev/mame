@@ -20,7 +20,7 @@ struct _drmicro_state
 	int            pcm_adr;
 
 	/* devices */
-	const device_config *msm;
+	running_device *msm;
 };
 
 
