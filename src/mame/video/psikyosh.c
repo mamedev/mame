@@ -4,50 +4,58 @@ See src/drivers/psikyosh.c for more info
 
 Hardware is extremely flexible (and luckily underused, although we now have a relatively complete implementation :). Many effects are subtle (e.g. fades, scanline effects).
 
-There are 32 data banks of 0x800 bytes starting at 0x3000000
-The first 8 are continuous and used for sprites exclusively in every game
+Banks:
+There are 32 data banks of 0x800 bytes starting at 0x3000000 (ps3) / 0x4000000 (ps5/ps5v2)
 
-Banks can be one of:
-* a set of adjacent banks for sprites (always uses the first 8 banks, probably configurable in the vid regs somehow
-* tilemap tiles (or 2 adjacent banks for large tilemaps)
-* xscroll/yscroll, pri/xzoom/alpha/bank per-layer (of which there are three) -> which points to another tilebank per-layer
-* xscroll/yscroll, pri/xzoom/alpha/bank per-scanline (typically 224) -> which points to another tilebank per-line
-* pre (i.e. screen clear) + post (i.e. drawn with a non-zero priority) line-fill/blend layer
+Can be one of:
+* a set of adjacent banks for sprites (we always use the first 7 banks currently, looks to be configurable in vidregs
+* a sprite draw list (max 1024 sprites, always in bank 07?)
+* pre (i.e. screen clear) + post (i.e. drawn with a non-zero priority) line-fill/blend layer (usually bank 08)
+* tilemap tiles (or 2 adjacent banks for large tilemaps) (usually banks 0c-1f)
+* xscroll/yscroll, pri/xzoom/alpha/bank per-layer (of which there are four) -> which points to another tilebank per-layer (usually bank 0a/0b)
+* xscroll/yscroll, pri/xzoom/alpha/bank per-scanline (typically 224) -> which points to another tilebank per-line (usually bank 0c/0d)
 
 Most games use bank 0x0a and 0x0b for the registers for double-buffering, which then refer to other banks for the tiles. If they use line-effects, they tend to populate the per-line registers into one of the other banks e.g. daraku or S1945II test+level 7+level8 boss and S1945III levels 7+8, soldivid final boss.
 */
 
 /*
-BG Scroll/Priority/Zoom/Alpha/Tilebank:
+BG Scroll/Priority/Zoom/Alpha/Tilebank registers:
 Either at 0x30053f0/4/8 (For 0a), 0x3005bf0/4/8 (For 0b) etc. (i.e. in the middle of a bank) Or per-line in a bank
    0x?vvv?xxx - v = vertical scroll - x = x scroll
 Either at 0x30057f0/4/8 (For 0a), 0x3005ff0/4/8 (For 0b) etc. (i.e. at the end of the bank) Or per-line in a bank
    0xppzzaabb - p = priority, z = zoom/expand(00 is none), a = alpha value/effect, b = tilebank
 
 Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
-
-0x00 -- alpha values for sprites, 8-bits per value (0-0x3f). sbomberb = 0000 3830 2820 1810
-0x04 --   "
-0x08 -- 0xffff0000 priority values for sprites, 4-bits per value, 0x00c0 is vert game (Controls whether row/line effects?), 0x000f is priority for per-line post-blending
-0x0c -- A table of 4 6-bit values (occupying a byte each), usually increasing from 0-0x3f again (unknown). 0000C000 is flipscreen (currently ignored).
-
-0x10 -- ffff0000 is always 0x00aa, 0000f000 varies, unknown. 00000fff Controls gfx data available to be read by SH-2 for verification.
-0x14 -- 83ff000e always? This and above may be related to vid timings
-0x18 -- bank for tilemaps. As follows for the different tilemaps: 112233--
-        usually 0a = normal 0b = alt buffer
-        Bit 0x80 indicates use of line effects and the bank should be used to look up the tile-bank per line.
+0x00 -- ffffffff alpha values for sprites, 8-bits per value (0-0x3f, 0x80 indicates per-pen alpha). sbomberb = 0000 3830 2820 1810
+0x04 -- ffffffff above continued.
+0x08 -- ffff0000 priority values for sprites, 4-bits per value
+        0000ff00 unknown. always 20. number of addressable banks? boards are populated with 20.
+        000000f0 unknown. s1945ii/s1945iii/gunbird2/gnbarich/tgm2 sets to c. soldivid/daraku is 0. another bank select?
+        0000000f is priority for per-line post-blending
+0x0c -- 3f3f3f3f unknown. A table of 4 6-bit values. usually 0f102038. tgm2 is 0a172838.
+        c0c00000 unknown. unused?
+        0000c000 is flipscreen (currently ignored).
+        000000c0 is screen size select. 0 is 224 lines, c is 240 (not confirmed).
+0x10 -- ffff0000 is always 00aa
+        0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/sbomberb/s1945ii is 3, gunbird2/s1945iii is 2, soldivid/daraku is b.
+        00000fff Controls gfx data bank available to be read by SH-2 for verification.
+0x14 -- ffffffff always 83ff000e
+0x18 -- ffffffff bank for tilemaps. As follows for the different tilemaps: 11223344. Bit 0x80 indicates use of line effects and the bank should be used to look up the tile-bank per line.
 0x1c -- ff000000 controls bank for 'pre'/'post' values
-        0000fff0 enable bits for 3 tilemaps. 8 is enable. 4 indicates 8bpp tiles. 1 is size select for tilemap
+        00ff0000 unknown, always 0?
+        0000ffff enable bits for 4 tilemaps. 8 is enable. 4 indicates 8bpp tiles. 1 is size select for tilemap
 */
 
 /*
 TODO:
-* Speedup per-line effects. currently terribly slow. how? Currently we have a hack for daraku to make it usable.
+* Perform tests on real hardware to document limits and remaining registers
+* Confirm existence of 4th tilemap layer on real hw
+* Hookup configurable sprite banks (not needed? reports of tgm2 dropping sprites when busy on real hw)
+* Hookup screen size select
 * Flip screen, located but not implemented. wait until tilemaps.
 * The stuff might be converted to use the tilemaps once all the features is worked out ...
 The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and every pair of adjacent banks for large tilemaps. This is rather than having one per background layer, due to the line effects. Would also need to support all of the logic relating to alpha table blending, row and column scroll/zoom etc.
 */
-
 
 #include "emu.h"
 #include "profiler.h"
@@ -57,7 +65,6 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE
-
 
 static UINT8 alphatable[256];	// this might be moved to psikyosh_state, if we ever add a *machine parameter to drawgfxm.h macros
 
@@ -477,15 +484,15 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 	const int lay_keys[8] = {KEYCODE_Q, KEYCODE_W, KEYCODE_E, KEYCODE_R};
 	bool lay_debug = false;
-	for (i = 0; i < 3; i++)
+	for (i = 0; i <= 3; i++)
 	{
 		if(input_code_pressed(machine, lay_keys[i])) {
 			lay_debug = true;
 		}
 	}
 
-	/* 1st-3rd layers */
-	for (i = 0; i < 3; i++)
+	/* 1st-4th layers */
+	for (i = 0; i <= 3; i++)
 	{
 #ifdef DEBUG_KEYS
 		if(lay_debug && !input_code_pressed(machine, lay_keys[i])) {
@@ -1060,7 +1067,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
-    0 ---- --yy yyyy yyyy | ---- --xx xxxx xxxx  1  F--- hhhh ZZZZ ZZZZ | fPPP wwww zzzz zzzz
+    0 ---- --yy yyyy yyyy | ---- --xx xxxx xxxx  1  F--- hhhh ZZZZ ZZZZ | f-PP wwww zzzz zzzz
     2 pppp pppp -aaa -nnn | nnnn nnnn nnnn nnnn  3  ---- ---- ---- ---- | ---- ---- ---- ----
 
     y = ypos
@@ -1106,7 +1113,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		listdat = list[BYTE_XOR_BE(listcntr)];
 		sprnum = (listdat & 0x03ff) * 4;
 
-		pri  = (src[sprnum + 1] & 0x00003000) >> 12; // & 0x00007000/0x00003000 ?
+		pri  = (src[sprnum + 1] & 0x00003000) >> 12;
 		pri = SPRITE_PRI(pri);
 
 		if (pri == req_pri)
@@ -1252,9 +1259,6 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 {
 	int i;
 	psikyosh_state *state = (psikyosh_state *)screen->machine->driver_data;
-
-				fprintf(stderr, "\nNew Frame\n");
-
 
 	// show only the priority associated with a given keypress(s) and/or hide sprites/tilemaps
 	int pri_debug = false;
