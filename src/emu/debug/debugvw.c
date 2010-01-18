@@ -85,9 +85,9 @@ struct _debug_view_expression
 
 
 /* debug_view describes a single text-based view */
-/* typedef struct _debug_view debug_view -- defined in debugvw.h */
-struct _debug_view
+class debug_view
 {
+public:
 	/* core view data */
 	debug_view *		next;					/* link to the next view */
 	running_machine *	machine;				/* machine associated with this view */
@@ -1024,26 +1024,20 @@ static void textbuf_view_notify(debug_view *view, view_notification type)
 
 static const registers_subview_item *registers_view_enumerate_subviews(running_machine *machine)
 {
-	astring tempstring;
 	registers_subview_item *head = NULL;
 	registers_subview_item **tailptr = &head;
-	running_device *cpu;
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	for (running_device *cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
-		registers_subview_item *subview;
-
-		/* determine the string and allocate a subview large enough */
-		tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), device_get_name(cpu));
-		subview = (registers_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
+		registers_subview_item *subview = auto_alloc(machine, registers_subview_item);
 
 		/* populate the subview */
 		subview->next = NULL;
 		subview->index = curindex++;
+		subview->name.printf("CPU '%s' (%s)", cpu->tag.cstr(), device_get_name(cpu));
 		subview->device = cpu;
-		strcpy(subview->name, tempstring);
 
 		/* add to the list */
 		*tailptr = subview;
@@ -1061,14 +1055,12 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 
 static int registers_view_alloc(debug_view *view)
 {
-	debug_view_registers *regdata;
-
 	/* fail if no available subviews */
 	if (view->machine->debugvw_data->registers_subviews == NULL)
 		return FALSE;
 
 	/* allocate memory */
-	regdata = auto_alloc_clear(view->machine, debug_view_registers);
+	debug_view_registers *regdata = auto_alloc_clear(view->machine, debug_view_registers);
 
 	/* default to the first subview */
 	regdata->device = view->machine->debugvw_data->registers_subviews->device;
@@ -1485,29 +1477,23 @@ void registers_view_set_subview(debug_view *view, int index)
 
 static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine *machine)
 {
-	astring tempstring;
 	disasm_subview_item *head = NULL;
 	disasm_subview_item **tailptr = &head;
-	running_device *cpu;
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	for (running_device *cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 		if (space != NULL)
 		{
-			disasm_subview_item *subview;
-
-			/* determine the string and allocate a subview large enough */
-			tempstring.printf("CPU '%s' (%s)", cpu->tag.cstr(), device_get_name(cpu));
-			subview = (disasm_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
+			disasm_subview_item *subview = auto_alloc(machine, disasm_subview_item);
 
 			/* populate the subview */
 			subview->next = NULL;
 			subview->index = curindex++;
+			subview->name.printf("CPU '%s' (%s)", cpu->tag.cstr(), device_get_name(cpu));
 			subview->space = space;
-			strcpy(subview->name, tempstring);
 
 			/* add to the list */
 			*tailptr = subview;
@@ -2362,38 +2348,29 @@ void disasm_view_set_selected_address(debug_view *view, offs_t address)
 
 static const memory_subview_item *memory_view_enumerate_subviews(running_machine *machine)
 {
-	astring tempstring;
 	memory_subview_item *head = NULL;
 	memory_subview_item **tailptr = &head;
-	running_device *device;
-	int spacenum;
-	const char *rgntag;
 	int curindex = 0;
-	int itemnum;
 
 	/* first add all the device's address spaces */
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+	for (running_device *device = machine->devicelist.first(); device != NULL; device = device->next)
+		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space *space = device->space(spacenum);
 			if (space != NULL)
 			{
-				memory_subview_item *subview;
-
-				/* determine the string and allocate a subview large enough */
-				if (device->type == CPU)
-					tempstring.printf("CPU '%s' (%s) %s memory", device->tag.cstr(), device_get_name(device), space->name);
-				else
-					tempstring.printf("%s '%s' space #%d memory", device_get_name(device), device->tag.cstr(), spacenum);
-				subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
+				memory_subview_item *subview = auto_alloc(machine, memory_subview_item);
 
 				/* populate the subview */
 				subview->next = NULL;
 				subview->index = curindex++;
+				if (device->type == CPU)
+					subview->name.printf("CPU '%s' (%s) %s memory", device->tag.cstr(), device_get_name(device), space->name);
+				else
+					subview->name.printf("%s '%s' space #%d memory", device_get_name(device), device->tag.cstr(), spacenum);
 				subview->space = space;
 				subview->endianness = space->endianness;
 				subview->prefsize = space->dbits / 8;
-				strcpy(subview->name, tempstring);
 
 				/* add to the list */
 				*tailptr = subview;
@@ -2402,66 +2379,47 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		}
 
 	/* then add all the memory regions */
-	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
+	for (const region_info *region = machine->regionlist.first(); region != NULL; region = region->next)
 	{
-		UINT32 length = memory_region_length(machine, rgntag);
-		UINT32 flags = memory_region_flags(machine, rgntag);
-		if (length > 0 && (flags & ROMREGION_DATATYPEMASK) == ROMREGION_DATATYPEROM)
-		{
-			UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-			UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
-			memory_subview_item *subview;
+		memory_subview_item *subview = auto_alloc(machine, memory_subview_item);
 
-			/* determine the string and allocate a subview large enough */
-			tempstring.printf("Region '%s'", rgntag);
-			subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
+		/* populate the subview */
+		subview->next = NULL;
+		subview->index = curindex++;
+		subview->name.printf("Region '%s'", region->name.cstr());
+		subview->base = *region;
+		subview->length = region->bytes();
+		subview->offsetxor = NATIVE_ENDIAN_VALUE_LE_BE(region->width() - 1, 0);
+		subview->endianness = region->endianness();
+		subview->prefsize = MIN(region->width(), 8);
 
-			/* populate the subview */
-			subview->next = NULL;
-			subview->index = curindex++;
-			subview->base = memory_region(machine, rgntag);
-			subview->length = memory_region_length(machine, rgntag);
-			subview->offsetxor = NATIVE_ENDIAN_VALUE_LE_BE(width - 1, 0);
-			subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
-			subview->prefsize = MIN(width, 8);
-			strcpy(subview->name, tempstring);
-
-			/* add to the list */
-			*tailptr = subview;
-			tailptr = &subview->next;
-		}
+		/* add to the list */
+		*tailptr = subview;
+		tailptr = &subview->next;
 	}
 
 	/* finally add all global array symbols */
-	for (itemnum = 0; itemnum < 10000; itemnum++)
+	for (int itemnum = 0; itemnum < 10000; itemnum++)
 	{
-		UINT32 valsize, valcount;
-		const char *name;
-		void *base;
-
 		/* stop when we run out of items */
-		name = state_save_get_indexed_item(machine, itemnum, &base, &valsize, &valcount);
+		UINT32 valsize, valcount;
+		void *base;
+		const char *name = state_save_get_indexed_item(machine, itemnum, &base, &valsize, &valcount);
 		if (name == NULL)
 			break;
 
 		/* if this is a single-entry global, add it */
 		if (valcount > 1 && strstr(name, "globals/"))
 		{
-			memory_subview_item *subview;
-
-			/* determine the string and allocate a subview large enough */
-			tempstring.printf("%s", strrchr(name, '/') + 1);
-			subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + tempstring.len());
+			memory_subview_item *subview = auto_alloc(machine, memory_subview_item);
 
 			/* populate the subview */
 			subview->next = NULL;
 			subview->index = curindex++;
+			subview->name.cpy(strrchr(name, '/') + 1);
 			subview->base = base;
 			subview->length = valcount * valsize;
-			subview->offsetxor = 0;
-			subview->endianness = ENDIANNESS_NATIVE;
 			subview->prefsize = MIN(valsize, 8);
-			strcpy(subview->name, tempstring);
 
 			/* add to the list */
 			*tailptr = subview;

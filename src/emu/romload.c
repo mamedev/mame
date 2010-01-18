@@ -1280,31 +1280,33 @@ static void process_region_list(rom_load_data *romdata)
 			/* the first entry must be a region */
 			assert(ROMENTRY_ISREGION(region));
 
-			/* if this is a device region, override with the device width and endianness */
-			if (romdata->machine->device(regiontag) != NULL)
-				regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
+			if (ROMREGION_ISROMDATA(region))
+			{
+				/* if this is a device region, override with the device width and endianness */
+				if (romdata->machine->device(regiontag) != NULL)
+					regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
 
-			/* remember the base and length */
-			romdata->region = memory_region_alloc(romdata->machine, regiontag, regionlength, regionflags);
-			LOG(("Allocated %X bytes @ %p\n", romdata->region->length, romdata->region->base.v));
+				/* remember the base and length */
+				romdata->region = memory_region_alloc(romdata->machine, regiontag, regionlength, regionflags);
+				LOG(("Allocated %X bytes @ %p\n", romdata->region->length, romdata->region->base.v));
 
-			/* clear the region if it's requested */
-			if (ROMREGION_ISERASE(region))
-				memset(romdata->region->base.v, ROMREGION_GETERASEVAL(region), romdata->region->length);
+				/* clear the region if it's requested */
+				if (ROMREGION_ISERASE(region))
+					memset(romdata->region->base.v, ROMREGION_GETERASEVAL(region), romdata->region->length);
 
-			/* or if it's sufficiently small (<= 4MB) */
-			else if (romdata->region->length <= 0x400000)
-				memset(romdata->region->base.v, 0, romdata->region->length);
+				/* or if it's sufficiently small (<= 4MB) */
+				else if (romdata->region->length <= 0x400000)
+					memset(romdata->region->base.v, 0, romdata->region->length);
 
 #ifdef MAME_DEBUG
-			/* if we're debugging, fill region with random data to catch errors */
-			else
-				fill_random(romdata->machine, romdata->region->base.u8, romdata->region->length);
+				/* if we're debugging, fill region with random data to catch errors */
+				else
+					fill_random(romdata->machine, romdata->region->base.u8, romdata->region->length);
 #endif
 
-			/* now process the entries in the region */
-			if (ROMREGION_ISROMDATA(region))
+				/* now process the entries in the region */
 				process_rom_entries(romdata, ROMREGION_ISLOADBYNAME(region) ? ROMREGION_GETTAG(region) : NULL, region + 1);
+			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(romdata, ROMREGION_GETTAG(region), region + 1);
 		}

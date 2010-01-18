@@ -89,7 +89,7 @@ typedef enum _disasm_right_column disasm_right_column;
 ***************************************************************************/
 
 /* opaque structure representing a debug view */
-typedef struct _debug_view debug_view;
+class debug_view;
 
 
 /* OSD callback function for a view */
@@ -97,8 +97,7 @@ typedef void (*debug_view_osd_update_func)(debug_view *view, void *osdprivate);
 
 
 /* pair of X,Y coordinates for sizing */
-typedef struct _debug_view_xy debug_view_xy;
-struct _debug_view_xy
+struct debug_view_xy
 {
 	INT32				x;
 	INT32				y;
@@ -106,46 +105,71 @@ struct _debug_view_xy
 
 
 /* a registers subview item */
-typedef struct _registers_subview_item registers_subview_item;
-struct _registers_subview_item
+class registers_subview_item
 {
+	DISABLE_COPYING(registers_subview_item);
+	
+public:
+	registers_subview_item()
+		: next(NULL),
+		  index(0),
+		  device(NULL) { }
+	
 	registers_subview_item *next;				/* link to next item */
 	int					index;					/* index of this item */
-	running_device *device;				/* CPU to display */
-	char				name[1];				/* name of the subview item */
+	astring				name;					/* name of the subview item */
+	running_device *	device;					/* device to display */
 };
 
 
 /* a disassembly subview item */
-typedef struct _disasm_subview_item disasm_subview_item;
-struct _disasm_subview_item
+class disasm_subview_item
 {
+	DISABLE_COPYING(disasm_subview_item);
+	
+public:
+	disasm_subview_item()
+		: next(NULL),
+		  index(0),
+		  space(NULL) { }
+
 	disasm_subview_item *next;					/* link to next item */
 	int					index;					/* index of this item */
+	astring				name;					/* name of the subview item */
 	const address_space *space;					/* address space to display */
-	char				name[1];				/* name of the subview item */
 };
 
 
 /* a memory subview item */
-typedef struct _memory_subview_item memory_subview_item;
-struct _memory_subview_item
+class memory_subview_item
 {
+	DISABLE_COPYING(memory_subview_item);
+	
+public:
+	memory_subview_item()
+		: next(NULL),
+		  index(0),
+		  space(NULL),
+		  base(NULL),
+		  length(0),
+		  offsetxor(0),
+		  endianness(ENDIANNESS_NATIVE),
+		  prefsize(1) { }
+
 	memory_subview_item *next;					/* link to next item */
 	int					index;					/* index of this item */
+	astring				name;					/* name of the subview item */
 	const address_space *space;					/* address space we reference (if any) */
 	void *				base;					/* pointer to memory base */
 	offs_t				length;					/* length of memory */
 	offs_t				offsetxor;				/* XOR to apply to offsets */
 	UINT8				endianness;				/* endianness of memory */
 	UINT8				prefsize;				/* preferred bytes per chunk */
-	char				name[1];				/* name of the subview item */
 };
 
 
 /* a single "character" in the debug view has an ASCII value and an attribute byte */
-typedef struct _debug_view_char debug_view_char;
-struct _debug_view_char
+struct debug_view_char
 {
 	UINT8				byte;
 	UINT8				attrib;
