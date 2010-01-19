@@ -330,26 +330,30 @@ static MACHINE_RESET(mquake)
  *
  *************************************/
 
-static const cia6526_interface cia_0_intf =
+static const mos6526_interface cia_0_intf =
 {
+	0,													/* tod_clock */
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_INPUT_PORT("CIA0PORTA"), DEVCB_HANDLER(mquake_cia_0_porta_w) },	/* port A */
-		{ DEVCB_HANDLER(mquake_cia_0_portb_r), DEVCB_HANDLER(mquake_cia_0_portb_w) }	/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("CIA0PORTA"),
+	DEVCB_HANDLER(mquake_cia_0_porta_w),	/* port A */
+	DEVCB_HANDLER(mquake_cia_0_portb_r),
+	DEVCB_HANDLER(mquake_cia_0_portb_w)	/* port B */
 };
 
-static const cia6526_interface cia_1_intf =
+static const mos6526_interface cia_1_intf =
 {
+	0,													/* tod_clock */
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_NULL, DEVCB_NULL },									/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( mquake )
@@ -394,8 +398,8 @@ static MACHINE_DRIVER_START( mquake )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cia */
-	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
-	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
+	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
+	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
 

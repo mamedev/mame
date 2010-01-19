@@ -377,26 +377,30 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const cia6526_interface cia_0_intf =
+static const mos6526_interface cia_0_intf =
 {
+	0,												/* tod_clock */
 	DEVCB_LINE(amiga_cia_0_irq),								/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,												/* tod_clock */
-	{
-		{ DEVCB_HANDLER(alg_cia_0_porta_r), DEVCB_HANDLER(alg_cia_0_porta_w) },	/* port A */
-		{ DEVCB_HANDLER(alg_cia_0_portb_r), DEVCB_HANDLER(alg_cia_0_portb_w) }	/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(alg_cia_0_porta_r),
+	DEVCB_HANDLER(alg_cia_0_porta_w),	/* port A */
+	DEVCB_HANDLER(alg_cia_0_portb_r),
+	DEVCB_HANDLER(alg_cia_0_portb_w)	/* port B */
 };
 
-static const cia6526_interface cia_1_intf =
+static const mos6526_interface cia_1_intf =
 {
+	0,												/* tod_clock */
 	DEVCB_LINE(amiga_cia_1_irq),								/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,												/* tod_clock */
-	{
-		{ DEVCB_HANDLER(alg_cia_1_porta_r), DEVCB_HANDLER(alg_cia_1_porta_w), },	/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }								/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(alg_cia_1_porta_r),
+	DEVCB_HANDLER(alg_cia_1_porta_w),	/* port A */
+	DEVCB_NULL,
+	DEVCB_NULL								/* port B */
 };
 
 static MACHINE_DRIVER_START( alg_r1 )
@@ -438,8 +442,8 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* cia */
-	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
-	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
+	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
+	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
 

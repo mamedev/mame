@@ -1,54 +1,86 @@
 /**********************************************************************
 
-    MOS 6526/8520 CIA interface and emulation
+    MOS 6526/8520 Complex Interface Adapter emulation
 
-    This function emulates all the functionality of up to 2 MOS6526 or
-    MOS8520 complex interface adapters.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+                            _____   _____
+                   Vss   1 |*    \_/     | 40  CNT
+                   PA0   2 |             | 39  SP
+                   PA1   3 |             | 38  RS0
+                   PA2   4 |             | 37  RS1
+                   PA3   5 |             | 36  RS2
+                   PA4   6 |             | 35  RS3
+                   PA5   7 |             | 34  _RES
+                   PA6   8 |             | 33  DB0
+                   PA7   9 |             | 32  DB1
+                   PB0  10 |   MOS6526   | 31  DB2
+                   PB1  11 |   MOS8520   | 30  DB3
+                   PB2  12 |             | 29  DB4
+                   PB3  13 |             | 28  DB5
+                   PB4  14 |             | 27  DB6
+                   PB5  15 |             | 26  DB7
+                   PB6  16 |             | 25  phi2
+                   PB7  17 |             | 24  _FLAG
+                   _PC  18 |             | 23  _CS
+                   TOD  19 |             | 22  R/W
+                   Vcc  20 |_____________| 21  _IRQ
 
 **********************************************************************/
 
 #ifndef __6526CIA_H__
 #define __6526CIA_H__
 
-
+#include "devcb.h"
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-#define CIA6526R1		DEVICE_GET_INFO_NAME(cia6526r1)
-#define CIA6526R2		DEVICE_GET_INFO_NAME(cia6526r1)
-#define CIA8520			DEVICE_GET_INFO_NAME(cia8520)
+#define MOS6526R1		DEVICE_GET_INFO_NAME(cia6526r1)
+#define MOS6526R2		DEVICE_GET_INFO_NAME(cia6526r1)
+#define MOS8520			DEVICE_GET_INFO_NAME(cia8520)
 
-#define MDRV_CIA6526_ADD(_tag, _variant, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, _variant, _clock) \
+#define MDRV_MOS6526R1_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, MOS6526R1, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CIA8520_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, CIA8520, _clock) \
+#define MDRV_MOS6526R2_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, MOS6526R2, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
+#define MDRV_MOS8520_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, MOS8520, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
 
+#define MOS6526_INTERFACE(name) \
+	const mos6526_interface (name)=
+
+#define MOS8520_INTERFACE(name) \
+	const mos6526_interface (name)=
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _cia6526_interface cia6526_interface;
-struct _cia6526_interface
+typedef struct _mos6526_interface mos6526_interface;
+struct _mos6526_interface
 {
-	devcb_write_line irq_func;
-	devcb_write_line pc_func;
-
 	int tod_clock;
 
-	struct
-	{
-		devcb_read8 read;
-		devcb_write8 write;
-	} port[2];
-};
+	devcb_write_line	out_irq_func;
+	devcb_write_line	out_pc_func;
+	devcb_write_line	out_cnt_func;
+	devcb_write_line	out_sp_func;
 
+	devcb_read8			in_pa_func;
+	devcb_write8		out_pa_func;
+
+	devcb_read8			in_pb_func;
+	devcb_write8		out_pb_func;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -58,25 +90,32 @@ DEVICE_GET_INFO(cia6526r1);
 DEVICE_GET_INFO(cia6526r2);
 DEVICE_GET_INFO(cia8520);
 
-/* configuration */
-void cia_set_port_mask_value(running_device *device, int port, int data);
+/* register access */
+READ8_DEVICE_HANDLER( mos6526_r );
+WRITE8_DEVICE_HANDLER( mos6526_w );
 
-/* reading and writing */
-READ8_DEVICE_HANDLER( cia_r );
-WRITE8_DEVICE_HANDLER( cia_w );
-void cia_clock_tod(running_device *device);
-void cia_issue_index(running_device *device);
-void cia_set_input_cnt(running_device *device, int data);
-void cia_set_input_sp(running_device *device, int data);
+/* port access */
+READ8_DEVICE_HANDLER( mos6526_pa_r );
+READ8_DEVICE_HANDLER( mos6526_pb_r );
 
+/* interrupt request */
+READ_LINE_DEVICE_HANDLER( mos6526_irq_r );
+
+/* time of day clock */
 WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w );
+
+/* serial counter */
+READ_LINE_DEVICE_HANDLER( mos6526_cnt_r );
 WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w );
+
+/* serial port */
+READ_LINE_DEVICE_HANDLER( mos6526_sp_r );
 WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
+
+/* flag */
 WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w );
 
-/* accessors */
-UINT8 cia_get_output_a(running_device *device);
-UINT8 cia_get_output_b(running_device *device);
-int cia_get_irq(running_device *device);
+/* port mask */
+void cia_set_port_mask_value(const device_config *device, int port, int data);
 
 #endif /* __6526CIA_H__ */

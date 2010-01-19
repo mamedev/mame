@@ -381,7 +381,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine, 0, (data & 2) ? 0 : 1);
 
-	handle_cd32_joystick_cia(data, cia_r(device, 2));
+	handle_cd32_joystick_cia(data, mos6526_r(device, 2));
 }
 
 /*************************************
@@ -1016,26 +1016,30 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const cia6526_interface cia_0_intf =
+static const mos6526_interface cia_0_intf =
 {
+	0,													/* tod_clock */
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_INPUT_PORT("CIA0PORTA"), DEVCB_HANDLER(cd32_cia_0_porta_w) },		/* port A */
-		{ DEVCB_HANDLER(cd32_cia_0_portb_r), DEVCB_HANDLER(cd32_cia_0_portb_w) }		/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("CIA0PORTA"),
+	DEVCB_HANDLER(cd32_cia_0_porta_w),		/* port A */
+	DEVCB_HANDLER(cd32_cia_0_portb_r),
+	DEVCB_HANDLER(cd32_cia_0_portb_w)		/* port B */
 };
 
-static const cia6526_interface cia_1_intf =
+static const mos6526_interface cia_1_intf =
 {
+	0,													/* tod_clock */
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_NULL, DEVCB_NULL },									/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( cd32 )
@@ -1074,8 +1078,8 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	/* cia */
-	MDRV_CIA8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)
-	MDRV_CIA8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
+	MDRV_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)
+	MDRV_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))

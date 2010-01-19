@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "6526cia.h"
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -32,7 +31,6 @@
 #define CIA_ICR			13
 #define CIA_CRA			14
 #define CIA_CRB			15
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -66,8 +64,10 @@ struct _cia_port
 struct _cia_state
 {
 	running_device *device;
-	devcb_resolved_write_line irq_func;
-	devcb_resolved_write_line pc_func;
+	devcb_resolved_write_line out_irq_func;
+	devcb_resolved_write_line out_pc_func;
+	devcb_resolved_write_line out_cnt_func;
+	devcb_resolved_write_line out_sp_func;
 
 	cia_port		port[2];
 	cia_timer		timer[2];
@@ -94,7 +94,6 @@ struct _cia_state
 	UINT8			serial;
 };
 
-
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
@@ -103,8 +102,6 @@ static TIMER_CALLBACK( cia_timer_proc );
 static void cia_timer_underflow(running_device *device, int timer);
 static TIMER_CALLBACK( cia_clock_tod_callback );
 
-
-
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
@@ -112,97 +109,20 @@ static TIMER_CALLBACK( cia_clock_tod_callback );
 INLINE cia_state *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == CIA6526R1) || (device->type == CIA6526R2) || (device->type == CIA8520));
+	assert((device->type == MOS6526R1) || (device->type == MOS6526R2) || (device->type == MOS8520));
 	return (cia_state *) device->token;
 }
 
-
-INLINE const cia6526_interface *get_interface(running_device *device)
+INLINE const mos6526_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == CIA6526R1) || (device->type == CIA6526R2) || (device->type == CIA8520));
-	return (cia6526_interface *) device->baseconfig().static_config;
+	assert((device->type == MOS6526R1) || (device->type == MOS6526R2) || (device->type == MOS8520));
+	return (mos6526_interface *) device->baseconfig().static_config;
 }
-
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
-
-/*-------------------------------------------------
-    DEVICE_START( cia )
--------------------------------------------------*/
-
-static DEVICE_START( cia )
-{
-	int t, p;
-	cia_state *cia = get_token(device);
-	const cia6526_interface *intf = get_interface(device);
-
-	/* clear out CIA structure, and copy the interface */
-	memset(cia, 0, sizeof(*cia));
-	cia->device = device;
-	devcb_resolve_write_line(&cia->irq_func, &intf->irq_func, device);
-	devcb_resolve_write_line(&cia->pc_func, &intf->pc_func, device);
-	cia->flag = 1;
-
-	/* setup ports */
-	for (p = 0; p < (sizeof(cia->port) / sizeof(cia->port[0])); p++)
-	{
-		devcb_resolve_read8(&cia->port[p].read, &intf->port[p].read, device);
-		devcb_resolve_write8(&cia->port[p].write, &intf->port[p].write, device);
-		cia->port[p].mask_value = 0xff;
-	}
-
-	/* setup timers */
-	for (t = 0; t < (sizeof(cia->timer) / sizeof(cia->timer[0])); t++)
-	{
-		cia_timer *timer = &cia->timer[t];
-		timer->timer = timer_alloc(device->machine, cia_timer_proc, timer);
-		timer->cia = cia;
-		timer->irq = 0x01 << t;
-	}
-
-	/* setup TOD timer, if appropriate */
-	if (intf->tod_clock != 0)
-		timer_pulse(device->machine, ATTOTIME_IN_HZ(intf->tod_clock), (void *) device, 0, cia_clock_tod_callback);
-
-	/* state save support */
-	state_save_register_device_item(device, 0, cia->port[0].ddr);
-	state_save_register_device_item(device, 0, cia->port[0].latch);
-	state_save_register_device_item(device, 0, cia->port[0].in);
-	state_save_register_device_item(device, 0, cia->port[0].out);
-	state_save_register_device_item(device, 0, cia->port[0].mask_value);
-	state_save_register_device_item(device, 0, cia->port[1].ddr);
-	state_save_register_device_item(device, 0, cia->port[1].latch);
-	state_save_register_device_item(device, 0, cia->port[1].in);
-	state_save_register_device_item(device, 0, cia->port[1].out);
-	state_save_register_device_item(device, 0, cia->port[1].mask_value);
-	state_save_register_device_item(device, 0, cia->timer[0].latch);
-	state_save_register_device_item(device, 0, cia->timer[0].count);
-	state_save_register_device_item(device, 0, cia->timer[0].mode);
-	state_save_register_device_item(device, 0, cia->timer[0].irq);
-	state_save_register_device_item(device, 0, cia->timer[1].latch);
-	state_save_register_device_item(device, 0, cia->timer[1].count);
-	state_save_register_device_item(device, 0, cia->timer[1].mode);
-	state_save_register_device_item(device, 0, cia->timer[1].irq);
-	state_save_register_device_item(device, 0, cia->tod);
-	state_save_register_device_item(device, 0, cia->tod_latch);
-	state_save_register_device_item(device, 0, cia->tod_latched);
-	state_save_register_device_item(device, 0, cia->tod_running);
-	state_save_register_device_item(device, 0, cia->alarm);
-	state_save_register_device_item(device, 0, cia->icr);
-	state_save_register_device_item(device, 0, cia->ics);
-	state_save_register_device_item(device, 0, cia->irq);
-	state_save_register_device_item(device, 0, cia->flag);
-	state_save_register_device_item(device, 0, cia->loaded);
-	state_save_register_device_item(device, 0, cia->sdr);
-	state_save_register_device_item(device, 0, cia->sp);
-	state_save_register_device_item(device, 0, cia->cnt);
-	state_save_register_device_item(device, 0, cia->shift);
-	state_save_register_device_item(device, 0, cia->serial);
-}
-
 
 /*-------------------------------------------------
     cia_set_port_mask_value
@@ -213,7 +133,6 @@ void cia_set_port_mask_value(running_device *device, int port, int data)
 	cia_state *cia = get_token(device);
 	cia->port[port].mask_value = data;
 }
-
 
 /*-------------------------------------------------
     DEVICE_RESET( cia )
@@ -258,7 +177,6 @@ static DEVICE_RESET( cia )
 	}
 }
 
-
 /*-------------------------------------------------
     DEVICE_VALIDITY_CHECK( cia )
 -------------------------------------------------*/
@@ -276,7 +194,6 @@ static DEVICE_VALIDITY_CHECK( cia )
 	return error;
 }
 
-
 /*-------------------------------------------------
     cia_update_pc - pulse /pc output
 -------------------------------------------------*/
@@ -286,10 +203,9 @@ static void cia_update_pc(running_device *device)
 	cia_state *cia = get_token(device);
 
 	/* this should really be one cycle long */
-	devcb_call_write_line(&cia->pc_func, 0);
-	devcb_call_write_line(&cia->pc_func, 1);
+	devcb_call_write_line(&cia->out_pc_func, 0);
+	devcb_call_write_line(&cia->out_pc_func, 1);
 }
-
 
 /*-------------------------------------------------
     cia_update_interrupts
@@ -311,10 +227,9 @@ static void cia_update_interrupts(running_device *device)
 	if (cia->irq != new_irq)
 	{
 		cia->irq = new_irq;
-		devcb_call_write_line(&cia->irq_func, cia->irq);
+		devcb_call_write_line(&cia->out_irq_func, cia->irq);
 	}
 }
-
 
 /*-------------------------------------------------
     is_timer_active
@@ -325,7 +240,6 @@ static int is_timer_active(emu_timer *timer)
 	attotime t = timer_firetime(timer);
 	return attotime_compare(t, attotime_never) != 0;
 }
-
 
 /*-------------------------------------------------
     cia_timer_update - updates the count and
@@ -400,7 +314,6 @@ static void cia_timer_bump(running_device *device, int timer)
 		cia_timer_update(&cia->timer[timer], cia->timer[timer].count - 1);
 }
 
-
 /*-------------------------------------------------
     cia_timer_underflow
 -------------------------------------------------*/
@@ -448,10 +361,16 @@ static void cia_timer_underflow(running_device *device, int timer)
 					cia->shift++;
 					cia->serial <<= 1;
 					cia->cnt = 0;
+
+					devcb_call_write_line(&cia->out_cnt_func, cia->cnt);
+					devcb_call_write_line(&cia->out_sp_func, cia->sp);
 				}
 				else
 				{
 					cia->cnt = 1;
+
+					devcb_call_write_line(&cia->out_cnt_func, cia->cnt);
+
 					if (cia->shift == 8)
 					{
 						cia->ics |= 0x08;
@@ -462,7 +381,6 @@ static void cia_timer_underflow(running_device *device, int timer)
 		}
 	}
 }
-
 
 /*-------------------------------------------------
     TIMER_CALLBACK( cia_timer_proc )
@@ -476,7 +394,6 @@ static TIMER_CALLBACK( cia_timer_proc )
 	cia_timer_underflow(cia->device, timer - cia->timer);
 }
 
-
 /*-------------------------------------------------
     bcd_increment
 -------------------------------------------------*/
@@ -488,7 +405,6 @@ static UINT8 bcd_increment(UINT8 value)
 		value += 0x10 - 0x0a;
 	return value;
 }
-
 
 /*-------------------------------------------------
     cia6526_increment
@@ -535,12 +451,11 @@ static void cia6526_increment(cia_state *cia)
 			 | (((UINT32) hour)			<< 24);
 }
 
-
 /*-------------------------------------------------
     cia_clock_tod - Update TOD on CIA A
 -------------------------------------------------*/
 
-void cia_clock_tod(running_device *device)
+static void cia_clock_tod(running_device *device)
 {
 	cia_state *cia;
 
@@ -548,13 +463,13 @@ void cia_clock_tod(running_device *device)
 
 	if (cia->tod_running)
 	{
-		if ((device->type == CIA6526R1) || (device->type == CIA6526R2))
+		if ((device->type == MOS6526R1) || (device->type == MOS6526R2))
 		{
 			/* The 6526 split the value into hours, minutes, seconds and
              * subseconds */
 			cia6526_increment(cia);
 		}
-		else if (device->type == CIA8520)
+		else if (device->type == MOS8520)
 		{
 			/* the 8520 has a straight 24-bit counter */
 			cia->tod++;
@@ -569,7 +484,6 @@ void cia_clock_tod(running_device *device)
 	}
 }
 
-
 /*-------------------------------------------------
     cia_clock_tod_callback
 -------------------------------------------------*/
@@ -580,35 +494,32 @@ static TIMER_CALLBACK( cia_clock_tod_callback )
 	cia_clock_tod(device);
 }
 
-
 /*-------------------------------------------------
     cia_issue_index
 -------------------------------------------------*/
 
-void cia_issue_index(running_device *device)
+static void cia_issue_index(running_device *device)
 {
 	cia_state *cia = get_token(device);
 	cia->ics |= 0x10;
 	cia_update_interrupts(device);
 }
 
-
 /*-------------------------------------------------
     cia_set_input_sp
 -------------------------------------------------*/
 
-void cia_set_input_sp(running_device *device, int data)
+static void cia_set_input_sp(running_device *device, int data)
 {
 	cia_state *cia = get_token(device);
 	cia->sp = data;
 }
 
-
 /*-------------------------------------------------
     cia_set_input_cnt
 -------------------------------------------------*/
 
-void cia_set_input_cnt(running_device *device, int data)
+static void cia_set_input_cnt(running_device *device, int data)
 {
 	cia_state *cia = get_token(device);
 
@@ -643,14 +554,45 @@ void cia_set_input_cnt(running_device *device, int data)
 	cia->cnt = data ? 1 : 0;
 }
 
+READ8_DEVICE_HANDLER( mos6526_pa_r )
+{
+	return (get_token(device)->port[0].latch | ~get_token(device)->port[0].ddr);
+}
+
+READ8_DEVICE_HANDLER( mos6526_pb_r )
+{
+	return (get_token(device)->port[1].latch | ~get_token(device)->port[1].ddr);
+}
+
+READ_LINE_DEVICE_HANDLER( mos6526_irq_r )
+{
+	cia_state *cia = get_token(device);
+
+	return cia->irq;
+}
+
 WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w )
 {
 	if (state) cia_clock_tod(device);
 }
 
+READ_LINE_DEVICE_HANDLER( mos6526_cnt_r )
+{
+	cia_state *cia = get_token(device);
+
+	return cia->cnt;
+}
+
 WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w )
 {
 	cia_set_input_cnt(device, state);
+}
+
+READ_LINE_DEVICE_HANDLER( mos6526_sp_r )
+{
+	cia_state *cia = get_token(device);
+
+	return cia->sp;
 }
 
 WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w )
@@ -671,10 +613,10 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w )
 }
 
 /*-------------------------------------------------
-    cia_r
+    mos6526_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( cia_r )
+READ8_DEVICE_HANDLER( mos6526_r )
 {
 	cia_timer *timer;
 	cia_state *cia;
@@ -748,7 +690,7 @@ READ8_DEVICE_HANDLER( cia_r )
 		case CIA_TOD1:
 		case CIA_TOD2:
 		case CIA_TOD3:
-			if (device->type == CIA8520)
+			if (device->type == MOS8520)
 			{
 				if (offset == CIA_TOD2)
 				{
@@ -796,12 +738,11 @@ READ8_DEVICE_HANDLER( cia_r )
 	return data;
 }
 
-
 /*-------------------------------------------------
-    cia_w
+    mos6526_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cia_w )
+WRITE8_DEVICE_HANDLER( mos6526_w )
 {
 	cia_timer *timer;
 	cia_state *cia;
@@ -875,7 +816,7 @@ WRITE8_DEVICE_HANDLER( cia_w )
 			else
 				cia->tod = (cia->tod & ~(0xff << shift)) | (data << shift);
 
-			if (device->type == CIA8520)
+			if (device->type == MOS8520)
 			{
 				if (offset == CIA_TOD2)
 					cia->tod_running = FALSE;
@@ -920,12 +861,84 @@ WRITE8_DEVICE_HANDLER( cia_w )
 	}
 }
 
+/*-------------------------------------------------
+    DEVICE_START( cia )
+-------------------------------------------------*/
 
+static DEVICE_START( cia )
+{
+	int t, p;
+	cia_state *cia = get_token(device);
+	const mos6526_interface *intf = get_interface(device);
 
-UINT8 cia_get_output_a(running_device *device)	{ return (get_token(device)->port[0].latch | ~get_token(device)->port[0].ddr); }
-UINT8 cia_get_output_b(running_device *device)	{ return (get_token(device)->port[1].latch | ~get_token(device)->port[1].ddr); }
-int cia_get_irq(running_device *device)		{ return get_token(device)->irq; }
+	/* clear out CIA structure, and copy the interface */
+	memset(cia, 0, sizeof(*cia));
+	cia->device = device;
+	devcb_resolve_write_line(&cia->out_irq_func, &intf->out_irq_func, device);
+	devcb_resolve_write_line(&cia->out_pc_func, &intf->out_pc_func, device);
+	devcb_resolve_write_line(&cia->out_cnt_func, &intf->out_cnt_func, device);
+	devcb_resolve_write_line(&cia->out_sp_func, &intf->out_sp_func, device);
+	cia->flag = 1;
 
+	/* setup ports */
+	devcb_resolve_read8(&cia->port[0].read, &intf->in_pa_func, device);
+	devcb_resolve_write8(&cia->port[0].write, &intf->out_pa_func, device);
+	devcb_resolve_read8(&cia->port[1].read, &intf->in_pb_func, device);
+	devcb_resolve_write8(&cia->port[1].write, &intf->out_pb_func, device);
+
+	for (p = 0; p < (sizeof(cia->port) / sizeof(cia->port[0])); p++)
+	{
+		cia->port[p].mask_value = 0xff;
+	}
+
+	/* setup timers */
+	for (t = 0; t < (sizeof(cia->timer) / sizeof(cia->timer[0])); t++)
+	{
+		cia_timer *timer = &cia->timer[t];
+		timer->timer = timer_alloc(device->machine, cia_timer_proc, timer);
+		timer->cia = cia;
+		timer->irq = 0x01 << t;
+	}
+
+	/* setup TOD timer, if appropriate */
+	if (intf->tod_clock != 0)
+		timer_pulse(device->machine, ATTOTIME_IN_HZ(intf->tod_clock), (void *) device, 0, cia_clock_tod_callback);
+
+	/* state save support */
+	state_save_register_device_item(device, 0, cia->port[0].ddr);
+	state_save_register_device_item(device, 0, cia->port[0].latch);
+	state_save_register_device_item(device, 0, cia->port[0].in);
+	state_save_register_device_item(device, 0, cia->port[0].out);
+	state_save_register_device_item(device, 0, cia->port[0].mask_value);
+	state_save_register_device_item(device, 0, cia->port[1].ddr);
+	state_save_register_device_item(device, 0, cia->port[1].latch);
+	state_save_register_device_item(device, 0, cia->port[1].in);
+	state_save_register_device_item(device, 0, cia->port[1].out);
+	state_save_register_device_item(device, 0, cia->port[1].mask_value);
+	state_save_register_device_item(device, 0, cia->timer[0].latch);
+	state_save_register_device_item(device, 0, cia->timer[0].count);
+	state_save_register_device_item(device, 0, cia->timer[0].mode);
+	state_save_register_device_item(device, 0, cia->timer[0].irq);
+	state_save_register_device_item(device, 0, cia->timer[1].latch);
+	state_save_register_device_item(device, 0, cia->timer[1].count);
+	state_save_register_device_item(device, 0, cia->timer[1].mode);
+	state_save_register_device_item(device, 0, cia->timer[1].irq);
+	state_save_register_device_item(device, 0, cia->tod);
+	state_save_register_device_item(device, 0, cia->tod_latch);
+	state_save_register_device_item(device, 0, cia->tod_latched);
+	state_save_register_device_item(device, 0, cia->tod_running);
+	state_save_register_device_item(device, 0, cia->alarm);
+	state_save_register_device_item(device, 0, cia->icr);
+	state_save_register_device_item(device, 0, cia->ics);
+	state_save_register_device_item(device, 0, cia->irq);
+	state_save_register_device_item(device, 0, cia->flag);
+	state_save_register_device_item(device, 0, cia->loaded);
+	state_save_register_device_item(device, 0, cia->sdr);
+	state_save_register_device_item(device, 0, cia->sp);
+	state_save_register_device_item(device, 0, cia->cnt);
+	state_save_register_device_item(device, 0, cia->shift);
+	state_save_register_device_item(device, 0, cia->serial);
+}
 
 /*-------------------------------------------------
     DEVICE_GET_INFO( cia6526r1 )
@@ -947,14 +960,13 @@ DEVICE_GET_INFO(cia6526r1)
 		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(cia); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "6526 CIA rev1");			break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "6526 CIA");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MOS6526 rev1");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MOS6526");					break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
-
 
 /*-------------------------------------------------
     DEVICE_GET_INFO( cia8520 )
@@ -965,11 +977,10 @@ DEVICE_GET_INFO(cia6526r2)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "6526 CIA rev2");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MOS6526 rev2");			break;
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
-
 
 /*-------------------------------------------------
     DEVICE_GET_INFO( cia8520 )
@@ -980,9 +991,7 @@ DEVICE_GET_INFO(cia8520)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "8520 CIA");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MOS8520");				break;
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
-
-
