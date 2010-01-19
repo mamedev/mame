@@ -1501,7 +1501,7 @@ static TIMER_CALLBACK( empty_event_queue )
 				/* if we're clearing the line that was previously asserted, or if we're just */
 				/* pulsing the line, reset the CPU */
 				if ((state == CLEAR_LINE && cpu_is_suspended(device, SUSPEND_REASON_RESET)) || state == PULSE_LINE)
-					device_reset(device);
+					device->reset();
 
 				/* if we're clearing the line, make sure the CPU is not halted */
 				cpu_resume(device, SUSPEND_REASON_RESET);

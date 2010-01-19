@@ -262,7 +262,7 @@ static DEVICE_START( via6522 )
 
 	/* Default clock is from CPU1 */
 	if (device->clock == 0)
-		device_set_clock(device, device->machine->firstcpu->clock);
+		device->set_clock(device->machine->firstcpu->clock);
 
 	/* save state register */
 	state_save_register_device_item(device, 0, v->in_a);

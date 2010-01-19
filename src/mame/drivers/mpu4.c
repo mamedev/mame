@@ -445,7 +445,7 @@ static MACHINE_RESET( mpu4 )
 		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(machine, "bank1",0);
-		device_reset(devtag_get_device(machine, "maincpu"));
+		machine->device("maincpu")->reset();
 	}
 
 }

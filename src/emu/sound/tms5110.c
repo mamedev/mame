@@ -722,7 +722,7 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 
 				case TMS5110_CMD_RESET:
 					perform_dummy_read(tms);
-					device_reset(tms->device);
+					tms->device->reset();
 					break;
 
 				case TMS5110_CMD_READ_BIT:

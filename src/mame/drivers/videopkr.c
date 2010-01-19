@@ -891,7 +891,7 @@ static WRITE8_DEVICE_HANDLER(baby_sound_p3_w)
 
 	if (!(sbp3 & 0x10))
 	{
-		device_reset(device);
+		device->reset();
 		logerror("AY3-8910: Reset\n");
 	}
 

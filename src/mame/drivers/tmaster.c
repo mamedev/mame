@@ -936,7 +936,7 @@ static MACHINE_RESET( galgames )
 
 	galgames_update_rombank(machine, 0);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 }
 
 static MACHINE_DRIVER_START( galgames )

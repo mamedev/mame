@@ -414,7 +414,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 
 	if (data == 0x5050)
 	{
-		device_reset(state->ics);
+		state->ics->reset();
 		cpu_set_input_line(state->soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
 		cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, PULSE_LINE);
 		if(0)

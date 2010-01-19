@@ -134,7 +134,7 @@ void s24_fd1094_machine_init(running_machine *machine)
 	m68k_set_rte_callback(devtag_get_device(machine, "sub"), s24_fd1094_rte_callback);
 	cpu_set_irq_callback(devtag_get_device(machine, "sub"), s24_fd1094_int_callback);
 
-	device_reset(devtag_get_device(machine, "sub"));
+	machine->device("sub")->reset();
 }
 
 static STATE_POSTLOAD( s24_fd1094_postload )

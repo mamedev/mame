@@ -257,7 +257,7 @@ static SOUND_RESET( taito_f3_soundsystem_reset )
 	sound_ram[3]=ROM[0x80003];
 
 	/* reset CPU to catch any banking of startup vectors */
-	device_reset(devtag_get_device(machine, "audiocpu"));
+	machine->device("audiocpu")->reset();
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 

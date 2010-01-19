@@ -864,7 +864,7 @@ MACHINE_RESET( namcos1 )
 	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);

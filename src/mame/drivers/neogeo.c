@@ -1123,7 +1123,7 @@ static MACHINE_RESET( neogeo )
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	neogeo_reset_rng(machine);
 

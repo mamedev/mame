@@ -445,7 +445,7 @@ static MACHINE_RESET( galivan )
 {
 	galivan_state *state = (galivan_state *)machine->driver_data;
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 //  state->layers = 0x60;
 	state->layers = 0;
@@ -459,7 +459,7 @@ static MACHINE_RESET( ninjemak )
 {
 	galivan_state *state = (galivan_state *)machine->driver_data;
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	state->scrollx[0] = state->scrollx[1] = 0;
 	state->scrolly[0] = state->scrolly[1] = 0;

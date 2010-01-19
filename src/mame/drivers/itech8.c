@@ -677,7 +677,7 @@ static MACHINE_RESET( itech8 )
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
-		device_reset(devtag_get_device(machine, "maincpu"));
+		machine->device("maincpu")->reset();
 	}
 
 	/* reset the palette chip */

@@ -398,7 +398,7 @@ static void memory_init_locate(running_machine *machine);
 static void memory_exit(running_machine *machine);
 
 /* address map helpers */
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens);
+static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens);
 
 /* memory mapping helpers */
 static void space_map_range(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -844,16 +844,16 @@ address_map *address_map_alloc(const device_config *devconfig, const game_driver
 	/* append the internal device map (first so it takes priority) */
 	internal_map = (const addrmap_token *)devconfig->get_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	if (internal_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig->tag, internal_map);
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, internal_map);
 
 	/* construct the standard map */
 	if (devconfig->address_map[spacenum] != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig->tag, devconfig->address_map[spacenum]);
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, devconfig->address_map[spacenum]);
 
 	/* append the default device map (last so it can be overridden) */
 	default_map = (const addrmap_token *)devconfig->get_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum);
 	if (default_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig->tag, default_map);
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, default_map);
 
 	return map;
 }
@@ -2210,7 +2210,7 @@ static void memory_exit(running_machine *machine)
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
 	} while (0)
 
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens)
+static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens)
 {
 	address_map_entry **firstentryptr;
 	address_map_entry **entryptr;
@@ -2252,7 +2252,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				map_detokenize(memdata, map, driver, devtag, TOKEN_GET_PTR(tokens, tokenptr));
+				map_detokenize(memdata, map, driver, devconfig, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -2307,7 +2307,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 					entry->read.name = TOKEN_GET_STRING(tokens);
 				}
 				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, TOKEN_GET_STRING(tokens));
+					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
@@ -2321,7 +2321,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 					entry->write.name = TOKEN_GET_STRING(tokens);
 				}
 				if (entry->write.type == AMH_DEVICE_HANDLER || entry->write.type == AMH_PORT || entry->write.type == AMH_BANK)
-					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, TOKEN_GET_STRING(tokens));
+					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_READWRITE:
@@ -2342,8 +2342,8 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
 				{
 					const char *basetag = TOKEN_GET_STRING(tokens);
-					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, basetag);
-					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, basetag);
+					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, basetag);
+					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, basetag);
 				}
 				break;
 
@@ -2351,7 +2351,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
-				entry->region = device_inherit_tag(entry->region_string, devtag, TOKEN_GET_STRING(tokens));
+				entry->region = devconfig->siblingtag(entry->region_string, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:

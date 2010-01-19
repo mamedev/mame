@@ -937,7 +937,7 @@ static void process_command(tms5220_state *tms)
 				if (tms->intf->read)
 					(*tms->intf->read)(tms->device, 1);
 			}
-			device_reset(tms->device);
+			tms->device->reset();
 			break;
         }
     }
@@ -1349,7 +1349,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 		if (new_val == 0)
 		{
 			if (tms->variant == variant_tms5220c)
-				device_reset(device);
+				device->reset();
 			else
 				/* illegal */
 				LOG(("tms5220_rs_w: illegal\n"));
@@ -1392,7 +1392,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		if (new_val == 0)
 		{
 			if (tms->variant == variant_tms5220c)
-				device_reset(device);
+				device->reset();
 			else
 				/* illegal */
 				LOG(("tms5220_ws_w: illegal\n"));

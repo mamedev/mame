@@ -533,7 +533,7 @@ static void sound_reset(running_machine *machine)
 
 	/* reset all the sound chips */
 	for (sound = sound_first(machine); sound != NULL; sound = sound_next(sound))
-		device_reset(sound);
+		sound->reset();
 }
 
 

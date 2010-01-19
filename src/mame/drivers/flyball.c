@@ -382,7 +382,7 @@ static MACHINE_RESET( flyball )
 	for (i = 0; i < 0x1000; i++)
 		state->rombase[i] = ROM[i ^ 0x1ff];
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
 

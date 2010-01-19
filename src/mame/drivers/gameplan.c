@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 
 	if (data == 0)
 	{
-		device_reset(state->riot);
+		state->riot->reset();
 		cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 	}
 }

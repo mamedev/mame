@@ -299,7 +299,7 @@ WRITE8_HANDLER( dday_control_w )
 
 	/* bit 4 is sound enable */
 	if (!(data & 0x10) && (state->control & 0x10))
-		device_reset(state->ay1);
+		state->ay1->reset();
 
 	sound_global_enable(space->machine, data & 0x10);
 

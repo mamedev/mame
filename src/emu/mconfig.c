@@ -101,19 +101,19 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
 				devtype = TOKEN_GET_PTR(tokens, devtype);
-				tag = device_build_tag(tempstring, owner, TOKEN_GET_STRING(tokens));
+				tag = owner->subtag(tempstring, TOKEN_GET_STRING(tokens));
 				device = config->devicelist.append(tag, global_alloc(device_config(owner, devtype, tag, clock)));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
 				tag = TOKEN_GET_STRING(tokens);
-				config->devicelist.remove(device_build_tag(tempstring, owner, tag));
+				config->devicelist.remove(owner->subtag(tempstring, tag));
 				device = NULL;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				device = config->devicelist.find(device_build_tag(tempstring, owner, tag));
+				device = config->devicelist.find(owner->subtag(tempstring, tag));
 				if (device == NULL)
 					fatalerror("Unable to find device: tag=%s\n", tempstring.cstr());
 				break;

@@ -1413,7 +1413,7 @@ static void init_machine(running_machine *machine)
 #endif /* MESS */
 
 	/* start up the devices */
-	device_list_start(machine);
+	machine->devicelist.start_all();
 
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */

@@ -272,7 +272,7 @@ static MACHINE_RESET( gladiator )
 	{
 		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
 		memory_set_bankptr(machine, "bank2",rom);
-		device_reset(devtag_get_device(machine, "audiocpu"));
+		machine->device("audiocpu")->reset();
 	}
 }
 

@@ -184,7 +184,7 @@ static WRITE8_HANDLER( sound_control_w )
 	/* bit 0x20 = LED */
 	/* bit 0x40 = BSMT2000 reset */
 	if ((diff & 0x40) && (data & 0x40))
-		device_reset(state->bsmt);
+		state->bsmt->reset();
 	if (data != 0x40 && data != 0x60)
 		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(space->cpu), data);
 }

@@ -94,7 +94,7 @@ static MACHINE_RESET( midzeus )
 {
 	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
 	*ram_base <<= 1;
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	cmos_protected = TRUE;
 }

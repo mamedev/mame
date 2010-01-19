@@ -31,7 +31,7 @@ z80_daisy_state *z80daisy_init(running_device *cpudevice, const z80_daisy_chain 
 	{
 		*tailptr = auto_alloc(cpudevice->machine, z80_daisy_state);
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = cpudevice->machine->device(device_inherit_tag(tempstring, cpudevice->tag, daisy->devname));
+		(*tailptr)->device = cpudevice->machine->device(cpudevice->siblingtag(tempstring, daisy->devname));
 		if ((*tailptr)->device == NULL)
 			fatalerror("Unable to locate device '%s'", daisy->devname);
 		(*tailptr)->irq_state = (z80_daisy_irq_state)(*tailptr)->device->get_config_fct(DEVINFO_FCT_IRQ_STATE);
@@ -48,7 +48,7 @@ void z80daisy_reset(z80_daisy_state *daisy)
 {
 	/* loop over all devices and call their reset function */
 	for ( ; daisy != NULL; daisy = daisy->next)
-		device_reset(daisy->device);
+		daisy->device->reset();
 }
 
 

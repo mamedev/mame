@@ -976,7 +976,7 @@ static MACHINE_RESET(mediagx)
 	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	timer_device_adjust_oneshot(devtag_get_device(machine, "sound_timer"), ATTOTIME_IN_MSEC(10), 0);
 

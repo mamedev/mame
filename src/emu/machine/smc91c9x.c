@@ -425,7 +425,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 		case EREG_RCR:		/* receive control register */
 			if (LOG_ETHERNET)
 			{
-				if (data & 0x8000) device_reset(device);
+				if (data & 0x8000) device->reset();
 				if (data & 0x8000) logerror("   SOFT RST\n");
 				if (data & 0x4000) logerror("   FILT_CAR\n");
 				if (data & 0x0200) logerror("   STRIP CRC\n");

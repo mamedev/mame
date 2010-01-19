@@ -273,7 +273,7 @@ static WRITE16_HANDLER( reset_w )
 		swap_linecpu_banks(space->machine);
 
 	if (!BIT(data, 2))
-		device_reset(laserdisc);
+		laserdisc->reset();
 
 	reset_latch = data & 0xff;
 }

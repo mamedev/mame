@@ -512,10 +512,7 @@ static WRITE8_HANDLER( speech_control_w )
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)
-	{
-		running_device *sp = devtag_get_device(space->machine, "spsnd");
-		device_reset(sp);
-	}
+		space->machine->device("spsnd")->reset();
 }
 
 

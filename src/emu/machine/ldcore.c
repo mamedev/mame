@@ -1485,10 +1485,7 @@ static DEVICE_START( laserdisc )
 	ld->screen = device->machine->device(config->screen);
 	assert(ld->screen != NULL);
 	if (!ld->screen->started)
-	{
-		device_delay_init(device);
-		return;
-	}
+		throw device_missing_dependencies();
 
 	/* save a copy of the device pointer */
 	ld->device = device;
@@ -1614,7 +1611,7 @@ void laserdisc_set_type(running_device *device, int type)
 	if (ld->core != NULL && ld->core->config.type != type)
 	{
 		ld->core->config.type = type;
-		device_reset(device);
+		device->reset();
 	}
 }
 

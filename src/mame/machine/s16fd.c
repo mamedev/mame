@@ -156,7 +156,7 @@ void fd1094_machine_init(running_device *device)
 	m68k_set_rte_callback(device, fd1094_rte_callback);
 	cpu_set_irq_callback(device, fd1094_int_callback);
 
-	device_reset(device);
+	device->reset();
 }
 
 static STATE_POSTLOAD( fd1094_postload )

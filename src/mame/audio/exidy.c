@@ -781,7 +781,7 @@ static DEVICE_RESET( venture_sound )
 	devtag_reset(device->machine, "pia1");
 
 	/* 6532 */
-	device_reset(riot);
+	riot->reset();
 
 	/* 8253 */
 	memset(sh8253_timer, 0, sizeof(sh8253_timer));
@@ -999,8 +999,8 @@ static DEVICE_RESET( victory_sound )
 	running_device *pia1 = devtag_get_device(device->machine, "pia1");
 
 	DEVICE_RESET_CALL(common_sh_reset);
-	device_reset(pia1);
-	device_reset(riot);
+	pia1->reset();
+	riot->reset();
 	memset(sh8253_timer, 0, sizeof(sh8253_timer));
 
 	/* the flip-flop @ F4 is reset */

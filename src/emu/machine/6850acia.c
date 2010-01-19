@@ -282,7 +282,7 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
 	if (divide == 3)
 	{
 		acia_p->reset = 1;
-		device_reset(device);
+		device->reset();
 	}
 	else
 	{

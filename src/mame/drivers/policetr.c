@@ -166,7 +166,7 @@ static WRITE32_HANDLER( control_w )
 	{
 		running_device *device = devtag_get_device(space->machine, "bsmt");
 		bsmt2000_data_w(device, bsmt_data_bank, 0, 0xffff);
-		device_reset(device);
+		device->reset();
 	}
 
 	/* log any unknown bits */

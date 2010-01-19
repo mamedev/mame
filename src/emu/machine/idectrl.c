@@ -302,7 +302,7 @@ void ide_set_user_password(running_device *device, const UINT8 *password)
 
 static TIMER_CALLBACK( reset_callback )
 {
-	device_reset((running_device *)ptr);
+	reinterpret_cast<running_device *>(ptr)->reset();
 }
 
 

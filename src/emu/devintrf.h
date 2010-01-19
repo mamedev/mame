@@ -24,115 +24,111 @@
     CONSTANTS
 ***************************************************************************/
 
-/* forward references */
+// forward references
 struct rom_entry;
 union machine_config_token;
 
 
-/* device classes */
+// device classes
 enum device_class
 {
-	DEVICE_CLASS_GENERAL = 0,			/* default class for general devices */
-	DEVICE_CLASS_PERIPHERAL,			/* peripheral devices: PIAs, timers, etc. */
-	DEVICE_CLASS_AUDIO,					/* audio devices (not sound chips), including speakers */
-	DEVICE_CLASS_VIDEO,					/* video devices, including screens */
-	DEVICE_CLASS_CPU_CHIP,				/* CPU chips; only CPU cores should return this class */
-	DEVICE_CLASS_SOUND_CHIP,			/* sound chips; only sound cores should return this class */
-	DEVICE_CLASS_TIMER,					/* timer devices */
-	DEVICE_CLASS_OTHER					/* anything else (the list may expand in the future) */
+	DEVICE_CLASS_GENERAL = 0,			// default class for general devices
+	DEVICE_CLASS_PERIPHERAL,			// peripheral devices: PIAs, timers, etc.
+	DEVICE_CLASS_AUDIO,					// audio devices (not sound chips), including speakers
+	DEVICE_CLASS_VIDEO,					// video devices, including screens
+	DEVICE_CLASS_CPU_CHIP,				// CPU chips; only CPU cores should return this class
+	DEVICE_CLASS_SOUND_CHIP,			// sound chips; only sound cores should return this class
+	DEVICE_CLASS_TIMER,					// timer devices
+	DEVICE_CLASS_OTHER					// anything else (the list may expand in the future)
 };
 
 
-/* useful in device_list functions for scanning through all devices */
-#define DEVICE_TYPE_WILDCARD			NULL
-
-
-/* state constants passed to the device_get_config_func */
+// state constants passed to the device_get_config_func
 enum
 {
-	/* --- the following bits of info are returned as 64-bit signed integers --- */
+	// --- the following bits of info are returned as 64-bit signed integers --- 
 	DEVINFO_INT_FIRST = 0x00000,
 
-		DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,	/* R/O: bytes to allocate for the token */
-		DEVINFO_INT_INLINE_CONFIG_BYTES,				/* R/O: bytes to allocate for the inline configuration */
-		DEVINFO_INT_CLASS,								/* R/O: the device's class */
+		DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,	// R/O: bytes to allocate for the token 
+		DEVINFO_INT_INLINE_CONFIG_BYTES,				// R/O: bytes to allocate for the inline configuration 
+		DEVINFO_INT_CLASS,								// R/O: the device's class 
 
-		DEVINFO_INT_ENDIANNESS,							/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
-		DEVINFO_INT_DATABUS_WIDTH,						/* R/O: data bus size for each address space (8,16,32,64) */
+		DEVINFO_INT_ENDIANNESS,							// R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE 
+		DEVINFO_INT_DATABUS_WIDTH,						// R/O: data bus size for each address space (8,16,32,64) 
 		DEVINFO_INT_DATABUS_WIDTH_0 = DEVINFO_INT_DATABUS_WIDTH + 0,
 		DEVINFO_INT_DATABUS_WIDTH_1 = DEVINFO_INT_DATABUS_WIDTH + 1,
 		DEVINFO_INT_DATABUS_WIDTH_2 = DEVINFO_INT_DATABUS_WIDTH + 2,
 		DEVINFO_INT_DATABUS_WIDTH_3 = DEVINFO_INT_DATABUS_WIDTH + 3,
 		DEVINFO_INT_DATABUS_WIDTH_LAST = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
-		DEVINFO_INT_ADDRBUS_WIDTH,						/* R/O: address bus size for each address space (12-32) */
+		DEVINFO_INT_ADDRBUS_WIDTH,						// R/O: address bus size for each address space (12-32) 
 		DEVINFO_INT_ADDRBUS_WIDTH_0 = DEVINFO_INT_ADDRBUS_WIDTH + 0,
 		DEVINFO_INT_ADDRBUS_WIDTH_1 = DEVINFO_INT_ADDRBUS_WIDTH + 1,
 		DEVINFO_INT_ADDRBUS_WIDTH_2 = DEVINFO_INT_ADDRBUS_WIDTH + 2,
 		DEVINFO_INT_ADDRBUS_WIDTH_3 = DEVINFO_INT_ADDRBUS_WIDTH + 3,
 		DEVINFO_INT_ADDRBUS_WIDTH_LAST = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
-		DEVINFO_INT_ADDRBUS_SHIFT,						/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
+		DEVINFO_INT_ADDRBUS_SHIFT,						// R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) 
 		DEVINFO_INT_ADDRBUS_SHIFT_0 = DEVINFO_INT_ADDRBUS_SHIFT + 0,
 		DEVINFO_INT_ADDRBUS_SHIFT_1 = DEVINFO_INT_ADDRBUS_SHIFT + 1,
 		DEVINFO_INT_ADDRBUS_SHIFT_2 = DEVINFO_INT_ADDRBUS_SHIFT + 2,
 		DEVINFO_INT_ADDRBUS_SHIFT_3 = DEVINFO_INT_ADDRBUS_SHIFT + 3,
 		DEVINFO_INT_ADDRBUS_SHIFT_LAST = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
 
-	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				/* R/W: device-specific values start here */
-	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
+	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				// R/W: device-specific values start here 
+	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				// R/W: device-specific values start here 
 	DEVINFO_INT_LAST = 0x0ffff,
 
-	/* --- the following bits of info are returned as pointers --- */
+	// --- the following bits of info are returned as pointers --- 
 	DEVINFO_PTR_FIRST = 0x10000,
 
-		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
-		DEVINFO_PTR_MACHINE_CONFIG,						/* R/O: pointer to device-specific machine config */
-		DEVINFO_PTR_CONTRACT_LIST,						/* R/O: pointer to list of supported device contracts */
+		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		// R/O: pointer to device-specific ROM region 
+		DEVINFO_PTR_MACHINE_CONFIG,						// R/O: pointer to device-specific machine config 
+		DEVINFO_PTR_CONTRACT_LIST,						// R/O: pointer to list of supported device contracts 
 
-		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				/* R/O: const addrmap_token *map */
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				// R/O: const addrmap_token *map 
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_0 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 0,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_1 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 1,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_2 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 2,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_3 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 3,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_LAST = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 
-		DEVINFO_PTR_DEFAULT_MEMORY_MAP,					/* R/O: const addrmap_token *map */
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP,					// R/O: const addrmap_token *map 
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_0 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 0,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_1 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 1,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_2 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 2,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_3 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 3,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_LAST = DEVINFO_PTR_DEFAULT_MEMORY_MAP + ADDRESS_SPACES - 1,
 
-	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				/* R/W: device-specific values start here */
-	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
+	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				// R/W: device-specific values start here 
+	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				// R/W: device-specific values start here 
 	DEVINFO_PTR_LAST = 0x1ffff,
 
-	/* --- the following bits of info are returned as pointers to functions --- */
+	// --- the following bits of info are returned as pointers to functions --- 
 	DEVINFO_FCT_FIRST = 0x20000,
 
-		DEVINFO_FCT_START = DEVINFO_FCT_FIRST,			/* R/O: device_start_func */
-		DEVINFO_FCT_STOP,								/* R/O: device_stop_func */
-		DEVINFO_FCT_RESET,								/* R/O: device_reset_func */
-		DEVINFO_FCT_EXECUTE,							/* R/O: device_execute_func */
-		DEVINFO_FCT_VALIDITY_CHECK,						/* R/O: device_validity_check_func */
-		DEVINFO_FCT_NVRAM,								/* R/O: device_nvram_func */
-		DEVINFO_FCT_CUSTOM_CONFIG,						/* R/O: device_custom_config_func */
-		DEVINFO_FCT_GET_RUNTIME_INFO,					/* R/O: device_get_runtime_info_func */
+		DEVINFO_FCT_START = DEVINFO_FCT_FIRST,			// R/O: device_start_func 
+		DEVINFO_FCT_STOP,								// R/O: device_stop_func 
+		DEVINFO_FCT_RESET,								// R/O: device_reset_func 
+		DEVINFO_FCT_EXECUTE,							// R/O: device_execute_func 
+		DEVINFO_FCT_VALIDITY_CHECK,						// R/O: device_validity_check_func 
+		DEVINFO_FCT_NVRAM,								// R/O: device_nvram_func 
+		DEVINFO_FCT_CUSTOM_CONFIG,						// R/O: device_custom_config_func 
+		DEVINFO_FCT_GET_RUNTIME_INFO,					// R/O: device_get_runtime_info_func 
 
-	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				/* R/W: device-specific values start here */
-	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
+	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				// R/W: device-specific values start here 
+	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				// R/W: device-specific values start here 
 	DEVINFO_FCT_LAST = 0x2ffff,
 
-	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	// --- the following bits of info are returned as NULL-terminated strings --- 
 	DEVINFO_STR_FIRST = 0x30000,
 
-		DEVINFO_STR_NAME = DEVINFO_STR_FIRST,			/* R/O: name of the device */
-		DEVINFO_STR_FAMILY,								/* R/O: family of the device */
-		DEVINFO_STR_VERSION,							/* R/O: version of the device */
-		DEVINFO_STR_SOURCE_FILE,						/* R/O: file containing the device implementation */
-		DEVINFO_STR_CREDITS,							/* R/O: credits for the device implementation */
+		DEVINFO_STR_NAME = DEVINFO_STR_FIRST,			// R/O: name of the device 
+		DEVINFO_STR_FAMILY,								// R/O: family of the device 
+		DEVINFO_STR_VERSION,							// R/O: version of the device 
+		DEVINFO_STR_SOURCE_FILE,						// R/O: file containing the device implementation 
+		DEVINFO_STR_CREDITS,							// R/O: credits for the device implementation 
 
-	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				/* R/W: device-specific values start here */
-	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				/* R/W: device-specific values start here */
+	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				// R/W: device-specific values start here 
+	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				// R/W: device-specific values start here 
 	DEVINFO_STR_LAST = 0x3ffff
 };
 
@@ -180,25 +176,17 @@ enum
 #define DEVICE_NVRAM_CALL(name)		DEVICE_NVRAM_NAME(name)(device, file, read_or_write)
 
 
-/* device contract lists */
-#define DEVICE_CONTRACT_LIST_NAME(name)		device_contract_list_##name
-
-#define DEVICE_CONTRACT_LIST_START(name)	static const device_contract DEVICE_CONTRACT_LIST_NAME(name)[] = {
-#define DEVICE_CONTRACT_ENTRY(type, var)	{ type, sizeof(var), &(var) },
-#define DEVICE_CONTRACT_LIST_END			{ NULL, 0, NULL } };
-
-
-/* macro for specifying a clock derived from an owning device */
+// macro for specifying a clock derived from an owning device 
 #define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
 
 
-/* shorthand for accessing devices by machine/type/tag */
+// shorthand for accessing devices by machine/type/tag 
 #define devtag_get_device(mach,tag)							(mach)->device(tag)
 
-#define devtag_reset(mach,tag)								device_reset((mach)->device(tag))
+#define devtag_reset(mach,tag)								(mach)->device(tag)->reset()
 
 
-/* shorthand for getting standard data about devices */
+// shorthand for getting standard data about devices 
 #define device_get_endianness(dev)							(dev)->get_config_int(DEVINFO_INT_ENDIANNESS)
 #define device_get_databus_width(dev,space)					(dev)->get_config_int(DEVINFO_INT_DATABUS_WIDTH + (space))
 #define device_get_addrbus_width(dev,space)					(dev)->get_config_int(DEVINFO_INT_ADDRBUS_WIDTH + (space))
@@ -215,22 +203,18 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* forward-declare these types */
+// forward-declare these types
+class region_info;
 class device_config;
 class running_device;
 union deviceinfo;
 
 
-/* a device contract */
-struct device_contract
-{
-	const char *	name;			/* name of this contract */
-	UINT32			size;			/* size of this contract in bytes */
-	const void *	contract;		/* pointer to the contract struct itself */
-};
+// exception types
+class device_missing_dependencies : public emu_exception { };
 
 
-/* device interface function types */
+// device interface function types
 typedef void (*device_get_config_func)(const device_config *device, UINT32 state, deviceinfo *info);
 typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
 typedef const machine_config_token *(*device_custom_config_func)(const device_config *device, UINT32 entrytype, const machine_config_token *tokens);
@@ -243,11 +227,11 @@ typedef void (*device_nvram_func)(running_device *device, mame_file *file, int r
 typedef void (*device_get_runtime_info_func)(running_device *device, UINT32 state, deviceinfo *info);
 
 
-/* a device_type is simply a pointer to its get_info function */
+// a device_type is simply a pointer to its get_info function
 typedef device_get_config_func device_type;
 
 
-// template specializations
+// tagged_device_list is a tagged_list with additional searching based on type or class
 template<class T> class tagged_device_list : public tagged_list<T>
 {
 	typedef tagged_list<T> super;
@@ -333,47 +317,59 @@ public:
 };
 
 
-// template specializations
+// device_config_list manages a list of device_configs
 typedef tagged_device_list<device_config> device_config_list;
 
+
+// device_list manages  a list of running_devices
 class device_list : public tagged_device_list<running_device>
 {
+	running_machine *machine;
+	
+	static void static_reset(running_machine *machine);
+	static void static_stop(running_machine *machine);
+	
 public:
+	device_list();
 	void import_config_list(const device_config_list &list, running_machine &machine);
+
+	void start_all();
+	void reset_all();
+	void stop_all();
 };
 
 
-/* the actual deviceinfo union */
+
+// the actual deviceinfo union 
 union deviceinfo
 {
-	INT64					i;							/* generic integers */
-	void *					p;							/* generic pointers */
-	genf *  				f;							/* generic function pointers */
-	char *					s;							/* generic strings */
+	INT64					i;							// generic integers 
+	void *					p;							// generic pointers 
+	genf *  				f;							// generic function pointers 
+	char *					s;							// generic strings 
 
-	device_start_func		start;						/* DEVINFO_FCT_START */
-	device_stop_func		stop;						/* DEVINFO_FCT_STOP */
-	device_reset_func		reset;						/* DEVINFO_FCT_RESET */
-	device_execute_func 	execute;					/* DEVINFO_FCT_EXECUTE */
-	device_validity_check_func validity_check;			/* DEVINFO_FCT_VALIDITY_CHECK */
-	device_custom_config_func custom_config;			/* DEVINFO_FCT_CUSTOM_CONFIG */
-	device_nvram_func		nvram;						/* DEVINFO_FCT_NVRAM */
-	device_get_runtime_info_func get_runtime_info;		/* DEVINFO_FCT_GET_RUNTIME_INFO */
-	const rom_entry *		romregion;					/* DEVINFO_PTR_ROM_REGION */
-	const machine_config_token *machine_config;			/* DEVINFO_PTR_MACHINE_CONFIG */
-	const device_contract *	contract_list;				/* DEVINFO_PTR_CONTRACT_LIST */
-	const addrmap8_token *	internal_map8;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap16_token *	internal_map16;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap32_token *	internal_map32;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap64_token *	internal_map64;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap8_token *	default_map8;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
-	const addrmap16_token *	default_map16;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
-	const addrmap32_token *	default_map32;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
-	const addrmap64_token *	default_map64;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	device_start_func		start;						// DEVINFO_FCT_START 
+	device_stop_func		stop;						// DEVINFO_FCT_STOP 
+	device_reset_func		reset;						// DEVINFO_FCT_RESET 
+	device_execute_func 	execute;					// DEVINFO_FCT_EXECUTE 
+	device_validity_check_func validity_check;			// DEVINFO_FCT_VALIDITY_CHECK 
+	device_custom_config_func custom_config;			// DEVINFO_FCT_CUSTOM_CONFIG 
+	device_nvram_func		nvram;						// DEVINFO_FCT_NVRAM 
+	device_get_runtime_info_func get_runtime_info;		// DEVINFO_FCT_GET_RUNTIME_INFO 
+	const rom_entry *		romregion;					// DEVINFO_PTR_ROM_REGION 
+	const machine_config_token *machine_config;			// DEVINFO_PTR_MACHINE_CONFIG 
+	const addrmap8_token *	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
+	const addrmap16_token *	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
+	const addrmap32_token *	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
+	const addrmap64_token *	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
+	const addrmap8_token *	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
+	const addrmap16_token *	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
+	const addrmap32_token *	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
+	const addrmap64_token *	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
 };
 
 
-/* the configuration for a general device */
+// the configuration for a general device 
 enum device_space
 {
 	AS_PROGRAM = 0,
@@ -381,8 +377,8 @@ enum device_space
 	AS_IO = 2
 };
 
-class region_info;
 
+// device_config represents a device configuration that is attached to a machine_config
 class device_config
 {
 	DISABLE_COPYING(device_config);
@@ -411,23 +407,27 @@ public:
 	genf *get_config_fct(UINT32 state) const;
 	const char *get_config_string(UINT32 state) const;
 
-	/* device relationships */
-	device_config *			next;					/* next device (of any type/class) */
-	device_config *			owner;					/* device that owns us, or NULL if nobody */
+	astring &subtag(astring &dest, const char *tag) const;
+	astring &siblingtag(astring &dest, const char *tag) const;
 
-	/* device properties */
-	astring 				tag;					/* tag for this instance */
-	device_type				type;					/* device type */
-	device_class			devclass;				/* device class */
+	// device relationships 
+	device_config *			next;					// next device (of any type/class) 
+	device_config *			owner;					// device that owns us, or NULL if nobody 
 
-	/* device configuration */
-	UINT32					clock;					/* device clock */
-	const addrmap_token *	address_map[ADDRESS_SPACES]; /* address maps for each address space */
-	const void *			static_config;			/* static device configuration */
-	void *					inline_config;			/* inline device configuration */
+	// device properties 
+	astring 				tag;					// tag for this instance 
+	device_type				type;					// device type 
+	device_class			devclass;				// device class 
+
+	// device configuration 
+	UINT32					clock;					// device clock 
+	const addrmap_token *	address_map[ADDRESS_SPACES]; // address maps for each address space 
+	const void *			static_config;			// static device configuration 
+	void *					inline_config;			// inline device configuration 
 };
 
 
+// running_device represents a device that is live and attached to a running_machine
 class running_device
 {
 	DISABLE_COPYING(running_device);
@@ -435,7 +435,7 @@ class running_device
 	const device_config &	_baseconfig;
 	
 public:	// private eventually
-	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
+	const address_space *	addrspace[ADDRESS_SPACES];	// auto-discovered address spaces 
 
 public:
 	running_device(running_machine &machine, const device_config &config);
@@ -445,6 +445,9 @@ public:
 
 	inline const address_space *space(int index = 0) const;
 	inline const address_space *space(device_space index) const;
+
+	astring &subtag(astring &dest, const char *tag) const { return _baseconfig.subtag(dest, tag); }
+	astring &siblingtag(astring &dest, const char *tag) const { return _baseconfig.siblingtag(dest, tag); }
 
 	const region_info *subregion(const char *tag) const;
 	running_device *subdevice(const char *tag) const;
@@ -462,6 +465,11 @@ public:
 		for (cur = this->next; cur != NULL && cur->devclass != devclass; cur = cur->next) ;
 		return cur;
 	}
+	
+	void start();
+	void reset();
+	void stop();
+	void set_clock(UINT32 clock);
 
 	// get state from a device config
 	INT64 get_config_int(UINT32 state) const { return _baseconfig.get_config_int(state); }
@@ -475,64 +483,30 @@ public:
 	
 	void set_address_space(int spacenum, const address_space *space);
 
-	/* these fields are only valid once the device is attached to a machine */
-	running_machine *		machine;				/* machine if device is live */
+	// these fields are only valid once the device is attached to a machine 
+	running_machine *		machine;				// machine if device is live 
 
-	/* device relationships */
-	running_device *		next;					/* next device (of any type/class) */
-	running_device *		owner;					/* device that owns us, or NULL if nobody */
+	// device relationships 
+	running_device *		next;					// next device (of any type/class) 
+	running_device *		owner;					// device that owns us, or NULL if nobody 
 
-	/* device properties */
-	astring 				tag;					/* tag for this instance */
-	device_type				type;					/* device type */
-	device_class			devclass;				/* device class */
+	// device properties 
+	astring 				tag;					// tag for this instance 
+	device_type				type;					// device type 
+	device_class			devclass;				// device class 
 
-	/* device configuration */
-	UINT32					clock;					/* device clock */
+	// device configuration 
+	UINT32					clock;					// device clock 
 
-	/* these fields are only valid if the device is live */
-	UINT8					started;				/* TRUE if the start function has succeeded */
-	void *					token;					/* token if device is live */
-	UINT32					tokenbytes;				/* size of the token data allocated */
-	const region_info *		region;					/* our device-local region */
+	// these fields are only valid if the device is live 
+	bool					started;				// true if the start function has succeeded 
+	void *					token;					// token if device is live 
+	UINT32					tokenbytes;				// size of the token data allocated 
+	const region_info *		region;					// our device-local region 
 
-	device_execute_func 	execute;				/* quick pointer to execute callback */
+	device_execute_func 	execute;				// quick pointer to execute callback 
 	device_get_runtime_info_func get_runtime_info;
 };
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- device configuration ----- */
-
-/* build a tag that combines the device's name and the given tag */
-astring &device_build_tag(astring &dest, const device_config *devconfig, const char *tag);
-
-/* build a tag with the same device prefix as the source tag*/
-astring &device_inherit_tag(astring &dest, const char *sourcetag, const char *tag);
-
-/* find a given contract on a device */
-const device_contract *device_get_contract(running_device *device, const char *name);
-
-
-
-/* ----- live device management ----- */
-
-/* start the configured list of devices for a machine */
-void device_list_start(running_machine *machine);
-
-/* reset a device based on an allocated device_config */
-void device_reset(running_device *device);
-
-/* change the clock on a device */
-void device_set_clock(running_device *device, UINT32 clock);
-
-/* allow a device to ask for its initialization to be delayed */
-void device_delay_init(running_device *device);
 
 
 
