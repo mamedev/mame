@@ -169,12 +169,9 @@ SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
 ifdef BIGENDIAN
-PPC=1
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
 endif	# SYMBOLS
-endif
-ifdef PPC
 ifdef PTR64
 CCOMFLAGS += -arch ppc64
 LDFLAGS += -arch ppc64
@@ -182,7 +179,7 @@ else
 CCOMFLAGS += -arch ppc
 LDFLAGS += -arch ppc
 endif
-else
+else	# BIGENDIAN
 ifdef PTR64
 CCOMFLAGS += -arch x86_64
 LDFLAGS += -arch x86_64
@@ -190,7 +187,8 @@ else
 CCOMFLAGS += -m32 -arch i386
 LDFLAGS += -m32 -arch i386
 endif
-endif
+endif	# BIGENDIAN
+
 endif
 
 ifeq ($(TARGETOS),win32)
@@ -199,6 +197,7 @@ SYNC_IMPLEMENTATION = win32
 NO_X11 = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI 
 LIBGL = -lopengl32
+SDLMAIN = $(SDLOBJ)/main.o
 # needed for unidasm
 LDFLAGS += -Wl,--allow-multiple-definition
 
@@ -217,12 +216,10 @@ CCOMFLAGS += -mms-bitfields \
 LDFLAGS += -L$(GTK_INSTALL_ROOT)/lib
 endif # GTK_INSTALL_ROOT
 
-SDLMAIN = $(SDLOBJ)/main.o
-DEFS += -Dmain=utf8_main
-
-# enable UNICODE flags
-DEFS += -DUNICODE -D_UNICODE
+# enable UNICODE
+DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
 LDFLAGS += -municode
+
 endif
 
 ifeq ($(TARGETOS),os2)
@@ -308,10 +305,32 @@ ifeq ($(BASE_TARGETOS),unix)
 DEFS += -DSDLMAME_UNIX
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 LIBGL = -lGL
+ifeq ($(NO_X11),1)
+NO_DEBUGGER = 1
+endif
 
+ifneq (,$(findstring ppc,$(UNAME)))
 # override for preprocessor weirdness on PPC Linux
-ifdef powerpc
 CFLAGS += -Upowerpc
+SUPPORTSM32M64 = 1
+endif
+
+ifneq (,$(findstring x86_64,$(UNAME)))
+SUPPORTSM32M64 = 1
+endif
+
+ifneq (,$(findstring i386,$(UNAME)))
+SUPPORTSM32M64 = 1
+endif
+
+ifeq ($(SUPPORTSM32M64),1)
+ifdef PTR64
+CCOMFLAGS += -m64
+LDFLAGS += -m64
+else
+CCOMFLAGS += -m32
+LDFLAGS += -m32
+endif
 endif
 
 ifndef SDL_INSTALL_ROOT
@@ -320,10 +339,6 @@ LIBS += -lm `sdl-config --libs`
 else
 CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include -D_GNU_SOURCE=1
 LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL 
-endif
-
-ifeq ($(NO_X11),1)
-NO_DEBUGGER = 1
 endif
 
 endif # Unix
