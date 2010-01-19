@@ -40,7 +40,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
-
 #include "pool.h"
 #include "coreutil.h"
 
@@ -165,7 +164,7 @@ INLINE objtype_entry *get_object_type(object_pool *pool, object_type type)
     pool_alloc - allocates a new memory pool
 -------------------------------------------------*/
 
-object_pool *pool_alloc(void (*fail)(const char *message))
+object_pool *pool_alloc_lib(void (*fail)(const char *message))
 {
 	object_pool *pool;
 
@@ -252,7 +251,7 @@ void pool_clear(object_pool *pool)
     contained memory blocks
 -------------------------------------------------*/
 
-void pool_free(object_pool *pool)
+void pool_free_lib(object_pool *pool)
 {
 	object_entry_block *block, *nextblock;
 	objtype_entry *type, *nexttype;
@@ -610,37 +609,37 @@ int test_memory_pools(void)
 	int i;
 
 	has_memory_error = FALSE;
-	pool = pool_alloc(memory_error);
+	pool = pool_alloc_lib(memory_error);
 	memset(ptrs, 0, sizeof(ptrs));
 
-	ptrs[0] = pool_malloc(pool, 50);
-	ptrs[1] = pool_malloc(pool, 100);
+	ptrs[0] = pool_malloc_lib(pool, 50);
+	ptrs[1] = pool_malloc_lib(pool, 100);
 
-	ptrs[0] = pool_realloc(pool, ptrs[0], 150);
-	ptrs[1] = pool_realloc(pool, ptrs[1], 200);
+	ptrs[0] = pool_realloc_lib(pool, ptrs[0], 150);
+	ptrs[1] = pool_realloc_lib(pool, ptrs[1], 200);
 
-	ptrs[2] = pool_malloc(pool, 250);
-	ptrs[3] = pool_malloc(pool, 300);
+	ptrs[2] = pool_malloc_lib(pool, 250);
+	ptrs[3] = pool_malloc_lib(pool, 300);
 
-	ptrs[0] = pool_realloc(pool, ptrs[0], 350);
-	ptrs[1] = pool_realloc(pool, ptrs[1], 400);
+	ptrs[0] = pool_realloc_lib(pool, ptrs[0], 350);
+	ptrs[1] = pool_realloc_lib(pool, ptrs[1], 400);
 
-	ptrs[2] = pool_realloc(pool, ptrs[2], 450);
-	ptrs[3] = pool_realloc(pool, ptrs[3], 500);
+	ptrs[2] = pool_realloc_lib(pool, ptrs[2], 450);
+	ptrs[3] = pool_realloc_lib(pool, ptrs[3], 500);
 
-	ptrs[0] = pool_realloc(pool, ptrs[0], 0);
-	ptrs[1] = pool_realloc(pool, ptrs[1], 0);
+	ptrs[0] = pool_realloc_lib(pool, ptrs[0], 0);
+	ptrs[1] = pool_realloc_lib(pool, ptrs[1], 0);
 
-	ptrs[2] = pool_realloc(pool, ptrs[2], 550);
-	ptrs[3] = pool_realloc(pool, ptrs[3], 600);
+	ptrs[2] = pool_realloc_lib(pool, ptrs[2], 550);
+	ptrs[3] = pool_realloc_lib(pool, ptrs[3], 600);
 
 	/* some heavier stress tests */
 	for (i = 0; i < 512; i++)
 	{
-		ptrs[i % ARRAY_LENGTH(ptrs)] = pool_realloc(pool,
+		ptrs[i % ARRAY_LENGTH(ptrs)] = pool_realloc_lib(pool,
 			ptrs[i % ARRAY_LENGTH(ptrs)], rand() % 1000);
 	}
 
-	pool_free(pool);
+	pool_free_lib(pool);
 	return has_memory_error;
 }

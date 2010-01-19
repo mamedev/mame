@@ -48,9 +48,9 @@
 ***************************************************************************/
 
 /* helper macros for memory pools that pass file/line number */
-#define pool_malloc(pool, size)			pool_malloc_file_line((pool), (size), __FILE__, __LINE__)
-#define pool_realloc(pool, ptr, size)	pool_realloc_file_line((pool), (ptr), (size), __FILE__, __LINE__)
-#define pool_strdup(pool, size)			pool_strdup_file_line((pool), (size), __FILE__, __LINE__)
+#define pool_malloc_lib(pool, size)			pool_malloc_file_line((pool), (size), __FILE__, __LINE__)
+#define pool_realloc_lib(pool, ptr, size)	pool_realloc_file_line((pool), (ptr), (size), __FILE__, __LINE__)
+#define pool_strdup_lib(pool, size)			pool_strdup_file_line((pool), (size), __FILE__, __LINE__)
 
 /* macro to define a 4-character type for a pool */
 #define OBJECT_TYPE(a,b,c,d)			(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
@@ -84,7 +84,7 @@ typedef struct _object_pool_iterator object_pool_iterator;
 /* ----- object pool management ----- */
 
 /* allocate a new object pool */
-object_pool *pool_alloc(void (*fail)(const char *message));
+object_pool *pool_alloc_lib(void (*fail)(const char *message));
 
 /* register a new object type; returns TRUE if the type already existed and was overridden */
 void pool_type_register(object_pool *pool, object_type type, const char *friendly, void (*destructor)(void *, size_t));
@@ -93,7 +93,7 @@ void pool_type_register(object_pool *pool, object_type type, const char *friendl
 void pool_clear(object_pool *pool);
 
 /* free an object pool, including all allocated objects */
-void pool_free(object_pool *pool);
+void pool_free_lib(object_pool *pool);
 
 
 
