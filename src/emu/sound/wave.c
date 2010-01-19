@@ -22,7 +22,7 @@
 static STREAM_UPDATE( wave_sound_update )
 {
 #ifdef MESS
-	running_device *image = param;
+	const device_config *image = (const device_config *)param;
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -33,7 +33,7 @@ static STREAM_UPDATE( wave_sound_update )
 
 	state = cassette_get_state(image);
 
-	state &= CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER;
+	state = (cassette_state)(state & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER));
 
 	if (image_exists(image) && (ALWAYS_PLAY_SOUND || (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED))))
 	{
@@ -62,13 +62,13 @@ static STREAM_UPDATE( wave_sound_update )
 
 static DEVICE_START( wave )
 {
-	running_device *image = NULL;
+	const device_config *image = NULL;
 
 	assert( device != NULL );
-	assert( device->baseconfig().static_config != NULL );
+	assert( device->static_config != NULL );
 
 #ifdef MESS
-	image = device->machine->device( (const char *)device->baseconfig().static_config );
+	image = device->machine->device( (const char *)device->static_config );
 #endif
 	stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
 }

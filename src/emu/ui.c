@@ -26,6 +26,7 @@
 #include "mess.h"
 #include "uimess.h"
 #include "inputx.h"
+#include "messopts.h"
 #endif /* MESS */
 
 #include <ctype.h>
@@ -239,6 +240,12 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 	int show_gameinfo = !options_get_bool(mame_options(), OPTION_SKIP_GAMEINFO);
 	int show_warnings = TRUE;
 	int state;
+
+#ifdef MESS
+	show_warnings = !options_get_bool(mame_options(), OPTION_SKIP_WARNINGS);
+	if (!show_warnings)
+		show_disclaimer = FALSE;
+#endif /* MESS */
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
        or if we are debugging */

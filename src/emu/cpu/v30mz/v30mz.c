@@ -53,14 +53,24 @@ typedef UINT32 DWORD;
 #include "v30mz.h"
 #include "nec.h"
 
-extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom);
-
 /* NEC registers */
 typedef union
 {                   /* eight general registers */
     UINT16 w[8];    /* viewed as 16 bits registers */
     UINT8  b[16];   /* or as 8 bit registers */
 } necbasicregs;
+
+typedef struct _nec_config nec_config;
+struct _nec_config
+{
+	const UINT8*	v25v35_decryptiontable; // internal decryption table
+};
+
+/* default configuration */
+static const nec_config default_config =
+{
+	NULL
+};
 
 typedef struct _v30mz_state v30mz_state;
 struct _v30mz_state
@@ -91,7 +101,11 @@ struct _v30mz_state
 	UINT32 ea;
 	UINT16 eo;
 	UINT16 e16;
+	
+	const nec_config *config;
 };
+
+extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
 INLINE v30mz_state *get_safe_token(running_device *device)
 {
@@ -920,13 +934,17 @@ static void set_irq_line(v30mz_state *cpustate, int irqline, int state)
 
 static CPU_DISASSEMBLE( nec )
 {
-	return necv_dasm_one(buffer, pc, oprom);
+	v30mz_state *cpustate = get_safe_token(device);
+
+	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
 }
 
 static void nec_init(running_device *device, cpu_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
 
+	const nec_config *config = &default_config;
+	
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);
 	state_save_register_device_item_array(device, 0, cpustate->sregs);
 
@@ -946,6 +964,7 @@ static void nec_init(running_device *device, cpu_irq_callback irqcallback, int t
 	state_save_register_device_item(device, 0, cpustate->CarryVal);
 	state_save_register_device_item(device, 0, cpustate->ParityVal);
 
+	cpustate->config = config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
