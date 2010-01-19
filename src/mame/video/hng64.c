@@ -1110,7 +1110,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	}
 
     // xrally's pink tilemaps make me think this is a tilemap enable bit.
-    if (!(tileregs & 0x0040)) return;
+	// pretty much every other game makes me think otherwise.
+    //if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
@@ -1825,9 +1826,6 @@ static void setCameraProjectionMatrix(const UINT16* packet)
     // [15] - ???? ... ? Gets data during buriki door-run
     ////////////*/
 
-	// This packet changes when fatfurwa 'How to play' is on the screen.
-	// Not too much, but if this is right, the aspect ratio is different...
-
 	// Heisted from GLFrustum - 6 parameters...
 	float left, right, top, bottom, near_, far_;
 
@@ -1882,49 +1880,26 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [14] - xxxx ... Transformation matrix
     // [15] - xxxx ... Transformation matrix
     ////////////*/
-	int k, l, m;
-
-	UINT16* threeDRoms;
-	UINT32  threeDOffset;
-	UINT16* threeDPointer;
-
 	UINT32 size[4];
 	UINT32 address[4];
 	UINT32 megaOffset;
-	float eyeCoords[4];			// ObjectCoords transformed by the modelViewMatrix
-	// float clipCoords[4];     // EyeCoords transformed by the projectionMatrix
-	float ndCoords[4];			// Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
-	float windowCoords[4];		// Mapped ndCoordinates to screen space
+	float eyeCoords[4];		// ObjectCoords transformed by the modelViewMatrix
+//	float clipCoords[4];    // EyeCoords transformed by the projectionMatrix
+	float ndCoords[4];		// Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
+	float windowCoords[4];	// Mapped ndCoordinates to screen space
 	float cullRay[4];
 
 	float objectMatrix[16];
-	struct polygon lastPoly = { 0 };
+	setIdentity(objectMatrix);
 
+	struct polygon lastPoly = { 0 };
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	// GEOMETRY
-	setIdentity(objectMatrix);
 
 	/////////////////
 	// HEADER INFO //
 	/////////////////
-
-	// 3d ROM Offset
-	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
-	threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
-	threeDPointer = &threeDRoms[threeDOffset * 3];
-
-	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU)
-	{
-		printf("Strange geometry packet: (ignoring)\n");
-		printPacket(packet, 1);
-		return;
-	}
-
-
-	//////////////////////////////////////
-	// THE OBJECT TRANSFORMATION MATRIX //
-	//////////////////////////////////////
+	// THE OBJECT TRANSFORMATION MATRIX
 	objectMatrix[8] = uToF(packet[7]);
 	objectMatrix[4] = uToF(packet[8]);
 	objectMatrix[0] = uToF(packet[9]);
@@ -1981,16 +1956,28 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	//if (packet[1] & 0x4000)	tdColor |= 0x000000ff;
 	//if (packet[1] & 0x8000)	tdColor |= 0xffffffff;
 
-/*
+	// 3d ROM Offset
+	UINT16* threeDRoms = (UINT16*)(memory_region(machine, "verts"));
+	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
+	UINT16* threeDPointer = &threeDRoms[threeDOffset * 3];
+
+	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU)
+	{
+		printf("Strange geometry packet: (ignoring)\n");
+		printPacket(packet, 1);
+		return;
+	}
+
+	/*
 	// Debug - ajg
 	printf("%08x : ", threeDOffset*3*2);
-	for (k = 0; k < 7*3; k++)
+	for (int k = 0; k < 7*3; k++)
 	{
 		printf("%04x ", threeDPointer[k]);
 		if ((k % 3) == 2) printf(" ");
 	}
 	printf("\n");
-*/
+	*/
 
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
@@ -2028,10 +2015,10 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	address[3] |= (megaOffset << 16);
 
 	/* For all 4 polygon chunks */
-	for (k = 0; k < 4; k++)
+	for (int k = 0; k < 4; k++)
 	{
 		UINT16* chunkOffset = &threeDRoms[address[k] * 3];
-		for (l = 0; l < size[k]; l++)
+		for (int l = 0; l < size[k]; l++)
 		{
 			////////////////////////////////////////////
 			// GATHER A SINGLE TRIANGLE'S INFORMATION //
@@ -2113,7 +2100,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
 			case 0x05:	// 0000 0101
 			case 0x0f:	// 0000 1111
-				for (m = 0; m < 3; m++)
+				for (int m = 0; m < 3; m++)
 				{
 					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
 					polys[*numPolys].vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
@@ -2151,9 +2138,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 24 word chunk, 3 vertices, per-vertex UVs
 			case 0x04:	// 0000 0100
 			case 0x0e:	// 0000 1110
-			case 0x24:	// 0010 0100        - TODO: I'm missing a lot of geo in the driving game intros
+			case 0x24:	// 0010 0100
 			case 0x2e:	// 0010 1110
-				for (m = 0; m < 3; m++)
+				for (int m = 0; m < 3; m++)
 				{
 					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
 					polys[*numPolys].vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
@@ -2179,9 +2166,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				}
 
 				// Redundantly called, but it works...
-				polys[*numPolys].faceNormal[0] = polys[*numPolys].vert[m].normal[0];
-				polys[*numPolys].faceNormal[1] = polys[*numPolys].vert[m].normal[1];
-				polys[*numPolys].faceNormal[2] = polys[*numPolys].vert[m].normal[2];
+				polys[*numPolys].faceNormal[0] = polys[*numPolys].vert[2].normal[0];
+				polys[*numPolys].faceNormal[1] = polys[*numPolys].vert[2].normal[1];
+				polys[*numPolys].faceNormal[2] = polys[*numPolys].vert[2].normal[2];
 				polys[*numPolys].faceNormal[3] = 0.0f;
 
 				chunkLength = 24;
@@ -2231,7 +2218,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 12 word chunk, 1 vertex, per-vertex UVs
 			case 0x86:	// 1000 0110
 			case 0x96:	// 1001 0110
-			case 0xb6:	// 1011 0110        - TODO: I'm missing a lot of geo in the driving game intros.
+			case 0xb6:	// 1011 0110
 			case 0xc6:	// 1100 0110
 			case 0xd6:	// 1101 0110
 				// Copy over the proper vertices from the previous triangle...
@@ -2270,10 +2257,10 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 				/* DEBUG
                 printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-                for (m = 0; m < 13; m++)
+                for (int m = 0; m < 13; m++)
                     printf("%04x ", chunkOffset[m]);
                 printf("\n");
-                for (m = 0; m < 13; m++)
+                for (int m = 0; m < 13; m++)
                     printf("%3.4f ", uToF(chunkOffset[m]));
                 printf("\n\n");
                 */
@@ -2333,7 +2320,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// TRANSFORM THE TRIANGLE INTO HOMOGENEOUS SCREEN SPACE //
 			if (polys[*numPolys].visible)
 			{
-				for (m = 0; m < polys[*numPolys].n; m++)
+				for (int m = 0; m < polys[*numPolys].n; m++)
 				{
 					// Transform and project the vertex into pre-divided homogeneous coordinates...
 					vecmatmul4(eyeCoords, modelViewMatrix, polys[*numPolys].vert[m].worldCoords);
@@ -2345,7 +2332,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					// Clip the triangles to the view frustum...
 					performFrustumClip(&polys[*numPolys]);
 
-					for (m = 0; m < polys[*numPolys].n; m++)
+					for (int m = 0; m < polys[*numPolys].n; m++)
 					{
 						// Convert into normalized device coordinates...
 						ndCoords[0] = polys[*numPolys].vert[m].clipCoords[0] / polys[*numPolys].vert[m].clipCoords[3];
