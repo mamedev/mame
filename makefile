@@ -67,6 +67,11 @@ TARGETOS = win32
 else
 
 ifneq ($(CROSSBUILD),1)
+
+ifneq ($(OS2_SHELL),)
+TARGETOS = win32
+else
+
 UNAME = $(shell uname -a)
 
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
@@ -106,6 +111,7 @@ BIGENDIAN=1
 endif
 endif # BIGENDIAN
 
+endif # OS/2
 endif # CROSS_BUILD	
 endif # Windows_NT
 
