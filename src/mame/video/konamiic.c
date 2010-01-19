@@ -5443,10 +5443,9 @@ static void K056832_UpdatePageLayout(void)
 		}
 	}
 
-	// winning spike doesn't like layer association..
+	// winning spike and vsnet soccer don't like our layer association implementation..
 	if (K056832_djmain_hack==2)
 		K056832_LayerAssociation = 0;
-
 
 	// disable all tilemaps
 	for (pageIndex=0; pageIndex<K056832_PAGE_COUNT; pageIndex++)

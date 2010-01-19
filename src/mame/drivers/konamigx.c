@@ -3732,11 +3732,11 @@ GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soc
 GAME( 1994, soccerssa,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
-GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, rungun2,   konamigx, gxtype4sd2, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, rushhero,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_IMPERFECT_GRAPHICS  )
