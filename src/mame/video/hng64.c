@@ -1109,6 +1109,9 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		}
 	}
 
+    // xrally's pink tilemaps make me think this is a tilemap enable bit.
+    if (!(tileregs & 0x0040)) return;
+
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
 		transmask = 0xff;
@@ -1918,16 +1921,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 		return;
 	}
 
-	// Debug - ajg
-	/*
-    printf("%08x : ", threeDOffset*3*2);
-    for (k = 0; k < 7*3; k++)
-    {
-        printf("%04x ", threeDPointer[k]);
-        if ((k % 3) == 2) printf(" ");
-    }
-    printf("\n");
-    */
 
 	//////////////////////////////////////
 	// THE OBJECT TRANSFORMATION MATRIX //
@@ -1981,6 +1974,24 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [20] - ???? always 0 ????
     //////////////////////////////////////////////*/
 
+	// Debug - ajg
+	//UINT32 tdColor = 0xff000000;
+    //if (packet[1] & 0x1000)	tdColor |= 0x00ff0000;
+	//if (packet[1] & 0x2000)	tdColor |= 0x0000ff00;
+	//if (packet[1] & 0x4000)	tdColor |= 0x000000ff;
+	//if (packet[1] & 0x8000)	tdColor |= 0xffffffff;
+
+/*
+	// Debug - ajg
+	printf("%08x : ", threeDOffset*3*2);
+	for (k = 0; k < 7*3; k++)
+	{
+		printf("%04x ", threeDPointer[k]);
+		if ((k % 3) == 2) printf(" ");
+	}
+	printf("\n");
+*/
+
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
 	address[1] = threeDPointer[1];
@@ -2002,13 +2013,13 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	/*           ????         [13]; Used. */
 	/*           ????         [14]; Used. */
 
-	/*           ????         [15]; Used? */
-	/*           ????         [16]; Used? */
-	/*           ????         [17]; Used? */
+	if (threeDPointer[15] != 0x0000) printf("ZOMG!  3dPointer[15] is non-zero!\n");
+	if (threeDPointer[16] != 0x0000) printf("ZOMG!  3dPointer[16] is non-zero!\n");
+	if (threeDPointer[17] != 0x0000) printf("ZOMG!  3dPointer[17] is non-zero!\n");
 
-	/*           ????         [18]; Used? */
-	/*           ????         [19]; Used? */
-	/*           ????         [20]; Used? */
+	if (threeDPointer[18] != 0x0000) printf("ZOMG!  3dPointer[18] is non-zero!\n");
+	if (threeDPointer[19] != 0x0000) printf("ZOMG!  3dPointer[19] is non-zero!\n");
+	if (threeDPointer[20] != 0x0000) printf("ZOMG!  3dPointer[20] is non-zero!\n");
 
 	/* Concatenate the megaOffset with the addresses */
 	address[0] |= (megaOffset << 16);
@@ -2048,11 +2059,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			}
 
 			// Debug - Colors polygons with certain flags bright blue! ajg
-			//if (chunkOffset[2] & 0x00f0)
-			//  polys[*numPolys].debugColor = 0xff0000ff;
+            polys[*numPolys].debugColor = 0;
+			//polys[*numPolys].debugColor = tdColor;
 
 			// Debug - ajg
-			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
+			//printf("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
 			// TEXTURE
@@ -2400,8 +2411,11 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 
 	case 0x0100:	// Geometry
 	case 0x0101:	// Similar to 0x0100, but throws a strange packet in every now and again.
-		//printPacket(packet, 1);
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
+
+        // HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
+        if (packet[2] == 0x0003 && packet[3] == 0x8f37 && hng64_mcu_type == SHOOT_MCU) 
+            break;
 
 		/* Immeditately rasterize the chunk's polygons into the display buffer */
 		for (i = 0; i < numPolys; i++)
@@ -2417,6 +2431,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0102:	// Geometry of a different type - sams games.
+		//printPacket(packet, 1);
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
@@ -2827,10 +2842,10 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 	float*  db = &(depthBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x_start]);
 	UINT32* cb = &(colorBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x_start]);
 
-	const UINT8 *gfx = memory_region(machine, "textures");
-	const UINT8 *textureOffset;
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
+	const UINT8 *textureOffset;
+	const UINT8 *gfx = memory_region(machine, "textures");
 
 	if (texIndex >= 0)
 		textureOffset = &gfx[texIndex * 1024 * 1024];
