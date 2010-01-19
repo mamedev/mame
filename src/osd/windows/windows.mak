@@ -136,7 +136,7 @@ AR += /LTCG
 endif
 
 # disable warnings and link against bufferoverflowu for 64-bit targets
-ifdef PTR64
+ifeq ($(PTR64),1)
 CCOMFLAGS += /wd4267
 LIBS += -lbufferoverflowu
 endif
@@ -221,7 +221,7 @@ endif
 CCOMFLAGS += -include $(WINSRC)/winprefix.h
 
 # for 32-bit apps, add unicows for Unicode support on Win9x
-ifndef PTR64
+ifneq ($(PTR64),1)
 LIBS += -lunicows
 endif
 

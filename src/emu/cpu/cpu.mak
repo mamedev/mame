@@ -44,7 +44,7 @@ DRCDEPS = \
 # fixme - need to make this work for other target architectures (PPC)
 
 ifndef FORCE_DRC_C_BACKEND
-ifdef PTR64
+ifeq ($(PTR64),1)
 
 DRCOBJ += \
 	$(CPUOBJ)/drcbex64.o \

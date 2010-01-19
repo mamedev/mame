@@ -172,7 +172,7 @@ ifdef BIGENDIAN
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
 endif	# SYMBOLS
-ifdef PTR64
+ifeq ($(PTR64),1)
 CCOMFLAGS += -arch ppc64
 LDFLAGS += -arch ppc64
 else
@@ -180,7 +180,7 @@ CCOMFLAGS += -arch ppc
 LDFLAGS += -arch ppc
 endif
 else	# BIGENDIAN
-ifdef PTR64
+ifeq ($(PTR64),1)
 CCOMFLAGS += -arch x86_64
 LDFLAGS += -arch x86_64
 else
@@ -324,7 +324,7 @@ SUPPORTSM32M64 = 1
 endif
 
 ifeq ($(SUPPORTSM32M64),1)
-ifdef PTR64
+ifeq ($(PTR64),1)
 CCOMFLAGS += -m64
 LDFLAGS += -m64
 else

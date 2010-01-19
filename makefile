@@ -285,7 +285,7 @@ endif
 endif
 
 # 64-bit builds get a '64' suffix
-ifdef PTR64
+ifeq ($(PTR64),1)
 SUFFIX64 = 64
 endif
 
@@ -345,7 +345,7 @@ DEFS += -DLSB_FIRST
 endif
 
 # define PTR64 if we are a 64-bit target
-ifdef PTR64
+ifeq ($(PTR64),1)
 DEFS += -DPTR64
 endif
 
