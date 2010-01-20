@@ -83,7 +83,9 @@ endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 TARGETOS = freebsd
 endif
-
+ifeq ($(firstword $(filter OpenBSD,$(UNAME))),FreeBSD)
+TARGETOS = openbsd
+endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 TARGETOS = macosx
 endif
@@ -95,6 +97,9 @@ endif
 # Autodetect PTR64
 ifndef PTR64
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+PTR64 = 1
+endif
+ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
 PTR64 = 1
 endif
 endif

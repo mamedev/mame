@@ -315,10 +315,12 @@ CFLAGS += -Upowerpc
 SUPPORTSM32M64 = 1
 endif
 
+ifneq (,$(findstring amd64,$(UNAME)))
+SUPPORTSM32M64 = 1
+endif
 ifneq (,$(findstring x86_64,$(UNAME)))
 SUPPORTSM32M64 = 1
 endif
-
 ifneq (,$(findstring i386,$(UNAME)))
 SUPPORTSM32M64 = 1
 endif
