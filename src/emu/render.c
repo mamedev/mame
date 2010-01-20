@@ -1478,7 +1478,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				/* we may be called very early, before machine->visible_area is initialized; handle that case */
 				if (scrconfig->type == SCREEN_TYPE_VECTOR)
 					visarea = &vectorvis;
-				else if (screendev != NULL && screendev->token != NULL)
+				else if (screendev != NULL && screendev->started)
 					visarea = video_screen_get_visible_area(screendev);
 				else
 					visarea = &scrconfig->visarea;
