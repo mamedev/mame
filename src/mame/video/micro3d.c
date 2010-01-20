@@ -511,6 +511,8 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 	int i;
 	int triangles = 0;
 	int vertices = state->fifo_idx / 3;
+	int min_y = 0x3ff;
+	int max_y = 0;
 
 	/* This satisifes the burst write test */
 	if (vertices == 0)
@@ -568,11 +570,12 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_Y_MIN);
 
 		/* Rasterise */
-		for (k = 2; k < clip_vertices; ++k)
+		if (clip_vertices >= 3)
 		{
 			micro3d_vtx a = vclip_list[0];
-			micro3d_vtx b = vclip_list[k - 1];
-			micro3d_vtx c = vclip_list[k];
+			micro3d_vtx b = vclip_list[1];
+
+			triangles = TRUE;
 
 			a.x += state->x_mid;
 			a.y += state->y_mid;
@@ -580,19 +583,41 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 			b.x += state->x_mid;
 			b.y += state->y_mid;
 
-			c.x += state->x_mid;
-			c.y += state->y_mid;
+			/* Keep track of the y-extents so we don't have to scan every line later */
+			if (a.y < min_y)
+				min_y = a.y;
+			if (a.y > max_y)
+				max_y = a.y;
 
-			/* TODO: Don't draw lines twice */
+			if (b.y < min_y)
+				min_y = b.y;
+			if (b.y > max_y)
+				max_y = b.y;
+
+			/* Draw the first line of the triangle/fan */
 			draw_line(state, a.x, a.y, b.x, b.y);
-			draw_line(state, b.x, b.y, c.x, c.y);
-			draw_line(state, a.x, a.y, c.x, c.y);
-			triangles = TRUE;
+
+			for (k = 2; k < clip_vertices; ++k)
+			{
+				micro3d_vtx c = vclip_list[k];
+
+				c.x += state->x_mid;
+				c.y += state->y_mid;
+
+				if (c.y < min_y)
+					min_y = c.y;
+				if (c.y > max_y)
+					max_y = c.y;
+
+				draw_line(state, b.x, b.y, c.x, c.y);
+				draw_line(state, a.x, a.y, c.x, c.y);
+				b = c;
+			}
 		}
 	}
 
-	if (triangles)
-		rasterise_spans(state, 0, 399, attr);
+	if (triangles == TRUE)
+		rasterise_spans(state, min_y, max_y, attr);
 }
 
 

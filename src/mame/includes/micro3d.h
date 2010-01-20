@@ -52,7 +52,7 @@ struct _micro3d_state
 	} mc68901;
 
 	UINT16				*shared_ram;
-	running_device *duart68681;
+	running_device 		*duart68681;
 	UINT8				m68681_tx0;
 
 	/* Sound */
@@ -78,7 +78,7 @@ struct _micro3d_state
 
 	/* 2D video */
 	UINT16				*micro3d_sprite_vram;
-	UINT16			creg;
+	UINT16				creg;
 	UINT16				xfer3dk;
 
 	/* 3D pipeline */
