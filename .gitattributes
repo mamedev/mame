@@ -1943,6 +1943,7 @@ src/mame/drivers/pcat_dyn.c svneol=native#text/plain
 src/mame/drivers/pcat_nit.c svneol=native#text/plain
 src/mame/drivers/pcktgal.c svneol=native#text/plain
 src/mame/drivers/pcxt.c svneol=native#text/plain
+src/mame/drivers/pengadvb.c svneol=native#text/plain
 src/mame/drivers/pengo.c svneol=native#text/plain
 src/mame/drivers/peplus.c svneol=native#text/plain
 src/mame/drivers/pgm.c svneol=native#text/plain

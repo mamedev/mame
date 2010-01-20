@@ -9310,6 +9310,7 @@ Other Sun games
 	DRIVER( bs94 )		/* (c) 1994 Entretenimientos GEMINIS */
 	DRIVER( jokrwild )	/* (c) 1988 Sigma */
 	DRIVER( pesadelo )	/* (c) 1989 Forte II Games */
+	DRIVER( pengadvb )	/* (c) 1988 Screen */
 	DRIVER( spool99 )	/* (c) 1998 Electronic Projects */
 	DRIVER( spool99a )	/* (c) 1998 Electronic Projects */
 	DRIVER( 4roses )	/* (c) 1999 Unknown */

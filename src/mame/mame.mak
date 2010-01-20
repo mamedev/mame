@@ -906,6 +906,7 @@ $(MAMEOBJ)/midway.a: \
 
 $(MAMEOBJ)/msx.a: \
 	$(DRIVERS)/forte2.o \
+	$(DRIVERS)/pengadvb.o \
 	$(DRIVERS)/sangho.o \
 	$(DRIVERS)/sfkick.o \
 
