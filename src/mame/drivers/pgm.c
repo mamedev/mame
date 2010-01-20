@@ -163,13 +163,13 @@ ASIC 22 + ASIC 25
 ASIC 25 + ASIC 28
     Oriental Legend Super
 
-ASIC 27 (5585E):
+ASIC 27 (55857E):
     performs a variety of calculations, quite complex, different per region, supplies region code
     used by:
     Knights of Valour 1 / Plus
     Photo Y2k / Real and Fake
 
-ASIC 27A(5585F/5585G):
+ASIC 27A(55857F/55857G):
     arm7 cpu with 16kb internal rom (different per game / region) + optional external data rom
     probably used to give extra power to the system, lots of calculations are offloaded to it
     used by:
@@ -302,7 +302,7 @@ static WRITE16_HANDLER( pgm_videoram_w )
 	else if (offset < 0x7000 / 2)
 		pgm_tx_videoram_w(space, offset - 0x4000 / 2, data, mem_mask);
 	else
-		COMBINE_DATA(&state->videoram[offset / 2]);
+		COMBINE_DATA(&state->videoram[offset]);
 }
 
 static READ16_HANDLER ( z80_ram_r )
@@ -880,7 +880,7 @@ static ADDRESS_MAP_START( kovsh_arm7_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-//5585G
+//55857G
 
 static WRITE32_HANDLER( svg_arm7_ram_sel_w )
 {
@@ -1416,7 +1416,7 @@ static MACHINE_DRIVER_START( kov )
 	MDRV_CPU_PROGRAM_MAP(kovsh_mem)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 5585E/F/G
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
 	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map)
 MACHINE_DRIVER_END
 
@@ -1427,7 +1427,7 @@ static MACHINE_DRIVER_START( kov2 )
 	MDRV_CPU_PROGRAM_MAP(kov2_mem)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 5585F
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857F
 	MDRV_CPU_PROGRAM_MAP(arm7_map)
 MACHINE_DRIVER_END
 
@@ -1438,7 +1438,7 @@ static MACHINE_DRIVER_START( svg )
 	MDRV_CPU_PROGRAM_MAP(svg_68k_mem)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 5585G
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857G
 	MDRV_CPU_PROGRAM_MAP(svg_arm7_map)
 MACHINE_DRIVER_END
 
@@ -1577,7 +1577,7 @@ ROM_END
 
 /*
 
-Oriental Legend / Xi Yo Gi Shi Re Zuang (CHINA 111 Ver.)
+Oriental Legend / Xi You Shi E Zhuan (CHINA 111 Ver.)
 (c)1997 IGS
 
 PGM system
@@ -1645,7 +1645,7 @@ ROM_END
 
 /*
 
-Oriental Legend / Xi Yo Gi Shi Re Zuang (KOREA 105 Ver.)
+Oriental Legend / Xi You Shi E Zhuan (KOREA 105 Ver.)
 (c)1997 IGS
 
 PGM system
