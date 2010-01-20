@@ -494,7 +494,7 @@ DRIVER_INIT( suprmrio )
 	DRIVER_INIT_CALL(vsnormal);
 
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "extra1");
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -1131,7 +1131,7 @@ DRIVER_INIT( MMC3 )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mapper4_w);
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "extra1");
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
 
 	/* common init */
 	init_vsnes(machine);
@@ -1354,7 +1354,7 @@ DRIVER_INIT( bnglngby )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0231, 0x0231, 0, 0, set_bnglngby_irq_r, set_bnglngby_irq_w);
 
 	/* extra ram */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "extra1");
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
 
 	ret = 0;
 
@@ -1506,7 +1506,7 @@ DRIVER_INIT( btlecity )
 DRIVER_INIT( vstetris )
 {
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "extra1");
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
 
 	init_vsnes(machine);
 	DRIVER_INIT_CALL(vsnormal);
