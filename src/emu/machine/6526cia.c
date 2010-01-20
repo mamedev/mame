@@ -362,8 +362,8 @@ static void cia_timer_underflow(running_device *device, int timer)
 					cia->serial <<= 1;
 					cia->cnt = 0;
 
-					devcb_call_write_line(&cia->out_cnt_func, cia->cnt);
 					devcb_call_write_line(&cia->out_sp_func, cia->sp);
+					devcb_call_write_line(&cia->out_cnt_func, cia->cnt);
 				}
 				else
 				{
@@ -373,6 +373,7 @@ static void cia_timer_underflow(running_device *device, int timer)
 
 					if (cia->shift == 8)
 					{
+						cia->shift = 0;
 						cia->ics |= 0x08;
 						cia_update_interrupts(device);
 					}
