@@ -144,15 +144,18 @@ union PAIR64
 ***************************************************************************/
 
 // constants for expression endianness
-#define ENDIANNESS_LITTLE				0
-#define ENDIANNESS_BIG					1
+enum endianness_t
+{
+	ENDIANNESS_LITTLE,
+	ENDIANNESS_BIG
+};
 
 
 // declare native endianness to be one or the other
 #ifdef LSB_FIRST
-#define ENDIANNESS_NATIVE				ENDIANNESS_LITTLE
+const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_LITTLE;
 #else
-#define ENDIANNESS_NATIVE				ENDIANNESS_BIG
+const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 #endif
 
 
@@ -179,7 +182,7 @@ union PAIR64
     COMMON MACROS
 ***************************************************************************/
 
-// more for defining a copy constructor and assignment operator to prevent copying
+// macro for defining a copy constructor and assignment operator to prevent copying
 #define DISABLE_COPYING(_Type) \
 private: \
 	_Type(const _Type &); \
