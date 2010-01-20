@@ -63,7 +63,7 @@ static void console_create_window(running_machine *machine);
 //  osd_wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(const device_config *device, int firststop)
+void osd_wait_for_debugger(running_device *device, int firststop)
 {
 	// create a console window
 	if (main_console == nil)
@@ -764,7 +764,7 @@ void console_create_window(running_machine *machine)
 }
 
 
-- (void)selectSubviewForCPU:(const device_config *)device {
+- (void)selectSubviewForCPU:(running_device *)device {
 	const int					selected = memory_view_get_subview(view);
 	const memory_subview_item	*subitem;
 	for (subitem = memory_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
@@ -1052,7 +1052,7 @@ void console_create_window(running_machine *machine)
 }
 
 
-- (void)selectSubviewForCPU:(const device_config *)device {
+- (void)selectSubviewForCPU:(runing_device *)device {
 	const int					selected = disasm_view_get_subview(view);
 	const disasm_subview_item	*subitem;
 	for (subitem = disasm_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
@@ -1296,7 +1296,7 @@ void console_create_window(running_machine *machine)
 }
 
 
-- (void)selectSubviewForCPU:(const device_config *)device {
+- (void)selectSubviewForCPU:(running_device *)device {
 	const int						selected = registers_view_get_subview(view);
 	const registers_subview_item	*subitem;
 	for (subitem = registers_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
@@ -1555,7 +1555,7 @@ void console_create_window(running_machine *machine)
 
 
 - (void)showDebugger:(NSNotification *)notification {
-	const device_config *device = (const device_config *) [[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
+	running_device *device = (running_device *) [[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
 	if (device->machine == machine) {
 		if (![window isVisible] && ![window isMiniaturized])
 			[window orderFront:self];
@@ -1755,7 +1755,7 @@ void console_create_window(running_machine *machine)
 }
 
 
-- (void)setCPU:(const device_config *)device {
+- (void)setCPU:(running_device *)device {
 	[regView selectSubviewForCPU:device];
 	[dasmView selectSubviewForCPU:device];
 	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %@",
@@ -1801,7 +1801,7 @@ void console_create_window(running_machine *machine)
 
 
 - (void)showDebugger:(NSNotification *)notification {
-	const device_config *device = (const device_config * )[[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
+	running_device *device = (running_device * )[[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
 	if (device->machine == machine) {
 		[self setCPU:device];
 		[window makeKeyAndOrderFront:self];
