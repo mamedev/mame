@@ -83,7 +83,7 @@ endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 TARGETOS = freebsd
 endif
-ifeq ($(firstword $(filter OpenBSD,$(UNAME))),FreeBSD)
+ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
 TARGETOS = openbsd
 endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
