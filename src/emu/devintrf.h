@@ -385,7 +385,7 @@ class device_config
 	
 public:
 	device_config(const device_config *owner, device_type type, const char *tag, UINT32 clock);
-	~device_config();
+	virtual ~device_config();
 
 	device_config *typenext() const
 	{
@@ -439,7 +439,7 @@ public:	// private eventually
 
 public:
 	running_device(running_machine &machine, const device_config &config);
-	~running_device();
+	virtual ~running_device();
 	
 	const device_config &baseconfig() const { return _baseconfig; }
 
