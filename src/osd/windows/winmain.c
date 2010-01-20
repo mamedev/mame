@@ -291,6 +291,7 @@ int main(int argc, char *argv[])
 
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
+	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
 
 	// if we're a GUI app, out errors to message boxes
 	if (win_is_gui_application() || is_double_click_start(argc))
@@ -577,7 +578,7 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 
 	// if we're hitting this recursively, just exit
 	if (already_hit)
-		ExitProcess(100);
+		return EXCEPTION_CONTINUE_SEARCH;
 	already_hit = 1;
 
 	// flush any debugging traces that were live
@@ -644,25 +645,11 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 		get_module_information != NULL)
 	{
 		CONTEXT context = *info->ContextRecord;
-		FPTR code_start, code_size;
 		STACKFRAME64 stackframe;
-		MODULEINFO info;
 	
 		// initialize the symbol lookup
 		sym_initialize(GetCurrentProcess(), NULL, TRUE);
 	
-		// get the actual address of the image
-		HMODULE module = GetModuleHandle(NULL);
-		get_module_information(GetCurrentProcess(), module, &info, sizeof(info));
-		code_start = reinterpret_cast<FPTR>(info.lpBaseOfDll);
-		code_size = info.SizeOfImage;
-
-		// find out the linker-generated base address of the image
-		PIMAGE_NT_HEADERS header = image_nt_header(module);
-		FPTR symbol_delta = 0;
-		if (header != NULL)
-			symbol_delta = code_start - header->OptionalHeader.ImageBase;
-
 		// reprint the actual exception address
 		fprintf(stderr, "-----------------------------------------------------\n");
 		fprintf(stderr, "Stack crawl:\n");
@@ -698,11 +685,10 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 		{
 			fprintf(stderr, "  %p: %p%s\n", (void *)stackframe.AddrFrame.Offset, (void *)stackframe.AddrPC.Offset, lookup_symbol((FPTR)stackframe.AddrPC.Offset));
 		}
-
-		// exit
-		ExitProcess(100);
 	}
-	return 0;
+
+	// exit
+	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
@@ -791,7 +777,7 @@ static const char *lookup_symbol(FPTR address)
 	// see if we have a map file
 	FILE *map = fopen(mapfile_name, "r");
 	if (map == NULL)
-		return "";
+		return " (no map)";
 
 	// reset the bests
 	astring best_symbol;
@@ -813,7 +799,7 @@ static const char *lookup_symbol(FPTR address)
 
 	// create the final result
 	if (address - best_addr > 0x10000)
-		return "";
+		return " (unknown)";
 	sprintf(buffer, " (%s+0x%04x)", best_symbol.trimspace().cstr(), (UINT32)(address - best_addr));
 	return buffer;
 }
