@@ -1052,7 +1052,7 @@ void console_create_window(running_machine *machine)
 }
 
 
-- (void)selectSubviewForCPU:(runing_device *)device {
+- (void)selectSubviewForCPU:(running_device *)device {
 	const int					selected = disasm_view_get_subview(view);
 	const disasm_subview_item	*subitem;
 	for (subitem = disasm_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
