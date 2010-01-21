@@ -1109,9 +1109,9 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		}
 	}
 
-    // xrally's pink tilemaps make me think this is a tilemap enable bit.
+	// xrally's pink tilemaps make me think this is a tilemap enable bit.
 	// pretty much every other game makes me think otherwise.
-    //if (!(tileregs & 0x0040)) return;
+	//if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
@@ -1125,8 +1125,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	if ((tileregs & 0x1800)==0x1000) // floor mode
 	{
 		/* Floor mode - per pixel simple / complex modes? -- every other line?
-          (there doesn't seem to be enough data in Buriki for every line at least)
-        */
+		  (there doesn't seem to be enough data in Buriki for every line at least)
+		*/
 		if ((tileregs&0xf000) == 0x1000)
 		{
 			popmessage("Floor is Active");
@@ -1503,7 +1503,7 @@ VIDEO_UPDATE( hng64 )
 			UINT32 *dst = BITMAP_ADDR32(bitmap, y, cliprect->min_x);
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-            {
+			{
 				if(*src & 0xff000000)
 					*dst = *src;
 
@@ -1522,26 +1522,26 @@ VIDEO_UPDATE( hng64 )
 		popmessage("%08x %08x %08x %08x %08x", hng64_spriteregs[0], hng64_spriteregs[1], hng64_spriteregs[2], hng64_spriteregs[3], hng64_spriteregs[4]);
 
 	if (0)
-    popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
+	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
 	 hng64_videoregs[0x00],
-     hng64_videoregs[0x01],
-    (hng64_videoregs[0x02]>>16)&0xf9ff, // bits we're sure about are masked out
-    (hng64_videoregs[0x02]>>0)&0xf9ff,
-    (hng64_videoregs[0x03]>>16)&0xf9ff,
-    (hng64_videoregs[0x03]>>0)&0xf9ff,
+	 hng64_videoregs[0x01],
+	(hng64_videoregs[0x02]>>16)&0xf9ff, // bits we're sure about are masked out
+	(hng64_videoregs[0x02]>>0)&0xf9ff,
+	(hng64_videoregs[0x03]>>16)&0xf9ff,
+	(hng64_videoregs[0x03]>>0)&0xf9ff,
 	(hng64_videoregs[0x04]>>16)&0xffff,
-    (hng64_videoregs[0x04]>>0)&0xffff,
-    (hng64_videoregs[0x05]>>16)&0xffff,
-    (hng64_videoregs[0x05]>>0)&0xffff,
-     hng64_videoregs[0x06],
-     hng64_videoregs[0x07],
-     hng64_videoregs[0x08],
-     hng64_videoregs[0x09],
-     hng64_videoregs[0x0a],
-     hng64_videoregs[0x0b],
-     hng64_videoregs[0x0c],
-     hng64_videoregs[0x0d],
-     hng64_videoregs[0x0e]);
+	(hng64_videoregs[0x04]>>0)&0xffff,
+	(hng64_videoregs[0x05]>>16)&0xffff,
+	(hng64_videoregs[0x05]>>0)&0xffff,
+	 hng64_videoregs[0x06],
+	 hng64_videoregs[0x07],
+	 hng64_videoregs[0x08],
+	 hng64_videoregs[0x09],
+	 hng64_videoregs[0x0a],
+	 hng64_videoregs[0x0b],
+	 hng64_videoregs[0x0c],
+	 hng64_videoregs[0x0d],
+	 hng64_videoregs[0x0e]);
 
 	if (0)
 	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
@@ -1783,13 +1783,13 @@ static void set3dFlags(const UINT16* packet)
 	/*//////////////
     // PACKET FORMAT
     // [0]  - 0011 ... ID
-    // [1]  - ???? ...
-    // [2]  - ???? ...
-    // [3]  - ???? ...
-    // [4]  - ???? ...
-    // [5]  - ???? ...
-    // [6]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
-    // [7]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
+    // [1]  - ???? ... 
+    // [2]  - ???? ... 
+    // [3]  - ???? ... 
+    // [4]  - ???? ... 
+    // [5]  - ???? ... 
+    // [6]  - ???? ... 
+    // [7]  - ???? ... 
     // [8]  - xx?? ... Palette offset & ??
     // [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
     // [10] - ???? ... ? ''  ''
@@ -1951,7 +1951,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 	// Debug - ajg
 	//UINT32 tdColor = 0xff000000;
-    //if (packet[1] & 0x1000)	tdColor |= 0x00ff0000;
+	//if (packet[1] & 0x1000)	tdColor |= 0x00ff0000;
 	//if (packet[1] & 0x2000)	tdColor |= 0x0000ff00;
 	//if (packet[1] & 0x4000)	tdColor |= 0x000000ff;
 	//if (packet[1] & 0x8000)	tdColor |= 0xffffffff;
@@ -1977,7 +1977,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 		if ((k % 3) == 2) printf(" ");
 	}
 	printf("\n");
-	*/
+	} 
+	*/ 
 
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
@@ -2046,7 +2047,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			}
 
 			// Debug - Colors polygons with certain flags bright blue! ajg
-            polys[*numPolys].debugColor = 0;
+			polys[*numPolys].debugColor = 0;
 			//polys[*numPolys].debugColor = tdColor;
 
 			// Debug - ajg
@@ -2077,7 +2078,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				/* TODO: Does the explicit palette bit do anything when the dynamic palette flag is on? */
 			}
 			else
-            {
+			{
 				UINT8 explicitPaletteValue = (chunkOffset[1] & 0x0f00) >> 8;
 				polys[*numPolys].palOffset += explicitPaletteValue * 0x80;
 			}
@@ -2366,8 +2367,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 void hng64_command3d(running_machine* machine, const UINT16* packet)
 {
-	int i;
-
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
 	struct polygon* polys = auto_alloc_array(machine, struct polygon, 1024*5);
@@ -2396,29 +2395,40 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		setCameraProjectionMatrix(packet);
 		break;
 
-	case 0x0100:	// Geometry
-	case 0x0101:	// Similar to 0x0100, but throws a strange packet in every now and again.
+	case 0x0100:
+	case 0x0101:	// Geometry with full transformations
+		// HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
+		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && hng64_mcu_type == SHOOT_MCU) 
+			break;
+
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
-
-        // HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
-        if (packet[2] == 0x0003 && packet[3] == 0x8f37 && hng64_mcu_type == SHOOT_MCU) 
-            break;
-
-		/* Immeditately rasterize the chunk's polygons into the display buffer */
-		for (i = 0; i < numPolys; i++)
-		{
-			if (polys[i].visible)
-			{
-				//DrawWireframe(machine, &polys[i]);
-				drawShaded(machine, &polys[i]);
-			}
-		}
-
-		numPolys = 0;
 		break;
 
-	case 0x0102:	// Geometry of a different type - sams games.
-		//printPacket(packet, 1);
+	case 0x0102:	// Geometry with only translation
+		// HACK.  Give up on strange calls to 0102.
+		if (packet[8] != 0x0102)
+		{
+			// It appears as though packet[7] might hold the magic #
+			// Almost looks like there is a chain mode for these guys.  Same for 0101?
+			// printf("WARNING: "); printPacket(packet, 1);
+			break;
+		}
+
+		// Split the packet and call recoverPolygonBlock on each half.
+		UINT16 miniPacket[16];
+		memset(miniPacket, 0, sizeof(UINT16)*16);
+		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i];
+		miniPacket[7] = 0x7fff;
+		miniPacket[11] = 0x7fff;
+		miniPacket[15] = 0x7fff;
+		recoverPolygonBlock(machine, miniPacket, polys, &numPolys);
+
+		memset(miniPacket, 0, sizeof(UINT16)*16);
+		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
+		miniPacket[7] = 0x7fff;
+		miniPacket[11] = 0x7fff;
+		miniPacket[15] = 0x7fff;
+		recoverPolygonBlock(machine, miniPacket, polys, &numPolys);
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
@@ -2432,6 +2442,16 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 	default:
 		printf("HNG64: Unknown 3d command %04x.\n", packet[0]);
 		break;
+	}
+
+	/* If there are polygons, rasterize them into the display buffer */
+	for (int i = 0; i < numPolys; i++)
+	{
+		if (polys[i].visible)
+		{
+			//DrawWireframe(machine, &polys[i]);
+			drawShaded(machine, &polys[i]);
+		}
 	}
 
 	auto_free(machine, polys);
