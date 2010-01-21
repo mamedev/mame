@@ -32,6 +32,15 @@
 #define CIA_CRA			14
 #define CIA_CRB			15
 
+#define CIA_CRA_START	0x01
+#define	CIA_CRA_PBON	0x02
+#define	CIA_CRA_OUTMODE	0x04
+#define	CIA_CRA_RUNMODE	0x08
+#define	CIA_CRA_LOAD	0x10
+#define	CIA_CRA_INMODE	0x20
+#define	CIA_CRA_SPMODE	0x40
+#define	CIA_CRA_TODIN	0x80
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -158,6 +167,10 @@ static DEVICE_RESET( cia )
 	cia->icr = 0x00;
 	cia->ics = 0x00;
 	cia->irq = 0;
+	cia->shift = 0;
+	cia->loaded = 0;
+	cia->cnt = 1;
+	cia->sp = 0;
 
 	/* initialize data direction registers */
 	cia->port[0].ddr = !strcmp(device->tag, "cia_0") ? 0x03 : 0xff;
@@ -346,36 +359,48 @@ static void cia_timer_underflow(running_device *device, int timer)
 		}
 
 		/* also the serial line */
-		if ((cia->timer[timer].irq == 0x01) && (cia->timer[timer].mode & 0x40))
+		if ((cia->timer[timer].irq == 0x01) && (cia->timer[timer].mode & CIA_CRA_SPMODE))
 		{
-			if (cia->shift || cia->loaded)
+			if (cia->loaded || cia->shift)
 			{
+				/* falling edge */
 				if (cia->cnt)
 				{
 					if (cia->shift == 0)
 					{
+						/* load shift register */
 						cia->loaded = 0;
 						cia->serial = cia->sdr;
 					}
-					cia->sp = (cia->serial & 0x80) ? 1 : 0;
-					cia->shift++;
-					cia->serial <<= 1;
-					cia->cnt = 0;
 
+					/* transmit MSB */
+					cia->sp = BIT(cia->serial, 7);
 					devcb_call_write_line(&cia->out_sp_func, cia->sp);
+
+					/* toggle CNT */
+					cia->cnt = !cia->cnt;
 					devcb_call_write_line(&cia->out_cnt_func, cia->cnt);
+
+					/* shift data */
+					cia->serial <<= 1;
+					cia->shift++;
+
+					if (cia->shift == 8)
+					{
+						/* signal interrupt */
+						cia->ics |= 0x08;
+						cia_update_interrupts(device);
+					}
 				}
 				else
 				{
-					cia->cnt = 1;
-
+					/* toggle CNT */
+					cia->cnt = !cia->cnt;
 					devcb_call_write_line(&cia->out_cnt_func, cia->cnt);
 
 					if (cia->shift == 8)
 					{
 						cia->shift = 0;
-						cia->ics |= 0x08;
-						cia_update_interrupts(device);
 					}
 				}
 			}
@@ -495,66 +520,6 @@ static TIMER_CALLBACK( cia_clock_tod_callback )
 	cia_clock_tod(device);
 }
 
-/*-------------------------------------------------
-    cia_issue_index
--------------------------------------------------*/
-
-static void cia_issue_index(running_device *device)
-{
-	cia_state *cia = get_token(device);
-	cia->ics |= 0x10;
-	cia_update_interrupts(device);
-}
-
-/*-------------------------------------------------
-    cia_set_input_sp
--------------------------------------------------*/
-
-static void cia_set_input_sp(running_device *device, int data)
-{
-	cia_state *cia = get_token(device);
-	cia->sp = data;
-}
-
-/*-------------------------------------------------
-    cia_set_input_cnt
--------------------------------------------------*/
-
-static void cia_set_input_cnt(running_device *device, int data)
-{
-	cia_state *cia = get_token(device);
-
-	/* is this a rising edge? */
-	if (!cia->cnt && data)
-	{
-		/* does timer #0 bump on CNT? */
-		if ((cia->timer[0].mode & 0x21) == 0x21)
-			cia_timer_bump(device, 0);
-
-		/* does timer #1 bump on CNT? */
-		if ((cia->timer[1].mode & 0x61) == 0x21)
-			cia_timer_bump(device, 1);
-
-		/* if the serial port is set to output, the CNT will shift the port */
-		if (!(cia->timer[0].mode & 0x40))
-		{
-			cia->serial >>= 1;
-			if (cia->sp)
-				cia->serial |= 0x80;
-
-			if (++cia->shift == 8)
-			{
-				cia->sdr = cia->serial;
-				cia->serial = 0;
-				cia->shift = 0;
-				cia->ics |= 0x08;
-				cia_update_interrupts(device);
-			}
-		}
-	}
-	cia->cnt = data ? 1 : 0;
-}
-
 READ8_DEVICE_HANDLER( mos6526_pa_r )
 {
 	return (get_token(device)->port[0].latch | ~get_token(device)->port[0].ddr);
@@ -586,7 +551,42 @@ READ_LINE_DEVICE_HANDLER( mos6526_cnt_r )
 
 WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w )
 {
-	cia_set_input_cnt(device, state);
+	cia_state *cia = get_token(device);
+
+	/* is this a rising edge? */
+	if (!cia->cnt && state)
+	{
+		if (cia->timer[0].mode & CIA_CRA_START)
+		{
+			/* does timer #0 bump on CNT? */
+			if (cia->timer[0].mode & CIA_CRA_INMODE)
+				cia_timer_bump(device, 0);
+		}
+
+		/* if the serial port is set to input, the CNT will shift the port */
+		if (!(cia->timer[0].mode & CIA_CRA_SPMODE))
+		{
+			cia->serial <<= 1;
+			cia->shift++;
+
+			if (cia->sp) cia->serial |= 0x01;
+
+			if (cia->shift == 8)
+			{
+				cia->sdr = cia->serial;
+				cia->serial = 0;
+				cia->shift = 0;
+				cia->ics |= 0x08;
+				cia_update_interrupts(device);
+			}
+		}
+
+		/* does timer #1 bump on CNT? */
+		if ((cia->timer[1].mode & 0x61) == 0x21)
+			cia_timer_bump(device, 1);
+	}
+
+	cia->cnt = state;
 }
 
 READ_LINE_DEVICE_HANDLER( mos6526_sp_r )
@@ -598,16 +598,20 @@ READ_LINE_DEVICE_HANDLER( mos6526_sp_r )
 
 WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w )
 {
-	cia_set_input_sp(device, state);
+	cia_state *cia = get_token(device);
+
+	cia->sp = state;
 }
 
 WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w )
 {
 	cia_state *cia = get_token(device);
 
+	/* falling edge */
 	if (cia->flag && !state)
 	{
-		cia_issue_index(device);
+		cia->ics |= 0x10;
+		cia_update_interrupts(device);
 	}
 
 	cia->flag = state;
