@@ -22,9 +22,6 @@ int sdl_num_processors = 0;
 
 #else
 
-// FIXME: remove this after malloc->osd_malloc
-#include <stdlib.h>
-
 #include "osdcore.h"
 #include "osinline.h"
 
@@ -154,7 +151,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	int threadnum;
 
 	// allocate a new queue
-	queue = (osd_work_queue *)malloc(sizeof(*queue));
+	queue = (osd_work_queue *)osd_malloc(sizeof(*queue));
 	if (queue == NULL)
 		goto error;
 	memset(queue, 0, sizeof(*queue));
@@ -186,7 +183,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	queue->threads = MIN(queue->threads, WORK_MAX_THREADS);
 
 	// allocate memory for thread array (+1 to count the calling thread)
-	queue->thread = (work_thread_info *)malloc((queue->threads + 1) * sizeof(queue->thread[0]));
+	queue->thread = (work_thread_info *)osd_malloc((queue->threads + 1) * sizeof(queue->thread[0]));
 	if (queue->thread == NULL)
 		goto error;
 	memset(queue->thread, 0, (queue->threads + 1) * sizeof(queue->thread[0]));
@@ -361,7 +358,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 	// free the list
 	if (queue->thread != NULL)
-		free(queue->thread);
+		osd_free(queue->thread);
 
 	// free all the events
 	if (queue->doneevent != NULL)
@@ -374,7 +371,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		queue->free = item->next;
 		if (item->event != NULL)
 			osd_event_free(item->event);
-		free(item);
+		osd_free(item);
 	}
 
 	// free all items in the active list
@@ -384,7 +381,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		queue->list = item->next;
 		if (item->event != NULL)
 			osd_event_free(item->event);
-		free(item);
+		osd_free(item);
 	}
 
 #if KEEP_STATISTICS
@@ -396,7 +393,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 	osd_scalable_lock_free(queue->lock);
 	// free the queue itself
-	free(queue);
+	osd_free(queue);
 }
 
 
@@ -426,7 +423,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		if (item == NULL)
 		{
 			// allocate the item
-			item = (osd_work_item *)malloc(sizeof(*item));
+			item = (osd_work_item *)osd_malloc(sizeof(*item));
 			if (item == NULL)
 				return NULL;
 			item->event = NULL;
