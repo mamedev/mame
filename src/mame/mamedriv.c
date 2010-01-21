@@ -3966,7 +3966,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( gprider1 )	/* 1990.12 GP Rider (US, FD1094, decrypted) */
 
 	/* Y-Board */
-						/* 1988.05 Gaalxy Force (Japan) */
+						/* 1988.05 Galaxy Force (Japan) */
 						/* 1988.08 Galaxy Force (US) */
 	DRIVER( gforce2j )	/* 1988.07 Galaxy Force II (Japan) */
 	DRIVER( gforce2 )	/* 1988.?? Galaxy Force II (World) */
@@ -4966,19 +4966,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 		/* the following ones all run on similar hardware */
 	DRIVER( hbarrel )	/* (c) 1987 Data East USA (US) */
 	DRIVER( hbarrelw )	/* (c) 1987 Data East Corporation (World) */
-	DRIVER( baddudes )	/* (c) 1988 Data East USA (US) */
-	DRIVER( drgninja )	/* (c) 1988 Data East Corporation (Japan) */
+	DRIVER( baddudes )	/* EI (c) 1988 Data East USA (US) */
+	DRIVER( drgninja )	/* EG (c) 1988 Data East Corporation (Japan) */
 	DRIVER( birdtry )	/* (c) 1988 Data East Corporation (Japan) */
-	DRIVER( robocop )	/* (c) 1988 Data East Corporation (World) */
-	DRIVER( robocopw )	/* (c) 1988 Data East Corporation (World) */
-	DRIVER( robocopj )	/* (c) 1988 Data East Corporation (Japan) */
+	DRIVER( robocop )	/* EP? (c) 1988 Data East Corporation (World) */
+	DRIVER( robocopw )	/* EP? (c) 1988 Data East Corporation (World) */
+	DRIVER( robocopj )	/* EM (c) 1988 Data East Corporation (Japan) */
 	DRIVER( robocopu )	/* (c) 1988 Data East USA (US) */
 	DRIVER( robocopu0 )	/* (c) 1988 Data East USA (US) */
 	DRIVER( robocopb )	/* bootleg */
 	DRIVER( automat )	/* bootleg */
-	DRIVER( hippodrm )	/* (c) 1989 Data East USA (US) */
-	DRIVER( ffantasy )	/* (c) 1989 Data East Corporation (Japan) */
-	DRIVER( ffantasya )	/* (c) 1989 Data East Corporation (Japan) */
+	DRIVER( hippodrm )	/* EW (c) 1989 Data East USA (US) */
+	DRIVER( ffantasy )	/* EV (c) 1989 Data East Corporation (Japan) */
+	DRIVER( ffantasya )	/* EV (c) 1989 Data East Corporation (Japan) */
 	DRIVER( ffantasybl )/* bootleg */
 	DRIVER( slyspy )	/* (c) 1989 Data East USA (US) */
 	DRIVER( slyspy2 )	/* (c) 1989 Data East USA (US) */

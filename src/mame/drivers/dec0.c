@@ -40,6 +40,113 @@ Original Service Manuals and Service Mode (when available).
 ToDo:
   Hook up the 68705 in Midnight Resistance (bootleg)
 
+
+PCB Layouts
+-----------                                                                 
+                                             
+Bad Dudes vs Dragonninja
+Data East, 1988
+
+Main Board:
+This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome
+
+DE-0297-3 (earlier version DE-0295-1 uses PGA custom chips)
+MEC-M1
+|------------------------------------------------------------------|
+|               TMM2018                                    12MHz   |
+|               TMM2018                                            |
+|               TMM2018          MB7122                 TC5565     |
+|                                                       TC5565     |
+|                                                       TMM2018    |
+|                                                       TMM2018    |
+|          20MHz                                  MB7116           |
+|J  RCDM-I1                                                        |
+|A  RCDM-I1                                TMM2018     |---------| |
+|M  RCDM-I1                                            |L7B0072  | |
+|M  RCDM-I1                                TMM2018     |DATAEAST | |
+|A  RCDM-I1                                            |BAC 06   | |
+|   RCDM-I1                                TMM2018     |---------| |
+|    DSW2       68000P10                   TMM2018                 |
+|    DSW1                                 |---------|  |---------| |
+|                              RP65C02    |L7B0073  |  |L7B0072  | |
+|UPC3403      TC5565                      |DATAEAST |  |DATAEAST | |
+|CN4   YM3014 TC5565        TMM2018       |MXC 06   |  |BAC 06   | |
+|VOL   YM3014 YM3812                      |---------|  |---------| |
+|MB3730      YM2203             CN2                CN1             |
+|------------------------------------------------------------------|
+Notes:
+      68000   - Clock input 10.000MHz [20/2]
+      65C02   - Clock input 1.500MHz [12/8]
+      YM2203  - Clock input 1.500MHz [12/8]
+      YM3812  - Clock input 3.000MHz [12/4]
+      TMM2018 - 2k x8 SRAM
+      TC5565  - 8k x8 SRAM
+      MB7122  - 1k x4 bipolar PROM
+      MB7116  - 512b x4 bipolar PROM
+      RCDM-I1 - Custom resistor array
+      DSW1/2  - 8-position DIP switches
+      L7B007x - DECO custom graphics chips (QFP160 or PGA type)
+      CN1/2   - 96-pin connectors joining to ROM board
+      CN4     - 6-pin cable joining to ROM board
+
+      Measurements
+      ------------
+      VSync - 57.4162Hz
+      HSync - 15.6172kHz
+      OSC1  - 20.00006MHz
+      XTAL1 - 11.9938MHz
+
+
+ROM Board:
+This board is used with Heavy Barrel, Bad Dudes & Birdie Try only.
+There is another type of ROM board used with Robocop & Hippodrome which
+is different (but not documented here)
+
+DE-0299-2 (earlier version DE-0293-2 uses PGA custom chips)
+MEC-M1
+|-------------------------------------------------------|
+|C4558  CN2          7.8A      CN1                      |
+|       1.3A 2.4A 3.6A  i8751 9.12A 10.14A 11.16A 12.17A|
+| M6295                 8MHz                            |
+|CN9                                                    |
+|                                                       |
+|       4.3C 5.4C 6.6C       13.12C 14.14C 15.16C 16.17C|
+|                                                       |
+|8.2C                                                   |
+|                 |---------|                           |
+|                 |L7B0072  | TMM2018                   |
+|CN5              |DATAEAST |17.12D 18.14D 19.16D 20.17D|
+|                 |BAC 06   | TMM2018                   |
+|                 |---------|                           |
+|CN6                                                    |
+|                            21.12F 22.14F 23.16F 24.17F|
+|                   27.7F 28.9F                         |
+|CN7                                                    |
+|                                                       |
+|                                                       |
+|CN8                29.7J 30.9J      25.15J 26.16J      |
+|-------------------------------------------------------|
+Notes:
+      i8751     - intel 8751 microcontroller, clock input 8.000MHz
+      M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
+      L7B0072   - DECO custom graphics chip (QFP160 or PGA type)
+      TMM2018   - 2k x8 SRAM
+      CN1/2     - 96-pin connectors joining to Main Board
+      CN5/6/7/8 - Connectors for other inputs/buttons (these are not populated on
+                  Bad Dudes but are used with Birdie Try/Heavy Barrel etc)
+      CN9       - 6-pin cable joining to Main Board
+
+      ROMs      - All ROM locations shown but not all are populated.
+                  All DECO games use a ROM code on the label....
+                   - Bad Dudes    = EI    \
+                   - Birdie Try   = EK     |
+                   - Dragon Ninja = EG     | These also change for different country/regions
+                   - Heavy Barrel = EC    /
+                  All ROMs are 27512/27256 EPROM/maskROM
+                  All ROMs have a number location on the board next to the chip. The chips
+                  can also be referenced via the numbers & letters on the side of the board.
+                  For example, both of these are the same chip.... EI30.30 or EI30.9J
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1035,11 +1142,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hbarrel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
@@ -1059,29 +1166,29 @@ static MACHINE_DRIVER_START( hbarrel )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 2 / 10)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( baddudes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
@@ -1101,29 +1208,29 @@ static MACHINE_DRIVER_START( baddudes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 2 / 10)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( birdtry )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
@@ -1143,32 +1250,32 @@ static MACHINE_DRIVER_START( birdtry )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 2 / 10)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( robocop )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
-	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
+	MDRV_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 	MDRV_CPU_PROGRAM_MAP(robocop_sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(3000))	/* Interleave between HuC6280 & 68000 */
@@ -1190,18 +1297,18 @@ static MACHINE_DRIVER_START( robocop )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 2 / 10)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -1250,14 +1357,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hippodrm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
-	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
+	MDRV_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(300))	/* Interleave between H6280 & 68000 */
@@ -1279,18 +1386,18 @@ static MACHINE_DRIVER_START( hippodrm )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 2 / 10)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -1523,88 +1630,94 @@ ROM_END
 
 ROM_START( baddudes )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code, middle 0x20000 unused */
-	ROM_LOAD16_BYTE( "baddudes.4",   0x00000, 0x10000, CRC(4bf158a7) SHA1(e034f64cec3e8596a2d86dd83462592178f19611) )
-	ROM_LOAD16_BYTE( "baddudes.1",   0x00001, 0x10000, CRC(74f5110c) SHA1(9b8ff24e69505846a1406f5ab82b855b84a5cdf2) )
-	ROM_LOAD16_BYTE( "baddudes.6",   0x40000, 0x10000, CRC(3ff8da57) SHA1(eea8125a3eac33d76d22e72b69633eaae138efe5) )
-	ROM_LOAD16_BYTE( "baddudes.3",   0x40001, 0x10000, CRC(f8f2bd94) SHA1(622c66fea00cabb2cce16bf621b07d38a660708d) )
+	ROM_LOAD16_BYTE( "ei04-1.3c", 0x00000, 0x10000, CRC(4bf158a7) SHA1(e034f64cec3e8596a2d86dd83462592178f19611) )
+	ROM_LOAD16_BYTE( "ei01-1.3a", 0x00001, 0x10000, CRC(74f5110c) SHA1(9b8ff24e69505846a1406f5ab82b855b84a5cdf2) )
+	ROM_LOAD16_BYTE( "ei06.6c",   0x40000, 0x10000, CRC(3ff8da57) SHA1(eea8125a3eac33d76d22e72b69633eaae138efe5) )
+	ROM_LOAD16_BYTE( "ei03.6a",   0x40001, 0x10000, CRC(f8f2bd94) SHA1(622c66fea00cabb2cce16bf621b07d38a660708d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "baddudes.7",   0x8000, 0x8000, CRC(9fb1ef4b) SHA1(f4dd0773be93c2ad8b0faacd12939c531b5aa130) )
+	ROM_LOAD( "ei07.8a",   0x8000, 0x8000, CRC(9fb1ef4b) SHA1(f4dd0773be93c2ad8b0faacd12939c531b5aa130) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
-	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ei31.9a",   0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "baddudes.25",  0x00000, 0x08000, CRC(bcf59a69) SHA1(486727e19c12ea55b47e2ef773d0d0471cf50083) )
-	ROM_LOAD( "baddudes.26",  0x08000, 0x08000, CRC(9aff67b8) SHA1(18c3972a9f17a48897463f48be0d723ea0cf5aba) )
+	ROM_LOAD( "ei25.15j",  0x00000, 0x08000, CRC(bcf59a69) SHA1(486727e19c12ea55b47e2ef773d0d0471cf50083) )
+	ROM_LOAD( "ei26.16j",  0x08000, 0x08000, CRC(9aff67b8) SHA1(18c3972a9f17a48897463f48be0d723ea0cf5aba) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */
-	ROM_LOAD( "baddudes.18",  0x00000, 0x10000, CRC(05cfc3e5) SHA1(a0163921c77dc9706463a402c3dd45ec4341cd21) )
-	ROM_LOAD( "baddudes.20",  0x10000, 0x10000, CRC(e11e988f) SHA1(0c59f0d8d1abe414c7e1ebd49d454179fed2cd00) )
-	ROM_LOAD( "baddudes.22",  0x20000, 0x10000, CRC(b893d880) SHA1(99e228174677f2e3e96154f77bfa9bf0f1c0a6a5) )
-	ROM_LOAD( "baddudes.24",  0x30000, 0x10000, CRC(6f226dda) SHA1(65ebb16a292c57d49c135fce7ed7537146226eb5) )
+	ROM_LOAD( "ei18.14d",  0x00000, 0x10000, CRC(05cfc3e5) SHA1(a0163921c77dc9706463a402c3dd45ec4341cd21) )
+	ROM_LOAD( "ei20.17d",  0x10000, 0x10000, CRC(e11e988f) SHA1(0c59f0d8d1abe414c7e1ebd49d454179fed2cd00) )
+	ROM_LOAD( "ei22.14f",  0x20000, 0x10000, CRC(b893d880) SHA1(99e228174677f2e3e96154f77bfa9bf0f1c0a6a5) )
+	ROM_LOAD( "ei24.17f",  0x30000, 0x10000, CRC(6f226dda) SHA1(65ebb16a292c57d49c135fce7ed7537146226eb5) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 ) /* tiles */
-	ROM_LOAD( "baddudes.30",  0x08000, 0x08000, CRC(982da0d1) SHA1(d819a587905624d793988f2ea726783da527d9f2) )
-	ROM_CONTINUE(             0x00000, 0x08000 )	/* the two halves are swapped */
-	ROM_LOAD( "baddudes.28",  0x18000, 0x08000, CRC(f01ebb3b) SHA1(1686690cb0c87d9e687b2abb4896cf285ab8378f) )
-	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_LOAD( "ei30.9j",   0x08000, 0x08000, CRC(982da0d1) SHA1(d819a587905624d793988f2ea726783da527d9f2) )
+	ROM_CONTINUE(          0x00000, 0x08000 )	/* the two halves are swapped */
+	ROM_LOAD( "ei28.9f",   0x18000, 0x08000, CRC(f01ebb3b) SHA1(1686690cb0c87d9e687b2abb4896cf285ab8378f) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
-	ROM_LOAD( "baddudes.15",  0x00000, 0x10000, CRC(a38a7d30) SHA1(5cb1fb97605829fc733c79a7e169fa52adc6863b) )
-	ROM_LOAD( "baddudes.16",  0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
-	ROM_LOAD( "baddudes.11",  0x20000, 0x10000, CRC(3a77326c) SHA1(4de81752329cde6210a9c250a9f8ebe3dad9fe92) )
-	ROM_LOAD( "baddudes.12",  0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
-	ROM_LOAD( "baddudes.13",  0x40000, 0x10000, CRC(e5ae2751) SHA1(4e4a3c68b11e9b0c8da70121b23296128063d4e9) )
-	ROM_LOAD( "baddudes.14",  0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
-	ROM_LOAD( "baddudes.9",   0x60000, 0x10000, CRC(6901e628) SHA1(1162c8cee20450780774cad54a9af40ebf0f0826) )
-	ROM_LOAD( "baddudes.10",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
+	ROM_LOAD( "ei15.16c",  0x00000, 0x10000, CRC(a38a7d30) SHA1(5cb1fb97605829fc733c79a7e169fa52adc6863b) )
+	ROM_LOAD( "ei16.17c",  0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
+	ROM_LOAD( "ei11.16a",  0x20000, 0x10000, CRC(3a77326c) SHA1(4de81752329cde6210a9c250a9f8ebe3dad9fe92) )
+	ROM_LOAD( "ei12.17a",  0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
+	ROM_LOAD( "ei13.13c",  0x40000, 0x10000, CRC(e5ae2751) SHA1(4e4a3c68b11e9b0c8da70121b23296128063d4e9) )
+	ROM_LOAD( "ei14.14c",  0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
+	ROM_LOAD( "ei09.13a",  0x60000, 0x10000, CRC(6901e628) SHA1(1162c8cee20450780774cad54a9af40ebf0f0826) )
+	ROM_LOAD( "ei10.14a",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "baddudes.8",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
+	ROM_LOAD( "ei08.2c",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
 ROM_END
 
 ROM_START( drgninja )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code, middle 0x20000 unused */
-	ROM_LOAD16_BYTE( "drgninja.04",  0x00000, 0x10000, CRC(41b8b3f8) SHA1(0ab143b9f7a5f857cfd2053c24fa5213ce7641e4) )
-	ROM_LOAD16_BYTE( "drgninja.01",  0x00001, 0x10000, CRC(e08e6885) SHA1(641eaf4ef6c8bfbc39611f5f81765f7915ae9d9f) )
-	ROM_LOAD16_BYTE( "drgninja.06",  0x40000, 0x10000, CRC(2b81faf7) SHA1(6d10c29f5ee06856843d83e77ba24c2b6e00a9cb) )
-	ROM_LOAD16_BYTE( "drgninja.03",  0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) )
+	ROM_LOAD16_BYTE( "eg04.3c",  0x00000, 0x10000, CRC(41b8b3f8) SHA1(0ab143b9f7a5f857cfd2053c24fa5213ce7641e4) )
+	ROM_LOAD16_BYTE( "eg01.3a",  0x00001, 0x10000, CRC(e08e6885) SHA1(641eaf4ef6c8bfbc39611f5f81765f7915ae9d9f) )
+	ROM_LOAD16_BYTE( "eg06.6c",  0x40000, 0x10000, CRC(2b81faf7) SHA1(6d10c29f5ee06856843d83e77ba24c2b6e00a9cb) )
+	ROM_LOAD16_BYTE( "eg03.6a",  0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "drgninja.07",  0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
+	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
 	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
 
+	/* various graphic and sound roms also differ when compared to baddudes */
+
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "drgninja.25",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
-	ROM_LOAD( "drgninja.26",  0x08000, 0x08000, CRC(5d75fc8f) SHA1(92947dd78bfe8067fb5f645fa1ef212e48b69c70) )
+	//ROM_LOAD( "drgninja.25",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
+	// the rom below was found on a genuine 'dragonninja' pcb, compared to the other ROM it has the 'bad dudes' (unused) logo
+	// partially erased, and a bad pixel on the left arrow character.  Is the other rom a cleaned up hack, or from a bootleg,
+	// or did Data East actually clean it up on a later PCB?
+	ROM_LOAD( "eg25.15j",  0x00000, 0x08000, CRC(dd557b19) SHA1(ce1e76aeb7e147f373bb48dbc1becc1601953499) ) // different to baddudes
+	ROM_LOAD( "eg26.16j",  0x08000, 0x08000, CRC(5d75fc8f) SHA1(92947dd78bfe8067fb5f645fa1ef212e48b69c70) ) // different to baddudes
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */
-	ROM_LOAD( "baddudes.18",  0x00000, 0x10000, CRC(05cfc3e5) SHA1(a0163921c77dc9706463a402c3dd45ec4341cd21) )
-	ROM_LOAD( "baddudes.20",  0x10000, 0x10000, CRC(e11e988f) SHA1(0c59f0d8d1abe414c7e1ebd49d454179fed2cd00) )
-	ROM_LOAD( "baddudes.22",  0x20000, 0x10000, CRC(b893d880) SHA1(99e228174677f2e3e96154f77bfa9bf0f1c0a6a5) )
-	ROM_LOAD( "baddudes.24",  0x30000, 0x10000, CRC(6f226dda) SHA1(65ebb16a292c57d49c135fce7ed7537146226eb5) )
+	ROM_LOAD( "eg18.14d",  0x00000, 0x10000, CRC(05cfc3e5) SHA1(a0163921c77dc9706463a402c3dd45ec4341cd21) )
+	ROM_LOAD( "eg20.17d",  0x10000, 0x10000, CRC(e11e988f) SHA1(0c59f0d8d1abe414c7e1ebd49d454179fed2cd00) )
+	ROM_LOAD( "eg22.14f",  0x20000, 0x10000, CRC(b893d880) SHA1(99e228174677f2e3e96154f77bfa9bf0f1c0a6a5) )
+	ROM_LOAD( "eg24.17f",  0x30000, 0x10000, CRC(6f226dda) SHA1(65ebb16a292c57d49c135fce7ed7537146226eb5) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 ) /* tiles */
-	ROM_LOAD( "drgninja.30",  0x08000, 0x08000, CRC(2438e67e) SHA1(5f143aeb83606a2c64d0b31bfee38156d231dcc9) )
-	ROM_CONTINUE(             0x00000, 0x08000 )	/* the two halves are swapped */
-	ROM_LOAD( "drgninja.28",  0x18000, 0x08000, CRC(5c692ab3) SHA1(4c58ff50833f869575f1a15c776fbf1429944fab) )
-	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_LOAD( "eg30.9j",   0x08000, 0x08000, CRC(2438e67e) SHA1(5f143aeb83606a2c64d0b31bfee38156d231dcc9) )
+	ROM_CONTINUE(          0x00000, 0x08000 )	/* the two halves are swapped */
+	ROM_LOAD( "eg28.9f",   0x18000, 0x08000, CRC(5c692ab3) SHA1(4c58ff50833f869575f1a15c776fbf1429944fab) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
-	ROM_LOAD( "drgninja.15",  0x00000, 0x10000, CRC(5617d67f) SHA1(8f684de27ae79c4d35720706cdd2733af0e0a9cc) )
-	ROM_LOAD( "baddudes.16",  0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
-	ROM_LOAD( "drgninja.11",  0x20000, 0x10000, CRC(ba83e8d8) SHA1(63092a5d0da0c9228a72a83b43a67a47b1388724) )
-	ROM_LOAD( "baddudes.12",  0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
-	ROM_LOAD( "drgninja.13",  0x40000, 0x10000, CRC(fd91e08e) SHA1(8998f020791c8830e963096dc7b8fcb430d041d4) )
-	ROM_LOAD( "baddudes.14",  0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
-	ROM_LOAD( "baddudes.9",   0x60000, 0x10000, CRC(6901e628) SHA1(1162c8cee20450780774cad54a9af40ebf0f0826) )
-	ROM_LOAD( "baddudes.10",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
+	ROM_LOAD( "eg15.16c",  0x00000, 0x10000, CRC(5617d67f) SHA1(8f684de27ae79c4d35720706cdd2733af0e0a9cc) ) // different to baddudes
+	ROM_LOAD( "eg16.17c",  0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
+	ROM_LOAD( "eg11.16a",  0x20000, 0x10000, CRC(ba83e8d8) SHA1(63092a5d0da0c9228a72a83b43a67a47b1388724) ) // different to baddudes
+	ROM_LOAD( "eg12.17a",  0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
+	ROM_LOAD( "eg13.13c",  0x40000, 0x10000, CRC(fd91e08e) SHA1(8998f020791c8830e963096dc7b8fcb430d041d4) ) // different to baddudes
+	ROM_LOAD( "eg14.14c",  0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
+	ROM_LOAD( "eg09.13a",  0x60000, 0x10000, CRC(601b7b23) SHA1(c1c665614f1377bc47720382b25c965266a2593f)) // different to baddudes
+	ROM_LOAD( "eg10.14a",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "baddudes.8",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
+	ROM_LOAD( "eg08.2c",   0x0000, 0x10000, CRC(92f2c916) SHA1(38b4ed81edcc2069b096591bdc5baab8b9edfa9a) ) // different to baddudes
 ROM_END
 
 ROM_START( birdtry )
