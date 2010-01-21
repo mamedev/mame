@@ -182,7 +182,7 @@ public:
 
 	UINT32 bytes() const { return (this != NULL) ? length : 0; }
 
-	UINT8 endianness() const { return ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG; }
+	endianness_t endianness() const { return ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG; }
 	UINT8 width() const { return 1 << ((flags & ROMREGION_WIDTHMASK) >> 8); }
 
 	region_info *			next;

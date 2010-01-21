@@ -1695,14 +1695,14 @@ static void memory_init_spaces(running_machine *machine)
 	/* loop over devices */
 	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (device_get_addrbus_width(device, spacenum) > 0)
+			if (device->addrbus_width(spacenum) > 0)
 			{
 				address_space *space = auto_alloc_clear(machine, address_space);
 				int logbits = cpu_get_logaddr_width(device, spacenum);
-				int ashift = device_get_addrbus_shift(device, spacenum);
-				int abits = device_get_addrbus_width(device, spacenum);
-				int dbits = device_get_databus_width(device, spacenum);
-				int endianness = device_get_endianness(device);
+				int ashift = device->baseconfig().addrbus_shift(spacenum);
+				int abits = device->addrbus_width(spacenum);
+				int dbits = device->databus_width(spacenum);
+				endianness_t endianness = device->endianness();
 				int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
 				int entrynum;
 

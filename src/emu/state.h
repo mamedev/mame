@@ -94,19 +94,19 @@ do {																								\
 
 /* register device items */
 #define state_save_register_device_item(_dev, _index, _val) \
-	state_save_register_generic((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, #_val, &_val, _val, 1)
+	state_save_register_generic((_dev)->machine, (_dev)->name(), (_dev)->tag, _index, #_val, &_val, _val, 1)
 
 #define state_save_register_device_item_pointer(_dev, _index, _val, _count) \
-	state_save_register_generic((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, #_val, &_val[0], _val[0], _count)
+	state_save_register_generic((_dev)->machine, (_dev)->name(), (_dev)->tag, _index, #_val, &_val[0], _val[0], _count)
 
 #define state_save_register_device_item_array(_dev, _index, _val) \
-	state_save_register_item_pointer((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, _val, sizeof(_val)/sizeof(_val[0]))
+	state_save_register_item_pointer((_dev)->machine, (_dev)->name(), (_dev)->tag, _index, _val, sizeof(_val)/sizeof(_val[0]))
 
 #define state_save_register_device_item_2d_array(_dev, _index, _val) \
-	state_save_register_item_pointer((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, _val[0], sizeof(_val)/sizeof(_val[0][0]))
+	state_save_register_item_pointer((_dev)->machine, (_dev)->name(), (_dev)->tag, _index, _val[0], sizeof(_val)/sizeof(_val[0][0]))
 
 #define state_save_register_device_item_bitmap(_dev, _index, _val)	\
-	state_save_register_bitmap((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, #_val, _val, __FILE__, __LINE__)
+	state_save_register_bitmap((_dev)->machine, (_dev)->name(), (_dev)->tag, _index, #_val, _val, __FILE__, __LINE__)
 
 
 

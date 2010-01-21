@@ -1277,8 +1277,8 @@ static int validate_devices(int drivnum, const machine_config *config, const iop
 		{
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			int databus_width = device_get_databus_width(devconfig, spacenum);
-			int addr_shift = device_get_addrbus_shift(devconfig, spacenum);
+			int databus_width = devconfig->databus_width(spacenum);
+			int addr_shift = devconfig->addrbus_shift(spacenum);
 			int alignunit = databus_width/8;
 			address_map_entry *entry;
 			address_map *map;

@@ -1230,20 +1230,20 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
 	running_device *device = machine->device(rgntag);
-	if (device != NULL && device_get_databus_width(device, ADDRESS_SPACE_0) != 0)
+	if (device != NULL && device->databus_width(0) != 0)
 	{
 		int buswidth;
 
 		/* set the endianness */
 		startflags &= ~ROMREGION_ENDIANMASK;
-		if (device_get_endianness(device) == ENDIANNESS_LITTLE)
+		if (device->endianness() == ENDIANNESS_LITTLE)
 			startflags |= ROMREGION_LE;
 		else
 			startflags |= ROMREGION_BE;
 
 		/* set the width */
 		startflags &= ~ROMREGION_WIDTHMASK;
-		buswidth = device_get_databus_width(device, ADDRESS_SPACE_0);
+		buswidth = device->databus_width(0);
 		if (buswidth <= 8)
 			startflags |= ROMREGION_8BIT;
 		else if (buswidth <= 16)

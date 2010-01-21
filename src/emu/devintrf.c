@@ -330,7 +330,7 @@ astring &device_config::siblingtag(astring &dest, const char *_tag) const
 -------------------------------------------------*/
 
 running_device::running_device(running_machine &_machine, const device_config &_config)
-	: _baseconfig(_config),
+	: m_baseconfig(_config),
 	  machine(&_machine),
 	  next(NULL),
 	  owner((_config.owner != NULL) ? _machine.devicelist.find(_config.owner->tag) : NULL),

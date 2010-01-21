@@ -303,7 +303,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : device->clock;
 	ppc->tb_divisor = (ppc->tb_divisor * device->clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 	ppc->codexor = 0;
-	if (!(cap & PPCCAP_4XX) && device_get_endianness(device) != ENDIANNESS_NATIVE)
+	if (!(cap & PPCCAP_4XX) && device->endianness() != ENDIANNESS_NATIVE)
 		ppc->codexor = 4;
 
 	/* allocate the virtual TLB */

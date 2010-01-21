@@ -488,7 +488,7 @@ static void route_sound(running_machine *machine)
 						speaker_info *speakerinfo = get_safe_token(target_device);
 
 						/* generate text for the UI */
-						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag.cstr(), device_get_name(sound), sound->tag.cstr());
+						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag.cstr(), sound->name(), sound->tag.cstr());
 						if (numoutputs > 1)
 							tempstring.catprintf(" Ch.%d", outputnum);
 

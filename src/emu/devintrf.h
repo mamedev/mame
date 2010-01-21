@@ -186,18 +186,6 @@ enum
 #define devtag_reset(mach,tag)								(mach)->device(tag)->reset()
 
 
-// shorthand for getting standard data about devices 
-#define device_get_endianness(dev)							(dev)->get_config_int(DEVINFO_INT_ENDIANNESS)
-#define device_get_databus_width(dev,space)					(dev)->get_config_int(DEVINFO_INT_DATABUS_WIDTH + (space))
-#define device_get_addrbus_width(dev,space)					(dev)->get_config_int(DEVINFO_INT_ADDRBUS_WIDTH + (space))
-#define device_get_addrbus_shift(dev,space)					(dev)->get_config_int(DEVINFO_INT_ADDRBUS_SHIFT + (space))
-#define device_get_name(dev)								(dev)->get_config_string(DEVINFO_STR_NAME)
-#define device_get_family(dev)								(dev)->get_config_string(DEVINFO_STR_FAMILY)
-#define device_get_version(dev) 							(dev)->get_config_string(DEVINFO_STR_VERSION)
-#define device_get_source_file(dev)							(dev)->get_config_string(DEVINFO_STR_SOURCE_FILE)
-#define device_get_credits(dev) 							(dev)->get_config_string(DEVINFO_STR_CREDITS)
-
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -402,6 +390,22 @@ public:
 	}
 
 	// get state from a device config
+	virtual endianness_t endianness() const { return static_cast<endianness_t>(get_config_int(DEVINFO_INT_ENDIANNESS)); }
+	virtual UINT8 databus_width(int spacenum = 0) const { return get_config_int(DEVINFO_INT_DATABUS_WIDTH + spacenum); }
+	virtual UINT8 addrbus_width(int spacenum = 0) const { return get_config_int(DEVINFO_INT_ADDRBUS_WIDTH + spacenum); }
+	virtual INT8 addrbus_shift(int spacenum = 0) const { return get_config_int(DEVINFO_INT_ADDRBUS_SHIFT + spacenum); }
+	
+	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_config_ptr(DEVINFO_PTR_ROM_REGION)); }
+	virtual const machine_config_token *machine_config() const { return reinterpret_cast<const machine_config_token *>(get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const addrmap_token *internal_map(int spacenum = 0) const { return reinterpret_cast<const addrmap_token *>(get_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum)); }
+	virtual const addrmap_token *default_map(int spacenum = 0) const { return reinterpret_cast<const addrmap_token *>(get_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum)); }
+	
+	virtual const char *name() const { return get_config_string(DEVINFO_STR_NAME); }
+	virtual const char *family() const { return get_config_string(DEVINFO_STR_FAMILY); }
+	virtual const char *version() const { return get_config_string(DEVINFO_STR_VERSION); }
+	virtual const char *source_file() const { return get_config_string(DEVINFO_STR_SOURCE_FILE); }
+	virtual const char *credits() const { return get_config_string(DEVINFO_STR_CREDITS); }
+	
 	INT64 get_config_int(UINT32 state) const;
 	void *get_config_ptr(UINT32 state) const;
 	genf *get_config_fct(UINT32 state) const;
@@ -432,7 +436,7 @@ class running_device
 {
 	DISABLE_COPYING(running_device);
 	
-	const device_config &	_baseconfig;
+	const device_config &	m_baseconfig;
 	
 public:	// private eventually
 	const address_space *	addrspace[ADDRESS_SPACES];	// auto-discovered address spaces 
@@ -441,13 +445,13 @@ public:
 	running_device(running_machine &machine, const device_config &config);
 	virtual ~running_device();
 	
-	const device_config &baseconfig() const { return _baseconfig; }
+	const device_config &baseconfig() const { return m_baseconfig; }
 
 	inline const address_space *space(int index = 0) const;
 	inline const address_space *space(device_space index) const;
 
-	astring &subtag(astring &dest, const char *tag) const { return _baseconfig.subtag(dest, tag); }
-	astring &siblingtag(astring &dest, const char *tag) const { return _baseconfig.siblingtag(dest, tag); }
+	astring &subtag(astring &dest, const char *tag) const { return m_baseconfig.subtag(dest, tag); }
+	astring &siblingtag(astring &dest, const char *tag) const { return m_baseconfig.siblingtag(dest, tag); }
 
 	const region_info *subregion(const char *tag) const;
 	running_device *subdevice(const char *tag) const;
@@ -472,10 +476,26 @@ public:
 	void set_clock(UINT32 clock);
 
 	// get state from a device config
-	INT64 get_config_int(UINT32 state) const { return _baseconfig.get_config_int(state); }
-	void *get_config_ptr(UINT32 state) const { return _baseconfig.get_config_ptr(state); }
-	genf *get_config_fct(UINT32 state) const { return _baseconfig.get_config_fct(state); }
-	const char *get_config_string(UINT32 state) const { return _baseconfig.get_config_string(state); }
+	endianness_t endianness() const { return m_baseconfig.endianness(); }
+	UINT8 databus_width(int spacenum = 0) const { return m_baseconfig.databus_width(spacenum); }
+	UINT8 addrbus_width(int spacenum = 0) const { return m_baseconfig.addrbus_width(spacenum); }
+	INT8 addrbus_shift(int spacenum = 0) const { return m_baseconfig.addrbus_shift(spacenum); }
+	
+	const rom_entry *rom_region() const { return m_baseconfig.rom_region(); }
+	const machine_config_token *machine_config() const { return m_baseconfig.machine_config(); }
+	const addrmap_token *internal_map(int spacenum = 0) const { return m_baseconfig.internal_map(spacenum); }
+	const addrmap_token *default_map(int spacenum = 0) const { return m_baseconfig.default_map(spacenum); }
+	
+	const char *name() const { return m_baseconfig.name(); }
+	const char *family() const { return m_baseconfig.family(); }
+	const char *version() const { return m_baseconfig.version(); }
+	const char *source_file() const { return m_baseconfig.source_file(); }
+	const char *credits() const { return m_baseconfig.credits(); }
+
+	INT64 get_config_int(UINT32 state) const { return m_baseconfig.get_config_int(state); }
+	void *get_config_ptr(UINT32 state) const { return m_baseconfig.get_config_ptr(state); }
+	genf *get_config_fct(UINT32 state) const { return m_baseconfig.get_config_fct(state); }
+	const char *get_config_string(UINT32 state) const { return m_baseconfig.get_config_string(state); }
 
 	INT64 get_runtime_int(UINT32 state);
 	void *get_runtime_ptr(UINT32 state);

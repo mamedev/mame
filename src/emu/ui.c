@@ -995,7 +995,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
-		string.cat(device_get_name(device));
+		string.cat(device->name());
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)
@@ -1024,7 +1024,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
-		string.cat(device_get_name(device));
+		string.cat(device->name());
 
 		/* display clock in kHz or MHz */
 		if (device->clock >= 1000000)

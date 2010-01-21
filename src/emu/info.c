@@ -634,7 +634,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"cpu\"");
 		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag));
-		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(devconfig)));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(devconfig->name()));
 		fprintf(out, " clock=\"%d\"", devconfig->clock);
 		fprintf(out, "/>\n");
 	}
@@ -645,7 +645,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"audio\"");
 		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag));
-		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(devconfig)));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(devconfig->name()));
 		if (devconfig->clock != 0)
 			fprintf(out, " clock=\"%d\"", devconfig->clock);
 		fprintf(out, "/>\n");
