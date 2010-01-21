@@ -11,8 +11,6 @@
 
 // standard sdl header
 #include <SDL/SDL.h>
-#include <unistd.h>
-#include <stdio.h>
 
 
 #define WIN32_LEAN_AND_MEAN
@@ -241,38 +239,35 @@ void osd_free(void *ptr)
 }
 
 //============================================================
-//  osd_alloc_executable
-//
-//  allocates "size" bytes of executable memory.  this must take
-//  things like NX support into account.
+//  osd_getenv
 //============================================================
 
-void *osd_alloc_executable(size_t size)
+char *osd_getenv(const char *name)
 {
-	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	return getenv(name);
 }
 
 //============================================================
-//  osd_free_executable
-//
-//  frees memory allocated with osd_alloc_executable
+//  osd_setenv
 //============================================================
 
-void osd_free_executable(void *ptr, size_t size)
+int osd_setenv(const char *name, const char *value, int overwrite)
 {
-	VirtualFree(ptr, 0, MEM_RELEASE);
-}
+	char *buf;
+	int result;
 
-//============================================================
-//  osd_break_into_debugger
-//============================================================
-
-void osd_break_into_debugger(const char *message)
-{
-	if (IsDebuggerPresent())
+	if (!overwrite)
 	{
-		OutputDebugStringA(message);
-		DebugBreak();
+		if (osd_getenv(name) != NULL)
+			return 0;
 	}
-}
+	buf = (char *) osd_malloc(strlen(name)+strlen(value)+2);
+	sprintf(buf, "%s=%s", name, value);
+	result = putenv(buf);
 
+	/* will be referenced by environment
+     * Therefore it is not freed here
+     */
+
+	return result;
+}

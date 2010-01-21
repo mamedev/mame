@@ -571,7 +571,7 @@ static int effective_num_processors(void)
 	else
 	{
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
-		procsoverride = getenv(SDLENV_PROCESSORS);
+		procsoverride = osd_getenv(SDLENV_PROCESSORS);
 		if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
 			return MIN(4 * physprocs, numprocs);
 
@@ -590,7 +590,7 @@ static UINT32 effective_cpu_mask(int index)
 	char	buf[5];
 	UINT32	mask = 0xFFFF;
 
-	s = getenv(SDLENV_CPUMASKS);
+	s = osd_getenv(SDLENV_CPUMASKS);
 	if (s != NULL && strcmp(s,"none"))
 	{
 		if (!strcmp(s,"auto"))

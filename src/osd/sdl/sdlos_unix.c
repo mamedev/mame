@@ -9,13 +9,11 @@
 //
 //============================================================
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <time.h>
 #include <sys/time.h>
-#include <signal.h>
 
 // MAME headers
 #include "osdcore.h"
@@ -104,48 +102,20 @@ void osd_free(void *ptr)
 }
 
 //============================================================
-//  osd_alloc_executable
-//
-//  allocates "size" bytes of executable memory.  this must take
-//  things like NX support into account.
+//  osd_getenv
 //============================================================
 
-void *osd_alloc_executable(size_t size)
+char *osd_getenv(const char *name)
 {
-#if defined(SDLMAME_BSD)
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
-#elif defined(SDLMAME_UNIX)
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
-#endif
+	return getenv(name);
 }
 
+
 //============================================================
-//  osd_free_executable
-//
-//  frees memory allocated with osd_alloc_executable
+//  osd_setenv
 //============================================================
 
-void osd_free_executable(void *ptr, size_t size)
+int osd_setenv(const char *name, const char *value, int overwrite)
 {
-#ifdef SDLMAME_SOLARIS
-	munmap((char *)ptr, size);
-#else
-	munmap(ptr, size);
-#endif
+	return setenv(name, value, overwrite);
 }
-
-//============================================================
-//  osd_break_into_debugger
-//============================================================
-
-void osd_break_into_debugger(const char *message)
-{
-	#ifdef MAME_DEBUG
-	printf("MAME exception: %s\n", message);
-	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP);
-	#else
-	printf("Ignoring MAME exception: %s\n", message);
-	#endif
-}
-

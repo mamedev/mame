@@ -12,8 +12,6 @@
 #ifndef __SDLVIDEO__
 #define __SDLVIDEO__
 
-#include <SDL/SDL.h>
-
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -52,6 +50,13 @@ enum {
 //  TYPE DEFINITIONS
 //============================================================
 
+typedef struct _sdl_mode sdl_mode;
+struct _sdl_mode
+{
+	int					width;
+	int					height;
+};
+
 typedef struct _sdl_monitor_info sdl_monitor_info;
 struct _sdl_monitor_info
 {
@@ -67,10 +72,6 @@ struct _sdl_monitor_info
 	float				aspect;					// computed/configured aspect ratio of the physical device
 	int					center_width;			// width of first physical screen for centering
 	int					center_height;			// height of first physical screen for centering
-#if !SDL_VERSION_ATLEAST(1,3,0)
-	//FIXME: This should not be a SDL-type
-	SDL_Rect **modes;							// supported modes
-#endif
 };
 
 

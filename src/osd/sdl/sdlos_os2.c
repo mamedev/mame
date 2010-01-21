@@ -21,7 +21,6 @@
 #include <os2.h>
 
 // MAME headers
-#include "osdepend.h"
 #include "osdcore.h"
 
 
@@ -184,40 +183,47 @@ int osd_num_processors(void)
     return numprocs;
 }
 
-
-
 //============================================================
-//  osd_alloc_executable
-//
-//  allocates "size" bytes of executable memory.  this must take
-//  things like NX support into account.
+//  osd_malloc
 //============================================================
 
-void *osd_alloc_executable(size_t size)
+void *osd_malloc(size_t size)
 {
-	void *p;
+#ifndef MALLOC_DEBUG
+	return malloc(size);
+#else
+#error "MALLOC_DEBUG not yet supported"
+#endif
+}
 
-	DosAllocMem( &p, size, fALLOC );
-	return p;
+
+//============================================================
+//  osd_free
+//============================================================
+
+void osd_free(void *ptr)
+{
+#ifndef MALLOC_DEBUG
+	free(ptr);
+#else
+#error "MALLOC_DEBUG not yet supported"
+#endif
 }
 
 //============================================================
-//  osd_free_executable
-//
-//  frees memory allocated with osd_alloc_executable
+//  osd_getenv
 //============================================================
 
-void osd_free_executable(void *ptr, size_t size)
+char *osd_getenv(const char *name)
 {
-	DosFreeMem( ptr );
+	return getenv(name);
 }
 
 //============================================================
-//  osd_break_into_debugger
+//  osd_setenv
 //============================================================
 
-void osd_break_into_debugger(const char *message)
+int osd_setenv(const char *name, const char *value, int overwrite)
 {
-	printf("Ignoring MAME exception: %s\n", message);
+	return setenv(name, value, overwrite);
 }
-

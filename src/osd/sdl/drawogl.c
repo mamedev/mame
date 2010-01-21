@@ -28,7 +28,10 @@
 
 // OpenGL headers
 #include "osd_opengl.h"
+#include "sdlos.h"
 
+
+#include "gl_shader_tool.h"
 #include "gl_shader_mgr.h"
 
 #if defined(SDLMAME_MACOSX)
@@ -748,7 +751,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	sdl->glsl_vid_attributes = video_config.glsl_vid_attributes;
 
-	if (getenv(SDLENV_VMWARE) != NULL)
+	if (osd_getenv(SDLENV_VMWARE) != NULL)
 	{
 		sdl->usetexturerect = 1;
 		sdl->texpoweroftwo = 1;

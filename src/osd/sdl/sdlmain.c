@@ -14,9 +14,6 @@
 #include <SDL/SDL_version.h>
 
 // standard includes
-#include <time.h>
-#include <ctype.h>
-#include <stdlib.h>
 
 // MAME headers
 #include "osdepend.h"
@@ -29,14 +26,10 @@
 #include "input.h"
 #include "output.h"
 #include "osdsdl.h"
+#include "sdlos.h"
 
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
-
-#ifdef SDLMAME_UNIX
-#include <signal.h>
-#include <unistd.h>
-#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 #include <X11/Xlib.h>
@@ -248,33 +241,6 @@ static const options_entry mame_sdl_options[] =
 	{ NULL }
 };
 
-#ifdef SDLMAME_WIN32
-
-/* mingw has no setenv */
-
-static int setenv(const char *name, const char *value, int overwrite)
-{
-	char *buf;
-	int result;
-
-	if (!overwrite)
-	{
-		if (getenv(name) != NULL)
-			return 0;
-	}
-	buf = (char *) osd_malloc(strlen(name)+strlen(value)+2);
-	sprintf(buf, "%s=%s", name, value);
-	result = putenv(buf);
-
-	/* will be referenced by environment
-     * Therefore it is not freed here
-     */
-
-	return result;
-}
-
-#endif
-
 //============================================================
 //  main
 //============================================================
@@ -328,7 +294,7 @@ int main(int argc, char *argv[])
 			char buf[130];
 			if (XMatchVisualInfo(display, DefaultScreen(display), 24, TrueColor, &vi)) {
 				snprintf(buf, sizeof(buf), "0x%lx", vi.visualid);
-				setenv(SDLENV_VISUALID, buf, 0);
+				osd_setenv(SDLENV_VISUALID, buf, 0);
 			}
 		}
 		if (display)
@@ -507,14 +473,14 @@ void osd_init(running_machine *machine)
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
-		setenv(SDLENV_AUDIODRIVER, stemp, 1);
+		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
 	stemp = options_get_string(mame_options(), SDLOPTION_VIDEODRIVER);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
-		setenv(SDLENV_VIDEODRIVER, stemp, 1);
+		osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
 	}
 
 	if (SDL_VERSION_ATLEAST(1,3,0))
@@ -523,7 +489,7 @@ void osd_init(running_machine *machine)
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
-			setenv(SDLENV_RENDERDRIVER, stemp, 1);
+			osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
 		}
 	}
 
@@ -535,7 +501,7 @@ void osd_init(running_machine *machine)
 	stemp = options_get_string(mame_options(), SDLOPTION_GL_LIB);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
-		setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
+		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
 		mame_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);
 	}
 

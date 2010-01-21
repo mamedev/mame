@@ -27,14 +27,13 @@
 
 #if defined(__sun__) && defined(__svr4__)
 #define SDLMAME_SOLARIS 1
-//#undef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#undef _XOPEN_VERSION
 #undef _XOPEN_SOURCE_EXTENDED
 #undef _XPG6
 #undef _XPG5
 #undef _XPG4_2
 
-#undef _XOPEN_SOURCE
-#undef _XOPEN_VERSION
 #define _XOPEN_SOURCE
 #define _XOPEN_VERSION 4
 

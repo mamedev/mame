@@ -56,6 +56,8 @@ struct _osd_event {
 
 struct _osd_thread {
 	pthread_t			thread;
+	osd_thread_callback callback;
+	void *param;
 };
 
 struct _osd_scalable_lock
@@ -400,12 +402,21 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 //  osd_thread_create
 //============================================================
 
+static void worker_thread_entry(void *param)
+{
+     osd_thread *thread = (osd_thread *) param;
+
+     thread->callback(thread->param);
+}
+
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
     osd_thread *thread;
 
     thread = (osd_thread *)calloc(1, sizeof(osd_thread));
-    thread->thread = _beginthread(callback, NULL, 65535, cbparam);
+    thread->callback = callback;
+    thread->param = cbparam;
+    thread->thread = _beginthread(worker_thread_entry, NULL, 65535, thread);
     if ( thread->thread == -1 )
     {
         free(thread);

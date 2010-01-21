@@ -41,10 +41,6 @@
 #include <os2.h>
 #endif
 
-// standard C headers
-#include <math.h>
-#include <unistd.h>
-
 // MAME headers
 #include "emu.h"
 #include "rendutil.h"
@@ -60,8 +56,7 @@
 #include "debugwin.h"
 
 #include "osdsdl.h"
-
-#include "osd_opengl.h"
+#include "sdlos.h"
 
 #ifdef MESS
 #include "menu.h"
@@ -251,7 +246,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
 			if (first_call==0)
 			{
-				char *dimstr = getenv(SDLENV_DESKTOPDIM);
+				char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
 				const SDL_VideoInfo *sdl_vi;
 
 				sdl_vi = SDL_GetVideoInfo();
@@ -431,11 +426,6 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	// guess the aspect ratio assuming square pixels
 	monitor->aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
 
-	// SDL will crash if monitors are queried here
-	// This will be done in window.c (Ughh, ugly)
-
-	monitor->modes = NULL;
-
 	// save the primary monitor handle
 	if (info.dwFlags & MONITORINFOF_PRIMARY)
 		primary_monitor = monitor;
@@ -505,7 +495,6 @@ static void init_monitors(void)
 	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
 	#else
 	add_primary_monitor((void *)&tailptr);
-	sdl_monitor_list->modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
 	#endif
 }
 

@@ -11,15 +11,7 @@
 
 // standard sdl header
 #include <SDL/SDL.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <signal.h>
+
 #include <unistd.h>
 
 #include <mach/mach.h>
@@ -169,44 +161,6 @@ int osd_num_processors(void)
 }
 
 //============================================================
-//  osd_alloc_executable
-//
-//  allocates "size" bytes of executable memory.  this must take
-//  things like NX support into account.
-//============================================================
-
-void *osd_alloc_executable(size_t size)
-{
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
-}
-
-//============================================================
-//  osd_free_executable
-//
-//  frees memory allocated with osd_alloc_executable
-//============================================================
-
-void osd_free_executable(void *ptr, size_t size)
-{
-	munmap(ptr, size);
-}
-
-//============================================================
-//  osd_break_into_debugger
-//============================================================
-
-void osd_break_into_debugger(const char *message)
-{
-	#ifdef MAME_DEBUG
-	printf("MAME exception: %s\n", message);
-	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP);
-	#else
-	printf("Ignoring MAME exception: %s\n", message);
-	#endif
-}
-
-//============================================================
 //  osd_malloc
 //============================================================
 
@@ -231,4 +185,22 @@ void osd_free(void *ptr)
 #else
 #error "MALLOC_DEBUG not yet supported"
 #endif
+}
+
+//============================================================
+//  osd_getenv
+//============================================================
+
+char *osd_getenv(const char *name)
+{
+	return getenv(name);
+}
+
+//============================================================
+//  osd_setenv
+//============================================================
+
+int osd_setenv(const char *name, const char *value, int overwrite)
+{
+	return setenv(name, value, overwrite);
 }

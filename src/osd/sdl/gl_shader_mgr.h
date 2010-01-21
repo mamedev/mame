@@ -2,16 +2,6 @@
 #ifndef GL_SHADER_MGR_H
 #define GL_SHADER_MGR_H
 
-#include <SDL/SDL.h>
-
-// OpenGL headers
-#include "osd_opengl.h"
-
-#include "gl_shader_tool.h"
-
-// OSD headers
-#include "window.h"
-
 // #define GLSL_SOURCE_ON_DISK 1
 
 typedef enum {

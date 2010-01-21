@@ -11,12 +11,9 @@
 
 // standard sdl header
 #include <SDL/SDL.h>
-#include <unistd.h>
-#include <math.h>
 
 // MAME headers
 #include "emu.h"
-#include "options.h"
 #include "emuopts.h"
 
 #include "osdepend.h"

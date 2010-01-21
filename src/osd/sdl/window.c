@@ -934,7 +934,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		minimum_height -= 4;
 	}
 
-#if defined(SDLMAME_WIN32)
+#if 1 // defined(SDLMAME_WIN32)
 	/*
      *  We need to do this here. If SDL_ListModes is
      * called in init_monitors, the call will crash

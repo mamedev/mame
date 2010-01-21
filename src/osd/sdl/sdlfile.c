@@ -23,18 +23,15 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include <errno.h>
 
 // MAME headers
 #include "osdcore.h"
+#include "sdlos.h"
 
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 #define PATHSEPCH '\\'
@@ -114,7 +111,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	tmpstr = NULL;
 
 	// allocate a file object, plus space for the converted filename
-	*file = (osd_file *) malloc(sizeof(**file) + sizeof(char) * strlen(path));
+	*file = (osd_file *) osd_malloc(sizeof(**file) + sizeof(char) * strlen(path));
 	if (*file == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -143,14 +140,14 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		goto error;
 	}
 
-	tmpstr = (char *) malloc(strlen((*file)->filename)+1);
+	tmpstr = (char *) osd_malloc(strlen((*file)->filename)+1);
 	strcpy(tmpstr, (*file)->filename);
 
 	// does path start with an environment variable?
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = (char *) malloc(strlen(tmpstr)+1);
+		envstr = (char *) osd_malloc(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -162,12 +159,12 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 		envstr[i] = '\0';
 
-		envval = getenv(&envstr[1]);
+		envval = osd_getenv(&envstr[1]);
 		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
-			free(tmpstr);
-			tmpstr = (char *) malloc(j);
+			osd_free(tmpstr);
+			tmpstr = (char *) osd_malloc(j);
 
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);
@@ -178,7 +175,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		}
 		else
 			fprintf(stderr, "Warning: osd_open environment variable %s not found.\n", envstr);
-		free(envstr);
+		osd_free(envstr);
 	}
 
 	#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
@@ -218,12 +215,12 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 			}
 		}
 
-		// if we still failed, clean up and free
+		// if we still failed, clean up and osd_free
 		if ((*file)->handle == -1)
 		{
-			free(*file);
+			osd_free(*file);
 			*file = NULL;
-			free(tmpstr);
+			osd_free(tmpstr);
 			return error_to_file_error(errno);
 		}
 	}
@@ -242,11 +239,11 @@ error:
 	// cleanup
 	if (filerr != FILERR_NONE && *file != NULL)
 	{
-		free(*file);
+		osd_free(*file);
 		*file = NULL;
 	}
 	if (tmpstr)
-		free(tmpstr);
+		osd_free(tmpstr);
 	return filerr;
 }
 
@@ -316,7 +313,7 @@ file_error osd_close(osd_file *file)
 {
 	// close the file handle and free the file structure
 	close(file->handle);
-	free(file);
+	osd_free(file);
 	return FILERR_NONE;
 }
 
@@ -487,7 +484,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *) malloc(sizeof(*result) + strlen(path) + 1);
+	result = (osd_directory_entry *) osd_malloc(sizeof(*result) + strlen(path) + 1);
 	strcpy(((char *) result) + sizeof(*result), path);
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;

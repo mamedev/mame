@@ -1,9 +1,16 @@
 
+#include <SDL/SDL.h>
+
 #include "osdcomm.h"
 #include "osdcore.h"
 #include "osdepend.h"
 
+#include "osd_opengl.h"
+
 #include "gl_shader_mgr.h"
+#include "gl_shader_tool.h"
+
+// OSD headers
 
 #define GLSL_VERTEX_SHADER_INT_NUMBER 1 // general
 #define GLSL_VERTEX_SHADER_MAX_NUMBER 2 // general + custom
