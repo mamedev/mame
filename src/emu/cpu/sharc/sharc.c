@@ -1075,15 +1075,15 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -3;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -2;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -3;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = -2;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -1200,7 +1200,7 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_FCT_READ:							info->read = CPU_READ_NAME(sharc);		break;
 		case CPUINFO_FCT_READOP:						info->readop = CPU_READOP_NAME(sharc);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "SHARC");				break;

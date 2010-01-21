@@ -2762,17 +2762,17 @@ CPU_GET_INFO( tmp90840 )
 		case CPUINFO_INT_MIN_CYCLES:								info->i = 2;					break;
 		case CPUINFO_INT_MAX_CYCLES:								info->i = 26;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:		info->i = 20;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 20;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:		info->i = 0;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:		info->i = 0;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_IO:			info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:			info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:			info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:			info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:				info->i = cpustate->irq_state & (1 << INTNMI);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:				info->i = cpustate->irq_state & (1 << INT0);		break;
@@ -2808,7 +2808,7 @@ CPU_GET_INFO( tmp90840 )
 		case CPUINFO_FCT_BURN:										info->burn = CPU_BURN_NAME(t90);				break;
 		case CPUINFO_FCT_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(t90);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &cpustate->icount;			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp90840_mem); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp90840_mem); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
@@ -2854,7 +2854,7 @@ CPU_GET_INFO( tmp90841 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp90841_mem); return;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp90841_mem); return;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
@@ -2870,7 +2870,7 @@ CPU_GET_INFO( tmp91640 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp91640_mem); return;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp91640_mem); return;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
@@ -2886,7 +2886,7 @@ CPU_GET_INFO( tmp91641 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp91641_mem); return;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp91641_mem); return;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 

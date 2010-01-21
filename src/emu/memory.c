@@ -842,7 +842,7 @@ address_map *address_map_alloc(const device_config *devconfig, const game_driver
 	map = global_alloc_clear(address_map);
 
 	/* append the internal device map (first so it takes priority) */
-	internal_map = (const addrmap_token *)devconfig->get_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+	internal_map = devconfig->internal_map(spacenum);
 	if (internal_map != NULL)
 		map_detokenize((memory_private *)memdata, map, driver, devconfig, internal_map);
 
@@ -851,7 +851,7 @@ address_map *address_map_alloc(const device_config *devconfig, const game_driver
 		map_detokenize((memory_private *)memdata, map, driver, devconfig, devconfig->address_map[spacenum]);
 
 	/* append the default device map (last so it can be overridden) */
-	default_map = (const addrmap_token *)devconfig->get_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum);
+	internal_map = devconfig->default_map(spacenum);
 	if (default_map != NULL)
 		map_detokenize((memory_private *)memdata, map, driver, devconfig, default_map);
 

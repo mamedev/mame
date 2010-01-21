@@ -1131,15 +1131,15 @@ static CPU_GET_INFO( pic16c62x )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;						break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;						break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 12;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = -1;						break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 5;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;						break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16;						break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 12;						break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = -1;						break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;						break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;						break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;						break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;						break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 5;						break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;						break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PREVPC;						break;
 
@@ -1270,13 +1270,13 @@ CPU_GET_INFO( pic16c620 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 9;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c620);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c620_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c620_ram);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c620_rom);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c620_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C620");			break;
@@ -1333,13 +1333,13 @@ CPU_GET_INFO( pic16c621 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 10;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c621);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c621_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c621_ram);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c621_rom);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c621_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C621");			break;
@@ -1396,13 +1396,13 @@ CPU_GET_INFO( pic16c622 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 11;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c622);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c622_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c622_ram);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c622_rom);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c622_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C622");			break;
@@ -1461,13 +1461,13 @@ CPU_GET_INFO( pic16c620a )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 9;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c620a);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c620a_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c620a_ram);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c620a_rom);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c620a_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C620A");			break;
@@ -1526,13 +1526,13 @@ CPU_GET_INFO( pic16c621a )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 10;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c621a);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c621a_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c621a_ram);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c621a_rom);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c621a_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C621A");			break;
@@ -1591,13 +1591,13 @@ CPU_GET_INFO( pic16c622a )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 11;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c622a);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c622a_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c622a_ram);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c622a_rom);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c622a_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C622A");			break;

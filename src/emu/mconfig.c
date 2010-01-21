@@ -293,7 +293,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	if (depth == 0)
 		for (device = config->devicelist.first(); device != NULL; device = device->next)
 		{
-			tokens = (const machine_config_token *)device->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
+			tokens = device->machine_config_tokens();
 			if (tokens != NULL)
 				machine_config_detokenize(config, tokens, device, depth + 1);
 		}

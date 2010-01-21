@@ -1030,15 +1030,15 @@ CPU_GET_INFO( m37710 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 20; /* rough guess */			break;
 		case CPUINFO_INT_INPUT_LINES:       			info->i = M37710_LINE_MAX;				break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0:	info->i = 0;						break;
 		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1:	info->i = 0;						break;
@@ -1073,9 +1073,9 @@ CPU_GET_INFO( m37710 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m37710);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->ICount;			break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m37710_internal_map); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:    info->internal_map16 = NULL;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map8 = NULL;	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m37710_internal_map); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map8 = NULL;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "M37710");				break;

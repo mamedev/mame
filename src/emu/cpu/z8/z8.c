@@ -860,15 +860,15 @@ static CPU_GET_INFO( z8 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 6;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 20;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 2;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 2;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:				info->setinfo = CPU_SET_INFO_NAME(z8);			break;
@@ -910,7 +910,7 @@ CPU_GET_INFO( z8601 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8601");								break;
@@ -924,7 +924,7 @@ CPU_GET_INFO( ub8830d )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "UB8830D");								break;
@@ -938,7 +938,7 @@ CPU_GET_INFO( z8611 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8611");								break;

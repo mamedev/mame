@@ -82,7 +82,6 @@ enum
 
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		// R/O: pointer to device-specific ROM region 
 		DEVINFO_PTR_MACHINE_CONFIG,						// R/O: pointer to device-specific machine config 
-		DEVINFO_PTR_CONTRACT_LIST,						// R/O: pointer to list of supported device contracts 
 
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				// R/O: const addrmap_token *map 
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_0 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 0,
@@ -396,7 +395,7 @@ public:
 	virtual INT8 addrbus_shift(int spacenum = 0) const { return get_config_int(DEVINFO_INT_ADDRBUS_SHIFT + spacenum); }
 	
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_config_ptr(DEVINFO_PTR_ROM_REGION)); }
-	virtual const machine_config_token *machine_config() const { return reinterpret_cast<const machine_config_token *>(get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const machine_config_token *machine_config_tokens() const { return reinterpret_cast<const machine_config_token *>(get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
 	virtual const addrmap_token *internal_map(int spacenum = 0) const { return reinterpret_cast<const addrmap_token *>(get_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum)); }
 	virtual const addrmap_token *default_map(int spacenum = 0) const { return reinterpret_cast<const addrmap_token *>(get_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum)); }
 	
@@ -482,7 +481,7 @@ public:
 	INT8 addrbus_shift(int spacenum = 0) const { return m_baseconfig.addrbus_shift(spacenum); }
 	
 	const rom_entry *rom_region() const { return m_baseconfig.rom_region(); }
-	const machine_config_token *machine_config() const { return m_baseconfig.machine_config(); }
+	const machine_config_token *machine_config_tokens() const { return m_baseconfig.machine_config_tokens(); }
 	const addrmap_token *internal_map(int spacenum = 0) const { return m_baseconfig.internal_map(spacenum); }
 	const addrmap_token *default_map(int spacenum = 0) const { return m_baseconfig.default_map(spacenum); }
 	

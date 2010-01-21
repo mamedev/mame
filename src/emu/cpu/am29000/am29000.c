@@ -728,15 +728,15 @@ CPU_GET_INFO( am29000 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + AM29000_PC:		info->i = am29000->pc;				break;

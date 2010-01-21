@@ -166,7 +166,7 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 	if (config != NULL)
 		for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next)
 		{
-			const rom_entry *devromp = (const rom_entry *)devconfig->get_config_ptr(DEVINFO_PTR_ROM_REGION);
+			const rom_entry *devromp = devconfig->rom_region();
 			if (devromp != NULL)
 				return (rom_source *)devconfig;
 		}
@@ -192,7 +192,7 @@ const rom_source *rom_next_source(const game_driver *drv, const machine_config *
 	/* look for further devices with ROM definitions */
 	for ( ; devconfig != NULL; devconfig = devconfig->next)
 	{
-		const rom_entry *devromp = (const rom_entry *)devconfig->get_config_ptr(DEVINFO_PTR_ROM_REGION);
+		const rom_entry *devromp = devconfig->rom_region();
 		if (devromp != NULL)
 			return (rom_source *)devconfig;
 	}
@@ -212,7 +212,7 @@ const rom_entry *rom_first_region(const game_driver *drv, const rom_source *sour
 	if (source == NULL || rom_source_is_gamedrv(drv, source))
 		romp = drv->rom;
 	else
-		romp = (const rom_entry *)((const device_config *)source)->get_config_ptr(DEVINFO_PTR_ROM_REGION);
+		romp = ((const device_config *)source)->rom_region();
 
 	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
 }

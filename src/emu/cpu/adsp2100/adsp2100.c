@@ -1900,12 +1900,12 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 14;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = -2;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 14;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = -1;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 14;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = -2;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 14;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = -1;							break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:
 		case CPUINFO_INT_INPUT_STATE + 1:
@@ -2155,9 +2155,9 @@ CPU_GET_INFO( adsp2181 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 9;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = -1;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 11;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = -1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2181);					break;

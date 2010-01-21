@@ -1382,15 +1382,15 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			/*info->i = 6 or 7 or 8;*/				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			/*info->i = 6 or 7 or 8;*/				break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 9;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	info->i = cpustate->ea;					break;
@@ -1407,8 +1407,8 @@ static CPU_GET_INFO( mcs48 )
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	/* set per-core */						break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		/* set per-core */						break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/* set per-core */						break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		/* set per-core */						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
@@ -1444,7 +1444,7 @@ static void mcs48_generic_get_info(const device_config *devconfig, running_devic
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:
 			if (ramsize == 64)
 				info->i = 6;
 			else if (ramsize == 128)
@@ -1477,7 +1477,7 @@ static void mcs48_generic_get_info(const device_config *devconfig, running_devic
 			break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
 			if (romsize == 0)
 				info->internal_map8 = NULL;
 			else if (romsize == 1024)
@@ -1490,7 +1490,7 @@ static void mcs48_generic_get_info(const device_config *devconfig, running_devic
 				fatalerror("mcs48_generic_get_info: Invalid RAM size");
 			break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
 			if (ramsize == 64)
 				info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);
 			else if (ramsize == 128)

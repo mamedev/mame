@@ -1750,15 +1750,15 @@ static CPU_GET_INFO( ppc )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -1901,8 +1901,8 @@ CPU_GET_INFO( ppc603 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = 17;					break;
 		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = read_decrementer();			break;
@@ -1949,8 +1949,8 @@ CPU_GET_INFO( ppc602 )
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_REGISTER + PPC_IBR:			info->i = ppc.ibr;						break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc602);		break;
@@ -1993,8 +1993,8 @@ CPU_GET_INFO( mpc8240 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mpc8240);		break;
@@ -2034,8 +2034,8 @@ CPU_GET_INFO( ppc601 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc601);		break;
@@ -2075,8 +2075,8 @@ CPU_GET_INFO( ppc604 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc604);		break;
