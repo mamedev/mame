@@ -736,6 +736,11 @@ DRIVER_INIT( micro3d )
 	memory_write_dword(space, 0x00470000, 0xa5a5a5a5);
 
 	state->mc68901.timer_a = timer_alloc(machine, mfp_timer_a_cb, NULL);
+
+	/* TODO? BOTSS crashes when starting the final stage because the 68000
+	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
+	avoids this */
+	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.945f);
 }
 
 MACHINE_RESET( micro3d )
