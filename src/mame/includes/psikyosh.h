@@ -30,7 +30,8 @@ struct _psikyosh_state
 
 	/* video-related */
 	bitmap_t       *zoom_bitmap, *z_bitmap, *bg_bitmap;
-//  UINT8 *        alphatable;
+	UINT16         *bg_zoom;
+//  UINT8          *alphatable;
 
 	/* misc */
 	UINT32         sample_offs;	// only used if ROMTEST = 1
