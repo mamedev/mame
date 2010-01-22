@@ -456,7 +456,7 @@ LIBS += -lX11 -lXinerama
 # Non-X11 builds can not use the debugger
 CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
-CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
+#CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
 
 # some systems still put important things in a different prefix
 LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib

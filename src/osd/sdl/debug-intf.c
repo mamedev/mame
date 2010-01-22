@@ -15,22 +15,19 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "emu.h"
 #include "debug-cb.h"
 #include "debug-intf.h"
 #include "debug-sup.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
-  g_object_ref (G_OBJECT(widget)), (GDestroyNotify) g_object_unref)
-
-// gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
+    gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
 
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
 GtkWidget*
-create_debugmain (running_machine *machine)
+create_debugmain (void)
 {
   GtkWidget *debugmain;
   GtkWidget *vbox1;
@@ -42,6 +39,7 @@ create_debugmain (running_machine *machine)
   GtkWidget *new_errorlog;
   GtkWidget *separator2;
   GtkWidget *run;
+  GtkWidget *run_to_cursor;
   GtkWidget *run_h;
   GtkWidget *run_cpu;
   GtkWidget *run_irq;
@@ -131,6 +129,11 @@ create_debugmain (running_machine *machine)
   gtk_widget_add_accelerator (run, "activate", accel_group,
                               GDK_F5, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
+
+  run_to_cursor = gtk_menu_item_new_with_mnemonic ("Run to cursor");
+  gtk_widget_set_name (run_to_cursor, "run_to_cursor");
+  gtk_widget_show (run_to_cursor);
+  gtk_container_add (GTK_CONTAINER (menuitem4_menu), run_to_cursor);
 
   run_h = gtk_menu_item_new_with_mnemonic ("Run and Hide Debugger");
   gtk_widget_set_name (run_h, "run_h");
@@ -297,48 +300,60 @@ create_debugmain (running_machine *machine)
   gtk_box_pack_start (GTK_BOX (vbox2), edit, FALSE, FALSE, 0);
   gtk_entry_set_activates_default (GTK_ENTRY (edit), TRUE);
 
-  g_signal_connect ((gpointer) new_mem, "activate",
-                    G_CALLBACK (on_new_mem_activate),
-                    machine);
-  g_signal_connect ((gpointer) new_disasm, "activate",
-                    G_CALLBACK (on_new_disasm_activate),
-                    machine);
-  g_signal_connect ((gpointer) new_errorlog, "activate",
-                    G_CALLBACK (on_new_errorlog_activate),
-                    machine);
-  g_signal_connect ((gpointer) run, "activate",
-                    G_CALLBACK (on_run_activate),
-                    machine);
-  g_signal_connect ((gpointer) run_h, "activate",
-                    G_CALLBACK (on_run_h_activate),
-                    machine);
-  g_signal_connect ((gpointer) run_cpu, "activate",
-                    G_CALLBACK (on_run_cpu_activate),
-                    machine);
-  g_signal_connect ((gpointer) run_irq, "activate",
-                    G_CALLBACK (on_run_irq_activate),
-                    machine);
-  g_signal_connect ((gpointer) run_vbl, "activate",
-                    G_CALLBACK (on_run_vbl_activate),
-                    machine);
-  g_signal_connect ((gpointer) step_into, "activate",
-                    G_CALLBACK (on_step_into_activate),
-                    machine);
-  g_signal_connect ((gpointer) step_over, "activate",
-                    G_CALLBACK (on_step_over_activate),
-                    machine);
-  g_signal_connect ((gpointer) step_out, "activate",
-                    G_CALLBACK (on_step_out_activate),
-                    machine);
-  g_signal_connect ((gpointer) soft_reset, "activate",
-                    G_CALLBACK (on_soft_reset_activate),
-                    machine);
-  g_signal_connect ((gpointer) hard_reset, "activate",
-                    G_CALLBACK (on_hard_reset_activate),
-                    machine);
-  g_signal_connect ((gpointer) exit, "activate",
-                    G_CALLBACK (on_exit_activate),
-                    machine);
+  g_signal_connect_swapped ((gpointer) new_mem, "activate",
+                            G_CALLBACK (on_new_mem_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) new_disasm, "activate",
+                            G_CALLBACK (on_new_disasm_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) new_errorlog, "activate",
+                            G_CALLBACK (on_new_errorlog_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run, "activate",
+                            G_CALLBACK (on_run_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run_to_cursor, "activate",
+                            G_CALLBACK (on_run_to_cursor_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run_h, "activate",
+                            G_CALLBACK (on_run_h_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run_cpu, "activate",
+                            G_CALLBACK (on_run_cpu_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run_irq, "activate",
+                            G_CALLBACK (on_run_irq_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run_vbl, "activate",
+                            G_CALLBACK (on_run_vbl_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) step_into, "activate",
+                            G_CALLBACK (on_step_into_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) step_over, "activate",
+                            G_CALLBACK (on_step_over_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) step_out, "activate",
+                            G_CALLBACK (on_step_out_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) soft_reset, "activate",
+                            G_CALLBACK (on_soft_reset_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) hard_reset, "activate",
+                            G_CALLBACK (on_hard_reset_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) exit, "activate",
+                            G_CALLBACK (on_exit_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) raw_opcodes, "activate",
+                            G_CALLBACK (on_raw_opcodes_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) enc_opcodes, "activate",
+                            G_CALLBACK (on_enc_opcodes_activate),
+                            GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) comments, "activate",
+                            G_CALLBACK (on_comments_activate),
+                            GTK_OBJECT (debugmain));
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (debugmain, debugmain, "debugmain");
@@ -351,6 +366,7 @@ create_debugmain (running_machine *machine)
   GLADE_HOOKUP_OBJECT (debugmain, new_errorlog, "new_errorlog");
   GLADE_HOOKUP_OBJECT (debugmain, separator2, "separator2");
   GLADE_HOOKUP_OBJECT (debugmain, run, "run");
+  GLADE_HOOKUP_OBJECT (debugmain, run_to_cursor, "run_to_cursor");
   GLADE_HOOKUP_OBJECT (debugmain, run_h, "run_h");
   GLADE_HOOKUP_OBJECT (debugmain, run_cpu, "run_cpu");
   GLADE_HOOKUP_OBJECT (debugmain, run_irq, "run_irq");
@@ -382,7 +398,7 @@ create_debugmain (running_machine *machine)
 }
 
 GtkWidget*
-create_memorywin (running_machine *machine)
+create_memorywin (void)
 {
   GtkWidget *memorywin;
   GtkWidget *vbox3;
@@ -672,48 +688,66 @@ create_memorywin (running_machine *machine)
   GTK_WIDGET_UNSET_FLAGS (memoryview, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (memoryview, GTK_CAN_DEFAULT);
 
-  g_signal_connect ((gpointer) new_mem, "activate",
-                    G_CALLBACK (on_new_mem_activate),
-		    machine);
-  g_signal_connect ((gpointer) new_disasm, "activate",
-                    G_CALLBACK (on_new_disasm_activate),
-		    machine);
-  g_signal_connect ((gpointer) new_errorlog, "activate",
-                    G_CALLBACK (on_new_errorlog_activate),
-		    machine);
-  g_signal_connect ((gpointer) run, "activate",
-                    G_CALLBACK (on_run_activate),
-		    machine);
-  g_signal_connect ((gpointer) run_h, "activate",
-                    G_CALLBACK (on_run_h_activate),
-		    machine);
-  g_signal_connect ((gpointer) run_cpu, "activate",
-                    G_CALLBACK (on_run_cpu_activate),
-		    machine);
-  g_signal_connect ((gpointer) run_irq, "activate",
-                    G_CALLBACK (on_run_irq_activate),
-		    machine);
-  g_signal_connect ((gpointer) run_vbl, "activate",
-                    G_CALLBACK (on_run_vbl_activate),
-		    machine);
-  g_signal_connect ((gpointer) step_into, "activate",
-                    G_CALLBACK (on_step_into_activate),
-		    machine);
-  g_signal_connect ((gpointer) step_over, "activate",
-                    G_CALLBACK (on_step_over_activate),
-		    machine);
-  g_signal_connect ((gpointer) step_out, "activate",
-                    G_CALLBACK (on_step_out_activate),
-		    machine);
-  g_signal_connect ((gpointer) soft_reset, "activate",
-                    G_CALLBACK (on_soft_reset_activate),
-		    machine);
-  g_signal_connect ((gpointer) hard_reset, "activate",
-                    G_CALLBACK (on_hard_reset_activate),
-		    machine);
-  g_signal_connect ((gpointer) exit, "activate",
-                    G_CALLBACK (on_exit_activate),
-		    machine);
+  g_signal_connect_swapped ((gpointer) new_mem, "activate",
+                            G_CALLBACK (on_new_mem_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) new_disasm, "activate",
+                            G_CALLBACK (on_new_disasm_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) new_errorlog, "activate",
+                            G_CALLBACK (on_new_errorlog_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) run, "activate",
+                            G_CALLBACK (on_run_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) run_h, "activate",
+                            G_CALLBACK (on_run_h_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) run_cpu, "activate",
+                            G_CALLBACK (on_run_cpu_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) run_irq, "activate",
+                            G_CALLBACK (on_run_irq_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) run_vbl, "activate",
+                            G_CALLBACK (on_run_vbl_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) step_into, "activate",
+                            G_CALLBACK (on_step_into_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) step_over, "activate",
+                            G_CALLBACK (on_step_over_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) step_out, "activate",
+                            G_CALLBACK (on_step_out_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) soft_reset, "activate",
+                            G_CALLBACK (on_soft_reset_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) hard_reset, "activate",
+                            G_CALLBACK (on_hard_reset_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) exit, "activate",
+                            G_CALLBACK (on_exit_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) chunks_1, "activate",
+                            G_CALLBACK (on_chunks_1_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) chunks_2, "activate",
+                            G_CALLBACK (on_chunks_2_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) chunks_4, "activate",
+                            G_CALLBACK (on_chunks_4_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) reverse, "activate",
+                            G_CALLBACK (on_reverse_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) ibpl, "activate",
+                            G_CALLBACK (on_ibpl_activate),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) dbpl, "activate",
+                            G_CALLBACK (on_dbpl_activate),
+                            GTK_OBJECT (memorywin));
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (memorywin, memorywin, "memorywin");
@@ -759,7 +793,7 @@ create_memorywin (running_machine *machine)
 }
 
 GtkWidget*
-create_disasmwin (running_machine *machine)
+create_disasmwin (void)
 {
   GtkWidget *disasmwin;
   GtkWidget *vbox4;
@@ -1008,48 +1042,57 @@ create_disasmwin (running_machine *machine)
   GTK_WIDGET_UNSET_FLAGS (disasmview, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (disasmview, GTK_CAN_DEFAULT);
 
-  g_signal_connect ((gpointer) menuitem6, "activate",
-                    G_CALLBACK (on_new_mem_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem7, "activate",
-                    G_CALLBACK (on_new_disasm_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem8, "activate",
-                    G_CALLBACK (on_new_errorlog_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem9, "activate",
-                    G_CALLBACK (on_run_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem10, "activate",
-                    G_CALLBACK (on_run_h_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem11, "activate",
-                    G_CALLBACK (on_run_cpu_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem12, "activate",
-                    G_CALLBACK (on_run_irq_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem13, "activate",
-                    G_CALLBACK (on_run_vbl_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem14, "activate",
-                    G_CALLBACK (on_step_into_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem15, "activate",
-                    G_CALLBACK (on_step_over_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem16, "activate",
-                    G_CALLBACK (on_step_out_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem17, "activate",
-                    G_CALLBACK (on_soft_reset_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem18, "activate",
-                    G_CALLBACK (on_hard_reset_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem19, "activate",
-                    G_CALLBACK (on_exit_activate),
-		    machine);
+  g_signal_connect_swapped ((gpointer) menuitem6, "activate",
+                            G_CALLBACK (on_new_mem_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem7, "activate",
+                            G_CALLBACK (on_new_disasm_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem8, "activate",
+                            G_CALLBACK (on_new_errorlog_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem9, "activate",
+                            G_CALLBACK (on_run_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem10, "activate",
+                            G_CALLBACK (on_run_h_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem11, "activate",
+                            G_CALLBACK (on_run_cpu_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem12, "activate",
+                            G_CALLBACK (on_run_irq_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem13, "activate",
+                            G_CALLBACK (on_run_vbl_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem14, "activate",
+                            G_CALLBACK (on_step_into_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem15, "activate",
+                            G_CALLBACK (on_step_over_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem16, "activate",
+                            G_CALLBACK (on_step_out_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem17, "activate",
+                            G_CALLBACK (on_soft_reset_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem18, "activate",
+                            G_CALLBACK (on_hard_reset_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) menuitem19, "activate",
+                            G_CALLBACK (on_exit_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) raw_opcodes, "activate",
+                            G_CALLBACK (on_raw_opcodes_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) enc_opcodes, "activate",
+                            G_CALLBACK (on_enc_opcodes_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) comments, "activate",
+                            G_CALLBACK (on_comments_activate),
+                            GTK_OBJECT (disasmwin));
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (disasmwin, disasmwin, "disasmwin");
@@ -1090,7 +1133,7 @@ create_disasmwin (running_machine *machine)
 }
 
 GtkWidget*
-create_logwin (running_machine *machine)
+create_logwin (void)
 {
   GtkWidget *logwin;
   GtkWidget *vbox5;
@@ -1276,48 +1319,48 @@ create_logwin (running_machine *machine)
   GTK_WIDGET_UNSET_FLAGS (logview, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (logview, GTK_CAN_DEFAULT);
 
-  g_signal_connect ((gpointer) menuitem27, "activate",
-                    G_CALLBACK (on_new_mem_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem28, "activate",
-                    G_CALLBACK (on_new_disasm_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem29, "activate",
-                    G_CALLBACK (on_new_errorlog_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem30, "activate",
-                    G_CALLBACK (on_run_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem31, "activate",
-                    G_CALLBACK (on_run_h_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem32, "activate",
-                    G_CALLBACK (on_run_cpu_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem33, "activate",
-                    G_CALLBACK (on_run_irq_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem34, "activate",
-                    G_CALLBACK (on_run_vbl_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem35, "activate",
-                    G_CALLBACK (on_step_into_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem36, "activate",
-                    G_CALLBACK (on_step_over_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem37, "activate",
-                    G_CALLBACK (on_step_out_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem38, "activate",
-                    G_CALLBACK (on_soft_reset_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem39, "activate",
-                    G_CALLBACK (on_hard_reset_activate),
-		    machine);
-  g_signal_connect ((gpointer) menuitem40, "activate",
-                    G_CALLBACK (on_exit_activate),
-		    machine);
+  g_signal_connect_swapped ((gpointer) menuitem27, "activate",
+                            G_CALLBACK (on_new_mem_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem28, "activate",
+                            G_CALLBACK (on_new_disasm_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem29, "activate",
+                            G_CALLBACK (on_new_errorlog_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem30, "activate",
+                            G_CALLBACK (on_run_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem31, "activate",
+                            G_CALLBACK (on_run_h_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem32, "activate",
+                            G_CALLBACK (on_run_cpu_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem33, "activate",
+                            G_CALLBACK (on_run_irq_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem34, "activate",
+                            G_CALLBACK (on_run_vbl_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem35, "activate",
+                            G_CALLBACK (on_step_into_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem36, "activate",
+                            G_CALLBACK (on_step_over_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem37, "activate",
+                            G_CALLBACK (on_step_out_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem38, "activate",
+                            G_CALLBACK (on_soft_reset_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem39, "activate",
+                            G_CALLBACK (on_hard_reset_activate),
+                            GTK_OBJECT (logwin));
+  g_signal_connect_swapped ((gpointer) menuitem40, "activate",
+                            G_CALLBACK (on_exit_activate),
+                            GTK_OBJECT (logwin));
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (logwin, logwin, "logwin");
