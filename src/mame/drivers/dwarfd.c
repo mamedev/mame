@@ -244,6 +244,32 @@ Stamp on disk:
     09-251A1-06
 
 
+=====================================================================================
+Quater Horse Classic
+
+Board silkscreend 	QUARTERHORSE
+			(C) ARJAY EXPORT CO.,INC/PRESTIGE GAMES> -1995 REV-C-95
+			HYANNIS,MA.02601--MADE IN USA
+
+.A10 - 27256	stickered	QUARTERHORSE CLASSIC
+				10A - V1.1
+				(c)1995 ARJAY EXPORT - PRESTIGE GAMES
+
+
+.H6 - 27128	stickered	QUARTERHORSE CLASSIC
+				CGR - 6H - V1.0
+				(c)1995 ARJAY EXPORT - PRESTIGE GAMES
+
+.K6 - 27128	stickered	QUARTERHORSE CLASSIC
+				CGR - 6K - V1.0
+				(c)1995 ARJAY EXPORT - PRESTIGE GAMES
+.U9 - Lattice GAL22V10	on daughter board
+
+P8085 @ B8
+P8275 @ F4
+AY8910 @ G4
+uPC1352C @ N3
+6116 @ B10 and C10
 
 */
 
@@ -537,7 +563,10 @@ static WRITE8_HANDLER(output2_w)
 }
 
 
-
+static READ8_HANDLER(qc_b8_r)
+{
+	return mame_rand(space->machine);
+}
 
 static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -558,6 +587,16 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( qc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( qc_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_IMPORT_FROM( io_map )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xb8, 0xb8) AM_READ(qc_b8_r)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dwarfd )
 	PORT_START("DSW1")
@@ -953,6 +992,14 @@ static MACHINE_DRIVER_START( dwarfd )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( qc )
+	MDRV_IMPORT_FROM( dwarfd )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(qc_map)
+	MDRV_CPU_IO_MAP(qc_io_map)
+MACHINE_DRIVER_END
+
 ROM_START( dwarfd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9l_pd_50-3196_m5l2732k.bin", 0x0000, 0x1000, CRC(34e942ae) SHA1(d4f0ee7f29e1c1a93b4b30b950023dbf60596100) )
@@ -1068,6 +1115,25 @@ ROM_START( quarterhb )
 	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
 ROM_END
 
+ROM_START( qc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "qc.a10", 0x0000, 0x8000, CRC(4e0327de) SHA1(543d89f2e808e48041c6c10ad4686c7f7113ed88) )
+
+	ROM_REGION( 0x8000, "gfx_data", 0 )
+	ROM_LOAD16_BYTE( "qc.h6", 0x0001, 0x4000, CRC(a091526e) SHA1(58507414ae0d02c6adee80987f66fb8894e169b0) )
+	ROM_LOAD16_BYTE( "qc.k6", 0x0000, 0x4000, CRC(eb583b44) SHA1(c23ad0037472c5bcb30fb030e4d13a6e5fde4b30) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_COPY("gfx_data", 0x6000, 0x1000, 0x800 )
+	ROM_COPY("gfx_data", 0x6800, 0x0000, 0x800 )
+	ROM_COPY("gfx_data", 0x7000, 0x1800, 0x800 )
+	ROM_COPY("gfx_data", 0x7800, 0x0800, 0x800 )
+	ROM_COPY("gfx1", 0x0000, 0x2000, 0x2000 )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0)
+
+ROM_END
 
 static DRIVER_INIT(dwarfd)
 {
@@ -1119,7 +1185,22 @@ static DRIVER_INIT(dwarfd)
 
 }
 
+static DRIVER_INIT(qc)
+{
+	DRIVER_INIT_CALL(dwarfd);
+
+	// hacks for program to proceed
+	memory_region(machine, "maincpu")[0x6564] = 0x00;
+	memory_region(machine, "maincpu")[0x6565] = 0x00;
+
+	memory_region(machine, "maincpu")[0x59b2] = 0x00;
+	memory_region(machine, "maincpu")[0x59b3] = 0x00;
+	memory_region(machine, "maincpu")[0x59b4] = 0x00;
+
+}
+
 GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1983, quarterhb, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1995, qc,       0,         qc,     dwarfd, qc,     ORIENTATION_FLIP_Y, "ArJay Exports/Prestige Games", "Quarter Horse Classic", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

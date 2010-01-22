@@ -9093,6 +9093,7 @@ Other Sun games
 	DRIVER( quarterh )	/* (c) 1983 Electro-Sports */
 	DRIVER( quarterha )	/* (c) 1983 Electro-Sports */
 	DRIVER( quarterhb )	/* (c) 1983 Electro-Sports */
+	DRIVER( qc )        /* (c) 1995 ArJay Exports/Prestige Games */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */
 	DRIVER( littlerb )	/* (c) 1993 TCH */
