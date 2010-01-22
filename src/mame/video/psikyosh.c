@@ -34,8 +34,8 @@ Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
         0000000f is priority for per-line post-blending
 0x0c -- 3f3f3f3f unknown. A table of 4 6-bit values. usually 0f102038. tgm2 is 0a172838.
         c0c00000 unknown. unused?
-        0000c000 is flipscreen (currently ignored).
-        000000c0 is screen size select. 0 is 224 lines, c is 240 (not confirmed).
+        0000c000 is flipscreen (currently ignored). presumably flipy<<1|flipx.
+        000000c0 is screen size select. 0 is 224 lines, c is 240 (see tgm2, not confirmed).
 0x10 -- ffff0000 is always 00aa
         0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/sbomberb/s1945ii is 3, gunbird2/s1945iii is 2, soldivid/daraku is b.
         00000fff Controls gfx data bank available to be read by SH-2 for verification.
@@ -48,8 +48,14 @@ Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
 
 /*
 TODO:
+* Fix background line zoom. There must be an internal LUT, current implmentation is based on eye-balling.
+* Correct sprite-sprite priority? Currently this is strictly in the order of the sprites in the sprite list. However, there's an additional priority parameter which looks to split the sprites into 4 discrete sets with decreasing priority. In addition to the sprite-tilemap mixing the only way I can think to emulate this is how the hardware would work. Iterate over the sprite list 4 times rendering the sprites to a bitmap, and then mix each pixel against the tilemaps and other elements with comparable priority. This will be pretty slow though. Justification: The unknown priority bits are used to seperate score/enemy bullets from ships/enemies from incidental effects. daraku appears to have a black, screen-filling srite which it uses for a flash immediately efore the screen fade/white flash when doing special moves. Currently obscured behind the other sprites.
 * Perform tests on real hardware to document limits and remaining registers
-* Confirm existence of 4th tilemap layer on real hw
+** Confirm existence of 4th tilemap layer on real hw by configuring it. No games ever get as far as enabling it.
+** Confirm sprite-sprite priority behaviours (two overlapping sprites in sprite list order, with differing priorities etc.)
+** Confirm xscroll/xzoom are applied in the right order
+** Figure out why the sprite zoom is not 100% when we even have a lookup table. See TGM2 MT report. Possibly we should offset calcs by half a pixel (i.e. start in the middle of the first source pixel rather than corner).
+** Figure out screen size registers and xflip/yflip
 * Hookup configurable sprite banks (not needed? reports of tgm2 dropping sprites when busy on real hw)
 * Hookup screen size select
 * Flip screen, located but not implemented. wait until tilemaps.
@@ -67,6 +73,44 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 //#define DEBUG_MESSAGE
 
 static UINT8 alphatable[256];	// this might be moved to psikyosh_state, if we ever add a *machine parameter to drawgfxm.h macros
+
+/* This is based on observations of the zoom using the s1945ii maintenance mode mode tilemap test. These are .10 fixed point source pixel increments.
+High bit set if verified on hardware to produce a tilemap of the same height to the nearest pixel. Other values are simply linearly interpolated */
+static UINT16 bg_zoom[256] = {
+	 0x8400, 0x83f4, 0x83e8, 0x83d8, 0x83c8, 0x83b8, 0x83ac, 0x83a0, // 0000
+	 0x8394, 0x8388, 0x8378, 0x836c, 0x8360, 0x8358, 0x834c, 0x8340, // 0x01
+	 0x8334, 0x032b, 0x0322, 0x0319, 0x0310, 0x0307, 0x02fe, 0x02f5, // 0x02
+	 0x82ec, 0x02e3, 0x02db, 0x02d3, 0x02cb, 0x02c2, 0x02ba, 0x02b2, // 0x03
+	 0x82aa, 0x02a3, 0x029c, 0x0295, 0x028f, 0x0288, 0x0281, 0x027a, // 0x04
+	 0x8274, 0x026e, 0x0269, 0x0263, 0x025e, 0x0258, 0x0253, 0x024d, // 0x05
+	 0x8248, 0x0243, 0x023e, 0x0239, 0x0234, 0x022f, 0x022a, 0x0225, // 0x06
+	 0x8220, 0x021c, 0x0218, 0x0214, 0x0210, 0x020c, 0x0208, 0x0204, // 0x07
+	 0x8200, 0x01fc, 0x01f9, 0x01f5, 0x01f2, 0x01ee, 0x01eb, 0x01e7, // 0x08
+	 0x81e4, 0x01e0, 0x01dd, 0x01d9, 0x01d6, 0x01d2, 0x01cf, 0x01cb, // 0x09
+	 0x81c8, 0x01c5, 0x01c2, 0x01bf, 0x01bc, 0x01b9, 0x01b6, 0x01b3, // 0x0a
+	 0x81b0, 0x01ad, 0x01aa, 0x01a7, 0x01a4, 0x01a1, 0x019e, 0x019b, // 0x0b
+	 0x8198, 0x0195, 0x0193, 0x0191, 0x018f, 0x018c, 0x018a, 0x0188, // 0x0c
+	 0x8186, 0x0183, 0x0181, 0x017f, 0x017d, 0x017a, 0x0178, 0x0176, // 0x0d
+	 0x8174, 0x0172, 0x0170, 0x016e, 0x016c, 0x016a, 0x0168, 0x0166, // 0x0e
+	 0x8164, 0x0162, 0x0160, 0x015e, 0x015d, 0x015b, 0x0159, 0x0157, // 0x0f
+	 0x8156, 0x0154, 0x0152, 0x0150, 0x014f, 0x014d, 0x014b, 0x0149, // 0x10
+	 0x8148, 0x0146, 0x0145, 0x0143, 0x0142, 0x0140, 0x013f, 0x013d, // 0x11
+	 0x813c, 0x013a, 0x0139, 0x0138, 0x0137, 0x0135, 0x0134, 0x0133, // 0x12
+	 0x8132, 0x0130, 0x012e, 0x012c, 0x012b, 0x0129, 0x0127, 0x0125, // 0x13
+	 0x8124, 0x0122, 0x0121, 0x0120, 0x011f, 0x011d, 0x011c, 0x011b, // 0x14
+	 0x811a, 0x0118, 0x0117, 0x0116, 0x0115, 0x0114, 0x0113, 0x0112, // 0x15
+	 0x8111, 0x010f, 0x010e, 0x010d, 0x010c, 0x010b, 0x010a, 0x0109, // 0x16
+	 0x8108, 0x0107, 0x0106, 0x0105, 0x0104, 0x0103, 0x0102, 0x0101, // 0x17
+	 0x8100, 0x00ff, 0x00fe, 0x00fd, 0x00fc, 0x00fb, 0x00fa, 0x00f9, // 0x18
+	 0x80f9, 0x00f8, 0x00f7, 0x00f6, 0x00f5, 0x00f4, 0x00f3, 0x00f2, // 0x19
+	 0x80f2, 0x00f1, 0x00f0, 0x00ef, 0x00ee, 0x00ed, 0x00ec, 0x00eb, // 0x1a
+	 0x80eb, 0x00ea, 0x00e9, 0x00e8, 0x00e7, 0x00e6, 0x00e5, 0x00e4, // 0x1b
+	 0x80e4, 0x00e3, 0x00e2, 0x00e1, 0x00e0, 0x00df, 0x00de, 0x00dd, // 0x1c
+	 0x80dd, 0x00dc, 0x00db, 0x00db, 0x00da, 0x00d9, 0x00d9, 0x00d8, // 0x1d
+	 0x80d8, 0x00d7, 0x00d6, 0x00d5, 0x00d5, 0x00d4, 0x00d3, 0x00d2, // 0x1e
+	 0x80d2, 0x80d1, 0x80d1, 0x80d0, 0x80cf, 0x80cf, 0x80ce, 0x80cd, // 0x1f
+};
+
 
 /*-------------------------------------------------
     palette.h like macros
@@ -339,42 +383,40 @@ static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap,
 static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, int size, int tilebank, int alpha, int *last_bank)
 {
 	// test if the tile row is the cached one or not
-	int tile_row = scanline / 16;
+	int sy = scanline / 16;
 
-	assert(tile_row > 0 && tile_row < 32);
+	assert(sy > 0 && sy < 32);
 
-	if(tilebank != last_bank[tile_row]) 
+	if(tilebank != last_bank[sy]) 
 	{
 		rectangle cliprect;
 
 		cliprect.min_x = 0;
 		cliprect.max_x = state->bg_bitmap->width - 1;
-		cliprect.min_y = tile_row * 16;
+		cliprect.min_y = sy * 16;
 		cliprect.max_y = cliprect.min_y + 16 - 1;
 
 		bitmap_fill(state->bg_bitmap, &cliprect, BG_TRANSPEN);
 		int width = size * 16;
 
-		int offs = 0;
-		int sx, sy;
-		for (sy = 0; sy < size; sy++)
+		int offs = size * sy;
+		int sx;
+
+		for (sx = 0; sx < 32; sx++)
 		{
-			for (sx = 0; sx < 32; sx++)
-			{
-				if(sy == tile_row)
-				{
-					int tileno, colour;
+			int tileno, colour;
 
-					tileno = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
-					colour = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0xff000000) >> 24;
-					int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
+			tileno = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
+			colour = (state->bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0xff000000) >> 24;
+			int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
-					drawgfx_alphastore(state->bg_bitmap, NULL, gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
-				}
-				offs++;
+			if(tileno) { // valid tile, but blank in all games?
+				drawgfx_alphastore(state->bg_bitmap, NULL, gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
 			}
+			
+			offs++;
 		}
-		last_bank[tile_row] = tilebank;
+		last_bank[sy] = tilebank;
 	}
 }
 
@@ -442,16 +484,17 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
 				profiler_mark_start(PROFILER_USER3);
+				int step = bg_zoom[zoom] & 0x7fff;
 				if(zoom) {
-					int jj = 0x10000 << 8; // ensure +ve for mod
+					int jj = 0x400 << 10; // ensure +ve for mod
 					for(int ii = 0; ii < scr_width; ii++) {
-						scr_line[ii] = tilemap_line[(int)((jj>>8) - scrollx) % width];
-						jj += (1<<8) - zoom; /* This is a guess, will need to verify on my board. not 6.10 like the sprites */
+						scr_line[ii] = tilemap_line[((jj>>10) - scrollx) % width];
+						jj += step;
 					}
 				}
 				else {
 					for(int ii = 0; ii < scr_width; ii++) {
-						scr_line[ii] = tilemap_line[(ii - scrollx + 0x10000) % width];
+						scr_line[ii] = tilemap_line[(ii - scrollx + 0x400) % width];
 					}
 				}
 				profiler_mark_end();
@@ -517,7 +560,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 /* --- SPRITES --- */
 
 /* 32-bit ONLY */
-/* zoomx/y are pixel slopes in 6.10 fixed point, not scale. 0x400 is 1:1 */
+/* zoomx/y are pixel slopes in 6.10 fixed point, not scale. 0x400 is 1:1. drawgfx zoom algorithm doesn't produce identical results to hardware. */
 /* high/wide are number of tiles wide/high up to max size of zoom_bitmap in either direction */
 /* code is index of first tile and incremented across rows then down columns (adjusting for flip obviously) */
 /* sx and sy is top-left of entire sprite regardless of flip */
@@ -1067,7 +1110,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
-    0 ---- --yy yyyy yyyy | ---- --xx xxxx xxxx  1  F--- hhhh ZZZZ ZZZZ | f-PP wwww zzzz zzzz
+    0 ---- --yy yyyy yyyy | ---- --xx xxxx xxxx  1  F-?? hhhh ZZZZ ZZZZ | f-PP wwww zzzz zzzz
     2 pppp pppp -aaa -nnn | nnnn nnnn nnnn nnnn  3  ---- ---- ---- ---- | ---- ---- ---- ----
 
     y = ypos
@@ -1093,30 +1136,45 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     However, sprite-sprite priority needs to be preserved.
     daraku and soldivid only use the lsb
 
+	? = unknown
+	Could be a sprite-sprite priority, tests seem to back this up
+
     **- End Sprite Format -*/
+	const int spr_keys[8] = {KEYCODE_Y, KEYCODE_U, KEYCODE_I, KEYCODE_O};
+	bool spr_debug = false;
+#ifdef DEBUG_KEYS
+	for (int i = 0; i <= 3; i++)
+	{
+		if(input_code_pressed(machine, spr_keys[i])) {
+			spr_debug = true;
+		}
+	}
+#endif
 
 
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	const gfx_element *gfx;
 	UINT32 *src = machine->generic.buffered_spriteram.u32; /* Use buffered spriteram */
 	UINT16 *list = (UINT16 *)src + 0x3800 / 2;
-	UINT16 listlen = 0x800/2, listcntr = 0;
+	UINT16 listlen = 0x800/2;
 	UINT16 *zoom_table = (UINT16 *)state->zoomram;
-	UINT8  *alpha_table = (UINT8 *)state->vidregs;
+	UINT8  *alpha_table = (UINT8 *)&(state->vidregs[0]);
 
+	UINT16 listcntr = 0;
 	while (listcntr < listlen)
 	{
 		UINT32 listdat, sprnum, xpos, ypos, high, wide, flpx, flpy, zoomx, zoomy, tnum, colr, dpth;
-		UINT32 pri, alphamap;
+		UINT8 bg_pri, spr_pri, alphamap;
 		int alpha;
 
 		listdat = list[BYTE_XOR_BE(listcntr)];
 		sprnum = (listdat & 0x03ff) * 4;
 
-		pri  = (src[sprnum + 1] & 0x00003000) >> 12;
-		pri = SPRITE_PRI(pri);
+		bg_pri  = (src[sprnum + 1] & 0x00003000) >> 12;
+		bg_pri = SPRITE_PRI(bg_pri);
 
-		if (pri == req_pri)
+		// sprite vs backgrounds pri
+		if (bg_pri == req_pri)
 		{
 			ypos = (src[sprnum + 0] & 0x03ff0000) >> 16;
 			xpos = (src[sprnum + 0] & 0x000003ff) >> 00;
@@ -1128,6 +1186,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			wide  = ((src[sprnum + 1] & 0x00000f00) >> 8) + 1;
 
 			flpy  = (src[sprnum + 1] & 0x80000000) >> 31;
+			spr_pri = (src[sprnum + 1] & 0x30000000) >> 28;
 			flpx  = (src[sprnum + 1] & 0x00008000) >> 15;
 
 			zoomy = (src[sprnum + 1] & 0x00ff0000) >> 16;
@@ -1149,18 +1208,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			else
 				alpha = pal6bit(0x3f - alpha); /* 0x3f-0x00 maps to 0x00-0xff */
 
-			/* start drawing */
-			if (zoom_table[BYTE_XOR_BE(zoomy)] && zoom_table[BYTE_XOR_BE(zoomx)]) /* Avoid division-by-zero when table contains 0 (Uninitialised/Bug) */
+			if(!spr_debug || input_code_pressed(machine, spr_keys[spr_pri]))
 			{
-				psikyosh_drawgfxzoom(machine, bitmap, cliprect, gfx, tnum, colr, flpx, flpy, xpos, ypos, alpha,
-									(UINT32)zoom_table[BYTE_XOR_BE(zoomx)], (UINT32)zoom_table[BYTE_XOR_BE(zoomy)], wide, high, listcntr);
+				/* start drawing */
+				if (zoom_table[BYTE_XOR_BE(zoomy)] && zoom_table[BYTE_XOR_BE(zoomx)]) /* Avoid division-by-zero when table contains 0 (Uninitialised/Bug) */
+				{
+					psikyosh_drawgfxzoom(machine, bitmap, cliprect, gfx, tnum, colr, flpx, flpy, xpos, ypos, alpha,
+										(UINT32)zoom_table[BYTE_XOR_BE(zoomx)], (UINT32)zoom_table[BYTE_XOR_BE(zoomy)], wide, high, listcntr);
+				}
+				/* end drawing */
 			}
-			/* end drawing */
+
 		}
 		listcntr++;
 		if (listdat & 0x4000) break;
 	}
-}
+}	
 
 
 static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -1210,12 +1273,12 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 
 		dstline = BITMAP_ADDR32(bitmap, y, 0);
 
-		if (lineblend[y] & 0x80) /* Row */
+		if (lineblend[y] & 0x80) /* solid */
 		{
 			for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
 				dstline[x] = lineblend[y] >> 8;
 		}
-		else if (lineblend[y] & 0x7f) /* Row */
+		else if (lineblend[y] & 0x7f) /* blended */
 		{
 			for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
 				dstline[x] = alpha_blend_r32(dstline[x], lineblend[y] >> 8, 2 * (lineblend[y] & 0x7f));
@@ -1288,10 +1351,9 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
     state->vidregs[6], state->vidregs[7]);
 #endif
 
-//	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine)); // psikyosh_prelineblend() will fill screen in all cases
 	bitmap_fill(state->z_bitmap, cliprect, 0); /* z-buffer */
 
-	psikyosh_prelineblend(screen->machine, bitmap, cliprect);
+	psikyosh_prelineblend(screen->machine, bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)
 	{
 		if(!pri_debug || input_code_pressed(screen->machine, pri_keys[i]))
@@ -1302,7 +1364,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 			if(backgrounds) {
 				draw_background(screen->machine, bitmap, cliprect, i);
 			}
-			psikyosh_postlineblend(screen->machine, bitmap, cliprect, i);
+			psikyosh_postlineblend(screen->machine, bitmap, cliprect, i); // assume this has highest priority at same priority level
 		}
 	}
 	return 0;

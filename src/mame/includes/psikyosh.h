@@ -13,10 +13,6 @@
 
 #define BG_TRANSPEN MAKE_ARGB(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
 
-/* All below have BG_LINE() set, row/linescroll enable/toggle */
-#define BG_SCROLL_0C   0x0c /* 224 v/h scroll values in bank 0x0c; Used in daraku, for text */
-#define BG_SCROLL_0D   0x0d /* 224 v/h scroll values in bank 0x0d; Used in daraku, for alternate characters of text */
-
 #define SPRITE_PRI(n) (((state->vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
 
@@ -34,7 +30,7 @@ struct _psikyosh_state
 
 	/* video-related */
 	bitmap_t       *zoom_bitmap, *z_bitmap, *bg_bitmap;
-//  UINT8          alphatable[256];
+//  UINT8 *        alphatable;
 
 	/* misc */
 	UINT32         sample_offs;	// only used if ROMTEST = 1

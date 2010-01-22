@@ -279,8 +279,6 @@ Notes:
 
 #include "includes/psikyosh.h"
 
-#define ROMTEST 1 /* Does necessary stuff to perform rom test, uses RAM as it doesn't dispose of GFX after decoding */
-
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -381,16 +379,13 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 	psikyosh_state *state = (psikyosh_state *)space->machine->driver_data;
 	COMBINE_DATA(&state->vidregs[offset]);
 
-#if ROMTEST
 	if (offset == 4) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 			memory_set_bank(space->machine, "bank2", state->vidregs[offset] & 0xfff);
 	}
-#endif
 }
 
-#if ROMTEST
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
 	psikyosh_state *state = (psikyosh_state *)space->machine->driver_data;
@@ -398,7 +393,6 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 
 	return ROM[state->sample_offs++] << 16;
 }
-#endif
 
 /* Mahjong Panel */
 static READ32_HANDLER( mjgtaste_input_r )
@@ -523,47 +517,55 @@ P1KEY11  29|30  P2KEY11
 }
 
 
+// ps3v1
 static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
+// rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
-	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // sprites (might be a bit longer)
-	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // backgrounds
+// video chip
+	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
+	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // video banks 7-0x1f (backgrounds and other effects)
 	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, paletteram) // palette..
-	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram) // a gradient sometimes ...
+	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram) // sprite zoom lookup table
 	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, vidregs) //  video registers
+	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
+// rom mapping
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
+// sound chip
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
+	AM_RANGE(0x05000004, 0x05000007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
+// inputs/eeprom
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
+// ram
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram) // main RAM (1 meg)
-
-#if ROMTEST
-	AM_RANGE(0x05000004, 0x05000007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
-	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
-#endif
 ADDRESS_MAP_END
 
+// ps5, ps5v2
 static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
+// rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
+// inputs/eeprom
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x03000004, 0x03000007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
+// sound chip
 	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
+	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
-	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // backgrounds
+// video chip
+	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
+	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // video banks 7-0x1f (backgrounds and other effects)
 	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, paletteram)
-	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram)
+	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram) // sprite zoom lookup table
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, vidregs) // video registers
-	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram)
-
-#if ROMTEST
-	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
-#endif
+// rom mapping
+	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
+// ram
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram)
 ADDRESS_MAP_END
 
 
@@ -719,6 +721,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tgm2 )
 	PORT_INCLUDE( common )
+	/* sticks should actually be PORT_4WAY according to manual */
 
 	PORT_START("JP4")	/* jumper pads on the PCB. Checked and discarded. However, if you force word 0x6060000 to 1/2/3 you can have various effects. Disbled at compile time */
 //	PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
@@ -801,12 +804,10 @@ static MACHINE_START( psikyosh )
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 
-#if ROMTEST
 	memory_configure_bank(machine, "bank2", 0, 0x1000, memory_region(machine, "gfx1"), 0x20000);
 
 	state->sample_offs = 0;
 	state_save_register_global(machine, state->sample_offs);
-#endif
 }
 
 
@@ -866,7 +867,7 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ps5_map)
 
-	/* It probably has a register to change visarea */
+	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 MACHINE_DRIVER_END
