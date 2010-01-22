@@ -11,6 +11,9 @@
 
 #include <sys/mman.h>
 #include <signal.h>
+#ifdef MAME_DEBUG
+#include <unistd.h>
+#endif
 
 // MAME headers
 #include "osdcore.h"
