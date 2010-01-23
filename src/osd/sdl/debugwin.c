@@ -57,7 +57,7 @@ typedef struct {
 } edit;
 
 typedef struct _win_i win_i;
-typedef struct _win_i {
+struct _win_i {
 	int 					type;
 	win_i *					next;
 	GtkWidget *				win;
@@ -108,7 +108,7 @@ static void run_func_on_win_list(void (*f)(GtkWidget *widget), int win_type_mask
 {
 	win_i *p;
 	for(p = win_list; p; p = p->next)
-		if (p->type & win_type_mask != 0)
+		if ((p->type & win_type_mask) != 0)
 			f(p->win);
 }
 
@@ -141,7 +141,7 @@ static win_i *first_win_i(int win_type_mask)
 
 	for(p = win_list; p; p = p->next)
 	{
-		if (p->type & win_type_mask != 0)
+		if ((p->type & win_type_mask) != 0)
 			return p;
 	}
 	return NULL;
