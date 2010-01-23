@@ -1597,8 +1597,9 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/peplus.o \
 	$(DRIVERS)/photon.o $(VIDEO)/pk8000.o \
 	$(DRIVERS)/photon2.o \
-	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/photoply.o \
+	$(DRIVERS)/pinkiri8.o \
+	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/pkscram.o \
 	$(DRIVERS)/pntnpuzl.o \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \

@@ -9975,4 +9975,6 @@ Other Sun games
 	DRIVER( am_mg24 )	/* (c) Amatic 2000 */
 	DRIVER( am_mg3 )	/* (c) Amatic 2000 */
 
+	DRIVER( pinkiri8 )
+
 #endif	/* DRIVER_RECURSIVE */

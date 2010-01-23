@@ -1952,6 +1952,7 @@ src/mame/drivers/photon.c svneol=native#text/plain
 src/mame/drivers/photon2.c svneol=native#text/plain
 src/mame/drivers/photoply.c svneol=native#text/plain
 src/mame/drivers/pingpong.c svneol=native#text/plain
+src/mame/drivers/pinkiri8.c svneol=native#text/plain
 src/mame/drivers/pipedrm.c svneol=native#text/plain
 src/mame/drivers/pipeline.c svneol=native#text/plain
 src/mame/drivers/pirates.c svneol=native#text/plain
