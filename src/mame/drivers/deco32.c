@@ -1655,11 +1655,11 @@ static INTERRUPT_GEN( tattass_snd_interrupt )
 static MACHINE_DRIVER_START( captaven )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
+	MDRV_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
 	MDRV_CPU_PROGRAM_MAP(captaven_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
+	MDRV_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
@@ -1685,18 +1685,18 @@ static MACHINE_DRIVER_START( captaven )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32_22MHz/9) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_32_22MHz/32) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32_22MHz/16) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_DRIVER_END
