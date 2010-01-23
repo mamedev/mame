@@ -7165,9 +7165,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( batlballu )	/* (c) 1995 Seibu Kaihatsu (Metrotainment License) */
 
 	DRIVER( viprp1 )	/* (c) 1995 Seibu Kaihatsu */
+	DRIVER( viprp1u )	/* (c) 1995 Seibu Kaihatsu (Fabtek license) */
 	DRIVER( viprp1j )	/* (c) 1995 Seibu Kaihatsu */
 	DRIVER( viprp1s )	/* (c) 1995 Seibu Kaihatsu */
-	DRIVER( viprp1o )	/* (c) 1995 Seibu Kaihatsu */
+	DRIVER( viprp1oj )	/* (c) 1995 Seibu Kaihatsu */
 	DRIVER( viprp1ot )	/* (c) 1995 Seibu Kaihatsu (Tuning License) */
 	DRIVER( viprp1hk )	/* (c) 1995 Seibu Kaihatsu (Metrotainment License) */
 
