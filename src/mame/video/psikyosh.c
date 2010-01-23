@@ -1277,7 +1277,7 @@ VIDEO_START( psikyosh )
 	/* precompute the background zoom table. verified against hardware. 
 	   unsure of the precision, we use .10 fixed point like the sprites */
 	for(i = 0; i < 0x100; i++) {
-		state->bg_zoom[i] = (64. / (i + 64.)) * 0x400;
+		state->bg_zoom[i] = (64 * 0x400) / (i + 64);
 	}
 
 	state_save_register_global_bitmap(machine, state->z_bitmap);
