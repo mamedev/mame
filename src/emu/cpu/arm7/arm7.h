@@ -46,4 +46,7 @@ extern CPU_GET_INFO( arm9 );
 extern CPU_GET_INFO( pxa255 );
 #define CPU_PXA255 CPU_GET_INFO_NAME( pxa255 )
 
+extern CPU_GET_INFO( sa1110 );
+#define CPU_SA1110 CPU_GET_INFO_NAME( sa1110 )
+
 #endif /* __ARM7_H__ */

@@ -260,6 +260,17 @@ static CPU_RESET( pxa255 )
 	cpustate->archFlags = eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE;	// has TE and XScale extensions
 }
 
+static CPU_RESET( sa1110 )
+{
+	arm_state *cpustate = get_safe_token(device);
+
+	// must call core reset
+	arm7_core_reset(device);
+
+	cpustate->archRev = 4;	// ARMv4
+	cpustate->archFlags = eARM_ARCHFLAGS_SA;	// has StrongARM, no Thumb, no Enhanced DSP
+}
+
 static CPU_EXIT( arm7 )
 {
 	/* nothing to do here */
@@ -566,6 +577,17 @@ CPU_GET_INFO( pxa255 )
     }
 }
 
+CPU_GET_INFO( sa1110 )
+{
+    switch (state)
+    {
+        case CPUINFO_FCT_RESET:            info->reset = CPU_RESET_NAME(sa1110);                       break;
+        case DEVINFO_STR_NAME:             strcpy(info->s, "SA1110");                        break;
+	default:	CPU_GET_INFO_CALL(arm7);
+		break;
+    }
+}
+
 /* ARM system coprocessor support */
 
 static WRITE32_DEVICE_HANDLER( arm7_do_callback )
@@ -638,7 +660,17 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
 				break;
 
 			case 4: // ARM7/SA11xx
-				data = 0x41 | (1 << 23) | (7 << 12);
+				if (cpustate->archFlags & eARM_ARCHFLAGS_SA)
+				{
+					// ARM Architecture Version 4
+					// Part Number 0xB11 (SA1110)
+					// Stepping B5
+			        	data = 0x69 | ( 0x01 << 16 ) | ( 0xB11 << 4 ) | 0x9;
+				}
+				else
+				{
+					data = 0x41 | (1 << 23) | (7 << 12);
+				}
 				break;
 
 			case 5:	// ARM9/10/XScale
