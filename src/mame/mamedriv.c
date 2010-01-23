@@ -3362,6 +3362,7 @@ V-V                           TP-027
 	DRIVER( pkladies )	/* (c) 1989 Mitchell */
 	DRIVER( pkladiesl )	/* (c) 1989 Leprechaun */
 	DRIVER( pkladiesla )/* (c) 1989 Leprechaun */
+	DRIVER( pkladiesbl )/* bootleg */
 	DRIVER( dokaben )	/*  3/1989 (c) 1989 Capcom (Japan) */
 						/*  8/1989 Dokaben 2 (baseball) */
 	DRIVER( pang )		/* (c) 1989 Mitchell (World) */

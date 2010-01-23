@@ -1002,6 +1002,19 @@ static const gfx_layout marukin_charlayout =
 	32*8    /* every char takes 32 consecutive bytes */
 };
 
+
+static const gfx_layout pkladiesbl_charlayout =
+{
+	8,8,	/* 8*8 characters */
+	65536,	/* 65536 characters */
+	4,		/* 4 bits per pixel */
+	{ 0*8, 1*8, 2*8, 3*8 },
+	{ 0, 1, 2, 3, 4,5,6,7 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8    /* every char takes 32 consecutive bytes */
+};
+
+
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
@@ -1022,6 +1035,11 @@ GFXDECODE_END
 
 static GFXDECODE_START( marukin )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0, 128 ) /* colors 0-2047 */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
+GFXDECODE_END
+
+static GFXDECODE_START( pkladiesbl )
+	GFXDECODE_ENTRY( "gfx1", 0, pkladiesbl_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
@@ -1322,6 +1340,62 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+/*
+
+Poker Ladies bootleg made by Playmark (PM stickers and pcb layout is same as many others Playmark bootlegs)
+PCB is jamma standard while the original is mahjong pinout and require matrix inputs.
+The bootleg has some gfx glitches (flickering of the text) and the colour of the background is totally black.
+
+Encrypted custom z80 in epoxy block. Clock is 12mhz/2
+
+YM2413 clock is 3.75mhz. The 7.5mhz clock which is divided by 2 by a 74ls74 before going to the YM2413 is too
+difficult to follow. 
+It is derived from the 10mhz pixel clock since shorting it the video goes out of sync and the music change in pitch/speed.
+
+Oki5205 clock is 384khz (resonator)
+
+Vsync is 59.09hz
+
+*/
+
+static MACHINE_DRIVER_START( pkladiesbl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mitchell_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(mitchell_map)
+	MDRV_CPU_IO_MAP(mitchell_io_map)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+
+	MDRV_NVRAM_HANDLER(mitchell)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(59.09) /* verified on pcb */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+
+	MDRV_GFXDECODE(pkladiesbl)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(pang)
+	MDRV_VIDEO_UPDATE(pang)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* It should be a OKIM5205 with a 384khz resonator */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
 
 /*************************************
  *
@@ -1445,6 +1519,42 @@ ROM_START( pkladiesla )
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "pko-voi1.2d",  0x00000, 0x20000, CRC(07e0f531) SHA1(315715f7686ae09c446029da36faec5bab7fcaf0) )
 	ROM_LOAD( "pko-voi2.3d",  0x20000, 0x20000, CRC(18398bf6) SHA1(9e9ab85383350d01ba597951a48f18ecee1f46c6) )
+ROM_END
+
+
+ROM_START( pkladiesbl )
+	ROM_REGION( 0x50000*2, "maincpu", 0 )
+	// you would expect one half of this to be decrypted code, and the other half to be decrypted data
+	// however, only parts of it are??
+	ROM_LOAD( "1.bin", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
+	ROM_CONTINUE(0x00000,0x08000)
+	ROM_LOAD( "2.bin", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x60000,0x10000)
+
+	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD32_BYTE("20.bin", 0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
+	ROM_LOAD32_BYTE("14.bin", 0x000001, 0x20000, CRC(d6fe4f36) SHA1(aa6250d4291ca67165898cec57b96ec830b89d8f) )
+	ROM_LOAD32_BYTE("10.bin", 0x000002, 0x20000, CRC(a2eff7a9) SHA1(290930ff93b20409cb99cbf12a7de493dce7baa2) )
+	ROM_LOAD32_BYTE("6.bin",  0x000003, 0x20000, CRC(0be240fc) SHA1(8c783ad87018fcbb03f98a4810372c5c6eb315c9) )
+	ROM_LOAD32_BYTE("21.bin", 0x080000, 0x20000, CRC(45bb438c) SHA1(2ba9a64d332e019f5eaa71ecb9f60681afd4930a) )
+	ROM_LOAD32_BYTE("15.bin", 0x080001, 0x20000, CRC(afb0fa4a) SHA1(f86df12bece344c29ff65cf2b00a64880f89c4bb) )
+	ROM_LOAD32_BYTE("11.bin", 0x080002, 0x20000, CRC(5d87135d) SHA1(b356edee8bec986446f6c91b5f9394a83bc1c094) )
+	ROM_LOAD32_BYTE("7.bin",  0x080003, 0x20000, CRC(ee822998) SHA1(1753a669a24f4152094489d073f87a18d5f36556) )
+	ROM_LOAD32_BYTE("18.bin", 0x100000, 0x20000, CRC(e088b5e2) SHA1(50950f6f94d6a6f646f5baf3faaceba95b837162) )
+	ROM_LOAD32_BYTE("12.bin", 0x100001, 0x20000, CRC(5339daa7) SHA1(66910bc1b6cfd51239b8c40d9ca34540fd73231b) )
+	ROM_LOAD32_BYTE("8.bin",  0x100002, 0x20000, CRC(fa117809) SHA1(4fffecdbf5adc4735d9680849e33556728c11997) )
+	ROM_LOAD32_BYTE("4.bin",  0x100003, 0x20000, CRC(09ba3171) SHA1(362be89c7b29de2f20ed1e28e73ed7a361f9f647) )
+	ROM_LOAD32_BYTE("19.bin", 0x180000, 0x20000, CRC(48540300) SHA1(cd25c1b7ddcf3883a5f77779d06c8b966acb0a99) )
+	ROM_LOAD32_BYTE("13.bin", 0x180001, 0x20000, CRC(5bcf710e) SHA1(3acf3b41b2002ee56a3452217dc99cbd36bd0273) )
+	ROM_LOAD32_BYTE("9.bin",  0x180002, 0x20000, CRC(edf4c0f4) SHA1(e1689bfaa1547fe8da5635808833cfe91b9d98bc) )
+	ROM_LOAD32_BYTE("5.bin",  0x180003, 0x20000, CRC(93422182) SHA1(72847f073ffaffb7ed34a0972598a3df929c25a3) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD("16.bin", 0x020000, 0x20000, CRC(c6decb5e) SHA1(3d35cef348deb16a62a066acdfbabebcf11fa997) )
+	ROM_LOAD("17.bin", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
+
+	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
+	ROM_LOAD("3.bin", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
 ROM_END
 
 ROM_START( dokaben )
@@ -2158,6 +2268,14 @@ static DRIVER_INIT( pkladies )
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
+static DRIVER_INIT( pkladiesbl )
+{
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 1;
+	nvram_size = 0;
+	bootleg_decode(machine);
+	configure_banks(machine);
+}
 static DRIVER_INIT( marukin )
 {
 	mitchell_state *state = (mitchell_state *)machine->driver_data;
@@ -2245,6 +2363,7 @@ GAME( 1989, mgakuen2,  0,        marukin, marukin,  mgakuen2, ROT0,   "Face", "M
 GAME( 1989, pkladies,  0,        marukin, pkladies, pkladies, ROT0,   "Mitchell", "Poker Ladies", GAME_SUPPORTS_SAVE )
 GAME( 1989, pkladiesl, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 510)", GAME_SUPPORTS_SAVE )
 GAME( 1989, pkladiesla,pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 401)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,pkladies, pkladiesbl,pkladies,pkladiesbl,ROT0, "bootleg", "Poker Ladies (Censored bootleg)", GAME_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
 GAME( 1989, dokaben,   0,        pang,    pang,     dokaben,  ROT0,   "Capcom", "Dokaben (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, pang,      0,        pang,    pang,     pang,     ROT0,   "Mitchell", "Pang (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, pangb,     pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 1)", GAME_SUPPORTS_SAVE )
