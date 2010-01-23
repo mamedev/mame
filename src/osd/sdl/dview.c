@@ -137,7 +137,7 @@ static void dview_realize(GtkWidget *wdv)
 	gint attributes_mask;
 	DView *dv;
 
-	GTK_WIDGET_SET_FLAGS(wdv, GTK_REALIZED);
+	GTK_WIDGET_SET_FLAGS(wdv, GTK_REALIZED | GTK_CAN_FOCUS);
 	dv = DVIEW(wdv);
 
 	attributes.window_type = GDK_WINDOW_CHILD;
@@ -148,7 +148,9 @@ static void dview_realize(GtkWidget *wdv)
 	attributes.wclass = GDK_INPUT_OUTPUT;
 	attributes.visual = gtk_widget_get_visual(wdv);
 	attributes.colormap = gtk_widget_get_colormap(wdv);
-	attributes.event_mask = gtk_widget_get_events(wdv) | GDK_EXPOSURE_MASK;
+	attributes.event_mask = gtk_widget_get_events(wdv) | GDK_EXPOSURE_MASK
+			| GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK
+			| GDK_FOCUS_CHANGE_MASK;
 
 	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 

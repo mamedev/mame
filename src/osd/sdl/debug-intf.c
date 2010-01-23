@@ -39,7 +39,6 @@ create_debugmain (void)
   GtkWidget *new_errorlog;
   GtkWidget *separator2;
   GtkWidget *run;
-  GtkWidget *run_to_cursor;
   GtkWidget *run_h;
   GtkWidget *run_cpu;
   GtkWidget *run_irq;
@@ -54,6 +53,8 @@ create_debugmain (void)
   GtkWidget *exit;
   GtkWidget *item1;
   GtkWidget *item1_menu;
+  GtkWidget *run_to_cursor;
+  GtkWidget *separator7;
   GSList *raw_opcodes_group = NULL;
   GtkWidget *raw_opcodes;
   GtkWidget *enc_opcodes;
@@ -129,11 +130,6 @@ create_debugmain (void)
   gtk_widget_add_accelerator (run, "activate", accel_group,
                               GDK_F5, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
-
-  run_to_cursor = gtk_menu_item_new_with_mnemonic ("Run to cursor");
-  gtk_widget_set_name (run_to_cursor, "run_to_cursor");
-  gtk_widget_show (run_to_cursor);
-  gtk_container_add (GTK_CONTAINER (menuitem4_menu), run_to_cursor);
 
   run_h = gtk_menu_item_new_with_mnemonic ("Run and Hide Debugger");
   gtk_widget_set_name (run_h, "run_h");
@@ -233,6 +229,17 @@ create_debugmain (void)
   gtk_widget_set_name (item1_menu, "item1_menu");
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item1), item1_menu);
 
+  run_to_cursor = gtk_menu_item_new_with_mnemonic ("Run to cursor");
+  gtk_widget_set_name (run_to_cursor, "run_to_cursor");
+  gtk_widget_show (run_to_cursor);
+  gtk_container_add (GTK_CONTAINER (item1_menu), run_to_cursor);
+
+  separator7 = gtk_separator_menu_item_new ();
+  gtk_widget_set_name (separator7, "separator7");
+  gtk_widget_show (separator7);
+  gtk_container_add (GTK_CONTAINER (item1_menu), separator7);
+  gtk_widget_set_sensitive (separator7, FALSE);
+
   raw_opcodes = gtk_radio_menu_item_new_with_mnemonic (raw_opcodes_group, "Raw Opcodes");
   raw_opcodes_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (raw_opcodes));
   gtk_widget_set_name (raw_opcodes, "raw_opcodes");
@@ -251,7 +258,6 @@ create_debugmain (void)
   gtk_widget_add_accelerator (enc_opcodes, "activate", accel_group,
                               GDK_e, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
-  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (enc_opcodes), TRUE);
 
   comments = gtk_radio_menu_item_new_with_mnemonic (raw_opcodes_group, "Comments");
   raw_opcodes_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (comments));
@@ -298,6 +304,7 @@ create_debugmain (void)
   gtk_widget_set_name (edit, "edit");
   gtk_widget_show (edit);
   gtk_box_pack_start (GTK_BOX (vbox2), edit, FALSE, FALSE, 0);
+  gtk_entry_set_invisible_char (GTK_ENTRY (edit), 9679);
   gtk_entry_set_activates_default (GTK_ENTRY (edit), TRUE);
 
   g_signal_connect_swapped ((gpointer) new_mem, "activate",
@@ -311,9 +318,6 @@ create_debugmain (void)
                             GTK_OBJECT (debugmain));
   g_signal_connect_swapped ((gpointer) run, "activate",
                             G_CALLBACK (on_run_activate),
-                            GTK_OBJECT (debugmain));
-  g_signal_connect_swapped ((gpointer) run_to_cursor, "activate",
-                            G_CALLBACK (on_run_to_cursor_activate),
                             GTK_OBJECT (debugmain));
   g_signal_connect_swapped ((gpointer) run_h, "activate",
                             G_CALLBACK (on_run_h_activate),
@@ -345,6 +349,9 @@ create_debugmain (void)
   g_signal_connect_swapped ((gpointer) exit, "activate",
                             G_CALLBACK (on_exit_activate),
                             GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) run_to_cursor, "activate",
+                            G_CALLBACK (on_run_to_cursor_activate),
+                            GTK_OBJECT (debugmain));
   g_signal_connect_swapped ((gpointer) raw_opcodes, "activate",
                             G_CALLBACK (on_raw_opcodes_activate),
                             GTK_OBJECT (debugmain));
@@ -354,6 +361,9 @@ create_debugmain (void)
   g_signal_connect_swapped ((gpointer) comments, "activate",
                             G_CALLBACK (on_comments_activate),
                             GTK_OBJECT (debugmain));
+  g_signal_connect ((gpointer) disasm, "button_press_event",
+                    G_CALLBACK (on_disasm_button_press_event),
+                    NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (debugmain, debugmain, "debugmain");
@@ -366,7 +376,6 @@ create_debugmain (void)
   GLADE_HOOKUP_OBJECT (debugmain, new_errorlog, "new_errorlog");
   GLADE_HOOKUP_OBJECT (debugmain, separator2, "separator2");
   GLADE_HOOKUP_OBJECT (debugmain, run, "run");
-  GLADE_HOOKUP_OBJECT (debugmain, run_to_cursor, "run_to_cursor");
   GLADE_HOOKUP_OBJECT (debugmain, run_h, "run_h");
   GLADE_HOOKUP_OBJECT (debugmain, run_cpu, "run_cpu");
   GLADE_HOOKUP_OBJECT (debugmain, run_irq, "run_irq");
@@ -381,6 +390,8 @@ create_debugmain (void)
   GLADE_HOOKUP_OBJECT (debugmain, exit, "exit");
   GLADE_HOOKUP_OBJECT (debugmain, item1, "item1");
   GLADE_HOOKUP_OBJECT (debugmain, item1_menu, "item1_menu");
+  GLADE_HOOKUP_OBJECT (debugmain, run_to_cursor, "run_to_cursor");
+  GLADE_HOOKUP_OBJECT (debugmain, separator7, "separator7");
   GLADE_HOOKUP_OBJECT (debugmain, raw_opcodes, "raw_opcodes");
   GLADE_HOOKUP_OBJECT (debugmain, enc_opcodes, "enc_opcodes");
   GLADE_HOOKUP_OBJECT (debugmain, comments, "comments");
@@ -675,6 +686,7 @@ create_memorywin (void)
   gtk_widget_set_name (edit, "edit");
   gtk_widget_show (edit);
   gtk_box_pack_start (GTK_BOX (hbox2), edit, TRUE, TRUE, 0);
+  gtk_entry_set_invisible_char (GTK_ENTRY (edit), 9679);
 
   zone = gtk_combo_box_new_text ();
   gtk_widget_set_name (zone, "zone");
@@ -748,6 +760,12 @@ create_memorywin (void)
   g_signal_connect_swapped ((gpointer) dbpl, "activate",
                             G_CALLBACK (on_dbpl_activate),
                             GTK_OBJECT (memorywin));
+  g_signal_connect ((gpointer) memoryview, "button_press_event",
+                    G_CALLBACK (on_memoryview_button_press_event),
+                    NULL);
+  g_signal_connect ((gpointer) memoryview, "key_press_event",
+                    G_CALLBACK (on_memoryview_key_press_event),
+                    NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (memorywin, memorywin, "memorywin");
@@ -1029,6 +1047,7 @@ create_disasmwin (void)
   gtk_widget_set_name (edit, "edit");
   gtk_widget_show (edit);
   gtk_box_pack_start (GTK_BOX (hbox3), edit, TRUE, TRUE, 0);
+  gtk_entry_set_invisible_char (GTK_ENTRY (edit), 9679);
 
   cpu = gtk_combo_box_new_text ();
   gtk_widget_set_name (cpu, "cpu");
@@ -1093,6 +1112,9 @@ create_disasmwin (void)
   g_signal_connect_swapped ((gpointer) comments, "activate",
                             G_CALLBACK (on_comments_activate),
                             GTK_OBJECT (disasmwin));
+  g_signal_connect ((gpointer) disasmview, "button_press_event",
+                    G_CALLBACK (on_disasm_button_press_event),
+                    NULL);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (disasmwin, disasmwin, "disasmwin");

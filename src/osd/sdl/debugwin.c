@@ -802,6 +802,68 @@ void on_dbpl_activate(GtkWidget *win)
 
 void on_run_to_cursor_activate(GtkWidget *win)
 {
+	win_i *info = get_win_i(win, WIN_TYPE_ALL);
+	char command[64];
+
+	if (debug_view_get_cursor_visible(info->disasm_dv))
+	{
+		const address_space *space = disasm_view_get_current_subview(info->disasm_dv)->space;
+		if (debug_cpu_get_visible_cpu(info->machine) == space->cpu)
+		{
+			offs_t address = disasm_view_get_selected_address(info->disasm_dv);
+			sprintf(command, "go %X", address);
+			debug_console_execute_command(info->machine, command, 1);
+		}
+	}
+
+}
+
+gboolean
+on_disasm_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+	DView *dvw = (DView *) widget;
+	LOG(("gef %f %f %p %p\n", event->x, event->y, dvw, widget));
+	if (debug_view_get_cursor_supported(dvw->dw))
+	{
+		DViewClass *dvc = DVIEW_GET_CLASS(dvw);
+		debug_view_xy topleft = debug_view_get_visible_position(dvw->dw);
+		debug_view_xy newpos;
+		newpos.x = topleft.x + event->x / dvc->fixedfont_width;
+		newpos.y = topleft.y + event->y / dvc->fixedfont_height;
+		debug_view_set_cursor_position(dvw->dw, newpos);
+		debug_view_set_cursor_visible(dvw->dw, TRUE);
+		gtk_widget_grab_focus(widget);
+		//SetFocus(wnd);
+	}
+	return true;
+}
+
+gboolean
+on_memoryview_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+	return on_disasm_button_press_event(widget, event, user_data);
+}
+
+gboolean
+on_memoryview_key_press_event             (GtkWidget   *widget,
+                                                        GdkEventKey *event,
+                                                        gpointer     user_data)
+{
+	DView *dvw = (DView *) widget;
+	//printf("%s\n", event->string);
+	//printf("The name of this keysym is `%s'\n",
+	//			gdk_keyval_name(event->keyval));
+	//if (/*waiting_for_debugger ||*/ !debugwin_seq_pressed(dvw->dw-> owner->machine))
+	{
+		if (event->keyval >= 32 && event->keyval < 127 && debug_view_get_cursor_supported(dvw->dw))
+			debug_view_type_character(dvw->dw, event->keyval);
+	}
+
+	return true;
 }
 
 #else

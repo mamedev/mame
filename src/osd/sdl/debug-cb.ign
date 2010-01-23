@@ -528,3 +528,271 @@ on_exit_activate                       (GtkMenuItem     *menuitem,
 
 }
 
+
+gboolean
+on_disasm_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+
+  return FALSE;
+}
+
+
+gboolean
+on_disasm_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+
+  return FALSE;
+}
+
+
+void
+on_run_to_cursor_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2)
+{
+
+}
+

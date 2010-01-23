@@ -189,3 +189,143 @@ void
 on_soft_reset_activate                (GtkWidget *win);
 
 
+
+gboolean
+on_disasm_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_disasm_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+gboolean
+on_memoryview_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_memoryview_key_press_event             (GtkWidget   *widget,
+                                                        GdkEventKey *event,
+                                                        gpointer     user_data);
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
+
+GtkWidget*
+dview_new (gchar *widget_name, gchar *string1, gchar *string2,
+                gint int1, gint int2);
