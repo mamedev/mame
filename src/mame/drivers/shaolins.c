@@ -225,10 +225,10 @@ static MACHINE_DRIVER_START( shaolins )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, MASTER_CLOCK/12)        /* verified on pcb */
+	MDRV_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/6)        /* verified on pcb */
+	MDRV_SOUND_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
