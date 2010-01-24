@@ -1438,6 +1438,13 @@ static INPUT_PORTS_START( insectx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( insectxj )
+	PORT_INCLUDE( insectx )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( jpopnics )
 	/* 0xc600 (CPU1) -> 0xef0e (shared RAM) */
@@ -2747,5 +2754,5 @@ GAME( 1988, tnzsop,   tnzs,     tnzs,     tnzsop,   tnzs,     ROT0,   "Taito Cor
 GAME( 1988, kabukiz,  0,        kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation Japan", "Kabuki-Z (World)", 0 )
 GAME( 1988, kabukizj, kabukiz,  kabukiz,  kabukizj, kabukiz,  ROT0,   "Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,  0,        insectx,  insectx,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
-GAME( 1989, insectxj, insectx,  insectx,  insectx,  insectx,  ROT0,   "Taito Corporation", "Insector X (Japan)", 0 )
+GAME( 1989, insectxj, insectx,  insectx,  insectxj, insectx,  ROT0,   "Taito Corporation", "Insector X (Japan)", 0 )
 GAME( 1992, jpopnics, 0,        jpopnics, jpopnics, 0,        ROT0,   "Nics", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )
