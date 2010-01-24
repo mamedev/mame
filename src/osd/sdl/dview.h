@@ -39,7 +39,7 @@ struct _DView
   int hsz, vsz;
   int hs, vs;
   int tr, tc;
-  debug_view *dw;
+  debug_view *view;
   gchar *name;
   PangoLayout *playout;
   GdkGC *gc;

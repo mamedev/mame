@@ -823,17 +823,17 @@ on_disasm_button_press_event           (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data)
 {
-	DView *dvw = (DView *) widget;
-	LOG(("gef %f %f %p %p\n", event->x, event->y, dvw, widget));
-	if (debug_view_get_cursor_supported(dvw->dw))
+	DView *info = (DView *) widget;
+	LOG(("gef %f %f %p %p\n", event->x, event->y, info, widget));
+	if (debug_view_get_cursor_supported(info->view))
 	{
-		DViewClass *dvc = DVIEW_GET_CLASS(dvw);
-		debug_view_xy topleft = debug_view_get_visible_position(dvw->dw);
+		DViewClass *dvc = DVIEW_GET_CLASS(info);
+		debug_view_xy topleft = debug_view_get_visible_position(info->view);
 		debug_view_xy newpos;
 		newpos.x = topleft.x + event->x / dvc->fixedfont_width;
 		newpos.y = topleft.y + event->y / dvc->fixedfont_height;
-		debug_view_set_cursor_position(dvw->dw, newpos);
-		debug_view_set_cursor_visible(dvw->dw, TRUE);
+		debug_view_set_cursor_position(info->view, newpos);
+		debug_view_set_cursor_visible(info->view, TRUE);
 		gtk_widget_grab_focus(widget);
 		//SetFocus(wnd);
 	}
@@ -853,14 +853,72 @@ on_memoryview_key_press_event             (GtkWidget   *widget,
                                                         GdkEventKey *event,
                                                         gpointer     user_data)
 {
-	DView *dvw = (DView *) widget;
+	DView *info = (DView *) widget;
 	//printf("%s\n", event->string);
 	//printf("The name of this keysym is `%s'\n",
 	//			gdk_keyval_name(event->keyval));
-	//if (/*waiting_for_debugger ||*/ !debugwin_seq_pressed(dvw->dw-> owner->machine))
+	//if (/*waiting_for_debugger ||*/ !debugwin_seq_pressed(info->view-> owner->machine))
+	switch (event->keyval)
 	{
-		if (event->keyval >= 32 && event->keyval < 127 && debug_view_get_cursor_supported(dvw->dw))
-			debug_view_type_character(dvw->dw, event->keyval);
+		case GDK_Up:
+			debug_view_type_character(info->view, DCH_UP);
+			break;
+
+		case GDK_Down:
+			debug_view_type_character(info->view, DCH_DOWN);
+			break;
+
+		case GDK_Left:
+			if ((event->state & GDK_CONTROL_MASK) != 0)
+				debug_view_type_character(info->view, DCH_CTRLLEFT);
+			else
+				debug_view_type_character(info->view, DCH_LEFT);
+			break;
+
+		case GDK_Right:
+			if ((event->state & GDK_CONTROL_MASK) != 0)
+				debug_view_type_character(info->view, DCH_CTRLRIGHT);
+			else
+				debug_view_type_character(info->view, DCH_RIGHT);
+			break;
+
+		case GDK_Prior:
+			debug_view_type_character(info->view, DCH_PUP);
+			break;
+
+		case GDK_Next:
+			debug_view_type_character(info->view, DCH_PDOWN);
+			break;
+
+		case GDK_Home:
+			if ((event->state & GDK_CONTROL_MASK) != 0)
+				debug_view_type_character(info->view, DCH_CTRLHOME);
+			else
+				debug_view_type_character(info->view, DCH_HOME);
+			break;
+
+		case GDK_End:
+			if ((event->state & GDK_CONTROL_MASK) != 0)
+				debug_view_type_character(info->view, DCH_CTRLEND);
+			else
+				debug_view_type_character(info->view, DCH_END);
+			break;
+
+		case GDK_Escape:
+			//if (info->owner->focuswnd != NULL)
+			//	SetFocus(info->owner->focuswnd);
+			//info->owner->ignore_char_lparam = lparam >> 16;
+			break;
+
+		case GDK_Tab:
+			//if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
+			//	debugwin_view_prev_view(info->owner, info);
+			//else
+			//	debugwin_view_next_view(info->view, dvw);
+			break;
+		default:
+			if (event->keyval >= 32 && event->keyval < 127 && debug_view_get_cursor_supported(info->view))
+				debug_view_type_character(info->view, event->keyval);
 	}
 
 	return true;

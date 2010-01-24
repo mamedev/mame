@@ -15,7 +15,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	UINT32 i, j, xx, yy;
 	GdkColor bg, fg;
 
-	vsize = debug_view_get_visible_size(dv->dw);
+	vsize = debug_view_get_visible_size(dv->view);
 
 	bg.red = bg.green = bg.blue = 0xffff;
 	gdk_gc_set_rgb_fg_color(dv->gc, &bg);
@@ -28,7 +28,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 						   dv->vsz, dv->hsz);
 	}
 
-	viewdata = debug_view_get_chars(dv->dw);
+	viewdata = debug_view_get_chars(dv->view);
 
 	yy = wdv->style->ythickness;
 	for(j=0; j<vsize.y; j++) {
@@ -106,12 +106,12 @@ static void dview_hadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->dw);
+	pos = debug_view_get_visible_position(dv->view);
 
 	if (v != pos.x)
 	{
 		pos.x = v;
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -121,12 +121,12 @@ static void dview_vadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->dw);
+	pos = debug_view_get_visible_position(dv->view);
 
 	if (v != pos.y)
 	{
 		pos.y = v;
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -170,8 +170,8 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	int ovs = dv->vs;
 	debug_view_xy size, pos, col, vsize;
 
-	pos = debug_view_get_visible_position(dv->dw);
-	size = debug_view_get_total_size(dv->dw);
+	pos = debug_view_get_visible_position(dv->view);
+	size = debug_view_get_total_size(dv->view);
 
 	dv->tr = size.y;
 	dv->tc = size.x;
@@ -214,8 +214,8 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		vsize.x = size.x-pos.x;
 	}
 
-	debug_view_set_visible_position(dv->dw, pos);
-	debug_view_set_visible_size(dv->dw, vsize);
+	debug_view_set_visible_position(dv->view, pos);
+	debug_view_set_visible_size(dv->view, vsize);
 
 	if(GTK_WIDGET_REALIZED(wdv))
 		gdk_window_move_resize(wdv->window,
@@ -244,7 +244,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->hadj->page_increment = span;
 		dv->hadj->page_size = span;
 		gtk_adjustment_changed(dv->hadj);
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 	} else {
 		if(ohs)
 			gtk_widget_hide(dv->hscrollbar);
@@ -272,7 +272,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->vadj->page_increment = span;
 		dv->vadj->page_size = span;
 		gtk_adjustment_changed(dv->vadj);
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 	} else {
 		if(ovs)
 			gtk_widget_hide(dv->vscrollbar);
@@ -287,7 +287,7 @@ static void dview_size_request(GtkWidget *wdv, GtkRequisition *req)
 	int vs = 0, hs = 0;
 	debug_view_xy size;
 
-	size = debug_view_get_total_size(dv->dw);
+	size = debug_view_get_total_size(dv->view);
 
 	if(size.x > 50) {
 		size.x = 50;
@@ -369,7 +369,7 @@ static void dview_init(DView *dv)
 											 pango_font_metrics_get_descent(metrics));
 	}
 
-	dv->dw = 0;
+	dv->view = 0;
 	gtk_widget_modify_font(GTK_WIDGET(dv), dvc->fixedfont);
 	dv->playout = gtk_widget_create_pango_layout(GTK_WIDGET(dv), 0);
 	pango_layout_set_font_description(dv->playout, dvc->fixedfont);
@@ -409,6 +409,6 @@ GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar
 
 void dview_set_debug_view(DView *dv, running_machine *machine, int type, debug_view **dwp)
 {
-	dv->dw = debug_view_alloc(machine, type, dview_update, dv);
-	*dwp = dv->dw;
+	dv->view = debug_view_alloc(machine, type, dview_update, dv);
+	*dwp = dv->view;
 }
