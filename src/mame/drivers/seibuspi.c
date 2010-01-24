@@ -2581,6 +2581,35 @@ ROM_START( viprp1s )
 	ROM_CONTINUE(0x100000,0x80000)
 ROM_END
 
+ROM_START( viprp1hk )
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_BYTE("seibu_1", 0x000000, 0x80000, CRC(283ba7b7) SHA1(28122e04b72f1163c69f3f845f6a493fdb6ed652) ) /* New Version or something different??? */
+	ROM_LOAD32_BYTE("seibu_2", 0x000001, 0x80000, CRC(2c4db249) SHA1(a6372c9a3cde5f262ec5ef446945f6d3ad506e88) )
+	ROM_LOAD32_BYTE("seibu_3", 0x000002, 0x80000, CRC(91989503) SHA1(8c215fac200cc693396dbd57e0939e7efe883342) )
+	ROM_LOAD32_BYTE("seibu_4", 0x000003, 0x80000, CRC(12c9582d) SHA1(a79e26514e5ab8703a7a8c3ac39b359cfa4117c1) )
+
+	ROM_REGION( 0x30000, "gfx1", 0)
+	ROM_LOAD24_WORD("seibu_5", 0x000000, 0x20000, CRC(80920fed) SHA1(b35ed080925f6d0a0b6d2d1ab4fa919f625b1e6a) ) /* Different from both "new" & "old" versions */
+	ROM_LOAD24_BYTE("seibu_6", 0x000002, 0x10000, CRC(e71a8722) SHA1(3e0133fe1f85058ca6d9ac59d731f342c6b50e92) )
+
+	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("v_bg-11.415",  0x000000, 0x200000, CRC(6fc96736) SHA1(12df47d8af2c1febc1bce5bcf3218766447885bd) )
+	ROM_LOAD24_BYTE("v_bg-12.415",  0x000002, 0x100000, CRC(d3c7281c) SHA1(340bca1f31486609b3c34dd7830362a216ff648e) )
+	ROM_LOAD24_WORD("v_bg-21.410",  0x300000, 0x100000, CRC(d65b4318) SHA1(6522970d95ffa7fa2f32e0b5b4f0eb69e0286b36) )
+	ROM_LOAD24_BYTE("v_bg-22.416",  0x300002, 0x080000, CRC(24a0a23a) SHA1(0b0330717620e3f3274a25845d9edaf8023b9db2) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("v_obj-1.322",  0x000000, 0x400000, CRC(3be5b631) SHA1(fd1064428d28ca166a9267b968c0ba846cfed656) )
+	ROM_LOAD("v_obj-2.324",  0x400000, 0x400000, CRC(924153b4) SHA1(db5dadcfb4cd5e6efe9d995085936ce4f4eb4254) )
+	ROM_LOAD("v_obj-3.323",  0x800000, 0x400000, CRC(e9fb9062) SHA1(18e97b4c5cced2b529e6e72d8041c6f78fcec76e) )
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
+
+	ROM_REGION(0x280000, "user2", ROMREGION_ERASE00)	/* sound roms */
+	ROM_LOAD("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
+	ROM_CONTINUE(0x100000,0x80000)
+ROM_END
+
 ROM_START( viprp1oj )
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_BYTE("v_1-o.211", 0x000000, 0x80000, CRC(4430be64) SHA1(96501a490042c289060d8510f6f79fbf64f79c1a) )
@@ -2620,35 +2649,6 @@ ROM_START( viprp1ot )
 	ROM_REGION( 0x30000, "gfx1", 0)
 	ROM_LOAD24_WORD("v_5-o.413", 0x000000, 0x20000, CRC(6d863acc) SHA1(3e3e14f51b9394b24d7cbf562f1cfffc9ec2216d) )
 	ROM_LOAD24_BYTE("v_6-o.48",  0x000002, 0x10000, CRC(fe7cb8f7) SHA1(55c7ab977c3666c8770deb62718d535673ffd4f8) )
-
-	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
-	ROM_LOAD24_WORD("v_bg-11.415",  0x000000, 0x200000, CRC(6fc96736) SHA1(12df47d8af2c1febc1bce5bcf3218766447885bd) )
-	ROM_LOAD24_BYTE("v_bg-12.415",  0x000002, 0x100000, CRC(d3c7281c) SHA1(340bca1f31486609b3c34dd7830362a216ff648e) )
-	ROM_LOAD24_WORD("v_bg-21.410",  0x300000, 0x100000, CRC(d65b4318) SHA1(6522970d95ffa7fa2f32e0b5b4f0eb69e0286b36) )
-	ROM_LOAD24_BYTE("v_bg-22.416",  0x300002, 0x080000, CRC(24a0a23a) SHA1(0b0330717620e3f3274a25845d9edaf8023b9db2) )
-
-	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
-	ROM_LOAD("v_obj-1.322",  0x000000, 0x400000, CRC(3be5b631) SHA1(fd1064428d28ca166a9267b968c0ba846cfed656) )
-	ROM_LOAD("v_obj-2.324",  0x400000, 0x400000, CRC(924153b4) SHA1(db5dadcfb4cd5e6efe9d995085936ce4f4eb4254) )
-	ROM_LOAD("v_obj-3.323",  0x800000, 0x400000, CRC(e9fb9062) SHA1(18e97b4c5cced2b529e6e72d8041c6f78fcec76e) )
-
-	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
-
-	ROM_REGION(0x280000, "user2", ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
-	ROM_CONTINUE(0x100000,0x80000)
-ROM_END
-
-ROM_START( viprp1hk )
-	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
-	ROM_LOAD32_BYTE("seibu_1", 0x000000, 0x80000, CRC(283ba7b7) SHA1(28122e04b72f1163c69f3f845f6a493fdb6ed652) )
-	ROM_LOAD32_BYTE("seibu_2", 0x000001, 0x80000, CRC(2c4db249) SHA1(a6372c9a3cde5f262ec5ef446945f6d3ad506e88) )
-	ROM_LOAD32_BYTE("seibu_3", 0x000002, 0x80000, CRC(91989503) SHA1(8c215fac200cc693396dbd57e0939e7efe883342) )
-	ROM_LOAD32_BYTE("seibu_4", 0x000003, 0x80000, CRC(12c9582d) SHA1(a79e26514e5ab8703a7a8c3ac39b359cfa4117c1) )
-
-	ROM_REGION( 0x30000, "gfx1", 0)
-	ROM_LOAD24_WORD("seibu_5", 0x000000, 0x20000, CRC(80920fed) SHA1(b35ed080925f6d0a0b6d2d1ab4fa919f625b1e6a) )
-	ROM_LOAD24_BYTE("seibu_6", 0x000002, 0x10000, CRC(e71a8722) SHA1(3e0133fe1f85058ca6d9ac59d731f342c6b50e92) )
 
 	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
 	ROM_LOAD24_WORD("v_bg-11.415",  0x000000, 0x200000, CRC(6fc96736) SHA1(12df47d8af2c1febc1bce5bcf3218766447885bd) )
@@ -3499,13 +3499,13 @@ GAME( 1995, batlballa, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu 
 GAME( 1995, batlballu, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Fabtek License)", "Battle Balls (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1995, viprp1,    0,       spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (World, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, viprp1u,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu (Fabtek license)", "Viper Phase 1 =U.S.A=",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* New version, "=U.S.A=" seems part of title */
+GAME( 1995, viprp1u,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu (Fabtek license)", "Viper Phase 1 (USA)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* New version, "=U.S.A=" seems part of title */
 GAME( 1995, viprp1j,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, viprp1s,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Switzerland, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1995, viprp1oj,  viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, viprp1ot,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Tuning License)", "Viper Phase 1 (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, viprp1hk,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Metrotainment License)", "Viper Phase 1 (Hong Kong, Metrotainment license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, viprp1hk,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Metrotainment License)", "Viper Phase 1 (Hong Kong)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
 GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,   ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
