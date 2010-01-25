@@ -8988,6 +8988,7 @@ Other Sun games
 	DRIVER( dreamwld )	/* (c) 2000 SemiCom */
 	DRIVER( cybertnk )	/* (c) 1990 Coreland */
 	DRIVER( cubeqst )	/* (c) 1983 Simutrek Inc. */
+	DRIVER( cubeqsta )	/* (c) 1983 Simutrek Inc. */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 
 	/* Impera CD-I based */
