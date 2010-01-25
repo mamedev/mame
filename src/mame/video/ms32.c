@@ -105,13 +105,13 @@ VIDEO_START( ms32 )
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	ms32_priram_8   = auto_alloc_array(machine, UINT8, 0x2000);
-	ms32_palram_16  = auto_alloc_array(machine, UINT16, 0x20000);
-	ms32_rozram_16  = auto_alloc_array(machine, UINT16, 0x10000);
-	ms32_lineram_16 = auto_alloc_array(machine, UINT16, 0x1000);
-	ms32_sprram_16  = auto_alloc_array(machine, UINT16, 0x20000);
-	ms32_bgram_16   = auto_alloc_array(machine, UINT16, 0x4000);
-	ms32_txram_16   = auto_alloc_array(machine, UINT16, 0x4000);
+	ms32_priram_8   = auto_alloc_array_clear(machine, UINT8, 0x2000);
+	ms32_palram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
+	ms32_rozram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
+	ms32_lineram_16 = auto_alloc_array_clear(machine, UINT16, 0x1000);
+	ms32_sprram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
+	ms32_bgram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
+	ms32_txram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
 
 	ms32_tx_tilemap = tilemap_create(machine, get_ms32_tx_tile_info,tilemap_scan_rows,8, 8,64,64);
 	ms32_bg_tilemap = tilemap_create(machine, get_ms32_bg_tile_info,tilemap_scan_rows,16,16,64,64);
@@ -124,6 +124,9 @@ VIDEO_START( ms32 )
 	temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	temp_bitmap_sprites_pri = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16); // not actually being used for rendering, we embed pri info in the raw colour bitmap
 
+	bitmap_fill(temp_bitmap_tilemaps,0,0);
+	bitmap_fill(temp_bitmap_sprites,0,0);
+	bitmap_fill(temp_bitmap_sprites_pri,0,0);
 
 	tilemap_set_transparent_pen(ms32_tx_tilemap,0);
 	tilemap_set_transparent_pen(ms32_bg_tilemap,0);
@@ -149,7 +152,7 @@ VIDEO_START( f1superb )
 {
 	VIDEO_START_CALL( ms32 );
 
-	f1superb_extraram_16  = auto_alloc_array(machine, UINT16, 0x10000);
+	f1superb_extraram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
 	ms32_extra_tilemap = tilemap_create(machine, get_ms32_extra_tile_info,tilemap_scan_rows,2048,1,1,0x400);
 
 }
