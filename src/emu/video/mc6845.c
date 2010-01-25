@@ -845,8 +845,6 @@ void mc6845_update(running_device *device, bitmap_t *bitmap, const rectangle *cl
 		/* call the tear down function if any */
 		if (mc6845->intf->end_update != NULL)
 			mc6845->intf->end_update(device, bitmap, cliprect, param);
-
-		popmessage(NULL);
 	}
 	else
 		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
