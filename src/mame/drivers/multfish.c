@@ -635,6 +635,23 @@ static MACHINE_DRIVER_START( multfish )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
+static MACHINE_RESET( island2a )
+{
+	MACHINE_RESET_CALL(multfish);
+
+	// this set expects these values set before it will boot
+	// protection added on this bootleg?
+	multfish_bram[0x2003] = 0x01;
+	multfish_bram[0x4003] = 0x02; 
+}
+static MACHINE_DRIVER_START( island2a )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(multfish)
+	MDRV_MACHINE_RESET( island2a )
+MACHINE_DRIVER_END
+
+
+
 
 /*********************************************************
    Multifish
@@ -2211,7 +2228,7 @@ GAME( 2006, pirate2d,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pi
 GAME( 2006, pirate2e,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005, banking address hack, changed version text set 3)",  0 ) // bank F9, changed version text to 070126, skip some start tests
 
 GAME( 2006, island2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529)",  0 ) /* World */
-GAME( 2006, island2a,    island2,  multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, banking address hack)",  0 ) // bank F9 (not standard, game does not work)
+GAME( 2006, island2a,    island2,  island2a, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, banking address hack)",  0 ) // bank F9 (not standard, requires special values in RAM)
 
 GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328)",  0 ) /* World */
 GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, banking address hack)",  0 ) // bank F9
