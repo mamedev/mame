@@ -87,6 +87,17 @@ PROM  : Type MB7051
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 
+typedef struct _shougi_state shougi_state;
+struct _shougi_state
+{
+	UINT8 *videoram;
+	int nmi_enabled;
+	//UINT8 *cpu_sharedram;
+	//UINT8 cpu_sharedram_control_val;
+	int r;
+};
+
+
 
 /***************************************************************************
 
@@ -148,6 +159,7 @@ static PALETTE_INIT( shougi )
 
 static VIDEO_UPDATE( shougi )
 {
+	shougi_state *state = (shougi_state *)screen->machine->driver_data;
 	int offs;
 
 	for (offs = 0;offs <0x4000; offs++)
@@ -156,11 +168,11 @@ static VIDEO_UPDATE( shougi )
 
 		sx = offs >> 8;		/*00..0x3f (64*4=256)*/
 		sy = offs & 0xff;	/*00..0xff*/
-//      if (flipscreen[0]) sx = 31 - sx;
-//      if (flipscreen[1]) sy = 31 - sy;
+		//if (flipscreen[0]) sx = 31 - sx;
+		//if (flipscreen[1]) sy = 31 - sy;
 
-		data1 = screen->machine->generic.videoram.u8[offs];				/* color */
-		data2 = screen->machine->generic.videoram.u8[0x4000 + offs];	/* pixel data */
+		data1 = state->videoram[offs];				/* color */
+		data2 = state->videoram[0x4000 + offs];	/* pixel data */
 
 		for (x=0; x<4; x++) /*4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)*/
 		{
@@ -175,9 +187,6 @@ static VIDEO_UPDATE( shougi )
 }
 
 #if 0
-
-static UINT8 *cpu_sharedram;
-static UINT8 cpu_sharedram_control_val = 0;
 
 //to do:
 // add separate sharedram/r/w() for both CPUs and use control value to verify access
@@ -203,14 +212,14 @@ static READ8_HANDLER ( cpu_sharedram_r )
 
 static WRITE8_HANDLER ( cpu_shared_ctrl_sub_w )
 {
-//  cpu_sharedram_control_val = 0;
-//logerror("cpu_sharedram_ctrl=SUB");
+	//cpu_sharedram_control_val = 0;
+	//logerror("cpu_sharedram_ctrl=SUB");
 }
 
 static WRITE8_HANDLER ( cpu_shared_ctrl_main_w )
 {
-//  cpu_sharedram_control_val = 1;
-//logerror("cpu_sharedram_ctrl=MAIN");
+	//cpu_sharedram_control_val = 1;
+	//logerror("cpu_sharedram_ctrl=MAIN");
 }
 
 static WRITE8_HANDLER( shougi_watchdog_reset_w )
@@ -231,11 +240,11 @@ static WRITE8_HANDLER( shougi_mcu_halt_on_w )
 }
 
 
-static int nmi_enabled = 0;
-
 static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 {
-	nmi_enabled = 0; /* disable NMIs */
+	shougi_state *state = (shougi_state *)space->machine->driver_data;
+
+	state->nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
@@ -244,12 +253,16 @@ static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	nmi_enabled = 1; /* enable NMIs */
+	shougi_state *state = (shougi_state *)space->machine->driver_data;
+
+	state->nmi_enabled = 1; /* enable NMIs */
 }
 
 static INTERRUPT_GEN( shougi_vblank_nmi )
 {
-	if ( nmi_enabled == 1 )
+	shougi_state *state = (shougi_state *)device->machine->driver_data;
+
+	if ( state->nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
@@ -283,15 +296,16 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(shougi_state,videoram)	/* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 /* sub */
-static int r=0;
 static READ8_HANDLER ( dummy_r )
 {
-	r ^= 1;
-	if(r)
+	shougi_state *state = (shougi_state *)space->machine->driver_data;
+	state->r ^= 1;
+
+	if(state->r)
 		return 0xff;
 	else
 		return 0;
@@ -374,6 +388,8 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( shougi )
+
+	MDRV_DRIVER_DATA( shougi_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map)

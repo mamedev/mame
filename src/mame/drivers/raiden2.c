@@ -145,15 +145,58 @@ Current Problem(s) - in order of priority
 #include "includes/raiden2.h"
 
 
-static tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
-static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
-static int bg_bank, fg_bank, mid_bank;
-static int bg_col, fg_col, mid_col;
+typedef struct _sprcpt_state sprcpt_state;
+struct _sprcpt_state
+{
+	UINT32 adr;
+	UINT32 idx;
 
-static int tick;
-static UINT16 *mainram;
+	UINT16 flags2;
+	UINT32 val[2];
+	UINT32 flags1;
+	UINT32 data_1[0x100];
+	UINT32 data_2[0x40];
+	UINT32 data_3[6];
+	UINT32 data_4[4];
+};
 
-static int c_r[0xc000], c_w[0xc000];
+
+typedef struct _raiden2_state raiden2_state;
+struct _raiden2_state
+{
+	tilemap_t *background_layer;
+	tilemap_t *midground_layer;
+	tilemap_t *foreground_layer;
+	tilemap_t *text_layer;
+
+	UINT16 *back_data;
+	UINT16 *fore_data;
+	UINT16 *mid_data;
+	UINT16 *w1ram;
+	UINT16 *mainram;
+	UINT16 *spriteram;
+	UINT16 *videoram;
+
+	int bg_bank;
+	int fg_bank;
+	int mid_bank;
+	int bg_col;
+	int fg_col;
+	int mid_col;
+
+	//int tick;
+
+	sprcpt_state sprcpt;
+
+	UINT16 mcu_prog[0x400];
+	int mcu_prog_offs;
+
+	struct
+	{
+		int read;
+		int write;
+	} stat[0xc000];
+};
 
 static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 {
@@ -165,10 +208,11 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 /* SPRITE DRAWING (move to video file) */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask )
 {
-	const UINT16 *source = machine->generic.spriteram.u16 + 0x1000/2 - 4;
-	const UINT16 *finish = machine->generic.spriteram.u16;
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+	const UINT16 *source = state->spriteram + 0x1000/2 - 4;
+	const UINT16 *finish = state->spriteram;
 
 	const gfx_element *gfx = machine->gfx[2];
 
@@ -262,57 +306,68 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static WRITE16_HANDLER(raiden2_background_w)
 {
-	COMBINE_DATA(&back_data[offset]);
-	tilemap_mark_tile_dirty(background_layer, offset);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->back_data[offset]);
+	tilemap_mark_tile_dirty(state->background_layer, offset);
 }
 
 static WRITE16_HANDLER(raiden2_midground_w)
 {
-	COMBINE_DATA(&mid_data[offset]);
-	tilemap_mark_tile_dirty(midground_layer,offset);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->mid_data[offset]);
+	tilemap_mark_tile_dirty(state->midground_layer,offset);
 }
 
 static WRITE16_HANDLER(raiden2_foreground_w)
 {
-	COMBINE_DATA(&fore_data[offset]);
-	tilemap_mark_tile_dirty(foreground_layer,offset);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->fore_data[offset]);
+	tilemap_mark_tile_dirty(state->foreground_layer,offset);
 }
 
 static WRITE16_HANDLER(raiden2_text_w)
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
-	tilemap_mark_tile_dirty(text_layer, offset);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->videoram[offset]);
+	tilemap_mark_tile_dirty(state->text_layer, offset);
 }
 
 /* TILEMAP RELATED (move to video file) */
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	int tile = back_data[tile_index];
-	int color = (tile >> 12) | (bg_col << 4);
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+	int tile = state->back_data[tile_index];
+	int color = (tile >> 12) | (state->bg_col << 4);
 
-	tile = (tile & 0xfff) | (bg_bank << 12);
+	tile = (tile & 0xfff) | (state->bg_bank << 12);
 
 	SET_TILE_INFO(1,tile+0x0000,color,0);
 }
 
 static TILE_GET_INFO( get_mid_tile_info )
 {
-	int tile = mid_data[tile_index];
-	int color = (tile >> 12) | (mid_col << 4);
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+	int tile = state->mid_data[tile_index];
+	int color = (tile >> 12) | (state->mid_col << 4);
 
-	tile = (tile & 0xfff) | (mid_bank << 12);
+	tile = (tile & 0xfff) | (state->mid_bank << 12);
 
 	SET_TILE_INFO(1,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fore_tile_info )
 {
-	int tile = fore_data[tile_index];
-	int color = (tile >> 12) | (fg_col << 4);
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+	int tile = state->fore_data[tile_index];
+	int color = (tile >> 12) | (state->fg_col << 4);
 
 
-	tile = (tile & 0xfff) | (fg_bank << 12);
+	tile = (tile & 0xfff) | (state->fg_bank << 12);
 	//  tile = (tile & 0xfff) | (3<<12);  // 3000 intro (cliff) 1000 game (bg )
 
 	SET_TILE_INFO(1,tile,color,0);
@@ -320,7 +375,8 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = machine->generic.videoram.u16[tile_index];
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+	int tile = state->videoram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -341,16 +397,18 @@ static void set_scroll(tilemap_t *tm, int plane)
 
 static VIDEO_START( raiden2 )
 {
-	text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
-	background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
-	midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
-	foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(midground_layer, 15);
-	tilemap_set_transparent_pen(foreground_layer, 15);
-	tilemap_set_transparent_pen(text_layer, 15);
+	state->text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
+	state->background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
+	state->foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
 
-	tick = 0;
+	tilemap_set_transparent_pen(state->midground_layer, 15);
+	tilemap_set_transparent_pen(state->foreground_layer, 15);
+	tilemap_set_transparent_pen(state->text_layer, 15);
+
+	//state->tick = 0;
 }
 
 // XXX
@@ -366,7 +424,7 @@ static VIDEO_START( raiden2 )
 
 static VIDEO_UPDATE ( raiden2 )
 {
-
+	raiden2_state *state = (raiden2_state *)screen->machine->driver_data;
 #if 0
 	int info_1, info_2, info_3;
 
@@ -540,16 +598,16 @@ static VIDEO_UPDATE ( raiden2 )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (!input_code_pressed(screen->machine, KEYCODE_Q))
-		tilemap_draw(bitmap, cliprect, background_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
 	if (!input_code_pressed(screen->machine, KEYCODE_W))
-		tilemap_draw(bitmap, cliprect, midground_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
 	if (!input_code_pressed(screen->machine, KEYCODE_E))
-		tilemap_draw(bitmap, cliprect, foreground_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	if (!input_code_pressed(screen->machine, KEYCODE_A))
-		tilemap_draw(bitmap, cliprect, text_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
 
 	return 0;
 }
@@ -575,90 +633,105 @@ static INTERRUPT_GEN( raiden2_interrupt )
 
 // Sprite encryption key upload
 
-static UINT32 sprcpt_adr, sprcpt_idx;
-
-static UINT16 sprcpt_flags2;
-static UINT32 sprcpt_val[2], sprcpt_flags1;
-static UINT32 sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
-
-static void sprcpt_init(void)
+static void sprcpt_init(running_machine *machine)
 {
-	memset(sprcpt_data_1, 0, sizeof(sprcpt_data_1));
-	memset(sprcpt_data_2, 0, sizeof(sprcpt_data_2));
-	memset(sprcpt_data_3, 0, sizeof(sprcpt_data_3));
-	memset(sprcpt_data_4, 0, sizeof(sprcpt_data_4));
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
 
-	sprcpt_adr = 0;
-	sprcpt_idx = 0;
+	memset(sprcpt, 0, sizeof(*sprcpt));
 }
 
 
 WRITE16_HANDLER(sprcpt_adr_w)
 {
-	combine32(&sprcpt_adr, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(&sprcpt->adr, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER(sprcpt_data_1_w)
 {
-	combine32(sprcpt_data_1+sprcpt_adr, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(sprcpt->data_1+sprcpt->adr, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER(sprcpt_data_2_w)
 {
-	combine32(sprcpt_data_2+sprcpt_adr, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(sprcpt->data_2+sprcpt->adr, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER(sprcpt_data_3_w)
 {
-	combine32(sprcpt_data_3+sprcpt_idx, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(sprcpt->data_3+sprcpt->idx, offset, data, mem_mask);
 	if(offset == 1) {
-		sprcpt_idx ++;
-		if(sprcpt_idx == 6)
-			sprcpt_idx = 0;
+		sprcpt->idx ++;
+		if(sprcpt->idx == 6)
+			sprcpt->idx = 0;
 	}
 }
 
 WRITE16_HANDLER(sprcpt_data_4_w)
 {
-	combine32(sprcpt_data_4+sprcpt_idx, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(sprcpt->data_4+sprcpt->idx, offset, data, mem_mask);
 	if(offset == 1) {
-		sprcpt_idx ++;
-		if(sprcpt_idx == 4)
-			sprcpt_idx = 0;
+		sprcpt->idx ++;
+		if(sprcpt->idx == 4)
+			sprcpt->idx = 0;
 	}
 }
 
 WRITE16_HANDLER(sprcpt_val_1_w)
 {
-	combine32(sprcpt_val+0, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(sprcpt->val+0, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER(sprcpt_val_2_w)
 {
-	combine32(sprcpt_val+1, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(sprcpt->val+1, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER(sprcpt_flags_1_w)
 {
-	combine32(&sprcpt_flags1, offset, data, mem_mask);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	combine32(&sprcpt->flags1, offset, data, mem_mask);
 	if(offset == 1) {
 		// bit 31: 1 = allow write on sprcpt data
 
-		if(!(sprcpt_flags1 & 0x80000000U)) {
+		if(!(sprcpt->flags1 & 0x80000000U)) {
 			// Upload finished
 			if(1) {
 				int i;
-				logerror("sprcpt_val 1: %08x\n", sprcpt_val[0]);
-				logerror("sprcpt_val 2: %08x\n", sprcpt_val[1]);
+				logerror("sprcpt_val 1: %08x\n", sprcpt->val[0]);
+				logerror("sprcpt_val 2: %08x\n", sprcpt->val[1]);
 				logerror("sprcpt_data 1:\n");
 				for(i=0; i<0x100; i++) {
-					logerror(" %08x", sprcpt_data_1[i]);
+					logerror(" %08x", sprcpt->data_1[i]);
 					if(!((i+1) & 7))
 						logerror("\n");
 				}
 				logerror("sprcpt_data 2:\n");
 				for(i=0; i<0x40; i++) {
-					logerror(" %08x", sprcpt_data_2[i]);
+					logerror(" %08x", sprcpt->data_2[i]);
 					if(!((i+1) & 7))
 						logerror("\n");
 				}
@@ -669,9 +742,12 @@ WRITE16_HANDLER(sprcpt_flags_1_w)
 
 WRITE16_HANDLER(sprcpt_flags_2_w)
 {
-	COMBINE_DATA(&sprcpt_flags2);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	sprcpt_state *sprcpt = &state->sprcpt;
+
+	COMBINE_DATA(&sprcpt->flags2);
 	if(offset == 0) {
-		if(sprcpt_flags2 & 0x8000) {
+		if(sprcpt->flags2 & 0x8000) {
 			// Reset decryption -> redo it
 		}
 	}
@@ -684,13 +760,17 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 
 static UINT16 handle_io_r(const address_space *space, int offset)
 {
-	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(space->cpu));
-	return mainram[offset];
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	logerror("io_r %04x, %04x (%x)\n", offset*2, state->mainram[offset], cpu_get_pc(space->cpu));
+	return state->mainram[offset];
 }
 
 static void handle_io_w(const address_space *space, int offset, UINT16 data, UINT16 mem_mask)
 {
-	COMBINE_DATA(&mainram[offset]);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->mainram[offset]);
 	switch(offset) {
 	default:
 		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
@@ -699,23 +779,27 @@ static void handle_io_w(const address_space *space, int offset, UINT16 data, UIN
 
 static READ16_HANDLER(any_r)
 {
-	c_r[offset]++;
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	state->stat[offset].read++;
 
 	if(offset >= 0x400/2 && offset < 0x800/2)
 		return handle_io_r(space, offset);
 
-	return mainram[offset];
+	return state->mainram[offset];
 }
 
 static WRITE16_HANDLER(any_w)
 {
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
 	int show = 0;
 	if(offset >= 0x400/2 && offset < 0x800/2)
 		handle_io_w(space, offset, data, mem_mask);
 
-	c_w[offset]++;
+	state->stat[offset].write++;
+
 	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));
-	if(mainram[offset] != data && offset >= 0x400 && offset < 0x800) {
+	if(state->mainram[offset] != data && offset >= 0x400 && offset < 0x800) {
 		if(0 &&
 		   offset != 0x4c0/2 && offset != 0x500/2 &&
 		   offset != 0x444/2 && offset != 0x6de/2 && offset != 0x47e/2 &&
@@ -724,9 +808,9 @@ static WRITE16_HANDLER(any_w)
 			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 
-	if(0 && c_w[offset]>1000 && !c_r[offset]) {
+	if(0 && state->stat[offset].write>1000 && !state->stat[offset].read) {
 		if(offset != 0x4c0/2 && (offset<0x500/2 || offset > 0x503/2))
-			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], cpu_get_pc(space->cpu));
+			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, state->stat[offset].write, state->stat[offset].read, cpu_get_pc(space->cpu));
 	}
 
 	//  if(offset == 0x471 || (offset >= 0xb146 && offset < 0xb156))
@@ -742,12 +826,14 @@ static WRITE16_HANDLER(any_w)
 	//  if(offset == 0x700)
 	//      cpu_setbank(2, memory_region(space->machine, "user1")+0x20000*data);
 
-	COMBINE_DATA(&mainram[offset]);
+	COMBINE_DATA(&state->mainram[offset]);
 }
 
 static WRITE16_HANDLER(w1x)
 {
-	COMBINE_DATA(&w1ram[offset]);
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->w1ram[offset]);
 	if(0 && offset < 0x800/2)
 		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, cpu_get_pc(space->cpu));
 }
@@ -755,7 +841,8 @@ static WRITE16_HANDLER(w1x)
 #ifdef UNUSED_FUNCTION
 static void r2_dt(UINT16 sc, UINT16 cc, UINT16 ent, UINT16 tm, UINT16 x, UINT16 y)
 {
-	int bank = mainram[0x704/2];
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+	int bank = state->mainram[0x704/2];
 
 #if 0
 	switch(ent) {
@@ -813,20 +900,22 @@ static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 }
 #endif
 
-static void common_reset(void)
+static void common_reset(running_machine *machine)
 {
-	bg_bank=0;
-	fg_bank=6;
-	mid_bank=1;
-	bg_col=0;
-	fg_col=1;
-	mid_col=2;
+	raiden2_state *state = (raiden2_state *)machine->driver_data;
+
+	state->bg_bank=0;
+	state->fg_bank=6;
+	state->mid_bank=1;
+	state->bg_col=0;
+	state->fg_col=1;
+	state->mid_col=2;
 }
 
 static MACHINE_RESET(raiden2)
 {
-	common_reset();
-	sprcpt_init();
+	common_reset(machine);
+	sprcpt_init(machine);
 	MACHINE_RESET_CALL(seibu_sound);
 
 	//cop_init();
@@ -838,17 +927,17 @@ static MACHINE_RESET(raiden2)
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
 
-	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
+	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE_MEMBER(raiden2_state,mainram)
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_MEMBER(raiden2_state,spriteram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE_MEMBER(raiden2_state,back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE_MEMBER(raiden2_state,fore_data)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE_MEMBER(raiden2_state,mid_data)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state,videoram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
+	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE_MEMBER(raiden2_state,w1ram)
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
@@ -858,17 +947,18 @@ ADDRESS_MAP_END
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
 
 
-static UINT16 mcu_prog[0x400];
-static int mcu_prog_offs = 0;
-
 static WRITE16_HANDLER( mcu_prog_w )
 {
-	mcu_prog[mcu_prog_offs*2] = data;
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	state->mcu_prog[state->mcu_prog_offs*2] = data;
 }
 
 static WRITE16_HANDLER( mcu_prog_w2 )
 {
-	mcu_prog[mcu_prog_offs*2+1] = data;
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	state->mcu_prog[state->mcu_prog_offs*2+1] = data;
 
 	// both new zero team and raiden2/dx v33 version upload the same table..
 #if 1
@@ -880,7 +970,7 @@ static WRITE16_HANDLER( mcu_prog_w2 )
 		fp=fopen(tmp, "w+b");
         if (fp)
         {
-            fwrite(mcu_prog, 0x400, 2, fp);
+            fwrite(state->mcu_prog, 0x400, 2, fp);
             fclose(fp);
         }
     }
@@ -889,7 +979,9 @@ static WRITE16_HANDLER( mcu_prog_w2 )
 
 static WRITE16_HANDLER( mcu_prog_offs_w )
 {
-	mcu_prog_offs = data;
+	raiden2_state *state = (raiden2_state *)space->machine->driver_data;
+
+	state->mcu_prog_offs = data;
 }
 
 
@@ -946,17 +1038,17 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00788, 0x00789) AM_READ(nzerotea_unknown_r)
 	AM_RANGE(0x00794, 0x00795) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
+	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE_MEMBER(raiden2_state,mainram)
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_MEMBER(raiden2_state,spriteram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE_MEMBER(raiden2_state,back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE_MEMBER(raiden2_state,fore_data)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE_MEMBER(raiden2_state,mid_data)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state,videoram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
+	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE_MEMBER(raiden2_state,w1ram)
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
@@ -1185,6 +1277,8 @@ GFXDECODE_END
 /* MACHINE DRIVERS */
 
 static MACHINE_DRIVER_START( raiden2 )
+
+	MDRV_DRIVER_DATA( raiden2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
@@ -2124,11 +2218,11 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_MEMBER(raiden2_state,spriteram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE_MEMBER(raiden2_state,back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE_MEMBER(raiden2_state,fore_data)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE_MEMBER(raiden2_state,mid_data)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state,videoram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -2236,10 +2330,12 @@ static INTERRUPT_GEN( rdx_v33_interrupt )
 
 static MACHINE_RESET( rdx_v33 )
 {
-	common_reset();
+	common_reset(machine);
 }
 
 static MACHINE_DRIVER_START( rdx_v33 )
+
+	MDRV_DRIVER_DATA( raiden2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 32000000/2 ) // ?

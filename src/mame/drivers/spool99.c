@@ -92,15 +92,20 @@ Note
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-static UINT8 *spool99_main;
-static tilemap_t *sc0_tilemap;
-static UINT8 *spool99_cram;
-static UINT8 *spool99_vram;
+typedef struct _spool99_state spool99_state;
+struct _spool99_state
+{
+	UINT8 *main;
+	tilemap_t *sc0_tilemap;
+	UINT8 *cram;
+	UINT8 *vram;
+};
 
 static TILE_GET_INFO( get_spool99_tile_info )
 {
-	int code = ((spool99_vram[tile_index*2+1]<<8) | (spool99_vram[tile_index*2+0]));
-	int color = spool99_cram[tile_index*2+0];
+	spool99_state *state = (spool99_state *)machine->driver_data;
+	int code = ((state->vram[tile_index*2+1]<<8) | (state->vram[tile_index*2+0]));
+	int color = state->cram[tile_index*2+0];
 
 	SET_TILE_INFO(
 			0,
@@ -111,25 +116,33 @@ static TILE_GET_INFO( get_spool99_tile_info )
 
 static VIDEO_START(spool99)
 {
-	sc0_tilemap = tilemap_create(machine, get_spool99_tile_info,tilemap_scan_rows,8,8,64,32);
+	spool99_state *state = (spool99_state *)machine->driver_data;
+
+	state->sc0_tilemap = tilemap_create(machine, get_spool99_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static VIDEO_UPDATE(spool99)
 {
-	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
+	spool99_state *state = (spool99_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
 	return 0;
 }
 
 static WRITE8_HANDLER( spool99_vram_w )
 {
-	spool99_vram[offset] = data;
-	tilemap_mark_tile_dirty(sc0_tilemap,offset/2);
+	spool99_state *state = (spool99_state *)space->machine->driver_data;
+
+	state->vram[offset] = data;
+	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( spool99_cram_w )
 {
-	spool99_cram[offset] = data;
-	tilemap_mark_tile_dirty(sc0_tilemap,offset/2);
+	spool99_state *state = (spool99_state *)space->machine->driver_data;
+
+	state->cram[offset] = data;
+	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
 }
 
 
@@ -185,7 +198,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 }
 
 static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xaeff) AM_RAM AM_BASE(&spool99_main)
+	AM_RANGE(0x0000, 0xaeff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
 	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
@@ -195,8 +208,8 @@ static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram) // palette
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE(&spool99_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE(&spool99_cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,vram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,cram)
 ADDRESS_MAP_END
 
 
@@ -267,6 +280,9 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( spool99 )
+
+	MDRV_DRIVER_DATA( spool99_state )
+
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/8)
 	MDRV_CPU_PROGRAM_MAP(spool99_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -324,9 +340,11 @@ ROM_END
 
 static DRIVER_INIT( spool99 )
 {
+	spool99_state *state = (spool99_state *)machine->driver_data;
+
 	UINT8 *ROM = memory_region(machine, "maincpu");
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(spool99_main, ROM, 0xae00);
+	memcpy(state->main, ROM, 0xae00);
 }
 
 

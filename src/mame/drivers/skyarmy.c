@@ -24,29 +24,40 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static UINT8 *skyarmy_videoram;
-static UINT8 *skyarmy_colorram;
-static UINT8 *skyarmy_scrollram;
-static tilemap_t* skyarmy_tilemap;
+typedef struct _skyarmy_state skyarmy_state;
+struct _skyarmy_state
+{
+	UINT8 *spriteram;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *scrollram;
+	tilemap_t* tilemap;
+	int nmi;
+};
 
 static TILE_GET_INFO( get_skyarmy_tile_info )
 {
-	int code = skyarmy_videoram[tile_index];
-	int attr = BITSWAP8(skyarmy_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+	skyarmy_state *state = (skyarmy_state *)machine->driver_data;
+	int code = state->videoram[tile_index];
+	int attr = BITSWAP8(state->colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 	SET_TILE_INFO( 0, code, attr, 0);
 }
 
 static WRITE8_HANDLER( skyarmy_videoram_w )
 {
-	skyarmy_videoram[offset] = data;
-	tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
+	skyarmy_state *state = (skyarmy_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap,offset);
 }
 
 static WRITE8_HANDLER( skyarmy_colorram_w )
 {
-	skyarmy_colorram[offset] = data;
-	tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
+	skyarmy_state *state = (skyarmy_state *)space->machine->driver_data;
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap,offset);
 }
 
 static PALETTE_INIT( skyarmy )
@@ -79,21 +90,24 @@ static PALETTE_INIT( skyarmy )
 
 static VIDEO_START( skyarmy )
 {
-	skyarmy_tilemap = tilemap_create(machine, get_skyarmy_tile_info,tilemap_scan_rows,8,8,32,32);
-	tilemap_set_scroll_cols(skyarmy_tilemap,32);
+	skyarmy_state *state = (skyarmy_state *)machine->driver_data;
+
+	state->tilemap = tilemap_create(machine, get_skyarmy_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(state->tilemap,32);
 }
 
 
 static VIDEO_UPDATE( skyarmy )
 {
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	skyarmy_state *state = (skyarmy_state *)screen->machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 	int i;
 
 	for(i=0;i<0x20;i++)
-		tilemap_set_scrolly( skyarmy_tilemap,i,skyarmy_scrollram[i]);
+		tilemap_set_scrolly( state->tilemap,i,state->scrollram[i]);
 
-	tilemap_draw(bitmap,cliprect,skyarmy_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{
@@ -114,27 +128,29 @@ static VIDEO_UPDATE( skyarmy )
 	return 0;
 }
 
-static int skyarmy_nmi=0;
-
 static INTERRUPT_GEN( skyarmy_nmi_source )
 {
-	if(skyarmy_nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
+	skyarmy_state *state = (skyarmy_state *)device->machine->driver_data;
+
+	if(state->nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	skyarmy_nmi=data&1;
+	skyarmy_state *state = (skyarmy_state *)space->machine->driver_data;
+
+	state->nmi=data&1;
 }
 
 
 static ADDRESS_MAP_START( skyarmy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE(&skyarmy_videoram) /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE(&skyarmy_colorram) /* Color RAM */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&skyarmy_scrollram)  /* Scroll RAM */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE_MEMBER(skyarmy_state,videoram) /* Video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE_MEMBER(skyarmy_state,colorram) /* Color RAM */
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(skyarmy_state,spriteram) /* Sprites */
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(skyarmy_state,scrollram)  /* Scroll RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
@@ -222,6 +238,9 @@ static GFXDECODE_START( skyarmy )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( skyarmy )
+
+	MDRV_DRIVER_DATA( skyarmy_state )
+
 	MDRV_CPU_ADD("maincpu", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(skyarmy_map)
 	MDRV_CPU_IO_MAP(skyarmy_io_map)

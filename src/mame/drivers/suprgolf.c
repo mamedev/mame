@@ -24,19 +24,31 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-static tilemap_t *suprgolf_tilemap;
-static UINT8 *suprgolf_bg_vram;
-static UINT16 *suprgolf_bg_fb,*suprgolf_fg_fb;
-static int suprgolf_rom_bank;
-static UINT8 suprgolf_bg_bank;
-static UINT8 suprgolf_vreg_bank;
-static UINT8 msm5205next,msm_nmi_mask;
-static UINT8 suprgolf_vreg_pen;
+typedef struct _suprgolf_state suprgolf_state;
+struct _suprgolf_state
+{
+	tilemap_t *tilemap;
+	UINT8 *videoram;
+	UINT8 *paletteram;
+	UINT8 *bg_vram;
+	UINT16 *bg_fb;
+	UINT16 *fg_fb;
+	int rom_bank;
+	UINT8 bg_bank;
+	UINT8 vreg_bank;
+	UINT8 msm5205next;
+	UINT8 msm_nmi_mask;
+	UINT8 vreg_pen;
+	UINT8 palette_switch;
+	UINT8 bg_vreg_test;
+	int toggle;
+};
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index*2]+256*(machine->generic.videoram.u8[tile_index*2+1]);
-	int color = machine->generic.videoram.u8[tile_index*2+0x800] & 0x7f;
+	suprgolf_state *state = (suprgolf_state *)machine->driver_data;
+	int code = state->videoram[tile_index*2]+256*(state->videoram[tile_index*2+1]);
+	int color = state->videoram[tile_index*2+0x800] & 0x7f;
 
 	SET_TILE_INFO(
 		0,
@@ -47,17 +59,20 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( suprgolf )
 {
-	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
-	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-	suprgolf_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
-	suprgolf_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	suprgolf_state *state = (suprgolf_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(suprgolf_tilemap,15);
+	state->tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	state->paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
+	state->bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	state->fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+
+	tilemap_set_transparent_pen(state->tilemap,15);
 }
 
 static VIDEO_UPDATE( suprgolf )
 {
+	suprgolf_state *state = (suprgolf_state *)screen->machine->driver_data;
 	int x,y,count,color;
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -68,7 +83,7 @@ static VIDEO_UPDATE( suprgolf )
 		{
 			for(x=0;x<512;x++)
 			{
-				color = suprgolf_bg_fb[count];
+				color = state->bg_fb[count];
 
 				if(x <= cliprect->max_x && y <= cliprect->max_y)
 					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
@@ -85,9 +100,9 @@ static VIDEO_UPDATE( suprgolf )
 		{
 			for(x=0;x<512;x++)
 			{
-				color = suprgolf_fg_fb[count];
+				color = state->fg_fb[count];
 
-				if(((suprgolf_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
+				if(((state->fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
 					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
 
 				count++;
@@ -95,29 +110,31 @@ static VIDEO_UPDATE( suprgolf )
 		}
 	}
 
-	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 
 	return 0;
 }
 
-static UINT8 palette_switch;
-
 static READ8_HANDLER( suprgolf_videoram_r )
 {
-	if(palette_switch)
-		return space->machine->generic.paletteram.u8[offset];
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+
+	if (state->palette_switch)
+		return state->paletteram[offset];
 	else
-		return space->machine->generic.videoram.u8[offset];
+		return state->videoram[offset];
 }
 
 static WRITE8_HANDLER( suprgolf_videoram_w )
 {
-	if(palette_switch)
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+
+	if(state->palette_switch)
 	{
 		int r,g,b,datax;
-		space->machine->generic.paletteram.u8[offset] = data;
+		state->paletteram[offset] = data;
 		offset>>=1;
-		datax=space->machine->generic.paletteram.u8[offset*2]+256*space->machine->generic.paletteram.u8[offset*2+1];
+		datax = state->paletteram[offset*2] + 256*state->paletteram[offset*2 + 1];
 
 		b = (datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
 		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
@@ -127,26 +144,28 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	}
 	else
 	{
-		space->machine->generic.videoram.u8[offset] = data;
-		tilemap_mark_tile_dirty(suprgolf_tilemap, (offset & 0x7fe) >> 1);
+		state->videoram[offset] = data;
+		tilemap_mark_tile_dirty(state->tilemap, (offset & 0x7fe) >> 1);
 	}
 }
 
 static READ8_HANDLER( suprgolf_vregs_r )
 {
-	return suprgolf_vreg_bank;
-}
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
 
-static UINT8 suprgolf_bg_vreg_test;
+	return state->vreg_bank;
+}
 
 static WRITE8_HANDLER( suprgolf_vregs_w )
 {
-	//bits 0,1,2 and probably 3 controls the background vram banking
-	suprgolf_vreg_bank = data;
-	palette_switch = (data & 0x80);
-	suprgolf_bg_bank = (data & 0x1f);
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
 
-	suprgolf_bg_vreg_test = data & 0x20;
+	//bits 0,1,2 and probably 3 controls the background vram banking
+	state->vreg_bank = data;
+	state->palette_switch = (data & 0x80);
+	state->bg_bank = (data & 0x1f);
+
+	state->bg_vreg_test = data & 0x20;
 
 	//if(data & 0x60)
 	//  printf("Video regs with data %02x activated\n",data);
@@ -154,13 +173,16 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 
 static READ8_HANDLER( suprgolf_bg_vram_r )
 {
-	return suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000];
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+
+	return state->bg_vram[offset+state->bg_bank*0x2000];
 }
 
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
 {
-	static UINT8 hi_nibble,lo_nibble;
-	static UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+	UINT8 hi_nibble,lo_nibble;
+	UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
 
 	hi_nibble = data & 0xf0;
 	lo_nibble = data & 0x0f;
@@ -169,66 +191,73 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 
 	if(hi_nibble == 0xf0)
 	{
-		hi_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0;
-		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
+		hi_nibble = state->bg_vram[offset+state->bg_bank*0x2000] & 0xf0;
+		if(!(state->vreg_pen & 0x80) && (!(state->bg_bank & 0x10)))
 			hi_dirty_dot = 0;
 	}
 
 	if(lo_nibble == 0x0f)
 	{
-		lo_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f;
-		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
+		lo_nibble = state->bg_vram[offset+state->bg_bank*0x2000] & 0x0f;
+		if(!(state->vreg_pen & 0x80) && (!(state->bg_bank & 0x10)))
 			lo_dirty_dot = 0;
 	}
 
-	if(suprgolf_vreg_pen & 0x80 || suprgolf_bg_bank & 0x10)
-		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
+	if(state->vreg_pen & 0x80 || state->bg_bank & 0x10)
+		state->bg_vram[offset+state->bg_bank*0x2000] = data;
 	else
-		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = hi_nibble|lo_nibble;
+		state->bg_vram[offset+state->bg_bank*0x2000] = hi_nibble|lo_nibble;
 
-	if(suprgolf_bg_bank & 0x10)
+	if(state->bg_bank & 0x10)
 	{
 		if(hi_dirty_dot)
-			suprgolf_fg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+1] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0)>>4);
+			state->fg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+1] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0xf0)>>4);
 		if(lo_dirty_dot)
-			suprgolf_fg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+0] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f)>>0);
+			state->fg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+0] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0x0f)>>0);
 	}
 	else
 	{
 		if(hi_dirty_dot)
-			suprgolf_bg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+1] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0)>>4);
+			state->bg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+1] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0xf0)>>4);
 		if(lo_dirty_dot)
-			suprgolf_bg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+0] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f)>>0);
+			state->bg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+0] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0x0f)>>0);
 	}
 }
 
 static WRITE8_HANDLER( suprgolf_pen_w )
 {
-	suprgolf_vreg_pen = data;
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+
+	state->vreg_pen = data;
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	msm5205next = data;
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+
+	state->msm5205next = data;
 }
 
 static READ8_HANDLER( rom_bank_select_r )
 {
-    return suprgolf_rom_bank;
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
+
+	return state->rom_bank;
 }
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
+	suprgolf_state *state = (suprgolf_state *)space->machine->driver_data;
 	UINT8 *region_base = memory_region(space->machine, "user1");
 
-	suprgolf_rom_bank = data;
+	state->rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 	memory_set_bankptr(space->machine, "bank2", region_base + (data&0x3f ) * 0x4000);
 
-	msm_nmi_mask = data & 0x40;
+	state->msm_nmi_mask = data & 0x40;
 	flip_screen_set(space->machine, data & 0x80);
 }
 
@@ -245,7 +274,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 
 static READ8_HANDLER( pedal_extra_bits_r )
 {
-	static UINT8 p1_sht_sw,p2_sht_sw;
+	UINT8 p1_sht_sw,p2_sht_sw;
 
 	p1_sht_sw = (input_port_read(space->machine, "P1_RELEASE") & 0x80)>>7;
 	p2_sht_sw = (input_port_read(space->machine, "P2_RELEASE") & 0x80)>>6;
@@ -269,7 +298,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_GENERIC(videoram) //foreground vram + paletteram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_MEMBER(suprgolf_state,videoram) //foreground vram + paletteram
 	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -404,19 +433,19 @@ static const ym2203_interface ym2203_config =
 
 static void adpcm_int(running_device *device)
 {
-	static int toggle = 0;
+	suprgolf_state *state = (suprgolf_state *)device->machine->driver_data;
 
 	{
 		msm5205_reset_w(device,0);
-		toggle ^= 1;
-		if(toggle)
+		state->toggle ^= 1;
+		if(state->toggle)
 		{
-			msm5205_data_w(device, (msm5205next & 0xf0) >> 4);
-			if(msm_nmi_mask) { cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
+			msm5205_data_w(device, (state->msm5205next & 0xf0) >> 4);
+			if(state->msm_nmi_mask) { cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
 		}
 		else
 		{
-			msm5205_data_w(device, (msm5205next & 0x0f) >> 0);
+			msm5205_data_w(device, (state->msm5205next & 0x0f) >> 0);
 		}
 	}
 }
@@ -429,13 +458,13 @@ static const msm5205_interface msm5205_config =
 
 static const gfx_layout gfxlayout =
 {
-   8,8,
-   RGN_FRAC(1,1),
-   4,
-   { 0, 1, 2, 3 },
-   { 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-   { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-   8*8*4
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*8*4
 };
 
 static GFXDECODE_START( suprgolf )
@@ -444,10 +473,15 @@ GFXDECODE_END
 
 static MACHINE_RESET( suprgolf )
 {
-	msm_nmi_mask = 0;
+	suprgolf_state *state = (suprgolf_state *)machine->driver_data;
+
+	state->msm_nmi_mask = 0;
 }
 
 static MACHINE_DRIVER_START( suprgolf )
+
+	MDRV_DRIVER_DATA( suprgolf_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(main_map)

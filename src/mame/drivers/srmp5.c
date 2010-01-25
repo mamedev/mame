@@ -42,15 +42,6 @@ This is not a bug (real machine behaves the same).
 #include "includes/st0016.h"
 
 #define DEBUG_CHAR
-static UINT32 databank;
-static UINT32 srmp5_vidregs[0x120 / 4];
-static UINT16 *tileram, *palram;
-static UINT16 *sprram;
-static UINT8 cmd1 = 0, cmd2 = 0, cmd_stat = 0;
-
-#ifdef DEBUG_CHAR
-static UINT8 tileduty[0x2000];
-#endif
 
 #define SPRITE_GLOBAL_X 0
 #define SPRITE_GLOBAL_Y 1
@@ -71,20 +62,41 @@ static UINT8 tileduty[0x2000];
 
 #define SPRITE_DATA_GRANULARITY 0x80
 
+typedef struct _srmp5_state srmp5_state;
+struct _srmp5_state
+{
+	UINT32 databank;
+	UINT16 *tileram;
+	UINT16 *palram;
+	UINT16 *sprram;
+
+	UINT8 input_select;
+
+	UINT8 cmd1;
+	UINT8 cmd2;
+	UINT8 cmd_stat;
+
+	UINT32 vidregs[0x120 / 4];
+#ifdef DEBUG_CHAR
+	UINT8 tileduty[0x2000];
+#endif
+};
+
 
 static VIDEO_UPDATE( srmp5 )
 {
+	srmp5_state *state = (srmp5_state *)screen->machine->driver_data;
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
-	UINT16 *sprite_list=sprram;
-	UINT16 *sprite_list_end=&sprram[0x4000]; //guess
-	UINT8 *pixels=(UINT8 *)tileram;
+	UINT16 *sprite_list=state->sprram;
+	UINT16 *sprite_list_end=&state->sprram[0x4000]; //guess
+	UINT8 *pixels=(UINT8 *)state->tileram;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
 #ifdef BG_ENABLE
-	UINT8 tile_width  = (srmp5_vidregs[2] >> 0) & 0xFF;
-	UINT8 tile_height = (srmp5_vidregs[2] >> 8) & 0xFF;
+	UINT8 tile_width  = (state->vidregs[2] >> 0) & 0xFF;
+	UINT8 tile_height = (state->vidregs[2] >> 8) & 0xFF;
 	if(tile_width && tile_height)
 	{
 		// 16x16 tile
@@ -104,7 +116,7 @@ static VIDEO_UPDATE( srmp5 )
 						UINT8 pen = pixels[address];
 						if(pen)
 						{
-							UINT16 pixdata=palram[pen];
+							UINT16 pixdata=state->palram[pen];
 							*BITMAP_ADDR32(bitmap, yw * 16 + y, xw * 16 + x) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
 						}
 						address++;
@@ -119,7 +131,7 @@ static VIDEO_UPDATE( srmp5 )
 
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{
-		UINT16 *sprite_sublist=&sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
+		UINT16 *sprite_sublist=&state->sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
 		UINT16 sublist_length=sprite_list[SUBLIST_LENGTH];
 		INT16 global_x,global_y;
 
@@ -156,7 +168,7 @@ static VIDEO_UPDATE( srmp5 )
 								{
 									if(xb+xs2<=visarea->max_x && xb+xs2>=visarea->min_x && yb+ys2<=visarea->max_y && yb+ys2>=visarea->min_y )
 									{
-										UINT16 pixdata=palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
+										UINT16 pixdata=state->palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 										*BITMAP_ADDR32(bitmap, yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
 									}
 								}
@@ -177,10 +189,10 @@ static VIDEO_UPDATE( srmp5 )
 		int i;
 		for(i = 0; i < 0x2000; i++)
 		{
-			if(tileduty[i] == 1)
+			if (state->tileduty[i] == 1)
 			{
-				decodechar(screen->machine->gfx[0], i, (UINT8 *)tileram);
-				tileduty[i] = 0;
+				decodechar(screen->machine->gfx[0], i, (UINT8 *)state->tileram);
+				state->tileduty[i] = 0;
 			}
 		}
 	}
@@ -190,62 +202,80 @@ static VIDEO_UPDATE( srmp5 )
 
 static READ32_HANDLER(srmp5_palette_r)
 {
-	return palram[offset];
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	return state->palram[offset];
 }
 
 static WRITE32_HANDLER(srmp5_palette_w)
 {
-	COMBINE_DATA(&palram[offset]);
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->palram[offset]);
 	palette_set_color(space->machine, offset, MAKE_RGB(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
 }
 static WRITE32_HANDLER(bank_w)
 {
-	COMBINE_DATA(&databank);
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->databank);
 }
 
 static READ32_HANDLER(tileram_r)
 {
-	return tileram[offset];
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	return state->tileram[offset];
 }
 
 static WRITE32_HANDLER(tileram_w)
 {
-	tileram[offset] = data & 0xFFFF; //lower 16bit only
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	state->tileram[offset] = data & 0xFFFF; //lower 16bit only
 #ifdef DEBUG_CHAR
-	tileduty[offset >> 6] = 1;
+	state->tileduty[offset >> 6] = 1;
 #endif
 }
 
 static READ32_HANDLER(spr_r)
 {
-	return sprram[offset];
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	return state->sprram[offset];
 }
 
 static WRITE32_HANDLER(spr_w)
 {
-	sprram[offset] = data & 0xFFFF; //lower 16bit only
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	state->sprram[offset] = data & 0xFFFF; //lower 16bit only
 }
 
 static READ32_HANDLER(data_r)
 {
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
 	UINT32 data;
 	const UINT8 *usr = memory_region(space->machine, "user2");
-	data=((databank>>4)&0xf)*0x100000; //guess
+
+	data=((state->databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;
 	return data|(data<<16);
 }
 
-static UINT8 input_select = 0;
-
 static WRITE32_HANDLER(input_select_w)
 {
-	input_select = data & 0x0F;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	state->input_select = data & 0x0F;
 }
 
 static READ32_HANDLER(srmp5_inputs_r)
 {
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
 	UINT32 ret = 0;
-	switch(input_select)
+
+	switch (state->input_select)
 	{
 	case 0x01:
 		ret = input_port_read(space->machine, "IN0");
@@ -267,33 +297,43 @@ static READ32_HANDLER(srmp5_inputs_r)
 //almost all cmds are sound related
 static WRITE32_HANDLER(cmd1_w)
 {
-	cmd1 = data & 0xFF;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	state->cmd1 = data & 0xFF;
 	logerror("cmd1_w %08X\n", data);
 }
 
 static WRITE32_HANDLER(cmd2_w)
 {
-	cmd2 = data & 0xFF;
-	cmd_stat = 5;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	state->cmd2 = data & 0xFF;
+	state->cmd_stat = 5;
 	logerror("cmd2_w %08X\n", data);
 }
 
 static READ32_HANDLER(cmd_stat32_r)
 {
-	return cmd_stat;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	return state->cmd_stat;
 }
 
 static READ32_HANDLER(srmp5_vidregs_r)
 {
-	logerror("vidregs read  %08X %08X\n", offset << 2, srmp5_vidregs[offset]);
-	return srmp5_vidregs[offset];
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	logerror("vidregs read  %08X %08X\n", offset << 2, state->vidregs[offset]);
+	return state->vidregs[offset];
 }
 
 static WRITE32_HANDLER(srmp5_vidregs_w)
 {
-	COMBINE_DATA(&srmp5_vidregs[offset]);
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->vidregs[offset]);
 	if(offset != 0x10C / 4)
-		logerror("vidregs write %08X %08X\n", offset << 2, srmp5_vidregs[offset]);
+		logerror("vidregs write %08X %08X\n", offset << 2, state->vidregs[offset]);
 }
 
 static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -339,18 +379,24 @@ READ8_HANDLER(st0016_dma_r);
 
 static READ8_HANDLER(cmd1_r)
 {
-	cmd_stat = 0;
-	return cmd1;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	state->cmd_stat = 0;
+	return state->cmd1;
 }
 
 static READ8_HANDLER(cmd2_r)
 {
-	return cmd2;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	return state->cmd2;
 }
 
 static READ8_HANDLER(cmd_stat8_r)
 {
-	return cmd_stat;
+	srmp5_state *state = (srmp5_state *)space->machine->driver_data;
+
+	return state->cmd_stat;
 }
 
 static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
@@ -507,10 +553,13 @@ static const gfx_layout tile_16x16x8_layout =
 
 static GFXDECODE_START( srmp5 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x8x8_layout,  0x0, 0x800  )
-//  GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
+	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( srmp5 )
+
+	MDRV_DRIVER_DATA( srmp5_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
@@ -575,12 +624,14 @@ ROM_END
 
 static DRIVER_INIT(srmp5)
 {
-	st0016_game=9;
-	tileram = auto_alloc_array(machine, UINT16, 0x100000/2);
-	sprram  = auto_alloc_array(machine, UINT16, 0x080000/2);
-	palram  = auto_alloc_array(machine, UINT16, 0x040000/2);
+	srmp5_state *state = (srmp5_state *)machine->driver_data;
+	st0016_game = 9;
+
+	state->tileram = auto_alloc_array(machine, UINT16, 0x100000/2);
+	state->sprram  = auto_alloc_array(machine, UINT16, 0x080000/2);
+	state->palram  = auto_alloc_array(machine, UINT16, 0x040000/2);
 #ifdef DEBUG_CHAR
-	memset(tileduty, 1, 0x2000);
+	memset(state->tileduty, 1, 0x2000);
 #endif
 }
 

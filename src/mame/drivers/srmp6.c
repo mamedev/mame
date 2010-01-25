@@ -71,12 +71,23 @@ Dumped 06/15/2000
 #include "deprecat.h"
 #include "sound/nile.h"
 
-static UINT16* tileram;
-static UINT16* dmaram;
+typedef struct _srmp6_state srmp6_state;
+struct _srmp6_state
+{
+	UINT16* tileram;
+	UINT16* dmaram;
 
-static UINT16 *sprram, *sprram_old;
+	UINT16 *sprram;
+	UINT16 *sprram_old;
 
-static int brightness;
+	int brightness;
+	UINT16 input_select;
+	UINT16 *video_regs;
+
+	unsigned short lastb;
+	unsigned short lastb2;
+	int destl;
+};
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -94,8 +105,9 @@ static const gfx_layout tiles8x8_layout =
 
 static void update_palette(running_machine *machine)
 {
+	srmp6_state *state = (srmp6_state *)machine->driver_data;
 	INT8 r, g ,b;
-	int brg = brightness - 0x60;
+	int brg = state->brightness - 0x60;
 	int i;
 
 	for(i = 0; i < 0x800; i++)
@@ -126,19 +138,17 @@ static void update_palette(running_machine *machine)
 
 static VIDEO_START(srmp6)
 {
-	tileram = auto_alloc_array(machine, UINT16, 0x100000*16/2);
-	memset(tileram,0x00,(0x100000*16));
+	srmp6_state *state = (srmp6_state *)machine->driver_data;
 
-	dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
-
-	sprram_old = auto_alloc_array(machine, UINT16, 0x80000/2);
-	memset(sprram_old, 0, 0x80000);
+	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x100000*16/2);
+	state->dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
+	state->sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)tileram, machine->config->total_colors / 256, 0);
+	machine->gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)state->tileram, machine->config->total_colors / 256, 0);
 	machine->gfx[0]->color_granularity=256;
 
-	brightness = 0x60;
+	state->brightness = 0x60;
 }
 
 #if 0
@@ -147,9 +157,10 @@ static int xixi=0;
 
 static VIDEO_UPDATE(srmp6)
 {
+	srmp6_state *state = (srmp6_state *)screen->machine->driver_data;
 	int alpha;
 	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
-	UINT16 *sprite_list=sprram_old;
+	UINT16 *sprite_list = state->sprram_old;
 	UINT16 mainlist_offset = 0;
 
 	union
@@ -179,7 +190,7 @@ static VIDEO_UPDATE(srmp6)
 	while (mainlist_offset<0x2000/2)
 	{
 
-		UINT16 *sprite_sublist=&sprram_old[sprite_list[mainlist_offset+1]<<3];
+		UINT16 *sprite_sublist = &state->sprram_old[sprite_list[mainlist_offset+1]<<3];
 		UINT16 sublist_length=sprite_list[mainlist_offset+0]&0x7fff; //+1 ?
 		INT16 global_x,global_y, flip_x, flip_y;
 		UINT16 global_pal;
@@ -206,7 +217,7 @@ static VIDEO_UPDATE(srmp6)
 			{
 				alpha = 255;
 			}
-	//  printf("%x %x \n",sprite_list[mainlist_offset+1],sublist_length);
+			//  printf("%x %x \n",sprite_list[mainlist_offset+1],sublist_length);
 
 			while(sublist_length)
 			{
@@ -257,12 +268,12 @@ static VIDEO_UPDATE(srmp6)
 		mainlist_offset+=8;
 	}
 
-	memcpy(sprram_old, sprram, 0x80000);
+	memcpy(state->sprram_old, state->sprram, 0x80000);
 
 	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
-		fwrite(tileram,1,0x100000*16,p);
+		fwrite(state->tileram, 1, 0x100000*16, p);
 		fclose(p);
 	}
 
@@ -274,19 +285,21 @@ static VIDEO_UPDATE(srmp6)
     Main CPU memory handlers
 ***************************************************************************/
 
-static UINT16 srmp6_input_select = 0;
-
 static WRITE16_HANDLER( srmp6_input_select_w )
 {
-	srmp6_input_select = data & 0x0f;
+	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+
+	state->input_select = data & 0x0f;
 }
 
 static READ16_HANDLER( srmp6_inputs_r )
 {
+	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+
 	if (offset == 0)			// DSW
 		return input_port_read(space->machine, "DSW");
 
-	switch(srmp6_input_select)	// inputs
+	switch (state->input_select)	// inputs
 	{
 		case 1<<0: return input_port_read(space->machine, "KEY0");
 		case 1<<1: return input_port_read(space->machine, "KEY1");
@@ -298,10 +311,10 @@ static READ16_HANDLER( srmp6_inputs_r )
 }
 
 
-static UINT16 *video_regs;
-
 static WRITE16_HANDLER( video_regs_w )
 {
+	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+
 	switch(offset)
 	{
 
@@ -315,8 +328,8 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x5c/2: // either 0x40 explicitely in many places, or according $2083b0 (IT4)
 			//Fade in/out (0x40(dark)-0x60(normal)-0x7e?(bright) reset by 0x00?
 			data = (!data)?0x60:(data == 0x5e)?0x60:data;
-			if(brightness != data) {
-				brightness = data;
+			if (state->brightness != data) {
+				state->brightness = data;
 				update_palette(space->machine);
 			}
 			break;
@@ -335,51 +348,49 @@ static WRITE16_HANDLER( video_regs_w )
 			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(space->cpu), offset*2, data, mem_mask);
 			break;
 	}
-	COMBINE_DATA(&video_regs[offset]);
+	COMBINE_DATA(&state->video_regs[offset]);
 }
 
 static READ16_HANDLER( video_regs_r )
 {
+	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+
 	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(space->cpu), offset*2);
-	return video_regs[offset];
+	return state->video_regs[offset];
 }
 
 
 /* DMA RLE stuff - the same as CPS3 */
-static unsigned short lastb;
-static unsigned short lastb2;
-static int destl;
-
 static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 {
-
+	srmp6_state *state = (srmp6_state *)machine->driver_data;
 	int l=0;
 
-	UINT8 *tram=(UINT8*)tileram;
+	UINT8 *tram=(UINT8*)state->tileram;
 
-	if(lastb==lastb2)	//rle
+	if (state->lastb == state->lastb2)	//rle
 	{
 		int i;
 		int rle=(b+1)&0xff;
 
 		for(i=0;i<rle;++i)
 		{
-			tram[dst_offset+destl] = lastb;
-			gfx_element_mark_dirty(machine->gfx[0], (dst_offset+destl)/0x40);
+			tram[dst_offset + state->destl] = state->lastb;
+			gfx_element_mark_dirty(machine->gfx[0], (dst_offset + state->destl)/0x40);
 
 			dst_offset++;
 			++l;
 		}
-		lastb2=0xffff;
+		state->lastb2 = 0xffff;
 
 		return l;
 	}
 	else
 	{
-		lastb2=lastb;
-		lastb=b;
-		tram[dst_offset+destl] = b;
-		gfx_element_mark_dirty(machine->gfx[0], (dst_offset+destl)/0x40);
+		state->lastb2 = state->lastb;
+		state->lastb = b;
+		tram[dst_offset + state->destl] = b;
+		gfx_element_mark_dirty(machine->gfx[0], (dst_offset + state->destl)/0x40);
 
 		return 1;
 	}
@@ -388,8 +399,11 @@ static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 
 static WRITE16_HANDLER(srmp6_dma_w)
 {
+	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	UINT16* dmaram = state->dmaram;
+
 	COMBINE_DATA(&dmaram[offset]);
-	if(offset==13 && dmaram[offset]==0x40)
+	if (offset==13 && dmaram[offset]==0x40)
 	{
 		const UINT8 *rom = memory_region(space->machine, "nile");
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
@@ -414,10 +428,10 @@ static WRITE16_HANDLER(srmp6_dma_w)
 				dmaram[0x18/2],
 				dmaram[0x1a/2]));
 
-		destl=dmaram[9]*0x40000;
+		state->destl = dmaram[9]*0x40000;
 
-		lastb=0xfffe;
-		lastb2=0xffff;
+		state->lastb = 0xfffe;
+		state->lastb2 = 0xffff;
 
 		while(1)
 		{
@@ -459,14 +473,14 @@ static WRITE16_HANDLER(srmp6_dma_w)
 /* if tileram is actually bigger than the mapped area, how do we access the rest? */
 static READ16_HANDLER(tileram_r)
 {
-//  return tileram[offset];
+	//return state->tileram[offset];
 	return 0x0000;
 }
 
 static WRITE16_HANDLER(tileram_w)
 {
 	//UINT16 tmp;
-//  COMBINE_DATA(&tileram[offset]);
+	//COMBINE_DATA(&state->tileram[offset]);
 
 	/* are the DMA registers enabled some other way, or always mapped here, over RAM? */
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
@@ -478,8 +492,9 @@ static WRITE16_HANDLER(tileram_w)
 
 static WRITE16_HANDLER(paletteram_w)
 {
+	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
 	INT8 r, g, b;
-	int brg = brightness - 0x60;
+	int brg = state->brightness - 0x60;
 
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 
@@ -521,20 +536,20 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x4d0000, 0x4d0001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 
 	// OBJ RAM: checked [$400000-$47dfff]
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_BASE(&sprram)
+	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_BASE_MEMBER(srmp6_state,sprram)
 
 	// CHR RAM: checked [$500000-$5fffff]
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w)//AM_RAM AM_BASE(&tileram)
-//  AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE(&dmaram)
+	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w)//AM_RAM AM_BASE_MEMBER(srmp6_state,tileram)
+	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE_MEMBER(srmp6_state,dmaram)
 
-	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE(&video_regs)	// ? gfx regs ST-0026 NiLe
+	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE_MEMBER(srmp6_state,video_regs)	// ? gfx regs ST-0026 NiLe
 	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_snd_r, nile_snd_w) AM_BASE(&nile_sound_regs)
 	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_sndctrl_r, nile_sndctrl_w)
-//  AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
-//  AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
+	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
+	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 
-//  AM_RANGE(0xf00004, 0xf00005) AM_RAM // ?
-//  AM_RANGE(0xf00006, 0xf00007) AM_RAM // ?
+	//AM_RANGE(0xf00004, 0xf00005) AM_RAM // ?
+	//AM_RANGE(0xf00006, 0xf00007) AM_RAM // ?
 
 ADDRESS_MAP_END
 
@@ -644,6 +659,9 @@ static INTERRUPT_GEN(srmp6_interrupt)
 }
 
 static MACHINE_DRIVER_START( srmp6 )
+
+	MDRV_DRIVER_DATA( srmp6_state )
+
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6)
 	MDRV_CPU_VBLANK_INT_HACK(srmp6_interrupt,2)

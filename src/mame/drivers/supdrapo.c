@@ -32,7 +32,14 @@ A3-1J
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static UINT8 *char_bank,*col_line;
+
+typedef struct _supdrapo_state supdrapo_state;
+struct _supdrapo_state
+{
+	UINT8 *char_bank;
+	UINT8 *col_line;
+	UINT8 *videoram;
+};
 
 static READ8_HANDLER( sdpoker_rng_r )
 {
@@ -43,10 +50,10 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_BASE(&col_line)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(supdrapo_state,col_line)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE(&char_bank)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_MEMBER(supdrapo_state,videoram)
+	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE_MEMBER(supdrapo_state,char_bank)
 	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
 	AM_RANGE(0x7c00, 0x7c00) AM_WRITENOP //?
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITENOP
@@ -194,6 +201,7 @@ static VIDEO_START( supdrapo )
 
 static VIDEO_UPDATE( supdrapo )
 {
+	supdrapo_state *state = (supdrapo_state *)screen->machine->driver_data;
 	int x,y;
 	int count;
 	int color;
@@ -204,9 +212,9 @@ static VIDEO_UPDATE( supdrapo )
 	{
 		for(x=0;x<32;x++)
 		{
-			int tile = screen->machine->generic.videoram.u8[count] + char_bank[count] * 0x100;
+			int tile = state->videoram[count] + state->char_bank[count] * 0x100;
 			/* Global Column Coloring, GUESS! */
-			color = col_line[(x*2)+1] ? (col_line[(x*2)+1]-1) & 0x7 : 0;
+			color = state->col_line[(x*2)+1] ? (state->col_line[(x*2)+1]-1) & 0x7 : 0;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
 
@@ -245,6 +253,9 @@ static PALETTE_INIT( sdpoker )
 }
 
 static MACHINE_DRIVER_START( supdrapo )
+
+	MDRV_DRIVER_DATA( supdrapo_state )
+
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* ??? */
 	MDRV_CPU_PROGRAM_MAP(sdpoker_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

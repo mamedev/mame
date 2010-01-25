@@ -27,28 +27,38 @@
 #include "machine/laserdsc.h"
 #include "video/resnet.h"
 
-static running_device *laserdisc;
-static UINT8 superdq_ld_in_latch;
-static UINT8 superdq_ld_out_latch;
+typedef struct _superdq_state superdq_state;
+struct _superdq_state
+{
+	running_device *laserdisc;
+	UINT8 ld_in_latch;
+	UINT8 ld_out_latch;
 
-static tilemap_t *superdq_tilemap;
-static int superdq_color_bank = 0;
+	UINT8 *videoram;
+	tilemap_t *tilemap;
+	int color_bank;
+};
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int tile = machine->generic.videoram.u8[tile_index];
+	superdq_state *state = (superdq_state *)machine->driver_data;
+	int tile = state->videoram[tile_index];
 
-	SET_TILE_INFO(0,tile,superdq_color_bank,0);
+	SET_TILE_INFO(0, tile, state->color_bank, 0);
 }
 
 static VIDEO_START( superdq )
 {
-	superdq_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
+	superdq_state *state = (superdq_state *)machine->driver_data;
+
+	state->tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( superdq )
 {
-	tilemap_draw(bitmap,cliprect,superdq_tilemap,0,0);
+	superdq_state *state = (superdq_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 
 	return 0;
 }
@@ -102,33 +112,40 @@ static PALETTE_INIT( superdq )
 
 static MACHINE_RESET( superdq )
 {
-	superdq_ld_in_latch = 0;
-	superdq_ld_out_latch = 0xff;
-	superdq_color_bank = 0;
+	superdq_state *state = (superdq_state *)machine->driver_data;
+
+	state->ld_in_latch = 0;
+	state->ld_out_latch = 0xff;
+	state->color_bank = 0;
 }
 
 static INTERRUPT_GEN( superdq_vblank )
 {
+	superdq_state *state = (superdq_state *)device->machine->driver_data;
+
 	/* status is read when the STATUS line from the laserdisc
        toggles (600usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	superdq_ld_in_latch = laserdisc_data_r(laserdisc);
+	state->ld_in_latch = laserdisc_data_r(state->laserdisc);
 
 	/* command is written when the COMMAND line from the laserdisc
        toggles (680usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	laserdisc_data_w(laserdisc, superdq_ld_out_latch);
+	laserdisc_data_w(state->laserdisc, state->ld_out_latch);
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( superdq_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(superdq_tilemap,offset);
+	superdq_state *state = (superdq_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap,offset);
 }
 
 static WRITE8_HANDLER( superdq_io_w )
 {
+	superdq_state *state = (superdq_state *)space->machine->driver_data;
 	int 			i;
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
@@ -138,7 +155,7 @@ static WRITE8_HANDLER( superdq_io_w )
 	coin_counter_w( space->machine, 0, data & 0x08 );
 	coin_counter_w( space->machine, 1, data & 0x04 );
 
-	superdq_color_bank = ( data & 2 ) ? 1 : 0;
+	state->color_bank = ( data & 2 ) ? 1 : 0;
 
 	for( i = 0; i < ARRAY_LENGTH( black_color_entries ); i++ )
 	{
@@ -158,12 +175,16 @@ static WRITE8_HANDLER( superdq_io_w )
 
 static READ8_HANDLER( superdq_ld_r )
 {
-	return superdq_ld_in_latch;
+	superdq_state *state = (superdq_state *)space->machine->driver_data;
+
+	return state->ld_in_latch;
 }
 
 static WRITE8_HANDLER( superdq_ld_w )
 {
-	superdq_ld_out_latch = data;
+	superdq_state *state = (superdq_state *)space->machine->driver_data;
+
+	state->ld_out_latch = data;
 }
 
 
@@ -177,7 +198,7 @@ static WRITE8_HANDLER( superdq_ld_w )
 static ADDRESS_MAP_START( superdq_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_BASE_MEMBER(superdq_state,videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )
@@ -292,11 +313,15 @@ GFXDECODE_END
 
 static MACHINE_START( superdq )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	superdq_state *state = (superdq_state *)machine->driver_data;
+
+	state->laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 
 static MACHINE_DRIVER_START( superdq )
+
+	MDRV_DRIVER_DATA( superdq_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)

@@ -94,7 +94,7 @@ typedef BOOL (WINAPI *av_revert_mm_thread_characteristics_ptr)(HANDLE AvrtHandle
 // from dbghelp.dll
 typedef PIMAGE_NT_HEADERS (WINAPI *image_nt_header_ptr)(PVOID ImageBase);
 typedef BOOL (WINAPI *stack_walk_64_ptr)(DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord, PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine, PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress);
-typedef BOOL (WINAPI *sym_initialize_ptr)(HANDLE hProcess, PCTSTR UserSearchPath, BOOL fInvadeProcess);
+typedef BOOL (WINAPI *sym_initialize_ptr)(HANDLE hProcess, LPCTSTR UserSearchPath, BOOL fInvadeProcess);
 typedef PVOID (WINAPI *sym_function_table_access_64_ptr)(HANDLE hProcess, DWORD64 AddrBase);
 typedef DWORD64 (WINAPI *sym_get_module_base_64_ptr)(HANDLE hProcess, DWORD64 dwAddr);
 typedef BOOL (WINAPI *sym_from_addr_ptr)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);

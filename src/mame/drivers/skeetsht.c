@@ -13,13 +13,21 @@
 
 /*************************************
  *
- *  Statics
+ *  Structs
  *
  *************************************/
 
-static UINT16	*tms_vram;
-static UINT8	porta_latch;
-static UINT8	ay_sel;
+typedef struct _skeetsht_state skeetsht_state;
+struct _skeetsht_state
+{
+	UINT16 *tms_vram;
+	UINT8 porta_latch;
+	UINT8 ay_sel;
+	UINT8 lastdataw;
+	UINT16 lastdatar;
+	running_device *ay;
+	running_device *tms;
+};
 
 
 /*************************************
@@ -30,6 +38,11 @@ static UINT8	ay_sel;
 
 static MACHINE_RESET( skeetsht )
 {
+	skeetsht_state *state = (skeetsht_state *)machine->driver_data;
+
+	state->ay = devtag_get_device(machine, "aysnd");
+	state->tms = devtag_get_device(machine, "tms");
+
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 }
@@ -43,13 +56,13 @@ static MACHINE_RESET( skeetsht )
 
 static VIDEO_START ( skeetsht )
 {
-
 }
 
 static void skeetsht_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
+	skeetsht_state *state = (skeetsht_state *)screen->machine->driver_data;
 	const rgb_t *const pens = tlc34076_get_pens();
-	UINT16 *vram = &tms_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *vram = &state->tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	int coladdr = params->coladdr;
 	int x;
@@ -97,22 +110,22 @@ static void skeetsht_tms_irq(running_device *device, int state)
 
 static WRITE8_HANDLER( tms_w )
 {
-	static UINT8 lastdata;
+	skeetsht_state *state = (skeetsht_state *)space->machine->driver_data;
 
 	if ((offset & 1) == 0)
-		lastdata = data;
+		state->lastdataw = data;
 	else
-		tms34010_host_w(devtag_get_device(space->machine, "tms"), offset >> 1, (lastdata << 8) | data);
+		tms34010_host_w(state->tms, offset >> 1, (state->lastdataw << 8) | data);
 }
 
 static READ8_HANDLER( tms_r )
 {
-	static UINT16 data;
+	skeetsht_state *state = (skeetsht_state *)space->machine->driver_data;
 
 	if ((offset & 1) == 0)
-		data = tms34010_host_r(devtag_get_device(space->machine, "tms"), offset >> 1);
+		state->lastdatar = tms34010_host_r(state->tms, offset >> 1);
 
-	return data >> ((offset & 1) ? 0 : 8);
+	return state->lastdatar >> ((offset & 1) ? 0 : 8);
 }
 
 
@@ -124,25 +137,29 @@ static READ8_HANDLER( tms_r )
 
 static READ8_HANDLER( hc11_porta_r )
 {
-	return porta_latch;
+	skeetsht_state *state = (skeetsht_state *)space->machine->driver_data;
+
+	return state->porta_latch;
 }
 
 static WRITE8_HANDLER( hc11_porta_w )
 {
-	if (!(data & 0x8) && (porta_latch & 8))
-		ay_sel = porta_latch & 0x10;
+	skeetsht_state *state = (skeetsht_state *)space->machine->driver_data;
 
-	porta_latch = data;
+	if (!(data & 0x8) && (state->porta_latch & 8))
+		state->ay_sel = state->porta_latch & 0x10;
+
+	state->porta_latch = data;
 }
 
 static WRITE8_HANDLER( ay8910_w )
 {
-	running_device *ay = devtag_get_device(space->machine, "aysnd");
+	skeetsht_state *state = (skeetsht_state *)space->machine->driver_data;
 
-	if (ay_sel)
-		ay8910_data_w(ay, 0, data);
+	if (state->ay_sel)
+		ay8910_data_w(state->ay, 0, data);
 	else
-		ay8910_address_w(ay, 0, data);
+		ay8910_address_w(state->ay, 0, data);
 }
 
 
@@ -172,7 +189,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tms_vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(skeetsht_state,tms_vram)
 	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE(ramdac_r, ramdac_w)
 	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_MIRROR(0x00400000) AM_REGION("tms", 0)
 ADDRESS_MAP_END
@@ -228,6 +245,9 @@ static const tms34010_config tms_config =
  *************************************/
 
 static MACHINE_DRIVER_START( skeetsht )
+
+	MDRV_DRIVER_DATA( skeetsht_state )
+
 	MDRV_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
 	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MDRV_CPU_IO_MAP(hc11_io_map)

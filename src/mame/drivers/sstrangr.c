@@ -12,10 +12,13 @@
 
 #define NUM_PENS	(8)
 
-
-static UINT8 *sstrngr_ram;
-static size_t sstrngr_ram_size;
-static UINT8 sstrngr_flip_screen;
+typedef struct _sstrangr_state sstrangr_state;
+struct _sstrangr_state
+{
+	UINT8 *ram;
+	UINT8 flip_screen;
+	UINT8 *proms;
+};
 
 
 
@@ -27,21 +30,22 @@ static UINT8 sstrngr_flip_screen;
 
 static VIDEO_UPDATE( sstrangr )
 {
+	sstrangr_state *state = (sstrangr_state *)screen->machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < sstrngr_ram_size; offs++)
+	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = sstrngr_ram[offs];
+		UINT8 data = state->ram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
-			if (sstrngr_flip_screen)
+			if (state->flip_screen)
 			{
 				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
 				data = data << 1;
@@ -75,15 +79,16 @@ static void get_pens(pen_t *pens)
 
 static VIDEO_UPDATE( sstrngr2 )
 {
+	sstrangr_state *state = (sstrangr_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
 
 	get_pens(pens);
 
-	color_map_base = &memory_region(screen->machine, "proms")[sstrngr_flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &memory_region(screen->machine, "proms")[state->flip_screen ? 0x0000 : 0x0200];
 
-	for (offs = 0; offs < sstrngr_ram_size; offs++)
+	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
 
@@ -92,14 +97,14 @@ static VIDEO_UPDATE( sstrngr2 )
 
 		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
 
-		UINT8 data = sstrngr_ram[offs];
+		UINT8 data = state->ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color;
 
-			if (sstrngr_flip_screen)
+			if (state->flip_screen)
 			{
 				color = (data & 0x80) ? fore_color : 0;
 				data = data << 1;
@@ -122,7 +127,9 @@ static VIDEO_UPDATE( sstrngr2 )
 
 static WRITE8_HANDLER( port_w )
 {
-	sstrngr_flip_screen = data & 0x20;
+	sstrangr_state *state = (sstrangr_state *)space->machine->driver_data;
+
+	state->flip_screen = data & 0x20;
 }
 
 
@@ -130,7 +137,7 @@ static WRITE8_HANDLER( port_w )
 static ADDRESS_MAP_START( sstrangr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&sstrngr_ram) AM_SIZE(&sstrngr_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(sstrangr_state,ram)
 	AM_RANGE(0x6000, 0x63ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -180,6 +187,8 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( sstrangr )
+
+	MDRV_DRIVER_DATA( sstrangr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",8080,1996800)	/* clock is a guess, taken from mw8080bw */

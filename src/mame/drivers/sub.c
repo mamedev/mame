@@ -112,9 +112,16 @@ PCB2  (Top board, CPU board)
 
 #define MASTER_CLOCK			XTAL_18_432MHz
 
-static UINT8* sub_vid;
-static UINT8* sub_attr;
-static UINT8* sub_scrolly;
+typedef struct _sub_state sub_state;
+struct _sub_state
+{
+	UINT8* vid;
+	UINT8* attr;
+	UINT8* scrolly;
+	UINT8* spriteram;
+	UINT8* spriteram2;
+	UINT8 nmi_en;
+};
 
 static VIDEO_START(sub)
 {
@@ -122,7 +129,9 @@ static VIDEO_START(sub)
 
 static VIDEO_UPDATE(sub)
 {
+	sub_state *state = (sub_state *)screen->machine->driver_data;
 	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx_1 = screen->machine->gfx[1];
 	int y,x;
 	int count = 0;
 
@@ -130,12 +139,12 @@ static VIDEO_UPDATE(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = sub_vid[count];
+			UINT16 tile = state->vid[count];
 			UINT8 col;
-			UINT8 y_offs = sub_scrolly[x];
+			UINT8 y_offs = state->scrolly[x];
 
-			tile += (sub_attr[count]&0xe0)<<3;
-			col = (sub_attr[count]&0x1f);
+			tile += (state->attr[count]&0xe0)<<3;
+			col = (state->attr[count]&0x1f);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
@@ -156,8 +165,8 @@ static VIDEO_UPDATE(sub)
     1 --cc cccc color
     */
 	{
-		UINT8 *spriteram = screen->machine->generic.spriteram.u8;
-		UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;
+		UINT8 *spriteram = state->spriteram;
+		UINT8 *spriteram_2 = state->spriteram2;
 		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
@@ -170,7 +179,7 @@ static VIDEO_UPDATE(sub)
 			if(fx) { x = 0xe0 - x; }
 			fy = (spriteram_2[i+0] & 0x40) ? 0 : 1;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,fy,x,y,0);
+			drawgfx_transpen(bitmap,cliprect,gfx_1,spr_offs,col,0,fy,x,y,0);
 		}
 	}
 
@@ -181,12 +190,12 @@ static VIDEO_UPDATE(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = sub_vid[count];
+			UINT16 tile = state->vid[count];
 			UINT8 col;
-			UINT8 y_offs = sub_scrolly[x];
+			UINT8 y_offs = state->scrolly[x];
 
-			tile += (sub_attr[count]&0xe0)<<3;
-			col = (sub_attr[count]&0x1f);
+			tile += (state->attr[count]&0xe0)<<3;
+			col = (state->attr[count]&0x1f);
 
 			if(x >= 28)
 			{
@@ -204,11 +213,11 @@ static VIDEO_UPDATE(sub)
 static ADDRESS_MAP_START( subm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(&sub_attr)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(&sub_vid)
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE_GENERIC(spriteram2)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(&sub_scrolly)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_MEMBER(sub_state,attr)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(sub_state,vid)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_MEMBER(sub_state,spriteram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE_MEMBER(sub_state,spriteram2)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(sub_state,scrolly)
 
 	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe800) AM_NOP
@@ -229,11 +238,11 @@ static WRITE8_HANDLER( subm_to_sound_w )
 	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
-static UINT8 nmi_en;
-
 static WRITE8_HANDLER( nmi_mask_w )
 {
-	nmi_en = data & 1;
+	sub_state *state = (sub_state *)space->machine->driver_data;
+
+	state->nmi_en = data & 1;
 }
 
 static ADDRESS_MAP_START( subm_io, ADDRESS_SPACE_IO, 8 )
@@ -348,14 +357,17 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static const gfx_layout tiles16x32_layout = {
-    16,32,
-    RGN_FRAC(1,3),
-    3,
-    { RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-    { 64+0, 64+1, 64+2, 64+3, 64+4, 64+5, 64+6, 64+7, 0, 1, 2, 3, 4, 5, 6, 7 },
-    { 55*8, 54*8, 53*8, 52*8, 51*8, 50*8, 49*8, 48*8, 39*8,38*8,37*8,36*8,35*8,34*8,33*8,32*8,23*8,22*8,21*8,20*8,19*8,18*8,17*8,16*8,7*8,
-6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-    64*8
+	16,32,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ 64+0, 64+1, 64+2, 64+3, 64+4, 64+5, 64+6, 64+7, 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 55*8, 54*8, 53*8, 52*8, 51*8, 50*8, 49*8, 48*8, 
+	  39*8, 38*8, 37*8, 36*8, 35*8, 34*8, 33*8, 32*8,
+	  23*8, 22*8, 21*8, 20*8, 19*8, 18*8, 17*8, 16*8,
+	   7*8,  6*8,  5*8,  4*8,  3*8,  2*8,  1*8,  0*8
+	},
+	64*8
 };
 
 static GFXDECODE_START( sub )
@@ -396,11 +408,16 @@ static PALETTE_INIT( sub )
 
 static INTERRUPT_GEN( subm_sound_irq )
 {
-	if(nmi_en)
+	sub_state *state = (sub_state *)device->machine->driver_data;
+
+	if(state->nmi_en)
 		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( sub )
+
+	MDRV_DRIVER_DATA( sub_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(subm_map)
