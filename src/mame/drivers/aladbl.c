@@ -129,6 +129,82 @@ ROM_START( aladbl )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
 ROM_END
 
+ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descramble in the rom load, and the data descramble in the init
+                    // this is bootlegged from  "Mortal Kombat 3 (4) [!].bin"
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "1.u1", 0x080001, 0x020000,  CRC(0dc01b23) SHA1(f1aa7ac88c8e3deb5a0a065862722e9d27b87b4c) )
+	ROM_CONTINUE(            0x000001, 0x020000)
+	ROM_CONTINUE(            0x0c0001, 0x020000)
+	ROM_CONTINUE(            0x040001, 0x020000)
+	ROM_LOAD16_BYTE( "2.u3", 0x180001, 0x040000,  CRC(50250235) SHA1(9f9e06f26163b92c76397fde43b38b3536bcb637) )
+	ROM_CONTINUE(            0x100001, 0x040000)
+	ROM_LOAD16_BYTE( "3.u9", 0x280001, 0x040000,  CRC(493404c1) SHA1(73f4bd1eeeee3f175f4378ab406a97f94f88880b) )
+	ROM_CONTINUE(            0x200001, 0x040000)
+	ROM_LOAD16_BYTE( "4.u11",0x380001, 0x040000,  CRC(a52156b8) SHA1(0990ef1fb3427a5d3c262e264feb25c1db75ed33) )
+	ROM_CONTINUE(            0x300001, 0x040000)
+	ROM_LOAD16_BYTE( "6.u2", 0x080000, 0x020000,  CRC(9852fd6f) SHA1(348befeca5129c5ea2c142760ec93511f98f23cc) )
+	ROM_CONTINUE(            0x000000, 0x020000)
+	ROM_CONTINUE(            0x0c0000, 0x020000)
+	ROM_CONTINUE(            0x040000, 0x020000)
+	ROM_LOAD16_BYTE( "5.u4", 0x180000, 0x040000,  CRC(ed6a6d13) SHA1(eaab912ee035ece03f7cfceb1b546004399daad5) )
+	ROM_CONTINUE(            0x100000, 0x040000)
+	ROM_LOAD16_BYTE( "7.u10",0x280000, 0x040000,  CRC(a124d8d1) SHA1(d391b130992701d0fae7e827ba314b8368d809de) )
+	ROM_CONTINUE(            0x200000, 0x040000)
+	ROM_LOAD16_BYTE( "8.u12",0x380000, 0x040000,  CRC(8176f7cc) SHA1(375e1e982b97ba709fb160b04f56f6aa2d580104) )
+	ROM_CONTINUE(            0x300000, 0x040000)
+ROM_END
+
+
+// this should be correct, the areas of the rom that differ to the original
+// after this decode look like intentional changes
+static DRIVER_INIT( mk3ghw )
+{
+	DRIVER_INIT_CALL(megadriv);
+
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	int x;
+
+	for (x=0x000001;x<0x100001;x+=2)
+	{
+		if (x&0x80000)
+		{
+			ROM[x] = ROM[x]^0xff;
+			ROM[x] = BITSWAP8(ROM[x], 0,3,2,5,4,6,7,1);
+		}
+		else
+		{
+			ROM[x] = ROM[x]^0xff;
+			ROM[x] = BITSWAP8(ROM[x], 4,0,7,1,3,6,2,5);
+		}
+	}
+
+	for (x=0x100001;x<0x400000;x+=2)
+	{
+		if (x&0x80000)
+		{
+			ROM[x] = ROM[x]^0xff;
+			ROM[x] = BITSWAP8(ROM[x], 2,7,5,4,1,0,3,6);
+		}
+		else
+		{
+			ROM[x] = BITSWAP8(ROM[x], 6,1,4,2,7,0,3,5);
+		}
+	}
+
+	// boot vectors don't seem to be valid...
+	// these are from the original, but I don't seem right for this either
+	ROM[1] = 0x01;
+	ROM[0] = 0x00;
+	ROM[3] = 0x00;
+	ROM[2] = 0x00;
+	ROM[5] = 0x00;
+	ROM[4] = 0x00;
+	ROM[7] = 0x02;
+	ROM[6] = 0x00;
+
+}
+
+
 static WRITE16_HANDLER( aladbl_w )
 {
     /*
@@ -162,3 +238,4 @@ static DRIVER_INIT( aladbl )
 }
 
 GAME( 1993, aladbl ,  0,   megadriv,    aladbl,       aladbl,  ROT0,   "bootleg / Sega", "Aladdin (bootleg of Japanese Megadrive version)", 0)
+GAME( 1996, mk3ghw ,  0,   megadriv,    aladbl,       mk3ghw,  ROT0,   "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", GAME_NOT_WORKING)

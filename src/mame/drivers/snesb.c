@@ -924,6 +924,20 @@ static DRIVER_INIT( iron )
 	DRIVER_INIT_CALL(snes);
 }
 
+static DRIVER_INIT( endless )
+{
+	INT32 i;
+	UINT8 *rom = memory_region(machine, "user3");
+	
+	/* there is more to this, 0x800 based block swaps? */
+	for(i=0;i<0x200000;i++)
+	{
+		rom[i]=rom[i]^0x55;
+	}
+
+	DRIVER_INIT_CALL(snes);
+}
+
 
 ROM_START( kinstb )
 	ROM_REGION( 0x400000, "user3", 0 )
@@ -936,7 +950,19 @@ ROM_START( kinstb )
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
 
 	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+ROM_END
 
+ROM_START( endless )
+	ROM_REGION( 0x400000, "user3", 0 )
+	ROM_LOAD( "endlessduel.unknownposition1", 0x000000, 0x80000, CRC(e49acd29) SHA1(ac137261fe7a7691738ac812bea9591256eb9038) )
+	ROM_LOAD( "endlessduel.unknownposition2", 0x080000, 0x80000, CRC(ad2052f9) SHA1(d61382e3d93eb0bff45fb534cec0ce5ae3626165) )
+	ROM_LOAD( "endlessduel.unknownposition3", 0x100000, 0x80000, CRC(30d06d7a) SHA1(17c617d94abb10c3bdf9d51013b116f4ef4debe8) )
+	ROM_LOAD( "endlessduel.unknownposition4", 0x180000, 0x80000, CRC(9a9493ad) SHA1(82ee4fce9cc2014cb8404fd43eebb7941cdb9ac1) )
+
+	ROM_REGION(0x100,           "user5", 0)
+	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( ffight2b )
@@ -1012,3 +1038,4 @@ GAME( 199?, kinstb,       0,     kinstb,	     kinstb,    kinstb,		ROT0, "bootleg
 GAME( 1996, ffight2b,     0,     kinstb,	     ffight2b,  ffight2b,	ROT0, "bootleg",	"Final Fight 2 (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b,  sblast2b,	ROT0, "bootleg",	"Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
 GAME( 1996, iron,         0,     kinstb,	     iron,      iron,		ROT0, "bootleg",	"Iron (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, endless,      0,     kinstb,	     iron,      endless,    ROT0, "bootleg",	"Gundam Wing: Endless Duel (SNES bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

@@ -1207,7 +1207,8 @@ const game_driver * const drivers[] =
 	DRIVER( kinstb )	/* bootleg */
 	DRIVER( ffight2b )	/* bootleg */
 	DRIVER( sblast2b )	/* bootleg */
-	DRIVER( iron )	    /* bootleg */
+	DRIVER( iron )		/* bootleg */
+	DRIVER( endless )	/* bootleg */
 
 	/* Midway 8080 b/w games */
 	DRIVER( seawolf )	/* 596 [1976] */
@@ -4426,6 +4427,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( ssf2ghw )	/* MegaDrive-based hack */
 	DRIVER( aladbl )	/* MegaDrive-based hack */
+	DRIVER( mk3ghw )	/* MegaDrive-based hack */
 	DRIVER( ssgbl )		/* MegaDrive-based hack */
 
 	/* Sega Naomi-based (Dreamcast) systems */
