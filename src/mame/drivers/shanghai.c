@@ -4,7 +4,7 @@ Shanghai
 
 driver by Nicola Salmoria
 
-The HD63484 emulation is incomplete, it implements the bare minimum required
+The hd63484 emulation is incomplete, it implements the bare minimum required
 to run these games.
 
 The end of round animation in Shanghai is wrong; change the opcode at 0xfb1f2
@@ -59,45 +59,47 @@ static PALETTE_INIT( shanghai )
 
 static VIDEO_START( shanghai )
 {
-	HD63484_start(machine);
 }
 
 static VIDEO_UPDATE( shanghai )
 {
-	int x,y,b;
+	running_device *hd63484 = devtag_get_device(screen->machine, "hd63484");
+	int x, y, b, src;
 
-	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
-	for (y = 0;y < 280;y++)
+	b = ((hd63484_regs_r(hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
+	for (y = 0; y < 280; y++)
 	{
-		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
+		for (x = 0 ; x < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
 		{
-			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b] & 0x00ff;
-			*BITMAP_ADDR16(bitmap, y, x+1) = (HD63484_ram[b] & 0xff00) >> 8;
+			b &= (HD63484_RAM_SIZE - 1);
+			src = hd63484_ram_r(hd63484, b, 0xffff);
+			*BITMAP_ADDR16(bitmap, y, x)     = src & 0x00ff;
+			*BITMAP_ADDR16(bitmap, y, x + 1) = (src & 0xff00) >> 8;
 			b++;
 		}
 	}
 
-	if ((HD63484_reg[0x06/2] & 0x0300) == 0x0300)
+	if ((hd63484_regs_r(hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
-		int sy = (HD63484_reg[0x94/2] & 0x0fff) - (HD63484_reg[0x88/2] >> 8);
-		int h = HD63484_reg[0x96/2] & 0x0fff;
-		int sx = ((HD63484_reg[0x92/2] >> 8) - (HD63484_reg[0x84/2] >> 8)) * 4;
-		int w = (HD63484_reg[0x92/2] & 0xff) * 4;
+		int sy = (hd63484_regs_r(hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, 0x88/2, 0xffff) >> 8);
+		int h = hd63484_regs_r(hd63484, 0x96/2, 0xffff) & 0x0fff;
+		int sx = ((hd63484_regs_r(hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(hd63484, 0x84/2, 0xffff) >> 8)) * 4;
+		int w = (hd63484_regs_r(hd63484, 0x92/2, 0xffff) & 0xff) * 4;
 		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
 
-		b = (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
+		b = (((hd63484_regs_r(hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xde/2, 0xffff));
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
+			for (x = 0 ; x < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
-				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 2)
-					{
-						*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b] & 0x00ff;
-						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0xff00) >> 8;
-					}
+				src = hd63484_ram_r(hd63484, b, 0xffff);
+				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 2)
+				{
+					*BITMAP_ADDR16(bitmap, y, x + sx)     = src & 0x00ff;
+					*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (src & 0xff00) >> 8;
+				}
 				b++;
 			}
 		}
@@ -134,8 +136,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( shanghai_portmap, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x00, 0x01) AM_READWRITE(HD63484_status_r, HD63484_address_w)
-	AM_RANGE(0x02, 0x03) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
 	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
@@ -148,21 +150,21 @@ static ADDRESS_MAP_START( shangha2_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x31) AM_READWRITE(HD63484_status_r, HD63484_address_w)
-	AM_RANGE(0x32, 0x33) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
+	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( kothello_HD63484_status_r )
+static READ16_HANDLER( kothello_hd63484_status_r )
 {
 	return 0xff22;	/* write FIFO ready + command end + read FIFO ready */
 }
 
 static ADDRESS_MAP_START( kothello_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_READWRITE(kothello_HD63484_status_r, HD63484_address_w)
-	AM_RANGE(0x08012, 0x08013) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE("hd63484", hd63484_address_w)
+	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
 	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
 	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
 	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
@@ -420,6 +422,7 @@ static const ym2203_interface kothello_ym2203_interface =
 	seibu_ym2203_irqhandler
 };
 
+static const hd63484_interface shanghai_hd63484_intf = { 0 };
 
 static MACHINE_DRIVER_START( shanghai )
 
@@ -441,6 +444,8 @@ static MACHINE_DRIVER_START( shanghai )
 	MDRV_PALETTE_INIT(shanghai)
 	MDRV_VIDEO_START(shanghai)
 	MDRV_VIDEO_UPDATE(shanghai)
+
+	MDRV_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -473,6 +478,8 @@ static MACHINE_DRIVER_START( shangha2 )
 
 	MDRV_VIDEO_START(shanghai)
 	MDRV_VIDEO_UPDATE(shanghai)
+
+	MDRV_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -510,6 +517,8 @@ static MACHINE_DRIVER_START( kothello )
 
 	MDRV_VIDEO_START(shanghai)
 	MDRV_VIDEO_UPDATE(shanghai)
+
+	MDRV_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -566,7 +575,7 @@ SSS8906
 |M             PAL            4464    4464 |
 |M                            4464    4464 |
 |A  ROM6                      4464    4464 |
-|              ROM5           HD63484      |
+|              ROM5           hd63484      |
 | YM3931                             898-3 |
 |                  SIS6091                 |
 |                                          |
@@ -585,13 +594,13 @@ Notes:
       YM3931 clock  : 4.000MHz
       YM2203 clock  : 4.000MHz
       M5205 clock   : 444598Hz; sample rate = M5205 clock / 48
-      HD63484 clock : pin50- 4.000MHz, pin52- 2.000MHz
+      hd63484 clock : pin50- 4.000MHz, pin52- 2.000MHz
       VSync         : 57Hz
 
-      HD63484  : Crt Controller
+      hd63484  : Crt Controller
       CXQ70116 : Compatible with NEC V30 (DIP40)
       D71011   : ? (DIP18) 710xx is series of common NEC ICs; timers, counters, parallel interface, interrupt controllers etc
-      898-3    : BI 898-3-R 22  8920  (?, DIP16, tied to HD63484)
+      898-3    : BI 898-3-R 22  8920  (?, DIP16, tied to hd63484)
       YM3931   : Also printed 'SEI0100BU' (SDIP64)
       SIS6091  : Custom QFP80 (Graphics controller?)
       4464     : 64K x4 DRAM
