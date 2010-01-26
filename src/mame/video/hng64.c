@@ -2287,7 +2287,15 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// Perform the world transformations...
 			// !! Can eliminate this step with a matrix stack (maybe necessary?) !!
 			setIdentity(modelViewMatrix);
-			matmul4(modelViewMatrix, modelViewMatrix, cameraMatrix);
+			if (hng64_mcu_type != SAMSHO_MCU)
+			{
+				// The sams64 games transform the geometry in front of a stationary camera.
+				// This is fine in sams64_2, since it never calls the 'camera transformation' function
+				// (thus using the identity matrix for this transform), but sams64 calls the 
+				// camera transformation function with rotation values.  
+				// It remains to be seen what those might do...
+				matmul4(modelViewMatrix, modelViewMatrix, cameraMatrix);
+			}
 			matmul4(modelViewMatrix, modelViewMatrix, objectMatrix);
 
 			// BACKFACE CULL //
