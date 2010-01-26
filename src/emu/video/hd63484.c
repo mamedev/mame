@@ -1,10 +1,11 @@
 /***************************************************************************
 
-hd63484
+  HD63484 ACRTC
+  Advanced CRT Controller.
 
-this chip is used in:
-- shanghai.c
-- adp.c
+  This chip is used in:
+  - shanghai.c
+  - adp.c
 
 ***************************************************************************/
 

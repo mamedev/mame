@@ -1,6 +1,7 @@
 /*
+
 ADP (Merkur?) games from '90 running on similar hardware.
-(68k + hd63484 + YM2149)
+(68k + HD63484 + YM2149)
 
 Skeleton driver by TS -  analog at op.pl
 
@@ -61,7 +62,7 @@ Video Board:
  |       ||| |____________|  |____________|   |||          *|
  |       ||| ___________                      |||          *|
  |       ||| |         |                      |||          *|
- |       ||| | hd63484 |  74HC04   74HC00     |||         P6|
+ |       ||| | HD63484 |  74HC04   74HC00     |||         P6|
  |       ||| |         |  74HC74   74HC08     |||  74HC245  |
  |           |         |                                    |
  | 74HC573   |_________|  74HC166  74HC166 74HC166 74HC166  |
@@ -69,7 +70,7 @@ Video Board:
 
 Parts:
 
- hd63484CP8         - Advanced CRT Controller
+ HD63484CP8         - Advanced CRT Controller
  KM681000ALP7       - 128K X 8 Bit Low Power CMOS Static RAM
 
 Connectors:

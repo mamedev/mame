@@ -4,7 +4,7 @@ Shanghai
 
 driver by Nicola Salmoria
 
-The hd63484 emulation is incomplete, it implements the bare minimum required
+The HD63484 emulation is incomplete, it implements the bare minimum required
 to run these games.
 
 The end of round animation in Shanghai is wrong; change the opcode at 0xfb1f2
@@ -575,7 +575,7 @@ SSS8906
 |M             PAL            4464    4464 |
 |M                            4464    4464 |
 |A  ROM6                      4464    4464 |
-|              ROM5           hd63484      |
+|              ROM5           HD63484      |
 | YM3931                             898-3 |
 |                  SIS6091                 |
 |                                          |
@@ -594,10 +594,10 @@ Notes:
       YM3931 clock  : 4.000MHz
       YM2203 clock  : 4.000MHz
       M5205 clock   : 444598Hz; sample rate = M5205 clock / 48
-      hd63484 clock : pin50- 4.000MHz, pin52- 2.000MHz
+      HD63484 clock : pin50- 4.000MHz, pin52- 2.000MHz
       VSync         : 57Hz
 
-      hd63484  : Crt Controller
+      HD63484  : CRT Controller
       CXQ70116 : Compatible with NEC V30 (DIP40)
       D71011   : ? (DIP18) 710xx is series of common NEC ICs; timers, counters, parallel interface, interrupt controllers etc
       898-3    : BI 898-3-R 22  8920  (?, DIP16, tied to hd63484)
