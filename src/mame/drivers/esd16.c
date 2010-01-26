@@ -521,7 +521,7 @@ static MACHINE_START( esd16 )
 	esd16_state *state = (esd16_state *)machine->driver_data;
 	UINT8 *AUDIO = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, "bank1", 0, 9, &AUDIO[0x0000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 17, &AUDIO[0x0000], 0x4000);
 
 	state->audio_cpu = devtag_get_device(machine, "audiocpu");
 	state->eeprom = devtag_get_device(machine, "eeprom");
