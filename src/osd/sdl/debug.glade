@@ -172,11 +172,20 @@
                 <child>
                   <widget class="GtkMenu" id="item1_menu">
                     <child>
+                      <widget class="GtkMenuItem" id="set_breakpoint_at_cursor">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Set breakpoint at cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_set_breakpoint_at_cursor_activate" object="debugmain"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkMenuItem" id="run_to_cursor">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Run to cursor</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_run_to_cursor_activate" object="debugmain"/>
+                        <accelerator key="F4" signal="activate"/>
                       </widget>
                     </child>
                     <child>
@@ -267,6 +276,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_focus">True</property>
+                    <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
                   </widget>
                   <packing>
@@ -471,7 +481,6 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">2-bytes chunks</property>
                         <property name="use_underline">True</property>
-                        <property name="active">True</property>
                         <property name="group">chunks_1</property>
                         <signal name="activate" handler="on_chunks_2_activate" object="memorywin"/>
                         <accelerator key="2" signal="activate" modifiers="GDK_CONTROL_MASK"/>
@@ -482,7 +491,6 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">4-bytes chunks</property>
                         <property name="use_underline">True</property>
-                        <property name="active">True</property>
                         <property name="group">chunks_1</property>
                         <signal name="activate" handler="on_chunks_4_activate" object="memorywin"/>
                         <accelerator key="4" signal="activate" modifiers="GDK_CONTROL_MASK"/>
@@ -490,6 +498,32 @@
                     </child>
                     <child>
                       <widget class="GtkSeparatorMenuItem" id="separator5">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="logical_addresses">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Logical Addresses</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="group_changed" handler="on_logical_addresses_group_changed" object="memorywin"/>
+                        <accelerator key="l" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="physical_addresses">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Physical Addresses</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <property name="group">logical_addresses</property>
+                        <signal name="group_changed" handler="on_physical_addresses_group_changed" object="memorywin"/>
+                        <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
                         <property name="visible">True</property>
                       </widget>
                     </child>
@@ -543,6 +577,7 @@
               <widget class="GtkEntry" id="edit">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="invisible_char">&#x25CF;</property>
               </widget>
               <packing>
                 <property name="position">0</property>
@@ -744,6 +779,28 @@
                 <child>
                   <widget class="GtkMenu" id="menuitem20_menu">
                     <child>
+                      <widget class="GtkMenuItem" id="set_breakpoint_at_cursor">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Set breakpoint at cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_set_breakpoint_at_cursor_activate" object="disasmwin"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_to_cursor1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_to_cursor_activate" object="disasmwin"/>
+                        <accelerator key="F4" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem4">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkRadioMenuItem" id="raw_opcodes">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Raw Opcodes</property>
@@ -793,6 +850,7 @@
               <widget class="GtkEntry" id="edit">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="invisible_char">&#x25CF;</property>
               </widget>
               <packing>
                 <property name="position">0</property>

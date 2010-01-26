@@ -84,6 +84,8 @@ dview_new (const gchar *widget_name, const gchar *string1, const gchar *string2,
 void
 on_run_to_cursor_activate             (GtkWidget *win);
 
+void
+on_set_breakpoint_at_cursor_activate             (GtkWidget *win);
 
 gboolean
 on_disasm_button_press_event           (GtkWidget       *widget,
@@ -99,4 +101,10 @@ gboolean
 on_memoryview_key_press_event             (GtkWidget   *widget,
                                                         GdkEventKey *event,
                                                         gpointer     user_data);
+
+void
+on_logical_addresses_group_changed     (GtkWidget *win);
+
+void
+on_physical_addresses_group_changed    (GtkWidget *win);
 

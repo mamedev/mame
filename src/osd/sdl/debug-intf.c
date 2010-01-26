@@ -53,6 +53,7 @@ create_debugmain (void)
   GtkWidget *exit;
   GtkWidget *item1;
   GtkWidget *item1_menu;
+  GtkWidget *set_breakpoint_at_cursor;
   GtkWidget *run_to_cursor;
   GtkWidget *separator7;
   GSList *raw_opcodes_group = NULL;
@@ -229,10 +230,18 @@ create_debugmain (void)
   gtk_widget_set_name (item1_menu, "item1_menu");
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item1), item1_menu);
 
+  set_breakpoint_at_cursor = gtk_menu_item_new_with_mnemonic ("Set breakpoint at cursor");
+  gtk_widget_set_name (set_breakpoint_at_cursor, "set_breakpoint_at_cursor");
+  gtk_widget_show (set_breakpoint_at_cursor);
+  gtk_container_add (GTK_CONTAINER (item1_menu), set_breakpoint_at_cursor);
+
   run_to_cursor = gtk_menu_item_new_with_mnemonic ("Run to cursor");
   gtk_widget_set_name (run_to_cursor, "run_to_cursor");
   gtk_widget_show (run_to_cursor);
   gtk_container_add (GTK_CONTAINER (item1_menu), run_to_cursor);
+  gtk_widget_add_accelerator (run_to_cursor, "activate", accel_group,
+                              GDK_F4, (GdkModifierType) 0,
+                              GTK_ACCEL_VISIBLE);
 
   separator7 = gtk_separator_menu_item_new ();
   gtk_widget_set_name (separator7, "separator7");
@@ -349,6 +358,9 @@ create_debugmain (void)
   g_signal_connect_swapped ((gpointer) exit, "activate",
                             G_CALLBACK (on_exit_activate),
                             GTK_OBJECT (debugmain));
+  g_signal_connect_swapped ((gpointer) set_breakpoint_at_cursor, "activate",
+                            G_CALLBACK (on_set_breakpoint_at_cursor_activate),
+                            GTK_OBJECT (debugmain));
   g_signal_connect_swapped ((gpointer) run_to_cursor, "activate",
                             G_CALLBACK (on_run_to_cursor_activate),
                             GTK_OBJECT (debugmain));
@@ -390,6 +402,7 @@ create_debugmain (void)
   GLADE_HOOKUP_OBJECT (debugmain, exit, "exit");
   GLADE_HOOKUP_OBJECT (debugmain, item1, "item1");
   GLADE_HOOKUP_OBJECT (debugmain, item1_menu, "item1_menu");
+  GLADE_HOOKUP_OBJECT (debugmain, set_breakpoint_at_cursor, "set_breakpoint_at_cursor");
   GLADE_HOOKUP_OBJECT (debugmain, run_to_cursor, "run_to_cursor");
   GLADE_HOOKUP_OBJECT (debugmain, separator7, "separator7");
   GLADE_HOOKUP_OBJECT (debugmain, raw_opcodes, "raw_opcodes");
@@ -440,6 +453,10 @@ create_memorywin (void)
   GtkWidget *chunks_2;
   GtkWidget *chunks_4;
   GtkWidget *separator5;
+  GSList *logical_addresses_group = NULL;
+  GtkWidget *logical_addresses;
+  GtkWidget *physical_addresses;
+  GtkWidget *separatormenuitem1;
   GtkWidget *reverse;
   GtkWidget *separator6;
   GtkWidget *ibpl;
@@ -629,7 +646,6 @@ create_memorywin (void)
   gtk_widget_add_accelerator (chunks_2, "activate", accel_group,
                               GDK_2, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
-  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (chunks_2), TRUE);
 
   chunks_4 = gtk_radio_menu_item_new_with_mnemonic (chunks_1_group, "4-bytes chunks");
   chunks_1_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (chunks_4));
@@ -639,13 +655,38 @@ create_memorywin (void)
   gtk_widget_add_accelerator (chunks_4, "activate", accel_group,
                               GDK_4, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
-  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (chunks_4), TRUE);
 
   separator5 = gtk_separator_menu_item_new ();
   gtk_widget_set_name (separator5, "separator5");
   gtk_widget_show (separator5);
   gtk_container_add (GTK_CONTAINER (options_menu), separator5);
   gtk_widget_set_sensitive (separator5, FALSE);
+
+  logical_addresses = gtk_radio_menu_item_new_with_mnemonic (logical_addresses_group, "Logical Addresses");
+  logical_addresses_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (logical_addresses));
+  gtk_widget_set_name (logical_addresses, "logical_addresses");
+  gtk_widget_show (logical_addresses);
+  gtk_container_add (GTK_CONTAINER (options_menu), logical_addresses);
+  gtk_widget_add_accelerator (logical_addresses, "activate", accel_group,
+                              GDK_l, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (logical_addresses), TRUE);
+
+  physical_addresses = gtk_radio_menu_item_new_with_mnemonic (logical_addresses_group, "Physical Addresses");
+  logical_addresses_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (physical_addresses));
+  gtk_widget_set_name (physical_addresses, "physical_addresses");
+  gtk_widget_show (physical_addresses);
+  gtk_container_add (GTK_CONTAINER (options_menu), physical_addresses);
+  gtk_widget_add_accelerator (physical_addresses, "activate", accel_group,
+                              GDK_y, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (physical_addresses), TRUE);
+
+  separatormenuitem1 = gtk_separator_menu_item_new ();
+  gtk_widget_set_name (separatormenuitem1, "separatormenuitem1");
+  gtk_widget_show (separatormenuitem1);
+  gtk_container_add (GTK_CONTAINER (options_menu), separatormenuitem1);
+  gtk_widget_set_sensitive (separatormenuitem1, FALSE);
 
   reverse = gtk_check_menu_item_new_with_mnemonic ("Reverse View");
   gtk_widget_set_name (reverse, "reverse");
@@ -751,6 +792,12 @@ create_memorywin (void)
   g_signal_connect_swapped ((gpointer) chunks_4, "activate",
                             G_CALLBACK (on_chunks_4_activate),
                             GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) logical_addresses, "group_changed",
+                            G_CALLBACK (on_logical_addresses_group_changed),
+                            GTK_OBJECT (memorywin));
+  g_signal_connect_swapped ((gpointer) physical_addresses, "group_changed",
+                            G_CALLBACK (on_physical_addresses_group_changed),
+                            GTK_OBJECT (memorywin));
   g_signal_connect_swapped ((gpointer) reverse, "activate",
                             G_CALLBACK (on_reverse_activate),
                             GTK_OBJECT (memorywin));
@@ -796,6 +843,9 @@ create_memorywin (void)
   GLADE_HOOKUP_OBJECT (memorywin, chunks_2, "chunks_2");
   GLADE_HOOKUP_OBJECT (memorywin, chunks_4, "chunks_4");
   GLADE_HOOKUP_OBJECT (memorywin, separator5, "separator5");
+  GLADE_HOOKUP_OBJECT (memorywin, logical_addresses, "logical_addresses");
+  GLADE_HOOKUP_OBJECT (memorywin, physical_addresses, "physical_addresses");
+  GLADE_HOOKUP_OBJECT (memorywin, separatormenuitem1, "separatormenuitem1");
   GLADE_HOOKUP_OBJECT (memorywin, reverse, "reverse");
   GLADE_HOOKUP_OBJECT (memorywin, separator6, "separator6");
   GLADE_HOOKUP_OBJECT (memorywin, ibpl, "ibpl");
@@ -837,6 +887,9 @@ create_disasmwin (void)
   GtkWidget *menuitem19;
   GtkWidget *menuitem20;
   GtkWidget *menuitem20_menu;
+  GtkWidget *set_breakpoint_at_cursor;
+  GtkWidget *run_to_cursor1;
+  GtkWidget *separatormenuitem4;
   GSList *raw_opcodes_group = NULL;
   GtkWidget *raw_opcodes;
   GtkWidget *enc_opcodes;
@@ -1008,6 +1061,25 @@ create_disasmwin (void)
   gtk_widget_set_name (menuitem20_menu, "menuitem20_menu");
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem20), menuitem20_menu);
 
+  set_breakpoint_at_cursor = gtk_menu_item_new_with_mnemonic ("Set breakpoint at cursor");
+  gtk_widget_set_name (set_breakpoint_at_cursor, "set_breakpoint_at_cursor");
+  gtk_widget_show (set_breakpoint_at_cursor);
+  gtk_container_add (GTK_CONTAINER (menuitem20_menu), set_breakpoint_at_cursor);
+
+  run_to_cursor1 = gtk_menu_item_new_with_mnemonic ("Run to cursor");
+  gtk_widget_set_name (run_to_cursor1, "run_to_cursor1");
+  gtk_widget_show (run_to_cursor1);
+  gtk_container_add (GTK_CONTAINER (menuitem20_menu), run_to_cursor1);
+  gtk_widget_add_accelerator (run_to_cursor1, "activate", accel_group,
+                              GDK_F4, (GdkModifierType) 0,
+                              GTK_ACCEL_VISIBLE);
+
+  separatormenuitem4 = gtk_separator_menu_item_new ();
+  gtk_widget_set_name (separatormenuitem4, "separatormenuitem4");
+  gtk_widget_show (separatormenuitem4);
+  gtk_container_add (GTK_CONTAINER (menuitem20_menu), separatormenuitem4);
+  gtk_widget_set_sensitive (separatormenuitem4, FALSE);
+
   raw_opcodes = gtk_radio_menu_item_new_with_mnemonic (raw_opcodes_group, "Raw Opcodes");
   raw_opcodes_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (raw_opcodes));
   gtk_widget_set_name (raw_opcodes, "raw_opcodes");
@@ -1103,6 +1175,12 @@ create_disasmwin (void)
   g_signal_connect_swapped ((gpointer) menuitem19, "activate",
                             G_CALLBACK (on_exit_activate),
                             GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) set_breakpoint_at_cursor, "activate",
+                            G_CALLBACK (on_set_breakpoint_at_cursor_activate),
+                            GTK_OBJECT (disasmwin));
+  g_signal_connect_swapped ((gpointer) run_to_cursor1, "activate",
+                            G_CALLBACK (on_run_to_cursor_activate),
+                            GTK_OBJECT (disasmwin));
   g_signal_connect_swapped ((gpointer) raw_opcodes, "activate",
                             G_CALLBACK (on_raw_opcodes_activate),
                             GTK_OBJECT (disasmwin));
@@ -1141,6 +1219,9 @@ create_disasmwin (void)
   GLADE_HOOKUP_OBJECT (disasmwin, menuitem19, "menuitem19");
   GLADE_HOOKUP_OBJECT (disasmwin, menuitem20, "menuitem20");
   GLADE_HOOKUP_OBJECT (disasmwin, menuitem20_menu, "menuitem20_menu");
+  GLADE_HOOKUP_OBJECT (disasmwin, set_breakpoint_at_cursor, "set_breakpoint_at_cursor");
+  GLADE_HOOKUP_OBJECT (disasmwin, run_to_cursor1, "run_to_cursor1");
+  GLADE_HOOKUP_OBJECT (disasmwin, separatormenuitem4, "separatormenuitem4");
   GLADE_HOOKUP_OBJECT (disasmwin, raw_opcodes, "raw_opcodes");
   GLADE_HOOKUP_OBJECT (disasmwin, enc_opcodes, "enc_opcodes");
   GLADE_HOOKUP_OBJECT (disasmwin, comments, "comments");
