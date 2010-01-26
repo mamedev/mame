@@ -182,6 +182,7 @@ EMUMACHINEOBJS = \
 
 EMUVIDEOOBJS = \
 	$(EMUVIDEO)/generic.o \
+	$(EMUVIDEO)/hd63484.o \
 	$(EMUVIDEO)/mc6845.o \
 	$(EMUVIDEO)/poly.o \
 	$(EMUVIDEO)/resnet.o \
