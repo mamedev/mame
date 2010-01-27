@@ -22,7 +22,7 @@
 static STREAM_UPDATE( wave_sound_update )
 {
 #ifdef MESS
-	const device_config *image = (const device_config *)param;
+	running_device *image = (running_device *)param;
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -62,7 +62,7 @@ static STREAM_UPDATE( wave_sound_update )
 
 static DEVICE_START( wave )
 {
-	const device_config *image = NULL;
+	running_device *image = NULL;
 
 	assert( device != NULL );
 	assert( device->baseconfig().static_config != NULL );

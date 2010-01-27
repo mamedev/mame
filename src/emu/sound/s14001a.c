@@ -265,7 +265,7 @@ typedef struct
 	UINT8 VSU1000_amp; // amplitude setting on VSU-1000 board
 } S14001AChip;
 
-INLINE S14001AChip *get_safe_token(const device_config *device)
+INLINE S14001AChip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -598,7 +598,7 @@ static DEVICE_START( s14001a )
 	chip->stream = stream_create(device, 0, 1, device->clock ? device->clock : device->machine->sample_rate, chip, s14001a_pcm_update);
 }
 
-int s14001a_bsy_r(const device_config *device)
+int s14001a_bsy_r(running_device *device)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -608,14 +608,14 @@ int s14001a_bsy_r(const device_config *device)
 	return (chip->machineState != 0);
 }
 
-void s14001a_reg_w(const device_config *device, int data)
+void s14001a_reg_w(running_device *device, int data)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
 	chip->WordInput = data;
 }
 
-void s14001a_rst_w(const device_config *device, int data)
+void s14001a_rst_w(running_device *device, int data)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -624,13 +624,13 @@ void s14001a_rst_w(const device_config *device, int data)
 	chip->machineState = chip->resetState ? 1 : chip->machineState;
 }
 
-void s14001a_set_clock(const device_config *device, int clock)
+void s14001a_set_clock(running_device *device, int clock)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_set_sample_rate(chip->stream, clock);
 }
 
-void s14001a_set_volume(const device_config *device, int volume)
+void s14001a_set_volume(running_device *device, int volume)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
