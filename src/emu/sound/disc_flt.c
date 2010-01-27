@@ -1180,21 +1180,22 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 	int i;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us = 0;
+	double vIn = DST_RCFILTER_SW__VIN;
 
-	if (DST_RCFILTER_SW__ENABLE)
+	if (EXPECTED(DST_RCFILTER_SW__ENABLE))
 	{
 		switch (bits)
 		{
 		case 0:
-			node->output[0] = DST_RCFILTER_SW__VIN;
+			node->output[0] = vIn;
 			break;
 		case 1:
-			context->vCap[0] += (DST_RCFILTER_SW__VIN - context->vCap[0]) * context->exp0;
-			node->output[0] = context->vCap[0] + (DST_RCFILTER_SW__VIN - context->vCap[0]) * context->factor;
+			context->vCap[0] += (vIn - context->vCap[0]) * context->exp0;
+			node->output[0] = context->vCap[0] + (vIn - context->vCap[0]) * context->factor;
 			break;
 		case 2:
-			context->vCap[1] += (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->exp1;
-			node->output[0] = context->vCap[1] + (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->factor;
+			context->vCap[1] += (vIn - context->vCap[1]) * context->exp1;
+			node->output[0] = context->vCap[1] + (vIn - context->vCap[1]) * context->factor;
 			break;
 		default:
 			for (i = 0; i < 4; i++)
@@ -1202,7 +1203,7 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 				if (( bits & (1 << i)) != 0)
 					us += context->vCap[i];
 			}
-			node->output[0] = context->f1[bits] * DST_RCFILTER_SW__VIN + context->f2[bits]  * us;
+			node->output[0] = context->f1[bits] * vIn + context->f2[bits]  * us;
 			for (i = 0; i < 4; i++)
 			{
 				if (( bits & (1 << i)) != 0)
