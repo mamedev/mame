@@ -356,18 +356,20 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( ddayjlc )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16*8 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 16*8 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0, 16*8 )
 
 GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
-	int code = state->bgram[tile_index] + ((state->bgram[tile_index + 0x400] & (1 << 3)) << (8 - 3));
+	int code = state->bgram[tile_index] + ((state->bgram[tile_index + 0x400] & 0x08) << 5);
+	int color = (state->bgram[tile_index + 0x400] & 0x7)+0x40;
+	color |= (state->bgram[tile_index + 0x400] & 0x40) >> 3;
 
-	SET_TILE_INFO(2, code, 0, 0);
+	SET_TILE_INFO(2, code, color, 0);
 }
 
 static VIDEO_START( ddayjlc )
@@ -474,6 +476,32 @@ static MACHINE_RESET( ddayjlc )
 	}
 }
 
+static PALETTE_INIT( ddayjlc )
+{
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
+
+	for (i = 0; i < 0x200; i++)
+	{
+		val = (color_prom[i+0x000]) | (color_prom[i+0x200]<<4);
+
+		bit0 = 0;
+		bit1 = (val >> 6) & 0x01;
+		bit2 = (val >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 3) & 0x01;
+		bit1 = (val >> 4) & 0x01;
+		bit2 = (val >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 0) & 0x01;
+		bit1 = (val >> 1) & 0x01;
+		bit2 = (val >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( ddayjlc )
 
 	/* driver data */
@@ -502,7 +530,8 @@ static MACHINE_DRIVER_START( ddayjlc )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(ddayjlc)
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_PALETTE_INIT(ddayjlc)
 
 	MDRV_VIDEO_START(ddayjlc)
 	MDRV_VIDEO_UPDATE(ddayjlc)
@@ -539,8 +568,8 @@ ROM_START( ddayjlc )
 	ROM_LOAD( "15", 0x1000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
-	ROM_LOAD( "12", 0x0000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
-	ROM_LOAD( "13", 0x1000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
+	ROM_LOAD( "12", 0x1000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
+	ROM_LOAD( "13", 0x0000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
 
 	ROM_REGION( 0xc0000, "user1", 0 )
 	ROM_LOAD( "5",  0x00000, 0x2000, CRC(299b05f2) SHA1(3c1804bccb514bada4bed68a6af08db63a8f1b19) )
@@ -550,12 +579,12 @@ ROM_START( ddayjlc )
 	ROM_LOAD( "9",  0x08000, 0x2000, CRC(ccb82f09) SHA1(37c23f13aa0728bae82dba9e2858a8d81fa8afa5) )
 	ROM_LOAD( "10", 0x0a000, 0x2000, CRC(5452aba1) SHA1(03ef47161d0ab047c8675d6ffd3b7acf81f74721) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "prom1",  0x00000, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom2",  0x00100, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom3",  0x00200, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom4",  0x00300, 0x0100, NO_DUMP )
-
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "3l.bin",  0x00400, 0x0100, CRC(da6fe846) SHA1(e8386cf7f552facf2d1a5b7b63ca3d2f1801d215) )
+	ROM_LOAD( "4l.bin",  0x00000, 0x0100, CRC(2c3fa534) SHA1(e4c0d06cf62459c1835cb27a4e659b01ad4be20c) )
+	ROM_LOAD( "4m.bin",  0x00200, 0x0100, CRC(e0ab9a8f) SHA1(77010c4039f9d408f40cea079c1ef56132ddbd2b) )
+	ROM_LOAD( "5n.bin",  0x00300, 0x0100, CRC(61d85970) SHA1(189e9da3dade54936872b80893b1318e5fbfbe5e) )
+	ROM_LOAD( "5p.bin",  0x00100, 0x0100, CRC(4fd96b26) SHA1(0fb9928ab6c4ee937cefcf82145a4c9d43ca8517) )
 ROM_END
 
 ROM_START( ddayjlca )
@@ -579,8 +608,8 @@ ROM_START( ddayjlca )
 	ROM_LOAD( "15", 0x1000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
-	ROM_LOAD( "12", 0x0000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
-	ROM_LOAD( "13", 0x1000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
+	ROM_LOAD( "12", 0x1000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
+	ROM_LOAD( "13", 0x0000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
 
 	ROM_REGION( 0xc0000, "user1", 0 )
 	ROM_LOAD( "5",  0x00000, 0x2000, CRC(299b05f2) SHA1(3c1804bccb514bada4bed68a6af08db63a8f1b19) )
@@ -590,11 +619,12 @@ ROM_START( ddayjlca )
 	ROM_LOAD( "9",  0x08000, 0x2000, CRC(ccb82f09) SHA1(37c23f13aa0728bae82dba9e2858a8d81fa8afa5) )
 	ROM_LOAD( "10", 0x0a000, 0x2000, CRC(5452aba1) SHA1(03ef47161d0ab047c8675d6ffd3b7acf81f74721) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "prom1",  0x00000, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom2",  0x00100, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom3",  0x00200, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom4",  0x00300, 0x0100, NO_DUMP )
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "3l.bin",  0x00400, 0x0100, CRC(da6fe846) SHA1(e8386cf7f552facf2d1a5b7b63ca3d2f1801d215) )
+	ROM_LOAD( "4l.bin",  0x00000, 0x0100, CRC(2c3fa534) SHA1(e4c0d06cf62459c1835cb27a4e659b01ad4be20c) )
+	ROM_LOAD( "4m.bin",  0x00200, 0x0100, CRC(e0ab9a8f) SHA1(77010c4039f9d408f40cea079c1ef56132ddbd2b) )
+	ROM_LOAD( "5n.bin",  0x00300, 0x0100, CRC(61d85970) SHA1(189e9da3dade54936872b80893b1318e5fbfbe5e) )
+	ROM_LOAD( "5p.bin",  0x00100, 0x0100, CRC(4fd96b26) SHA1(0fb9928ab6c4ee937cefcf82145a4c9d43ca8517) )
 
 ROM_END
 
