@@ -28,7 +28,7 @@
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
  * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core. (with the direction of independent sound core and analog stuff, this should actually be attached in the main berzerk/frenzy driver and not here)
- * fix the local and global silence stuff to not force the dac to a specific level, but cease doing deltas (i.e. force all deltas to 0) after the last sample; this should fix the clipping in p
+ * fix the local and global silence stuff to not force the dac to a specific level, but cease doing deltas (i.e. force all deltas to 0) after the last sample; this should fix the clipping in wolfpack and in the fidelity games in mess.
 */
 
 /* Chip Pinout:
