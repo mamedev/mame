@@ -1,6 +1,6 @@
 /*
 
- TSI S14001A emulator v1.31c
+ TSI S14001A emulator v1.32
  By Jonathan Gevaryahu ("Lord Nightmare") with help from Kevin Horton ("kevtris")
  MAME conversion and integration by R. Belmont
  Clock Frequency control updated by Zsolt Vasvari
@@ -23,10 +23,12 @@
  1.31a Add chip pinout and other notes - LN (0.128u4)
  1.31b slight update to notes to clarify input bus stuff, mostly finish the state map in the comments - LN
  1.31c remove usage of deprecat.h - AtariAce (0.128u5)
+ 1.32 fix the squealing noise using a define; it isn't accurate to the chip exactly, but there are other issues which need to be fixed too. see TODO. - LN (0.136u2)
 
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
  * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core. (with the direction of independent sound core and analog stuff, this should actually be attached in the main berzerk/frenzy driver and not here)
+ * fix the local and global silence stuff to not force the dac to a specific level, but cease doing deltas (i.e. force all deltas to 0) after the last sample; this should fix the clipping in p
 */
 
 /* Chip Pinout:
@@ -229,6 +231,8 @@ and off as it normally does during speech). Once START has gone low-high-low, th
  *   if mirrored mode is OFF, increment oddphone. if not, don't touch it here. if oddphone was 1 before the increment, increment phoneaddress and set oddphone to 0
  *
  */
+ 
+#undef ACCURATE_SQUEAL
 
 #include "emu.h"
 #include "streams.h"
@@ -261,7 +265,7 @@ typedef struct
 	UINT8 VSU1000_amp; // amplitude setting on VSU-1000 board
 } S14001AChip;
 
-INLINE S14001AChip *get_safe_token(running_device *device)
+INLINE S14001AChip *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -291,6 +295,7 @@ static const INT8 DeltaTable[4][4] =
 	{  1,  1,  3,  3  },
 };
 
+#ifdef ACCURATE_SQUEAL
 static INT16 audiofilter(S14001AChip *chip) /* rewrite me to better match the real filter! */
 {
 	UINT8 temp1;
@@ -309,8 +314,8 @@ static void shiftIntoFilter(S14001AChip *chip, INT16 inputvalue)
 		chip->filtervals[temp1] = chip->filtervals[(temp1 - 1)];
 	}
 	chip->filtervals[0] = inputvalue;
-
 }
+#endif
 
 static void PostPhoneme(S14001AChip *chip) /* figure out what the heck to do after playing a phoneme */
 {
@@ -411,19 +416,22 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 	chip->oddeven = !(chip->oddeven); // invert the clock
 	if (chip->oddeven == 0) // even clock
 	{
+#ifdef ACCURATE_SQUEAL
 		chip->audioout = ALTFLAG; // flag to the renderer that this output should be the average of the last 8
-		// DIGITAL INPUT on the test pins occurs on this cycle used for output
+#endif
+		// DIGITAL INPUT *MIGHT* occur on the test pins occurs on this cycle?
 	}
 	else // odd clock
 	{
 		// fix dac output between samples. theoretically this might be unnecessary but it would require some messy logic in state 5 on the first sample load.
+		// Note: this behavior is NOT accurate, and needs to be fixed. see TODO.
 		if (chip->GlobalSilenceState || LOCALSILENCESTATE)
 		{
 			chip->DACOutput = SILENCE;
 			chip->OldDelta = 2;
 		}
 		chip->audioout = (chip->GlobalSilenceState || LOCALSILENCESTATE) ? SILENCE : chip->DACOutput; // when either silence state is 1, output silence.
-		// DIGITAL OUTPUT is driven onto the test pins on this cycle
+		// DIGITAL OUTPUT *might* be driven onto the test pins on this cycle?
 		switch(chip->machineState) // HUUUUUGE switch statement
 		{
 		case 0: // idle state
@@ -554,6 +562,7 @@ static STREAM_UPDATE( s14001a_pcm_update )
 	for (i = 0; i < samples; i++)
 	{
 		s14001a_clock(chip);
+#ifdef ACCURATE_SQUEAL
 		if (chip->audioout == ALTFLAG) // input from test pins -> output
 		{
 			shiftIntoFilter(chip, audiofilter(chip)); // shift over the previous outputs and stick in audioout.
@@ -562,8 +571,11 @@ static STREAM_UPDATE( s14001a_pcm_update )
 		else // normal, dac-driven output
 		{
 			shiftIntoFilter(chip, ((((INT16)chip->audioout)-8)<<9)); // shift over the previous outputs and stick in audioout 4 times. note <<9 instead of <<10, to prevent clipping, and to simulate that the filtered output normally has a somewhat lower amplitude than the driven one.
+#endif
 			outputs[0][i] = ((((INT16)chip->audioout)-8)<<10)*chip->VSU1000_amp;
+#ifdef ACCURATE_SQUEAL
 		}
+#endif
 	}
 }
 
@@ -586,7 +598,7 @@ static DEVICE_START( s14001a )
 	chip->stream = stream_create(device, 0, 1, device->clock ? device->clock : device->machine->sample_rate, chip, s14001a_pcm_update);
 }
 
-int s14001a_bsy_r(running_device *device)
+int s14001a_bsy_r(const device_config *device)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -596,14 +608,14 @@ int s14001a_bsy_r(running_device *device)
 	return (chip->machineState != 0);
 }
 
-void s14001a_reg_w(running_device *device, int data)
+void s14001a_reg_w(const device_config *device, int data)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
 	chip->WordInput = data;
 }
 
-void s14001a_rst_w(running_device *device, int data)
+void s14001a_rst_w(const device_config *device, int data)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -612,13 +624,13 @@ void s14001a_rst_w(running_device *device, int data)
 	chip->machineState = chip->resetState ? 1 : chip->machineState;
 }
 
-void s14001a_set_clock(running_device *device, int clock)
+void s14001a_set_clock(const device_config *device, int clock)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_set_sample_rate(chip->stream, clock);
 }
 
-void s14001a_set_volume(running_device *device, int volume)
+void s14001a_set_volume(const device_config *device, int volume)
 {
 	S14001AChip *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -638,7 +650,7 @@ DEVICE_GET_INFO( s14001a )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "S14001A");						break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "TSI S14001A");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.31");						break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.32");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Jonathan Gevaryahu"); break;
 	}
