@@ -77,10 +77,10 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
-#include "cheat.h"
 #include "debugger.h"
 #include "profiler.h"
 #include "render.h"
+#include "cheat.h"
 #include "ui.h"
 #include "uimenu.h"
 #include "uiinput.h"
@@ -540,7 +540,7 @@ void mame_schedule_exit(running_machine *machine)
 	if (started_empty && options_get_string(mame_options(), OPTION_GAMENAME)[0] != 0)
 	{
 		options_set_string(mame_options(), OPTION_GAMENAME, "", OPTION_PRIORITY_CMDLINE);
-		ui_menu_force_game_select(machine);
+		ui_menu_force_game_select(machine, render_container_get_ui());
 	}
 
 	/* otherwise, exit for real */

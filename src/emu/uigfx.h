@@ -24,7 +24,7 @@
 void ui_gfx_init(running_machine *machine);
 
 /* master handler */
-UINT32 ui_gfx_ui_handler(running_machine *machine, UINT32 state);
+UINT32 ui_gfx_ui_handler(running_machine *machine, render_container *container, UINT32 state);
 
 
 #endif	/* __UIGFX_H__ */

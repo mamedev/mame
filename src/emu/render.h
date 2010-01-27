@@ -145,11 +145,8 @@ enum
 ***************************************************************************/
 
 /* convenience macros for adding items to the UI container */
-#define render_ui_add_point(x0,y0,diam,argb,flags)				render_container_add_line(render_container_get_ui(), x0, y0, x0, y0, diam, argb, flags)
-#define render_ui_add_line(x0,y0,x1,y1,diam,argb,flags)			render_container_add_line(render_container_get_ui(), x0, y0, x1, y1, diam, argb, flags)
-#define render_ui_add_rect(x0,y0,x1,y1,argb,flags)				render_container_add_quad(render_container_get_ui(), x0, y0, x1, y1, argb, NULL, flags)
-#define render_ui_add_quad(x0,y0,x1,y1,argb,tex,flags)			render_container_add_quad(render_container_get_ui(), x0, y0, x1, y1, argb, tex, flags)
-#define render_ui_add_char(x0,y0,ht,asp,argb,font,ch)			render_container_add_char(render_container_get_ui(), x0, y0, ht, asp, argb, font, ch)
+#define render_container_add_point(c, x0,y0,diam,argb,flags)	render_container_add_line(c, x0, y0, x0, y0, diam, argb, flags)
+#define render_container_add_rect(c, x0,y0,x1,y1,argb,flags)	render_container_add_quad(c, x0, y0, x1, y1, argb, NULL, flags)
 
 /* convenience macros for adding items to a screen container */
 #define render_screen_add_point(scr,x0,y0,diam,argb,flags)		render_container_add_line(render_container_get_screen(scr), x0, y0, x0, y0, diam, argb, flags)

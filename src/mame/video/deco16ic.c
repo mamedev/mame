@@ -823,7 +823,7 @@ void deco16_print_debug_info(running_machine *machine, bitmap_t *bitmap)
 
 	sprintf(&buf[strlen(buf)],"%04X",deco16_priority);
 
-	ui_draw_text(buf,60,40);
+	ui_draw_text(render_container_get_ui(), buf,60,40);
 }
 
 /*****************************************************************************************/

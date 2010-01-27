@@ -14,6 +14,7 @@
 #ifndef __UIMENU_H__
 #define __UIMENU_H__
 
+#include "render.h"
 
 
 /***************************************************************************
@@ -87,7 +88,7 @@ void ui_menu_init(running_machine *machine);
 /* ----- core menu management ----- */
 
 /* allocate a new menu */
-ui_menu *ui_menu_alloc(running_machine *machine, ui_menu_handler_func handler, void *parameter);
+ui_menu *ui_menu_alloc(running_machine *machine, render_container *container, ui_menu_handler_func handler, void *parameter);
 
 /* free a menu */
 void ui_menu_free(ui_menu *menu);
@@ -140,13 +141,13 @@ void ui_menu_stack_pop(running_machine *machine);
 /* ----- UI system interaction ----- */
 
 /* master handler */
-UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state);
+UINT32 ui_menu_ui_handler(running_machine *machine, render_container *container, UINT32 state);
 
 /* slider handler */
-UINT32 ui_slider_ui_handler(running_machine *machine, UINT32 state);
+UINT32 ui_slider_ui_handler(running_machine *machine, render_container *container, UINT32 state);
 
 /* force game select menu */
-void ui_menu_force_game_select(running_machine *machine);
+void ui_menu_force_game_select(running_machine *machine, render_container *container);
 int ui_menu_is_force_game_select(void);
 
 

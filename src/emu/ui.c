@@ -14,8 +14,8 @@
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "profiler.h"
-#include "cheat.h"
 #include "render.h"
+#include "cheat.h"
 #include "rendfont.h"
 #include "ui.h"
 #include "uiinput.h"
@@ -54,7 +54,7 @@ enum
 static render_font *ui_font;
 
 /* current UI handler */
-static UINT32 (*ui_handler_callback)(running_machine *, UINT32);
+static UINT32 (*ui_handler_callback)(running_machine *, render_container *, UINT32);
 static UINT32 ui_handler_param;
 
 /* flag to track single stepping */
@@ -91,11 +91,11 @@ static astring &disclaimer_string(running_machine *machine, astring &buffer);
 static astring &warnings_string(running_machine *machine, astring &buffer);
 
 /* UI handlers */
-static UINT32 handler_messagebox(running_machine *machine, UINT32 state);
-static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state);
-static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state);
-static UINT32 handler_ingame(running_machine *machine, UINT32 state);
-static UINT32 handler_load_save(running_machine *machine, UINT32 state);
+static UINT32 handler_messagebox(running_machine *machine, render_container *container, UINT32 state);
+static UINT32 handler_messagebox_ok(running_machine *machine, render_container *container, UINT32 state);
+static UINT32 handler_messagebox_anykey(running_machine *machine, render_container *container, UINT32 state);
+static UINT32 handler_ingame(running_machine *machine, render_container *container, UINT32 state);
+static UINT32 handler_load_save(running_machine *machine, render_container *container, UINT32 state);
 
 /* slider controls */
 static slider_state *slider_alloc(running_machine *machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
@@ -135,7 +135,7 @@ static INT32 slider_crossoffset(running_machine *machine, void *arg, astring *st
     pair for the current UI handler
 -------------------------------------------------*/
 
-INLINE UINT32 ui_set_handler(UINT32 (*callback)(running_machine *, UINT32), UINT32 param)
+INLINE UINT32 ui_set_handler(UINT32 (*callback)(running_machine *, render_container *, UINT32), UINT32 param)
 {
 	ui_handler_callback = callback;
 	ui_handler_param = param;
@@ -340,10 +340,10 @@ void ui_set_startup_text(running_machine *machine, const char *text, int force)
     render it; called by video.c
 -------------------------------------------------*/
 
-void ui_update_and_render(running_machine *machine)
+void ui_update_and_render(running_machine *machine, render_container *container)
 {
 	/* always start clean */
-	render_container_empty(render_container_get_ui());
+	render_container_empty(container);
 
 	/* if we're paused, dim the whole screen */
 	if (mame_get_phase(machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(machine)))
@@ -354,19 +354,19 @@ void ui_update_and_render(running_machine *machine)
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)
-			render_ui_add_rect(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			render_container_add_rect(container, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	/* render any cheat stuff at the bottom */
-	cheat_render_text(machine);
+	cheat_render_text(machine, container);
 
 	/* call the current UI handler */
 	assert(ui_handler_callback != NULL);
-	ui_handler_param = (*ui_handler_callback)(machine, ui_handler_param);
+	ui_handler_param = (*ui_handler_callback)(machine, container, ui_handler_param);
 
 	/* display any popup messages */
 	if (osd_ticks() < popup_text_end)
-		ui_draw_text_box(messagebox_text, JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		ui_draw_text_box(container, messagebox_text, JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		popup_text_end = 0;
 
@@ -462,13 +462,13 @@ float ui_get_string_width(const char *s)
     color
 -------------------------------------------------*/
 
-void ui_draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor)
+void ui_draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
-	render_ui_add_rect(x0, y0, x1, y1, backcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x0, y0, x1, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x1, y0, x1, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x1, y1, x0, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x0, y1, x0, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_container_add_rect(container, x0, y0, x1, y1, backcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_container_add_line(container, x0, y0, x1, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_container_add_line(container, x1, y0, x1, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_container_add_line(container, x1, y1, x0, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_container_add_line(container, x0, y1, x0, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 
@@ -476,9 +476,9 @@ void ui_draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolo
     ui_draw_text - simple text renderer
 -------------------------------------------------*/
 
-void ui_draw_text(const char *buf, float x, float y)
+void ui_draw_text(render_container *container, const char *buf, float x, float y)
 {
-	ui_draw_text_full(buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	ui_draw_text_full(container, buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
 
@@ -488,7 +488,7 @@ void ui_draw_text(const char *buf, float x, float y)
     and full size computation
 -------------------------------------------------*/
 
-void ui_draw_text_full(const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
+void ui_draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
 {
 	float lineheight = ui_get_line_height();
 	const char *ends = origs + strlen(origs);
@@ -625,7 +625,7 @@ void ui_draw_text_full(const char *origs, float x, float y, float origwrapwidth,
 
 		/* if opaque, add a black box */
 		if (draw == DRAW_OPAQUE)
-			render_ui_add_rect(curx, cury, curx + curwidth, cury + lineheight, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			render_container_add_rect(container, curx, cury, curx + curwidth, cury + lineheight, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* loop from the line start and add the characters */
 		while (linestart < s)
@@ -638,7 +638,7 @@ void ui_draw_text_full(const char *origs, float x, float y, float origwrapwidth,
 
 			if (draw != DRAW_NONE)
 			{
-				render_ui_add_char(curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, linechar);
+				render_container_add_char(container, curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, linechar);
 				curx += ui_get_char_width(linechar);
 			}
 			linestart += linecharcount;
@@ -647,11 +647,11 @@ void ui_draw_text_full(const char *origs, float x, float y, float origwrapwidth,
 		/* append ellipses if needed */
 		if (wrap == WRAP_TRUNCATE && *s != 0 && draw != DRAW_NONE)
 		{
-			render_ui_add_char(curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, '.');
+			render_container_add_char(container, curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, '.');
 			curx += ui_get_char_width('.');
-			render_ui_add_char(curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, '.');
+			render_container_add_char(container, curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, '.');
 			curx += ui_get_char_width('.');
-			render_ui_add_char(curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, '.');
+			render_container_add_char(container, curx, cury, lineheight, render_get_ui_aspect(), fgcolor, ui_font, '.');
 			curx += ui_get_char_width('.');
 		}
 
@@ -692,13 +692,13 @@ void ui_draw_text_full(const char *origs, float x, float y, float origwrapwidth,
     message with a box around it
 -------------------------------------------------*/
 
-void ui_draw_text_box(const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
+void ui_draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
 {
 	float target_width, target_height;
 	float target_x, target_y;
 
 	/* compute the multi-line target width/height */
-	ui_draw_text_full(text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER,
+	ui_draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER,
 				justify, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / ui_get_line_height()) * ui_get_line_height();
@@ -718,11 +718,11 @@ void ui_draw_text_box(const char *text, int justify, float xpos, float ypos, rgb
 		target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
 
 	/* add a box around that */
-	ui_draw_outlined_box(target_x - UI_BOX_LR_BORDER,
+	ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
 					 target_y - UI_BOX_TB_BORDER,
 					 target_x + target_width + UI_BOX_LR_BORDER,
 					 target_y + target_height + UI_BOX_TB_BORDER, backcolor);
-	ui_draw_text_full(text, target_x, target_y, target_width,
+	ui_draw_text_full(container, text, target_x, target_y, target_width,
 				justify, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
@@ -1080,9 +1080,9 @@ astring &game_info_astring(running_machine *machine, astring &string)
     messagebox_text string but handles no input
 -------------------------------------------------*/
 
-static UINT32 handler_messagebox(running_machine *machine, UINT32 state)
+static UINT32 handler_messagebox(running_machine *machine, render_container *container, UINT32 state)
 {
-	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -1092,10 +1092,10 @@ static UINT32 handler_messagebox(running_machine *machine, UINT32 state)
     messagebox_text string and waits for an OK
 -------------------------------------------------*/
 
-static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
+static UINT32 handler_messagebox_ok(running_machine *machine, render_container *container, UINT32 state)
 {
 	/* draw a standard message window */
-	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* an 'O' or left joystick kicks us to the next state */
 	if (state == 0 && (input_code_pressed_once(machine, KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
@@ -1122,10 +1122,10 @@ static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
     any keypress
 -------------------------------------------------*/
 
-static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state)
+static UINT32 handler_messagebox_anykey(running_machine *machine, render_container *container, UINT32 state)
 {
 	/* draw a standard message window */
-	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* if the user cancels, exit out completely */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
@@ -1147,14 +1147,14 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state)
     of the standard keypresses
 -------------------------------------------------*/
 
-static UINT32 handler_ingame(running_machine *machine, UINT32 state)
+static UINT32 handler_ingame(running_machine *machine, render_container *container, UINT32 state)
 {
 	int is_paused = mame_is_paused(machine);
 
 	/* first draw the FPS counter */
 	if (showfps || osd_ticks() < showfps_end)
 	{
-		ui_draw_text_full(video_get_speed_text(machine), 0.0f, 0.0f, 1.0f,
+		ui_draw_text_full(container, video_get_speed_text(machine), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 	else
@@ -1165,7 +1165,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	{
 		astring profilertext;
 		profiler_get_text(machine, profilertext);
-		ui_draw_text_full(profilertext, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+		ui_draw_text_full(container, profilertext, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
 	/* if we're single-stepping, pause now */
@@ -1312,7 +1312,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
     specifying a game to save or load
 -------------------------------------------------*/
 
-static UINT32 handler_load_save(running_machine *machine, UINT32 state)
+static UINT32 handler_load_save(running_machine *machine, render_container *container, UINT32 state)
 {
 	char filename[20];
 	input_code code;
@@ -1324,9 +1324,9 @@ static UINT32 handler_load_save(running_machine *machine, UINT32 state)
 
 	/* okay, we're waiting for a key to select a slot; display a message */
 	if (state == LOADSAVE_SAVE)
-		ui_draw_message_window("Select position to save to");
+		ui_draw_message_window(container, "Select position to save to");
 	else
-		ui_draw_message_window("Select position to load from");
+		ui_draw_message_window(container, "Select position to load from");
 
 	/* check for cancel key */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))

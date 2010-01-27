@@ -1299,7 +1299,7 @@ void video_frame_update(running_machine *machine, int debug)
 	}
 
 	/* draw the user interface */
-	ui_update_and_render(machine);
+	ui_update_and_render(machine, render_container_get_ui());
 
 	/* if we're throttling, synchronize before rendering */
 	if (!debug && !skipped_it && effective_throttle(machine))

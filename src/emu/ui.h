@@ -112,7 +112,7 @@ struct _slider_state
     MACROS
 ***************************************************************************/
 
-#define ui_draw_message_window(text) ui_draw_text_box(text, JUSTIFY_LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR)
+#define ui_draw_message_window(c, text) ui_draw_text_box(c, text, JUSTIFY_LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR)
 
 
 
@@ -130,7 +130,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 void ui_set_startup_text(running_machine *machine, const char *text, int force);
 
 /* once-per-frame update and render */
-void ui_update_and_render(running_machine *machine);
+void ui_update_and_render(running_machine *machine, render_container *container);
 
 /* returns the current UI font */
 render_font *ui_get_font(void);
@@ -143,16 +143,16 @@ float ui_get_char_width(unicode_char ch);
 float ui_get_string_width(const char *s);
 
 /* draw an outlined box filled with a given color */
-void ui_draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor);
+void ui_draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 
 /* simple text draw at the given coordinates */
-void ui_draw_text(const char *buf, float x, float y);
+void ui_draw_text(render_container *container, const char *buf, float x, float y);
 
 /* full-on text draw with all the options */
-void ui_draw_text_full(const char *origs, float x, float y, float wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight);
+void ui_draw_text_full(render_container *container, const char *origs, float x, float y, float wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight);
 
 /* draw a multi-line message with a box around it */
-void ui_draw_text_box(const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
+void ui_draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
 
 /* display a temporary message at the bottom of the screen */
 void CLIB_DECL ui_popup_time(int seconds, const char *text, ...) ATTR_PRINTF(2,3);

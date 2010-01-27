@@ -508,7 +508,7 @@ void cheat_set_global_enable(running_machine *machine, int enable)
     to render text
 -------------------------------------------------*/
 
-void cheat_render_text(running_machine *machine)
+void cheat_render_text(running_machine *machine, render_container *container)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
 	if (cheatinfo != NULL)
@@ -520,7 +520,7 @@ void cheat_render_text(running_machine *machine)
 			if (cheatinfo->output[linenum].len() != 0)
 			{
 				/* output the text */
-				ui_draw_text_full(cheatinfo->output[linenum],
+				ui_draw_text_full(container, cheatinfo->output[linenum],
 						0.0f, (float)linenum * ui_get_line_height(), 1.0f,
 						cheatinfo->justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
 						ARGB_WHITE, ARGB_BLACK, NULL, NULL);

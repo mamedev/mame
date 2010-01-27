@@ -80,18 +80,18 @@ static void ui_gfx_exit(running_machine *machine);
 
 /* palette handling */
 static void palette_handle_keys(running_machine *machine, ui_gfx_state *state);
-static void palette_handler(running_machine *machine, ui_gfx_state *state);
+static void palette_handler(running_machine *machine, render_container *container, ui_gfx_state *state);
 
 /* graphics set handling */
 static void gfxset_handle_keys(running_machine *machine, ui_gfx_state *state, int xcells, int ycells);
 static void gfxset_draw_item(running_machine *machine, const gfx_element *gfx, int index, bitmap_t *bitmap, int dstx, int dsty, int color, int rotate);
 static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
-static void gfxset_handler(running_machine *machine, ui_gfx_state *state);
+static void gfxset_handler(running_machine *machine, render_container *container, ui_gfx_state *state);
 
 /* tilemap handling */
 static void tilemap_handle_keys(running_machine *machine, ui_gfx_state *state, int viswidth, int visheight);
 static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state, int width, int height);
-static void tilemap_handler(running_machine *machine, ui_gfx_state *state);
+static void tilemap_handler(running_machine *machine, render_container *container, ui_gfx_state *state);
 
 
 
@@ -151,7 +151,7 @@ static void ui_gfx_exit(running_machine *machine)
     ui_gfx_ui_handler - primary UI handler
 -------------------------------------------------*/
 
-UINT32 ui_gfx_ui_handler(running_machine *machine, UINT32 uistate)
+UINT32 ui_gfx_ui_handler(running_machine *machine, render_container *container, UINT32 uistate)
 {
 	ui_gfx_state *state = &ui_gfx;
 
@@ -171,7 +171,7 @@ again:
 			/* if we have a palette, display it */
 			if (machine->config->total_colors > 0)
 			{
-				palette_handler(machine, state);
+				palette_handler(machine, container, state);
 				break;
 			}
 
@@ -182,7 +182,7 @@ again:
 			/* if we have graphics sets, display them */
 			if (machine->gfx[0] != NULL)
 			{
-				gfxset_handler(machine, state);
+				gfxset_handler(machine, container, state);
 				break;
 			}
 
@@ -193,7 +193,7 @@ again:
 			/* if we have tilemaps, display them */
 			if (tilemap_count(machine) > 0)
 			{
-				tilemap_handler(machine, state);
+				tilemap_handler(machine, container, state);
 				break;
 			}
 
@@ -234,7 +234,7 @@ cancel:
     viewer
 -------------------------------------------------*/
 
-static void palette_handler(running_machine *machine, ui_gfx_state *state)
+static void palette_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
 	int total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->config->total_colors;
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
@@ -276,14 +276,14 @@ static void palette_handler(running_machine *machine, ui_gfx_state *state)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	/* go ahead and draw the outer box now */
-	ui_draw_outlined_box(boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	ui_draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
 
 	/* draw the title */
 	x0 = 0.5f - 0.5f * titlewidth;
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (x = 0; title[x] != 0; x++)
 	{
-		render_ui_add_char(x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
+		render_container_add_char(container, x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
 		x0 += render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), title[x]);
 	}
 
@@ -297,12 +297,12 @@ static void palette_handler(running_machine *machine, ui_gfx_state *state)
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		render_ui_add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, "0123456789ABCDEF"[x & 0xf]);
+		render_container_add_char(container, x0 + 0.5f * (cellwidth - chwidth), y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, "0123456789ABCDEF"[x & 0xf]);
 
 		/* if we're skipping, draw a point between the character and the box to indicate which */
 		/* one it's referring to */
 		if (skip != 0)
-			render_ui_add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			render_container_add_point(container, x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	/* draw the side column headers */
@@ -319,14 +319,14 @@ static void palette_handler(running_machine *machine, ui_gfx_state *state)
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
 			if (skip != 0)
-				render_ui_add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				render_container_add_point(container, 0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			/* draw the row header */
 			sprintf(buffer, "%5X", state->palette.offset + y * state->palette.count);
 			for (x = 4; x >= 0; x--)
 			{
 				x0 -= render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), buffer[x]);
-				render_ui_add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, buffer[x]);
+				render_container_add_char(container, x0, y0 + 0.5f * (cellheight - chheight), chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, buffer[x]);
 			}
 		}
 
@@ -338,7 +338,7 @@ static void palette_handler(running_machine *machine, ui_gfx_state *state)
 			if (index < total)
 			{
 				pen_t pen = state->palette.which ? colortable_palette_get_color(machine->colortable, index) : raw_color[index];
-				render_ui_add_rect(cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
+				render_container_add_rect(container, cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
 									cellboxbounds.x0 + (x + 1) * cellwidth, cellboxbounds.y0 + (y + 1) * cellheight,
 									0xff000000 | pen, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
@@ -422,7 +422,7 @@ static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
     viewer
 -------------------------------------------------*/
 
-static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
+static void gfxset_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
 	render_font *ui_font = ui_get_font();
 	int set = state->gfxset.set;
@@ -519,14 +519,14 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	/* go ahead and draw the outer box now */
-	ui_draw_outlined_box(boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	ui_draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
 
 	/* draw the title */
 	x0 = 0.5f - 0.5f * titlewidth;
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (x = 0; title[x] != 0; x++)
 	{
-		render_ui_add_char(x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
+		render_container_add_char(container, x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
 		x0 += render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), title[x]);
 	}
 
@@ -536,12 +536,12 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		render_ui_add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, "0123456789ABCDEF"[x & 0xf]);
+		render_container_add_char(container, x0 + 0.5f * (cellwidth - chwidth), y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, "0123456789ABCDEF"[x & 0xf]);
 
 		/* if we're skipping, draw a point between the character and the box to indicate which */
 		/* one it's referring to */
 		if (skip != 0)
-			render_ui_add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			render_container_add_point(container, x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	/* draw the side column headers */
@@ -558,14 +558,14 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
 			if (skip != 0)
-				render_ui_add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				render_container_add_point(container, 0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			/* draw the row header */
 			sprintf(buffer, "%5X", state->gfxset.offset[set] + y * xcells);
 			for (x = 4; x >= 0; x--)
 			{
 				x0 -= render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), buffer[x]);
-				render_ui_add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, buffer[x]);
+				render_container_add_char(container, x0, y0 + 0.5f * (cellheight - chheight), chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, buffer[x]);
 			}
 		}
 
@@ -573,7 +573,7 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 	gfxset_update_bitmap(machine, state, xcells, ycells, gfx);
 
 	/* add the final quad */
-	render_ui_add_quad(boxbounds.x0 + 6.0f * chwidth, boxbounds.y0 + 3.5f * chheight,
+	render_container_add_quad(container, boxbounds.x0 + 6.0f * chwidth, boxbounds.y0 + 3.5f * chheight,
 						boxbounds.x0 + 6.0f * chwidth + (float)cellboxwidth / (float)targwidth,
 						boxbounds.y0 + 3.5f * chheight + (float)cellboxheight / (float)targheight,
 						ARGB_WHITE, state->texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -839,7 +839,7 @@ static void gfxset_draw_item(running_machine *machine, const gfx_element *gfx, i
     viewer
 -------------------------------------------------*/
 
-static void tilemap_handler(running_machine *machine, ui_gfx_state *state)
+static void tilemap_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
 	render_font *ui_font = ui_get_font();
 	float chwidth, chheight;
@@ -919,14 +919,14 @@ static void tilemap_handler(running_machine *machine, ui_gfx_state *state)
 	}
 
 	/* go ahead and draw the outer box now */
-	ui_draw_outlined_box(boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	ui_draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
 
 	/* draw the title */
 	x0 = 0.5f - 0.5f * titlewidth;
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (x = 0; title[x] != 0; x++)
 	{
-		render_ui_add_char(x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
+		render_container_add_char(container, x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
 		x0 += render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), title[x]);
 	}
 
@@ -934,7 +934,7 @@ static void tilemap_handler(running_machine *machine, ui_gfx_state *state)
 	tilemap_update_bitmap(machine, state, mapboxwidth / pixelscale, mapboxheight / pixelscale);
 
 	/* add the final quad */
-	render_ui_add_quad(mapboxbounds.x0, mapboxbounds.y0,
+	render_container_add_quad(container, mapboxbounds.x0, mapboxbounds.y0,
 						mapboxbounds.x1, mapboxbounds.y1,
 						ARGB_WHITE, state->texture,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(state->tilemap.rotate));

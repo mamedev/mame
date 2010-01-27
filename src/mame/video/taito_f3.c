@@ -480,7 +480,7 @@ static void print_debug_info(bitmap_t *bitmap)
 	l[3]=f3_line_ram[0x15e0]&0xffff;
 	bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	ui_draw_text(buf, 60, 40);
+	ui_draw_text(render_container_get_ui(), buf, 60, 40);
 }
 
 /******************************************************************************/

@@ -40,7 +40,7 @@ void cheat_set_global_enable(running_machine *machine, int enable);
 /* ----- cheat UI helpers ----- */
 
 /* render any text overlays */
-void cheat_render_text(running_machine *machine);
+void cheat_render_text(running_machine *machine, render_container *container);
 
 /* return data about the next menu entry, or the first entry if previous == NULL */
 void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const char **description, const char **state, UINT32 *flags);

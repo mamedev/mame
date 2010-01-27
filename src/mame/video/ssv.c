@@ -905,7 +905,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				if (input_code_pressed(machine, KEYCODE_Z))	/* Display some info on each sprite */
 				{	char buf[30];
 					sprintf(buf, "%02X",/*(s2[2] & ~0x3ff)>>8*/mode>>8);
-					ui_draw_text(buf, sx, sy);
+					ui_draw_text(render_container_get_ui(), buf, sx, sy);
 				}
 				#endif
 
@@ -1085,7 +1085,7 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 			{
 				char buf[10];
 				sprintf(buf, "%X",size);
-				ui_draw_text(buf, sx / 0x10000, sy / 0x10000);
+				ui_draw_text(render_container_get_ui(), buf, sx / 0x10000, sy / 0x10000);
 			}
 			#endif
 		}	/* single-sprites */
