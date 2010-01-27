@@ -356,17 +356,16 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( ddayjlc )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 16*8 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0, 16*8 )
-
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x080, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
 	int code = state->bgram[tile_index] + ((state->bgram[tile_index + 0x400] & 0x08) << 5);
-	int color = (state->bgram[tile_index + 0x400] & 0x7)+0x40;
+	int color = (state->bgram[tile_index + 0x400] & 0x7);
 	color |= (state->bgram[tile_index + 0x400] & 0x40) >> 3;
 
 	SET_TILE_INFO(2, code, color, 0);
@@ -386,28 +385,30 @@ static VIDEO_UPDATE( ddayjlc )
 
 	for (i = 0; i < 0x400; i += 4)
 	{
-		INT32 flags = state->spriteram[i + 2];
-		INT32 y = 256 - state->spriteram[i + 0] - 8;
-		INT32 code = state->spriteram[i + 1];
-		INT32 x = state->spriteram[i + 3] - 16;
-		INT32 xflip = flags & 0x80;
-		INT32 yflip = (code & 0x80);
+		UINT8  flags = state->spriteram[i + 2];
+		UINT8  y = 256 - state->spriteram[i + 0] - 8;
+		UINT16 code = state->spriteram[i + 1];
+		UINT8  x = state->spriteram[i + 3] - 16;
+		UINT8  xflip = flags & 0x80;
+		UINT8  yflip = (code & 0x80);
+		UINT8  color = flags & 0xf;
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], code, 1, xflip, yflip, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
 		UINT32 x, y, c;
+		/* FIXME: where is/are the color offset(s)? I doubt it's hard-coded ... */
 		for (y = 0; y < 32; y++)
 			for (x = 0; x < 32; x++)
 			{
 				c = state->videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 1, 0, 0, x*8, y*8, 0);
+					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 1, 0, 0, x*8, y*8);
+					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;
@@ -564,8 +565,8 @@ ROM_START( ddayjlc )
 	ROM_LOAD( "19", 0x6000, 0x2000, CRC(5816f947) SHA1(2236bed3e82980d3e7de3749aef0fbab042086e6) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "14", 0x0000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
-	ROM_LOAD( "15", 0x1000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
+	ROM_LOAD( "14", 0x1000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
+	ROM_LOAD( "15", 0x0000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
 	ROM_LOAD( "12", 0x1000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
@@ -604,8 +605,8 @@ ROM_START( ddayjlca )
 	ROM_LOAD( "19", 0x6000, 0x2000, CRC(5816f947) SHA1(2236bed3e82980d3e7de3749aef0fbab042086e6) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "14", 0x0000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
-	ROM_LOAD( "15", 0x1000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
+	ROM_LOAD( "14", 0x1000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
+	ROM_LOAD( "15", 0x0000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
 	ROM_LOAD( "12", 0x1000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
@@ -689,5 +690,5 @@ static DRIVER_INIT( ddayjlc )
 	memory_set_bank(machine, "bank1", 0);
 }
 
-GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
