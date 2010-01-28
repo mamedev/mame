@@ -1,18 +1,8 @@
-/* Sang Ho Soft 'Puzzle Star' PCB */
+/* 
 
-/*
+Sang Ho Soft 'Puzzle Star' PCB
 
- It is important that this is finished before all the
- PCBs are dead incase we need anything additional
- from the boards which can only be retrived while they are
- in working condition.
-
- At this stage it looks unlikely that we will need anything
- as the battery backed chip appears to control ports+banking.
-
- */
-
-/*
+Driver by David Haywood, Tomasz Slanina and Mariusz Wojcieszek
 
 Each board contains a custom FGPA on a sub-board with
 a warning   "WARNING ! NO TOUCH..." printed on the PCB
@@ -53,6 +43,7 @@ is a YM2413 compatible chip.
 #include "sound/2413intf.h"
 
 static UINT8* sangho_ram;
+static UINT8 sexyboom_bank[8];
 
 static WRITE8_HANDLER(sangho_ram_w)
 {
@@ -67,11 +58,66 @@ static ADDRESS_MAP_START( pzlestar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sexyboom_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
+ADDRESS_MAP_END
+
 /* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
 	memory_set_bankptr(space->machine, "bank2",&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
 	memory_set_bankptr(space->machine, "bank3",&memory_region(space->machine, "user1")[  0x18000  ]);
+}
+
+static void sexyboom_map_bank(running_machine *machine, int bank)
+{
+	UINT8 banknum, banktype;
+	char read_bank_name[6], write_bank_name[6];
+	
+	banknum = sexyboom_bank[bank*2];
+	banktype = sexyboom_bank[bank*2 + 1];
+	sprintf(read_bank_name, "bank%d", bank+1);
+	sprintf(write_bank_name, "bank%d", bank+1+4);
+
+	if (banktype == 0)
+	{
+		if (banknum & 0x80)
+		{
+			// ram
+			memory_set_bankptr(machine, read_bank_name, &sangho_ram[(banknum & 0x7f) * 0x4000]);
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0, write_bank_name );
+			memory_set_bankptr(machine, write_bank_name, &sangho_ram[(banknum & 0x7f) * 0x4000]);
+		}
+		else
+		{
+			// rom 0
+			memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x4000*banknum);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
+		}
+	}
+	else if (banktype == 0x82)
+	{
+		memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x20000+banknum*0x4000);
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
+	}
+	else if (banktype == 0x80)
+	{
+		memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x120000+banknum*0x4000);
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
+	}
+	else
+	{
+		logerror("Unknown bank type %02x\n", banktype);
+	}
+}
+
+static WRITE8_HANDLER(sexyboom_bank_w)
+{
+	sexyboom_bank[offset] = data;
+	sexyboom_map_bank(space->machine, offset>>1);
 }
 
 /* Puzzle Star Ports */
@@ -101,7 +147,7 @@ static ADDRESS_MAP_START( sexyboom_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0xf2, 0xf2) AM_WRITE( v9938_0_palette_w )
 	AM_RANGE( 0xf3, 0xf3) AM_WRITE( v9938_0_register_w )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
-	//bank f8-ff ???
+	AM_RANGE( 0xf8, 0xff) AM_WRITE( sexyboom_bank_w )
 ADDRESS_MAP_END
 
 
@@ -188,13 +234,20 @@ static MACHINE_RESET(pzlestar)
 
 static MACHINE_RESET(sexyboom)
 {
-	/* give it some code to run */
-	memcpy(sangho_ram,memory_region(machine, "user1"),0x8000);
-	/* patch out rom check */
-	sangho_ram[0x022e]=0xc9;
-	sangho_ram[0x4604]=0xc9;
+	sexyboom_bank[0] = 0x00;
+	sexyboom_bank[1] = 0x00;
+	sexyboom_bank[2] = 0x01;
+	sexyboom_bank[3] = 0x00;
+	sexyboom_bank[4] = 0x80;
+	sexyboom_bank[5] = 0x00;
+	sexyboom_bank[6] = 0x80;
+	sexyboom_bank[7] = 0x01;
+	sexyboom_map_bank(machine, 0);
+	sexyboom_map_bank(machine, 1);
+	sexyboom_map_bank(machine, 2);
+	sexyboom_map_bank(machine, 3);
 
-	sangho_common_machine_reset(machine);
+	v9938_reset(0);
 }
 
 static void msx_vdp_interrupt(running_machine *machine, int i)
@@ -252,7 +305,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sexyboom )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(pzlestar_map)
+	MDRV_CPU_PROGRAM_MAP(sexyboom_map)
 	MDRV_CPU_IO_MAP(sexyboom_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
@@ -324,4 +377,4 @@ static DRIVER_INIT(sangho)
 }
 
 GAME( 1991, pzlestar,  0,    pzlestar, sangho, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
-GAME( 1992, sexyboom,  0,    sexyboom, sangho, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1992, sexyboom,  0,    sexyboom, sangho, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
