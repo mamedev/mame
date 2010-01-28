@@ -274,6 +274,7 @@ UINT32 read_program_word(am29000_state *state, UINT32 address)
 	{
 		fatalerror("Am29000 instruction MMU translation enabled!");
 	}
+	return 0;
 }
 
 /***************************************************************************
