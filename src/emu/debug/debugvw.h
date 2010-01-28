@@ -108,13 +108,13 @@ struct debug_view_xy
 class registers_subview_item
 {
 	DISABLE_COPYING(registers_subview_item);
-	
+
 public:
 	registers_subview_item()
 		: next(NULL),
 		  index(0),
 		  device(NULL) { }
-	
+
 	registers_subview_item *next;				/* link to next item */
 	int					index;					/* index of this item */
 	astring				name;					/* name of the subview item */
@@ -126,7 +126,7 @@ public:
 class disasm_subview_item
 {
 	DISABLE_COPYING(disasm_subview_item);
-	
+
 public:
 	disasm_subview_item()
 		: next(NULL),
@@ -144,7 +144,7 @@ public:
 class memory_subview_item
 {
 	DISABLE_COPYING(memory_subview_item);
-	
+
 public:
 	memory_subview_item()
 		: next(NULL),

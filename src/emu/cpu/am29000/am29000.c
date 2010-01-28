@@ -225,7 +225,7 @@ static CPU_RESET( am29000 )
 
 static CPU_EXIT( am29000 )
 {
-	
+
 }
 
 
@@ -989,7 +989,7 @@ CPU_GET_INFO( am29000 )
 																									am29000->cps & CPS_DA ? 'D' : '.',
 																									(am29000->r[1] >> 2) & 0x7f); break;
 
-		case CPUINFO_STR_REGISTER + AM29000_PC:  		sprintf(info->s, "PC: %08X", am29000->pc);			break;
+		case CPUINFO_STR_REGISTER + AM29000_PC: 		sprintf(info->s, "PC: %08X", am29000->pc);			break;
 		case CPUINFO_STR_REGISTER + AM29000_VAB:		sprintf(info->s, "VAB: %08X", am29000->vab);		break;
 		case CPUINFO_STR_REGISTER + AM29000_OPS:		sprintf(info->s, "OPS: %08X", am29000->ops);		break;
 		case CPUINFO_STR_REGISTER + AM29000_CPS:		sprintf(info->s, "CPS: %08X", am29000->cps);		break;

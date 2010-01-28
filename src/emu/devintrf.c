@@ -73,7 +73,7 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 {
 	// remember the machine for later use
 	machine = &_machine;
-	
+
 	// append each device from the configuration list
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next)
 		append(devconfig->tag, new running_device(_machine, *devconfig));
@@ -97,7 +97,7 @@ void device_list::start_all()
 	int numstarted = 0;
 	while (numstarted < devcount)
 	{
-		// iterate over devices and start them 
+		// iterate over devices and start them
 		int prevstarted = numstarted;
 		for (running_device *device = first(); device != NULL; device = device->next)
 			if (!device->started)
@@ -308,7 +308,7 @@ astring &device_config::subtag(astring &dest, const char *_tag) const
 
 
 /*-------------------------------------------------
-    siblingtag - create a tag for an object that 
+    siblingtag - create a tag for an object that
     a sibling to this device
 -------------------------------------------------*/
 
@@ -360,7 +360,7 @@ running_device::running_device(running_machine &_machine, const device_config &_
 
 
 /*-------------------------------------------------
-    ~running_device - destructor for a 
+    ~running_device - destructor for a
     running_device
 -------------------------------------------------*/
 

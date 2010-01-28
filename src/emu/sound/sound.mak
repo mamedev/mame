@@ -592,7 +592,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter YM2151,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/2151intf.o $(SOUNDOBJ)/ym2151.o 
+SOUNDOBJS += $(SOUNDOBJ)/2151intf.o $(SOUNDOBJ)/ym2151.o
 endif
 
 ifneq ($(filter YM2203,$(SOUNDS)),)

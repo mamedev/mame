@@ -331,23 +331,23 @@ public:
 	tagged_list() :
 		head(NULL),
 		tailptr(&head) { }
-	
+
 	virtual ~tagged_list()
 	{
 		while (head != NULL)
 			remove(head);
 	}
-	
+
 	T *first() const { return head; }
-	
+
 	int count() const
 	{
 		int num = 0;
 		for (T *cur = head; cur != NULL; cur = cur->next)
 			num++;
-		return num; 
+		return num;
 	}
-	
+
 	int index(T *object) const
 	{
 		int num = 0;
@@ -358,13 +358,13 @@ public:
 				num++;
 		return -1;
 	}
-	
+
 	int index(const char *tag) const
 	{
 		T *object = find(tag);
 		return (object != NULL) ? index(object) : -1;
 	}
-	
+
 	T *prepend(const char *tag, T *object, bool replace_if_duplicate = false)
 	{
 		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
@@ -375,7 +375,7 @@ public:
 			tailptr = &object->next;
 		return object;
 	}
-	
+
 	T *append(const char *tag, T *object, bool replace_if_duplicate = false)
 	{
 		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
@@ -385,7 +385,7 @@ public:
 		tailptr = &object->next;
 		return object;
 	}
-	
+
 	void remove(T *object)
 	{
 		for (T **objectptr = &head; *objectptr != NULL; objectptr = &(*objectptr)->next)
@@ -399,14 +399,14 @@ public:
 				return;
 			}
 	}
-	
+
 	void remove(const char *tag)
 	{
 		T *object = find(tag);
 		if (object != NULL)
 			remove(object);
 	}
-	
+
 	T *find(const char *tag) const
 	{
 		return map.find_hash_only(tag);

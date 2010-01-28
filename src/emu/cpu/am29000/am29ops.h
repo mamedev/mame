@@ -194,9 +194,9 @@ static void write_spr(am29000_state *am29000, UINT32 idx, UINT32 val)
 		case SPR_CR:	am29000->chc &= ~(CHC_CR_MASK << CHC_CR_SHIFT);
 						am29000->chc |= (val & CHC_CR_MASK) << CHC_CR_SHIFT;
 						break;
-//		case SPR_FPE:
-//		case SPR_INTE:
-//		case SPR_FPS:
+//      case SPR_FPE:
+//      case SPR_INTE:
+//      case SPR_FPS:
 		default: logerror("Unhandled SPR write (%d)\n", idx);
 	}
 }
@@ -215,7 +215,7 @@ static void ADD(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = a + b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_V_ADD(r, a, b);
@@ -247,7 +247,7 @@ static void ADDCS(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = a + b + GET_CARRY;
-	
+
 	if (!FREEZE_MODE)
 	{
 		UINT32 carry = GET_CARRY;
@@ -276,7 +276,7 @@ static void SUB(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
 	UINT32 r = a - b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_V_SUB(r, a, b);
@@ -294,7 +294,7 @@ static void SUBS(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
 	UINT32 r = a - b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_V_SUB(r, a, b);
@@ -334,7 +334,7 @@ static void SUBR(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
 	UINT32 r = b - a;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_V_SUB(r, a, b);
@@ -361,7 +361,7 @@ static void SUBRC(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
 	UINT32 r = b - a - 1 + GET_CARRY;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_V_SUB(r, a, b);
@@ -523,7 +523,7 @@ static void DIV(am29000_state *am29000)
 		c = (UINT32)(r) < (UINT32)(a);
 	}
 
-	
+
 	df = (~(c ^ (am29000->alu >> ALU_DF_SHIFT) ^ (am29000->alu >> ALU_N_SHIFT)) & 1);
 
 	if (!FREEZE_MODE)
@@ -781,7 +781,7 @@ static void AND(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = a & b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -796,7 +796,7 @@ static void ANDN(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = a & ~b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -811,7 +811,7 @@ static void NAND(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = ~(a & b);
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -826,7 +826,7 @@ static void OR(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = a | b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -841,7 +841,7 @@ static void NOR(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = ~(a | b);
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -856,7 +856,7 @@ static void XOR(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = a ^ b;
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -871,7 +871,7 @@ static void XNOR(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
 	UINT32 r = ~(a ^ b);
-	
+
 	if (!FREEZE_MODE)
 	{
 		SET_ALU_Z(r);
@@ -891,7 +891,7 @@ static void SLL(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
 	UINT32 r = a << b;
-	
+
 	am29000->r[RC] = r;
 }
 
@@ -900,7 +900,7 @@ static void SRL(am29000_state *am29000)
 	UINT32 a = GET_RA_VAL;
 	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
 	UINT32 r = a >> b;
-	
+
 	am29000->r[RC] = r;
 }
 
@@ -909,7 +909,7 @@ static void SRA(am29000_state *am29000)
 	INT32 a = GET_RA_VAL;
 	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
 	UINT32 r = a >> b;
-	
+
 	am29000->r[RC] = r;
 }
 
@@ -918,7 +918,7 @@ static void EXTRACT(am29000_state *am29000)
 	INT32 a = GET_RA_VAL;
 	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL);
 	UINT64 r;
-	
+
 	r = (((UINT64)a << 32) | b) << GET_ALU_FC;
 
 	am29000->r[RC] = r >> 32;
@@ -960,8 +960,8 @@ static void LOAD(am29000_state *am29000)
 		}
 	}
 
-//	if (opt & 2)
-//		logerror("Am29000: Half word LOAD\n");
+//  if (opt & 2)
+//      logerror("Am29000: Half word LOAD\n");
 
 	if (!FREEZE_MODE)
 	{
@@ -1047,7 +1047,7 @@ static void LOADM(am29000_state *am29000)
 		{
 			am29000->r[r] = memory_read_dword_32be(am29000->data, addr);
 
-//			SET_CHC_CR(cnt - 1);
+//          SET_CHC_CR(cnt - 1);
 			addr += 4;
 
 			if (++r == 256)
@@ -1161,7 +1161,7 @@ static void STOREM(am29000_state *am29000)
 		{
 			memory_write_dword_32be(am29000->data, addr, am29000->r[r]);
 
-//			SET_CHC_CR(cnt - 1);
+//          SET_CHC_CR(cnt - 1);
 			addr += 4;
 
 			if (++r == 256)

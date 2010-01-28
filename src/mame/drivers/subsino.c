@@ -274,7 +274,7 @@ static WRITE8_HANDLER( subsino_out_a_w )
 	coin_counter_w( space->machine, 2, data & 0x10 );	/* keyout */
 	coin_counter_w( space->machine, 3, data & 0x20 );	/* payout */
 
-//	popmessage("Out A %02x",data);
+//  popmessage("Out A %02x",data);
 
 }
 
@@ -357,7 +357,7 @@ static WRITE8_HANDLER( subsino_out_b_w )
 	output_set_lamp_value(6, (data >> 6) & 1);	/* Lamp 6 */
 	output_set_lamp_value(7, (data >> 7) & 1);	/* Lamp 7 */
 
-//	popmessage("Out B %02x",data);
+//  popmessage("Out B %02x",data);
 }
 
 
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0900b, 0x0900b ) AM_RAM //protection
 
-//	AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
@@ -646,7 +646,7 @@ static INPUT_PORTS_START( victor21 )
 
 	PORT_START( "INA" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )		PORT_CODE(KEYCODE_V)	PORT_NAME("Split")	
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )		PORT_CODE(KEYCODE_V)	PORT_NAME("Split")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_CODE(KEYCODE_Z)	PORT_NAME("Deal / Hit")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_BET )		PORT_IMPULSE(3)
@@ -966,7 +966,7 @@ static INPUT_PORTS_START( sharkpy )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x08, "6" )
 	PORT_DIPSETTING(    0x00, "7" )
- 	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START( "DSW4" )
@@ -1058,7 +1058,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_DIPSETTING(    0x28, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
 	PORT_DIPSETTING(    0x38, "7" )
- 	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START( "DSW4" )
@@ -1152,7 +1152,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_DIPSETTING(    0x28, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
 	PORT_DIPSETTING(    0x38, "7" )
- 	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START( "DSW4" )

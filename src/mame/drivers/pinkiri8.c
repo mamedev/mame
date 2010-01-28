@@ -44,7 +44,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( pinkiri8 )
 	MDRV_CPU_ADD("maincpu",Z180,16000000)
 	MDRV_CPU_PROGRAM_MAP(pinkiri8_map)
-//	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+//  MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -60,8 +60,8 @@ static MACHINE_DRIVER_START( pinkiri8 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 /***************************************************************************

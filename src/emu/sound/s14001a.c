@@ -231,7 +231,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
  *   if mirrored mode is OFF, increment oddphone. if not, don't touch it here. if oddphone was 1 before the increment, increment phoneaddress and set oddphone to 0
  *
  */
- 
+
 #undef ACCURATE_SQUEAL
 
 #include "emu.h"

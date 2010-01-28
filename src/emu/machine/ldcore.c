@@ -1632,7 +1632,7 @@ static const ldplayer_interface *get_interface(const device_config *devconfig)
 	for (int pltype = 0; pltype < ARRAY_LENGTH(player_interfaces); pltype++)
 		if (player_interfaces[pltype]->type == config->type)
 			return player_interfaces[pltype];
-	
+
 	return NULL;
 }
 

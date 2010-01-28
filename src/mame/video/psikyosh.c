@@ -146,7 +146,7 @@ do																									\
 while (0)																							\
 
 /*-------------------------------------------------
-    draw_scanline32_alpha - take an RGB-encoded UINT32 
+    draw_scanline32_alpha - take an RGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
 static void draw_scanline32_alpha(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha)
@@ -161,7 +161,7 @@ static void draw_scanline32_alpha(bitmap_t *bitmap, INT32 destx, INT32 desty, IN
 }
 
 /*-------------------------------------------------
-    draw_scanline32_argb - take an ARGB-encoded UINT32 
+    draw_scanline32_argb - take an ARGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
 static void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
@@ -177,7 +177,7 @@ static void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT
 }
 
 /*-------------------------------------------------
-    draw_scanline32_tranpens - take an RGB-encoded UINT32 
+    draw_scanline32_tranpens - take an RGB-encoded UINT32
     scanline and copy it into the destination bitmap, testing for the special ARGB transpen
 -------------------------------------------------*/
 static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
@@ -194,11 +194,11 @@ static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty,
 
 /*-------------------------------------------------
     drawgfx_alphastore - render a gfx element with
-    a single transparent pen, storing the alpha value 
+    a single transparent pen, storing the alpha value
     in alpha field of ARGB32, negative alpha implies alphatable
 -------------------------------------------------*/
 static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -238,8 +238,8 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
 }
 
 /*-------------------------------------------------
-    drawgfx_alphatable - render a sprite with either 
-    a fixed alpha value, or if alpha==-1 then uses 
+    drawgfx_alphatable - render a sprite with either
+    a fixed alpha value, or if alpha==-1 then uses
     the per-pen alphatable[] array
  -------------------------------------------------*/
 static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
@@ -277,7 +277,7 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 /* Psikyo PS6406B */
 /* --- BACKGROUNDS --- */
 
-/* 'Normal' layers, no line/columnscroll. No per-line effects. 
+/* 'Normal' layers, no line/columnscroll. No per-line effects.
 Zooming isn't supported just because it's not used and it would be slow */
 static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
@@ -349,7 +349,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 
 	assert(sy > 0 && sy < 32);
 
-	if(tilebank != last_bank[sy]) 
+	if(tilebank != last_bank[sy])
 	{
 		rectangle cliprect;
 
@@ -375,7 +375,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 			if(tileno) { // valid tile, but blank in all games?
 				drawgfx_alphastore(state->bg_bitmap, NULL, gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
 			}
-			
+
 			offs++;
 		}
 		last_bank[sy] = tilebank;
@@ -384,8 +384,8 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 
 
 /* Row Scroll/Zoom and/or Column Zoom, has per-column Alpha/Bank/Priority
-Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used). 
-From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels 
+Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used).
+From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels
 into the RGB32 bitmap (with either the alpha information from the ARGB, or per-line alpha */
 static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
@@ -402,20 +402,20 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 	int last_bank[32]; // corresponds to bank of bitmap in state->bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
 	for(int ii = 0; ii < 32; ii++) last_bank[ii] = -1;
 
-	int scr_width = (cliprect->max_x-cliprect->min_x + 1); 
+	int scr_width = (cliprect->max_x-cliprect->min_x + 1);
 	int scr_height = (cliprect->max_y-cliprect->min_y + 1);
 	UINT32 *scroll_reg = &state->bgram[(linebank * 0x800) / 4 - 0x4000 / 4];
 	UINT32 *pzab_reg   = &state->bgram[(linebank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; // pri, zoom, alpha, bank
 
-// now, for each scanline, check priority, 
-// extract the relevant scanline from the bitmap, after applying per-scanline vscroll, 
+// now, for each scanline, check priority,
+// extract the relevant scanline from the bitmap, after applying per-scanline vscroll,
 // stretch it and scroll it into another buffer
 // write it with alpha
 	for(int scanline = 0; scanline < scr_height; scanline++)
 	{
 		int pri = (*pzab_reg & 0xff000000) >> 24;
 
-		if(pri == req_pri) 
+		if(pri == req_pri)
 		{
 			int scrollx  = (*scroll_reg & 0x000001ff) >> 0;
 			int scrolly  = (*scroll_reg & 0x03ff0000) >> 16;
@@ -1098,8 +1098,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     However, sprite-sprite priority needs to be preserved.
     daraku and soldivid only use the lsb
 
-	? = unknown
-	Could be a sprite-sprite priority, tests seem to back this up
+    ? = unknown
+    Could be a sprite-sprite priority, tests seem to back this up
 
     **- End Sprite Format -*/
 	const int spr_keys[8] = {KEYCODE_Y, KEYCODE_U, KEYCODE_I, KEYCODE_O};
@@ -1185,7 +1185,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		listcntr++;
 		if (listdat & 0x4000) break;
 	}
-}	
+}
 
 
 static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -1274,8 +1274,8 @@ VIDEO_START( psikyosh )
 		alphatable[i + 0xc0] = alpha;
 	}
 
-	/* precompute the background zoom table. verified against hardware. 
-	   unsure of the precision, we use .10 fixed point like the sprites */
+	/* precompute the background zoom table. verified against hardware.
+       unsure of the precision, we use .10 fixed point like the sprites */
 	for(i = 0; i < 0x100; i++) {
 		state->bg_zoom[i] = (64 * 0x400) / (i + 64);
 	}

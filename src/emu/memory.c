@@ -1777,7 +1777,7 @@ static void memory_init_spaces(running_machine *machine)
 				/* link us in */
 				*nextptr = space;
 				nextptr = (address_space **)&space->next;
-				
+
 				/* notify the deveice */
 				device->set_address_space(spacenum, space);
 			}

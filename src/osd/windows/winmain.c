@@ -451,7 +451,7 @@ static void soft_link_functions(void)
 		av_set_mm_max_thread_characteristics = (av_set_mm_max_thread_characteristics_ptr)GetProcAddress(library, "AvSetMmMaxThreadCharacteristics" UNICODE_POSTFIX);
 		av_revert_mm_thread_characteristics = (av_revert_mm_thread_characteristics_ptr)GetProcAddress(library, "AvRevertMmThreadCharacteristics");
 	}
-	
+
 	// psapi helpers (not available in win9x)
 	library = LoadLibrary(TEXT("psapi.dll"));
 	if (library != NULL)
@@ -646,10 +646,10 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 	{
 		CONTEXT context = *info->ContextRecord;
 		STACKFRAME64 stackframe;
-	
+
 		// initialize the symbol lookup
 		sym_initialize(GetCurrentProcess(), NULL, TRUE);
-	
+
 		// reprint the actual exception address
 		fprintf(stderr, "-----------------------------------------------------\n");
 		fprintf(stderr, "Stack crawl:\n");
@@ -700,15 +700,15 @@ static const char *line_to_symbol(const char *line, FPTR &address)
 {
 #ifdef __GNUC__
 /*
-	32-bit gcc map line:
+    32-bit gcc map line:
                 0x0089cb00                nbmj9195_palette_r(_address_space const*, unsigned int)
 
-	64-bit gcc map line:
+    64-bit gcc map line:
                 0x0000000000961afc                nbmj9195_palette_r(_address_space const*, unsigned int)
 */
 	char symbol[1024];
 	void *temp;
-	
+
 	// find a matching start
 	if (strncmp(line, "                0x", 18) == 0)
 		if (sscanf(line, " 0x%p %s", &temp, symbol) == 2)
@@ -720,16 +720,16 @@ static const char *line_to_symbol(const char *line, FPTR &address)
 
 #ifdef _MSC_VER
 /*
-	32-bit MSVC map line:
+    32-bit MSVC map line:
  0001:00387890       ?nbmj9195_palette_r@@YAEPBU_address_space@@I@Z 00788890 f   nichibut:nbmj9195.o
 
-	64-bit MSVC map line:
+    64-bit MSVC map line:
  0001:004d7510       ?nbmj9195_palette_r@@YAEPEBU_address_space@@I@Z 00000001404d8510 f   nichibut:nbmj9195.o
 */
 	static char symbol[1024];
 	int dummy1, dummy2;
 	void *temp;
-	
+
 	symbol[0] = 0;
 	if (line[0] == ' ' && line[5] == ':')
 		if (sscanf(line, " %04x:%08x %s %p", &dummy1, &dummy2, symbol, &temp) == 4)
@@ -765,7 +765,7 @@ static const char *lookup_symbol(FPTR address)
 	{
 		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
 		DWORD linedisp;
-		
+
 		// try to get source info as well; again we are returned an ANSI string
 		if (sym_get_line_from_addr_64 != NULL && sym_get_line_from_addr_64(GetCurrentProcess(), address, &linedisp, &lineinfo))
 			sprintf(buffer, " (%s+0x%04x, %s:%d)", info.Name, (UINT32)displacement, lineinfo.FileName, (int)lineinfo.LineNumber);
@@ -1020,7 +1020,7 @@ static void start_profiler(void)
 {
 	HANDLE currentThread;
 	BOOL result;
-	
+
 	assert_always(
 
 	// parse the map file, if present

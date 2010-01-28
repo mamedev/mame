@@ -190,7 +190,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 					continue;
 
 				if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = alpha_blend_r32(pal_base[pixel], dst_base[dst_ptr+ecx+dst_base2], alpha);
-			
+
 				if (pixeldouble_output)
 				{
 					ecx++;

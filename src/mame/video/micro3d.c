@@ -75,7 +75,7 @@ void micro3d_scanline_update(running_device *screen, bitmap_t *bitmap, int scanl
 	int x;
 
 	UINT16 *frame_src;
-	
+
 	scanline = MAX((scanline - params->veblnk), 0);
 	frame_src = state->frame_buffers[state->display_buffer] + (scanline << 10);
 
@@ -87,9 +87,9 @@ void micro3d_scanline_update(running_device *screen, bitmap_t *bitmap, int scanl
 		UINT16 pix = src[coladdr++ & 0x1ff];
 
 		/*
-			TODO: The upper four bits of the 3D buffer affect priority
-			0xfxx forces 3D priority?
-		*/
+            TODO: The upper four bits of the 3D buffer affect priority
+            0xfxx forces 3D priority?
+        */
 		if (pix & 0x80)
 			dest[x + 0] = sd_11_7 | (pix & 0x7f);
 		else
@@ -135,7 +135,7 @@ WRITE16_HANDLER( micro3d_xfer3dk_w )
 
 void micro3d_tms_interrupt(running_device *device, int state)
 {
-//	mc68901_int_gen(device->machine, GPIP4);
+//  mc68901_int_gen(device->machine, GPIP4);
 }
 
 
@@ -334,7 +334,7 @@ void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
 			tmp2 = dy << 1;
 			acc = tmp2 - dx;
 			dy = (dy - dx) << 1;
-			
+
 			do
 			{
 				if (~acc & 0x80000000)
@@ -352,7 +352,7 @@ void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
 				}
 			} while (y2 != y1);
 		}
-		
+
 		if (x2 != x1)
 			write_span(state, y1, x2);
 
@@ -421,10 +421,10 @@ void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UINT32 at
 	else
 	{
 		/*
-			I don't know the LFSR arrangement inside the DRAW2 ASIC
-			but here are some possible tap arrangements
-		*/
-		static const UINT8 taps[8][4] = 
+            I don't know the LFSR arrangement inside the DRAW2 ASIC
+            but here are some possible tap arrangements
+        */
+		static const UINT8 taps[8][4] =
 		{
 			{9, 8, 7, 2},
 			{9, 8, 6, 5},
@@ -435,7 +435,7 @@ void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UINT32 at
 			{9, 7, 5, 2},
 			{9, 6, 5, 3},
 		};
-		
+
 		int noise_val = (attr >> 12) & 0x3ff;
 		int noise_taps = 0;
 
@@ -629,15 +629,15 @@ MPGDRAW commands
 85000xxx     End of vertex list - draw (xxx = colour) [0]
 8Axxxxxx     End of vertex list - random fill shading (xxx = colour) [0]
 
-90000000	 Set clipping Z min [1]
-94000000	 Set clipping Z max [1]
-98000000	 Set clipping Y max [1]
-9c000000	 Set clipping X min [1]
-a0000000	 Set clipping X max [1]
-a4000001	 Set clipping Y min [1] (what does 1 mean?)
+90000000     Set clipping Z min [1]
+94000000     Set clipping Z max [1]
+98000000     Set clipping Y max [1]
+9c000000     Set clipping X min [1]
+a0000000     Set clipping X max [1]
+a4000001     Set clipping Y min [1] (what does 1 mean?)
 
-d8000000	 End of frame (will swap render buffer)    [0]
-f8000000	 Toggle health LED [0]
+d8000000     End of frame (will swap render buffer)    [0]
+f8000000     Toggle health LED [0]
 
 b8000000-1fe Draw ASIC DPRAM address
 b80003ff     Data
@@ -684,9 +684,9 @@ WRITE32_HANDLER( micro3d_fifo_w )
 					state->draw_state = STATE_DRAW_VTX_DATA;
 
 					/* Invalidate the draw RAM
-					 * TODO: Not sure this is the right place for it -
-					 * causes monitor mode draw tests to fail
-					 */
+                     * TODO: Not sure this is the right place for it -
+                     * causes monitor mode draw tests to fail
+                     */
 					for (addr = 0; addr < 512; ++addr)
 						state->draw_dpram[addr << 1] = 0x3ff000;
 
@@ -764,7 +764,7 @@ READ32_HANDLER( micro3d_pipe_r )
 
 INTERRUPT_GEN( micro3d_vblank )
 {
-//	mc68901_int_gen(device->machine, GPIP7);
+//  mc68901_int_gen(device->machine, GPIP7);
 	micro3d_state *state = (micro3d_state*)device->machine->driver_data;
 
 	state->display_buffer = state->drawing_buffer ^ 1;

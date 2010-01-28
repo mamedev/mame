@@ -1165,7 +1165,7 @@ DEVICE_GET_RUNTIME_INFO( naomibd )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MEMORY:				info->p = get_safe_token(device)->memory;		break;
-		
+
 		/* default to the standard info */
 		default:								DEVICE_GET_INFO_NAME(naomibd)(&device->baseconfig(), state, info);	break;
 	}

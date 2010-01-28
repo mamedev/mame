@@ -168,7 +168,7 @@ WRITE16_HANDLER( micro3d_mc68901_w )
 			int mode = state->mc68901.tacr & 0xf;
 
 			state->mc68901.tadr = data;
-			
+
 			/* Timer stopped */
 			if (mode == 0)
 			{
@@ -628,7 +628,7 @@ READ16_HANDLER( micro3d_encoder_l_r )
 static TIMER_CALLBACK( adc_done_callback )
 {
 	micro3d_state *state = (micro3d_state*)machine->driver_data;
-	
+
 	switch (param)
 	{
 		case 0: state->adc_val = input_port_read_safe(machine, "THROTTLE", 0);
@@ -639,7 +639,7 @@ static TIMER_CALLBACK( adc_done_callback )
 		case 3: break;
 	}
 
-//	mc68901_int_gen(machine, GPIP3);
+//  mc68901_int_gen(machine, GPIP3);
 }
 
 READ16_HANDLER( micro3d_adc_r )
@@ -685,7 +685,7 @@ WRITE16_HANDLER( host_drmath_int_w )
 
 /*************************************
  *
- *  
+ *
  *
  *************************************/
 
@@ -732,14 +732,14 @@ DRIVER_INIT( micro3d )
 	state->duart68681 = devtag_get_device(machine, "duart68681");
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
-	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
+    non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	memory_write_dword(space, 0x00470000, 0xa5a5a5a5);
 
 	state->mc68901.timer_a = timer_alloc(machine, mfp_timer_a_cb, NULL);
 
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
-	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
-	avoids this */
+    overwrites memory in use by the Am29000. Slowing down the 68000 slightly
+    avoids this */
 	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.945f);
 }
 

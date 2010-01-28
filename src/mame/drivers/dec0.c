@@ -42,8 +42,8 @@ ToDo:
 
 
 PCB Layouts
------------                                                                 
-                                             
+-----------
+
 Bad Dudes vs Dragonninja
 Data East, 1988
 

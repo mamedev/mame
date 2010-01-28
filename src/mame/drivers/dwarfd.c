@@ -247,23 +247,23 @@ Stamp on disk:
 =====================================================================================
 Quater Horse Classic
 
-Board silkscreend 	QUARTERHORSE
-			(C) ARJAY EXPORT CO.,INC/PRESTIGE GAMES> -1995 REV-C-95
-			HYANNIS,MA.02601--MADE IN USA
+Board silkscreend   QUARTERHORSE
+            (C) ARJAY EXPORT CO.,INC/PRESTIGE GAMES> -1995 REV-C-95
+            HYANNIS,MA.02601--MADE IN USA
 
-.A10 - 27256	stickered	QUARTERHORSE CLASSIC
-				10A - V1.1
-				(c)1995 ARJAY EXPORT - PRESTIGE GAMES
+.A10 - 27256    stickered   QUARTERHORSE CLASSIC
+                10A - V1.1
+                (c)1995 ARJAY EXPORT - PRESTIGE GAMES
 
 
-.H6 - 27128	stickered	QUARTERHORSE CLASSIC
-				CGR - 6H - V1.0
-				(c)1995 ARJAY EXPORT - PRESTIGE GAMES
+.H6 - 27128 stickered   QUARTERHORSE CLASSIC
+                CGR - 6H - V1.0
+                (c)1995 ARJAY EXPORT - PRESTIGE GAMES
 
-.K6 - 27128	stickered	QUARTERHORSE CLASSIC
-				CGR - 6K - V1.0
-				(c)1995 ARJAY EXPORT - PRESTIGE GAMES
-.U9 - Lattice GAL22V10	on daughter board
+.K6 - 27128 stickered   QUARTERHORSE CLASSIC
+                CGR - 6K - V1.0
+                (c)1995 ARJAY EXPORT - PRESTIGE GAMES
+.U9 - Lattice GAL22V10  on daughter board
 
 P8085 @ B8
 P8275 @ F4

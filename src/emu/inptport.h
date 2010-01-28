@@ -696,7 +696,7 @@ struct _input_field_user_settings
 class input_port_config
 {
 	DISABLE_COPYING(input_port_config);
-	
+
 public:
 	input_port_config(const char *tag);
 	~input_port_config();

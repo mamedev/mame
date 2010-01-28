@@ -39,15 +39,15 @@ static void mem_map_banks(running_machine *machine)
 	slot_select = (mem_map >> 0) & 0x03;
 	switch(slot_select)
 	{
-		case 0: 
+		case 0:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 			break;
 		};
 		case 1:
-		case 2: 
-		case 3: 
+		case 2:
+		case 3:
 		{
 			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
 			break;
@@ -58,24 +58,24 @@ static void mem_map_banks(running_machine *machine)
 	slot_select = (mem_map >> 2) & 0x03;
 	switch(slot_select)
 	{
-		case 0: 
+		case 0:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, "bank21" );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank22" );
-			memory_set_bankptr(machine, "bank21", memory_region(machine, "maincpu") + 0x4000); 
+			memory_set_bankptr(machine, "bank21", memory_region(machine, "maincpu") + 0x4000);
 			memory_set_bankptr(machine, "bank22", memory_region(machine, "maincpu") + 0x4000 + 0x2000);
 			break;
 		}
-		case 1: 
+		case 1:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, "bank21" );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank22" );
-			memory_set_bankptr(machine, "bank21", memory_region(machine, "game") + mem_banks[0]*0x2000); 
+			memory_set_bankptr(machine, "bank21", memory_region(machine, "game") + mem_banks[0]*0x2000);
 			memory_set_bankptr(machine, "bank22", memory_region(machine, "game") + mem_banks[1]*0x2000);
 			break;
 		}
-		case 2: 
-		case 3: 
+		case 2:
+		case 3:
 		{
 			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
 			break;
@@ -86,7 +86,7 @@ static void mem_map_banks(running_machine *machine)
 	slot_select = (mem_map >> 4) & 0x03;
 	switch(slot_select)
 	{
-		case 1: 
+		case 1:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "bank31" );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank32" );
@@ -94,9 +94,9 @@ static void mem_map_banks(running_machine *machine)
 			memory_set_bankptr(machine, "bank32", memory_region(machine, "game") + mem_banks[3]*0x2000);
 			break;
 		}
-		case 0: 
-		case 2: 
-		case 3: 
+		case 0:
+		case 2:
+		case 3:
 		{
 			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 			break;
@@ -108,14 +108,14 @@ static void mem_map_banks(running_machine *machine)
 
 	switch(slot_select)
 	{
-		case 0: 
+		case 0:
 		case 1:
-		case 2: 
+		case 2:
 		{
 			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0);
 			break;
 		}
-		case 3: 
+		case 3:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, "bank4" );
 			memory_set_bankptr(machine, "bank4", main_mem);

@@ -1349,7 +1349,7 @@ The bootleg has some gfx glitches (flickering of the text) and the colour of the
 Encrypted custom z80 in epoxy block. Clock is 12mhz/2
 
 YM2413 clock is 3.75mhz. The 7.5mhz clock which is divided by 2 by a 74ls74 before going to the YM2413 is too
-difficult to follow. 
+difficult to follow.
 It is derived from the 10mhz pixel clock since shorting it the video goes out of sync and the music change in pitch/speed.
 
 Oki5205 clock is 384khz (resonator)

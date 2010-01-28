@@ -642,7 +642,7 @@ static MACHINE_RESET( island2a )
 	// this set expects these values set before it will boot
 	// protection added on this bootleg?
 	multfish_bram[0x2003] = 0x01;
-	multfish_bram[0x4003] = 0x02; 
+	multfish_bram[0x4003] = 0x02;
 }
 static MACHINE_DRIVER_START( island2a )
 	/* basic machine hardware */

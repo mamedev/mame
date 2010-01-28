@@ -187,7 +187,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 	{
 		running_device *device = devtag_get_device(machine, data & 4 ? "noise_2" : "noise_1");
 		noise_state *nstate = (noise_state *)device->token;
-		
+
 		if (state->dac_data != nstate->dac[data & 3])
 		{
 			double q;
@@ -323,7 +323,7 @@ static DEVICE_START( micro3d_sound )
 	configure_filter(&state->noise_filters[1], 2.7e3 + 1e3, 0.30e-6);
 	configure_filter(&state->noise_filters[2], 2.7e3 + 270, 0.15e-6);
 	configure_filter(&state->noise_filters[3], 2.7e3 + 0, 0.082e-6);
-//	configure_filter(&state->noise_filters[4], 33e3, 0.1e-6);
+//  configure_filter(&state->noise_filters[4], 33e3, 0.1e-6);
 }
 
 static DEVICE_RESET( micro3d_sound )

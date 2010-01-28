@@ -133,7 +133,7 @@ static void doclr16( running_device *device, int opcode, UINT16 fill, int *dst, 
 					hd63484->ram[*dst] ^= fill;
 					break;
 			}
-			if (ax == 0) 
+			if (ax == 0)
 				break;
 			else if (ax > 0)
 			{
@@ -151,14 +151,14 @@ static void doclr16( running_device *device, int opcode, UINT16 fill, int *dst, 
 		if (_ay < 0)
 		{
 			*dst = (*dst + (hd63484->reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
-			if (ay == 0) 
+			if (ay == 0)
 				break;
 			ay++;
 		}
 		else
 		{
 			*dst = (*dst - (hd63484->reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
-			if (ay == 0) 
+			if (ay == 0)
 				break;
 			ay--;
 		}
@@ -1481,14 +1481,14 @@ WRITE16_DEVICE_HANDLER( hd63484_data_w )
 
 	COMBINE_DATA(&hd63484->reg[hd63484->regno/2]);
 
-	if (hd63484->skattva_hack) 
+	if (hd63484->skattva_hack)
 		hd63484->reg[2/2] = (hd63484->reg[2/2] & 0xf8ff) | 0x0200; // hack to set proper color depth in skattva
 
-	if (hd63484->regno & 0x80) 
+	if (hd63484->regno & 0x80)
 		hd63484->regno += 2;	/* autoincrement */
 
 #if LOG_COMMANDS
-//	logerror("PC %05x: HD63484 register %02x write %04x\n", cpu_get_pc(space->cpu), hd63484->regno, hd63484->reg[hd63484->regno/2]);
+//  logerror("PC %05x: HD63484 register %02x write %04x\n", cpu_get_pc(space->cpu), hd63484->regno, hd63484->reg[hd63484->regno/2]);
 #endif
 
 	if (hd63484->regno == 0)	/* FIFO */
@@ -1505,14 +1505,14 @@ READ16_DEVICE_HANDLER( hd63484_data_r )
 	else if (hd63484->regno == 0)
 	{
 #if LOG_COMMANDS
-//		logerror("%05x: HD63484 read FIFO\n", cpu_get_pc(space->cpu));
+//      logerror("%05x: HD63484 read FIFO\n", cpu_get_pc(space->cpu));
 #endif
 		res = hd63484->readfifo;
 	}
 	else
 	{
 #if LOG_COMMANDS
-//		logerror("%05x: HD63484 read register %02x\n", cpu_get_pc(space->cpu), hd63484->regno);
+//      logerror("%05x: HD63484 read register %02x\n", cpu_get_pc(space->cpu), hd63484->regno);
 #endif
 		res = 0;
 	}
@@ -1557,9 +1557,9 @@ static DEVICE_START( hd63484 )
 	hd63484->skattva_hack = intf->skattva_hack;
 	hd63484->ram = auto_alloc_array_clear(device->machine, UINT16, HD63484_RAM_SIZE);
 
-//	state_save_register_device_item(device, 0, hd63484->clear_bitmap);
-//	state_save_register_device_item_pointer(device, 0, hd63484->spriteram, 0x1000);
-//	state_save_register_device_item_bitmap(device, 0, hd63484->sprites_bitmap);
+//  state_save_register_device_item(device, 0, hd63484->clear_bitmap);
+//  state_save_register_device_item_pointer(device, 0, hd63484->spriteram, 0x1000);
+//  state_save_register_device_item_bitmap(device, 0, hd63484->sprites_bitmap);
 }
 
 static DEVICE_RESET( hd63484 )

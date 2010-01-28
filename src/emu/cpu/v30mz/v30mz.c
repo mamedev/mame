@@ -101,7 +101,7 @@ struct _v30mz_state
 	UINT32 ea;
 	UINT16 eo;
 	UINT16 e16;
-	
+
 	const nec_config *config;
 };
 
@@ -944,7 +944,7 @@ static void nec_init(running_device *device, cpu_irq_callback irqcallback, int t
 	v30mz_state *cpustate = get_safe_token(device);
 
 	const nec_config *config = &default_config;
-	
+
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);
 	state_save_register_device_item_array(device, 0, cpustate->sregs);
 

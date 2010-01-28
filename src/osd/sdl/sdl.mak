@@ -7,7 +7,7 @@
 #   Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
-#   SDLMAME by Olivier Galibert and R. Belmont 
+#   SDLMAME by Olivier Galibert and R. Belmont
 #
 ###########################################################################
 
@@ -42,8 +42,8 @@
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
 
-# uncomment the next line to build a binary using 
-# GL-dispatching. 
+# uncomment the next line to build a binary using
+# GL-dispatching.
 # This option takes precedence over MESA_INSTALL_ROOT
 
 USE_DISPATCH_GL = 1
@@ -80,18 +80,18 @@ CCOMFLAGS += $(OPT_FLAGS)
 #-------------------------------------------------
 # distribution may change things
 #-------------------------------------------------
-	
+
 ifeq ($(DISTRO),)
 DISTRO = generic
-else 
+else
 ifeq ($(DISTRO),debian-stable)
 DEFS += -DNO_AFFINITY_NP
-else 
+else
 ifeq ($(DISTRO),ubuntu-intrepid)
 # Force gcc-4.2 on ubuntu-intrepid
 CC = @gcc -V 4.2
 LD = g++-4.2
-else 
+else
 ifeq ($(DISTRO),gcc44-generic)
 CC = @gcc -V 4.4
 LD = @g++ -V 4.4
@@ -139,11 +139,11 @@ endif
 ifeq ($(TARGETOS),freebsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-DEFS += -DNO_AFFINITY_NP 
+DEFS += -DNO_AFFINITY_NP
 # /usr/local/include is not considered a system include directory
 # on FreeBSD. GL.h resides there and throws warnings
 CCOMFLAGS += -isystem /usr/local/include
-# No clue here. There is a popmessage(NULL) in uimenu.c which 
+# No clue here. There is a popmessage(NULL) in uimenu.c which
 # triggers a non-null format warning on FreeBSD only.
 CCOMFLAGS += -Wno-format
 endif
@@ -195,7 +195,7 @@ ifeq ($(TARGETOS),win32)
 BASE_TARGETOS = win32
 SYNC_IMPLEMENTATION = win32
 NO_X11 = 1
-DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI 
+DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI
 LIBGL = -lopengl32
 SDLMAIN = $(SDLOBJ)/main.o
 # needed for unidasm
@@ -207,7 +207,7 @@ NO_DEBUGGER = 1
 else
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
-	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0 
+	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
 CCOMFLAGS += -mms-bitfields \
 	-I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/glib-2.0 \
 	-I$(GTK_INSTALL_ROOT)/include/cairo -I$(GTK_INSTALL_ROOT)/include/pango-1.0 \
@@ -256,11 +256,11 @@ OBJDIRS += $(SDLOBJ)
 OSDCOREOBJS = \
 	$(SDLOBJ)/strconv.o	\
 	$(SDLOBJ)/sdldir.o	\
-	$(SDLOBJ)/sdlfile.o  	\
+	$(SDLOBJ)/sdlfile.o 	\
 	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o	\
 	$(SDLOBJ)/sdlos_$(BASE_TARGETOS).o	\
 	$(SDLOBJ)/sdlsync_$(SYNC_IMPLEMENTATION).o     \
-	$(SDLOBJ)/sdlwork.o	
+	$(SDLOBJ)/sdlwork.o
 
 # any "main" must be in LIBOSD or else the build will fail!
 # for the windows build, we just add it to libocore as well.
@@ -272,7 +272,7 @@ OSDOBJS = \
 	$(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
-	$(SDLOBJ)/output.o 
+	$(SDLOBJ)/output.o
 
 # Add SDL1.3 support
 ifdef SDL_INSTALL_ROOT
@@ -338,16 +338,16 @@ endif
 
 ifndef SDL_INSTALL_ROOT
 CCOMFLAGS += `sdl-config --cflags`
-LIBS += -lm `sdl-config --libs` 
+LIBS += -lm `sdl-config --libs`
 else
 CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include -D_GNU_SOURCE=1
-LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL 
+LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
 endif
 
 endif # Unix
 
 #-------------------------------------------------
-# Windows 
+# Windows
 #-------------------------------------------------
 
 # Win32: add the necessary libraries
@@ -358,7 +358,7 @@ OSDCOREOBJS += $(SDLMAIN)
 
 ifdef SDL_INSTALL_ROOT
 CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include
-LIBS += -L$(SDL_INSTALL_ROOT)/lib 
+LIBS += -L$(SDL_INSTALL_ROOT)/lib
 #-Wl,-rpath,$(SDL_INSTALL_ROOT)/lib
 endif
 
@@ -366,13 +366,13 @@ endif
 # Static linking
 
 LDFLAGS += -static-libgcc
-LIBS += -Wl,-Bstatic -lSDL -Wl,-Bdynamic 
+LIBS += -Wl,-Bstatic -lSDL -Wl,-Bdynamic
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 endif	# Win32
 
 #-------------------------------------------------
-# Mac OS X 
+# Mac OS X
 #-------------------------------------------------
 
 ifeq ($(BASE_TARGETOS),macosx)
@@ -380,7 +380,7 @@ ifeq ($(BASE_TARGETOS),macosx)
 
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
-LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread 
+LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
 else
 # Compile using installed libSDL (Fink or MacPorts):
 #
@@ -395,7 +395,7 @@ endif
 endif	# Mac OS X
 
 #-------------------------------------------------
-# OS/2 
+# OS/2
 #-------------------------------------------------
 
 ifeq ($(BASE_TARGETOS),os2)
@@ -406,7 +406,7 @@ LIBS += `sdl-config --libs`
 endif # OS2
 
 #-------------------------------------------------
-# Debugging 
+# Debugging
 #-------------------------------------------------
 
 ifeq ($(NO_DEBUGGER),1)
@@ -418,7 +418,7 @@ OSDOBJS += $(DEBUGOBJS)
 endif # NO_DEBUGGER
 
 #-------------------------------------------------
-# OPENGL 
+# OPENGL
 #-------------------------------------------------
 
 ifeq ($(NO_OPENGL),1)
@@ -442,7 +442,7 @@ endif
 endif
 
 #-------------------------------------------------
-# X11 
+# X11
 #-------------------------------------------------
 
 ifeq ($(NO_X11),1)
@@ -454,7 +454,7 @@ LIBS += -lX11 -lXinerama
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
 # Non-X11 builds can not use the debugger
-CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
+CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0`
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 #CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
 
@@ -465,7 +465,7 @@ CCOMFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
 
 #-------------------------------------------------
-# Dependencies 
+# Dependencies
 #-------------------------------------------------
 
 # due to quirks of using /bin/sh, we need to explicitly specify the current path
@@ -491,16 +491,16 @@ $(LIBOCORE): $(OSDCOREOBJS)
 $(LIBOSD): $(OSDOBJS)
 
 #-------------------------------------------------
-# Tools 
+# Tools
 #-------------------------------------------------
 
 TOOLS += \
 	testkeys$(EXE)
 
-$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c  
+$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 	@echo Compiling $<...
 	$(CC)  $(CFLAGS) $(DEFS) -c $< -o $@
-	
+
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
@@ -529,7 +529,7 @@ BUILD_VERSION = $(shell grep 'build_version\[\] =' src/version.c | sed -e "s/.*=
 DISTFILES = test_dist.sh whatsnew.txt whatsnew_$(BUILD_VERSION).txt makefile  docs/ src/
 EXCLUDES = -x "*/.svn/*"
 
-zip: 
+zip:
 	zip -rq ../mame_$(BUILD_VERSION).zip $(DISTFILES) $(EXCLUDES)
 
 DEPENDFILE = .depend_$(EMULATOR)

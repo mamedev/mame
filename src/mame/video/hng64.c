@@ -1125,8 +1125,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	if ((tileregs & 0x1800)==0x1000) // floor mode
 	{
 		/* Floor mode - per pixel simple / complex modes? -- every other line?
-		  (there doesn't seem to be enough data in Buriki for every line at least)
-		*/
+          (there doesn't seem to be enough data in Buriki for every line at least)
+        */
 		if ((tileregs&0xf000) == 0x1000)
 		{
 			popmessage("Floor is Active");
@@ -1783,13 +1783,13 @@ static void set3dFlags(const UINT16* packet)
 	/*//////////////
     // PACKET FORMAT
     // [0]  - 0011 ... ID
-    // [1]  - ???? ... 
-    // [2]  - ???? ... 
-    // [3]  - ???? ... 
-    // [4]  - ???? ... 
-    // [5]  - ???? ... 
-    // [6]  - ???? ... 
-    // [7]  - ???? ... 
+    // [1]  - ???? ...
+    // [2]  - ???? ...
+    // [3]  - ???? ...
+    // [4]  - ???? ...
+    // [5]  - ???? ...
+    // [6]  - ???? ...
+    // [7]  - ???? ...
     // [8]  - xx?? ... Palette offset & ??
     // [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
     // [10] - ???? ... ? ''  ''
@@ -1884,7 +1884,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	UINT32 address[4];
 	UINT32 megaOffset;
 	float eyeCoords[4];		// ObjectCoords transformed by the modelViewMatrix
-//	float clipCoords[4];    // EyeCoords transformed by the projectionMatrix
+//  float clipCoords[4];    // EyeCoords transformed by the projectionMatrix
 	float ndCoords[4];		// Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
 	float windowCoords[4];	// Mapped ndCoordinates to screen space
 	float cullRay[4];
@@ -1951,10 +1951,10 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 	// Debug - ajg
 	//UINT32 tdColor = 0xff000000;
-	//if (packet[1] & 0x1000)	tdColor |= 0x00ff0000;
-	//if (packet[1] & 0x2000)	tdColor |= 0x0000ff00;
-	//if (packet[1] & 0x4000)	tdColor |= 0x000000ff;
-	//if (packet[1] & 0x8000)	tdColor |= 0xffffffff;
+	//if (packet[1] & 0x1000)   tdColor |= 0x00ff0000;
+	//if (packet[1] & 0x2000)   tdColor |= 0x0000ff00;
+	//if (packet[1] & 0x4000)   tdColor |= 0x000000ff;
+	//if (packet[1] & 0x8000)   tdColor |= 0xffffffff;
 
 	// 3d ROM Offset
 	UINT16* threeDRoms = (UINT16*)(memory_region(machine, "verts"));
@@ -1969,16 +1969,16 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	}
 
 	/*
-	// Debug - ajg
-	printf("%08x : ", threeDOffset*3*2);
-	for (int k = 0; k < 7*3; k++)
-	{
-		printf("%04x ", threeDPointer[k]);
-		if ((k % 3) == 2) printf(" ");
-	}
-	printf("\n");
-	} 
-	*/ 
+    // Debug - ajg
+    printf("%08x : ", threeDOffset*3*2);
+    for (int k = 0; k < 7*3; k++)
+    {
+        printf("%04x ", threeDPointer[k]);
+        if ((k % 3) == 2) printf(" ");
+    }
+    printf("\n");
+    }
+    */
 
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
@@ -2029,9 +2029,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // [0] ??-- - ???? unused ????
             // [0] --xx - Chunk type
             // [1] ?--- - Flags [x000 = ???
-								 0x00 = ???
-								 00x0 = ???
-								 000x = low-res texture flag]
+                                 0x00 = ???
+                                 00x0 = ???
+                                 000x = low-res texture flag]
             // [1] -x-- - Explicit palette index.
             // [1] --?- - Unknown
             // [1] ---x - Texture index
@@ -2291,8 +2291,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			{
 				// The sams64 games transform the geometry in front of a stationary camera.
 				// This is fine in sams64_2, since it never calls the 'camera transformation' function
-				// (thus using the identity matrix for this transform), but sams64 calls the 
-				// camera transformation function with rotation values.  
+				// (thus using the identity matrix for this transform), but sams64 calls the
+				// camera transformation function with rotation values.
 				// It remains to be seen what those might do...
 				matmul4(modelViewMatrix, modelViewMatrix, cameraMatrix);
 			}
@@ -2406,7 +2406,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 	case 0x0100:
 	case 0x0101:	// Geometry with full transformations
 		// HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
-		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && hng64_mcu_type == SHOOT_MCU) 
+		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && hng64_mcu_type == SHOOT_MCU)
 			break;
 
 		recoverPolygonBlock(machine, packet, polys, &numPolys);

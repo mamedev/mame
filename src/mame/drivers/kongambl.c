@@ -69,7 +69,7 @@ static MACHINE_DRIVER_START( kongambl )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	 // ?
 	MDRV_CPU_PROGRAM_MAP(kongambl_map)
 	//MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
-	
+
 	MDRV_GFXDECODE(kongambl)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -1996,7 +1996,7 @@ static void init_timetables(FM_OPN *OPN, double freqbase)
 	}
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
-	but LFO works with one more bit of a precision so we really need 4096 elements */
+    but LFO works with one more bit of a precision so we really need 4096 elements */
 	/* calculate fnumber -> increment counter table */
 	for(i = 0; i < 4096; i++)
 	{
@@ -2111,7 +2111,7 @@ static void init_tables(void)
 		o = o / (ENV_STEP/4);
 
 		n = (int)(2.0*o);
-		if (n&1)     		/* round to nearest */
+		if (n&1)    		/* round to nearest */
 			n = (n>>1)+1;
 		else
 			n = n>>1;
@@ -2283,8 +2283,8 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 		lt += ((out_fm[5]>>0) & OPN->pan[10]);
 		rt += ((out_fm[5]>>0) & OPN->pan[11]);
 
-//		Limit( lt, MAXOUT, MINOUT );
-//		Limit( rt, MAXOUT, MINOUT );
+//      Limit( lt, MAXOUT, MINOUT );
+//      Limit( rt, MAXOUT, MINOUT );
 
 		#ifdef SAVE_SAMPLE
 			SAVE_ALL_CHANNELS

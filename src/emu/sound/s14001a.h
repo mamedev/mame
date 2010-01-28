@@ -3,7 +3,7 @@
 #ifndef __S14001A_H__
 #define __S14001A_H__
 
-int s14001a_bsy_r(running_device *device);     		/* read BUSY pin */
+int s14001a_bsy_r(running_device *device);  		/* read BUSY pin */
 void s14001a_reg_w(running_device *device, int data);		/* write to input latch */
 void s14001a_rst_w(running_device *device, int data);		/* write to RESET pin */
 void s14001a_set_clock(running_device *device, int clock);     /* set VSU-1000 clock */

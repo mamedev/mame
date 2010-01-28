@@ -724,10 +724,10 @@ static INPUT_PORTS_START( tgm2 )
 	/* sticks should actually be PORT_4WAY according to manual */
 
 	PORT_START("JP4")	/* jumper pads on the PCB. Checked and discarded. However, if you force word 0x6060000 to 1/2/3 you can have various effects. Disbled at compile time */
-//	PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
-//	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(          0x02000000, "International Ver A." )
-//	PORT_DIPSETTING(          0x01000000, "International Ver B." )
+//  PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
+//  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(          0x02000000, "International Ver A." )
+//  PORT_DIPSETTING(          0x01000000, "International Ver B." )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 INPUT_PORTS_END
 

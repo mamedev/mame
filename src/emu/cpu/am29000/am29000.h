@@ -334,7 +334,7 @@ enum
 
 #define PROCESSOR_REL_FIELD		(PRL_AM29000 | PRL_REV_D)
 
-#define VAB_SHIFT 				(16)
+#define VAB_SHIFT				(16)
 #define VAB_MASK				(0xffff)
 
 #define CPS_CA					(1 << 15)

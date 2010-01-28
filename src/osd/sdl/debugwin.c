@@ -32,11 +32,11 @@
 #define MAX_VIEWS		(4)
 
 enum {
-	WIN_TYPE_MAIN 		= 0x01,
+	WIN_TYPE_MAIN		= 0x01,
 	WIN_TYPE_MEMORY 	= 0x02,
 	WIN_TYPE_DISASM 	= 0x04,
-	WIN_TYPE_LOG 		= 0x08,
-	WIN_TYPE_ALL 		= 0x0f
+	WIN_TYPE_LOG		= 0x08,
+	WIN_TYPE_ALL		= 0x0f
 };
 
 //============================================================
@@ -65,7 +65,7 @@ struct _win_i {
 	int 					type;
 	win_i *					next;
 	GtkWidget *				win;
-	edit 					ed;
+	edit					ed;
 	running_machine *		machine;	// machine
 	DView *					views[MAX_VIEWS];
 	running_device *		cpu;	// current CPU
@@ -1119,7 +1119,7 @@ on_memoryview_key_press_event             (GtkWidget   *widget,
 	DView *info = (DView *) widget;
 	//printf("%s\n", event->string);
 	//printf("The name of this keysym is `%s'\n",
-	//			gdk_keyval_name(event->keyval));
+	//          gdk_keyval_name(event->keyval));
 	//if (/*waiting_for_debugger ||*/ !debugwin_seq_pressed(info->view-> owner->machine))
 	switch (event->keyval)
 	{
@@ -1169,15 +1169,15 @@ on_memoryview_key_press_event             (GtkWidget   *widget,
 
 		case GDK_Escape:
 			//if (info->owner->focuswnd != NULL)
-			//	SetFocus(info->owner->focuswnd);
+			//  SetFocus(info->owner->focuswnd);
 			//info->owner->ignore_char_lparam = lparam >> 16;
 			break;
 
 		case GDK_Tab:
 			//if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
-			//	debugwin_view_prev_view(info->owner, info);
+			//  debugwin_view_prev_view(info->owner, info);
 			//else
-			//	debugwin_view_next_view(info->view, dvw);
+			//  debugwin_view_next_view(info->view, dvw);
 			break;
 		default:
 			if (event->keyval >= 32 && event->keyval < 127 && debug_view_get_cursor_supported(info->view))

@@ -813,12 +813,12 @@ static const y8950_interface y8950_config = {
 static MACHINE_DRIVER_START( cybertnk )
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem)
-//	MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
+//  MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("slave", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(slave_mem)
-//	MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
+//  MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579500)

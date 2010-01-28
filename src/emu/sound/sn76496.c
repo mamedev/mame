@@ -76,7 +76,7 @@
   Fix an issue with SN76489 and SN76489A having the wrong periodic noise periods.
   Note that properly emulating the noise cycle bit timing accurately may require
   extensive rewriting.
-  
+
   24/01/2010: Lord Nightmare
   Implement periodic noise as forcing one of the XNOR or XOR taps to 1 or 0 respectively.
   Thanks to PlgDavid for providing samples which helped immensely here.
@@ -388,7 +388,7 @@ static void generic_start(running_device *device, int feedbackmask, int noisetap
 	chip->Negate = negate;
 	chip->Stereo = stereo;
 	chip->ClockDivider = clockdivider;
-	chip->CurrentClock = clockdivider-1; 
+	chip->CurrentClock = clockdivider-1;
 
 	state_save_register_device_item_array(device, 0, chip->VolTable);
 	state_save_register_device_item_array(device, 0, chip->Register);

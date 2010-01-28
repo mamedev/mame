@@ -28,12 +28,12 @@
     ========
 
     In 1975, Si Redd founded A1-Supply.  This was renamed to Sircoma in 1978,
-	and eventually IGT (International Game Technology) in 1981.
+    and eventually IGT (International Game Technology) in 1981.
 
-	Along the way, in 1978, Fortune Coin Company was acquired and contained
-	the basis to their Fortune I game machines.
+    Along the way, in 1978, Fortune Coin Company was acquired and contained
+    the basis to their Fortune I game machines.
 
-	The Fortune I hardware consisted of the following games:
+    The Fortune I hardware consisted of the following games:
       Regular Draw Poker
       Progressive Draw Poker
       Joker Wild Draw Poker
@@ -438,7 +438,7 @@ static PALETTE_INIT( fortune1 )
 		b = tb - (i * (tb / 5));
 
 		c = j;
-		
+
 		// Swap Position of Inner-most Colors on Each 4 Color Palette
 		if ((c % 4) == 1 || (c % 4) == 2)
 			c = ((int)(c / 4) * 4) + (3 - (c % 4));

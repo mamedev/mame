@@ -167,7 +167,7 @@ CPU_DISASSEMBLE( am29000 )
 		case 0x18: case 0x19:	sprintf(buffer, "addcs   %s", TYPE_1);							break;
 		case 0x1a: case 0x1b:	sprintf(buffer, "addcu   %s", TYPE_1);							break;
 		case 0x1c: case 0x1d:	sprintf(buffer, "addc    %s", TYPE_1);							break;
-		case 0x1e: case 0x1f:	sprintf(buffer, "store   %s", TYPE_6);							break; 
+		case 0x1e: case 0x1f:	sprintf(buffer, "store   %s", TYPE_6);							break;
 		case 0x20: case 0x21:	sprintf(buffer, "subs    %s", TYPE_1);							break;
 		case 0x22: case 0x23:	sprintf(buffer, "subu    %s", TYPE_1);							break;
 		case 0x24: case 0x25:	sprintf(buffer, "sub     %s", TYPE_1);							break;
@@ -180,9 +180,9 @@ CPU_DISASSEMBLE( am29000 )
 		case 0x32: case 0x33:	sprintf(buffer, "subru   %s", TYPE_1);							break;
 		case 0x34: case 0x35:	sprintf(buffer, "subr    %s", TYPE_1);							break;
 		case 0x36: case 0x37:	sprintf(buffer, "loadm   %s", TYPE_6);							break;
-		case 0x38: case 0x39:	sprintf(buffer, "subrcs  %s", TYPE_1);							break; 
+		case 0x38: case 0x39:	sprintf(buffer, "subrcs  %s", TYPE_1);							break;
 		case 0x3a: case 0x3b:	sprintf(buffer, "subrcu  %s", TYPE_1);							break;
-		case 0x3c: case 0x3d:	sprintf(buffer, "subrc   %s", TYPE_1);							break; 
+		case 0x3c: case 0x3d:	sprintf(buffer, "subrc   %s", TYPE_1);							break;
 		case 0x3e: case 0x3f:	sprintf(buffer, "storem  %s", TYPE_6);							break;
 		case 0x40: case 0x41:	sprintf(buffer, "cplt    %s", TYPE_1);							break;
 		case 0x42: case 0x43:	sprintf(buffer, "cpltu   %s", TYPE_1);							break;

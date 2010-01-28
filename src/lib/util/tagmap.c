@@ -150,7 +150,7 @@ void tagmap_remove(tagmap *map, const char *tag)
 
 
 /*-------------------------------------------------
-    tagmap_remove_object - remove an entry from a 
+    tagmap_remove_object - remove an entry from a
     tagmap by object pointer
 -------------------------------------------------*/
 

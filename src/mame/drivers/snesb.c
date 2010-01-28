@@ -928,7 +928,7 @@ static DRIVER_INIT( endless )
 {
 	INT32 i;
 	UINT8 *rom = memory_region(machine, "user3");
-	
+
 	/* there is more to this, 0x800 based block swaps? */
 	for(i=0;i<0x200000;i++)
 	{

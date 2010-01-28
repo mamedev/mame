@@ -208,7 +208,7 @@ DEFS += -Dmain=utf8_main
 
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
-DEFS += -DMALLOC_DEBUG
+#DEFS += -DMALLOC_DEBUG
 endif
 
 
