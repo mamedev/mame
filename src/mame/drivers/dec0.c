@@ -858,6 +858,48 @@ static INPUT_PORTS_START( midres )
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( midresb )
+	PORT_INCLUDE( dec0 )
+
+	PORT_START("DSW")
+	DEC0_COIN_SETTING
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )	// Always OFF
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	// Always OFF
+
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0200, "4" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")	/* manual mentions Extra Lives - Default OFF */
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")	/* manual mentions Extra Lives - Default OFF */
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+
+	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+
+	PORT_START("AN1")	/* player 2 12-way rotary control - converted in controls_r() */
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( bouldash )
 	PORT_INCLUDE( dec1 )
 
@@ -1526,6 +1568,17 @@ static MACHINE_DRIVER_START( midres )
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1MHz) /* verified on pcb (1mhz crystal) */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 verified on pcb
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.40)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( midresb )
+	MDRV_IMPORT_FROM(midres)
+
+	MDRV_CPU_REPLACE("audiocpu", M6502, 1500000 )
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
+
+	MDRV_SOUND_MODIFY("ym2")
+	MDRV_SOUND_CONFIG(ym3812_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 /******************************************************************************/
@@ -2853,6 +2906,15 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 	dump_to_file(machine,R, 0x70000, 0x08000);
 }
 #endif
+
+static DRIVER_INIT( midresb )
+{
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00180000, 0x0018000f, 0, 0,  dec0_controls_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x001a0000, 0x001a000f, 0, 0,  dec0_rotary_r );
+
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00180014, 0x00180015, 0, 0, midres_sound_w );
+}
+
 /******************************************************************************/
 
 GAME( 1987, hbarrel,  0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
@@ -2879,6 +2941,6 @@ GAME( 1989, secretab, slyspy,   secretab, slyspy,   slyspy,   ROT0,   "bootleg",
 GAME( 1989, midres,   0,        midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
 GAME( 1989, midresu,  midres,   midres,   midres,   0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
 GAME( 1989, midresj,  midres,   midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
-GAME( 1989, midresb,  midres,   midres,   midres,   0,        ROT0,   "bootleg",               "Midnight Resistance (bootleg with 68705)", GAME_NOT_WORKING ) // need to hook up 68705
+GAME( 1989, midresb,  midres,   midresb,  midresb,  midresb,  ROT0,   "bootleg",               "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
 GAME( 1990, bouldash, 0,        slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
 GAME( 1990, bouldashj,bouldash, slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )
