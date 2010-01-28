@@ -176,16 +176,16 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	dv->tr = size.y;
 	dv->tc = size.x;
 
-	dv->hs = size.x*dvc->fixedfont_width > aw;
-	dv->vs = size.y*dvc->fixedfont_height > ah;
+	dv->hs = (size.x*dvc->fixedfont_width > aw ? 1 : 0);
+	dv->vs = (size.y*dvc->fixedfont_height > ah ? 1 : 0);
 
 	if(dv->hs)
 		ah -= dv->hsz;
 	if(dv->vs)
 		aw -= dv->vsz;
 
-	dv->hs = size.x*dvc->fixedfont_width > aw;
-	dv->vs = size.y*dvc->fixedfont_height > ah;
+	dv->hs = (size.x*dvc->fixedfont_width > aw ? 1 : 0);
+	dv->vs = (size.y*dvc->fixedfont_height > ah ? 1 : 0);
 
 	ah = allocation->height - (dv->hs ? dv->hsz : 0);
 	aw = allocation->width  - (dv->vs ? dv->vsz : 0);
@@ -214,6 +214,12 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		vsize.x = size.x-pos.x;
 	}
 
+	{
+		GdkGeometry x;
+		x.max_width = size.x*dvc->fixedfont_width;
+		x.max_height = -1;
+		gdk_window_set_geometry_hints( wdv->window,&x, GDK_HINT_MAX_SIZE  );
+	}
 	debug_view_set_visible_position(dv->view, pos);
 	debug_view_set_visible_size(dv->view, vsize);
 
@@ -293,8 +299,8 @@ static void dview_size_request(GtkWidget *wdv, GtkRequisition *req)
 		size.x = 50;
 		hs = 1;
 	}
-	if(size.y > 20) {
-		size.y = 20;
+	if(size.y > 5) {
+		size.y = 5;
 		vs = 1;
 	}
 	req->width = size.x*dvc->fixedfont_width+2*wdv->style->xthickness;

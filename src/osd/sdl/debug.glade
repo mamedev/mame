@@ -252,23 +252,34 @@
               <widget class="GtkVBox" id="vbox2">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="Custom" id="disasm">
+                  <widget class="GtkVPaned" id="vpaned1">
                     <property name="visible">True</property>
-                    <property name="creation_function">dview_new</property>
-                    <signal name="button_press_event" handler="on_disasm_button_press_event"/>
+                    <property name="can_focus">True</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <widget class="Custom" id="disasm">
+                        <property name="visible">True</property>
+                        <property name="creation_function">dview_new</property>
+                        <signal name="button_press_event" handler="on_disasm_button_press_event"/>
+                      </widget>
+                      <packing>
+                        <property name="resize">False</property>
+                        <property name="shrink">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Custom" id="console">
+                        <property name="visible">True</property>
+                        <property name="creation_function">dview_new</property>
+                      </widget>
+                      <packing>
+                        <property name="resize">True</property>
+                        <property name="shrink">True</property>
+                      </packing>
+                    </child>
                   </widget>
                   <packing>
-                    <property name="padding">2</property>
                     <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="Custom" id="console">
-                    <property name="visible">True</property>
-                    <property name="creation_function">dview_new</property>
-                  </widget>
-                  <packing>
-                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
@@ -278,11 +289,12 @@
                     <property name="has_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
+                    <property name="width_chars">30</property>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
               </widget>

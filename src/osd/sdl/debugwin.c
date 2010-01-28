@@ -52,7 +52,7 @@ typedef struct hentry {
 typedef struct _win_i win_i;
 
 typedef struct _edit edit;
-typedef struct _edit {
+struct _edit {
 	GtkEntry *edit_w;
 	struct hentry *h, *ch;
 	char *hold;

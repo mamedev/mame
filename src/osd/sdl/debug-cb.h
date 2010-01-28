@@ -108,3 +108,4 @@ on_logical_addresses_group_changed     (GtkWidget *win);
 void
 on_physical_addresses_group_changed    (GtkWidget *win);
 
+

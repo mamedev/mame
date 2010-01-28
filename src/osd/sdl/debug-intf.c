@@ -63,6 +63,7 @@ create_debugmain (void)
   GtkWidget *hbox1;
   GtkWidget *registers;
   GtkWidget *vbox2;
+  GtkWidget *vpaned1;
   GtkWidget *disasm;
   GtkWidget *console;
   GtkWidget *edit;
@@ -295,17 +296,22 @@ create_debugmain (void)
   gtk_widget_show (vbox2);
   gtk_box_pack_start (GTK_BOX (hbox1), vbox2, TRUE, TRUE, 0);
 
+  vpaned1 = gtk_vpaned_new ();
+  gtk_widget_set_name (vpaned1, "vpaned1");
+  gtk_widget_show (vpaned1);
+  gtk_box_pack_start (GTK_BOX (vbox2), vpaned1, TRUE, TRUE, 0);
+
   disasm = dview_new ("disasm", "", "", 0, 0);
   gtk_widget_set_name (disasm, "disasm");
   gtk_widget_show (disasm);
-  gtk_box_pack_start (GTK_BOX (vbox2), disasm, TRUE, TRUE, 2);
+  gtk_paned_pack1 (GTK_PANED (vpaned1), disasm, FALSE, TRUE);
   GTK_WIDGET_UNSET_FLAGS (disasm, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (disasm, GTK_CAN_DEFAULT);
 
   console = dview_new ("console", "", "", 0, 0);
   gtk_widget_set_name (console, "console");
   gtk_widget_show (console);
-  gtk_box_pack_start (GTK_BOX (vbox2), console, TRUE, TRUE, 0);
+  gtk_paned_pack2 (GTK_PANED (vpaned1), console, TRUE, TRUE);
   GTK_WIDGET_UNSET_FLAGS (console, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (console, GTK_CAN_DEFAULT);
 
@@ -315,6 +321,7 @@ create_debugmain (void)
   gtk_box_pack_start (GTK_BOX (vbox2), edit, FALSE, FALSE, 0);
   gtk_entry_set_invisible_char (GTK_ENTRY (edit), 9679);
   gtk_entry_set_activates_default (GTK_ENTRY (edit), TRUE);
+  gtk_entry_set_width_chars (GTK_ENTRY (edit), 30);
 
   g_signal_connect_swapped ((gpointer) new_mem, "activate",
                             G_CALLBACK (on_new_mem_activate),
@@ -411,6 +418,7 @@ create_debugmain (void)
   GLADE_HOOKUP_OBJECT (debugmain, hbox1, "hbox1");
   GLADE_HOOKUP_OBJECT (debugmain, registers, "registers");
   GLADE_HOOKUP_OBJECT (debugmain, vbox2, "vbox2");
+  GLADE_HOOKUP_OBJECT (debugmain, vpaned1, "vpaned1");
   GLADE_HOOKUP_OBJECT (debugmain, disasm, "disasm");
   GLADE_HOOKUP_OBJECT (debugmain, console, "console");
   GLADE_HOOKUP_OBJECT (debugmain, edit, "edit");
