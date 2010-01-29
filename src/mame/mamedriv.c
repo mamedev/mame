@@ -4192,6 +4192,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top) */
 	DRIVER( indy500 )	/* 1995.07 Indy 500 */
 	DRIVER( indy500d )
+	DRIVER( indy500to )
 	DRIVER( skytargt )	/* 1995.10 Sky Target */
 	DRIVER( fvipers )	/* 1995.11 Fighting Vipers */
 	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On */
