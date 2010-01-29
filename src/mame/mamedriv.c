@@ -9106,6 +9106,7 @@ Other Sun games
 	DRIVER( tattack )	/* (c) 198? Shonan */
 	DRIVER( mosaicf2 )	/* (c) 1999 F2 System */
 	DRIVER( finalgdr )	/* (c) 2001 Semicom */
+	DRIVER( mrkicker )	/* (c) 2001 Semicom */
 	DRIVER( wyvernwg )	/* (c) 2001 Semicom / Game Vision */
 	DRIVER( rbmk )		/* (c) 1995 GMS */
 	DRIVER( go2000 )	/* (c) 2000 SA */

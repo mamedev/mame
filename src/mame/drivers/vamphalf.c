@@ -19,6 +19,7 @@
     Mission Craft              (c) 2000 Sun                (version 2.4)
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
+    Mr. Kicker                 (c) 2001 SemiCom
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
 
  Real games bugs:
@@ -1269,7 +1270,7 @@ SEMICOM-003a
 +---------------------------------------------+
 |                     +------+                |
 |            YM3012   |  U7  |                |
-|                     +------+                |
+| VR1                 +------+                |
 |            YM2151   M6295                   |
 |                                             |
 |            +-----+      MEM1l  +----------+ |
@@ -1296,7 +1297,7 @@ SEMICOM-003a
 ROM1 & U7 are 27C040
 ROML00 & ROMH00 are MX 29F1610MC flashroms
 ROM0, ROML01 & ROMH01 are unpopulated
-YM2151, YM3012 & M6295 badged as BS901, BS902 U6295
+YM2151, YM3012 & M6295 badged as BS901, BS902 & U6295
 CRAM are MCM6206BAEJ15
 DRAM are KM416C1204AJ-6
 MEM are MCM6206BAEJ15
@@ -1304,6 +1305,7 @@ MEM are MCM6206BAEJ15
 
 SW1 is the reset button
 SW2 is the setup button
+VR1 is the volume adjust pot
 
 */
 
@@ -1320,6 +1322,81 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 
 	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
 	ROM_LOAD( "u7", 0x000000, 0x080000, CRC(080f61f8) SHA1(df3764b1b07f9fc38685e3706b0f834f62088727) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+ROM_END
+
+/*
+
+Mr. Kicker (c) SemiCom
+
+SEMICOM-003b
+
++---------------------------------------------+
+|                     +------+                |
+|            YM3012   |  U7  |                |
+| VR1                 +------+                |
+|            YM2151   M6295                   |
+|                                             |
+|            +-----+      MEM1l  +----------+ |
+|            |CRAM2|             |QuickLogic| |
+|            +-----+             | QL12X16B | |
+|            +-----+             | XPL84C   | |
+|  +-------+ |CRAM2|      MEM1U  |          | |
+|J | DRAM1 | +-----+             +----------+ |
+|A +-------+ +----------+ MEM3                |
+|M +-------+ |          |        +----------+ |
+|M | DRAM2 | |HyperStone| MEM7   |QuickLogic| |
+|A +-------+ |  E1-32T  |        | QL12X16B | |
+|            |          | MEM6   | XPL84C   | |
+|     PAL    +----------+        |          | |
+|                         MEM2   +----------+ |
+|SW1 SW2       61L256S                        |
+|        ROM0*  +--------+ +--------+  28MHz  |
+|        ROM1   | ROML00 | | ROMH00 |  +-----+|
+|               +--------+ +--------+  |93C46||
+|   50MHz         ROML01*    ROMH01*   +-----+|
+|                                             |
++---------------------------------------------+
+
+ROM1 & U7 are 27C040
+ROML00 & ROMH00 are MX 29F1610MC flashroms
+ROM0, ROML01 & ROMH01 are unpopulated
+YM2151, YM3012 & M6295 badged as U6651, U6612 & AD-65
+CRAM are MCM6206BAEJ15
+DRAM are KM416C1204AJ-6
+MEM are MCM6206BAEJ15
+61L256S - 32K x 8 bit High Speed CMOS SRAM (game's so called "Backup Data")
+
+SW1 is the reset button
+SW2 is the setup button
+VR1 is the volume adjust pot
+
+*/
+
+ROM_START( mrkicker )
+	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* rom0 empty */
+	ROM_LOAD( "2-semicom.rom1", 0x080000, 0x080000, CRC(d3da29ca) SHA1(b843c650096a1c6d50f99e354ec0c93eb4406c5b) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )  /* gfx data */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(c677aac3) SHA1(356073a29260e8e6c29dd12b2113b30140c6108c) )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(b6337d4a) SHA1(2f46e2933af7fd0f71083900d5e6e4f602ab4c66) )
+	/* roml01 empty */
+	/* romh01 empty */
+
+	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
+	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
@@ -1682,6 +1759,20 @@ static DRIVER_INIT( finalgdr )
 	semicom_prot_data[1] = 3;
 }
 
+static DRIVER_INIT( mrkicker )
+{
+	finalgdr_backupram_bank = 1;
+	finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
+//	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, mrkicker_speedup_r );
+
+	palshift = 0;
+	flip_bit = 1; //?
+
+	semicom_prot_idx = 8;
+	semicom_prot_data[0] = 2;
+	semicom_prot_data[1] = 3;
+}
+
 static DRIVER_INIT( dquizgo2 )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00cde70, 0x00cde73, 0, 0, dquizgo2_speedup_r );
@@ -1717,5 +1808,6 @@ GAME( 1999, vamphalfk,vamphalf, vamphalf, common,   vamphafk, ROT0,   "Danbi & F
 GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
+GAME( 2001, mrkicker, 0,        finalgdr, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
