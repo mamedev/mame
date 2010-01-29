@@ -2583,7 +2583,7 @@ ROM_END
 
 ROM_START( viprp1hk )
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
-	ROM_LOAD32_BYTE("seibu_1", 0x000000, 0x80000, CRC(283ba7b7) SHA1(28122e04b72f1163c69f3f845f6a493fdb6ed652) ) /* New Version or something different??? */
+	ROM_LOAD32_BYTE("seibu_1", 0x000000, 0x80000, CRC(283ba7b7) SHA1(28122e04b72f1163c69f3f845f6a493fdb6ed652) ) /* Old Version, "=HONG KONG=" seems part of title */
 	ROM_LOAD32_BYTE("seibu_2", 0x000001, 0x80000, CRC(2c4db249) SHA1(a6372c9a3cde5f262ec5ef446945f6d3ad506e88) )
 	ROM_LOAD32_BYTE("seibu_3", 0x000002, 0x80000, CRC(91989503) SHA1(8c215fac200cc693396dbd57e0939e7efe883342) )
 	ROM_LOAD32_BYTE("seibu_4", 0x000003, 0x80000, CRC(12c9582d) SHA1(a79e26514e5ab8703a7a8c3ac39b359cfa4117c1) )
@@ -3499,7 +3499,7 @@ GAME( 1995, batlballa, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu 
 GAME( 1995, batlballu, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Fabtek License)", "Battle Balls (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1995, viprp1,    0,       spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (World, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, viprp1u,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu (Fabtek license)", "Viper Phase 1 (USA)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* New version, "=U.S.A=" seems part of title */
+GAME( 1995, viprp1u,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu (Fabtek license)", "Viper Phase 1 (USA, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* New version, "=U.S.A=" seems part of title */
 GAME( 1995, viprp1j,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, viprp1s,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Switzerland, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
