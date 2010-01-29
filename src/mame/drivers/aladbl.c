@@ -154,6 +154,38 @@ ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descrambl
 	ROM_CONTINUE(            0x300000, 0x040000)
 ROM_END
 
+static INPUT_PORTS_START(mk3ghw)
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // a
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // b
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // c
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
+
+	PORT_MODIFY("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_BIT( 0xf8, 0x00, IPT_UNUSED )
+	
+	PORT_START("IN1")
+	PORT_DIPUNKNOWN( 0x01, 0x00 )
+	PORT_DIPUNKNOWN( 0x02, 0x00 )
+	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPUNKNOWN( 0x08, 0x00 )
+	PORT_DIPUNKNOWN( 0x10, 0x00 )
+	PORT_DIPUNKNOWN( 0x20, 0x00 )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
+INPUT_PORTS_END
 
 // this should be correct, the areas of the rom that differ to the original
 // after this decode look like intentional changes
@@ -191,8 +223,7 @@ static DRIVER_INIT( mk3ghw )
 		}
 	}
 
-	// boot vectors don't seem to be valid...
-	// these are from the original, but I don't seem right for this either
+	// boot vectors don't seem to be valid, so they are patched...
 	ROM[1] = 0x01;
 	ROM[0] = 0x00;
 	ROM[3] = 0x00;
@@ -200,8 +231,10 @@ static DRIVER_INIT( mk3ghw )
 	ROM[5] = 0x00;
 	ROM[4] = 0x00;
 	ROM[7] = 0x02;
-	ROM[6] = 0x00;
+	ROM[6] = 0x10;
 
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770071, 0, 0, "IN0");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770072, 0x770073, 0, 0, "IN1");
 }
 
 
@@ -238,4 +271,4 @@ static DRIVER_INIT( aladbl )
 }
 
 GAME( 1993, aladbl ,  0,   megadriv,    aladbl,       aladbl,  ROT0,   "bootleg / Sega", "Aladdin (bootleg of Japanese Megadrive version)", 0)
-GAME( 1996, mk3ghw ,  0,   megadriv,    aladbl,       mk3ghw,  ROT0,   "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", GAME_NOT_WORKING)
+GAME( 1996, mk3ghw ,  0,   megadriv,    mk3ghw,       mk3ghw,  ROT0,   "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
