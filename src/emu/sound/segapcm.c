@@ -14,6 +14,7 @@ struct _segapcm_state
 	const UINT8 *rom;
 	int bankshift;
 	int bankmask;
+	int rgnmask;
 	sound_stream * stream;
 };
 
@@ -29,6 +30,7 @@ INLINE segapcm_state *get_safe_token(running_device *device)
 static STREAM_UPDATE( SEGAPCM_update )
 {
 	segapcm_state *spcm = (segapcm_state *)param;
+	int rgnmask = spcm->rgnmask;
 	int ch;
 
 	/* clear the buffers */
@@ -70,7 +72,7 @@ static STREAM_UPDATE( SEGAPCM_update )
 				}
 
 				/* fetch the sample */
-				v = rom[addr >> 8] - 0x80;
+				v = rom[(addr >> 8) & rgnmask] - 0x80;
 
 				/* apply panning and advance */
 				outputs[0][i] += v * voll;
@@ -103,7 +105,10 @@ static DEVICE_START( segapcm )
 		mask = BANK_MASK7>>16;
 
 	len = device->region->bytes();
+	spcm->rgnmask = len - 1;
+
 	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
+
 	rom_mask--;
 
 	spcm->bankmask = mask & (rom_mask >> spcm->bankshift);
