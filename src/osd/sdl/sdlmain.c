@@ -57,6 +57,7 @@ void MorphToPM()
 //============================================================
 
 #ifdef MESS
+#include <unistd.h>
 static char cwd[512];
 #endif
 
