@@ -116,6 +116,6 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
 WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w );
 
 /* port mask */
-void cia_set_port_mask_value(const device_config *device, int port, int data);
+void cia_set_port_mask_value(running_device *device, int port, int data);
 
 #endif /* __6526CIA_H__ */
