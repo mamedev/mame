@@ -82,7 +82,7 @@ CPU_DISASSEMBLE( apexc )
 	char mnemonic[9];			/* storage for generated mnemonic */
 
 	/* read the instruction to disassemble */
-	instruction = *((UINT32 *) oprom);
+	instruction = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
 
 	/* isolate the instruction fields */
 	x = (instruction >> 22) & 0x3FF;

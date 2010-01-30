@@ -6,7 +6,7 @@ CPU_DISASSEMBLE( tx0_64kw )
 	int md;
 	int x;
 
-	md = *((UINT32 *) oprom);
+	md = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
 
 	x = md & 0177777;
 	switch (md >> 16)
@@ -32,7 +32,7 @@ CPU_DISASSEMBLE( tx0_8kw )
 	int md;
 	int x;
 
-	md = *((UINT32 *) oprom);
+	md = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
 
 	x = md & 0017777;
 	switch (md >> 13)
