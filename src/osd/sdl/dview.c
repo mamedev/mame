@@ -218,7 +218,10 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		GdkGeometry x;
 		x.max_width = size.x*dvc->fixedfont_width;
 		x.max_height = -1;
-		gdk_window_set_geometry_hints( wdv->window,&x, GDK_HINT_MAX_SIZE  );
+		if (wdv->window)
+		{
+			gdk_window_set_geometry_hints( wdv->window,&x, GDK_HINT_MAX_SIZE  );
+		}
 	}
 	debug_view_set_visible_position(dv->view, pos);
 	debug_view_set_visible_size(dv->view, vsize);
