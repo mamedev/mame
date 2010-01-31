@@ -5576,7 +5576,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( le2j )		/* 1994.06 GX312 (Japan) */
 	DRIVER( puzldama )	/* 1994.07 GX315 (Japan) */
 	DRIVER( gokuparo )	/* 1994.04 GX321 (Japan) */
-	DRIVER( fantjour )	/* 1994.?? GX321 (US?) */
+	DRIVER( fantjour )	/* 1994.?? GX321 (Euro) */
+	DRIVER( fantjoura )	/* 1994.?? GX321 (Asia) */
 	DRIVER( dragoona )	/* 1995.?? GX417 (Asia) */
 	DRIVER( dragoonj )	/* 1995.08 GX417 (Japan) */
 	DRIVER( tbyahhoo )	/* 1995.04 GX424 (Japan) */
@@ -9117,11 +9118,11 @@ Other Sun games
 	DRIVER( victor5 )	/* (c) 1990 Subsino */
 	DRIVER( victor21 )	/* (c) 1990 Subsino */
 	DRIVER( crsbingo )	/* (c) 1991 Subsino */
+	DRIVER( tisub )		/* (c) 1991 Subsino */
 	DRIVER( sharkpy )	/* (c) 1993 Subsino */
 	DRIVER( sharkpya )	/* (c) 1993 Subsino */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
-	DRIVER( tisub )
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
