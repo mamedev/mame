@@ -2178,7 +2178,7 @@ static DRIVER_INIT( tisub )
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS  LAYOUT      */
 GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,     layout_victor21 )
 GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0,     layout_victor5 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
-GAME ( 1991, tisub,    sharkpy,        tisub,    crsbingo, tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)",            GAME_NOT_WORKING )
+GAME ( 1991, tisub,    0,        tisub,    crsbingo, tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)",            GAME_NOT_WORKING )
 GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,     layout_crsbingo ) // alt version of Cross Bingo?
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,     layout_sharkpy ) // missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,     layout_sharkpy ) // missing POST messages?
