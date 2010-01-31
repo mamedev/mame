@@ -294,65 +294,31 @@ p) 'mooncrgx'
     for hi-score table when screen not is flipped
 
 
-Notes about 'azurian' :
------------------------
+Stephh's notes (based on the games Z80 code and some tests) for other games :
 
-  bit 6 of IN1 is linked with bit 2 of IN2 (check code at 0x05b3) to set difficulty :
+1) 'scramblb' and 'scramb2'
 
-    bit 6  bit 2        contents of
-     IN1     IN2          0x40f4            consequences                   difficulty
+  - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch
+    (check code at 0x1043 which changes player and routines that handle players inputs :
+    0x1741 UP and DOWN - 0x1796 LEFT and RIGHT - 0x24e6 BUTTON1 - 0x2615 BUTTON2).
 
-     OFF     OFF             2          aliens move 2 frames out of 3       easy
-     ON      OFF             4          aliens move 4 frames out of 5       hard
-     OFF     ON              3          aliens move 3 frames out of 4       normal
-     ON      ON              5          aliens move 5 frames out of 6       very hard
+2) 'ozon1'
 
-  aliens movements is handled by routine at 0x1d59 :
-
-    - alien 1 moves when 0x4044 != 0 else contents of 0x40f4 is stored at 0x4044
-    - alien 2 moves when 0x4054 != 0 else contents of 0x40f4 is stored at 0x4054
-    - alien 3 moves when 0x4064 != 0 else contents of 0x40f4 is stored at 0x4064
-
-
-Notes about 'scorpnmc' :
-------------------------
-
-  As the START buttons are also the buttons for player 1, how should I map them ?
-  I've coded this the same way as in 'checkman', but I'm not sure this is correct.
-
-  I can't tell if it's a bug, but if you reset the game when the screen is flipped,
-  the screens remains flipped (the "flip screen" routine doesn't seem to be called) !
-
-
-
-Notes about 'frogg' :
----------------------
-
-  If bit 5 of IN0 or bit 5 of IN1 is HIGH, something strange occurs (check code
-  at 0x3580) : each time you press START2 a counter at 0x47da is incremented.
-  When this counter reaches 0x2f, each next time you press START2, it acts as if
-  you had pressed COIN2, so credits are added !
-  Bit 5 of IN0 is tested if "Cabinet" Dip Switch is set to "Upright" and
-  bit 5 of IN1 is tested if "Cabinet" Dip Switch is set to "Cocktail".
-
-
-
-Notes about 'scramblb' and 'scramb2' :
---------------------------------------
-
-  Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch
-  (check code at 0x1043 which changes player and routines that handle players inputs :
-  0x1741 UP and DOWN - 0x1796 LEFT and RIGHT - 0x24e6 BUTTON1 - 0x2615 BUTTON2).
-
-
-
-TO DO :
--------
-
-  - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode)
-               fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
-  - frogg    : fix read/writes at/to unmapped/wrong memory
-  - scprpng  : fix read/writes at/to unmapped/wrong memory
+  - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch
+    (check code at 0x03c6 which changes player and routines that handle players inputs :
+    0x0dc3 and 0x1e31 LEFT and RIGHT - 0x0e76 BUTTON1).
+  - Credits are coded on 1 byte (range 0x00-0xff) and stored at 0x4002.
+    To display them, they are converted to BCD on 1 byte via routine at 0x1421.
+    As a result, it will always display 0 to 99 (eg: 0xf0 = 240 will display 40).
+    When you get 256 credits, 0x4002 = 0x00, so the game thinks you have no credit
+    at all and enters "attract mode" again (but the game does NOT reset).
+  - There's an ingame bug when you get 101 or 201 credits : due to code at 0x0239,
+    the game checks the BCD value (0x01) instead of the correct one at 0x4002,
+    so you can't start a 2 players game !
+  - There is another ingame bug when "Coinage" settings are "A 1C/2C  B 1C/1C"
+    and you press COIN2 : due to code at 0x0473, contents of 0x4004 is NEVER reset
+    to 0x00, so routine at 0x042a ALWAYS thinks that you've pressed COIN2,
+    and as a consequence, it ALWAYS adds 1 credit (even when you are playing) !
 
 ***************************************************************************/
 
@@ -617,7 +583,7 @@ static ADDRESS_MAP_START( dkongjrm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa803, 0xa803) AM_DEVWRITE(GAL_AUDIO, galaxian_noise_enable_w)
   //AM_RANGE(0xa805, 0xa805) AM_WRITE(galaxian)
 	AM_RANGE(0xa806, 0xa807) AM_DEVWRITE(GAL_AUDIO, galaxian_vol_w)
-	AM_RANGE(0xb000, 0xb0ff) AM_READ_PORT("DSW0")
+	AM_RANGE(0xb000, 0xb0ff) AM_READ_PORT("DSW")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
   //AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
@@ -636,11 +602,11 @@ static ADDRESS_MAP_START( ozon1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x6801, 0x6801) AM_WRITENOP //continuosly 0 and 1
 	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0x6806, 0x6806) AM_WRITENOP //only one 0 at reset
-	AM_RANGE(0x6807, 0x6807) AM_WRITENOP //only one 0 at reset
+	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN0")
 	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("IN1")
-	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("DSW")
+	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("IN2")
 	AM_RANGE(0x8103, 0x8103) AM_WRITENOP //only one 9b at reset
 ADDRESS_MAP_END
 
@@ -835,7 +801,7 @@ static ADDRESS_MAP_START( ckongg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc403, 0xc403) AM_DEVWRITE(GAL_AUDIO, galaxian_noise_enable_w)
 	AM_RANGE(0xc405, 0xc405) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)
 	AM_RANGE(0xc406, 0xc407) AM_DEVWRITE(GAL_AUDIO, galaxian_vol_w)
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0")
+	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW")
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP // link cut
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(galaxold_flip_screen_x_w)
@@ -862,7 +828,7 @@ static ADDRESS_MAP_START( ckongmc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa803, 0xa803) AM_DEVWRITE(GAL_AUDIO, galaxian_noise_enable_w)                        /* GUESS */
 	AM_RANGE(0xa805, 0xa805) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)                        /* GUESS */
 	AM_RANGE(0xa806, 0xa807) AM_DEVWRITE(GAL_AUDIO, galaxian_vol_w)                                 /* GUESS */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP                                                            /* AM_WRITE(galaxold_stars_enable_w) */
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)                                     /* GUESS */
@@ -1187,7 +1153,7 @@ static INPUT_PORTS_START( dkongjrm )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dkongjrm_coinage_r, (void *)0xc0)
 
-	PORT_START("DSW0")
+	PORT_START("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dkongjrm_coinage_r, (void *)0x01)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x00, "3" )
@@ -1212,6 +1178,7 @@ static INPUT_PORTS_START( dkongjrm )
 INPUT_PORTS_END
 
 
+/* verified from Z80 code */
 static INPUT_PORTS_START( rockclim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )             /* only adds 1 credit if "Coin Slots" is set to 1 */
@@ -1296,158 +1263,147 @@ static INPUT_PORTS_START( rockclim )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_8C ) )
 INPUT_PORTS_END
 
-/*
 
-Game bug:
-- you can insert 99 credits 3 times consecutively, then it resets
-
-*/
+/* verified from Z80 code */
 static INPUT_PORTS_START( ozon1 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "A 1C/1C  B 2C/1C" )
-	PORT_DIPSETTING(    0x02, "A 1C/2C  B 1C/1C" ) // when you insert a coin with COIN2 it starts an infinite loop
+	PORT_DIPSETTING(    0x02, "A 1C/2C  B 1C/1C" )          /* see notes */
 	PORT_DIPSETTING(    0x04, "A 1C/3C  B 3C/1C" )
 	PORT_DIPSETTING(    0x06, "A 1C/4C  B 4C/1C" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+/* verified from Z80 code */
 static INPUT_PORTS_START( ladybugg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL /* 2nd Button 1 */
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x80, "A 1C/1C  B 1C/5C" )
-	PORT_DIPSETTING(    0x00, "A 2C/1C  B 1C/3C" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPSETTING(    0x08, "40000" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) /* Yes, the game reads both of these */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) /* Check code at 0x22e1 */
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+/* Coinage Dips are spread accross two input ports */
+static CUSTOM_INPUT( vpool_lives_r )
+{
+	int bit_mask = (FPTR)param;
+
+	switch (bit_mask)
+	{
+		case 0x40:  /* vpool : IN1 (0xa800) bit 6 */
+			return ((input_port_read(field->port->machine, "LIVES") & bit_mask) >> 6);
+		case 0x01:  /* vpool : DSW (0xb000) bit 0 */
+			return ((input_port_read(field->port->machine, "LIVES") & bit_mask) >> 0);
+
+		default:
+			logerror("vpool_lives_r : invalid %02X bit_mask\n",bit_mask);
+			return 0;
+	}
+}
+
+/* verified from Z80 code */
 static INPUT_PORTS_START( vpool )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )           /* uses same coinage as COIN1 and COIN2 */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vpool_lives_r, (void *)0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vpool_lives_r, (void *)0x01)
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("LIVES")
+	PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x41, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "Infinite (Cheat)" )          /* also gives 99 credits after coin insertion regardless of coinage */
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( drivfrcg )
 	PORT_START("IN0")
@@ -1927,7 +1883,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW0")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -1969,7 +1925,7 @@ static INPUT_PORTS_START( ckongmc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0xc0)
 
-	PORT_START("DSW0")
+	PORT_START("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongg_coinage_r, (void *)0x01)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -3156,9 +3112,9 @@ GAME( 1981, 4in1,     0,        4in1,     4in1,     4in1,     ROT90,  "Armenia /
 GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, 0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, rockclim, 0,        rockclim, rockclim, 0,	      ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
-GAME( 1983, ozon1,    0,        ozon1,    ozon1,    0,	      ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
-GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1980, vpool,    hustler,  mooncrst, vpool,    0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ozon1,    0,        ozon1,    ozon1,    0,	      ROT90,  "Proma", "Ozon I", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1980, vpool,    hustler,  mooncrst, vpool,    0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "Shinkai Inc. (Magic Eletronics USA licence)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1983, bongo,    0,        bongo,    bongo,    0,	      ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
