@@ -557,6 +557,37 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
+
+	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
+	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
+	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "DSW3" )
+
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "DSW4" )
+	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
+	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
+
+	//0x09008: output C?
+	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
+
+	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
+
+	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
+
+//	AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+
+	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
+
+	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
+
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM //overlap unmapped regions
+	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
+	AM_RANGE( 0x15000, 0x15dff ) AM_RAM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subsino_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
@@ -1225,6 +1256,18 @@ static const gfx_layout layout_8x8x4 =
 	8*8
 };
 
+static const gfx_layout layout_8x32x4 =
+{
+	8, 32,
+	RGN_FRAC(1, 4),
+	4,
+	{ RGN_FRAC(2,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(1,4) },
+	{ STEP8(0,1) },
+	{ STEP32(0,8) },
+	8*8*4
+};
+
+
 static GFXDECODE_START( subsino_depth3 )
 	GFXDECODE_ENTRY( "tilemap", 0, layout_8x8x3, 0, 16 )
 GFXDECODE_END
@@ -1233,6 +1276,10 @@ static GFXDECODE_START( subsino_depth4 )
 	GFXDECODE_ENTRY( "tilemap", 0, layout_8x8x4, 0, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( subsino_depth4_reels )
+	GFXDECODE_ENTRY( "tilemap", 0, layout_8x8x4, 0, 16 )
+	GFXDECODE_ENTRY( "reels", 0, layout_8x32x4, 0, 16 )
+GFXDECODE_END
 
 /***************************************************************************
 *                             Machine Drivers                              *
@@ -1351,6 +1398,35 @@ static MACHINE_DRIVER_START( sharkpy )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sharkpy_map)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( tisub )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
+	MDRV_CPU_PROGRAM_MAP(tisub_map)
+	MDRV_CPU_IO_MAP(subsino_iomap)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+
+	MDRV_GFXDECODE(subsino_depth4_reels)
+
+	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_INIT(subsino_2proms)
+
+	MDRV_VIDEO_START(subsino)
+	MDRV_VIDEO_UPDATE(subsino)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)	/* Unknown clock */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1782,6 +1858,33 @@ ROM_START( smoto20 )
 	ROM_LOAD( "82s129.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
 ROM_END
 
+/************************
+ Treasure Island
+  -- this probably has an extra layer at least
+************************/
+
+ROM_START( tisub )
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
+	ROM_CONTINUE(0x0000,0xc000)
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "rom_4.bin", 0x00000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
+	ROM_LOAD( "rom_5.bin", 0x10000, 0x10000, CRC(3d18acd8) SHA1(179545c18ad880097366c07c8e2fa821701a2758) )
+	ROM_LOAD( "rom_6.bin", 0x20000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
+	ROM_LOAD( "rom_7.bin", 0x30000, 0x10000, CRC(9d7d99d8) SHA1(a3df5e023c2102028a5186101dc0b19d91e8965e) )
+
+	ROM_REGION( 0x8000, "reels", 0 )
+	ROM_LOAD( "rom_2.bin", 0x0000, 0x4000, CRC(836c756d) SHA1(fca1d5b600861eea30ed73ee13be735e7d167097) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "rom_3.bin", 0x4000, 0x4000, CRC(2ad82222) SHA1(68780b9528393b28eaa2f90501efb5a8c39bed63) )
+	ROM_IGNORE(0x4000)
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "prom2", 0x100, 0x100, NO_DUMP )
+ROM_END
+
 
 /***************************************************************************
 *                        Driver Init / Decryption                          *
@@ -1940,6 +2043,21 @@ static DRIVER_INIT( smoto20 )
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 
+static DRIVER_INIT( tisub )
+{
+	UINT8 *rom = memory_region( machine, "maincpu" );
+
+	DRIVER_INIT_CALL(victor5);
+
+	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
+	rom[0x64c8] = 0x00;
+	rom[0x64c9] = 0x00;
+	rom[0x64ca] = 0x00;
+	rom[0x64cd] = 0x00;
+	rom[0x64ce] = 0x00;
+	rom[0x64cf] = 0x00;
+}
+
 
 /***************************************************************************
 *                               Game Drivers                               *
@@ -1948,6 +2066,7 @@ static DRIVER_INIT( smoto20 )
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS  LAYOUT      */
 GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,     layout_victor21 )
 GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0,     layout_victor5 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
+GAME ( 1991, tisub,    0,        tisub,    crsbingo, tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)",            GAME_NOT_WORKING )
 GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,     layout_crsbingo ) // alt version of Cross Bingo?
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,     layout_sharkpy ) // missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,     layout_sharkpy ) // missing POST messages?
