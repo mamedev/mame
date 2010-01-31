@@ -218,7 +218,7 @@ VIDEO_UPDATE( schaser )
 }
 
 
-VIDEO_UPDATE( schasrcv )
+VIDEO_UPDATE( schasercv )
 {
 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];

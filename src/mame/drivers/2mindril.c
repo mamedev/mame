@@ -26,14 +26,6 @@ looks like regs @460000 are used,  pairs at N, and N+8, so
 460004, 46000c
 460006, 46000e
 
-*/
-
-/*
-
-TWO MINUTE DRILL - Taito 1993?
-
-No idea what this game is... I do not have the pinout
-See pic for more details
 
  Brief hardware overview:
  ------------------------
@@ -48,7 +40,7 @@ See pic for more details
                   - TC0510NI0
 
 DAC               -26.6860Mhz
-                        -32.0000Mhz
+                  -32.0000Mhz
 
 */
 

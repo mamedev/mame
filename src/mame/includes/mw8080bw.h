@@ -280,8 +280,8 @@ WRITE8_HANDLER( invrvnge_sh_port_w );
 WRITE8_HANDLER( lupin3_sh_port_1_w );
 WRITE8_HANDLER( lupin3_sh_port_2_w );
 
-WRITE8_HANDLER( schasrcv_sh_port_1_w );
-WRITE8_HANDLER( schasrcv_sh_port_2_w );
+WRITE8_HANDLER( schasercv_sh_port_1_w );
+WRITE8_HANDLER( schasercv_sh_port_2_w );
 
 WRITE8_HANDLER( yosakdon_sh_port_1_w );
 WRITE8_HANDLER( yosakdon_sh_port_2_w );
@@ -309,7 +309,7 @@ MACHINE_START( extra_8080bw_vh );
 VIDEO_UPDATE( invadpt2 );
 VIDEO_UPDATE( ballbomb );
 VIDEO_UPDATE( schaser );
-VIDEO_UPDATE( schasrcv );
+VIDEO_UPDATE( schasercv );
 VIDEO_UPDATE( rollingc );
 VIDEO_UPDATE( polaris );
 VIDEO_UPDATE( lupin3 );

@@ -56,9 +56,9 @@
 /* 21 Nov 1999 - added spacewar3 [LT]                                       */
 /*                                                                          */
 /* 26 May 2001 - added galxwars                                             */
-/*                     galxwar2                                             */
-/*                     jspectr2                                             */
-/*                     ozmawar2                                             */
+/*                     galxwar2 (galxwars2)                                 */
+/*                     jspectr2 (jspecter2)                                 */
+/*                     ozmawar2 (ozmawars2)                                 */
 /*                     spaceatt                                             */
 /*                     sstrangr                                             */
 /*                                                                          */
@@ -67,17 +67,18 @@
 /* 30 Jul 2001 - added sstrngr2                                             */
 /*                                                                          */
 /* 17 Jul 2006 - schaser - connect up prom - fix dipswitches                */
-/*               schasrcv - allow bottom line to show on screen             */
+/*               schasrcv (schasercv) - allow bottom line to show on screen */
 /*                                                                          */
 /*                                                                          */
 /* 10 Sep 2006 - invadpt2 - add name reset button                           */
 /*               spcewars - add bitstream circuit, fix dipswitches          */
 /*                                                                          */
 /*                                                                          */
-/* 13 Dec 2006 - add PRELIMINARY sound support and documentation to         */
-/*               rollingc, spcenctr, gunfight, m4, gmissile, schasrcv,      */
-/*               280zzzap, lagunar, lupin3, phantom2, blueshrk, desertgu,   */
-/*               ballbomb, yasokdon/yosakdoa, shuttlei, invrvnge/invrvnga.  */
+/* 13 Dec 2006 - add PRELIMINARY sound support and documentation to:        */
+/*               rollingc, spcenctr, gunfight, m4, gmissile,                */
+/*               schasrcv (schasercv), 280zzzap, lagunar, lupin3, phantom2, */
+/*		 blueshrk, desertgu, ballbomb, yosakdon/yosakdoa (yosakdona)*/
+/*               shuttlei, invrvnge/invrvnga (invrvngea).                   */
 /*               Documented indianbt sound. Removed NO_SOUND flag from      */
 /*               cosmo and dogpatch as the sound was already working.       */
 /*               [Robert]                                                   */
@@ -950,17 +951,17 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-static ADDRESS_MAP_START( schasrcv_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( schasercv_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_shift_result_r) AM_WRITE(schasrcv_sh_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_shift_result_r) AM_WRITE(schasercv_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(schasrcv_sh_port_2_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(schasercv_sh_port_2_w)
 ADDRESS_MAP_END
 
 
-static INPUT_PORTS_START( schasrcv )
+static INPUT_PORTS_START( schasercv )
 	PORT_INCLUDE( invrvnge )
 
 	PORT_MODIFY("IN1")
@@ -984,20 +985,20 @@ static INPUT_PORTS_START( schasrcv )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( schasrcv )
+static MACHINE_DRIVER_START( schasercv )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
-	MDRV_CPU_IO_MAP(schasrcv_io_map)
+	MDRV_CPU_IO_MAP(schasercv_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
 	MDRV_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(schasrcv)
+	MDRV_VIDEO_UPDATE(schasercv)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -2861,7 +2862,7 @@ GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space 
 GAME( 1980, vortex,   0,        invaders, invadpt2, 0, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080 */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1979, schasercv,schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
 GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, lupin3a,  lupin3,   lupin3a,  lupin3a,  0, ROT270, "Taito", "Lupin III (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
