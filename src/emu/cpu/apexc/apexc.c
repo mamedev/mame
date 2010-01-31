@@ -356,6 +356,7 @@ struct _apexc_state
 
 	int running;	/* 1 flag: */
 				/* running: flag implied by the existence of the stop instruction */
+	UINT32 pc;	/* address of next instruction for the disassembler */
 
 	running_device *device;
 	const address_space *program;
@@ -540,6 +541,7 @@ static void execute(apexc_state *cpustate)
 	function = (cpustate->cr >> 7) & 0x1F;
 	c6 = (cpustate->cr >> 1) & 0x3F;
 	vector = cpustate->cr & 1;
+	cpustate->pc = y<<2;
 
 	function &= 0x1E;	/* this is a mere guess - the LSBit is reserved for future additions */
 
@@ -595,6 +597,7 @@ static void execute(apexc_state *cpustate)
 			{
 				/* load ml with X */
 				delay1 = load_ml(cpustate, x, vector);
+				cpustate->pc = x<<2;
 				/* burn pre-fetch delay if needed */
 				if (delay1)
 				{
@@ -827,7 +830,7 @@ static CPU_EXECUTE( apexc )
 
 	do
 	{
-		debugger_instruction_hook(device, effective_address(cpustate, cpustate->ml));
+		debugger_instruction_hook(device, cpustate->pc);
 
 		if (cpustate->running)
 			execute(cpustate);
@@ -870,6 +873,7 @@ static CPU_SET_INFO( apexc )
 	case CPUINFO_INT_REGISTER + APEXC_A:		cpustate->a = info->i;							break;
 	case CPUINFO_INT_REGISTER + APEXC_R:		cpustate->r = info->i;							break;
 	case CPUINFO_INT_REGISTER + APEXC_ML:		cpustate->ml = info->i & 0x3ff;					break;
+	case CPUINFO_INT_REGISTER + APEXC_PC:		cpustate->pc = info->i;					break;
 	case CPUINFO_INT_REGISTER + APEXC_WS:		cpustate->working_store = info->i & 0xf;		break;
 	case CPUINFO_INT_REGISTER + APEXC_STATE:	cpustate->running = info->i ? TRUE : FALSE;		break;
 	}
@@ -904,11 +908,7 @@ CPU_GET_INFO( apexc )
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:
-		/* no PC - return memory location register instead, this should be
-        equivalent unless executed in the midst of an instruction */
-		info->i = effective_address(cpustate, cpustate->ml);
-		break;
-	case CPUINFO_INT_PREVIOUSPC:					info->i = 0;	/* no PC */				break;
+	case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->pc;	/* psuedo-PC */				break;
 
 	/*case CPUINFO_INT_INPUT_STATE + ...:*/							/* no interrupts */
 
@@ -916,6 +916,7 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_INT_REGISTER + APEXC_A:			info->i = cpustate->a;						break;
 	case CPUINFO_INT_REGISTER + APEXC_R:			info->i = cpustate->r;						break;
 	case CPUINFO_INT_REGISTER + APEXC_ML:			info->i = cpustate->ml;						break;
+	case CPUINFO_INT_REGISTER + APEXC_PC:			info->i = cpustate->pc;						break;
 	case CPUINFO_INT_REGISTER + APEXC_WS:			info->i = cpustate->working_store;			break;
 	case CPUINFO_INT_REGISTER + APEXC_STATE:		info->i = cpustate->running;				break;
 	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:		info->i = effective_address(cpustate, cpustate->ml);	break;
@@ -940,6 +941,7 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_STR_REGISTER + APEXC_A:			sprintf(info->s, "A :%08X", cpustate->a); break;
 	case CPUINFO_STR_REGISTER + APEXC_R:			sprintf(info->s, "R :%08X", cpustate->r); break;
 	case CPUINFO_STR_REGISTER + APEXC_ML:			sprintf(info->s, "ML:%03X", cpustate->ml); break;
+	case CPUINFO_STR_REGISTER + APEXC_PC:			sprintf(info->s, "PC:%03X", cpustate->pc); break;
 	case CPUINFO_STR_REGISTER + APEXC_WS:			sprintf(info->s, "WS:%01X", cpustate->working_store); break;
 
 	case CPUINFO_STR_REGISTER + APEXC_STATE:		sprintf(info->s, "CPU state:%01X", cpustate->running ? TRUE : FALSE); break;

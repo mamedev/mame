@@ -51,6 +51,15 @@
 
     For vector instructions, replace the first space on the right of the mnemonic
     with a 'v'.
+
+	01-Feb-2010 (Robbbert):
+	I've added the actual address, (as shown in the extreme left of the debugger
+	output), so that you can see much easier how the program will flow. Example:
+
+	+C  XXX(##/##)   XXX(##/##)
+
+	The X value shows where the data word is located, and the Y value is the
+	address of the next instruction.
 */
 enum _format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
 typedef enum _format_type format_type;
@@ -104,7 +113,7 @@ CPU_DISASSEMBLE( apexc )
 	case two_address:
 	case branch:
 	case swap:
-		buffer += sprintf(buffer, "%-10s", mnemonic);	/* 10 chars*/
+		buffer += sprintf(buffer, "   %-10s", mnemonic);	/* 10 chars*/
 		break;
 
 	case shiftl:
@@ -113,32 +122,32 @@ CPU_DISASSEMBLE( apexc )
 			n = c6;
 		else
 			n = 64-c6;
-		buffer += sprintf(buffer, "%-2s(%2d)    ", mnemonic, n);	/* 10 chars */
+		buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n);	/* 10 chars */
 		break;
 
 	case multiply:
 		n = 33-c6;
 		if (n == 32)
 			/* case "32" : do not show bit specifier */
-			buffer += sprintf(buffer, "%-10s", mnemonic);	/* 10 chars */
+			buffer += sprintf(buffer, "   %-10s", mnemonic);	/* 10 chars */
 		else
-			buffer += sprintf(buffer, "%-2s(%2d)    ", mnemonic, n);	/* 10 chars */
+			buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n);	/* 10 chars */
 		break;
 
 	case store:
 		if (c6 == 0)
 		{	/* case "1-32" : do not show bit specifier */
-			buffer += sprintf(buffer, "%-10s", mnemonic);	/* 10 chars*/
+			buffer += sprintf(buffer, "   %-10s", mnemonic);	/* 10 chars*/
 		}
 		else if (c6 & 0x20)
 		{	/* case "1-n" */
 			n = c6-32;
-			buffer += sprintf(buffer, "%-2s (1-%02d) ", mnemonic, n);	/* 10 chars */
+			buffer += sprintf(buffer, "   %-2s (1-%02d) ", mnemonic, n);	/* 10 chars */
 		}
 		else
 		{	/* case "n-32" */
 			n = c6+1;
-			buffer += sprintf(buffer, "%-2s(%02d-32) ", mnemonic, n);	/* 8 chars */
+			buffer += sprintf(buffer, "   %-2s(%02d-32) ", mnemonic, n);	/* 8 chars */
 		}
 	}
 
@@ -147,28 +156,28 @@ CPU_DISASSEMBLE( apexc )
 	{
 	case branch:
 		buffer--;	/* eat last char */
-		buffer += sprintf(buffer, "<(%02d/%02d) >=", (x >> 5) & 0x1f, x & 0x1f);	/* 10+1 chars */
+		buffer += sprintf(buffer, "<%03X(%02d/%02d) >=", x<<2, (x >> 5) & 0x1f, x & 0x1f);	/* 10+1 chars */
 		break;
 
 	case multiply:
 	case swap:
-		buffer += sprintf(buffer, "(%02d)      ", (x >> 5) & 0x1f);	/* 10 chars */
+		buffer += sprintf(buffer, "   (%02d)      ", (x >> 5) & 0x1f);	/* 10 chars */
 		break;
 
 	case one_address:
 	case shiftl:
 	case shiftr:
-		buffer += sprintf(buffer, "          ");	/* 10 chars */
+		buffer += sprintf(buffer, "             ");	/* 10 chars */
 		break;
 
 	case two_address:
 	case store:
-		buffer += sprintf(buffer, "(%02d/%02d)   ", (x >> 5) & 0x1f, x & 0x1f);	/* 10 chars */
+		buffer += sprintf(buffer, "%03X(%02d/%02d)   ", x<<2, (x >> 5) & 0x1f, x & 0x1f);	/* 10 chars */
 		break;
 	}
 
 	/* print Y address */
-	buffer += sprintf(buffer, "(%02d/%02d)", (y >> 5) & 0x1f, y & 0x1f);	/* 7 chars */
+	buffer += sprintf(buffer, "%03X(%02d/%02d)", y<<2, (y >> 5) & 0x1f, y & 0x1f);	/* 7 chars */
 
 	return 4;
 }
