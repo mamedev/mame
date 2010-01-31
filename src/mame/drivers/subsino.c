@@ -137,7 +137,15 @@
 static UINT8 *videoram;
 static UINT8 *colorram;
 static tilemap_t *tmap;
+static tilemap_t *reel1_tilemap, *reel2_tilemap, *reel3_tilemap;
 static int tiles_offset;
+static UINT8* reel1_ram;
+static UINT8* reel2_ram;
+static UINT8* reel3_ram;
+static UINT8* reel1_scroll;
+static UINT8* reel2_scroll;
+static UINT8* reel3_scroll;
+
 
 static WRITE8_HANDLER( subsino_tiles_offset_w )
 {
@@ -167,6 +175,8 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
+
+
 static VIDEO_START( subsino )
 {
 	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
@@ -174,9 +184,104 @@ static VIDEO_START( subsino )
 	tiles_offset = 0;
 }
 
+
+
+WRITE8_HANDLER( subsino_reel1_ram_w )
+{
+	reel1_ram[offset] = data;
+	tilemap_mark_tile_dirty(reel1_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_subsino_reel1_tile_info )
+{
+	int code = reel1_ram[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
+
+WRITE8_HANDLER( subsino_reel2_ram_w )
+{
+	reel2_ram[offset] = data;
+	tilemap_mark_tile_dirty(reel2_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_subsino_reel2_tile_info )
+{
+	int code = reel2_ram[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
+WRITE8_HANDLER( subsino_reel3_ram_w )
+{
+	reel3_ram[offset] = data;
+	tilemap_mark_tile_dirty(reel3_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_subsino_reel3_tile_info )
+{
+	int code = reel3_ram[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
+
+
+static VIDEO_START( subsino_reels )
+{
+	VIDEO_START_CALL( subsino );
+
+	reel1_tilemap = tilemap_create(machine,get_subsino_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	reel2_tilemap = tilemap_create(machine,get_subsino_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	reel3_tilemap = tilemap_create(machine,get_subsino_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
+
+	tilemap_set_scroll_cols(reel1_tilemap, 64);
+	tilemap_set_scroll_cols(reel2_tilemap, 64);
+	tilemap_set_scroll_cols(reel3_tilemap, 64);
+
+}
+
 static VIDEO_UPDATE( subsino )
 {
 	bitmap_fill(bitmap,cliprect,0);
+	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
+	return 0;
+}
+
+// are these hardcoded, or registers?
+static const rectangle visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+7)*8-1 };
+static const rectangle visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
+static const rectangle visible3 = { 0*8, (14+48)*8-1, 18*8, (18+7)*8-1 };
+
+static VIDEO_UPDATE( subsino_reels )
+{
+	int i;
+	bitmap_fill(bitmap,cliprect,0);
+
+	for (i= 0;i < 64;i++)
+	{
+		tilemap_set_scrolly(reel1_tilemap, i, reel1_scroll[i]);
+		tilemap_set_scrolly(reel2_tilemap, i, reel2_scroll[i]);
+		tilemap_set_scrolly(reel3_tilemap, i, reel3_scroll[i]);
+	}
+
+	tilemap_draw(bitmap, &visible1, reel1_tilemap, 0, 0);
+	tilemap_draw(bitmap, &visible2, reel2_tilemap, 0, 0);
+	tilemap_draw(bitmap, &visible3, reel3_tilemap, 0, 0);
+
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
 }
@@ -586,7 +691,13 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
-	AM_RANGE( 0x15000, 0x15dff ) AM_RAM
+	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_BASE(&reel3_scroll)
+	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_BASE(&reel2_scroll)
+	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_BASE(&reel1_scroll)
+
+	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(&reel1_ram)
+	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(&reel2_ram)
+	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(&reel3_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subsino_iomap, ADDRESS_SPACE_IO, 8 )
@@ -1417,10 +1528,10 @@ static MACHINE_DRIVER_START( tisub )
 	MDRV_GFXDECODE(subsino_depth4_reels)
 
 	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(subsino_2proms)
+	MDRV_PALETTE_INIT(subsino_3proms)
 
-	MDRV_VIDEO_START(subsino)
-	MDRV_VIDEO_UPDATE(subsino)
+	MDRV_VIDEO_START(subsino_reels)
+	MDRV_VIDEO_UPDATE(subsino_reels)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1860,7 +1971,7 @@ ROM_END
 
 /************************
  Treasure Island
-  -- this probably has an extra layer at least
+  -- this has an extra layer for the reels, exactly the same as goldstar.c
 ************************/
 
 ROM_START( tisub )
@@ -1880,9 +1991,10 @@ ROM_START( tisub )
 	ROM_LOAD( "rom_3.bin", 0x4000, 0x4000, CRC(2ad82222) SHA1(68780b9528393b28eaa2f90501efb5a8c39bed63) )
 	ROM_IGNORE(0x4000)
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "prom1", 0x000, 0x100, NO_DUMP )
-	ROM_LOAD( "prom2", 0x100, 0x100, NO_DUMP )
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "n82s129n.u39", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -2066,7 +2178,7 @@ static DRIVER_INIT( tisub )
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS  LAYOUT      */
 GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,     layout_victor21 )
 GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0,     layout_victor5 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
-GAME ( 1991, tisub,    0,        tisub,    crsbingo, tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)",            GAME_NOT_WORKING )
+GAME ( 1991, tisub,    sharkpy,        tisub,    crsbingo, tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)",            GAME_NOT_WORKING )
 GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,     layout_crsbingo ) // alt version of Cross Bingo?
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,     layout_sharkpy ) // missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,     layout_sharkpy ) // missing POST messages?
