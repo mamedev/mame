@@ -3139,7 +3139,6 @@ src/mame/machine/stvcd.h svneol=native#text/plain
 src/mame/machine/stvprot.c svneol=native#text/plain
 src/mame/machine/stvprot.h svneol=native#text/plain
 src/mame/machine/subs.c svneol=native#text/plain
-src/mame/machine/system16.c svneol=native#text/plain
 src/mame/machine/tait8741.c svneol=native#text/plain
 src/mame/machine/tait8741.h svneol=native#text/plain
 src/mame/machine/taitoio.c svneol=native#text/plain
