@@ -5576,8 +5576,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( le2j )		/* 1994.06 GX312 (Japan) */
 	DRIVER( puzldama )	/* 1994.07 GX315 (Japan) */
 	DRIVER( gokuparo )	/* 1994.04 GX321 (Japan) */
-	DRIVER( fantjour )	/* 1994.?? GX321 (Euro) */
-	DRIVER( fantjoura )	/* 1994.?? GX321 (Asia) */
+	DRIVER( fantjour )	/* 1994.?? GX321 (US?) */
 	DRIVER( dragoona )	/* 1995.?? GX417 (Asia) */
 	DRIVER( dragoonj )	/* 1995.08 GX417 (Japan) */
 	DRIVER( tbyahhoo )	/* 1995.04 GX424 (Japan) */
@@ -9986,5 +9985,6 @@ Other Sun games
 	DRIVER( am_mg3 )	/* (c) Amatic 2000 */
 
 	DRIVER( pinkiri8 )
+	DRIVER( neptunp2 )
 
 #endif	/* DRIVER_RECURSIVE */

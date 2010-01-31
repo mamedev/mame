@@ -1900,6 +1900,7 @@ src/mame/drivers/nbmj9195.c svneol=native#text/plain
 src/mame/drivers/nemesis.c svneol=native#text/plain
 src/mame/drivers/neodrvr.c svneol=native#text/plain
 src/mame/drivers/neogeo.c svneol=native#text/plain
+src/mame/drivers/neptunp2.c svneol=native#text/plain
 src/mame/drivers/news.c svneol=native#text/plain
 src/mame/drivers/nightgal.c svneol=native#text/plain
 src/mame/drivers/ninjakd2.c svneol=native#text/plain
