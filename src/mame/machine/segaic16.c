@@ -8,7 +8,7 @@
 #include "segaic16.h"
 #include "video/resnet.h"
 #include "machine/fd1089.h"
-#include "includes/system16.h"
+#include "includes/segas16.h"		// needed for fd1094 calls
 
 
 /*************************************
@@ -137,8 +137,9 @@ void segaic16_memory_mapper_init(running_device *cpu, const segaic16_memory_map_
 
 	/* create the initial regions */
 	update_memory_mapping(cpu->machine, chip, 0);
-}
 
+	state_save_register_item_array(cpu->machine, "segaic16_mapper", NULL, 0, chip->regs);
+}
 
 void segaic16_memory_mapper_reset(running_machine *machine)
 {
@@ -420,7 +421,6 @@ WRITE16_HANDLER( segaic16_memory_mapper_lsb_w )
 }
 
 
-
 /*************************************
  *
  *  Multiply chip
@@ -461,7 +461,10 @@ WRITE16_HANDLER( segaic16_multiply_0_w ) { multiply_w(0, offset, data, mem_mask)
 WRITE16_HANDLER( segaic16_multiply_1_w ) { multiply_w(1, offset, data, mem_mask); }
 WRITE16_HANDLER( segaic16_multiply_2_w ) { multiply_w(2, offset, data, mem_mask); }
 
-
+void segaic16_multiply_chip_register_save( running_machine *machine, int which )
+{
+	state_save_register_item_array(machine, "segaic16_multiply", NULL, which, multiply[which].regs);
+}
 
 /*************************************
  *
@@ -576,6 +579,10 @@ WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(space, 0, offset, data, mem_ma
 WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(space, 1, offset, data, mem_mask); }
 WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(space, 2, offset, data, mem_mask); }
 
+void segaic16_divide_chip_register_save( running_machine *machine, int which )
+{
+	state_save_register_item_array(machine, "segaic16_divide", NULL, which, divide[which].regs);
+}
 
 
 /*************************************
@@ -584,11 +591,20 @@ WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(space, 2, offset, data, mem_ma
  *
  *************************************/
 
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *))
+static void segaic16_compare_timer_chip_register_save( running_machine *machine, int which )
+{
+	state_save_register_item_array(machine, "segaic16_compare", NULL, which, compare_timer[which].regs);
+	state_save_register_item(machine, "segaic16_compare", NULL, which, compare_timer[which].counter);
+	state_save_register_item(machine, "segaic16_compare", NULL, which, compare_timer[which].bit);
+}
+
+void segaic16_compare_timer_init( running_machine *machine, int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *))
 {
 	memset(&compare_timer[which], 0, sizeof(compare_timer[which]));
 	compare_timer[which].sound_w = sound_write_callback;
 	compare_timer[which].timer_ack = timer_ack_callback;
+
+	segaic16_compare_timer_chip_register_save(machine, which);
 }
 
 

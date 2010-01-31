@@ -34,35 +34,3 @@ MACHINE_RESET( sys16_onetime )
 	sys18_splittab_fg_y=0;
 }
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-GFXDECODE_START( sys16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	0, 1024 )
-GFXDECODE_END
-
-
-/* sound */
-
-static void sound_cause_nmi( running_device *device, int chip )
-{
-	/* upd7759 callback */
-	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
-const upd7759_interface sys16_upd7759_interface =
-{
-	sound_cause_nmi
-};
-
-int sys18_sound_info[4*2];
-

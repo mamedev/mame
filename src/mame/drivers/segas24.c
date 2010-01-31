@@ -338,7 +338,6 @@ Notes:
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "video/segaic24.h"
-#include "includes/system16.h"
 #include "includes/segas24.h"
 
 #define MASTER_CLOCK		XTAL_20MHz

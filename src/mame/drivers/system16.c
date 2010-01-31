@@ -99,6 +99,34 @@
 
 #define ShadowColorsMultiplier 2
 
+int sys18_sound_info[4*2];
+
+static const gfx_layout charlayout =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+GFXDECODE_START( sys16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	0, 1024 )
+GFXDECODE_END
+
+static DRIVER_INIT( common )
+{
+	sys16_bg1_trans=0;
+	sys16_rowscroll_scroll=0;
+	sys18_splittab_bg_x=0;
+	sys18_splittab_bg_y=0;
+	sys18_splittab_fg_x=0;
+	sys18_splittab_fg_y=0;
+}
+
+
 /***************************************************************************/
 
 static UINT16 coinctrl;
@@ -334,6 +362,19 @@ static MACHINE_DRIVER_START( system16 )
 MACHINE_DRIVER_END
 
 
+static void sound_cause_nmi( running_device *device, int chip )
+{
+	/* upd7759 callback */
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+const upd7759_interface sys16_upd7759_interface =
+{
+	sound_cause_nmi
+};
+
+
 static MACHINE_DRIVER_START( system16_7759 )
 
 	/* basic machine hardware */
@@ -546,7 +587,7 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( dduxbl )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 /***************************************************************************/
@@ -605,7 +646,7 @@ static MACHINE_RESET( eswatbl )
 
 static DRIVER_INIT( eswatbl )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 	sys16_rowscroll_scroll=0x8000;
 	//sys18_splittab_fg_x=&sys16_textram[0x0f80];
 }
@@ -1059,7 +1100,7 @@ static MACHINE_RESET( goldnaxe )
 
 static DRIVER_INIT( goldnab2 )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 /***************************************************************************/
@@ -1218,7 +1259,7 @@ static MACHINE_RESET( fpointbl )
 
 static DRIVER_INIT( fpointbl )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 	//sys16_video_config(fpoint_update_proc, -0xb8, NULL);
 }
 
@@ -1409,12 +1450,12 @@ static MACHINE_RESET( passht4b )
 
 static DRIVER_INIT( passsht )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 static DRIVER_INIT( passht4b )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 /***************************************************************************/
@@ -1592,7 +1633,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( shinobl )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 /***************************************************************************/
@@ -1680,7 +1721,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( tetrisbl )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 
@@ -1792,7 +1833,7 @@ static DRIVER_INIT( tturfbl )
 {
 	UINT8 *mem;
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 
 	mem = memory_region(machine, "soundcpu");
 	memcpy(mem, mem+0x10000, 0x8000);
@@ -1877,7 +1918,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( wb3bbl )
 {
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 /***************************************************************************/
@@ -2121,7 +2162,7 @@ static DRIVER_INIT( goldnabl )
 
 	memory_set_decrypted_region(space, 0x00000, 0xbffff, decrypted_region);
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 }
 
 
@@ -2156,7 +2197,7 @@ static DRIVER_INIT( bayrouteb2 )
 {
 	UINT8 *mem;
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 
 	mem = memory_region(machine, "soundcpu");
 	memcpy(mem, mem+0x10000, 0x8000);
@@ -2550,7 +2591,7 @@ static DRIVER_INIT( beautyb )
 
 	}
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 
 }
 
@@ -2905,7 +2946,7 @@ static DRIVER_INIT( shdancbl )
 {
 	UINT8 *mem;
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
@@ -2969,7 +3010,7 @@ static DRIVER_INIT( mwalkbl )
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
 
@@ -3030,7 +3071,7 @@ static DRIVER_INIT( astormbl )
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	MACHINE_RESET_CALL(sys16_onetime);
+	DRIVER_INIT_CALL(common);
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
 	sys16_MaxShadowColors = 0; // doesn't seem to use transparent shadows

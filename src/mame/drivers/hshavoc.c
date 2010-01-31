@@ -39,8 +39,7 @@ Unfortunately it's read protected.
 #include "cpu/m68000/m68000.h"
 #include "sound/2612intf.h"
 #include "sound/sn76496.h"
-
-#include "megadriv.h"
+#include "includes/megadriv.h"
 
 static INPUT_PORTS_START( hshavoc )
 	PORT_START("IN0")	/* 16bit */

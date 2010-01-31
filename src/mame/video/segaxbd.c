@@ -5,19 +5,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "segaic16.h"
-#include "includes/system16.h"
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT8 road_priority;
-
+#include "video/segaic16.h"
+#include "includes/segas16.h"
 
 
 /*************************************
@@ -42,21 +31,6 @@ VIDEO_START( xboard )
 }
 
 
-
-/*************************************
- *
- *  Miscellaneous setters
- *
- *************************************/
-
-void xboard_set_road_priority(int priority)
-{
-	/* this is only set at init time */
-	road_priority = priority;
-}
-
-
-
 /*************************************
  *
  *  Video update
@@ -65,6 +39,8 @@ void xboard_set_road_priority(int priority)
 
 VIDEO_UPDATE( xboard )
 {
+	segas1x_state *state = (segas1x_state *)screen->machine->driver_data;
+
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{
@@ -77,7 +53,7 @@ VIDEO_UPDATE( xboard )
 
 	/* draw the low priority road layer */
 	segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
-	if (road_priority == 0)
+	if (state->road_priority == 0)
 		segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* draw background */
@@ -89,7 +65,7 @@ VIDEO_UPDATE( xboard )
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
 
 	/* draw the high priority road */
-	if (road_priority == 1)
+	if (state->road_priority == 1)
 		segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* text layer */

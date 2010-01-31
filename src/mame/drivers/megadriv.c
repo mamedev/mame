@@ -73,7 +73,7 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 #include "sound/upd7759.h"
 #include "sound/fm.h"
 #include "cpu/m68000/m68000.h"
-#include "megadriv.h"
+#include "includes/megadriv.h"
 #include "cpu/sh2/sh2.h"
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]

@@ -48,7 +48,7 @@ Notes:
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 
-#include "megadriv.h"
+#include "includes/megadriv.h"
 
 
 /* Puckman Pockimon Input Ports */

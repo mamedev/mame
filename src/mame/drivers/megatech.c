@@ -92,8 +92,8 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "sound/sn76496.h"
 #include "rendlay.h"
 
-#include "segamsys.h"
-#include "megadriv.h"
+#include "includes/segamsys.h"
+#include "includes/megadriv.h"
 
 static struct _mtech_bios mtech_bios;
 

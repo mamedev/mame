@@ -233,11 +233,12 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/system16.h"
+#include "includes/segas16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
+#include "video/segaic16.h"
 
 
 #define MASTER_CLOCK			50000000
@@ -251,20 +252,7 @@ Notes:
  *
  *************************************/
 
-static UINT8 iochip_regs[2][8];
-static UINT8 iochip_force_input;
-static UINT8 (*iochip_custom_io_r[2])(offs_t offset, UINT8 portdata);
-static void (*iochip_custom_io_w[2])(offs_t offset, UINT8 data);
-
-static UINT8 adc_reverse[8];
-
-static UINT8 vblank_irq_state;
-static UINT8 timer_irq_state;
-static UINT8 gprider_hack;
-
 static UINT16 *backupram1, *backupram2;
-
-
 
 /*************************************
  *
@@ -274,18 +262,37 @@ static UINT16 *backupram1, *backupram2;
 
 static void xboard_generic_init(running_machine *machine)
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", NULL);
 
 	/* set the default road priority */
-	xboard_set_road_priority(1);
+	state->road_priority = 1;
 
 	/* reset the custom handlers and other pointers */
-	memset(iochip_custom_io_r, 0, sizeof(iochip_custom_io_r));
-	memset(iochip_custom_io_w, 0, sizeof(iochip_custom_io_w));
-	memset(adc_reverse, 0, sizeof(adc_reverse));
+	memset(state->iochip_custom_io_r, 0, sizeof(state->iochip_custom_io_r));
+	memset(state->iochip_custom_io_w, 0, sizeof(state->iochip_custom_io_w));
+	memset(state->adc_reverse, 0, sizeof(state->adc_reverse));
 
-	gprider_hack = 0;
+	state->gprider_hack = 0;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	segaic16_multiply_chip_register_save(machine, 0);
+	segaic16_multiply_chip_register_save(machine, 1);
+	segaic16_divide_chip_register_save(machine, 0);
+	segaic16_divide_chip_register_save(machine, 1);
+
+	state_save_register_global(machine, state->iochip_force_input);
+	state_save_register_global(machine, state->vblank_irq_state);
+	state_save_register_global(machine, state->timer_irq_state);
+	state_save_register_global(machine, state->gprider_hack);
+	state_save_register_global_array(machine, state->iochip_regs[0]);
+	state_save_register_global_array(machine, state->iochip_regs[1]);
+	state_save_register_global_array(machine, state->adc_reverse);
 }
 
 
@@ -298,27 +305,28 @@ static void xboard_generic_init(running_machine *machine)
 
 static void update_main_irqs(running_machine *machine)
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
 	int irq = 0;
 
-	if (timer_irq_state)
+	if (state->timer_irq_state)
 		irq |= 2;
 	else
-		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 2, CLEAR_LINE);
 
-	if (vblank_irq_state)
+	if (state->vblank_irq_state)
 		irq |= 4;
 	else
-		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 4, CLEAR_LINE);
 
-	if (gprider_hack && irq > 4)
+	if (state->gprider_hack && irq > 4)
 		irq = 4;
 
 	if (!(irq==6))
-		cputag_set_input_line(machine, "maincpu", 6, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 
 	if (irq)
 	{
-		cputag_set_input_line(machine, "maincpu", irq, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, irq, ASSERT_LINE);
 		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
@@ -326,28 +334,30 @@ static void update_main_irqs(running_machine *machine)
 
 static TIMER_CALLBACK( scanline_callback )
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	int scanline = param;
 	int next_scanline = (scanline + 2) % 262;
 	int update = 0;
 
 	/* clock the timer and set the IRQ if something happened */
 	if ((scanline % 2) != 0 && segaic16_compare_timer_clock(0))
-		timer_irq_state = update = 1;
+		state->timer_irq_state = update = 1;
 
 	/* set VBLANK on scanline 223 */
 	if (scanline == 223)
 	{
-		vblank_irq_state = update = 1;
-		cputag_set_input_line(machine, "sub", 4, ASSERT_LINE);
+		state->vblank_irq_state = update = 1;
+		cpu_set_input_line(state->subcpu, 4, ASSERT_LINE);
 		next_scanline = scanline + 1;
 	}
 
 	/* clear VBLANK on scanline 224 */
 	else if (scanline == 224)
 	{
-		vblank_irq_state = 0;
+		state->vblank_irq_state = 0;
 		update = 1;
-		cputag_set_input_line(machine, "sub", 4, CLEAR_LINE);
+		cpu_set_input_line(state->subcpu, 4, CLEAR_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -362,8 +372,10 @@ static TIMER_CALLBACK( scanline_callback )
 
 static void timer_ack_callback(running_machine *machine)
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	/* clear the timer IRQ */
-	timer_irq_state = 0;
+	state->timer_irq_state = 0;
 	update_main_irqs(machine);
 }
 
@@ -377,10 +389,11 @@ static void timer_ack_callback(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, param);
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -392,13 +405,17 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 
 static void sound_cpu_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, state);
+	segas1x_state *driver = (segas1x_state *)device->machine->driver_data;
+
+	cpu_set_input_line(driver->soundcpu, 0, state);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
+	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -412,7 +429,9 @@ static READ8_HANDLER( sound_data_r )
 
 static void xboard_reset(running_device *device)
 {
-	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
+	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+
+	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
@@ -426,8 +445,8 @@ static MACHINE_RESET( xboard )
 	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), xboard_reset);
 
 	/* set up the compare/timer chip */
-	segaic16_compare_timer_init(0, sound_data_w, timer_ack_callback);
-	segaic16_compare_timer_init(1, NULL, NULL);
+	segaic16_compare_timer_init(machine, 0, sound_data_w, timer_ack_callback);
+	segaic16_compare_timer_init(machine, 1, NULL, NULL);
 
 	/* start timers to track interrupts */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), NULL, 1, scanline_callback);
@@ -443,14 +462,15 @@ static MACHINE_RESET( xboard )
 
 static READ16_HANDLER( adc_r )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-	int which = (iochip_regs[0][2] >> 2) & 7;
+	int which = (state->iochip_regs[0][2] >> 2) & 7;
 
 	/* on the write, latch the selected input port and stash the value */
 	int value = input_port_read_safe(space->machine, ports[which], 0x0010);
 
 	/* reverse some port values */
-	if (adc_reverse[which])
+	if (state->adc_reverse[which])
 		value = 255 - value;
 
 	/* return the previously latched value */
@@ -463,33 +483,34 @@ static WRITE16_HANDLER( adc_w )
 }
 
 
-INLINE UINT16 iochip_r(int which, int port, int inputval)
+INLINE UINT16 iochip_r(running_machine *machine, int which, int port, int inputval)
 {
-	UINT16 result = iochip_regs[which][port];
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	UINT16 result = state->iochip_regs[which][port];
 
 	/* if there's custom I/O, do that to get the input value */
-	if (iochip_custom_io_r[which])
-		inputval = (*iochip_custom_io_r[which])(port, inputval);
+	if (state->iochip_custom_io_r[which])
+		inputval = (*state->iochip_custom_io_r[which])(port, inputval);
 
 	/* for ports 0-3, the direction is controlled 4 bits at a time by register 6 */
 	if (port <= 3)
 	{
-		if (iochip_force_input || ((iochip_regs[which][6] >> (2*port+0)) & 1))
+		if (state->iochip_force_input || ((state->iochip_regs[which][6] >> (2 * port + 0)) & 1))
 			result = (result & ~0x0f) | (inputval & 0x0f);
-		if (iochip_force_input || ((iochip_regs[which][6] >> (2*port+1)) & 1))
+		if (state->iochip_force_input || ((state->iochip_regs[which][6] >> (2 * port + 1)) & 1))
 			result = (result & ~0xf0) | (inputval & 0xf0);
 	}
 
 	/* for port 4, the direction is controlled 1 bit at a time by register 7 */
 	else
 	{
-		if ((iochip_regs[which][7] >> 0) & 1)
+		if ((state->iochip_regs[which][7] >> 0) & 1)
 			result = (result & ~0x01) | (inputval & 0x01);
-		if ((iochip_regs[which][7] >> 1) & 1)
+		if ((state->iochip_regs[which][7] >> 1) & 1)
 			result = (result & ~0x02) | (inputval & 0x02);
-		if ((iochip_regs[which][7] >> 2) & 1)
+		if ((state->iochip_regs[which][7] >> 2) & 1)
 			result = (result & ~0x04) | (inputval & 0x04);
-		if ((iochip_regs[which][7] >> 3) & 1)
+		if ((state->iochip_regs[which][7] >> 3) & 1)
 			result = (result & ~0x08) | (inputval & 0x08);
 		result &= 0x0f;
 	}
@@ -507,23 +528,23 @@ static READ16_HANDLER( iochip_0_r )
                 D6: /INTR of ADC0804
                 D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
             */
-			return iochip_r(0, 0, input_port_read(space->machine, "IO0PORTA"));
+			return iochip_r(space->machine, 0, 0, input_port_read(space->machine, "IO0PORTA"));
 
 		case 1:
 			/* I/O port: CN C pins 17,15,13,11,9,7,5,3 */
-			return iochip_r(0, 1, input_port_read(space->machine, "IO0PORTB"));
+			return iochip_r(space->machine, 0, 1, input_port_read(space->machine, "IO0PORTB"));
 
 		case 2:
 			/* Output port */
-			return iochip_r(0, 2, 0);
+			return iochip_r(space->machine, 0, 2, 0);
 
 		case 3:
 			/* Output port */
-			return iochip_r(0, 3, 0);
+			return iochip_r(space->machine, 0, 3, 0);
 
 		case 4:
 			/* Unused */
-			return iochip_r(0, 4, 0);
+			return iochip_r(space->machine, 0, 4, 0);
 	}
 
 	/* everything else returns 0 */
@@ -533,6 +554,7 @@ static READ16_HANDLER( iochip_0_r )
 
 static WRITE16_HANDLER( iochip_0_w )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
 	UINT8 oldval;
 
 	/* access is via the low 8 bits */
@@ -542,8 +564,8 @@ static WRITE16_HANDLER( iochip_0_w )
 	data &= 0xff;
 
 	/* swap in the new value and remember the previous value */
-	oldval = iochip_regs[0][offset];
-	iochip_regs[0][offset] = data;
+	oldval = state->iochip_regs[0][offset];
+	state->iochip_regs[0][offset] = data;
 
 	/* certain offsets have common effects */
 	switch (offset)
@@ -559,7 +581,7 @@ static WRITE16_HANDLER( iochip_0_w )
             */
 			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(space,0,0);
 			segaic16_set_display_enable(space->machine, data & 0x20);
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:
@@ -582,23 +604,23 @@ static READ16_HANDLER( iochip_1_r )
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 0, input_port_read(space->machine, "IO1PORTA"));
+			return iochip_r(space->machine, 1, 0, input_port_read(space->machine, "IO1PORTA"));
 
 		case 1:
 			/* Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 1, input_port_read(space->machine, "IO1PORTB"));
+			return iochip_r(space->machine, 1, 1, input_port_read(space->machine, "IO1PORTB"));
 
 		case 2:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 2, input_port_read(space->machine, "IO1PORTC"));
+			return iochip_r(space->machine, 1, 2, input_port_read(space->machine, "IO1PORTC"));
 
 		case 3:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 3, input_port_read(space->machine, "IO1PORTD"));
+			return iochip_r(space->machine, 1, 3, input_port_read(space->machine, "IO1PORTD"));
 
 		case 4:
 			/* Unused */
-			return iochip_r(1, 4, 0);
+			return iochip_r(space->machine, 1, 4, 0);
 	}
 
 	/* everything else returns 0 */
@@ -608,6 +630,8 @@ static READ16_HANDLER( iochip_1_r )
 
 static WRITE16_HANDLER( iochip_1_w )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
 	/* access is via the low 8 bits */
 	if (!ACCESSING_BITS_0_7)
 		return;
@@ -615,7 +639,7 @@ static WRITE16_HANDLER( iochip_1_w )
 	data &= 0xff;
 
 	/* swap in the new value and remember the previous value */
-	iochip_regs[1][offset] = data;
+	state->iochip_regs[1][offset] = data;
 
 	if (offset <= 4)
 		logerror("I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
@@ -642,11 +666,13 @@ static WRITE16_HANDLER( iocontrol_w )
 
 static WRITE16_HANDLER( aburner2_iochip_0_D_w )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
 	/* access is via the low 8 bits */
 	if (!ACCESSING_BITS_0_7)
 		return;
 
-	iochip_regs[0][3] = data;
+	state->iochip_regs[0][3] = data;
 
 	output_set_lamp_value(2, (data >> 1) & 0x01);	/* altitude warning lamp */
 	output_set_led_value(0, (data >> 2) & 0x01);	/* start lamp */
@@ -664,11 +690,11 @@ static WRITE16_HANDLER( aburner2_iochip_0_D_w )
  *
  *************************************/
 
-static UINT16 *loffire_sync;
-
 static WRITE16_HANDLER( loffire_sync0_w )
 {
-	COMBINE_DATA(&loffire_sync[offset]);
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->loffire_sync[offset]);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
@@ -1336,6 +1362,9 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( xboard )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(segas1x_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -2808,8 +2837,11 @@ static DRIVER_INIT( generic_xboard )
 
 static DRIVER_INIT( aburner2 )
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	xboard_generic_init(machine);
-	xboard_set_road_priority(0);
+
+	state->road_priority = 0;
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
 }
@@ -2817,18 +2849,23 @@ static DRIVER_INIT( aburner2 )
 
 static DRIVER_INIT( aburner )
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	xboard_generic_init(machine);
-	xboard_set_road_priority(0);
+
+	state->road_priority = 0;
 }
 
 
 static DRIVER_INIT( loffire )
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	xboard_generic_init(machine);
-	adc_reverse[1] = adc_reverse[3] = 1;
+	state->adc_reverse[1] = state->adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	loffire_sync = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	state->loffire_sync = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
 }
 
 
@@ -2841,8 +2878,10 @@ static DRIVER_INIT( smgp )
 
 static DRIVER_INIT( gprider )
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	xboard_generic_init(machine);
-	gprider_hack = 1;
+	state->gprider_hack = 1;
 }
 
 

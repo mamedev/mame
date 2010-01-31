@@ -73,7 +73,7 @@
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
 
-#include "megadriv.h"
+#include "includes/megadriv.h"
 
 #define XL1_CLOCK			640000
 #define XL2_CLOCK			53693175

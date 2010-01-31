@@ -5,19 +5,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "segaic16.h"
-#include "includes/system16.h"
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static bitmap_t *yboard_bitmap;
-
+#include "video/segaic16.h"
+#include "includes/segas16.h"
 
 
 /*************************************
@@ -28,11 +17,13 @@ static bitmap_t *yboard_bitmap;
 
 VIDEO_START( yboard )
 {
+	segas1x_state *state = (segas1x_state *)machine->driver_data;
+
 	/* compute palette info */
 	segaic16_palette_init(0x2000);
 
 	/* allocate a bitmap for the yboard layer */
-	yboard_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->tmp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 
 	/* initialize the sprites */
 	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_YBOARD_16B, 0x800, 0);
@@ -40,6 +31,8 @@ VIDEO_START( yboard )
 
 	/* initialize the rotation layer */
 	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
+
+	state_save_register_global_bitmap(machine, state->tmp_bitmap);
 }
 
 
@@ -52,6 +45,7 @@ VIDEO_START( yboard )
 
 VIDEO_UPDATE( yboard )
 {
+	segas1x_state *state = (segas1x_state *)screen->machine->driver_data;
 	rectangle yboard_clip;
 
 	/* if no drawing is happening, fill with black and get out */
@@ -64,10 +58,10 @@ VIDEO_UPDATE( yboard )
 	/* draw the yboard sprites */
 	yboard_clip.min_x = yboard_clip.min_y = 0;
 	yboard_clip.max_x = yboard_clip.max_y = 511;
-	segaic16_sprites_draw(screen, yboard_bitmap, &yboard_clip, 1);
+	segaic16_sprites_draw(screen, state->tmp_bitmap, &yboard_clip, 1);
 
 	/* apply rotation */
-	segaic16_rotate_draw(screen->machine, 0, bitmap, cliprect, yboard_bitmap);
+	segaic16_rotate_draw(screen->machine, 0, bitmap, cliprect, state->tmp_bitmap);
 
 	/* draw the 16B sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);

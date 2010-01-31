@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "megadriv.h"
+#include "includes/megadriv.h"
 
 ROM_START( ssf2ghw )
 	ROM_REGION( 0x1400000, "maincpu", 0 ) /* 68000 Code */

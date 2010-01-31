@@ -12,7 +12,7 @@ make more configurable (select caches per game?)
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
 #include "machine/fddebug.h"
-#include "includes/system16.h"
+#include "includes/segas16.h"
 
 
 #define CACHE_ENTRIES	8

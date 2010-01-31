@@ -40,6 +40,7 @@ READ16_HANDLER( segaic16_multiply_2_r );
 WRITE16_HANDLER( segaic16_multiply_0_w );
 WRITE16_HANDLER( segaic16_multiply_1_w );
 WRITE16_HANDLER( segaic16_multiply_2_w );
+void segaic16_multiply_chip_register_save(running_machine *machine, int which);
 
 /* divide chip */
 READ16_HANDLER( segaic16_divide_0_r );
@@ -48,12 +49,12 @@ READ16_HANDLER( segaic16_divide_2_r );
 WRITE16_HANDLER( segaic16_divide_0_w );
 WRITE16_HANDLER( segaic16_divide_1_w );
 WRITE16_HANDLER( segaic16_divide_2_w );
+void segaic16_divide_chip_register_save(running_machine *machine, int which);
 
 /* compare/timer chip */
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *));
+void segaic16_compare_timer_init(running_machine *machine, int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *));
 int segaic16_compare_timer_clock(int which);
 READ16_HANDLER( segaic16_compare_timer_0_r );
 READ16_HANDLER( segaic16_compare_timer_1_r );
 WRITE16_HANDLER( segaic16_compare_timer_0_w );
 WRITE16_HANDLER( segaic16_compare_timer_1_w );
-
