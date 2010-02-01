@@ -10668,7 +10668,6 @@ static void update_palette_color( running_device *device, UINT32 palette_base, i
 
 READ32_DEVICE_HANDLER( k037122_sram_r )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	return k037122->tile_ram[offset];
@@ -10676,7 +10675,6 @@ READ32_DEVICE_HANDLER( k037122_sram_r )
 
 WRITE32_DEVICE_HANDLER( k037122_sram_w )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	COMBINE_DATA(k037122->tile_ram + offset);
@@ -10716,7 +10714,6 @@ WRITE32_DEVICE_HANDLER( k037122_sram_w )
 
 READ32_DEVICE_HANDLER( k037122_char_r )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	int bank = k037122->reg[0x30 / 4] & 0x7;
 
@@ -10725,7 +10722,6 @@ READ32_DEVICE_HANDLER( k037122_char_r )
 
 WRITE32_DEVICE_HANDLER( k037122_char_w )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	int bank = k037122->reg[0x30 / 4] & 0x7;
 	UINT32 addr = offset + (bank * (0x40000/4));
@@ -10736,7 +10732,6 @@ WRITE32_DEVICE_HANDLER( k037122_char_w )
 
 READ32_DEVICE_HANDLER( k037122_reg_r )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	switch (offset)
@@ -10751,7 +10746,6 @@ READ32_DEVICE_HANDLER( k037122_reg_r )
 
 WRITE32_DEVICE_HANDLER( k037122_reg_w )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	COMBINE_DATA(k037122->reg + offset);
