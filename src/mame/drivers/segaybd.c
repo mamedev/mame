@@ -191,13 +191,6 @@ static MACHINE_START( yboard )
 	state->subx = devtag_get_device(machine, "subx");
 	state->suby = devtag_get_device(machine, "suby");
 
-	segaic16_multiply_chip_register_save(machine, 0);
-	segaic16_multiply_chip_register_save(machine, 1);
-	segaic16_multiply_chip_register_save(machine, 2);
-	segaic16_divide_chip_register_save(machine, 0);
-	segaic16_divide_chip_register_save(machine, 1);
-	segaic16_divide_chip_register_save(machine, 2);
-
 	state_save_register_global(machine, state->vblank_irq_state);
 	state_save_register_global(machine, state->timer_irq_state);
 	state_save_register_global(machine, state->irq2_scanline);
@@ -422,9 +415,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_READWRITE(segaic16_multiply_0_r, segaic16_multiply_0_w)
+	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("5248_main", segaic16_multiply_r, segaic16_multiply_w)
 	AM_RANGE(0x082000, 0x083fff) AM_WRITE(sound_data_w)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_READWRITE(segaic16_divide_0_r, segaic16_divide_0_w)
+	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("5249_main", segaic16_divide_r, segaic16_divide_w)
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x10001f) AM_READWRITE(io_chip_r, io_chip_w)
@@ -444,8 +437,8 @@ static ADDRESS_MAP_START( subx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_READWRITE(segaic16_multiply_1_r, segaic16_multiply_1_w)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_READWRITE(segaic16_divide_1_r, segaic16_divide_1_w)
+	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&segaic16_spriteram_1)
 	AM_RANGE(0x1f8000, 0x1fbfff) AM_RAM
@@ -457,8 +450,8 @@ static ADDRESS_MAP_START( suby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_READWRITE(segaic16_multiply_2_r, segaic16_multiply_2_w)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_READWRITE(segaic16_divide_2_r, segaic16_divide_2_w)
+	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("5248_suby", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("5249_suby", segaic16_divide_r, segaic16_divide_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_BASE(&segaic16_rotateram_0)
 	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_BASE(&segaic16_spriteram_0)
@@ -1014,6 +1007,13 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_TIMER_ADD("int_timer", scanline_callback)
+
+	MDRV_315_5248_ADD("5248_main")
+	MDRV_315_5248_ADD("5248_subx")
+	MDRV_315_5248_ADD("5248_suby")
+	MDRV_315_5249_ADD("5249_main")
+	MDRV_315_5249_ADD("5249_subx")
+	MDRV_315_5249_ADD("5249_suby")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

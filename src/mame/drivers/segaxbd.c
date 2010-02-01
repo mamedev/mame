@@ -280,11 +280,7 @@ static void xboard_generic_init(running_machine *machine)
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
 	state->subcpu = devtag_get_device(machine, "sub");
-
-	segaic16_multiply_chip_register_save(machine, 0);
-	segaic16_multiply_chip_register_save(machine, 1);
-	segaic16_divide_chip_register_save(machine, 0);
-	segaic16_divide_chip_register_save(machine, 1);
+	state->_315_5250_1 = devtag_get_device(machine, "5250_main");
 
 	state_save_register_global(machine, state->iochip_force_input);
 	state_save_register_global(machine, state->vblank_irq_state);
@@ -341,7 +337,7 @@ static TIMER_CALLBACK( scanline_callback )
 	int update = 0;
 
 	/* clock the timer and set the IRQ if something happened */
-	if ((scanline % 2) != 0 && segaic16_compare_timer_clock(0))
+	if ((scanline % 2) != 0 && segaic16_compare_timer_clock(state->_315_5250_1))
 		state->timer_irq_state = update = 1;
 
 	/* set VBLANK on scanline 223 */
@@ -443,10 +439,6 @@ static MACHINE_RESET( xboard )
 
 	/* hook the RESET line, which resets CPU #1 */
 	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), xboard_reset);
-
-	/* set up the compare/timer chip */
-	segaic16_compare_timer_init(machine, 0, sound_data_w, timer_ack_callback);
-	segaic16_compare_timer_init(machine, 1, NULL, NULL);
 
 	/* start timers to track interrupts */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), NULL, 1, scanline_callback);
@@ -756,9 +748,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share2") AM_BASE(&backupram2)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_READWRITE(segaic16_multiply_0_r, segaic16_multiply_0_w)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_divide_0_r, segaic16_divide_0_w)
-	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_compare_timer_0_r, segaic16_compare_timer_0_w)
+	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_main", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_main", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5250_main", segaic16_compare_timer_r, segaic16_compare_timer_w)
 	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x110000, 0x11ffff) AM_WRITE(segaic16_sprites_draw_0_w)
 	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
@@ -769,9 +761,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("sub", 0x00000)
 	AM_RANGE(0x280000, 0x283fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x2a0000, 0x2a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_READWRITE(segaic16_multiply_1_r, segaic16_multiply_1_w)
-	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_divide_1_r, segaic16_divide_1_w)
-	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_READWRITE(segaic16_compare_timer_1_r, segaic16_compare_timer_1_w)
+	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
 	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE(&segaic16_roadram_0)
 	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE(segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
@@ -793,9 +785,9 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_READWRITE(segaic16_multiply_1_r, segaic16_multiply_1_w)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_divide_1_r, segaic16_divide_1_w)
-	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_READWRITE(segaic16_compare_timer_1_r, segaic16_compare_timer_1_w)
+	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
 	AM_RANGE(0x0ec000, 0x0ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5")
 	AM_RANGE(0x0ee000, 0x0effff) AM_READWRITE(segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
@@ -1361,6 +1353,16 @@ GFXDECODE_END
  *
  *************************************/
 
+static const ic_315_5250_interface segaxb_5250_1_intf =
+{
+	sound_data_w, timer_ack_callback
+};
+
+static const ic_315_5250_interface segaxb_5250_2_intf =
+{
+	NULL, NULL
+};
+
 static MACHINE_DRIVER_START( xboard )
 
 	/* driver data */
@@ -1380,6 +1382,13 @@ static MACHINE_DRIVER_START( xboard )
 	MDRV_MACHINE_RESET(xboard)
 	MDRV_NVRAM_HANDLER(xboard)
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_315_5248_ADD("5248_main")
+	MDRV_315_5248_ADD("5248_subx")
+	MDRV_315_5249_ADD("5249_main")
+	MDRV_315_5249_ADD("5249_subx")
+	MDRV_315_5250_ADD("5250_main", segaxb_5250_1_intf)
+	MDRV_315_5250_ADD("5250_subx", segaxb_5250_2_intf)
 
 	/* video hardware */
 	MDRV_GFXDECODE(segaxbd)

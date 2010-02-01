@@ -1062,9 +1062,9 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
 	state->mcu = devtag_get_device(machine, "mcu");
-	state->ymsnd = devtag_get_device(machine, "ymsnd");
-
-	segaic16_multiply_chip_register_save(machine, 0);
+	state->_315_5248_1 = devtag_get_device(machine, "315_5248");
+	state->_315_5250_1 = devtag_get_device(machine, "315_5250_1");
+	state->_315_5250_2 = devtag_get_device(machine, "315_5250_2");
 
 	state_save_register_global(machine, state->disable_screen_blanking);
 	state_save_register_global(machine, state->mj_input_num);
@@ -1226,16 +1226,18 @@ static WRITE16_HANDLER( rom_5704_bank_w )
 
 static READ16_HANDLER( rom_5797_bank_math_r )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			return segaic16_multiply_0_r(space, offset & 3, mem_mask);
+			return segaic16_multiply_r(state->_315_5248_1, offset & 3, mem_mask);
 
 		case 0x1000/2:
 			/* compare registers */
-			return segaic16_compare_timer_0_r(space, offset & 7, mem_mask);
+			return segaic16_compare_timer_r(state->_315_5250_1, offset & 7, mem_mask);
 	}
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
@@ -1243,17 +1245,19 @@ static READ16_HANDLER( rom_5797_bank_math_r )
 
 static WRITE16_HANDLER( rom_5797_bank_math_w )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			segaic16_multiply_0_w(space, offset & 3, data, mem_mask);
+			segaic16_multiply_w(state->_315_5248_1, offset & 3, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			/* compare registers */
-			segaic16_compare_timer_0_w(space, offset & 7, data, mem_mask);
+			segaic16_compare_timer_w(state->_315_5250_1, offset & 7, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1266,15 +1270,19 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 
 static READ16_HANDLER( unknown_rgn2_r )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return segaic16_compare_timer_1_r(space, offset & 7, mem_mask);
+	return segaic16_compare_timer_r(state->_315_5250_2, offset & 7, mem_mask);
 }
 
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
+	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	segaic16_compare_timer_1_w(space, offset & 7, data, mem_mask);
+	segaic16_compare_timer_w(state->_315_5250_2, offset & 7, data, mem_mask);
 }
 
 
@@ -3324,6 +3332,29 @@ static MACHINE_DRIVER_START( system16b_8751 )
 	MDRV_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+MACHINE_DRIVER_END
+
+/* same as the above, but with custom Sega ICs */
+
+static const ic_315_5250_interface sys16b_5250_intf =
+{
+	NULL, NULL
+};
+
+static MACHINE_DRIVER_START( system16b_5248 )
+	MDRV_IMPORT_FROM(system16b)
+
+	MDRV_315_5248_ADD("315_5248")
+	MDRV_315_5250_ADD("315_5250_1", sys16b_5250_intf)
+	MDRV_315_5250_ADD("315_5250_2", sys16b_5250_intf)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( system16b_8751_5248 )
+	MDRV_IMPORT_FROM(system16b_8751)
+
+	MDRV_315_5248_ADD("315_5248")
+	MDRV_315_5250_ADD("315_5250_1", sys16b_5250_intf)
+	MDRV_315_5250_ADD("315_5250_2", sys16b_5250_intf)
 MACHINE_DRIVER_END
 
 
@@ -6494,25 +6525,25 @@ GAME( 1988, ddux1,      ddux,     system16b_8751, ddux,     ddux_5704,          
 
 GAME( 1986, dunkshot,   0,        timescan,       dunkshot, dunkshot_5358,      ROT0,   "Sega",           "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b,      eswat,    generic_5797,       ROT0,   "Sega",           "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b,      eswat,    generic_5797,       ROT0,   "Sega",           "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b,      eswat,    generic_5797,       ROT0,   "Sega",           "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
+GAME( 1989, eswat,      0,        system16b_5248, eswat,    generic_5797,       ROT0,   "Sega",           "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_5248, eswat,    generic_5797,       ROT0,   "Sega",           "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_5248, eswat,    generic_5797,       ROT0,   "Sega",           "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
 
 GAME( 1988, exctleag,   0,        system16b,      exctleag, exctleag_5358,      ROT0,   "Sega",           "Excite League (FD1094 317-0079)", 0 )
 
 GAME( 1989, fpoint,     0,        system16b,      fpoint,   generic_5358,       ROT0,   "Sega",           "Flash Point (set 2, Japan, FD1094 317-0127A)", 0 )
 GAME( 1989, fpoint1,    fpoint,   system16b,      fpoint,   generic_5704,       ROT0,   "Sega",           "Flash Point (set 1, Japan, FD1094 317-0127A)", 0 )
 
-GAME( 1989, goldnaxe,   0,        system16b_8751, goldnaxe, goldnaxe_5797,      ROT0,   "Sega",           "Golden Axe (set 6, US, 8751 317-123A)", 0 )
-GAME( 1989, goldnaxeu,  goldnaxe, system16b,      goldnaxe, generic_5797,       ROT0,   "Sega",           "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
+GAME( 1989, goldnaxe,   0,        system16b_8751_5248, goldnaxe, goldnaxe_5797, ROT0,   "Sega",           "Golden Axe (set 6, US, 8751 317-123A)", 0 )
+GAME( 1989, goldnaxeu,  goldnaxe, system16b_5248, goldnaxe, generic_5797,       ROT0,   "Sega",           "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
 GAME( 1989, goldnaxej,  goldnaxe, system16b,      goldnaxe, generic_5704,       ROT0,   "Sega",           "Golden Axe (set 4, Japan, FD1094 317-0121)", 0 )
 GAME( 1989, goldnaxe3,  goldnaxe, system16b,      goldnaxe, generic_5704,       ROT0,   "Sega",           "Golden Axe (set 3, World, FD1094 317-0120)" , 0) // set was labeled japan but doesn't seem to be
 GAME( 1989, goldnaxe2,  goldnaxe, system16b_8751, goldnaxe, goldnaxe_5704,      ROT0,   "Sega",           "Golden Axe (set 2, US, 8751 317-0112)", 0 )
-GAME( 1989, goldnaxe1,  goldnaxe, system16b,      goldnaxe, generic_5797,       ROT0,   "Sega",           "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
+GAME( 1989, goldnaxe1,  goldnaxe, system16b_5248, goldnaxe, generic_5797,       ROT0,   "Sega",           "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
 
 GAME( 1987, hwchamp,    0,        system16b,      hwchamp,  hwchamp_5521,       ROT0,   "Sega",           "Heavyweight Champ", 0 )
 
-GAME( 1989, mvp,        0,        system16b,      mvp,      generic_5797,       ROT0,   "Sega",           "MVP (set 2, US, FD1094 317-0143)", 0 )
+GAME( 1989, mvp,        0,        system16b_5248, mvp,      generic_5797,       ROT0,   "Sega",           "MVP (set 2, US, FD1094 317-0143)", 0 )
 GAME( 1989, mvpj,       mvp,      system16b,      mvp,      generic_5704,       ROT0,   "Sega",           "MVP (set 1, Japan, FD1094 317-0142)", 0 )
 
 GAME( 1988, passsht,    0,        system16b,      passsht,  generic_5358,       ROT270, "Sega",           "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
@@ -6543,7 +6574,7 @@ GAME( 1988, tetris1,    tetris,   system16b,      tetris,   generic_5358,       
 
 GAME( 1987, timescan,   0,        timescan,       timescan, generic_5358,       ROT270, "Sega",           "Time Scanner (set 2, System 16B)", 0 )
 
-GAME( 1994, toryumon,   0,        system16b,      toryumon, generic_5797,       ROT0,   "Sega",           "Toryumon", 0 )
+GAME( 1994, toryumon,   0,        system16b_5248, toryumon, generic_5797,       ROT0,   "Sega",           "Toryumon", 0 )
 
 GAME( 1989, tturf,      0,        system16b_8751, tturf,    tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", GAME_NO_SOUND /* due to missing ROM only */)
 GAME( 1989, tturfu,     tturf,    system16b_8751, tturf,    tturf_5358,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)

@@ -40,29 +40,6 @@ struct memory_mapper_chip
 };
 
 
-struct multiply_chip
-{
-	UINT16	regs[4];
-};
-
-
-struct divide_chip
-{
-	UINT16	regs[8];
-};
-
-
-struct compare_timer_chip
-{
-	UINT16	regs[16];
-	UINT16	counter;
-	UINT8	bit;
-	void	(*sound_w)(running_machine *, UINT8);
-	void	(*timer_ack)(running_machine *);
-};
-
-
-
 /*************************************
  *
  *  Statics
@@ -70,10 +47,6 @@ struct compare_timer_chip
  *************************************/
 
 static struct memory_mapper_chip memory_mapper;
-static struct multiply_chip multiply[3];
-static struct divide_chip divide[3];
-static struct compare_timer_chip compare_timer[2];
-
 
 
 /*************************************
@@ -83,7 +56,6 @@ static struct compare_timer_chip compare_timer[2];
  *************************************/
 
 static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt);
-
 
 
 /*************************************
@@ -423,295 +395,476 @@ WRITE16_HANDLER( segaic16_memory_mapper_lsb_w )
 
 /*************************************
  *
- *  Multiply chip
+ *  Multiply chip - 315-5248
  *
  *************************************/
 
-static UINT16 multiply_r(int which, offs_t offset, UINT16 mem_mask)
+typedef struct _ic_315_5248_state ic_315_5248_state ;
+struct _ic_315_5248_state
 {
+	UINT16	regs[4];
+};
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE ic_315_5248_state *_315_5248_get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == _315_5248);
+
+	return (ic_315_5248_state *)device->token;
+}
+
+/*****************************************************************************
+    IMPLEMENTATION
+*****************************************************************************/
+
+READ16_DEVICE_HANDLER ( segaic16_multiply_r )
+{
+	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
+
 	offset &= 3;
 	switch (offset)
 	{
-		case 0:	return multiply[which].regs[0];
-		case 1:	return multiply[which].regs[1];
-		case 2:	return ((INT16)multiply[which].regs[0] * (INT16)multiply[which].regs[1]) >> 16;
-		case 3:	return ((INT16)multiply[which].regs[0] * (INT16)multiply[which].regs[1]) & 0xffff;
+		case 0:	return ic_315_5248->regs[0];
+		case 1:	return ic_315_5248->regs[1];
+		case 2:	return ((INT16)ic_315_5248->regs[0] * (INT16)ic_315_5248->regs[1]) >> 16;
+		case 3:	return ((INT16)ic_315_5248->regs[0] * (INT16)ic_315_5248->regs[1]) & 0xffff;
 	}
 	return 0xffff;
 }
 
 
-static void multiply_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+WRITE16_DEVICE_HANDLER( segaic16_multiply_w )
 {
+	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
+
 	offset &= 3;
 	switch (offset)
 	{
-		case 0:	COMBINE_DATA(&multiply[which].regs[0]);	break;
-		case 1:	COMBINE_DATA(&multiply[which].regs[1]);	break;
-		case 2:	COMBINE_DATA(&multiply[which].regs[0]);	break;
-		case 3:	COMBINE_DATA(&multiply[which].regs[1]);	break;
+		case 0:	COMBINE_DATA(&ic_315_5248->regs[0]);	break;
+		case 1:	COMBINE_DATA(&ic_315_5248->regs[1]);	break;
+		case 2:	COMBINE_DATA(&ic_315_5248->regs[0]);	break;
+		case 3:	COMBINE_DATA(&ic_315_5248->regs[1]);	break;
 	}
 }
 
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
 
-READ16_HANDLER( segaic16_multiply_0_r )  { return multiply_r(0, offset, mem_mask); }
-READ16_HANDLER( segaic16_multiply_1_r )  { return multiply_r(1, offset, mem_mask); }
-READ16_HANDLER( segaic16_multiply_2_r )  { return multiply_r(2, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_multiply_0_w ) { multiply_w(0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_multiply_1_w ) { multiply_w(1, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_multiply_2_w ) { multiply_w(2, offset, data, mem_mask); }
-
-void segaic16_multiply_chip_register_save( running_machine *machine, int which )
+static DEVICE_START( ic_315_5248 )
 {
-	state_save_register_item_array(machine, "segaic16_multiply", NULL, which, multiply[which].regs);
+	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
+
+	state_save_register_device_item_array(device, 0, ic_315_5248->regs);
+}
+
+static DEVICE_RESET( ic_315_5248 )
+{
+	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
+	int i;
+
+	for (i = 0; i < 4; i++)
+		ic_315_5248->regs[i] = 0;
 }
 
 /*************************************
  *
- *  Divide chip
+ *  Divide chip - 315-5249
  *
  *************************************/
 
-static void update_divide(int which, int mode)
+typedef struct _ic_315_5249_state ic_315_5249_state ;
+struct _ic_315_5249_state
 {
+	UINT16	regs[8];
+};
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE ic_315_5249_state *_315_5249_get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == _315_5249);
+
+	return (ic_315_5249_state *)device->token;
+}
+
+/*****************************************************************************
+    IMPLEMENTATION
+*****************************************************************************/
+
+static void update_divide( running_device *device, int mode )
+{
+	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
+
 	/* clear the flags by default */
-	divide[which].regs[6] = 0;
+	ic_315_5249->regs[6] = 0;
 
 	/* if mode 0, store quotient/remainder */
 	if (mode == 0)
 	{
-		INT32 dividend = (INT32)((divide[which].regs[0] << 16) | divide[which].regs[1]);
-		INT32 divisor = (INT16)divide[which].regs[2];
+		INT32 dividend = (INT32)((ic_315_5249->regs[0] << 16) | ic_315_5249->regs[1]);
+		INT32 divisor = (INT16)ic_315_5249->regs[2];
 		INT32 quotient, remainder;
 
 		/* perform signed divide */
 		if (divisor == 0)
 		{
 			quotient = dividend;//((INT32)(dividend ^ divisor) < 0) ? 0x8000 : 0x7fff;
-			divide[which].regs[6] |= 0x4000;
+			ic_315_5249->regs[6] |= 0x4000;
 		}
 		else
 			quotient = dividend / divisor;
+
 		remainder = dividend - quotient * divisor;
 
 		/* clamp to 16-bit signed */
 		if (quotient < -32768)
 		{
 			quotient = -32768;
-			divide[which].regs[6] |= 0x8000;
+			ic_315_5249->regs[6] |= 0x8000;
 		}
 		else if (quotient > 32767)
 		{
 			quotient = 32767;
-			divide[which].regs[6] |= 0x8000;
+			ic_315_5249->regs[6] |= 0x8000;
 		}
 
 		/* store quotient and remainder */
-		divide[which].regs[4] = quotient;
-		divide[which].regs[5] = remainder;
+		ic_315_5249->regs[4] = quotient;
+		ic_315_5249->regs[5] = remainder;
 	}
 
 	/* if mode 1, store 32-bit quotient */
 	else
 	{
-		UINT32 dividend = (UINT32)((divide[which].regs[0] << 16) | divide[which].regs[1]);
-		UINT32 divisor = (UINT16)divide[which].regs[2];
+		UINT32 dividend = (UINT32)((ic_315_5249->regs[0] << 16) | ic_315_5249->regs[1]);
+		UINT32 divisor = (UINT16)ic_315_5249->regs[2];
 		UINT32 quotient;
 
 		/* perform unsigned divide */
 		if (divisor == 0)
 		{
 			quotient = dividend;//0x7fffffff;
-			divide[which].regs[6] |= 0x4000;
+			ic_315_5249->regs[6] |= 0x4000;
 		}
 		else
 			quotient = dividend / divisor;
 
 		/* store 32-bit quotient */
-		divide[which].regs[4] = quotient >> 16;
-		divide[which].regs[5] = quotient & 0xffff;
+		ic_315_5249->regs[4] = quotient >> 16;
+		ic_315_5249->regs[5] = quotient & 0xffff;
 	}
 }
 
-static UINT16 divide_r(int which, offs_t offset, UINT16 mem_mask)
+READ16_DEVICE_HANDLER ( segaic16_divide_r )
 {
+	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
+
 	/* 8 effective read registers */
 	offset &= 7;
 	switch (offset)
 	{
-		case 0:	return divide[which].regs[0];	/* dividend high */
-		case 1:	return divide[which].regs[1];	/* dividend low */
-		case 2:	return divide[which].regs[2];	/* divisor */
-		case 4: return divide[which].regs[4];	/* quotient (mode 0) or quotient high (mode 1) */
-		case 5:	return divide[which].regs[5];	/* remainder (mode 0) or quotient low (mode 1) */
-		case 6: return divide[which].regs[6];	/* flags */
+		case 0:	return ic_315_5249->regs[0];	/* dividend high */
+		case 1:	return ic_315_5249->regs[1];	/* dividend low */
+		case 2:	return ic_315_5249->regs[2];	/* divisor */
+		case 4: 	return ic_315_5249->regs[4];	/* quotient (mode 0) or quotient high (mode 1) */
+		case 5:	return ic_315_5249->regs[5];	/* remainder (mode 0) or quotient low (mode 1) */
+		case 6: 	return ic_315_5249->regs[6];	/* flags */
 	}
+
 	return 0xffff;
 }
 
 
-static void divide_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+WRITE16_DEVICE_HANDLER( segaic16_divide_w )
 {
+	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
 	int a4 = offset & 8;
 	int a3 = offset & 4;
 
-	if (LOG_DIVIDE) logerror("%s:divide%d_w(%X) = %04X\n", cpuexec_describe_context(space->machine), which, offset, data);
+	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
 
 	/* only 4 effective write registers */
 	offset &= 3;
 	switch (offset)
 	{
-		case 0:	COMBINE_DATA(&divide[which].regs[0]); break;	/* dividend high */
-		case 1:	COMBINE_DATA(&divide[which].regs[1]); break;	/* dividend low */
-		case 2:	COMBINE_DATA(&divide[which].regs[2]); break;	/* divisor/trigger */
+		case 0:	COMBINE_DATA(&ic_315_5249->regs[0]); break;	/* dividend high */
+		case 1:	COMBINE_DATA(&ic_315_5249->regs[1]); break;	/* dividend low */
+		case 2:	COMBINE_DATA(&ic_315_5249->regs[2]); break;	/* divisor/trigger */
 		case 3:	break;
 	}
 
 	/* if a4 line is high, divide, using a3 as the mode */
-	if (a4) update_divide(which, a3);
+	if (a4) update_divide(device, a3);
 }
 
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
 
-READ16_HANDLER( segaic16_divide_0_r )  { return divide_r(0, offset, mem_mask); }
-READ16_HANDLER( segaic16_divide_1_r )  { return divide_r(1, offset, mem_mask); }
-READ16_HANDLER( segaic16_divide_2_r )  { return divide_r(2, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(space, 0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(space, 1, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(space, 2, offset, data, mem_mask); }
-
-void segaic16_divide_chip_register_save( running_machine *machine, int which )
+static DEVICE_START( ic_315_5249 )
 {
-	state_save_register_item_array(machine, "segaic16_divide", NULL, which, divide[which].regs);
+	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
+
+	state_save_register_device_item_array(device, 0, ic_315_5249->regs);
 }
 
+static DEVICE_RESET( ic_315_5249 )
+{
+	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
+	int i;
+
+	for (i = 0; i < 8; i++)
+		ic_315_5249->regs[i] = 0;
+}
 
 /*************************************
  *
- *  Compare/timer chip
+ *  Compare/timer chip - 315-5250
  *
  *************************************/
 
-static void segaic16_compare_timer_chip_register_save( running_machine *machine, int which )
+typedef struct _ic_315_5250_state ic_315_5250_state ;
+struct _ic_315_5250_state
 {
-	state_save_register_item_array(machine, "segaic16_compare", NULL, which, compare_timer[which].regs);
-	state_save_register_item(machine, "segaic16_compare", NULL, which, compare_timer[which].counter);
-	state_save_register_item(machine, "segaic16_compare", NULL, which, compare_timer[which].bit);
+	UINT16	regs[16];
+	UINT16	counter;
+	UINT8	      bit;
+	_315_5250_sound_callback       sound_w;
+	_315_5250_timer_ack_callback   timer_ack;
+};
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE ic_315_5250_state *_315_5250_get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == _315_5250);
+
+	return (ic_315_5250_state *)device->token;
 }
 
-void segaic16_compare_timer_init( running_machine *machine, int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *))
+INLINE const ic_315_5250_interface *_315_5250_get_interface( running_device *device )
 {
-	memset(&compare_timer[which], 0, sizeof(compare_timer[which]));
-	compare_timer[which].sound_w = sound_write_callback;
-	compare_timer[which].timer_ack = timer_ack_callback;
-
-	segaic16_compare_timer_chip_register_save(machine, which);
+	assert(device != NULL);	
+	assert((device->type == _315_5250));
+	return (const ic_315_5250_interface *) device->baseconfig().static_config;
 }
 
+/*****************************************************************************
+    IMPLEMENTATION
+*****************************************************************************/
 
-int segaic16_compare_timer_clock(int which)
+int segaic16_compare_timer_clock( running_device *device )
 {
-	int old_counter = compare_timer[which].counter;
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+	int old_counter = ic_315_5250->counter;
 	int result = 0;
 
 	/* if we're enabled, clock the upcounter */
-	if (compare_timer[which].regs[10] & 1)
-		compare_timer[which].counter++;
+	if (ic_315_5250->regs[10] & 1)
+		ic_315_5250->counter++;
 
 	/* regardless of the enable, a value of 0xfff will generate the IRQ */
 	if (old_counter == 0xfff)
 	{
 		result = 1;
-		compare_timer[which].counter = compare_timer[which].regs[8] & 0xfff;
+		ic_315_5250->counter = ic_315_5250->regs[8] & 0xfff;
 	}
 	return result;
 }
 
 
-static void update_compare(int which, int update_history)
+static void update_compare( running_device *device, int update_history )
 {
-	int bound1 = (INT16)compare_timer[which].regs[0];
-	int bound2 = (INT16)compare_timer[which].regs[1];
-	int value = (INT16)compare_timer[which].regs[2];
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+	int bound1 = (INT16)ic_315_5250->regs[0];
+	int bound2 = (INT16)ic_315_5250->regs[1];
+	int value = (INT16)ic_315_5250->regs[2];
 	int min = (bound1 < bound2) ? bound1 : bound2;
 	int max = (bound1 > bound2) ? bound1 : bound2;
 
 	if (value < min)
 	{
-		compare_timer[which].regs[7] = min;
-		compare_timer[which].regs[3] = 0x8000;
+		ic_315_5250->regs[7] = min;
+		ic_315_5250->regs[3] = 0x8000;
 	}
 	else if (value > max)
 	{
-		compare_timer[which].regs[7] = max;
-		compare_timer[which].regs[3] = 0x4000;
+		ic_315_5250->regs[7] = max;
+		ic_315_5250->regs[3] = 0x4000;
 	}
 	else
 	{
-		compare_timer[which].regs[7] = value;
-		compare_timer[which].regs[3] = 0x0000;
+		ic_315_5250->regs[7] = value;
+		ic_315_5250->regs[3] = 0x0000;
 	}
 
 	if (update_history)
-		compare_timer[which].regs[4] |= (compare_timer[which].regs[3] == 0) << compare_timer[which].bit++;
+		ic_315_5250->regs[4] |= (ic_315_5250->regs[3] == 0) << ic_315_5250->bit++;
 }
 
 
-static void timer_interrupt_ack(running_machine *machine, int which)
+static void timer_interrupt_ack( running_device *device )
 {
-	if (compare_timer[which].timer_ack)
-		(*compare_timer[which].timer_ack)(machine);
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+
+	if (ic_315_5250->timer_ack)
+		(*ic_315_5250->timer_ack)(device->machine);
 }
 
 
-static UINT16 compare_timer_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
+READ16_DEVICE_HANDLER ( segaic16_compare_timer_r )
 {
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%s:compare%d_r(%X) = %04X\n", cpuexec_describe_context(space->machine), which, offset, compare_timer[which].regs[offset]);
+	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, ic_315_5250->regs[offset]);
 	switch (offset)
 	{
-		case 0x0:	return compare_timer[which].regs[0];
-		case 0x1:	return compare_timer[which].regs[1];
-		case 0x2:	return compare_timer[which].regs[2];
-		case 0x3:	return compare_timer[which].regs[3];
-		case 0x4:	return compare_timer[which].regs[4];
-		case 0x5:	return compare_timer[which].regs[1];
-		case 0x6:	return compare_timer[which].regs[2];
-		case 0x7:	return compare_timer[which].regs[7];
+		case 0x0:	return ic_315_5250->regs[0];
+		case 0x1:	return ic_315_5250->regs[1];
+		case 0x2:	return ic_315_5250->regs[2];
+		case 0x3:	return ic_315_5250->regs[3];
+		case 0x4:	return ic_315_5250->regs[4];
+		case 0x5:	return ic_315_5250->regs[1];
+		case 0x6:	return ic_315_5250->regs[2];
+		case 0x7:	return ic_315_5250->regs[7];
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(space->machine, which); break;
+		case 0xd:	timer_interrupt_ack(device); break;
 	}
 	return 0xffff;
 }
 
 
-static void compare_timer_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+WRITE16_DEVICE_HANDLER ( segaic16_compare_timer_w )
 {
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%s:compare%d_w(%X) = %04X\n", cpuexec_describe_context(space->machine), which, offset, data);
+	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
 	switch (offset)
 	{
-		case 0x0:	COMBINE_DATA(&compare_timer[which].regs[0]); update_compare(which, 0); break;
-		case 0x1:	COMBINE_DATA(&compare_timer[which].regs[1]); update_compare(which, 0); break;
-		case 0x2:	COMBINE_DATA(&compare_timer[which].regs[2]); update_compare(which, 1); break;
-		case 0x4:	compare_timer[which].regs[4] = 0; compare_timer[which].bit = 0; break;
-		case 0x6:	COMBINE_DATA(&compare_timer[which].regs[2]); update_compare(which, 0); break;
+		case 0x0:	COMBINE_DATA(&ic_315_5250->regs[0]); update_compare(device, 0); break;
+		case 0x1:	COMBINE_DATA(&ic_315_5250->regs[1]); update_compare(device, 0); break;
+		case 0x2:	COMBINE_DATA(&ic_315_5250->regs[2]); update_compare(device, 1); break;
+		case 0x4:	ic_315_5250->regs[4] = 0; ic_315_5250->bit = 0; break;
+		case 0x6:	COMBINE_DATA(&ic_315_5250->regs[2]); update_compare(device, 0); break;
 		case 0x8:
-		case 0xc:	COMBINE_DATA(&compare_timer[which].regs[8]); break;
+		case 0xc:	COMBINE_DATA(&ic_315_5250->regs[8]); break;
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(space->machine, which); break;
+		case 0xd:	timer_interrupt_ack(device); break;
 		case 0xa:
-		case 0xe:	COMBINE_DATA(&compare_timer[which].regs[10]); break;
+		case 0xe:	COMBINE_DATA(&ic_315_5250->regs[10]); break;
 		case 0xb:
 		case 0xf:
-			COMBINE_DATA(&compare_timer[which].regs[11]);
-			if (compare_timer[which].sound_w)
-				(*compare_timer[which].sound_w)(space->machine, compare_timer[which].regs[11]);
+			COMBINE_DATA(&ic_315_5250->regs[11]);
+			if (ic_315_5250->sound_w)
+				(*ic_315_5250->sound_w)(device->machine, ic_315_5250->regs[11]);
 			break;
 	}
 }
 
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
 
-READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(space, 0, offset, mem_mask); }
-READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(space, 1, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(space, 0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(space, 1, offset, data, mem_mask); }
+static DEVICE_START( ic_315_5250 )
+{
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+	const ic_315_5250_interface *intf = _315_5250_get_interface(device);
+
+	ic_315_5250->sound_w = intf->sound_write_callback;
+	ic_315_5250->timer_ack = intf->timer_ack_callback;
+
+	state_save_register_device_item(device, 0, ic_315_5250->counter);
+	state_save_register_device_item(device, 0, ic_315_5250->bit);
+	state_save_register_device_item_array(device, 0, ic_315_5250->regs);
+}
+
+static DEVICE_RESET( ic_315_5250 )
+{
+	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+
+	memset(&ic_315_5250, 0, sizeof(ic_315_5250));
+}
+
+
+
+DEVICE_GET_INFO( ic_315_5248 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5248_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5248);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ic_315_5248);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega 315-5248");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega Custom IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+DEVICE_GET_INFO( ic_315_5249 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5249_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5249);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ic_315_5249);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega 315-5249");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega Custom IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+DEVICE_GET_INFO( ic_315_5250 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5250_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5250);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ic_315_5250);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega 315-5250");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega Custom IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}

@@ -89,6 +89,9 @@ struct _segas1x_state
 	running_device *ppi8255_1;
 	running_device *ppi8255_2;
 	running_device *interrupt_timer;
+	running_device *_315_5248_1;
+	running_device *_315_5250_1;
+	running_device *_315_5250_2;
 };
 
 

@@ -33,28 +33,67 @@ WRITE8_HANDLER( segaic16_memory_mapper_w );
 READ16_HANDLER( segaic16_memory_mapper_lsb_r );
 WRITE16_HANDLER( segaic16_memory_mapper_lsb_w );
 
+/*** Sega 16-bit Devices ***/
+
+#include "devcb.h"
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef void (*_315_5250_sound_callback)(running_machine *, UINT8);
+typedef void (*_315_5250_timer_ack_callback)(running_machine *);
+
+typedef struct _ic_315_5250_interface ic_315_5250_interface;
+struct _ic_315_5250_interface
+{
+	_315_5250_sound_callback          sound_write_callback;
+	_315_5250_timer_ack_callback      timer_ack_callback;
+};
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO( ic_315_5248 );
+DEVICE_GET_INFO( ic_315_5249 );
+DEVICE_GET_INFO( ic_315_5250 );
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define _315_5248 DEVICE_GET_INFO_NAME( ic_315_5248 )
+
+#define MDRV_315_5248_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, _315_5248, 0)
+
+#define _315_5249 DEVICE_GET_INFO_NAME( ic_315_5249 )
+
+#define MDRV_315_5249_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, _315_5249, 0)
+
+#define _315_5250 DEVICE_GET_INFO_NAME( ic_315_5250 )
+
+#define MDRV_315_5250_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, _315_5250, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
+/***************************************************************************
+    DEVICE I/O FUNCTIONS
+***************************************************************************/
+
 /* multiply chip */
-READ16_HANDLER( segaic16_multiply_0_r );
-READ16_HANDLER( segaic16_multiply_1_r );
-READ16_HANDLER( segaic16_multiply_2_r );
-WRITE16_HANDLER( segaic16_multiply_0_w );
-WRITE16_HANDLER( segaic16_multiply_1_w );
-WRITE16_HANDLER( segaic16_multiply_2_w );
-void segaic16_multiply_chip_register_save(running_machine *machine, int which);
+READ16_DEVICE_HANDLER( segaic16_multiply_r );
+WRITE16_DEVICE_HANDLER( segaic16_multiply_w );
 
 /* divide chip */
-READ16_HANDLER( segaic16_divide_0_r );
-READ16_HANDLER( segaic16_divide_1_r );
-READ16_HANDLER( segaic16_divide_2_r );
-WRITE16_HANDLER( segaic16_divide_0_w );
-WRITE16_HANDLER( segaic16_divide_1_w );
-WRITE16_HANDLER( segaic16_divide_2_w );
-void segaic16_divide_chip_register_save(running_machine *machine, int which);
+READ16_DEVICE_HANDLER( segaic16_divide_r );
+WRITE16_DEVICE_HANDLER( segaic16_divide_w );
 
 /* compare/timer chip */
-void segaic16_compare_timer_init(running_machine *machine, int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *));
-int segaic16_compare_timer_clock(int which);
-READ16_HANDLER( segaic16_compare_timer_0_r );
-READ16_HANDLER( segaic16_compare_timer_1_r );
-WRITE16_HANDLER( segaic16_compare_timer_0_w );
-WRITE16_HANDLER( segaic16_compare_timer_1_w );
+int segaic16_compare_timer_clock( running_device *device );
+READ16_DEVICE_HANDLER( segaic16_compare_timer_r );
+WRITE16_DEVICE_HANDLER( segaic16_compare_timer_w );
