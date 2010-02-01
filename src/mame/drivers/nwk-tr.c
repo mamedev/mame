@@ -216,13 +216,14 @@ Thrill Drive 713A13  -       713A14  -
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
-#include "machine/konppc.h"
 #include "machine/adc1213x.h"
-#include "sound/rf5c400.h"
-#include "video/voodoo.h"
-#include "machine/timekpr.h"
-#include "sound/k056800.h"
 #include "machine/k033906.h"
+#include "machine/konppc.h"
+#include "machine/timekpr.h"
+#include "sound/rf5c400.h"
+#include "sound/k056800.h"
+#include "video/voodoo.h"
+#include "video/konicdev.h"
 
 static UINT8 led_reg0, led_reg1;
 
@@ -236,438 +237,22 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-
-
-/* K001604 Tilemap chip (move to konamiic.c ?) */
-
-#define MAX_K001604_CHIPS	2
-
-static UINT32 *K001604_tile_ram[MAX_K001604_CHIPS];
-static UINT32 *K001604_char_ram[MAX_K001604_CHIPS];
-static int K001604_gfx_index[MAX_K001604_CHIPS][2];
-static tilemap_t *K001604_layer_8x8[MAX_K001604_CHIPS][2];
-static int K001604_tilemap_offset;
-static tilemap_t *K001604_layer_roz[MAX_K001604_CHIPS][2];
-static int K001604_roz_size[MAX_K001604_CHIPS];
-
-static UINT32 *K001604_reg[MAX_K001604_CHIPS];
-
-static int K001604_layer_size;
-
-#define K001604_NUM_TILES_LAYER0		16384
-#define K001604_NUM_TILES_LAYER1		4096
-
-static const gfx_layout K001604_char_layout_layer_8x8 =
-{
-	8, 8,
-	K001604_NUM_TILES_LAYER0,
-	8,
-	{ 8,9,10,11,12,13,14,15 },
-	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
-	8*128
-};
-
-static const gfx_layout K001604_char_layout_layer_16x16 =
-{
-	16, 16,
-	K001604_NUM_TILES_LAYER1,
-	8,
-	{ 8,9,10,11,12,13,14,15 },
-	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16, 9*16, 8*16, 11*16, 10*16, 13*16, 12*16, 15*16, 14*16 },
-	{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256, 8*256, 9*256, 10*256, 11*256, 12*256, 13*256, 14*256, 15*256 },
-	16*256
-};
-
-
-static TILEMAP_MAPPER( K001604_scan_layer_8x8_0 )
-{
-	/* logical (col,row) -> memory offset */
-	int width = K001604_layer_size ? 256 : 128;
-	return K001604_tilemap_offset + (row * width) + col;
-}
-
-static TILEMAP_MAPPER( K001604_scan_layer_8x8_1 )
-{
-	/* logical (col,row) -> memory offset */
-	int width = K001604_layer_size ? 256 : 128;
-	return K001604_tilemap_offset + (row * width) + col + 64;
-}
-
-static TILEMAP_MAPPER( K001604_scan_layer_roz_0 )
-{
-	/* logical (col,row) -> memory offset */
-	int width = K001604_layer_size ? 256 : 128;
-	return (row * width) + col + (K001604_layer_size ? 128 : 0);
-}
-
-static TILEMAP_MAPPER( K001604_scan_layer_roz_1 )
-{
-	/* logical (col,row) -> memory offset */
-	int width = K001604_layer_size ? 256 : 128;
-	return (row * width) + col + (K001604_layer_size ? 192 : 64);
-}
-
-static TILE_GET_INFO( K001604_0_tile_info_layer_8x8 )
-{
-	UINT32 val = K001604_tile_ram[0][tile_index];
-	int color = (val >> 17) & 0x1f;
-	int tile = (val & 0x7fff);
-	int flags = 0;
-
-	if (val & 0x400000)
-		flags |= TILE_FLIPX;
-	if (val & 0x800000)
-		flags |= TILE_FLIPY;
-
-	SET_TILE_INFO(K001604_gfx_index[0][0], tile, color, flags);
-}
-
-static TILE_GET_INFO( K001604_0_tile_info_layer_roz )
-{
-	UINT32 val = K001604_tile_ram[0][tile_index];
-	int flags = 0;
-	int color = (val >> 17) & 0x1f;
-	int tile = val & 0x7ff;
-
-	if (val & 0x400000)
-		flags |= TILE_FLIPX;
-	if (val & 0x800000)
-		flags |= TILE_FLIPY;
-
-	tile += K001604_roz_size[0] ? 0x800 : 0x2000;
-
-	SET_TILE_INFO(K001604_gfx_index[0][K001604_roz_size[0]], tile, color, flags);
-}
-
-static TILE_GET_INFO( K001604_1_tile_info_layer_8x8 )
-{
-	UINT32 val = K001604_tile_ram[1][tile_index];
-	int color = (val >> 17) & 0x1f;
-	int tile = (val & 0x7fff);
-	int flags = 0;
-
-	if (val & 0x400000)
-		flags |= TILE_FLIPX;
-	if (val & 0x800000)
-		flags |= TILE_FLIPY;
-
-	SET_TILE_INFO(K001604_gfx_index[1][0], tile, color, flags);
-}
-
-static TILE_GET_INFO( K001604_1_tile_info_layer_roz )
-{
-	UINT32 val = K001604_tile_ram[1][tile_index];
-	int flags = 0;
-	int color = (val >> 17) & 0x1f;
-	int tile = (val & 0x7ff);
-
-	if (val & 0x400000)
-		flags |= TILE_FLIPX;
-	if (val & 0x800000)
-		flags |= TILE_FLIPY;
-
-	tile += K001604_roz_size[1] ? 0x800 : 0x2000;
-
-	SET_TILE_INFO(K001604_gfx_index[1][K001604_roz_size[1]], tile, color, flags);
-}
-
-int K001604_vh_start(running_machine *machine, int chip)
-{
-	const char *gamename = machine->gamedrv->name;
-
-	/* HACK !!! To be removed */
-	if (mame_stricmp(gamename, "racingj") == 0 || mame_stricmp(gamename, "racingj2") == 0
-		|| mame_stricmp(gamename, "hangplt") == 0 || mame_stricmp(gamename, "slrasslt") == 0
-		|| mame_stricmp(gamename, "jetwave") == 0)
-	{
-		K001604_layer_size = 0;		// width = 128 tiles
-	}
-	else
-	{
-		K001604_layer_size = 1;		// width = 256 tiles
-	}
-
-	/* HACK !!! To be removed */
-	if (mame_stricmp(gamename, "slrasslt") == 0)
-	{
-		K001604_tilemap_offset = 16384;
-
-		K001604_roz_size[chip] = 0;		// 8x8
-	}
-	else
-	{
-		K001604_tilemap_offset = 0;
-
-		K001604_roz_size[chip] = 1;		// 16x16
-	}
-
-	for (K001604_gfx_index[chip][0] = 0; K001604_gfx_index[chip][0] < MAX_GFX_ELEMENTS; K001604_gfx_index[chip][0]++)
-		if (machine->gfx[K001604_gfx_index[chip][0]] == 0)
-			break;
-	if (K001604_gfx_index[chip][0] == MAX_GFX_ELEMENTS)
-	{
-		return 1;
-	}
-
-	for (K001604_gfx_index[chip][1] = K001604_gfx_index[chip][0] + 1; K001604_gfx_index[chip][1] < MAX_GFX_ELEMENTS; K001604_gfx_index[chip][1]++)
-		if (machine->gfx[K001604_gfx_index[chip][1]] == 0)
-			break;
-	if (K001604_gfx_index[chip][1] == MAX_GFX_ELEMENTS)
-	{
-		return 1;
-	}
-
-	K001604_char_ram[chip] = auto_alloc_array(machine, UINT32, 0x200000/4);
-
-	K001604_tile_ram[chip] = auto_alloc_array(machine, UINT32, 0x20000/4);
-
-	K001604_reg[chip] = auto_alloc_array(machine, UINT32, 0x400/4);
-
-	if (chip == 0)
-	{
-		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
-		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(machine, K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(machine, K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
-
-		K001604_layer_roz[chip][0] = tilemap_create(machine, K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(machine, K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
-	}
-	else
-	{
-		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
-		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(machine, K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(machine, K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
-
-		K001604_layer_roz[chip][0] = tilemap_create(machine, K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(machine, K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
-	}
-
-	tilemap_set_transparent_pen(K001604_layer_8x8[chip][0], 0);
-	tilemap_set_transparent_pen(K001604_layer_8x8[chip][1], 0);
-
-	memset(K001604_char_ram[chip], 0, 0x200000);
-	memset(K001604_tile_ram[chip], 0, 0x10000);
-	memset(K001604_reg[chip], 0, 0x400);
-
-
-	machine->gfx[K001604_gfx_index[chip][0]] = gfx_element_alloc(machine, &K001604_char_layout_layer_8x8, (UINT8*)&K001604_char_ram[chip][0], machine->config->total_colors / 16, 0);
-	machine->gfx[K001604_gfx_index[chip][1]] = gfx_element_alloc(machine, &K001604_char_layout_layer_16x16, (UINT8*)&K001604_char_ram[chip][0], machine->config->total_colors / 16, 0);
-
-	return 0;
-}
-
-void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int layer;
-	int num_layers;
-	bitmap_fill(bitmap, cliprect, 0);
-
-	num_layers = K001604_layer_size ? 2 : 1;
-
-	for (layer=0; layer < num_layers; layer++)
-	{
-		int reg = 0x08;
-
-		INT32 x  = (INT16)((K001604_reg[chip][reg+0] >> 16) & 0xffff);
-		INT32 y  = (INT16)((K001604_reg[chip][reg+0] >>  0) & 0xffff);
-		INT32 xx = (INT16)((K001604_reg[chip][reg+1] >>  0) & 0xffff);
-		INT32 xy = (INT16)((K001604_reg[chip][reg+1] >> 16) & 0xffff);
-		INT32 yx = (INT16)((K001604_reg[chip][reg+2] >>  0) & 0xffff);
-		INT32 yy = (INT16)((K001604_reg[chip][reg+2] >> 16) & 0xffff);
-
-		x  = (x + 320) * 256;
-		y  = (y + 208) * 256;
-		xx = (xx);
-		xy = (-xy);
-		yx = (-yx);
-		yy = (yy);
-
-		if ((K001604_reg[chip][0x6c/4] & (0x08 >> layer)) != 0)
-		{
-			tilemap_draw_roz(bitmap, cliprect, K001604_layer_roz[chip][layer],
-							 x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);
-		}
-	}
-}
-
-void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	//tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][1], 0,0);
-	tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][0], 0,0);
-}
-
-READ32_HANDLER(K001604_tile_r)
-{
-	int chip = get_cgboard_id();
-
-	return K001604_tile_ram[chip][offset];
-}
-
-READ32_HANDLER(K001604_char_r)
-{
-	int chip = get_cgboard_id();
-
-	int set, bank;
-	UINT32 addr;
-
-	set = (K001604_reg[chip][0x60/4] & 0x1000000) ? 0x100000 : 0;
-
-	if (set)
-	{
-		bank = (K001604_reg[chip][0x60/4] >> 8) & 0x3;
-	}
-	else
-	{
-		bank = (K001604_reg[chip][0x60/4] & 0x3);
-	}
-
-	addr = offset + ((set + (bank * 0x40000)) / 4);
-
-	return K001604_char_ram[chip][addr];
-}
-
-WRITE32_HANDLER(K001604_tile_w)
-{
-	int chip = get_cgboard_id();
-
-	int x, y;
-	COMBINE_DATA(K001604_tile_ram[chip] + offset);
-
-	if (K001604_layer_size)
-	{
-		x = offset & 0xff;
-		y = offset / 256;
-	}
-	else
-	{
-		x = offset & 0x7f;
-		y = offset / 128;
-	}
-
-	if (K001604_layer_size)
-	{
-		if (x < 64)
-		{
-			tilemap_mark_tile_dirty(K001604_layer_8x8[chip][0], offset);
-		}
-		else if (x < 128)
-		{
-			tilemap_mark_tile_dirty(K001604_layer_8x8[chip][1], offset);
-		}
-		else if (x < 192)
-		{
-			tilemap_mark_tile_dirty(K001604_layer_roz[chip][0], offset);
-		}
-		else
-		{
-			tilemap_mark_tile_dirty(K001604_layer_roz[chip][1], offset);
-		}
-	}
-	else
-	{
-		if (x < 64)
-		{
-			tilemap_mark_tile_dirty(K001604_layer_8x8[chip][0], offset);
-
-			tilemap_mark_tile_dirty(K001604_layer_roz[chip][0], offset);
-		}
-		else
-		{
-			tilemap_mark_tile_dirty(K001604_layer_8x8[chip][1], offset);
-
-			tilemap_mark_tile_dirty(K001604_layer_roz[chip][1], offset);
-		}
-	}
-}
-
-WRITE32_HANDLER(K001604_char_w)
-{
-	int chip = get_cgboard_id();
-
-	int set, bank;
-	UINT32 addr;
-
-	set = (K001604_reg[chip][0x60/4] & 0x1000000) ? 0x100000 : 0;
-
-	if (set)
-	{
-		bank = (K001604_reg[chip][0x60/4] >> 8) & 0x3;
-	}
-	else
-	{
-		bank = (K001604_reg[chip][0x60/4] & 0x3);
-	}
-
-	addr = offset + ((set + (bank * 0x40000)) / 4);
-
-	COMBINE_DATA(K001604_char_ram[chip] + addr);
-
-	gfx_element_mark_dirty(space->machine->gfx[K001604_gfx_index[chip][0]], addr / 32);
-	gfx_element_mark_dirty(space->machine->gfx[K001604_gfx_index[chip][1]], addr / 128);
-}
-
-
-
-WRITE32_HANDLER(K001604_reg_w)
-{
-	int chip = get_cgboard_id();
-
-	COMBINE_DATA(K001604_reg[chip] + offset);
-
-	switch (offset)
-	{
-		case 0x8:
-		case 0x9:
-		case 0xa:
-			//printf("K001604_reg_w %02X, %08X, %08X\n", offset, data, mem_mask);
-			break;
-	}
-
-	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
-	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(space->cpu));
-	}
-}
-
-READ32_HANDLER(K001604_reg_r)
-{
-	int chip = get_cgboard_id();
-
-	switch (offset)
-	{
-		case 0x54/4:	return mame_rand(space->machine) << 16; break;
-		case 0x5c/4:	return mame_rand(space->machine) << 16 | mame_rand(space->machine); break;
-	}
-
-	return K001604_reg[chip][offset];
-}
-
-
-
-
 static void voodoo_vblank_0(running_device *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
-}
-
-static VIDEO_START( nwktr )
-{
-	K001604_vh_start(machine, 0);
 }
 
 
 static VIDEO_UPDATE( nwktr )
 {
 	running_device *voodoo = devtag_get_device(screen->machine, "voodoo");
+	running_device *k001604 = devtag_get_device(screen->machine, "k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	K001604_draw_front_layer(0, bitmap, cliprect);
+	k001604_draw_front_layer(k001604, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
@@ -886,10 +471,10 @@ static MACHINE_START( nwktr )
 
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K001604_reg_r, K001604_reg_w)
+	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_reg_r, k001604_reg_w)
 	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K001604_tile_r, K001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K001604_char_r, K001604_char_w)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_DEVREADWRITE("k001604", k001604_tile_r, k001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_DEVREADWRITE("k001604", k001604_char_r, k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
@@ -1048,6 +633,20 @@ static const k033906_interface nwktr_k033906_interface =
 	"voodoo"
 };
 
+static const k001604_interface racingj_k001604_intf =
+{
+	0, 1, 	/* gfx index 1 & 2 */
+	0, 1,		/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
+static const k001604_interface thrilld_k001604_intf =
+{
+	0, 1, 	/* gfx index 1 & 2 */
+	1, 1,		/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
 static MACHINE_RESET( nwktr )
 {
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1088,8 +687,9 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_START(nwktr)
 	MDRV_VIDEO_UPDATE(nwktr)
+
+	MDRV_K001604_ADD("k001604", racingj_k001604_intf)
 
 	MDRV_K056800_ADD("k056800", nwktr_k056800_interface)
 
@@ -1103,6 +703,14 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_ADC12138_ADD( "adc12138", nwktr_adc_interface )
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( thrilld )
+	MDRV_IMPORT_FROM(nwktr)
+
+	MDRV_DEVICE_REMOVE("k001604")
+	MDRV_K001604_ADD("k001604", thrilld_k001604_intf)
+MACHINE_DRIVER_END
+
 
 /*****************************************************************************/
 
@@ -1192,6 +800,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr, nwktr, nwktr, ROT0, "Konami", "Racing Jam", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, racingj2,   racingj, nwktr, nwktr, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, thrilld,    0,       nwktr, nwktr, nwktr, ROT0, "Konami", "Thrill Drive", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1999, racingj2,   racingj, nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr, ROT0, "Konami", "Thrill Drive", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )

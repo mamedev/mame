@@ -167,30 +167,16 @@ Check gticlub.c for details on the bottom board.
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
-#include "sound/k054539.h"
 #include "machine/konppc.h"
 #include "machine/adc083x.h"
 #include "machine/k056230.h"
 #include "machine/eeprom.h"
+#include "sound/k056800.h"
+#include "sound/k054539.h"
 #include "video/konicdev.h"
 #include "video/gticlub.h"
-#include "sound/k056800.h"
 
 static UINT8 led_reg0, led_reg1;
-
-
-
-// defined in drivers/nwk-tr.c
-int K001604_vh_start(running_machine *machine, int chip);
-void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
-void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
-READ32_HANDLER(K001604_tile_r);
-READ32_HANDLER(K001604_char_r);
-WRITE32_HANDLER(K001604_tile_w);
-WRITE32_HANDLER(K001604_char_w);
-WRITE32_HANDLER(K001604_reg_w);
-READ32_HANDLER(K001604_reg_r);
-
 
 
 
@@ -198,17 +184,18 @@ static VIDEO_START( jetwave )
 {
 	K001005_init(machine);
 	K001006_init(machine);
-	K001604_vh_start(machine, 0);
 }
 
 
 static VIDEO_UPDATE( jetwave )
 {
+	running_device *k001604 = devtag_get_device(screen->machine, "k001604");
+
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	K001005_draw(bitmap, cliprect);
 
-	K001604_draw_front_layer(0, bitmap, cliprect);
+	k001604_draw_front_layer(k001604, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
@@ -428,10 +415,10 @@ static WRITE32_HANDLER( jetwave_palette_w )
 
 static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
+	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_reg_r, k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_tile_r, k001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_char_r, k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_MIRROR(0x80000000) AM_WRITE(cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_0_r, K001006_0_w)
@@ -775,6 +762,14 @@ static MACHINE_DRIVER_START( zr107 )
 	MDRV_ADC0838_ADD("adc0838", zr107_adc_interface)
 MACHINE_DRIVER_END
 
+
+static const k001604_interface jetwave_k001604_intf =
+{
+	0, 1, 	/* gfx index 1 & 2 */
+	0, 1,		/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
 static MACHINE_DRIVER_START( jetwave )
 
 	/* basic machine hardware */
@@ -808,6 +803,8 @@ static MACHINE_DRIVER_START( jetwave )
 
 	MDRV_VIDEO_START(jetwave)
 	MDRV_VIDEO_UPDATE(jetwave)
+
+	MDRV_K001604_ADD("k001604", jetwave_k001604_intf)
 
 	MDRV_K056800_ADD("k056800", zr107_k056800_interface)
 

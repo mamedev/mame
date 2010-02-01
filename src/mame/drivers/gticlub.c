@@ -228,26 +228,17 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "machine/k056230.h"
 #include "machine/k033906.h"
 #include "sound/rf5c400.h"
+#include "sound/k056800.h"
 #include "video/voodoo.h"
 #include "video/gticlub.h"
+#include "video/konicdev.h"
+
 #include "rendlay.h"
-#include "sound/k056800.h"
 
 static UINT32 *work_ram;
 
 UINT8 gticlub_led_reg0;
 UINT8 gticlub_led_reg1;
-
-int K001604_vh_start(running_machine *machine, int chip);
-void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
-void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
-READ32_HANDLER(K001604_tile_r);
-READ32_HANDLER(K001604_char_r);
-WRITE32_HANDLER(K001604_tile_w);
-WRITE32_HANDLER(K001604_char_w);
-WRITE32_HANDLER(K001604_reg_w);
-READ32_HANDLER(K001604_reg_r);
-
 
 
 static WRITE32_HANDLER( paletteram32_w )
@@ -267,36 +258,31 @@ static void voodoo_vblank_1(running_device *device, int param)
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static VIDEO_START( hangplt )
-{
-	K001604_vh_start(machine, 0);
-	K001604_vh_start(machine, 1);
-}
-
-
 static VIDEO_UPDATE( hangplt )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	if (strcmp(screen->tag, "lscreen") == 0)
 	{
+		running_device *k001604 = devtag_get_device(screen->machine, "k001604_1");
 		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
 
-	//  K001604_draw_back_layer(bitmap, cliprect);
+	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
 		voodoo_update(voodoo, bitmap, cliprect);
 
-		K001604_draw_front_layer(0, bitmap, cliprect);
+		k001604_draw_front_layer(k001604, bitmap, cliprect);
 	}
 	else if (strcmp(screen->tag, "rscreen") == 0)
 	{
+		running_device *k001604 = devtag_get_device(screen->machine, "k001604_2");
 		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");
 
-	//  K001604_draw_back_layer(bitmap, cliprect);
+	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
 		voodoo_update(voodoo, bitmap, cliprect);
 
-		K001604_draw_front_layer(1, bitmap, cliprect);
+		k001604_draw_front_layer(k001604, bitmap, cliprect);
 	}
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
@@ -304,6 +290,44 @@ static VIDEO_UPDATE( hangplt )
 
 	return 0;
 }
+
+static READ32_HANDLER( gticlub_k001604_tile_r )
+{
+	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	return k001604_tile_r(k001604, offset, mem_mask);
+}
+
+static WRITE32_HANDLER( gticlub_k001604_tile_w )
+{
+	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	k001604_tile_w(k001604, offset, data, mem_mask);
+}
+
+
+static READ32_HANDLER( gticlub_k001604_char_r )
+{
+	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	return k001604_char_r(k001604, offset, mem_mask);
+}
+
+static WRITE32_HANDLER( gticlub_k001604_char_w )
+{
+	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	k001604_char_w(k001604, offset, data, mem_mask);
+}
+
+static READ32_HANDLER( gticlub_k001604_reg_r )
+{
+	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	return k001604_reg_r(k001604, offset, mem_mask);
+}
+
+static WRITE32_HANDLER( gticlub_k001604_reg_w )
+{
+	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	k001604_reg_w(k001604, offset, data, mem_mask);
+}
+
 
 /******************************************************************/
 
@@ -406,10 +430,10 @@ static MACHINE_START( gticlub )
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K001604_reg_r, K001604_reg_w)
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K001604_tile_r, K001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K001604_char_r, K001604_char_w)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(gticlub_k001604_char_r, gticlub_k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(K001006_1_r, K001006_1_w)
@@ -757,6 +781,34 @@ static const k056230_interface thunderh_k056230_intf =
 	1
 };
 
+static const k001604_interface gticlub_k001604_intf =
+{
+	1, 2, 	/* gfx index 1 & 2 */
+	1, 1,		/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
+static const k001604_interface slrasslt_k001604_intf =
+{
+	1, 2, 	/* gfx index 1 & 2 */
+	0, 0,		/* layer_size, roz_size */
+	1		/* slrasslt hack */
+};
+
+static const k001604_interface hangplt_k001604_intf_l =
+{
+	1, 2, 	/* gfx index 1 & 2 */
+	0, 1,		/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
+static const k001604_interface hangplt_k001604_intf_r =
+{
+	3, 4, 	/* gfx index 1 & 2 */
+	0, 1,		/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
 
 static MACHINE_RESET( gticlub )
 {
@@ -800,6 +852,8 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_VIDEO_START(gticlub)
 	MDRV_VIDEO_UPDATE(gticlub)
 
+	MDRV_K001604_ADD("k001604_1", gticlub_k001604_intf)
+
 	MDRV_K056800_ADD("k056800", gticlub_k056800_interface)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -826,6 +880,9 @@ static MACHINE_DRIVER_START( slrasslt )
 
 	MDRV_DEVICE_REMOVE("adc1038")
 	MDRV_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+
+	MDRV_DEVICE_REMOVE("k001604_1")
+	MDRV_K001604_ADD("k001604_1", slrasslt_k001604_intf)
 MACHINE_DRIVER_END
 
 
@@ -902,8 +959,10 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
-	MDRV_VIDEO_START(hangplt)
 	MDRV_VIDEO_UPDATE(hangplt)
+
+	MDRV_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
+	MDRV_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
 
 	MDRV_K056800_ADD("k056800", gticlub_k056800_interface)
 

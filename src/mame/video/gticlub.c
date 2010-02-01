@@ -2,7 +2,8 @@
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/poly.h"
-#include "gticlub.h"
+#include "video/konicdev.h"
+#include "video/gticlub.h"
 
 
 typedef struct _poly_extra_data poly_extra_data;
@@ -16,15 +17,8 @@ struct _poly_extra_data
 	int texture_mirror_y;
 };
 
-
-// defined in drivers/nwk-tr.c
-int K001604_vh_start(running_machine *machine, int chip);
-void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
-void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
-
 extern UINT8 gticlub_led_reg0;
 extern UINT8 gticlub_led_reg1;
-
 
 
 /*****************************************************************************/
@@ -981,16 +975,17 @@ VIDEO_START( gticlub )
 
 	K001006_init(machine);
 	K001005_init(machine);
-	K001604_vh_start(machine, 0);
 }
 
 VIDEO_UPDATE( gticlub )
 {
-	K001604_draw_back_layer(0, bitmap, cliprect);
+	running_device *k001604 = devtag_get_device(screen->machine, "k001604_1");
+
+	k001604_draw_back_layer(k001604, bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);
 
-	K001604_draw_front_layer(0, bitmap, cliprect);
+	k001604_draw_front_layer(k001604, bitmap, cliprect);
 
 	tick++;
 	if( tick >= 5 ) {

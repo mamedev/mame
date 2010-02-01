@@ -10122,8 +10122,6 @@ static DEVICE_STOP( k001005 )
 }
 
 
-// from drivers/nwk-tr
-
 /***************************************************************************/
 /*                                                                         */
 /*                                  001604                                 */
@@ -10341,7 +10339,6 @@ void k001604_draw_front_layer( running_device *device, bitmap_t *bitmap, const r
 
 READ32_DEVICE_HANDLER( k001604_tile_r )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	return k001604->tile_ram[offset];
@@ -10349,7 +10346,6 @@ READ32_DEVICE_HANDLER( k001604_tile_r )
 
 READ32_DEVICE_HANDLER( k001604_char_r )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int set, bank;
@@ -10367,9 +10363,21 @@ READ32_DEVICE_HANDLER( k001604_char_r )
 	return k001604->char_ram[addr];
 }
 
+READ32_DEVICE_HANDLER( k001604_reg_r )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0x54/4:	return mame_rand(device->machine) << 16; break;
+		case 0x5c/4:	return mame_rand(device->machine) << 16 | mame_rand(device->machine); break;
+	}
+
+	return k001604->reg[offset];
+}
+
 WRITE32_DEVICE_HANDLER( k001604_tile_w )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int x, y;
@@ -10422,7 +10430,6 @@ WRITE32_DEVICE_HANDLER( k001604_tile_w )
 
 WRITE32_DEVICE_HANDLER( k001604_char_w )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int set, bank;
@@ -10445,7 +10452,6 @@ WRITE32_DEVICE_HANDLER( k001604_char_w )
 
 WRITE32_DEVICE_HANDLER( k001604_reg_w )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	COMBINE_DATA(k001604->reg + offset);
@@ -10463,20 +10469,6 @@ WRITE32_DEVICE_HANDLER( k001604_reg_w )
 	{
 		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(space->cpu));
 	}
-}
-
-READ32_DEVICE_HANDLER( k001604_reg_r )
-{
-//  int chip = get_cgboard_id();
-	k001604_state *k001604 = k001604_get_safe_token(device);
-
-	switch (offset)
-	{
-		case 0x54/4:	return mame_rand(device->machine) << 16; break;
-		case 0x5c/4:	return mame_rand(device->machine) << 16 | mame_rand(device->machine); break;
-	}
-
-	return k001604->reg[offset];
 }
 
 
