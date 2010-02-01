@@ -1062,6 +1062,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
 	state->mcu = devtag_get_device(machine, "mcu");
+	state->ymsnd = devtag_get_device(machine, "ymsnd");
 	state->_315_5248_1 = devtag_get_device(machine, "315_5248");
 	state->_315_5250_1 = devtag_get_device(machine, "315_5250_1");
 	state->_315_5250_2 = devtag_get_device(machine, "315_5250_2");
