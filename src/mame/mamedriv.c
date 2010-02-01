@@ -1437,6 +1437,7 @@ const game_driver * const drivers[] =
 	DRIVER( minigolf2 )	/* (c) 1985 */
 	DRIVER( toggle )	/* (c) 1985 */
 	DRIVER( nametune )	/* (c) 1986 */
+	DRIVER( nametune2 )	/* (c) 1986 */
 	DRIVER( nstocker )	/* (c) 1986 */
 	DRIVER( nstocker2 )	/* (c) 1986 */
 	DRIVER( sfootbal )	/* (c) 1986 */

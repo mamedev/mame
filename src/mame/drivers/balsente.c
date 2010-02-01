@@ -1748,6 +1748,36 @@ ROM_START( nametune )
     MOTHERBOARD_PALS
 ROM_END
 
+ROM_START( nametune2 )
+	ROM_REGION( 0x70000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "nmetneur_ab_01.u8a",   0x10000, 0x4000, CRC(4044891d) SHA1(4e1e7cb9846939e03b035b95ba04f62a78719bb2) )
+	ROM_CONTINUE(                     0x40000, 0x4000 )
+	ROM_LOAD( "nmetneur_ab_23.u7a",   0x14000, 0x4000, CRC(df3454bc) SHA1(82faf87ca8974629e546b6854718908721b64ad0) )
+	ROM_CONTINUE(                     0x44000, 0x4000 )
+	ROM_LOAD( "nmetneur_ab_45.u6a",   0x18000, 0x4000, CRC(fb4050b0) SHA1(a4d185e02aa08e886b90454f681f49de3de76f86) )
+	ROM_CONTINUE(                     0x48000, 0x4000 )
+	ROM_LOAD( "nmetneur_ab_67.u5a",   0x1c000, 0x4000, CRC(276a28f4) SHA1(cceeb9c05ff72cfe86ab55555055cf8195d3ea16) )
+	ROM_CONTINUE(                     0x4c000, 0x4000 )
+	ROM_LOAD( "nmetneur_cd_01.u4a",   0x20000, 0x4000, CRC(88bed028) SHA1(69c83ba07f34dd1d45f432e2ed6a50e2d13c4acb) )
+	ROM_CONTINUE(                     0x50000, 0x4000 )
+	ROM_LOAD( "nmetneur_cd_23.u3a",   0x24000, 0x4000, CRC(38c63308) SHA1(1a26642cbe91ebc96444eb05fa1454c9175d370c) )
+	ROM_CONTINUE(                     0x54000, 0x4000 )
+	ROM_LOAD( "nmetneur_cd_45.u2a",   0x28000, 0x4000, CRC(d19a3671) SHA1(b68010ad235175c73258f64f9a64b37b2a06efdc) )
+	ROM_CONTINUE(                     0x58000, 0x4000 )
+	ROM_LOAD( "nmetneur_cd_6_ef.u1a", 0x2c000, 0x4000, CRC(e73c7cda) SHA1(c6f751923d0c7930db2e173f680674759f94c8bb) )
+	ROM_CONTINUE(                     0x5c000, 0x4000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
+	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
+	ROM_LOAD( "nmetneur_gr_0.u3c", 0x00000, 0x8000, CRC(a0121b80) SHA1(ba38e9b738baac85fa33ae3751d02cb223fa3e65) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP )  /* PAL16R8ANC */
+
+    MOTHERBOARD_PALS
+ROM_END
 
 /*
     Night Stocker
@@ -2167,6 +2197,9 @@ GAME( 1984, triviabb, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente
 GAME( 1987, triviaes, 0,        balsente, triviaes, triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish Edition)", GAME_SUPPORTS_SAVE )
 GAME( 1985, toggle,   0,        balsente, toggle,   toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune", GAME_SUPPORTS_SAVE )
+
+/* Board: 006-8030-01-0A Rev A */
+GAME( 1986, nametune2,nametune, balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune (3-23-86)", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8027-01-0B Rev B */
 GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 1)", GAME_SUPPORTS_SAVE )
