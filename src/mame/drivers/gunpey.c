@@ -351,7 +351,6 @@ MACHINE_DRIVER_END
 
 /***************************************************************************************/
 
-
 ROM_START( gunpey )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
 	ROM_LOAD16_BYTE( "gp_rom1.021",  0x00000, 0x80000, CRC(07a589a7) SHA1(06c4140ffd5f74b3d3ddfc424f43fcd08d903490) )
@@ -367,4 +366,16 @@ ROM_START( gunpey )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, 0,	ROT0, "Banpresto", "Gunpey",GAME_NOT_WORKING)
+static DRIVER_INIT( gunpey )
+{
+	UINT8 *rom = memory_region(machine, "maincpu");
+
+	/* patch SLOOOOW cycle checks ... */
+	rom[0x848b5] = 0x7e;
+//	rom[0x848b6] = 0x03;
+	rom[0x89657] = 0x75;
+	rom[0x8e628] = 0x75;
+
+}
+
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey,	ROT0, "Banpresto", "Gunpey",GAME_NOT_WORKING)
