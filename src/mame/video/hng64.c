@@ -1895,6 +1895,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	struct polygon lastPoly = { 0 };
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
+	// Debug - ajg
+	//UINT32 tdColor = 0xff000000;
+	//if (packet[1] & 0x8000)   tdColor |= 0x00ff0000;
+	//if (packet[1] & 0x0000)   tdColor |= 0x0000ff00;
+	//if (packet[1] & 0x0000)   tdColor |= 0x000000ff;
 
 	/////////////////
 	// HEADER INFO //
@@ -1949,13 +1954,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [20] - ???? always 0 ????
     //////////////////////////////////////////////*/
 
-	// Debug - ajg
-	//UINT32 tdColor = 0xff000000;
-	//if (packet[1] & 0x1000)   tdColor |= 0x00ff0000;
-	//if (packet[1] & 0x2000)   tdColor |= 0x0000ff00;
-	//if (packet[1] & 0x4000)   tdColor |= 0x000000ff;
-	//if (packet[1] & 0x8000)   tdColor |= 0xffffffff;
-
 	// 3d ROM Offset
 	UINT16* threeDRoms = (UINT16*)(memory_region(machine, "verts"));
 	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
@@ -1977,7 +1975,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
         if ((k % 3) == 2) printf(" ");
     }
     printf("\n");
-    }
     */
 
 	// There are 4 hunks per address.
@@ -2055,7 +2052,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			//break;
 
 			// TEXTURE
-			/* The current thought is there may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
+			/* There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
 			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
 			else						 polys[*numPolys].texType = 0x0;
 
@@ -2119,11 +2116,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)] );
 					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)] );
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
 				}
 
 				// Redundantly called, but it works...
@@ -2159,11 +2151,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[22]);
 					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[23]);
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
 				}
 
 				// Redundantly called, but it works...
@@ -2203,10 +2190,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].vert[0].normal[2] = uToF(chunkOffset[11]);
 				polys[*numPolys].vert[0].normal[3] = 0.0f;
 
-				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
-				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
-				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
-
 				polys[*numPolys].faceNormal[0] = uToF(chunkOffset[12]);
 				polys[*numPolys].faceNormal[1] = uToF(chunkOffset[13]);
 				polys[*numPolys].faceNormal[2] = uToF(chunkOffset[14]);
@@ -2237,11 +2220,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].vert[0].texCoords[1] = uToF(chunkOffset[8]);
 				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
 				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
-
-				// !!! DUMB !!!
-				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
-				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
-				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				polys[*numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
@@ -2859,13 +2837,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
-	const UINT8 *textureOffset;
 	const UINT8 *gfx = memory_region(machine, "textures");
-
-	if (texIndex >= 0)
-		textureOffset = &gfx[texIndex * 1024 * 1024];
-	else
-		textureOffset = 0x00;
+	const UINT8 *textureOffset = &gfx[texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)
 	{
@@ -2875,13 +2848,25 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			t_coord = t_start / w_start;
 			s_coord = s_start / w_start;
 
-			// DEBUG COLOR MODE
-			if (debugColor != 0x00000000)
+			if ((debugColor & 0xff000000) == 0x01000000)
 			{
+				// UV COLOR MODE
+				*cb = MAKE_ARGB(255, (UINT8)(s_coord*255.0f), (UINT8)(t_coord*255.0f), (UINT8)(0));
+				*db = z_start;
+			}
+			else if ((debugColor & 0xff000000) == 0x02000000)
+			{
+				// Lit
+				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
+				*db = z_start;
+			}
+			else if ((debugColor & 0xff000000) == 0xff000000)
+			{
+				// DEBUG COLOR MODE
 				*cb = debugColor;
 				*db = z_start;
 			}
-			else if (texIndex >= 0)
+			else
 			{
 				// TEXTURED
 				if (textureType == 0x0)
@@ -2897,12 +2882,6 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 					*cb = machine->pens[palOffset + paletteEntry];
 					*db = z_start;
 				}
-			}
-			else
-			{
-				// UNTEXTURED
-				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
-				*db = z_start;
 			}
 		}
 		db++;
