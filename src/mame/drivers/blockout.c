@@ -193,7 +193,7 @@ static INPUT_PORTS_START( blockout )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8") /* Listed as "Unused" */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( blckoutj )
+static INPUT_PORTS_START( blockoutj )
 	PORT_INCLUDE( blockout )
 
 	PORT_MODIFY("P1")
@@ -405,6 +405,6 @@ ROM_END
 
 GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1989, blockout2,blockout, blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, blockoutj,blockout, blockout, blckoutj, 0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockoutj,blockout, blockout, blockoutj,0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1991, agress,   0,        blockout, agress,   0, ROT0, "Palco", "Agress", GAME_SUPPORTS_SAVE )
 GAME( 2003, agressb,  agress,   blockout, agress,   0, ROT0, "Palco", "Agress (English bootleg)", GAME_SUPPORTS_SAVE )

@@ -360,7 +360,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( minesw4p )
+static INPUT_PORTS_START( mineswpr4 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* This wiring selects cocktail mode */
@@ -621,4 +621,4 @@ GAME( 1976, comotion,  0,        comotion, comotion, 0, ROT0, "Gremlin", "Comoti
 GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1977, hustle,    0,        hustle,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1977, mineswpr,  0,        blasto,   mineswpr, 0, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1977, mineswpr4, mineswpr, blasto,   minesw4p, 0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1977, mineswpr4, mineswpr, blasto,   mineswpr4,0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

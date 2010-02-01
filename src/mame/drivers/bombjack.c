@@ -4,7 +4,7 @@ Bomb Jack
 
 driver by Mirko Buffoni
 
-bombjac2 has YOU ARE LUCY instead of LUCKY, so it's probably an older version
+bombjack2 has YOU ARE LUCY instead of LUCKY, so it's probably an older version
 
 
 MAIN BOARD:
@@ -85,10 +85,10 @@ Stephh's notes (based on the game Z80 code and some tests) :
   - Ingame bug : if game is reset when screen is flipped, the screen remains
     flipped for the start-up tests and we'll be OK when scores are displayed.
 
-  - The only difference between 'bombjack' and 'bombjac2' is that 'bombjack'
+  - The only difference between 'bombjack' and 'bombjack2' is that 'bombjack'
     fixes the message when you get a 'S' for extra credit (text at 0xd24a) :
       * 'bombjack' : "YOU ARE LUCKY"
-      * 'bombjac2' : "YOU ARE LUCY"
+      * 'bombjack2' : "YOU ARE LUCY"
 
 2008-07
 Dip Locations and factory settings verified with manual

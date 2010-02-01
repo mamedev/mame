@@ -766,7 +766,7 @@ static INPUT_PORTS_START( minigolf )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( minigol2 )
+static INPUT_PORTS_START( minigolf2 )
 	PORT_INCLUDE( minigolf )
 
 	PORT_MODIFY("SWH")
@@ -2110,7 +2110,7 @@ static DRIVER_INIT( triviag2 )
 static DRIVER_INIT( triviaes ) { expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( gimeabrk ) { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 1); }
 static DRIVER_INIT( minigolf ) { expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 2); }
-static DRIVER_INIT( minigol2 ) { expand_roms(machine, 0x0c);        config_shooter_adc(machine, FALSE, 2); }
+static DRIVER_INIT( minigolf2 ) { expand_roms(machine, 0x0c);        config_shooter_adc(machine, FALSE, 2); }
 static DRIVER_INIT( toggle )   { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( nametune )
 {
@@ -2185,7 +2185,7 @@ GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente
 GAMEL(1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker", GAME_SUPPORTS_SAVE, layout_stocker )
 GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, minigolf2,minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, minigolf2,minigolf, balsente, minigolf2,minigolf2,ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown (Baby Boomer Edition uses 006-8025-01-0B Rev B board.  Do the rest use it too? */
 GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (set 1)", GAME_SUPPORTS_SAVE )

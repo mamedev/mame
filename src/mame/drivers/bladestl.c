@@ -221,7 +221,7 @@ static INPUT_PORTS_START( bladestl )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bladstle )
+static INPUT_PORTS_START( bladestle )
 	PORT_INCLUDE( bladestl )
 
 	PORT_MODIFY("DSW2")
@@ -437,4 +437,4 @@ ROM_END
  *************************************/
 
 GAME( 1987, bladestl,  0,        bladestl, bladestl, 0, ROT90, "Konami", "Blades of Steel (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladstle, 0, ROT90, "Konami", "Blades of Steel (version E)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestle,0, ROT90, "Konami", "Blades of Steel (version E)", GAME_SUPPORTS_SAVE )

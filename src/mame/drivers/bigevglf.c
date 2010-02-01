@@ -294,7 +294,7 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bigevglj )
+static INPUT_PORTS_START( bigevglfj )
 	PORT_INCLUDE(bigevglf)
 
 	PORT_MODIFY("DSW2")
@@ -641,4 +641,4 @@ static DRIVER_INIT( bigevglf )
 }
 
 GAME( 1986, bigevglf,  0,        bigevglf, bigevglf, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglj, bigevglf, ROT270, "Taito Corporation", "Big Event Golf (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj,bigevglf, ROT270, "Taito Corporation", "Big Event Golf (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -633,7 +633,7 @@ GAME( 1989, badlands, 0, badlands, badlands, badlands, ROT0, "Atari Games", "Bad
 
 */
 
-static READ16_HANDLER( badlandb_unk_r )
+static READ16_HANDLER( badlandsb_unk_r )
 {
 
 	return 0xffff;
@@ -643,14 +643,14 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 
-	AM_RANGE(0x400008, 0x400009) AM_READ(badlandb_unk_r )
-	AM_RANGE(0x4000fe, 0x4000ff) AM_READ(badlandb_unk_r )
+	AM_RANGE(0x400008, 0x400009) AM_READ(badlandsb_unk_r )
+	AM_RANGE(0x4000fe, 0x4000ff) AM_READ(badlandsb_unk_r )
 
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandb_unk_r )
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r )
 
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(badlandb_unk_r )
-	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(badlandb_unk_r )
-	AM_RANGE(0xfe4006, 0xfe4007) AM_READ(badlandb_unk_r )
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(badlandsb_unk_r )
+	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(badlandsb_unk_r )
+	AM_RANGE(0xfe4006, 0xfe4007) AM_READ(badlandsb_unk_r )
 
 
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(badlands_state, atarigen.eeprom, atarigen.eeprom_size)
@@ -677,7 +677,7 @@ static const gfx_layout pflayout_bootleg =
 	8*8
 };
 
-static GFXDECODE_START( badlandb )
+static GFXDECODE_START( badlandsb )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout_bootleg,    0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,  128, 8 )
 GFXDECODE_END
@@ -700,7 +700,7 @@ static void scanline_update_bootleg(running_device *screen, int scanline)
 
 
 
-static MACHINE_RESET( badlandb )
+static MACHINE_RESET( badlandsb )
 {
 	badlands_state *state = (badlands_state *)machine->driver_data;
 //  state->pedal_value[0] = state->pedal_value[1] = 0x80;
@@ -713,7 +713,7 @@ static MACHINE_RESET( badlandb )
 //  memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
 }
 
-static MACHINE_DRIVER_START( badlandb )
+static MACHINE_DRIVER_START( badlandsb )
 	MDRV_DRIVER_DATA(badlands_state)
 
 	/* basic machine hardware */
@@ -725,12 +725,12 @@ static MACHINE_DRIVER_START( badlandb )
 //  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap)
 
 	MDRV_MACHINE_START(badlands)
-	MDRV_MACHINE_RESET(badlandb)
+	MDRV_MACHINE_RESET(badlandsb)
 	MDRV_NVRAM_HANDLER(atarigen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(badlandb)
+	MDRV_GFXDECODE(badlandsb)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -785,4 +785,4 @@ ROM_START( badlandsb )
 ROM_END
 
 
-GAME( 1989, badlandsb, badlands, badlandb, badlands, 0, ROT0, "[Atari Games] (Playmark bootleg)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandsb, badlands, 0, ROT0, "[Atari Games] (Playmark bootleg)", "Bad Lands (bootleg)", GAME_NOT_WORKING )

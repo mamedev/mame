@@ -139,7 +139,7 @@ static INPUT_PORTS_START( battlnts )
 	KONAMI8_B1_UNK(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( thehustj )
+static INPUT_PORTS_START( thehustlj )
 	PORT_INCLUDE( battlnts )
 
 	PORT_MODIFY("DSW2")
@@ -418,6 +418,6 @@ static DRIVER_INIT( rackemup )
 
 GAME( 1987, battlnts,  0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", GAME_SUPPORTS_SAVE )
 GAME( 1987, battlntsj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, thehustj, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, thehustlj,rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustlj,0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustlj,0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

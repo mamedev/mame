@@ -226,7 +226,7 @@ static VIDEO_UPDATE(backfire)
 
 static READ32_DEVICE_HANDLER(backfire_eeprom_r)
 {
-	/* some kind of screen indicator?  checked by backfira set before it will boot */
+	/* some kind of screen indicator?  checked by backfirea set before it will boot */
 	int backfire_screen = mame_rand(device->machine) & 1;
 	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
 			| ((input_port_read(device->machine, "IN2") & 0xbf) << 16)
@@ -655,7 +655,7 @@ static READ32_HANDLER( backfire_speedup_r )
 //  mame_printf_debug( "%08x\n",cpu_get_pc(space->cpu));
 
 	if (cpu_get_pc(space->cpu)==0xce44)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfire
-	if (cpu_get_pc(space->cpu)==0xcee4)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfira
+	if (cpu_get_pc(space->cpu)==0xcee4)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfirea
 
 	return backfire_mainram[0x18/4];
 }
