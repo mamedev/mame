@@ -965,7 +965,7 @@ CPU_GET_INFO( pdp1 )
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:							info->i = PC;							break;
-	case CPUINFO_INT_PREVIOUSPC:					info->i = 0;	/* TODO??? */			break;
+	case CPUINFO_INT_PREVIOUSPC:					info->i = PC;	/* TODO??? */			break;
 
 	case CPUINFO_INT_INPUT_STATE + 0:
 	case CPUINFO_INT_INPUT_STATE + 1:
@@ -1060,7 +1060,7 @@ CPU_GET_INFO( pdp1 )
 		break;
 
 
-	case CPUINFO_STR_REGISTER + PDP1_PC:			sprintf(info->s, "PC:0%06o", PC); break;
+	case CPUINFO_STR_REGISTER + PDP1_PC:			sprintf(info->s, "PC:0%06o(%04X)", PC, PC); break;
 	case CPUINFO_STR_REGISTER + PDP1_IR:			sprintf(info->s, "IR:0%02o", IR); break;
 	case CPUINFO_STR_REGISTER + PDP1_MB:			sprintf(info->s, "MB:0%06o", MB); break;
 	case CPUINFO_STR_REGISTER + PDP1_MA:			sprintf(info->s, "MA:0%06o", MA); break;
