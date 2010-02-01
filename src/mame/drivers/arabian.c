@@ -72,7 +72,7 @@
 #include "sound/ay8910.h"
 
 /* constants */
-#define MAIN_OSC		12000000
+#define MAIN_OSC		XTAL_12MHz
 
 
 /*************************************

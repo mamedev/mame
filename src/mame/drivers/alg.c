@@ -795,14 +795,14 @@ GAME( 1990, maddog,   alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Las
   /* works ok but uses right player (2) controls only for trigger and holster */
 GAME( 1992, maddog2,  alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.04", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog22, alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.02", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, maddog21, maddog2, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.0", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, maddog21, maddog2,  alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.0", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
   /* works ok but uses right player (2) controls only for trigger and holster */
 GAME( 1992, spacepir, alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Space Pirates v2.2", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, gallgall, alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Gallagher's Gallery v2.2", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
   /* all good, but no holster */
 GAME( 1993, crimepat, alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.4", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep2,  alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.3", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, crimep211,crimep2, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, crimep211,crimep2,  alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, lastbh,   alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fastdraw, alg_bios, alg_r2,   alg_2p, palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.3", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
   /* works ok but uses right player (2) controls only for trigger and holster */

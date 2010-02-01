@@ -778,7 +778,7 @@ static INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x0000, "5 Points" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spinlbru )
+static INPUT_PORTS_START( spinlbrku )
 	PORT_INCLUDE(spinlbrk)
 
 	PORT_MODIFY("DSW")
@@ -2502,7 +2502,7 @@ ROM_END
 
 
 GAME( 1990, spinlbrk, 0,        spinlbrk, spinlbrk, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1990, spinlbrku,spinlbrk, spinlbrk, spinlbru, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1990, spinlbrku,spinlbrk, spinlbrk, spinlbrku,0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1990, spinlbrkj,spinlbrk, spinlbrk, spinlbrk, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, pspikes,  0,        pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

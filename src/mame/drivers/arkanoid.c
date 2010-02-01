@@ -8,18 +8,18 @@
     Here are the versions we have:
 
     arkanoid    World version, probably an earlier revision
-    arknoidu    USA version, probably a later revision; There has been code
+    arkanoidu   USA version, probably a later revision; There has been code
                 inserted, NOT patched, so I don't think it's a bootleg
                 The 68705 code for this one was not available; I made it up from
                 the World version changing the level data pointer table.
-    arknoiuo    USA version, probably an earlier revision
+    arkanoiduo  USA version, probably an earlier revision
                 ROM a75-10.bin should be identical to the real World one.
                 (It only differs in the country byte from A75-11.ROM)
                 This version works fine with the real MCU ROM
     arkatour    Tournament version
                 The 68705 code for this one was not available; I made it up from
                 the World version changing the level data pointer table.
-    arknoidj    Japanese version with level selector.
+    arkanoidj   Japanese version with level selector.
                 The 68705 code for this one was not available; I made it up from
                 the World version changing the level data pointer table.
     arkbl2      Bootleg of the early Japanese version.
@@ -224,7 +224,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * affects ball speed at start of level (0x06 or 0x08)
       * affects level 2 (same as normal version or same as level 30)
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
   - Level 30 differs from original Japanese version
   - There seems to be code to edit levels (check code at 0x8082), but the routines
     don't seem to be called anymore.
@@ -247,7 +247,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * affects ball speed at start of level (0x04 or 0x06)
       * affects level 2 (same as normal version or same as level 30)
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
     No "What round do you want to start from ?" message though.
   - Level 30 differs from original Japanese version (it also differs from 'arkangc')
   - The routine to handle the paddle is completely different as in 'arkangc'
@@ -278,11 +278,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - "Continue" Dip Switch has been replaced by sort of "Debug" Dip Switch as in 'arkangc';
     however, this has no effect due to newly patched code at 0x06e9 !
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
   - Levels 1, 2, 3, 4, 6, 7, 11, 14, 30, 31 and 32 differ from original Japanese version;
     level 1 starts at a different offset (0x90a8 instead of 0xbf15).
   - Complerely different initials on high-scores table, but scores and rounds
-    are the same as in the original Japanese set we have ('arknoidj').
+    are the same as in the original Japanese set we have ('arkanoidj').
   - There seems to be code to edit levels (check code at 0x8082), but the routines
     don't seem to be called anymore.
   - Known bugs :
@@ -317,12 +317,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - All reads from 0xf002 are patched.
   - Reads bit 5 from 0xd008.
   - You can select your starting level (between 1 and 30) but they aren't displayed
-    like in the original Japanese set we have ('arknoidj').
+    like in the original Japanese set we have ('arkanoidj').
   - "Continue" Dip Switch has been replaced by sort of "Debug" Dip Switch :
       * affects ball speed at start of level (0x06 or 0x08)
       * affects level 2 (same as normal version or same as level 30)
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
   - Level 30 differs from original Japanese version (same as the one from 'arkangc2')
   - Known bugs :
       * You can go from one side of the screen to the other through the walls
@@ -345,7 +345,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Different "Lives" Dip Switch (check table at 0x9a28)
   - Specific coinage (always 2C_1C)
   - If Dip Switch is set, you can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
   - Same level 30 as original Japanese version
   - Known bugs :
       * You can go from one side of the screen to the other through the walls
@@ -373,7 +373,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * "20K 60K 60K+"  or "20K" when you continue
   - Different "Lives" Dip Switch (check table at 0x9a28)
   - If Dip Switch is set, you can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
   - Levels are based on the ones from "Arkanoid II".
   - Known bugs :
       * You can go from one side of the screen to the other through the walls
@@ -424,9 +424,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
 TO DO (2006.09.12) :
 
   - Check the following Taito sets (adresses, routines and Dip Switches) :
-      * 'arkanoid' = 'arknoiuo'
-      * 'arknoidj'
-      * 'arknoidu'
+      * 'arkanoid' = 'arkanoiduo'
+      * 'arkanoidj'
+      * 'arkanoidu'
       * 'arkatour'
   - Add more notes about main addresses and routines in the Z80
   - Try to understand the problem with the MCU in the following sets :
@@ -498,7 +498,7 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
 ***************************************************************************
 
 DIP locations verified for:
-  - arknoidj
+  - arkanoidj
   - arkanoid
 
 ***************************************************************************/
@@ -613,7 +613,7 @@ static INPUT_PORTS_START( arkanoid )
 INPUT_PORTS_END
 
 /* Different coinage and additional "Cabinet" Dip Switch */
-static INPUT_PORTS_START( arknoidj )
+static INPUT_PORTS_START( arkanoidj )
 	PORT_INCLUDE( arkanoid )
 
 	PORT_MODIFY("DSW")
@@ -626,7 +626,7 @@ static INPUT_PORTS_START( arknoidj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ark1ball )
-	PORT_INCLUDE( arknoidj )
+	PORT_INCLUDE( arkanoidj )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4") /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
@@ -639,7 +639,7 @@ INPUT_PORTS_END
 
 /* Bootlegs do not read from the MCU */
 static INPUT_PORTS_START( arkatayt )
-	PORT_INCLUDE( arknoidj )
+	PORT_INCLUDE( arkanoidj )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )		/* Some bootlegs need it to be 1 */
@@ -1382,8 +1382,8 @@ static DRIVER_INIT( tetrsark )
 GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidj,  arkanoid, arkanoid, arknoidj, 0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkmcubl,   arkanoid, arkanoid, arknoidj, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkmcubl,   arkanoid, arkanoid, arkanoidj,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc,  arkangc,  ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkangc2, ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )

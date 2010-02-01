@@ -533,7 +533,7 @@ static INPUT_PORTS_START( spaceint )
 	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spaceinj )
+static INPUT_PORTS_START( spaceintj )
 	PORT_INCLUDE( spaceint )
 
 	PORT_MODIFY("IN1")
@@ -776,4 +776,4 @@ GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, kamikaze, ROT270, "Stern",  
 GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, kamikaze, ROT270, "bootleg",            "Kosmo Killer",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
 GAME( 1979, spcking2, 0,        spcking2, spcking2, spcking2, ROT270, "Konami",             "Space King 2",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, spaceint, 0,        spaceint, spaceint, 0,        ROT90,  "Shoei",              "Space Intruder", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceintj,spaceint, spaceint, spaceinj, 0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, spaceintj,spaceint, spaceint, spaceintj,0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

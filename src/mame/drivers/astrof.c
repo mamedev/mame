@@ -821,7 +821,7 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spfgmk22 )
+static INPUT_PORTS_START( spfghmk22 )
 	PORT_INCLUDE( astrof_common )
 
 	PORT_START("IN")
@@ -935,7 +935,7 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tomahaw1 )
+static INPUT_PORTS_START( tomahawk1 )
 	PORT_INCLUDE( tomahawk )
 
 	PORT_MODIFY("DSW")
@@ -1362,6 +1362,6 @@ GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",  
 GAME( 1979, acombato, astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat (older, PZ)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfgmk22, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfghmk22,0,       ROT90, "Data East",   "Space Fighter Mark II (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 5)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahaw1, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahawk1,0,       ROT90, "Data East",   "Tomahawk 777 (rev 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

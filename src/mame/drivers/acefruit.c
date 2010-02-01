@@ -402,7 +402,7 @@ static INPUT_PORTS_START( spellbnd )
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-/* I've only mapped the known inputs after comparaison with 'spellbnd' and the ones known to do something */
+/* I've only mapped the known inputs after comparison with 'spellbnd' and the ones known to do something */
 static INPUT_PORTS_START( starspnr )
 	PORT_START("IN0")	// 0
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )

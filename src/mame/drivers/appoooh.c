@@ -603,7 +603,7 @@ static DRIVER_INIT(robowres)
 	robowres_decode(machine, "maincpu");
 }
 
-static DRIVER_INIT(robowrb)
+static DRIVER_INIT(robowresb)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x1c000);
@@ -618,4 +618,4 @@ static DRIVER_INIT(robowrb)
 
 GAME( 1984, appoooh,   0,        appoooh,  appoooh,  0,        ROT0, "[Sanritsu] Sega", "Appoooh", GAME_SUPPORTS_SAVE )
 GAME( 1986, robowres,  0,        robowres, robowres, robowres, ROT0, "Sega",            "Robo Wres 2001", GAME_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, robowrb,  ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres, robowres, robowresb,ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )

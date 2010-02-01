@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atetrsb2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atetrisb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
@@ -276,7 +276,7 @@ INPUT_PORTS_END
 
 
 // Same as the regular one except they added a Flip Controls switch
-static INPUT_PORTS_START( atetcktl )
+static INPUT_PORTS_START( atetrisc )
 	PORT_INCLUDE( atetris )
 
 	PORT_MODIFY("IN0")
@@ -374,11 +374,11 @@ static MACHINE_DRIVER_START( atetris )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( atetrsb2 )
+static MACHINE_DRIVER_START( atetrisb2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(atetrsb2_map)
+	MDRV_CPU_PROGRAM_MAP(atetrisb2_map)
 
 	MDRV_MACHINE_START(atetris)
 	MDRV_MACHINE_RESET(atetris)
@@ -509,6 +509,6 @@ static DRIVER_INIT( atetris )
 GAME( 1988, atetris,  0,       atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, atetrisa, atetris, atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, atetrisb, atetris, atetris,  atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2,atetris, atetrsb2, atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, atetrisc, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, atetrisc2,atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2,atetris, atetrisb2,atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, atetrisc, atetris, atetris,  atetrisc, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2,atetris, atetris,  atetrisc, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", GAME_SUPPORTS_SAVE )

@@ -75,7 +75,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
     and select difficulty/court. I've mapped them this way because you
     absolutely need the 2 buttons when you are in the "test mode".
 
- 4)  'timesold', 'timesol1' and 'btlfield'
+ 4)  'timesold', 'timesold1' and 'btlfield'
 
   - The "Unused" Dip Switch is sort of "Debug Mode" Dip Switch and has an
     effect ONLY if 0x008fff.b is writable (as Bryan mentioned it).
@@ -88,7 +88,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
     it is set to "Romstar". Again, it has an effect only if 0x000074.w is
     writable and its role seems only to be limited to display some coordonates.
 
- 7)  'skyadvnt', 'skyadvnu' and 'skyadvnj'
+ 7)  'skyadvnt', 'skyadvntu' and 'skyadvntj'
 
   - As in 'skysoldr', you can access to some "hidden features" if 0x000074.w
     is writable :
@@ -97,7 +97,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
       * bit 6 (when "Difficulty" Dip Switch is set to DEF_STR( Hard ) or DEF_STR( Hardest ))
         determines if some coordonates are displayed.
 
- 8)  'gangwarb'
+ 8)  'gangwarsb'
 
   - When "Coin Slots" Dip Switch is set to "1", COIN2 only adds ONE credit
     and this has nothing to do with the microcontroller stuff.
@@ -125,13 +125,13 @@ Stephh's log (2002.06.19) :
     for 'sstingry', even if I had to rewrite it !)
   - Fix screen flipping in 'sbasebal' (this was a Dip Switch issue)
   - Add READ16_HANDLER( *_cycle_r ) for the following games :
-      * timesol1  (based on the one from 'timesold')
+      * timesold1  (based on the one from 'timesold')
       * btlfield  (based on the one from 'timesold')
-      * gangwarb  (I splitted the one from 'gangwars')
-      * skyadvnt, skyadvnu and skyadvnj
+      * gangwarsb  (I splitted the one from 'gangwars')
+      * skyadvnt, skyadvntu and skyadvntj
   - Change manufacturer for the following games :
       * timesold
-      * timesol1
+      * timesold1
       * btlfield
       * skysoldr
     I can send you the ending pics where "Alpha Denshi Co." is mentioned.
@@ -180,7 +180,7 @@ note: CLUT and color remap PROMs missing
 DIP locations verified from manuals for:
 - tnextspc
 - btlfield
-- gangwarb
+- gangwarsb
 - skyadvnt
 - goldmedl
 - kyros
@@ -1176,7 +1176,7 @@ static INPUT_PORTS_START( btlfield )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( btlfildb )
+static INPUT_PORTS_START( btlfieldb )
 	PORT_INCLUDE( btlfield )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
@@ -1358,7 +1358,7 @@ static INPUT_PORTS_START( skyadvnt )
 INPUT_PORTS_END
 
 /* Same as 'skyadvnt' but bits 0-3 of 2nd set of Dip Switches are different */
-static INPUT_PORTS_START( skyadvnu )
+static INPUT_PORTS_START( skyadvntu )
 	PORT_INCLUDE( skyadvnt )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
@@ -1428,7 +1428,7 @@ static INPUT_PORTS_START( gangwars )
 INPUT_PORTS_END
 
 /* Same as 'gangwars' but bits 0-3 of 2nd set of Dip Switches are different */
-static INPUT_PORTS_START( gangwarb )
+static INPUT_PORTS_START( gangwarsb )
 	PORT_INCLUDE( gangwars )	/* See notes about "IN2" (microcontroller) */
 
 	PORT_MODIFY("IN3")
@@ -2164,7 +2164,7 @@ static MACHINE_DRIVER_START( alpha68k_II )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( btlfildb )
+static MACHINE_DRIVER_START( btlfieldb )
 	MDRV_IMPORT_FROM(alpha68k_II)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
@@ -3140,7 +3140,7 @@ static READ16_HANDLER( timesold_cycle_r )
 	return ret;
 }
 
-static READ16_HANDLER( timesol1_cycle_r )
+static READ16_HANDLER( timesold1_cycle_r )
 {
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x4];
@@ -3210,7 +3210,7 @@ static READ16_HANDLER( gangwars_cycle_r )
 	return ret;
 }
 
-static READ16_HANDLER( gangwarb_cycle_r )
+static READ16_HANDLER( gangwarsb_cycle_r )
 {
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x103];
@@ -3269,10 +3269,10 @@ static DRIVER_INIT( timesold )
 	state->coin_id = 0x22 | (0x22 << 8);
 }
 
-static DRIVER_INIT( timesol1 )
+static DRIVER_INIT( timesold1 )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, timesol1_cycle_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, timesold1_cycle_r);
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3287,7 +3287,7 @@ static DRIVER_INIT( btlfield )
 	state->coin_id = 0x22 | (0x22 << 8);
 }
 
-static DRIVER_INIT( btlfildb )
+static DRIVER_INIT( btlfieldb )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	state->invert_controls = 1;
@@ -3314,7 +3314,7 @@ static DRIVER_INIT( goldmedl )
 	state->coin_id = 0x23 | (0x24 << 8);
 }
 
-static DRIVER_INIT( goldmeda )
+static DRIVER_INIT( goldmedla )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	memory_set_bankptr(machine, "bank8", memory_region(machine, "maincpu") + 0x20000);
@@ -3332,7 +3332,7 @@ static DRIVER_INIT( skyadvnt )
 	state->coin_id = 0x22 | (0x22 << 8);
 }
 
-static DRIVER_INIT( skyadvnu )
+static DRIVER_INIT( skyadvntu )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
@@ -3351,10 +3351,10 @@ static DRIVER_INIT( gangwars )
 	state->coin_id = 0x23 | (0x24 << 8);
 }
 
-static DRIVER_INIT( gangwarb )
+static DRIVER_INIT( gangwarsb )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwarsb_cycle_r);
 	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
@@ -3401,18 +3401,18 @@ GAME( 1986, kyrosj,    kyros,    kyros,          kyros,    kyros,    ROT90, "Alp
 GAME( 1987, jongbou,   0,        jongbou,        jongbou,  jongbou,  ROT90, "SNK",                "Mahjong Block Jongbou (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddlema,  0,        alpha68k_I,     paddlema, paddlema, ROT90, "SNK",                "Paddle Mania", GAME_SUPPORTS_SAVE )
 GAME( 1987, timesold,  0,        alpha68k_II,    timesold, timesold, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1987, timesold1, timesold, alpha68k_II,    timesold, timesol1, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timesold1, timesold, alpha68k_II,    timesold, timesold1,ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield, btlfield, ROT90, "[Alpha Denshi Co.] (SNK license)", "Battle Field (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, btlfieldb, timesold, btlfildb,       btlfildb, btlfildb, ROT90, "bootleg",            "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb,btlfieldb,ROT90, "bootleg",            "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, skysoldr, ROT90, "[Alpha Denshi Co.] (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, goldmedl, ROT0,  "SNK",                "Gold Medalist", GAME_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, goldmeda, ROT0,  "SNK",                "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
-GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, goldmeda, ROT0,  "bootleg",            "Gold Medalist (bootleg)", GAME_NOT_WORKING )
+GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "SNK",                "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
+GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "bootleg",            "Gold Medalist (bootleg)", GAME_NOT_WORKING )
 GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvnu, skyadvnu, ROT90, "Alpha Denshi Co. (SNK of America license)", "Sky Adventure (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu,skyadvntu,ROT90, "Alpha Denshi Co. (SNK of America license)", "Sky Adventure (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, skyadvntj, skyadvnt, alpha68k_V,     skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gangwars,  0,        alpha68k_V,     gangwars, gangwars, ROT0,  "Alpha Denshi Co.",   "Gang Wars (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwarb, gangwarb, ROT0,  "bootleg",            "Gang Wars (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwarsb,gangwarsb,ROT0,  "bootleg",            "Gang Wars (bootleg)", GAME_SUPPORTS_SAVE )
 #if SBASEBAL_HACK
 GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, sbasebal, ROT0,  "Alpha Denshi Co.",   "Super Champion Baseball (Japan)", GAME_SUPPORTS_SAVE )
 #else

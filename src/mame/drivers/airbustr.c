@@ -488,7 +488,7 @@ static INPUT_PORTS_START( airbustr )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( airbustj )
+static INPUT_PORTS_START( airbustrj )
 	PORT_INCLUDE(airbustr)
 
 	PORT_MODIFY("DSW1")
@@ -688,7 +688,7 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( airbusb )
+static MACHINE_DRIVER_START( airbustrb )
 	MDRV_IMPORT_FROM(airbustr)
 	MDRV_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
 MACHINE_DRIVER_END
@@ -809,5 +809,5 @@ static DRIVER_INIT( airbustr )
 /* Game Drivers */
 
 GAME( 1990, airbustr,   0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", GAME_SUPPORTS_SAVE )	// 891220
-GAME( 1990, airbustrj,  airbustr, airbustr, airbustj, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", GAME_SUPPORTS_SAVE)    // 891229
-GAME( 1990, airbustrb,  airbustr, airbusb,  airbustj, 0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)	// based on Japan set (891229)
+GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj,airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", GAME_SUPPORTS_SAVE)    // 891229
+GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj,0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)	// based on Japan set (891229)

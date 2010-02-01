@@ -185,7 +185,7 @@ GAME( 1995, enchfrst, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enc
 GAME( 1996, dolphntr, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 1.24.4.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, dolphtra, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1997, goldprmd, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13-05-97, USA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, qotn,	  0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, qotn,     0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1997, dmdtouch, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30-06-97, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, adonis,   0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, reelrock, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )

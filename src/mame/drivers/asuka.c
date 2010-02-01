@@ -76,13 +76,13 @@ TC0100SCN do use the FG layer for text (Driftout is an exception).
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
-1) 'bonzeadv', 'jigkmgri' and 'bonzeadu'
+1) 'bonzeadv', 'jigkmgri' and 'bonzeadvu'
 
   - Region stored at 0x03fffe.w
   - Sets :
       * 'bonzeadv' : region = 0x0002
       * 'jigkmgri' : region = 0x0000
-      * 'bonzeadu' : region = 0x0001
+      * 'bonzeadvu': region = 0x0001
   - These 3 games are 100% the same, only region differs !
   - Coinage relies on the region (code at 0x02d344) :
       * 0x0000 (Japan) and 0x0001 (US) use TAITO_COINAGE_JAPAN_OLD_LOC()
@@ -107,11 +107,11 @@ Stephh's notes (based on the game M68000 code and some tests) :
     but it is now unused due to "bra" instruction at 0x007572
 
 
-2) 'bonzeado'
+2) 'bonzeadvo'
 
   - Region stored at 0x03fffe.w
   - Sets :
-      * 'bonzeado' : region = 0x0002
+      * 'bonzeadvo' : region = 0x0002
   - The only difference is that the following code is missing :
 
       00D218: 08AD 0004 15DE             bclr    #$4, ($15de,A5)

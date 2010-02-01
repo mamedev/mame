@@ -358,7 +358,7 @@ static INPUT_PORTS_START( asteroid )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( asteroib )
+static INPUT_PORTS_START( asteroidb )
 	PORT_INCLUDE( asteroid )
 
 	PORT_MODIFY("IN0")
@@ -920,7 +920,7 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( asteroib )
+static DRIVER_INIT( asteroidb )
 {
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
@@ -943,7 +943,7 @@ static DRIVER_INIT( asterock )
 GAME( 1979, asteroid, 0,        asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 4)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroid2,asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 2)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroid1,asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 1)",        GAME_SUPPORTS_SAVE )
-GAME( 1979, asteroidb,asteroid, asteroid, asteroib, asteroib, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroidb,asteroid, asteroid, asteroidb,asteroidb,ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "Sidam",   "Asterock",                 GAME_SUPPORTS_SAVE )
 GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "VGG",     "Meteorites",               GAME_SUPPORTS_SAVE )
 GAME( 1980, meteorho, asteroid, asteroid, asteroid, 0,        ROT0, "Hoei",    "Meteor",                   GAME_SUPPORTS_SAVE )
