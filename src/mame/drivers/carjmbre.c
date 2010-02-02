@@ -28,9 +28,6 @@
 
 Notes:
 
-- sound cpu speed chosen from coin error countdown, 1.536 MHz is too fast
-  as it loses synchronisation with the onscreen timer
-
 - some sprite glitches from sprite number/colour changes happening on
   different frames, possibly original behaviour. eg cars changing colour
   just before exploding, animals displaying as the wrong sprite for one
@@ -120,26 +117,26 @@ static INPUT_PORTS_START( carjmbre )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x18, "250 (Cheat)")
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "10k, then every 100k" )
 	PORT_DIPSETTING(    0x20, "20k, then every 100k" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -198,13 +195,13 @@ static MACHINE_DRIVER_START( carjmbre )
 	MDRV_DRIVER_DATA(carjmbre_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(carjmbre)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 1500000)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6/2)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_map)
 	MDRV_CPU_IO_MAP(carjmbre_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -227,10 +224,10 @@ static MACHINE_DRIVER_START( carjmbre )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_DRIVER_END
 
