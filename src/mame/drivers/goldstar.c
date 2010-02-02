@@ -5025,6 +5025,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_CPU_PROGRAM_MAP(lucky8_map)
 	//MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // causes 'magical' to display 'wait' instead
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
@@ -6301,6 +6302,37 @@ ROM_START( lucky8 )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( magical )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8_p6_d12.512", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
+	ROM_IGNORE(0x8000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "9_p7_d14.512", 0x08000, 0x04000, CRC(095230ba) SHA1(e60f5497c2cd5f1c0fc33b1e21303dd569654e6d) )
+	ROM_IGNORE(0xc000) // BADADDR        --xxxxxxxxxxxxxx
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5_l5_g2.512", 0x00000, 0x10000, CRC(f0ffb199) SHA1(383406e6ab74e8cecaf5574a879bf24aa606ac37) )
+	ROM_LOAD( "6_l6_g3.512", 0x10000, 0x10000, CRC(3e44d92b) SHA1(4e00e26a4dbf326c0c919c40382505189e82c85b) )
+	ROM_LOAD( "7_l7_g5.512", 0x20000, 0x10000, CRC(654bb754) SHA1(346bfbf85fc38797cf422da47d474e2ef2ef459c) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1_m1_h2.764", 0x00000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
+	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
+	ROM_LOAD( "4_m4_h6.764", 0x06000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "proms", 0x0000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x20, "proms2", ROMREGION_ERASE00 )
+	//ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", ROMREGION_ERASE00 )
+	//ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", ROMREGION_ERASE00 )
+	//ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -8656,6 +8688,7 @@ GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south kor
 GAME( 198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                  GAME_NOT_WORKING )
 
 GAME( 198?, mtonic,    0,        ncb3,     cmv801,   mtonic,    ROT0, "Tonic",             "Magical Tonic?",                              GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 198?, magical,   0,        lucky8,   lucky8,   0,         ROT0, "Micro Manufacturing Inc.", "Magical Tonic / Magical Odds?",                   GAME_NOT_WORKING )
 
 
 /* --- Amcoe games --- */
