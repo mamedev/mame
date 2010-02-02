@@ -455,10 +455,13 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 		case 0x100/2   :	megasys1_sprite_flag = new_data;		break;
 
 		case 0x300/2   :	megasys1_screen_flag = new_data;
-							if (new_data & 0x10)
-								cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
-							else
-								cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+							if (devtag_get_device(space->machine, "soundcpu"))
+							{
+								if (new_data & 0x10)
+									cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+								else
+									cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+							}
 							break;
 
 		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);

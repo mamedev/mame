@@ -1522,6 +1522,42 @@ static MACHINE_DRIVER_START( system_B )
 	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( system_Bbl )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(megasys1B_map)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
+
+	MDRV_MACHINE_RESET(megasys1)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(ABC)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_PALETTE_INIT(megasys1)
+	MDRV_VIDEO_START(megasys1)
+	MDRV_VIDEO_UPDATE(megasys1)
+	MDRV_VIDEO_EOF(megasys1)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	/* just the one OKI, used for sound and music */
+	MDRV_SOUND_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( system_B_hayaosi1 )
 
 	/* basic machine hardware */
@@ -2332,7 +2368,6 @@ ROM_START( edf )
 	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-
 ROM_START( edfu )
 	ROM_REGION( 0xc0000, "maincpu", 0 )		/* Main CPU Code: 00000-3ffff & 80000-bffff */
 	ROM_LOAD16_BYTE( "edf5.b5",  0x000000, 0x020000, CRC(105094d1) SHA1(e962164836756bc20c2b5dc0032042a0219e82d8) )
@@ -2369,6 +2404,41 @@ ROM_START( edfu )
 	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+
+ROM_START( edfbl )
+	ROM_REGION( 0xc0000, "maincpu", 0 )		/* Main CPU Code: 00000-3ffff & 80000-bffff */
+	ROM_LOAD16_BYTE( "02.bin",  0x000000, 0x020000, CRC(19a0dfa0) SHA1(acd020fa42de9cd98e51fe92377a46846859797b) )
+	ROM_CONTINUE (               0x080000, 0x020000 )
+	ROM_LOAD16_BYTE( "01.bin",  0x000001, 0x020000, CRC(fc893ad0) SHA1(6d7be560e2343f3943f52ccdae7bd255b7720b6e) )
+	ROM_CONTINUE (                  0x080001, 0x020000 )
+
+	/* no 2nd 68k on this bootleg */
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "07.bin",  0x000000, 0x040000, CRC(4495c228) SHA1(2193561e193e696c66f27fa186f27ffbbdcb1826) )
+	ROM_LOAD( "06.bin",  0x040000, 0x040000, CRC(3e37f226) SHA1(b789c1d2159f54d7464239e111bd729e0582b89b) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+	ROM_LOAD( "03.bin",  0x000000, 0x040000, CRC(eea24345) SHA1(1ed690eb62b28cf6bbcb6fec7e8e39daaa340af3) )
+	ROM_LOAD( "04.bin",  0x040000, 0x040000, CRC(2cfe9439) SHA1(c953f1cf16be444eef3dc389305733ac351559b6) )
+
+	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "05.bin",   0x000000, 0x020000, CRC(96e38983) SHA1(a4fb94f15d9a9f7df1645be66fe3e179d0ebf765) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "09.bin",  0x000000, 0x040000, CRC(e89d27c0) SHA1(b95d7988f13c578f501dc6cf2a5109dbef2a4d6c) )
+	ROM_LOAD( "08.bin",  0x040000, 0x040000, CRC(603ac969) SHA1(193144080d2cb5536980e5f0f7173fba470ab79f) )
+
+	ROM_REGION( 0x040000, "oki1", 0 ) /* Samples - non-banked sfx? */
+	ROM_LOAD( "12.bin",  0x000000, 0x010000, CRC(e645f447) SHA1(5de3acc32a2211995ed1e9b4577063124b0db45a) )
+
+	ROM_REGION( 0x080000, "okibanks", 0 ) /* Samples - banked music? */
+	ROM_LOAD( "11.bin",  0x000000, 0x040000, CRC(5a8896cb) SHA1(ffa529acc1842868d51c22acf2b6b5a6aa1a79b2) )
+	ROM_LOAD( "10.bin",  0x040000, 0x040000, CRC(baa7c91b) SHA1(1f4d240a4059fad1d09d624275dfe2dffe950a47) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* the bootleg has an 82s131 prom like the original, but it isn't confirmed to be the same yet */
+	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
 
 /***************************************************************************
 
@@ -3738,6 +3808,17 @@ static DRIVER_INIT( edf )
 	ip_select_values[4] = 0x24;
 }
 
+static READ16_HANDLER( edfbl_input_r )
+{
+	return 0xffff;
+}
+
+static DRIVER_INIT( edfbl )
+{
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0002, 0xe000b, 0, 0, edfbl_input_r);
+}
+
+
 static DRIVER_INIT( hachoo )
 {
 	UINT16 *RAM;
@@ -3909,6 +3990,7 @@ GAME( 1990, phantasm, avspirit, system_A,          phantasm, phantasm, ROT0,   "
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, monkelf,  ROT0,   "bootleg", "Monky Elf (Korean bootleg of Avenging Spirit)", GAME_NOT_WORKING )
 GAME( 1991, edf,      0,        system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
+GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      edfbl,    ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1991, 64street, 0,        system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streetj,64street, system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
 GAME( 1992, soldam,   0,        system_A,          soldam,   soldam,   ROT0,   "Jaleco", "Soldam", 0 )
