@@ -372,6 +372,7 @@ const game_driver * const drivers[] =
 	DRIVER( cannonb2 )	/* (c) 1985 TV Game Gruenberg */
 	DRIVER( cannonb3 )	/* (c) 1985 Soft */
 	DRIVER( ckongb )	/* bootleg */
+	DRIVER( bagmanf )	/* bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB */
 
 	/* Nichibutsu games */
 	DRIVER( gomoku )	/* (c) 1981 */

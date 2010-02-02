@@ -1642,9 +1642,9 @@ ROM_START( silvland )
 	/* no samples */
 ROM_END
 
-/*This dump is a mess.  11n and 11k seem to be bad dumps, the second half should probably be sprite data
+/*This dump was a mess.  11n and 11k seem to be bad dumps, the second half should probably be sprite data
   Comparing to set 2 11l and 11h are unnecessary, and are actually from Le Bagnard(set1), as is 5m.
-  5n ID'd as unknown, but it also is from bagnard with some patches.*/
+  5n ID'd as unknown, but it also is from bagnard with some patches. */
 ROM_START( cannonb )
 	ROM_REGION( 0x11000, "maincpu", 0 )
 	ROM_LOAD( "canballs.5d", 0x10000, 0x1000, CRC(43ad0d16) SHA1(682f1ee15e41bb5a161287536bb97704c0d3be9c) ) /* only this one ROM is encrypted */
@@ -1675,11 +1675,11 @@ ROM_START( cannonb )
 	ROM_LOAD( "canballs.5s",  0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "canballs.5p",  0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 
-	ROM_REGION( 0x6000, "unused", 0 )	/* unused roms, don't seem to belong to this game, can probably remove them later */
-	ROM_LOAD( "canballs.5m",  0x0000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) ) // patched 'le bagnard' cod rom
-	ROM_LOAD( "canballs.5n",  0x1000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) ) // ?
-	ROM_LOAD( "canballs.11l", 0x2000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) ) // 'le bagnard gfx'
-	ROM_LOAD( "canballs.11h", 0x3000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) ) // 'le bagnard gfx'
+	ROM_REGION( 0x6000, "unused", ROMREGION_ERASEFF )	/* unused roms, don't seem to belong to this game - they come from the bagman on crazy kong conversion, see below */
+	//ROM_LOAD( "canballs.5m",  0x0000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) ) // patched 'le bagnard' cod rom
+	//ROM_LOAD( "canballs.5n",  0x1000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) ) // ?
+	//ROM_LOAD( "canballs.11l", 0x2000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) ) // 'le bagnard gfx'
+	//ROM_LOAD( "canballs.11h", 0x3000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) ) // 'le bagnard gfx'
 	ROM_LOAD( "canballs.11n", 0x4000, 0x1000, CRC(a95b8e03) SHA1(e78125023e1af6de292292b875b45401b2173ca9) ) // probably just bad dump (missing sprite data)
 	ROM_LOAD( "canballs.11k", 0x5000, 0x1000, CRC(dbbe8263) SHA1(efe4bba25a03261bc8309e6d83d5600def875b0c) ) // probably just bad dump (missing sprite data)
 ROM_END
@@ -1745,6 +1745,58 @@ ROM_START( cannonb3 )
 	ROM_LOAD( "ck14 pos s5  2532.bin",  0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "ck13 pos r5  2532.bin",  0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
+
+
+/* PCB FCK-00 (Falcon Crazy Kong) + Daughterboard
+   running Bagman
+
+   there are a lot of wire-mods on this board, it's possible that it's been hacked to work more like
+   an original bagman board, a lot of the roms are the same
+   
+   this set also explains why the cannonball set above contained a number of bagman roms, it was clearly
+   a half-converted board.
+
+*/
+ROM_START( bagmanf )
+	ROM_REGION( 0x11000, "maincpu", 0 )
+	ROM_LOAD( "01.d5.bin",  0x0000, 0x1000, CRC(e0156191) SHA1(bb5f16d49fbe48f3bac118acd1fea51ec4bc5355) )
+	ROM_LOAD( "02.f5.bin",  0x1000, 0x1000, CRC(7b758982) SHA1(c8460023b43fed4aca9c6b987faea334832c5e30) )
+	ROM_LOAD( "03.h5.bin",  0x2000, 0x1000, CRC(302a077b) SHA1(916c4a6ea1e631cc72bdb91ff9d263dcbaf08bb2) )
+	ROM_LOAD( "04.k5.bin",  0x3000, 0x1000, CRC(b704d761) SHA1(60f5f84a7c43ef50cf8ea81d566a3b23ca4f57c4) )
+	ROM_LOAD( "05.l5.bin",  0x4000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) )
+	ROM_LOAD( "2732 05 pos dboard.bin",  0x5000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "09.l11.bin", 0x0000, 0x0800, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
+	/* 0x0800-0x0fff - empty */
+	ROM_CONTINUE(           0x1000, 0x0800 )
+	/* 0x1800-0x0fff - empty */
+	ROM_LOAD( "11.h11.bin", 0x2000, 0x0800, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
+	/* 0x2800-0x0fff - empty */
+	ROM_CONTINUE(           0x3000, 0x0800 )
+	/* 0x3800-0x0fff - empty */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "10.n11.bin",   0x0000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) )
+	ROM_LOAD( "12.k11.bin",   0x1000, 0x1000, CRC(4a0a6b55) SHA1(955f8bd4bd9b0fc3c6c359c25ba543ba26c04cbd) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	/* as well as one of the program roms, the daughterboard contains the speech hardware + roms */
+	ROM_REGION( 0x0020, "proms2", 0 )
+	ROM_LOAD( "daughterboard.prom",  0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
+
+	ROM_REGION( 0x2000, "speech", 0 ) /* data for the TMS5110 speech chip */
+	ROM_LOAD( "2732 07 pos dboard.bin",   0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
+	ROM_LOAD( "2732 08 pos dboard.bin",   0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
+
+	ROM_REGION( 0x2000, "samples", ROMREGION_ERASE00 )	/* samples */
+	/* unpopulated */
+ROM_END
+
 
 ROM_START( swimmer )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2001,6 +2053,7 @@ GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg",
 GAME( 1981, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
 GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
 GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
+GAME( 1981, bagmanf,  bagman,   cclimber, ckong,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", GAME_NOT_WORKING )
 GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
 GAME( 1981, rpatrolb, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
 GAME( 1981, silvland, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
