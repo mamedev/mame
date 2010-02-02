@@ -811,6 +811,25 @@ ROM_START( spinner )
 	ROM_LOAD( "sp11-12.r9",   0x6000, 0x1000, CRC(4d37da5a) SHA1(37567d19596506385e9dcc7a7c0cf65120189ae0) )
 ROM_END
 
+ROM_START( spiders3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sp-ic74.bin",   0xc000, 0x1000, CRC(ed6b5dcd) SHA1(551fecb9adbab5cb5ac07fb27cc1fcfa03b5e832) )
+	ROM_LOAD( "sp-ic73.bin",   0xd000, 0x1000, CRC(bc04f779) SHA1(a6366461a120d978b27470dad34a2270aee71428) )
+	ROM_LOAD( "sp-ic72.bin",   0xe000, 0x1000, CRC(c7dd097d) SHA1(c7802ac33c1a67ffcb1891e74f0e43483f5b1016) )
+	ROM_LOAD( "sp-ic71.bin",   0xf000, 0x1000, CRC(593b43c4) SHA1(f0cf06a22be205f00a9d52f766c3aae1985f0090) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sp-ic3.bin",   0xf800, 0x0800, CRC(153adee7) SHA1(45dbd756adb5d75562b066fc152c0af7925052de) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "sp-ic33.bin",  0x0000, 0x1000, CRC(7209dacd) SHA1(142de81c013f4074a8eaedc5cd7e9498e6910eb9) )
+	ROM_LOAD( "sp-ic25.bin",  0x1000, 0x1000, CRC(d3d06722) SHA1(da510ed162e5c310945123c9ce6d5648c7b0ae48) )
+	ROM_LOAD( "sp-ic24",      0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )
+	ROM_LOAD( "sp-ic23",      0x3000, 0x1000, CRC(3ca08053) SHA1(20c5709d9650c426b91aed5318a9ab0a10009f17) )
+	ROM_LOAD( "sp-ic22",      0x4000, 0x1000, CRC(07ea073c) SHA1(2e57831092730db5fbdb97c2d78d8842868906f4) )
+	ROM_LOAD( "sp-ic21",      0x5000, 0x1000, CRC(41b344b4) SHA1(c0eac1e332da1eada062059ae742b666051da76c) )
+	ROM_LOAD( "sp-ic20",      0x6000, 0x1000, CRC(4d37da5a) SHA1(37567d19596506385e9dcc7a7c0cf65120189ae0) )
+ROM_END
 
 
 /*************************************
@@ -822,4 +841,5 @@ ROM_END
 /* this is a newer version with just one bug fix */
 GAME( 1981, spiders,  0,       spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1981, spiders2, spiders, spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1981, spiders3, spiders, spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1981, spinner,  spiders, spiders, spiders, 0, ROT270, "bootleg",				  "Spinner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)

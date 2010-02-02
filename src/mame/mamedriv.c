@@ -8194,6 +8194,7 @@ Other Sun games
 	DRIVER( r2dtank )	/* (c) 1980 Sigma Ent. Inc. */
 	DRIVER( spiders )	/* (c) 1981 Sigma Ent. Inc. */
 	DRIVER( spiders2 )	/* (c) 1981 Sigma Ent. Inc. */
+	DRIVER( spiders3 )	/* (c) 1981 Sigma Ent. Inc. */
 	DRIVER( spinner )	/* bootleg */
 	DRIVER( sub )		/* (c) 1985 Sigma Ent. Inc. */
 
