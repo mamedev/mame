@@ -2489,6 +2489,7 @@ V-V                           TP-027
 	DRIVER( gnga )		/*  9/1985 (c) 1985 */
 	DRIVER( gngbl )		/* bootleg */
 	DRIVER( gngblita )	/* bootleg */
+	DRIVER( gngc )		/*  9/1985 (c) 1985 */
 	DRIVER( gngt )		/*  9/1985 (c) 1985 */
 	DRIVER( makaimur )	/*  9/1985 (c) 1985 */
 	DRIVER( makaimurc )	/*  9/1985 (c) 1985 */
