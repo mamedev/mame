@@ -2919,7 +2919,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	ROM[0x72] = 0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }
 
 
