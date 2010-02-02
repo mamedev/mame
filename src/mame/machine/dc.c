@@ -303,7 +303,9 @@ static int jvsboard_init(int pos)
 	maple0x86data2[pos+20]=8; // bits per channel
 	maple0x86data2[pos+21]=0;
 	//4 rotary
-	maple0x86data2[pos+22]=0;
+	maple0x86data2[pos+22]=4;
+	maple0x86data2[pos+23]=4; // channels
+	maple0x86data2[pos+24]=8; // bits per channel
 	//5 keyboard
 	//6 (touch?) screen
 	//7 card reader
@@ -617,6 +619,7 @@ WRITE64_HANDLER( naomi_maple_w )
 					{
 						if (port > 0)
 							buff[0]=0xffffffff;
+//						printf("MAPLE: command %02x\n", command);
 						switch (command)
 						{
 							case 1:
@@ -696,7 +699,7 @@ WRITE64_HANDLER( naomi_maple_w )
 									jvs_address = (buff[1] >> 16) & 0xff; // slave address
 									jvs_command = buff[2] & 0xff; // jvs command
 									#if DEBUG_MAPLE
-									printf("MAPLE: sent jvs command %x\n", jvs_command);
+									printf("MAPLE: sent jvs command %x to address %x\n", jvs_command, jvs_address);
 									#endif
 									//buff[1] = 0xe4e3e2e1;
 									ddtdata.length = 0;//2;

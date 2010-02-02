@@ -4493,7 +4493,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( capsnk )	/* 2000.09 Capcom vs. SNK Millenium Fight 2000 */
 	DRIVER( gram2000 )	/* 2000.09 Giant Gram 2000 Zen Nippon Pro-wres 3 */
 						/* 2000.09 Nittere Shiki! Mirai Yosou Studio */
-						/* 2000.10 Crackin' DJ */
+	DRIVER( crackndj )	/* 2000.10 Crackin' DJ */
 	DRIVER( cspike )	/* 2000.10 Gun Spike */
 						/* 2000.10 Sega Strike Fighter */
 	DRIVER( deathcox )	/* 2000.10 Death Crimson OX */
