@@ -2248,6 +2248,7 @@ const game_driver * const drivers[] =
 	DRIVER( outzonea )	/* TP-O18 (c) 1990 Toaplan */
 	DRIVER( outzoneb )	/* TP-O18 (c) 1990 Toaplan */
 	DRIVER( outzonec )	/* TP-O18 (c) 1990 Toaplan */
+	DRIVER( outzoned )	/* TP-O18 (c) 1990 Toaplan */
 	DRIVER( vimana )	/* TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan) */
 	DRIVER( vimana1 )	/* TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)  */
 	DRIVER( vimanan )	/* TP-O19 (c) 1991 Toaplan (+ Nova Apparate GMBH & Co license) */
