@@ -743,7 +743,7 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
 
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM //overlap unmapped regions
-	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
+
 	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_BASE(&reel3_scroll)
 	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_BASE(&reel2_scroll)
 	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_BASE(&reel1_scroll)
@@ -751,6 +751,8 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(&reel1_ram)
 	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(&reel2_ram)
 	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(&reel3_ram)
+
+	AM_RANGE( 0x10000, 0x17fff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subsino_iomap, ADDRESS_SPACE_IO, 8 )
@@ -1849,9 +1851,10 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( tisub )
-	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
 	ROM_CONTINUE(0x0000,0xc000)
+	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "rom_4.bin", 0x00000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
