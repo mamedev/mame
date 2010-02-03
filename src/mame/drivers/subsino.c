@@ -742,8 +742,8 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
 
-	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM //overlap unmapped regions
-
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM // overlap unmapped regions
+	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
 	AM_RANGE( 0x14000, 0x14fff ) AM_ROM // reads the card face data here (see rom copy in rom loading)
 
 	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_BASE(&reel3_scroll)
