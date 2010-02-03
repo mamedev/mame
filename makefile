@@ -69,7 +69,7 @@ else
 ifneq ($(CROSSBUILD),1)
 
 ifneq ($(OS2_SHELL),)
-TARGETOS = win32
+TARGETOS = os2
 else
 
 UNAME = $(shell uname -a)
