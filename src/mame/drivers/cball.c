@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( cball )
 	MDRV_DRIVER_DATA(cball_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 16) /* ? */
+	MDRV_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 
 	MDRV_MACHINE_START(cball)

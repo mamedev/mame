@@ -191,7 +191,7 @@ VIDEO_START( cyberbal )
 }
 
 
-VIDEO_START( cyberb2p )
+VIDEO_START( cyberbal2p )
 {
 	video_start_cyberbal_common(machine, 1);
 

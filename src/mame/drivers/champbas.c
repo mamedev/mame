@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( exctsccrb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -753,14 +753,14 @@ static MACHINE_DRIVER_START( exctsccr )
 MACHINE_DRIVER_END
 
 /* Bootleg running on a modified Champion Baseball board */
-static MACHINE_DRIVER_START( exctsccb )
+static MACHINE_DRIVER_START( exctsccrb )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(champbas_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MDRV_CPU_PROGRAM_MAP(exctsccb_main_map)
+	MDRV_CPU_PROGRAM_MAP(exctsccrb_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
@@ -1218,5 +1218,5 @@ GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha D
 GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccrj2, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, exctsccrb,  exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1983, exctsccrb,  exctsccr, exctsccrb,exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1984, exctscc2,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", GAME_SUPPORTS_SAVE )

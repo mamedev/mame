@@ -390,7 +390,7 @@ static INPUT_PORTS_START( cliffhgr )
 	PORT_BIT ( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cliffhga )
+static INPUT_PORTS_START( cliffhgra )
 	PORT_START("BANK0")
 	PORT_BIT ( 0x3F, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* SW2 on CPU PCB */
@@ -783,6 +783,6 @@ static DRIVER_INIT( cliff )
  *
  *************************************/
 
-GAME( 1983, cliffhgr, 0,        cliffhgr, cliffhgr, cliff, ROT0, "Stern Electronics", "Cliff Hanger", 0)
-GAME( 1983, cliffhgra,cliffhgr, cliffhgr, cliffhga, cliff, ROT0, "Stern Electronics", "Cliff Hanger (Alt)", 0)
+GAME( 1983, cliffhgr, 0,        cliffhgr, cliffhgr,  cliff, ROT0, "Stern Electronics", "Cliff Hanger", 0)
+GAME( 1983, cliffhgra,cliffhgr, cliffhgr, cliffhgra, cliff, ROT0, "Stern Electronics", "Cliff Hanger (Alt)", 0)
 GAME( 1983, goaltogo, 0,        cliffhgr, goaltogo, cliff, ROT0, "Stern Electronics", "Goal To Go", GAME_NOT_WORKING)

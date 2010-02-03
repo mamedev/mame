@@ -6198,12 +6198,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( area51a )	/* 136105           (c) 1995 */
 	DRIVER( fishfren )	/* (proto)          (c) 1995 */
 	DRIVER( freezeat )	/* (proto)          (c) 1996 */
-	DRIVER( freezejp )	/* (proto)          (c) 1996 */
-	DRIVER( freezea2 )	/* (proto)          (c) 1996 */
-	DRIVER( freezea3 )	/* (proto)          (c) 1996 */
-	DRIVER( freezea4 )	/* (proto)          (c) 1996 */
-	DRIVER( freezea5 )	/* (proto)          (c) 1996 */
-	DRIVER( freezea6 )	/* (proto)          (c) 1996 */
+	DRIVER( freezeatjp )	/* (proto)          (c) 1996 */
+	DRIVER( freezeat2 )	/* (proto)          (c) 1996 */
+	DRIVER( freezeat3 )	/* (proto)          (c) 1996 */
+	DRIVER( freezeat4 )	/* (proto)          (c) 1996 */
+	DRIVER( freezeat5 )	/* (proto)          (c) 1996 */
+	DRIVER( freezeat6 )	/* (proto)          (c) 1996 */
 	DRIVER( area51mx )	/* 136105           (c) 1998 */
 	DRIVER( a51mxr3k )	/*     ??           (c) 1998 */
 	DRIVER( maxforce )	/*     ??           (c) 1996 */
@@ -9249,7 +9249,7 @@ Other Sun games
 
 	DRIVER( altair )	/* (c) 1981 Cidelsa */
 	DRIVER( destryer )	/* (c) 1981 Cidelsa */
-	DRIVER( destryea )	/* (c) 1981 Cidelsa */
+	DRIVER( destryera )	/* (c) 1981 Cidelsa */
 	DRIVER( draco )		/* (c) 1981 Cidelsa */
 	DRIVER( rockduck )	/* (c) 1983 Datel SAS */
 	DRIVER( tetriskr )	/* (c) 1988? bootleg */

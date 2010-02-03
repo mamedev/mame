@@ -89,7 +89,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     to the "test mode" (code at 0x0040de).
 
 
-2) 'crshrac2'
+2) 'crshrace2'
 
   - Even if there is code for it, there is NO possibility to select a 3 players
     game due to code at 0x003796 which "invalidates" the previous reading of DSW 3 :
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( crshrace )
 INPUT_PORTS_END
 
 /* Same as 'crshrace', but additional "unknown" Dip Switch (see notes) */
-static INPUT_PORTS_START( crshrac2 )
+static INPUT_PORTS_START( crshrace2 )
 	PORT_INCLUDE( crshrace )
 
 	PORT_MODIFY("DSW0")
@@ -603,7 +603,7 @@ static DRIVER_INIT( crshrace )
 	#endif
 }
 
-static DRIVER_INIT( crshrac2 )
+static DRIVER_INIT( crshrace2 )
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);
@@ -611,5 +611,5 @@ static DRIVER_INIT( crshrac2 )
 }
 
 
-GAME( 1993, crshrace, 0,        crshrace, crshrace, crshrace, ROT270, "Video System Co.", "Lethal Crash Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, crshrace2,crshrace, crshrace, crshrac2, crshrac2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

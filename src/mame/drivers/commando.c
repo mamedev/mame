@@ -38,7 +38,7 @@ write:
 ****************************************************************************
 
 Note : there is an ingame typo bug that doesn't display the bonus life values
-       correctly on the title screen in 'commando', 'commandj' and 'spaceinv'.
+       correctly on the title screen in 'commando', 'commandoj' and 'spaceinv'.
 
 ***************************************************************************/
 
@@ -155,7 +155,7 @@ static INPUT_PORTS_START( commando )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( commandu )
+static INPUT_PORTS_START( commandou )
 	PORT_INCLUDE(commando)
 
 	PORT_MODIFY("DSW2")
@@ -403,7 +403,7 @@ ROM_END
 
 ROM_START( commandob )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
-	ROM_LOAD( "commandb_04_9m_27256.bin",  0x0000, 0x8000, CRC(348a7654) SHA1(f3668c47c154a9c7d7afeabb0259c9bc56e847ac) )
+	ROM_LOAD( "commandob_04_9m_27256.bin",  0x0000, 0x8000, CRC(348a7654) SHA1(f3668c47c154a9c7d7afeabb0259c9bc56e847ac) )
 	ROM_LOAD( "cm03.8m",  0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -442,7 +442,7 @@ ROM_START( commandob )
            and the CPU1 (a Z80 compatible NEC D780C-1). This sub-board is plugged on what seems to be
            a ROM socket. */
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "commandb_pal16l8a.bin", 0x0000, 0x0104, NO_DUMP ) /* I Didn't try to dump it... */
+	ROM_LOAD( "commandob_pal16l8a.bin", 0x0000, 0x0104, NO_DUMP ) /* I Didn't try to dump it... */
 ROM_END
 
 ROM_START( sinvasn )
@@ -561,7 +561,7 @@ static DRIVER_INIT( spaceinv )
 /* Game Drivers */
 
 GAME( 1985, commando,  0,        commando, commando, commando, ROT270, "Capcom", "Commando (World)", GAME_SUPPORTS_SAVE )
-GAME( 1985, commandou, commando, commando, commandu, commando, ROT270, "Capcom (Data East USA license)", "Commando (US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, commandou, commando, commando, commandou,commando, ROT270, "Capcom (Data East USA license)", "Commando (US)", GAME_SUPPORTS_SAVE )
 GAME( 1985, commandoj, commando, commando, commando, commando, ROT270, "Capcom", "Senjou no Ookami", GAME_SUPPORTS_SAVE )
 GAME( 1985, commandob, commando, commando, commando, spaceinv, ROT270, "bootleg", "Commando (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1985, sinvasn,   commando, commando, commando, commando, ROT270, "Capcom", "Space Invasion (Europe)", GAME_SUPPORTS_SAVE )

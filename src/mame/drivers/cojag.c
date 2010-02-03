@@ -1335,7 +1335,7 @@ ROM_START( freezeat )
 	ROMX_LOAD( "fish_eng.07-00", 0x800007, 0x100000, CRC(13fa20ad) SHA1(0a04fdea025109c0e604ef2a6d58cfb3adce9bd1), ROM_SKIP(7) )
 ROM_END
 
-ROM_START( freezejp )
+ROM_START( freezeatjp )
 	ROM_REGION32_BE( 0x200000, "user1", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog_jpn.hh",          0x000000, 0x040000, CRC(989302bf) SHA1(232927ec0a52b8bb587a3c206af8e1c6cde67860) )
 	ROM_LOAD32_BYTE( "prog_jpn.hl",          0x000001, 0x040000, CRC(6262b760) SHA1(12ca749f5cdc6db7d19f88a21f5f955b80206784) )
@@ -1361,7 +1361,7 @@ ROM_START( freezejp )
 	ROMX_LOAD( "fish_jpn.07-00", 0x800007, 0x100000, CRC(e7e0daa5) SHA1(108da84cc6b4df7ae88cfdacd27c1728e59cdb81), ROM_SKIP(7) )
 ROM_END
 
-ROM_START( freezea2 )
+ROM_START( freezeat2 )
 	ROM_REGION32_BE( 0x200000, "user1", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog.hh",              0x000000, 0x040000, CRC(a8aefa52) SHA1(ba95da93035520de4b15245f68217c59dfb69dbd) )
 	ROM_LOAD32_BYTE( "prog.hl",              0x000001, 0x040000, CRC(152dd641) SHA1(52fa260baf1979ed8f15f8abcbbeebd8e595d0e4) )
@@ -1387,7 +1387,7 @@ ROM_START( freezea2 )
 	ROMX_LOAD( "fish_gr1.07-00", 0x800007, 0x100000, CRC(1f20c020) SHA1(71b32386dc0444264f2f1e2a81899e0e9260994c), ROM_SKIP(7) )
 ROM_END
 
-ROM_START( freezea3 )
+ROM_START( freezeat3 )
 	ROM_REGION32_BE( 0x200000, "user1", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog.hh",              0x000000, 0x040000, CRC(863942e6) SHA1(c7429c8a5c86ff93c64950e201cffca83dd7b7b0) )
 	ROM_LOAD32_BYTE( "prog.hl",              0x000001, 0x040000, CRC(2acc18ef) SHA1(ead02566f7641b1d1066bd2e257b695e5c7e8437) )
@@ -1413,7 +1413,7 @@ ROM_START( freezea3 )
 	ROMX_LOAD( "fish_gr1.07-00", 0x800007, 0x100000, CRC(5ae08327) SHA1(822d8292793509ebfbfce27e92a74c78c4328bda), ROM_SKIP(7) )
 ROM_END
 
-ROM_START( freezea4 )
+ROM_START( freezeat4 )
 	ROM_REGION32_BE( 0x200000, "user1", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog.hh",              0x000000, 0x040000, CRC(80336f5e) SHA1(9946e8eebec2cd68db059f40f535ea212f41913d) )
 	ROM_LOAD32_BYTE( "prog.hl",              0x000001, 0x040000, CRC(55125520) SHA1(13be4fbf32bcd94a2ea97fd690bd1dfdff146d33) )
@@ -1439,7 +1439,7 @@ ROM_START( freezea4 )
 	ROMX_LOAD( "fish_gr1.07-00", 0x800007, 0x100000, CRC(a84335c3) SHA1(340f5ddb9bff1ecd469eab8be36cc0ede84f1f5e), ROM_SKIP(7) )
 ROM_END
 
-ROM_START( freezea5 )
+ROM_START( freezeat5 )
 	ROM_REGION32_BE( 0x200000, "user1", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog.hh",              0x000000, 0x040000, CRC(95c4fc64) SHA1(cd00efe7f760ef1e4cdc4bc8a3b368427cb15d8a) )
 	ROM_LOAD32_BYTE( "prog.hl",              0x000001, 0x040000, CRC(ffb9cb71) SHA1(35d6a5440d63bc5b94c4447645365039169da368) )
@@ -1465,7 +1465,7 @@ ROM_START( freezea5 )
 	ROMX_LOAD( "fish_gr1.07-00", 0x800007, 0x100000, CRC(3676ac70) SHA1(640c4d4f53ca2bcae2009e402fd6ad70e40defa4), ROM_SKIP(7) )
 ROM_END
 
-ROM_START( freezea6 )
+ROM_START( freezeat6 )
 	ROM_REGION32_BE( 0x200000, "user1", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog.hh",              0x000000, 0x040000, CRC(120711fe) SHA1(387e3cc8a1a9ea7d65c528387891d09ed9889fe3) )
 	ROM_LOAD32_BYTE( "prog.hl",              0x000001, 0x040000, CRC(18dd292a) SHA1(00e79851140716985f43594142c97e510a06b24a) )
@@ -1609,11 +1609,11 @@ static void init_freeze_common(running_machine *machine, offs_t main_speedup_add
 }
 
 static DRIVER_INIT( freezeat ) { init_freeze_common(machine, 0x1001a9f4); }
-static DRIVER_INIT( freezea2 ) { init_freeze_common(machine, 0x1001a8c4); }
-static DRIVER_INIT( freezea3 ) { init_freeze_common(machine, 0x1001a134); }
-static DRIVER_INIT( freezea4 ) { init_freeze_common(machine, 0x1001a134); }
-static DRIVER_INIT( freezea5 ) { init_freeze_common(machine, 0x10019b34); }
-static DRIVER_INIT( freezea6 ) { init_freeze_common(machine, 0x10019684); }
+static DRIVER_INIT( freezeat2 ) { init_freeze_common(machine, 0x1001a8c4); }
+static DRIVER_INIT( freezeat3 ) { init_freeze_common(machine, 0x1001a134); }
+static DRIVER_INIT( freezeat4 ) { init_freeze_common(machine, 0x1001a134); }
+static DRIVER_INIT( freezeat5 ) { init_freeze_common(machine, 0x10019b34); }
+static DRIVER_INIT( freezeat6 ) { init_freeze_common(machine, 0x10019684); }
 
 
 static DRIVER_INIT( vcircle )
@@ -1635,20 +1635,20 @@ static DRIVER_INIT( vcircle )
  *
  *************************************/
 
-GAME( 1996, area51,   0,        cojagr3k,  area51,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
-GAME( 1995, area51t,  area51,   cojag68k,  area51,   area51a,  ROT0, "Time Warner", "Area 51 (Time Warner License)", 0 )
-GAME( 1995, area51a,  area51,   cojag68k,  area51,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games License)", 0 )
-GAME( 1995, fishfren, 0,        cojagr3k,  fishfren, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
-GAME( 1996, freezeat, 0,        cojagr3k,  freezeat, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
-GAME( 1996, freezejp, freezeat, cojagr3k,  freezeat, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
-GAME( 1996, freezea2, freezeat, cojagr3k,  freezeat, freezea2, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
-GAME( 1996, freezea3, freezeat, cojagr3k,  freezeat, freezea3, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
-GAME( 1996, freezea4, freezeat, cojagr3k,  freezeat, freezea4, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
-GAME( 1996, freezea5, freezeat, cojagr3k,  freezeat, freezea5, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
-GAME( 1996, freezea6, freezeat, cojagr3k,  freezeat, freezea6, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
-GAME( 1996, maxforce, 0,        cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
-GAME( 1996, maxf_102, maxforce, cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
-GAME( 1996, maxf_ng,  maxforce, cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
-GAME( 1998, area51mx, 0,        cojag68k,  area51,   area51mx, ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
-GAME( 1998, a51mxr3k, area51mx, cojagr3k,  area51,   a51mxr3k, ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
-GAME( 1996, vcircle,  0,        cojagr3k,  vcircle,  vcircle,  ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )
+GAME( 1996, area51,    0,        cojagr3k,  area51,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
+GAME( 1995, area51t,   area51,   cojag68k,  area51,   area51a,  ROT0, "Time Warner", "Area 51 (Time Warner License)", 0 )
+GAME( 1995, area51a,   area51,   cojag68k,  area51,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games License)", 0 )
+GAME( 1995, fishfren,  0,        cojagr3k,  fishfren, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
+GAME( 1996, freezeat,  0,        cojagr3k,  freezeat, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
+GAME( 1996, freezeatjp,freezeat, cojagr3k,  freezeat, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
+GAME( 1996, freezeat2, freezeat, cojagr3k,  freezeat, freezeat2,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
+GAME( 1996, freezeat3, freezeat, cojagr3k,  freezeat, freezeat3,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
+GAME( 1996, freezeat4, freezeat, cojagr3k,  freezeat, freezeat4,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
+GAME( 1996, freezeat5, freezeat, cojagr3k,  freezeat, freezeat5,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
+GAME( 1996, freezeat6, freezeat, cojagr3k,  freezeat, freezeat6,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
+GAME( 1996, maxforce,  0,        cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
+GAME( 1996, maxf_102,  maxforce, cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
+GAME( 1996, maxf_ng,   maxforce, cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
+GAME( 1998, area51mx,  0,        cojag68k,  area51,   area51mx, ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
+GAME( 1998, a51mxr3k,  area51mx, cojagr3k,  area51,   a51mxr3k, ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
+GAME( 1996, vcircle,   0,        cojagr3k,  vcircle,  vcircle,  ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )

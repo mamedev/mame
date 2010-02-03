@@ -895,7 +895,7 @@ static INPUT_PORTS_START( hunchbak )
 	PORT_DIPSETTING(    0x00, "80k only" )                  /* displays "80000" */
 
 	/* hunchbak : DSW2 bit 5 stored at 0x5e97 - code at 0x516c - read back code at 0x6054 */
-	/* hunchbka : DSW2 bit 5 stored at 0x1e97 - code at 0x0c0c - read back code at 0x6054 */
+	/* hunchbaka : DSW2 bit 5 stored at 0x1e97 - code at 0x0c0c - read back code at 0x6054 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( superbik )
@@ -1616,7 +1616,7 @@ static DRIVER_INIT( huncholy )
 }
 
 
-static DRIVER_INIT( hunchbka )
+static DRIVER_INIT( hunchbaka )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
@@ -1718,7 +1718,7 @@ GAME( 1982, goldbug,   0,        cvs,     goldbug,  0,        ROT90, "Century El
 GAME( 1982, diggerc,   0,        cvs,     diggerc,  0,        ROT90, "Century Electronics", "Digger (CVS)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, heartatk,  0,        cvs,     heartatk, 0,        ROT90, "Century Electronics", "Heart Attack", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, hunchbak,  0,        cvs,     hunchbak, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, hunchbaka,ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, superbik,  0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, raiders,   0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, hero,      0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

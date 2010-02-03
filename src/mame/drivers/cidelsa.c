@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( destryer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( destryea_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( destryera_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
@@ -526,12 +526,12 @@ static MACHINE_DRIVER_START( destryer )
 	MDRV_IMPORT_FROM(destryer_video)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( destryea )
+static MACHINE_DRIVER_START( destryera )
 	MDRV_DRIVER_DATA(cidelsa_state)
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MDRV_CPU_PROGRAM_MAP(destryea_map)
+	MDRV_CPU_PROGRAM_MAP(destryera_map)
 	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -605,12 +605,12 @@ ROM_START( destryer )
 ROM_END
 
 // this was destroyer2.rom in standalone emu..
-ROM_START( destryea )
+ROM_START( destryera )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "destryea_1", 0x0000, 0x0800, CRC(421428e9) SHA1(0ac3a1e7f61125a1cd82145fa28cbc4b93505dc9) )
-	ROM_LOAD( "destryea_2", 0x0800, 0x0800, CRC(55dc8145) SHA1(a0066d3f3ac0ae56273485b74af90eeffea5e64e) )
-	ROM_LOAD( "destryea_3", 0x1000, 0x0800, CRC(5557bdf8) SHA1(37a9cbc5d25051d3bed7535c58aac937cd7c64e1) )
-	ROM_LOAD( "destryea_4", 0x1800, 0x0800, CRC(608b779c) SHA1(8fd6cc376c507680777553090329cc66be42a934) )
+	ROM_LOAD( "destryera_1", 0x0000, 0x0800, CRC(421428e9) SHA1(0ac3a1e7f61125a1cd82145fa28cbc4b93505dc9) )
+	ROM_LOAD( "destryera_2", 0x0800, 0x0800, CRC(55dc8145) SHA1(a0066d3f3ac0ae56273485b74af90eeffea5e64e) )
+	ROM_LOAD( "destryera_3", 0x1000, 0x0800, CRC(5557bdf8) SHA1(37a9cbc5d25051d3bed7535c58aac937cd7c64e1) )
+	ROM_LOAD( "destryera_4", 0x1800, 0x0800, CRC(608b779c) SHA1(8fd6cc376c507680777553090329cc66be42a934) )
 ROM_END
 
 ROM_START( altair )
@@ -640,7 +640,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1980, destryer, 0,		destryer, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, destryea, destryer, destryea, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, altair,   0,		altair,   altair,   0, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, draco,    0,		draco,    draco,    0, ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, destryer, 0,        destryer, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, destryera,destryer, destryera,destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, altair,   0,        altair,   altair,   0, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, draco,    0,        draco,    draco,    0, ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

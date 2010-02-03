@@ -3,7 +3,7 @@
  TS 01.05.2006:
 
  - added sprites, bgmap reading and few ixes here and there
-   airraid and cshootre are a bit "playable" ;) without gfx
+   airraid and cshootere are a bit "playable" ;) without gfx
 
 
 Haze's notes :
@@ -14,7 +14,7 @@ Haze's notes :
   - i can't decode the other gfx? rom
   - there don't seem to be any sprites / bg's in ram, interrupts?
   - palette? format isn't understood
-  - the other sets ('cshootre' and 'airraid') need decrypting ..
+  - the other sets ('cshootere' and 'airraid') need decrypting ..
     is the main one protected ? theres a 68705 on it
 
 
@@ -658,7 +658,7 @@ static DRIVER_INIT( cshooter )
 	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
 }
 
-static DRIVER_INIT( cshootre )
+static DRIVER_INIT( cshootere )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int A;
@@ -698,7 +698,7 @@ static DRIVER_INIT( cshootre )
 
 
 
-GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter, ROT270, "[Seibu Kaihatsu] (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootre, ROT270, "[Seibu Kaihatsu] (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootre, ROT270, "Seibu Kaihatsu",                    "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter,  ROT270, "[Seibu Kaihatsu] (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootere, ROT270, "[Seibu Kaihatsu] (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu",                    "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
 

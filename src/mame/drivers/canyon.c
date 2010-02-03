@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( canyon )
 	MDRV_DRIVER_DATA(canyon_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 	MDRV_WATCHDOG_VBLANK_INIT(8)

@@ -188,7 +188,7 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 	memory_set_bank(space->machine, "bank4", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
-static READ8_HANDLER( saiyugb1_mcu_command_r )
+static READ8_HANDLER( saiyugoub1_mcu_command_r )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
 #if 0
@@ -200,7 +200,7 @@ static READ8_HANDLER( saiyugb1_mcu_command_r )
 	return state->mcu_command;
 }
 
-static WRITE8_HANDLER( saiyugb1_mcu_command_w )
+static WRITE8_HANDLER( saiyugoub1_mcu_command_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
 	state->mcu_command = data;
@@ -212,19 +212,19 @@ static WRITE8_HANDLER( saiyugb1_mcu_command_w )
 #endif
 }
 
-static WRITE8_HANDLER( saiyugb1_adpcm_rom_addr_w )
+static WRITE8_HANDLER( saiyugoub1_adpcm_rom_addr_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
 	/* i8748 Port 1 write */
 	state->i8748_P1 = data;
 }
 
-static WRITE8_DEVICE_HANDLER( saiyugb1_adpcm_control_w )
+static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
 {
 	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
 
 	/* i8748 Port 2 write */
-	UINT8 *saiyugb1_adpcm_rom = memory_region(device->machine, "adpcm");
+	UINT8 *saiyugoub1_adpcm_rom = memory_region(device->machine, "adpcm");
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -251,7 +251,7 @@ static WRITE8_DEVICE_HANDLER( saiyugb1_adpcm_control_w )
 
 		state->adpcm_addr = ((state->adpcm_addr & 0x07fff) | (data & 0x70 << 11));
 
-		state->pcm_nibble = saiyugb1_adpcm_rom[state->adpcm_addr & 0x3ffff];
+		state->pcm_nibble = saiyugoub1_adpcm_rom[state->adpcm_addr & 0x3ffff];
 
 		state->pcm_nibble = (state->pcm_nibble >> state->pcm_shift) & 0x0f;
 
@@ -267,7 +267,7 @@ static WRITE8_DEVICE_HANDLER( saiyugb1_adpcm_control_w )
 	state->i8748_P2 = data;
 }
 
-static WRITE8_DEVICE_HANDLER( saiyugb1_m5205_clk_w )
+static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 {
 	/* i8748 T0 output clk mode */
 	/* This signal goes through a divide by 8 counter */
@@ -288,7 +288,7 @@ static WRITE8_DEVICE_HANDLER( saiyugb1_m5205_clk_w )
 #endif
 }
 
-static READ8_HANDLER( saiyugb1_m5205_irq_r )
+static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
 	if (state->adpcm_sound_irq)
@@ -299,7 +299,7 @@ static READ8_HANDLER( saiyugb1_m5205_irq_r )
 	return 0;
 }
 
-static void saiyugb1_m5205_irq_w( running_device *device )
+static void saiyugoub1_m5205_irq_w( running_device *device )
 {
 	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
 	state->adpcm_sound_irq = 1;
@@ -362,11 +362,11 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saiyugb1_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( saiyugoub1_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugb1_mcu_command_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugoub1_mcu_command_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -376,11 +376,11 @@ static ADDRESS_MAP_START( i8748_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8748_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugb1_mcu_command_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE("adpcm", saiyugb1_m5205_clk_w)		/* Drives the clock on the m5205 at 1/8 of this frequency */
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugb1_m5205_irq_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugb1_adpcm_rom_addr_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("adpcm", saiyugb1_adpcm_control_w)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE("adpcm", saiyugoub1_m5205_clk_w)		/* Drives the clock on the m5205 at 1/8 of this frequency */
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("adpcm", saiyugoub1_adpcm_control_w)
 ADDRESS_MAP_END
 
 
@@ -506,7 +506,7 @@ static const ym2151_interface ym2151_config =
 /* This on the bootleg board, instead of the m6295 */
 static const msm5205_interface msm5205_config =
 {
-	saiyugb1_m5205_irq_w,	/* Interrupt function */
+	saiyugoub1_m5205_irq_w,	/* Interrupt function */
 	MSM5205_S64_4B			/* vclk input mode (6030Hz, 4-bit) */
 };
 
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( saiyugb1 )
+static MACHINE_DRIVER_START( saiyugoub1 )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(ddragon_state)
@@ -627,7 +627,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
-	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_map)
+	MDRV_CPU_PROGRAM_MAP(saiyugoub1_sound_map)
 
 	MDRV_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
 	MDRV_CPU_PROGRAM_MAP(i8748_map)
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( saiyugb2 )
+static MACHINE_DRIVER_START( saiyugoub2 )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(ddragon_state)
@@ -938,7 +938,7 @@ static DRIVER_INIT( chinagat )
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat,   0,        chinagat, chinagat, chinagat, ROT0, "[Technos Japan] (Taito Romstar license)", "China Gate (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, saiyugou,   chinagat, chinagat, chinagat, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub1, chinagat, saiyugb1, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub2, chinagat, saiyugb2, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat, ROT0, "[Technos Japan] (Taito Romstar license)", "China Gate (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", GAME_SUPPORTS_SAVE )

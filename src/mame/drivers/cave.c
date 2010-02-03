@@ -4089,7 +4089,7 @@ static DRIVER_INIT( metmqstr )
 }
 
 
-static DRIVER_INIT( pwrins2j )
+static DRIVER_INIT( pwrinst2j )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "audiocpu");
@@ -4127,7 +4127,7 @@ static DRIVER_INIT( pwrinst2 )
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
        problem? does the Japan set need it or not? */
-	DRIVER_INIT_CALL(pwrins2j);
+	DRIVER_INIT_CALL(pwrinst2j);
 
 #if 1		//ROM PATCH
 	{
@@ -4213,7 +4213,7 @@ static DRIVER_INIT( korokoro )
 ***************************************************************************/
 
 GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus/Cave",                           "Power Instinct 2 (US, Ver. 94/04/08)"			, 0 )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)"		, 0 )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)"		, 0 )
 GAME( 1994, mazinger,   0,        mazinger, mazinger, mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (International/Japan)"			, 0 ) // region in eeprom
 GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (US)"						, 0 )
 GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Japan)"					, 0 )
@@ -4221,8 +4221,8 @@ GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/C
 GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Hong Kong)"					, 0 )
 GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Metamoqester (International)"				, 0 )
 GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Oni - The Ninja Master (Japan)"				, 0 )
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Power Instinct Legends (US, Ver. 95/06/20)"		, 0 )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Power Instinct Legends (US, Ver. 95/06/20)"		, 0 )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
 GAME( 1995, sailormn,   0,        sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22B)"	, 0 ) // region in eeprom
 GAME( 1995, sailormno,  sailormn, sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22)"	, 0 ) // region in eeprom
 GAME( 1996, agallet,    0,        sailormn, sailormn, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (JUEHTK)"					, 0 ) // board was taiwan, region in eeprom

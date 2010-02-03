@@ -2834,7 +2834,7 @@ static DRIVER_INIT( mshuttlj )
 	irq_line = 0;
 
 	/* decrypt the code */
-	cclimbrj_decode(machine);
+	cclimberj_decode(machine);
 }
 
 

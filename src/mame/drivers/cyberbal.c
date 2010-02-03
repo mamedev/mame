@@ -74,7 +74,7 @@ static MACHINE_RESET( cyberbal )
 }
 
 
-static void cyberb2p_update_interrupts(running_machine *machine)
+static void cyberbal2p_update_interrupts(running_machine *machine)
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -82,12 +82,12 @@ static void cyberb2p_update_interrupts(running_machine *machine)
 }
 
 
-static MACHINE_RESET( cyberb2p )
+static MACHINE_RESET( cyberbal2p )
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 
 	atarigen_eeprom_reset(&state->atarigen);
-	atarigen_interrupt_reset(&state->atarigen, cyberb2p_update_interrupts);
+	atarigen_interrupt_reset(&state->atarigen, cyberbal2p_update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
 	atarijsa_reset();
 }
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cyberb2p_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cyberbal2p_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( cyberbal )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( cyberb2p )
+static INPUT_PORTS_START( cyberbal2p )
 	PORT_START("IN0")		/* fc0000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -490,16 +490,16 @@ static MACHINE_DRIVER_START( cyberbal )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( cyberb2p )
+static MACHINE_DRIVER_START( cyberbal2p )
 	MDRV_DRIVER_DATA(cyberbal_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(cyberb2p_map)
+	MDRV_CPU_PROGRAM_MAP(cyberbal2p_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_MACHINE_START(cyberbal)
-	MDRV_MACHINE_RESET(cyberb2p)
+	MDRV_MACHINE_RESET(cyberbal2p)
 	MDRV_NVRAM_HANDLER(atarigen)
 
 	/* video hardware */
@@ -513,7 +513,7 @@ static MACHINE_DRIVER_START( cyberb2p )
 	/* the board uses an SOS-2 chip to generate video signals */
 	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 
-	MDRV_VIDEO_START(cyberb2p)
+	MDRV_VIDEO_START(cyberbal2p)
 	MDRV_VIDEO_UPDATE(cyberbal)
 
 	/* sound hardware */
@@ -1003,7 +1003,7 @@ static DRIVER_INIT( cyberbal )
 }
 
 
-static DRIVER_INIT( cyberbt )
+static DRIVER_INIT( cyberbalt )
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	state->atarigen.eeprom_default = default_eeprom;
@@ -1011,7 +1011,7 @@ static DRIVER_INIT( cyberbt )
 }
 
 
-static DRIVER_INIT( cyberb2p )
+static DRIVER_INIT( cyberbal2p )
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	state->atarigen.eeprom_default = default_eeprom;
@@ -1030,11 +1030,11 @@ GAMEL(1988, cyberbal,  0,        cyberbal, cyberbal, cyberbal, ROT0, "Atari Game
 GAMEL(1988, cyberbal2, cyberbal, cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
 GAMEL(1988, cyberbalp, cyberbal, cyberbal, cyberbal, cyberbal, ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
 
-GAME( 1989, cyberbal2p,  cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
-GAME( 1989, cyberbal2p3, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
-GAME( 1989, cyberbal2p2, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
-GAME( 1989, cyberbal2p1, cyberbal, cyberb2p, cyberb2p, cyberb2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
+GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
+GAME( 1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
+GAME( 1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
+GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
 
-GAMEL(1989, cyberbalt,  cyberbal, cyberbal, cyberbal, cyberbt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
-GAMEL(1989, cyberbalt1, cyberbal, cyberbal, cyberbal, cyberbt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbalt,  cyberbal, cyberbal, cyberbal, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbalt1, cyberbal, cyberbal, cyberbal, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
 

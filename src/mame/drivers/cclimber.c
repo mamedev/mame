@@ -482,7 +482,7 @@ static INPUT_PORTS_START( cclimber )
 INPUT_PORTS_END
 
 /* Same as 'cclimber' but correct "Bonus Life" Dip Switch */
-static INPUT_PORTS_START( cclimbrj )
+static INPUT_PORTS_START( cclimberj )
 	PORT_INCLUDE( cclimber )
 
 	PORT_MODIFY("DSW")
@@ -2041,9 +2041,9 @@ static DRIVER_INIT( toprollr )
 
 
 GAME( 1980, cclimber, 0,        cclimber, cclimber, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", 0 )
-GAME( 1980, cclimberj,cclimber, cclimber, cclimbrj, cclimbrj, ROT0,   "Nichibutsu", "Crazy Climber (Japan)", 0 )
-GAME( 1980, ccboot,   cclimber, cclimber, cclimber, cclimbrj, ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", 0 )
-GAME( 1980, ccboot2,  cclimber, cclimber, cclimber, cclimbrj, ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", 0 )
+GAME( 1980, cclimberj,cclimber, cclimber, cclimberj,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", 0 )
+GAME( 1980, ccboot,   cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", 0 )
+GAME( 1980, ccboot2,  cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", 0 )
 GAME( 1981, ckong,    0,        cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", 0 )
 GAME( 1981, ckonga,   ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", 0 )
 GAME( 1981, ckong2j,  ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", 0 )

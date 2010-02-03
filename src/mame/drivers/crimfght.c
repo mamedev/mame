@@ -180,7 +180,7 @@ static INPUT_PORTS_START( crimfght )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( crimfgtj )
+static INPUT_PORTS_START( crimfghtj )
 	PORT_INCLUDE( crimfght )
 
 	PORT_MODIFY("DSW1")
@@ -427,5 +427,5 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 }
 
 GAME( 1989, crimfght,  0,        crimfght, crimfght, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimfght2, crimfght, crimfght, crimfgtj, 0, ROT0, "Konami", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfgtj, 0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfght2, crimfght, crimfght, crimfghtj,0, ROT0, "Konami", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfghtj,0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", GAME_SUPPORTS_SAVE )
