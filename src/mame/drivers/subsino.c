@@ -25,6 +25,15 @@
   Press START/DEAL (key 2) to exit.
 
 
+  * Treasure Island.
+
+  To enter test mode, keep STATS/TEST (key 9) pressed during boot.
+  HOLD3 (key C) to increase the tune/sound number, START (key 2) to decrease it.
+
+  To enter the bookkeeping mode press STATS/TEST (key 9).
+  Press START/TAKE (key 2) to exit.
+
+
   * Poker Carnival (crsbingo)
 
   To adjust the game rate, press SETTINGS (key 0) and then use HOLD4 (key V)
@@ -41,7 +50,7 @@
   HOLD5 (key B) to select between VOICE <-> MUSIC.
   HOLD4 (key V) to increase the tune/sound number, START (key 2) to decrease it.
 
-  To enter the bookkeeping mode press STATS (key 9).
+  To enter the bookkeeping mode press STATS/TEST (key 9).
   Press START/DEAL (key 2) to exit.
 
 
@@ -116,6 +125,27 @@
   - Added button-lamps layout.
 
 
+  2010-02-03
+  ----------
+
+  Treasure Island:
+
+  - Added proper inputs.
+  - Added coin/keyin/keyout/payout counters.
+  - Limited the bet and coin pulses to avoid repeats and coin jams.
+  - Added complete coinage and keyin DIP switches.
+  - Added main game and double-up rates DIP switches.
+  - Added minimum bet DIP switches.
+  - Added maximum bet DIP switches.
+  - Added main game and double-up limit DIP switches.
+  - Added payout mode and auto take DIP switches.
+  - Added DIP locations as seen in the settings mode.
+  - Added demo sounds DIP switch.
+  - Created proper button-lamps layout.
+  - Added technical notes.
+  - Some clean-ups...
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -129,6 +159,7 @@
 #include "crsbingo.lh"
 #include "sharkpy.lh"
 #include "smoto.lh"
+#include "tisub.lh"
 
 /***************************************************************************
 *                              Video Hardware                              *
@@ -244,9 +275,9 @@ static VIDEO_START( subsino_reels )
 {
 	VIDEO_START_CALL( subsino );
 
-	reel1_tilemap = tilemap_create(machine,get_subsino_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
-	reel2_tilemap = tilemap_create(machine,get_subsino_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
-	reel3_tilemap = tilemap_create(machine,get_subsino_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	reel1_tilemap = tilemap_create(machine,get_subsino_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel2_tilemap = tilemap_create(machine,get_subsino_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel3_tilemap = tilemap_create(machine,get_subsino_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 
 	tilemap_set_scroll_cols(reel1_tilemap, 64);
 	tilemap_set_scroll_cols(reel2_tilemap, 64);
@@ -358,6 +389,15 @@ static WRITE8_HANDLER( subsino_out_a_w )
   --x- ----  Payout pulse.
 
 
+  * Treasure Island.
+
+  7654 3210
+  ---- ---x  Key In pulse.
+  ---- --x-  Coin pulse.
+  ---x ----  Key Out pulse.
+  --x- ----  Payout pulse.
+
+
   * Super Rider, Super Moto, Shark Party.
 
   7654 3210
@@ -374,8 +414,8 @@ static WRITE8_HANDLER( subsino_out_a_w )
 	output_set_lamp_value(14, (data >> 6) & 1);	/* Lamp 14 */
 	output_set_lamp_value(15, (data >> 7) & 1);	/* Lamp 15 */
 
-	coin_counter_w( space->machine, 0, data & 0x01 );	/* Coin1 */
-	coin_counter_w( space->machine, 1, data & 0x02 );	/* keyin */
+	coin_counter_w( space->machine, 0, data & 0x01 );	/* coin / keyin */
+	coin_counter_w( space->machine, 1, data & 0x02 );	/* keyin / coin */
 	coin_counter_w( space->machine, 2, data & 0x10 );	/* keyout */
 	coin_counter_w( space->machine, 3, data & 0x20 );	/* payout */
 
@@ -411,6 +451,19 @@ static WRITE8_HANDLER( subsino_out_b_w )
   --x- ----  DEAL / HIT.
   -x-- ----  ???.
   x--- ----  GAME OVER?.
+
+
+  * Treasure Island.
+
+  7654 3210
+  ---- ---x  HOLD1.
+  ---- --x-  HOLD2 / BIG.
+  ---- -x--  ???.
+  ---- x---  BET.
+  ---x ----  DOUBLE / INFO.
+  --x- ----  START / TAKE.
+  -x-- ----  HOLD3 / SMALL.
+  x--- ----  ???.
 
 
   * Poker Carnival (crsbingo).
@@ -475,11 +528,11 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
 
-	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "DSW1" )
-	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "DSW2" )
-	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "DSW3" )
+	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "SW2" )
+	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "SW3" )
 
-	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "DSW4" )
+	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INB" )
 
@@ -502,11 +555,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
-	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
-	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "DSW3" )
+	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "SW2" )
+	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "SW3" )
 
-	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "DSW4" )
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
@@ -543,9 +596,9 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INB" )
 
-	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "DSW1" )
-	AM_RANGE( 0x09007, 0x09007 ) AM_READ_PORT( "DSW2" )
-	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "DSW3" )
+	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x09007, 0x09007 ) AM_READ_PORT( "SW2" )
+	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW3" )
 
 	AM_RANGE( 0x0900b, 0x0900b ) AM_RAM //protection
 
@@ -632,15 +685,15 @@ static READ8_HANDLER( hwcheck_r )
 static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
-	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
+	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "SW2" )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09003, 0x09003 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_WRITE( subsino_out_a_w )
 
-	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "DSW4" )
-	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "DSW3" )	// AM_WRITE( subsino_out_a_w )
+	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW4" )
+	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "SW3" )	// AM_WRITE( subsino_out_a_w )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE( hwcheck_r, subsino_out_b_w )
 
 	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE( flash_r, flash_w )
@@ -665,15 +718,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
-	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
-	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "DSW3" )
+	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "SW2" )
+	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "SW3" )
 
-	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "DSW4" )
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
-	//0x09008: output C?
+	/* 0x09008: is marked as OUTPUT C in the test mode. */
 	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
 
@@ -710,7 +763,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( victor21 )
 
-	PORT_START( "DSW1" )
+	PORT_START( "SW1" )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
@@ -736,7 +789,7 @@ static INPUT_PORTS_START( victor21 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START( "DSW2" )
+	PORT_START( "SW2" )
 	PORT_DIPNAME( 0x03, 0x03, "Main Game Rate" )
 	PORT_DIPSETTING(    0x00, "75%" )
 	PORT_DIPSETTING(    0x01, "80%" )
@@ -753,15 +806,15 @@ static INPUT_PORTS_START( victor21 )
 	PORT_DIPNAME( 0x20, 0x20, "Attract Music" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2 - 40" )
+	PORT_DIPNAME( 0x40, 0x40, "SW2 - 40" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START( "DSW3" )
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x01, 0x01, "SW3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -820,7 +873,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( victor5 )
 
-	PORT_START( "DSW1" )
+	PORT_START( "SW1" )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
@@ -845,7 +898,7 @@ static INPUT_PORTS_START( victor5 )
 	PORT_DIPSETTING(    0xc0, "50" )
 	PORT_DIPSETTING(    0x00, "80" )
 
-	PORT_START( "DSW2" )
+	PORT_START( "SW2" )
 	PORT_DIPNAME( 0x03, 0x03, "Main Game Rate" )
 	PORT_DIPSETTING(    0x00, "68%" )
 	PORT_DIPSETTING(    0x01, "76%" )
@@ -868,8 +921,8 @@ static INPUT_PORTS_START( victor5 )
 	PORT_DIPSETTING(    0xc0, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START( "DSW3" )
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x01, 0x01, "SW3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -926,9 +979,145 @@ static INPUT_PORTS_START( victor5 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tisub )
+
+	PORT_START( "SW1" )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3")	// SW1-123
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Key In" )				PORT_DIPLOCATION("SW1:4,5,6")	// SW1-456
+	PORT_DIPSETTING(    0x30, "4 Points/Pulse" )
+	PORT_DIPSETTING(    0x28, "8 Points/Pulse" )
+	PORT_DIPSETTING(    0x20, "20 Points/Pulse" )
+	PORT_DIPSETTING(    0x38, "40 Points/Pulse" )
+	PORT_DIPSETTING(    0x18, "80 Points/Pulse" )
+	PORT_DIPSETTING(    0x10, "100 Points/Pulse" )
+	PORT_DIPSETTING(    0x08, "200 Points/Pulse" )
+	PORT_DIPSETTING(    0x00, "400 Points/Pulse" )
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )			PORT_DIPLOCATION("SW1:7")	// SW1-7
+	PORT_DIPSETTING(    0x40, "Coin Value" )
+	PORT_DIPSETTING(    0x00, "Key In Value" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "SW2" )
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )			PORT_DIPLOCATION("SW2:1,2")	// SW2-12
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "8" )
+	PORT_DIPSETTING(    0x01, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x0c, 0x08, "Max Bet" )				PORT_DIPLOCATION("SW2:3,4")	// SW2-34
+	PORT_DIPSETTING(    0x0c, "2" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x04, "16" )
+	PORT_DIPSETTING(    0x08, "32" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:5")	// Not in test mode.
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Game Limit" )			PORT_DIPLOCATION("SW2:6")	// SW2-6
+	PORT_DIPSETTING(    0x20, "20000" )
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Take" )				PORT_DIPLOCATION("SW2:7")	// SW2-7
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )		PORT_DIPLOCATION("SW3:1,2,3")	// SW3-123
+	PORT_DIPSETTING(    0x00, "77%" )
+	PORT_DIPSETTING(    0x01, "80%" )
+	PORT_DIPSETTING(    0x02, "83%" )
+	PORT_DIPSETTING(    0x03, "86%" )
+	PORT_DIPSETTING(    0x04, "89%" )
+	PORT_DIPSETTING(    0x07, "92%" )
+	PORT_DIPSETTING(    0x05, "95%" )
+	PORT_DIPSETTING(    0x06, "98%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "SW4" )
+	PORT_DIPNAME( 0x07, 0x07, "Double-Up Rate" )		PORT_DIPLOCATION("SW4:1,2,3")	// SW4-123
+	PORT_DIPSETTING(    0x00, "70%" )
+	PORT_DIPSETTING(    0x01, "74%" )
+	PORT_DIPSETTING(    0x02, "78%" )
+	PORT_DIPSETTING(    0x03, "82%" )
+	PORT_DIPSETTING(    0x04, "86%" )
+	PORT_DIPSETTING(    0x07, "90%" )
+	PORT_DIPSETTING(    0x05, "94%" )
+	PORT_DIPSETTING(    0x06, "98%" )
+	PORT_DIPNAME( 0x08, 0x08, "Double-Up Limit" )		PORT_DIPLOCATION("SW4:4")	// SW4-4
+	PORT_DIPSETTING(    0x08, "5000" )
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "INA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )	PORT_NAME("Double / Info")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_NAME("Start / Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_BET )		PORT_IMPULSE(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "INB" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )			PORT_IMPULSE(3)	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	// key in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats / Test")	// Bookkeeping.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_0)	PORT_NAME("Settings")		// Current settings.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	// payout
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	// key out
+
+	PORT_START( "INC" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_R)	PORT_NAME("Reset")	// hard reset
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( crsbingo )
 
-	PORT_START( "DSW1" )
+	PORT_START( "SW1" )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
@@ -954,7 +1143,7 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START( "DSW2" )
+	PORT_START( "SW2" )
 	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -977,8 +1166,8 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START( "DSW3" )
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x01, 0x01, "SW3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -1003,7 +1192,7 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START( "DSW4" )
+	PORT_START( "SW4" )
 	PORT_DIPNAME( 0x07, 0x07, "Double-Up Rate" )
 	PORT_DIPSETTING(    0x00, "70%" )
 	PORT_DIPSETTING(    0x01, "74%" )
@@ -1044,7 +1233,7 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	// key in
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats")	// Bookkeeping.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats")		// Bookkeeping.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_0)	PORT_NAME("Settings")	// Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	// payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	// key out
@@ -1063,7 +1252,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sharkpy )
 
-	PORT_START( "DSW1" )
+	PORT_START( "SW1" )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, "1 Coin / 10 Credits" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
@@ -1075,7 +1264,7 @@ static INPUT_PORTS_START( sharkpy )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START( "DSW2" )
+	PORT_START( "SW2" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1089,7 +1278,7 @@ static INPUT_PORTS_START( sharkpy )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START( "DSW3" )
+	PORT_START( "SW3" )
 	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
 	PORT_DIPSETTING(    0x00, "55%" )
 	PORT_DIPSETTING(    0x01, "60%" )
@@ -1111,7 +1300,7 @@ static INPUT_PORTS_START( sharkpy )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START( "DSW4" )
+	PORT_START( "SW4" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1155,7 +1344,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( smoto16 )
 
-	PORT_START( "DSW1" )
+	PORT_START( "SW1" )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, "1 Coin / 10 Credits" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
@@ -1167,7 +1356,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START( "DSW2" )
+	PORT_START( "SW2" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1181,7 +1370,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START( "DSW3" )
+	PORT_START( "SW3" )
 	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
 	PORT_DIPSETTING(    0x00, "55%" )
 	PORT_DIPSETTING(    0x01, "60%" )
@@ -1203,7 +1392,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START( "DSW4" )
+	PORT_START( "SW4" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1249,7 +1438,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( smoto20 )
 
-	PORT_START( "DSW1" )
+	PORT_START( "SW1" )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, "1 Coin / 10 Credits" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
@@ -1261,7 +1450,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START( "DSW2" )
+	PORT_START( "SW2" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1275,7 +1464,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START( "DSW3" )
+	PORT_START( "SW3" )
 	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
 	PORT_DIPSETTING(    0x00, "25%" )
 	PORT_DIPSETTING(    0x01, "30%" )
@@ -1297,7 +1486,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START( "DSW4" )
+	PORT_START( "SW4" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -1654,6 +1843,36 @@ ROM_END
 
 /***************************************************************************
 
+  Treasure Island
+  -- this has an extra layer for the reels, exactly the same as goldstar.c
+
+***************************************************************************/
+
+ROM_START( tisub )
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
+	ROM_CONTINUE(0x0000,0xc000)
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "rom_4.bin", 0x00000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
+	ROM_LOAD( "rom_5.bin", 0x10000, 0x10000, CRC(3d18acd8) SHA1(179545c18ad880097366c07c8e2fa821701a2758) )
+	ROM_LOAD( "rom_6.bin", 0x20000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
+	ROM_LOAD( "rom_7.bin", 0x30000, 0x10000, CRC(9d7d99d8) SHA1(a3df5e023c2102028a5186101dc0b19d91e8965e) )
+
+	ROM_REGION( 0x8000, "reels", 0 )
+	ROM_LOAD( "rom_2.bin", 0x0000, 0x4000, CRC(836c756d) SHA1(fca1d5b600861eea30ed73ee13be735e7d167097) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "rom_3.bin", 0x4000, 0x4000, CRC(2ad82222) SHA1(68780b9528393b28eaa2f90501efb5a8c39bed63) )
+	ROM_IGNORE(0x4000)
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "n82s129n.u39", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, NO_DUMP )
+ROM_END
+
+/***************************************************************************
+
 Cross Bingo
 (C)1991 Subsino
 
@@ -1969,34 +2188,6 @@ ROM_START( smoto20 )
 	ROM_LOAD( "82s129.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
 ROM_END
 
-/************************
- Treasure Island
-  -- this has an extra layer for the reels, exactly the same as goldstar.c
-************************/
-
-ROM_START( tisub )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
-	ROM_CONTINUE(0x0000,0xc000)
-
-	ROM_REGION( 0x40000, "tilemap", 0 )
-	ROM_LOAD( "rom_4.bin", 0x00000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
-	ROM_LOAD( "rom_5.bin", 0x10000, 0x10000, CRC(3d18acd8) SHA1(179545c18ad880097366c07c8e2fa821701a2758) )
-	ROM_LOAD( "rom_6.bin", 0x20000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
-	ROM_LOAD( "rom_7.bin", 0x30000, 0x10000, CRC(9d7d99d8) SHA1(a3df5e023c2102028a5186101dc0b19d91e8965e) )
-
-	ROM_REGION( 0x8000, "reels", 0 )
-	ROM_LOAD( "rom_2.bin", 0x0000, 0x4000, CRC(836c756d) SHA1(fca1d5b600861eea30ed73ee13be735e7d167097) )
-	ROM_IGNORE(0x4000)
-	ROM_LOAD( "rom_3.bin", 0x4000, 0x4000, CRC(2ad82222) SHA1(68780b9528393b28eaa2f90501efb5a8c39bed63) )
-	ROM_IGNORE(0x4000)
-
-	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "n82s129n.u39", 0x000, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, NO_DUMP )
-ROM_END
-
 
 /***************************************************************************
 *                        Driver Init / Decryption                          *
@@ -2175,12 +2366,12 @@ static DRIVER_INIT( tisub )
 *                               Game Drivers                               *
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS  LAYOUT      */
-GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,     layout_victor21 )
-GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0,     layout_victor5 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
-GAME ( 1991, tisub,    0,        tisub,    crsbingo, tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)",            GAME_NOT_WORKING )
-GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,     layout_crsbingo ) // alt version of Cross Bingo?
-GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,     layout_sharkpy ) // missing POST messages?
-GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,     layout_sharkpy ) // missing POST messages?
-GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0,     layout_smoto )
-GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",  0,     layout_smoto )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS              LAYOUT      */
+GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,                 layout_victor21 )
+GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0,                 layout_victor5 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
+GAMEL( 1991, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)", GAME_WRONG_COLORS, layout_tisub )
+GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,                 layout_crsbingo ) // alt version of Cross Bingo?
+GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,                 layout_sharkpy ) // missing POST messages?
+GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,                 layout_sharkpy ) // missing POST messages?
+GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0,                 layout_smoto )
+GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",  0,                 layout_smoto )

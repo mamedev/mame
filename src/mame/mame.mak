@@ -1811,6 +1811,7 @@ $(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
 
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
 						$(LAYOUT)/victor21.lh \
+						$(LAYOUT)/tisub.lh \
 						$(LAYOUT)/crsbingo.lh \
 						$(LAYOUT)/sharkpy.lh \
 						$(LAYOUT)/smoto.lh
