@@ -2,8 +2,7 @@
 
 Best League (c) 1993
 
-A Big Striker Italian bootleg (made by Playmark?) running on a different hardware, and with
-Italian Serie A teams instead of the national teams.
+A Big Striker Italian bootleg (made by Playmark?) running on a different hardware.
 
 driver by David Haywood & Angelo Salese
 
@@ -150,6 +149,22 @@ static VIDEO_UPDATE(bestleag)
 	tilemap_set_scrolly(tx_tilemap,0,bestleag_vregs[0x06/2]);
 	tilemap_set_scrollx(fg_tilemap,0,bestleag_vregs[0x08/2] & 0xfff8);
 	tilemap_set_scrolly(fg_tilemap,0,bestleag_vregs[0x0a/2]);
+
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	draw_sprites(screen->machine,bitmap,cliprect);
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	return 0;
+}
+
+static VIDEO_UPDATE(bestleaw)
+{
+	tilemap_set_scrollx(bg_tilemap,0,bestleag_vregs[0x08/2]);
+	tilemap_set_scrolly(bg_tilemap,0,bestleag_vregs[0x0a/2]);
+	tilemap_set_scrollx(tx_tilemap,0,bestleag_vregs[0x00/2]);
+	tilemap_set_scrolly(tx_tilemap,0,bestleag_vregs[0x02/2]);
+	tilemap_set_scrollx(fg_tilemap,0,bestleag_vregs[0x04/2]);
+	tilemap_set_scrolly(fg_tilemap,0,bestleag_vregs[0x06/2]);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
@@ -317,7 +332,6 @@ static MACHINE_DRIVER_START( bestleag )
 	MDRV_CPU_PROGRAM_MAP(bestleag_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -339,6 +353,13 @@ static MACHINE_DRIVER_START( bestleag )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( bestleaw )
+	MDRV_IMPORT_FROM(bestleag)
+
+	MDRV_VIDEO_UPDATE(bestleaw)
+MACHINE_DRIVER_END
+
+
 /* Rom Loading */
 
 ROM_START( bestleag )
@@ -358,16 +379,16 @@ ROM_START( bestleag )
 	ROM_LOAD( "29_27c010.u84", 0x040000, 0x20000, CRC(7ea4e22d) SHA1(3c7f05dfd1c5889bfcbc14d08026e2a484870216) )
 	ROM_LOAD( "30_27c010.u83", 0x060000, 0x20000, CRC(283d9ba6) SHA1(6054853f76907a4a0f89ad5aa02dde9d3d4ff196) )
 
-	ROM_REGION( 0x80000, "user1", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki_rom", 0 ) /* Samples */
 	ROM_LOAD( "20_27c040.u16", 0x00000, 0x80000, CRC(e152138e) SHA1(9d41b61b98414e1d5804b5a9edf4acb4c5f31615) )
 
 	ROM_REGION( 0xc0000, "oki", 0 )
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
+	ROM_COPY( "oki_rom", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "oki_rom", 0x020000, 0x020000, 0x020000)
+	ROM_COPY( "oki_rom", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "oki_rom", 0x040000, 0x060000, 0x020000)
+	ROM_COPY( "oki_rom", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "oki_rom", 0x060000, 0x0a0000, 0x020000)
 ROM_END
 
 ROM_START( bestleaw )
@@ -387,27 +408,27 @@ ROM_START( bestleaw )
 	ROM_LOAD( "29_27c010.u84", 0x040000, 0x20000, CRC(7ea4e22d) SHA1(3c7f05dfd1c5889bfcbc14d08026e2a484870216) )
 	ROM_LOAD( "30_27c010.u83", 0x060000, 0x20000, CRC(283d9ba6) SHA1(6054853f76907a4a0f89ad5aa02dde9d3d4ff196) )
 
-	ROM_REGION( 0x80000, "user1", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki_rom", 0 ) /* Samples */
 	ROM_LOAD( "20_27c040.u16", 0x00000, 0x80000, CRC(e152138e) SHA1(9d41b61b98414e1d5804b5a9edf4acb4c5f31615) )
 
 	ROM_REGION( 0xc0000, "oki", 0 )
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
+	ROM_COPY( "oki_rom", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "oki_rom", 0x020000, 0x020000, 0x020000)
+	ROM_COPY( "oki_rom", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "oki_rom", 0x040000, 0x060000, 0x020000)
+	ROM_COPY( "oki_rom", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "oki_rom", 0x060000, 0x0a0000, 0x020000)
 
 	ROM_REGION( 0x2000, "plds", 0 )
 	ROM_LOAD( "85c060.bin",            0x0000, 0x032f, CRC(537100ac) SHA1(3d5e9013e3cba660671f02e78c233c866dad2e53) )
 	ROM_LOAD( "gal16v8-25hb1.u182",    0x0200, 0x0117, NO_DUMP ) /* Protected */
 	ROM_LOAD( "gal16v8-25hb1.u183",    0x0400, 0x0117, NO_DUMP ) /* Protected */
 	ROM_LOAD( "gal16v8-25hb1.u58",     0x0800, 0x0117, NO_DUMP ) /* Protected */
-      ROM_LOAD( "palce20v8h-15pc-4.u38", 0x1000, 0x0157, NO_DUMP ) /* Protected */
+	ROM_LOAD( "palce20v8h-15pc-4.u38", 0x1000, 0x0157, NO_DUMP ) /* Protected */
 ROM_END
 
 /* GAME drivers */
 
-GAME( 1993, bestleag, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League", 0 )
-GAME( 1993, bestleaw, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, bestleag, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", 0 )
+GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", 0 )
 
