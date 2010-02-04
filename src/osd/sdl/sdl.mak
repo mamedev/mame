@@ -94,7 +94,7 @@ LD = g++-4.2
 else
 ifeq ($(DISTRO),gcc44-generic)
 CC = @gcc -V 4.4
-LD = @g++ -V 4.4
+LD = @g++-4.4
 else
 $(error DISTRO $(DISTRO) unknown)
 endif
