@@ -214,6 +214,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		vsize.x = size.x-pos.x;
 	}
 
+	/* FIXME: This does not really work */
 	{
 		GdkGeometry x;
 		x.max_width = size.x*dvc->fixedfont_width;
