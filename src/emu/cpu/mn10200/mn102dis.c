@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "mn102dis.h"
 
 #include <stdio.h>
 
