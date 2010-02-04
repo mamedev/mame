@@ -326,7 +326,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "machine/idectrl.h"
 #include "machine/mb3773.h"
 #include "sound/psx.h"
-
+#include "audio/taito_zm.h"
 
 static unsigned char cis[512];
 static int locked;
@@ -853,6 +853,9 @@ static MACHINE_RESET( coh3002t )
 	psx_machine_init(machine);
 	devtag_reset(machine, "card");
 	ide_set_gnet_readlock(devtag_get_device(machine, "card"), 1);
+
+	// halt sound CPU since it has no valid program at start
+	cputag_set_input_line(machine, "mn10200",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
 static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -948,6 +951,8 @@ static MACHINE_DRIVER_START( coh3002t )
 	MDRV_NVRAM_HANDLER( coh3002t )
 
 	MDRV_MB3773_ADD("mb3773")
+
+	MDRV_IMPORT_FROM( taito_zoom_sound )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( coh3002t )
@@ -1075,9 +1080,9 @@ INPUT_PORTS_END
     	ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_SYSTEM_BIOS( 1, "v2",   "G-NET Bios v2" ) \
     	ROM_LOAD16_WORD_BIOS(1, "flashv2.u30", 0x000000, 0x200000, CRC(CAE462D3) SHA1(f1b10846a8423d9fe021191c5876190857c3d2a4) ) \
-	ROM_REGION32_LE( 0x80000,  "soundcpu", 0) \
+	ROM_REGION32_LE( 0x80000,  "mn10200", 0) \
 	ROM_FILL( 0, 0x80000, 0xff) \
-	ROM_REGION32_LE( 0x600000, "samples", 0) \
+	ROM_REGION32_LE( 0x600000, "zsg1", 0) \
 	ROM_FILL( 0, 0x600000, 0xff)
 
 ROM_START( taitogn )

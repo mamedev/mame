@@ -1236,6 +1236,20 @@ $(CPUOBJ)/rsp/rspfe.o:	$(CPUSRC)/rsp/rspfe.c \
 
 
 #-------------------------------------------------
+# Panasonic MN10200
+#-------------------------------------------------
+
+ifneq ($(filter MN10200,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/mn10200
+CPUOBJS += $(CPUOBJ)/mn10200/mn10200.o
+DASMOBJS += $(CPUOBJ)/mn10200/mn102dis.o
+endif
+
+$(CPUOBJ)/mn10200/mn10200.o:	$(CPUSRC)/mn10200/mn10200.c \
+								$(CPUSRC)/mn10200/mn10200.h
+
+
+#-------------------------------------------------
 # Saturn
 #-------------------------------------------------
 
