@@ -559,7 +559,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ddragnba_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ddragonba_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -574,15 +574,15 @@ static ADDRESS_MAP_START( dd2_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* might not be 100% accurate, check bits written */
-static WRITE8_HANDLER( ddragnba_port_w )
+static WRITE8_HANDLER( ddragonba_port_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
 	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 	cpu_set_input_line(state->sub_cpu, state->sprite_irq, CLEAR_LINE );
 }
 
-static ADDRESS_MAP_START( ddragnba_sub_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(ddragnba_port_w)
+static ADDRESS_MAP_START( ddragonba_sub_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(ddragonba_port_w)
 ADDRESS_MAP_END
 
 
@@ -1033,17 +1033,17 @@ static MACHINE_DRIVER_START( ddragonb )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( ddragnba )
+static MACHINE_DRIVER_START( ddragonba )
 	MDRV_IMPORT_FROM(ddragon)
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragnba_sub_map)
-	MDRV_CPU_IO_MAP(ddragnba_sub_portmap)
+	MDRV_CPU_PROGRAM_MAP(ddragonba_sub_map)
+	MDRV_CPU_IO_MAP(ddragonba_sub_portmap)
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( ddgn6809 )
+static MACHINE_DRIVER_START( ddragon6809 )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(ddragon_state)
@@ -2033,7 +2033,7 @@ static DRIVER_INIT( toffy )
 	/* should the sound rom be bitswapped too? */
 }
 
-static DRIVER_INIT( ddgn6809 )
+static DRIVER_INIT( ddragon6809 )
 {
 	ddragon_state *state = (ddragon_state *)machine->driver_data;
 	/* Descramble GFX here */
@@ -2057,9 +2057,9 @@ GAME( 1987, ddragonu,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos
 GAME( 1987, ddragonua,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonb2,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonb,    ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", GAME_SUPPORTS_SAVE ) // according to dump notes
-GAME( 1987, ddragonba,   ddragon,  ddragnba, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragon6809, ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
-GAME( 1987, ddragon6809a,ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
+GAME( 1987, ddragonba,   ddragon,  ddragonba,   ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragon6809, ddragon,  ddragon6809, ddragon,  ddragon6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
+GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon,  ddragon6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
 GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
 

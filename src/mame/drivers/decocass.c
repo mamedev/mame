@@ -789,11 +789,11 @@ static MACHINE_DRIVER_START( cgraplop )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( cgraplp2 )
+static MACHINE_DRIVER_START( cgraplop2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(decocass)
-	MDRV_MACHINE_RESET(cgraplp2)
+	MDRV_MACHINE_RESET(cgraplop2)
 MACHINE_DRIVER_END
 
 
@@ -1170,7 +1170,7 @@ ROM_START( cgraplop2 )
 	ROM_LOAD( "cgraplop.pro", 0x0000, 0x1000, CRC(ee93787d) SHA1(0c753d62fdce2fdbd5b329a5aa259a967d07a651) ) /* is this right for this set? */
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cgraplp2.cas", 0x0000, 0x8000, CRC(2e728981) SHA1(83ba90d95858d647315a1c311b8643672afea5f7) )
+	ROM_LOAD( "cgraplop2.cas", 0x0000, 0x8000, CRC(2e728981) SHA1(83ba90d95858d647315a1c311b8643672afea5f7) )
 ROM_END
 
 ROM_START( clapapa )
@@ -1404,7 +1404,7 @@ static DRIVER_INIT( decocrom )
 /* 27 */ GAME( 1982, cburnrub2,cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
 /* 27 */ GAME( 1982, cbnj,     cburnrub, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump N Jump (Cassette)", 0 )
 /* 28 */ GAME( 1983, cgraplop, decocass, cgraplop, cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 1)", 0 )
-/* 28 */ GAME( 1983, cgraplop2,cgraplop, cgraplp2, cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
+/* 28 */ GAME( 1983, cgraplop2,cgraplop, cgraplop2,cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
 /* 29 */ GAME( 1983, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
 /* 29 */ GAME( 1983, clapapa2, clapapa,  clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
 /* 31 */ GAME( 1983, cprobowl, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (Cassette)", 0 )

@@ -182,7 +182,7 @@ WRITE8_HANDLER( srdarwin_control_w )
     }
 }
 
-WRITE8_HANDLER( lastmiss_control_w )
+WRITE8_HANDLER( lastmisn_control_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
 
@@ -215,13 +215,13 @@ WRITE8_HANDLER( shackled_control_w )
 	state->scroll2[2] = (data >> 6) & 1;
 }
 
-WRITE8_HANDLER( lastmiss_scrollx_w )
+WRITE8_HANDLER( lastmisn_scrollx_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
 	state->scroll2[1] = data;
 }
 
-WRITE8_HANDLER( lastmiss_scrolly_w )
+WRITE8_HANDLER( lastmisn_scrolly_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
 	state->scroll2[3] = data;
@@ -640,7 +640,7 @@ VIDEO_START( oscar )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( lastmiss )
+VIDEO_UPDATE( lastmisn )
 {
 	dec8_state *state = (dec8_state *)screen->machine->driver_data;
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8)+ state->scroll2[1]));
@@ -667,13 +667,13 @@ VIDEO_UPDATE( shackled )
 	return 0;
 }
 
-static TILEMAP_MAPPER( lastmiss_scan_rows )
+static TILEMAP_MAPPER( lastmisn_scan_rows )
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x0f) + ((row & 0x0f) << 4)) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static TILE_GET_INFO( get_lastmiss_tile_info )
+static TILE_GET_INFO( get_lastmisn_tile_info )
 {
 	dec8_state *state = (dec8_state *)machine->driver_data;
 	int offs = tile_index * 2;
@@ -692,7 +692,7 @@ static TILE_GET_INFO( get_lastmiss_tile_info )
 			0);
 }
 
-static TILE_GET_INFO( get_lastmiss_fix_tile_info )
+static TILE_GET_INFO( get_lastmisn_fix_tile_info )
 {
 	dec8_state *state = (dec8_state *)machine->driver_data;
 	int offs = tile_index << 1;
@@ -706,11 +706,11 @@ static TILE_GET_INFO( get_lastmiss_fix_tile_info )
 			0);
 }
 
-VIDEO_START( lastmiss )
+VIDEO_START( lastmisn )
 {
 	dec8_state *state = (dec8_state *)machine->driver_data;
-	state->pf0_tilemap = tilemap_create(machine, get_lastmiss_tile_info, lastmiss_scan_rows, 16, 16, 32, 32);
-	state->fix_tilemap = tilemap_create(machine, get_lastmiss_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->pf0_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
+	state->fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 	state->game_uses_priority = 0;
@@ -719,8 +719,8 @@ VIDEO_START( lastmiss )
 VIDEO_START( shackled )
 {
 	dec8_state *state = (dec8_state *)machine->driver_data;
-	state->pf0_tilemap = tilemap_create(machine, get_lastmiss_tile_info, lastmiss_scan_rows, 16, 16, 32, 32);
-	state->fix_tilemap = tilemap_create(machine, get_lastmiss_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->pf0_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
+	state->fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 	tilemap_set_transmask(state->pf0_tilemap, 0, 0x000f, 0xfff0); /* Bottom 12 pens */

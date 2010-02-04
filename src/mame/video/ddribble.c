@@ -7,10 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ddrible.h"
+#include "includes/ddribble.h"
 
 
-PALETTE_INIT( ddrible )
+PALETTE_INIT( ddribble )
 {
 	int i;
 
@@ -31,7 +31,7 @@ PALETTE_INIT( ddrible )
 
 static void set_pens( running_machine *machine )
 {
-	ddrible_state *state = (ddrible_state *)machine->driver_data;
+	ddribble_state *state = (ddribble_state *)machine->driver_data;
 	int i;
 
 	for (i = 0x00; i < 0x80; i += 2)
@@ -46,7 +46,7 @@ static void set_pens( running_machine *machine )
 
 WRITE8_HANDLER( K005885_0_w )
 {
-	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
 	switch (offset)
 	{
 		case 0x03:	/* char bank selection for set 1 */
@@ -65,7 +65,7 @@ WRITE8_HANDLER( K005885_0_w )
 
 WRITE8_HANDLER( K005885_1_w )
 {
-	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
 	switch (offset)
 	{
 		case 0x03:	/* char bank selection for set 2 */
@@ -96,7 +96,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	ddrible_state *state = (ddrible_state *)machine->driver_data;
+	ddribble_state *state = (ddribble_state *)machine->driver_data;
 	UINT8 attr = state->fg_videoram[tile_index];
 	int num = state->fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((state->charbank[0] & 2) << 10);
 	SET_TILE_INFO(
@@ -108,7 +108,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	ddrible_state *state = (ddrible_state *)machine->driver_data;
+	ddribble_state *state = (ddribble_state *)machine->driver_data;
 	UINT8 attr = state->bg_videoram[tile_index];
 	int num = state->bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (state->charbank[1] << 11);
 	SET_TILE_INFO(
@@ -124,9 +124,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 ***************************************************************************/
 
-VIDEO_START( ddrible )
+VIDEO_START( ddribble )
 {
-	ddrible_state *state = (ddrible_state *)machine->driver_data;
+	ddribble_state *state = (ddribble_state *)machine->driver_data;
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan, 8, 8, 64, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan, 8, 8, 64, 32);
@@ -140,16 +140,16 @@ VIDEO_START( ddrible )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( ddrible_fg_videoram_w )
+WRITE8_HANDLER( ddribble_fg_videoram_w )
 {
-	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0xbff);
 }
 
-WRITE8_HANDLER( ddrible_bg_videoram_w )
+WRITE8_HANDLER( ddribble_bg_videoram_w )
 {
-	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0xbff);
 }
@@ -250,9 +250,9 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-VIDEO_UPDATE( ddrible )
+VIDEO_UPDATE( ddribble )
 {
-	ddrible_state *state = (ddrible_state *)screen->machine->driver_data;
+	ddribble_state *state = (ddribble_state *)screen->machine->driver_data;
 	set_pens(screen->machine);
 
 	tilemap_set_flip(state->fg_tilemap, (state->vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

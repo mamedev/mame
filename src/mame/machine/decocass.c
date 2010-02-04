@@ -1570,7 +1570,7 @@ MACHINE_RESET( cgraplop )
 	state->type3_swap = TYPE3_SWAP_56;
 }
 
-MACHINE_RESET( cgraplp2 )
+MACHINE_RESET( cgraplop2 )
 {
 	decocass_state *state = (decocass_state *)machine->driver_data;
 	decocass_reset_common(machine);

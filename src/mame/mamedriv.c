@@ -8161,10 +8161,10 @@ Other Sun games
 	DRIVER( mjtensin )	/* "100" 1995 Dynax */
 	DRIVER( nettoqc )	/* "103" (c) 1995 Nakanihon */
 	DRIVER( majrjhdx )	/* "105" 1996 Dynax */
-	DRIVER( ddenlvrj )	/* "113" (c) 1995 Dynax */
-	DRIVER( ddenlvrk )	/* "113" (c) 1995 Dynax */
-	DRIVER( ddenlovr )	/* "113" (c) 1996 Dynax */
-	DRIVER( ddenlovb )	/* bootleg */
+	DRIVER( ddenlovj )	/* "113" (c) 1995 Dynax (Japan) */
+	DRIVER( ddenlovrk )	/* "113" (c) 1995 Dynax (Korea) */
+	DRIVER( ddenlovr )	/* "113" (c) 1996 Dynax (Hong Kong) */
+	DRIVER( ddenlovrb )	/* bootleg */
 	DRIVER( hanakanz )	/* "507" 1996 Dynax */
 	DRIVER( akamaru )	/* "501" 1996 Dynax */
 	DRIVER( sryudens )	/* "502" 1996 Dynax / Face */

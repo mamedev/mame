@@ -149,7 +149,7 @@ extern MACHINE_RESET( cbnj );
 extern MACHINE_RESET( cburnrub );
 extern MACHINE_RESET( cbtime );
 extern MACHINE_RESET( cgraplop );
-extern MACHINE_RESET( cgraplp2 );
+extern MACHINE_RESET( cgraplop2 );
 extern MACHINE_RESET( clapapa );
 extern MACHINE_RESET( cfghtice );
 extern MACHINE_RESET( cprobowl );

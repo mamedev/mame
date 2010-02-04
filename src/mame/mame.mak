@@ -774,7 +774,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/contra.o $(VIDEO)/contra.o \
 	$(DRIVERS)/crimfght.o $(VIDEO)/crimfght.o \
 	$(DRIVERS)/dbz.o $(VIDEO)/dbz.o \
-	$(DRIVERS)/ddrible.o $(VIDEO)/ddrible.o \
+	$(DRIVERS)/ddribble.o $(VIDEO)/ddribble.o \
 	$(DRIVERS)/djmain.o $(VIDEO)/djmain.o \
 	$(DRIVERS)/fastfred.o $(VIDEO)/fastfred.o \
 	$(DRIVERS)/fastlane.o $(VIDEO)/fastlane.o \

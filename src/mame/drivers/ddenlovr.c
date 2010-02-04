@@ -81,7 +81,7 @@ TODO:
 
 - quiz365 protection
 
-- ddenlvrj, akamaru: the elapsed time text in the "game information" screen
+- ddenlovj, akamaru: the elapsed time text in the "game information" screen
   is all wrong (RTC/interrupts related).
 
 - sryudens: Transparency problems (Test->Option->Gal, Bonus Game during Demo mode).
@@ -1625,18 +1625,18 @@ static ADDRESS_MAP_START( quiz365_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static UINT16 *ddenlvrj_dsw_sel;
+static UINT16 *ddenlovj_dsw_sel;
 
-static READ16_HANDLER( ddenlvrj_dsw_r )
+static READ16_HANDLER( ddenlovj_dsw_r )
 {
 	UINT16 dsw = 0;
-	if ((~*ddenlvrj_dsw_sel) & 0x01)	dsw |= input_port_read(space->machine, "DSW1");
-	if ((~*ddenlvrj_dsw_sel) & 0x02)	dsw |= input_port_read(space->machine, "DSW2");
-	if ((~*ddenlvrj_dsw_sel) & 0x04)	dsw |= input_port_read(space->machine, "DSW3");
+	if ((~*ddenlovj_dsw_sel) & 0x01)	dsw |= input_port_read(space->machine, "DSW1");
+	if ((~*ddenlovj_dsw_sel) & 0x02)	dsw |= input_port_read(space->machine, "DSW2");
+	if ((~*ddenlovj_dsw_sel) & 0x04)	dsw |= input_port_read(space->machine, "DSW3");
 	return dsw;
 }
 
-static WRITE16_HANDLER( ddenlvrj_coincounter_w )
+static WRITE16_HANDLER( ddenlovj_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1646,12 +1646,12 @@ static WRITE16_HANDLER( ddenlvrj_coincounter_w )
 	}
 }
 
-static CUSTOM_INPUT( ddenlvrj_blitter_r )
+static CUSTOM_INPUT( ddenlovj_blitter_r )
 {
 	return ddenlovr_blitter_irq_flag ? 0x03 : 0x00;		// bit 4 = 1 -> blitter busy
 }
 
-static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddenlovj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ROM
 
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)							// Palette
@@ -1673,9 +1673,9 @@ static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlvrj_dsw_r)								// DSW
-	AM_RANGE(0x300188, 0x300189) AM_WRITE(ddenlvrj_coincounter_w)						// Coin Counters
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_BASE(&ddenlvrj_dsw_sel)			// DSW select
+	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlovj_dsw_r)								// DSW
+	AM_RANGE(0x300188, 0x300189) AM_WRITE(ddenlovj_coincounter_w)						// Coin Counters
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_BASE(&ddenlovj_dsw_sel)			// DSW select
 	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)// Sound
@@ -1683,35 +1683,35 @@ static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static UINT16 *ddenlvrk_protection1, *ddenlvrk_protection2;
-static READ16_HANDLER( ddenlvrk_protection1_r )
+static UINT16 *ddenlovrk_protection1, *ddenlovrk_protection2;
+static READ16_HANDLER( ddenlovrk_protection1_r )
 {
-	switch(*ddenlvrk_protection1)
+	switch(*ddenlovrk_protection1)
 	{
 		case 0x007e:	return 0x00aa;
 	}
-	return *ddenlvrk_protection1;
+	return *ddenlovrk_protection1;
 }
 
-static READ16_HANDLER( ddenlvrk_protection2_r )
+static READ16_HANDLER( ddenlovrk_protection2_r )
 {
-	switch(*ddenlvrk_protection1)
+	switch(*ddenlovrk_protection1)
 	{
-		case 0x0000:	return *ddenlvrk_protection2;
+		case 0x0000:	return *ddenlovrk_protection2;
 	}
 	return 0x80;
 }
-static WRITE16_HANDLER( ddenlvrk_protection2_w )
+static WRITE16_HANDLER( ddenlovrk_protection2_w )
 {
-	COMBINE_DATA( ddenlvrk_protection2 );
-	okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), ((*ddenlvrk_protection2)&0x7) * 0x40000);
+	COMBINE_DATA( ddenlovrk_protection2 );
+	okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), ((*ddenlovrk_protection2)&0x7) * 0x40000);
 }
 
-static ADDRESS_MAP_START( ddenlvrk_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddenlovrk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlvrk_protection1_r)							AM_BASE(&ddenlvrk_protection1)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlvrk_protection2_r, ddenlvrk_protection2_w)	AM_BASE(&ddenlvrk_protection2)
+	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlovrk_protection1_r)							AM_BASE(&ddenlovrk_protection1)
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlovrk_protection2_r, ddenlovrk_protection2_w)	AM_BASE(&ddenlovrk_protection2)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
@@ -3508,7 +3508,7 @@ ADDRESS_MAP_END
 
 
 
-static INPUT_PORTS_START( ddenlvrj )
+static INPUT_PORTS_START( ddenlovj )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -3535,7 +3535,7 @@ static INPUT_PORTS_START( ddenlvrj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	/* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	// blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ddenlvrj_blitter_r, NULL)	// blitter irq flag? (bit 5) & RTC (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ddenlovj_blitter_r, NULL)	// blitter irq flag? (bit 5) & RTC (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
 	PORT_START("DSW1")
@@ -7376,18 +7376,18 @@ static MACHINE_DRIVER_START( ddenlovr )
 	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( ddenlvrj )
+static MACHINE_DRIVER_START( ddenlovj )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ddenlvrj_map)
+	MDRV_CPU_PROGRAM_MAP(ddenlovj_map)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( ddenlvrk )
+static MACHINE_DRIVER_START( ddenlovrk )
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ddenlvrk_map)
+	MDRV_CPU_PROGRAM_MAP(ddenlovrk_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( akamaru )
@@ -8459,7 +8459,7 @@ ROMs:
 
 ***************************************************************************/
 
-ROM_START( ddenlvrj )
+ROM_START( ddenlovj )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "1124.2d", 0x000000, 0x040000, CRC(6a9ec557) SHA1(e1512601910a9d06e16a20e10ab7acc96a0819bd) )
 	ROM_LOAD16_BYTE( "1123.2h", 0x000001, 0x040000, CRC(d41cbed0) SHA1(5c80f6a6cf15518120f664a0446355e80eeb2a0f) )
@@ -8530,7 +8530,7 @@ Hardware info by Guru
 
 ***************************************************************************/
 
-ROM_START( ddenlvrk )
+ROM_START( ddenlovrk )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom.1a", 0x000000, 0x40000, CRC(868c45f8) SHA1(023ceaa30cfa03470ef005c8b739a85ae9764e15) )
 	ROM_LOAD16_BYTE( "rom.1b", 0x000001, 0x40000, CRC(4fab3c90) SHA1(61a756a3ccae39f3a649371116b9d940d3b1b852) )
@@ -8618,7 +8618,7 @@ Notes:
       HSync 15.30kHz
       VSync 60Hz
 */
-ROM_START( ddenlovb )
+ROM_START( ddenlovrb )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom2", 0x000000, 0x040000, CRC(cabdf78f) SHA1(789d4754c7b84964ee317b8a618f26a417f50bcc) )
 	ROM_LOAD16_BYTE( "rom3", 0x000001, 0x040000, CRC(36f8d05e) SHA1(78f75175541ebf377f5375ea30d80ea91f380971) )
@@ -9771,10 +9771,10 @@ GAME( 1994, hparadis, 0,        hparadis, hparadis, 0,        ROT0, "Dynax",    
 GAME( 1995, hgokou,   0,        hgokou,   hgokou,   0,        ROT0, "Dynax (Alba licence)",					       "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL )
 GAME( 1995, mjdchuka, 0,        mjchuuka, mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL )
 GAME( 1995, nettoqc,  0,        nettoqc,  nettoqc,  0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1995, ddenlvrj, 0,        ddenlvrj, ddenlvrj, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL )
-GAME( 1995, ddenlvrk, ddenlvrj, ddenlvrk, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL )
-GAME( 1995, ddenlovb, ddenlvrj, ddenlovr, ddenlovr, 0,        ROT0, "[Dynax] (bootleg)",                           "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL )
-GAME( 1996, ddenlovr, ddenlvrj, ddenlovr, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL )
+GAME( 1995, ddenlovj, 0,        ddenlovj, ddenlovj, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL )
+GAME( 1995, ddenlovrk,ddenlovj, ddenlovrk,ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL )
+GAME( 1995, ddenlovrb,ddenlovj, ddenlovr, ddenlovr, 0,        ROT0, "[Dynax] (bootleg)",                           "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL )
+GAME( 1996, ddenlovr, ddenlovj, ddenlovr, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL )
 GAME( 1996, hanakanz, 0,        hanakanz, hanakanz, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           GAME_NO_COCKTAIL )
 GAME( 1996, akamaru,  0,        akamaru,  akamaru,  0,        ROT0, "Dynax (Nakanihon licence)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        GAME_NO_COCKTAIL )
 GAME( 1996, sryudens, 0,        sryudens, sryudens, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

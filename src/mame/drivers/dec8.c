@@ -295,7 +295,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 			((((state->coin1 / 10) << 4) | (state->coin1 % 10)) << 8); /* Coins */
 }
 
-static WRITE8_HANDLER( lastmiss_i8751_w )
+static WRITE8_HANDLER( lastmisn_i8751_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
 	state->i8751_return = 0;
@@ -681,7 +681,7 @@ static ADDRESS_MAP_START( oscar_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmiss_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastmisn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -694,11 +694,11 @@ static ADDRESS_MAP_START( lastmiss_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
 	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
-	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
-	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
+	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmisn_scrollx_w) /* Scroll LSB */
+	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmisn_scrolly_w) /* Scroll LSB */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x180d, 0x180d) AM_WRITE(lastmiss_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmiss_i8751_w)
+	AM_RANGE(0x180d, 0x180d) AM_WRITE(lastmisn_control_w) /* Bank switch + Scroll MSB */
+	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmisn_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
@@ -707,7 +707,7 @@ static ADDRESS_MAP_START( lastmiss_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmiss_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastmisn_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -739,8 +739,8 @@ static ADDRESS_MAP_START( shackled_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
-	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
+	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmisn_scrollx_w) /* Scroll LSB */
+	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmisn_scrolly_w) /* Scroll LSB */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
@@ -764,8 +764,8 @@ static ADDRESS_MAP_START( shackled_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
 	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
-	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
-	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
+	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmisn_scrollx_w) /* Scroll LSB */
+	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmisn_scrolly_w) /* Scroll LSB */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(shackled_i8751_w)
@@ -1493,7 +1493,7 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( lastmsnj )
+static INPUT_PORTS_START( lastmisnj )
 	PORT_START("IN0")
 	PLAYER1_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -2294,17 +2294,17 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( lastmiss )
+static MACHINE_DRIVER_START( lastmisn )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(dec8_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(lastmiss_map)
+	MDRV_CPU_PROGRAM_MAP(lastmisn_map)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(lastmiss_sub_map)
+	MDRV_CPU_PROGRAM_MAP(lastmisn_sub_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(ym3526_s_map)
@@ -2327,8 +2327,8 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_GFXDECODE(shackled)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(lastmiss)
-	MDRV_VIDEO_UPDATE(lastmiss)
+	MDRV_VIDEO_START(lastmisn)
+	MDRV_VIDEO_UPDATE(lastmisn)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2428,8 +2428,8 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_GFXDECODE(shackled)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(lastmiss)
-	MDRV_VIDEO_UPDATE(lastmiss)
+	MDRV_VIDEO_START(lastmisn)
+	MDRV_VIDEO_UPDATE(lastmisn)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -3603,7 +3603,7 @@ static DRIVER_INIT( shackled )
 	DRIVER_INIT_CALL( dec8 );
 }
 
-static DRIVER_INIT( lastmiss )
+static DRIVER_INIT( lastmisn )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
@@ -3634,9 +3634,9 @@ GAME( 1988, oscar,    0,        oscar,    oscar,    oscar,       ROT0,   "Data E
 GAME( 1987, oscaru,   oscar,    oscar,    oscaru,   oscar,       ROT0,   "Data East USA", "Psycho-Nics Oscar (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, oscarj1,  oscar,    oscar,    oscaru,   oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, oscarj2,  oscar,    oscar,    oscaru,   oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lastmisn, 0,        lastmiss, lastmisn, lastmiss,    ROT270, "Data East USA", "Last Mission (US revision 6)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lastmisno,lastmisn, lastmiss, lastmisn, lastmiss,    ROT270, "Data East USA", "Last Mission (US revision 5)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,lastmisn, lastmiss, lastmsnj, lastmiss,    ROT270, "Data East Corporation", "Last Mission (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lastmisn, 0,        lastmisn, lastmisn, lastmisn,    ROT270, "Data East USA", "Last Mission (US revision 6)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lastmisno,lastmisn, lastmisn, lastmisn, lastmisn,    ROT270, "Data East USA", "Last Mission (US revision 5)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,lastmisn, lastmisn, lastmisnj, lastmisn,    ROT270, "Data East Corporation", "Last Mission (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, shackled, 0,        shackled, shackled, shackled,    ROT0,   "Data East USA", "Shackled (US)", GAME_SUPPORTS_SAVE )
 GAME( 1986, breywood, shackled, shackled, shackled, shackled,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, csilver,  0,        csilver,  csilver,  csilver,     ROT0,   "Data East Corporation", "Captain Silver (World)", GAME_SUPPORTS_SAVE )

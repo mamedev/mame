@@ -99,7 +99,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
       * BUTTON2n : "nuke"
 
 
-3) 'dassaul4'
+3) 'dassault4'
 
   - always 4 players :
 
@@ -422,7 +422,7 @@ static INPUT_PORTS_START( dassault )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dassaul4 )
+static INPUT_PORTS_START( dassault4 )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("P1_P2")
@@ -848,4 +848,4 @@ static DRIVER_INIT( thndzone )
 
 GAME( 1991, thndzone, 0,        dassault, thndzone, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", 0 )
 GAME( 1991, dassault, thndzone, dassault, dassault, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", 0 )
-GAME( 1991, dassault4,thndzone, dassault, dassaul4, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", 0 )
+GAME( 1991, dassault4,thndzone, dassault, dassault4,dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", 0 )

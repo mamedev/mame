@@ -4,8 +4,8 @@
 
 ***************************************************************************/
 
-typedef struct _ddrible_state ddrible_state;
-struct _ddrible_state
+typedef struct _ddribble_state ddribble_state;
+struct _ddribble_state
 {
 	/* memory pointers */
 	UINT8 *     sharedram;
@@ -30,13 +30,13 @@ struct _ddrible_state
 	running_device *filter3;
 };
 
-/*----------- defined in video/ddrible.c -----------*/
+/*----------- defined in video/ddribble.c -----------*/
 
-WRITE8_HANDLER( ddrible_fg_videoram_w );
-WRITE8_HANDLER( ddrible_bg_videoram_w );
+WRITE8_HANDLER( ddribble_fg_videoram_w );
+WRITE8_HANDLER( ddribble_bg_videoram_w );
 WRITE8_HANDLER( K005885_0_w );
 WRITE8_HANDLER( K005885_1_w );
 
-PALETTE_INIT( ddrible );
-VIDEO_START( ddrible );
-VIDEO_UPDATE( ddrible );
+PALETTE_INIT( ddribble );
+VIDEO_START( ddribble );
+VIDEO_UPDATE( ddribble );

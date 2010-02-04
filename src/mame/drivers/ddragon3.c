@@ -437,7 +437,7 @@ static INPUT_PORTS_START( ctribe )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ddrago3b )
+static INPUT_PORTS_START( ddragon3b )
 	PORT_INCLUDE( ctribe )
 
 	PORT_MODIFY("IN0")
@@ -630,7 +630,7 @@ static MACHINE_DRIVER_START( ddragon3 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( ddrago3b )
+static MACHINE_DRIVER_START( ddragon3b )
 	MDRV_IMPORT_FROM(ddragon3)
 
 	MDRV_CPU_MODIFY("maincpu")
@@ -1014,7 +1014,7 @@ ROM_END
 GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ddragon3j,ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ddragon3p,ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b,ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b,ddragon3, ddragon3b,ddragon3b,0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US Set 1?)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (Japan)", GAME_SUPPORTS_SAVE )
