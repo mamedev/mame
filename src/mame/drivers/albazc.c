@@ -4,7 +4,7 @@
 TODO:
 - colour decoding might not be perfect
 - Background color should be green, but current handling might be wrong.
-- some unknown sprite attributes, sprite flipping in flip screen needed
+- some unknown sprite attributes
 - don't know what to do when the jackpot is displayed (missing controls ?)
 - according to the board pic, there should be one more 4-switches dip
   switch bank, and probably some NVRAM because there's a battery.
@@ -21,6 +21,7 @@ struct _albazc_state
 	UINT8 *  spriteram1;
 	UINT8 *  spriteram2;
 	UINT8 *  spriteram3;
+	UINT8 flip_bit;
 };
 
 
@@ -61,7 +62,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int sx = state->spriteram1[i + 0x200] | ((state->spriteram2[i + 0x200] & 0x07) << 8);
 		int sy = 242 - state->spriteram3[i];
 
-		if (flip_screen_get(machine))
+		if (state->flip_bit)
 		{
 			sy = 242 - sy;
 			flipx = !flipx;
@@ -123,6 +124,26 @@ static WRITE8_HANDLER( hanaroku_out_2_w )
 	// unused
 }
 
+static WRITE8_HANDLER( albazc_vregs_w )
+{
+	albazc_state *state = (albazc_state *)space->machine->driver_data;
+
+	#ifdef UNUSED_FUNCTION
+	{
+		static UINT8 x[5];
+		x[offset] = data;
+		popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
+	}
+	#endif
+
+	if(offset == 0)
+	{
+		/* core bug with this? */
+		//flip_screen_set(space->machine, (data & 0x40) >> 6);
+		state->flip_bit = (data & 0x40) >> 6;
+	}
+}
+
 /* main cpu */
 
 static ADDRESS_MAP_START( hanaroku_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -131,7 +152,7 @@ static ADDRESS_MAP_START( hanaroku_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram2)
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITENOP	// ???
+	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM			// main ram
 	AM_RANGE(0xc400, 0xc4ff) AM_RAM			// ???
@@ -260,7 +281,7 @@ static MACHINE_DRIVER_START( hanaroku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000) /* ? MHz */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -282,4 +303,4 @@ ROM_START( hanaroku )
 ROM_END
 
 
-GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, 0, ROT0, "Alba", "Hanaroku", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, 0, ROT0, "Alba", "Hanaroku", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
