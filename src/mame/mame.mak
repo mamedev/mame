@@ -120,7 +120,7 @@ CPUS += SUPERFX
 CPUS += Z8
 CPUS += I8008
 CPUS += SCMP
-
+CPUS += MN10200
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1331,6 +1331,7 @@ $(MAMEOBJ)/taito.a: \
 	$(AUDIO)/t5182.o \
 	$(MACHINE)/taitoio.o \
 	$(VIDEO)/taitoic.o \
+	$(AUDIO)/taito_zm.o \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \
