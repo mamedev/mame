@@ -168,7 +168,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
     (reads from 0x2801 occur almost all the time).
     So IMO this set looks like a World bootleg .
 
-4) 'wexpresb'
+4) 'wexpressb'
 
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
   - Modified Warning screen
@@ -184,7 +184,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
       * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
       * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
 
-5) 'wexpresc'
+5) 'wexpressb2'
 
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
   - Original Warning screen
@@ -193,12 +193,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
     that there shall exist a "better" Japan undumped version)
     so all comments also fit for this set. The main difference is
     the way protection is bypassed (in a different way than 'wexpress'
-    but also in a different way than 'wexpresb' as reads from 0x2801
+    but also in a different way than 'wexpressb' as reads from 0x2801
     occur when you lose a life but also on "shoot" stages).
-    The other difference is that you can NOT continue a game as in 'wexpresb'.
-  - "Bonus lives" routine starts at 0xe4e5 (same as 'wexpresb')
-  - Coinage related stuff starts at 0xe7d8 (same as 'wexpresb').
-  - Coinage tables (same as 'wexpresb') :
+    The other difference is that you can NOT continue a game as in 'wexpressb'.
+  - "Bonus lives" routine starts at 0xe4e5 (same as 'wexpressb')
+  - Coinage related stuff starts at 0xe7d8 (same as 'wexpressb').
+  - Coinage tables (same as 'wexpressb') :
       * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
       * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
 
@@ -781,21 +781,21 @@ static DRIVER_INIT( exprraid )
 	exprraid_gfx_expand(machine);
 }
 
-static DRIVER_INIT( wexpresb )
+static DRIVER_INIT( wexpressb )
 {
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 
-static DRIVER_INIT( wexpresc )
+static DRIVER_INIT( wexpressb2 )
 {
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 
 
-GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wexpress,  exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wexpressb, exprraid, exprboot, exprboot, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid,  ROT0, "Data East USA", "Express Raider (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid,  ROT0, "Data East USA", "Express Raider (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpress,  exprraid, exprraid, exprraid, wexpress,  ROT0, "Data East Corporation", "Western Express (World?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb, exprraid, exprboot, exprboot, wexpressb, ROT0, "bootleg", "Western Express (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, wexpressb2,ROT0, "bootleg", "Western Express (bootleg set 2)", GAME_SUPPORTS_SAVE )

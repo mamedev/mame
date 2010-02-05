@@ -8992,8 +8992,8 @@ Other Sun games
 	DRIVER( laserbasa )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( futflash )	/* (c) 1981 HOEI (Arcade TV Game List - P.96, Right, 18 from top) */
 	DRIVER( turbosub )	/* (c) 1985 Entertainment Sciences */
-	DRIVER( turbosb7 )	/* (c) 1985 Entertainment Sciences */
-	DRIVER( turbosb6 )	/* (c) 1985 Entertainment Sciences */
+	DRIVER( turbosub7 )	/* (c) 1985 Entertainment Sciences */
+	DRIVER( turbosub6 )	/* (c) 1985 Entertainment Sciences */
 	DRIVER( pipeline )	/* (c) 1990 Daehyun Electronics */
 	DRIVER( ttchamp )
 	DRIVER( ttchampa )

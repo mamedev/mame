@@ -37,7 +37,7 @@ Done:
   Couriersud: 11/2007
 
     - Added configuration switch to change palette between TKG02 (radarscp conversion) and TKG04 (dkong 2board)
-    - Added speech support (samples) to radarsc1
+    - Added speech support (samples) to radarscp1
     - Hooked up and written 8257 dma controller
         All dkong and dkongjr based games now use the 8257
         All epos and 2650 based games now use the 8257
@@ -448,7 +448,7 @@ static MACHINE_START( radarscp )
     state->hardware_type = HARDWARE_TRS02;
 }
 
-static MACHINE_START( radarsc1 )
+static MACHINE_START( radarscp1 )
 {
     dkong_state *state = (dkong_state *)machine->driver_data;
 
@@ -1615,16 +1615,16 @@ static MACHINE_DRIVER_START( radarscp )
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( radarsc1 )
+static MACHINE_DRIVER_START( radarscp1 )
 
     MDRV_IMPORT_FROM(dkong_base)
 
-    MDRV_MACHINE_START(radarsc1)
+    MDRV_MACHINE_START(radarscp1)
     MDRV_PALETTE_LENGTH(RS_PALETTE_LENGTH)
-    MDRV_PALETTE_INIT(radarsc1)
+    MDRV_PALETTE_INIT(radarscp1)
 
     /* sound hardware */
-    MDRV_IMPORT_FROM(radarsc1_audio)
+    MDRV_IMPORT_FROM(radarscp1_audio)
 
 MACHINE_DRIVER_END
 
@@ -2948,7 +2948,7 @@ static DRIVER_INIT( strtheat )
  *************************************/
 
 GAME( 1980, radarscp, 0,        radarscp, radarscp,       0, ROT90, "Nintendo", "Radar Scope", GAME_SUPPORTS_SAVE )
-GAME( 1980, radarscp1,radarscp, radarsc1, radarscp,       0, ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
+GAME( 1980, radarscp1,radarscp, radarscp1,radarscp,       0, ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, dkong,    0,        dkong2b,  dkong,          0,  ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongo,   dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )

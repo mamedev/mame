@@ -1140,9 +1140,9 @@ Addresses found at @0x510, cpu2
         { 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }
     and related samples interface
 
-    static const char *const radarsc1_sample_names[] =
+    static const char *const radarscp1_sample_names[] =
     {
-        "*radarsc1",
+        "*radarscp1",
         "10.wav",
         "12.wav",
         "14.wav",
@@ -1155,10 +1155,10 @@ Addresses found at @0x510, cpu2
         0
     };
 
-    static const samples_interface radarsc1_samples_interface =
+    static const samples_interface radarscp1_samples_interface =
     {
         8,
-        radarsc1_sample_names
+        radarscp1_sample_names
     };
 
 */
@@ -1259,7 +1259,7 @@ static ADDRESS_MAP_START( dkongjr_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( radarsc1_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( radarscp1_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls175.3d", latch8_r)
 	AM_RANGE(0x00, 0xff) AM_DEVWRITE("discrete", dkong_p1_w) /* DAC here */
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_LATCH8_READ("virtual_p1")
@@ -1320,8 +1320,8 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_SOUND7_INP)
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
-     *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
-     *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
+     *   If P2.Bit6 -> activates the external compressed sample ROM (not radarscp1)
+     *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarscp1)
      *   If P2.Bit4 -> status code to main cpu
      *   P2.Bit2-0  -> select the 256 byte bank for external ROM
      */
@@ -1352,11 +1352,11 @@ MACHINE_DRIVER_START( radarscp_audio )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( radarsc1_audio )
+MACHINE_DRIVER_START( radarscp1_audio )
 
 	MDRV_IMPORT_FROM( radarscp_audio )
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_IO_MAP(radarsc1_sound_io_map)
+	MDRV_CPU_IO_MAP(radarscp1_sound_io_map)
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */

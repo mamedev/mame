@@ -118,7 +118,7 @@ TODO:
   dip switch reading will fail if the main CPU is running at the nominally correct
   4MHz speed. This is kludge by slighly lowering the speed to 3.98MHz.
 - the dorunrun attract mode sequence is also very timing sensitive. The behaviour
-  of the "dorunru2" set, verified on the real board, with all dips in the OFF
+  of the "dorunrun2" set, verified on the real board, with all dips in the OFF
   position (easiest difficulty setting), should be, for the first 12 rounds of
   demo play:
   1) Mr do moves right. Kills all monsters and a letter 'E'.
@@ -137,7 +137,7 @@ TODO:
   Small changes to the CPU speed alter the demo timing and can cause the above
   sequence not to work (e.g. Mr Do might not fill all monsters at once on the
   first round). The 3.98MHz speed makes the sequence work.
-  Note that this only works in the dorunru2 set. The dorunrun set works slightly
+  Note that this only works in the dorunrun2 set. The dorunrun set works slightly
   differently, however it hasn't been compared with the real board so it might be
   right.
 - unknown ports 0 and 2
@@ -609,7 +609,7 @@ static MACHINE_DRIVER_START( docastle )
 
 	/* basic machine hardware */
 //  MDRV_CPU_ADD("maincpu", Z80, 4000000)  // 4 MHz
-	MDRV_CPU_ADD("maincpu", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
+	MDRV_CPU_ADD("maincpu", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunrun2 attract sequence
 	MDRV_CPU_PROGRAM_MAP(docastle_map)
 	MDRV_CPU_IO_MAP(docastle_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

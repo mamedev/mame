@@ -1482,7 +1482,7 @@ GAME( 1980, spectar1, spectar, spectar,  spectar,  spectar,  ROT0, "Exidy", "Spe
 GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, panzer,   spectar, rallys,   rallys,   rallys,   ROT0, "Proel", "Panzer (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, phantom,  spectar, rallys,   phantoma, phantoma, ROT0, "Proel","Phantom (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, phantom,  spectar, rallys,   phantoma, phantoma, ROT0, "Proel", "Phantom (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1981, mtrap,    0,       mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", GAME_SUPPORTS_SAVE )

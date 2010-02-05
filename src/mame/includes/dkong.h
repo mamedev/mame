@@ -195,7 +195,7 @@ WRITE8_HANDLER( dkong_videoram_w );
 
 PALETTE_INIT( dkong2b );
 PALETTE_INIT( radarscp );
-PALETTE_INIT( radarsc1 );
+PALETTE_INIT( radarscp1 );
 PALETTE_INIT( dkong3 );
 
 VIDEO_START( dkong );
@@ -211,5 +211,5 @@ MACHINE_DRIVER_EXTERN( radarscp_audio );
 MACHINE_DRIVER_EXTERN( dkong2b_audio );
 MACHINE_DRIVER_EXTERN( dkongjr_audio );
 MACHINE_DRIVER_EXTERN( dkong3_audio );
-MACHINE_DRIVER_EXTERN( radarsc1_audio );
+MACHINE_DRIVER_EXTERN( radarscp1_audio );
 
