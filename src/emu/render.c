@@ -63,15 +63,6 @@
 
 enum
 {
-	COMPONENT_TYPE_IMAGE = 0,
-	COMPONENT_TYPE_RECT,
-	COMPONENT_TYPE_DISK,
-	COMPONENT_TYPE_MAX
-};
-
-
-enum
-{
 	CONTAINER_ITEM_LINE = 0,
 	CONTAINER_ITEM_QUAD,
 	CONTAINER_ITEM_MAX
@@ -280,6 +271,7 @@ static container_item *render_container_item_add_generic(render_container *conta
 static void render_container_overlay_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 static void render_container_recompute_lookups(render_container *container);
 static void render_container_update_palette(render_container *container);
+static void render_target_free_component_containers(const render_target *target);
 
 
 
@@ -1152,6 +1144,10 @@ void render_target_free(render_target *target)
 	/* remove us from the list */
 	for (curr = &targetlist; *curr != target; curr = &(*curr)->next) ;
 	*curr = target->next;
+
+	/* free any containers */
+
+	render_target_free_component_containers(target);
 
 	/* free any primitives */
 	for (listnum = 0; listnum < ARRAY_LENGTH(target->primlist); listnum++)
@@ -2114,6 +2110,19 @@ static void add_element_primitives(render_target *target, render_primitive_list 
 			append_render_primitive(list, prim);
 		else
 			free_render_primitive(prim);
+	}
+	/* Look for container components */
+	for (element_component *component = element->complist; element != NULL; element = element->next )
+	{
+		if (component->type == COMPONENT_TYPE_CONTAINER)
+		{
+			if (component->container != NULL)
+				add_container_primitives(target, list, xform, component->container, BLENDMODE_ALPHA);
+			component->scaled_bounds.min_x = render_round_nearest(xform->xoffs);
+			component->scaled_bounds.min_y = render_round_nearest(xform->yoffs);
+			component->scaled_bounds.max_x = render_round_nearest(xform->xoffs + xform->xscale);
+			component->scaled_bounds.max_y = render_round_nearest(xform->yoffs + xform->yscale);
+		}
 	}
 }
 
@@ -3151,4 +3160,51 @@ static void render_container_update_palette(render_container *container)
 					}
 		}
 	}
+}
+
+static void render_target_free_component_containers(const render_target *target)
+{
+	/* for each layer, get scan all components ... */
+	for (int layer = 0; layer < ITEM_LAYER_MAX; layer++)
+		for (view_item *item = target->curview->itemlist[layer]; item != NULL; item = item->next)
+		{
+			for (layout_element *element = item->element; element != NULL; element = element->next)
+			{
+				for (element_component *component = element->complist; component != NULL; component = component->next)
+				{
+					if ((component->type == COMPONENT_TYPE_CONTAINER) && component->container != NULL)
+					{
+						render_container_free(component->container);
+						component->container = NULL;
+					}
+				}
+			}
+		}
+}
+
+render_container *render_target_get_component_container(const render_target *target, const char *name, rectangle *scaled_bounds)
+{
+	/* for each layer, get scan all components ... */
+	for (int layer = 0; layer < ITEM_LAYER_MAX; layer++)
+		for (view_item *item = target->curview->itemlist[layer]; item != NULL; item = item->next)
+		{
+			for (layout_element *element = item->element; element != NULL; element = element->next)
+			{
+				for (element_component *component = element->complist; component != NULL; component = component->next)
+				{
+					if ((component->type == COMPONENT_TYPE_CONTAINER) && (strcmp(name, component->string) == 0))
+					{
+						if (scaled_bounds != NULL)
+							*scaled_bounds = component->scaled_bounds;
+						if (component->container == NULL)
+						{
+							component->container = render_container_alloc(target->machine);
+						}
+						return component->container;
+					}
+				}
+			}
+		}
+	return NULL;
+
 }

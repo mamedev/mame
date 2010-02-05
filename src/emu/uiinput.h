@@ -61,6 +61,8 @@ void ui_input_init(running_machine *machine);
 
 /* ----- event handling ----- */
 
+void ui_input_frame_update(running_machine *machine);
+
 /* pushes a single event onto the queue */
 int ui_input_push_event(running_machine *machine, ui_event event);
 

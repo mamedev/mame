@@ -59,7 +59,7 @@ struct _ui_input_private
     FUNCTION PROTOYPES
 ***************************************************************************/
 
-static void ui_input_frame_update(running_machine *machine);
+//static void ui_input_frame_update(running_machine *machine);
 
 
 
@@ -95,7 +95,7 @@ void ui_input_init(running_machine *machine)
     corresponding IPT_UI_* events
 -------------------------------------------------*/
 
-static void ui_input_frame_update(running_machine *machine)
+void ui_input_frame_update(running_machine *machine)
 {
 	ui_input_private *uidata = machine->ui_input_data;
 	int code;

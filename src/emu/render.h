@@ -460,6 +460,6 @@ void render_container_add_quad(render_container *container, float x0, float y0, 
 /* add a char item to the specified container */
 void render_container_add_char(render_container *container, float x0, float y0, float height, float aspect, rgb_t argb, render_font *font, UINT16 ch);
 
-
+render_container *render_target_get_component_container(const render_target *target, const char *name, rectangle *scaled_bounds);
 
 #endif	/* __RENDER_H__ */

@@ -70,6 +70,21 @@ enum
 };
 
 
+enum
+{
+	COMPONENT_TYPE_IMAGE = 0,
+	COMPONENT_TYPE_RECT,
+	COMPONENT_TYPE_DISK,
+	COMPONENT_TYPE_TEXT,
+	COMPONENT_TYPE_CONTAINER,
+	COMPONENT_TYPE_LED7SEG,
+	COMPONENT_TYPE_LED14SEG,
+	COMPONENT_TYPE_LED16SEG,
+	COMPONENT_TYPE_LED14SEGSC,
+	COMPONENT_TYPE_LED16SEGSC,
+	COMPONENT_TYPE_MAX
+};
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -82,6 +97,25 @@ typedef struct _view_item_state view_item_state;
 typedef struct _view_item view_item;
 typedef struct _layout_view layout_view;
 typedef struct _layout_file layout_file;
+
+/* an element_component represents an image, rectangle, or disk in an element */
+struct _element_component
+{
+	element_component *	next;				/* link to next component */
+	int					type;				/* type of component */
+	int					state;				/* state where this component is visible (-1 means all states) */
+	render_bounds		bounds;				/* bounds of the element */
+	render_container *	container;			/* container for container elements */
+	rectangle			scaled_bounds;		/* for container elements */
+	render_color		color;				/* color of the element */
+	const char *		string;				/* string for text components */
+											/* name for container components */
+	bitmap_t *			bitmap;				/* source bitmap for images */
+	const char *		dirname;			/* directory name of image file (for lazy loading) */
+	const char *		imagefile;			/* name of the image file (for lazy loading) */
+	const char *		alphafile;			/* name of the alpha file (for lazy loading) */
+	int					hasalpha;			/* is there any alpha component present? */
+};
 
 /* an element_texture encapsulates a texture for a given element in a given state */
 struct _element_texture
@@ -166,8 +200,6 @@ void layout_view_recompute(layout_view *view, int layerconfig);
 /* ----- layout file parsing ----- */
 layout_file *layout_file_load(const machine_config *config, const char *dirname, const char *filename);
 void layout_file_free(layout_file *file);
-
-
 
 /***************************************************************************
     GLOBAL VARIABLES

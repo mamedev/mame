@@ -106,40 +106,11 @@
 #define LINE_CAP_START 1
 #define LINE_CAP_END   2
 
-enum
-{
-	COMPONENT_TYPE_IMAGE = 0,
-	COMPONENT_TYPE_RECT,
-	COMPONENT_TYPE_DISK,
-	COMPONENT_TYPE_TEXT,
-	COMPONENT_TYPE_LED7SEG,
-	COMPONENT_TYPE_LED14SEG,
-	COMPONENT_TYPE_LED16SEG,
-	COMPONENT_TYPE_LED14SEGSC,
-	COMPONENT_TYPE_LED16SEGSC,
-	COMPONENT_TYPE_MAX
-};
-
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* an element_component represents an image, rectangle, or disk in an element */
-struct _element_component
-{
-	element_component *	next;				/* link to next component */
-	int					type;				/* type of component */
-	int					state;				/* state where this component is visible (-1 means all states) */
-	render_bounds		bounds;				/* bounds of the element */
-	render_color		color;				/* color of the element */
-	const char *		string;				/* string for text components */
-	bitmap_t *			bitmap;				/* source bitmap for images */
-	const char *		dirname;			/* directory name of image file (for lazy loading) */
-	const char *		imagefile;			/* name of the image file (for lazy loading) */
-	const char *		alphafile;			/* name of the alpha file (for lazy loading) */
-	int					hasalpha;			/* is there any alpha component present? */
-};
 
 
 
@@ -390,6 +361,10 @@ static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const r
 
 				case COMPONENT_TYPE_TEXT:
 					layout_element_draw_text(dest, &bounds, &component->color, component->string);
+					break;
+
+				case COMPONENT_TYPE_CONTAINER:
+					component->scaled_bounds = bounds;
 					break;
 
 				case COMPONENT_TYPE_LED7SEG:
@@ -1687,6 +1662,20 @@ static element_component *load_element_component(const machine_config *config, x
 		component->alphafile = (afile == NULL) ? NULL : copy_string(afile);
 	}
 
+	/* container nodes */
+	else if (strcmp(compnode->name, "container") == 0)
+	{
+		const char *name = xml_get_attribute_string_with_subst(config, compnode, "name", "");
+		char *string;
+
+		/* allocate a copy of the string */
+		component->type = COMPONENT_TYPE_CONTAINER;
+		string = global_alloc_array(char, strlen(name) + 1);
+		strcpy(string, name);
+		component->string = string;
+		component->container = NULL;
+	}
+
 	/* text nodes */
 	else if (strcmp(compnode->name, "text") == 0)
 	{
@@ -2124,3 +2113,4 @@ static void layout_element_free(layout_element *element)
 		global_free(element->name);
 	global_free(element);
 }
+
