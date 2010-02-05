@@ -9,6 +9,7 @@ Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.
 
 UINT64 *naomi_ram64;
 int jvsboard_type;
+UINT16 actel_id;
 
 static READ64_HANDLER( naomi_bios_idle_skip_r )
 {
@@ -25,12 +26,14 @@ DRIVER_INIT(naomi)
 {
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
+	actel_id = 0xffff;
 }
 
 DRIVER_INIT(naomi_mp)
 {
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_MAHJONG;
+	actel_id = 0xffff;
 }
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
@@ -77,4 +80,28 @@ DRIVER_INIT( ggxxrl )
 {
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
+}
+
+DRIVER_INIT( qmegamis )
+{
+	DRIVER_INIT_CALL(naomi);
+	actel_id = 0; //FIXME: correct value
+}
+
+DRIVER_INIT( mvsc2 )
+{
+	DRIVER_INIT_CALL(naomi);
+	actel_id = 0; //FIXME: correct value
+}
+
+DRIVER_INIT( gram2000 )
+{
+	DRIVER_INIT_CALL(naomi);
+	actel_id = 0; //FIXME: correct value
+}
+
+DRIVER_INIT( vf4evoct )
+{
+//	DRIVER_INIT_CALL(naomi2);
+	actel_id = 0; //FIXME: correct value
 }
