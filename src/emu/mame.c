@@ -1317,7 +1317,7 @@ running_machine::running_machine(const game_driver *driver)
 
 		/* fetch core options */
 		sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
-		debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
+		debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_OSD_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
 	}
 	catch (std::bad_alloc &)
 	{

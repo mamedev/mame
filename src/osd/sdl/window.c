@@ -510,7 +510,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 	ASSERT_WINDOW_THREAD();
 
 	// if we are in debug mode, never go full screen
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	if (window->machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		return NULL;
 
 	// If we are going fullscreen (leaving windowed) remember our windowed size
@@ -642,7 +642,7 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!options_get_bool(mame_options(), OPTION_DEBUG))
+	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		//FIXME: SDL1.3: really broken: the whole SDL code
 		//       will only work correct with relative mouse movements ...
@@ -665,7 +665,7 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 #else
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!options_get_bool(mame_options(), OPTION_DEBUG))
+	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		if ( window->fullscreen || sdlinput_should_hide_mouse(machine) )
 		{

@@ -301,7 +301,7 @@ static void winwindow_exit(running_machine *machine)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// possibly kill the debug window
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		debugwin_destroy_windows();
 
 	// free all the windows
@@ -386,7 +386,7 @@ void winwindow_process_events(running_machine *machine, int ingame)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we're running, disable some parts of the debugger
-	if (ingame && (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (ingame && (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugwin_update_during_game(machine);
 
 	// remember the last time we did this
@@ -514,8 +514,9 @@ void winwindow_toggle_full_screen(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we are in debug mode, never go full screen
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
-		return;
+	for (window = win_window_list; window != NULL; window = window->next)
+		if (window->machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+			return;
 
 	// toggle the window mode
 	video_config.windowed = !video_config.windowed;

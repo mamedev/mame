@@ -137,7 +137,7 @@ void winvideo_init(running_machine *machine)
 		SetForegroundWindow(win_window_list->hwnd);
 
 	// possibly create the debug window, but don't show it yet
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		debugwin_init_windows();
 }
 
@@ -406,7 +406,7 @@ static void extract_video_config(running_machine *machine)
 	video_config.numscreens    = options_get_int(mame_options(), WINOPTION_NUMSCREENS);
 
 	// if we are in debug mode, never go full screen
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 	stemp                      = options_get_string(mame_options(), WINOPTION_EFFECT);
 	if (strcmp(stemp, "none") != 0)

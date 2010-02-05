@@ -354,7 +354,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	sdlinput_poll(machine);
 	check_osd_inputs(machine);
 
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if ((machine->debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugwin_update_during_game(machine);
 }
 
@@ -635,7 +635,7 @@ static void extract_video_config(running_machine *machine)
 	#endif
 
 
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
 	stemp = options_get_string(mame_options(), SDLOPTION_EFFECT);

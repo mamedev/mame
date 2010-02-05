@@ -541,7 +541,7 @@ void osd_init(running_machine *machine)
 	defines_verbose();
 
 	if (!SDLMAME_HAS_DEBUGGER)
-		if (options_get_bool(mame_options(), OPTION_DEBUG))
+		if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		{
 			mame_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
 			osd_exit(machine);

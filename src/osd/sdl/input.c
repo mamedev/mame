@@ -1118,7 +1118,7 @@ void sdlinput_init(running_machine *machine)
 	// register the mice
 	sdlinput_register_mice(machine);
 
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 	{
 		mame_printf_warning("Debug Build: Disabling input grab for -debug\n");
 		mouse_enabled = 0;

@@ -339,7 +339,7 @@ void osd_init(running_machine *machine)
 	const char *stemp;
 
 	// thread priority
-	if (!options_get_bool(mame_options(), OPTION_DEBUG))
+	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
 		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
 
 	// ensure we get called on the way out
