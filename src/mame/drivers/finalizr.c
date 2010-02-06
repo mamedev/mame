@@ -6,7 +6,7 @@
 
     2009-03:
     Added dsw locations and verified factory setting based on Guru's notes
-    (actually for finalizr only, finalizb locations assumed to be the same)
+    (actually for finalizr only, finalizrb locations assumed to be the same)
 
 ***************************************************************************/
 
@@ -193,7 +193,7 @@ static INPUT_PORTS_START( finalizr )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( finalizb )
+static INPUT_PORTS_START( finalizrb )
 	PORT_INCLUDE( finalizr )
 
 	PORT_MODIFY("DSW2")
@@ -374,5 +374,5 @@ static DRIVER_INIT( finalizr )
 }
 
 
-GAME( 1985, finalizr,  0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr, ROT90, "Konami",  "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

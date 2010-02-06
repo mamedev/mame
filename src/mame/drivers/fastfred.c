@@ -996,5 +996,5 @@ GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "
 GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Taito", "Jump Coaster (Taito)", 0 )
 GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84", 0 )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
-GAME( 1984, imago,	  0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,	  imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1984, imago,    0,	imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,   imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

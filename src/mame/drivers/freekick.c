@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( pbillrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekckb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( freekickb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)	// tilemap
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( oigas_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_WRITE(oigas_5_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekckb_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( freekickb_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(freekick_ff_r, freekick_ff_w)
 ADDRESS_MAP_END
@@ -689,12 +689,12 @@ static MACHINE_DRIVER_START( pbillrd )
 	MDRV_MACHINE_RESET(freekick)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( freekckb )
+static MACHINE_DRIVER_START( freekickb )
 	MDRV_IMPORT_FROM(base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(freekckb_map)
-	MDRV_CPU_IO_MAP(freekckb_io_map)
+	MDRV_CPU_PROGRAM_MAP(freekickb_map)
+	MDRV_CPU_IO_MAP(freekickb_io_map)
 
 	MDRV_MACHINE_START(freekick)
 	MDRV_MACHINE_RESET(freekick)
@@ -825,7 +825,7 @@ ROM_START( freekick )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
 ROM_END
 
-ROM_START( freekckb )
+ROM_START( freekickb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "freekbl8.q7", 0x00000, 0x10000, CRC(4208cfe5) SHA1(21628cbe8a217fbae30a6c24c9cc4c790fe45d65) ) // this was on the bootleg, would normally be battery backed inside cpu?
 
@@ -851,7 +851,7 @@ ROM_START( freekckb )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
 ROM_END
 
-ROM_START( freekcb2 )
+ROM_START( freekickb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "15.bin", 0x00000, 0x10000, CRC(6569f2b0) SHA1(9306e316e6ae659bae3759a12a4e445b555a8893) ) // this was on the bootleg, would normally be battery backed inside cpu?
 
@@ -914,7 +914,7 @@ ROM_START( countrun )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
 ROM_END
 
-ROM_START( countrb2 )
+ROM_START( countrunb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "crunbl.8", 0x00000, 0x10000, CRC(318f95d9) SHA1(f2386b9d26d1bc98728aad9e257363b381043dc9) ) // encrypted? bad? its strange anyway
 
@@ -943,7 +943,7 @@ ROM_START( countrb2 )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
 ROM_END
 
-ROM_START( countrnb )
+ROM_START( countrunb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "rom_cpu.bin", 0x00000, 0x10000, CRC(f65639ae) SHA1(faa81607858d49559098c887ac847722df955a76) )
 
@@ -1134,17 +1134,17 @@ static DRIVER_INIT( gigas )
  *  Game driver(s)
  *
  *************************************/
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT     COMPANY   FULLNAME        FLAGS  */
-GAME( 1986, gigas,    0,        gigas,    gigas,    gigas,    ROT270, "Sega", "Gigas (MC-8123, 317-5002)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1986, gigasb,   gigas,    gigas,    gigas,    gigasb,   ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, oigas,    gigas ,   oigas,    gigas,    gigasb,   ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigasb,   ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, pbillrd,  0,        pbillrd,  pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", GAME_SUPPORTS_SAVE )
-GAME( 1987, pbillrds, pbillrd,  pbillrd,  pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", GAME_SUPPORTS_SAVE )
-GAME( 1987, freekick, 0,        freekckb, freekck,  0,        ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1987, freekckb, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, freekcb2, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, countrun, 0,        freekckb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1988, countrnb, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, countrb2, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE    INPUT     INIT      ROT     COMPANY   FULLNAME        FLAGS  */
+GAME( 1986, gigas,     0,        gigas,     gigas,    gigas,    ROT270, "Sega", "Gigas (MC-8123, 317-5002)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1986, gigasb,    gigas,    gigas,     gigas,    gigasb,   ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, oigas,     gigas ,   oigas,     gigas,    gigasb,   ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  gigasb,   ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrds,  pbillrd,  pbillrd,   pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", GAME_SUPPORTS_SAVE )
+GAME( 1987, freekick,  0,        freekickb, freekck,  0,        ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1987, freekickb, freekick, freekickb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, freekickb2,freekick, freekickb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, countrun,  0,        freekickb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1988, countrunb, countrun, freekickb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, countrunb2,countrun, freekickb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 

@@ -956,7 +956,7 @@
     - Added new game: Jolly Card (Evona Electronic)
     - Added new game: Super Joly 2000 - 3x
     - Fixed some inputs.
-    - Masked inputs to allow jolyjkra to boot.
+    - Masked inputs to allow jolyjokra to boot.
     - Added minor corrections.
     - Updated technical notes.
 
@@ -1803,7 +1803,7 @@ static INPUT_PORTS_START( pool10 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jolyjkra )
+static INPUT_PORTS_START( jolyjokra )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1")
@@ -2875,7 +2875,7 @@ ROM_START( jolyjokr )	/* Jolly Joker (Impera, original) */
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
-ROM_START( jolyjkra )	/* Jolly Joker (Impera, 50bet) */
+ROM_START( jolyjokra )	/* Jolly Joker (Impera, 50bet) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera50.bin", 0x8000, 0x8000, CRC(7effc044) SHA1(961438e7fb8222296fb959b510cdf646e4ac3226) )
 
@@ -3208,7 +3208,7 @@ GAME( 1993, vegasslw, 0,        funworld, funworld, 0,        ROT0, "Funworld", 
 GAME( 1993, vegasfst, vegasslw, funworld, funworld, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0 )
 GAME( 1993, vegasfte, vegasslw, funworld, funworld, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", 0 )
 GAME( 198?, jolyjokr, 0,        funworld, funworld, 0,        ROT0, "Impera",          "Jolly Joker",                                     0 )
-GAME( 198?, jolyjkra, jolyjokr, funworld, jolyjkra, 0,        ROT0, "Impera",          "Jolly Joker (50bet)",                             0 )
+GAME( 198?, jolyjokra,jolyjokr, funworld, jolyjokra,0,        ROT0, "Impera",          "Jolly Joker (50bet)",                             0 )
 GAME( 1993, jokercrd, 0,        funworld, funworld, 0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 199?, mongolnw, 0,        royalmcu, royalcrd, 0,        ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw, 0,        royalcrd, royalcrd, soccernw, ROT0, "bootleg",         "Soccer New (italian)",                            GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

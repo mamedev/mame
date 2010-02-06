@@ -46,7 +46,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Possible "Lives" settings : 3, 4, 5 or 6 (code at 0x0501)
   - Bonus life routine at 0x2d03 (test on DSW bit 6)
 
-1b) 'funkbeeb'
+1b) 'funkybeeb'
 
   - Removal of ORCA copyright on title screen (text at 0x0e9a).
     However, high scores table remains unchanged.
@@ -64,7 +64,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
     but "Bonus Life" settings depend on the starting number of lives.
     DSW bit 6 has no effect because of this.
 
-2a) 'skylance'
+2a) 'skylancre'
 
   - Possible "Lives" settings : 3, 4, 5 or 6 (code at 0x0601)
   - Bonus life routine at 0x1f28 (test on DSW bit 6)
@@ -160,7 +160,7 @@ static INPUT_PORTS_START( funkybee )
 	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( funkbeeb )
+static INPUT_PORTS_START( funkybeeb )
 	PORT_INCLUDE(funkybee)
 
 	PORT_MODIFY("DSW")
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( skylancr )
 	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( skylance )
+static INPUT_PORTS_START( skylancre )
 	PORT_INCLUDE(skylancr)
 
 	PORT_MODIFY("DSW")
@@ -436,6 +436,6 @@ ROM_START( skylancre )
 ROM_END
 
 GAME( 1982, funkybee,  0,        funkybee, funkybee, 0, ROT90, "Orca",                           "Funky Bee",                            GAME_SUPPORTS_SAVE )
-GAME( 1982, funkybeeb, funkybee, funkybee, funkbeeb, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          GAME_SUPPORTS_SAVE )
+GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb,0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          GAME_SUPPORTS_SAVE )
 GAME( 1983, skylancr,  0,        funkybee, skylancr, 0, ROT90, "Orca",                           "Sky Lancer",                           GAME_SUPPORTS_SAVE )
-GAME( 1983, skylancre, skylancr, funkybee, skylance, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", GAME_SUPPORTS_SAVE )
+GAME( 1983, skylancre, skylancr, funkybee, skylancre,0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", GAME_SUPPORTS_SAVE )

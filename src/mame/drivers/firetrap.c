@@ -370,7 +370,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( firetpbl )
+static INPUT_PORTS_START( firetrapbl )
 	PORT_START("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
@@ -633,7 +633,7 @@ static MACHINE_DRIVER_START( firetrap )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( firetpbl )
+static MACHINE_DRIVER_START( firetrapbl )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(firetrap_state)
@@ -747,7 +747,7 @@ ROM_START( firetrap )
 	ROM_LOAD( "firetrap.4b",  0x0100,  0x0100, CRC(d5abfc64) SHA1(6c808c1d6087804214dc29d35280f42382c40b18) ) /* palette blue component */
 ROM_END
 
-ROM_START( firetpbl )
+ROM_START( firetrapbl )
 	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "ft0d.bin",     0x00000, 0x8000, CRC(793ef849) SHA1(5a2c587370733d43484ba0a38a357260cdde8357) )
 	ROM_LOAD( "ft0a.bin",     0x08000, 0x8000, CRC(613313ee) SHA1(54e386b2b1faada3441e3e0bb7822a63eab36930) )	/* unprotection code */
@@ -810,5 +810,5 @@ ROM_END
 
 
 
-GAME( 1986, firetrap, 0,        firetrap, firetrap, 0, ROT90, "Data East USA", "Fire Trap (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, firetpbl, firetrap, firetpbl, firetpbl, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   0, ROT90, "Data East USA", "Fire Trap (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", GAME_SUPPORTS_SAVE )

@@ -4909,7 +4909,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gekitsui )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( tryout )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( firetrap )	/* (c) 1986 Data East USA (US) */
-	DRIVER( firetpbl )	/* bootleg */
+	DRIVER( firetrapbl )	/* bootleg */
 	DRIVER( metlclsh )	/* (c) 1985 Data East */
 	DRIVER( chanbara )	/* (c) 1985 Data East */
 	DRIVER( brkthru )	/* (c) 1986 Data East USA (US) */
@@ -8395,11 +8395,11 @@ Other Sun games
 	DRIVER( pbillrd )	/* (c) 1987 Nihon System */
 	DRIVER( pbillrds )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( freekick )	/* (c) 1988 Nihon System (+ optional Sega) */
-	DRIVER( freekckb )	/* (c) 1987 bootleg */
-	DRIVER( freekcb2 )	/* (c) 1987 bootleg */
+	DRIVER( freekickb )	/* (c) 1987 bootleg */
+	DRIVER( freekickb2 )	/* (c) 1987 bootleg */
 	DRIVER( countrun )	/* (c) 1988 Nihon System (+ optional Sega) */
-	DRIVER( countrnb )	/* (c) 1988 bootleg */
-	DRIVER( countrb2 )	/* (c) 1988 bootleg */
+	DRIVER( countrunb )	/* (c) 1988 bootleg */
+	DRIVER( countrunb2 )	/* (c) 1988 bootleg */
 
 	/* Alba games */
 	DRIVER( rmhaihai )	/* (c) 1985 Alba */
@@ -9048,7 +9048,7 @@ Other Sun games
 	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
 	DRIVER( vegasfte )	/* (c) 1993 Soft Design */
 	DRIVER( jolyjokr )	/* (c) 198? Impera */
-	DRIVER( jolyjkra )	/* (c) 198? Impera */
+	DRIVER( jolyjokra )	/* (c) 198? Impera */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
