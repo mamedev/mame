@@ -25,7 +25,7 @@ Year + Game         License       PCB         Tilemaps        Sprites         Ot
 95  Sailor Moon     Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
 95  Donpachi        Atlus         AT-C01DP-2  038 9429WX727   013 8647-01     NMK 112
 96  Air Gallet      Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
-96  Hotdog Storm    Marble        ?           ?                               Z80
+96  Hotdog Storm    Marble        ASTC9501    038 9341EX702                   Z80
 97  Dodonpachi      Atlus         ATC03D2     ?
 98  Dangun Feveron  Nihon System  CV01        038 9808WX003   013 9807EX004
 98  ESP Ra.De.      Atlus         ATC04       ?
