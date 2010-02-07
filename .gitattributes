@@ -2086,6 +2086,7 @@ src/mame/drivers/shougi.c svneol=native#text/plain
 src/mame/drivers/shuuz.c svneol=native#text/plain
 src/mame/drivers/sidearms.c svneol=native#text/plain
 src/mame/drivers/sidepckt.c svneol=native#text/plain
+src/mame/drivers/sigmab52.c svneol=native#text/plain
 src/mame/drivers/silkroad.c svneol=native#text/plain
 src/mame/drivers/simpl156.c svneol=native#text/plain
 src/mame/drivers/simpsons.c svneol=native#text/plain

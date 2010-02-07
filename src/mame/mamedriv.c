@@ -8202,6 +8202,11 @@ Other Sun games
 	DRIVER( spinner )	/* bootleg */
 	DRIVER( sub )		/* (c) 1985 Sigma Ent. Inc. */
 
+	/* Sigma B52 */
+	DRIVER( jwildb52 )	/* (c) 199? Sigma */
+	DRIVER( jwildb52a )	/* (c) 199? Sigma */
+	DRIVER( jwildb52h )	/* (c) 199? Sigma */
+
 	/* IGS games ( www.igs.com.tw ) */
 	DRIVER( goldstar )	/* (c) 198? IGS */
 	DRIVER( goldstbl )	/* (c) 198? IGS */
