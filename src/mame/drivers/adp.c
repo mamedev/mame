@@ -208,6 +208,28 @@ static MACHINE_START( skattv )
 
 	state_save_register_global(machine, state->mux_data);
 	state_save_register_global(machine, state->register_active);
+
+	/*
+  		ACRTC memory:
+ 
+  		00000-3ffff = RAM
+  		40000-7ffff = ROM
+  		80000-bffff = unused
+  		c0000-fffff = unused
+	*/	
+
+	// hack to handle acrt rom
+	{
+		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
+		int i;
+
+		running_device *hd63484 = devtag_get_device(machine, "hd63484");
+
+		for(i = 0; i < 0x40000/2; ++i)
+		{
+			hd63484_ram_w(hd63484, i + 0x40000/2, rom[i], 0xffff); 
+		}
+	}
 }
 
 static MACHINE_RESET( skattv )
@@ -257,12 +279,6 @@ static PALETTE_INIT( adp )
 
 static VIDEO_START(adp)
 {
-//  adp_state *state = (adp_state *)machine->driver_data;
-//  UINT32 i;
-//  UINT16 *prgrom = (UINT16*)memory_region(machine, "maincpu");
-
-//  for (i = 0; i < 0x70000; i++)
-//      hd63484_ram_w(state->hd63484, 0x90000 + i, prgrom[i]);
 
 }
 
@@ -273,29 +289,30 @@ static VIDEO_UPDATE( adp )
 
 	b = ((hd63484_regs_r(state->hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->hd63484, 0xce/2, 0xffff);
 #if 0
+	b = 0;
 	if (input_code_pressed(screen->machine, KEYCODE_M)) b = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q)) b += 0x060 * 280 * 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W)) b += 0x060 * 280 * 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E)) b += 0x060 * 280 * 3;
-	if (input_code_pressed(screen->machine, KEYCODE_R)) b += 0x060 * 280 * 4;
-	if (input_code_pressed(screen->machine, KEYCODE_T)) b += 0x060 * 280 * 5;
-	if (input_code_pressed(screen->machine, KEYCODE_Y)) b += 0x060 * 280 * 6;
-	if (input_code_pressed(screen->machine, KEYCODE_U)) b += 0x060 * 280 * 7;
-	if (input_code_pressed(screen->machine, KEYCODE_I)) b += 0x060 * 280 * 8;
-	if (input_code_pressed(screen->machine, KEYCODE_A)) b += 0x060 * 280 * 9;
-	if (input_code_pressed(screen->machine, KEYCODE_S)) b += 0x060 * 280 * 10;
-	if (input_code_pressed(screen->machine, KEYCODE_D)) b += 0x060 * 280 * 11;
-	if (input_code_pressed(screen->machine, KEYCODE_F)) b += 0x060 * 280 * 12;
-	if (input_code_pressed(screen->machine, KEYCODE_G)) b += 0x060 * 280 * 13;
-	if (input_code_pressed(screen->machine, KEYCODE_H)) b += 0x060 * 280 * 14;
-	if (input_code_pressed(screen->machine, KEYCODE_J)) b += 0x060 * 280 * 15;
-	if (input_code_pressed(screen->machine, KEYCODE_K)) b += 0x060 * 280 * 16;
-	if (input_code_pressed(screen->machine, KEYCODE_Z)) b += 0x060 * 280 * 17;
-	if (input_code_pressed(screen->machine, KEYCODE_X)) b += 0x060 * 280 * 18;
-	if (input_code_pressed(screen->machine, KEYCODE_C)) b += 0x060 * 280 * 19;
-	if (input_code_pressed(screen->machine, KEYCODE_V)) b += 0x060 * 280 * 20;
-	if (input_code_pressed(screen->machine, KEYCODE_B)) b += 0x060 * 280 * 21;
-	if (input_code_pressed(screen->machine, KEYCODE_N)) b += 0x060 * 280 * 22;
+	if (input_code_pressed(screen->machine, KEYCODE_Q)) b += 0x2000 * 1;
+	if (input_code_pressed(screen->machine, KEYCODE_W)) b += 0x2000 * 2;
+	if (input_code_pressed(screen->machine, KEYCODE_E)) b += 0x2000 * 3;
+	if (input_code_pressed(screen->machine, KEYCODE_R)) b += 0x2000 * 4;
+	if (input_code_pressed(screen->machine, KEYCODE_T)) b += 0x2000 * 5;
+	if (input_code_pressed(screen->machine, KEYCODE_Y)) b += 0x2000 * 6;
+	if (input_code_pressed(screen->machine, KEYCODE_U)) b += 0x2000 * 7;
+	if (input_code_pressed(screen->machine, KEYCODE_I)) b += 0x2000 * 8;
+	if (input_code_pressed(screen->machine, KEYCODE_A)) b += 0x2000 * 9;
+	if (input_code_pressed(screen->machine, KEYCODE_S)) b += 0x2000 * 10;
+	if (input_code_pressed(screen->machine, KEYCODE_D)) b += 0x2000 * 11;
+	if (input_code_pressed(screen->machine, KEYCODE_F)) b += 0x2000 * 12;
+	if (input_code_pressed(screen->machine, KEYCODE_G)) b += 0x2000 * 13;
+	if (input_code_pressed(screen->machine, KEYCODE_H)) b += 0x2000 * 14;
+	if (input_code_pressed(screen->machine, KEYCODE_J)) b += 0x2000 * 15;
+	if (input_code_pressed(screen->machine, KEYCODE_K)) b += 0x2000 * 16;
+	if (input_code_pressed(screen->machine, KEYCODE_Z)) b += 0x2000 * 17;
+	if (input_code_pressed(screen->machine, KEYCODE_X)) b += 0x2000 * 18;
+	if (input_code_pressed(screen->machine, KEYCODE_C)) b += 0x2000 * 19;
+	if (input_code_pressed(screen->machine, KEYCODE_V)) b += 0x2000 * 20;
+	if (input_code_pressed(screen->machine, KEYCODE_B)) b += 0x2000 * 21;
+	if (input_code_pressed(screen->machine, KEYCODE_N)) b += 0x2000 * 22;
 #endif
 	for (y = 0;y < 280;y++)
 	{
@@ -310,7 +327,7 @@ static VIDEO_UPDATE( adp )
 			b++;
 		}
 	}
-if (!input_code_pressed(screen->machine, KEYCODE_O))
+if (!input_code_pressed(screen->machine, KEYCODE_O)) // debug: toggle window
 	if ((hd63484_regs_r(state->hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(state->hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->hd63484, 0x88/2, 0xffff) >> 8);
@@ -732,8 +749,8 @@ ROM_START( quickjac )
 	ROM_LOAD16_BYTE( "quick_jack_index_a.2.u6.bin", 0x00001, 0x10000, CRC(210cb89b) SHA1(8eac60d40b60e845f9c02fee6c447f125ba5d1ab) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.1.u2.bin", 0x00000, 0x20000, CRC(73c27fc6) SHA1(12429bc0009b7754e08d2b6a5e1cd8251ab66e2d) )
-	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.2.u6.bin", 0x00001, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
+	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.1.u2.bin", 0x00001, 0x20000, CRC(73c27fc6) SHA1(12429bc0009b7754e08d2b6a5e1cd8251ab66e2d) )
+	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.2.u6.bin", 0x00000, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
 ROM_END
 
 ROM_START( skattv )
@@ -742,8 +759,8 @@ ROM_START( skattv )
 	ROM_LOAD16_BYTE( "f2_ii.bin", 0x00001, 0x20000, CRC(0db1d2d5) SHA1(a29b0299352e0b2b713caf02aa7978f2a4b34e37) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "f1_i.bin", 0x00000, 0x20000, CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
-	ROM_LOAD16_BYTE( "f1_ii.bin", 0x00001, 0x20000, CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
+	ROM_LOAD16_BYTE( "f1_i.bin", 0x00001, 0x20000, CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
+	ROM_LOAD16_BYTE( "f1_ii.bin", 0x00000, 0x20000, CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
 ROM_END
 
 ROM_START( skattva )
@@ -752,8 +769,8 @@ ROM_START( skattva )
 	ROM_LOAD16_BYTE( "skat_tv_version_ts3.2.u6.bin", 0x00001, 0x20000, CRC(4f927832) SHA1(bbe013005fd00dd42d12939eab5c80ec44a54b71) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2.bin", 0x00000, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
-	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5.bin", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
+	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2.bin", 0x00001, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
+	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5.bin", 0x00000, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
 ROM_END
 
 ROM_START( backgamn )
@@ -762,8 +779,8 @@ ROM_START( backgamn )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b_f1_i.bin", 0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "b_f1_ii.bin", 0x00001, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "b_f1_i.bin", 0x00001, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "b_f1_ii.bin", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
 ROM_START( fashiong )
@@ -772,8 +789,8 @@ ROM_START( fashiong )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_ii.bin", 0x00001, 0x80000, CRC(5a2466d1) SHA1(c113a2295beed2011c70887a1f2fcdec00b055cb) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_i.bin", 0x00000, 0x80000, CRC(d1ee9133) SHA1(e5fdfa303a3317f8f5fbdc03438ee97415afff4b) )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_ii.bin", 0x00001, 0x80000, CRC(07b1e722) SHA1(594cbe9edfea6b04a4e49d1c1594f1c3afeadef5) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_i.bin", 0x00001, 0x80000, CRC(d1ee9133) SHA1(e5fdfa303a3317f8f5fbdc03438ee97415afff4b) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_ii.bin", 0x00000, 0x80000, CRC(07b1e722) SHA1(594cbe9edfea6b04a4e49d1c1594f1c3afeadef5) )
 
 	ROM_REGION( 0x4000, "user1", 0 )
 	//nvram - 16 bit
@@ -787,8 +804,8 @@ ROM_START( funlddlx )
 	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
-	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
+	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00001, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
+	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00000, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
 ROM_END
 
 ROM_START( fstation )
@@ -797,8 +814,8 @@ ROM_START( fstation )
 	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.ii", 0x00001, 0x80000, CRC(a972184d) SHA1(1849e71e696039f07b7b67c4172c7999e81664c3) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.i", 0x00000, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
-	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.i", 0x00001, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00000, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
 ROM_END
 
 
