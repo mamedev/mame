@@ -651,11 +651,11 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_DRIVER_DATA(lethal_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)	// ???
+	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(le_main)
 	MDRV_CPU_VBLANK_INT("screen", lethalen_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
+	MDRV_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(le_sound)
 
 	MDRV_MACHINE_START(lethalen)
@@ -670,7 +670,7 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
