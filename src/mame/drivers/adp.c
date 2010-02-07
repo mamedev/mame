@@ -227,7 +227,10 @@ static MACHINE_START( skattv )
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{
-			hd63484_ram_w(hd63484, i + 0x40000/2, rom[i], 0xffff); 
+			hd63484_ram_w(hd63484, i + 0x00000/2, rom[i], 0xffff);
+			hd63484_ram_w(hd63484, i + 0x40000/2, rom[i], 0xffff);
+			hd63484_ram_w(hd63484, i + 0x80000/2, rom[i], 0xffff);
+			hd63484_ram_w(hd63484, i + 0xc0000/2, rom[i], 0xffff);
 		}
 	}
 }
@@ -288,8 +291,7 @@ static VIDEO_UPDATE( adp )
 	int x, y, b, src;
 
 	b = ((hd63484_regs_r(state->hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->hd63484, 0xce/2, 0xffff);
-#if 0
-	b = 0;
+#if 1
 	if (input_code_pressed(screen->machine, KEYCODE_M)) b = 0;
 	if (input_code_pressed(screen->machine, KEYCODE_Q)) b += 0x2000 * 1;
 	if (input_code_pressed(screen->machine, KEYCODE_W)) b += 0x2000 * 2;
@@ -381,14 +383,24 @@ static READ16_HANDLER( test_r )
 		case 0x0b: value = input_port_read(space->machine, "x11"); break;
 		case 0x0c: value = input_port_read(space->machine, "x12"); break;
 		case 0x0d: value = input_port_read(space->machine, "x13"); break;
-		case 0x0e: value = input_port_read(space->machine, "x14"); break;
-		case 0x0f: value = input_port_read(space->machine, "x15"); break;
+		case 0x0e: value = input_port_read(space->machine, "1P_START"); break;
+		case 0x0f: value = input_port_read(space->machine, "1P_COIN"); break;
 	}
 
 	state->mux_data++;
 	state->mux_data &= 0xf;
-
-	return value;
+/*
+	switch (mame_rand(space->machine) & 3)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 0xffff;
+		default:
+			return mame_rand(space->machine) & 0xffff;
+	}
+*/
+	return value | (mame_rand(space->machine) & 0x0000);
 }
 
 /*???*/
@@ -588,15 +600,11 @@ static INPUT_PORTS_START( skattv )
 	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x14") //button 4
-	PORT_DIPNAME( 0x0004,0x0004, "SW14" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_START("1P_START")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x15")
-	PORT_DIPNAME( 0x0004,0x0004, "SW15" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_START("1P_COIN")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
 INPUT_PORTS_END
 
