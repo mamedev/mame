@@ -648,3 +648,12 @@ endif
 ifneq ($(filter YMZ280B,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/ymz280b.o
 endif
+
+#-------------------------------------------------
+# ZOOM ZSG-2
+#-------------------------------------------------
+
+ifneq ($(filter ZSG2,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/zsg2.o
+endif
+

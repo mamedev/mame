@@ -220,7 +220,7 @@ SOUNDS += SP0256
 SOUNDS += DIGITALKER
 SOUNDS += CDP1863
 SOUNDS += CDP1864
-
+SOUNDS += ZSG2
 
 #-------------------------------------------------
 # this is the list of driver libraries that
