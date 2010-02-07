@@ -9414,6 +9414,7 @@ Other Sun games
 	/* Astro Corp. */
 	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
 	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
+	DRIVER( skilldrp )	/* (c) 2002  Astro Corp. */
 
 	/* Dyna */
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
