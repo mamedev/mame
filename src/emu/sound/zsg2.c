@@ -22,6 +22,15 @@
     - loop position in bytes, always....
     - flags, probably
 
+    It is interesting to note that this header is *not* parsed by the
+    ZSG.  The main program reads the rom through appropriate ZSG
+    commands, and use the results in subsequent register setups.  It's
+    not even obvious that the ZSG cares about the pages, it may just
+    see the address space as linear.  In the same line, the
+    interpretation of the flags is obviously dependant on the main
+    program, not the ZSG, but some of the bits are directly copied to
+    some of the registers.
+
     The samples are compressed with a 2:1 ratio.  Each bloc of 4-bytes
     becomes 4 16-bits samples.  Reading the 4 bytes as a *little-endian*
     32bits values, the structure is:
@@ -38,6 +47,7 @@
 #include "streams.h"
 #include "zsg2.h"
 
+// 16 registers per channel, 48 channels
 typedef struct _zchan zchan;
 struct _zchan
 {
