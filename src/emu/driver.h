@@ -43,12 +43,8 @@
 #define GAME_IS_BIOS_ROOT				0x00001000	/* this driver entry is a BIOS root */
 #define GAME_NO_STANDALONE				0x00002000	/* this driver cannot stand alone */
 #define GAME_REQUIRES_ARTWORK			0x00004000	/* the driver requires external artwork for key elements of the game */
-
-
-#ifdef MESS
 #define GAME_COMPUTER_MODIFIED      	0x00008000	/* Official? Hack */
 #define GAME_COMPUTER               	0x00010000  /* Driver is a computer (needs full keyboard) */
-#endif
 
 
 
@@ -137,6 +133,7 @@ GAME_EXTERN(empty);
 
 const game_driver *driver_get_name(const char *name);
 const game_driver *driver_get_clone(const game_driver *driver);
+const game_driver *driver_get_compatible(const game_driver *drv);
 
 void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list);
 int driver_list_get_count(const game_driver * const driverlist[]);

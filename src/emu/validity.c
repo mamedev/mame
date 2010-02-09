@@ -319,6 +319,8 @@ static int validate_driver(int drivnum, const machine_config *config, game_drive
 {
 	const game_driver *driver = drivers[drivnum];
 	const game_driver *clone_of;
+	const char *compatible_with;
+	const game_driver *other_drv;
 	int error = FALSE, is_clone;
 	const char *s;
 
@@ -385,14 +387,42 @@ static int validate_driver(int drivnum, const machine_config *config, game_drive
 			break;
 		}
 
-#ifndef MESS
+	/* normalize driver->compatible_with */
+	compatible_with = driver->compatible_with;
+	if ((compatible_with != NULL) && !strcmp(compatible_with, "0"))
+		compatible_with = NULL;
+
+	/* check for this driver being compatible with a non-existant driver */
+	if ((compatible_with != NULL) && (driver_get_name(driver->compatible_with) == NULL))
+	{
+		mame_printf_error("%s: is compatible with %s, which is not in drivers[]\n", driver->name, driver->compatible_with);
+		error = TRUE;
+	}
+
+	/* check for clone_of and compatible_with being specified at the same time */
+	if ((driver_get_clone(driver) != NULL) && (compatible_with != NULL))
+	{
+		mame_printf_error("%s: both compatible_with and clone_of are specified\n", driver->name);
+		error = TRUE;
+	}
+		
+	/* find any recursive dependencies on the current driver */
+	for (other_drv = driver_get_compatible(driver); other_drv != NULL; other_drv = driver_get_compatible(other_drv))
+	{
+		if (driver == other_drv)
+		{
+			mame_printf_error("%s: recursive compatibility\n", driver->name);
+			error = TRUE;
+			break;
+		}
+	}
+
 	/* make sure sound-less drivers are flagged */
 	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && sound_first(config) == NULL && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
 	}
-#endif
 
 	return error;
 }
@@ -1163,12 +1193,6 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 					}
 				}
 		}
-
-#ifdef MESS
-	if (mess_validate_input_ports(drivnum, config, portlist))
-		error = TRUE;
-#endif /* MESS */
-
 	/* free the config */
 	return error;
 }

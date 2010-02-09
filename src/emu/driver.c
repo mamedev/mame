@@ -244,3 +244,19 @@ int driver_list_get_count(const game_driver * const driverlist[])
 	for (count = 0; driverlist[count] != NULL; count++) ;
 	return count;
 }
+
+/*-------------------------------------------------
+    driver_get_compatible - return a pointer to the
+    compatible driver.
+-------------------------------------------------*/
+
+const game_driver *driver_get_compatible(const game_driver *drv)
+{
+	if (driver_get_clone(drv))
+		drv = driver_get_clone(drv);
+	else if (drv->compatible_with)
+		drv = driver_get_name(drv->compatible_with);
+	else
+		drv = NULL;
+	return drv;
+}
