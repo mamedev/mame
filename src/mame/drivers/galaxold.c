@@ -302,7 +302,12 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     (check code at 0x1043 which changes player and routines that handle players inputs :
     0x1741 UP and DOWN - 0x1796 LEFT and RIGHT - 0x24e6 BUTTON1 - 0x2615 BUTTON2).
 
-2) 'porter'
+2) 'bagmanmc'
+
+  - DSW bit 6 was previously used for "Bonus Lives" settings, but it has no effect
+    in this set because of 'NOP' instructions from 0x3501 to 0x3507.
+
+3) 'porter'
 
   - It's difficult to map correctly players buttons because of what they do :
     on one side, both buttons do the same thing (code at 0x0940 for player 1 and
@@ -310,7 +315,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     but on the other side, due to code at 0x0910, player 1 BUTTON1 acts as a
     START1 button while player 1 BUTTON2 acts as a START2 button. Any help is welcome !
 
-3) 'bongo'
+4) 'bongo'
 
   - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
     there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
@@ -1398,9 +1403,7 @@ static INPUT_PORTS_START( bagmanmc )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( English ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x40, "30000" )
-	PORT_DIPSETTING(	0x00, "40000" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                   /* see notes */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )          /* check code at 0x2d78 and 0x2e6b - affect initials entry */
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
