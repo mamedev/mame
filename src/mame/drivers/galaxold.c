@@ -315,7 +315,17 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     but on the other side, due to code at 0x0910, player 1 BUTTON1 acts as a
     START1 button while player 1 BUTTON2 acts as a START2 button. Any help is welcome !
 
-4) 'bongo'
+4) 'tazzmang'
+
+  - If you press COIN2 during the boot-up sequence, you enter sort of "test mode"
+    where you can access to all inputs, but this doesn't give a clue about what
+    they do (only the status - 0 or 1 - is displayed).
+  - IN1 bit 0 has 2 effects : it starts a one player game (code at 0x5585),
+    but it also acts as 2nd button (bomb) for BOTH players regardless of "Cabinet"
+    settings (code at 0x5805 for player 1 and player 2 in "Upright" cabinet, or
+    0x5563 for player 2 in "Cocktail" cabinet).
+
+5) 'bongo'
 
   - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
     there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
@@ -1404,9 +1414,9 @@ static INPUT_PORTS_START( bagmanmc )
 	PORT_DIPSETTING(	0x20, DEF_STR( English ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                   /* see notes */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )          /* check code at 0x2d78 and 0x2e6b - affect initials entry */
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          /* check code at 0x2d78 and 0x2e6b - affect initials entry */
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1504,7 +1514,7 @@ static INPUT_PORTS_START( porter )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(	0x00, "A 2C/1C  B 1C/3C" )
 	PORT_DIPSETTING(	0x01, "A 1C/1C  B 1C/6C" )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                            /* stored to 0x8021 bit 1 but not tested */
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                             /* stored to 0x8021 bit 1 but not tested */
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x00, "2" )
 	PORT_DIPSETTING(	0x04, "3" )
@@ -1514,26 +1524,31 @@ static INPUT_PORTS_START( porter )
 INPUT_PORTS_END
 
 
+/* verified from Z80 code */
 static INPUT_PORTS_START( tazzmang )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start 1 / P1 and P2 Button 2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(	0x80, "5" )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
@@ -1543,22 +1558,9 @@ static INPUT_PORTS_START( tazzmang )
 	PORT_DIPSETTING(    0x00, "A 4C/1C  B 1C/4C" )
 	PORT_DIPSETTING(    0x02, "A 3C/1C  B 1C/3C" )
 	PORT_DIPSETTING(    0x06, "A 2C/1C  B 1C/2C" )
-	PORT_DIPSETTING(    0x04, "A 1C/1C  B 1C/1C" )
-	PORT_DIPNAME( 0x08, 0x00, "3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -3106,7 +3108,7 @@ GAME( 1981, 4in1,     0,        4in1,     4in1,     4in1,     ROT90,  "Armenia /
 GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, 0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, porter,   dockman,  mooncrst, porter,   0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // missing GFX bank switch!
-GAME( 1982, tazzmang, tazmania,	tazzmang, tazzmang, 0,        ROT90,  "bootleg", "Tazz-Mania (Galaxian Hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazzmang, tazmania,	tazzmang, tazzmang, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, bongo,    0,        bongo,    bongo,    0,	      ROT90,  "Jetsoft", "Bongo", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, ozon1,    0,        ozon1,    ozon1,    0,	      ROT90,  "Proma", "Ozon I", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
