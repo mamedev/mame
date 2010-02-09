@@ -155,6 +155,11 @@ static void output_pc(i8255a_t *i8255a)
 		{
 			mask |= 0xf0;
 		}
+		else
+		{
+			/* TTL inputs float high */
+			data |= 0xf0;
+		}
 		break;
 
 	case MODE_1:
@@ -186,6 +191,11 @@ static void output_pc(i8255a_t *i8255a)
 		if (port_c_lower_mode(i8255a) == MODE_OUTPUT)
 		{
 			mask |= 0x0f;
+		}
+		else
+		{
+			/* TTL inputs float high */
+			data |= 0x0f;
 		}
 		break;
 
@@ -578,6 +588,16 @@ static void set_mode(running_device *device, UINT8 data)
 	i8255a->inte[PORT_A] = 0;
 	i8255a->inte1 = 0;
 	i8255a->inte2 = 0;
+	
+	if (port_mode(i8255a, PORT_A) == MODE_OUTPUT)
+	{
+		devcb_call_write8(&i8255a->out_port_func[PORT_A], 0, i8255a->output[PORT_A]);
+	}
+	else
+	{
+		/* TTL inputs float high */
+		devcb_call_write8(&i8255a->out_port_func[PORT_A], 0, 0xff);
+	}
 
 	if (LOG) logerror("8255A '%s' Group A Mode: %u\n", device->tag.cstr(), group_mode(i8255a, GROUP_A));
 	if (LOG) logerror("8255A '%s' Port A Mode: %s\n", device->tag.cstr(), (port_mode(i8255a, PORT_A) == MODE_OUTPUT) ? "output" : "input");
@@ -592,6 +612,16 @@ static void set_mode(running_device *device, UINT8 data)
 	i8255a->ibf[PORT_B] = 0;
 	i8255a->obf[PORT_B] = 1;
 	i8255a->inte[PORT_B] = 0;
+	
+	if (port_mode(i8255a, PORT_B) == MODE_OUTPUT)
+	{
+		devcb_call_write8(&i8255a->out_port_func[PORT_B], 0, i8255a->output[PORT_B]);
+	}
+	else
+	{
+		/* TTL inputs float high */
+		devcb_call_write8(&i8255a->out_port_func[PORT_B], 0, 0xff);
+	}
 
 	i8255a->output[PORT_C] = 0;
 	i8255a->input[PORT_C] = 0;
@@ -717,14 +747,28 @@ READ8_DEVICE_HANDLER( i8255a_pa_r )
 {
 	i8255a_t *i8255a = get_safe_token(device);
 
-	return i8255a->output[PORT_A];
+	UINT8 data = 0xff;
+
+	if (port_mode(i8255a, PORT_A) == MODE_OUTPUT)
+	{
+		data = i8255a->output[PORT_A];
+	}
+
+	return data;
 }
 
 READ8_DEVICE_HANDLER( i8255a_pb_r )
 {
 	i8255a_t *i8255a = get_safe_token(device);
 
-	return i8255a->output[PORT_B];
+	UINT8 data = 0xff;
+
+	if (port_mode(i8255a, PORT_B) == MODE_OUTPUT)
+	{
+		data = i8255a->output[PORT_B];
+	}
+
+	return data;
 }
 
 WRITE_LINE_DEVICE_HANDLER( i8255a_pc2_w )
