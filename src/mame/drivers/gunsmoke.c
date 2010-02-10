@@ -39,19 +39,19 @@ Stephh's notes (based on the games Z80 code and some tests) :
     You can enter 3 chars for your initials.
 
 
-2) 'gunsmokj'
+2) 'gunsmokej'
 
   - Japan version (but English text though).
     You can enter 8 chars for your initials.
 
 
-3) 'gunsmoku'
+3) 'gunsmokeu'
 
   - US version licenced to Romstar.
     You can enter 3 chars for your initials.
 
 
-4) 'gunsmoka'
+4) 'gunsmokeua'
 
   - US version licenced to Romstar.
     You can enter 3 chars for your initials.
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( gunsmoke )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gunsmoka )
+static INPUT_PORTS_START( gunsmokeua )
 	PORT_INCLUDE(gunsmoke)
 
 	// Same as 'gunsmoke', but "Lives" Dip Switch instead of "Demonstration" Dip Switch
@@ -539,7 +539,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1985, gunsmoke, 0,        gunsmoke, gunsmoke, 0, ROT270, "Capcom", "Gun.Smoke (World)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gunsmokej, gunsmoke, gunsmoke, gunsmoke, 0, ROT270, "Capcom", "Gun.Smoke (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gunsmokeu, gunsmoke, gunsmoke, gunsmoke, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, gunsmokeua, gunsmoke, gunsmoke, gunsmoka, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gunsmoke,  0,        gunsmoke, gunsmoke,  0, ROT270, "Capcom", "Gun.Smoke (World)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gunsmokej, gunsmoke, gunsmoke, gunsmoke,  0, ROT270, "Capcom", "Gun.Smoke (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gunsmokeu, gunsmoke, gunsmoke, gunsmoke,  0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, gunsmokeua,gunsmoke, gunsmoke, gunsmokeua,0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", GAME_SUPPORTS_SAVE )

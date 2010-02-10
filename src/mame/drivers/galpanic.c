@@ -72,7 +72,7 @@ Stephh's additional notes :
     In the Comad games, the interruption is the same, but the addresses
     which are checked are in full RAM. So the Dip Switch could be checked.
 
-  - I added the 'galpania' romset which is in fact the same as 'galpanic',
+  - I added the 'galpanica' romset which is in fact the same as 'galpanic',
     but with the PRG ROMS which aren't overwritten and simulated the CALC1
     MCU functions
     Here are a few notes about what I found :
@@ -176,7 +176,7 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 	}
 }
 
-static WRITE16_HANDLER( galpania_6295_bankswitch_w )
+static WRITE16_HANDLER( galpanica_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -187,7 +187,7 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( galpania_misc_w )
+static WRITE16_HANDLER( galpanica_misc_w )
 {
 	running_device *pandora = devtag_get_device(machine, "pandora");
 
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( comad_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x80000a, 0x80000b) AM_READ(kludge)	/* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x80000c, 0x80000d) AM_READ(kludge)	/* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)	/* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM				/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM				/* fantasia, newfant */
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)	/* fantasia, missw96 */
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( fantsia2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)	/* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)	/* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* coin counters, + ? */
 	AM_RANGE(0xc80000, 0xc80001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( galhustl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP // ?
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0xff00)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( zipzap_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)
 
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( supmodel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_READ(kludge)
 	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)	/* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
@@ -485,7 +485,7 @@ static INPUT_PORTS_START( galpanic )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( galpania )
+static INPUT_PORTS_START( galpanica )
 	PORT_START("DSW1_P1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -915,7 +915,7 @@ static MACHINE_DRIVER_START( galpanic )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( galpania )
+static MACHINE_DRIVER_START( galpanica )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galpanic)
@@ -1320,7 +1320,7 @@ ROM_START( supmodel )
 ROM_END
 
 GAME( 1990, galpanic, 0,        galpanic, galpanic, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
-GAME( 1990, galpanica,galpanic, galpania, galpania, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
+GAME( 1990, galpanica,galpanic, galpanica,galpanica,0, ROT90, "Kaneko", "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
 GAME( 1994, supmodel, 0,        supmodel, fantasia, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL ) // 'official' or hack of fantasia?
 GAME( 1995, newfant,  0,        comad,    fantasia, 0, ROT90, "Comad & New Japan System", "New Fantasia", GAME_NO_COCKTAIL )
 GAME( 1995, fantsy95, 0,        comad,    fantasia, 0, ROT90, "Hi-max Technology Inc.", "Fantasy '95", GAME_NO_COCKTAIL )

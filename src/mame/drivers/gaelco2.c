@@ -1429,8 +1429,8 @@ ROM_START( grtesoro )
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
-GAME( 1994, aligator,   0,        alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1994, aligatorun, aligator, alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
+GAME( 1994, aligator,  0,       alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1994, aligatorun,aligator,alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
 GAME( 1995, touchgo,  0,        touchgo,  touchgo,  touchgo,  ROT0, "Gaelco", "Touch & Go (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

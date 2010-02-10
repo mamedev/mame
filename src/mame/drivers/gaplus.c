@@ -144,7 +144,7 @@ TODO:
 
 - Add 62XX custom to machine/namcoio.c (though it's quite different from 56XX and 58XX).
 
-- Is the spirte generator the same as Phozon? This isn't clear yet. They are
+- Is the sprite generator the same as Phozon? This isn't clear yet. They are
   very similar, especially in the way the size flags are layed out.
 
 ***************************************************************************/
