@@ -355,7 +355,7 @@ static INPUT_PORTS_START( kinstb )
 	PORT_DIPSETTING(   0x0, DEF_STR( No )  )
 	PORT_DIPSETTING(   0x1, DEF_STR( Yes ) )
 
-#ifdef MAME_DEBUG
+#ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")	/* IN 9 : debug switches */
 	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
 	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_DIPSETTING(   0x0, DEF_STR( No )  )
 	PORT_DIPSETTING(   0x1, DEF_STR( Yes ) )
 
-#ifdef MAME_DEBUG
+#ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")	/* IN 9 : debug switches */
 	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
 	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
@@ -585,7 +585,7 @@ static INPUT_PORTS_START( sblast2b )
 	PORT_DIPSETTING(   0x0, DEF_STR( No )  )
 	PORT_DIPSETTING(   0x1, DEF_STR( Yes ) )
 
-#ifdef MAME_DEBUG
+#ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")	/* IN 9 : debug switches */
 	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
 	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
@@ -697,7 +697,7 @@ static INPUT_PORTS_START( iron )
 	PORT_DIPSETTING(   0x0, DEF_STR( No )  )
 	PORT_DIPSETTING(   0x1, DEF_STR( Yes ) )
 
-#ifdef MAME_DEBUG
+#ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")	/* IN 9 : debug switches */
 	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
 	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
@@ -818,7 +818,7 @@ static INPUT_PORTS_START( denseib )
 	PORT_DIPSETTING(   0x0, DEF_STR( No )  )
 	PORT_DIPSETTING(   0x1, DEF_STR( Yes ) )
 
-#ifdef MAME_DEBUG
+#ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")	/* IN 9 : debug switches */
 	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
 	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )

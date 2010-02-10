@@ -23,10 +23,12 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
+#define SNES_LAYER_DEBUG  0
+
 /* Debug definitions */
 #ifdef MAME_DEBUG
 /* #define SNES_DBG_GENERAL*/		/* Display general debug info */
-/* #define SNES_DBG_video*/		/* Display video debug info */
+/* #define SNES_DBG_VIDEO */		/* Display video debug info */
 /* #define SNES_DBG_GDMA*/			/* Display GDMA debug info */
 /* #define SNES_DBG_HDMA*/			/* Display HDMA debug info */
 /* #define SNES_DBG_REG_R*/			/* Display register read info */
