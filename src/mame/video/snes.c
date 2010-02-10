@@ -136,11 +136,11 @@ enum
  * Routine for additive/subtractive blending
  * between the main and sub screens.
  *****************************************/
-INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 clip, UINT8 black_pen_clip )
+INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 factor, UINT8 clip, UINT8 black_pen_clip )
 {
 	if ((black_pen_clip == SNES_CLIP_ALL2) ||
-		(black_pen_clip == SNES_CLIP_IN && snes_ppu.clipmasks[SNES_COLOR][offset]) ||
-		(black_pen_clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[SNES_COLOR][offset]))
+		(black_pen_clip == SNES_CLIP_IN && snes_ppu.clipmasks[SNES_COLOR][offset / factor]) ||
+		(black_pen_clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[SNES_COLOR][offset / factor]))
 		*colour = 0; //clip to black before color math
 
 	if (clip == SNES_CLIP_ALL2) // blending mode 3 == always OFF
@@ -150,8 +150,8 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 clip, UINT8 bla
 	if (!debug_options.transparency_disabled)
 #endif /* SNES_LAYER_DEBUG */
 	if ((clip == SNES_CLIP_ALL) ||
-		(clip == SNES_CLIP_IN  && !snes_ppu.clipmasks[SNES_COLOR][offset]) ||
-		(clip == SNES_CLIP_OUT && snes_ppu.clipmasks[SNES_COLOR][offset]))
+		(clip == SNES_CLIP_IN  && !snes_ppu.clipmasks[SNES_COLOR][offset / factor]) ||
+		(clip == SNES_CLIP_OUT && snes_ppu.clipmasks[SNES_COLOR][offset / factor]))
 	{
 		UINT16 r, g, b;
 		int clip_max = 0;	// if add then clip to 0x1f, if sub then clip to 0
@@ -223,6 +223,15 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 clip, UINT8 bla
 	}
 }
 
+INLINE void snes_draw_blend_lores(UINT16 offset, UINT16 *colour, UINT8 clip, UINT8 black_pen_clip )
+{
+	snes_draw_blend(offset, colour, 1, clip, black_pen_clip);
+}
+
+INLINE void snes_draw_blend_hires(UINT16 offset, UINT16 *colour, UINT8 clip, UINT8 black_pen_clip )
+{
+	snes_draw_blend(offset, colour, 2, clip, black_pen_clip);
+}
 
 /*****************************************
  * snes_draw_tile()
@@ -1009,21 +1018,26 @@ static void snes_update_windowmasks(void)
 
 	for (ii = 0; ii < SNES_SCR_WIDTH + 8; ii++)
 	{
-		/* update bg 1, 2, 3, 4 & obj */
+		/* update bg 1, 2, 3, 4, obj & color windows */
 		/* jj = layer */
-		for (jj = 0; jj < 5; jj++)
+		for (jj = 0; jj < 6; jj++)
 		{
-			snes_ppu.clipmasks[jj][ii] = 0xff;
+			snes_ppu.clipmasks[jj][ii] = 0xff;	/* let's start from un-masked */
 			w1 = w2 = -1;
+
 			if (snes_ppu.layer[jj].window1_enabled)
 			{
+				/* Default to mask area inside */
 				if ((ii < snes_ppu.window1_left) || (ii > snes_ppu.window1_right))
 					w1 = 0;
 				else
 					w1 = 1;
+
+				/* If mask area is outside then swap */
 				if (snes_ppu.layer[jj].window1_invert)
 					w1 = !w1;
 			}
+
 			if (snes_ppu.layer[jj].window2_enabled)
 			{
 				if ((ii < snes_ppu.window2_left) || (ii > snes_ppu.window2_right))
@@ -1033,6 +1047,8 @@ static void snes_update_windowmasks(void)
 				if (snes_ppu.layer[jj].window2_invert)
 					w2 = !w2;
 			}
+
+			/* mask if the appropriate expression is true */
 			if (w1 >= 0 && w2 >= 0)
 			{
 				switch (snes_ppu.layer[jj].wlog_mask)
@@ -1056,52 +1072,6 @@ static void snes_update_windowmasks(void)
 			else if (w2 >= 0)
 				snes_ppu.clipmasks[jj][ii] = w2 ? 0x00 : 0xff;
 		}
-
-		/* update colour window */
-		snes_ppu.clipmasks[SNES_COLOR][ii] = 0xff;
-		w1 = w2 = -1;
-		if (snes_ppu.colour.window1_enabled)
-		{
-			/* Default to mask area inside */
-			if ((ii < snes_ppu.window1_left) || (ii > snes_ppu.window1_right))
-				w1 = 0;
-			else
-				w1 = 1;
-			/* If mask area is outside then swap */
-			if (snes_ppu.colour.window1_invert)
-				w1 = !w1;
-		}
-		if (snes_ppu.colour.window2_enabled)
-		{
-			if ((ii < snes_ppu.window2_left) || (ii > snes_ppu.window2_right))
-				w2 = 0;
-			else
-				w2 = 1;
-			if (snes_ppu.colour.window2_invert)
-				w2 = !w2;
-		}
-		if (w1 >= 0 && w2 >= 0)
-		{
-			switch (snes_ppu.colour.wlog_mask)
-			{
-				case 0x0:	/* OR */
-					snes_ppu.clipmasks[SNES_COLOR][ii] = w1 | w2 ? 0x00 : 0xff;
-					break;
-				case 0x4:	/* AND */
-					snes_ppu.clipmasks[SNES_COLOR][ii] = w1 & w2 ? 0x00 : 0xff;
-					break;
-				case 0x8:	/* XOR */
-					snes_ppu.clipmasks[SNES_COLOR][ii] = w1 ^ w2 ? 0x00 : 0xff;
-					break;
-				case 0xc:	/* XNOR */
-					snes_ppu.clipmasks[SNES_COLOR][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
-					break;
-			}
-		}
-		else if (w1 >= 0)
-			snes_ppu.clipmasks[SNES_COLOR][ii] = w1 ? 0x00 : 0xff;
-		else if (w2 >= 0)
-			snes_ppu.clipmasks[SNES_COLOR][ii] = w2 ? 0x00 : 0xff;
 	}
 }
 
@@ -1209,28 +1179,68 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		/* Phew! Draw the line to screen */
 		fade = snes_ppu.screen_brightness;
 
-		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
+		for (x = 0; x < SNES_SCR_WIDTH * 2; x += 2)
 		{
-			int r, g, b;
-			c = scanline->buffer[x];
-
-			/* perform color math if the layer wants it (except if it's an object > 192) */
-			if (!scanlines[SNES_MAINSCREEN].blend_exception[x] && 
-				((scanlines[SNES_MAINSCREEN].layer[x] != SNES_COLOR && snes_ppu.layer[scanlines[SNES_MAINSCREEN].layer[x]].color_math)
-				|| (scanlines[SNES_MAINSCREEN].layer[x] == SNES_COLOR && snes_ppu.colour.color_math)))
-				snes_draw_blend(x, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask);
-
-			r = ((c & 0x1f) * fade) >> 4;
-			g = (((c & 0x3e0) >> 5) * fade) >> 4;
-			b = (((c & 0x7c00) >> 10) * fade) >> 4;
-
-			if (snes_htmult == 1)
+			if (snes_ppu.mode != 5 && snes_ppu.mode != 6)
 			{
+				int r, g, b;
+				c = scanline->buffer[x];
+
+				/* perform color math if the layer wants it (except if it's an object > 192) */
+				if (!scanlines[SNES_MAINSCREEN].blend_exception[x] && snes_ppu.layer[scanlines[SNES_MAINSCREEN].layer[x]].color_math)
+					snes_draw_blend_lores(x, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask);
+
+				r = ((c & 0x1f) * fade) >> 4;
+				g = (((c & 0x3e0) >> 5) * fade) >> 4;
+				b = (((c & 0x7c00) >> 10) * fade) >> 4;
+
 				*BITMAP_ADDR32(bitmap, curline, x * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 				*BITMAP_ADDR32(bitmap, curline, x * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+
+				c = scanline->buffer[x + 1];
+
+				/* perform color math if the layer wants it (except if it's an object > 192) */
+				if (!scanlines[SNES_MAINSCREEN].blend_exception[x + 1] && snes_ppu.layer[scanlines[SNES_MAINSCREEN].layer[x + 1]].color_math)
+					snes_draw_blend_lores(x + 1, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask);
+
+				r = ((c & 0x1f) * fade) >> 4;
+				g = (((c & 0x3e0) >> 5) * fade) >> 4;
+				b = (((c & 0x7c00) >> 10) * fade) >> 4;
+
+				*BITMAP_ADDR32(bitmap, curline, (x + 1) * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				*BITMAP_ADDR32(bitmap, curline, (x + 1) * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+
 			}
 			else
+			{
+				int r, g, b;
+				UINT16 temp_col;
+				c = scanline->buffer[x];
+				temp_col = scanline->buffer[x];
+
+				/* perform color math if the layer wants it (except if it's an object > 192) */
+				if (!scanlines[SNES_MAINSCREEN].blend_exception[x] && snes_ppu.layer[scanlines[SNES_MAINSCREEN].layer[x]].color_math)
+					snes_draw_blend_hires(x, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask);
+
+				r = ((c & 0x1f) * fade) >> 4;
+				g = (((c & 0x3e0) >> 5) * fade) >> 4;
+				b = (((c & 0x7c00) >> 10) * fade) >> 4;
+
 				*BITMAP_ADDR32(bitmap, curline, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+
+				c = scanlines[SNES_SUBSCREEN].buffer[x];
+				scanlines[SNES_SUBSCREEN].buffer[x] = temp_col;
+
+				/* perform color math only if it's been done on the previous pixel */
+				if (!scanlines[SNES_MAINSCREEN].blend_exception[x] && snes_ppu.layer[scanlines[SNES_MAINSCREEN].layer[x]].color_math)
+					snes_draw_blend_hires(x, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask);
+
+				r = ((c & 0x1f) * fade) >> 4;
+				g = (((c & 0x3e0) >> 5) * fade) >> 4;
+				b = (((c & 0x7c00) >> 10) * fade) >> 4;
+
+				*BITMAP_ADDR32(bitmap, curline, x + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+			}
 		}
 	}
 

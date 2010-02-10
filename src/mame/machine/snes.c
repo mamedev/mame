@@ -1158,10 +1158,10 @@ WRITE8_HANDLER( snes_w_io )
 				snes_ppu.layer[SNES_OAM].window1_enabled = data & 0x02;
 				snes_ppu.layer[SNES_OAM].window2_invert = data & 0x04;
 				snes_ppu.layer[SNES_OAM].window2_enabled = data & 0x08;
-				snes_ppu.colour.window1_invert = data & 0x10;
-				snes_ppu.colour.window1_enabled = data & 0x20;
-				snes_ppu.colour.window2_invert = data & 0x40;
-				snes_ppu.colour.window2_enabled = data & 0x80;
+				snes_ppu.layer[SNES_COLOR].window1_invert = data & 0x10;
+				snes_ppu.layer[SNES_COLOR].window1_enabled = data & 0x20;
+				snes_ppu.layer[SNES_COLOR].window2_invert = data & 0x40;
+				snes_ppu.layer[SNES_COLOR].window2_enabled = data & 0x80;
 				snes_ppu.update_windows = 1;
 			}
 			break;
@@ -1207,7 +1207,7 @@ WRITE8_HANDLER( snes_w_io )
 			if (data != snes_ram[offset])
 			{
 				snes_ppu.layer[SNES_OAM].wlog_mask = data & 0x03;
-				snes_ppu.colour.wlog_mask = (data & 0x0c) >> 2;
+				snes_ppu.layer[SNES_COLOR].wlog_mask = (data & 0x0c) >> 2;
 				snes_ppu.update_windows = 1;
 			}
 			break;
@@ -1257,7 +1257,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.layer[SNES_BG3].color_math = data & 0x04;
 			snes_ppu.layer[SNES_BG4].color_math = data & 0x08;
 			snes_ppu.layer[SNES_OAM].color_math = data & 0x10;
-			snes_ppu.colour.color_math = data & 0x20;
+			snes_ppu.layer[SNES_COLOR].color_math = data & 0x20;
 			break;
 		case COLDATA:	/* Fixed colour data for fixed colour addition/subtraction */
 			{
@@ -2019,13 +2019,13 @@ static void snes_init_ram(running_machine *machine)
 	int i, j;
 
 	/* Init VRAM */
-	memset( snes_vram, 0, SNES_VRAM_SIZE );
+	memset(snes_vram, 0, SNES_VRAM_SIZE );
 
 	/* Init Colour RAM */
-	memset( (UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
+	memset((UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
-	memset( snes_oam, 0xff, SNES_OAM_SIZE );
+	memset(snes_oam, 0xff, SNES_OAM_SIZE );
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
 	/* make sure it happens to the 65816 (CPU 0) */

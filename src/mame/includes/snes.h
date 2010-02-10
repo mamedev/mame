@@ -23,7 +23,7 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
-#define SNES_LAYER_DEBUG  0
+#define SNES_LAYER_DEBUG  1
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
@@ -472,15 +472,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 			UINT16 tile_vert;
 			UINT16 shift_vert;
 		} offset;
-	} layer[5];	// this is for the BG1 - BG2 - BG3 - BG4 - OBJ layers
-
-	struct
-	{
-		UINT8 window1_enabled, window1_invert;
-		UINT8 window2_enabled, window2_invert;
-		UINT8 wlog_mask;
-		UINT8 color_math;
-	} colour;	// this is for the color (which is 'seen' as a layer by the window masking code)
+	} layer[6];	// this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
 
 	struct
 	{
