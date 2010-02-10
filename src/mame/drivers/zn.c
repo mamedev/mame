@@ -80,6 +80,7 @@ static const UINT8 mg03[ 8 ] = { 0xc0, 0x04, 0x78, 0x82, 0x03, 0xf1, 0x10, 0xe0 
 static const UINT8 mg04[ 8 ] = { 0xf0, 0xe1, 0x81, 0x82, 0xfa, 0x04, 0x3c, 0xc0 };
 static const UINT8 mg05[ 8 ] = { 0x80, 0xc2, 0x38, 0xf9, 0xfd, 0x0c, 0x10, 0xe0 }; /* brute forced */
 static const UINT8 mg06[ 8 ] = { 0xc0, 0xe2, 0xe1, 0xfd, 0x04, 0x78, 0x70, 0xf0 };
+static const UINT8 mg07[ 8 ] = { 0xe0, 0xc2, 0x38, 0xf9, 0xfd, 0x0c, 0x70, 0x80 };
 static const UINT8 mg08[ 8 ] = { 0xf0, 0xfa, 0xf9, 0xc1, 0x20, 0x1c, 0x7c, 0x80 };
 static const UINT8 mg09[ 8 ] = { 0xf0, 0x03, 0xe2, 0x18, 0x78, 0x7c, 0x3c, 0xc0 }; /* brute forced */
 static const UINT8 mg10[ 8 ] = { 0xfc, 0xf2, 0x30, 0xc1, 0xf9, 0x78, 0x60, 0xe0 };
@@ -157,6 +158,7 @@ static const struct
 	{ "doapp",    mg01, mg05 }, /* OK */
 	{ "flamegun", mg01, mg06 }, /* OK */
 	{ "flamegunj",mg01, mg06 }, /* OK */
+	{ "lpadv",    mg01, mg07 },
 	{ "glpracr3", mg01, mg08 },
 	{ "tondemo",  mg01, mg09 }, /* OK */
 	{ "1on1gov",  mg01, mg10 }, /* OK */
@@ -3701,6 +3703,16 @@ ROM_START( flamegunj )
 	ROM_LOAD( "fb0b.326",              0x3000000, 0x400000, CRC(ad78ec79) SHA1(7e37a90a64c70f2c0024eaf30e1e4e028c0d858e) )
 ROM_END
 
+ROM_START( lpadv )
+	TPS_BIOS
+
+	ROM_REGION32_LE( 0xc00000, "user2", 0 )
+        ROM_LOAD16_BYTE( "lp_3.u0119",   0x000001, 0x100000, CRC(18cade44) SHA1(8a44156224c77c51f4f6ca61a0168e48dfcc6eda) ) 
+        ROM_LOAD16_BYTE( "lp_4.u0120",   0x000000, 0x100000, CRC(12fffc02) SHA1(3294b65e4a0bbf501785565dd0c1f36f9bcea969) ) 
+        ROM_LOAD( "rp00.u0216",   0x400000, 0x400000, CRC(d759d0d4) SHA1(47b009a5dfa81611276b1376bdab44dfad597e85) ) 
+        ROM_LOAD( "rp01.u0217",   0x800000, 0x400000, CRC(5be576e1) SHA1(e24a96d179016d6d65205079874b35500760a642) ) 
+ROM_END
+
 ROM_START( mfjump )
 	TPS_BIOS
 
@@ -4475,6 +4487,7 @@ GAME( 1999, tondemo,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tondemo
 GAME( 1999, glpracr3,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 3 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flamegun,  tps,      coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flamegunj, flamegun, coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, lpadv,     tps,      coh1002m, zn, coh1002m, ROT0, "Amuse World", "Logic Pro Adventure (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, tblkkuzu,  tps,      coh1002m, zn, coh1002m, ROT0, "Tamsoft/D3 Publisher", "The Block Kuzushi (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, 1on1gov,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, tecmowcm,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

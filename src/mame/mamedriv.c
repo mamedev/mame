@@ -3035,6 +3035,7 @@ V-V                           TP-027
 	DRIVER( glpracr3 )	/* Gallop Racer 3 (JAPAN) */
 	DRIVER( flamegun )	/* Flame Gunner (USA) */
 	DRIVER( flamegunj )	/* Flame Gunner (JAPAN) */
+	DRIVER( lpadv )		/* Logic Pro Adventure (JAPAN) */
 	DRIVER( tblkkuzu )	/* The Block Kuzushi (JAPAN) */
 	DRIVER( 1on1gov )	/* 1 on 1 Government (JAPAN) */
 	DRIVER( tecmowcm )	/* Tecmo World Cup Millenium (JAPAN) */
