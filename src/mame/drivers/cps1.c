@@ -2552,9 +2552,14 @@ static INPUT_PORTS_START( pang3 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWC")
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x01, 0x01 )
+	PORT_DIPUNUSED( 0x02, 0x02 )
+	PORT_DIPUNUSED( 0x04, 0x04 )
+	PORT_DIPUNUSED( 0x08, 0x08 )
+	PORT_DIPUNUSED( 0x10, 0x10 )
+	PORT_DIPUNUSED( 0x20, 0x20 )
+	PORT_DIPUNUSED( 0x40, 0x40 )
+	PORT_DIPUNUSED( 0x80, 0x80 ) /* doubles up as an extra service switch */
 
 	PORT_START( "EEPROMIN" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
@@ -2563,6 +2568,23 @@ static INPUT_PORTS_START( pang3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+INPUT_PORTS_END
+
+/* Needs further checking */
+static INPUT_PORTS_START( pang3n )
+	PORT_INCLUDE( pang3 )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPUNUSED( 0x01, 0x01 )
+	PORT_DIPUNUSED( 0x02, 0x02 )
+	PORT_DIPUNUSED( 0x04, 0x04 )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x10, 0x10 )
+	PORT_DIPUNUSED( 0x20, 0x20 )
+	PORT_DIPUNUSED( 0x40, 0x40 )
+	PORT_DIPUNUSED( 0x80, 0x80 )
 INPUT_PORTS_END
 
 /* Needs further checking */
@@ -8500,8 +8522,36 @@ ROM_START( qtono2 )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 ROM_END
 
-/* B-Board 94916-10 */
+
 ROM_START( pang3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pa3e-17a.11l", 0x00000, 0x80000, CRC(a213fa80) SHA1(fee6b0b21e2ef573ebfb35eaa1785533101c9170) )
+	ROM_LOAD16_WORD_SWAP( "pa3e-16a.10l", 0x80000, 0x80000, CRC(7169ea67) SHA1(1076afaff7b05c9009798a0cea13e71fa27f2b7e) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "pa3-01m.2c", 0x000000, 0x100000, CRC(068a152c) SHA1(fa491874068924c39bcc7de93dfda3b27f5d9613) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(            0x000004, 0x100000 )
+	ROMX_LOAD( "pa3-07m.2f", 0x000002, 0x100000, CRC(3a4a619d) SHA1(cfe68e24632b53fb6cd6d03b2166d6b5ba28b778) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(            0x000006, 0x100000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "pa3-11.11f",  0x00000, 0x08000, CRC(90a08c46) SHA1(7544adab2d7e052e0d21c920bff7841d9d718345) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "pa3-05.10d",  0x00000, 0x20000, CRC(73a10d5d) SHA1(999465e4fbc35a34746d2db61ad49f61403d5af7) )
+	ROM_LOAD( "pa3-06.11d",  0x20000, 0x20000, CRC(affa4f82) SHA1(27b9292bbc121cf585f53297a79fe8f0d0a729ae) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+ROM_END
+
+
+/* B-Board 94916-10 */
+ROM_START( pang3n ) /* this set isn't encrypted, is it actually an original? */
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pa3w-17.11l", 0x00000, 0x80000, CRC(12138234) SHA1(956a2c847a3cfb94007d1a636167fd2bb9f826ec) )
 	ROM_LOAD16_WORD_SWAP( "pa3w-16.10l", 0x80000, 0x80000, CRC(d1ba585c) SHA1(c6d04441fe97abf0a72b23c917777a7b58e94a85) )
@@ -8718,7 +8768,7 @@ static DRIVER_INIT( slammast )
 	DRIVER_INIT_CALL(cps1);
 }
 
-static DRIVER_INIT( pang3 )
+static DRIVER_INIT( pang3n )
 {
 	/* Pang 3 is the only non-QSound game to have an EEPROM. */
 	/* It is mapped in the CPS-B address range so probably is on the C-board. */
@@ -8727,7 +8777,7 @@ static DRIVER_INIT( pang3 )
 	DRIVER_INIT_CALL(cps1);
 }
 
-static DRIVER_INIT( pang3j )
+static DRIVER_INIT( pang3 )
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	int A, src, dst;
@@ -8748,7 +8798,7 @@ static DRIVER_INIT( pang3j )
 		rom[A/2] = dst;
 	}
 
-	DRIVER_INIT_CALL(pang3);
+	DRIVER_INIT_CALL(pang3n);
 }
 #endif
 
@@ -8918,6 +8968,7 @@ GAME( 1993, mbombrd,  0,        qsound,     slammast, slammast, ROT0,   "Capcom"
 GAME( 1993, mbombrdj, mbombrd,  qsound,     slammast, slammast, ROT0,   "Capcom", "Muscle Bomber Duo - Heat Up Warriors (Japan 931206)", GAME_SUPPORTS_SAVE )
 
 GAME( 1994, pnickj,   0,        cps1_12MHz, pnickj,   cps1,     ROT0,   "Compile (Capcom license)", "Pnickies (Japan 940608)", GAME_SUPPORTS_SAVE )
-/* Japanese version of Pang 3 is encrypted, Euro version is not */
-GAME( 1995, pang3,    0,        pang3,      pang3,    pang3,    ROT0,   "Mitchell", "Pang! 3 (Euro 950511)", GAME_SUPPORTS_SAVE )
-GAME( 1995, pang3j,   pang3,    pang3,      pang3,    pang3j,   ROT0,   "Mitchell", "Pang! 3 (Japan 950511)", GAME_SUPPORTS_SAVE )
+
+GAME( 1995, pang3,    0,        pang3,      pang3,    pang3,     ROT0,   "Mitchell", "Pang! 3 (Euro 950601)", GAME_SUPPORTS_SAVE )
+GAME( 1995, pang3n,   pang3,    pang3,      pang3n,   pang3n,    ROT0,   "Mitchell", "Pang! 3 (Euro 950511, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1995, pang3j,   pang3,    pang3,      pang3n,   pang3,     ROT0,   "Mitchell", "Pang! 3 (Japan 950511)", GAME_SUPPORTS_SAVE )

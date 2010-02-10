@@ -1310,7 +1310,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"rockmanj", CPS_B_21_DEF, mapper_RCM63B },
 	{"pnickj",   CPS_B_21_DEF, mapper_pnickj },
 	{"pang3",    CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
-	{"pang3j",   CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3n",   CPS_B_21_DEF, mapper_pang3 },	/* ^^ */
+	{"pang3j",   CPS_B_21_DEF, mapper_pang3 },	/* ^^ */
 	#ifdef MESS
 	{"sfzch",    CPS_B_21_DEF, mapper_sfzch },
 	#endif

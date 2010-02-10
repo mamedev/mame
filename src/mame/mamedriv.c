@@ -2702,7 +2702,8 @@ V-V                           TP-027
 	DRIVER( qad )		/* 01/07/1992 (c) 1992 (US)    */
 	DRIVER( qadj )		/* 21/09/1994 (c) 1994 (Japan) */
 	DRIVER( qtono2 )	/* 23/01/1995 (c) 1995 (Japan) */
-	DRIVER( pang3 )		/* 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
+	DRIVER( pang3 )		/* 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
+	DRIVER( pang3n )	/* 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3j )	/* 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site */
 	DRIVER( megaman )	/* 06/10/1995 (c) 1995 (Asia)  */
 	DRIVER( rockmanj )	/* 22/09/1995 (c) 1995 (Japan) */
