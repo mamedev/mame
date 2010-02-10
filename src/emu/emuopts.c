@@ -154,6 +154,7 @@ const options_entry mame_core_options[] =
 	{ "bios",                        NULL,        0,                 "select the system BIOS to use" },
 	{ "cheat;c",                     "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
 	{ "skip_gameinfo",               "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
+	{ "skip_warnings",               "0",         OPTION_BOOLEAN,	 "skip displaying the warnings screen" },
 
 	{ NULL }
 };

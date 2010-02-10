@@ -231,21 +231,15 @@ static void ui_exit(running_machine *machine)
 
 int ui_display_startup_screens(running_machine *machine, int first_time, int show_disclaimer)
 {
-#ifdef MESS
-	const int maxstate = 4;
-#else
 	const int maxstate = 3;
-#endif
 	int str = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
 	int show_gameinfo = !options_get_bool(mame_options(), OPTION_SKIP_GAMEINFO);
 	int show_warnings = TRUE;
 	int state;
 
-#ifdef MESS
 	show_warnings = !options_get_bool(mame_options(), OPTION_SKIP_WARNINGS);
 	if (!show_warnings)
 		show_disclaimer = FALSE;
-#endif /* MESS */
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
        or if we are debugging */
@@ -285,10 +279,6 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				if (show_gameinfo && game_info_astring(machine, messagebox_text).len() > 0)
 					ui_set_handler(handler_messagebox_anykey, 0);
 				break;
-#ifdef MESS
-			case 3:
-				break;
-#endif
 		}
 
 		/* clear the input memory */
