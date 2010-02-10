@@ -450,7 +450,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 {
 	struct
 	{
-		UINT8 blend;
+		UINT8 color_math;
 		UINT32 data;
 		UINT32 map;
 		UINT8 map_size;
@@ -477,6 +477,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT8 window1_enabled, window1_invert;
 		UINT8 window2_enabled, window2_invert;
 		UINT8 wlog_mask;
+		UINT8 color_math;
 	} colour;	// this is for the color (which is 'seen' as a layer by the window masking code)
 
 	struct

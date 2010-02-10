@@ -1252,14 +1252,13 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case CGADSUB:	/* Addition/Subtraction designation for each screen */
 			snes_ppu.color_modes = data & 0xc0;
-			{
-				UINT8 sub = (data & 0x80) >> 7;
-				snes_ppu.layer[SNES_BG1].blend = (data & 0x1) << sub;
-				snes_ppu.layer[SNES_BG2].blend = ((data & 0x2) >> 1) << sub;
-				snes_ppu.layer[SNES_BG3].blend = ((data & 0x4) >> 2) << sub;
-				snes_ppu.layer[SNES_BG4].blend = ((data & 0x8) >> 3) << sub;
-				snes_ppu.layer[SNES_OAM].blend = ((data & 0x10) >> 4) << sub;
-			} break;
+			snes_ppu.layer[SNES_BG1].color_math = data & 0x01;
+			snes_ppu.layer[SNES_BG2].color_math = data & 0x02;
+			snes_ppu.layer[SNES_BG3].color_math = data & 0x04;
+			snes_ppu.layer[SNES_BG4].color_math = data & 0x08;
+			snes_ppu.layer[SNES_OAM].color_math = data & 0x10;
+			snes_ppu.colour.color_math = data & 0x20;
+			break;
 		case COLDATA:	/* Fixed colour data for fixed colour addition/subtraction */
 			{
 				/* Store it in the extra space we made in the CGRAM. It doesn't really go there, but it's as good a place as any. */
