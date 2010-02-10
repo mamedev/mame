@@ -1,14 +1,21 @@
 /***************************************************************************
 
 Mr Do!
-
 driver by Nicola Salmoria
 
+Updated 02/2010 with proper XTAL values thanks to Oliver_A
 
-Video clock: XTAL = 20 MHz
-Horizontal video frequency: HSYNC = XTAL/4/312 = 16.02564103 kHz
-Video frequency: VSYNC = HSYNC/262 = 61.1665688 Hz
-VBlank duration: 1/VSYNC * (70/262) = 4368 us
+PCB Model: 8201
+Main Clock: XTAL = 8.2 MHz
+Video clock: XTAL = 19.6 MHz
+
+Horizontal video frequency: HSYNC = XTAL/4/312 = 15.7051282051 kHz
+Video frequency: VSYNC = HSYNC/262 = 59.94323742 Hz
+VBlank duration: 1/VSYNC * (70/262) = 4457 us
+
+
+The manual for this model clearly shows above values in 'Misc' parts listings.
+There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 
 ***************************************************************************/
 
@@ -16,8 +23,8 @@ VBlank duration: 1/VSYNC * (70/262) = 4368 us
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
-#define MAIN_CLOCK		XTAL_8MHz
-#define VIDEO_CLOCK		XTAL_20MHz
+#define MAIN_CLOCK		XTAL_8_2MHz
+#define VIDEO_CLOCK		XTAL_19_6MHz
 
 
 extern UINT8 *mrdo_bgvideoram,*mrdo_fgvideoram;
@@ -170,7 +177,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrdo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)	/* Verified */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -189,10 +196,10 @@ static MACHINE_DRIVER_START( mrdo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, MAIN_CLOCK/2)
+	MDRV_SOUND_ADD("sn1", SN76489, MAIN_CLOCK/2)	/* Verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn2", SN76489, MAIN_CLOCK/2)
+	MDRV_SOUND_ADD("sn2", SN76489, MAIN_CLOCK/2)	/* Verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
