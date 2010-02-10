@@ -342,7 +342,7 @@ static void snes_dynamic_res_change( running_machine *machine )
 	visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
 
 	// fixme: should compensate for SNES_DBG_video
-	if (snes_ram[SETINI] & 0x08 || snes_ppu.mode == 5 || snes_ppu.mode == 6 )
+	if (snes_ppu.mode == 5 || snes_ppu.mode == 6 )
 		snes_htmult = 2;
 	else
 		snes_htmult = 1;
