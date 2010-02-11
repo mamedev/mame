@@ -483,7 +483,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 	else if (offset == 0xd40010)
 	{
 		// latch B
-		wd17xx_set_density(fdc,(data & 2) ? DEN_MFM_LO : DEN_MFM_HI);
+		wd17xx_dden_w(fdc, BIT(data, 1));
 	}
 	#endif
 	else
