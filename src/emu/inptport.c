@@ -4208,3 +4208,20 @@ static void record_port(const input_port_config *port)
 		}
 	}
 }
+
+int input_machine_have_keyboard(running_machine *machine)
+{
+	const input_field_config *field;
+	const input_port_config *port;
+	int have_keyboard = FALSE;
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
+	{
+		for (field = port->fieldlist; field != NULL; field = field->next)
+		{
+			if (field->type == IPT_KEYBOARD)
+				have_keyboard = TRUE;
+				break;
+		}
+	}
+	return have_keyboard;
+}

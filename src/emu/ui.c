@@ -879,8 +879,8 @@ static astring &warnings_string(running_machine *machine, astring &string)
 		string.cat("There are known problems with this " GAMENOUN "\n\n");
 
 		/* add one line per warning flag */
-		if (machine->gamedrv->flags & GAME_COMPUTER)
-			string.cat("The emulated system is a computer:\n\nThe keyboard emulation may not be 100% accurate.\n");
+		if (input_machine_have_keyboard(machine))
+			string.cat("The keyboard emulation may not be 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
 			string.cat("The colors aren't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_WRONG_COLORS)

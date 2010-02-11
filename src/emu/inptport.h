@@ -1134,5 +1134,7 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 /* convert an input_port_token to a default string */
 const char *input_port_string_from_token(const input_port_token token);
 
+/* return TRUE if machine use full keyboard emulation */
+int input_machine_have_keyboard(running_machine *machine);
 
 #endif	/* __INPTPORT_H__ */

@@ -155,4 +155,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND )
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND_HW )

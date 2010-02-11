@@ -418,7 +418,7 @@ static int validate_driver(int drivnum, const machine_config *config, game_drive
 	}
 
 	/* make sure sound-less drivers are flagged */
-	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && sound_first(config) == NULL && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && sound_first(config) == NULL && (driver->flags & GAME_NO_SOUND) == 0 && (driver->flags & GAME_NO_SOUND_HW) == 0)
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -442,9 +442,8 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 	int items_since_region = 1;
 	int error = FALSE;
 
-#ifndef MESS
 	/* check for duplicate ROM entries */
-	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0)
+	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0 && (driver->flags & GAME_CAN_SHARE_ROMS) == 0)
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
@@ -455,7 +454,6 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 			error = TRUE;
 		}
 	}
-#endif
 
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
 	for (const rom_source *source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))

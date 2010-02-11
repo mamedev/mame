@@ -186,5 +186,5 @@ ROM_START( dotrikun2 )
 ROM_END
 
 
-GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 1990, dotrikun2,dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+GAME( 1990, dotrikun2,dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
