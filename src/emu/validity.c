@@ -443,7 +443,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 	int error = FALSE;
 
 	/* check for duplicate ROM entries */
-	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0 && (driver->flags & GAME_CAN_SHARE_ROMS) == 0)
+	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0 && (driver->flags & GAME_SHARE_ROMS) == 0)
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
