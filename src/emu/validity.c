@@ -443,7 +443,8 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 	int error = FALSE;
 
 	/* check for duplicate ROM entries */
-	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0 && (driver->flags & GAME_SHARE_ROMS) == 0)
+/*	
+	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0 )
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
@@ -454,7 +455,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 			error = TRUE;
 		}
 	}
-
+*/
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
 	for (const rom_source *source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))
 	{

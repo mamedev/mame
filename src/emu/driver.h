@@ -45,7 +45,6 @@
 #define GAME_REQUIRES_ARTWORK			0x00004000	/* the driver requires external artwork for key elements of the game */
 #define GAME_UNOFFICIAL      			0x00008000	/* unofficial hardware change */
 #define GAME_NO_SOUND_HW				0x00010000	/* sound hardware not available */
-#define GAME_SHARE_ROMS					0x00020000	/* share roms with other games (different hardware same roms) */
 
 
 /* ----- flags to return from video_update ----- */
