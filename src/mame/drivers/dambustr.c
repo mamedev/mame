@@ -8,6 +8,41 @@ Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 2008-08
 Dip locations verified with manual
 
+
+Stephh's notes (based on the games Z80 code and some tests) :
+
+1) 'dambustr'
+
+  - This seems to be a bugfixed version as only the 3 "fire" buttons are
+    tested while entering the initials (code at 0x1e59).
+  - The "Initials Reset" button only affects the initials, not the scores !
+  - The "Disable Background Collision" Dip Switch only prevents you to lose
+    "lives" if you touch the background : you can still be hit by enemies'
+    bullets and be stalled if speed is too low.
+  - There is a setting which is only available in the "test mode", it's the
+    maximum game time. If you don't set it, the game considers it's illimited
+    time (full doesn't decrease). But once you set it to a value, it is not
+    possible to turn the value back to 0 even by reseting the game.
+  - If you go too far without dying, background becomes complete garbage,
+    but it then appears again correctly. Is there a bad dumped ROM or is
+    emulation bugged somewhere ? Verification against real PCB is needed !
+
+2) 'dambustra'
+
+  - There is sort of bug at 0x1e59 : you can't enter a letter in the
+    initials screen while pressing one of the system buttons (SERVICE,
+    "Initials Reset", START1 or START2), and even COIN2.
+    This is because 8 bytes are checked instead of 3 in 'dambustr'.
+  - Same as 'dambustr' otherwise.
+
+3) 'dambustruk'
+
+  - This set is based on 'dambustr' as there is no initials bug (code at 0x1e0f).
+  - The differences with 'dambustr' are :
+      * coinage for 2nd slot
+      * currency and price (but it's still 2 credits to start a game)
+      * score is divided by 10
+
 ***************************************************************************/
 
 
@@ -67,44 +102,59 @@ static ADDRESS_MAP_START( dambustr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
+
+/* verified from Z80 code */
 static INPUT_PORTS_START( dambustr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_DIPNAME( 0x20, 0x00, "Clear Swear Words" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Initials Reset") PORT_CODE(KEYCODE_0)
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_DIPNAME( 0x40, 0x00, "2nd Coin Counter" ) PORT_DIPLOCATION("SW:!1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY
+	PORT_DIPNAME( 0x40, 0x40, "Coin Counters" ) PORT_DIPLOCATION("SW:!1")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2")
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )   PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )   PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, "A 1/1  B 1/2" )     PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, "A 1/2  B 1/6" )     PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x40)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:!3,!4")
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Game Test Mode" ) PORT_DIPLOCATION("SW:!5") /* Manual says must be OFF */
+	PORT_DIPNAME( 0x04, 0x00, "Disable Background Collision (Cheat)" ) PORT_DIPLOCATION("SW:!5") /* see notes - manual says must be OFF */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Union Jack" ) PORT_DIPLOCATION("SW:!6")
+	PORT_DIPNAME( 0x08, 0x00, "Union Jack Flag" ) PORT_DIPLOCATION("SW:!6")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( dambustruk )
+	PORT_INCLUDE(dambustr)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2")
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )   PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )   PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, "A 1/1  B 1/6" )     PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, "A 1/2  B 1/12" )    PORT_CONDITION("IN1", 0x40, PORTCOND_EQUALS, 0x40)
 INPUT_PORTS_END
 
 
@@ -295,6 +345,6 @@ ROM_START( dambustruk )
 ROM_END
 
 
-GAME( 1981, dambustr,  0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
-GAME( 1981, dambustra, dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
-GAME( 1981, dambustruk,dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
