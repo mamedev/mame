@@ -143,6 +143,7 @@
 #define OPTION_VERBOSE				"verbose"
 #define OPTION_LOG					"log"
 #define OPTION_DEBUG				"debug"
+#define OPTION_DEBUG_INTERNAL		"debug_internal"
 #define OPTION_DEBUGSCRIPT			"debugscript"
 #define OPTION_UPDATEINPAUSE		"update_in_pause"
 

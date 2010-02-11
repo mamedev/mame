@@ -23,6 +23,7 @@ OBJDIRS += \
 	$(EMUOBJ)/cpu \
 	$(EMUOBJ)/sound \
 	$(EMUOBJ)/debug \
+	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
@@ -86,7 +87,8 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/debughlp.o \
 	$(EMUOBJ)/debug/debugvw.o \
 	$(EMUOBJ)/debug/express.o \
-	$(EMUOBJ)/debug/textbuf.o
+	$(EMUOBJ)/debug/textbuf.o \
+	$(EMUOBJ)/debugint/debugint.o
 
 ifdef PROFILER
 EMUOBJS += \

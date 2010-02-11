@@ -21,4 +21,17 @@
 			<bounds x="0" y="0" width="3" height="4" />
 		</screen>
 	</view>
+
+	<element name="dbgdis">
+	</element>
+
+	<view name="Debug">
+		<screen index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+		<bezel element="dbgdis">
+			<bounds x="-2.5" y="0" width="8" height="6" />
+		</bezel>
+	</view>
+
 </mamelayout>

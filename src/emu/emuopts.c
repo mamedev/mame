@@ -148,6 +148,7 @@ const options_entry mame_core_options[] =
 	{ "update_in_pause",             "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ "debug;d",                     "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ "debugscript",                 NULL,        0,                 "script for debugger" },
+	{ "debug_internal;di",           "0",         OPTION_BOOLEAN,    "use the internal debugger for debugging" },
 
 	/* misc options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE MISC OPTIONS" },

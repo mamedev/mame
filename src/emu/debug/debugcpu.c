@@ -24,6 +24,7 @@
 #include "express.h"
 #include "debugvw.h"
 #include "debugger.h"
+#include "debugint/debugint.h"
 #include "uiinput.h"
 #include <ctype.h>
 
@@ -674,7 +675,10 @@ void debug_cpu_instruction_hook(running_device *device, offs_t curpc)
 
 			/* clear the memory modified flag and wait */
 			global->memory_modified = FALSE;
-			osd_wait_for_debugger(device, firststop);
+			if (device->machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+				osd_wait_for_debugger(device, firststop);
+			else if (device->machine->debug_flags & DEBUG_FLAG_ENABLED)
+				debugint_wait_for_debugger(device, firststop);
 			firststop = FALSE;
 
 			/* if something modified memory, update the screen */

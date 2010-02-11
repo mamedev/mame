@@ -14,6 +14,7 @@
 #include "profiler.h"
 #include "png.h"
 #include "debugger.h"
+#include "debugint/debugint.h"
 #include "rendutil.h"
 #include "ui.h"
 #include "aviio.h"
@@ -1300,6 +1301,9 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* draw the user interface */
 	ui_update_and_render(machine, render_container_get_ui());
+
+	/* update the internal render debugger */
+	debugint_update_during_game(machine);
 
 	/* if we're throttling, synchronize before rendering */
 	if (!debug && !skipped_it && effective_throttle(machine))

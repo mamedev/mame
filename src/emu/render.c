@@ -63,6 +63,15 @@
 
 enum
 {
+	COMPONENT_TYPE_IMAGE = 0,
+	COMPONENT_TYPE_RECT,
+	COMPONENT_TYPE_DISK,
+	COMPONENT_TYPE_MAX
+};
+
+
+enum
+{
 	CONTAINER_ITEM_LINE = 0,
 	CONTAINER_ITEM_QUAD,
 	CONTAINER_ITEM_MAX
@@ -105,6 +114,7 @@ struct _object_transform
 	float				xscale, yscale;		/* scale transforms */
 	render_color		color;				/* color transform */
 	int					orientation;		/* orientation transform */
+	int					no_center;			/* center the container? */
 };
 
 
@@ -157,6 +167,7 @@ public:
 	int					base_layerconfig;	/* the layer configuration at the time of first frame */
 	int					maxtexwidth;		/* maximum width of a texture */
 	int					maxtexheight;		/* maximum height of a texture */
+	render_container *	debug_containers;
 };
 
 
@@ -271,7 +282,6 @@ static container_item *render_container_item_add_generic(render_container *conta
 static void render_container_overlay_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 static void render_container_recompute_lookups(render_container *container);
 static void render_container_update_palette(render_container *container);
-static void render_target_free_component_containers(const render_target *target);
 
 
 
@@ -1145,10 +1155,6 @@ void render_target_free(render_target *target)
 	for (curr = &targetlist; *curr != target; curr = &(*curr)->next) ;
 	*curr = target->next;
 
-	/* free any containers */
-
-	render_target_free_component_containers(target);
-
 	/* free any primitives */
 	for (listnum = 0; listnum < ARRAY_LENGTH(target->primlist); listnum++)
 	{
@@ -1636,6 +1642,22 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 		}
 	}
 
+	/* process the debug containers */
+	for (render_container *debug = target->debug_containers; debug != NULL; debug = debug->next)
+	{
+		ui_xform.xoffs = 0;
+		ui_xform.yoffs = 0;
+		ui_xform.xscale = (float) target->width;
+		ui_xform.yscale = (float) target->height;
+		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = ui_xform.color.a = 1.0f;
+		ui_xform.color.a = 0.9;
+		ui_xform.orientation = target->orientation;
+		ui_xform.no_center = TRUE;
+
+		/* add UI elements */
+		add_container_primitives(target, &target->primlist[listnum], &ui_xform, debug, BLENDMODE_ALPHA);
+	}
+
 	/* process the UI if we are the UI target */
 	if (target == render_get_ui_target())
 	{
@@ -1905,8 +1927,16 @@ static void add_container_primitives(render_target *target, render_primitive_lis
 		if (container_xform.orientation & ORIENTATION_FLIP_Y) yoffs = -yoffs;
 		container_xform.xscale = xform->xscale * xscale;
 		container_xform.yscale = xform->yscale * yscale;
-		container_xform.xoffs = xform->xscale * (0.5f - 0.5f * xscale + xoffs) + xform->xoffs;
-		container_xform.yoffs = xform->yscale * (0.5f - 0.5f * yscale + yoffs) + xform->yoffs;
+		if (xform->no_center)
+		{
+			container_xform.xoffs = xform->xscale * (xoffs) + xform->xoffs;
+			container_xform.yoffs = xform->yscale * (yoffs) + xform->yoffs;
+		}
+		else
+		{
+			container_xform.xoffs = xform->xscale * (0.5f - 0.5f * xscale + xoffs) + xform->xoffs;
+			container_xform.yoffs = xform->yscale * (0.5f - 0.5f * yscale + yoffs) + xform->yoffs;
+		}
 		container_xform.color = xform->color;
 	}
 
@@ -2110,19 +2140,6 @@ static void add_element_primitives(render_target *target, render_primitive_list 
 			append_render_primitive(list, prim);
 		else
 			free_render_primitive(prim);
-	}
-	/* Look for container components */
-	for (element_component *component = element->complist; element != NULL; element = element->next )
-	{
-		if (component->type == COMPONENT_TYPE_CONTAINER)
-		{
-			if (component->container != NULL)
-				add_container_primitives(target, list, xform, component->container, BLENDMODE_ALPHA);
-			component->scaled_bounds.min_x = render_round_nearest(xform->xoffs);
-			component->scaled_bounds.min_y = render_round_nearest(xform->yoffs);
-			component->scaled_bounds.max_x = render_round_nearest(xform->xoffs + xform->xscale);
-			component->scaled_bounds.max_y = render_round_nearest(xform->yoffs + xform->yscale);
-		}
 	}
 }
 
@@ -3162,49 +3179,66 @@ static void render_container_update_palette(render_container *container)
 	}
 }
 
-static void render_target_free_component_containers(const render_target *target)
+
+render_container *render_debug_alloc(render_target *target)
 {
-	/* for each layer, get scan all components ... */
-	for (int layer = 0; layer < ITEM_LAYER_MAX; layer++)
-		for (view_item *item = target->curview->itemlist[layer]; item != NULL; item = item->next)
-		{
-			for (layout_element *element = item->element; element != NULL; element = element->next)
-			{
-				for (element_component *component = element->complist; component != NULL; component = component->next)
-				{
-					if ((component->type == COMPONENT_TYPE_CONTAINER) && component->container != NULL)
-					{
-						render_container_free(component->container);
-						component->container = NULL;
-					}
-				}
-			}
-		}
+	render_container *container = render_container_alloc(target->machine);
+
+	container->next = target->debug_containers;
+	target->debug_containers = container;
+
+	return container;
 }
 
-render_container *render_target_get_component_container(const render_target *target, const char *name, rectangle *scaled_bounds)
-{
-	/* for each layer, get scan all components ... */
-	for (int layer = 0; layer < ITEM_LAYER_MAX; layer++)
-		for (view_item *item = target->curview->itemlist[layer]; item != NULL; item = item->next)
-		{
-			for (layout_element *element = item->element; element != NULL; element = element->next)
-			{
-				for (element_component *component = element->complist; component != NULL; component = component->next)
-				{
-					if ((component->type == COMPONENT_TYPE_CONTAINER) && (strcmp(name, component->string) == 0))
-					{
-						if (scaled_bounds != NULL)
-							*scaled_bounds = component->scaled_bounds;
-						if (component->container == NULL)
-						{
-							component->container = render_container_alloc(target->machine);
-						}
-						return component->container;
-					}
-				}
-			}
-		}
-	return NULL;
 
+void render_debug_free(render_target *target, render_container *container)
+{
+	if (container == target->debug_containers)
+	{
+		target->debug_containers = container->next;
+	}
+	else
+	{
+		render_container *c;
+
+		for (c = target->debug_containers; c != NULL; c = c->next)
+			if (c->next == container)
+				break;
+		c->next = container->next;
+	}
+	render_container_free(container);
 }
+
+
+void render_debug_top(render_target *target, render_container *container)
+{
+	/* remove */
+	if (container == target->debug_containers)
+	{
+		target->debug_containers = container->next;
+	}
+	else
+	{
+		render_container *c;
+
+		for (c = target->debug_containers; c != NULL; c = c->next)
+			if (c->next == container)
+				break;
+		c->next = container->next;
+	}
+	/* add to end */
+	if (target->debug_containers == NULL)
+		target->debug_containers = container;
+	else
+	{
+		render_container *c;
+
+		for (c = target->debug_containers; c != NULL; c = c->next)
+			if (c->next == NULL)
+				break;
+		c->next = container;
+	}
+	container->next = NULL;
+}
+
+
