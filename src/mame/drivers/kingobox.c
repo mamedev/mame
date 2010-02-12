@@ -797,7 +797,7 @@ ROM_START( ringkingw )
 	ROM_LOAD( "prom1.bin",    0x0800, 0x0400, CRC(913f5975) SHA1(3d1e40eeb4d5a3a4bd42ec73d05bfca13b2f1805) ) /* blue component */
 ROM_END
 
-static DRIVER_INIT( ringkin3 )
+static DRIVER_INIT( ringking3 )
 {
 	int i;
 	UINT8 *RAM = memory_region(machine, "proms");
@@ -807,7 +807,7 @@ static DRIVER_INIT( ringkin3 )
 		RAM[i] = RAM[i + 0x100] >> 4;
 }
 
-static DRIVER_INIT( ringkinw )
+static DRIVER_INIT( ringkingw )
 {
 	int i,j,k;
 	UINT8 *PROMS = memory_region(machine, "proms");
@@ -832,5 +832,5 @@ static DRIVER_INIT( ringkinw )
 GAME( 1985, kingofb,   0,       kingofb,  kingofb,  0,        ROT90, "Woodplace",     "King of Boxer (English)", GAME_SUPPORTS_SAVE )
 GAME( 1985, ringking,  kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, ringking2, kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  ringkin3, ROT90, "Data East USA", "Ring King (US set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  ringkinw, ROT90, "Woodplace",     "Ring King (US, Woodplace license)", GAME_SUPPORTS_SAVE )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  ringking3,ROT90, "Data East USA", "Ring King (US set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  ringkingw,ROT90, "Woodplace",     "Ring King (US, Woodplace license)", GAME_SUPPORTS_SAVE )

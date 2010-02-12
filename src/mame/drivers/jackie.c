@@ -1,3 +1,47 @@
+Happy Jackie (c) 1993 IGS.
+Video Slot machine game for amusement only.
+
+Driver by David Haywood and Mirko Buffoni
+
+/*
+
+Anno    199x
+Produttore  IGS
+N.revisione
+
+CPU
+
+1x Z0840006PSC (main)
+2x D8255AC
+1x unknown AMT001
+1x unknown IGS002
+1x UM3567 (sound)
+1x oscillator 12.000MHz
+1x oscillator 3.579645
+
+ROMs
+
+2x D27128A (1,3)
+1x MBM27128 (2)
+3x 27C010 (4,5,6)
+1x D27512 (7sv)
+1x MBM27C512 (v110)
+1x unknown (DIP20 mil300)(jack3)
+3x PEEL18CV8PC (read protected)
+1x TIBPAL16L8 (read protected)
+
+Note
+
+1x 36x2 edge connector
+1x 10x2 edge connector (payout system)
+1x trimmer (volume)
+1x pushbutton
+1x battery
+5x 8x2 switches dip
+
+*/
+
+
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
@@ -453,6 +497,25 @@ static GFXDECODE_START( jackie )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
+static DRIVER_INIT( jackie )
+{
+
+	int A;
+	UINT8 *rom = memory_region(machine, "maincpu");
+
+	for (A = 0;A < 0xf000;A++)
+	{
+		rom[A] = rom[A] ^ 0x21;
+
+		if (((A & 0x0080) == 0x0000) && ((A & 0x0008) == 0x0000)) rom[A] = rom[A] ^ 0x20;
+		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
+		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
+	}
+	memset( &rom[0xf000], 0, 0x1000);
+
+	// Patch trap
+	rom[0x7e86] = 0xc3;
+}
 
 
 static MACHINE_DRIVER_START( jackie )
@@ -487,43 +550,6 @@ static MACHINE_DRIVER_START( jackie )
 MACHINE_DRIVER_END
 
 
-/*
-
-Anno    199x
-Produttore  IGS
-N.revisione
-
-CPU
-
-1x Z0840006PSC (main)
-2x D8255AC
-1x unknown AMT001
-1x unknown IGS002
-1x UM3567 (sound)
-1x oscillator 12.000MHz
-1x oscillator 3.579645
-
-ROMs
-
-2x D27128A (1,3)
-1x MBM27128 (2)
-3x 27C010 (4,5,6)
-1x D27512 (7sv)
-1x MBM27C512 (v110)
-1x unknown (DIP20 mil300)(jack3)
-3x PEEL18CV8PC (read protected)
-1x TIBPAL16L8 (read protected)
-
-Note
-
-1x 36x2 edge connector
-1x 10x2 edge connector (payout system)
-1x trimmer (volume)
-1x pushbutton
-1x battery
-5x 8x2 switches dip
-
-*/
 ROM_START( jackie )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jackiev110.u23",   0x0000, 0x10000, CRC(1b78a619) SHA1(a6eb6b6e544efa55225f2e947483614afb6ece3b) )
@@ -548,24 +574,5 @@ ROM_START( jackie )
 	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
 ROM_END
 
-static DRIVER_INIT( jackie )
-{
-
-	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
-
-	for (A = 0;A < 0xf000;A++)
-	{
-		rom[A] = rom[A] ^ 0x21;
-
-		if (((A & 0x0080) == 0x0000) && ((A & 0x0008) == 0x0000)) rom[A] = rom[A] ^ 0x20;
-		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
-		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
-	}
-	memset( &rom[0xf000], 0, 0x1000);
-
-	// Patch trap
-	rom[0x7e86] = 0xc3;
-}
 
 GAME( 1993,  jackie,   0,        jackie,   jackie, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)",       0 )

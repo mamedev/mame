@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 
 Main_PortMap( gyrodine, 0x00 )
 Main_PortMap( flashgal, 0x40 )
-Main_PortMap( flashgla, 0xc0 )
+Main_PortMap( flashgala, 0xc0 )
 Main_PortMap( srdmissn, 0x08 )
 
 
@@ -102,7 +102,7 @@ Sub_MemMap( gyrodine, 0x1fff, 0x4000, 0x8080, 0x8040, 0x8000 )
 Sub_MemMap( sonofphx, 0x7fff, 0xa000, 0xc080, 0xc040, 0xc000 )
 Sub_MemMap( srdmissn, 0x7fff, 0x8000, 0xf400, 0xf401, 0xf402 )
 Sub_MemMap( legend,   0x7fff, 0xc000, 0xf800, 0xf801, 0xf802 )
-Sub_MemMap( flashgla, 0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
+Sub_MemMap( flashgala, 0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
 
 
 
@@ -123,7 +123,7 @@ ADDRESS_MAP_END																			\
 Sub_PortMap( gyrodine, 0x00, 0xc0 )
 Sub_PortMap( sonofphx, 0x00, 0x40 )
 Sub_PortMap( srdmissn, 0x80, 0x84 )
-Sub_PortMap( flashgla, 0x40, 0x80 )
+Sub_PortMap( flashgala, 0x40, 0x80 )
 
 
 /*************************************
@@ -555,16 +555,16 @@ static MACHINE_DRIVER_START( flashgal )
 	MDRV_CPU_IO_MAP(flashgal_portmap)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( flashgla )
+static MACHINE_DRIVER_START( flashgala )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(flashgla_portmap)
+	MDRV_CPU_IO_MAP(flashgala_portmap)
 
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(flashgla_sub_map)
-	MDRV_CPU_IO_MAP(flashgla_sub_portmap)
+	MDRV_CPU_PROGRAM_MAP(flashgala_sub_map)
+	MDRV_CPU_IO_MAP(flashgala_sub_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( legend )
@@ -1334,7 +1334,7 @@ GAME( 1985, 99lstwar,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "
 GAME( 1985, 99lstwara, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 99lstwark, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
 GAME( 1985, flashgal,  0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, flashgala, flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgala, flashgal, flashgala,flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
 GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
 GAME( 1986, legend,    0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE )

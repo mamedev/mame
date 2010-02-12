@@ -793,4 +793,4 @@ ROM_START( gp98 )
 ROM_END
 
 GAME( 1995?, jingbell, 0, jingbell, jingbell, jingbell, ROT0, "IGS", "Jingle Bell (Italy, V133I)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1998,  gp98,  0,    gp98,  jingbell,        0,    ROT0, "Romtec Co. LTD", "Grand Prix '98",GAME_NOT_WORKING| GAME_NO_SOUND )
+GAME( 1998,  gp98,     0,     gp98, jingbell,        0, ROT0, "Romtec Co. LTD", "Grand Prix '98",GAME_NOT_WORKING| GAME_NO_SOUND )

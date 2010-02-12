@@ -2735,7 +2735,7 @@ static DRIVER_INIT( rimrockn )
 
 /* Wheel of Fortune-style PCB */
 GAME( 1989, wfortune, 0,        wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune", 0 )
-GAME( 1989, wfortunea, wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 )
+GAME( 1989, wfortunea,wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 )
 
 /* Grudge Match-style PCB */
 GAME( 1989, grmatch,  0,        grmatch,           grmatch,  grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
@@ -2749,23 +2749,23 @@ GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t,    0,        ROT0,   "
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot, 0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", 0 )
-GAME( 1990, slikshot17, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
-GAME( 1990, slikshot16, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
-GAME( 1990, dynobop,  0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 )
-GAME( 1990, sstrike,  0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
-GAME( 1991, pokrdice, 0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", 0 )
+GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
+GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
+GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */
-GAME( 1990, hstennis, 0,        hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
-GAME( 1990, hstennis10, hstennis, hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
-GAME( 1991, arlingtn, 0,        hstennis_hi,       arlingtn, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
-GAME( 1991, peggle,   0,        hstennis_lo,       peggle,   peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
-GAME( 1991, pegglet,  peggle,   hstennis_lo,       pegglet,  peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
-GAME( 1992, neckneck, 0,        hstennis_lo,       neckneck, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
+GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
+GAME( 1990, hstennis10,hstennis, hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
+GAME( 1991, arlingtn,  0,        hstennis_hi,       arlingtn, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
+GAME( 1991, peggle,    0,        hstennis_lo,       peggle,   peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
+GAME( 1991, pegglet,   peggle,   hstennis_lo,       pegglet,  peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
+GAME( 1992, neckneck,  0,        hstennis_lo,       neckneck, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn, 0,        rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn,   0,        rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
 GAME( 1991, rimrockn20, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
 GAME( 1991, rimrockn16, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
 GAME( 1991, rimrockn12, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
