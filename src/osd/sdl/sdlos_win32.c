@@ -18,6 +18,7 @@
 
 // MAME headers
 #include "osdcore.h"
+#include "strconv.h"
 
 //============================================================
 //  PROTOTYPES
