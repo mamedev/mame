@@ -138,6 +138,7 @@
 #define OPTION_JOYSTICK_SATURATION	"joystick_saturation"
 #define OPTION_STEADYKEY			"steadykey"
 #define OPTION_OFFSCREEN_RELOAD		"offscreen_reload"
+#define OPTION_NATURAL_KEYBOARD		"natural"
 
 /* core debugging options */
 #define OPTION_VERBOSE				"verbose"

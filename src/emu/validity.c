@@ -444,7 +444,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 
 	/* check for duplicate ROM entries */
 /*	
-	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0 )
+	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0)
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
@@ -1192,7 +1192,10 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 					}
 				}
 		}
-	/* free the config */
+		
+	error = error || validate_natural_keyboard_statics();
+	
+	/* free the config */	
 	return error;
 }
 
@@ -1461,9 +1464,6 @@ int mame_validitychecks(const game_driver *curdriver)
 	osd_ticks_t input_checks = 0;
 	osd_ticks_t sound_checks = 0;
 	osd_ticks_t device_checks = 0;
-#ifdef MESS
-	osd_ticks_t mess_checks = 0;
-#endif
 
 	int drivnum, strnum;
 	int error = FALSE;
@@ -1575,14 +1575,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		machine_config_free(config);
 	}
-
-#ifdef MESS
-	mess_checks -= get_profile_ticks();
-	if (mess_validitychecks())
-		error = TRUE;
-	mess_checks += get_profile_ticks();
-#endif /* MESS */
-
+	
 #if (REPORT_TIMES)
 	mame_printf_info("Prep:      %8dm\n", (int)(prep / 1000000));
 	mame_printf_info("Expansion: %8dm\n", (int)(expansion / 1000000));
@@ -1593,9 +1586,6 @@ int mame_validitychecks(const game_driver *curdriver)
 	mame_printf_info("Graphics:  %8dm\n", (int)(gfx_checks / 1000000));
 	mame_printf_info("Input:     %8dm\n", (int)(input_checks / 1000000));
 	mame_printf_info("Sound:     %8dm\n", (int)(sound_checks / 1000000));
-#ifdef MESS
-	mame_printf_info("MESS:      %8dm\n", (int)(mess_checks / 1000000));
-#endif
 #endif
 
 	return error;

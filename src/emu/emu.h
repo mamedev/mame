@@ -93,7 +93,6 @@
 // the running machine
 #ifdef MESS
 #include "mess.h"
-#include "uimess.h"
 #include "image.h"
 #include "messdrv.h"
 #endif /* MESS */

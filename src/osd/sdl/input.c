@@ -914,7 +914,6 @@ static int lookup_mame_index(const char *scode)
 	return index;
 }
 
-#ifdef MESS
 static int lookup_mame_code(const char *scode)
 {
 	int index;
@@ -924,7 +923,6 @@ static int lookup_mame_code(const char *scode)
 	else
 		return -1;
 }
-#endif
 
 
 //============================================================
@@ -1584,9 +1582,7 @@ int sdlinput_should_hide_mouse(running_machine *machine)
 
 void osd_customize_input_type_list(input_type_desc *typelist)
 {
-	#ifdef MESS
 	int mameid_code ,ui_code;
-	#endif
 	input_type_desc *typedesc;
 
 	// loop over the defaults
@@ -1594,14 +1590,12 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 	{
 		switch (typedesc->type)
 		{
-			#ifdef MESS
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
 				mameid_code = lookup_mame_code((const char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY));
 				ui_code = INPUT_CODE(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, mameid_code);
 				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], ui_code);
 				break;
-			#endif
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
 				typedesc->token = "TOGGLE_FULLSCREEN";

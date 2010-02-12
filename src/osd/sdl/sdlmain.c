@@ -56,10 +56,8 @@ void MorphToPM()
 //  LOCAL VARIABLES
 //============================================================
 
-#ifdef MESS
 #include <unistd.h>
-static char cwd[512];
-#endif
+extern char sdl_cwd[512];
 
 //============================================================
 //  OPTIONS
@@ -186,13 +184,6 @@ static const options_entry mame_sdl_options[] =
 	{ NULL, 		                          NULL,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
 	{ SDLOPTION_KEYMAP,                      "0",    OPTION_BOOLEAN,    "enable keymap" },
 	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", 0,           "keymap filename" },
-#ifdef MESS
-#ifdef SDLMAME_MACOSX	// work around for SDL 1.2.11 on Mac - 1.2.12 should not require this
-	{ SDLOPTION_UIMODEKEY,			"DELETE", 0,                  "Key to toggle MESS keyboard mode" },
-#else
-	{ SDLOPTION_UIMODEKEY,			"SCROLLOCK", 0,                  "Key to toggle MESS keyboard mode" },
-#endif	// SDLMAME_MACOSX
-#endif	// MESS
 
 	// joystick mapping
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
@@ -280,9 +271,7 @@ int main(int argc, char *argv[])
 	MorphToPM();
 	#endif
 
-	#ifdef MESS
-	getcwd(cwd, 511);
-	#endif
+	getcwd(sdl_cwd, 511);
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 	if (SDL_Linked_Version()->patch < 10)
@@ -572,10 +561,3 @@ void osd_init(running_machine *machine)
 	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }
-
-#ifdef MESS
-char *osd_get_startup_cwd(void)
-{
-	return cwd;
-}
-#endif

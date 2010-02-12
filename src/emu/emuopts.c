@@ -129,7 +129,14 @@ const options_entry mame_core_options[] =
 	{ "joystick_map;joymap",         "auto",      0,                 "explicit joystick map, or auto to auto-select" },
 	{ "joystick_deadzone;joy_deadzone;jdz",      "0.3",  0,          "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ "joystick_saturation;joy_saturation;jsat", "0.85", 0,          "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
-
+	{ "natural;nat",				 "0",		  OPTION_BOOLEAN,	 "specifies whether to use a natural keyboard or not" },
+	#if defined(__APPLE__) && defined(__MACH__)
+	{ "uimodekey;umk",        		"ITEM_ID_INSERT",  0,    		 "specifies the key used to toggle between full and partial UI mode" },
+	#else
+	{ "uimodekey;umk",        		"ITEM_ID_SCRLOCK", 0,    		 "specifies the key used to toggle between full and partial UI mode" },
+	#endif
+	
+	
 	/* input autoenable options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT AUTOMATIC ENABLE OPTIONS" },
 	{ "paddle_device;paddle",        "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a paddle control is present" },

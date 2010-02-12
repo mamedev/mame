@@ -19,10 +19,6 @@
 #include "emu.h"
 #include "machine/pckeybrd.h"
 
-#ifdef MESS
-#include "inputx.h"
-#endif /* MESS */
-
 /* AT keyboard documentation comes from www.beyondlogic.org and HelpPC documentation */
 
 /* to enable logging of keyboard read/writes */

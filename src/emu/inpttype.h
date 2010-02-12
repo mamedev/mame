@@ -603,10 +603,8 @@ static const input_type_desc core_types[] =
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_NEXT_GROUP,       "UI Next Group",          SEQ_DEF_1(KEYCODE_CLOSEBRACE) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ROTATE,           "UI Rotate",              SEQ_DEF_1(KEYCODE_R) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_SHOW_PROFILER,    "Show Profiler",          SEQ_DEF_2(KEYCODE_F11, KEYCODE_LSHIFT) )
-#ifdef MESS
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_TOGGLE_UI,        "UI Toggle",              SEQ_DEF_3(KEYCODE_SCRLOCK, SEQCODE_NOT, KEYCODE_LSHIFT) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_PASTE,            "UI Paste Text",          SEQ_DEF_2(KEYCODE_SCRLOCK, KEYCODE_LSHIFT) )
-#endif /* MESS */
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_TOGGLE_DEBUG,     "Toggle Debugger",        SEQ_DEF_1(KEYCODE_F5) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_SAVE_STATE,       "Save State",             SEQ_DEF_2(KEYCODE_F7, KEYCODE_LSHIFT) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_LOAD_STATE,       "Load State",             SEQ_DEF_3(KEYCODE_F7, SEQCODE_NOT, KEYCODE_LSHIFT) )

@@ -1288,7 +1288,6 @@ running_machine::running_machine(const game_driver *driver)
 	  generic_audio_data(NULL),
 #ifdef MESS
 	  images_data(NULL),
-	  ui_mess_data(NULL),
 #endif /* MESS */
 	  driver_data(NULL)
 {
@@ -1368,9 +1367,6 @@ static void init_machine(running_machine *machine)
 	palette_init(machine);
 	render_init(machine);
 	ui_init(machine);
-#ifdef MESS
-	ui_mess_init(machine);
-#endif /* MESS */
 	generic_machine_init(machine);
 	generic_video_init(machine);
 	generic_sound_init(machine);

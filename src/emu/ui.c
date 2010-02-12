@@ -23,10 +23,7 @@
 #include "uigfx.h"
 
 #ifdef MESS
-#include "mess.h"
 #include "uimess.h"
-#include "inputx.h"
-#include "messopts.h"
 #endif /* MESS */
 
 #include <ctype.h>
@@ -45,6 +42,53 @@ enum
 };
 
 
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
+
+/* list of natural keyboard keys that are not associated with UI_EVENT_CHARs */
+static const input_item_id non_char_keys[] =
+{
+	ITEM_ID_ESC,
+	ITEM_ID_F1,
+	ITEM_ID_F2,
+	ITEM_ID_F3,
+	ITEM_ID_F4,
+	ITEM_ID_F5,
+	ITEM_ID_F6,
+	ITEM_ID_F7,
+	ITEM_ID_F8,
+	ITEM_ID_F9,
+	ITEM_ID_F10,
+	ITEM_ID_F11,
+	ITEM_ID_F12,
+	ITEM_ID_NUMLOCK,
+	ITEM_ID_0_PAD,
+	ITEM_ID_1_PAD,
+	ITEM_ID_2_PAD,
+	ITEM_ID_3_PAD,
+	ITEM_ID_4_PAD,
+	ITEM_ID_5_PAD,
+	ITEM_ID_6_PAD,
+	ITEM_ID_7_PAD,
+	ITEM_ID_8_PAD,
+	ITEM_ID_9_PAD,
+	ITEM_ID_DEL_PAD,
+	ITEM_ID_PLUS_PAD,
+	ITEM_ID_MINUS_PAD,
+	ITEM_ID_INSERT,
+	ITEM_ID_DEL,
+	ITEM_ID_HOME,
+	ITEM_ID_END,
+	ITEM_ID_PGUP,
+	ITEM_ID_PGDN,
+	ITEM_ID_UP,
+	ITEM_ID_DOWN,
+	ITEM_ID_LEFT,
+	ITEM_ID_RIGHT,
+	ITEM_ID_PAUSE,
+	ITEM_ID_CANCEL
+};
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -78,6 +122,10 @@ static rgb_t messagebox_backcolor;
 static slider_state *slider_list;
 static slider_state *slider_current;
 
+static int ui_active;
+/* natural keyboard info */
+static int ui_use_natural_keyboard;
+static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];	
 
 
 /***************************************************************************
@@ -206,7 +254,11 @@ int ui_init(running_machine *machine)
 
 	/* reset globals */
 	single_step = FALSE;
-	ui_set_handler(handler_messagebox, 0);
+	ui_set_handler(handler_messagebox, 0);	
+	ui_active = 0;
+	/* retrieve options */
+	ui_use_natural_keyboard = options_get_bool(mame_options(), OPTION_NATURAL_KEYBOARD);
+	
 	return 0;
 }
 
@@ -1127,6 +1179,94 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, render_contain
 
 
 /*-------------------------------------------------
+    ui_use_new_ui - determines if the "new ui"
+    is in use
+-------------------------------------------------*/
+
+int ui_use_new_ui(void)
+{
+#ifdef MESS
+#if (defined(WIN32) || defined(_MSC_VER)) && !defined(SDLMAME_WIN32)
+	if (options_get_bool(mame_options(), "newui"))
+		return TRUE;
+#endif
+#endif
+	return FALSE;
+}
+
+/*-------------------------------------------------
+    process_natural_keyboard - processes any
+    natural keyboard input
+-------------------------------------------------*/
+
+static void process_natural_keyboard(running_machine *machine)
+{
+	ui_event event;
+	int i, pressed;
+	input_item_id itemid;
+	input_code code;
+	UINT8 *key_down_ptr;
+	UINT8 key_down_mask;
+
+	/* loop while we have interesting events */
+	while (ui_input_pop_event(machine, &event))
+	{
+		/* if this was a UI_EVENT_CHAR event, post it */
+		if (event.event_type == UI_EVENT_CHAR)
+			inputx_postc(machine, event.ch);
+	}
+
+	/* process natural keyboard keys that don't get UI_EVENT_CHARs */
+	for (i = 0; i < ARRAY_LENGTH(non_char_keys); i++)
+	{
+		/* identify this keycode */
+		itemid = non_char_keys[i];
+		code = input_code_from_input_item_id(machine, itemid);
+
+		/* ...and determine if it is pressed */
+		pressed = input_code_pressed(machine, code);
+
+		/* figure out whey we are in the key_down map */
+		key_down_ptr = &non_char_keys_down[i / 8];
+		key_down_mask = 1 << (i % 8);
+
+		if (pressed && !(*key_down_ptr & key_down_mask))
+		{
+			/* this key is now down */
+			*key_down_ptr |= key_down_mask;
+
+			/* post the key */
+			inputx_postc(machine, UCHAR_MAMEKEY_BEGIN + code);
+		}
+		else if (!pressed && (*key_down_ptr & key_down_mask))
+		{
+			/* this key is now up */
+			*key_down_ptr &= ~key_down_mask;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    ui_paste - does a paste from the keyboard
+-------------------------------------------------*/
+
+void ui_paste(running_machine *machine)
+{
+	/* retrieve the clipboard text */
+	char *text = osd_get_clipboard_text();
+
+	/* was a result returned? */
+	if (text != NULL)
+	{
+		/* post the text */
+		inputx_post_utf8(machine, text);
+
+		/* free the string */
+		free(text);
+	}
+}
+
+/*-------------------------------------------------
     handler_ingame - in-game handler takes care
     of the standard keypresses
 -------------------------------------------------*/
@@ -1159,9 +1299,58 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 		single_step = FALSE;
 	}
 
+	/* determine if we should disable the rest of the UI */
+	int ui_disabled = ui_use_new_ui() || (input_machine_have_keyboard(machine) && !ui_active);
+
+	/* is ScrLk UI toggling applicable here? */
+	if (!ui_use_new_ui() && input_machine_have_keyboard(machine))
+	{
+		/* are we toggling the UI with ScrLk? */
+		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
+		{
+			/* toggle the UI */
+			ui_active = !ui_active;
+
+			/* display a popup indicating the new status */
+			if (ui_active)
+			{
+				ui_popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
+					"Keyboard Emulation Status",
+					"-------------------------",
+					"Mode: PARTIAL Emulation",
+					"UI:   Enabled",
+					"-------------------------",
+					"**Use ScrLock to toggle**");
+			}
+			else
+			{
+				ui_popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
+					"Keyboard Emulation Status",
+					"-------------------------",
+					"Mode: FULL Emulation",
+					"UI:   Disabled",
+					"-------------------------",
+					"**Use ScrLock to toggle**");
+			}
+		}
+	}
+
+	/* is the natural keyboard enabled? */
+	if (ui_get_use_natural_keyboard(machine) && (mame_get_phase(machine) == MAME_PHASE_RUNNING))
+		process_natural_keyboard(machine);
+
+	/* MESS-specific UI; provided that the UI is not disabled */
+	if (!ui_disabled)
+	{
+		/* paste command */
+		if (ui_input_pressed(machine, IPT_UI_PASTE))
+			ui_paste(machine);
+	}
+
+	if (ui_disabled) return ui_disabled;
+
 #ifdef MESS
-	if (ui_mess_handler_ingame(machine))
-		return 0;
+	ui_mess_handler_ingame(machine);
 #endif /* MESS */
 
 	/* if the user pressed ESC, stop the emulation */
@@ -2003,3 +2192,27 @@ static INT32 slider_crossoffset(running_machine *machine, void *arg, astring *st
 	return field->crossoffset;
 }
 #endif
+
+
+/*-------------------------------------------------
+    ui_get_use_natural_keyboard - returns
+    whether the natural keyboard is active
+-------------------------------------------------*/
+
+int ui_get_use_natural_keyboard(running_machine *machine)
+{
+	return ui_use_natural_keyboard;
+}
+
+
+
+/*-------------------------------------------------
+    ui_set_use_natural_keyboard - specifies
+    whether the natural keyboard is active
+-------------------------------------------------*/
+
+void ui_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard)
+{
+	ui_use_natural_keyboard = use_natural_keyboard;
+}
+

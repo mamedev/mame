@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 
 // MAME headers
@@ -378,7 +379,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 /*      osd_is_path_separator */
 /*============================================================ */
 
-static int osd_is_path_separator(char c)
+int osd_is_path_separator(char c)
 {
         return (c == '/') || (c == '\\');
 }
@@ -494,3 +495,204 @@ osd_directory_entry *osd_stat(const char *path)
 }
 #endif
 #endif
+
+//============================================================
+//   osd_getcurdir
+//============================================================
+
+file_error osd_getcurdir(char *buffer, size_t buffer_len)
+{
+	file_error filerr = FILERR_NONE;
+
+	if (getcwd(buffer, buffer_len) == NULL)
+	{
+		filerr = FILERR_FAILURE;
+	}
+
+	if( filerr != FILERR_FAILURE )
+	{
+		if( strcmp( &buffer[strlen(buffer)-1], PATH_SEPARATOR ) != 0 )
+		{
+		        strncat( buffer, PATH_SEPARATOR, buffer_len );
+		}
+	}
+
+	return filerr;
+}
+
+//============================================================
+//  osd_get_full_path
+//============================================================
+
+file_error osd_get_full_path(char **dst, const char *path)
+{
+	file_error err;
+	char path_buffer[512];
+
+	err = FILERR_NONE;
+
+	if (getcwd(path_buffer, 511) == NULL)
+	{
+		printf("osd_get_full_path: failed!\n");
+		err = FILERR_FAILURE;
+	}
+	else
+	{
+		*dst = (char *)malloc(strlen(path_buffer)+strlen(path)+3);
+
+		// if it's already a full path, just pass it through
+		if (path[0] == '/')
+		{
+			strcpy(*dst, path);
+		}
+		else
+		{
+			sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
+		}
+	}
+
+	return err;
+}
+
+//============================================================
+//  osd_setcurdir
+//============================================================
+
+file_error osd_setcurdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	if (chdir(dir) != 0)
+	{
+		filerr = FILERR_FAILURE;
+	}
+
+	return filerr;
+}
+
+//============================================================
+//  osd_basename
+//============================================================
+
+char *osd_basename(char *filename)
+{
+	char *c;
+
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// start at the end and return when we hit a slash or colon
+	for (c = filename + strlen(filename) - 1; c >= filename; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+			return c + 1;
+
+	// otherwise, return the whole thing
+	return filename;
+}
+
+//============================================================
+//  osd_dirname
+//============================================================
+
+char *osd_dirname(const char *filename)
+{
+	char *dirname;
+	char *c;
+
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// allocate space for it
+	dirname = (char*)malloc(strlen(filename) + 1);
+	if (!dirname)
+		return NULL;
+
+	// copy in the name
+	strcpy(dirname, filename);
+
+	// search backward for a slash or a colon
+	for (c = dirname + strlen(dirname) - 1; c >= dirname; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+		{
+			// found it: NULL terminate and return
+			*(c + 1) = 0;
+			return dirname;
+		}
+
+	// otherwise, return an empty string
+	dirname[0] = 0;
+	return dirname;
+}
+
+// no idea what these are for, just cheese them
+int osd_num_devices(void)
+{
+	return 1;
+}
+
+const char *osd_get_device_name(int idx)
+{
+	return "/";
+}
+
+//============================================================
+//  osd_get_temp_filename
+//============================================================
+
+file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
+{
+	char tempbuf[512];
+
+	if (!basename)
+		basename = "tempfile";
+
+	sprintf(tempbuf, "/tmp/%s", basename);
+	unlink(tempbuf);
+
+	strncpy(buffer, tempbuf, buffer_len);
+
+	return FILERR_NONE;
+}
+
+//============================================================
+//  osd_mkdir
+//============================================================
+
+file_error osd_mkdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	#ifdef SDLMAME_WIN32
+	if (mkdir(dir) != 0)
+	#else
+	if (mkdir(dir, 0700) != 0)
+	#endif
+	{
+		filerr = FILERR_FAILURE;
+	}
+
+	return filerr;
+}
+
+//============================================================
+//  osd_rmdir
+//============================================================
+
+file_error osd_rmdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	if (rmdir(dir) != 0)
+	{
+		filerr = FILERR_FAILURE;
+	}
+
+	return filerr;
+}
+char sdl_cwd[512];
+void osd_get_emulator_directory(char *dir, size_t dir_size)
+{
+	strncpy(dir, sdl_cwd, dir_size);
+}

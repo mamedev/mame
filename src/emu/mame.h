@@ -285,7 +285,6 @@ public:
 	generic_audio_private *	generic_audio_data;	/* internal data from audio/generic.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
-	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */
 #endif /* MESS */
 
 	/* driver-specific information */
@@ -466,14 +465,6 @@ void mame_get_base_datetime(running_machine *machine, mame_system_time *systime)
 
 /* retrieve the current system time */
 void mame_get_current_datetime(running_machine *machine, mame_system_time *systime);
-
-
-
-#ifdef MESS
-#include "mess.h"
-#endif /* MESS */
-
-
 
 /***************************************************************************
     INLINE FUNCTIONS
