@@ -5,6 +5,14 @@ Warning
   work.
 - if you are using wine on unix be sure to disable wintab32.dll
 
+Known bugs:
+===========
+
+* SDL1.3/X11: Some compound keys, e.g. "'" are not supported by SDL driver
+* SDL1.3: sdlvideofps does not take -numscreens>1 into account.
+* SDL1.3/WIN32: crashes with -rd d3d
+* SDL1.3/WIN32: resizing does not work
+      
 Build SDL 1.3 from SVN
 ======================
 

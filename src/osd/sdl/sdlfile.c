@@ -423,40 +423,9 @@ int osd_is_absolute_path(const char *path)
         return result;
 }
 
-/* not used anywhere */
-#if 0
 //============================================================
-//  osd_mkdir
+//  MESS - specific code below ....
 //============================================================
-
-file_error osd_mkdir(const char *dir)
-{
-	#ifdef SDLMAME_WIN32
-	if (mkdir(dir) != 0)
-	#else
-	if (mkdir(dir, 0666) != 0)
-	#endif
-	{
-		return error_to_file_error(errno);
-	}
-
-	return FILERR_NONE;
-}
-
-//============================================================
-//  osd_rmdir
-//============================================================
-
-static file_error osd_rmdir(const char *dir)
-{
-	if (rmdir(dir) != 0)
-	{
-		return error_to_file_error(errno);
-	}
-
-	return FILERR_NONE;
-}
-#endif
 
 // these are MESS specific - DO NOT TOUCH!!@!
 #ifdef MESS
