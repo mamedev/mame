@@ -17,12 +17,11 @@
 static TILE_GET_INFO( ttl_get_tile_info )
 {
 	rungun_state *state = (rungun_state *)machine->driver_data;
-	UINT32 *lvram = (UINT32 *)state->ttl_vram;
+	UINT8 *lvram = (UINT8 *)state->ttl_vram;
 	int attr, code;
 
-	code = (lvram[tile_index] >> 16) & 0xffff;
-	code |= (lvram[tile_index] & 0x0f) << 8;	/* tile "bank" */
-	attr = ((lvram[tile_index] & 0xf0) >> 4);	/* palette */
+	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
+	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
 
 	SET_TILE_INFO(state->ttl_gfx_index, code, attr, 0);
 }
