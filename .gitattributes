@@ -3976,7 +3976,6 @@ src/osd/sdl/osxutils.m svneol=native#text/plain
 src/osd/sdl/output.c svneol=native#text/plain
 src/osd/sdl/output.h svneol=native#text/plain
 src/osd/sdl/sdl.mak svneol=native#text/plain
-src/osd/sdl/sdlclip.c svneol=native#text/plain
 src/osd/sdl/sdldir.c svneol=native#text/plain
 src/osd/sdl/sdlfile.c svneol=native#text/plain
 src/osd/sdl/sdlmain.c svneol=native#text/plain
