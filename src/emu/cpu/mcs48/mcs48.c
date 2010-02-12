@@ -1515,6 +1515,8 @@ static void mcs48_generic_get_info(const device_config *devconfig, running_devic
 
 
 /* Official Intel MCS-48 parts */
+CPU_GET_INFO( i8021 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "I8021"); }
+CPU_GET_INFO( i8022 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 2048, 128, "I8022"); }
 CPU_GET_INFO( i8035 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE,    0,  64, "I8035"); }
 CPU_GET_INFO( i8048 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "I8048"); }
 CPU_GET_INFO( i8648 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "I8648"); }
