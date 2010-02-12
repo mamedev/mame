@@ -1,8 +1,9 @@
+/*
 Happy Jackie (c) 1993 IGS.
 Video Slot machine game for amusement only.
 
 Driver by David Haywood and Mirko Buffoni
-
+*/
 /*
 
 Anno    199x
