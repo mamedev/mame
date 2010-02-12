@@ -158,22 +158,23 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 factor, UINT8 c
 
 		if (snes_ppu.sub_add_mode) /* SNES_SUBSCREEN*/
 		{
-			switch (snes_ppu.color_modes & 0x80)
+			if (snes_ppu.color_modes & 0x80 == 0x00)
 			{
-			case 0x00:	/* add */
+				/* add */
 				r = (*colour & 0x1f) + (scanlines[SNES_SUBSCREEN].buffer[offset] & 0x1f);
 				g = ((*colour & 0x3e0) >> 5) + ((scanlines[SNES_SUBSCREEN].buffer[offset] & 0x3e0) >> 5);
 				b = ((*colour & 0x7c00) >> 10) + ((scanlines[SNES_SUBSCREEN].buffer[offset] & 0x7c00) >> 10);
 				clip_max = 1;
-				break;
-			case 0x80:	/* sub */
+			}
+			else
+			{
+				/* 0x80 sub */
 				r = (*colour & 0x1f) - (scanlines[SNES_SUBSCREEN].buffer[offset] & 0x1f);
 				g = ((*colour & 0x3e0) >> 5) - ((scanlines[SNES_SUBSCREEN].buffer[offset] & 0x3e0) >> 5);
 				b = ((*colour & 0x7c00) >> 10) - ((scanlines[SNES_SUBSCREEN].buffer[offset] & 0x7c00) >> 10);
 				if (r > 0x1f) r = 0;
 				if (g > 0x1f) g = 0;
 				if (b > 0x1f) b = 0;
-				break;
 			}
 			/* only halve if the color is not the back colour */
 			if ((snes_ppu.color_modes & 0x40) && (scanlines[SNES_SUBSCREEN].buffer[offset] != snes_cgram[FIXED_COLOUR]))
@@ -185,22 +186,23 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 factor, UINT8 c
 		}
 		else /* Fixed colour */
 		{
-			switch (snes_ppu.color_modes & 0x80)
+			if (snes_ppu.color_modes & 0x80 == 0x00)
 			{
-			case 0x00:	/* add */
+				/* add */
 				r = (*colour & 0x1f) + (snes_cgram[FIXED_COLOUR] & 0x1f);
 				g = ((*colour & 0x3e0) >> 5) + ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
 				b = ((*colour & 0x7c00) >> 10) + ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
 				clip_max = 1;
-				break;
-			case 0x80:	/* sub */
+			}
+			else
+			{
+				/* 0x80: sub */
 				r = (*colour & 0x1f) - (snes_cgram[FIXED_COLOUR] & 0x1f);
 				g = ((*colour & 0x3e0) >> 5) - ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
 				b = ((*colour & 0x7c00) >> 10) - ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
 				if (r > 0x1f) r = 0;
 				if (g > 0x1f) g = 0;
 				if (b > 0x1f) b = 0;
-				break;
 			}
 			/* halve if necessary */
 			if (snes_ppu.color_modes & 0x40)
