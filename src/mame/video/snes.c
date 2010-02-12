@@ -158,7 +158,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 factor, UINT8 c
 
 		if (snes_ppu.sub_add_mode) /* SNES_SUBSCREEN*/
 		{
-			if (snes_ppu.color_modes & 0x80 == 0x00)
+			if ((snes_ppu.color_modes & 0x80) == 0x00)
 			{
 				/* add */
 				r = (*colour & 0x1f) + (scanlines[SNES_SUBSCREEN].buffer[offset] & 0x1f);
@@ -186,7 +186,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 factor, UINT8 c
 		}
 		else /* Fixed colour */
 		{
-			if (snes_ppu.color_modes & 0x80 == 0x00)
+			if ((snes_ppu.color_modes & 0x80) == 0x00)
 			{
 				/* add */
 				r = (*colour & 0x1f) + (snes_cgram[FIXED_COLOUR] & 0x1f);
