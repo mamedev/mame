@@ -34,6 +34,10 @@
 #include "osdcore.h"
 #include "sdlos.h"
 
+//============================================================
+//  CONSTANTS
+//============================================================
+
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 #define PATHSEPCH '\\'
 #define INVPATHSEPCH '/'
@@ -42,9 +46,8 @@
 #define INVPATHSEPCH '\\'
 #endif
 
-static UINT32 create_path_recursive(char *path);
-
 #define NO_ERROR	(0)
+
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -56,6 +59,19 @@ struct _osd_file
 	char		filename[1];
 };
 
+
+//============================================================
+//  Global variables
+//============================================================
+
+char sdl_cwd[512];
+
+
+//============================================================
+//  Static variables
+//============================================================
+
+static UINT32 create_path_recursive(char *path);
 
 //============================================================
 //  error_to_file_error
@@ -691,7 +707,12 @@ file_error osd_rmdir(const char *dir)
 
 	return filerr;
 }
-char sdl_cwd[512];
+
+
+//============================================================
+//  osd_get_emulator_directory
+//============================================================
+
 void osd_get_emulator_directory(char *dir, size_t dir_size)
 {
 	strncpy(dir, sdl_cwd, dir_size);
