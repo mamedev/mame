@@ -14,6 +14,7 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
@@ -306,7 +307,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 //============================================================
 //  osd_get_emulator_directory
 //============================================================
-
+extern char sdl_cwd[512];
 void osd_get_emulator_directory(char *dir, size_t dir_size)
 {
 	strncpy(dir, sdl_cwd, dir_size);
