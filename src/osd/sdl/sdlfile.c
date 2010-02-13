@@ -27,7 +27,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 
 // MAME headers
@@ -61,14 +60,7 @@ struct _osd_file
 
 
 //============================================================
-//  Global variables
-//============================================================
-
-char sdl_cwd[512];
-
-
-//============================================================
-//  Static variables
+//  Prototypes
 //============================================================
 
 static UINT32 create_path_recursive(char *path);

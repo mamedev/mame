@@ -810,6 +810,22 @@ void osd_free_executable(void *ptr, size_t size);
 void osd_break_into_debugger(const char *message);
 
 
+/*-----------------------------------------------------------------------------
+  MESS specific code below
+-----------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------
+    osd_get_clipboard_text: retrieves text from the clipboard
+
+    Return value:
+
+        the returned string needs to be free()-ed!
+
+-----------------------------------------------------------------------------*/
+char *osd_get_clipboard_text(void);
+
+
+#ifdef MESS
 /***************************************************************************
     DIRECTORY INTERFACES
 ***************************************************************************/
@@ -866,16 +882,6 @@ file_error osd_get_full_path(char **dst, const char *path);
 ***************************************************************************/
 
 /*-----------------------------------------------------------------------------
-    osd_get_clipboard_text: retrieves text from the clipboard
-
-    Return value:
-
-        the returned string needs to be free()-ed!
-
------------------------------------------------------------------------------*/
-char *osd_get_clipboard_text(void);
-
-/*-----------------------------------------------------------------------------
     osd_get_volume_name: retrieves the volume name
 
     Parameters:
@@ -888,5 +894,6 @@ char *osd_get_clipboard_text(void);
 
 -----------------------------------------------------------------------------*/
 const char *osd_get_volume_name(int idx);
+#endif
 
 #endif	/* __OSDEPEND_H__ */

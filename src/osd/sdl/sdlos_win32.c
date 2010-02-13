@@ -273,6 +273,9 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return result;
 }
 
+//============================================================
+//  MESS specific code below
+//============================================================
 
 //============================================================
 //  get_clipboard_text_by_format
@@ -312,7 +315,6 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 	}
 	return result;
 }
-
 
 
 //============================================================
@@ -355,6 +357,8 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
+
+#ifdef MESS
 
 //============================================================
 //  astring_from_utf8
@@ -582,3 +586,4 @@ void osd_get_emulator_directory(char *dir, size_t dir_size)
 	if (s)
 		s[1] = '\0';
 }
+#endif

@@ -207,7 +207,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return setenv(name, value, overwrite);
 }
 
-
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
@@ -308,6 +307,12 @@ char *osd_get_clipboard_text(void)
 }
 
 //============================================================
+//  MESS specific code below
+//============================================================
+
+#ifdef MESS
+
+//============================================================
 //  osd_stat
 //============================================================
 
@@ -392,3 +397,4 @@ void osd_get_emulator_directory(char *dir, size_t dir_size)
 {
 	strncpy(dir, sdl_cwd, dir_size);
 }
+#endif

@@ -124,7 +124,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return setenv(name, value, overwrite);
 }
 
-
 #if defined(SDL_VIDEO_DRIVER_X11) && defined(SDLMAME_X11)
 
 //============================================================
@@ -228,6 +227,13 @@ char *osd_get_clipboard_text(void)
 #endif
 
 //============================================================
+//  MESS specific code below
+//  Disabled for MAME until it compiles
+//============================================================
+
+#ifdef MESS
+
+//============================================================
 //  osd_stat
 //============================================================
 
@@ -312,3 +318,4 @@ void osd_get_emulator_directory(char *dir, size_t dir_size)
 {
 	strncpy(dir, sdl_cwd, dir_size);
 }
+#endif

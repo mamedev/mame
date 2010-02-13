@@ -14,6 +14,13 @@
 #include <SDL/SDL_version.h>
 
 // standard includes
+#ifdef MESS
+#include <unistd.h>
+#endif
+#ifdef SDLMAME_OS2
+#define INCL_DOS
+#include <os2.h>
+#endif
 
 // MAME headers
 #include "osdepend.h"
@@ -36,29 +43,6 @@
 #include <X11/Xutil.h>
 #endif
 
-#ifdef SDLMAME_OS2
-#define INCL_DOS
-#include <os2.h>
-
-void MorphToPM()
-{
-  PPIB pib;
-  PTIB tib;
-
-  DosGetInfoBlocks(&tib, &pib);
-
-  // Change flag from VIO to PM:
-  if (pib->pib_ultype==2) pib->pib_ultype = 3;
-}
-#endif
-
-//============================================================
-//  LOCAL VARIABLES
-//============================================================
-
-#include <unistd.h>
-extern char sdl_cwd[512];
-
 //============================================================
 //  OPTIONS
 //============================================================
@@ -74,6 +58,19 @@ extern char sdl_cwd[512];
 #endif // MESS
 #endif // MACOSX
 #endif // INI_PATH
+
+
+//============================================================
+//  Global variables
+//============================================================
+
+#ifdef MESS
+char sdl_cwd[512];
+#endif
+
+//============================================================
+//  Local variables
+//============================================================
 
 static const options_entry mame_sdl_options[] =
 {
@@ -234,6 +231,23 @@ static const options_entry mame_sdl_options[] =
 };
 
 //============================================================
+//  OS2 specific
+//============================================================
+
+#ifdef SDLMAME_OS2
+void MorphToPM()
+{
+  PPIB pib;
+  PTIB tib;
+
+  DosGetInfoBlocks(&tib, &pib);
+
+  // Change flag from VIO to PM:
+  if (pib->pib_ultype==2) pib->pib_ultype = 3;
+}
+#endif
+
+//============================================================
 //  main
 //============================================================
 
@@ -270,8 +284,9 @@ int main(int argc, char *argv[])
 	#ifdef SDLMAME_OS2
 	MorphToPM();
 	#endif
-
+	#ifdef MESS
 	getcwd(sdl_cwd, 511);
+	#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 	if (SDL_Linked_Version()->patch < 10)
