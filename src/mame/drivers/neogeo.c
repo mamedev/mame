@@ -1194,7 +1194,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( auido_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
   /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
@@ -1241,8 +1241,8 @@ static const ym2610_interface ym2610_config =
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
 	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")	\
 	PORT_DIPSETTING(	  0x0018, "1" )														\
-	PORT_DIPSETTING(	  0x0008, "2" )														\
-	PORT_DIPSETTING(	  0x0010, "3" )														\
+	PORT_DIPSETTING(	  0x0010, "2" )														\
+	PORT_DIPSETTING(	  0x0008, "3" )														\
 	PORT_DIPSETTING(	  0x0000, "4" )														\
 	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")	\
 	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )											\
@@ -1348,7 +1348,7 @@ static MACHINE_DRIVER_START( neogeo )
 
 	MDRV_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(audio_map)
-	MDRV_CPU_IO_MAP(auido_io_map)
+	MDRV_CPU_IO_MAP(audio_io_map)
 
 	MDRV_WATCHDOG_TIME_INIT(USEC(128762))
 
