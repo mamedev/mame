@@ -227,3 +227,16 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 {
 	return setenv(name, value, overwrite);
 }
+
+
+//============================================================
+//  osd_get_clipboard_text
+//    - used in MESS
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	char *result = NULL;
+
+	return result;
+}

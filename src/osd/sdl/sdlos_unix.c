@@ -228,7 +228,6 @@ char *osd_get_clipboard_text(void)
 
 //============================================================
 //  MESS specific code below
-//  Disabled for MAME until it compiles
 //============================================================
 
 #ifdef MESS
