@@ -520,16 +520,3 @@ const char *osd_get_volume_name(int idx)
 
 	return p;
 }
-
-//============================================================
-//  osd_get_emulator_directory
-//============================================================
-
-void osd_get_emulator_directory(char *dir, size_t dir_size)
-{
-	char *s;
-	win_get_module_file_name_utf8(NULL, dir, dir_size);
-	s = strrchr(dir, '\\');
-	if (s)
-		s[1] = '\0';
-}

@@ -309,12 +309,4 @@ file_error osd_get_full_path(char **dst, const char *path)
 	return err;
 }
 
-//============================================================
-//  osd_get_emulator_directory
-//============================================================
-extern char sdl_cwd[512];
-void osd_get_emulator_directory(char *dir, size_t dir_size)
-{
-	strncpy(dir, sdl_cwd, dir_size);
-}
 #endif

@@ -64,10 +64,6 @@
 //  Global variables
 //============================================================
 
-#ifdef MESS
-char sdl_cwd[512];
-#endif
-
 //============================================================
 //  Local variables
 //============================================================
@@ -283,9 +279,6 @@ int main(int argc, char *argv[])
 
 	#ifdef SDLMAME_OS2
 	MorphToPM();
-	#endif
-	#ifdef MESS
-	getcwd(sdl_cwd, 511);
 	#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)

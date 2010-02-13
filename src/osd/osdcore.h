@@ -850,18 +850,6 @@ osd_directory_entry *osd_stat(const char *path);
 ***************************************************************************/
 
 /*-----------------------------------------------------------------------------
-    osd_get_emulator_directory: returns the path containing the emulator
-
-    Parameters:
-
-        dir - space to output directory
-        dir_size - size of path
-
------------------------------------------------------------------------------*/
-
-void osd_get_emulator_directory(char *dir, size_t dir_size);
-
-/*-----------------------------------------------------------------------------
     osd_get_full_path: retrieves the full path
 
     Parameters:

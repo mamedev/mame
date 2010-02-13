@@ -553,37 +553,4 @@ done:
 	return err;
 }
 
-//============================================================
-//  win_get_module_file_name_utf8
-//============================================================
-
-static DWORD win_get_module_file_name_utf8(HMODULE module, char *filename, DWORD size)
-{
-	TCHAR t_filename[MAX_PATH];
-	char *utf8_filename;
-
-	if (GetModuleFileName(module, t_filename, ARRAY_LENGTH(t_filename)) == 0)
-		return 0;
-
-	utf8_filename = utf8_from_tstring(t_filename);
-	if (!utf8_filename)
-		return 0;
-
-	size = (DWORD) snprintf(filename, size, "%s", utf8_filename);
-	free(utf8_filename);
-	return size;
-}
-
-//============================================================
-//  osd_get_emulator_directory
-//============================================================
-
-void osd_get_emulator_directory(char *dir, size_t dir_size)
-{
-	char *s;
-	win_get_module_file_name_utf8(NULL, dir, dir_size);
-	s = strrchr(dir, '\\');
-	if (s)
-		s[1] = '\0';
-}
 #endif
