@@ -413,48 +413,6 @@ static file_error win_error_to_mame_file_error(DWORD error)
 	return filerr;
 }
 
-
-//============================================================
-//  osd_get_temp_filename
-//============================================================
-
-file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
-{
-	TCHAR tempbuf[MAX_PATH];
-	TCHAR *t_filename;
-	char *u_tempbuf;
-
-	if (!basename)
-		basename = "tempfile.tmp";
-
-	GetTempPath(ARRAY_LENGTH(tempbuf), tempbuf);
-	t_filename = tstring_from_utf8(basename);
-	_tcscat(tempbuf, t_filename);
-	free(t_filename);
-	DeleteFile(tempbuf);
-
-	u_tempbuf = utf8_from_tstring(tempbuf);
-	snprintf(buffer, buffer_len, "%s", u_tempbuf);
-	free(u_tempbuf);
-
-	return FILERR_NONE;
-}
-
-
-//============================================================
-//  osd_copyfile
-//============================================================
-
-file_error osd_copyfile(const char *destfile, const char *srcfile)
-{
-	// wrapper for win_copy_file_utf8()
-	if (!win_copy_file_utf8(srcfile, destfile, TRUE))
-		return win_error_to_mame_file_error(GetLastError());
-
-	return FILERR_NONE;
-}
-
-
 //============================================================
 //  osd_stat
 //============================================================
@@ -502,77 +460,6 @@ done:
 	return result;
 }
 
-
-
-//============================================================
-//  osd_is_path_separator
-//============================================================
-
-int osd_is_path_separator(char c)
-{
-	return (c == '/') || (c == '\\');
-}
-
-
-
-//============================================================
-//  osd_dirname
-//============================================================
-
-char *osd_dirname(const char *filename)
-{
-	char *dirname;
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return NULL;
-
-	// allocate space for it
-	dirname = (char*)malloc(strlen(filename) + 1);
-	if (!dirname)
-		return NULL;
-
-	// copy in the name
-	strcpy(dirname, filename);
-
-	// search backward for a slash or a colon
-	for (c = dirname + strlen(dirname) - 1; c >= dirname; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-		{
-			// found it: NULL terminate and return
-			*(c + 1) = 0;
-			return dirname;
-		}
-
-	// otherwise, return an empty string
-	dirname[0] = 0;
-	return dirname;
-}
-
-
-//============================================================
-//  osd_basename
-//============================================================
-
-char *osd_basename(char *filename)
-{
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return NULL;
-
-	// start at the end and return when we hit a slash or colon
-	for (c = filename + strlen(filename) - 1; c >= filename; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return filename;
-}
-
-
 //============================================================
 //  osd_get_full_path
 //============================================================
@@ -614,141 +501,11 @@ done:
 	return err;
 }
 
-
 //============================================================
-//  osd_mkdir
-//============================================================
-
-file_error osd_mkdir(const char *dir)
-{
-	file_error filerr = FILERR_NONE;
-
-	TCHAR *tempstr = tstring_from_utf8(dir);
-	if (!tempstr)
-	{
-		filerr = FILERR_OUT_OF_MEMORY;
-		goto done;
-	}
-
-	if (!CreateDirectory(tempstr, NULL))
-	{
-		filerr = win_error_to_mame_file_error(GetLastError());
-		goto done;
-	}
-
-done:
-	if (tempstr)
-		free(tempstr);
-	return filerr;
-}
-
-
-//============================================================
-//  osd_rmdir
+//  osd_get_volume_name
 //============================================================
 
-file_error osd_rmdir(const char *dir)
-{
-	file_error filerr = FILERR_NONE;
-
-	TCHAR *tempstr = tstring_from_utf8(dir);
-	if (!tempstr)
-	{
-		filerr = FILERR_OUT_OF_MEMORY;
-		goto done;
-	}
-
-	if (!RemoveDirectory(tempstr))
-	{
-		filerr = win_error_to_mame_file_error(GetLastError());
-		goto done;
-	}
-
-done:
-	if (tempstr)
-		free(tempstr);
-	return filerr;
-}
-
-
-//============================================================
-//  osd_getcurdir
-//============================================================
-
-file_error osd_getcurdir(char *buffer, size_t buffer_len)
-{
-	file_error filerr = FILERR_NONE;
-	char *tempstr = NULL;
-	TCHAR path[_MAX_PATH];
-
-	if (!GetCurrentDirectory(ARRAY_LENGTH(path), path))
-	{
-		filerr = win_error_to_mame_file_error(GetLastError());
-		goto done;
-	}
-
-	tempstr = utf8_from_tstring(path);
-	if (!tempstr)
-	{
-		filerr = FILERR_OUT_OF_MEMORY;
-		goto done;
-	}
-	snprintf(buffer, buffer_len, "%s", tempstr);
-
-done:
-	if (tempstr)
-		free(tempstr);
-	return filerr;
-}
-
-
-//============================================================
-//  osd_setcurdir
-//============================================================
-
-file_error osd_setcurdir(const char *dir)
-{
-	file_error filerr = FILERR_NONE;
-
-	TCHAR *tempstr = tstring_from_utf8(dir);
-	if (!tempstr)
-	{
-		filerr = FILERR_OUT_OF_MEMORY;
-		goto done;
-	}
-
-	if (!SetCurrentDirectory(tempstr))
-	{
-		filerr = win_error_to_mame_file_error(GetLastError());
-		goto done;
-	}
-
-done:
-	if (tempstr)
-		free(tempstr);
-	return filerr;
-}
-
-
-//============================================================
-//  DIRECTORIES
-//============================================================
-
-int osd_num_devices(void)
-{
-	char szBuffer[128];
-	char *p;
-	int i;
-
-	GetLogicalDriveStringsA(ARRAY_LENGTH(szBuffer), szBuffer);
-
-	i = 0;
-	for (p = szBuffer; *p; p += (strlen(p) + 1))
-		i++;
-	return i;
-}
-
-const char *osd_get_device_name(int idx)
+const char *osd_get_volume_name(int idx)
 {
 	static char szBuffer[128];
 	const char *p;
@@ -756,11 +513,17 @@ const char *osd_get_device_name(int idx)
 	GetLogicalDriveStringsA(ARRAY_LENGTH(szBuffer), szBuffer);
 
 	p = szBuffer;
-	while(idx--)
+	while(idx--) {
 		p += strlen(p) + 1;
+		if (!*p) return NULL;
+	}
 
 	return p;
 }
+
+//============================================================
+//  osd_get_emulator_directory
+//============================================================
 
 void osd_get_emulator_directory(char *dir, size_t dir_size)
 {

@@ -50,6 +50,8 @@
 
 #include "osdcomm.h"
 
+
+
 /***************************************************************************
     FILE I/O INTERFACES
 ***************************************************************************/
@@ -83,18 +85,6 @@ typedef enum _file_error file_error;
 
 /* osd_file is an opaque type which represents an open file */
 typedef struct _osd_file osd_file;
-
-enum
-{
-	OSD_FOPEN_READ,
-	OSD_FOPEN_WRITE,
-	OSD_FOPEN_RW,
-	OSD_FOPEN_RW_CREATE
-};
-
-
-struct _mame_file;
-
 
 /*-----------------------------------------------------------------------------
     osd_open: open a new file.
@@ -819,46 +809,6 @@ void osd_free_executable(void *ptr, size_t size);
 -----------------------------------------------------------------------------*/
 void osd_break_into_debugger(const char *message);
 
-/***************************************************************************
-    FILE I/O INTERFACES
-***************************************************************************/
-
-/*-----------------------------------------------------------------------------
-    osd_copyfile: copies a file
-
-    Parameters:
-
-        destfile - path to destination
-
-        srcfile - path to source file
-
-    Return value:
-
-        a file_error describing any error that occurred while copying
-        the file, or FILERR_NONE if no error occurred
------------------------------------------------------------------------------*/
-file_error osd_copyfile(const char *destfile, const char *srcfile);
-
-
-/*-----------------------------------------------------------------------------
-    osd_get_temp_filename: given a filename, return a full path with that
-    filename but in a temporary directory
-
-    Parameters:
-
-        buffer - pointer to buffer
-
-        buffer_len - length of buffer
-
-        basename - basename of file to create
-
-    Return value:
-
-        a file_error describing any error that occurred while copying
-        the file, or FILERR_NONE if no error occurred
------------------------------------------------------------------------------*/
-file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename);
-
 
 /***************************************************************************
     DIRECTORY INTERFACES
@@ -879,69 +829,6 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 -----------------------------------------------------------------------------*/
 osd_directory_entry *osd_stat(const char *path);
 
-
-/*-----------------------------------------------------------------------------
-    osd_mkdir: creates a directory
-
-    Parameters:
-
-        dir - path to directory to create
-
-    Return value:
-
-        a file_error describing any error that occurred while creating
-        the directory, or FILERR_NONE if no error occurred
------------------------------------------------------------------------------*/
-file_error osd_mkdir(const char *dir);
-
-
-/*-----------------------------------------------------------------------------
-    osd_rmdir: removes a directory
-
-    Parameters:
-
-        dir - path to directory to removes
-
-    Return value:
-
-        a file_error describing any error that occurred while deleting
-        the directory, or FILERR_NONE if no error occurred
------------------------------------------------------------------------------*/
-file_error osd_rmdir(const char *dir);
-
-
-/*-----------------------------------------------------------------------------
-    osd_getcurdir: retrieves the current working directory
-
-    Parameters:
-
-        buffer - place to store current working directory
-
-        buffer_len - length of buffer
-
-    Return value:
-
-        a file_error describing any error that occurred while deleting
-        the directory, or FILERR_NONE if no error occurred
------------------------------------------------------------------------------*/
-file_error osd_getcurdir(char *buffer, size_t buffer_len);
-
-
-/*-----------------------------------------------------------------------------
-    osd_setcurdir: sets the current working directory
-
-    Parameters:
-
-        dir - path to directory to which to change
-
-    Return value:
-
-        a file_error describing any error that occurred while deleting
-        the directory, or FILERR_NONE if no error occurred
------------------------------------------------------------------------------*/
-file_error osd_setcurdir(const char *dir);
-
-
 /***************************************************************************
     PATH INTERFACES
 ***************************************************************************/
@@ -959,51 +846,6 @@ file_error osd_setcurdir(const char *dir);
 void osd_get_emulator_directory(char *dir, size_t dir_size);
 
 /*-----------------------------------------------------------------------------
-    osd_is_path_separator: returns whether a character is a path separator
-
-    Parameters:
-
-        c - the character in question
-
-    Return value:
-
-        non-zero if the character is a path separator, zero otherwise
-
------------------------------------------------------------------------------*/
-int osd_is_path_separator(char c);
-
-
-/*-----------------------------------------------------------------------------
-    osd_dirname: returns the base directory of a file path
-
-    Parameters:
-
-        filename - the path in question
-
-    Return value:
-
-        an allocated path to the directory containing this file
-
------------------------------------------------------------------------------*/
-char *osd_dirname(const char *filename);
-
-
-/*-----------------------------------------------------------------------------
-    osd_basename: returns the file or directory name from a full path
-
-    Parameters:
-
-        filename - the path in question
-
-    Return value:
-
-        a pointer to the base name of the file
-
------------------------------------------------------------------------------*/
-char *osd_basename(char *filename);
-
-
-/*-----------------------------------------------------------------------------
     osd_get_full_path: retrieves the full path
 
     Parameters:
@@ -1019,25 +861,32 @@ char *osd_basename(char *filename);
 file_error osd_get_full_path(char **dst, const char *path);
 
 
-
 /***************************************************************************
     UNCATEGORIZED INTERFACES
 ***************************************************************************/
 
+/*-----------------------------------------------------------------------------
+    osd_get_clipboard_text: retrieves text from the clipboard
 
-/* reads text from the clipboard - the returned string needs to be free()-ed! */
+    Return value:
+
+        the returned string needs to be free()-ed!
+
+-----------------------------------------------------------------------------*/
 char *osd_get_clipboard_text(void);
 
+/*-----------------------------------------------------------------------------
+    osd_get_volume_name: retrieves the volume name
 
+    Parameters:
 
-/******************************************************************************
+        idx - order number of volume
 
-  Device and file browsing
+    Return value:
 
-******************************************************************************/
+        pointer to volume name
 
-int osd_num_devices(void);
-const char *osd_get_device_name(int idx);
-
+-----------------------------------------------------------------------------*/
+const char *osd_get_volume_name(int idx);
 
 #endif	/* __OSDEPEND_H__ */

@@ -305,3 +305,89 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
+
+//============================================================
+//  osd_stat
+//============================================================
+
+osd_directory_entry *osd_stat(const char *path)
+{
+	int err;
+	osd_directory_entry *result = NULL;
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_NO64BITIO)
+	struct stat st;
+	#else
+	struct stat64 st;
+	#endif
+
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_NO64BITIO)
+	err = stat(path, &st);
+	#else
+	err = stat64(path, &st);
+	#endif
+
+	if( err == -1) return NULL;
+
+	// create an osd_directory_entry; be sure to make sure that the caller can
+	// free all resources by just freeing the resulting osd_directory_entry
+	result = (osd_directory_entry *) osd_malloc(sizeof(*result) + strlen(path) + 1);
+	strcpy(((char *) result) + sizeof(*result), path);
+	result->name = ((char *) result) + sizeof(*result);
+	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+	result->size = (UINT64)st.st_size;
+
+	return result;
+}
+
+//============================================================
+//  osd_get_volume_name
+//============================================================
+
+const char *osd_get_volume_name(int idx)
+{
+	if (idx!=0) return NULL;
+	return "/";
+}
+
+//============================================================
+//  osd_get_full_path
+//============================================================
+
+file_error osd_get_full_path(char **dst, const char *path)
+{
+	file_error err;
+	char path_buffer[512];
+
+	err = FILERR_NONE;
+
+	if (getcwd(path_buffer, 511) == NULL)
+	{
+		printf("osd_get_full_path: failed!\n");
+		err = FILERR_FAILURE;
+	}
+	else
+	{
+		*dst = (char *)malloc(strlen(path_buffer)+strlen(path)+3);
+
+		// if it's already a full path, just pass it through
+		if (path[0] == '/')
+		{
+			strcpy(*dst, path);
+		}
+		else
+		{
+			sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
+		}
+	}
+
+	return err;
+}
+
+//============================================================
+//  osd_get_emulator_directory
+//============================================================
+
+void osd_get_emulator_directory(char *dir, size_t dir_size)
+{
+	strncpy(dir, sdl_cwd, dir_size);
+}

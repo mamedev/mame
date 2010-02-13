@@ -355,3 +355,230 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
+
+//============================================================
+//  astring_from_utf8
+//============================================================
+
+CHAR *astring_from_utf8(const char *utf8string)
+{
+	WCHAR *wstring;
+	int char_count;
+	CHAR *result;
+
+	// convert MAME string (UTF-8) to UTF-16
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	wstring = (WCHAR *)alloca(char_count * sizeof(*wstring));
+	MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, wstring, char_count);
+
+	// convert UTF-16 to "ANSI code page" string
+	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, NULL, 0, NULL, NULL);
+	result = (CHAR *)malloc(char_count * sizeof(*result));
+	if (result != NULL)
+		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, NULL, NULL);
+
+	return result;
+}
+
+//============================================================
+//  wstring_from_utf8
+//============================================================
+
+WCHAR *wstring_from_utf8(const char *utf8string)
+{
+	int char_count;
+	WCHAR *result;
+
+	// convert MAME string (UTF-8) to UTF-16
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	result = (WCHAR *)malloc(char_count * sizeof(*result));
+	if (result != NULL)
+		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
+
+	return result;
+}
+
+//============================================================
+//  win_attributes_to_entry_type
+//============================================================
+
+static osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes)
+{
+	if (attributes == 0xFFFFFFFF)
+		return ENTTYPE_NONE;
+	else if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+		return ENTTYPE_DIR;
+	else
+		return ENTTYPE_FILE;
+}
+
+//============================================================
+//  osd_stat
+//============================================================
+
+osd_directory_entry *osd_stat(const char *path)
+{
+	osd_directory_entry *result = NULL;
+	TCHAR *t_path;
+	HANDLE find = INVALID_HANDLE_VALUE;
+	WIN32_FIND_DATA find_data;
+
+	// convert the path to TCHARs
+	t_path = tstring_from_utf8(path);
+	if (t_path == NULL)
+		goto done;
+
+	// attempt to find the first file
+	find = FindFirstFile(t_path, &find_data);
+	if (find == INVALID_HANDLE_VALUE)
+		goto done;
+
+	// create an osd_directory_entry; be sure to make sure that the caller can
+	// free all resources by just freeing the resulting osd_directory_entry
+	result = (osd_directory_entry *) malloc(sizeof(*result) + strlen(path) + 1);
+	if (!result)
+		goto done;
+	strcpy(((char *) result) + sizeof(*result), path);
+	result->name = ((char *) result) + sizeof(*result);
+	result->type = win_attributes_to_entry_type(find_data.dwFileAttributes);
+	result->size = find_data.nFileSizeLow | ((UINT64) find_data.nFileSizeHigh << 32);
+
+done:
+	if (t_path)
+		free(t_path);
+	return result;
+}
+
+//============================================================
+//  osd_get_volume_name
+//============================================================
+
+const char *osd_get_volume_name(int idx)
+{
+	static char szBuffer[128];
+	const char *p;
+
+	GetLogicalDriveStringsA(ARRAY_LENGTH(szBuffer), szBuffer);
+
+	p = szBuffer;
+	while(idx--) {
+		p += strlen(p) + 1;
+		if (!*p) return NULL;
+	}
+
+	return p;
+}
+
+//============================================================
+//  win_error_to_mame_file_error
+//============================================================
+
+static file_error win_error_to_mame_file_error(DWORD error)
+{
+	file_error filerr;
+
+	// convert a Windows error to a file_error
+	switch (error)
+	{
+		case ERROR_SUCCESS:
+			filerr = FILERR_NONE;
+			break;
+
+		case ERROR_OUTOFMEMORY:
+			filerr = FILERR_OUT_OF_MEMORY;
+			break;
+
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+			filerr = FILERR_NOT_FOUND;
+			break;
+
+		case ERROR_ACCESS_DENIED:
+			filerr = FILERR_ACCESS_DENIED;
+			break;
+
+		case ERROR_SHARING_VIOLATION:
+			filerr = FILERR_ALREADY_OPEN;
+			break;
+
+		default:
+			filerr = FILERR_FAILURE;
+			break;
+	}
+	return filerr;
+}
+
+//============================================================
+//  osd_get_full_path
+//============================================================
+
+file_error osd_get_full_path(char **dst, const char *path)
+{
+	file_error err;
+	TCHAR *t_path;
+	TCHAR buffer[MAX_PATH];
+
+	// convert the path to TCHARs
+	t_path = tstring_from_utf8(path);
+	if (t_path == NULL)
+	{
+		err = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	// cannonicalize the path
+	if (!GetFullPathName(t_path, ARRAY_LENGTH(buffer), buffer, NULL))
+	{
+		err = win_error_to_mame_file_error(GetLastError());
+		goto done;
+	}
+
+	// convert the result back to UTF-8
+	*dst = utf8_from_tstring(buffer);
+	if (!*dst)
+	{
+		err = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	err = FILERR_NONE;
+
+done:
+	if (t_path != NULL)
+		free(t_path);
+	return err;
+}
+
+//============================================================
+//  win_get_module_file_name_utf8
+//============================================================
+
+static DWORD win_get_module_file_name_utf8(HMODULE module, char *filename, DWORD size)
+{
+	TCHAR t_filename[MAX_PATH];
+	char *utf8_filename;
+
+	if (GetModuleFileName(module, t_filename, ARRAY_LENGTH(t_filename)) == 0)
+		return 0;
+
+	utf8_filename = utf8_from_tstring(t_filename);
+	if (!utf8_filename)
+		return 0;
+
+	size = (DWORD) snprintf(filename, size, "%s", utf8_filename);
+	free(utf8_filename);
+	return size;
+}
+
+//============================================================
+//  osd_get_emulator_directory
+//============================================================
+
+void osd_get_emulator_directory(char *dir, size_t dir_size)
+{
+	char *s;
+	win_get_module_file_name_utf8(NULL, dir, dir_size);
+	s = strrchr(dir, '\\');
+	if (s)
+		s[1] = '\0';
+}
