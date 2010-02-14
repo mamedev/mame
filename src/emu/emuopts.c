@@ -130,11 +130,7 @@ const options_entry mame_core_options[] =
 	{ "joystick_deadzone;joy_deadzone;jdz",      "0.3",  0,          "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ "joystick_saturation;joy_saturation;jsat", "0.85", 0,          "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ "natural;nat",				 "0",		  OPTION_BOOLEAN,	 "specifies whether to use a natural keyboard or not" },
-	#if defined(__APPLE__) && defined(__MACH__)
-	{ "uimodekey;umk",        		"ITEM_ID_INSERT",  0,    		 "specifies the key used to toggle between full and partial UI mode" },
-	#else
-	{ "uimodekey;umk",        		"ITEM_ID_SCRLOCK", 0,    		 "specifies the key used to toggle between full and partial UI mode" },
-	#endif
+	{ "uimodekey;umk",        		 "auto",  	  0,    		 	 "specifies the key used to toggle between full and partial UI mode" },
 	
 	
 	/* input autoenable options */

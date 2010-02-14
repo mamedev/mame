@@ -1584,6 +1584,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 {
 	int mameid_code ,ui_code;
 	input_type_desc *typedesc;
+	const char*  uimode;
 
 	// loop over the defaults
 	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
@@ -1592,7 +1593,16 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 		{
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				mameid_code = lookup_mame_code((const char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY));
+				uimode = (const char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY);
+				if(!strcmp(uimode,"auto")) {
+					#if defined(__APPLE__) && defined(__MACH__)
+					mameid_code = lookup_mame_code("ITEM_ID_INSERT");
+					#else
+					mameid_code = lookup_mame_code("ITEM_ID_SCRLOCK");
+					#endif
+				} else {
+					mameid_code = lookup_mame_code(uimode);
+				}
 				ui_code = INPUT_CODE(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, mameid_code);
 				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], ui_code);
 				break;
