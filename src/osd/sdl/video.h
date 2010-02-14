@@ -102,10 +102,6 @@ struct _sdl_video_config
 	int					centerh;
 	int					centerv;
 
-
-	// per-window configuration
-	sdl_window_config	window[MAX_VIDEO_WINDOWS];		// configuration data per-window
-
 	// hardware options
 	int					mode;			// output mode
 	int					waitvsync;		// spin until vsync

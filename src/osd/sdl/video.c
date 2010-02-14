@@ -95,6 +95,7 @@ static sdl_monitor_info *pick_monitor(int index);
 static void check_osd_inputs(running_machine *machine);
 
 static void extract_video_config(running_machine *machine);
+static void extract_window_config(running_machine *machine, int index, sdl_window_config *conf);
 static void load_effect_overlay(running_machine *machine, const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, sdl_window_config *config, int report_error);
@@ -129,8 +130,11 @@ int sdlvideo_init(running_machine *machine)
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
 	{
-		video_config.window[index].totalColors = tc;
-		if (sdlwindow_video_window_create(machine, index, pick_monitor(index), &video_config.window[index]))
+		sdl_window_config conf;
+		memset(&conf, 0, sizeof(conf));
+		extract_window_config(machine, index, &conf);
+		conf.totalColors = tc;
+		if (sdlwindow_video_window_create(machine, index, pick_monitor(index), &conf))
 			goto error;
 	}
 
@@ -610,6 +614,18 @@ static void check_osd_inputs(running_machine *machine)
 		sdlwindow_toggle_draw(machine, window);
 }
 
+//============================================================
+//  extract_window_config
+//============================================================
+
+static void extract_window_config(running_machine *machine, int index, sdl_window_config *conf)
+{
+	char buf[10];
+
+	sprintf(buf,SDLOPTION_RESOLUTION("%d"), index);
+	// per-window options: extract the data
+	get_resolution(buf, conf, TRUE);
+}
 
 //============================================================
 //  extract_video_config
@@ -637,12 +653,6 @@ static void extract_video_config(running_machine *machine)
 	stemp = options_get_string(mame_options(), SDLOPTION_EFFECT);
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
 		load_effect_overlay(machine, stemp);
-
-	// per-window options: extract the data
-	get_resolution(SDLOPTION_RESOLUTION("0"), &video_config.window[0], TRUE);
-	get_resolution(SDLOPTION_RESOLUTION("1"), &video_config.window[1], TRUE);
-	get_resolution(SDLOPTION_RESOLUTION("2"), &video_config.window[2], TRUE);
-	get_resolution(SDLOPTION_RESOLUTION("3"), &video_config.window[3], TRUE);
 
 	// default to working video please
 	video_config.novideo = 0;
