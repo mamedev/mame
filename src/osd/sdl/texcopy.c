@@ -45,7 +45,7 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 #else
 
 
-static int clamp[256+128+128] = { 255 };
+static int clamp_lu[256+128+128] = { 255 };
 static int coff_cr[256][2] = {  {0, 0} };
 static int coff_cb[256][2] = { {0, 0} };
 
@@ -54,12 +54,12 @@ static void init_clamp(void)
 	int i;
 	for (i=0;i<128;i++)
 	{
-		clamp[i] = 0;
-		clamp[i + 256 + 128] = 255;
+		clamp_lu[i] = 0;
+		clamp_lu[i + 256 + 128] = 255;
 	}
 	for (i=0;i<256;i++)
 	{
-		clamp[i + 128] = i;
+		clamp_lu[i + 128] = i;
 
 		coff_cr[i][0] =              + 409 * i     - 56992;
 		coff_cr[i][1] =              - 208 * i;
@@ -68,7 +68,7 @@ static void init_clamp(void)
 	}
 }
 
-INLINE int clamp(int x)	{	return (const int) clamp[(x >> 8) + 128] ; }
+INLINE int clamp(int x)	{	return (const int) clamp_lu[(x >> 8) + 128] ; }
 
 INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 {
@@ -135,7 +135,7 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 	UINT32 *dst;
 	UINT16 *src;
 
-	if (clamp[0]>0)
+	if (clamp_lu[0]>0)
 		init_clamp();
 
 	// loop over Y
@@ -176,7 +176,7 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 	UINT16 *src;
 	int lookup[256];
 
-	if (clamp[0]>0)
+	if (clamp_lu[0]>0)
 		init_clamp();
 
 	/* preprocess lookup */
