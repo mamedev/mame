@@ -193,7 +193,7 @@ static INPUT_PORTS_START( irobot )
 //  Printed Manual States Dip (0x01) adjusts Doodle City playtime:  ON=2M10S / OFF=3M5S
 	PORT_DIPNAME( 0x02, 0x02, "Minimum Game Time" )  PORT_DIPLOCATION("SW5E:2")
 	PORT_DIPSETTING(	0x00, "90 Seconds on Level 1" )
-	PORT_DIPSETTING(	0x02, "None" )
+	PORT_DIPSETTING(	0x02, DEF_STR( None ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW5E:3,4")
 	PORT_DIPSETTING(	0x08, DEF_STR( None ) )
 	PORT_DIPSETTING(	0x0c, "20000" )
