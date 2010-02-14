@@ -55,7 +55,7 @@
 struct _osd_file
 {
 	int		handle;
-	char		filename[1];
+	char	filename[1];
 };
 
 
@@ -108,7 +108,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	UINT32 access;
 	const char *src;
 	char *dst;
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
 	struct stat st;
 	#else
 	struct stat64 st;
@@ -192,7 +192,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	#endif
 
 	// attempt to open the file
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
 	(*file)->handle = open(tmpstr, access, 0666);
 	#else
 	(*file)->handle = open64(tmpstr, access, 0666);
@@ -215,7 +215,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
 				{
-		                        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
+					#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
 					(*file)->handle = open(tmpstr, access, 0666);
 					#else
 					(*file)->handle = open64(tmpstr, access, 0666);
@@ -235,7 +235,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// get the file size
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
 	fstat((*file)->handle, &st);
 	#else
 	fstat64((*file)->handle, &st);
@@ -383,34 +383,36 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 	return FALSE;		// no, no way, huh-uh, forget it
 }
 
-/*============================================================ */
-/*      osd_is_path_separator */
-/*============================================================ */
+//============================================================
+//  osd_is_path_separator
+//============================================================
 
 static int osd_is_path_separator(char c)
 {
-        return (c == '/') || (c == '\\');
+	return (c == '/') || (c == '\\');
 }
 
-/*============================================================ */
-/*      osd_is_absolute_path */
-/*============================================================ */
+//============================================================
+//  osd_is_absolute_path
+//============================================================
+
 int osd_is_absolute_path(const char *path)
 {
-        int result;
+	int result;
 
-        if (osd_is_path_separator(path[0]))
-                result = TRUE;
+	if (osd_is_path_separator(path[0]))
+		result = TRUE;
 #if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
-        else if (path[0] == '.')
-                result = TRUE;
+	else if (path[0] == '.')
+		result = TRUE;
 #else
 	#ifndef UNDER_CE
 	else if (*path && path[1] == ':')
 		result = TRUE;
 	#endif
 #endif
-        else
-                result = FALSE;
-        return result;
+	else
+		result = FALSE;
+
+	return result;
 }
