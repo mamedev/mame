@@ -52,7 +52,20 @@ struct _osd_directory
 	struct dirent64 *data;
 #endif
 	DIR *fd;
+	char *path;
 };
+
+static char *build_full_path(const char *path, const char *file)
+{
+	char *ret = (char *) osd_malloc(strlen(path)+strlen(file)+2);
+	char *p = ret;
+
+	strcpy(p, path);
+	p += strlen(path);	
+	*p++ = PATHSEPCH;
+	strcpy(p, file);
+	return ret; 
+}
 
 
 #if defined (SDLMAME_LINUX) || defined (SDLMAME_BSD) || defined(SDLMAME_DARWIN)
@@ -64,6 +77,7 @@ static osd_dir_entry_type get_attributes_enttype(int attributes)
 		return ENTTYPE_FILE;
 }
 #else
+
 static osd_dir_entry_type get_attributes_stat(const char *file)
 {
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
@@ -76,13 +90,10 @@ static osd_dir_entry_type get_attributes_stat(const char *file)
 		return ENTTYPE_NONE;
 #endif
 
-#ifdef SDLMAME_WIN32
-	if (S_ISBLK(st.st_mode)) return ENTTYPE_DIR;
-#else
-	if (S_ISDIR(st.st_mode)) return ENTTYPE_DIR;
-#endif
-
-	return ENTTYPE_FILE;
+	if (S_ISDIR(st.st_mode))
+		return ENTTYPE_DIR;
+	else
+		return ENTTYPE_FILE;
 }
 #endif
 
@@ -128,7 +139,7 @@ osd_directory *osd_opendir(const char *dirname)
 		strcpy(envstr, tmpstr);
 
 		i = 0;
-		while (envstr[i] != PATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
+		while (envstr[i] != PATHSEPCH && envstr[i] != INVPATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
 		{
 			i++;
 		}
@@ -155,15 +166,15 @@ osd_directory *osd_opendir(const char *dirname)
 	}
 
 	dir->fd = opendir(tmpstr);
+	dir->path = tmpstr;
 
 	if (dir && (dir->fd == NULL))
 	{
+		osd_free(dir->path);
 		osd_free(dir);
 		dir = NULL;
 	}
 
-	if (tmpstr)
-	  osd_free(tmpstr);
 	return dir;
 }
 
@@ -174,6 +185,7 @@ osd_directory *osd_opendir(const char *dirname)
 
 const osd_directory_entry *osd_readdir(osd_directory *dir)
 {
+	char *temp;
 	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
 	dir->data = readdir(dir->fd);
 	#else
@@ -184,12 +196,14 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 		return NULL;
 
 	dir->ent.name = dir->data->d_name;
+	temp = build_full_path(dir->path, dir->data->d_name);
 	#if defined (SDLMAME_LINUX) || defined (SDLMAME_BSD) || defined(SDLMAME_DARWIN)
 	dir->ent.type = get_attributes_enttype(dir->data->d_type);
 	#else
-	dir->ent.type = get_attributes_stat(dir->data->d_name);
+	dir->ent.type = get_attributes_stat(temp);
 	#endif
-	dir->ent.size = osd_get_file_size(dir->data->d_name);
+	dir->ent.size = osd_get_file_size(temp);
+	osd_free(temp);
 	return &dir->ent;
 }
 
@@ -202,6 +216,7 @@ void osd_closedir(osd_directory *dir)
 {
 	if (dir->fd != NULL)
 		closedir(dir->fd);
+	osd_free(dir->path);
 	osd_free(dir);
 }
 
