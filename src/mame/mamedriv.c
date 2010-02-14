@@ -10007,4 +10007,7 @@ Other Sun games
 	DRIVER( pinkiri8 )
 	DRIVER( neptunp2 )
 
+	/* Diatec */
+	DRIVER( unclepoo )
+
 #endif	/* DRIVER_RECURSIVE */
