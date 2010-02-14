@@ -1910,6 +1910,70 @@ static unicode_char get_keyboard_code(const input_field_config *field, int i)
 	return ch;
 }
 
+/***************************************************************************
+    MISCELLANEOUS
+***************************************************************************/
+
+/*-------------------------------------------------
+    find_charinfo - looks up information about a
+    particular character
+-------------------------------------------------*/
+
+static const char_info *find_charinfo(unicode_char target_char)
+{
+	int low = 0;
+	int high = ARRAY_LENGTH(charinfo);
+	int i;
+	unicode_char ch;
+
+	/* perform a simple binary search to find the proper alternate */
+	while(high > low)
+	{
+		i = (high + low) / 2;
+		ch = charinfo[i].ch;
+		if (ch < target_char)
+			low = i + 1;
+		else if (ch > target_char)
+			high = i;
+		else
+			return &charinfo[i];
+	}
+	return NULL;
+}
+
+/*-------------------------------------------------
+    inputx_key_name - returns the name of a
+    specific key
+-------------------------------------------------*/
+
+static const char *inputx_key_name(unicode_char ch)
+{
+	static char buf[UTF8_CHAR_MAX + 1];
+	const char_info *ci;
+	const char *result;
+	int pos;
+
+	ci = find_charinfo(ch);
+	result = ci ? ci->name : NULL;
+
+	if (ci && ci->name)
+	{
+		result = ci->name;
+	}
+	else
+	{
+		if ((ch > 0x7F) || isprint(ch))
+		{
+			pos = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
+			buf[pos] = '\0';
+			result = buf;
+		}
+		else
+			result = "???";
+	}
+	return result;
+}
+
 /*-------------------------------------------------
     get_keyboard_key_name - builds the name of
     a key based on natural keyboard characters
@@ -4656,39 +4720,6 @@ int input_machine_has_keyboard(running_machine *machine)
 }
 
 /***************************************************************************
-    MISCELLANEOUS
-***************************************************************************/
-
-/*-------------------------------------------------
-    find_charinfo - looks up information about a
-    particular character
--------------------------------------------------*/
-
-static const char_info *find_charinfo(unicode_char target_char)
-{
-	int low = 0;
-	int high = ARRAY_LENGTH(charinfo);
-	int i;
-	unicode_char ch;
-
-	/* perform a simple binary search to find the proper alternate */
-	while(high > low)
-	{
-		i = (high + low) / 2;
-		ch = charinfo[i].ch;
-		if (ch < target_char)
-			low = i + 1;
-		else if (ch > target_char)
-			high = i;
-		else
-			return &charinfo[i];
-	}
-	return NULL;
-}
-
-
-
-/***************************************************************************
     CODE ASSEMBLING
 ***************************************************************************/
 
@@ -4977,15 +5008,6 @@ static int can_post_key_alternate(unicode_char ch)
 	return 1;
 }
 
-
-
-int inputx_can_post_key(running_machine *machine, unicode_char ch)
-{
-	return inputx_can_post(machine) && (can_post_key_directly(ch) || can_post_key_alternate(ch));
-}
-
-
-
 static attotime choose_delay(unicode_char ch)
 {
 	attoseconds_t delay = 0;
@@ -5043,7 +5065,7 @@ static int buffer_full(running_machine *machine)
 
 
 
-void inputx_postn_rate(running_machine *machine, const unicode_char *text, size_t text_len, attotime rate)
+static void inputx_postn_rate(running_machine *machine, const unicode_char *text, size_t text_len, attotime rate)
 {
 	int last_cr = 0;
 	unicode_char ch;
@@ -5144,43 +5166,6 @@ static TIMER_CALLBACK(inputx_timerproc)
 	}
 }
 
-/*-------------------------------------------------
-    inputx_key_name - returns the name of a
-    specific key
--------------------------------------------------*/
-
-const char *inputx_key_name(unicode_char ch)
-{
-	static char buf[UTF8_CHAR_MAX + 1];
-	const char_info *ci;
-	const char *result;
-	int pos;
-
-	ci = find_charinfo(ch);
-	result = ci ? ci->name : NULL;
-
-	if (ci && ci->name)
-	{
-		result = ci->name;
-	}
-	else
-	{
-		if ((ch > 0x7F) || isprint(ch))
-		{
-			pos = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
-			buf[pos] = '\0';
-			result = buf;
-		}
-		else
-			result = "???";
-	}
-	return result;
-}
-
-
-
-/* --------------------------------------------------------------------- */
-
 int inputx_is_posting(running_machine *machine)
 {
 	const key_buffer *keybuf;
@@ -5188,15 +5173,14 @@ int inputx_is_posting(running_machine *machine)
 	return (keybuf->begin_pos != keybuf->end_pos) || (charqueue_empty && !charqueue_empty());
 }
 
-
-
 /***************************************************************************
 
     Coded input
 
 ***************************************************************************/
+static void inputx_postc_rate(running_machine *machine, unicode_char ch, attotime rate);
 
-void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
+static void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
 {
 	size_t i, j, key_len, increment;
 	unicode_char ch;
@@ -5273,124 +5257,17 @@ void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t 
 
 ***************************************************************************/
 
-void inputx_postn(running_machine *machine, const unicode_char *text, size_t text_len)
-{
-	inputx_postn_rate(machine, text, text_len, attotime_make(0, 0));
-}
-
-
-
-void inputx_post_rate(running_machine *machine, const unicode_char *text, attotime rate)
-{
-	size_t len = 0;
-	while(text[len])
-		len++;
-	inputx_postn_rate(machine, text, len, rate);
-}
-
-
-
-void inputx_post(running_machine *machine, const unicode_char *text)
-{
-	inputx_post_rate(machine, text, attotime_make(0, 0));
-}
-
-
-
-void inputx_postc_rate(running_machine *machine, unicode_char ch, attotime rate)
+static void inputx_postc_rate(running_machine *machine, unicode_char ch, attotime rate)
 {
 	inputx_postn_rate(machine, &ch, 1, rate);
 }
-
-
 
 void inputx_postc(running_machine *machine, unicode_char ch)
 {
 	inputx_postc_rate(machine, ch, attotime_make(0, 0));
 }
 
-
-
-void inputx_postn_utf16_rate(running_machine *machine, const utf16_char *text, size_t text_len, attotime rate)
-{
-	size_t len = 0;
-	unicode_char c;
-	utf16_char w1, w2;
-	unicode_char buf[256];
-
-	while(text_len > 0)
-	{
-		if (len == ARRAY_LENGTH(buf))
-		{
-			inputx_postn(machine, buf, len);
-			len = 0;
-		}
-
-		w1 = *(text++);
-		text_len--;
-
-		if ((w1 >= 0xd800) && (w1 <= 0xdfff))
-		{
-			if (w1 <= 0xDBFF)
-			{
-				w2 = 0;
-				if (text_len > 0)
-				{
-					w2 = *(text++);
-					text_len--;
-				}
-				if ((w2 >= 0xdc00) && (w2 <= 0xdfff))
-				{
-					c = w1 & 0x03ff;
-					c <<= 10;
-					c |= w2 & 0x03ff;
-				}
-				else
-				{
-					c = INVALID_CHAR;
-				}
-			}
-			else
-			{
-				c = INVALID_CHAR;
-			}
-		}
-		else
-		{
-			c = w1;
-		}
-		buf[len++] = c;
-	}
-	inputx_postn_rate(machine, buf, len, rate);
-}
-
-
-
-void inputx_postn_utf16(running_machine *machine, const utf16_char *text, size_t text_len)
-{
-	inputx_postn_utf16_rate(machine, text, text_len, attotime_make(0, 0));
-}
-
-
-
-void inputx_post_utf16_rate(running_machine *machine, const utf16_char *text, attotime rate)
-{
-	size_t len = 0;
-	while(text[len])
-		len++;
-	inputx_postn_utf16_rate(machine, text, len, rate);
-}
-
-
-
-void inputx_post_utf16(running_machine *machine, const utf16_char *text)
-{
-	inputx_post_utf16_rate(machine, text, attotime_make(0, 0));
-}
-
-
-
-void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
+static void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
 {
 	size_t len = 0;
 	unicode_char buf[256];
@@ -5401,7 +5278,7 @@ void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t t
 	{
 		if (len == ARRAY_LENGTH(buf))
 		{
-			inputx_postn(machine, buf, len);
+			inputx_postn_rate(machine, buf, len, attotime_make(0, 0));
 			len = 0;
 		}
 
@@ -5418,49 +5295,15 @@ void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t t
 	inputx_postn_rate(machine, buf, len, rate);
 }
 
-
-
-void inputx_postn_utf8(running_machine *machine, const char *text, size_t text_len)
+void inputx_post_utf8(running_machine *machine, const char *text)
 {
-	inputx_postn_utf8_rate(machine, text, text_len, attotime_make(0, 0));
+	inputx_postn_utf8_rate(machine, text, strlen(text), attotime_make(0, 0));
 }
-
-
 
 void inputx_post_utf8_rate(running_machine *machine, const char *text, attotime rate)
 {
 	inputx_postn_utf8_rate(machine, text, strlen(text), rate);
-}
-
-
-
-void inputx_post_utf8(running_machine *machine, const char *text)
-{
-	inputx_post_utf8_rate(machine, text, attotime_make(0, 0));
-}
-
-
-
-void inputx_post_coded(running_machine *machine, const char *text)
-{
-	inputx_postn_coded(machine, text, strlen(text));
-}
-
-
-
-void inputx_post_coded_rate(running_machine *machine, const char *text, attotime rate)
-{
-	inputx_postn_coded_rate(machine, text, strlen(text), rate);
-}
-
-
-
-void inputx_postn_coded(running_machine *machine, const char *text, size_t text_len)
-{
-	inputx_postn_coded_rate(machine, text, text_len, attotime_make(0, 0));
-}
-
-
+}  
 
 /***************************************************************************
 
@@ -5650,7 +5493,7 @@ int input_category_active(running_machine *machine, int category)
 
 static void execute_input(running_machine *machine, int ref, int params, const char *param[])
 {
-	inputx_post_coded(machine, param[0]);
+	inputx_postn_coded_rate(machine, param[0], strlen(param[0]), attotime_make(0, 0));
 }
 
 
