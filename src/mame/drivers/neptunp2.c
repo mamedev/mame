@@ -63,7 +63,7 @@ static const gfx_layout charlayout =
 #endif
 
 static GFXDECODE_START( neptunp2 )
-//	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
+//  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( neptunp2 )
@@ -72,7 +72,7 @@ static MACHINE_DRIVER_START( neptunp2 )
 	MDRV_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
 	MDRV_CPU_PROGRAM_MAP(neptunp2_map)
 	MDRV_CPU_IO_MAP(neptunp2_io)
-//	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

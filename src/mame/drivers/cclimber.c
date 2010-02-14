@@ -1752,7 +1752,7 @@ ROM_END
 
    there are a lot of wire-mods on this board, it's possible that it's been hacked to work more like
    an original bagman board, a lot of the roms are the same
-   
+
    this set also explains why the cannonball set above contained a number of bagman roms, it was clearly
    a half-converted board.
 

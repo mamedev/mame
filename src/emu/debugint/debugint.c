@@ -44,11 +44,11 @@ enum
 
 enum
 {
-	VIEW_STATE_BUTTON 			= 0x01,
-	VIEW_STATE_MOVING 			= 0x02,
-	VIEW_STATE_SIZING 			= 0x04,
+	VIEW_STATE_BUTTON			= 0x01,
+	VIEW_STATE_MOVING			= 0x02,
+	VIEW_STATE_SIZING			= 0x04,
 	VIEW_STATE_NEEDS_UPDATE 	= 0x08,
-	VIEW_STATE_FOLLOW_CPU 		= 0x10,
+	VIEW_STATE_FOLLOW_CPU		= 0x10,
 };
 
 /***************************************************************************
@@ -270,8 +270,8 @@ INLINE void dview_set_state(DView *dv, int state, int onoff)
 ***************************************************************************/
 
 static render_font *	debug_font;
-static int 				debug_font_width;
-static int 				debug_font_height;
+static int				debug_font_width;
+static int				debug_font_height;
 static float			debug_font_aspect;
 static DView *			list;
 static DView *			focus_view;
@@ -1376,7 +1376,7 @@ static void handle_menus(running_machine *machine)
 			CreateMainMenu(machine);
 		/* turn on editor if requested */
 		//if (ui_input_pressed(machine, IPT_UI_UP) && focus_view->editor.active)
-		//	cur_editor = &focus_view->editor;
+		//  cur_editor = &focus_view->editor;
 		handle_editor(machine);
 	}
 }

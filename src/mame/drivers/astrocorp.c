@@ -199,7 +199,7 @@ static WRITE16_HANDLER( showhand_outputs_w )
 static WRITE16_HANDLER( skilldrp_outputs_w )
 {
 	// key in          (0001)
-	// coin	in         (0002)
+	// coin in         (0002)
 	// key out         (0004)
 	// coin out        (0008)
 	// hopper?         (0010)
@@ -220,7 +220,7 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 		coin_counter_w(space->machine, 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
 		coin_counter_w(space->machine, 1,	(data & 0x0004));	// key out |
 		ticket_dispenser_w(devtag_get_device(space->machine, "hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
-		//                                  (data & 0x0010)		// hopper?
+		//                                  (data & 0x0010)     // hopper?
 		set_led_status(space->machine, 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
 		ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, data & 0x0080);	// ticket motor?
 	}
@@ -235,7 +235,7 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 		set_led_status(space->machine, 6,	(data & 0x8000));	// ticket?
 	}
 
-//	popmessage("%04X",data);
+//  popmessage("%04X",data);
 }
 
 static WRITE16_HANDLER( astrocorp_enable_w )

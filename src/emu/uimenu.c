@@ -1535,8 +1535,8 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	ui_mess_main_menu_populate(machine, menu);
 #endif /* MESS */
 
-  	/* add keyboard mode menu */
-  	if (input_machine_has_keyboard(machine) && inputx_can_post(machine))
+	/* add keyboard mode menu */
+	if (input_machine_has_keyboard(machine) && inputx_can_post(machine))
 		ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, (void *)ui_menu_keyboard_mode);
 
 	/* add sliders menu */

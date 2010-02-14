@@ -2524,7 +2524,7 @@ profiler_mark_start(PROFILER_INPUT);
 
 		/* hook for MESS's natural keyboard support */
 		input_port_update_hook(machine, port, &port->state->digital);
-		
+
 		/* handle playback/record */
 		playback_port(port);
 		record_port(port);
@@ -5303,7 +5303,7 @@ void inputx_post_utf8(running_machine *machine, const char *text)
 void inputx_post_utf8_rate(running_machine *machine, const char *text, attotime rate)
 {
 	inputx_postn_utf8_rate(machine, text, strlen(text), rate);
-}  
+}
 
 /***************************************************************************
 

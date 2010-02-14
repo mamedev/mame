@@ -210,13 +210,13 @@ static MACHINE_START( skattv )
 	state_save_register_global(machine, state->register_active);
 
 	/*
-  		ACRTC memory:
- 
-  		00000-3ffff = RAM
-  		40000-7ffff = ROM
-  		80000-bffff = unused
-  		c0000-fffff = unused
-	*/	
+        ACRTC memory:
+
+        00000-3ffff = RAM
+        40000-7ffff = ROM
+        80000-bffff = unused
+        c0000-fffff = unused
+    */
 
 	// hack to handle acrt rom
 	{
@@ -390,15 +390,15 @@ static READ16_HANDLER( test_r )
 	state->mux_data++;
 	state->mux_data &= 0xf;
 /*
-	switch (mame_rand(space->machine) & 3)
-	{
-		case 0:
-			return 0;
-		case 1:
-			return 0xffff;
-		default:
-			return mame_rand(space->machine) & 0xffff;
-	}
+    switch (mame_rand(space->machine) & 3)
+    {
+        case 0:
+            return 0;
+        case 1:
+            return 0xffff;
+        default:
+            return mame_rand(space->machine) & 0xffff;
+    }
 */
 	return value | (mame_rand(space->machine) & 0x0000);
 }

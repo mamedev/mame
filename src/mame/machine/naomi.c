@@ -102,6 +102,6 @@ DRIVER_INIT( gram2000 )
 
 DRIVER_INIT( vf4evoct )
 {
-//	DRIVER_INIT_CALL(naomi2);
+//  DRIVER_INIT_CALL(naomi2);
 	actel_id = 0; //FIXME: correct value
 }

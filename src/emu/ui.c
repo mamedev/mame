@@ -125,7 +125,7 @@ static slider_state *slider_current;
 static int ui_active;
 /* natural keyboard info */
 static int ui_use_natural_keyboard;
-static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];	
+static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];
 
 
 /***************************************************************************
@@ -254,11 +254,11 @@ int ui_init(running_machine *machine)
 
 	/* reset globals */
 	single_step = FALSE;
-	ui_set_handler(handler_messagebox, 0);	
+	ui_set_handler(handler_messagebox, 0);
 	ui_active = 0;
 	/* retrieve options */
 	ui_use_natural_keyboard = options_get_bool(mame_options(), OPTION_NATURAL_KEYBOARD);
-	
+
 	return 0;
 }
 

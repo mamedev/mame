@@ -372,7 +372,7 @@ static DRIVER_INIT( gunpey )
 
 	/* patch SLOOOOW cycle checks ... */
 	rom[0x848b5] = 0x7e;
-//	rom[0x848b6] = 0x03;
+//  rom[0x848b6] = 0x03;
 	rom[0x89657] = 0x75;
 	rom[0x8e628] = 0x75;
 

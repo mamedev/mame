@@ -731,7 +731,7 @@ static WRITE16_HANDLER( c76_speedup_w )
 
 static READ16_HANDLER( c76_inputs_r )
 {
-//	logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(space->cpu));
+//  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(space->cpu));
 
 	switch (offset)
 	{
@@ -831,7 +831,7 @@ INTERRUPT_GEN( c76_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-	 		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+			cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 			break;
 
 		case 1:

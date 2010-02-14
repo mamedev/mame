@@ -62,19 +62,19 @@ static TILEMAP_MAPPER( sys16_bg_map )
 {
 	int page = 0;
 	if (row < 32)
-	{ 
+	{
 		/* top */
-		if (col < 64) 
-			page = 0; 
-		else 
+		if (col < 64)
+			page = 0;
+		else
 			page = 1;
 	}
-	else 
-	{ 
+	else
+	{
 		/* bottom */
-		if (col < 64) 
-			page = 2; 
-		else 
+		if (col < 64)
+			page = 2;
+		else
 			page = 3;
 	}
 

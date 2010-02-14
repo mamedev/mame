@@ -1589,9 +1589,9 @@ READ8_HANDLER( snes_r_bank3 )
 	else if (snes_cart.mode & 5)							/* Mode 20 & 22 */
 	{
 		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20)) //FIXME: check this
-		{	
+		{
 			value = 0xff;							/* Reserved */
-			//value =  snes_ram[0x200000 + ((offset & ~0x8000) | 0x8000)];	// is this hack still needed?	/* Reserved */
+			//value =  snes_ram[0x200000 + ((offset & ~0x8000) | 0x8000)];  // is this hack still needed?   /* Reserved */
 		}
 		else
 			value = snes_ram[0x400000 + offset];

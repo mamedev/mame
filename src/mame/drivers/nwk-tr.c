@@ -635,14 +635,14 @@ static const k033906_interface nwktr_k033906_interface =
 
 static const k001604_interface racingj_k001604_intf =
 {
-	0, 1, 	/* gfx index 1 & 2 */
+	0, 1,	/* gfx index 1 & 2 */
 	0, 1,		/* layer_size, roz_size */
 	0		/* slrasslt hack */
 };
 
 static const k001604_interface thrilld_k001604_intf =
 {
-	0, 1, 	/* gfx index 1 & 2 */
+	0, 1,	/* gfx index 1 & 2 */
 	1, 1,		/* layer_size, roz_size */
 	0		/* slrasslt hack */
 };

@@ -619,7 +619,7 @@ WRITE64_HANDLER( naomi_maple_w )
 					{
 						if (port > 0)
 							buff[0]=0xffffffff;
-//						printf("MAPLE: command %02x\n", command);
+//                      printf("MAPLE: command %02x\n", command);
 						switch (command)
 						{
 							case 1:

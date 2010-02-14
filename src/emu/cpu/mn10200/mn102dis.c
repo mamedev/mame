@@ -117,7 +117,7 @@ int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 
 	case 0x80: case 0x85: case 0x8a: case 0x8f:
 		sprintf(buffer, "mov %s, d%d", i8str(program_read_byte(pc+1)), opcode & 3);
-		return 2;    
+		return 2;
 
 	case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 	case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:

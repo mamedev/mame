@@ -9,9 +9,9 @@
   - sigmab52.c
 
   ACRTC memory map:
- 
+
   00000-3ffff = RAM
-  40000-7ffff = ROM		handled with a hack in the drivers
+  40000-7ffff = ROM     handled with a hack in the drivers
   80000-bffff = unused
   c0000-fffff = unused
 

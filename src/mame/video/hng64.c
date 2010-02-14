@@ -1971,7 +1971,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     }
     printf("\n");
 */
-        
+
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
 	address[1] = threeDPointer[1];
@@ -2065,8 +2065,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			polys[*numPolys].palPageSize = 0x100;
 
 			/* FIXME: This isn't correct.
-					  Buriki & Xrally need this line.  Roads Edge needs it removed. 
-					  So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
+                      Buriki & Xrally need this line.  Roads Edge needs it removed.
+                      So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
 			if (hng64_3dregs[0x00/4] & 0x2000)
 			{
 				polys[*numPolys].palOffset += 0x800;
@@ -2080,9 +2080,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			if (explicitPaletteValue2) polys[*numPolys].palPageSize = 0x10;
 
 			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
- 			if ((packet[1] & 0x0100))
+			if ((packet[1] & 0x0100))
 			{
- 				explicitPaletteValue1 = paletteState3d * 0x80;
+				explicitPaletteValue1 = paletteState3d * 0x80;
 				explicitPaletteValue2 = 0;      // This is probably hiding somewhere in operation 0011
             }
 
@@ -2889,7 +2889,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 				if (paletteEntry != 0)
 				{
 					paletteEntry %= palPageSize;
-                    
+
 					// Greyscale texture test.
 					// *cb = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 					*cb = machine->pens[palOffset + paletteEntry];

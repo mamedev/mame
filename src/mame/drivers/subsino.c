@@ -734,7 +734,7 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-//	AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
 
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
 

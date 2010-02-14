@@ -43,7 +43,7 @@
 #define GAME_IS_BIOS_ROOT				0x00001000	/* this driver entry is a BIOS root */
 #define GAME_NO_STANDALONE				0x00002000	/* this driver cannot stand alone */
 #define GAME_REQUIRES_ARTWORK			0x00004000	/* the driver requires external artwork for key elements of the game */
-#define GAME_UNOFFICIAL      			0x00008000	/* unofficial hardware change */
+#define GAME_UNOFFICIAL     			0x00008000	/* unofficial hardware change */
 #define GAME_NO_SOUND_HW				0x00010000	/* sound hardware not available */
 
 

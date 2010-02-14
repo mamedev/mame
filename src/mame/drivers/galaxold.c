@@ -339,7 +339,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     but their status is discarded with 3 'NOP' instructions at 0x06d1.
   - DSW0 is read via code at 0x2426, but its contents is directly overwritten
     with value read from DSW1 (AY port A) via code at 0x3647.
- 
+
 4) 'ozon1'
 
   - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch

@@ -3067,7 +3067,7 @@ ROM_START( gram2000 )
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-23377.ic11",        0x0000000, 0x0400000, CRC(4ca3149c) SHA1(9d25fc659658b416202b033754669be2f3abcdbe) )
 	/* Test mode returns IC1 as bad dump, it looks like that is data provided by the Actel A54SX32 FPGA present on board
-	   and mirrored there.  Provided as documentation until we know more about it. */
+       and mirrored there.  Provided as documentation until we know more about it. */
 	ROM_LOAD("gram2000.ic1",          0x0800000, 0x0800000, CRC(4a86556a) SHA1(61100dc84c95dd47d9f61c7cc52ea25579b90632) )
 	ROM_LOAD32_WORD("mpr-23357.ic17", 0x1000000, 0x0800000, CRC(eaf77487) SHA1(bdfc4666a6724441c11b31d89fa30c4bd11cbdd1) ) //ic 2
 	ROM_LOAD32_WORD("mpr-23358.ic18", 0x1000002, 0x0800000, CRC(96819a5b) SHA1(e28c9d7b0579ab5d6116401b49f30dc8e4961618) ) //ic 3

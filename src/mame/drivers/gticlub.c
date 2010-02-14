@@ -783,28 +783,28 @@ static const k056230_interface thunderh_k056230_intf =
 
 static const k001604_interface gticlub_k001604_intf =
 {
-	1, 2, 	/* gfx index 1 & 2 */
+	1, 2,	/* gfx index 1 & 2 */
 	1, 1,		/* layer_size, roz_size */
 	0		/* slrasslt hack */
 };
 
 static const k001604_interface slrasslt_k001604_intf =
 {
-	1, 2, 	/* gfx index 1 & 2 */
+	1, 2,	/* gfx index 1 & 2 */
 	0, 0,		/* layer_size, roz_size */
 	1		/* slrasslt hack */
 };
 
 static const k001604_interface hangplt_k001604_intf_l =
 {
-	1, 2, 	/* gfx index 1 & 2 */
+	1, 2,	/* gfx index 1 & 2 */
 	0, 1,		/* layer_size, roz_size */
 	0		/* slrasslt hack */
 };
 
 static const k001604_interface hangplt_k001604_intf_r =
 {
-	3, 4, 	/* gfx index 1 & 2 */
+	3, 4,	/* gfx index 1 & 2 */
 	0, 1,		/* layer_size, roz_size */
 	0		/* slrasslt hack */
 };

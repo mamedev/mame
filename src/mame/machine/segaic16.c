@@ -658,7 +658,7 @@ INLINE ic_315_5250_state *_315_5250_get_safe_token( running_device *device )
 
 INLINE const ic_315_5250_interface *_315_5250_get_interface( running_device *device )
 {
-	assert(device != NULL);	
+	assert(device != NULL);
 	assert((device->type == _315_5250));
 	return (const ic_315_5250_interface *) device->baseconfig().static_config;
 }

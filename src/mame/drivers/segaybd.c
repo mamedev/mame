@@ -205,7 +205,7 @@ static MACHINE_RESET( yboard )
 
 	state->irq2_scanline = 170;
 
-	state->interrupt_timer = devtag_get_device(machine, "int_timer");	
+	state->interrupt_timer = devtag_get_device(machine, "int_timer");
 	timer_device_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), 223);
 }
 

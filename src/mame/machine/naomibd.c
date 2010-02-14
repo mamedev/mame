@@ -460,7 +460,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	}
 	else if ((offset == 2) && ACCESSING_BITS_32_63)
 	{
-		//	Actel FPGA ID, used on some games for a "special" ROM test.
+		//  Actel FPGA ID, used on some games for a "special" ROM test.
 
 		return (UINT64)actel_id << 32;
 	}

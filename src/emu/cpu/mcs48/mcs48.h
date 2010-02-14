@@ -116,8 +116,8 @@ enum
 ***************************************************************************/
 
 /* Official Intel MCS-48 parts */
-CPU_GET_INFO( i8021 );			/* 1k internal ROM,		 64 bytes internal RAM */
-CPU_GET_INFO( i8022 );			/* 2k internal ROM,		128 bytes internal RAM */
+CPU_GET_INFO( i8021 );			/* 1k internal ROM,      64 bytes internal RAM */
+CPU_GET_INFO( i8022 );			/* 2k internal ROM,     128 bytes internal RAM */
 CPU_GET_INFO( i8035 );			/* external ROM,         64 bytes internal RAM */
 CPU_GET_INFO( i8048 );			/* 1k internal ROM,      64 bytes internal RAM */
 CPU_GET_INFO( i8648 );			/* 1k internal OTP ROM,  64 bytes internal RAM */

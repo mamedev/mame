@@ -1,4 +1,4 @@
-/* 
+/*
 
 Sang Ho Soft 'Puzzle Star' PCB
 
@@ -76,7 +76,7 @@ static void sexyboom_map_bank(running_machine *machine, int bank)
 {
 	UINT8 banknum, banktype;
 	char read_bank_name[6], write_bank_name[6];
-	
+
 	banknum = sexyboom_bank[bank*2];
 	banktype = sexyboom_bank[bank*2 + 1];
 	sprintf(read_bank_name, "bank%d", bank+1);

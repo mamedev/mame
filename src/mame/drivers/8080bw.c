@@ -77,7 +77,7 @@
 /* 13 Dec 2006 - add PRELIMINARY sound support and documentation to:        */
 /*               rollingc, spcenctr, gunfight, m4, gmissile,                */
 /*               schasrcv (schasercv), 280zzzap, lagunar, lupin3, phantom2, */
-/*		 blueshrk, desertgu, ballbomb, yosakdon/yosakdoa (yosakdona)*/
+/*       blueshrk, desertgu, ballbomb, yosakdon/yosakdoa (yosakdona)*/
 /*               shuttlei, invrvnge/invrvnga (invrvngea).                   */
 /*               Documented indianbt sound. Removed NO_SOUND flag from      */
 /*               cosmo and dogpatch as the sound was already working.       */

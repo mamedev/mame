@@ -9,7 +9,7 @@
     - Final Fight 2
     - Sonic Blast Man 2
     - Iron (bootleg of Iron Commando)
-	- Ghost Chaser Densei
+    - Ghost Chaser Densei
 
     Not dumped:
     - Final Fight 3
@@ -1066,7 +1066,7 @@ static DRIVER_INIT( denseib )
 
 	UINT8 *rom = memory_region(machine, "user3");
 
-	INT32 i;	
+	INT32 i;
 	for(i=0;i<0x200000;i++)
 	{
 		rom[i]=rom[i]^0xff;
@@ -1084,11 +1084,11 @@ static DRIVER_INIT( denseib )
     /*  boot vector */
     rom[0xfffc]=0x40;
     rom[0xfffd]=0xf7;
-	
+
 	/* extra inputs */
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, denseib_770071_r);
     memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, denseib_770079_r);
-	
+
 
 	DRIVER_INIT_CALL(snes_hirom);
 }

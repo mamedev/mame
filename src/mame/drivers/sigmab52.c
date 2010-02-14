@@ -152,9 +152,9 @@ static VIDEO_UPDATE( jwildb52 )
 
 	b = ((hd63484_regs_r(hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
 
-//save vram to file	
+//save vram to file
 #if 0
-	if (input_code_pressed_once(screen->machine, KEYCODE_Q)) 
+	if (input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
 		FILE *p = fopen("vram.bin", "wb");
 		fwrite(&HD63484_ram[0], 1, 0x40000 * 4, p);
@@ -167,7 +167,7 @@ static VIDEO_UPDATE( jwildb52 )
 	{
 		for (x = 0; x < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
 		{
-						
+
 			src = hd63484_ram_r(hd63484, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
 			*BITMAP_ADDR16(bitmap, y, x    ) = ((src & 0x000f) >>  0) << 0;
@@ -238,7 +238,7 @@ static WRITE8_HANDLER(acrtc_w)
 		if(!latch)
 		{
 			acrtc_data = data;
-		
+
 		}
 
 		else
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( jwildb52_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf700, 0xf700) AM_READ(unk_f700_r)
 	AM_RANGE(0xf710, 0xf710) AM_WRITE(unk_f710_w)
 	AM_RANGE(0xf721, 0xf721) AM_READ(unk_f721_r)
-	
+
 	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
 	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
 
@@ -528,19 +528,19 @@ static MACHINE_START(jwildb52)
 	memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x10000 + 0x0000]);
 
 	memory_set_bankptr(machine, "bank2", &memory_region(machine, "maincpu")[0x10000 + 0xf800]);
-	
+
 	memory_set_bankptr(machine, "bank3", &memory_region(machine, "maincpu")[0x10000 + 0x8000]);
 
 /*
 
   ACRTC memory:
- 
+
   00000-3ffff = RAM
   40000-7ffff = ROM
   80000-bffff = unused
   c0000-fffff = unused
 
-*/	
+*/
 
 	{
 		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");

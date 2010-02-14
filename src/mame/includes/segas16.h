@@ -3,11 +3,11 @@ typedef struct _segas1x_state segas1x_state;
 struct _segas1x_state
 {
 	/* memory pointers */
-//	UINT16 *  workram;	// this is used in the nvram handler, hence it cannot be added here
-//	UINT16 *  paletteram;	// this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//	UINT16 *  tileram_0;	// this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//	UINT16 *  textram_0;	// this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//	UINT16 *  spriteram_0;	// this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  workram;  // this is used in the nvram handler, hence it cannot be added here
+//  UINT16 *  paletteram;   // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  tileram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  textram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  spriteram_0;  // this is used in the segaic16 mapper, hence it cannot be added here (yet)
 
 	/* misc video */
 	UINT8 road_priority;		// segaxbd

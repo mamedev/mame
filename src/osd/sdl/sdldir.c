@@ -71,10 +71,10 @@ static char *build_full_path(const char *path, const char *file)
 	char *p = ret;
 
 	strcpy(p, path);
-	p += strlen(path);	
+	p += strlen(path);
 	*p++ = PATHSEPCH;
 	strcpy(p, file);
-	return ret; 
+	return ret;
 }
 
 

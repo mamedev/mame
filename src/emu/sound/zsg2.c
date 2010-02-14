@@ -34,7 +34,7 @@
     The samples are compressed with a 2:1 ratio.  Each bloc of 4-bytes
     becomes 4 16-bits samples.  Reading the 4 bytes as a *little-endian*
     32bits values, the structure is:
-    
+
     1444 4444 1333 3333 1222 2222 ssss1111
 
     's' is a 4-bit scale value.  '1', '2', '3', '4' are signed 7-bits
@@ -77,7 +77,7 @@ INLINE zsg2_state *get_safe_token(running_device *device)
 
 static STREAM_UPDATE( update_stereo )
 {
-//	zsg2_state *info = (zsg2_state *)param;
+//  zsg2_state *info = (zsg2_state *)param;
 	stream_sample_t *dest1 = outputs[0];
 	stream_sample_t *dest2 = outputs[1];
 
@@ -116,9 +116,9 @@ static void keyon(zsg2_state *info, int chan)
 
 static void control_w(zsg2_state *info, int reg, UINT16 data)
 {
-	switch(reg) 
+	switch(reg)
 	{
-		case 0x00: case 0x02: case 0x04: 
+		case 0x00: case 0x02: case 0x04:
 		{
 			int base = (reg & 6) << 3;
 			int i;
@@ -128,7 +128,7 @@ static void control_w(zsg2_state *info, int reg, UINT16 data)
 			break;
 		}
 
-		case 0x08: case 0x0a: case 0x0c: 
+		case 0x08: case 0x0a: case 0x0c:
 		{
 			int base = (reg & 6) << 3;
 			int i;
@@ -152,26 +152,26 @@ static void control_w(zsg2_state *info, int reg, UINT16 data)
 		default:
 		//      log_event("ZOOMCTRL", "%02x = %04x", reg, data);
 			break;
-	}    
+	}
 }
 
 static UINT16 control_r(zsg2_state *info, int reg)
 {
-	switch(reg) 
+	switch(reg)
 	{
 		case 0x28:
 			return 0xff00;
 
-		case 0x3c: case 0x3e: 
+		case 0x3c: case 0x3e:
 		{
 			UINT32 adr = (info->ahigh << 16) | info->alow;
 			UINT32 val = *(unsigned int *)(info->bank_samples+adr);
-//			log_event("ZOOMCTRL", "rom read.%c %06x = %08x", reg == 0x3e ? 'h' : 'l', adr, val);
+//          log_event("ZOOMCTRL", "rom read.%c %06x = %08x", reg == 0x3e ? 'h' : 'l', adr, val);
 			return (reg == 0x3e) ? (val >> 16) : val;
 		}
 	}
 
-//	log_event("ZOOMCTRL", "read %02x", reg);
+//  log_event("ZOOMCTRL", "read %02x", reg);
 
 	return 0xffff;
 }
@@ -191,7 +191,7 @@ WRITE16_DEVICE_HANDLER( zsg2_w )
 		int reg = (adr >> 1) & 15;
 
 		chan_w(info, chan, reg, data);
-	} 
+	}
 	else
 	{
 		control_w(info, adr - 0x600, data);
@@ -205,12 +205,12 @@ READ16_DEVICE_HANDLER( zsg2_r )
 
 	assert(mem_mask == 0xffff);	// we only support full 16-bit accesses
 
-	if (adr < 0x600) 
+	if (adr < 0x600)
 	{
 		int chan = adr >> 5;
 		int reg = (adr >> 1) & 15;
 		return chan_r(info, chan, reg);
-	} 
+	}
 	else
 	{
 		return control_r(info, adr - 0x600);
@@ -237,7 +237,7 @@ static DEVICE_START( zsg2 )
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
-							   
+
 DEVICE_GET_INFO( zsg2 )
 {
 	switch (state)

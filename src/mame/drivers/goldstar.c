@@ -5025,7 +5025,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_CPU_PROGRAM_MAP(lucky8_map)
 	//MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // causes 'magical' to display 'wait' instead
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // causes 'magical' to display 'wait' instead
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )

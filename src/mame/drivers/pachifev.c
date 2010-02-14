@@ -3,9 +3,9 @@
 PACHI FEVER / SANKI DENSHI KOGYO
 
 
-GEN6480830 (TEXAS INSTRUMENTS) 
+GEN6480830 (TEXAS INSTRUMENTS)
 XTAL:12.000MHZ
-RY050012   (TEXAS INSTRUMENTS) 
+RY050012   (TEXAS INSTRUMENTS)
 XTAL:10.738MHZ
 
 SOUND   :MSM5205 & ?
@@ -21,14 +21,14 @@ Tomasz Slanina 10.02.2010:
 ---------------------------
 
 There's very little info about the game or hardware, so all the above (except for clocks and MSM ) is
-just a guess: 
+just a guess:
 
 - CPU (GEN6480830 ?) is TMS9995 or derivative ( decrementer + lvl3 interrupt, internal ram)
 - RY050012 could be a VDP ( probably TMS9928A )
 - SN76469A (or similar) used for music
 - MSM5205 - sample player (see below)
 
-- TODO: 
+- TODO:
   - what's the correct game title - Pachifever ? Fever 777 ?
   - ic48.50 ROM redump (probably more adpcm samples + lookuptable .. mapped at $c000)
   - remaing DSW
@@ -37,7 +37,7 @@ just a guess:
   - controls : make PLUNGER (or whatever it is in reality) implementation more clear
                here's some code used to read plunger pos(angle?):
 
-0284: 04CC             clr  R12            ; CRU address 
+0284: 04CC             clr  R12            ; CRU address
 0286: 0208 FF00        li   R8,>ff00     ; R8=ff00 - initial data ($ff)
 028A: D688             movb R8,*R10     ; ff-> ff40  - write to output
 028C: 3449             stcr R9,1        ; CRU read (one bit)
@@ -64,7 +64,7 @@ typedef struct _pachifev_state pachifev_state;
 struct _pachifev_state
 {
  /* controls related */
- 
+
  int power;
  int max_power;
  int input_power;
@@ -75,7 +75,7 @@ struct _pachifev_state
 
 static WRITE8_HANDLER(controls_w)
 {
-    if(!data) 
+    if(!data)
     {
         pachifev_state *state = (pachifev_state *)space->machine->driver_data;
 
@@ -100,7 +100,7 @@ static READ8_HANDLER(controls_r)
 
 static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x9fff) AM_ROM
-    
+
     AM_RANGE(0xc000, 0xc0ff) AM_NOP /* game is expecting here some kind of lookup table (adpcm samples start?) */
 
     AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -127,21 +127,21 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pachifev )
     PORT_START("IN0")
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )  /* used on enter player initials in top 5 */
-    PORT_BIT( 0x4d, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+    PORT_BIT( 0x4d, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
     PORT_START("IN1")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
-    
+    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
     PORT_START("DSW1")
     PORT_DIPUNKNOWN( 0x07, 0x07 )
-    
-    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )    
+
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-    
+
     PORT_DIPNAME( 0x30, 0x10, "Balls" )
     PORT_DIPSETTING(    0x00, "200")
     PORT_DIPSETTING(    0x10, "100")
@@ -153,39 +153,39 @@ static INPUT_PORTS_START( pachifev )
     PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
     PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
     PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
-    
+
     PORT_START("DSW2")
-        
+
     PORT_DIPNAME( 0x03, 0x01, "Time" )
     PORT_DIPSETTING(    0x00, "180")
     PORT_DIPSETTING(    0x01, "120")
     PORT_DIPSETTING(    0x02, "150")
     PORT_DIPSETTING(    0x03, "90")
-    
+
     PORT_DIPUNKNOWN( 0x0c, 0x0c )
-    
+
     PORT_DIPNAME( 0x30, 0x20, "Limit (attract)" ) /* attract mode only??? */
     PORT_DIPSETTING(    0x00, "2000")
     PORT_DIPSETTING(    0x10, "1500")
     PORT_DIPSETTING(    0x20, "1000")
     PORT_DIPSETTING(    0x30, "500")
-    
+
     PORT_DIPNAME( 0xc0, 0xc0, "Limit (game)" )  /* ball limit in game */
     PORT_DIPSETTING(    0x00, "1500")
     PORT_DIPSETTING(    0x40, "1000")
     PORT_DIPSETTING(    0x80, "500")
     PORT_DIPSETTING(    0xc0, "300")
-        
+
     PORT_START("DSW3")
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) 
+    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    
+
     PORT_DIPUNKNOWN( 0xfe, 0xfe )
-    
+
     PORT_START("PLUNGER")
-    PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(4) PORT_CENTERDELTA(0xff) 
-    
+    PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(4) PORT_CENTERDELTA(0xff)
+
 INPUT_PORTS_END
 
 
@@ -231,13 +231,13 @@ static const msm5205_interface msm5205_config =
 static MACHINE_RESET( pachifev )
 {
     pachifev_state *state = (pachifev_state *)machine->driver_data;
-    
+
     state->power=0;
     state->max_power=0;
     state->input_power=0;
     state->previous_power=0;
     state->cnt=0;
-    
+
 #if USE_MSM
     adpcm_pos = 0;
 #endif
@@ -247,7 +247,7 @@ static MACHINE_RESET( pachifev )
 static INTERRUPT_GEN( pachifev_vblank_irq )
 {
     TMS9928A_interrupt(device->machine);
-    
+
     {
         pachifev_state *state = (pachifev_state *)device->machine->driver_data;
         int current_power=input_port_read(device->machine, "PLUNGER") & 0x3f;
@@ -255,13 +255,13 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
         {
             popmessage    ("%d%%", (current_power * 100) / 0x3f);
         }
-        
+
         if( (!current_power) && (state->previous_power) )
         {
             state->input_power=state->previous_power;
-            state->cnt=NUM_PLUNGER_REPEATS; 
+            state->cnt=NUM_PLUNGER_REPEATS;
         }
-        
+
         state->previous_power=current_power;
     }
 
@@ -281,7 +281,7 @@ static MACHINE_START( pachifev)
     TMS9928A_configure(&tms9928a_interface);
     {
         pachifev_state *state = (pachifev_state *)machine->driver_data;
-    
+
         state_save_register_global(machine, state->power);
         state_save_register_global(machine, state->max_power);
         state_save_register_global(machine, state->input_power);
@@ -322,8 +322,8 @@ static MACHINE_DRIVER_START( pachifev )
     MDRV_SOUND_ADD("adpcm", MSM5205, 288000)  /* guess */
     MDRV_SOUND_CONFIG(msm5205_config)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif    
-    MDRV_SOUND_ADD("sn76", SN76489, XTAL_10_738635MHz/3) /* guess */ 
+#endif
+    MDRV_SOUND_ADD("sn76", SN76489, XTAL_10_738635MHz/3) /* guess */
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -337,7 +337,7 @@ ROM_START( pachifev )
 
     ROM_REGION( 0x4000, "adpcm", 0 )
     ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
-    
+
     ROM_REGION( 0x2000, "user1", 0 )
     ROM_LOAD( "ic48.50",   0x00000, 0x2000, BAD_DUMP CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
 ROM_END

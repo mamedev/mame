@@ -2,7 +2,7 @@
     Panasonic MN10200 emulator
 
     Written by Olivier Galibert
-    MAME conversion by R. Belmont	
+    MAME conversion by R. Belmont
 
 */
 

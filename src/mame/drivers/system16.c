@@ -381,7 +381,7 @@ static void tturfbl_msm5205_callback( running_device *device )
 		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface tturfbl_msm5205_interface  = 
+static const msm5205_interface tturfbl_msm5205_interface  =
 {
 	tturfbl_msm5205_callback,
 	MSM5205_S48_4B
@@ -392,7 +392,7 @@ static READ8_HANDLER( tturfbl_soundbank_r )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)space->machine->driver_data;
 
-	if (state->soundbank_ptr) 
+	if (state->soundbank_ptr)
 		return state->soundbank_ptr[offset & 0x3fff];
 	return 0x80;
 }
@@ -1076,9 +1076,9 @@ static WRITE8_HANDLER( sys18_soundbank_w )
 	int mask = state->sound_info[rom * 2 + 0];
 	int offs = state->sound_info[rom * 2 + 1];
 
-	if (mask) 
+	if (mask)
 		state->sound_bank = &mem[0x10000 + offs + ((bank & mask) << 13)];
-	else 
+	else
 		state->sound_bank = NULL;
 }
 
@@ -1220,7 +1220,7 @@ static void shdancbl_msm5205_callback(running_device *device)
 		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface shdancbl_msm5205_interface  = 
+static const msm5205_interface shdancbl_msm5205_interface  =
 {
 	shdancbl_msm5205_callback,
 	MSM5205_S48_4B
@@ -1230,7 +1230,7 @@ static READ8_HANDLER( shdancbl_soundbank_r )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)space->machine->driver_data;
 
-	if (state->soundbank_ptr) 
+	if (state->soundbank_ptr)
 		return state->soundbank_ptr[offset & 0x3fff];
 	return 0xff;
 }
@@ -1969,7 +1969,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout  = 
+static const gfx_layout charlayout  =
 {
 	8,8,
 	RGN_FRAC(1,3),
@@ -2037,7 +2037,7 @@ static void sound_cause_nmi( running_device *device, int chip )
 }
 
 
-const upd7759_interface sys16_upd7759_interface  = 
+const upd7759_interface sys16_upd7759_interface  =
 {
 	sound_cause_nmi
 };
@@ -2335,8 +2335,8 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-/****************************** 
-	System 16A Bootlegs 
+/******************************
+    System 16A Bootlegs
 ******************************/
 
 /* Shinobi bootleg by 'Datsu' - Sound hardware is different */
@@ -2444,8 +2444,8 @@ ROM_START( wb3bbl )
 ROM_END
 
 
-/****************************** 
-	System 16B Bootlegs 
+/******************************
+    System 16B Bootlegs
 ******************************/
 
 // protected + encrypted bootleg
@@ -2537,67 +2537,67 @@ ROM_START( bayrouteb2 )
 	ROM_LOAD( "br_02", 0x20000, 0x10000, CRC(ef63991b) SHA1(4221741780f88c80b3213ddca949bee7d4c1469a) )
 ROM_END
 
-/* 
+/*
 
-	this is a more complete dump of the old encrypted bootleg set
+    this is a more complete dump of the old encrypted bootleg set
 
-	Golden Axe (different HW bottleg)
+    Golden Axe (different HW bottleg)
 
-	Anno    1989
-	Produttore
-	N.revisione
+    Anno    1989
+    Produttore
+    N.revisione
 
-	CPU: 
-	main PCB:
-		1x 68000 (main)(missing)
-		1x LH0080B-Z80B-CPU (sound)
-		1x D7759C (sound)
-		1x YM2151 (sound)
-		1x YM3012 (sound)
-		1x UPC1241H (sound)
-		1x oscillator 20.000 (close to main)
-		1x oscillator 24.000MHz (close to sound)
-		1x blue resonator 655K (close to sound)
+    CPU:
+    main PCB:
+        1x 68000 (main)(missing)
+        1x LH0080B-Z80B-CPU (sound)
+        1x D7759C (sound)
+        1x YM2151 (sound)
+        1x YM3012 (sound)
+        1x UPC1241H (sound)
+        1x oscillator 20.000 (close to main)
+        1x oscillator 24.000MHz (close to sound)
+        1x blue resonator 655K (close to sound)
 
-	ROMs:
-	main PCB:
-		2x NMC27C512 (1,3)
-		2x NMC27C256 (2,12)
-		8x TMS27PC512 (4,5,6,7,8,9,10,11)
+    ROMs:
+    main PCB:
+        2x NMC27C512 (1,3)
+        2x NMC27C256 (2,12)
+        8x TMS27PC512 (4,5,6,7,8,9,10,11)
 
-	roms PCB:
-		29x Am27C512 (13-32,34-42)
-		1x NMC27C512 (33)
-		1x PROM N82S129N
-
-
-	RAMs:
-	main PCB:
-		1x GM76C28
-		2x GM76C88
-		2x HM6116K
-
-	roms PCB:
-		8x LC3517BS
-		2x 256K S BGD-A
+    roms PCB:
+        29x Am27C512 (13-32,34-42)
+        1x NMC27C512 (33)
+        1x PROM N82S129N
 
 
-	PLDs:
-	main PCB:
-		3x PAL16L8ACN (not dumped)
+    RAMs:
+    main PCB:
+        1x GM76C28
+        2x GM76C88
+        2x HM6116K
 
-	roms PCB:
-		1x PEEL18CV8P (not dumped)
+    roms PCB:
+        8x LC3517BS
+        2x 256K S BGD-A
 
-	Note
-	main PCB:
-		1x JAMMA edge connector
-		2x 50 pins flat cable connector to roms PCB
-		1x trimmer (volume)
-		2x 8x2 switches dip
 
-	roms PCB:
-		2x 50 pins flat cable connector to roms PCB
+    PLDs:
+    main PCB:
+        3x PAL16L8ACN (not dumped)
+
+    roms PCB:
+        1x PEEL18CV8P (not dumped)
+
+    Note
+    main PCB:
+        1x JAMMA edge connector
+        2x 50 pins flat cable connector to roms PCB
+        1x trimmer (volume)
+        2x 8x2 switches dip
+
+    roms PCB:
+        2x 50 pins flat cable connector to roms PCB
 */
 
 ROM_START( goldnaxeb1 )
@@ -2667,24 +2667,24 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD( "82s129.bin",     0x000, 0x100,  CRC(88962e80) SHA1(ebf3d57d53fcba727cf20e4bb26f12934f7d1bc7) )
 ROM_END
 
-/* 
-	Golden Axe (bootleg) made in Italy?
-	PCB: GENSYS-1/I
+/*
+    Golden Axe (bootleg) made in Italy?
+    PCB: GENSYS-1/I
 
-	CPUs
-		1x SCN68000CAN64-KGQ7551-8931KE (main - upper board)(IC40)
-		1x oscillator 20.000MHz (upper board - near main CPU)(XL2)
-		1x STZ8400BB1-Z80BCPU-28911 (sound - upper board)(IC44)
-		2x YAMAHA YM2203C (sound - upper board)IC27, IC28)
-		1x OKI M5205 (sound - upper board)(IC16)
-		2x YAMAHA Y3014B (DAC - sound - upper board)(IC19, IC20)
-		1x crystal resonator CSB398P (upper board - near sound CPUs)(XL1)
-		1x oscillator 24MHz (lower board near connectors to upper board)(XL1)
+    CPUs
+        1x SCN68000CAN64-KGQ7551-8931KE (main - upper board)(IC40)
+        1x oscillator 20.000MHz (upper board - near main CPU)(XL2)
+        1x STZ8400BB1-Z80BCPU-28911 (sound - upper board)(IC44)
+        2x YAMAHA YM2203C (sound - upper board)IC27, IC28)
+        1x OKI M5205 (sound - upper board)(IC16)
+        2x YAMAHA Y3014B (DAC - sound - upper board)(IC19, IC20)
+        1x crystal resonator CSB398P (upper board - near sound CPUs)(XL1)
+        1x oscillator 24MHz (lower board near connectors to upper board)(XL1)
 
-	ROMs
-		8x TMS27C512-20JL (from 1 to 8 - upper board) (CPU)
-		26x ST M27512FI (from 9 to 34 - upper board) (Sound + Tilemap)
-		6x ST M27512FI (from 35 to 40 - lower board) (Sprites)
+    ROMs
+        8x TMS27C512-20JL (from 1 to 8 - upper board) (CPU)
+        26x ST M27512FI (from 9 to 34 - upper board) (Sound + Tilemap)
+        6x ST M27512FI (from 35 to 40 - lower board) (Sprites)
 
 */
 
@@ -2892,11 +2892,11 @@ ROM_END
 
 
 
-/****************************** 
-	Tetris-based HW 
+/******************************
+    Tetris-based HW
 ******************************/
 
-/* 
+/*
 Program Roms contain
 
 Designed and Programmed by A.M.T. Research & Development Department 03/30/1991.
@@ -2958,8 +2958,8 @@ ROM_START( iqpipe )
 ROM_END
 
 
-/****************************** 
-	System 18 Bootlegs 
+/******************************
+    System 18 Bootlegs
 ******************************/
 
 ROM_START( astormbl )
@@ -3416,7 +3416,7 @@ static DRIVER_INIT( mwalkbl )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
 	UINT8 *RAM =  memory_region(machine, "soundcpu");
-	static const int mwalk_sound_info[]  = 
+	static const int mwalk_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
 		0x1f, 0x20000, // ROM #2 = 256K
@@ -3438,7 +3438,7 @@ static DRIVER_INIT( astormbl )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
 	UINT8 *RAM =  memory_region(machine, "soundcpu");
-	static const int astormbl_sound_info[]  = 
+	static const int astormbl_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
 		0x1f, 0x20000, // ROM #2 = 256K

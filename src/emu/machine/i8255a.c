@@ -588,7 +588,7 @@ static void set_mode(running_device *device, UINT8 data)
 	i8255a->inte[PORT_A] = 0;
 	i8255a->inte1 = 0;
 	i8255a->inte2 = 0;
-	
+
 	if (port_mode(i8255a, PORT_A) == MODE_OUTPUT)
 	{
 		devcb_call_write8(&i8255a->out_port_func[PORT_A], 0, i8255a->output[PORT_A]);
@@ -612,7 +612,7 @@ static void set_mode(running_device *device, UINT8 data)
 	i8255a->ibf[PORT_B] = 0;
 	i8255a->obf[PORT_B] = 1;
 	i8255a->inte[PORT_B] = 0;
-	
+
 	if (port_mode(i8255a, PORT_B) == MODE_OUTPUT)
 	{
 		devcb_call_write8(&i8255a->out_port_func[PORT_B], 0, i8255a->output[PORT_B]);

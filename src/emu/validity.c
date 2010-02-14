@@ -405,7 +405,7 @@ static int validate_driver(int drivnum, const machine_config *config, game_drive
 		mame_printf_error("%s: both compatible_with and clone_of are specified\n", driver->name);
 		error = TRUE;
 	}
-		
+
 	/* find any recursive dependencies on the current driver */
 	for (other_drv = driver_get_compatible(driver); other_drv != NULL; other_drv = driver_get_compatible(other_drv))
 	{
@@ -443,18 +443,18 @@ static int validate_roms(int drivnum, const machine_config *config, region_array
 	int error = FALSE;
 
 	/* check for duplicate ROM entries */
-/*	
-	if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0)
-	{
-		char romaddr[20];
-		sprintf(romaddr, "%p", driver->rom);
-		if (roms.add(romaddr, driver, FALSE) == TMERR_DUPLICATE)
-		{
-			const game_driver *match = roms.find(romaddr);
-			mame_printf_error("%s: %s uses the same ROM set as (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->name);
-			error = TRUE;
-		}
-	}
+/*
+    if (driver->rom != NULL && (driver->flags & GAME_NO_STANDALONE) == 0)
+    {
+        char romaddr[20];
+        sprintf(romaddr, "%p", driver->rom);
+        if (roms.add(romaddr, driver, FALSE) == TMERR_DUPLICATE)
+        {
+            const game_driver *match = roms.find(romaddr);
+            mame_printf_error("%s: %s uses the same ROM set as (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->name);
+            error = TRUE;
+        }
+    }
 */
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
 	for (const rom_source *source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))
@@ -1192,10 +1192,10 @@ static int validate_inputs(int drivnum, const machine_config *config, int_map &d
 					}
 				}
 		}
-		
+
 	error = error || validate_natural_keyboard_statics();
-	
-	/* free the config */	
+
+	/* free the config */
 	return error;
 }
 
@@ -1575,7 +1575,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		machine_config_free(config);
 	}
-	
+
 #if (REPORT_TIMES)
 	mame_printf_info("Prep:      %8dm\n", (int)(prep / 1000000));
 	mame_printf_info("Expansion: %8dm\n", (int)(expansion / 1000000));

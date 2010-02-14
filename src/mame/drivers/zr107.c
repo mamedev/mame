@@ -765,7 +765,7 @@ MACHINE_DRIVER_END
 
 static const k001604_interface jetwave_k001604_intf =
 {
-	0, 1, 	/* gfx index 1 & 2 */
+	0, 1,	/* gfx index 1 & 2 */
 	0, 1,		/* layer_size, roz_size */
 	0		/* slrasslt hack */
 };

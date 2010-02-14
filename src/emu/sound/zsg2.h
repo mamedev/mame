@@ -1,5 +1,5 @@
 /*
-	ZOOM ZSG-2 custom wavetable synthesizer
+    ZOOM ZSG-2 custom wavetable synthesizer
 */
 
 #pragma once

@@ -52,14 +52,14 @@
     For vector instructions, replace the first space on the right of the mnemonic
     with a 'v'.
 
-	01-Feb-2010 (Robbbert):
-	I've added the actual address, (as shown in the extreme left of the debugger
-	output), so that you can see much easier how the program will flow. Example:
+    01-Feb-2010 (Robbbert):
+    I've added the actual address, (as shown in the extreme left of the debugger
+    output), so that you can see much easier how the program will flow. Example:
 
-	+C  XXX(##/##)   XXX(##/##)
+    +C  XXX(##/##)   XXX(##/##)
 
-	The X value shows where the data word is located, and the Y value is the
-	address of the next instruction.
+    The X value shows where the data word is located, and the Y value is the
+    address of the next instruction.
 */
 enum _format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
 typedef enum _format_type format_type;

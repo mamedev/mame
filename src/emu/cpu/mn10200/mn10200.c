@@ -2,7 +2,7 @@
     Panasonic MN10200 emulator
 
     Written by Olivier Galibert
-    MAME conversion by R. Belmont	
+    MAME conversion by R. Belmont
 
 */
 
@@ -167,7 +167,7 @@ static void unemul(mn102_info *mn102)
 INLINE INT32 r24u(mn102_info *mn102, offs_t adr)
 {
 	return mn102_read_word(mn102, adr)|(mn102_read_byte(mn102, adr+2)<<16);
-}	    
+}
 
 INLINE void w24(mn102_info *mn102, offs_t adr, UINT32 val)
 {
@@ -330,7 +330,7 @@ INLINE void do_jsr(mn102_info *mn102, UINT32 to, UINT32 ret)
 
 void mn102_force_irq(mn102_info *mn102, int level, int group, int entry)
 {
-	if(!(mn102->psw & 0x800)) 
+	if(!(mn102->psw & 0x800))
 	{
 		if(group != 1 || entry != 3)
 			log_event("MN102", "Dropping irq %d %d %d, pc=%x, a3=%x", level, group, entry, mn102->pc, mn102->a[3]);
@@ -355,7 +355,7 @@ static CPU_EXECUTE(mn10200)
 
 	mn102->cycles = cycles;
 
-	while(mn102->cycles > 0) 
+	while(mn102->cycles > 0)
 	{
 		UINT8 opcode;
 
@@ -366,7 +366,7 @@ static CPU_EXECUTE(mn10200)
 		// mov dm, (an)
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			mn102->cycles -= 1;     
+			mn102->cycles -= 1;
 			mn102_write_word(mn102, mn102->a[(opcode>>2)&3], (UINT16)mn102->d[opcode & 3]);
 			mn102->pc += 1;
 			break;
@@ -374,7 +374,7 @@ static CPU_EXECUTE(mn10200)
 		// movb dm, (an)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			mn102->cycles -= 1;     
+			mn102->cycles -= 1;
 			mn102_write_byte(mn102, mn102->a[(opcode>>2)&3], (UINT8)mn102->d[opcode & 3]);
 			mn102->pc += 1;
 			break;
@@ -382,7 +382,7 @@ static CPU_EXECUTE(mn10200)
 		// mov (an), dm
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-			mn102->cycles -= 1;     
+			mn102->cycles -= 1;
 			mn102->d[opcode & 3] = (INT16)mn102_read_word(mn102, mn102->a[(opcode>>2)&3]);
 			mn102->pc += 1;
 			break;
@@ -390,7 +390,7 @@ static CPU_EXECUTE(mn10200)
 		// movbu (an), dm
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-			mn102->cycles -= 1;     
+			mn102->cycles -= 1;
 			mn102->d[opcode & 3] = mn102_read_byte(mn102, mn102->a[(opcode>>2)&3]);
 			mn102->pc += 1;
 			break;
@@ -440,7 +440,7 @@ static CPU_EXECUTE(mn10200)
 			mn102->cycles -= 1;
 			mn102->d[opcode & 3] = (INT8)mn102_read_byte(mn102, mn102->pc+1);
 			mn102->pc += 2;
-			break;    
+			break;
 
 		// add dn, dm
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
@@ -540,16 +540,16 @@ static CPU_EXECUTE(mn10200)
 			mn102->cycles -= 1;
 			mn102->a[opcode & 3] = mn102_read_word(mn102, mn102->pc+1);
 			mn102->pc += 3;
-			break;    
+			break;
 
 		// blt label8
 		case 0xe0:
-			if(((mn102->psw & 0x0a) == 2) || ((mn102->psw & 0x0a) == 8)) 
+			if(((mn102->psw & 0x0a) == 2) || ((mn102->psw & 0x0a) == 8))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -558,12 +558,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bgt label8
 		case 0xe1:
-			if(((mn102->psw & 0x0b) == 0) || ((mn102->psw & 0x0b) == 0xa)) 
+			if(((mn102->psw & 0x0b) == 0) || ((mn102->psw & 0x0b) == 0xa))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -572,12 +572,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bge label8
 		case 0xe2:
-			if(((mn102->psw & 0x0a) == 0) || ((mn102->psw & 0x0a) == 0xa)) 
+			if(((mn102->psw & 0x0a) == 0) || ((mn102->psw & 0x0a) == 0xa))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -586,12 +586,12 @@ static CPU_EXECUTE(mn10200)
 
 		// ble label8
 		case 0xe3:
-			if((mn102->psw & 0x01) || ((mn102->psw & 0x0a) == 2) || ((mn102->psw & 0x0a) == 8)) 
+			if((mn102->psw & 0x01) || ((mn102->psw & 0x0a) == 2) || ((mn102->psw & 0x0a) == 8))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 			mn102->cycles -= 1;
 			mn102->pc += 2;
@@ -600,12 +600,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bcs label8
 		case 0xe4:
-			if(mn102->psw & 0x04) 
+			if(mn102->psw & 0x04)
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -614,12 +614,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bhi label8
 		case 0xe5:
-			if(!(mn102->psw & 0x05)) 
+			if(!(mn102->psw & 0x05))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -628,12 +628,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bcc label8
 		case 0xe6:
-			if(!(mn102->psw & 0x04)) 
+			if(!(mn102->psw & 0x04))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -642,12 +642,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bls label8
 		case 0xe7:
-			if(mn102->psw & 0x05) 
+			if(mn102->psw & 0x05)
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -656,12 +656,12 @@ static CPU_EXECUTE(mn10200)
 
 		// beq label8
 		case 0xe8:
-			if(mn102->psw & 0x01) 
+			if(mn102->psw & 0x01)
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -670,12 +670,12 @@ static CPU_EXECUTE(mn10200)
 
 		// bne label8
 		case 0xe9:
-			if(!(mn102->psw & 0x01)) 
+			if(!(mn102->psw & 0x01))
 			{
 				mn102->cycles -= 2;
 				mn102_change_pc(mn102, mn102->pc+2+(INT8)mn102_read_byte(mn102, mn102->pc+1));
-			} 
-			else 
+			}
+			else
 			{
 				mn102->cycles -= 1;
 				mn102->pc += 2;
@@ -1733,7 +1733,7 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x056: {
 //    const char *modes[4] = { "l", "h", "fall", "rise" };
 //    log_event("MN102", "irq3=%s irq2=%s irq1=%s irq0=%s",
-//	      modes[(data >> 6) & 3], modes[(data >> 4) & 3], modes[(data >> 2) & 3], modes[data & 3]);
+//        modes[(data >> 6) & 3], modes[(data >> 4) & 3], modes[(data >> 2) & 3], modes[data & 3]);
     break;
   }
 
@@ -1754,9 +1754,9 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     mn102->serial[ser].ctrll = data;
 
 //    log_event("MN102", "Serial %d length=%c, parity=%s, stop=%c, source=%s",
-//	      ser,
-//	      data & 0x80 ? '8' : '7', parity[(data >> 4) & 7],
-//	      data & 8 ? '2' : '1', source[data & 3]);
+//        ser,
+//        data & 0x80 ? '8' : '7', parity[(data >> 4) & 7],
+//        data & 8 ? '2' : '1', source[data & 3]);
     break;
   }
 
@@ -1764,10 +1764,10 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     int ser = (adr-0x180) >> 4;
     mn102->serial[ser].ctrlh = data;
 //    log_event("MN102", "Serial %d transmit=%s, recieve=%s, break=%s, proto=%s, order=%s",
-//	      ser,
-//	      data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off", 
-//	      data & 0x20 ? "on" : "off", data & 8 ? "sync" : "async",
-//	      data & 2 ? "msb" : "lsb");
+//        ser,
+//        data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off",
+//        data & 0x20 ? "on" : "off", data & 8 ? "sync" : "async",
+//        data & 2 ? "msb" : "lsb");
     break;
   }
 
@@ -1777,7 +1777,7 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     log_event("MN102", "Serial %d buffer=%02x", ser, data);
     break;
   }
-   
+
   case 0x1a0:
     log_event("MN102", "AN %s timer7=%s /%d %s %s",
 	      data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off",
@@ -1822,19 +1822,19 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 //    const char *modes[4] = { "single", "double", "ioa", "iob" };
 //    const char *sources[8] = { "pres.0", "pres.1", "iob", "sysclk", "*4", "*1", "6", "7" };
 //    log_event("MN102", "Timer %d comp=%s on_1=%s on_match=%s phase=%s source=%s",
-//	      10 + ((adr-0x230) >> 4),
-//	      modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared", 
-//	      data & 8 ? "tff" : "rsff", sources[data & 7]);
+//        10 + ((adr-0x230) >> 4),
+//        modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared",
+//        data & 8 ? "tff" : "rsff", sources[data & 7]);
     break;
   }
 
   case 0x231: case 0x241: case 0x251: {
 //    const char *modes[4] = { "up", "down", "up on ioa", "up on iob" };
 //    log_event("MN102", "Timer %d %s ff=%s op=%s ext_trig=%s %s",
-//	      10 + ((adr-0x230) >> 4),
-//	      data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
-//	      modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
-	      
+//        10 + ((adr-0x230) >> 4),
+//        data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
+//        modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
+
     break;
   }
 
@@ -1869,9 +1869,9 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x260: case 0x261: {
 //    const char *mode[4] = { "sysbuf", "4-phase", "4-phase 1/2", "3" };
 //    log_event("MN102", "Sync Output %c timing=%s out=%s dir=%s mode=%s",
-//	      adr == 0x261 ? 'B' : 'A',
-//	      data & 0x10 ? "12A" : "1", data & 8 ? "sync a" :"P13-10",
-//	      data & 4 ? "ccw" : "cw", mode[data & 3]);
+//        adr == 0x261 ? 'B' : 'A',
+//        data & 0x10 ? "12A" : "1", data & 8 ? "sync a" :"P13-10",
+//        data & 4 ? "ccw" : "cw", mode[data & 3]);
     break;
   }
 
@@ -1949,7 +1949,7 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 /*    static const char *trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
     static const char *start[32] = {
       "soft", "a/d", "ser0tx", "set0rx", "ser1tx", "ser1rx",
-      "timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6", "timer7", "timer8", "timer9", 
+      "timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6", "timer7", "timer8", "timer9",
       "timer10u", "timer10a", "timer10b",
       "timer11u", "timer11a", "timer12b",
       "timer12a", "timer12b",
@@ -1966,20 +1966,20 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 	      start[data & 31]);
     break;
   }
-    
+
   case 0x28b: case 0x29b: case 0x2ab: case 0x2bb: case 0x2cb: case 0x2db: case 0x2eb: case 0x2fb: {
 //    static const char *tradr[4] = { "inc", "dec", "fixed", "reserved" };
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].ctrlh = data;
 /*    log_event("MN102", "DMA %d control %s irq=%s %s %s dir=%s %s %s",
-	      dma,
-	      data & 0x80 ? "enable" : "disable",
-	      data & 0x40 ? "off" : "on",
-	      data & 0x20 ? "byte" : "word",
-	      data & 0x10 ? "burst" : "single",
-	      data & 0x08 ? "dst" : "src",
-	      data & 0x04 ? "continue" : "normal",
-	      tradr[data & 3]);*/
+          dma,
+          data & 0x80 ? "enable" : "disable",
+          data & 0x40 ? "off" : "on",
+          data & 0x20 ? "byte" : "word",
+          data & 0x10 ? "burst" : "single",
+          data & 0x08 ? "dst" : "src",
+          data & 0x04 ? "continue" : "normal",
+          tradr[data & 3]);*/
     break;
   }
 
@@ -2049,28 +2049,28 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 		mn102->ddr[0] = data;
 		break;
 
-	case 0x3e1:	// port1 ddr                                          
+	case 0x3e1:	// port1 ddr
 		mn102->ddr[1] = data;
 		break;
 
-	case 0x3e2:	// port2 ddr                                          
+	case 0x3e2:	// port2 ddr
 		mn102->ddr[2] = data;
 		break;
 
-	case 0x3e3:	// port3 ddr                                          
+	case 0x3e3:	// port3 ddr
 		mn102->ddr[3] = data;
 		break;
 
   case 0x3f3:
 /*    log_event("MN102", "Port 3 bits 4=%s 3=%s 2=%s 1=%s 0=%s",
-	      data & 0x10 ? data & 0x40 ? "serial_1" : "tm9" : "p34",
-	      data & 0x08 ? data & 0x20 ? "serial_0" : "tm8" : "p33",
-	      data & 0x04 ? "tm7" : "p32",
-	      data & 0x04 ? "tm6" : "p31",
-	      data & 0x04 ? "tm5" : "p30");*/
+          data & 0x10 ? data & 0x40 ? "serial_1" : "tm9" : "p34",
+          data & 0x08 ? data & 0x20 ? "serial_0" : "tm8" : "p33",
+          data & 0x04 ? "tm7" : "p32",
+          data & 0x04 ? "tm6" : "p31",
+          data & 0x04 ? "tm5" : "p30");*/
     break;
-    
-    
+
+
   default:
     log_event("MN102", "internal_w %04x, %02x (%03x)", adr+0xfc00, data, adr);
     break;
@@ -2124,16 +2124,16 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
     break;
 
 	case 0x264:	// port 1 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT1); 
+		return memory_read_byte_8le(mn102->io, MN10200_PORT1);
 
 	case 0x3c0:	// port 0 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT0); 
+		return memory_read_byte_8le(mn102->io, MN10200_PORT0);
 
 	case 0x3c2:	// port 2 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT2); 
+		return memory_read_byte_8le(mn102->io, MN10200_PORT2);
 
 	case 0x3c3:	// port 3 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT3); 
+		return memory_read_byte_8le(mn102->io, MN10200_PORT3);
 
   default:
     log_event("MN102", "internal_r %04x (%03x)", adr+0xfc00, adr);
@@ -2196,7 +2196,7 @@ CPU_GET_INFO( mn10200 )
 
 		case CPUINFO_INT_PC:    /* intentional fallthrough */
 		case CPUINFO_INT_REGISTER + MN10200_PC:    info->i = cpustate->pc;                      break;
-		case CPUINFO_INT_REGISTER + MN10200_PSW:   info->i = cpustate->psw;    			break;
+		case CPUINFO_INT_REGISTER + MN10200_PSW:   info->i = cpustate->psw; 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(mn10200);        break;
@@ -2216,7 +2216,7 @@ CPU_GET_INFO( mn10200 )
 		case DEVINFO_STR_CREDITS:                  strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
 		case CPUINFO_STR_FLAGS:                    // intentional fallthrough
-		case CPUINFO_STR_REGISTER + MN10200_PSW:   sprintf(info->s, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c", 
+		case CPUINFO_STR_REGISTER + MN10200_PSW:   sprintf(info->s, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
 									(cpustate->psw >> 12) & 3,
 									cpustate->psw & 0x0800 ? "on" : "off",
 									(cpustate->psw >> 8) & 7,

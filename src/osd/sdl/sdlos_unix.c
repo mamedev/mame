@@ -246,7 +246,7 @@ osd_directory_entry *osd_stat(const char *path)
 	struct stat64 st;
 	#endif
 
-	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) 
+	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD)
 	err = stat(path, &st);
 	#else
 	err = stat64(path, &st);
