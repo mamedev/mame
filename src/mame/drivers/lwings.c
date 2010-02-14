@@ -335,12 +335,12 @@ static ADDRESS_MAP_START( trojan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(trojan_bg2_scrollx_w)
 	AM_RANGE(0xf805, 0xf805) AM_WRITE(trojan_bg2_image_w)
-	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE") AM_WRITENOP //watchdog
 	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -367,7 +367,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_adpcm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("5205", msm5205_w)
 ADDRESS_MAP_END
 
