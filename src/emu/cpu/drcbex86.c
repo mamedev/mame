@@ -1553,7 +1553,7 @@ static void emit_or_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const 
 		if (inst->flags == 0 && (UINT32)param->value == 0)
 			/* skip */;
 		else if (inst->flags == 0 && (UINT32)param->value == 0xffffffff)
-			emit_mov_r32_imm(dst, reg, -1);												// mov  reg,-1
+			emit_mov_r32_imm(dst, reg, ~0);												// mov  reg,-1
 		else
 			emit_or_r32_imm(dst, reg, param->value);									// or   reg,param
 	}
@@ -1576,7 +1576,7 @@ static void emit_or_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS
 		if (inst->flags == 0 && (UINT32)param->value == 0)
 			/* skip */;
 		else if (inst->flags == 0 && (UINT32)param->value == 0xffffffff)
-			emit_mov_m32_imm(dst, MEMPARAMS, -1);										// mov   [dest],-1
+			emit_mov_m32_imm(dst, MEMPARAMS, ~0);										// mov   [dest],-1
 		else
 			emit_or_m32_imm(dst, MEMPARAMS, param->value);								// or   [dest],param
 	}
@@ -2501,14 +2501,14 @@ static void emit_or_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UINT
 		if (inst->flags == 0 && (UINT32)param->value == 0)
 			/* skip */;
 		else if (inst->flags == 0 && (UINT32)param->value == 0xffffffff)
-			emit_mov_r32_imm(dst, reglo, -1);											// mov   reglo,-1
+			emit_mov_r32_imm(dst, reglo, ~0);											// mov   reglo,-1
 		else
 			emit_or_r32_imm(dst, reglo, param->value);									// or    reglo,param
 		if (saveflags) emit_pushf(dst);													// pushf
 		if (inst->flags == 0 && (UINT32)(param->value >> 32) == 0)
 			/* skip */;
 		else if (inst->flags == 0 && (UINT32)(param->value >> 32) == 0xffffffff)
-			emit_mov_r32_imm(dst, reghi, -1);											// mov   reghi,-1
+			emit_mov_r32_imm(dst, reghi, ~0);											// mov   reghi,-1
 		else
 			emit_or_r32_imm(dst, reghi, param->value >> 32);							// or    reghi,param >> 32
 	}
@@ -2536,14 +2536,14 @@ static void emit_or_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS
 		if (inst->flags == 0 && (UINT32)param->value == 0)
 			/* skip */;
 		else if (inst->flags == 0 && (UINT32)param->value == 0xffffffff)
-			emit_mov_m32_imm(dst, MEMPARAMS, -1);										// mov   [dest],-1
+			emit_mov_m32_imm(dst, MEMPARAMS, ~0);										// mov   [dest],-1
 		else
 			emit_or_m32_imm(dst, MEMPARAMS, param->value);								// or    [dest],param
 		if (saveflags) emit_pushf(dst);													// pushf
 		if (inst->flags == 0 && (UINT32)(param->value >> 32) == 0)
 			/* skip */;
 		else if (inst->flags == 0 && (UINT32)(param->value >> 32) == 0xffffffff)
-			emit_mov_m32_imm(dst, MEMPARAMS + 4, -1);									// mov   [dest+4],-1
+			emit_mov_m32_imm(dst, MEMPARAMS + 4, ~0);									// mov   [dest+4],-1
 		else
 			emit_or_m32_imm(dst, MEMPARAMS + 4, param->value >> 32);					// or    [dest+4],param >> 32
 	}

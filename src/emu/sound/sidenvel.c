@@ -543,18 +543,15 @@ INLINE UINT16 enveEmuShortAttack(sidOperator* pVoice)
 #endif
 /*      return enveEmuStartRelease(pVoice); */
 		return enveEmuStartDecay(pVoice);
-	else
-	{
 #if defined(DIRECT_FIXPOINT) && !defined(SID_FPUENVE)
-		pVoice->enveVol = pVoice->enveStep.w[HI];
+	pVoice->enveVol = pVoice->enveStep.w[HI];
 #else
-		pVoice->enveVol = pVoice->enveStep;
+	pVoice->enveVol = pVoice->enveStep;
 #endif
-	    pVoice->enveShortAttackCount--;
-/*      cout << hex << pVoice->enveShortAttackCount << " / " << pVoice->enveVol << endl; */
-		enveEmuEnveAdvance(pVoice);
-		return masterAmplModTable[ pVoice->sid->masterVolumeAmplIndex + pVoice->enveVol ];
-	}
+    pVoice->enveShortAttackCount--;
+/*  cout << hex << pVoice->enveShortAttackCount << " / " << pVoice->enveVol << endl; */
+	enveEmuEnveAdvance(pVoice);
+	return masterAmplModTable[ pVoice->sid->masterVolumeAmplIndex + pVoice->enveVol ];
 }
 
 INLINE UINT16 enveEmuAlterShortAttack(sidOperator* pVoice)
