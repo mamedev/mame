@@ -1606,6 +1606,61 @@ INPUT_PORTS_START( ssf2ghw )
 //  PORT_DIPSETTING(    0x00, "10 (Fastest)" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(mk3ghw)
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_BIT( 0xf8, 0x00, IPT_UNUSED )
+	
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN( 0x01, 0x00 )
+	PORT_DIPUNKNOWN( 0x02, 0x00 )
+	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPUNKNOWN( 0x08, 0x00 )
+	PORT_DIPUNKNOWN( 0x10, 0x00 )
+	PORT_DIPUNKNOWN( 0x20, 0x00 )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
+INPUT_PORTS_END
+
 
 INPUT_PORTS_START( aladbl )
 	PORT_INCLUDE( md_common )
@@ -1653,6 +1708,9 @@ static void megadrive_init_io(running_machine *machine)
 		init_megadri6_io(machine);
 
 	if (ipt == INPUT_PORTS_NAME(ssf2ghw))
+		init_megadri6_io(machine);
+
+	if (ipt == INPUT_PORTS_NAME(mk3ghw))
 		init_megadri6_io(machine);
 }
 
@@ -6302,7 +6360,7 @@ static void megadriv_init_common(running_machine *machine)
 
 	m68k_set_tas_callback(devtag_get_device(machine, "maincpu"), megadriv_tas_callback);
 
-	if ((ipt == INPUT_PORTS_NAME(megadri6)) || (ipt == INPUT_PORTS_NAME(ssf2ghw)))
+	if ((ipt == INPUT_PORTS_NAME(megadri6)) || (ipt == INPUT_PORTS_NAME(ssf2ghw)) || (ipt == INPUT_PORTS_NAME(mk3ghw)))
 	{
 		megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_6button;
 		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_6button;
