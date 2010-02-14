@@ -45,7 +45,7 @@
 #include <mmsystem.h>
 
 // MAME headers
-#include "osdepend.h"
+#include "osdcore.h"
 
 
 
