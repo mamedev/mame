@@ -68,7 +68,7 @@ static void init_clamp(void)
 	}
 }
 
-INLINE int CLSH(int x)	{	return (const int) clamp[(x >> 8) + 128] ; }
+INLINE int clamp(int x)	{	return (const int) clamp[(x >> 8) + 128] ; }
 
 INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 {
@@ -78,7 +78,7 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 	r = (const int) coff_cr[cr][0]; //             409 * cr - 56992;
 	g = (const int) coff_cb[cb][0] + (const int) coff_cr[cr][1]; //- 100 * cb - 208 * cr + 34784;
 	b = (const int) coff_cb[cb][1]; //+ 516 * cb - 70688;
-	return 0xff000000 | (CLSH(r + common)<<16) | (CLSH(g + common)<<8) | (CLSH(b + common));
+	return 0xff000000 | (clamp(r + common)<<16) | (clamp(g + common)<<8) | (clamp(b + common));
 }
 
 #endif
@@ -212,8 +212,8 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			int y2 = (const int) lookup[(srcpix1 >> 8)];
 
 
-			*dst++ = 0xff000000 | (CLSH(r + y1)<<16) | (CLSH(g + y1)<<8) | (CLSH(b + y1));
-			*dst++ = 0xff000000 | (CLSH(r + y2)<<16) | (CLSH(g + y2)<<8) | (CLSH(b + y2));
+			*dst++ = 0xff000000 | (clamp(r + y1)<<16) | (clamp(g + y1)<<8) | (clamp(b + y1));
+			*dst++ = 0xff000000 | (clamp(r + y2)<<16) | (clamp(g + y2)<<8) | (clamp(b + y2));
 #endif
 		}
 
@@ -224,7 +224,6 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 		#endif
 	}
 }
-#undef CLSH
 
 #endif
 
