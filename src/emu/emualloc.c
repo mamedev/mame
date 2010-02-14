@@ -41,9 +41,9 @@
 #include "coreutil.h"
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 // align all allocated memory to this size
 const int memory_align = 16;
@@ -53,39 +53,39 @@ const int memory_block_alloc_chunk = 256;
 
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
 // enable deletion
 #undef delete
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 // this struct is allocated in pools to track memory allocations
 // it must be a POD type!!
 class memory_entry
 {
 public:
-	memory_entry *		next;			// link to the next entry
-	memory_entry *		prev;			// link to the previous entry
-	size_t				size;			// size of the allocation (not including this header)
-	void *				base;			// base of the allocation
-	const char *		file;			// file the allocation was made from
-	int					line;			// line number within that file
-	int					id;				// unique id
+	memory_entry *		m_next;				// link to the next entry
+	memory_entry *		m_prev;				// link to the previous entry
+	size_t				m_size;				// size of the allocation (not including this header)
+	void *				m_base;				// base of the allocation
+	const char *		m_file;				// file the allocation was made from
+	int					m_line;				// line number within that file
+	int					m_id;				// unique id
 
-	static const int	hash_prime = 193;
+	static const int	k_hash_prime = 193;
 
-	static int			curid;			// current ID
-	static osd_lock *	lock;			// lock for managing the list
-	static bool			lock_alloc;		// set to true temporarily during lock allocation
-	static memory_entry *hash[hash_prime];// hash table based on pointer
-	static memory_entry *freehead;		// pointer to the head of the free list
+	static int			s_curid;			// current ID
+	static osd_lock *	s_lock;				// lock for managing the list
+	static bool			s_lock_alloc;		// set to true temporarily during lock allocation
+	static memory_entry *s_hash[k_hash_prime];// hash table based on pointer
+	static memory_entry *s_freehead;		// pointer to the head of the free list
 
 	static memory_entry *allocate(size_t size, void *base, const char *file, int line);
 	static memory_entry *find(void *ptr);
@@ -99,9 +99,9 @@ private:
 
 
 
-/***************************************************************************
-    GLOBALS
-***************************************************************************/
+//**************************************************************************
+//  GLOBALS
+//**************************************************************************
 
 // global resource pool to handle allocations outside of the emulator context
 resource_pool global_resource_pool;
@@ -110,17 +110,17 @@ resource_pool global_resource_pool;
 const zeromem_t zeromem = { };
 
 // globals for memory_entry
-int memory_entry::curid = 0;
-osd_lock *memory_entry::lock = NULL;
-bool memory_entry::lock_alloc = false;
-memory_entry *memory_entry::hash[memory_entry::hash_prime] = { NULL };
-memory_entry *memory_entry::freehead = NULL;
+int memory_entry::s_curid = 0;
+osd_lock *memory_entry::s_lock = NULL;
+bool memory_entry::s_lock_alloc = false;
+memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
+memory_entry *memory_entry::s_freehead = NULL;
 
 
 
-/***************************************************************************
-    GLOBAL HELPERS
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL HELPERS
+//**************************************************************************
 
 /*-------------------------------------------------
     malloc_file_line - allocate memory with file
@@ -189,9 +189,9 @@ void dump_unfreed_mem(void)
 
 
 
-/***************************************************************************
-    RESOURCE POOL
-***************************************************************************/
+//**************************************************************************
+//  RESOURCE POOL
+//**************************************************************************
 
 /*-------------------------------------------------
     resource_pool - constructor for a new resource
@@ -199,10 +199,10 @@ void dump_unfreed_mem(void)
 -------------------------------------------------*/
 
 resource_pool::resource_pool()
-	: listlock(osd_lock_alloc()),
-	  ordered_head(NULL)
+	: m_listlock(osd_lock_alloc()),
+	  m_ordered_head(NULL)
 {
-	memset(hash, 0, sizeof(hash));
+	memset(m_hash, 0, sizeof(m_hash));
 }
 
 
@@ -215,8 +215,8 @@ resource_pool::resource_pool()
 resource_pool::~resource_pool()
 {
 	clear();
-	if (listlock != NULL)
-		osd_lock_free(listlock);
+	if (m_listlock != NULL)
+		osd_lock_free(m_listlock);
 }
 
 
@@ -226,20 +226,20 @@ resource_pool::~resource_pool()
 
 void resource_pool::add(resource_pool_item &item)
 {
-	osd_lock_acquire(listlock);
+	osd_lock_acquire(m_listlock);
 
 	// insert into hash table
-	int hashval = reinterpret_cast<FPTR>(item.ptr) % hash_prime;
-	item.next = hash[hashval];
-	hash[hashval] = &item;
+	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % k_hash_prime;
+	item.m_next = m_hash[hashval];
+	m_hash[hashval] = &item;
 
 	// insert into ordered list
-	item.ordered_next = ordered_head;
-	if (ordered_head != NULL)
-		ordered_head->ordered_prev = &item;
-	ordered_head = &item;
+	item.m_ordered_next = m_ordered_head;
+	if (m_ordered_head != NULL)
+		m_ordered_head->m_ordered_prev = &item;
+	m_ordered_head = &item;
 
-	osd_lock_release(listlock);
+	osd_lock_release(m_listlock);
 }
 
 
@@ -255,32 +255,32 @@ void resource_pool::remove(void *ptr)
 		return;
 
 	// search for the item
-	osd_lock_acquire(listlock);
+	osd_lock_acquire(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % hash_prime;
-	for (resource_pool_item **scanptr = &hash[hashval]; *scanptr != NULL; scanptr = &(*scanptr)->next)
+	int hashval = reinterpret_cast<FPTR>(ptr) % k_hash_prime;
+	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != NULL; scanptr = &(*scanptr)->m_next)
 
 		// must match the pointer
-		if ((*scanptr)->ptr == ptr)
+		if ((*scanptr)->m_ptr == ptr)
 		{
 			// remove from hash table
 			resource_pool_item *deleteme = *scanptr;
-			*scanptr = deleteme->next;
+			*scanptr = deleteme->m_next;
 
 			// remove from ordered list
-			if (deleteme->ordered_prev != NULL)
-				deleteme->ordered_prev->ordered_next = deleteme->ordered_next;
+			if (deleteme->m_ordered_prev != NULL)
+				deleteme->m_ordered_prev->m_ordered_next = deleteme->m_ordered_next;
 			else
-				ordered_head = deleteme->ordered_next;
-			if (deleteme->ordered_next != NULL)
-				deleteme->ordered_next->ordered_prev = deleteme->ordered_prev;
+				m_ordered_head = deleteme->m_ordered_next;
+			if (deleteme->m_ordered_next != NULL)
+				deleteme->m_ordered_next->m_ordered_prev = deleteme->m_ordered_prev;
 
 			// delete the object and break
 			delete deleteme;
 			break;
 		}
 
-	osd_lock_release(listlock);
+	osd_lock_release(m_listlock);
 }
 
 
@@ -292,15 +292,15 @@ void resource_pool::remove(void *ptr)
 resource_pool_item *resource_pool::find(void *ptr)
 {
 	// search for the item
-	osd_lock_acquire(listlock);
+	osd_lock_acquire(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % hash_prime;
+	int hashval = reinterpret_cast<FPTR>(ptr) % k_hash_prime;
 	resource_pool_item *item;
-	for (item = hash[hashval]; item != NULL; item = item->next)
-		if (item->ptr == ptr)
+	for (item = m_hash[hashval]; item != NULL; item = item->m_next)
+		if (item->m_ptr == ptr)
 			break;
 
-	osd_lock_release(listlock);
+	osd_lock_release(m_listlock);
 
 	return item;
 }
@@ -317,19 +317,19 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 	UINT8 *ptrend = reinterpret_cast<UINT8 *>(_ptrend);
 
 	// search for the item
-	osd_lock_acquire(listlock);
+	osd_lock_acquire(m_listlock);
 
 	resource_pool_item *item = NULL;
-	for (item = ordered_head; item != NULL; item = item->ordered_next)
+	for (item = m_ordered_head; item != NULL; item = item->m_ordered_next)
 	{
-		UINT8 *objstart = reinterpret_cast<UINT8 *>(item->ptr);
-		UINT8 *objend = objstart + item->size;
+		UINT8 *objstart = reinterpret_cast<UINT8 *>(item->m_ptr);
+		UINT8 *objend = objstart + item->m_size;
 		if (ptrstart >= objstart && ptrend <= objend)
 			goto found;
 	}
 
 found:
-	osd_lock_release(listlock);
+	osd_lock_release(m_listlock);
 
 	return (item != NULL);
 }
@@ -341,20 +341,20 @@ found:
 
 void resource_pool::clear()
 {
-	osd_lock_acquire(listlock);
+	osd_lock_acquire(m_listlock);
 
 	// important: delete in reverse order of adding
-	while (ordered_head != NULL)
-		remove(ordered_head->ptr);
+	while (m_ordered_head != NULL)
+		remove(m_ordered_head->m_ptr);
 
-	osd_lock_release(listlock);
+	osd_lock_release(m_listlock);
 }
 
 
 
-/***************************************************************************
-    MEMORY ENTRY
-***************************************************************************/
+//**************************************************************************
+//  MEMORY ENTRY
+//**************************************************************************
 
 /*-------------------------------------------------
     acquire_lock - acquire the memory entry lock,
@@ -365,15 +365,15 @@ void memory_entry::acquire_lock()
 {
 	// allocate a lock on first usage
 	// note that osd_lock_alloc() may re-enter this path, so protect against recursion!
-	if (lock == NULL)
+	if (s_lock == NULL)
 	{
-		if (lock_alloc)
+		if (s_lock_alloc)
 			return;
-		lock_alloc = true;
-		lock = osd_lock_alloc();
-		lock_alloc = false;
+		s_lock_alloc = true;
+		s_lock = osd_lock_alloc();
+		s_lock_alloc = false;
 	}
-	osd_lock_acquire(lock);
+	osd_lock_acquire(s_lock);
 }
 
 
@@ -383,7 +383,7 @@ void memory_entry::acquire_lock()
 
 void memory_entry::release_lock()
 {
-	osd_lock_release(lock);
+	osd_lock_release(s_lock);
 }
 
 
@@ -396,7 +396,7 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	acquire_lock();
 
 	// if we're out of free entries, allocate a new chunk
-	if (freehead == NULL)
+	if (s_freehead == NULL)
 	{
 		// create a new chunk, and fail if we can't
 		memory_entry *entry = reinterpret_cast<memory_entry *>(osd_malloc(memory_block_alloc_chunk * sizeof(memory_entry)));
@@ -409,29 +409,29 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 		// add all the entries to the list
 		for (int entrynum = 0; entrynum < memory_block_alloc_chunk; entrynum++)
 		{
-			entry->next = freehead;
-			freehead = entry++;
+			entry->m_next = s_freehead;
+			s_freehead = entry++;
 		}
 	}
 
 	// grab a free entry
-	memory_entry *entry = freehead;
-	freehead = entry->next;
+	memory_entry *entry = s_freehead;
+	s_freehead = entry->m_next;
 
 	// populate it
-	entry->size = size;
-	entry->base = base;
-	entry->file = file;
-	entry->line = line;
-	entry->id = curid++;
+	entry->m_size = size;
+	entry->m_base = base;
+	entry->m_file = file;
+	entry->m_line = line;
+	entry->m_id = s_curid++;
 
 	// add it to the alloc list
-	int hashval = reinterpret_cast<FPTR>(base) % hash_prime;
-	entry->next = hash[hashval];
-	if (entry->next != NULL)
-		entry->next->prev = entry;
-	entry->prev = NULL;
-	hash[hashval] = entry;
+	int hashval = reinterpret_cast<FPTR>(base) % k_hash_prime;
+	entry->m_next = s_hash[hashval];
+	if (entry->m_next != NULL)
+		entry->m_next->m_prev = entry;
+	entry->m_prev = NULL;
+	s_hash[hashval] = entry;
 
 	release_lock();
 	return entry;
@@ -451,10 +451,10 @@ memory_entry *memory_entry::find(void *ptr)
 	// scan the list under the lock
 	acquire_lock();
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % hash_prime;
+	int hashval = reinterpret_cast<FPTR>(ptr) % k_hash_prime;
 	memory_entry *entry;
-	for (entry = hash[hashval]; entry != NULL; entry = entry->next)
-		if (entry->base == ptr)
+	for (entry = s_hash[hashval]; entry != NULL; entry = entry->m_next)
+		if (entry->m_base == ptr)
 			break;
 
 	release_lock();
@@ -471,17 +471,17 @@ void memory_entry::release(memory_entry *entry)
 	acquire_lock();
 
 	// remove ourselves from the alloc list
-	int hashval = reinterpret_cast<FPTR>(entry->base) % hash_prime;
-	if (entry->prev != NULL)
-		entry->prev->next = entry->next;
+	int hashval = reinterpret_cast<FPTR>(entry->m_base) % k_hash_prime;
+	if (entry->m_prev != NULL)
+		entry->m_prev->m_next = entry->m_next;
 	else
-		hash[hashval] = entry->next;
-	if (entry->next != NULL)
-		entry->next->prev = entry->prev;
+		s_hash[hashval] = entry->m_next;
+	if (entry->m_next != NULL)
+		entry->m_next->m_prev = entry->m_prev;
 
 	// add ourself to the free list
-	entry->next = freehead;
-	freehead = entry;
+	entry->m_next = s_freehead;
+	s_freehead = entry;
 
 	release_lock();
 }
@@ -499,131 +499,18 @@ void memory_entry::report_unfreed()
 	// check for leaked memory
 	UINT32 total = 0;
 
-	for (int hashnum = 0; hashnum < hash_prime; hashnum++)
-		for (memory_entry *entry = hash[hashnum]; entry != NULL; entry = entry->next)
-			if (entry->file != NULL)
+	for (int hashnum = 0; hashnum < k_hash_prime; hashnum++)
+		for (memory_entry *entry = s_hash[hashnum]; entry != NULL; entry = entry->m_next)
+			if (entry->m_file != NULL)
 			{
 				if (total == 0)
 					fprintf(stderr, "--- memory leak warning ---\n");
-				total += entry->size;
-				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", entry->id, static_cast<UINT32>(entry->size), entry->file, (int)entry->line);
+				total += entry->m_size;
+				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
 			}
 
 	release_lock();
 
 	if (total > 0)
 		fprintf(stderr, "a total of %d bytes were not free()'d\n", total);
-}
-
-
-
-/***************************************************************************
-    STANDARD NEW/DELETE OPERATORS
-***************************************************************************/
-
-void *operator new(std::size_t size) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, NULL, 0);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-
-void *operator new[](std::size_t size) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, NULL, 0);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-
-void operator delete(void *ptr)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, NULL, 0);
-}
-
-
-void operator delete[](void *ptr)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, NULL, 0);
-}
-
-
-
-/***************************************************************************
-    POOL NEW/DELETE OPERATORS
-***************************************************************************/
-
-void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-
-void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-
-void operator delete(void *ptr, const char *file, int line)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-
-void operator delete[](void *ptr, const char *file, int line)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-
-
-/***************************************************************************
-    POOL NEW/DELETE OPERATORS WITH ZEROING
-***************************************************************************/
-
-void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	memset(result, 0, size);
-	return result;
-}
-
-
-void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	memset(result, 0, size);
-	return result;
-}
-
-
-void operator delete(void *ptr, const char *file, int line, const zeromem_t &)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-
-void operator delete[](void *ptr, const char *file, int line, const zeromem_t &)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
 }
