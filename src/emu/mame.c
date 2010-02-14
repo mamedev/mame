@@ -1406,6 +1406,9 @@ static void init_machine(running_machine *machine)
 	/* allocate the gfx elements prior to device initialization */
 	gfx_init(machine);
 
+	/* initialize natural keyboard support */
+	inputx_init(machine);
+
 #ifdef MESS
 	/* first MESS initialization */
 	mess_predevice_init(machine);
