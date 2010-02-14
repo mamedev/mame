@@ -1156,7 +1156,7 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 const char *input_port_string_from_token(const input_port_token token);
 
 /* return TRUE if machine use full keyboard emulation */
-int input_machine_have_keyboard(running_machine *machine);
+int input_machine_has_keyboard(running_machine *machine);
 
 /* these are called by the core; they should not be called from FEs */
 void inputx_init(running_machine *machine);

@@ -931,7 +931,7 @@ static astring &warnings_string(running_machine *machine, astring &string)
 		string.cat("There are known problems with this " GAMENOUN "\n\n");
 
 		/* add one line per warning flag */
-		if (input_machine_have_keyboard(machine))
+		if (input_machine_has_keyboard(machine))
 			string.cat("The keyboard emulation may not be 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
 			string.cat("The colors aren't 100% accurate.\n");
@@ -1300,10 +1300,10 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = ui_use_new_ui() || (input_machine_have_keyboard(machine) && !ui_active);
+	int ui_disabled = ui_use_new_ui() || (input_machine_has_keyboard(machine) && !ui_active);
 
 	/* is ScrLk UI toggling applicable here? */
-	if (!ui_use_new_ui() && input_machine_have_keyboard(machine))
+	if (!ui_use_new_ui() && input_machine_has_keyboard(machine))
 	{
 		/* are we toggling the UI with ScrLk? */
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))

@@ -4641,7 +4641,7 @@ static void record_port(const input_port_config *port)
 	}
 }
 
-int input_machine_have_keyboard(running_machine *machine)
+int input_machine_has_keyboard(running_machine *machine)
 {
 	const input_field_config *field;
 	const input_port_config *port;
@@ -4911,7 +4911,7 @@ void inputx_init(running_machine *machine)
 	}
 
 	/* posting keys directly only makes sense for a computer */
-	if (input_machine_have_keyboard(machine))
+	if (input_machine_has_keyboard(machine))
 	{
 		codes = build_codes(machine, machine->portlist.first());
 		setup_keybuffer(machine);
