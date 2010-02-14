@@ -462,6 +462,19 @@ CCOMFLAGS += \
 	-I$(SRC)/osd/$(OSD) \
 
 
+#-------------------------------------------------
+# archiving flags
+#-------------------------------------------------
+# Default to something reasonable for all platforms
+ARFLAGS = -cr
+# Deal with macosx brain damage if COMMAND_MODE is in
+# the luser's environment:
+ifeq ($(TARGETOS),macosx)
+ifeq ($(COMMAND_MODE),"legacy")
+ARFLAGS = -crs
+endif
+endif
+
 
 #-------------------------------------------------
 # linking flags
@@ -680,7 +693,7 @@ $(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC) $(FILE2STR)
 $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
-	$(AR) -cr $@ $^
+	$(AR) $(ARFLAGS) $@ $^
 
 ifeq ($(TARGETOS),macosx)
 $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
