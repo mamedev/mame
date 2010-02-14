@@ -269,15 +269,12 @@ struct _input_port_private
 	UINT32						playback_accumulated_frames;/* accumulated frames during playback */
 };
 
-typedef const input_port_config *input_port_config_c;
-typedef const input_field_config *input_field_config_c;
-
 
 typedef struct _inputx_code inputx_code;
 struct _inputx_code
 {
 	unicode_char ch;
-	input_field_config_c field[NUM_SIMUL_KEYS];
+	const input_field_config * field[NUM_SIMUL_KEYS];
 };
 
 typedef struct _key_buffer key_buffer;
@@ -4747,7 +4744,7 @@ static const char *code_point_string(running_machine *machine, unicode_char ch)
     sets up natural keyboard input mapping
 -------------------------------------------------*/
 
-static int scan_keys(running_machine *machine, const input_port_config *portconfig, inputx_code *codes, input_port_config_c *ports, input_field_config_c *shift_ports, int keys, int shift)
+static int scan_keys(running_machine *machine, const input_port_config *portconfig, inputx_code *codes, const input_port_config * *ports, const input_field_config * *shift_ports, int keys, int shift)
 {
 	int code_count = 0;
 	const input_port_config *port;
