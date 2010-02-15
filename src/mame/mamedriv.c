@@ -928,6 +928,7 @@ const game_driver * const drivers[] =
 	DRIVER( motoxgo )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
 	DRIVER( timecrs2b )	/* (c) 1997 */
+	DRIVER( timecrs2c )	/* (c) 1997 */
 	DRIVER( panicprk )	/* (c) 1998 */
 	DRIVER( 500gp )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
