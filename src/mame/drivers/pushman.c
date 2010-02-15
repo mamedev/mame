@@ -15,7 +15,8 @@
     The hardware is actually very similar to F1-Dream and Tiger Road but
     with a 68705 for protection.
 
-    There is a Top Tronic licensed version currently not dumped
+    Pushman is known to be released in a 2 PCB stack as well as a large
+    single plane board. 
 
  **************************************************************************
 
@@ -507,8 +508,8 @@ ROM_START( pushman )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pushman.013", 0x00000, 0x08000,  CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) )
 
-	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 3 currently dumped versions */
-	ROM_LOAD( "pushman68705r3.bin",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
+	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 4 currently dumped versions */
+	ROM_LOAD( "pushman68705r3p.ic23",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "pushman.001",  0x00000, 0x08000, CRC(626e5865) SHA1(4ab96c8512f439d18390094d71a898f5c576399c) )
@@ -527,6 +528,9 @@ ROM_START( pushman )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
 	ROM_LOAD( "pushman.010", 0x00000, 0x08000, CRC(a500132d) SHA1(26b02c9fea69b51c5f7dc1b43b838cd336ebf862) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
+	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) /* priority (not used) */
 ROM_END
 
 ROM_START( pushmana )
@@ -537,8 +541,8 @@ ROM_START( pushmana )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pushman.013", 0x00000, 0x08000,  CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) ) // missing from this set?
 
-	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 3 currently dumped versions */
-	ROM_LOAD( "pushman68705r3.bin",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
+	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 4 currently dumped versions */
+	ROM_LOAD( "pushman68705r3p.ic23",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "pushmana.130",  0x00000, 0x10000, CRC(f83f92e7) SHA1(37f337d7b496f8d81eed247c80390a6aabcf4b95) )
@@ -557,36 +561,75 @@ ROM_START( pushmana )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
 	ROM_LOAD( "pushmana.189", 0x00000, 0x10000, CRC(59f25598) SHA1(ace33afd6e6d07376ed01048db99b13bcec790d7) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
+	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) /* priority (not used) */
 ROM_END
 
 ROM_START( pushmans )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "pman-12.212", 0x000000, 0x10000, CRC(4251109d) SHA1(d4b020e4ecc2005b3a4c1b34d88de82b09bf5a6b) )
-	ROM_LOAD16_BYTE( "pman-11.197", 0x000001, 0x10000, CRC(1167ed9f) SHA1(ca0296950a75ef15ff6f9d3a776b02180b941d61) )
+	ROM_LOAD16_BYTE( "pman-12.ic212", 0x000000, 0x10000, CRC(4251109d) SHA1(d4b020e4ecc2005b3a4c1b34d88de82b09bf5a6b) )
+	ROM_LOAD16_BYTE( "pman-11.ic197", 0x000001, 0x10000, CRC(1167ed9f) SHA1(ca0296950a75ef15ff6f9d3a776b02180b941d61) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "pman-13.216", 0x00000, 0x08000, CRC(bc03827a) SHA1(b4d6ae164bbb7ba19e4934392fe2ba29575f28b9) )
+	ROM_LOAD( "pman-13.ic216", 0x00000, 0x08000, CRC(bc03827a) SHA1(b4d6ae164bbb7ba19e4934392fe2ba29575f28b9) )
 
-	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 3 currently dumped versions */
-	ROM_LOAD( "pushman68705r3.bin",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
+	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 4 currently dumped versions */
+	ROM_LOAD( "pushman68705r3p.ic23",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "pman-1.130",  0x00000, 0x08000, CRC(14497754) SHA1(a47d03c56add18c5d9aed221990550b18589ff43) )
+	ROM_LOAD( "pman-1.ic130",  0x00000, 0x08000, CRC(14497754) SHA1(a47d03c56add18c5d9aed221990550b18589ff43) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "pman-4.58", 0x00000, 0x10000, CRC(16e5ce6b) SHA1(cb9c6094a853abc550eae29c35083f26a0d1de94) )
-	ROM_LOAD( "pman-5.59", 0x10000, 0x10000, CRC(b82140b8) SHA1(0a16b904eb2739bfa22a87d03266d3ff2b750b67) )
+	ROM_LOAD( "pman-4.ic58", 0x00000, 0x10000, CRC(16e5ce6b) SHA1(cb9c6094a853abc550eae29c35083f26a0d1de94) )
+	ROM_LOAD( "pman-5.ic59", 0x10000, 0x10000, CRC(b82140b8) SHA1(0a16b904eb2739bfa22a87d03266d3ff2b750b67) )
 	ROM_LOAD( "pman-2.56", 0x20000, 0x10000, CRC(2cb2ac29) SHA1(165447ad7eb8593c0d4346096ec13ac386e905c9) )
 	ROM_LOAD( "pman-3.57", 0x30000, 0x10000, CRC(8ab957c8) SHA1(143501819920c521353930f83e49f1e19fbba34f) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "pman-6.131", 0x00000, 0x10000, CRC(bd0f9025) SHA1(7262410d4631f1b051c605d5cea5b91e9f68327e) )
-	ROM_LOAD( "pman-8.148", 0x10000, 0x10000, CRC(591bd5c0) SHA1(6e0e18e0912fa38e113420ac31c7f36853b830ec) )
-	ROM_LOAD( "pman-7.132", 0x20000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
-	ROM_LOAD( "pman-9.149", 0x30000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
+	ROM_LOAD( "pman-6.ic131", 0x00000, 0x10000, CRC(bd0f9025) SHA1(7262410d4631f1b051c605d5cea5b91e9f68327e) )
+	ROM_LOAD( "pman-8.ic148", 0x10000, 0x10000, CRC(591bd5c0) SHA1(6e0e18e0912fa38e113420ac31c7f36853b830ec) )
+	ROM_LOAD( "pman-7.ic132", 0x20000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
+	ROM_LOAD( "pman-9.ic149", 0x30000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
-	ROM_LOAD( "pman-10.189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) )
+	ROM_LOAD( "pman-10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
+	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) /* priority (not used) */
+ROM_END
+
+ROM_START( pushmant ) /* Single plane PCB */
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "12.ic212", 0x000000, 0x10000, CRC(4251109d) SHA1(d4b020e4ecc2005b3a4c1b34d88de82b09bf5a6b) )
+	ROM_LOAD16_BYTE( "11.ic197", 0x000001, 0x10000, CRC(1167ed9f) SHA1(ca0296950a75ef15ff6f9d3a776b02180b941d61) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "13.ic216", 0x00000, 0x08000, CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) ) /* Same as the Comad set */
+
+	ROM_REGION( 0x01000, "mcu", 0 ) /* Verified same for all 4 currently dumped versions */
+	ROM_LOAD( "pushman68705r3p.ic23",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "1.ic130",  0x00000, 0x08000, CRC(14497754) SHA1(a47d03c56add18c5d9aed221990550b18589ff43) ) /* Same as the Sammy set */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "4.ic58", 0x00000, 0x10000, CRC(69209214) SHA1(c5b527234aefbdfb39864806e2b1784fdf2dd49c) )
+	ROM_LOAD( "5.ic59", 0x10000, 0x10000, CRC(75fc0ac4) SHA1(aa3a19573b96d89b94bfddda5b404d19cbb47335) )
+	ROM_LOAD( "2.ic56", 0x20000, 0x10000, CRC(2bb8093f) SHA1(e86048d676b06796a1d2ed325ea8ea9cada3c4b6) )
+	ROM_LOAD( "3.ic57", 0x30000, 0x10000, CRC(5f1c4e7a) SHA1(751caf2365eccbab6d7de5434c4656ac5bd7f13b) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "6.ic131", 0x00000, 0x10000, CRC(bd0f9025) SHA1(7262410d4631f1b051c605d5cea5b91e9f68327e) ) /* These 4 are the same as the Sammy set */
+	ROM_LOAD( "8.ic148", 0x10000, 0x10000, CRC(591bd5c0) SHA1(6e0e18e0912fa38e113420ac31c7f36853b830ec) )
+	ROM_LOAD( "7.ic132", 0x20000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
+	ROM_LOAD( "9.ic149", 0x30000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
+	ROM_LOAD( "10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) ) /* Same as the Sammy set */
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
+	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) /* priority (not used) */
 ROM_END
 
 ROM_START( bballs )
@@ -619,10 +662,11 @@ ROM_START( bballs )
 	ROM_LOAD( "bb10.l6", 0x00000, 0x08000, CRC(d06498f9) SHA1(9f33bbc40ebe11c03aec29289f76f1c3ca5bf009) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
-	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) */
+	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) N82S129 BPROM */
 ROM_END
 
 GAME( 1990, pushman,  0,       pushman, pushman, 0, ROT0, "Comad", "Pushman (Korea, set 1)", 0 )
 GAME( 1990, pushmana, pushman, pushman, pushman, 0, ROT0, "Comad", "Pushman (Korea, set 2)", 0 )
 GAME( 1990, pushmans, pushman, pushman, pushman, 0, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", 0 )
+GAME( 1990, pushmant, pushman, pushman, pushman, 0, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", 0 )
 GAME( 1991, bballs,   0,       bballs,  bballs,  0, ROT0, "Comad", "Bouncing Balls", 0 )

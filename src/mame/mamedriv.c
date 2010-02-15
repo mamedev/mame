@@ -7000,6 +7000,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
+	DRIVER( tmdo )		/* (c) 1996 Midway Games */
 	DRIVER( tm2k )		/* (c) 1996 Midway Games */
 	DRIVER( tm3k )		/* (c) 1997 Midway Games */
 	DRIVER( tm3ka )		/* (c) 1997 Midway Games */
@@ -7898,6 +7899,7 @@ Other Sun games
 	DRIVER( pushman )	/* (c) 1990 Comad */
 	DRIVER( pushmana )	/* (c) 1990 Comad */
 	DRIVER( pushmans )	/* (c) 1990 Comad + American Sammy license */
+	DRIVER( pushmant )	/* (c) 1990 Comad + Top Tronic license */
 	DRIVER( bballs )	/* (c) 1991 Comad */
 	DRIVER( zerozone )	/* (c) 1993 Comad */
 	DRIVER( lvgirl94 )	/* (c) 1994 Comad */

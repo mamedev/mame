@@ -1010,18 +1010,35 @@ Xlinx XC3042a
 
 ROM_START( tm )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
-	ROM_LOAD16_BYTE( "tmaster.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) ) /* Ver: 3.00 Euro 11-25-96 */
-	ROM_LOAD16_BYTE( "tmaster.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) ) /* Ver: 3.00 Euro 11-25-96 */
+	ROM_LOAD16_BYTE( "tmaster_v300_euro.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) ) /* Ver: 3.00 Euro 11-25-96 */
+	ROM_LOAD16_BYTE( "tmaster_v300_euro.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) ) /* Ver: 3.00 Euro 11-25-96 */
 
 	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )	// Blitter gfx
-	ROM_LOAD16_BYTE( "tmaster.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) )
-	ROM_LOAD16_BYTE( "tmaster.u36", 0x100001, 0x080000, CRC(204096ec) SHA1(9239923b7eedb6003c63ef2e8ff224edee657bbc) )
+	ROM_LOAD16_BYTE( "tmaster.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) ) /* Same as U38 below */
+	ROM_LOAD16_BYTE( "tmaster.u36", 0x100001, 0x080000, CRC(204096ec) SHA1(9239923b7eedb6003c63ef2e8ff224edee657bbc) ) /* Same as U36 below */
 	// unused gap
-	ROM_LOAD16_BYTE( "tmaster.u39", 0x300000, 0x080000, CRC(cbb716cb) SHA1(4e8d8f6cbfb25a8161ff8fe7505d6b209650dd2b) )
-	ROM_LOAD16_BYTE( "tmaster.u37", 0x300001, 0x080000, CRC(e0b6a9f7) SHA1(7e057ca87833c682e5be03668469259bbdefbf20) )
+	ROM_LOAD16_BYTE( "tmaster.u39", 0x300000, 0x080000, CRC(cbb716cb) SHA1(4e8d8f6cbfb25a8161ff8fe7505d6b209650dd2b) ) /* Different then U39 below, newer or region specific? */
+	ROM_LOAD16_BYTE( "tmaster.u37", 0x300001, 0x080000, CRC(e0b6a9f7) SHA1(7e057ca87833c682e5be03668469259bbdefbf20) ) /* Different then U37 below, newer or region specific? */
 
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
-	ROM_LOAD( "tmaster.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) )
+	ROM_LOAD( "tmaster.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Same as U8 below */
+	ROM_CONTINUE(           0xc0000, 0x040000 )
+ROM_END
+
+ROM_START( tmdo )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tmaster_v22-01.u51", 0x000000, 0x080000, CRC(12e1b085) SHA1(b01325e0067204991a707db24e3e2036708ebccf) ) /* Ver: 2.2-01 Standard 10-17-96 */
+	ROM_LOAD16_BYTE( "tmaster_v22-01.u52", 0x000001, 0x080000, CRC(6c2c643f) SHA1(8dd7930f4c499483ca46b0b97bde94cb8d6e06aa) ) /* Ver: 2.2-01 Standard 10-17-96 */
+
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tmaster.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) ) /* Marked as Rev 2.1 */
+	ROM_LOAD16_BYTE( "tmaster.u36", 0x100001, 0x080000, CRC(204096ec) SHA1(9239923b7eedb6003c63ef2e8ff224edee657bbc) ) /* Marked as Rev 2.1 */
+	// unused gap
+	ROM_LOAD16_BYTE( "tmaster_v21.u39", 0x300000, 0x080000, CRC(a4445260) SHA1(915347f69d7ea45f8f299a67d77ff437983495d2) ) /* Marked as Rev 2.1 */
+	ROM_LOAD16_BYTE( "tmaster_v21.u37", 0x300001, 0x080000, CRC(0e140a3e) SHA1(10a34e3b95c0d36fe687fe8c1124ef244a93d720) ) /* Marked as Rev 2.1 */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tmaster.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Marked as Rev 1.0 */
 	ROM_CONTINUE(           0xc0000, 0x040000 )
 ROM_END
 
@@ -1711,17 +1728,18 @@ static DRIVER_INIT( galgame2 )
 }
 
 
-GAME( 1996, tm,       0,        tm,       tm,       0,        ROT0, "Midway",                                  "Touchmaster (v3.00 Euro)",            0 )
-GAME( 1996, tm2k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway",                                  "Touchmaster 2000 (v4.02 Standard)",   0 )
-GAME( 1997, tm3k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway",                                  "Touchmaster 3000 (v5.02 Standard)",   0 )
-GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster,  0,        ROT0, "Midway",                                  "Touchmaster 3000 (v5.01 Standard)",   0 )
-GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway",                                  "Touchmaster 4000 (v6.02 Standard)",   0 )
-GAME( 1998, tm5k,     0,        tm3k,     tmaster,  tm5k,     ROT0, "Midway",                                  "Touchmaster 5000 (v7.10 Standard)",   0 )
-GAME( 1998, tm5kca,   tm5k,     tm3k,     tmaster,  tm5kca,   ROT0, "Midway",                                  "Touchmaster 5000 (v7.10 California)", 0 )
-GAME( 1998, tm5ka,    tm5k,     tm3k,     tmaster,  tm5ka,    ROT0, "Midway",                                  "Touchmaster 5000 (v7.01 Standard)",   0 )
-GAME( 1999, tm7k,     0,        tm3k,     tmaster,  tm7k,     ROT0, "Midway",                                  "Touchmaster 7000 (v8.04 Standard)",   0 )
-GAME( 1999, tm7ka,    tm7k,     tm3k,     tmaster,  tm7ka,    ROT0, "Midway",                                  "Touchmaster 7000 (v8.00 Standard)",   0 )
-GAME( 1999, tm7keval, tm7k,     tm3k,     tmaster,  tm7keval, ROT0, "Midway",                                  "Touchmaster 7000 (v8.1X Evaluation)", 0 )
-GAME( 2000, tm8k,     0,        tm3k,     tmaster,  tm8k,     ROT0, "Midway",                                  "Touchmaster 8000 (v9.04 Standard)",   0 )
+GAME( 1996, tm,       0,        tm,       tm,       0,        ROT0, "CES Inc., Midway Games Inc.",             "Touchmaster (v3.00 Euro)",            0 )
+GAME( 1996, tmdo,     tm,       tm,       tm,       0,        ROT0, "CES Inc., Midway Games Inc.",             "Touchmaster (v2.2-01 Standard)",      0 )
+GAME( 1996, tm2k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",   0 )
+GAME( 1997, tm3k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",   0 )
+GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",   0 )
+GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",   0 )
+GAME( 1998, tm5k,     0,        tm3k,     tmaster,  tm5k,     ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",   0 )
+GAME( 1998, tm5kca,   tm5k,     tm3k,     tmaster,  tm5kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)", 0 )
+GAME( 1998, tm5ka,    tm5k,     tm3k,     tmaster,  tm5ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",   0 )
+GAME( 1999, tm7k,     0,        tm3k,     tmaster,  tm7k,     ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Standard)",   0 )
+GAME( 1999, tm7ka,    tm7k,     tm3k,     tmaster,  tm7ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Standard)",   0 )
+GAME( 1999, tm7keval, tm7k,     tm3k,     tmaster,  tm7keval, ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X Evaluation)", 0 )
+GAME( 2000, tm8k,     0,        tm3k,     tmaster,  tm8k,     ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",   0 )
 GAME( 1998, galgbios, 0,        galgames, galgames, galgames, ROT0, "Creative Electronics & Software",         "Galaxy Games (BIOS v1.90)",           GAME_IS_BIOS_ROOT )
 GAME( 1998, galgame2, galgbios, galgame2, galgames, galgame2, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",              0 )
