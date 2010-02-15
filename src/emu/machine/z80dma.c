@@ -12,8 +12,6 @@
         - Only memory to memory is tested!
 
     TODO:
-        - refactor according to new memory system
-        - implement interrupt support (not used in dkong3 and mario)
         - implement missing features
         - implement more asserts
         - implement a INPUT_LINE_BUSREQ for Z80. As a workaround,
@@ -26,10 +24,7 @@
 #include "z80dma.h"
 #include "cpu/z80/z80daisy.h"
 
-#define VERBOSE 0
-
-#define LOG(x)	do { if (VERBOSE) printf x; } while (0)
-
+#define LOG 0
 
 #define REGNUM(_m, _s) (((_m)<<3) + (_s))
 #define GET_REGNUM(_c, _r) (&(_r) - &(WR0(_c)))
@@ -94,6 +89,20 @@
 
 #define READY_ACTIVE_HIGH(_c) ((WR5(_c)>>3) & 0x01)
 
+#define INTERRUPT_ENABLE(_c)		(WR3(_c) & 0x20)
+#define INT_ON_MATCH(_c)			(INTERRUPT_CTRL(_c) & 0x01)
+#define INT_ON_END_OF_BLOCK(_c)		(INTERRUPT_CTRL(_c) & 0x02)
+#define INT_ON_READY(_c)			(INTERRUPT_CTRL(_c) & 0x40)
+#define STATUS_AFFECTS_VECTOR(_c)	(INTERRUPT_CTRL(_c) & 0x20)
+
+enum
+{
+	INT_RDY = 0,
+	INT_MATCH,
+	INT_END_OF_BLOCK,
+	INT_MATCH_END_OF_BLOCK
+};
+
 typedef struct _z80dma_t z80dma_t;
 struct _z80dma_t
 {
@@ -116,22 +125,27 @@ struct _z80dma_t
 	UINT8	read_regs_follow[7];
 	UINT8	status;
 	UINT8	dma_enabled;
-
+	
 	UINT16 addressA;
 	UINT16 addressB;
 	UINT16 count;
 
 	UINT8 rdy;
-	UINT8 irq_en;
 	UINT8 reset_pointer;
 
 	UINT8 is_read;
 	UINT8 cur_cycle;
 	UINT8 latch;
+
+	/* interrupts */
+	int ip;						/* interrupt pending */
+	int ius;					/* interrupt under service */
+	UINT8 vector;				/* interrupt vector */
 };
 
 static TIMER_CALLBACK( z80dma_timerproc );
 static void z80dma_update_status(running_device *device);
+static int z80dma_irq_state(running_device *device);
 
 /* ----------------------------------------------------------------------- */
 
@@ -142,34 +156,68 @@ INLINE z80dma_t *get_safe_token(running_device *device) {
 	return ( z80dma_t * ) device->token;
 }
 
+static void interrupt_check(running_device *device)
+{
+	z80dma_t *z80dma = get_safe_token(device);
+
+	devcb_call_write_line(&z80dma->out_int_func, z80dma->ip ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static void trigger_interrupt(running_device *device, int level)
+{
+	z80dma_t *z80dma = get_safe_token(device);
+
+	if (!z80dma->ius && INTERRUPT_ENABLE(z80dma))
+	{
+		/* set interrupt pending flag */
+		z80dma->ip = 1;
+
+		/* set interrupt vector */
+		if (STATUS_AFFECTS_VECTOR(z80dma))
+		{
+			z80dma->vector = (INTERRUPT_VECTOR(z80dma) & 0xf9) | (level << 1);
+		}
+		else
+		{
+			z80dma->vector = INTERRUPT_VECTOR(z80dma);
+		}
+
+		z80dma->status &= ~0x08;
+
+		if (LOG) logerror("Z80DMA '%s' Interrupt Pending\n", device->tag.cstr());
+
+		interrupt_check(device);
+	}
+}
+
 static void z80dma_do_read(running_device *device)
 {
-	z80dma_t *cntx = get_safe_token(device);
+	z80dma_t *z80dma = get_safe_token(device);
 	UINT8 mode;
 
-	mode = TRANSFER_MODE(cntx);
+	mode = TRANSFER_MODE(z80dma);
 	switch(mode) {
 		case TM_TRANSFER:
 		case TM_SEARCH:
-			if (PORTA_IS_SOURCE(cntx))
+			if (PORTA_IS_SOURCE(z80dma))
 			{
-				if (PORTA_MEMORY(cntx))
-					cntx->latch = devcb_call_read8(&cntx->in_mreq_func, cntx->addressA);
+				if (PORTA_MEMORY(z80dma))
+					z80dma->latch = devcb_call_read8(&z80dma->in_mreq_func, z80dma->addressA);
 				else
-					cntx->latch = devcb_call_read8(&cntx->in_iorq_func, cntx->addressA);
+					z80dma->latch = devcb_call_read8(&z80dma->in_iorq_func, z80dma->addressA);
 
-				LOG(("A src: %04x \n",cntx->addressA));
-				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_INC(cntx) ? PORTA_STEP(cntx) : -PORTA_STEP(cntx);
+				if (LOG) logerror("A src: %04x \n",z80dma->addressA);
+				z80dma->addressA += PORTA_FIXED(z80dma) ? 0 : PORTA_INC(z80dma) ? PORTA_STEP(z80dma) : -PORTA_STEP(z80dma);
 			}
 			else
 			{
-				if (PORTB_MEMORY(cntx))
-					cntx->latch = devcb_call_read8(&cntx->in_mreq_func, cntx->addressB);
+				if (PORTB_MEMORY(z80dma))
+					z80dma->latch = devcb_call_read8(&z80dma->in_mreq_func, z80dma->addressB);
 				else
-					cntx->latch = devcb_call_read8(&cntx->in_iorq_func, cntx->addressB);
+					z80dma->latch = devcb_call_read8(&z80dma->in_iorq_func, z80dma->addressB);
 
-				LOG(("B src: %04x \n",cntx->addressB));
-				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
+				if (LOG) logerror("B src: %04x \n",z80dma->addressB);
+				z80dma->addressB += PORTB_FIXED(z80dma) ? 0 : PORTB_INC(z80dma) ? PORTB_STEP(z80dma) : -PORTB_STEP(z80dma);
 			}
 			break;
 		case TM_SEARCH_TRANSFER:
@@ -183,52 +231,57 @@ static void z80dma_do_read(running_device *device)
 
 static int z80dma_do_write(running_device *device)
 {
-	z80dma_t *cntx = get_safe_token(device);
+	z80dma_t *z80dma = get_safe_token(device);
 	int done;
 	UINT8 mode;
 
-	mode = TRANSFER_MODE(cntx);
-	if (cntx->count == 0x0000)
+	mode = TRANSFER_MODE(z80dma);
+	if (z80dma->count == 0x0000)
 	{
 		//FIXME: Any signal here
 	}
 	switch(mode) {
 		case TM_TRANSFER:
-			if (PORTA_IS_SOURCE(cntx))
+			if (PORTA_IS_SOURCE(z80dma))
 			{
-				if (PORTB_MEMORY(cntx))
-					devcb_call_write8(&cntx->out_mreq_func, cntx->addressB, cntx->latch);
+				if (PORTB_MEMORY(z80dma))
+					devcb_call_write8(&z80dma->out_mreq_func, z80dma->addressB, z80dma->latch);
 				else
-					devcb_call_write8(&cntx->out_iorq_func, cntx->addressB, cntx->latch);
+					devcb_call_write8(&z80dma->out_iorq_func, z80dma->addressB, z80dma->latch);
 
-				LOG(("B dst: %04x \n",cntx->addressB));
-				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
+				if (LOG) logerror("B dst: %04x \n",z80dma->addressB);
+				z80dma->addressB += PORTB_FIXED(z80dma) ? 0 : PORTB_INC(z80dma) ? PORTB_STEP(z80dma) : -PORTB_STEP(z80dma);
 			}
 			else
 			{
-				if (PORTA_MEMORY(cntx))
-					devcb_call_write8(&cntx->out_mreq_func, cntx->addressA, cntx->latch);
+				if (PORTA_MEMORY(z80dma))
+					devcb_call_write8(&z80dma->out_mreq_func, z80dma->addressA, z80dma->latch);
 				else
-					devcb_call_write8(&cntx->out_iorq_func, cntx->addressA, cntx->latch);
+					devcb_call_write8(&z80dma->out_iorq_func, z80dma->addressA, z80dma->latch);
 
-				LOG(("A dst: %04x \n",cntx->addressA));
-				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_INC(cntx) ? PORTA_STEP(cntx) : -PORTA_STEP(cntx);
+				if (LOG) logerror("A dst: %04x \n",z80dma->addressA);
+				z80dma->addressA += PORTA_FIXED(z80dma) ? 0 : PORTA_INC(z80dma) ? PORTA_STEP(z80dma) : -PORTA_STEP(z80dma);
 			}
-			cntx->count--;
-			done = (cntx->count == 0xFFFF);
+			z80dma->count--;
+			done = (z80dma->count == 0xFFFF);
 			break;
 
 		case TM_SEARCH:
 			{
 				UINT8 load_byte,match_byte;
-				load_byte = cntx->latch | MASK_BYTE(cntx);
-				match_byte = MATCH_BYTE(cntx) | MASK_BYTE(cntx);
-				//LOG(("%02x %02x\n",load_byte,match_byte));
-				if(load_byte == match_byte)
-					MATCH_F_SET(cntx);
+				load_byte = z80dma->latch | MASK_BYTE(z80dma);
+				match_byte = MATCH_BYTE(z80dma) | MASK_BYTE(z80dma);
+				//if (LOG) logerror("%02x %02x\n",load_byte,match_byte));
+				if (load_byte == match_byte)
+				{
+					if (INT_ON_MATCH(z80dma))
+					{
+						trigger_interrupt(device, INT_MATCH);
+					}
+				}
 
-				cntx->count--;
-				done = (cntx->count == 0xFFFF); //correct?
+				z80dma->count--;
+				done = (z80dma->count == 0xFFFF); //correct?
 			}
 			break;
 
@@ -250,30 +303,44 @@ static int z80dma_do_write(running_device *device)
 static TIMER_CALLBACK( z80dma_timerproc )
 {
 	running_device *device = (running_device *)ptr;
-	z80dma_t *cntx = get_safe_token(device);
+	z80dma_t *z80dma = get_safe_token(device);
 	int done;
 
-	if (--cntx->cur_cycle)
+	if (--z80dma->cur_cycle)
 	{
 		return;
 	}
-	if (cntx->is_read)
+
+	if (z80dma->is_read)
 	{
 		z80dma_do_read(device);
 		done = 0;
-		cntx->is_read = 0;
-		cntx->cur_cycle = (PORTA_IS_SOURCE(cntx) ? PORTA_CYCLE_LEN(cntx) : PORTB_CYCLE_LEN(cntx));
+		z80dma->is_read = 0;
+		z80dma->cur_cycle = (PORTA_IS_SOURCE(z80dma) ? PORTA_CYCLE_LEN(z80dma) : PORTB_CYCLE_LEN(z80dma));
 	}
 	else
 	{
 		done = z80dma_do_write(device);
-		cntx->is_read = 1;
-		cntx->cur_cycle = (PORTB_IS_SOURCE(cntx) ? PORTA_CYCLE_LEN(cntx) : PORTB_CYCLE_LEN(cntx));
+		z80dma->is_read = 1;
+		z80dma->cur_cycle = (PORTB_IS_SOURCE(z80dma) ? PORTA_CYCLE_LEN(z80dma) : PORTB_CYCLE_LEN(z80dma));
 	}
+
 	if (done)
 	{
-		cntx->dma_enabled = 0; //FIXME: Correct?
+		z80dma->dma_enabled = 0; //FIXME: Correct?
+        z80dma->status = 0x19;
+        
+		if(!(z80dma->rdy ^ READY_ACTIVE_HIGH(z80dma))) z80dma->status |= 0x02;   // ready line status
+		
+		if(TRANSFER_MODE(z80dma) == TM_TRANSFER)     z80dma->status |= 0x10;   // no match found
+		
 		z80dma_update_status(device);
+		if (LOG) logerror("Z80DMA '%s' End of Block\n", device->tag.cstr());
+        
+		if (INT_ON_END_OF_BLOCK(z80dma))
+        {
+			trigger_interrupt(device, INT_END_OF_BLOCK);
+        }
 	}
 }
 
@@ -311,14 +378,14 @@ static void z80dma_update_status(running_device *device)
 
 READ8_DEVICE_HANDLER( z80dma_r )
 {
-	z80dma_t *cntx = get_safe_token(device);
+	z80dma_t *z80dma = get_safe_token(device);
 	UINT8 res;
 
-	res = cntx->read_regs_follow[cntx->read_cur_follow];
-	cntx->read_cur_follow++;
+	res = z80dma->read_regs_follow[z80dma->read_cur_follow];
+	z80dma->read_cur_follow++;
 
-	if(cntx->read_cur_follow >= cntx->read_num_follow)
-		cntx->read_cur_follow = 0;
+	if(z80dma->read_cur_follow >= z80dma->read_num_follow)
+		z80dma->read_cur_follow = 0;
 
 	return res;
 }
@@ -326,151 +393,160 @@ READ8_DEVICE_HANDLER( z80dma_r )
 
 WRITE8_DEVICE_HANDLER( z80dma_w )
 {
-	z80dma_t *cntx = get_safe_token(device);
+	z80dma_t *z80dma = get_safe_token(device);
 
-	if (cntx->num_follow == 0)
+	if (z80dma->num_follow == 0)
 	{
 		if ((data & 0x87) == 0) // WR2
 		{
-			WR2(cntx) = data;
+			WR2(z80dma) = data;
 			if (data & 0x40)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PORTB_TIMING(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PORTB_TIMING(z80dma));
 		}
 		else if ((data & 0x87) == 0x04) // WR1
 		{
-			WR1(cntx) = data;
+			WR1(z80dma) = data;
 			if (data & 0x40)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PORTA_TIMING(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PORTA_TIMING(z80dma));
 		}
 		else if ((data & 0x80) == 0) // WR0
 		{
-			WR0(cntx) = data;
+			WR0(z80dma) = data;
 			if (data & 0x08)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_L(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PORTA_ADDRESS_L(z80dma));
 			if (data & 0x10)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_H(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PORTA_ADDRESS_H(z80dma));
 			if (data & 0x20)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, BLOCKLEN_L(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, BLOCKLEN_L(z80dma));
 			if (data & 0x40)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, BLOCKLEN_H(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, BLOCKLEN_H(z80dma));
 		}
 		else if ((data & 0x83) == 0x80) // WR3
 		{
-			WR3(cntx) = data;
+			WR3(z80dma) = data;
 			if (data & 0x08)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, MASK_BYTE(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, MASK_BYTE(z80dma));
 			if (data & 0x10)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, MATCH_BYTE(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, MATCH_BYTE(z80dma));
 		}
 		else if ((data & 0x83) == 0x81) // WR4
 		{
-			WR4(cntx) = data;
+			WR4(z80dma) = data;
 			if (data & 0x04)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PORTB_ADDRESS_L(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PORTB_ADDRESS_L(z80dma));
 			if (data & 0x08)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PORTB_ADDRESS_H(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PORTB_ADDRESS_H(z80dma));
 			if (data & 0x10)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, INTERRUPT_CTRL(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, INTERRUPT_CTRL(z80dma));
 		}
 		else if ((data & 0xC7) == 0x82) // WR5
 		{
-			WR5(cntx) = data;
+			WR5(z80dma) = data;
 		}
 		else if ((data & 0x83) == 0x83) // WR6
 		{
-			WR6(cntx) = data;
+			WR6(z80dma) = data;
 			switch (data)
 			{
-				case 0xA3:	/* Reset and disable interrupts */
 				case 0xB7:	/* Enable after rti */
-				case 0xBF:	/* Read status byte */
 					fatalerror("Unimplemented WR6 command %02x", data);
 					break;
+				case 0xBF:	/* Read status byte */
+					if (LOG) logerror("CMD Read status Byte\n");
+        			READ_MASK(z80dma) = 0;
+        			break;
+				case 0xA3:	               /* Reset and disable interrupts */
+					WR3(z80dma) &= ~0x20;
+					z80dma->ip = 0;
+					z80dma->ius = 0;
+					z80dma->rdy = 0;
+					z80dma->status |= 0x08;
+					break;
 				case 0xA7:	/* Initiate read sequence */
-					LOG(("Initiate Read Sequence\n"));
-					cntx->read_cur_follow = cntx->read_num_follow = 0;
-					if(READ_MASK(cntx) & 0x01) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->status; }
-					if(READ_MASK(cntx) & 0x02) { cntx->read_regs_follow[cntx->read_num_follow++] = BLOCKLEN_L(cntx); } //byte counter (low)
-					if(READ_MASK(cntx) & 0x04) { cntx->read_regs_follow[cntx->read_num_follow++] = BLOCKLEN_H(cntx); } //byte counter (high)
-					if(READ_MASK(cntx) & 0x08) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTA_ADDRESS_L(cntx); } //port A address (low)
-					if(READ_MASK(cntx) & 0x10) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTA_ADDRESS_H(cntx); } //port A address (high)
-					if(READ_MASK(cntx) & 0x20) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTB_ADDRESS_L(cntx); } //port B address (low)
-					if(READ_MASK(cntx) & 0x40) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTA_ADDRESS_H(cntx); } //port B address (high)
+					if (LOG) logerror("Initiate Read Sequence\n");
+					z80dma->read_cur_follow = z80dma->read_num_follow = 0;
+					if(READ_MASK(z80dma) & 0x01) { z80dma->read_regs_follow[z80dma->read_num_follow++] = z80dma->status; }
+					if(READ_MASK(z80dma) & 0x02) { z80dma->read_regs_follow[z80dma->read_num_follow++] = BLOCKLEN_L(z80dma); } //byte counter (low)
+					if(READ_MASK(z80dma) & 0x04) { z80dma->read_regs_follow[z80dma->read_num_follow++] = BLOCKLEN_H(z80dma); } //byte counter (high)
+					if(READ_MASK(z80dma) & 0x08) { z80dma->read_regs_follow[z80dma->read_num_follow++] = PORTA_ADDRESS_L(z80dma); } //port A address (low)
+					if(READ_MASK(z80dma) & 0x10) { z80dma->read_regs_follow[z80dma->read_num_follow++] = PORTA_ADDRESS_H(z80dma); } //port A address (high)
+					if(READ_MASK(z80dma) & 0x20) { z80dma->read_regs_follow[z80dma->read_num_follow++] = PORTB_ADDRESS_L(z80dma); } //port B address (low)
+					if(READ_MASK(z80dma) & 0x40) { z80dma->read_regs_follow[z80dma->read_num_follow++] = PORTA_ADDRESS_H(z80dma); } //port B address (high)
 					break;
 				case 0xC3:	/* Reset */
-					LOG(("Reset\n"));
-					cntx->dma_enabled = 0;
-					cntx->rdy = 1;
-					cntx->irq_en = 0;
+					if (LOG) logerror("Reset\n");
+					z80dma->dma_enabled = 0;
+					z80dma->rdy = 1;
 					/* Needs six reset commands to reset the DMA */
 					{
 						UINT8 WRi;
 
 						for(WRi=0;WRi<7;WRi++)
-							REG(cntx,WRi,cntx->reset_pointer) = 0;
+							REG(z80dma,WRi,z80dma->reset_pointer) = 0;
 
-						cntx->reset_pointer++;
-						if(cntx->reset_pointer >= 6) { cntx->reset_pointer = 0; }
+						z80dma->reset_pointer++;
+						if(z80dma->reset_pointer >= 6) { z80dma->reset_pointer = 0; }
 					}
-					cntx->status = 0x38;
+					z80dma->status = 0x38;
 					break;
 				case 0xCF:	/* Load */
-					cntx->addressA = PORTA_ADDRESS(cntx);
-					cntx->addressB = PORTB_ADDRESS(cntx);
-					cntx->count = BLOCKLEN(cntx);
-					cntx->status |= 0x30;
-					LOG(("Load A: %x B: %x N: %x\n", cntx->addressA, cntx->addressB, cntx->count));
+					z80dma->addressA = PORTA_ADDRESS(z80dma);
+					z80dma->addressB = PORTB_ADDRESS(z80dma);
+					z80dma->count = BLOCKLEN(z80dma);
+					z80dma->status |= 0x30;
+					if (LOG) logerror("Load A: %x B: %x N: %x\n", z80dma->addressA, z80dma->addressB, z80dma->count);
 					break;
 				case 0x83:	/* Disable dma */
-					LOG(("Disable DMA\n"));
-					cntx->dma_enabled = 0;
-					cntx->rdy = 1 ^ ((WR5(cntx) & 0x8)>>3);
-					z80dma_rdy_w(device, cntx->rdy);
+					if (LOG) logerror("Disable DMA\n");
+					z80dma->dma_enabled = 0;
+					z80dma->rdy = 1 ^ ((WR5(z80dma) & 0x8)>>3);
+					z80dma_rdy_w(device, z80dma->rdy);
 					break;
 				case 0x87:	/* Enable dma */
-					LOG(("Enable DMA\n"));
-					cntx->dma_enabled = 1;
-					cntx->rdy = (WR5(cntx) & 0x8)>>3;
-					z80dma_rdy_w(device, cntx->rdy);
+					if (LOG) logerror("Enable DMA\n");
+					z80dma->dma_enabled = 1;
+					z80dma->rdy = (WR5(z80dma) & 0x8)>>3;
+					z80dma_rdy_w(device, z80dma->rdy);
 					break;
 				case 0xBB:
-					LOG(("Set Read Mask\n"));
-					cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, READ_MASK(cntx));
+					if (LOG) logerror("Set Read Mask\n");
+					z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, READ_MASK(z80dma));
 					break;
 				case 0xD3:	/* Continue */
-					LOG(("Continue\n"));
-					cntx->count = 0;
-					cntx->dma_enabled = 1;
+					if (LOG) logerror("Continue\n");
+					z80dma->count = 0;
+					z80dma->dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
-					cntx->status |= 0x30;
+					z80dma->status |= 0x30;
 					break;
 				case 0xc7:	/* Reset Port A Timing */
-					LOG(("Reset Port A Timing\n"));
-					PORTA_TIMING(cntx) = 0;
+					if (LOG) logerror("Reset Port A Timing\n");
+					PORTA_TIMING(z80dma) = 0;
 					break;
 				case 0xcb:	/* Reset Port B Timing */
-					LOG(("Reset Port B Timing\n"));
-					PORTB_TIMING(cntx) = 0;
+					if (LOG) logerror("Reset Port B Timing\n");
+					PORTB_TIMING(z80dma) = 0;
 					break;
 				case 0xB3:	/* Force ready */
-					LOG(("Force ready\n"));
-					cntx->rdy = (WR5(cntx) & 0x8)>>3;
-					z80dma_rdy_w(device, cntx->rdy);
+					if (LOG) logerror("Force ready\n");
+					z80dma->rdy = (WR5(z80dma) & 0x8)>>3;
+					z80dma_rdy_w(device, z80dma->rdy);
 					break;
 				case 0xAB:	/* Enable interrupts */
-					LOG(("Enable IRQ\n"));
-					cntx->irq_en = 1;
+					if (LOG) logerror("Enable IRQ\n");
+					WR3(z80dma) |= 0x20;
 					break;
 				case 0xAF:	/* Disable interrupts */
-					LOG(("Disable IRQ\n"));
-					cntx->irq_en = 0;
+					if (LOG) logerror("Disable IRQ\n");
+					WR3(z80dma) &= ~0x20;
 					break;
 				case 0x8B:	/* Reinitialize status byte */
-					LOG(("Reinitialize status byte\n"));
-					cntx->status |= 0x30;
+					if (LOG) logerror("Reinitialize status byte\n");
+					z80dma->status |= 0x30;
+					z80dma->ip = 0;
 					break;
 				case 0xFB:
-					LOG(("Z80DMA undocumented command triggered 0x%02X!\n",data));
+					if (LOG) logerror("Z80DMA undocumented command triggered 0x%02X!\n",data);
 					break;
 				default:
 					fatalerror("Unknown WR6 command %02x", data);
@@ -478,23 +554,23 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 		}
 		else
 			fatalerror("Unknown base register %02x", data);
-		cntx->cur_follow = 0;
+		z80dma->cur_follow = 0;
 	}
 	else
 	{
-		int nreg = cntx->regs_follow[cntx->cur_follow];
-		cntx->regs[nreg] = data;
-		cntx->cur_follow++;
-		if (cntx->cur_follow>=cntx->num_follow)
-			cntx->num_follow = 0;
+		int nreg = z80dma->regs_follow[z80dma->cur_follow];
+		z80dma->regs[nreg] = data;
+		z80dma->cur_follow++;
+		if (z80dma->cur_follow>=z80dma->num_follow)
+			z80dma->num_follow = 0;
 		if (nreg == REGNUM(4,3))
 		{
-			cntx->num_follow=0;
+			z80dma->num_follow=0;
 			if (data & 0x08)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, PULSE_CTRL(cntx));
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, PULSE_CTRL(z80dma));
 			if (data & 0x10)
-				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, INTERRUPT_VECTOR(cntx));
-			cntx->cur_follow = 0;
+				z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, INTERRUPT_VECTOR(z80dma));
+			z80dma->cur_follow = 0;
 		}
 	}
 }
@@ -504,13 +580,18 @@ static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
 	running_device *device = (running_device *)ptr;
 	int state = param & 0x01;
-	z80dma_t *cntx = get_safe_token(device);
+	z80dma_t *z80dma = get_safe_token(device);
 
 	/* normalize state */
-	cntx->rdy = 1 ^ state ^ READY_ACTIVE_HIGH(cntx);
-	cntx->status = (cntx->status & 0xFD) | (cntx->rdy<<1);
+	z80dma->rdy = 1 ^ state ^ READY_ACTIVE_HIGH(z80dma);
+	z80dma->status = (z80dma->status & 0xFD) | (z80dma->rdy<<1);
 
 	z80dma_update_status(device);
+
+	if (z80dma->rdy && INT_ON_READY(z80dma))
+    {
+		trigger_interrupt(device, INT_RDY);
+    }
 }
 
 
@@ -520,7 +601,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w )
 	int param;
 
 	param = (state ? 1 : 0);
-	LOG(("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(z80dma)));
+	if (LOG) logerror("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(z80dma));
 	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
 }
 
@@ -532,25 +613,68 @@ WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w )
 {
 }
 
-
 /***************************************************************************
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
 static int z80dma_irq_state(running_device *device)
 {
+	z80dma_t *z80dma = get_safe_token(device);
 	int state = 0;
+
+	if (z80dma->ip)
+	{
+		/* interrupt pending */
+		state = Z80_DAISY_INT;
+	}
+
+	if (LOG) logerror("Z80DMA '%s' Interrupt State: %u\n", device->tag.cstr(), state);
 
 	return state;
 }
 
 static int z80dma_irq_ack(running_device *device)
 {
+	z80dma_t *z80dma = get_safe_token(device);
+
+	if (z80dma->ip)
+	{
+	    if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", device->tag.cstr());
+		
+		/* clear interrupt pending flag */
+		z80dma->ip = 0;
+	    interrupt_check(device);
+
+		/* set interrupt under service flag */
+		z80dma->ius = 1;
+		
+		/* disable DMA */
+		z80dma->dma_enabled = 0;
+
+		return z80dma->vector;
+	}
+
+	if (LOG) logerror("z80dma_irq_ack: failed to find an interrupt to ack!\n");
+
 	return 0;
 }
 
 static void z80dma_irq_reti(running_device *device)
 {
+	z80dma_t *z80dma = get_safe_token(device);
+
+	if (z80dma->ius)
+	{
+	    if (LOG) logerror("Z80DMA '%s' Return from Interrupt\n", device->tag.cstr());
+
+		/* clear interrupt under service flag */
+		z80dma->ius = 0;
+	    interrupt_check(device);
+
+		return;
+	}
+
+	if (LOG) logerror("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 /***************************************************************************
@@ -581,6 +705,9 @@ static DEVICE_START( z80dma )
 	state_save_register_device_item(device, 0, z80dma->cur_follow);
 	state_save_register_device_item(device, 0, z80dma->status);
 	state_save_register_device_item(device, 0, z80dma->dma_enabled);
+	state_save_register_device_item(device, 0, z80dma->vector);
+	state_save_register_device_item(device, 0, z80dma->ip);
+	state_save_register_device_item(device, 0, z80dma->ius);
 	state_save_register_device_item(device, 0, z80dma->addressA);
 	state_save_register_device_item(device, 0, z80dma->addressB);
 	state_save_register_device_item(device, 0, z80dma->count);
@@ -599,9 +726,15 @@ static DEVICE_RESET( z80dma )
 	z80dma->rdy = 0;
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
+	z80dma->vector = 0;
+	z80dma->ip = 0;
+	z80dma->ius = 0;
 	z80dma->read_num_follow = z80dma->read_cur_follow = 0;
-	z80dma->irq_en = 0;
 	z80dma->reset_pointer = 0;
+
+	/* disable interrupts */
+	WR3(z80dma) &= ~0x20;
+
 	z80dma_update_status(device);
 }
 
