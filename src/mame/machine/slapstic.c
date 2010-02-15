@@ -615,7 +615,7 @@ static const struct slapstic_data slapstic113 =
 };
 
 
-/* slapstic 137412-114: Unknown (Europe) (unconfirmed) */
+/* slapstic 137412-114: Pit Fighter (rev 9) (confirmed) */
 static const struct slapstic_data slapstic114 =
 {
 	/* basic banking */

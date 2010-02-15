@@ -626,8 +626,105 @@ ROM_END
 
 
 /*
-This (rev 7) is the most recent Pit Fighter pcb that we have documented.
-It has printed Atari stickers that show the following:
+Pit Fighter (rev 9)
+
+There are printed Atari stickers that show the following:
+
+2 main board stickers:
+
+PITFIGHTER
+A0478936-03
+
+WO#-PITPCB08
+G1 REV.D BD.
+
+2 stickers on JSA Audio II board:
+
+JSA II PITJSA10
+PIT
+FIGHTER
+A047184-05
+
+SBOM
+00R5
+001
+
+The card stuck into location 10P has 1 sticker:
+
+OOPSPCB01
+G1 OOPS
+PCB
+A048490-01
+
+The chip on the 10P card is labeled 136079-2053
+*/
+ROM_START( pitfight )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_LOAD16_BYTE( "136081-9028.05d", 0x00000, 0x10000, CRC(427713e9) SHA1(8b4913188cac9fe3845c812a07c81f5fdb4a2ded) )
+	ROM_LOAD16_BYTE( "136081-9029.05b", 0x00001, 0x10000, CRC(2cdeaeba) SHA1(e02c99d7f5a7080ea75dc2dd59d4678b62f6bd55) )
+	ROM_LOAD16_BYTE( "136081-9030.15d", 0x20000, 0x10000, CRC(3bace9ef) SHA1(29072871b268f343fa1e7fcc9682674df2b2e34f) )
+	ROM_LOAD16_BYTE( "136081-9031.15b", 0x20001, 0x10000, CRC(c717f011) SHA1(3c5d6c12b85285422345a1aba3f8c497f74c6889) )
+
+	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_LOAD( "136081-1060.1b", 0x10000, 0x4000, CRC(231d71d7) SHA1(24622eee5fe873ef81e1df2691bd7a1d3ea7ef6b) )
+	ROM_CONTINUE(               0x04000, 0xc000 )
+
+	ROM_REGION( 0x0a0000, "gfx1", 0 )
+	ROM_LOAD( "136081-1017.130m", 0x000000, 0x10000, CRC(ad3cfea5) SHA1(7b6fec131230e84ab87b7fc95f08989916f30e02) ) /* playfield, planes 0-3 odd */
+	ROM_LOAD( "136081-1018.120m", 0x010000, 0x10000, CRC(1a0f8bcf) SHA1(b965e73246db9507d2ad42dfcb033692b43b9b7a) )
+	ROM_LOAD( "136081-1021.90m",  0x040000, 0x10000, CRC(777efee3) SHA1(07591f11685c4c75c24c55fd242878253d32481b) ) /* playfield, planes 0-3 even */
+	ROM_LOAD( "136081-1022.75m",  0x050000, 0x10000, CRC(524319d0) SHA1(6f47a69d7d4e2a8f79b7470138e8b4edd6d0b2bb) )
+	ROM_LOAD( "136081-1025.45m",  0x080000, 0x10000, CRC(fc41691a) SHA1(4ef2f9093f20d27e1ba7d218b90ff6abb1f33646) ) /* playfield plane 4 */
+
+	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
+
+	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
+	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
+	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
+	ROM_LOAD16_BYTE( "136081-1004.70n",  0x040000, 0x20000, CRC(977744da) SHA1(10f388eef999f702863e2b1a02a188df9a0a6086) )
+	ROM_LOAD16_BYTE( "136081-1005.75r",  0x080001, 0x20000, CRC(ae59aef2) SHA1(44eda8a01016f6911b47df973b9427ff9f2ecef0) )
+	ROM_LOAD16_BYTE( "136081-1006.75n",  0x080000, 0x20000, CRC(b6ccd77e) SHA1(f09a829143abd972699f3e671d4a1362fd362b19) )
+	ROM_LOAD16_BYTE( "136081-1007.90r",  0x0c0001, 0x20000, CRC(ba33b0c0) SHA1(be09ba8796d3db2a859a2776336c1e9acbdaee95) )
+	ROM_LOAD16_BYTE( "136081-1008.90n",  0x0c0000, 0x20000, CRC(09bd047c) SHA1(c283d526c7b08ce06e3981d1fc69433ea0dae657) )
+	ROM_LOAD16_BYTE( "136081-1009.100r", 0x100001, 0x20000, CRC(ab85b00b) SHA1(6c60b9b58ff93ffdd1cffc49c3ea67400d56bf61) )
+	ROM_LOAD16_BYTE( "136081-1010.100n", 0x100000, 0x20000, CRC(eca94bdc) SHA1(c474dfc9dc4460cd2f40cc6012214e760b133c0d) )
+	ROM_LOAD16_BYTE( "136081-1011.115r", 0x140001, 0x20000, CRC(a86582fd) SHA1(8b557622c53c8ff388248ea54d3cc85b0d77cafb) )
+	ROM_LOAD16_BYTE( "136081-1012.115n", 0x140000, 0x20000, CRC(efd1152d) SHA1(77d1752b76b079c9e834a8b73e8601873d3afdbe) )
+	ROM_LOAD16_BYTE( "136081-1013.120r", 0x180001, 0x20000, CRC(a141379e) SHA1(d4c98b364495e19e2e7bee5431834f38ba20a514) )
+	ROM_LOAD16_BYTE( "136081-1014.120n", 0x180000, 0x20000, CRC(93bfcc15) SHA1(4d8f6c8c279533b2fc35f87c3eb5ed614cb03248) )
+	ROM_LOAD16_BYTE( "136081-1015.130r", 0x1c0001, 0x20000, CRC(9378ad0b) SHA1(909f9879f5b8fc3ed0622fd27d903ccb1f7a90c6) )
+	ROM_LOAD16_BYTE( "136081-1016.130n", 0x1c0000, 0x20000, CRC(19c3fbe0) SHA1(ba28f71edb04387f009afe39bfe0ffeff8fbf5e9) )
+
+	ROM_REGION( 0x40000, "adpcm", 0 )	/* 256k for ADPCM samples */
+	ROM_LOAD( "136081-1061.7k",  0x00000, 0x10000, CRC(5b0468c6) SHA1(c910344622386e6be336fe04bc0be758ac6c59db) )
+	ROM_LOAD( "136081-1062.7j",  0x10000, 0x10000, CRC(f73fe3cb) SHA1(547b5c4add617237c4c851751a27cda091fb7933) )
+	ROM_LOAD( "136081-1063.7e",  0x20000, 0x10000, CRC(aa93421d) SHA1(f319057dadcb77a489d0bcffb24e0afe88adc769) )
+	ROM_LOAD( "136081-1064.7d",  0x30000, 0x10000, CRC(33f045d5) SHA1(1fc7bedafeb3c1ffa0f115538cc300959c8d4601) )
+
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_LOAD( "136081-1040.30s",  0x0000, 0x0200, CRC(9b0f8b95) SHA1(d03987fe2d50a9f7769c600885bd1c7e1dee0789) )
+	ROM_LOAD( "136081-1041.25s",  0x0200, 0x0200, CRC(f7ba6153) SHA1(d58792c9e9ea72d8f53f41ac1b420a86db6da3a3) )
+	ROM_LOAD( "136081-1042.20s",  0x0400, 0x0200, CRC(3572fe68) SHA1(ab34ff337c16cd4d568cd2bd6a5063f5ed97368f) )
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	ROM_LOAD( "gal16v8a-136081-1043.15e",  0x0000, 0x0117, CRC(649d9c0d) SHA1(bba2f3cf4607946340de27157c799f6b84c48584) )
+	ROM_LOAD( "gal16v8a-136079-1045.40p",  0x0200, 0x0117, CRC(535c4d2e) SHA1(a428eef81723546566216e6af0db3baebda9a1f2) )
+	ROM_LOAD( "gal16v8a-136079-1046.65d",  0x0400, 0x0117, CRC(38b22b2c) SHA1(cf9051129a790f3427e1c6d74a5c66f16acbd4be) )
+	ROM_LOAD( "gal16v8a-136079-1047.40s",  0x0600, 0x0117, CRC(20839904) SHA1(134d1b379b7708ce33fbbf75e5c879dad971cd22) )
+	ROM_LOAD( "gal16v8a-136079-1048.125f", 0x0800, 0x0117, CRC(d16e8d6e) SHA1(61cc270d80cb34f63fc407e41b55f95d59717757) )
+	ROM_LOAD( "gal16v8a-136079-1049.120f", 0x0a00, 0x0117, CRC(68440ab1) SHA1(2f4eabac27d9a5778fcba0d9aa47460bcb153378) )
+	ROM_LOAD( "gal16v8a-136079-1050.115f", 0x0c00, 0x0117, CRC(20dc296a) SHA1(9179fca2efcdd0782bb15cbf1923670806755bc8) )
+	ROM_LOAD( "gal16v8a-136079-1051.105f", 0x0e00, 0x0117, CRC(45f0cb5f) SHA1(a7043231f68374871253da50cfd905519f283d9e) )
+	ROM_LOAD( "gal16v8a-136079-1052.30n",  0x1000, 0x0117, CRC(6b3d2669) SHA1(143178d9c36a87aa58034faea2e4d4038ae565e7) )
+ROM_END
+
+
+/*
+Pit Fighter (rev 7)
+
+There are printed Atari stickers that show the following:
 
 2 main board stickers:
 
@@ -657,8 +754,7 @@ A048490-01
 
 The chip on the 10P card is labeled 136079-2053.
 */
-
-ROM_START( pitfight )
+ROM_START( pitfight7 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136081-7028.05d", 0x00000, 0x10000, CRC(7391dc8b) SHA1(2140b21e71871c2cb81cccd92f536763d955ec97) )
 	ROM_LOAD16_BYTE( "136081-7029.05b", 0x00001, 0x10000, CRC(b3b88382) SHA1(0a0de330d7261c7eaa5aa705328d6c0c28d27536) )
@@ -1093,8 +1189,9 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 static DRIVER_INIT( hydra )    { init_g1_common(machine, 0x078000, 116, 0); }
 static DRIVER_INIT( hydrap )   { init_g1_common(machine, 0x000000,   0, 0); }
 
-static DRIVER_INIT( pitfight7 ) { init_g1_common(machine, 0x038000, 112, 2); }
-static DRIVER_INIT( pitfight ) { init_g1_common(machine, 0x038000, 111, 1); }
+static DRIVER_INIT( pitfight9 ) { init_g1_common(machine, 0x038000, 114, 1); }
+static DRIVER_INIT( pitfight7 ) { init_g1_common(machine, 0x038000, 112, 1); }
+static DRIVER_INIT( pitfight )  { init_g1_common(machine, 0x038000, 111, 1); }
 static DRIVER_INIT( pitfightj ) { init_g1_common(machine, 0x038000, 113, 1); }
 static DRIVER_INIT( pitfightb ) { init_g1_common(machine, 0x038000,  -1, 1); }
 
@@ -1109,10 +1206,11 @@ GAME( 1990, hydra,    0,        atarig1, hydra,    hydra,    ROT0, "Atari Games"
 GAME( 1990, hydrap,   hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hydrap2,  hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight,  0,        atarig1, pitfight, pitfight7,ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight6, pitfight, atarig1, pitfight, pitfightj,ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight5, pitfight, atarig1, pitfight, pitfight7,ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight4, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight3, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightj, pitfight, atarig1, pitfightj,pitfightj,ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, atarig1, pitfight, pitfightb,ROT0, "Atari Games", "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight,  0,        atarig1, pitfight, pitfight9, ROT0, "Atari Games", "Pit Fighter (rev 9)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight7, pitfight, atarig1, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight6, pitfight, atarig1, pitfight, pitfightj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight5, pitfight, atarig1, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight4, pitfight, atarig1, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight3, pitfight, atarig1, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightj, pitfight, atarig1, pitfightj,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, atarig1, pitfight, pitfightb, ROT0, "Atari Games", "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )
