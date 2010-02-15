@@ -14,19 +14,25 @@
   Noise emulation for all verified chips should be accurate:
 
   ** SN76489 uses a 15-bit shift register with taps on bits D and E, output on E,
-  XOR function; SN94624 is identical to SN76489.
+  XOR function.
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
+  Its output is inverted.
+  ** SN94624 is the same as SN76489 but lacks the /8 divider on its clock input.
   ** SN76489A uses a 15-bit shift register with taps on bits D and E, output on F,
-  XNOR function
+  XOR function.
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
+  Its output is not inverted.
   ** SN76494 is the same as SN76489A but lacks the /8 divider on its clock input.
-  ** SN76496 is PROBABLY identical in operation to the SN76489A, need more info.
+  ** SN76496 is identical in operation to the SN76489A, but the audio input is
+  documented.
   All the SN7xxxx chips have an audio input line which is mixed with the 4 channels
-  of output.
+  of output. (It is undocumented and may not function properly on the sn76489, 76489a
+  and 76494; the sn76489a input is mentioned in datasheets for the tms5200)
   ** Sega Master System III/MD/Genesis PSG uses a 16-bit shift register with taps
   on bits C and F, output on F
   It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
-  (whether it uses an XOR or XNOR needs to be verified)
+  (whether it uses an XOR or XNOR needs to be verified, assumed XOR)
+  (whether output is inverted or not needs to be verified, assumed to be inverted)
   ** Sega Game Gear PSG is identical to the SMS3/MD/Genesis one except it has an
   extra register for mapping which channels go to which speaker.
   The register, connected to a z80 port, means:
@@ -82,6 +88,11 @@
   Thanks to PlgDavid for providing samples which helped immensely here.
   Added true clock divider emulation, so sn94624 and sn76494 run 8x faster than
   the others, as in real life.
+  
+  15/02/2010: Lord Nightmare & Michael Zapf (additional testing by PlgDavid)
+  Fix noise period when set to mirror channel 3 and channel 3 period is set to 0 (tested on hardware for noise, wave needs tests) - MZ
+  Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only inversion is the output itself - LN, Plgdavid
+  Thanks to PlgDavid and Michael Zapf for providing samples which helped immensely here.
 
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
@@ -114,7 +125,6 @@ struct _sn76496_state
 	INT32 FeedbackMask;	/* mask for feedback */
 	INT32 WhitenoiseTap1;	/* mask for white noise tap 1 (higher one, usually bit 14) */
 	INT32 WhitenoiseTap2;	/* mask for white noise tap 2 (lower one, usually bit 13)*/
-	INT32 FeedbackInvert;	/* feedback invert flag (xor vs xnor) */
 	INT32 Negate;		/* output negate flag */
 	INT32 Stereo;		/* whether we're dealing with stereo or not */
 	INT32 StereoMask;	/* the stereo output mask */
@@ -193,7 +203,8 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 		case 2:	/* tone 1 : frequency */
 		case 4:	/* tone 2 : frequency */
 		    if ((data & 0x80) == 0) R->Register[r] = (R->Register[r] & 0x0f) | ((data & 0x3f) << 4);
-			R->Period[c] = R->Register[r];
+			if (R->Register[r] != 0) R->Period[c] = R->Register[r];
+			else R->Period[c] = 0x400;
 			if (r == 4)
 			{
 				/* update noise shift frequency */
@@ -248,7 +259,7 @@ static STREAM_UPDATE( SN76496Update )
 			for (i = 0;i < 3;i++)
 			{
 				R->Count[i]--;
-				if (R->Count[i] < 0)
+				if (R->Count[i] <= 0)
 				{
 					R->Output[i] ^= 1;
 					R->Count[i] = R->Period[i];
@@ -261,7 +272,7 @@ static STREAM_UPDATE( SN76496Update )
 			{
 			// if noisemode is 1, both taps are enabled
 			// if noisemode is 0, the lower tap, whitenoisetap2, is held at 1 or 0 depending on whether FeedbackInvert is set or clear
-				if (((R->RNG & R->WhitenoiseTap1)?1:0) ^ (((((R->RNG & R->WhitenoiseTap2)?0:1))*(NOISEMODE))^R->FeedbackInvert) ^ R->FeedbackInvert )
+				if (((R->RNG & R->WhitenoiseTap1)?1:0) ^ ((((R->RNG & R->WhitenoiseTap2)?1:0))*(NOISEMODE)))
 				{
 					R->RNG >>= 1;
 					R->RNG |= R->FeedbackMask;
@@ -360,7 +371,6 @@ static int SN76496_init(running_device *device, sn76496_state *R, int stereo)
 	R->FeedbackMask = 0x10000;     /* mask for feedback */
 	R->WhitenoiseTap1 = 0x04;   /* mask for white noise tap 1*/
 	R->WhitenoiseTap2 = 0x08;   /* mask for white noise tap 2*/
-	R->FeedbackInvert = 1; /* feedback invert flag */
 	R->Negate = 0; /* channels are not negated */
 	R->Stereo = stereo; /* depends on init */
 	R->CyclestoREADY = 1; /* assume ready is not active immediately on init. is this correct?*/
@@ -373,7 +383,7 @@ static int SN76496_init(running_device *device, sn76496_state *R, int stereo)
 }
 
 
-static void generic_start(running_device *device, int feedbackmask, int noisetap1, int noisetap2, int feedbackinvert, int negate, int stereo, int clockdivider)
+static void generic_start(running_device *device, int feedbackmask, int noisetap1, int noisetap2, int negate, int stereo, int clockdivider)
 {
 	sn76496_state *chip = get_safe_token(device);
 
@@ -384,7 +394,6 @@ static void generic_start(running_device *device, int feedbackmask, int noisetap
 	chip->FeedbackMask = feedbackmask;
 	chip->WhitenoiseTap1 = noisetap1;
 	chip->WhitenoiseTap2 = noisetap2;
-	chip->FeedbackInvert = feedbackinvert;
 	chip->Negate = negate;
 	chip->Stereo = stereo;
 	chip->ClockDivider = clockdivider;
@@ -400,7 +409,6 @@ static void generic_start(running_device *device, int feedbackmask, int noisetap
 	state_save_register_device_item(device, 0, chip->FeedbackMask);
 	state_save_register_device_item(device, 0, chip->WhitenoiseTap1);
 	state_save_register_device_item(device, 0, chip->WhitenoiseTap2);
-	state_save_register_device_item(device, 0, chip->FeedbackInvert);
 	state_save_register_device_item(device, 0, chip->Negate);
 	state_save_register_device_item(device, 0, chip->Stereo);
 	state_save_register_device_item(device, 0, chip->StereoMask);
@@ -410,46 +418,47 @@ static void generic_start(running_device *device, int feedbackmask, int noisetap
 	state_save_register_device_item(device, 0, chip->CyclestoREADY);
 }
 
-// function parameters: device, feedback destination tap, feedback source taps, xor(false)/xnor(true), normal(false)/invert(true), mono(false)/stereo(true), clock divider factor
+// function parameters: device, feedback destination tap, feedback source taps,
+// normal(false)/invert(true), mono(false)/stereo(true), clock divider factor
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, FALSE, 8); // SN76489 not verified yet. todo: verify;
+	generic_start(device, 0x10000, 0x04, 0x08, TRUE, FALSE, 8); // SN76489 not verified yet. todo: verify;
 }
 
 static DEVICE_START( sn76489a )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, TRUE, FALSE, FALSE, 8); // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
+	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8); // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
 }
 
 static DEVICE_START( sn76494 )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, TRUE, FALSE, FALSE, 1); // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
+	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 1); // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
 }
 
 static DEVICE_START( sn76496 )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, TRUE, FALSE, FALSE, 8); // SN76496 not verified; assumed to be the same as sn76489a
+	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8); // SN76496: Whitenoise verified, phase verified, periodic verified (by Michael Zapf)
 }
 
 static DEVICE_START( sn94624 )
 {
-	generic_start(device, 0x4000, 0x01, 0x02, FALSE, TRUE, FALSE, 1); // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
+	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 1); // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
 }
 
 static DEVICE_START( ncr7496 )
 {
-	generic_start(device, 0x8000, 0x02, 0x20, FALSE, FALSE, FALSE, 8); // NCR7496 not verified; info from smspower wiki
+	generic_start(device, 0x8000, 0x02, 0x20, FALSE, FALSE, 8); // NCR7496 not verified; info from smspower wiki
 }
 
 static DEVICE_START( gamegear )
 {
-	generic_start(device, 0x8000, 0x01, 0x08, FALSE, TRUE, TRUE, 8); // Verified by Justin Kerk
+	generic_start(device, 0x8000, 0x01, 0x08, TRUE, TRUE, 8); // Verified by Justin Kerk
 }
 
 static DEVICE_START( smsiii )
 {
-	generic_start(device, 0x8000, 0x01, 0x08, FALSE, TRUE, FALSE, 8); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
+	generic_start(device, 0x8000, 0x01, 0x08, TRUE, FALSE, 8); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 }
 
 
