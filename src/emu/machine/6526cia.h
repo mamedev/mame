@@ -40,7 +40,7 @@
 ***************************************************************************/
 
 #define MOS6526R1		DEVICE_GET_INFO_NAME(cia6526r1)
-#define MOS6526R2		DEVICE_GET_INFO_NAME(cia6526r1)
+#define MOS6526R2		DEVICE_GET_INFO_NAME(cia6526r2)
 #define MOS8520			DEVICE_GET_INFO_NAME(cia8520)
 
 #define MDRV_MOS6526R1_ADD(_tag, _clock, _config) \
