@@ -1621,9 +1621,9 @@ static DISCRETE_STEP(dst_switch)
  * input[3]    - Threshold for enable
  *
  ************************************************************************/
-#define DST_ASWITCH__CTRL		DISCRETE_INPUT(1)
-#define DST_ASWITCH__IN			DISCRETE_INPUT(2)
-#define DST_ASWITCH__THRESHOLD	DISCRETE_INPUT(3)
+#define DST_ASWITCH__CTRL		DISCRETE_INPUT(0)
+#define DST_ASWITCH__IN			DISCRETE_INPUT(1)
+#define DST_ASWITCH__THRESHOLD	DISCRETE_INPUT(2)
 
 
 static DISCRETE_STEP(dst_aswitch)
