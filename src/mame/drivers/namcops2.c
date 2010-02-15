@@ -115,7 +115,7 @@ ROM_END
 
 ROM_START( kinniku )
 	ROM_REGION(0x200000, "bios", 0)
-	SYSTEM246_BIOS
+	SYSTEM256_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
         ROM_LOAD( "kn1vera.ic002", 0x000000, 0x800000, CRC(17aac6c3) SHA1(dddf37e88385f01bba27496d03f053fdc33882e2) )
@@ -133,6 +133,7 @@ ROM_START( netchu02 )
         ROM_LOAD( "npy1verb_spr.ic002", 0x800000, 0x040000, CRC(6a3374f0) SHA1(0c0845edc0ac0e9871e65caade8b4157614b81eb) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "npy1cd0b", 0, SHA1(514adcd2d4205873b3d144a05c033822344798e3) )
 ROM_END
 
 ROM_START( soulclb2 )
@@ -155,6 +156,7 @@ ROM_START( soulcl2a )
         ROM_LOAD( "sc21vera_spr.ic002", 0x800000, 0x040000, CRC(f5502fdf) SHA1(064196982d855bd41bafe97db5ff5694b933016a) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sc210d", 0, SHA1(9a7b1ea836adc9d78481928a3067530e0f8d74a6) )
 ROM_END
 
 ROM_START( soulclb3 )
@@ -166,6 +168,7 @@ ROM_START( soulclb3 )
         ROM_LOAD( "sc31001-na-a_spr.ic002", 0x800000, 0x040000, CRC(18c6f56d) SHA1(13bc6a3688985c0cd9900b063824a4af691a1b31) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sc31na0b", 0, SHA1(b46ee35083f8fcc091ce562951c55fbdbb929e4b) )
 ROM_END
 
 ROM_START( sukuinuf )
@@ -177,11 +180,12 @@ ROM_START( sukuinuf )
         ROM_LOAD( "in2vera_spr.ic002", 0x800000, 0x040000, CRC(c43fed95) SHA1(b6001dc8ff34198400a7bf3e41e5ab73823685b0) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "in2vera", 0, SHA1(4e2d95798a2bcc6f93bc82c364379a3936d68986) )
 ROM_END
 
 ROM_START( taiko9 )
 	ROM_REGION(0x200000, "bios", 0)
-	SYSTEM246_BIOS
+	SYSTEM256_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
         ROM_LOAD( "tk91001-na-a.ic002", 0x000000, 0x800000, CRC(db4efc9a) SHA1(a24f10c726f5bc7313559a515d5c4c34cd129c97) )
@@ -221,6 +225,7 @@ ROM_START( tekken4b )
         ROM_LOAD( "tef1vera.spr", 0x800000, 0x040000, CRC(64e12053) SHA1(04383cf928b4fd82290d7cccc7b23104fbf2c2f2) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tef1dvd0", 0, SHA1(f39aa37156245f622a6e19e8a0e081418e247b36) )
 ROM_END
 
 ROM_START( tekken51 )
@@ -232,6 +237,7 @@ ROM_START( tekken51 )
         ROM_LOAD( "te51verb_spr.ic002", 0x800000, 0x040000, CRC(683bad0d) SHA1(ef10accbdc82143c31d29e2b8b812a209b341b1b) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "te510b", 0, SHA1(2a0ac3723725572c1810b0ef4bcfa7aa114062f8) )
 ROM_END
 
 ROM_START( zgundm )
@@ -269,9 +275,9 @@ GAME(2004, fghtjam,    sys246, system246, system246, 0, ROT0, "Capcom/Namco", "C
 GAME(2004, sukuinuf,   sys246, system246, system246, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2004, zgundmdx,   sys246, system246, system246, 0, ROT0, "Capcom/Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2005, soulclb3,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2006, kinniku,    sys246, system246, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2006, taiko9,     sys246, system246, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 
