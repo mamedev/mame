@@ -1179,22 +1179,6 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, render_contain
 
 
 /*-------------------------------------------------
-    ui_use_new_ui - determines if the "new ui"
-    is in use
--------------------------------------------------*/
-
-int ui_use_new_ui(void)
-{
-#ifdef MESS
-#if (defined(WIN32) || defined(_MSC_VER)) && !defined(SDLMAME_WIN32)
-	if (options_get_bool(mame_options(), "newui"))
-		return TRUE;
-#endif
-#endif
-	return FALSE;
-}
-
-/*-------------------------------------------------
     process_natural_keyboard - processes any
     natural keyboard input
 -------------------------------------------------*/
@@ -1300,10 +1284,10 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = ui_use_new_ui() || (input_machine_has_keyboard(machine) && !ui_active);
+	int ui_disabled = (input_machine_has_keyboard(machine) && !ui_active);
 
 	/* is ScrLk UI toggling applicable here? */
-	if (!ui_use_new_ui() && input_machine_has_keyboard(machine))
+	if (input_machine_has_keyboard(machine))
 	{
 		/* are we toggling the UI with ScrLk? */
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
@@ -1339,7 +1323,6 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	if (ui_get_use_natural_keyboard(machine) && (mame_get_phase(machine) == MAME_PHASE_RUNNING))
 		process_natural_keyboard(machine);
 
-	/* MESS-specific UI; provided that the UI is not disabled */
 	if (!ui_disabled)
 	{
 		/* paste command */
@@ -1347,11 +1330,11 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 			ui_paste(machine);
 	}
 
-	if (ui_disabled) return ui_disabled;
-
 #ifdef MESS
 	ui_mess_handler_ingame(machine);
 #endif /* MESS */
+
+	if (ui_disabled) return ui_disabled;
 
 	/* if the user pressed ESC, stop the emulation */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))

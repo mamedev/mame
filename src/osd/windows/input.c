@@ -771,15 +771,6 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_ENTER);
 				break;
 
-			case IPT_OSD_2:
-				if (ui_use_new_ui())
-				{
-					typedesc->token = "TOGGLE_MENUBAR";
-					typedesc->name = "Toggle Menubar";
-					input_seq_set_1 (&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_SCRLOCK);
-				}
-				break;
-
 			case IPT_UI_THROTTLE:
 				input_seq_set_0(&typedesc->seq[SEQ_TYPE_STANDARD]);
 				break;
