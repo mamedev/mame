@@ -227,7 +227,6 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 				/* N/512,N/1024,N/2048,Tone #3 output */
 				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (1 << (5+(n&3)));
 				R->RNG = R->FeedbackMask;
-				R->Output[3] = R->RNG & 1;
 			}
 			break;
 	}
@@ -271,7 +270,7 @@ static STREAM_UPDATE( SN76496Update )
 			if (R->Count[3] <= 0)
 			{
 			// if noisemode is 1, both taps are enabled
-			// if noisemode is 0, the lower tap, whitenoisetap2, is held at 1 or 0 depending on whether FeedbackInvert is set or clear
+			// if noisemode is 0, the lower tap, whitenoisetap2, is held at 0
 				if (((R->RNG & R->WhitenoiseTap1)?1:0) ^ ((((R->RNG & R->WhitenoiseTap2)?1:0))*(NOISEMODE)))
 				{
 					R->RNG >>= 1;
@@ -423,7 +422,7 @@ static void generic_start(running_device *device, int feedbackmask, int noisetap
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, TRUE, FALSE, 8); // SN76489 not verified yet. todo: verify;
+	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 8); // SN76489 not verified yet. todo: verify;
 }
 
 static DEVICE_START( sn76489a )
