@@ -818,6 +818,39 @@ static void print_game_driver(FILE *out, const game_driver *game, const machine_
 	fprintf(out, "/>\n");
 }
 
+/*-------------------------------------------------
+    print_game_categories - print the Categories
+    settings for a system
+-------------------------------------------------*/
+
+void print_game_categories(FILE *out, const game_driver *game, const ioport_list &portlist)
+{
+	const input_port_config *port;
+	const input_field_config *field;
+
+	/* iterate looking for Categories */
+	for (port = portlist.first(); port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if (field->type == IPT_CATEGORY)
+			{
+				const input_setting_config *setting;
+
+				/* output the category name information */
+				fprintf(out, "\t\t<category name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
+
+				/* loop over item settings */
+				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				{
+					fprintf(out, "\t\t\t<item name=\"%s\"", xml_normalize_string(setting->name));
+					if (setting->value == field->defvalue)
+						fprintf(out, " default=\"yes\"");
+					fprintf(out, "/>\n");
+				}
+
+				/* terminate the category entry */
+				fprintf(out, "\t\t</category>\n");
+			}
+}
 
 /*-------------------------------------------------
     print_game_info - print the XML information
@@ -890,9 +923,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_input(out, game, portlist);
 	print_game_switches(out, game, portlist);
 	print_game_configs(out, game, portlist);
-#ifdef MESS
 	print_game_categories(out, game, portlist);
-#endif /* MESS */
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 #ifdef MESS
@@ -926,7 +957,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 #ifdef MESS
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*)>\n"
 #else
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, driver?)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?)>\n"
 #endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
@@ -1015,13 +1046,11 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
-#ifdef MESS
 		"\t\t<!ELEMENT category (item*)>\n"
 		"\t\t\t<!ATTLIST category name CDATA #REQUIRED>\n"
 		"\t\t\t<!ELEMENT item EMPTY>\n"
 		"\t\t\t\t<!ATTLIST item name CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST item default (yes|no) \"no\">\n"
-#endif
 		"\t\t<!ELEMENT adjuster EMPTY>\n"
 		"\t\t\t<!ATTLIST adjuster name CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST adjuster default CDATA #REQUIRED>\n"
