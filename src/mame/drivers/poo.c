@@ -16,6 +16,33 @@ TODO:
 
 *******************************************************************************************/
 
+/* Stephh's Notes:
+
+'unclepoo'
+
+SYSTEM bit 7 is sort of "freeze", but it doesn't seem to have any effect when playing
+(only during boot up sequence - unsure about attract mode)
+
+DSW1 bit 5 is "Bonus Lives" :
+  - when Off (0x00), you get an extra life EVERY 30000 points
+  - When On  (0x20), you get an extra life at 30000 points ONLY
+
+DSW1 bits 6 and 7 might be used for difficulty (to be confirmed)
+
+DSW2 bit 0 is the "Cabinet" Dip Switch :
+  - when Off (0x00), cabinet is cocktail
+  - When On  (0x01), cabinet is upright
+This affects write to 0xb700 (bit 7) and reads from 0xb506 and 0xb507 ...
+BTW, remove PORT_PLAYER(1) and change PORT_PLAYER(2) to PORT_COCKTAIL ...
+
+DSW2 bit 7 overwrites the number of lives :
+  - When Off (0x00), lives are based on DSW1 bit 4
+  - When On  (0x80), lives are set to 255 (0xff) but they are NOT infinite
+
+Other bits from DSW2 (but bit 5) don't seem to be read / tested at all ...
+*/
+
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
