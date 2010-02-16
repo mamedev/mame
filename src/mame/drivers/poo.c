@@ -2,12 +2,12 @@
 
 Uncle Poo (c) 1983 Diatec
 
-actually a bootleg / hack of something else?
+actually an hack of Joinem? Or there's something even more similar?
 
 driver by David Haywood and Angelo Salese
 
 TODO:
--sound
+-merge with jack.c driver, this is a modification of that HW (with colscroll)
 -accurate game speed (controlled by an irq)
 -title screen colors are wrong? But I can't see how I could fix it without breaking anything
  else
@@ -96,16 +96,15 @@ static WRITE8_HANDLER( unk_w )
 /* soundlatch write */
 static WRITE8_HANDLER( test_w )
 {
-	popmessage("%02x",data);
-	//soundlatch_w(space, 0, (data & 0xff));
+	soundlatch_w(space, 0, (data & 0xff));
 	cputag_set_input_line(space->machine, "subcpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( test2_w )
 {
-	popmessage("%02x",data);
+	//x[1] = data;
 	//soundlatch2_w(space, 0, (data & 0xff));
-	cputag_set_input_line(space->machine, "subcpu", 0, HOLD_LINE);
+	//cputag_set_input_line(space->machine, "subcpu", 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( unclepoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -148,8 +147,7 @@ static ADDRESS_MAP_START( unclepoo_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 
-//	AM_RANGE(0x6000, 0x6000) AM_WRITE(soundlatch_clear_w)
-
+	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* R/C filter ??? */
 ADDRESS_MAP_END
 
 
@@ -308,25 +306,30 @@ static READ8_HANDLER( test2_r )
 }
 #endif
 
+static READ8_HANDLER( timer_r )
+{
+	return cpu_get_total_cycles(space->cpu) / 128;
+}
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("subcpu", PROGRAM, unk_inp_r),
-	DEVCB_MEMORY_HANDLER("subcpu", PROGRAM, unk_inp_r),
+	DEVCB_MEMORY_HANDLER("subcpu", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("subcpu", PROGRAM, timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( unclepoo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,18000000/6)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(unclepoo_main_map)
 	MDRV_CPU_IO_MAP(unclepoo_main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,120) // controls game speed
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,256) // ??? controls game speed
 
-	MDRV_CPU_ADD("subcpu", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("subcpu", Z80,18000000/12)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(unclepoo_sub_map)
 	MDRV_CPU_IO_MAP(unclepoo_sub_portmap)
 //	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -347,7 +350,7 @@ static MACHINE_DRIVER_START( unclepoo )
 	MDRV_VIDEO_UPDATE(unclepoo)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
+	MDRV_SOUND_ADD("ay", AY8910, 18000000/12) /* ? Mhz */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -374,4 +377,4 @@ ROM_START( unclepoo )
 	ROM_LOAD( "diatec_l.bin", 0x100, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
 ROM_END
 
-GAME( 1983, unclepoo, 0, unclepoo, unclepoo, 0, ROT90, "Diatec",         "Uncle Poo", GAME_NO_SOUND )
+GAME( 1983, unclepoo, 0, unclepoo, unclepoo, 0, ROT90, "Diatec",         "Uncle Poo", 0 )
