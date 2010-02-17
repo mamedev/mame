@@ -333,10 +333,11 @@ static READ8_HANDLER( test2_r )
 }
 #endif
 
-static READ8_HANDLER( timer_r )
+ static READ8_HANDLER( timer_r )
 {
-	return cpu_get_total_cycles(space->cpu) / 128;
+	return cpu_get_total_cycles(space->cpu) / 16;
 }
+
 
 static const ay8910_interface ay8910_config =
 {
@@ -367,7 +368,7 @@ static MACHINE_DRIVER_START( unclepoo )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 
 	MDRV_GFXDECODE(unclepoo)
 	MDRV_PALETTE_LENGTH(0x100)
