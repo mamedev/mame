@@ -302,7 +302,7 @@ READ8_DEVICE_HANDLER( z80ctc_r )
 		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds)));
 
 		if (channel->timer != NULL)
-			return ((int)(attotime_to_double(timer_timeleft(channel->timer)) * attotime_to_double(period)) + 1) & 0xff;
+			return ((int)(attotime_to_double(timer_timeleft(channel->timer)) / attotime_to_double(period)) + 1) & 0xff;
 		else
 			return 0;
 	}
