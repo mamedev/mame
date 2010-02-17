@@ -2069,7 +2069,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
                       So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
 			if (hng64_3dregs[0x00/4] & 0x2000)
 			{
-				polys[*numPolys].palOffset += 0x800;
+				if (strcmp(machine->basename, "roadedge"))
+					polys[*numPolys].palOffset += 0x800;
 			}
 
 			//UINT16 explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
@@ -2826,6 +2827,15 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 // polygon rendering //
 ///////////////////////
 
+struct polygonRasterOptions
+{
+    int texType;
+    int texIndex;
+    int palOffset;
+    int palPageSize;
+    int debugColor;
+};
+
 /*********************************************************************/
 /**   FillSmoothTexPCHorizontalLine                                 **/
 /**     Input: Color Buffer (framebuffer), depth buffer, width and  **/
@@ -2836,8 +2846,7 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
-										  int textureType, int palOffset, int palPageSize,
-										  int texIndex, int debugColor,
+										  const polygonRasterOptions& prOptions,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
 										  float g_start, float g_delta, float b_start, float b_delta,
@@ -2849,7 +2858,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
 	const UINT8 *gfx = memory_region(machine, "textures");
-	const UINT8 *textureOffset = &gfx[texIndex * 1024 * 1024];
+	const UINT8 *textureOffset = &gfx[prOptions.texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)
 	{
@@ -2859,40 +2868,40 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			t_coord = t_start / w_start;
 			s_coord = s_start / w_start;
 
-			if ((debugColor & 0xff000000) == 0x01000000)
+			if ((prOptions.debugColor & 0xff000000) == 0x01000000)
 			{
 				// UV COLOR MODE
 				*cb = MAKE_ARGB(255, (UINT8)(s_coord*255.0f), (UINT8)(t_coord*255.0f), (UINT8)(0));
 				*db = z_start;
 			}
-			else if ((debugColor & 0xff000000) == 0x02000000)
+			else if ((prOptions.debugColor & 0xff000000) == 0x02000000)
 			{
 				// Lit
 				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*db = z_start;
 			}
-			else if ((debugColor & 0xff000000) == 0xff000000)
+			else if ((prOptions.debugColor & 0xff000000) == 0xff000000)
 			{
 				// DEBUG COLOR MODE
-				*cb = debugColor;
+				*cb = prOptions.debugColor;
 				*db = z_start;
 			}
 			else
 			{
 				// TEXTURED
-				if (textureType == 0x0)
+				if (prOptions.texType == 0x0)
 					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
-				else if (textureType == 0x1)
+				else if (prOptions.texType == 0x1)
 					paletteEntry = textureOffset[(((int)(s_coord*512.0f))*1024 + (int)(t_coord*512.0f))];
 
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
-					paletteEntry %= palPageSize;
-
+					paletteEntry %= prOptions.palPageSize;
+                    
 					// Greyscale texture test.
 					// *cb = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
-					*cb = machine->pens[palOffset + paletteEntry];
+					*cb = machine->pens[prOptions.palOffset + paletteEntry];
 					*db = z_start;
 				}
 			}
@@ -2943,8 +2952,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											int textureType, int palOffset, int palPageSize,
-											int texIndex, int debugColor)
+											const polygonRasterOptions& prOptions)
 {
 	// Get our order of points by increasing y-coord
 	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
@@ -3041,9 +3049,9 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 	t_max = (p_max == A) ? ta : (p_max == B) ? tb : tc;
 
 	// Find out control points for y, this divides the triangle into upper and lower
-	y_min  = (((int)p_min[1]) + 0.5 >= p_min[1]) ? p_min[1] : ((int)p_min[1]) + 1;
-	y_max  = (((int)p_max[1]) + 0.5 <  p_max[1]) ? p_max[1] : ((int)p_max[1]) - 1;
-	y_mid  = (((int)p_mid[1]) + 0.5 >= p_mid[1]) ? p_mid[1] : ((int)p_mid[1]) + 1;
+	y_min  = (((int)p_min[1]) + 0.5 >= p_min[1]) ? (int)p_min[1] : ((int)p_min[1]) + 1;
+	y_max  = (((int)p_max[1]) + 0.5 <  p_max[1]) ? (int)p_max[1] : ((int)p_max[1]) - 1;
+	y_mid  = (((int)p_mid[1]) + 0.5 >= p_mid[1]) ? (int)p_mid[1] : ((int)p_mid[1]) + 1;
 
 	// Compute the slopes of each line, and color this is used to determine the interpolation
 	x1_slope = (p_max[0] - p_min[0]) / (p_max[1] - p_min[1]);
@@ -3095,8 +3103,8 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 		// Compute the integer starting and ending points and the appropriate z by
 		// interpolating.  Remember the pixels are in the middle of the grid, i.e. (0.5,0.5,0.5)
 		if (x1_interp < x2_interp) {
-			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? x1_interp : ((int)x1_interp) + 1;
-			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? x2_interp : ((int)x2_interp) - 1;
+			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? (int)x1_interp : ((int)x1_interp) + 1;
+			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? (int)x2_interp : ((int)x2_interp) - 1;
 			z_delta_x  = (z2_interp - z1_interp) / (x2_interp - x1_interp);
 			w_delta_x  = (w2_interp - w1_interp) / (x2_interp - x1_interp);
 			r_delta_x  = (r2_interp - r1_interp) / (x2_interp - x1_interp);
@@ -3114,8 +3122,8 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 			t_interp_x = t1_interp + (t2_interp - t1_interp) * t;
 
 		} else {
-			x_start    = ((((int)x2_interp) + 0.5) >= x2_interp) ? x2_interp : ((int)x2_interp) + 1;
-			x_end      = ((((int)x1_interp) + 0.5) <  x1_interp) ? x1_interp : ((int)x1_interp) - 1;
+			x_start    = ((((int)x2_interp) + 0.5) >= x2_interp) ? (int)x2_interp : ((int)x2_interp) + 1;
+			x_end      = ((((int)x1_interp) + 0.5) <  x1_interp) ? (int)x1_interp : ((int)x1_interp) - 1;
 			z_delta_x  = (z1_interp - z2_interp) / (x1_interp - x2_interp);
 			w_delta_x  = (w1_interp - w2_interp) / (x1_interp - x2_interp);
 			r_delta_x  = (r1_interp - r2_interp) / (x1_interp - x2_interp);
@@ -3135,7 +3143,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, palPageSize, texIndex, debugColor,
+		FillSmoothTexPCHorizontalLine(machine, prOptions,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3175,8 +3183,8 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 	for (; y_mid <= y_max; y_mid++) {
 
 		if (x1_interp < x2_interp) {
-			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? x1_interp : ((int)x1_interp) + 1;
-			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? x2_interp : ((int)x2_interp) - 1;
+			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? (int)x1_interp : ((int)x1_interp) + 1;
+			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? (int)x2_interp : ((int)x2_interp) - 1;
 			z_delta_x  = (z2_interp - z1_interp) / (x2_interp - x1_interp);
 			w_delta_x  = (w2_interp - w1_interp) / (x2_interp - x1_interp);
 			r_delta_x  = (r2_interp - r1_interp) / (x2_interp - x1_interp);
@@ -3194,8 +3202,8 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 			t_interp_x = t1_interp + (t2_interp - t1_interp) * t;
 
 		} else {
-			x_start    = ((((int)x2_interp) + 0.5) >= x2_interp) ? x2_interp : ((int)x2_interp) + 1;
-			x_end      = ((((int)x1_interp) + 0.5) <  x1_interp) ? x1_interp : ((int)x1_interp) - 1;
+			x_start    = ((((int)x2_interp) + 0.5) >= x2_interp) ? (int)x2_interp : ((int)x2_interp) + 1;
+			x_end      = ((((int)x1_interp) + 0.5) <  x1_interp) ? (int)x1_interp : ((int)x1_interp) - 1;
 			z_delta_x  = (z1_interp - z2_interp) / (x1_interp - x2_interp);
 			w_delta_x  = (w1_interp - w2_interp) / (x1_interp - x2_interp);
 			r_delta_x  = (r1_interp - r2_interp) / (x1_interp - x2_interp);
@@ -3215,7 +3223,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, palPageSize, texIndex, debugColor,
+		FillSmoothTexPCHorizontalLine(machine, prOptions,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3245,14 +3253,21 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 		p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
 	}
 
+	// Set up the struct that will pass the polygon's options around.
+	polygonRasterOptions prOptions;
+	prOptions.texType = p->texType;
+	prOptions.texIndex = p->texIndex;
+	prOptions.palOffset = p->palOffset;
+	prOptions.palPageSize = p->palPageSize;
+	prOptions.debugColor = p->debugColor;
+
 	for (j = 1; j < p->n-1; j++)
 	{
 		RasterizeTriangle_SMOOTH_TEX_PC(machine,
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										p->texType, p->palOffset, p->palPageSize,
-										p->texIndex, p->debugColor);
+										prOptions);
 	}
 }
 
