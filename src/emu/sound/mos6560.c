@@ -13,7 +13,48 @@
       - investigate attckufo chip features (no invert mode, no multicolor, 16 col chars)
       - investigate why some vic20 carts crash emulation
 
-***************************************************************************/
+****************************************************************************
+
+    Original notes:
+
+    2 Versions
+    6560 NTSC
+    6561 PAL
+    14 bit addr bus
+    12 bit data bus
+    (16 8 bit registers)
+    alternates with MOS 6502 on the address bus
+    fetch 8 bit characternumber and 4 bit color
+    high bit of 4 bit color value determines:
+    0: 2 color mode
+    1: 4 color mode
+    than fetch characterbitmap for characternumber
+    2 color mode:
+    set bit in characterbitmap gives pixel in color of the lower 3 color bits
+    cleared bit gives pixel in backgroundcolor
+    4 color mode:
+    2 bits in the characterbitmap are viewed together
+    00: backgroundcolor
+    11: colorram
+    01: helpercolor
+    10: framecolor
+    advance to next character in videorram until line is full
+    repeat this 8 or 16 lines, before moving to next line in videoram
+    screen ratio ntsc, pal 4/3
+
+    pal version:
+    can contain greater visible areas
+    expects other sync position (so ntsc modules may be displayed at
+    the upper left corner of the tv screen)
+    pixel ratio seems to be different on pal and ntsc
+
+    commodore vic20 notes
+    6560 adress line 13 is connected inverted to address line 15 of the board
+    1 K 4 bit ram at 0x9400 is additional connected as 4 higher bits
+    of the 6560 (colorram) without decoding the 6560 address line a8..a13
+
+*****************************************************************************/
+
 
 #include "emu.h"
 #include "streams.h"
@@ -113,9 +154,9 @@ INLINE const mos6560_interface *get_interface( running_device *device )
 
 /* 2008-05 FP: lightpen code needs to read input port from vc20.c */
 
-#define LIGHTPEN_BUTTON		(mos6560->lightpen_button_cb(device->machine))
-#define LIGHTPEN_X_VALUE	(mos6560->lightpen_x_cb(device->machine))
-#define LIGHTPEN_Y_VALUE	(mos6560->lightpen_y_cb(device->machine))
+#define LIGHTPEN_BUTTON		((mos6560->lightpen_button_cb != NULL) ? mos6560->lightpen_button_cb(device->machine) : 0)
+#define LIGHTPEN_X_VALUE	((mos6560->lightpen_x_cb != NULL) ? mos6560->lightpen_x_cb(device->machine) : 0)
+#define LIGHTPEN_Y_VALUE	((mos6560->lightpen_y_cb != NULL) ? mos6560->lightpen_y_cb(device->machine) : 0)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
@@ -435,7 +476,7 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 		break;
 	case 8:						   /* poti 1 */
 	case 9:						   /* poti 2 */
-		val = mos6560->paddle_cb[offset - 8](device->machine);
+		val = (mos6560->paddle_cb != NULL) ? mos6560->paddle_cb[offset - 8](device->machine) : mos6560->reg[offset];
 		break;
 	default:
 		val = mos6560->reg[offset];
@@ -769,6 +810,9 @@ static DEVICE_START( mos6560 )
 	mos6560->type = intf->type;
 
 	mos6560->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+
+	assert(intf->dma_read != NULL);
+	assert(intf->dma_read_color != NULL);
 
 	mos6560->dma_read = intf->dma_read;
 	mos6560->dma_read_color = intf->dma_read_color;
