@@ -10,7 +10,7 @@
 static INT16 *_single;
 static int single_rate = 0;
 static int single_volume = 0;
-
+UINT8 senjyo_sound_cmd;
 
 const z80_daisy_chain senjyo_daisy_chain[] =
 {
@@ -22,10 +22,15 @@ const z80_daisy_chain senjyo_daisy_chain[] =
 
 /* z80 pio */
 
-const z80pio_interface senjyo_pio_intf =
+READ8_DEVICE_HANDLER( pio_pa_r )
+{
+	return senjyo_sound_cmd;
+}
+
+Z80PIO_INTERFACE( senjyo_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
+	DEVCB_HANDLER(pio_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

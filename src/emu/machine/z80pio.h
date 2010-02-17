@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Z80 PIO (Z8420) implementation
+    Zilog Z80 Parallel Input/Output Controller implementation
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -16,8 +16,8 @@
                    PA7   7 |             | 34  PB7
                    PA6   8 |             | 33  PB6
                    PA5   9 |             | 32  PB5
-                   PA4  10 |   Z80-PIO   | 31  PB4
-                   GND  11 |             | 30  PB3
+                   PA4  10 |    Z8420    | 31  PB4
+                   GND  11 |         	 | 30  PB3
                    PA3  12 |             | 29  PB2
                    PA2  13 |             | 28  PB1
                    PA1  14 |             | 27  PB0
@@ -30,10 +30,21 @@
 
 ***************************************************************************/
 
-#ifndef __Z80PIO_H__
-#define __Z80PIO_H__
+#ifndef __Z80PIO__
+#define __Z80PIO__
 
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
+#define Z80PIO DEVICE_GET_INFO_NAME(z80pio)
+
+#define MDRV_Z80PIO_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, Z80PIO, _clock) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define Z80PIO_INTERFACE(_name) \
+	const z80pio_interface (_name) =
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -42,71 +53,47 @@
 typedef struct _z80pio_interface z80pio_interface;
 struct _z80pio_interface
 {
-	devcb_write_line intr;    /* callback when change interrupt status */
-	devcb_read8 portAread;    /* port A read callback */
-	devcb_read8 portBread;    /* port B read callback */
-	devcb_write8 portAwrite;  /* port A write callback */
-	devcb_write8 portBwrite;  /* port B write callback */
-	devcb_write_line rdyA;    /* portA ready active callback */
-	devcb_write_line rdyB;    /* portB ready active callback */
+	devcb_write_line	out_int_func;
+
+	devcb_read8			in_pa_func;
+	devcb_write8		out_pa_func;
+	devcb_write_line	out_ardy_func;
+
+	devcb_read8			in_pb_func;
+	devcb_write8		out_pb_func;
+	devcb_write_line	out_brdy_func;
 };
 
-
-
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
+    PROTOTYPES
 ***************************************************************************/
 
-#define MDRV_Z80PIO_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80PIO, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
-
-
-
-/***************************************************************************
-    CONTROL REGISTER READ/WRITE
-***************************************************************************/
-
-WRITE8_DEVICE_HANDLER( z80pio_c_w );
-READ8_DEVICE_HANDLER( z80pio_c_r );
-
-
-/***************************************************************************
-    DATA REGISTER READ/WRITE
-***************************************************************************/
-
-WRITE8_DEVICE_HANDLER( z80pio_d_w );
-READ8_DEVICE_HANDLER( z80pio_d_r );
-
-
-/***************************************************************************
-    PORT I/O
-***************************************************************************/
-
-WRITE8_DEVICE_HANDLER( z80pio_p_w );
-READ8_DEVICE_HANDLER( z80pio_p_r );
-
-
-/***************************************************************************
-    STROBE STATE MANAGEMENT
-***************************************************************************/
-
-void z80pio_astb_w(running_device *device, int state);
-void z80pio_bstb_w(running_device *device, int state);
-
-
-/***************************************************************************
-    READ/WRITE HANDLERS
-***************************************************************************/
-READ8_DEVICE_HANDLER(z80pio_r);
-WRITE8_DEVICE_HANDLER(z80pio_w);
-READ8_DEVICE_HANDLER(z80pio_alt_r);
-WRITE8_DEVICE_HANDLER(z80pio_alt_w);
-
-
-/* ----- device interface ----- */
-
-#define Z80PIO DEVICE_GET_INFO_NAME(z80pio)
 DEVICE_GET_INFO( z80pio );
+
+/* control register access */
+READ8_DEVICE_HANDLER( z80pio_c_r );
+WRITE8_DEVICE_HANDLER( z80pio_c_w );
+
+/* data register access */
+READ8_DEVICE_HANDLER( z80pio_d_r );
+WRITE8_DEVICE_HANDLER( z80pio_d_w );
+
+/* register access */
+READ8_DEVICE_HANDLER( z80pio_cd_ba_r );
+WRITE8_DEVICE_HANDLER( z80pio_cd_ba_w );
+
+READ8_DEVICE_HANDLER( z80pio_ba_cd_r );
+WRITE8_DEVICE_HANDLER( z80pio_ba_cd_w );
+
+/* port access */
+READ8_DEVICE_HANDLER( z80pio_pa_r );
+WRITE8_DEVICE_HANDLER( z80pio_pa_w );
+
+READ8_DEVICE_HANDLER( z80pio_pb_r );
+WRITE8_DEVICE_HANDLER( z80pio_pb_w );
+
+/* strobe */
+WRITE_LINE_DEVICE_HANDLER( z80pio_astb_w );
+WRITE_LINE_DEVICE_HANDLER( z80pio_bstb_w );
 
 #endif

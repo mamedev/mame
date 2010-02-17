@@ -75,7 +75,7 @@ I/O read/write
 #include "machine/segacrpt.h"
 #include "includes/senjyo.h"
 
-
+extern UINT8 senjyo_sound_cmd;
 static int int_delay_kludge;
 
 static MACHINE_RESET( senjyo )
@@ -98,6 +98,13 @@ static WRITE8_HANDLER( flip_screen_w )
 	flip_screen_set(space->machine, data);
 }
 
+static WRITE8_DEVICE_HANDLER( sound_cmd_w )
+{
+	senjyo_sound_cmd = data;
+
+	z80pio_astb_w(device, 0);
+	z80pio_astb_w(device, 1);
+}
 
 static ADDRESS_MAP_START( senjyo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -127,23 +134,9 @@ static ADDRESS_MAP_START( senjyo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_DEVWRITE("z80pio", z80pio_p_w)
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_DEVWRITE("z80pio", sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
-
-
-static WRITE8_DEVICE_HANDLER( pio_w )
-{
-	if (offset & 1)
-		z80pio_c_w(device, (offset >> 1) & 1, data);
-	else
-		z80pio_d_w(device, (offset >> 1) & 1, data);
-}
-
-static READ8_DEVICE_HANDLER( pio_r )
-{
-	return (offset & 1) ? z80pio_c_r(device, (offset >> 1) & 1) : z80pio_d_r(device, (offset >> 1) & 1);
-}
 
 static ADDRESS_MAP_START( senjyo_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -160,7 +153,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( senjyo_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", pio_r, pio_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -200,7 +193,7 @@ static ADDRESS_MAP_START( starforb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_DEVWRITE("z80pio", z80pio_p_w)
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_DEVWRITE("z80pio", sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 
 	/* these aren't used / written, left here to make sure memory is allocated */
@@ -558,7 +551,7 @@ static MACHINE_DRIVER_START( senjyo )
 
 	MDRV_MACHINE_RESET(senjyo)
 
-	MDRV_Z80PIO_ADD( "z80pio", senjyo_pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", 2000000, senjyo_pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", 2000000 /* same as "sub" */, senjyo_ctc_intf )
 
 	/* video hardware */

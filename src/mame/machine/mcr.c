@@ -253,7 +253,7 @@ Z80CTC_INTERFACE( nflfoot_ctc_intf )
 };
 
 
-const z80pio_interface nflfoot_pio_intf =
+Z80PIO_INTERFACE( nflfoot_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("ipu", INPUT_LINE_IRQ0),  /* interrupt handler */
 	DEVCB_NULL,

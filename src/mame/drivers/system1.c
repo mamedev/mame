@@ -496,9 +496,13 @@ static READ8_HANDLER( sound_data_r )
 		return soundlatch_r(space, offset);
 	}
 
-	/* if we have a Z80 PIO, just do a port read which will auto-ack */
+	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
 	else if (pio != NULL)
-		return z80pio_p_r(pio, 0);
+	{
+		z80pio_astb_w(pio, 0);
+		z80pio_astb_w(pio, 1);
+		return soundlatch_r(space, offset);
+	}
 
 	return 0xff;
 }
@@ -516,12 +520,6 @@ static TIMER_DEVICE_CALLBACK( soundirq_gen )
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
 	cputag_set_input_line(timer->machine, "soundcpu", 0, HOLD_LINE);
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( pio_ready_w )
-{
-	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -756,7 +754,7 @@ static ADDRESS_MAP_START( system1_pio_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")	/* DIP1 some games read it from here... */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")	/* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_r, z80pio_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 
@@ -2079,14 +2077,14 @@ static const ppi8255_interface ppi_interface =
 	DEVCB_HANDLER(sound_control_w)
 };
 
-static const z80pio_interface pio_interface =
+static Z80PIO_INTERFACE( pio_interface )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundport_w),
+	DEVCB_CPU_INPUT_LINE("soundcpu", INPUT_LINE_NMI),
+	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, videomode_w),
-	DEVCB_LINE(pio_ready_w),
 	DEVCB_NULL
 };
 
@@ -2158,7 +2156,7 @@ static MACHINE_DRIVER_START( sys1pio )
 	MDRV_CPU_IO_MAP(system1_pio_io_map)
 
 	MDRV_DEVICE_REMOVE("ppi")
-	MDRV_Z80PIO_ADD("pio", pio_interface)
+	MDRV_Z80PIO_ADD("pio", MASTER_CLOCK, pio_interface)
 MACHINE_DRIVER_END
 
 /* reduced visible area for scrolling games */
