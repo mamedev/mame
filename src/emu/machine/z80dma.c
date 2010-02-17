@@ -24,6 +24,10 @@
 #include "z80dma.h"
 #include "cpu/z80/z80daisy.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define LOG 0
 
 #define REGNUM(_m, _s) (((_m)<<3) + (_s))
@@ -56,7 +60,6 @@
 #define PULSE_CTRL(_c)		REG(_c,4,5)
 
 #define READ_MASK(_c)		REG(_c,6,1)
-
 
 #define PORTA_ADDRESS(_c)	((PORTA_ADDRESS_H(_c)<<8) | PORTA_ADDRESS_L(_c))
 #define PORTB_ADDRESS(_c)	((PORTB_ADDRESS_H(_c)<<8) | PORTB_ADDRESS_L(_c))
@@ -103,6 +106,27 @@ enum
 	INT_MATCH_END_OF_BLOCK
 };
 
+#define COMMAND_RESET							0xc3
+#define COMMAND_RESET_PORT_A_TIMING				0xc7
+#define COMMAND_RESET_PORT_B_TIMING				0xcb
+#define COMMAND_LOAD							0xcf
+#define COMMAND_CONTINUE						0xd3
+#define COMMAND_DISABLE_INTERRUPTS				0xaf
+#define COMMAND_ENABLE_INTERRUPTS				0xab
+#define COMMAND_RESET_AND_DISABLE_INTERRUPTS	0xa3
+#define COMMAND_ENABLE_AFTER_RETI				0xb7
+#define COMMAND_READ_STATUS_BYTE				0xbf
+#define COMMAND_REINITIALIZE_STATUS_BYTE		0x8b
+#define COMMAND_INITIATE_READ_SEQUENCE			0xa7
+#define COMMAND_FORCE_READY						0xb3
+#define COMMAND_ENABLE_DMA						0x87
+#define COMMAND_DISABLE_DMA						0x83
+#define COMMAND_READ_MASK_FOLLOWS				0xbb
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _z80dma_t z80dma_t;
 struct _z80dma_t
 {
@@ -147,21 +171,34 @@ static TIMER_CALLBACK( z80dma_timerproc );
 static void z80dma_update_status(running_device *device);
 static int z80dma_irq_state(running_device *device);
 
-/* ----------------------------------------------------------------------- */
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-INLINE z80dma_t *get_safe_token(running_device *device) {
-	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == Z80DMA );
-	return ( z80dma_t * ) device->token;
+INLINE z80dma_t *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == Z80DMA);
+	return (z80dma_t *) device->token;
 }
 
-static void interrupt_check(running_device *device)
-{
-	z80dma_t *z80dma = get_safe_token(device);
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
+/*-------------------------------------------------
+    interrupt_check - update IRQ line state
+-------------------------------------------------*/
+
+static void interrupt_check(z80dma_t *z80dma)
+{
 	devcb_call_write_line(&z80dma->out_int_func, z80dma->ip ? ASSERT_LINE : CLEAR_LINE);
 }
+
+/*-------------------------------------------------
+    trigger_interrupt - trigger DMA interrupt
+-------------------------------------------------*/
 
 static void trigger_interrupt(running_device *device, int level)
 {
@@ -186,9 +223,13 @@ static void trigger_interrupt(running_device *device, int level)
 
 		if (LOG) logerror("Z80DMA '%s' Interrupt Pending\n", device->tag.cstr());
 
-		interrupt_check(device);
+		interrupt_check(z80dma);
 	}
 }
+
+/*-------------------------------------------------
+    z80dma_do_read - perform DMA read
+-------------------------------------------------*/
 
 static void z80dma_do_read(running_device *device)
 {
@@ -228,6 +269,10 @@ static void z80dma_do_read(running_device *device)
 			break;
 	}
 }
+
+/*-------------------------------------------------
+    z80dma_do_write - perform DMA write
+-------------------------------------------------*/
 
 static int z80dma_do_write(running_device *device)
 {
@@ -300,6 +345,10 @@ static int z80dma_do_write(running_device *device)
 	return done;
 }
 
+/*-------------------------------------------------
+    TIMER_CALLBACK( z80dma_timerproc )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( z80dma_timerproc )
 {
 	running_device *device = (running_device *)ptr;
@@ -344,6 +393,10 @@ static TIMER_CALLBACK( z80dma_timerproc )
 	}
 }
 
+/*-------------------------------------------------
+    z80dma_update_status - update DMA status
+-------------------------------------------------*/
+
 static void z80dma_update_status(running_device *device)
 {
 	z80dma_t *z80dma = get_safe_token(device);
@@ -374,7 +427,9 @@ static void z80dma_update_status(running_device *device)
 	devcb_call_write_line(&z80dma->out_busreq_func, pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* ----------------------------------------------------------------------- */
+/*-------------------------------------------------
+    z80dma_r - register read
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( z80dma_r )
 {
@@ -390,6 +445,9 @@ READ8_DEVICE_HANDLER( z80dma_r )
 	return res;
 }
 
+/*-------------------------------------------------
+    z80dma_w - register write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( z80dma_w )
 {
@@ -448,21 +506,21 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 			WR6(z80dma) = data;
 			switch (data)
 			{
-				case 0xB7:	/* Enable after rti */
+				case COMMAND_ENABLE_AFTER_RETI:
 					fatalerror("Unimplemented WR6 command %02x", data);
 					break;
-				case 0xBF:	/* Read status byte */
+				case COMMAND_READ_STATUS_BYTE:
 					if (LOG) logerror("CMD Read status Byte\n");
         			READ_MASK(z80dma) = 0;
         			break;
-				case 0xA3:	               /* Reset and disable interrupts */
+				case COMMAND_RESET_AND_DISABLE_INTERRUPTS:
 					WR3(z80dma) &= ~0x20;
 					z80dma->ip = 0;
 					z80dma->ius = 0;
 					z80dma->rdy = 0;
 					z80dma->status |= 0x08;
 					break;
-				case 0xA7:	/* Initiate read sequence */
+				case COMMAND_INITIATE_READ_SEQUENCE:
 					if (LOG) logerror("Initiate Read Sequence\n");
 					z80dma->read_cur_follow = z80dma->read_num_follow = 0;
 					if(READ_MASK(z80dma) & 0x01) { z80dma->read_regs_follow[z80dma->read_num_follow++] = z80dma->status; }
@@ -473,7 +531,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					if(READ_MASK(z80dma) & 0x20) { z80dma->read_regs_follow[z80dma->read_num_follow++] = PORTB_ADDRESS_L(z80dma); } //port B address (low)
 					if(READ_MASK(z80dma) & 0x40) { z80dma->read_regs_follow[z80dma->read_num_follow++] = PORTA_ADDRESS_H(z80dma); } //port B address (high)
 					break;
-				case 0xC3:	/* Reset */
+				case COMMAND_RESET:
 					if (LOG) logerror("Reset\n");
 					z80dma->dma_enabled = 0;
 					z80dma->rdy = 1;
@@ -489,58 +547,58 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					}
 					z80dma->status = 0x38;
 					break;
-				case 0xCF:	/* Load */
+				case COMMAND_LOAD:
 					z80dma->addressA = PORTA_ADDRESS(z80dma);
 					z80dma->addressB = PORTB_ADDRESS(z80dma);
 					z80dma->count = BLOCKLEN(z80dma);
 					z80dma->status |= 0x30;
 					if (LOG) logerror("Load A: %x B: %x N: %x\n", z80dma->addressA, z80dma->addressB, z80dma->count);
 					break;
-				case 0x83:	/* Disable dma */
+				case COMMAND_DISABLE_DMA:
 					if (LOG) logerror("Disable DMA\n");
 					z80dma->dma_enabled = 0;
 					z80dma->rdy = 1 ^ ((WR5(z80dma) & 0x8)>>3);
 					z80dma_rdy_w(device, z80dma->rdy);
 					break;
-				case 0x87:	/* Enable dma */
+				case COMMAND_ENABLE_DMA:
 					if (LOG) logerror("Enable DMA\n");
 					z80dma->dma_enabled = 1;
 					z80dma->rdy = (WR5(z80dma) & 0x8)>>3;
 					z80dma_rdy_w(device, z80dma->rdy);
 					break;
-				case 0xBB:
+				case COMMAND_READ_MASK_FOLLOWS:
 					if (LOG) logerror("Set Read Mask\n");
 					z80dma->regs_follow[z80dma->num_follow++] = GET_REGNUM(z80dma, READ_MASK(z80dma));
 					break;
-				case 0xD3:	/* Continue */
+				case COMMAND_CONTINUE:
 					if (LOG) logerror("Continue\n");
 					z80dma->count = 0;
 					z80dma->dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
 					z80dma->status |= 0x30;
 					break;
-				case 0xc7:	/* Reset Port A Timing */
+				case COMMAND_RESET_PORT_A_TIMING:
 					if (LOG) logerror("Reset Port A Timing\n");
 					PORTA_TIMING(z80dma) = 0;
 					break;
-				case 0xcb:	/* Reset Port B Timing */
+				case COMMAND_RESET_PORT_B_TIMING:
 					if (LOG) logerror("Reset Port B Timing\n");
 					PORTB_TIMING(z80dma) = 0;
 					break;
-				case 0xB3:	/* Force ready */
+				case COMMAND_FORCE_READY:
 					if (LOG) logerror("Force ready\n");
 					z80dma->rdy = (WR5(z80dma) & 0x8)>>3;
 					z80dma_rdy_w(device, z80dma->rdy);
 					break;
-				case 0xAB:	/* Enable interrupts */
+				case COMMAND_ENABLE_INTERRUPTS:
 					if (LOG) logerror("Enable IRQ\n");
 					WR3(z80dma) |= 0x20;
 					break;
-				case 0xAF:	/* Disable interrupts */
+				case COMMAND_DISABLE_INTERRUPTS:
 					if (LOG) logerror("Disable IRQ\n");
 					WR3(z80dma) &= ~0x20;
 					break;
-				case 0x8B:	/* Reinitialize status byte */
+				case COMMAND_REINITIALIZE_STATUS_BYTE:
 					if (LOG) logerror("Reinitialize status byte\n");
 					z80dma->status |= 0x30;
 					z80dma->ip = 0;
@@ -575,6 +633,9 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 	}
 }
 
+/*-------------------------------------------------
+    TIMER_CALLBACK( z80dma_rdy_write_callback )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
@@ -594,6 +655,9 @@ static TIMER_CALLBACK( z80dma_rdy_write_callback )
     }
 }
 
+/*-------------------------------------------------
+    z80dma_rdy_w - ready input
+-------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w )
 {
@@ -605,17 +669,25 @@ WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w )
 	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
 }
 
+/*-------------------------------------------------
+    z80dma_wait_w - wait input
+-------------------------------------------------*/
+
 WRITE_LINE_DEVICE_HANDLER( z80dma_wait_w )
 {
 }
+
+/*-------------------------------------------------
+    z80dma_bai_w - bus acknowledge input
+-------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w )
 {
 }
 
-/***************************************************************************
-    DAISY CHAIN INTERFACE
-***************************************************************************/
+/*-------------------------------------------------
+    z80dma_irq_state - read interrupt state
+-------------------------------------------------*/
 
 static int z80dma_irq_state(running_device *device)
 {
@@ -627,11 +699,20 @@ static int z80dma_irq_state(running_device *device)
 		/* interrupt pending */
 		state = Z80_DAISY_INT;
 	}
+	else if (z80dma->ius)
+	{
+		/* interrupt under service */
+		state = Z80_DAISY_IEO;
+	}
 
 	if (LOG) logerror("Z80DMA '%s' Interrupt State: %u\n", device->tag.cstr(), state);
 
 	return state;
 }
+
+/*-------------------------------------------------
+    z80dma_irq_ack - interrupt acknowledge
+-------------------------------------------------*/
 
 static int z80dma_irq_ack(running_device *device)
 {
@@ -643,7 +724,7 @@ static int z80dma_irq_ack(running_device *device)
 		
 		/* clear interrupt pending flag */
 		z80dma->ip = 0;
-	    interrupt_check(device);
+	    interrupt_check(z80dma);
 
 		/* set interrupt under service flag */
 		z80dma->ius = 1;
@@ -654,10 +735,14 @@ static int z80dma_irq_ack(running_device *device)
 		return z80dma->vector;
 	}
 
-	if (LOG) logerror("z80dma_irq_ack: failed to find an interrupt to ack!\n");
+	logerror("z80dma_irq_ack: failed to find an interrupt to ack!\n");
 
 	return 0;
 }
+
+/*-------------------------------------------------
+    z80dma_irq_reti - return from interrupt
+-------------------------------------------------*/
 
 static void z80dma_irq_reti(running_device *device)
 {
@@ -669,17 +754,17 @@ static void z80dma_irq_reti(running_device *device)
 
 		/* clear interrupt under service flag */
 		z80dma->ius = 0;
-	    interrupt_check(device);
+	    interrupt_check(z80dma);
 
 		return;
 	}
 
-	if (LOG) logerror("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	logerror("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
+/*-------------------------------------------------
+    DEVICE_START( z80dma )
+-------------------------------------------------*/
 
 static DEVICE_START( z80dma )
 {
@@ -717,6 +802,9 @@ static DEVICE_START( z80dma )
 	state_save_register_device_item(device, 0, z80dma->latch);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( z80dma )
+-------------------------------------------------*/
 
 static DEVICE_RESET( z80dma )
 {
@@ -726,18 +814,21 @@ static DEVICE_RESET( z80dma )
 	z80dma->rdy = 0;
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
-	z80dma->vector = 0;
-	z80dma->ip = 0;
-	z80dma->ius = 0;
 	z80dma->read_num_follow = z80dma->read_cur_follow = 0;
 	z80dma->reset_pointer = 0;
 
 	/* disable interrupts */
 	WR3(z80dma) &= ~0x20;
+	z80dma->ip = 0;
+	z80dma->ius = 0;
+	z80dma->vector = 0;
 
 	z80dma_update_status(device);
 }
 
+/*-------------------------------------------------
+    DEVICE_GET_INFO( z80dma )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( z80dma )
 {
@@ -758,7 +849,7 @@ DEVICE_GET_INFO( z80dma )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8410");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80DMA");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80");					break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;

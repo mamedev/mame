@@ -33,7 +33,6 @@
 #ifndef __Z80DMA__
 #define __Z80DMA__
 
-
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
@@ -71,6 +70,8 @@ struct _z80dma_interface
     PROTOTYPES
 ***************************************************************************/
 
+DEVICE_GET_INFO( z80dma );
+
 /* register access */
 READ8_DEVICE_HANDLER( z80dma_r );
 WRITE8_DEVICE_HANDLER( z80dma_w );
@@ -83,7 +84,5 @@ WRITE_LINE_DEVICE_HANDLER( z80dma_wait_w );
 
 /* bus acknowledge in */
 WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w );
-
-DEVICE_GET_INFO( z80dma );
 
 #endif
