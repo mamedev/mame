@@ -1822,6 +1822,7 @@ const game_driver * const drivers[] =
 	DRIVER( arktayt2 )	/* bootleg */
 	DRIVER( arkatour )	/* ??? (c) 1987 Taito America Corporation + Romstar license (US) */
 	DRIVER( tetrsark )	/* ??? (c) D.R.Korea */
+	DRIVER( hexa )		/* D. R. Korea */
 	DRIVER( sqix )		/* B03 1987 */
 	DRIVER( sqixr1 )	/* B03 1987 */
 	DRIVER( sqixu )		/* B03 1987 */
@@ -8661,7 +8662,6 @@ Other Sun games
 	DRIVER( monzagp )	/* (c) 1981 Olympia */
 	DRIVER( dday )		/* (c) 1982 Olympia */
 	DRIVER( ddayc )		/* (c) 1982 Olympia + Centuri license */
-	DRIVER( hexa )		/* D. R. Korea */
 	DRIVER( stactics )	/* [1981 Sega] */
 	DRIVER( exterm )	/* (c) 1989 Premier Technology - a Gottlieb game */
 	DRIVER( kingofb )	/* (c) 1985 Woodplace Inc. */
