@@ -221,6 +221,7 @@ SOUNDS += DIGITALKER
 SOUNDS += CDP1863
 SOUNDS += CDP1864
 SOUNDS += ZSG2
+SOUNDS += MOS656X
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -1485,7 +1486,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/astrocorp.o \
-	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
+	$(DRIVERS)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/big10.o \
