@@ -7,14 +7,6 @@
 	
 ***************************************************************************/
 
-/*
-
-	TODO:
-
-	- save state
-
-*/
-
 #include "emu.h"
 #include "z80pio.h"
 #include "cpu/z80/z80daisy.h"
@@ -828,7 +820,23 @@ static DEVICE_START( z80pio )
 	devcb_resolve_write_line(&z80pio->port[PORT_B].out_rdy_func, &intf->out_brdy_func, device);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, z80pio->);
+	for (int index = PORT_A; index < PORT_COUNT; index++)
+	{
+		state_save_register_device_item(device, 0, z80pio->port[index].mode);
+		state_save_register_device_item(device, 0, z80pio->port[index].next_control_word);
+		state_save_register_device_item(device, 0, z80pio->port[index].input);
+		state_save_register_device_item(device, 0, z80pio->port[index].output);
+		state_save_register_device_item(device, 0, z80pio->port[index].ior);
+		state_save_register_device_item(device, 0, z80pio->port[index].rdy);
+		state_save_register_device_item(device, 0, z80pio->port[index].stb);
+		state_save_register_device_item(device, 0, z80pio->port[index].ie);
+		state_save_register_device_item(device, 0, z80pio->port[index].ip);
+		state_save_register_device_item(device, 0, z80pio->port[index].ius);
+		state_save_register_device_item(device, 0, z80pio->port[index].icw);
+		state_save_register_device_item(device, 0, z80pio->port[index].vector);
+		state_save_register_device_item(device, 0, z80pio->port[index].mask);
+		state_save_register_device_item(device, 0, z80pio->port[index].match);
+	}
 }
 
 /*-------------------------------------------------
