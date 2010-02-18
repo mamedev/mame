@@ -301,11 +301,6 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 					/* next word is mask control */
 					port->next_control_word = MASK;
 				}
-				else
-				{
-					/* monitor all bits */
-					port->mask = 0;
-				}
 				break;
 
 			case 0x03: /* set interrupt enable flip-flop */
