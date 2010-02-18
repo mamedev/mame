@@ -299,7 +299,7 @@ static int meritm_touch_coord_transform(running_machine *machine, int *touch_x, 
  *
  *************************************/
 
-static int meritm_vint = 0x00;
+static int meritm_vint = 0x18;
 static int meritm_interrupt_vdp0_state = 0;
 static int meritm_interrupt_vdp1_state = 0;
 static bitmap_t *vdp0_bitmap, *vdp1_bitmap;
@@ -317,32 +317,14 @@ static INTERRUPT_GEN( meritm_interrupt )
 
 static void meritm_vdp0_interrupt(running_machine *machine, int i)
 {
-	if ( meritm_interrupt_vdp0_state != i )
-	{
-		meritm_interrupt_vdp0_state = i;
-		if (i)
-			meritm_vint &= ~0x08;
-		else
-			meritm_vint |= 0x08;
-
-		if(i)
-			z80pio_pa_w(meritm_z80pio[0], 0, meritm_vint);
-	}
+	/* this is not used as the v9938 interrupt callbacks are broken
+ 	   interrupts seem to be fired quite randomly */
 }
 
 static void meritm_vdp1_interrupt(running_machine *machine, int i)
 {
-	if ( meritm_interrupt_vdp1_state != i )
-	{
-		meritm_interrupt_vdp1_state = i;
-		if (i)
-			meritm_vint &= ~0x10;
-		else
-			meritm_vint |= 0x10;
-
-		if(i)
-			z80pio_pa_w(meritm_z80pio[0], 0, meritm_vint);
-	}
+	/* this is not used as the v9938 interrupt callbacks are broken
+ 	   interrupts seem to be fired quite randomly */
 }
 
 static int layer0_enabled, layer1_enabled;
@@ -1051,6 +1033,20 @@ static NVRAM_HANDLER(meritm_crt260)
 #define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
+static TIMER_DEVICE_CALLBACK( vblank_start_tick )
+{
+	/* this is a workaround to signal the v9938 vblank interrupt correctly */
+	meritm_vint = 0x08;
+	z80pio_pa_w(meritm_z80pio[0], 0, meritm_vint);
+}
+
+static TIMER_DEVICE_CALLBACK( vblank_end_tick )
+{
+	/* this is a workaround to signal the v9938 vblank interrupt correctly */
+	meritm_vint = 0x18;
+	z80pio_pa_w(meritm_z80pio[0], 0, meritm_vint);
+}
+
 static MACHINE_DRIVER_START(meritm_crt250)
 	MDRV_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MDRV_CPU_PROGRAM_MAP(meritm_crt250_map)
@@ -1064,6 +1060,9 @@ static MACHINE_DRIVER_START(meritm_crt250)
 
 	MDRV_Z80PIO_ADD( "z80pio_0", SYSTEM_CLK/6, meritm_audio_pio_intf )
 	MDRV_Z80PIO_ADD( "z80pio_1", SYSTEM_CLK/6, meritm_io_pio_intf )
+
+	MDRV_TIMER_ADD_SCANLINE("vblank_start", vblank_start_tick, "screen", 259, 262)
+	MDRV_TIMER_ADD_SCANLINE("vblank_end",   vblank_end_tick,   "screen", 262, 262)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

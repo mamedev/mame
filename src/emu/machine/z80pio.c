@@ -111,12 +111,36 @@ static void check_interrupts(running_device *device)
 	{
 		pio_port *port = &z80pio->port[index];
 
+		if (port->mode == MODE_BIT_CONTROL)
+		{
+			/* fetch input data (ignore output lines) */
+			UINT8 data = (port->input & port->ior) | (port->output & ~port->ior);
+			UINT8 mask = ~port->mask;
+			int match = 0;
+
+			data &= mask;
+
+			if ((port->icw & 0x60) == 0 && data != mask) match = 1;
+			else if ((port->icw & 0x60) == 0x20 && data != 0) match = 1;
+			else if ((port->icw & 0x60) == 0x40 && data == 0) match = 1;
+			else if ((port->icw & 0x60) == 0x60 && data == mask) match = 1;
+
+			if (!port->match && match)
+			{
+				/* trigger interrupt */
+				port->ip = 1;
+				if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", device->tag.cstr(), 'A' + index);
+			}
+
+			port->match = match;
+		}
+
 		if (port->ie && port->ip && !port->ius)
 		{
 			state = ASSERT_LINE;
 		}
 	}
-	
+
 	devcb_call_write_line(&z80pio->out_int_func, state);
 }
 
@@ -254,6 +278,14 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 			case 0x07: /* set interrupt control word */
 				port->icw = data;
 
+				if (LOG)
+				{
+					logerror("Z80PIO '%s' Port %c Interrupt Enable: %u\n", device->tag.cstr(), 'A' + index, BIT(data, 7));
+					logerror("Z80PIO '%s' Port %c Logic: %s\n", device->tag.cstr(), 'A' + index, BIT(data, 6) ? "AND" : "OR");
+					logerror("Z80PIO '%s' Port %c Active %s\n", device->tag.cstr(), 'A' + index, BIT(data, 5) ? "High" : "Low");
+					logerror("Z80PIO '%s' Port %c Mask Follows: %u\n", device->tag.cstr(), 'A' + index, BIT(data, 4));
+				}
+
 				if (port->icw & ICW_MASK_FOLLOWS)
 				{
 					/* disable interrupts until mask is written */
@@ -268,6 +300,11 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 					/* next word is mask control */
 					port->next_control_word = MASK;
+				}
+				else
+				{
+					/* monitor all bits */
+					port->mask = 0;
 				}
 				break;
 
@@ -394,7 +431,8 @@ WRITE8_DEVICE_HANDLER( z80pio_d_w )
 		break;
 
 	case MODE_INPUT:
-		/* do nothing */
+		/* latch output data */
+		port->output = data;
 		break;
 
 	case MODE_BIDIRECTIONAL:
@@ -498,60 +536,6 @@ READ8_DEVICE_HANDLER( z80pio_pa_r )
 }
 
 /*-------------------------------------------------
-    check_equation - check bit logic equation
--------------------------------------------------*/
-
-static void check_equation(running_device *device, int index, UINT8 data)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-	pio_port *port = &z80pio->port[index];
-
-	if (port->mask == 0xff) return;
-
-	int bit;
-	int match = 0;
-
-	int edge = (port->icw & ICW_HIGH) ? 1 : 0;
-
-	UINT8 mask = port->mask;
-	UINT8 ior = port->ior;
-	UINT8 old_data = port->input;
-
-	if (old_data == data) return;
-
-	for (bit = 0; bit < 8; bit++)
-	{
-		if (BIT(mask, bit)) continue; /* masked out */
-		if (!BIT(ior, bit)) continue; /* output bit */
-
-		if ((BIT(old_data, bit) ^ edge) && !(BIT(data, bit) ^ edge)) /* falling edge */
-		{
-			/* logic equation is true, until proven otherwise */
-			match = 1;
-
-			if (LOG) logerror("Z80PIO '%s' Port %c Edge Transition detected on bit %u, data %02x %02x\n", device->tag.cstr(), 'A' + index, bit, old_data, data);
-		}
-		else if (port->icw & ICW_AND)
-		{
-			/* all bits must match in AND mode, so logic equation is false */
-			match = 0;
-			break;
-		}
-	}
-
-	if (!port->match && match) /* rising edge */
-	{
-		/* latch data */
-		port->input = data;
-
-		/* trigger interrupt only once */
-		trigger_interrupt(device, index);
-	}
-
-	port->match = match;
-}
-
-/*-------------------------------------------------
     z80pio_pa_w - port A write
 -------------------------------------------------*/
 
@@ -562,7 +546,9 @@ WRITE8_DEVICE_HANDLER( z80pio_pa_w )
 	
 	if (port->mode == MODE_BIT_CONTROL)
 	{
-		check_equation(device, PORT_A, data);
+		/* latch data */
+		port->input = data;
+		check_interrupts(device);
 	}
 }
 
@@ -602,7 +588,9 @@ WRITE8_DEVICE_HANDLER( z80pio_pb_w )
 	
 	if (port->mode == MODE_BIT_CONTROL)
 	{
-		check_equation(device, PORT_B, data);
+		/* latch data */
+		port->input = data;
+		check_interrupts(device);
 	}
 }
 
@@ -760,10 +748,11 @@ static int z80pio_irq_ack(running_device *device)
 
 			/* clear interrupt pending flag */
 			port->ip = 0;
-			check_interrupts(device);
 
 			/* set interrupt under service flag */
 			port->ius = 1;
+
+			check_interrupts(device);
 
 			return port->vector;
 		}
@@ -853,9 +842,6 @@ static DEVICE_RESET( z80pio )
 
 		/* set mode 1 */
 		set_mode(device, index, MODE_INPUT);
-
-		/* reset port mask registers */
-		port->mask = 0;
 
 		/* reset interrupt enable flip-flops */
 		port->icw &= ~ICW_ENABLE_INT;
