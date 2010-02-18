@@ -5720,6 +5720,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( circusse )	/* bootleg */
 	DRIVER( robotbwl )	/* no copyright notice */
 	DRIVER( crash )		/* Exidy [1979?] */
+	DRIVER( smash )		/* bootleg */
 	DRIVER( ripcord )	/* Exidy [1977?] */
 	DRIVER( starfire )	/* Exidy [1979?] */
 	DRIVER( starfirea )	/* Exidy [1979?] */

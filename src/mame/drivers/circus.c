@@ -537,6 +537,28 @@ ROM_START( crash )
 	ROM_LOAD( "crash.d14",    0x0000, 0x0200, CRC(833f81e4) SHA1(78a0ace3510546691ecaf6f6275cb3269495edc9) )  /* Cars */
 ROM_END
 
+ROM_START( smash )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "smash.a1",     0x1000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) ) /* Code */
+	ROM_LOAD( "smash.a2",     0x1200, 0x0200, CRC(b4581a95) SHA1(b3662bda5013443a56eabbe21fefa91e255e18e7) )
+	ROM_LOAD( "smash.a3",     0x1400, 0x0200, CRC(597555ae) SHA1(39a6d10e229be0e0d52b1061f2aa2f678b351f0b) )
+	ROM_LOAD( "smash.a4",     0x1600, 0x0200, CRC(0a15d69f) SHA1(c3a7b5ce4406cce511108e5c015b1dd5587b75ed) )
+	ROM_LOAD( "smash.a5",     0x1800, 0x0200, CRC(a9c7a328) SHA1(2f21ee58ba117bf4fe9101373c55449217a08da6) )
+	ROM_LOAD( "smash.a6",     0x1a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
+	ROM_LOAD( "smash.a7",     0x1c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
+	ROM_LOAD( "smash.a8",     0x1e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
+	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "smash.c4",     0x0000, 0x0200, CRC(442500e5) SHA1(c54ebd5ccee096d8eed4153f623adc4e655b3909) )  /* Character Set */
+	ROM_LOAD( "smash.c3",     0x0200, 0x0200, CRC(3c8f7560) SHA1(ce4023167a0b4b912bbbc70b00fd3b462990a04c) )
+	ROM_LOAD( "smash.c2",     0x0400, 0x0200, CRC(38f3e4ed) SHA1(4e537402c09b58997bc45498fd721d83a0eac3a7) )
+	ROM_LOAD( "smash.c1",     0x0600, 0x0200, CRC(e9adf1e1) SHA1(c1f6d2a3be1e9b35c8675d1e3f57e6a85ddd99fd) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 )
+	ROM_LOAD( "smash.d14",    0x0000, 0x0200, CRC(833f81e4) SHA1(78a0ace3510546691ecaf6f6275cb3269495edc9) )  /* Cars */
+ROM_END
+
 ROM_START( ripcord )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9027.1a",      0x1000, 0x0200, CRC(56b8dc06) SHA1(5432e4f2e321805a8dc9cfce20b8372793a9a4dd) ) /* Code */
@@ -587,4 +609,5 @@ GAMEL(1977, circus,   0,      circus,   circus,   circus,   ROT0, "Exidy / Taito
 GAMEL(1977, circusse, circus, circus,   circus,   circus,   ROT0, "[Exidy] (Sub-Electro bootleg)", "Circus (Sub-Electro bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
 GAME( 1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl, ROT0, "Exidy", "Robot Bowl", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1979, crash,    0,      crash,    crash,    crash,    ROT0, "Exidy", "Crash", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash )
+GAMEL(1979, smash,    crash,  crash,    crash,    crash,    ROT0, "[Exidy] (bootleg)", "Smash (Crash bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
 GAME( 1979, ripcord,  0,      ripcord,  ripcord,  ripcord,  ROT0, "Exidy", "Rip Cord", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
