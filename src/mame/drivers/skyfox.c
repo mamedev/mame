@@ -19,19 +19,7 @@ Verified Dip locations and recommended settings with manual
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-
-/* Variables defined in video: */
-
-extern int skyfox_bg_pos, skyfox_bg_ctrl;
-
-
-/* Functions defined in video: */
-
-WRITE8_HANDLER( skyfox_vregs_w );
-
-PALETTE_INIT( skyfox );
-
-VIDEO_UPDATE( skyfox );
+#include "includes/skyfox.h"
 
 
 /***************************************************************************
@@ -50,7 +38,7 @@ VIDEO_UPDATE( skyfox );
 static ADDRESS_MAP_START( skyfox_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM							// ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM							// RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_SIZE_MEMBER(skyfox_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xd400, 0xdfff) AM_RAM							// RAM?
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
@@ -96,7 +84,8 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	skyfox_state *state = (skyfox_state *)field->port->machine->driver_data;
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( skyfox )
@@ -225,11 +214,34 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( skyfox_interrupt )
 {
+	skyfox_state *state = (skyfox_state *)device->machine->driver_data;
+
 	/* Scroll the bg */
-	skyfox_bg_pos += (skyfox_bg_ctrl >> 1) & 0x7;	// maybe..
+	state->bg_pos += (state->bg_ctrl >> 1) & 0x7;	// maybe..
+}
+
+static MACHINE_START( skyfox )
+{
+	skyfox_state *state = (skyfox_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->bg_pos);
+	state_save_register_global(machine, state->bg_ctrl);
+}
+
+static MACHINE_RESET( skyfox )
+{
+	skyfox_state *state = (skyfox_state *)machine->driver_data;
+
+	state->bg_pos = 0;
+	state->bg_ctrl = 0;
 }
 
 static MACHINE_DRIVER_START( skyfox )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(skyfox_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
@@ -238,6 +250,9 @@ static MACHINE_DRIVER_START( skyfox )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1748000)
 	MDRV_CPU_PROGRAM_MAP(skyfox_sound_map)
+
+	MDRV_MACHINE_START(skyfox)
+	MDRV_MACHINE_RESET(skyfox)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -394,20 +409,20 @@ static DRIVER_INIT( skyfox )
 {
 	UINT8 *RAM = memory_region(machine, "gfx1");
 	UINT8 *end = RAM + memory_region_length(machine, "gfx1");
-	UINT8 buf[32*32];
+	UINT8 buf[32 * 32];
 
 	while (RAM < end)
 	{
 		int i;
-		for (i=0;i<(32*32);i++)
-			buf[i] = RAM[(i%8) + ((i/8)%8)*32 + ((i/64)%4)*8 + (i/256)*256];
+		for (i = 0; i < (32 * 32); i++)
+			buf[i] = RAM[(i % 8) + ((i / 8) % 8) * 32 + ((i / 64) % 4) * 8 + (i / 256) * 256];
 
-		memcpy(RAM,buf,32*32);
-		RAM += 32*32;
+		memcpy(RAM, buf, 32 * 32);
+		RAM += 32 * 32;
 	}
 }
 
 
 
-GAME( 1987, skyfox,   0,      skyfox, skyfox, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox" , 0 )
-GAME( 1987, exerizrb, skyfox, skyfox, skyfox, skyfox, ROT90, "bootleg", "Exerizer (Japan) (bootleg)", 0 )
+GAME( 1987, skyfox,   0,      skyfox, skyfox, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox" , GAME_SUPPORTS_SAVE )
+GAME( 1987, exerizrb, skyfox, skyfox, skyfox, skyfox, ROT90, "bootleg", "Exerizer (Japan) (bootleg)", GAME_SUPPORTS_SAVE )
