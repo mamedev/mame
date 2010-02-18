@@ -1650,7 +1650,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 		ui_xform.xscale = (float) target->width;
 		ui_xform.yscale = (float) target->height;
 		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = ui_xform.color.a = 1.0f;
-		ui_xform.color.a = 0.9;
+		ui_xform.color.a = 0.9f;
 		ui_xform.orientation = target->orientation;
 		ui_xform.no_center = TRUE;
 

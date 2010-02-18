@@ -1137,7 +1137,7 @@ static void render_editor(DView_edit *editor)
 	x1 = 0.5f - 0.5f * maxwidth;
 	x2 = x1 + maxwidth;
 	y1 = 0.25;
-	y2 = 0.45 - UI_BOX_TB_BORDER;
+	y2 = 0.45f - UI_BOX_TB_BORDER;
 
 	/* draw a box */
 	ui_draw_outlined_box(editor->container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);

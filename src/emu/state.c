@@ -181,7 +181,9 @@ void state_init(running_machine *machine)
 	float test_float;
 	double test_double;
 	test_enum_type test_enum;
+#ifdef __GNUC__
 	test_class_type test_class;
+#endif
 
 	assert_always(IS_VALID_SAVE_TYPE(test_bool), "bool is not a valid type for save");
 	assert_always(IS_VALID_SAVE_TYPE(test_INT8), "INT8 is not a valid type for save");

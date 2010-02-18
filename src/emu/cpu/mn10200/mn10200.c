@@ -171,8 +171,9 @@ INLINE INT32 r24u(mn102_info *mn102, offs_t adr)
 
 INLINE void w24(mn102_info *mn102, offs_t adr, UINT32 val)
 {
-	if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2)
-	log_write("TRACE", adr, val, MEM_LONG);
+	if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2) {
+		log_write("TRACE", adr, val, MEM_LONG);
+	}
 	mn102_write_byte(mn102, adr, val);
 	mn102_write_byte(mn102, adr+1, val>>8);
 	mn102_write_byte(mn102, adr+2, val>>16);
@@ -332,13 +333,15 @@ void mn102_force_irq(mn102_info *mn102, int level, int group, int entry)
 {
 	if(!(mn102->psw & 0x800))
 	{
-		if(group != 1 || entry != 3)
+		if(group != 1 || entry != 3){
 			log_event("MN102", "Dropping irq %d %d %d, pc=%x, a3=%x", level, group, entry, mn102->pc, mn102->a[3]);
+		}
 		return;
 	}
 
-	if(group != 1 || entry != 3)
+	if(group != 1 || entry != 3) {
 		log_event("MN102", "Taking irq %d %d %d, pc=%x, a3=%x", level, group, entry, mn102->pc, mn102->a[3]);
+	}
 	mn102->a[3] -= 6;
 	w24(mn102, mn102->a[3]+2, mn102->pc);
 	mn102_write_word(mn102, mn102->a[3], mn102->psw);
@@ -1685,8 +1688,9 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 
   switch(adr) {
   case 0x000:
-    if(data & 12)
+    if(data & 12) {
       log_event("CPU", "Stop request");
+	}
     break;
   case 0x001:
     log_event("WATCHDOG", "Write %d", data>>7);
@@ -1717,15 +1721,16 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
   case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055: {
     int irq = ((adr & 0x3f)>>1)-1;
-    if((mn102->icrh[irq] != data) && (data & 15))
+    if((mn102->icrh[irq] != data) && (data & 15)) {
       log_event("MN102", "irq %d enabled, level=%x, enable= %s %s %s %s", irq+1, (data >> 4) & 7,
 		data & 1 ? inames[irq][0] : "-",
 		data & 2 ? inames[irq][1] : "-",
 		data & 4 ? inames[irq][2] : "-",
 		data & 8 ? inames[irq][3] : "-");
-
-    if((mn102->icrh[irq] != data) && !(data & 15))
+	}
+    if((mn102->icrh[irq] != data) && !(data & 15)) {
       log_event("MN102", "irq %d disabled", irq+1);
+	}
     mn102->icrh[irq] = data;
     break;
   }
