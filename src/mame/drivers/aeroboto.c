@@ -45,9 +45,15 @@ static INTERRUPT_GEN( aeroboto_interrupt )
 	aeroboto_state *state = (aeroboto_state *)device->machine->driver_data;
 
 	if (!state->disable_irq)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, ASSERT_LINE);
 	else
 		state->disable_irq--;
+}
+
+static READ8_HANDLER( aeroboto_irq_ack_r )
+{
+	cputag_set_input_line(space->machine,"maincpu", 0, CLEAR_LINE);
+	return 0xff;
 }
 
 static READ8_HANDLER( aeroboto_2973_r )
@@ -86,7 +92,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3004, 0x3004) AM_READ(aeroboto_201_r) AM_WRITEONLY AM_BASE_MEMBER(aeroboto_state, starx)
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE_MEMBER(aeroboto_state, stary)	// usable but probably wrong
 	AM_RANGE(0x3006, 0x3006) AM_WRITEONLY AM_BASE_MEMBER(aeroboto_state, bgcolor)
-	AM_RANGE(0x3800, 0x3800) AM_READNOP							// watchdog or IRQ ack
+	AM_RANGE(0x3800, 0x3800) AM_READ(aeroboto_irq_ack_r)		// watchdog or IRQ ack
 	AM_RANGE(0x4000, 0xffff) AM_ROM								// main ROM
 ADDRESS_MAP_END
 
