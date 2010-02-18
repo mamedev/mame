@@ -71,7 +71,7 @@
 
 static void big10_vdp_interrupt(running_machine *machine, int i)
 {
-	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line (machine, "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static INTERRUPT_GEN( big10_interrupt )
