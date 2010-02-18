@@ -2652,6 +2652,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 {
 	UINT32 address, ea;
 	UINT8 modrm = FETCH(cpustate);
+	I386_SREG seg;
 
 	switch( (modrm >> 3) & 0x7 )
 	{
@@ -2703,6 +2704,11 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					CYCLES(cpustate,CYCLES_LLDT_MEM);
 				}
 				cpustate->ldtr.segment = READ32(cpustate,ea);
+				memset(&seg, 0, sizeof(seg));
+				seg.selector = cpustate->ldtr.segment;
+				i386_load_protected_mode_segment(cpustate,&seg);
+				cpustate->ldtr.limit = seg.limit;
+				cpustate->ldtr.base = seg.base;
 			}
 			else
 			{
