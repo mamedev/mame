@@ -499,9 +499,10 @@ static READ8_HANDLER( sound_data_r )
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
 	else if (pio != NULL)
 	{
+		UINT8 data = z80pio_pa_r(pio, 0);
 		z80pio_astb_w(pio, 0);
 		z80pio_astb_w(pio, 1);
-		return soundlatch_r(space, offset);
+		return data;
 	}
 
 	return 0xff;
