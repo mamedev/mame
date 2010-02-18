@@ -550,7 +550,6 @@ DIP locations verified for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/arkanoid.h"
-#include "includes/hexa.h"
 #include "sound/ay8910.h"
 #include "cpu/m6805/m6805.h"
 
@@ -596,7 +595,7 @@ static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(hexa_d008_w)
 	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w)	/* or IRQ acknowledge, or both */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(hexa_videoram_w) AM_BASE_SIZE_MEMBER(hexa_state, videoram, videoram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_SIZE_MEMBER(arkanoid_state, videoram, videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -957,7 +956,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	/* driver data */
 	MDRV_DRIVER_DATA(arkanoid_state)
 
-	// basic machine hardware
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -970,7 +969,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	MDRV_MACHINE_START(arkanoid)
 	MDRV_MACHINE_RESET(arkanoid)
 
-	// video hardware
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -984,7 +983,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	MDRV_VIDEO_START(arkanoid)
 	MDRV_VIDEO_UPDATE(arkanoid)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("aysnd", YM2149, XTAL_12MHz/4/2) /* YM2149 clock is 3mhz, pin 26 is low so 3mhz/2 */
@@ -993,31 +992,17 @@ static MACHINE_DRIVER_START( arkanoid )
 MACHINE_DRIVER_END
 
 
-static MACHINE_START( hexa )
-{
-	hexa_state *state = (hexa_state *)machine->driver_data;
-
-	state_save_register_global(machine, state->charbank);
-}
-
-static MACHINE_RESET( hexa )
-{
-	hexa_state *state = (hexa_state *)machine->driver_data;
-
-	state->charbank = 0;
-}
-
 static MACHINE_DRIVER_START( hexa )
 	/* driver data */
-	MDRV_DRIVER_DATA(hexa_state)
+	MDRV_DRIVER_DATA(arkanoid_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* Imported from arkanoid - correct? */
 	MDRV_CPU_PROGRAM_MAP(hexa_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(hexa)
-	MDRV_MACHINE_RESET(hexa)
+	MDRV_MACHINE_START(arkanoid)
+	MDRV_MACHINE_RESET(arkanoid)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1031,7 +1016,7 @@ static MACHINE_DRIVER_START( hexa )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(hexa)
+	MDRV_VIDEO_START(arkanoid)
 	MDRV_VIDEO_UPDATE(hexa)
 
 	/* sound hardware */
@@ -1045,7 +1030,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bootleg )
 	MDRV_IMPORT_FROM(arkanoid)
 
-	// basic machine hardware
+	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 

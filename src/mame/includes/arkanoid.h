@@ -17,6 +17,7 @@ struct _arkanoid_state
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
 	size_t   spriteram_size;
+	size_t   videoram_size;
 
 	/* video-related */
 	tilemap_t  *bg_tilemap;
@@ -44,9 +45,11 @@ extern WRITE8_HANDLER( arkanoid_videoram_w );
 
 extern WRITE8_HANDLER( arkanoid_d008_w );
 extern WRITE8_HANDLER( tetrsark_d008_w );
+extern WRITE8_HANDLER( hexa_d008_w );
 
 extern VIDEO_START( arkanoid );
 extern VIDEO_UPDATE( arkanoid );
+extern VIDEO_UPDATE( hexa );
 
 
 /*----------- defined in machine/arkanoid.c -----------*/

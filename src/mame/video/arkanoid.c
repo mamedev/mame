@@ -120,6 +120,39 @@ WRITE8_HANDLER( tetrsark_d008_w )
 }
 
 
+WRITE8_HANDLER( hexa_d008_w )
+{
+	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+
+	/* bit 0 = flipx (or y?) */
+	if (flip_screen_x_get(space->machine) != (data & 0x01))
+	{
+		flip_screen_x_set(space->machine, data & 0x01);
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	}
+
+	/* bit 1 = flipy (or x?) */
+	if (flip_screen_y_get(space->machine) != (data & 0x02))
+	{
+		flip_screen_y_set(space->machine, data & 0x02);
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	}
+
+	/* bit 2 - 3 unknown */
+
+	/* bit 4 could be the ROM bank selector for 8000-bfff (not sure) */
+	memory_set_bank(space->machine, "bank1", ((data & 0x10) >> 4));
+
+	/* bit 5 = gfx bank */
+	if (state->gfxbank != ((data & 0x20) >> 5))
+	{
+		state->gfxbank = (data & 0x20) >> 5;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	}
+
+	/* bit 6 - 7 unknown */
+}
+
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
@@ -175,5 +208,13 @@ VIDEO_UPDATE( arkanoid )
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
+	return 0;
+}
+
+VIDEO_UPDATE( hexa )
+{
+	arkanoid_state *state = (arkanoid_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
