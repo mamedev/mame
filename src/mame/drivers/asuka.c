@@ -214,6 +214,7 @@ DIP locations verified for:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "video/taitoic.h"
@@ -293,6 +294,19 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 	state->adpcm_pos &= 0xff00;
 }
 
+static UINT8 *cadash_shared_ram;
+
+static READ16_HANDLER( cadash_share_r )
+{
+	return cadash_shared_ram[offset];
+}
+
+static WRITE16_HANDLER( cadash_share_w )
+{
+	cadash_shared_ram[offset] = data & 0xff;
+}
+
+
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
@@ -338,7 +352,7 @@ static ADDRESS_MAP_START( cadash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM	/* network ram */
+	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(cadash_share_r,cadash_share_w)	/* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_4bpg_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
@@ -401,6 +415,14 @@ static ADDRESS_MAP_START( cadash_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( cadash_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&cadash_shared_ram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cadash_sub_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x3f) AM_RAM // I think it's NOT internal RAM, hence it's not a z180 (an hitachi clone with 0xed 0x39 opcode?) ...
+ADDRESS_MAP_END
 
 /***********************************************************
              INPUT PORTS, DIPs
@@ -966,6 +988,10 @@ static MACHINE_DRIVER_START( cadash )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map)
 
+	MDRV_CPU_ADD("subcpu", Z180, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(cadash_sub_map)
+	MDRV_CPU_IO_MAP(cadash_sub_io)
+
 	MDRV_MACHINE_START(asuka)
 	MDRV_MACHINE_RESET(asuka)
 
@@ -1340,7 +1366,7 @@ ROM_START( cadash )
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -1367,7 +1393,7 @@ ROM_START( cadashj )
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1390,7 +1416,7 @@ ROM_START( cadashu )
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1411,7 +1437,7 @@ ROM_START( cadashi )
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1432,7 +1458,7 @@ ROM_START( cadashf )
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1453,7 +1479,7 @@ ROM_START( cadashg )
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
