@@ -1004,18 +1004,18 @@ static UINT8 spc7110_mmio_read(running_machine *machine, UINT32 addr)
 		case 0x4810:
 		{
 			UINT8 data;
-			UINT32 addr, adjust, adjustaddr;
+			UINT32 address, adjust, adjustaddr;
 
 			if(snes_spc7110.r481x != 0x07) return 0x00;
 
-			addr = spc7110_data_pointer();
+			address = spc7110_data_pointer();
 			adjust = spc7110_data_adjust();
 			if(snes_spc7110.r4818 & 8)
 			{
 				adjust = (INT16)adjust;  //16-bit sign extend
 			}
 
-			adjustaddr = addr;
+			adjustaddr = address;
 			if(snes_spc7110.r4818 & 2)
 			{
 				adjustaddr += adjust;
@@ -1033,7 +1033,7 @@ static UINT8 spc7110_mmio_read(running_machine *machine, UINT32 addr)
 
 				if((snes_spc7110.r4818 & 16) == 0)
 				{
-					spc7110_set_data_pointer(addr + increment);
+					spc7110_set_data_pointer(address + increment);
 				}
 				else
 				{
@@ -1054,25 +1054,25 @@ static UINT8 spc7110_mmio_read(running_machine *machine, UINT32 addr)
 		case 0x481a:
 		{
 			UINT8 data;
-			UINT32 addr, adjust;
+			UINT32 address, adjust;
 			if(snes_spc7110.r481x != 0x07)
 			{
 				return 0x00;
 			}
 
-			addr = spc7110_data_pointer();
+			address = spc7110_data_pointer();
 			adjust = spc7110_data_adjust();
 			if(snes_spc7110.r4818 & 8)
 			{
 				adjust = (INT16)adjust;  //16-bit sign extend
 			}
 
-			data = ROM[spc7110_datarom_addr(addr + adjust)];
+			data = ROM[spc7110_datarom_addr(address + adjust)];
 			if((snes_spc7110.r4818 & 0x60) == 0x60)
 			{
 				if((snes_spc7110.r4818 & 16) == 0)
 				{
-					spc7110_set_data_pointer(addr + adjust);
+					spc7110_set_data_pointer(address + adjust);
 				}
 				else
 				{
@@ -1143,17 +1143,17 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 		case 0x4805: snes_spc7110.r4805 = data; break;
 		case 0x4806:
 		{
-			UINT32 table, index, length, addr, mode, offset;
+			UINT32 table, index, length, address, mode, offset;
 			snes_spc7110.r4806 = data;
 
 			table   = (snes_spc7110.r4801 + (snes_spc7110.r4802 << 8) + (snes_spc7110.r4803 << 16));
 			index   = (snes_spc7110.r4804 << 2);
 			length  = (snes_spc7110.r4809 + (snes_spc7110.r480a << 8));
-			addr    = spc7110_datarom_addr(table + index);
-			mode    = (ROM[addr + 0]);
-			offset  = (ROM[addr + 1] << 16)
-                    + (ROM[addr + 2] <<  8)
-                    + (ROM[addr + 3] <<  0);
+			address = spc7110_datarom_addr(table + index);
+			mode    = (ROM[address + 0]);
+			offset  = (ROM[address + 1] << 16)
+                    + (ROM[address + 2] <<  8)
+                    + (ROM[address + 3] <<  0);
 
 			SPC7110Decomp_init(snes_spc7110.decomp, machine, mode, offset, (snes_spc7110.r4805 + (snes_spc7110.r4806 << 8)) << mode);
 			snes_spc7110.r480c = 0x80;

@@ -589,7 +589,7 @@ static void DSP4_OP07( void )
 
 static void DSP4_OP08( void )
 {
-  INT16 win_left, win_right;
+  INT16 wleft, wright;
   INT16 view_x[2], view_y[2];
   INT16 envelope[2][2];
 
@@ -695,33 +695,33 @@ static void DSP4_OP08( void )
   // SR = 0x00
 
   // re-center coordinates
-  win_left = DSP4_vars.poly_cx[0][0] - view_x[0] + envelope[0][0];
-  win_right = DSP4_vars.poly_cx[0][1] - view_x[0] + envelope[0][1];
+  wleft = DSP4_vars.poly_cx[0][0] - view_x[0] + envelope[0][0];
+  wright = DSP4_vars.poly_cx[0][1] - view_x[0] + envelope[0][1];
 
   // saturate offscreen data for polygon #1
-  if (win_left < DSP4_vars.poly_clipLf[0][0])
+  if (wleft < DSP4_vars.poly_clipLf[0][0])
   {
-    win_left = DSP4_vars.poly_clipLf[0][0];
+    wleft = DSP4_vars.poly_clipLf[0][0];
   }
-  if (win_left > DSP4_vars.poly_clipRt[0][0])
+  if (wleft > DSP4_vars.poly_clipRt[0][0])
   {
-    win_left = DSP4_vars.poly_clipRt[0][0];
+    wleft = DSP4_vars.poly_clipRt[0][0];
   }
-  if (win_right < DSP4_vars.poly_clipLf[0][1])
+  if (wright < DSP4_vars.poly_clipLf[0][1])
   {
-    win_right = DSP4_vars.poly_clipLf[0][1];
+    wright = DSP4_vars.poly_clipLf[0][1];
   }
-  if (win_right > DSP4_vars.poly_clipRt[0][1])
+  if (wright > DSP4_vars.poly_clipRt[0][1])
   {
-    win_right = DSP4_vars.poly_clipRt[0][1];
+    wright = DSP4_vars.poly_clipRt[0][1];
   }
 
   // SR = 0x80
 
   // initial output for polygon #1
   DSP4_CLEAR_OUT();
-  DSP4_WRITE_BYTE(win_left & 0xff);
-  DSP4_WRITE_BYTE(win_right & 0xff);
+  DSP4_WRITE_BYTE(wleft & 0xff);
+  DSP4_WRITE_BYTE(wright & 0xff);
 
 
   do
