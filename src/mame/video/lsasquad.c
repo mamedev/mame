@@ -1,37 +1,36 @@
 #include "emu.h"
 #include "includes/lsasquad.h"
 
-UINT8 *lsasquad_scrollram;
-
-
-
-static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *scrollram)
+static void draw_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *scrollram )
 {
-	int offs,scrollx,scrolly;
-
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	int offs, scrollx, scrolly;
 
 	scrollx = scrollram[3];
 	scrolly = -scrollram[0];
 
-	for (offs = 0;offs < 0x080;offs += 4)
+	for (offs = 0; offs < 0x080; offs += 4)
 	{
-		int base,y,sx,sy,code,color;
+		int base, y, sx, sy, code, color;
 
-		base = 64 * scrollram[offs+1];
-		sx = 8*(offs/4) + scrollx;
-		if (flip_screen_get(machine)) sx = 248 - sx;
+		base = 64 * scrollram[offs + 1];
+		sx = 8 * (offs / 4) + scrollx;
+		if (flip_screen_get(machine)) 
+			sx = 248 - sx;
+
 		sx &= 0xff;
 
-		for (y = 0;y < 32;y++)
+		for (y = 0; y < 32; y++)
 		{
 			int attr;
 
-			sy = 8*y + scrolly;
-			if (flip_screen_get(machine)) sy = 248 - sy;
+			sy = 8 * y + scrolly;
+			if (flip_screen_get(machine)) 
+				sy = 248 - sy;
 			sy &= 0xff;
 
-			attr = machine->generic.videoram.u8[base + 2*y + 1];
-			code = machine->generic.videoram.u8[base + 2*y] + ((attr & 0x0f) << 8);
+			attr = state->videoram[base + 2 * y + 1];
+			code = state->videoram[base + 2 * y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
@@ -49,76 +48,78 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 	}
 }
 
-static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int  * previd, int type)
+static int draw_layer_daikaiju( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int  * previd, int type )
 {
-	int id,scrollx,scrolly,initoffs, globalscrollx;
-	int stepx=0;
-	initoffs=offs;
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	int id, scrollx, scrolly, initoffs, globalscrollx;
+	int stepx = 0;
 
-	globalscrollx=0;
+	initoffs = offs;
+	globalscrollx = 0;
 
-	id=lsasquad_scrollram[offs+2];
+	id = state->scrollram[offs + 2];
 
-	for(;offs < 0x400; offs+=4)
+	for( ; offs < 0x400; offs += 4)
 	{
-		int base,y,sx,sy,code,color;
+		int base, y, sx, sy, code, color;
 
 		 //id change
-		if(id!=lsasquad_scrollram[offs+2])
+		if (id != state->scrollram[offs + 2])
 		{
 			*previd = id;
 			return offs;
 		}
 		else
 		{
-			id=lsasquad_scrollram[offs+2];
+			id = state->scrollram[offs + 2];
 		}
 
 		//skip empty (??) column, potential probs with 1st column in scrollram (scroll 0, tile 0, id 0)
-		if( (lsasquad_scrollram[offs+0]|lsasquad_scrollram[offs+1]|lsasquad_scrollram[offs+2]|lsasquad_scrollram[offs+3])==0)
+		if ((state->scrollram[offs + 0] | state->scrollram[offs + 1] | state->scrollram[offs + 2] | state->scrollram[offs + 3]) == 0)
 			continue;
 
 		//local scroll x/y
-		scrolly = -lsasquad_scrollram[offs+0];
-		scrollx =  lsasquad_scrollram[offs+3];
+		scrolly = -state->scrollram[offs + 0];
+		scrollx =  state->scrollram[offs + 3];
 
 		//check for global x scroll used in bg layer in game (starts at offset 0 in scrollram
 		// and game name/logo on title screen (starts in the middle of scrollram, but with different
 		// (NOT unique )id than prev coulmn(s)
 
-		if( *previd!=1 )
+		if (*previd != 1)
 		{
-			if(offs!=initoffs)
+			if (offs != initoffs)
 			{
-				scrollx+=globalscrollx;
+				scrollx += globalscrollx;
 			}
 			else
 			{
 				//global scroll init
-				globalscrollx=scrollx;
+				globalscrollx = scrollx;
 			}
 		}
 
-		base = 64 * lsasquad_scrollram[offs+1];
-		sx = scrollx+stepx;
+		base = 64 * state->scrollram[offs + 1];
+		sx = scrollx + stepx;
 
-		if (flip_screen_get(machine)) sx = 248 - sx;
+		if (flip_screen_get(machine)) 
+			sx = 248 - sx;
 		sx &= 0xff;
 
-		for (y = 0;y < 32;y++)
+		for (y = 0; y < 32; y++)
 		{
 			int attr;
 
-			sy = 8*y + scrolly;
-			if (flip_screen_get(machine)) sy = 248 - sy;
+			sy = 8 * y + scrolly;
+			if (flip_screen_get(machine)) 
+				sy = 248 - sy;
 			sy &= 0xff;
 
-			attr = machine->generic.videoram.u8[base + 2*y + 1];
-			code = machine->generic.videoram.u8[base + 2*y] + ((attr & 0x0f) << 8);
+			attr = state->videoram[base + 2 * y + 1];
+			code = state->videoram[base + 2 * y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
-
-			if((type==0 && color!=0x0d) || (type !=0 && color==0x0d))
+			if ((type == 0 && color != 0x0d) || (type != 0 && color == 0x0d))
 			{
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
@@ -137,38 +138,40 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 	return offs;
 }
 
-static void drawbg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int type)
+static void drawbg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int type )
 {
-	int i=0;
-	int id=-1;
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	int i = 0;
+	int id = -1;
 
-	while(i<0x400)
+	while (i < 0x400)
 	{
-		if(!(lsasquad_scrollram[i+2]&1))
+		if (!(state->scrollram[i + 2] & 1))
 		{
-			i=draw_layer_daikaiju(machine, bitmap, cliprect, i, &id,type);
+			i = draw_layer_daikaiju(machine, bitmap, cliprect, i, &id, type);
 		}
 		else
 		{
-			id=lsasquad_scrollram[i+2];
-			i+=4;
+			id = state->scrollram[i + 2];
+			i += 4;
 		}
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size-4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
-		int sx,sy,attr,code,color,flipx,flipy;
+		int sx, sy, attr, code, color, flipx, flipy;
 
-		sx = spriteram[offs+3];
+		sx = spriteram[offs + 3];
 		sy = 240 - spriteram[offs];
-		attr = spriteram[offs+1];
-		code = spriteram[offs+2] + ((attr & 0x30) << 4);
+		attr = spriteram[offs + 1];
+		code = spriteram[offs + 2] + ((attr & 0x30) << 4);
 		color = attr & 0x0f;
 		flipx = attr & 0x40;
 		flipy = attr & 0x80;
@@ -197,21 +200,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( lsasquad )
 {
-	bitmap_fill(bitmap,cliprect,511);
+	lsasquad_state *state = (lsasquad_state *)screen->machine->driver_data;
+	bitmap_fill(bitmap, cliprect, 511);
 
-	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x000);
-	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x080);
-	draw_sprites(screen->machine,bitmap,cliprect);
-	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x100);
+	draw_layer(screen->machine, bitmap, cliprect, state->scrollram + 0x000);
+	draw_layer(screen->machine, bitmap, cliprect, state->scrollram + 0x080);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_layer(screen->machine, bitmap, cliprect, state->scrollram + 0x100);
 	return 0;
 }
 
 
 VIDEO_UPDATE( daikaiju )
 {
-	bitmap_fill(bitmap,cliprect,511);
-	drawbg(screen->machine,bitmap,cliprect,0); // bottom
-	draw_sprites(screen->machine,bitmap,cliprect);
-	drawbg(screen->machine,bitmap,cliprect,1);	// top = pallete $d ?
+	bitmap_fill(bitmap, cliprect, 511);
+	drawbg(screen->machine, bitmap, cliprect, 0); // bottom
+	draw_sprites(screen->machine, bitmap, cliprect);
+	drawbg(screen->machine, bitmap, cliprect, 1);	// top = pallete $d ?
 	return 0;
 }

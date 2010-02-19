@@ -85,32 +85,37 @@ TODO:
 #include "includes/lkage.h"
 
 
-static int sound_nmi_enable,pending_nmi;
-
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	else pending_nmi = 1;
+	lkage_state *state = (lkage_state *)machine->driver_data;
+	if (state->sound_nmi_enable) 
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	else 
+		state->pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( lkage_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	timer_call_after_resynch(space->machine, NULL, data,nmi_callback);
+	soundlatch_w(space, offset, data);
+	timer_call_after_resynch(space->machine, NULL, data, nmi_callback);
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_disable_w )
 {
-	sound_nmi_enable = 0;
+	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 {
-	sound_nmi_enable = 1;
-	if (pending_nmi)
-	{ /* probably wrong but commands may go lost otherwise */
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		pending_nmi = 0;
+	lkage_state *state = (lkage_state *)space->machine->driver_data;
+
+	state->sound_nmi_enable = 1;
+	if (state->pending_nmi)
+	{ 
+		/* probably wrong but commands may go lost otherwise */
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->pending_nmi = 0;
 	}
 }
 
@@ -118,7 +123,7 @@ static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE(&lkage_vreg) /* video registers */
+	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE_MEMBER(lkage_state, vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP
 	AM_RANGE(0xf062, 0xf062) AM_READWRITE(lkage_mcu_r,lkage_mcu_w)
@@ -131,10 +136,10 @@ static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
 	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
-	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE(&lkage_scroll)
+	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE_MEMBER(lkage_state, scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_GENERIC(videoram) /* videoram */
+	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_MEMBER(lkage_state, spriteram)
+	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_MEMBER(lkage_state, videoram)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )
@@ -148,12 +153,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lkage_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lkage_68705_portA_r,lkage_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lkage_68705_portB_r,lkage_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(lkage_68705_portC_r,lkage_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(lkage_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(lkage_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(lkage_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lkage_68705_port_a_r,lkage_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lkage_68705_port_b_r,lkage_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(lkage_68705_port_c_r,lkage_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(lkage_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(lkage_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(lkage_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -337,7 +342,8 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	lkage_state *state = (lkage_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -350,7 +356,69 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
+static MACHINE_START( lkage )
+{
+	lkage_state *state = (lkage_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	state_save_register_global(machine, state->bg_tile_bank);
+	state_save_register_global(machine, state->fg_tile_bank);
+
+	state_save_register_global(machine, state->mcu_ready);
+	state_save_register_global(machine, state->mcu_val);
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->port_c_in);
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+}
+
+static MACHINE_RESET( lkage )
+{
+	lkage_state *state = (lkage_state *)machine->driver_data;
+
+	state->bg_tile_bank = state->fg_tile_bank = 0;
+
+	state->mcu_ready = 3;
+	state->mcu_val = 0;
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->port_c_in = 0;
+	state->port_c_out = 0;
+	state->ddr_c = 0;
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->from_main = 0;
+	state->from_mcu = 0;
+}
+
+
 static MACHINE_DRIVER_START( lkage )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lkage_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage_map)
@@ -363,6 +431,9 @@ static MACHINE_DRIVER_START( lkage )
 
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(lkage_m68705_map)
+
+	MDRV_MACHINE_START(lkage)
+	MDRV_MACHINE_RESET(lkage)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -397,6 +468,10 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( lkageb )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lkage_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage_map)
@@ -406,6 +481,9 @@ static MACHINE_DRIVER_START( lkageb )
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
+
+	MDRV_MACHINE_START(lkage)
+	MDRV_MACHINE_RESET(lkage)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -592,40 +670,39 @@ ROM_START( lkageb3 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) )	/* unknown */
 ROM_END
 
-static UINT8 mcu_val;
-
 /*Note: This probably uses another MCU dump,which is undumped.*/
 
 static READ8_HANDLER( fake_mcu_r )
 {
+	lkage_state *state = (lkage_state *)space->machine->driver_data;
 	int result = 0;
 
-	switch(mcu_val)
+	switch (state->mcu_val)
 	{
 		/*These are for the attract mode*/
 		case 0x01:
-			result = mcu_val-1;
+			result = state->mcu_val - 1;
 			break;
 
 		case 0x90:
-			result = mcu_val+0x43;
+			result = state->mcu_val + 0x43;
 			break;
 
 		/*Gameplay Protection,checked in this order at a start of a play*/
 		case 0xa6:
-			result = mcu_val+0x27;
+			result = state->mcu_val + 0x27;
 			break;
 
 		case 0x34:
-			result = mcu_val+0x7f;
+			result = state->mcu_val + 0x7f;
 			break;
 
 		case 0x48:
-			result = mcu_val+0xb7;
+			result = state->mcu_val + 0xb7;
 			break;
 
 		default:
-			result = mcu_val;
+			result = state->mcu_val;
 			break;
 	}
 	return result;
@@ -633,13 +710,14 @@ static READ8_HANDLER( fake_mcu_r )
 
 static WRITE8_HANDLER( fake_mcu_w )
 {
-	mcu_val = data;
+	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	state->mcu_val = data;
 }
 
 static READ8_HANDLER( fake_status_r )
 {
-	static int res = 3; /* cpu data/mcu ready status */
-	return res;
+	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	return state->mcu_ready;
 }
 
 static DRIVER_INIT( lkageb )
@@ -649,9 +727,9 @@ static DRIVER_INIT( lkageb )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
 }
 
-GAME( 1984, lkage,    0,        lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL )
-GAME( 1984, lkageo,   lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (older)", GAME_NO_COCKTAIL )
-GAME( 1984, lkageoo,  lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (oldest)", GAME_NO_COCKTAIL )
-GAME( 1984, lkageb,   lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", GAME_NO_COCKTAIL )
+GAME( 1984, lkage,    0,        lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageo,   lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (older)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageoo,  lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (oldest)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageb,   lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

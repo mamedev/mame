@@ -110,24 +110,20 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 #define MCU_CONTROLS1 0x36
 #define MCU_MESSAGE   0x40
 #define MCU_CONTROLS2 0x44
-#define MCU_ID				0x60
+#define MCU_ID        0x60
 
 #define MCU_ADDRESS1_LENGTH  2
 #define MCU_ADDRESS2_LENGTH  2
 #define MCU_CONTROLS1_LENGTH 2
 #define MCU_MESSAGE_LENGTH   3
 #define MCU_CONTROLS2_LENGTH 3
-#define MCU_ID_LENGTH				 0
+#define MCU_ID_LENGTH        0
 
-#define SET_COMMAND(n)	daikaiju_command=data; \
-			daikaiju_length=n;\
-			daikaiju_cnt=0;\
-			daikaiju_cntr=0;
+#define SET_COMMAND(n)	state->daikaiju_command = data; \
+			state->daikaiju_length = n;\
+			state->daikaiju_cnt = 0;\
+			state->daikaiju_cntr = 0;
 
-
-static int daikaiju_xor, daikaiju_command, daikaiju_length, daikaiju_prev, daikaiju_cnt, daikaiju_cntr;
-
-static int daikaiju_buffer[256];
 
 static const int xortable[]=
 {
@@ -135,33 +131,28 @@ static const int xortable[]=
  0x11, 0x00, 0xC0, 0x19, 0xD1, 0xF1, 0xC9, -1
 };
 
-MACHINE_RESET(daikaiju)
-{
-	daikaiju_xor=-1;
-	daikaiju_command=0;
-	daikaiju_length=0;
-}
-
 WRITE8_HANDLER( daikaiju_mcu_w )
 {
-  if(daikaiju_xor <0)
+	lsasquad_state *state = (lsasquad_state *)space->machine->driver_data;
+
+	if (state->daikaiju_xor < 0)
 	{
 		//reset
-		daikaiju_xor=0;
-		data^=0xc3;
+		state->daikaiju_xor = 0;
+		data ^= 0xc3;
 	}
 	else
 	{
-		data^=xortable[daikaiju_xor];
+		data ^= xortable[state->daikaiju_xor];
 		//check for end of table
-		if(xortable[++daikaiju_xor]<0)
+		if (xortable[++state->daikaiju_xor] < 0)
 		{
-			daikaiju_xor=0;
+			state->daikaiju_xor = 0;
 		}
 	}
-	daikaiju_prev=data;
+	state->daikaiju_prev = data;
 
-	if(daikaiju_length == 0) //new command
+	if (state->daikaiju_length == 0) //new command
 	{
 		switch(data)
 		{
@@ -172,22 +163,24 @@ WRITE8_HANDLER( daikaiju_mcu_w )
 			case MCU_CONTROLS1: SET_COMMAND(MCU_CONTROLS1_LENGTH); break;
 			case MCU_MESSAGE:	SET_COMMAND(MCU_MESSAGE_LENGTH); break;
 			case MCU_CONTROLS2: SET_COMMAND(MCU_CONTROLS2_LENGTH); break;
-			case MCU_ID:				SET_COMMAND(MCU_ID_LENGTH); break;
+			case MCU_ID:			SET_COMMAND(MCU_ID_LENGTH); break;
 			default:
-				daikaiju_command=data;
+				state->daikaiju_command = data;
 				logerror("Unknown MCU command W %x %x \n",data,cpu_get_pc(space->cpu));
 		}
 	}
 	else
 	{
-		--daikaiju_length;
-		daikaiju_buffer[daikaiju_cnt++]=data;
+		--state->daikaiju_length;
+		state->daikaiju_buffer[state->daikaiju_cnt++] = data;
 	}
 }
 
 READ8_HANDLER( daikaiju_mcu_r )
 {
-	switch(daikaiju_command)
+	lsasquad_state *state = (lsasquad_state *)space->machine->driver_data;
+
+	switch (state->daikaiju_command)
 	{
 		case MCU_ID:
 			return ID_DAIKAIJU;
@@ -195,9 +188,9 @@ READ8_HANDLER( daikaiju_mcu_r )
 		case MCU_CONTROLS1:
 		{
 			int n;
-			switch( (daikaiju_buffer[0]&0xf)^0xf)
+			switch ((state->daikaiju_buffer[0] & 0xf) ^ 0xf)
 			{
-				case 0x00:	n = (daikaiju_buffer[1]&(~8))&0xf; break;
+				case 0x00:	n = (state->daikaiju_buffer[1] & (~8)) & 0xf; break;
 				case 0x08:	n = 0 | 8; break;
 				case 0x0a:	n = 1 | 8; break;
 				case 0x02:	n = 2 | 8; break;
@@ -210,49 +203,49 @@ READ8_HANDLER( daikaiju_mcu_r )
 				default:		n = 0; break;
 			}
 
-			if( !(daikaiju_buffer[0]&0x10) ) //button 1 pressed
+			if (!(state->daikaiju_buffer[0] & 0x10)) //button 1 pressed
 			{
-				if(daikaiju_buffer[1]&0x10) //previous status
+				if (state->daikaiju_buffer[1] & 0x10) //previous status
 				{
-					n|=0x40;	// button 0->1
+					n |= 0x40;	// button 0->1
 				}
 				else
 				{
-					n|=0; //button 1->1
+					n |= 0; //button 1->1
 				}
 			}
 			else
 			{
-				if(daikaiju_buffer[1]&0x10) //previous status
+				if (state->daikaiju_buffer[1] & 0x10) //previous status
 				{
-					n|=0x40+0x10;	// button 0->0
+					n |= 0x40 + 0x10;	// button 0->0
 				}
 				else
 				{
-					n|=0x10; //button 1->0
+					n |= 0x10; //button 1->0
 				}
 			}
 
-			if( !(daikaiju_buffer[0]&0x20) ) //button 2 pressed
+			if (!(state->daikaiju_buffer[0] & 0x20)) //button 2 pressed
 			{
-				if(daikaiju_buffer[1]&0x20) //previous status
+				if (state->daikaiju_buffer[1] & 0x20) //previous status
 				{
-					n|=0x80;	// button 0->1
+					n |= 0x80;	// button 0->1
 				}
 				else
 				{
-					n|=0; //button 1->1
+					n |= 0; //button 1->1
 				}
 			}
 			else
 			{
-				if(daikaiju_buffer[1]&0x20) //previous status
+				if (state->daikaiju_buffer[1] & 0x20) //previous status
 				{
-					n|=0x80+0x20;	// button 0->0
+					n |= 0x80 + 0x20;	// button 0->0
 				}
 				else
 				{
-					n|=0x20; //button 1->0
+					n |= 0x20; //button 1->0
 				}
 			}
 			return n;
@@ -260,89 +253,91 @@ READ8_HANDLER( daikaiju_mcu_r )
 
 		case MCU_ADDRESS1:
 		{
-			int address=daikaiju_buffer[1]*2+64*daikaiju_buffer[0];
+			int address = state->daikaiju_buffer[1] * 2 + 64 * state->daikaiju_buffer[0];
 
-			address&=0x0fff; // ?
-			address+=0xd000;
+			address &= 0x0fff; // ?
+			address += 0xd000;
 
-			if(daikaiju_cntr==0)
+			if (state->daikaiju_cntr == 0)
 			{
-				daikaiju_cntr++;
-				return address&0xff;
+				state->daikaiju_cntr++;
+				return address & 0xff;
 			}
 			else
 			{
-				return address>>8;
+				return address >> 8;
 			}
 		}
 
 		case MCU_ADDRESS2:
 		{
-			int address=daikaiju_buffer[1]*2+64*daikaiju_buffer[0];
+			int address = state->daikaiju_buffer[1] * 2 + 64 * state->daikaiju_buffer[0];
 
-			address&=0x1fff; // ?
-			address+=0xc000;
+			address &= 0x1fff; // ?
+			address += 0xc000;
 
-			if(daikaiju_cntr==0)
+			if (state->daikaiju_cntr == 0)
 			{
-				daikaiju_cntr++;
-				return address&0xff;
+				state->daikaiju_cntr++;
+				return address & 0xff;
 			}
 			else
 			{
-				return address>>8;
+				return address >> 8;
 			}
 		}
 
 		case MCU_MESSAGE:
-			return daikaiju_buffer[1];
+			return state->daikaiju_buffer[1];
 
 		case MCU_CONTROLS2:
 		{
 			int n;
-			int dest=(daikaiju_buffer[0]&0x7)<<1;
-			int prev=(daikaiju_buffer[1]&0xf);
+			int dest = (state->daikaiju_buffer[0] & 0x7) << 1;
+			int prev = (state->daikaiju_buffer[1] & 0xf);
 
-			if(daikaiju_buffer[2]==2)
+			if (state->daikaiju_buffer[2] == 2)
 			{
-				prev&=0xfe;
+				prev &= 0xfe;
 			}
-			if(prev!=dest)
-			{
-				int diff=(dest-prev);
 
-				if((diff>8 )|| (diff<0 && diff >-8))
+			if (prev != dest)
+			{
+				int diff = (dest - prev);
+
+				if ((diff > 8)|| (diff < 0 && diff > -8))
 				{
-					n=(prev-daikaiju_buffer[2])&0xf;
+					n = (prev - state->daikaiju_buffer[2]) & 0xf;
 				}
 				else
 				{
-					n=(prev+daikaiju_buffer[2])&0xf;
+					n = (prev + state->daikaiju_buffer[2]) & 0xf;
 				}
 			}
 			else
 			{
-				n=prev;
+				n = prev;
 			}
-			prev&=0xf;
-			if(prev!=n)
+			prev &= 0xf;
+
+			if (prev != n)
 			{
-				n|=0x10;
+				n |= 0x10;
 			}
 			return n;
 		}
 	}
-	logerror("Unknown MCU R %x %x %x %x\n",cpu_get_pc(space->cpu), daikaiju_command, daikaiju_length, daikaiju_prev);
+	logerror("Unknown MCU R %x %x %x %x\n", cpu_get_pc(space->cpu), state->daikaiju_command, state->daikaiju_length, state->daikaiju_prev);
 	return 0xff;
 }
 
 READ8_HANDLER( daikaiju_mcu_status_r )
 {
+	lsasquad_state *state = (lsasquad_state *)space->machine->driver_data;
 	int res = input_port_read(space->machine, "MCU?");
 
-	res^=mame_rand(space->machine)&3;
-	res |=((lsasquad_sound_pending & 0x02)^2)<<3; //inverted flag
-	lsasquad_sound_pending &= ~0x02;
+	res ^= mame_rand(space->machine) & 3;
+	res |= ((state->sound_pending & 0x02) ^ 2) << 3; //inverted flag
+	state->sound_pending &= ~0x02;
 	return res;
 }
-

@@ -60,7 +60,10 @@ static TILE_GET_INFO( get_back_tile_info )
 	}
 
 	tile = RAM[tile_index];
-	if (tile > 0x7f) bank = 3; else bank = 2;
+	if (tile > 0x7f) 
+		bank = 3; 
+	else 
+		bank = 2;
 	SET_TILE_INFO(bank, tile & 0x7f, state->background_color, 0);
 }
 
@@ -104,7 +107,7 @@ WRITE8_HANDLER( deco16_io_w )
 	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	state->io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
-		tilemap_mark_all_tiles_dirty(state->background_tilemap);
+		tilemap_mark_all_tiles_dirty(state->back_tilemap);
 
 	switch (offset)
 	{
@@ -112,20 +115,20 @@ WRITE8_HANDLER( deco16_io_w )
 			if (((data >> 4) & 3) != state->background_color)
 			{
 				state->background_color = (data >> 4) & 3;
-				tilemap_mark_all_tiles_dirty(state->background_tilemap);
+				tilemap_mark_all_tiles_dirty(state->back_tilemap);
 			}
 			state->background_disable = data & 0x4;
-			flip_screen_set(space->machine, data & 0x1);
+			flip_screen_set(space->machine, data & 0x01);
 			break;
 		case 7: /* Background palette resistors? */
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			cputag_set_input_line(space->machine, "maincpu", DECO16_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
 			soundlatch_w(space, 0, data);
-			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
@@ -135,9 +138,9 @@ WRITE8_HANDLER( prosoccr_io_w )
 	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	state->io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
-		tilemap_mark_all_tiles_dirty(state->background_tilemap);
+		tilemap_mark_all_tiles_dirty(state->back_tilemap);
 
-//  popmessage("%02x %02x",state->io_ram[6],state->io_ram[7]);
+	//  popmessage("%02x %02x",state->io_ram[6],state->io_ram[7]);
 
 	switch (offset)
 	{
@@ -150,11 +153,11 @@ WRITE8_HANDLER( prosoccr_io_w )
 			/* x--- ---- used on the attract mode */
 			break;
 		case 8: /* Irq ack */
-			cputag_set_input_line(space->machine, "maincpu", DECO16_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
 			soundlatch_w(space, 0, data);
-			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
@@ -170,14 +173,14 @@ WRITE8_HANDLER( prosport_io_w )
 		case 0:
 			//background_disable = ~data & 0x80;
 			flip_screen_set(space->machine, data & 0x80);
-			tilemap_mark_all_tiles_dirty(state->background_tilemap);
+			tilemap_mark_all_tiles_dirty(state->back_tilemap);
 			break;
 		case 2: /* Sound */
 			soundlatch_w(space, 0, data);
-			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 		case 4: /* Irq ack */
-			cputag_set_input_line(space->machine, "maincpu", DECO16_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 	}
 }
@@ -200,7 +203,7 @@ WRITE8_HANDLER( prosport_bg_vram_w )
 {
 	liberate_state *state = (liberate_state *)space->machine->driver_data;
 	state->bg_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->background_tilemap, offset);
+	tilemap_mark_tile_dirty(state->back_tilemap, offset);
 }
 
 /***************************************************************************/
@@ -208,47 +211,48 @@ WRITE8_HANDLER( prosport_bg_vram_w )
 VIDEO_START( prosoccr )
 {
 	liberate_state *state = (liberate_state *)machine->driver_data;
-	state->background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
-	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	state->back_tilemap = tilemap_create(machine, get_back_tile_info, back_scan, 16, 16, 32, 32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap,0);
+	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 
-	state->charram = auto_alloc_array(machine, UINT8, 0x1800*2);
+	state->charram = auto_alloc_array(machine, UINT8, 0x1800 * 2);
 }
 
 VIDEO_START( boomrang )
 {
 	liberate_state *state = (liberate_state *)machine->driver_data;
-	state->background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
-	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	state->back_tilemap = tilemap_create(machine, get_back_tile_info, back_scan, 16, 16, 32, 32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
-	tilemap_set_transmask(state->background_tilemap,0,0x0001,0x007e); /* Bottom 1 pen/Top 7 pens */
-	tilemap_set_transparent_pen(state->fix_tilemap,0);
+	tilemap_set_transmask(state->back_tilemap, 0, 0x0001, 0x007e); /* Bottom 1 pen/Top 7 pens */
+	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 }
 
 VIDEO_START( liberate )
 {
 	liberate_state *state = (liberate_state *)machine->driver_data;
-	state->background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
-	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	state->back_tilemap = tilemap_create(machine, get_back_tile_info, back_scan, 16, 16, 32, 32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap,0);
+	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 }
 
 VIDEO_START( prosport )
 {
 	liberate_state *state = (liberate_state *)machine->driver_data;
-	state->background_tilemap = tilemap_create(machine, prosport_get_back_tile_info,back_scan,16,16,32,32);
-	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+	state->back_tilemap = tilemap_create(machine, prosport_get_back_tile_info, back_scan, 16, 16, 32, 32);
+	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap,0);
+	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 }
 
 /***************************************************************************/
 
 WRITE8_HANDLER( prosport_paletteram_w )
 {
-	space->machine->generic.paletteram.u8[offset] = data;
+	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	state->paletteram[offset] = data;
 
 	/* RGB output is inverted */
 	palette_set_color_rgb(space->machine, offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
@@ -256,7 +260,7 @@ WRITE8_HANDLER( prosport_paletteram_w )
 
 PALETTE_INIT( liberate )
 {
-	int i,bit0,bit1,bit2,g,r,b;
+	int i, bit0, bit1, bit2, g, r, b;
 
 	for (i = 0;i < 32;i++)
 	{
@@ -286,15 +290,16 @@ PALETTE_INIT( liberate )
 
 /***************************************************************************/
 
-static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void liberate_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	/* Sprites */
-	for (offs = 0x000;offs < 0x800;offs += 4)
+	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
-		int multi,fx,fy,sx,sy,sy2,code,color;
+		int multi, fx, fy, sx, sy, sy2, code, color;
 
 		/*
             Byte 0: 0x01 - ?
@@ -309,34 +314,35 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
             Byte 3: 0xff - X position
         */
 
-		code = spriteram[offs+1] + ((spriteram[offs+0] & 0x60) << 3);
-		sx = 240 - spriteram[offs+3];
-		sy = 240 - spriteram[offs+2];
-		color = ((spriteram[offs+1] & 0x08) >> 3); // ?
+		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0x60) << 3);
+		sx = 240 - spriteram[offs + 3];
+		sy = 240 - spriteram[offs + 2];
+		color = ((spriteram[offs + 1] & 0x08) >> 3); // ?
 
-		fx = spriteram[offs+0] & 0x04;
-		fy = spriteram[offs+0] & 0x02;
-		multi = spriteram[offs+0] & 0x10;
+		fx = spriteram[offs + 0] & 0x04;
+		fy = spriteram[offs + 0] & 0x02;
+		multi = spriteram[offs + 0] & 0x10;
 
-		if (multi && fy==0) sy-=16;
+		if (multi && fy == 0) 
+			sy -= 16;
 
 		if (flip_screen_get(machine))
 		{
-			sy=240-sy;
-			sx=240-sx;
+			sy = 240 - sy;
+			sx = 240 - sx;
 			if (fy)
-				sy2=sy+16;
+				sy2 = sy + 16;
 			else
-				sy2=sy-16;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
+				sy2 = sy - 16;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
 		}
 		else
 		{
 			if (fy)
-				sy2=sy-16;
+				sy2 = sy - 16;
 			else
-				sy2=sy+16;
+				sy2 = sy + 16;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -353,53 +359,55 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void prosport_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	liberate_state *state = (liberate_state *)machine->driver_data;
-	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color,gfx_region;
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color, gfx_region;
+	UINT8 *spriteram = state->spriteram;
 
-	for (offs = 0x000;offs < 0x800;offs += 4)
+	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
-		if ((spriteram[offs+0]&1)!=1) continue;
+		if ((spriteram[offs + 0] & 1) != 1) 
+			continue;
 
-		code = spriteram[offs+1] + ((spriteram[offs+0]&0x3)<<8);
-		code2=code+1;
+		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0x3) << 8);
+		code2 = code + 1;
 
-		if(state->io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
-			gfx_region = 3+4;
+		if(state->io_ram[0] & 0x40) //dynamic ram-based gfxs for Pro Golf
+			gfx_region = 3 + 4;
 		else
-			gfx_region = ((state->io_ram[0]&0x30)>>4)+4;
+			gfx_region = ((state->io_ram[0] & 0x30) >> 4) + 4;
 
 
-		multi = spriteram[offs+0] & 0x10;
+		multi = spriteram[offs + 0] & 0x10;
 
-		sy=spriteram[offs+2];
-		if (multi) sy+=16;
-		sx = (240 - spriteram[offs+3]);
-//      sy = (240-spriteram[offs+2]);//-16;
-		sy = 240-sy;
+		sy = spriteram[offs + 2];
+		if (multi) 
+			sy += 16;
+		sx = (240 - spriteram[offs + 3]);
+//      sy = (240 - spriteram[offs + 2]);//-16;
+		sy = 240 - sy;
 
-		color = 1;//(state->io_ram[4] & 2)+1;//(spriteram[offs+0]&0x4)>>2;
+		color = 1;//(state->io_ram[4] & 2) + 1;//(spriteram[offs + 0] & 0x4) >> 2;
 
-		fy = spriteram[offs+0] & 0x02;
-		fx = spriteram[offs+0] & 0x04;
-		multi = 0;// spriteram[offs+0] & 0x10;
+		fy = spriteram[offs + 0] & 0x02;
+		fx = spriteram[offs + 0] & 0x04;
+		multi = 0;// spriteram[offs + 0] & 0x10;
 
-//      if (multi) sy-=16;
-		if ((fy && multi) || (fx && multi)) { code2=code; code++; }
+//      if (multi) sy -= 16;
+		if ((fy && multi) || (fx && multi)) { code2 = code; code++; }
 
 		if (flip_screen_get(machine))
 		{
-			sy=240-sy;
-			sx=240-sx;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			sy2=sy-16;
+			sy = 240 - sy;
+			sx = 240 - sx;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
+			sy2 = sy - 16;
 		}
 		else
 		{
-			sy2=sy+16;
+			sy2 = sy + 16;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
@@ -416,47 +424,51 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void boomrang_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color;
 
-	for (offs = 0x000;offs < 0x800;offs += 4)
+	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
-		if ((spriteram[offs+0]&1)!=1) continue;
-		if ((spriteram[offs+0]&0x8)!=pri) continue;
+		if ((spriteram[offs + 0] & 1) != 1) 
+			continue;
+		if ((spriteram[offs + 0] & 0x8) != pri) 
+			continue;
 
-		code = spriteram[offs+1] + ((spriteram[offs+0]&0xe0)<<3);
-		code2=code+1;
+		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0xe0) << 3);
+		code2 = code + 1;
 
-		multi = spriteram[offs+0] & 0x10;
+		multi = spriteram[offs + 0] & 0x10;
 
-		sy=spriteram[offs+2];
-		if (multi) sy+=16;
-		sx = (240 - spriteram[offs+3]);
-//      sy = (240-spriteram[offs+2]);//-16;
-		sy = 240-sy;
+		sy=spriteram[offs + 2];
+		if (multi) 
+			sy += 16;
+		sx = (240 - spriteram[offs + 3]);
+//      sy = (240-spriteram[offs + 2]);//-16;
+		sy = 240 - sy;
 
-		color = (spriteram[offs+0]&0x4)>>2;
+		color = (spriteram[offs + 0] & 0x4) >> 2;
 
 		fx = 0;
-		fy = spriteram[offs+0] & 0x02;
-		multi = spriteram[offs+0] & 0x10;
+		fy = spriteram[offs + 0] & 0x02;
+		multi = spriteram[offs + 0] & 0x10;
 
-//      if (multi) sy-=16;
-		if (fy && multi) { code2=code; code++; }
+//      if (multi) sy -= 16;
+		if (fy && multi) { code2 = code; code++; }
 
 		if (flip_screen_get(machine))
 		{
-			sy=240-sy;
-			sx=240-sx;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			sy2=sy-16;
+			sy = 240 - sy;
+			sx = 240 - sx;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
+			sy2 = sy - 16;
 		}
 		else
 		{
-			sy2=sy+16;
+			sy2 = sy + 16;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -473,20 +485,22 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void prosoccr_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	int offs,code,fx,fy,sx,sy;
+	liberate_state *state = (liberate_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	int offs, code, fx, fy, sx, sy;
 
-	for (offs = 0x000;offs < 0x400;offs += 4)
+	for (offs = 0x000; offs < 0x400; offs += 4)
 	{
-		if ((spriteram[offs+0]&1)!=1) continue;
+		if ((spriteram[offs + 0] & 1) != 1) 
+			continue;
 
-		code = spriteram[offs+1];
-		sy = 240 - spriteram[offs+2];
-		sx = 240 - spriteram[offs+3];
-		fx = spriteram[offs+0] & 4;
-		fy = spriteram[offs+0] & 2;
+		code = spriteram[offs + 1];
+		sy = 240 - spriteram[offs + 2];
+		sx = 240 - spriteram[offs + 3];
+		fx = spriteram[offs + 0] & 4;
+		fy = spriteram[offs + 0] & 2;
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
@@ -501,16 +515,16 @@ static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE( prosoccr )
 {
 	liberate_state *state = (liberate_state *)screen->machine->driver_data;
-	tilemap_set_scrolly(state->background_tilemap,0, state->io_ram[1]);
-	tilemap_set_scrollx(state->background_tilemap,0,-state->io_ram[0]);
+	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
+	tilemap_set_scrollx(state->back_tilemap, 0, -state->io_ram[0]);
 
 	if (state->background_disable)
-		bitmap_fill(bitmap,cliprect,32);
+		bitmap_fill(bitmap, cliprect, 32);
 	else
-		tilemap_draw(bitmap,cliprect,state->background_tilemap,0,0);
+		tilemap_draw(bitmap, cliprect, state->back_tilemap, 0, 0);
 
-	tilemap_draw(bitmap,cliprect,state->fix_tilemap,0,0);
-	prosoccr_draw_sprites(screen->machine,bitmap,cliprect);
+	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	prosoccr_draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -520,41 +534,41 @@ VIDEO_UPDATE( prosport )
 	liberate_state *state = (liberate_state *)screen->machine->driver_data;
 	UINT8 *videoram = state->videoram;
 	UINT8 *colorram = state->colorram;
-	int mx,my,tile,offs,gfx_region;
-	int scrollx,scrolly;
+	int mx, my, tile, offs, gfx_region;
+	int scrollx, scrolly;
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	offs = 0;
 	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
-	scrolly = ((state->io_ram[0] & 0x8)<<5);
-	scrollx = ((state->io_ram[0] & 0x2)<<7) | (state->io_ram[1]);
+	scrolly = ((state->io_ram[0] & 0x8) << 5);
+	scrollx = ((state->io_ram[0] & 0x2) << 7) | (state->io_ram[1]);
 
-	tilemap_set_scrolly(state->background_tilemap,0,scrolly);
-	tilemap_set_scrollx(state->background_tilemap,0,-scrollx);
+	tilemap_set_scrolly(state->back_tilemap, 0, scrolly);
+	tilemap_set_scrollx(state->back_tilemap, 0, -scrollx);
 
-	tilemap_draw(bitmap,cliprect,state->background_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->back_tilemap, 0, 0);
 
 //  popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
 //  ,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
 
-	for (offs = 0;offs < 0x400;offs++)
+	for (offs = 0; offs < 0x400; offs++)
 	{
-		tile=videoram[offs]+((colorram[offs]&0x3)<<8);
+		tile = videoram[offs] + ((colorram[offs] & 0x3) << 8);
 
-		if(state->io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
+		if(state->io_ram[0] & 0x40) //dynamic ram-based gfxs for Pro Golf
 			gfx_region = 3;
 		else
-			gfx_region = ((state->io_ram[0]&0x30)>>4);
+			gfx_region = ((state->io_ram[0] & 0x30) >> 4);
 
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx_region],
-				tile,1,0,0,248-8*mx,8*my,0);
+		drawgfx_transpen(bitmap, cliprect,screen->machine->gfx[gfx_region],
+				tile, 1, 0, 0, 248 - 8 * mx, 8 * my, 0);
 	}
 
-	prosport_draw_sprites(screen->machine,bitmap,cliprect);
+	prosport_draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -562,34 +576,35 @@ VIDEO_UPDATE( prosport )
 VIDEO_UPDATE( boomrang )
 {
 	liberate_state *state = (liberate_state *)screen->machine->driver_data;
-	tilemap_set_scrolly(state->background_tilemap,0, state->io_ram[1]);
-	tilemap_set_scrollx(state->background_tilemap,0,-state->io_ram[0]);
+	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
+	tilemap_set_scrollx(state->back_tilemap, 0, -state->io_ram[0]);
 
 	if (state->background_disable)
-		bitmap_fill(bitmap,cliprect,32);
+		bitmap_fill(bitmap, cliprect, 32);
 	else
-		tilemap_draw(bitmap,cliprect,state->background_tilemap,TILEMAP_DRAW_LAYER1,0);
+		tilemap_draw(bitmap, cliprect, state->back_tilemap, TILEMAP_DRAW_LAYER1, 0);
 
 	boomrang_draw_sprites(screen->machine,bitmap,cliprect,8);
 	if (!state->background_disable)
-		tilemap_draw(bitmap,cliprect,state->background_tilemap,TILEMAP_DRAW_LAYER0,0);
-	boomrang_draw_sprites(screen->machine,bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,state->fix_tilemap,0,0);
+		tilemap_draw(bitmap, cliprect, state->back_tilemap, TILEMAP_DRAW_LAYER0, 0);
+
+	boomrang_draw_sprites(screen->machine, bitmap, cliprect, 0);
+	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( liberate )
 {
 	liberate_state *state = (liberate_state *)screen->machine->driver_data;
-	tilemap_set_scrolly(state->background_tilemap,0, state->io_ram[1]);
-	tilemap_set_scrollx(state->background_tilemap,0,-state->io_ram[0]);
+	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
+	tilemap_set_scrollx(state->back_tilemap, 0, -state->io_ram[0]);
 
 	if (state->background_disable)
-		bitmap_fill(bitmap,cliprect,32);
+		bitmap_fill(bitmap, cliprect, 32);
 	else
-		tilemap_draw(bitmap,cliprect,state->background_tilemap,0,0);
+		tilemap_draw(bitmap, cliprect, state->back_tilemap, 0, 0);
 
-	liberate_draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->fix_tilemap,0,0);
+	liberate_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }

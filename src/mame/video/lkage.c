@@ -1,11 +1,8 @@
-#include "emu.h"
-#include "includes/lkage.h"
+/***************************************************************************
 
-static tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
-static UINT8 bg_tile_bank, fg_tile_bank;
-UINT8 *lkage_scroll, *lkage_vreg;
+    video/lkage.c
 
-/*
+
     lkage_scroll[0x00]: text layer horizontal scroll
     lkage_scroll[0x01]: text layer vertical scroll
     lkage_scroll[0x02]: foreground layer horizontal scroll
@@ -35,71 +32,84 @@ UINT8 *lkage_scroll, *lkage_vreg;
         04 1e f3 : attract#2    110
         04 1e f3 : attract#3    110
         00 4e f3 : attract#4    110
-*/
+
+
+***************************************************************************/
+
+#include "emu.h"
+#include "includes/lkage.h"
+
 
 WRITE8_HANDLER( lkage_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	lkage_state *state = (lkage_state *)space->machine->driver_data;
 
-	switch( offset/0x400 )
+	state->videoram[offset] = data;
+
+	switch (offset / 0x400)
 	{
 	case 0:
-		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
+		tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0x3ff);
 		break;
 
 	case 1:
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
+		tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 		break;
 
 	case 2:
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+		tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
 		break;
 
 	default:
 		break;
 	}
-} /* lkage_videoram_w */
+}
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index + 0x800] + 256 * (bg_tile_bank?5:1);
+	lkage_state *state = (lkage_state *)machine->driver_data;
+	int code = state->videoram[tile_index + 0x800] + 256 * (state->bg_tile_bank ? 5 : 1);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index + 0x400] + 256 * (fg_tile_bank?1:0);
+	lkage_state *state = (lkage_state *)machine->driver_data;
+	int code = state->videoram[tile_index + 0x400] + 256 * (state->fg_tile_bank ? 1 : 0);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
+	lkage_state *state = (lkage_state *)machine->driver_data;
+	int code = state->videoram[tile_index];
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 VIDEO_START( lkage )
 {
-	bg_tile_bank = fg_tile_bank = 0;
+	lkage_state *state = (lkage_state *)machine->driver_data;
 
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,32,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
-	tilemap_set_transparent_pen(tx_tilemap,0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->tx_tilemap, 0);
 
-	tilemap_set_scrolldx(bg_tilemap,-5,-5+24);
-	tilemap_set_scrolldx(fg_tilemap,-3,-3+24);
-	tilemap_set_scrolldx(tx_tilemap,-1,-1+24);
-} /* VIDEO_START( lkage ) */
+	tilemap_set_scrolldx(state->bg_tilemap, -5, -5 + 24);
+	tilemap_set_scrolldx(state->fg_tilemap, -3, -3 + 24);
+	tilemap_set_scrolldx(state->tx_tilemap, -1, -1 + 24);
+}
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	const UINT8 *source = machine->generic.spriteram.u8;
-	const UINT8 *finish = source+0x60;
-	while( source<finish )
+	lkage_state *state = (lkage_state *)machine->driver_data;
+	const UINT8 *source = state->spriteram;
+	const UINT8 *finish = source + 0x60;
+
+	while (source < finish)
 	{
 		int attributes = source[2];
 		/* 0x01: horizontal flip
@@ -110,22 +120,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
          * 0x80: priority
          */
 		int priority_mask = 0;
-		int color = (attributes>>4)&7;
-		int flipx = attributes&0x01;
-		int flipy = attributes&0x02;
-		int height = (attributes&0x08) ? 2 : 1;
-		int sx = source[0]-15;
-		int sy = 256-16*height-source[1];
+		int color = (attributes >> 4) & 7;
+		int flipx = attributes & 0x01;
+		int flipy = attributes & 0x02;
+		int height = (attributes & 0x08) ? 2 : 1;
+		int sx = source[0] - 15;
+		int sy = 256 - 16 * height - source[1];
 		int sprite_number = source[3] + ((attributes & 0x04) << 6);
 		int y;
 
-		if( attributes&0x80 )
+		if (attributes & 0x80)
 		{
-			priority_mask = (0xf0|0xcc );
+			priority_mask = (0xf0 | 0xcc);
 		}
 		else
 		{
-			priority_mask = (0xf0);
+			priority_mask = 0xf0;
 		}
 
 		if (flip_screen_x_get(machine))
@@ -133,9 +143,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if( flip_screen_y_get(machine) )
+		if (flip_screen_y_get(machine))
 		{
-			sy = 254 - 16*height - sy;
+			sy = 254 - 16 * height - sy;
 			flipy = !flipy;
 		}
 		if (height == 2 && !flipy)
@@ -143,7 +153,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sprite_number ^= 1;
 		}
 
-		for (y = 0;y < height;y++)
+		for (y = 0; y < height; y++)
 		{
 			pdrawgfx_transpen(
 				bitmap,
@@ -157,55 +167,56 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				machine->priority_bitmap,
 				priority_mask,0 );
 		}
-		source+=4;
+		source += 4;
 	}
-} /* draw_sprites */
+}
 
 VIDEO_UPDATE( lkage )
 {
+	lkage_state *state = (lkage_state *)screen->machine->driver_data;
 	int bank;
 
-	flip_screen_x_set(screen->machine, ~lkage_vreg[2] & 0x01);
-	flip_screen_y_set(screen->machine, ~lkage_vreg[2] & 0x02);
+	flip_screen_x_set(screen->machine, ~state->vreg[2] & 0x01);
+	flip_screen_y_set(screen->machine, ~state->vreg[2] & 0x02);
 
-	bank = lkage_vreg[1]&0x08;
-	if( bg_tile_bank != bank )
+	bank = state->vreg[1] & 0x08;
+	if (state->bg_tile_bank != bank)
 	{
-		bg_tile_bank = bank;
-		tilemap_mark_all_tiles_dirty( bg_tilemap );
+		state->bg_tile_bank = bank;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 
-	bank = lkage_vreg[0]&0x04;
-	if( fg_tile_bank != bank )
+	bank = state->vreg[0]&0x04;
+	if (state->fg_tile_bank != bank)
 	{
-		fg_tile_bank = bank;
-		tilemap_mark_all_tiles_dirty( fg_tilemap );
+		state->fg_tile_bank = bank;
+		tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 	}
 
-	tilemap_set_palette_offset( bg_tilemap, 0x300 + (lkage_vreg[1]&0xf0) );
-	tilemap_set_palette_offset( fg_tilemap, 0x200 + (lkage_vreg[1]&0xf0) );
-	tilemap_set_palette_offset( tx_tilemap, 0x110 );
+	tilemap_set_palette_offset(state->bg_tilemap, 0x300 + (state->vreg[1] & 0xf0));
+	tilemap_set_palette_offset(state->fg_tilemap, 0x200 + (state->vreg[1] & 0xf0));
+	tilemap_set_palette_offset(state->tx_tilemap, 0x110);
 
-	tilemap_set_scrollx(tx_tilemap,0,lkage_scroll[0]);
-	tilemap_set_scrolly(tx_tilemap,0,lkage_scroll[1]);
+	tilemap_set_scrollx(state->tx_tilemap, 0, state->scroll[0]);
+	tilemap_set_scrolly(state->tx_tilemap, 0, state->scroll[1]);
 
-	tilemap_set_scrollx(fg_tilemap,0,lkage_scroll[2]);
-	tilemap_set_scrolly(fg_tilemap,0,lkage_scroll[3]);
+	tilemap_set_scrollx(state->fg_tilemap, 0, state->scroll[2]);
+	tilemap_set_scrolly(state->fg_tilemap, 0, state->scroll[3]);
 
-	tilemap_set_scrollx(bg_tilemap,0,lkage_scroll[4]);
-	tilemap_set_scrolly(bg_tilemap,0,lkage_scroll[5]);
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll[4]);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll[5]);
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
-	if ((lkage_vreg[2] & 0xf0) == 0xf0)
+	if ((state->vreg[2] & 0xf0) == 0xf0)
 	{
-		tilemap_draw( bitmap,cliprect,bg_tilemap,0,1 );
-		tilemap_draw( bitmap,cliprect,fg_tilemap,0,(lkage_vreg[1]&2)?2:4 );
-		tilemap_draw( bitmap,cliprect,tx_tilemap,0,4 );
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 1);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, (state->vreg[1] & 2) ? 2 : 4);
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 4);
 	}
 	else
 	{
-		tilemap_draw( bitmap,cliprect,tx_tilemap,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	}
-	draw_sprites(screen->machine, bitmap,cliprect );
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

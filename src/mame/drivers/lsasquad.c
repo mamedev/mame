@@ -155,10 +155,8 @@ Notes:
 
 static WRITE8_HANDLER( lsasquad_bankswitch_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-
 	/* bits 0-2 select ROM bank */
-	memory_set_bankptr(space->machine, "bank1",&ROM[0x10000 + 0x2000 * (data & 7)]);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
@@ -172,9 +170,9 @@ static ADDRESS_MAP_START( lsasquad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&lsasquad_scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, videoram, videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, spriteram, spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -194,7 +192,7 @@ static ADDRESS_MAP_START( lsasquad_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r,lsasquad_sh_result_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r, lsasquad_sh_result_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
@@ -203,11 +201,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_portA_r,lsasquad_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_portB_r,lsasquad_68705_portB_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_port_a_r,lsasquad_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_port_b_r,lsasquad_68705_port_b_w)
 	AM_RANGE(0x0002, 0x0002) AM_READ(lsasquad_mcu_status_r)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(lsasquad_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(lsasquad_68705_ddrB_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(lsasquad_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(lsasquad_68705_ddr_b_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -342,9 +340,9 @@ static ADDRESS_MAP_START( daikaiju_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&lsasquad_scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, videoram, videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, spriteram, spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r)	/* COIN + 68705 status */
@@ -505,7 +503,8 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	lsasquad_state *state = (lsasquad_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( unk )
@@ -528,7 +527,80 @@ static const ym2203_interface ym2203_config =
 };
 
 
+static MACHINE_START( lsasquad )
+{
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+
+	state_save_register_global(machine, state->sound_pending);
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+	state_save_register_global(machine, state->sound_cmd);
+	state_save_register_global(machine, state->sound_result);
+
+	state_save_register_global(machine, state->daikaiju_xor);
+	state_save_register_global(machine, state->daikaiju_command);
+	state_save_register_global(machine, state->daikaiju_length);
+	state_save_register_global(machine, state->daikaiju_prev);
+	state_save_register_global(machine, state->daikaiju_cnt);
+	state_save_register_global(machine, state->daikaiju_cntr);
+
+	state_save_register_global_array(machine, state->daikaiju_buffer);
+}
+
+static MACHINE_RESET( lsasquad )
+{
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+
+	state->sound_pending = 0;
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+	state->sound_cmd = 0;
+	state->sound_result = 0;
+
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->from_main = 0;
+	state->from_mcu = 0;
+
+	/* daikaiju */
+	state->daikaiju_xor = -1;
+	state->daikaiju_command = 0;
+	state->daikaiju_length = 0;
+	state->daikaiju_prev = 0;
+	state->daikaiju_cnt = 0;
+	state->daikaiju_cntr = 0;
+
+	memset(state->daikaiju_buffer, 0, ARRAY_LENGTH(state->daikaiju_buffer));
+}
+
 static MACHINE_DRIVER_START( lsasquad )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lsasquad_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz? */
@@ -544,6 +616,9 @@ static MACHINE_DRIVER_START( lsasquad )
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
+
+	MDRV_MACHINE_START(lsasquad)
+	MDRV_MACHINE_RESET(lsasquad)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -575,6 +650,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( daikaiju )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(lsasquad_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(daikaiju_map)
@@ -588,7 +666,8 @@ static MACHINE_DRIVER_START( daikaiju )
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MDRV_MACHINE_RESET(daikaiju)
+	MDRV_MACHINE_START(lsasquad)
+	MDRV_MACHINE_RESET(lsasquad)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -730,11 +809,19 @@ ROM_END
 
 
 /* coin inputs are inverted in storming */
-static DRIVER_INIT( lsasquad ) { lsasquad_invertcoin = 0x00; }
-static DRIVER_INIT( storming ) { lsasquad_invertcoin = 0x0c; }
+static DRIVER_INIT( lsasquad ) 
+{ 
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	state->invertcoin = 0x00; 
+}
+
+static DRIVER_INIT( storming ) 
+{ 
+	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	state->invertcoin = 0x0c; 
+}
 
 
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, storming, lsasquad, lsasquad, lsasquad, storming, ROT270, "Taito", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, daikaiju, 0,	daikaiju, daikaiju, 0, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION)
-
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, lsasquad, lsasquad, storming, ROT270, "Taito", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,	daikaiju, daikaiju, 0, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
