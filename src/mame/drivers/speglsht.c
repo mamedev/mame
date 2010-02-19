@@ -202,6 +202,12 @@ static READ32_HANDLER(cop_r)
 	return 0;
 }
 
+static READ32_HANDLER(irq_ack_clear)
+{
+	cputag_set_input_line(space->machine, "sub", R3000_IRQ4, CLEAR_LINE);
+	return 0;
+}
+
 static ADDRESS_MAP_START( speglsht_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
@@ -214,7 +220,7 @@ static ADDRESS_MAP_START( speglsht_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_RAM
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READNOP //interrupt related
+	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0) // mirror for interrupts
 ADDRESS_MAP_END
@@ -301,11 +307,6 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
- static INTERRUPT_GEN( irq4_gen )
-{
-	cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
-}
-
 static const r3000_cpu_core config =
 {
 	0,
@@ -329,7 +330,7 @@ static MACHINE_DRIVER_START( speglsht )
 	MDRV_CPU_ADD("sub", R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(speglsht_mem)
-	MDRV_CPU_VBLANK_INT("screen", irq4_gen)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_assert)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_MACHINE_RESET(speglsht)

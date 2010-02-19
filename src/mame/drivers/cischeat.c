@@ -227,7 +227,7 @@ static WRITE16_HANDLER( bigrun_paletteram16_w )
 static ADDRESS_MAP_START( bigrun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x080000, 0x083fff) AM_READWRITE(bigrun_vregs_r, bigrun_vregs_w) AM_BASE(&megasys1_vregs)	// Vregs
-	AM_RANGE(0x084000, 0x087fff) AM_WRITEONLY													// Linking with other units
+	AM_RANGE(0x084000, 0x087fff) AM_RAM													// Linking with other units
 	AM_RANGE(0x088000, 0x08bfff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2)			// Sharedram with sub CPU#2
 	AM_RANGE(0x08c000, 0x08ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE(&sharedram1)			// Sharedram with sub CPU#1
 
@@ -623,7 +623,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigrun_map3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
-	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram2_r, sharedram1_w)	// Shared RAM (with Main CPU)
+	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[1])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM										// RAM
 ADDRESS_MAP_END
@@ -703,8 +703,8 @@ static ADDRESS_MAP_START( bigrun_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r, bigrun_soundbank_w)	// From Main CPU
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)							// To Main CPU
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM													// RAM
 ADDRESS_MAP_END
 

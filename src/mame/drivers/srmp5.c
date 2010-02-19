@@ -336,6 +336,12 @@ static WRITE32_HANDLER(srmp5_vidregs_w)
 		logerror("vidregs write %08X %08X\n", offset << 2, state->vidregs[offset]);
 }
 
+static READ32_HANDLER(irq_ack_clear)
+{
+	cputag_set_input_line(space->machine, "sub", R3000_IRQ4, CLEAR_LINE);
+	return 0;
+}
+
 static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM //maybe 0 - 2fffff ?
 	AM_RANGE(0x002f0000, 0x002f7fff) AM_RAM
@@ -362,7 +368,7 @@ static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
 
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITEONLY
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READNOP
+	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -510,16 +516,6 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-//It seems that interrupt flags are never cleared, so I use last line only.
-
-static INTERRUPT_GEN( irq4_gen )
-{
-	if(cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
-	else
-		cpu_set_input_line(device, R3000_IRQ4, CLEAR_LINE);
-}
-
 static const r3000_cpu_core config =
 {
 	1,	/* 1 if we have an FPU, 0 otherwise */
@@ -569,8 +565,7 @@ static MACHINE_DRIVER_START( srmp5 )
 	MDRV_CPU_ADD("sub", R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(srmp5_mem)
-	//256???K??
-	MDRV_CPU_VBLANK_INT_HACK(irq4_gen, 256)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_assert)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
