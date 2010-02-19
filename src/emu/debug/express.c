@@ -914,8 +914,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 				{
 					/* if we have a number prefix, assume it is a number */
 					bufindex = 0;
-					if (buffer[0] == '$') { numbase = 16; bufindex++; must_be_number = 1; }
-					else if (buffer[0] == '0' && buffer[1] == 'x') { numbase = 16; bufindex += 2; must_be_number = 1; }
+					if (buffer[0] == '0' && buffer[1] == 'x') { numbase = 16; bufindex += 2; must_be_number = 1; }
 					else if (buffer[0] == '#') { numbase = 10; bufindex++; must_be_number = 1; }
 
 					/* if we're not forced to be a number, check for a symbol match first */
@@ -939,6 +938,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 					/* see if we parse as a number */
 					if (token->type == TOK_INVALID)
 					{
+						if (buffer[0] == '$') { numbase = 16; bufindex++; must_be_number = 1; }
 						value = 0;
 						while (buffer[bufindex] != 0)
 						{
