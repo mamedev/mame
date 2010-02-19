@@ -1306,7 +1306,7 @@ static void handle_editor(running_machine *machine)
 				{
 					/* autoschow */
 					cur_editor = &focus_view->editor;
-					cur_editor->str = cur_editor->str.substr(0, cur_editor->str.len());
+					cur_editor->str = cur_editor->str.substr(0, cur_editor->str.len()-1);
 				}
 				/* if it's any other key and we're not maxed out, update */
 				else if (event.ch >= ' ' && event.ch < 0x7f)
