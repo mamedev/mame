@@ -5,9 +5,9 @@
 
  The program rom extracted from the Z180 also refers to this as Lucky 74..
 
-
-
-
+ TODO:
+ - interrupt generation (nested NMIs? disabled for now)
+ - video emulation (uses tilexor)
 
  Lucky Girl
  Wing 1991
@@ -77,18 +77,62 @@
 #include "cpu/z180/z180.h"
 #include "video/mc6845.h"
 
+static UINT8 *luck_vram1,*luck_vram2,*luck_vram3;
+
+static VIDEO_START(luckgrln)
+{
+
+}
+
+static VIDEO_UPDATE(luckgrln)
+{
+	int y,x;
+	int count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			UINT16 tile = (luck_vram1[count] & 0xff) | ((luck_vram2[count] & 0x1f)<<8);
+			UINT8 col = 0;
+			//UINT8 region = (luck_vram2[count] & 0x20) >> 5;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,col,0,0,x*8,y*8);
+
+			count++;
+		}
+	}
+	return 0;
+}
 
 static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x10000, 0x1ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
+	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
+
+	AM_RANGE(0x0c200, 0x0c5ff) AM_RAM
+	AM_RANGE(0x0ca00, 0x0cdff) AM_RAM
+
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM
+
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM AM_BASE(&luck_vram1)
+	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_BASE(&luck_vram2)
+	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_BASE(&luck_vram3)
+
+	AM_RANGE(0x0f800, 0x0ffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
+/*
+static WRITE8_HANDLER( output_w )
+{
+	printf("%02x\n",data);
+}
+*/
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
+//	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
 	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_register_w)
 ADDRESS_MAP_END
@@ -104,24 +148,14 @@ static const gfx_layout tiles8x8_layout =
 	RGN_FRAC(1,6),
 	6,
 	{ RGN_FRAC(0,6),RGN_FRAC(1,6),RGN_FRAC(2,6),RGN_FRAC(3,6),RGN_FRAC(4,6),RGN_FRAC(5,6) },
-	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,1) },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8},
 	8*8
 };
 static GFXDECODE_START( luckgrln )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
-
-static VIDEO_START(luckgrln)
-{
-
-}
-
-static VIDEO_UPDATE(luckgrln)
-{
-	return 0;
-}
 
 static const mc6845_interface mc6845_intf =
 {
@@ -141,7 +175,7 @@ static MACHINE_DRIVER_START( luckgrln )
 	MDRV_CPU_ADD("maincpu", Z180,8000000)
 	MDRV_CPU_PROGRAM_MAP(mainmap)
 	MDRV_CPU_IO_MAP(portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MC6845_ADD("crtc", H46505, 6000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
@@ -150,8 +184,8 @@ static MACHINE_DRIVER_START( luckgrln )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
 	MDRV_GFXDECODE(luckgrln)
 	MDRV_PALETTE_LENGTH(0x100)
@@ -164,7 +198,7 @@ static DRIVER_INIT( luckgrln )
 {
 	int i;
 	UINT8 x,v;
-	UINT8* rom = memory_region(machine,"user1");
+	UINT8* rom = memory_region(machine,"rom_data");
 
 	for (i=0;i<0x20000;i++)
 	{
@@ -191,14 +225,14 @@ static DRIVER_INIT( luckgrln )
 	#endif
 
 	// ??
-	memory_set_bankptr(machine, "bank1",&rom[0x010000]);
+//	memory_set_bankptr(machine, "bank1",&rom[0x010000]);
 }
 
 ROM_START( luckgrln )
 	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 rom
 	ROM_LOAD( "lucky74.bin",  0x00000, 0x4000, CRC(fa128e05) SHA1(97a9534b8414f984159271db48b153b0724d22f9) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) // external data / cpu rom
+	ROM_REGION( 0x20000, "rom_data", 0 ) // external data / cpu rom
 	ROM_LOAD( "falcon.13",  0x00000, 0x20000, CRC(f7a717fd) SHA1(49a39b84620876ee2faf73aaa405a1e17cab2da2) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
