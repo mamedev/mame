@@ -415,13 +415,29 @@ static ADDRESS_MAP_START( cadash_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 ADDRESS_MAP_END
 
+/*
+Cadash communication CPU is a z180.
+[0x8000]: at pc=31, z180 checks a byte ... if it's equal to 0x4d ("M") then the board is in master mode, otherwise it's in slave mode.
+Right now, the z180 is too fast, so it never checks it properly ... maybe I'm missing a z180 halt line that's lying to somewhere on m68k side.
+[0x8002]: puts T in master mode, R in slave mode ... looks a rather obvious flag that says the current Tx / Rx state
+[0x8080-0x80ff]: slave data
+[0x8100-0x817f]: master data
+
+Internal I/O Asynchronous SCI regs are then checked ... we can't emulate this at the current time, needs two MAME instances.
+
+m68k M communicates with z180 M thru shared ram, then the z180 M communicates with z180 S thru these ASCI regs ... finally, the z180 S
+communicates with m68k S with its own shared ram. In short:
+
+m68k M -> z180 M <-> z180 S <- m68k S
+*/
+
 static ADDRESS_MAP_START( cadash_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&cadash_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cadash_sub_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x3f) AM_RAM // I think it's NOT internal RAM, hence it's not a z180 (an hitachi clone with 0xed 0x39 opcode?) ...
+	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal I/O regs
 ADDRESS_MAP_END
 
 /***********************************************************
