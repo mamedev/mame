@@ -1377,7 +1377,9 @@ static DRIVER_INIT(ss23)
 	s23_porta = 0, s23_rtcstate = 0;
 	gorgon_vbl = 0;
 
-	if ((!strcmp(machine->gamedrv->name, "motoxgo")) || (!strcmp(machine->gamedrv->name, "timecrs2")))
+	if ((!strcmp(machine->gamedrv->name, "motoxgo")) || 
+	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
+	    (!strcmp(machine->gamedrv->name, "timecrs2")))
 	{
 		has_jvsio = 1;
 	}
@@ -1962,9 +1964,7 @@ ROM_START( panicprk )
         ROM_LOAD16_WORD_SWAP( "pnp2ver-a.ic3", 0x000000, 0x080000, CRC(fe4bc6f4) SHA1(2114dc4bc63d589e6c3b26a73dbc60924f3b1765) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
-	// i/o program from motoxgo, as it's "general". however, game crashes(H8 unknown opcode) if add this program
-//      ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
-		ROM_FILL( 0x00000, 0x40000, 0 ) // Temporary - fixes validity check warning
+	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000000, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
