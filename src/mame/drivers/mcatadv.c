@@ -141,17 +141,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2610intf.h"
 #include "includes/mcatadv.h"
 
-UINT16* mcatadv_videoram1, *mcatadv_videoram2;
-UINT16* mcatadv_scroll, *mcatadv_scroll2;
-UINT16* mcatadv_vidregs;
-
 
 /*** Main CPU ***/
 
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
+	mcatadv_state *state = (mcatadv_state *)space->machine->driver_data;
+
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -169,7 +167,7 @@ static WRITE16_HANDLER( mcat_coin_w )
 
 static READ16_HANDLER( mcat_wd_r )
 {
-	watchdog_reset_r(space,0);
+	watchdog_reset_r(space, 0);
 	return 0xc00;
 }
 
@@ -180,16 +178,16 @@ static ADDRESS_MAP_START( mcatadv_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 //  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
 
-	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE(&mcatadv_scroll)
-	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE(&mcatadv_scroll2)
+	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE_MEMBER(mcatadv_state, scroll1)
+	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE_MEMBER(mcatadv_state, scroll2)
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE(&mcatadv_videoram1) // Tilemap 0
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE(&mcatadv_videoram2) // Tilemap 1
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE_MEMBER(mcatadv_state, videoram1) // Tilemap 0
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE_MEMBER(mcatadv_state, videoram2) // Tilemap 1
 
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // Sprites, two halves for double buffering
+	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE_MEMBER(mcatadv_state, spriteram, spriteram_size) // Sprites, two halves for double buffering
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM // Tests more than is needed?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
@@ -198,20 +196,18 @@ static ADDRESS_MAP_START( mcatadv_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE(&mcatadv_vidregs)
+	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE_MEMBER(mcatadv_state, vidregs)
 
 	AM_RANGE(0xb00018, 0xb00019) AM_WRITE(watchdog_reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(soundlatch2_word_r,mcat_soundlatch_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(soundlatch2_word_r, mcat_soundlatch_w)
 ADDRESS_MAP_END
 
 /*** Sound ***/
 
 static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
-	UINT8 *rom = memory_region(space->machine, "soundcpu") + 0x10000;
-
-	memory_set_bankptr(space->machine, "bank1",rom + data * 0x4000);
+	memory_set_bank(space->machine, "bank1", data);
 }
 
 
@@ -420,15 +416,35 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( running_device *device, int irq )
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	mcatadv_state *state = (mcatadv_state *)device->machine->driver_data;
+	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
+
 static const ym2610_interface mcatadv_ym2610_interface =
 {
 	sound_irq	/* irq */
 };
 
 
+static MACHINE_START( mcatadv )
+{
+	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "soundcpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	memory_set_bank(machine, "bank1", 1);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
+
+	state_save_register_global(machine, state->palette_bank1);
+	state_save_register_global(machine, state->palette_bank2);
+}
+
 static MACHINE_DRIVER_START( mcatadv )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mcatadv_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -438,6 +454,8 @@ static MACHINE_DRIVER_START( mcatadv )
 	MDRV_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_map)
 	MDRV_CPU_IO_MAP(mcatadv_sound_io_map)
+
+	MDRV_MACHINE_START(mcatadv)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -474,14 +492,6 @@ static MACHINE_DRIVER_START( nost )
 	MDRV_CPU_PROGRAM_MAP(nost_sound_map)
 	MDRV_CPU_IO_MAP(nost_sound_io_map)
 MACHINE_DRIVER_END
-
-
-static DRIVER_INIT( mcatadv )
-{
-	UINT8 *z80rom = memory_region(machine, "soundcpu") + 0x10000;
-
-	memory_set_bankptr(machine, "bank1", z80rom + 0x4000);
-}
 
 
 ROM_START( mcatadv )
@@ -662,9 +672,10 @@ ROM_START( nostk )
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv, ROT0,   "Wintechno", "Magical Cat Adventure", GAME_NO_COCKTAIL )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", GAME_NO_COCKTAIL )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv, ROT0,   "Wintechno", "Catt (Japan)", GAME_NO_COCKTAIL )
-GAME( 1993, nost,     0,       nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL )
-GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL )
-GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL )
+
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, 0, ROT0,   "Wintechno", "Magical Cat Adventure", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, 0, ROT0,   "Wintechno", "Catt (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost,    0, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost,    0, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost,    0, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

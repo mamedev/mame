@@ -1,19 +1,15 @@
 /******************************************************************************
 
-Markham (c) 1983 Sun Electronics
+    Markham (c) 1983 Sun Electronics
 
-Video hardware driver by Uki
+    Video hardware driver by Uki
 
     17/Jun/2001 -
 
 ******************************************************************************/
 
 #include "emu.h"
-
-
-UINT8 *markham_xscroll;
-
-static tilemap_t *bg_tilemap;
+#include "includes/markham.h"
 
 PALETTE_INIT( markham )
 {
@@ -45,8 +41,9 @@ PALETTE_INIT( markham )
 
 WRITE8_HANDLER( markham_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	markham_state *state = (markham_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( markham_flipscreen_w )
@@ -60,8 +57,9 @@ WRITE8_HANDLER( markham_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.videoram.u8[tile_index * 2];
-	int code = machine->generic.videoram.u8[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
+	markham_state *state = (markham_state *)machine->driver_data;
+	int attr = state->videoram[tile_index * 2];
+	int code = state->videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -69,45 +67,46 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( markham )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
-		 8, 8, 32, 32);
+	markham_state *state = (markham_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	markham_state *state = (markham_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs=0x60; offs<0x100; offs +=4)
+	for (offs = 0x60; offs < 0x100; offs += 4)
 	{
-		int chr = spriteram[offs+1];
-		int col = spriteram[offs+2];
+		int chr = spriteram[offs + 1];
+		int col = spriteram[offs + 2];
 
 		int fx = flip_screen_get(machine);
 		int fy = flip_screen_get(machine);
 
-		int x = spriteram[offs+3];
-		int y = spriteram[offs+0];
-		int px,py;
+		int x = spriteram[offs + 3];
+		int y = spriteram[offs + 0];
+		int px, py;
 		col &= 0x3f ;
 
-		if (flip_screen_get(machine)==0)
+		if (flip_screen_get(machine) == 0)
 		{
-			px = x-2;
-			py = 240-y;
+			px = x - 2;
+			py = 240 - y;
 		}
 		else
 		{
-			px = 240-x;
+			px = 240 - x;
 			py = y;
 		}
 
 		px = px & 0xff;
 
-		if (px>248)
-			px = px-256;
+		if (px > 248)
+			px = px - 256;
 
 		drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 			chr,
@@ -120,17 +119,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( markham )
 {
+	markham_state *state = (markham_state *)screen->machine->driver_data;
 	int i;
 
 	for (i = 0; i < 32; i++)
 	{
-		if ((i > 3) && (i<16))
-			tilemap_set_scrollx(bg_tilemap, i, markham_xscroll[0]);
+		if ((i > 3) && (i < 16))
+			tilemap_set_scrollx(state->bg_tilemap, i, state->xscroll[0]);
 		if (i >= 16)
-			tilemap_set_scrollx(bg_tilemap, i, markham_xscroll[1]);
+			tilemap_set_scrollx(state->bg_tilemap, i, state->xscroll[1]);
 	}
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

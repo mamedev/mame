@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-Markham (c) 1983 Sun Electronics
+    Markham (c) 1983 Sun Electronics
 
     Driver by Uki
 
@@ -11,15 +11,7 @@ Markham (c) 1983 Sun Electronics
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-
-WRITE8_HANDLER( markham_videoram_w );
-WRITE8_HANDLER( markham_flipscreen_w );
-
-PALETTE_INIT( markham );
-VIDEO_START( markham );
-VIDEO_UPDATE( markham );
-
-extern UINT8 *markham_xscroll;
+#include "includes/markham.h"
 
 
 static READ8_HANDLER( markham_e004_r )
@@ -33,8 +25,8 @@ static ADDRESS_MAP_START( markham_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_MEMBER(markham_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_BASE_MEMBER(markham_state, videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW2")
@@ -49,7 +41,7 @@ static ADDRESS_MAP_START( markham_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0xe009, 0xe009) AM_WRITENOP /* to CPU2 busreq */
 
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITEONLY AM_BASE(&markham_xscroll)
+	AM_RANGE(0xe00c, 0xe00d) AM_WRITEONLY AM_BASE_MEMBER(markham_state, xscroll)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
 ADDRESS_MAP_END
 
@@ -182,6 +174,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( markham )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(markham_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(markham_master_map)
@@ -249,4 +244,4 @@ ROM_START( markham )
 ROM_END
 
 
-GAME( 1983, markham, 0, markham, markham, 0, ROT0, "Sun Electronics", "Markham", 0 )
+GAME( 1983, markham, 0, markham, markham, 0, ROT0, "Sun Electronics", "Markham", GAME_SUPPORTS_SAVE )

@@ -1095,7 +1095,7 @@ $(MAMEOBJ)/sanritsu.a: \
 	$(DRIVERS)/chinsan.o \
 	$(DRIVERS)/drmicro.o $(VIDEO)/drmicro.o \
 	$(DRIVERS)/jantotsu.o \
-	$(DRIVERS)/mayumi.o $(VIDEO)/mayumi.o \
+	$(DRIVERS)/mayumi.o \
 	$(DRIVERS)/mermaid.o $(VIDEO)/mermaid.o \
 	$(DRIVERS)/mjkjidai.o $(VIDEO)/mjkjidai.o \
 

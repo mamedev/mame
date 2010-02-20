@@ -210,7 +210,7 @@ static void compute_tables(es5506_state *chip)
 	/* allocate volume lookup table */
 	chip->volume_lookup = auto_alloc_array(chip->device->machine, UINT16, 4096);
 
-	/* generate ulaw lookup table */
+	/* generate volume lookup table */
 	for (i = 0; i < 4096; i++)
 	{
 		UINT8 exponent = i >> 8;
@@ -869,6 +869,47 @@ static void es5506_start_common(running_device *device, const void *config, soun
 
 	/* allocate memory */
 	chip->scratch = auto_alloc_array(device->machine, INT32, 2 * MAX_SAMPLE_CHUNK);
+
+	/* register save */
+	state_save_register_device_item(device, 0, chip->sample_rate);
+	state_save_register_device_item(device, 0, chip->write_latch);
+	state_save_register_device_item(device, 0, chip->read_latch);
+
+	state_save_register_device_item(device, 0, chip->current_page);
+	state_save_register_device_item(device, 0, chip->active_voices);
+	state_save_register_device_item(device, 0, chip->mode);
+	state_save_register_device_item(device, 0, chip->wst);
+	state_save_register_device_item(device, 0, chip->wend);
+	state_save_register_device_item(device, 0, chip->lrend);
+	state_save_register_device_item(device, 0, chip->irqv);
+
+	state_save_register_device_item_pointer(device, 0, chip->scratch, 2 * MAX_SAMPLE_CHUNK);
+
+	for (j = 0; j < 32; j++)
+	{
+		state_save_register_device_item(device, j, chip->voice[j].control);
+		state_save_register_device_item(device, j, chip->voice[j].freqcount);
+		state_save_register_device_item(device, j, chip->voice[j].start);
+		state_save_register_device_item(device, j, chip->voice[j].lvol);
+		state_save_register_device_item(device, j, chip->voice[j].end);
+		state_save_register_device_item(device, j, chip->voice[j].lvramp);
+		state_save_register_device_item(device, j, chip->voice[j].accum);
+		state_save_register_device_item(device, j, chip->voice[j].rvol);
+		state_save_register_device_item(device, j, chip->voice[j].rvramp);
+		state_save_register_device_item(device, j, chip->voice[j].ecount);
+		state_save_register_device_item(device, j, chip->voice[j].k2);
+		state_save_register_device_item(device, j, chip->voice[j].k2ramp);
+		state_save_register_device_item(device, j, chip->voice[j].k1);
+		state_save_register_device_item(device, j, chip->voice[j].k1ramp);
+		state_save_register_device_item(device, j, chip->voice[j].o4n1);
+		state_save_register_device_item(device, j, chip->voice[j].o3n1);
+		state_save_register_device_item(device, j, chip->voice[j].o3n2);
+		state_save_register_device_item(device, j, chip->voice[j].o2n1);
+		state_save_register_device_item(device, j, chip->voice[j].o2n2);
+		state_save_register_device_item(device, j, chip->voice[j].o1n1);
+		state_save_register_device_item(device, j, chip->voice[j].exbank);
+		state_save_register_device_item(device, j, chip->voice[j].filtcount);
+	}
 
 	/* success */
 }

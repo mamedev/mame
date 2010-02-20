@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-Kikiippatsu Mayumi-chan (c) 1988 Victory L.L.C.
+    Kikiippatsu Mayumi-chan (c) 1988 Victory L.L.C.
 
     Driver by Uki
 
@@ -12,47 +12,100 @@ Kikiippatsu Mayumi-chan (c) 1988 Victory L.L.C.
 
 #define MCLK 10000000
 
-extern UINT8 *mayumi_videoram;
-WRITE8_HANDLER( mayumi_videoram_w );
-VIDEO_START( mayumi );
-VIDEO_UPDATE( mayumi );
 
-static int int_enable;
-static int input_sel;
+typedef struct _mayumi_state mayumi_state;
+struct _mayumi_state
+{
+	/* memory pointers */
+	UINT8 *    videoram;
+//	UINT8 *    nvram;		// this currently uses generic nvram handlers
 
-/****************************************************************************/
+	/* video-related */
+	tilemap_t *tilemap;
+
+	/* misc */
+	int int_enable;
+	int input_sel;
+};
+
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+static TILE_GET_INFO( get_tile_info )
+{
+	mayumi_state *state = (mayumi_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + (state->videoram[tile_index + 0x800] & 0x1f) * 0x100;
+	int col = (state->videoram[tile_index + 0x1000] >> 3) & 0x1f;
+
+	SET_TILE_INFO(0, code, col, 0);
+}
+
+static VIDEO_START( mayumi )
+{
+	mayumi_state *state = (mayumi_state *)machine->driver_data;
+	state->tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+}
+
+static WRITE8_HANDLER( mayumi_videoram_w )
+{
+	mayumi_state *state = (mayumi_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap, offset & 0x7ff);
+}
+
+static VIDEO_UPDATE( mayumi )
+{
+	mayumi_state *state = (mayumi_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
+	return 0;
+}
+
+/*************************************
+ *
+ *  Interrupt generator
+ *
+ *************************************/
 
 static INTERRUPT_GEN( mayumi_interrupt )
 {
-	if (int_enable)
+	mayumi_state *state = (mayumi_state *)device->machine->driver_data;
+
+	if (state->int_enable)
 		 cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
 static WRITE8_HANDLER( bank_sel_w )
 {
-	UINT8 *BANKROM = memory_region(space->machine, "maincpu");
-	int bank = ((data & 0x80)) >> 7 | ((data & 0x40) >> 5);
-	memory_set_bankptr(space->machine, "bank1", &BANKROM[0x10000+bank*0x4000]);
+	mayumi_state *state = (mayumi_state *)space->machine->driver_data;
+	int bank = BIT(data, 7) | (BIT(data, 6) << 1);
 
-	int_enable = data & 1;
+	memory_set_bank(space->machine, "bank1", bank);
+
+	state->int_enable = data & 1;
 
 	flip_screen_set(space->machine, data & 2);
 }
 
-static MACHINE_RESET( mayumi )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	bank_sel_w(space, 0, 0);
-}
-
 static WRITE8_HANDLER( input_sel_w )
 {
-	input_sel = data;
+	mayumi_state *state = (mayumi_state *)space->machine->driver_data;
+	state->input_sel = data;
 }
 
 static READ8_HANDLER( key_matrix_r )
 {
-	int p,i,ret;
+	mayumi_state *state = (mayumi_state *)space->machine->driver_data;
+	int p, i, ret;
 	static const char *const keynames[2][5] =
 			{
 				{ "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" },
@@ -61,24 +114,28 @@ static READ8_HANDLER( key_matrix_r )
 
 	ret = 0xff;
 
-	p = ~input_sel & 0x1f;
+	p = ~state->input_sel & 0x1f;
 
-	for (i=0; i<5; i++)
+	for (i = 0; i < 5; i++)
 	{
-		if (p & (1 << i))
+		if (BIT(p, i))
 			ret &= input_port_read(space->machine, keynames[offset][i]);
 	}
 
 	return ret;
 }
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( mayumi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE(&mayumi_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE_MEMBER(mayumi_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -91,11 +148,14 @@ static ADDRESS_MAP_START( mayumi_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mayumi )
-
-    PORT_START("DSW1")  /* dsw1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -120,7 +180,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")  /* dsw2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-1" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -146,7 +206,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("KEY0")	/* P1 IN0 (2) */
+	PORT_START("KEY0")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -155,7 +215,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY1")	/* P1 IN1 (3) */
+	PORT_START("KEY1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -164,7 +224,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY2")	/* P1 IN2 (4) */
+	PORT_START("KEY2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -173,7 +233,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY3")	/* P1 IN3 (5) */
+	PORT_START("KEY3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -182,11 +242,11 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY4")	/* P1 IN4 (6) */
+	PORT_START("KEY4")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY5")	/* P2 IN0 (7) */
+	PORT_START("KEY5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
@@ -195,7 +255,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY6")	/* P2 IN1 (8) */
+	PORT_START("KEY6")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
@@ -204,7 +264,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY7")	/* P2 IN2 (9) */
+	PORT_START("KEY7")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
@@ -213,7 +273,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY8")	/* P2 IN3 (10) */
+	PORT_START("KEY8")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
@@ -222,23 +282,26 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY9")	/* P2 IN4 (11) */
+	PORT_START("KEY9")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0")
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW , IPT_COIN1 )
-    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW , IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) // analyzer
-    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-    PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) // memory reset
-
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) // analyzer
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) // memory reset
 INPUT_PORTS_END
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -255,6 +318,12 @@ static GFXDECODE_START( mayumi )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 32 )
 GFXDECODE_END
 
+/*************************************
+ *
+ *  Sound interfaces
+ *
+ *************************************/
+
 static const ym2203_interface ym2203_config =
 {
 	{
@@ -268,7 +337,36 @@ static const ym2203_interface ym2203_config =
 	NULL
 };
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( mayumi )
+{
+	mayumi_state *state = (mayumi_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+	memory_set_bank(machine, "bank1", 0);
+
+	state_save_register_global(machine, state->int_enable);
+	state_save_register_global(machine, state->input_sel);
+}
+
+static MACHINE_RESET( mayumi )
+{
+	mayumi_state *state = (mayumi_state *)machine->driver_data;
+
+	state->int_enable = 0;
+	state->input_sel = 0;
+}
+
 static MACHINE_DRIVER_START( mayumi )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mayumi_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
@@ -276,6 +374,7 @@ static MACHINE_DRIVER_START( mayumi )
 	MDRV_CPU_IO_MAP(mayumi_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mayumi_interrupt)
 
+	MDRV_MACHINE_START( mayumi )
 	MDRV_MACHINE_RESET( mayumi )
 
 	/* video hardware */
@@ -307,7 +406,11 @@ static MACHINE_DRIVER_START( mayumi )
 
 MACHINE_DRIVER_END
 
-/****************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( mayumi )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* CPU */
@@ -326,4 +429,10 @@ ROM_START( mayumi )
 	ROM_LOAD( "my-9k.bin", 0x0200,  0x0100, CRC(3e7a8012) SHA1(24129586a1c39f68dad274b5afbdd6c027ab0901) ) // B
 ROM_END
 
-GAME( 1988, mayumi, 0, mayumi, mayumi, 0, ROT0, "[Sanritsu] Victory L.L.C.",  "Kikiippatsu Mayumi-chan (Japan)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1988, mayumi, 0, mayumi, mayumi, 0, ROT0, "[Sanritsu] Victory L.L.C.",  "Kikiippatsu Mayumi-chan (Japan)", GAME_SUPPORTS_SAVE )

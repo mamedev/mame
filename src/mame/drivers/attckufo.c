@@ -46,8 +46,19 @@ LOIPOIO-B
 #include "sound/mos6560.h"
 
 
-static UINT8 *mainram;
-static UINT8 *tileram;
+typedef struct _attckufo_state attckufo_state;
+struct _attckufo_state
+{
+	/* memory pointers */
+	UINT8 *      mainram;
+	UINT8 *      tileram;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *mos6560;
+};
+
+
 
 static const rgb_t attckufo_palette[] =
 {
@@ -103,10 +114,10 @@ static WRITE8_HANDLER(attckufo_io_w)
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&mainram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(attckufo_state, mainram)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_port_r, mos6560_port_w)
 	AM_RANGE(0x1400, 0x1403) AM_READWRITE(attckufo_io_r, attckufo_io_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(&tileram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(attckufo_state, tileram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -140,26 +151,28 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN( attckufo_raster_interrupt )
 {
-	running_device *mos6560 = devtag_get_device(device->machine, "mos6560");
-	mos6560_raster_interrupt_gen(mos6560);
+	attckufo_state *state = (attckufo_state *)device->machine->driver_data;
+	mos6560_raster_interrupt_gen(state->mos6560);
 }
 
 VIDEO_UPDATE( attckufo )
 {
-	running_device *mos6560 = devtag_get_device(screen->machine, "mos6560");
-	mos6560_video_update(mos6560, bitmap, cliprect);
+	attckufo_state *state = (attckufo_state *)screen->machine->driver_data;
+	mos6560_video_update(state->mos6560, bitmap, cliprect);
 	return 0;
 }
 
 static int attckufo_dma_read( running_machine *machine, int offset )
 {
-	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	attckufo_state *state = (attckufo_state *)machine->driver_data;
+	const address_space *program = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	return memory_read_byte(program, offset);
 }
 
 static int attckufo_dma_read_color( running_machine *machine, int offset )
 {
-	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	attckufo_state *state = (attckufo_state *)machine->driver_data;
+	const address_space *program = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	return memory_read_byte(program, offset + 0x400);
 }
 
@@ -172,10 +185,26 @@ static const mos6560_interface attckufo_6560_intf =
 	attckufo_dma_read, attckufo_dma_read_color	/* DMA */
 };
 
+
+static MACHINE_START( attckufo )
+{
+	attckufo_state *state = (attckufo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->mos6560 = devtag_get_device(machine, "mos6560");
+}
+
 static MACHINE_DRIVER_START( attckufo )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(attckufo_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 14318181/14)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_PERIODIC_INT(attckufo_raster_interrupt, MOS656X_HRETRACERATE)
+
+	MDRV_MACHINE_START(attckufo)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -211,4 +240,4 @@ ROM_START( attckufo )
 	ROM_COPY( "maincpu", 0x02000, 0x00000, 0x400)
 ROM_END
 
-GAME( 1980, attckufo, 0,      attckufo, attckufo, 0, ROT270, "Ryoto Electric Co.", "Attack Ufo", 0 )
+GAME( 1980, attckufo, 0,      attckufo, attckufo, 0, ROT270, "Ryoto Electric Co.", "Attack Ufo", GAME_SUPPORTS_SAVE )
