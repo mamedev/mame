@@ -1351,6 +1351,7 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x6000, 0x6003) AM_RAM // inputs?
 	AM_RANGE(0x7000, 0x700f) AM_RAM	// probably actually the digital inputs, but ignore for now
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
@@ -1361,6 +1362,8 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( s23iobrdiomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE( s23_iob_p4_r, s23_iob_p4_w )
+	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_NOP	// status LED in bit 2
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_NOP	// unknown
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_iob_mcu_r, s23_iob_mcu_w )
 ADDRESS_MAP_END
 
@@ -1487,7 +1490,7 @@ static MACHINE_DRIVER_START( s23 )
 
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap)
-	MDRV_CPU_IO_MAP( s23iobrdiomap)
+	MDRV_CPU_IO_MAP( s23iobrdiomap )
 
 	MDRV_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
