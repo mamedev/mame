@@ -27,7 +27,7 @@
 
     - Hook up actual inputs (?) via the 2 serial latches at d00004 and d00006.
       Works like this: write to d00004, then read d00004 12 times.  Ditto at
-      d00006.  This gives 24 bits of inputs (?) from the I/O board (?).
+      d00006.  This gives 24 bits of inputs (?) from the I/O board (?) or guns (?)
 
     - The entire 3D subsystem.  Is there a DSP living down there?  If not, why the 300k
       download on initial startup?
@@ -39,6 +39,14 @@
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
       and displaying it I'm not going to meddle with it though.
 
+    - Ok, it's the "mt" roms, which the game calls data roms.  One pair is
+      at a8000000, the other at aa000000.  Point roms are accessed for
+      checksumming through a port at a200000x:
+      - reset the port by writing 0000 to a2000006
+      - write offset >> 16  to a2000004
+      - write offset & ffff to a2000004 (yes, same address, hence the reset)
+      - read 2 bytes from one rom at a200000a
+      - read 2 bytes from one rom at a200000c
 */
 
 /*
@@ -749,6 +757,7 @@ static tilemap_t *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram;
 static UINT32 *namcos23_charram;
 static UINT8 namcos23_jvssense;
+static INT32 has_jvsio;
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -1080,10 +1089,13 @@ static WRITE16_HANDLER( sharedram_sub_w )
 {
 	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
 
-	// fake that an I/O board is connected
-	if ((offset == 0x4052/2) && (data == 0x78))
+	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
+	if (!has_jvsio)
 	{
-		data = 0;
+		if ((offset == 0x4052/2) && (data == 0x78))
+		{
+			data = 0;
+		}
 	}
 
 	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
@@ -1224,15 +1236,15 @@ static WRITE8_HANDLER( s23_mcu_settings_w )
 	s23_setstate ^= 1;
 }
 
-static UINT8 maintoio[64], mi_rd, mi_wr;
-static UINT8 iotomain[64], im_rd, im_wr;
+static UINT8 maintoio[128], mi_rd, mi_wr;
+static UINT8 iotomain[128], im_rd, im_wr;
 
 static READ8_HANDLER( s23_mcu_iob_r )
 {
 	UINT8 ret = iotomain[im_rd];
 
 	im_rd++;
-	im_rd &= 0x3f;
+	im_rd &= 0x7f;
 
 	if (im_rd == im_wr)
 	{
@@ -1250,7 +1262,7 @@ static READ8_HANDLER( s23_mcu_iob_r )
 static WRITE8_HANDLER( s23_mcu_iob_w )
 {
 	maintoio[mi_wr++] = data;
-	mi_wr &= 0x3f;
+	mi_wr &= 0x7f;
 
 	cputag_set_input_line(space->machine, "ioboard", H8_SCI_0_RX, ASSERT_LINE);
 }
@@ -1304,7 +1316,7 @@ static READ8_HANDLER( s23_iob_mcu_r )
 	UINT8 ret = maintoio[mi_rd];
 
 	mi_rd++;
-	mi_rd &= 0x3f;
+	mi_rd &= 0x7f;
 
 	if (mi_rd == mi_wr)
 	{
@@ -1317,7 +1329,7 @@ static READ8_HANDLER( s23_iob_mcu_r )
 static WRITE8_HANDLER( s23_iob_mcu_w )
 {
 	iotomain[im_wr++] = data;
-	im_wr &= 0x3f;
+	im_wr &= 0x7f;
 
 	cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 }
@@ -1339,6 +1351,7 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x7000, 0x700f) AM_RAM	// probably actually the digital inputs, but ignore for now
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1363,6 +1376,15 @@ static DRIVER_INIT(ss23)
 	s23_tssio_port_4 = 0;
 	s23_porta = 0, s23_rtcstate = 0;
 	gorgon_vbl = 0;
+
+	if ((!strcmp(machine->gamedrv->name, "motoxgo")) || (!strcmp(machine->gamedrv->name, "timecrs2")))
+	{
+		has_jvsio = 1;
+	}
+	else
+	{
+		has_jvsio = 0;
+	}
 }
 
 #define XOR(a) WORD2_XOR_BE(a)
@@ -1409,10 +1431,6 @@ static const mips3_config config =
 	8192,				/* code cache size - VERIFIED */
 	8192				/* data cache size - VERIFIED */
 };
-
-static INTERRUPT_GEN( namcos23_interrupt )
-{
-}
 
 static MACHINE_DRIVER_START( gorgon )
 
@@ -1501,7 +1519,7 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
-	MDRV_CPU_VBLANK_INT("screen", namcos23_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
