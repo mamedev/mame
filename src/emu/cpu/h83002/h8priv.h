@@ -23,6 +23,7 @@ struct _h83xx_state
 	UINT8  ccr;
 	UINT8  h8nflag, h8vflag, h8cflag, h8zflag, h8iflag, h8hflag;
 	UINT8  h8uflag, h8uiflag;
+	UINT8  incheckirqs;
 
 	cpu_irq_callback irq_cb;
 	running_device *device;
