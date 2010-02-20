@@ -43,40 +43,53 @@ TO DO:
 
 #define MAZERBLA 0x01
 #define GREATGUN 0x02
-static UINT8 game_id = 0; /* hacks per game */
 
 #define MASTER_CLOCK XTAL_4MHz
 #define SOUND_CLOCK XTAL_14_31818MHz
 
-static UINT8 *cfb_ram;
 
-static UINT8 ls670_0[4];
-static UINT8 ls670_1[4];
+typedef struct _mazerbla_state mazerbla_state;
+struct _mazerbla_state
+{
+	/* memory pointers */
+	UINT8 *   cfb_ram;
+	UINT8 *   videoram;
+	size_t    videoram_size;
 
-static UINT8 zpu_int_vector;
+	/* video-related */
+	bitmap_t * tmpbitmaps[4];
 
-static UINT8 bcd_7445 = 0;
+	UINT8 vcu_video_reg[4];
+	UINT32 vcu_gfx_addr;
+	UINT32 vcu_gfx_param_addr;
 
-static UINT8 vsb_ls273;
-static UINT8 soundlatch;
+	UINT8 bknd_col;
+	UINT8 port02_status;
+	UINT8 vbank; 		/* video page select signal, likely for double buffering ?*/
+	UINT32 xpos, ypos, pix_xsize, pix_ysize;
+	UINT8 color1, color2, mode, plane;
+	UINT8 lookup_ram[0x100*4];
+	UINT32 gfx_rom_bank;	/* graphics ROMs are banked */
 
+	double weights_r[2], weights_g[3], weights_b[3];
 
-/*************************************
- *
- *  Video Hardware
- *
- *************************************/
+	/* misc */
+	UINT8 game_id; /* hacks per game */
+	UINT8 ls670_0[4];
+	UINT8 ls670_1[4];
 
-static UINT8 bknd_col;
-static UINT8 port02_status = 0;
-static UINT8 VCU_video_reg[4];
-static UINT8 vbank = 0; /* video page select signal, likely for double buffering ?*/
-static UINT32 VCU_gfx_addr = 0;
-static UINT32 VCU_gfx_param_addr = 0;
-static UINT32 xpos=0, ypos=0, pix_xsize=0, pix_ysize=0;
-static UINT8 color=0, color2=0, mode=0, plane=0;
-static UINT8 lookup_RAM[0x100*4];
-static UINT32 gfx_rom_bank;	/* graphics ROMs are banked */
+	UINT8 zpu_int_vector;
+
+	UINT8 bcd_7445;
+
+	UINT8 vsb_ls273;
+	UINT8 soundlatch;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *subcpu;
+};
+
 
 
 /***************************************************************************
@@ -97,30 +110,32 @@ static UINT32 gfx_rom_bank;	/* graphics ROMs are banked */
 
 ***************************************************************************/
 
-static double weights_r[2], weights_g[3], weights_b[3];
-
 static PALETTE_INIT( mazerbla )
 {
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
 	static const int resistances_r[2]  = { 4700, 2200 };
 	static const int resistances_gb[3] = { 10000, 4700, 2200 };
 
 	/* just to calculate coefficients for later use */
 	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_gb,	weights_g,	3600,	0,
-			3,	resistances_gb,	weights_b,	3600,	0,
-			2,	resistances_r,	weights_r,	3600,	0);
+			3,	resistances_gb,	state->weights_g,	3600,	0,
+			3,	resistances_gb,	state->weights_b,	3600,	0,
+			2,	resistances_r,	state->weights_r,	3600,	0);
 
 }
 
-
-static bitmap_t * tmpbitmaps[4];
-
 static VIDEO_START( mazerbla )
 {
-	tmpbitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	tmpbitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	tmpbitmaps[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	tmpbitmaps[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	state->tmpbitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmaps[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmaps[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	state_save_register_global_bitmap(machine, state->tmpbitmaps[0]);
+	state_save_register_global_bitmap(machine, state->tmpbitmaps[1]);
+	state_save_register_global_bitmap(machine, state->tmpbitmaps[2]);
+	state_save_register_global_bitmap(machine, state->tmpbitmaps[3]);
 }
 
 #ifdef UNUSED_DEFINITION
@@ -134,37 +149,38 @@ static int planes_enabled[4] = {1,1,1,1}; //all enabled
 
 VIDEO_UPDATE( test_vcu )
 {
+	mazerbla_state *state = (mazerbla_state *)screen->machine->driver_data;
 	int j;
 	char buf[128];
 
-	UINT32 color_base=0;
+	UINT32 color_base = 0;
 
-	if (game_id==MAZERBLA)
+	if (state->game_id == MAZERBLA)
 		color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
 
-	if (game_id==GREATGUN)
-		color_base = 0x0;
+	if (state->game_id == GREATGUN)
+		color_base = 0x00;
 
-	bitmap_fill(bitmap,NULL,0);
+	bitmap_fill(bitmap, NULL, 0);
 //  logerror("-->frame\n");
 
 	if (planes_enabled[3])
-		copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,cliprect);
+		copybitmap(bitmap, state->tmpbitmaps[3], 0, 0, 0, 0, cliprect);
 
 	if (planes_enabled[2])
-		copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,color_base);
+		copybitmap_trans(bitmap, state->tmpbitmaps[2], 0, 0, 0, 0,cliprect, color_base);
 
-	bitmap_fill(tmpbitmaps[2],NULL,color_base);
+	bitmap_fill(state->tmpbitmaps[2], NULL, color_base);
 
 	if (planes_enabled[1])
-		copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,color_base);
+		copybitmap_trans(bitmap, state->tmpbitmaps[1], 0, 0, 0, 0,cliprect, color_base);
 
-	bitmap_fill(tmpbitmaps[1],NULL,color_base);
+	bitmap_fill(state->tmpbitmaps[1], NULL, color_base);
 
 	if (planes_enabled[0])
-		copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,color_base);
+		copybitmap_trans(bitmap, state->tmpbitmaps[0], 0, 0, 0, 0,cliprect, color_base);
 
-	bitmap_fill(tmpbitmaps[0],NULL,color_base);
+	bitmap_fill(state->tmpbitmaps[0], NULL, color_base);
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_1))	/* plane 1 */
 		planes_enabled[0] ^= 1;
@@ -191,7 +207,7 @@ VIDEO_UPDATE( test_vcu )
 		dbg_vbank ^= 1;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_L))	/* showlookup ram */
-		dbg_lookup = (dbg_lookup+1)%5;//0,1,2,3, 4-off
+		dbg_lookup = (dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
 
 
 	if (dbg_info)
@@ -210,15 +226,15 @@ VIDEO_UPDATE( test_vcu )
 		if (dbg_lookup!=4)
 		{
 			int lookup_offs = (dbg_lookup)*256; //=0,1,2,3*256
-			int y,x;
+			int y, x;
 
-			for (y=0; y<16; y++)
+			for (y = 0; y < 16; y++)
 			{
-				memset(buf,0,128);
-				sprintf( buf+strlen(buf), "%04x ", lookup_offs+y*16 );
-				for (x=0; x<16; x++)
+				memset(buf, 0, 128);
+				sprintf(buf + strlen(buf), "%04x ", lookup_offs + y * 16);
+				for (x = 0; x < 16; x++)
 				{
-					sprintf( buf+strlen(buf), "%02x ", lookup_RAM[ lookup_offs+x+y*16 ] );
+					sprintf(buf + strlen(buf), "%02x ", lookup_ram[lookup_offs + x + y * 16]);
 				}
 				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height());
 			}
@@ -230,70 +246,53 @@ VIDEO_UPDATE( test_vcu )
 #endif
 
 
-/* these two VIDEO_UPDATE()s will be joined one day */
-static VIDEO_UPDATE( greatgun )
-{
-	UINT32 color_base=0;
-
-	if (game_id==MAZERBLA)
-		color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
-
-	if (game_id==GREATGUN)
-		color_base = 0x0;
-
-//  bitmap_fill(bitmap,NULL,0);
-
-	copybitmap      (bitmap,tmpbitmaps[3],0,0,0,0,cliprect);
-	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,color_base);
-	copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,color_base);
-	copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,color_base);
-	return 0;
-}
-
 static VIDEO_UPDATE( mazerbla )
 {
-	UINT32 color_base=0;
+	mazerbla_state *state = (mazerbla_state *)screen->machine->driver_data;
+	UINT32 color_base = 0;
 
-	if (game_id==MAZERBLA)
+	if (state->game_id == MAZERBLA)
 		color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
 
-	if (game_id==GREATGUN)
-		color_base = 0x0;
+	if (state->game_id == GREATGUN)
+		color_base = 0x00;
 
-//  bitmap_fill(bitmap,NULL,0);
+	//  bitmap_fill(bitmap, NULL, 0);
 
-	copybitmap      (bitmap,tmpbitmaps[3],0,0,0,0,cliprect); //text
-	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,0);
-	copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,0); //haircross
-	copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,0); //sprites
+	copybitmap(bitmap, state->tmpbitmaps[3], 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, state->tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, state->tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, state->tmpbitmaps[0], 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 
 
 static WRITE8_HANDLER( cfb_backgnd_color_w )
 {
-	if (bknd_col != data)
-	{
-		int r,g,b, bit0, bit1, bit2;
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
 
-		bknd_col = data;
+	if (state->bknd_col != data)
+	{
+		int r, g, b, bit0, bit1, bit2;
+
+		state->bknd_col = data;
 
 		/* red component */
-		bit1 = (data >> 7) & 0x01;
-		bit0 = (data >> 6) & 0x01;
-		r = combine_2_weights(weights_r, bit0, bit1);
+		bit1 = BIT(data, 7);
+		bit0 = BIT(data, 6);
+		r = combine_2_weights(state->weights_r, bit0, bit1);
 
 		/* green component */
-		bit2 = (data >> 5) & 0x01;
-		bit1 = (data >> 4) & 0x01;
-		bit0 = (data >> 3) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		bit2 = BIT(data, 5);
+		bit1 = BIT(data, 4);
+		bit0 = BIT(data, 3);
+		g = combine_3_weights(state->weights_g, bit0, bit1, bit2);
 
 		/* blue component */
-		bit2 = (data >> 2) & 0x01;
-		bit1 = (data >> 1) & 0x01;
-		bit0 = (data >> 0) & 0x01;
-		b = combine_3_weights(weights_b, bit0, bit1, bit2);
+		bit2 = BIT(data, 2);
+		bit1 = BIT(data, 1);
+		bit0 = BIT(data, 0);
+		b = combine_3_weights(state->weights_b, bit0, bit1, bit2);
 
 		palette_set_color(space->machine, 255, MAKE_RGB(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
@@ -301,100 +300,111 @@ static WRITE8_HANDLER( cfb_backgnd_color_w )
 }
 
 
-static WRITE8_HANDLER(cfb_vbank_w)
+static WRITE8_HANDLER( cfb_vbank_w )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+
 	/* only bit 6 connected */
-	vbank = (data & 0x40)>>6;
+	state->vbank = BIT(data, 6);
 }
 
 
-static WRITE8_HANDLER(cfb_rom_bank_sel_w)	/* mazer blazer */
+static WRITE8_HANDLER( cfb_rom_bank_sel_w )	/* mazer blazer */
 {
-	gfx_rom_bank = data;
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	state->gfx_rom_bank = data;
 
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000);
 }
 
-static WRITE8_HANDLER(cfb_rom_bank_sel_w_gg)	/* great guns */
+static WRITE8_HANDLER( cfb_rom_bank_sel_w_gg )	/* great guns */
 {
-	gfx_rom_bank = data>>1;
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	state->gfx_rom_bank = data >> 1;
 
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 
 /* VCU status? */
 static READ8_HANDLER( cfb_port_02_r )
 {
-	port02_status ^= 0xff;
-	return (port02_status);
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	state->port02_status ^= 0xff;
+	return state->port02_status;
 }
 
 
-static WRITE8_HANDLER( VCU_video_reg_w )
+static WRITE8_HANDLER( vcu_video_reg_w )
 {
-	if (VCU_video_reg[offset] != data)
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	if (state->vcu_video_reg[offset] != data)
 	{
-		VCU_video_reg[offset] = data;
-		//popmessage("video_reg= %02x %02x %02x %02x", VCU_video_reg[0], VCU_video_reg[1], VCU_video_reg[2], VCU_video_reg[3] );
-		//logerror("video_reg= %02x %02x %02x %02x\n", VCU_video_reg[0], VCU_video_reg[1], VCU_video_reg[2], VCU_video_reg[3] );
+		state->vcu_video_reg[offset] = data;
+		//popmessage("video_reg= %02x %02x %02x %02x", state->vcu_video_reg[0], state->vcu_video_reg[1], state->vcu_video_reg[2], state->vcu_video_reg[3]);
+		//logerror("video_reg= %02x %02x %02x %02x\n", state->vcu_video_reg[0], state->vcu_video_reg[1], state->vcu_video_reg[2], state->vcu_video_reg[3]);
 	}
 }
 
-static READ8_HANDLER( VCU_set_cmd_param_r )
+static READ8_HANDLER( vcu_set_cmd_param_r )
 {
-	VCU_gfx_param_addr = offset;
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	state->vcu_gfx_param_addr = offset;
 
 	/* offset  = 0 is not known */
-	xpos      = cfb_ram[VCU_gfx_param_addr + 1] | (cfb_ram[VCU_gfx_param_addr + 2]<<8);
-	ypos      = cfb_ram[VCU_gfx_param_addr + 3] | (cfb_ram[VCU_gfx_param_addr + 4]<<8);
-	color     = cfb_ram[VCU_gfx_param_addr + 5];
-	color2    = cfb_ram[VCU_gfx_param_addr + 6];
-	mode      = cfb_ram[VCU_gfx_param_addr + 7];
-	pix_xsize = cfb_ram[VCU_gfx_param_addr + 8];
-	pix_ysize = cfb_ram[VCU_gfx_param_addr + 9];
+	state->xpos      = state->cfb_ram[state->vcu_gfx_param_addr + 1] | (state->cfb_ram[state->vcu_gfx_param_addr + 2]<<8);
+	state->ypos      = state->cfb_ram[state->vcu_gfx_param_addr + 3] | (state->cfb_ram[state->vcu_gfx_param_addr + 4]<<8);
+	state->color1    = state->cfb_ram[state->vcu_gfx_param_addr + 5];
+	state->color2    = state->cfb_ram[state->vcu_gfx_param_addr + 6];
+	state->mode      = state->cfb_ram[state->vcu_gfx_param_addr + 7];
+	state->pix_xsize = state->cfb_ram[state->vcu_gfx_param_addr + 8];
+	state->pix_ysize = state->cfb_ram[state->vcu_gfx_param_addr + 9];
 
-	plane = mode & 3;
+	state->plane = state->mode & 3;
 
 	return 0;
 }
 
 
-static READ8_HANDLER( VCU_set_gfx_addr_r )
+static READ8_HANDLER( vcu_set_gfx_addr_r )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	UINT8 * rom = memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
-	int x,y;
+	int x, y;
 	int bits = 0;
+	UINT8 color_base;
 
-	UINT8 color_base=0;
+	if (state->game_id == MAZERBLA)
+		color_base = 0x80;	/* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
 
-	UINT8 * rom = memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
-
+	if (state->game_id == GREATGUN)
+		color_base = 0x00;	/* 0x00 - good for Great Guns: (both in game and CRT test mode) */
 /*
-    if ((mode<=0x07) || (mode>=0x10))
+    if ((mode <= 0x07) || (mode >= 0x10))
     {
         logerror("paradr=");
-        logerror("%3x ",VCU_gfx_param_addr );
+        logerror("%3x ", state->vcu_gfx_param_addr );
 
-        logerror("%02x ", cfb_ram[VCU_gfx_param_addr + 0] );
-        logerror("x=%04x ", xpos );                 //1,2
-        logerror("y=%04x ", ypos );                 //3,4
-        logerror("color=%02x ", color);             //5
-        logerror("color2=%02x ", color2);           //6
-        logerror("mode=%02x ", mode );              //7
-        logerror("xpix=%02x ", pix_xsize );         //8
-        logerror("ypix=%02x ", pix_ysize );         //9
+        logerror("%02x ", state->cfb_ram[vcu_gfx_param_addr + 0] );
+        logerror("x=%04x ", state->xpos );                 //1,2
+        logerror("y=%04x ", state->ypos );                 //3,4
+        logerror("color1=%02x ", state->color1);             //5
+        logerror("color2=%02x ", state->color2);           //6
+        logerror("mode=%02x ", state->mode );              //7
+        logerror("xpix=%02x ", state->pix_xsize );         //8
+        logerror("ypix=%02x ", state->pix_ysize );         //9
 
-        logerror("addr=%4i bank=%1i\n", offset, gfx_rom_bank);
+        logerror("addr=%4i bank=%1i\n", offset, state->gfx_rom_bank);
     }
 */
 
-	VCU_gfx_addr = offset;
+	state->vcu_gfx_addr = offset;
 
 	/* draw */
-	offs = VCU_gfx_addr;
+	offs = state->vcu_gfx_addr;
 
-	switch(mode)
+	switch(state->mode)
 	{
 		/* 2 bits per pixel */
 		case 0x0f:
@@ -403,42 +413,36 @@ static READ8_HANDLER( VCU_set_gfx_addr_r )
 		case 0x0c:
 //      if (dbg_gfx_e)
 //      {
-//          if (vbank==dbg_vbank)
+//          if (state->vbank == dbg_vbank)
 		{
-			if (game_id==MAZERBLA)
-				color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
-
-			if (game_id==GREATGUN)
-				color_base = 0x00;
-
-			for (y = 0; y <= pix_ysize; y++)
+			for (y = 0; y <= state->pix_ysize; y++)
 			{
-				for (x = 0; x <= pix_xsize; x++)
+				for (x = 0; x <= state->pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits>>3)) % 0x2000];
-					UINT8 data = (pixeldata>>(6-(bits&7))) & 3;
+					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
 					UINT8 col = 0;
 
 					switch(data)
 					{
 						case 0:
-							col = color_base | ((color &0x0f));		//background PEN
+							col = color_base | ((state->color1 & 0x0f));		//background PEN
 							break;
 						case 1:
-							col = color_base | ((color &0xf0)>>4);	//foreground PEN
+							col = color_base | ((state->color1 & 0xf0) >> 4);	//foreground PEN
 							break;
 						case 2:
-							col = color_base | ((color2 &0x0f));	//background PEN2
+							col = color_base | ((state->color2 & 0x0f));	//background PEN2
 							break;
 						case 3:
-							col = color_base | ((color2 &0xf0)>>4);	//foreground PEN2
+							col = color_base | ((state->color2 & 0xf0) >> 4);	//foreground PEN2
 							break;
 					}
 
-					if ( ((xpos+x)<256) && ((ypos+y)<256) )
-						*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = col;
+					if (((state->xpos + x) < 256) && ((state->ypos + y) < 256) )
+						*BITMAP_ADDR16(state->tmpbitmaps[state->plane], state->ypos + y, state->xpos + x) = col;
 
-					bits+=2;
+					bits += 2;
 				}
 			}
 		}
@@ -452,27 +456,22 @@ static READ8_HANDLER( VCU_set_gfx_addr_r )
 		case 0x08:/* */
 //      if (dbg_gfx_e)
 //      {
-//          if (vbank==dbg_vbank)
+//          if (state->vbank == dbg_vbank)
 		{
-			if (game_id==MAZERBLA)
-				color_base = 0x80;	/* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
 
-			if (game_id==GREATGUN)
-				color_base = 0x00;	/* 0x00 - good for Great Guns: (both in game and CRT test mode) */
-
-			for (y = 0; y <= pix_ysize; y++)
+			for (y = 0; y <= state->pix_ysize; y++)
 			{
-				for (x = 0; x <= pix_xsize; x++)
+				for (x = 0; x <= state->pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits>>3)) % 0x2000];
-					UINT8 data = (pixeldata>>(7-(bits&7))) & 1;
+					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					UINT8 data = (pixeldata >> (7 - (bits & 7))) & 1;
 
 					/* color = 4 MSB = front PEN, 4 LSB = background PEN */
 
-					if ( ((xpos+x)<256) && ((ypos+y)<256) )
-						*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = data? color_base | ((color&0xf0)>>4): color_base | ((color&0x0f));
+					if (((state->xpos + x) < 256) && ((state->ypos + y) < 256))
+						*BITMAP_ADDR16(state->tmpbitmaps[state->plane], state->ypos + y, state->xpos + x) = data ? color_base | ((state->color1 & 0xf0) >> 4): color_base | ((state->color1 & 0x0f));
 
-					bits+=1;
+					bits += 1;
 				}
 			}
 		}
@@ -485,74 +484,69 @@ static READ8_HANDLER( VCU_set_gfx_addr_r )
 		case 0x00:
 //      if (dbg_gfx_e)
 //      {
-//          if (vbank==dbg_vbank)
+//          if (state->vbank == dbg_vbank)
 		{
-			if (game_id==MAZERBLA)
-				color_base = 0x80;	/* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
-
-			if (game_id==GREATGUN)
-				color_base = 0x00;	/* 0x00 - good for Great Guns: (both in game and CRT test mode) */
-
-			for (y = 0; y <= pix_ysize; y++)
+			for (y = 0; y <= state->pix_ysize; y++)
 			{
-				for (x = 0; x <= pix_xsize; x++)
+				for (x = 0; x <= state->pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits>>3)) % 0x2000];
-					UINT8 data = (pixeldata>>(4-(bits&7))) & 15;
+					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					UINT8 data = (pixeldata >> (4 - (bits & 7))) & 15;
 					UINT8 col = 0;
 
 					col = color_base | data;
 
-					if ( ((xpos+x)<256) && ((ypos+y)<256) )
-						*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = col;
+					if (((state->xpos + x) < 256) && ((state->ypos + y) < 256))
+						*BITMAP_ADDR16(state->tmpbitmaps[state->plane], state->ypos + y, state->xpos + x) = col;
 
-					bits+=4;
+					bits += 4;
 				}
 			}
 		}
 //      }
 		break;
 	default:
-		popmessage("not supported VCU drawing mode=%2x", mode);
+		popmessage("not supported VCU drawing mode=%2x", state->mode);
 		break;
 	}
 
 	return 0;
 }
 
-static READ8_HANDLER( VCU_set_clr_addr_r )
+static READ8_HANDLER( vcu_set_clr_addr_r )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	UINT8 * rom = memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
-	int x,y;
+	int x, y;
 	int bits = 0;
 
-	UINT8 color_base=0;
+	UINT8 color_base = 0;
 
-	UINT8 * rom = memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     //if (0) //(mode != 0x07)
     {
         logerror("paladr=");
-        logerror("%3x ",VCU_gfx_param_addr );
+        logerror("%3x ", state->vcu_gfx_param_addr );
 
-        logerror("%02x ", cfb_ram[VCU_gfx_param_addr + 0] );
-        logerror("x=%04x ", xpos );                 //1,2
-        logerror("y=%04x ", ypos );                 //3,4
-        logerror("color=%02x ", color);             //5
-        logerror("color2=%02x ", color2 );          //6
-        logerror("mode=%02x ", mode );              //7
-        logerror("xpix=%02x ", pix_xsize );         //8
-        logerror("ypix=%02x ", pix_ysize );         //9
+        logerror("%02x ", state->cfb_ram[state->vcu_gfx_param_addr + 0] );
+        logerror("x=%04x ", state->xpos );                 //1,2
+        logerror("y=%04x ", state->ypos );                 //3,4
+        logerror("color1=%02x ", state->color1);             //5
+        logerror("color2=%02x ", state->color2 );          //6
+        logerror("mode=%02x ", state->mode );              //7
+        logerror("xpix=%02x ", state->pix_xsize );         //8
+        logerror("ypix=%02x ", state->pix_ysize );         //9
 
-        logerror("addr=%4i bank=%1i\n", offset, gfx_rom_bank);
+        logerror("addr=%4i bank=%1i\n", offset, state->gfx_rom_bank);
 
-        for (y=0; y<16; y++)
+        for (y = 0; y < 16; y++)
         {
-            logerror("%04x: ",offset+y*16);
-            for (x=0; x<16; x++)
+            logerror("%04x: ", offset + y * 16);
+            for (x = 0; x < 16; x++)
             {
-                logerror("%02x ",cfb_ram[offset+x+y*16]);
+                logerror("%02x ", state->cfb_ram[offset + x + y * 16]);
             }
             logerror("\n");
         }
@@ -563,7 +557,7 @@ static READ8_HANDLER( VCU_set_clr_addr_r )
 /* copy palette / CLUT(???) */
 
 
-	switch(mode)
+	switch (state->mode)
 	{
 		case 0x13: /* draws sprites?? in mazer blazer and ... wrong sprite in place of targeting-cross and UFO laser */
 		case 0x03:
@@ -571,42 +565,42 @@ static READ8_HANDLER( VCU_set_clr_addr_r )
            the draw command/palette selector is done via the 'mode' only ... */
 		//if (dbg_clr_e)
 		{
-			offs = VCU_gfx_addr;
+			offs = state->vcu_gfx_addr;
 
-			if (game_id==MAZERBLA)
+			if (state->game_id == MAZERBLA)
 				color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
 
-			if (game_id==GREATGUN)
+			if (state->game_id == GREATGUN)
 				color_base = 0x00;
 
-			for (y = 0; y <= pix_ysize; y++)
+			for (y = 0; y <= state->pix_ysize; y++)
 			{
-				for (x = 0; x <= pix_xsize; x++)
+				for (x = 0; x <= state->pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits>>3)) % 0x2000];
-					UINT8 data = (pixeldata>>(6-(bits&7))) & 3;
+					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
 					UINT8 col = 0;
 
 					switch(data)
 					{
 						case 0:
-							col = color_base | ((color &0x0f));		//background PEN
+							col = color_base | ((state->color1 & 0x0f));		//background PEN
 							break;
 						case 1:
-							col = color_base | ((color &0xf0)>>4);	//foreground PEN
+							col = color_base | ((state->color1 & 0xf0) >> 4);	//foreground PEN
 							break;
 						case 2:
-							col = color_base | ((color2 &0x0f));	//background PEN2
+							col = color_base | ((state->color2 & 0x0f));	//background PEN2
 							break;
 						case 3:
-							col = color_base | ((color2 &0xf0)>>4);	//foreground PEN2
+							col = color_base | ((state->color2 & 0xf0) >> 4);	//foreground PEN2
 							break;
 					}
 
-					if ( ((xpos+x)<256) && ((ypos+y)<256) )
-						*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = col;
+					if (((state->xpos + x) < 256) && ((state->ypos + y) < 256))
+						*BITMAP_ADDR16(state->tmpbitmaps[state->plane], state->ypos + y, state->xpos + x) = col;
 
-						bits+=2;
+						bits += 2;
 				}
 			}
 		}
@@ -616,97 +610,97 @@ static READ8_HANDLER( VCU_set_clr_addr_r )
 		case 0x07:
 		offs = offset;
 
-		switch(ypos)
+		switch(state->ypos)
 		{
 			case 6: //seems to encode palette write
 			{
-				int r,g,b, bit0, bit1, bit2;
+				int r, g, b, bit0, bit1, bit2;
 
 				//pix_xsize and pix_ysize seem to be related to palette length ? (divide by 2)
-				int lookup_offs = (ypos>>1)*256; //=3*256
+				int lookup_offs = (state->ypos >> 1) * 256; //=3*256
 
-				for (y=0; y<16; y++)
+				for (y = 0; y < 16; y++)
 				{
-					for (x=0; x<16; x++)
+					for (x = 0; x < 16; x++)
 					{
-						UINT8 colour = cfb_ram[ offs + x + y*16 ];
+						UINT8 colour = state->cfb_ram[offs + x + y * 16];
 
 						/* red component */
 						bit1 = (colour >> 7) & 0x01;
 						bit0 = (colour >> 6) & 0x01;
-						r = combine_2_weights(weights_r, bit0, bit1);
+						r = combine_2_weights(state->weights_r, bit0, bit1);
 
 						/* green component */
 						bit2 = (colour >> 5) & 0x01;
 						bit1 = (colour >> 4) & 0x01;
 						bit0 = (colour >> 3) & 0x01;
-						g = combine_3_weights(weights_g, bit0, bit1, bit2);
+						g = combine_3_weights(state->weights_g, bit0, bit1, bit2);
 
 						/* blue component */
 						bit2 = (colour >> 2) & 0x01;
 						bit1 = (colour >> 1) & 0x01;
 						bit0 = (colour >> 0) & 0x01;
-						b = combine_3_weights(weights_b, bit0, bit1, bit2);
+						b = combine_3_weights(state->weights_b, bit0, bit1, bit2);
 
-						if ((x+y*16)<255)//keep color 255 free for use as background color
-							palette_set_color(space->machine, x+y*16, MAKE_RGB(r, g, b));
+						if ((x + y * 16) < 255)//keep color 255 free for use as background color
+							palette_set_color(space->machine, x + y * 16, MAKE_RGB(r, g, b));
 
-						lookup_RAM[ lookup_offs + x + y*16 ] = colour;
+						state->lookup_ram[lookup_offs + x + y * 16] = colour;
 					}
 				}
 			}
 			break;
 			case 4: //seems to encode lookup???? table write
 			{
-				int lookup_offs = (ypos>>1)*256; //=2*256
+				int lookup_offs = (state->ypos >> 1) * 256; //=2*256
 
-				for (y=0; y<16; y++)
+				for (y = 0; y < 16; y++)
 				{
-					for (x=0; x<16; x++)
+					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = cfb_ram[ offs + x + y*16 ];
-						lookup_RAM[ lookup_offs + x + y*16 ] = dat;
+						UINT8 dat = state->cfb_ram[offs + x + y * 16];
+						state->lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
 			}
 			break;
 			case 2: //seems to encode lookup???? table write
 			{
-				int lookup_offs = (ypos>>1)*256; //=1*256
+				int lookup_offs = (state->ypos >> 1) * 256; //=1*256
 
-				for (y=0; y<16; y++)
+				for (y = 0; y < 16; y++)
 				{
-					for (x=0; x<16; x++)
+					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = cfb_ram[ offs + x + y*16 ];
-						lookup_RAM[ lookup_offs + x + y*16 ] = dat;
+						UINT8 dat = state->cfb_ram[offs + x + y * 16];
+						state->lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
 			}
 			break;
 			case 0: //seems to encode lookup???? table write
 			{
-				int lookup_offs = (ypos>>1)*256; //=0*256
+				int lookup_offs = (state->ypos >> 1) * 256; //=0*256
 
-				for (y=0; y<16; y++)
+				for (y = 0; y < 16; y++)
 				{
-					for (x=0; x<16; x++)
+					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = cfb_ram[ offs + x + y*16 ];
-						lookup_RAM[ lookup_offs + x + y*16 ] = dat;
+						UINT8 dat = state->cfb_ram[offs + x + y * 16];
+						state->lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
 			}
 			break;
 
 			default:
-			popmessage("not supported lookup/color write mode=%2x", ypos);
+			popmessage("not supported lookup/color write mode=%2x", state->ypos);
 			break;
 		}
 		break;
 
 	default:
-		popmessage("not supported VCU color mode=%2x", mode);
+		popmessage("not supported VCU color mode=%2x", state->mode);
 		break;
 	}
 
@@ -721,64 +715,74 @@ static READ8_HANDLER( VCU_set_clr_addr_r )
 
 static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
 {
-	zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
 
-	cputag_set_input_line(space->machine, "maincpu", 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	state->zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
+
+	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 static READ8_HANDLER( cfb_zpu_int_req_clr )
 {
-	zpu_int_vector |= 2;
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+
+	state->zpu_int_vector |= 2;
 
 	/* clear the INT line when there are no more interrupt requests */
-	if (zpu_int_vector == 0xff)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	if (state->zpu_int_vector == 0xff)
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
 
 static READ8_HANDLER( ls670_0_r )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+
 	/* set a timer to force synchronization after the read */
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
-	return ls670_0[offset];
+	return state->ls670_0[offset];
 }
 
 static TIMER_CALLBACK( deferred_ls670_0_w )
 {
-	int offset = (param>>8) & 255;
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	int offset = (param >> 8) & 255;
 	int data = param & 255;
 
-	ls670_0[offset] = data;
+	state->ls670_0[offset] = data;
 }
 
 static WRITE8_HANDLER( ls670_0_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(space->machine, NULL, (offset<<8) | data, deferred_ls670_0_w);
+	timer_call_after_resynch(space->machine, NULL, (offset << 8) | data, deferred_ls670_0_w);
 }
 
 static READ8_HANDLER( ls670_1_r )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+
 	/* set a timer to force synchronization after the read */
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
-	return ls670_1[offset];
+	return state->ls670_1[offset];
 }
 
 static TIMER_CALLBACK( deferred_ls670_1_w )
 {
-	int offset = (param>>8) & 255;
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	int offset = (param >> 8) & 255;
 	int data = param & 255;
 
-	ls670_1[offset] = data;
+	state->ls670_1[offset] = data;
 }
 
 static WRITE8_HANDLER( ls670_1_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(space->machine, NULL, (offset<<8) | data, deferred_ls670_1_w);
+	timer_call_after_resynch(space->machine, NULL, (offset << 8) | data, deferred_ls670_1_w);
 }
 
 
@@ -836,18 +840,21 @@ Vertical movement of gun is Strobe 9, Bits 0-7.
 
 static WRITE8_HANDLER( zpu_bcd_decoder_w )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+
 	/* bcd decoder used a input select (a mux) for reads from port 0x62 */
-	bcd_7445 = data & 0xf;
+	state->bcd_7445 = data & 0xf;
 }
 
 static READ8_HANDLER( zpu_inputs_r )
 {
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
 	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
 	                                           "STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
 	UINT8 ret = 0;
 
-	ret = input_port_read(space->machine, strobenames[bcd_7445]);
+	ret = input_port_read(space->machine, strobenames[state->bcd_7445]);
 
 	return ret;
 }
@@ -856,7 +863,7 @@ static WRITE8_HANDLER( zpu_led_w )
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	set_led_status(space->machine, 0, offset&1 );
+	set_led_status(space->machine, 0, offset & 1);
 }
 
 static WRITE8_HANDLER( zpu_lamps_w)
@@ -864,26 +871,26 @@ static WRITE8_HANDLER( zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*set_led_status(space->machine, 0, (data&0x10)>>4 );*/
-	/*set_led_status(space->machine, 1, (data&0x20)>>4 );*/
+	/*set_led_status(space->machine, 0, (data & 0x10) >> 4);*/
+	/*set_led_status(space->machine, 1, (data & 0x20) >> 4);*/
 }
 
 static WRITE8_HANDLER( zpu_coin_counter_w )
 {
 	/* bit 6 = coin counter */
-	coin_counter_w(space->machine, offset, (data&0x40)>>6 );
+	coin_counter_w(space->machine, offset, BIT(data, 6));
 }
 
 static WRITE8_HANDLER(cfb_led_w)
 {
 	/* bit 7 - led on */
-	set_led_status(space->machine, 2,(data&0x80)>>7);
+	set_led_status(space->machine, 2, BIT(data, 7));
 }
 
 static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
 {
 	/* bit 0, bit 1 - led on */
-	set_led_status(device->machine,1,data&0x01);
+	set_led_status(device->machine, 1, BIT(data, 0));
 }
 
 
@@ -895,23 +902,26 @@ static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
 
 static WRITE8_HANDLER( vsb_ls273_audio_control_w )
 {
-	vsb_ls273 = data;
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	state->vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	set_led_status(space->machine, 1,(data&0x20)>>5);
+	set_led_status(space->machine, 1, BIT(data, 5));
 }
 
 static READ8_DEVICE_HANDLER( soundcommand_r )
 {
-	return soundlatch;
+	mazerbla_state *state = (mazerbla_state *)device->machine->driver_data;
+	return state->soundlatch;
 }
 
 static TIMER_CALLBACK( delayed_sound_w )
 {
-	soundlatch = param;
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	state->soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( main_sound_w )
@@ -921,12 +931,14 @@ static WRITE8_HANDLER( main_sound_w )
 
 static WRITE8_HANDLER( sound_int_clear_w )
 {
-	cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sound_nmi_clear_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	mazerbla_state *state = (mazerbla_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -940,7 +952,7 @@ static ADDRESS_MAP_START( mazerbla_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(mazerbla_state, videoram, videoram_size)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -970,11 +982,11 @@ static ADDRESS_MAP_START( mazerbla_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
-	AM_RANGE(0x4000, 0x4003) AM_WRITE(VCU_video_reg_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(VCU_set_cmd_param_r)	/* VCU command and parameters LOAD */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(VCU_set_gfx_addr_r)	/* gfx LOAD (blit) */
-	AM_RANGE(0xe000, 0xffff) AM_READ(VCU_set_clr_addr_r)	/* palette? LOAD */
+	AM_RANGE(0x4000, 0x4003) AM_WRITE(vcu_video_reg_w)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(mazerbla_state, cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
+	AM_RANGE(0xa000, 0xa7ff) AM_READ(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
+	AM_RANGE(0xc000, 0xdfff) AM_READ(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
+	AM_RANGE(0xe000, 0xffff) AM_READ(vcu_set_clr_addr_r)	/* palette? LOAD */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1367,7 +1379,8 @@ static IRQ_CALLBACK(irq_callback)
     note:
     1111 11110 (0xfe) - cannot happen and is not handled by game */
 
-	return (zpu_int_vector & ~1);	/* D0->GND is performed on CFB board */
+	mazerbla_state *state = (mazerbla_state *)device->machine->driver_data;
+	return (state->zpu_int_vector & ~1);	/* D0->GND is performed on CFB board */
 }
 
 /* frequency is 14.318 MHz/16/16/16/16 */
@@ -1383,32 +1396,86 @@ static INTERRUPT_GEN( sound_interrupt )
  *
  *************************************/
 
+static MACHINE_START( mazerbla )
+{
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global_array(machine, state->vcu_video_reg);
+	state_save_register_global(machine, state->vcu_gfx_addr);
+	state_save_register_global(machine, state->vcu_gfx_param_addr);
+
+	state_save_register_global(machine, state->bknd_col);
+	state_save_register_global(machine, state->port02_status);
+	state_save_register_global(machine, state->vbank);
+	state_save_register_global(machine, state->xpos);
+	state_save_register_global(machine, state->ypos);
+	state_save_register_global(machine, state->pix_xsize);
+	state_save_register_global(machine, state->pix_ysize);
+	state_save_register_global(machine, state->color1);
+	state_save_register_global(machine, state->color2);
+	state_save_register_global(machine, state->mode);
+	state_save_register_global(machine, state->plane);
+	state_save_register_global_array(machine, state->lookup_ram);
+	state_save_register_global(machine, state->gfx_rom_bank);
+
+	state_save_register_global_array(machine, state->ls670_0);
+	state_save_register_global_array(machine, state->ls670_1);
+
+	state_save_register_global(machine, state->zpu_int_vector);
+
+	state_save_register_global(machine, state->bcd_7445);
+
+	state_save_register_global(machine, state->vsb_ls273);
+	state_save_register_global(machine, state->soundlatch);
+}
+
 static MACHINE_RESET( mazerbla )
 {
-	game_id = MAZERBLA;
-	zpu_int_vector = 0xff;
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	int i;
+
+	state->zpu_int_vector = 0xff;
+
+	state->bknd_col = 0xaa;
+	state->gfx_rom_bank = 0xff;
+
+	state->vcu_gfx_addr = 0;
+	state->vcu_gfx_param_addr = 0;
+	state->port02_status = 0;
+	state->vbank = 0;
+	state->xpos = 0;
+	state->ypos = 0;
+	state->pix_xsize = 0;
+	state->pix_ysize = 0;
+	state->color1 = 0;
+	state->color2 = 0;
+	state->mode = 0;
+	state->plane = 0;
+	state->bcd_7445 = 0;
+	state->vsb_ls273 = 0;
+	state->soundlatch = 0;
+
+	for (i = 0; i < 4; i++)
+	{
+		state->vcu_video_reg[i] = 0;
+		state->ls670_0[i] = 0;
+		state->ls670_1[i] = 0;
+	}
+
+	memset(state->lookup_ram, 0, ARRAY_LENGTH(state->lookup_ram));
+
 	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 }
 
-
-static MACHINE_RESET( greatgun )
-{
-	UINT8 *rom = memory_region(machine, "sub2");
-	game_id = GREATGUN;
-	zpu_int_vector = 0xff;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
-
-
-//  patch VCU test
-//  VCU test starts at PC=0x56f
-	rom[0x05b6] = 0;
-	rom[0x05b7] = 0;
-//  so we also need to patch ROM checksum test
-	rom[0x037f] = 0;
-	rom[0x0380] = 0;
-}
 
 static MACHINE_DRIVER_START( mazerbla )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mazerbla_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MDRV_CPU_PROGRAM_MAP(mazerbla_map)
@@ -1429,6 +1496,7 @@ static MACHINE_DRIVER_START( mazerbla )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* synchronization forced on the fly */
+	MDRV_MACHINE_START(mazerbla)
 	MDRV_MACHINE_RESET(mazerbla)
 
 	/* video hardware */
@@ -1451,6 +1519,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( greatgun )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(mazerbla_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MDRV_CPU_PROGRAM_MAP(mazerbla_map)
@@ -1469,7 +1540,8 @@ static MACHINE_DRIVER_START( greatgun )
     */
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(greatgun)
+	MDRV_MACHINE_START(mazerbla)
+	MDRV_MACHINE_RESET(mazerbla)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1483,7 +1555,7 @@ static MACHINE_DRIVER_START( greatgun )
 
 	MDRV_PALETTE_INIT(mazerbla)
 	MDRV_VIDEO_START(mazerbla)
-	MDRV_VIDEO_UPDATE(greatgun)
+	MDRV_VIDEO_UPDATE(mazerbla)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1610,10 +1682,26 @@ ROM_END
 
 static DRIVER_INIT( mazerbla )
 {
-	bknd_col = 0xaa;
-	gfx_rom_bank = 0xff;
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	state->game_id = MAZERBLA;
 }
 
-GAME( 1983, mazerbla, 0,        mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1983, mazerblaa,mazerbla, mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1983, greatgun, 0,        greatgun,  greatgun, mazerbla, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+static DRIVER_INIT( greatgun )
+{
+	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
+	UINT8 *rom = memory_region(machine, "sub2");
+
+	state->game_id = GREATGUN;
+
+	//  patch VCU test
+	//  VCU test starts at PC=0x56f
+	rom[0x05b6] = 0;
+	rom[0x05b7] = 0;
+	//  so we also need to patch ROM checksum test
+	rom[0x037f] = 0;
+	rom[0x0380] = 0;
+}
+
+GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, greatgun, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

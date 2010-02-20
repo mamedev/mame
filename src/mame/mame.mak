@@ -1394,7 +1394,7 @@ $(MAMEOBJ)/thepit.a: \
 	$(DRIVERS)/timelimt.o $(VIDEO)/timelimt.o \
 
 $(MAMEOBJ)/toaplan.a: \
-	$(DRIVERS)/mjsister.o $(VIDEO)/mjsister.o \
+	$(DRIVERS)/mjsister.o \
 	$(DRIVERS)/slapfght.o $(MACHINE)/slapfght.o $(VIDEO)/slapfght.o \
 	$(DRIVERS)/snowbros.o $(VIDEO)/kan_pand.o $(VIDEO)/kan_panb.o \
 	$(DRIVERS)/toaplan1.o $(MACHINE)/toaplan1.o $(VIDEO)/toaplan1.o \
@@ -1576,7 +1576,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
 	$(DRIVERS)/mirderby.o \
-	$(DRIVERS)/mole.o $(VIDEO)/mole.o \
+	$(DRIVERS)/mole.o \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
 	$(DRIVERS)/multfish.o \

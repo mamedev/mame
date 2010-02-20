@@ -18,25 +18,18 @@
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-VIDEO_START( madmotor );
-VIDEO_UPDATE( madmotor );
-
-WRITE16_HANDLER( madmotor_pf1_data_w );
-WRITE16_HANDLER( madmotor_pf2_data_w );
-WRITE16_HANDLER( madmotor_pf3_data_w );
-extern UINT16 *madmotor_pf1_rowscroll;
-extern UINT16 *madmotor_pf1_data,*madmotor_pf2_data,*madmotor_pf3_data;
-extern UINT16 *madmotor_pf1_control,*madmotor_pf2_control,*madmotor_pf3_control;
+#include "includes/madmotor.h"
 
 /******************************************************************************/
 
 static WRITE16_HANDLER( madmotor_sound_w )
 {
+	madmotor_state *state = (madmotor_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -45,17 +38,17 @@ static WRITE16_HANDLER( madmotor_sound_w )
 
 static ADDRESS_MAP_START( madmotor_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18001f) AM_WRITEONLY AM_BASE(&madmotor_pf1_control)
-	AM_RANGE(0x184000, 0x1847ff) AM_RAM AM_BASE(&madmotor_pf1_rowscroll)
-	AM_RANGE(0x188000, 0x189fff) AM_RAM_WRITE(madmotor_pf1_data_w) AM_BASE(&madmotor_pf1_data)
+	AM_RANGE(0x180000, 0x18001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf1_control)
+	AM_RANGE(0x184000, 0x1847ff) AM_RAM AM_BASE_MEMBER(madmotor_state, pf1_rowscroll)
+	AM_RANGE(0x188000, 0x189fff) AM_RAM_WRITE(madmotor_pf1_data_w) AM_BASE_MEMBER(madmotor_state, pf1_data)
 	AM_RANGE(0x18c000, 0x18c001) AM_NOP
-	AM_RANGE(0x190000, 0x19001f) AM_WRITEONLY AM_BASE(&madmotor_pf2_control)
-	AM_RANGE(0x198000, 0x1987ff) AM_RAM_WRITE(madmotor_pf2_data_w) AM_BASE(&madmotor_pf2_data)
+	AM_RANGE(0x190000, 0x19001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf2_control)
+	AM_RANGE(0x198000, 0x1987ff) AM_RAM_WRITE(madmotor_pf2_data_w) AM_BASE_MEMBER(madmotor_state, pf2_data)
 	AM_RANGE(0x19c000, 0x19c001) AM_READNOP
-	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITEONLY AM_BASE(&madmotor_pf3_control)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM_WRITE(madmotor_pf3_data_w) AM_BASE(&madmotor_pf3_data)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf3_control)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM_WRITE(madmotor_pf3_data_w) AM_BASE_MEMBER(madmotor_state, pf3_data)
 	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
-	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE_SIZE_MEMBER(madmotor_state, spriteram, spriteram_size)
 	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
@@ -221,7 +214,8 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	madmotor_state *driver_state = (madmotor_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -229,7 +223,27 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+static MACHINE_START( madmotor )
+{
+	madmotor_state *state = (madmotor_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->flipscreen);
+}
+
+static MACHINE_RESET( madmotor )
+{
+	madmotor_state *state = (madmotor_state *)machine->driver_data;
+
+	state->flipscreen = 0;
+}
+
 static MACHINE_DRIVER_START( madmotor )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(madmotor_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
@@ -238,6 +252,9 @@ static MACHINE_DRIVER_START( madmotor )
 
 	MDRV_CPU_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(madmotor)
+	MDRV_MACHINE_RESET(madmotor)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -334,4 +351,4 @@ static DRIVER_INIT( madmotor )
 
 
  /* The title screen is undated, but it's (c) 1989 Data East at 0xefa0 */
-GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor, ROT0, "Mitchell", "Mad Motor", 0 )
+GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor, ROT0, "Mitchell", "Mad Motor", GAME_SUPPORTS_SAVE )

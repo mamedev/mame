@@ -1,4 +1,6 @@
-/* MOLE ATTACK by Yachiyo Electronics Co.,LTD. 1982
+/*****************************************************************************
+
+   MOLE ATTACK by Yachiyo Electronics Co.,LTD. 1982
 
    Known Clones:
    "Holey Moley", from tai (Thomas Automatics, Inc.)
@@ -43,21 +45,93 @@
    0x3DC                    affects mole popmessage
    0x3E5                    round point/passing point control?
    0x3E7                    round point/passing point control?
-*/
 
+******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
-WRITE8_HANDLER(mole_videoram_w);
-WRITE8_HANDLER(mole_tilebank_w);
-WRITE8_HANDLER(mole_flipscreen_w);
 
-PALETTE_INIT(mole);
-VIDEO_START(mole);
-VIDEO_UPDATE(mole);
+typedef struct _mole_state mole_state;
+struct _mole_state
+{
+	/* memory pointers */
+	UINT16 *     tileram;
 
+	/* video-related */
+	tilemap_t    *bg_tilemap;
+	int          tile_bank;
+};
+
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+static PALETTE_INIT( mole )
+{
+	int i;
+
+	for (i = 0; i < 8; i++)
+		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+}
+
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	mole_state *state = (mole_state *)machine->driver_data;
+	UINT16 code = state->tileram[tile_index];
+
+	SET_TILE_INFO((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
+}
+
+static VIDEO_START( mole )
+{
+	mole_state *state = (mole_state *)machine->driver_data;
+	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x400);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
+
+	state_save_register_global_pointer(machine, state->tileram, 0x400);
+}
+
+static WRITE8_HANDLER( mole_videoram_w )
+{
+	mole_state *state = (mole_state *)space->machine->driver_data;
+
+	state->tileram[offset] = data | (state->tile_bank << 8);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+}
+
+static WRITE8_HANDLER( mole_tilebank_w )
+{
+	mole_state *state = (mole_state *)space->machine->driver_data;
+
+	state->tile_bank = data;
+	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+}
+
+static WRITE8_HANDLER( mole_flipscreen_w )
+{
+	flip_screen_set(space->machine, data & 0x01);
+}
+
+static VIDEO_UPDATE( mole )
+{
+	mole_state *state = (mole_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static READ8_HANDLER( mole_protection_r )
 {
@@ -109,6 +183,12 @@ static READ8_HANDLER( mole_protection_r )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( mole_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
@@ -127,6 +207,12 @@ static ADDRESS_MAP_START( mole_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mole )
 	PORT_START("DSW")	/* 0x8d00 */
@@ -181,6 +267,12 @@ static INPUT_PORTS_START( mole )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout tile_layout =
 {
 	8,8,	/* character size */
@@ -199,14 +291,40 @@ static GFXDECODE_START( mole )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( mole )
+{
+	mole_state *state = (mole_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->tile_bank);
+}
+
+static MACHINE_RESET( mole )
+{
+	mole_state *state = (mole_state *)machine->driver_data;
+
+	state->tile_bank = 0;
+}
+
 static MACHINE_DRIVER_START( mole )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mole_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 4000000) // ???
 	MDRV_CPU_PROGRAM_MAP(mole_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	// video hardware
+	MDRV_MACHINE_START(mole)
+	MDRV_MACHINE_RESET(mole)
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -221,13 +339,19 @@ static MACHINE_DRIVER_START( mole )
 	MDRV_VIDEO_START(mole)
 	MDRV_VIDEO_UPDATE(mole)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( mole ) // ALL ROMS ARE 2732
 	ROM_REGION( 0x10000, "maincpu", 0 )	// 64k for 6502 code
@@ -245,4 +369,10 @@ ROM_START( mole ) // ALL ROMS ARE 2732
 ROM_END
 
 
-GAME( 1982, mole, 0, mole, mole, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1982, mole, 0, mole, mole, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", GAME_SUPPORTS_SAVE )
