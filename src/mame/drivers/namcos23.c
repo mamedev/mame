@@ -945,11 +945,6 @@ static VIDEO_UPDATE( ss23 )
 	return 0;
 }
 
-static VIDEO_UPDATE( gorgon )
-{
-	return 0;
-}
-
 static WRITE32_HANDLER( s23_txtchar_w )
 {
 	COMBINE_DATA(&namcos23_charram[offset]);
@@ -1026,7 +1021,7 @@ static READ32_HANDLER(sysctl_stat_r)
 {
 	if (offset == 1) return 0x0000ffff;	// all inputs in
 
-	return 0xffffffff;
+	return 0xfffffeff;	// gorgon wants & 0x100 clear
 }
 
 // as with System 22, we need to halt the MCU while checking shared RAM
@@ -1048,19 +1043,35 @@ static WRITE32_HANDLER( s23_mcuen_w )
 	}
 }
 
-static UINT32 gorgon_vbl = 0;
+static UINT32 gorgon_vbl;
 static READ32_HANDLER( gorgon_vbl_r )
 {
-	gorgon_vbl ^= 0xffffffff;
+	gorgon_vbl ^= 0x80008000;
 
-	return gorgon_vbl;
+	return gorgon_vbl | 0x8e0000;
+}
+
+static READ32_HANDLER( gorgon_magic_r )
+{
+	return 0xffffffff;	// must be non-zero (rapidrvr @ 8000229C)
 }
 
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	AM_RANGE(0x01000000, 0x0100003f) AM_READ( gorgon_magic_r )
 	AM_RANGE(0x02000000, 0x02000003) AM_READ( gorgon_vbl_r )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
+
+	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
+
+	AM_RANGE(0x06110000, 0x0613ffff) AM_READ(namcos23_paletteram_r) AM_WRITE(namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
+
+	AM_RANGE(0x06400000, 0x06403fff) AM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_READ(namcos23_textram_r) AM_WRITE(namcos23_textram_w) AM_BASE(&namcos23_textram)
+
+	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs?
+
 	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
@@ -1073,7 +1084,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
 	AM_RANGE(0x06800000, 0x06800fff) AM_RAM 			// text layer palette
-	AM_RANGE(0x06800000, 0x06803fff) AM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
+	AM_RANGE(0x06800000, 0x06807fff) AM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_READ(namcos23_textram_r) AM_WRITE(namcos23_textram_w) AM_BASE(&namcos23_textram)
 	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	//gamma?
@@ -1463,7 +1474,7 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_GFXDECODE(namcos23)
 
 	MDRV_VIDEO_START(ss23)
-	MDRV_VIDEO_UPDATE(gorgon)
+	MDRV_VIDEO_UPDATE(ss23)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1565,9 +1576,9 @@ ROM_START( rapidrvr )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
-	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000000, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
-        ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000001, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
+	ROM_REGION32_BE( 0x800000, "data", 0 )	/* sprite? tilemap? tiles */
+        ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000001, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
+        ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000000, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "rd1cguu.5b",   0x0000000, 0x800000, CRC(611bab41) SHA1(84cddb2b63bf8336e92aecb06eddf1b34af73540) )
@@ -1624,9 +1635,9 @@ ROM_START( finlflng )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
-	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "ff2mtal.1j",   0x000000, 0x400000, CRC(ed1a5bf2) SHA1(bd05388a125a0201a41af95fb2aa5fe1c8b0f270) )
-        ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000001, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
+	ROM_REGION32_BE( 0x800000, "data", 0 )	/* sprite? tilemap? tiles */
+        ROM_LOAD16_BYTE( "ff2mtal.1j",   0x000001, 0x400000, CRC(ed1a5bf2) SHA1(bd05388a125a0201a41af95fb2aa5fe1c8b0f270) )
+        ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000000, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ff2cguu.5b",   0x0000000, 0x400000, CRC(595deee4) SHA1(b29ff9c6ba17737f1f87c05b2d899d80b0b72dbb) )
