@@ -1072,7 +1072,6 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	state_save_register_global(machine, state->mj_last_val);
 	state_save_register_global(machine, state->hwc_input_value);
 	state_save_register_global(machine, state->atomicp_sound_divisor);
-//	state_save_register_global(machine, state->atomicp_sound_count);
 	state_save_register_global_pointer(machine, segaic16_spriteram_0, 0x00800/2);
 	state_save_register_global_pointer(machine, segaic16_paletteram,  0x01000/2);
 	state_save_register_global_pointer(machine, segaic16_tileram_0,   0x10000/2);
