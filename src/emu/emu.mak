@@ -142,6 +142,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/i2cmem.o \
 	$(EMUMACHINE)/i2cmemdev.o \
 	$(EMUMACHINE)/idectrl.o \
+	$(EMUMACHINE)/ins8154.o	\
 	$(EMUMACHINE)/intelfsh.o \
 	$(EMUMACHINE)/k033906.o \
 	$(EMUMACHINE)/k056230.o \
