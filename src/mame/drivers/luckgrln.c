@@ -78,6 +78,7 @@
 #include "video/mc6845.h"
 
 static UINT8 *luck_vram1,*luck_vram2,*luck_vram3;
+static UINT8 nmi_enable;
 
 static VIDEO_START(luckgrln)
 {
@@ -91,7 +92,7 @@ static VIDEO_UPDATE(luckgrln)
 
 	for (y=0;y<32;y++)
 	{
-		for (x=0;x<32;x++)
+		for (x=0;x<64;x++)
 		{
 			UINT16 tile = (luck_vram1[count] & 0xff) | ((luck_vram2[count] & 0x1f)<<8);
 			UINT8 col = 0;
@@ -119,20 +120,26 @@ static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_BASE(&luck_vram2)
 	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_BASE(&luck_vram3)
 
+	/* patch NMI checks until I understand. */
+	AM_RANGE(0x0faff, 0x0faff) AM_NOP
+	AM_RANGE(0x0fb02, 0x0fb02) AM_NOP
+
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-/*
 static WRITE8_HANDLER( output_w )
 {
-	printf("%02x\n",data);
+	/* correct? */
+	nmi_enable = data & 1;
+	// other values unknown
+//	printf("%02x\n",data);
 }
-*/
+
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
-//	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
+	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
 	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_register_w)
 ADDRESS_MAP_END
@@ -171,14 +178,21 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static INTERRUPT_GEN( luckgrln_irq )
+{
+	#if 0
+	if(nmi_enable)
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	#endif
+}
+
 static MACHINE_DRIVER_START( luckgrln )
 	MDRV_CPU_ADD("maincpu", Z180,8000000)
 	MDRV_CPU_PROGRAM_MAP(mainmap)
 	MDRV_CPU_IO_MAP(portmap)
-//	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", luckgrln_irq)
 
 	MDRV_MC6845_ADD("crtc", H46505, 6000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
