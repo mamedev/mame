@@ -116,44 +116,22 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8* mermaid_videoram;
-extern UINT8* mermaid_colorram;
-extern UINT8* mermaid_videoram2;
-extern UINT8* mermaid_bg_scrollram;
-extern UINT8* mermaid_fg_scrollram;
-
-WRITE8_HANDLER( mermaid_videoram2_w );
-WRITE8_HANDLER( mermaid_videoram_w );
-WRITE8_HANDLER( mermaid_colorram_w );
-WRITE8_HANDLER( mermaid_flip_screen_x_w );
-WRITE8_HANDLER( mermaid_flip_screen_y_w );
-WRITE8_HANDLER( mermaid_bg_scroll_w );
-WRITE8_HANDLER( mermaid_fg_scroll_w );
-WRITE8_HANDLER( rougien_gfxbankswitch1_w );
-WRITE8_HANDLER( rougien_gfxbankswitch2_w );
-READ8_HANDLER( mermaid_collision_r );
-
-PALETTE_INIT( mermaid );
-VIDEO_START( mermaid );
-VIDEO_UPDATE( mermaid );
-VIDEO_EOF( mermaid );
-
+#include "includes/mermaid.h"
 
 /* Read/Write Handlers */
 
-static UINT8 *mermaid_ay8910_enable;
-
 static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
 {
-	if (mermaid_ay8910_enable[0]) ay8910_data_w(devtag_get_device(space->machine, "ay1"), offset, data);
-	if (mermaid_ay8910_enable[1]) ay8910_data_w(devtag_get_device(space->machine, "ay2"), offset, data);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	if (state->ay8910_enable[0]) ay8910_data_w(state->ay1, offset, data);
+	if (state->ay8910_enable[1]) ay8910_data_w(state->ay2, offset, data);
 }
 
 static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 {
-	if (mermaid_ay8910_enable[0]) ay8910_address_w(devtag_get_device(space->machine, "ay1"), offset, data);
-	if (mermaid_ay8910_enable[1]) ay8910_address_w(devtag_get_device(space->machine, "ay2"), offset, data);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	if (state->ay8910_enable[0]) ay8910_address_w(state->ay1, offset, data);
+	if (state->ay8910_enable[1]) ay8910_address_w(state->ay2, offset, data);
 }
 
 
@@ -162,14 +140,14 @@ static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_BASE(&mermaid_videoram2)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(mermaid_videoram_w) AM_BASE(&mermaid_videoram)
-	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE(mermaid_bg_scroll_w) AM_BASE(&mermaid_bg_scrollram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_BASE(&mermaid_fg_scrollram)
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_BASE(&mermaid_colorram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_BASE_MEMBER(mermaid_state, videoram2)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(mermaid_videoram_w) AM_BASE_MEMBER(mermaid_state, videoram)
+	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE(mermaid_bg_scroll_w) AM_BASE_MEMBER(mermaid_state, bg_scrollram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_BASE_MEMBER(mermaid_state, fg_scrollram)
+	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_SIZE_MEMBER(mermaid_state, spriteram, spriteram_size)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_BASE_MEMBER(mermaid_state, colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
-	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE(&mermaid_ay8910_enable)
+	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE_MEMBER(mermaid_state, ay8910_enable)
 	AM_RANGE(0xe002, 0xe002) AM_WRITENOP	// ???
 	AM_RANGE(0xe003, 0xe003) AM_WRITENOP	// ???
 	AM_RANGE(0xe004, 0xe004) AM_WRITENOP	// ???
@@ -348,14 +326,50 @@ GFXDECODE_END
 
 /* Machine Driver */
 
+static MACHINE_START( mermaid )
+{
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->ay1 = devtag_get_device(machine, "ay1");
+	state->ay2 = devtag_get_device(machine, "ay2");
+
+	state_save_register_global(machine, state->coll_bit0);
+	state_save_register_global(machine, state->coll_bit1);
+	state_save_register_global(machine, state->coll_bit2);
+	state_save_register_global(machine, state->coll_bit3);
+	state_save_register_global(machine, state->coll_bit6);
+	state_save_register_global(machine, state->rougien_gfxbank1);
+	state_save_register_global(machine, state->rougien_gfxbank2);
+}
+
+static MACHINE_RESET( mermaid )
+{
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
+
+	state->coll_bit0 = 0;
+	state->coll_bit1 = 0;
+	state->coll_bit2 = 0;
+	state->coll_bit3 = 0;
+	state->coll_bit6 = 0;
+	state->rougien_gfxbank1 = 0;
+	state->rougien_gfxbank2 = 0;
+}
+
 static MACHINE_DRIVER_START( mermaid )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mermaid_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(mermaid_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	// video hardware
+	MDRV_MACHINE_START(mermaid)
+	MDRV_MACHINE_RESET(mermaid)
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -371,7 +385,7 @@ static MACHINE_DRIVER_START( mermaid )
 	MDRV_VIDEO_UPDATE(mermaid)
 	MDRV_VIDEO_EOF(mermaid)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
@@ -486,6 +500,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid,  0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", 0 )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn,  0, ROT0, "[Sanritsu] Esco", "Yachtsman", 0 )
-GAME( 1982, rougien,  0,        mermaid,  rougien,  0, ROT0, "Sanritsu", "Rougien", 0 )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid,  0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", GAME_SUPPORTS_SAVE )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn,  0, ROT0, "[Sanritsu] Esco", "Yachtsman", GAME_SUPPORTS_SAVE )
+GAME( 1982, rougien,  0,        mermaid,  rougien,  0, ROT0, "Sanritsu", "Rougien", GAME_SUPPORTS_SAVE )

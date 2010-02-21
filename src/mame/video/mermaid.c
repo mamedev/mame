@@ -1,29 +1,17 @@
 #include "emu.h"
+#include "includes/mermaid.h"
 
-static tilemap_t *bg_tilemap, *fg_tilemap;
-
-UINT8* mermaid_videoram;
-UINT8* mermaid_colorram;
-UINT8* mermaid_videoram2;
-UINT8* mermaid_bg_scrollram;
-UINT8* mermaid_fg_scrollram;
-
-static bitmap_t* helper;
-static bitmap_t* helper2;
-static int coll_bit0,coll_bit1,coll_bit2,coll_bit3,coll_bit6;
-
-static int rougien_gfxbank1, rougien_gfxbank2;
 
 static const rectangle spritevisiblearea =
 {
-	0*8, 26*8-1,
-	2*8, 30*8-1
+	0 * 8, 26 * 8 - 1,
+	2 * 8, 30 * 8 - 1
 };
 
 static const rectangle flip_spritevisiblearea =
 {
-	6*8, 31*8-1,
-	2*8, 30*8-1
+	6 * 8, 31 * 8 - 1,
+	2 * 8, 30 * 8 - 1
 };
 
 PALETTE_INIT( mermaid )
@@ -58,20 +46,23 @@ PALETTE_INIT( mermaid )
 
 WRITE8_HANDLER( mermaid_videoram2_w )
 {
-	mermaid_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_videoram_w )
 {
-	mermaid_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_colorram_w )
 {
-	mermaid_colorram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_flip_screen_x_w )
@@ -86,24 +77,28 @@ WRITE8_HANDLER( mermaid_flip_screen_y_w )
 
 WRITE8_HANDLER( mermaid_bg_scroll_w )
 {
-	mermaid_bg_scrollram[offset] = data;
-	tilemap_set_scrolly(bg_tilemap, offset, data);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->bg_scrollram[offset] = data;
+	tilemap_set_scrolly(state->bg_tilemap, offset, data);
 }
 
 WRITE8_HANDLER( mermaid_fg_scroll_w )
 {
-	mermaid_fg_scrollram[offset] = data;
-	tilemap_set_scrolly(fg_tilemap, offset, data);
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->fg_scrollram[offset] = data;
+	tilemap_set_scrolly(state->fg_tilemap, offset, data);
 }
 
 WRITE8_HANDLER( rougien_gfxbankswitch1_w )
 {
-	rougien_gfxbank1 = data & 0x01;
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->rougien_gfxbank1 = data & 0x01;
 }
 
 WRITE8_HANDLER( rougien_gfxbankswitch2_w )
 {
-	rougien_gfxbank2 = data & 0x01;
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	state->rougien_gfxbank2 = data & 0x01;
 }
 
 READ8_HANDLER( mermaid_collision_r )
@@ -123,20 +118,22 @@ READ8_HANDLER( mermaid_collision_r )
         Bit 7
     */
 
+	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
 	int collision = 0xff;
 
-	if(coll_bit0) collision &= 0xfe;
-	if(coll_bit1) collision &= 0xfd;
-	if(coll_bit2) collision &= 0xfb;
-	if(coll_bit3) collision &= 0xf7;
-	if(coll_bit6) collision &= 0xbf;
+	if (state->coll_bit0) collision &= 0xfe;
+	if (state->coll_bit1) collision &= 0xfd;
+	if (state->coll_bit2) collision &= 0xfb;
+	if (state->coll_bit3) collision &= 0xf7;
+	if (state->coll_bit6) collision &= 0xbf;
 
 	return collision;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = mermaid_videoram2[tile_index];
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
+	int code = state->videoram2[tile_index];
 	int sx = tile_index % 32;
 	int color = (sx >= 26) ? 0 : 1;
 
@@ -145,36 +142,40 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = mermaid_colorram[tile_index];
-	int code = mermaid_videoram[tile_index] + ((attr & 0x30) << 4);
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0x30) << 4);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	code |= rougien_gfxbank1 * 0x2800;
-	code |= rougien_gfxbank2 * 0x2400;
+	code |= state->rougien_gfxbank1 * 0x2800;
+	code |= state->rougien_gfxbank2 * 0x2400;
 
 	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( mermaid )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(bg_tilemap, 32);
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(fg_tilemap, 32);
-	tilemap_set_transparent_pen(fg_tilemap, 0);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 
-	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(state->fg_tilemap, 32);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+
+	state->helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -187,8 +188,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (sx >= 0xf0) sx -= 256;
 
-		code |= rougien_gfxbank1 * 0x2800;
-		code |= rougien_gfxbank2 * 0x2400;
+		code |= state->rougien_gfxbank1 * 0x2800;
+		code |= state->rougien_gfxbank2 * 0x2400;
 
 		if (flip_screen_x_get(machine))
 		{
@@ -209,14 +210,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( mermaid )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	mermaid_state *state = (mermaid_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
-static UINT8 collision_check(colortable_t *colortable, rectangle* rect)
+static UINT8 collision_check( running_machine *machine, rectangle* rect )
 {
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
 	UINT8 data = 0;
 
 	int x;
@@ -225,8 +229,8 @@ static UINT8 collision_check(colortable_t *colortable, rectangle* rect)
 	for (y = rect->min_y; y <= rect->max_y; y++)
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(colortable, *BITMAP_ADDR16(helper, y, x));
-			UINT16 b = colortable_entry_get_value(colortable, *BITMAP_ADDR16(helper2, y, x));
+			UINT16 a = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper, y, x));
+			UINT16 b = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper2, y, x));
 
 			if (b != 0)
 				if ((a != 0) & (a != 0x40))
@@ -238,20 +242,21 @@ static UINT8 collision_check(colortable_t *colortable, rectangle* rect)
 
 VIDEO_EOF( mermaid )
 {
+	mermaid_state *state = (mermaid_state *)machine->driver_data;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 
-	int offs,offs2;
+	int offs, offs2;
 
-	coll_bit1 = 0;
-	coll_bit2 = 0;
-	coll_bit3 = 0;
-	coll_bit6 = 0;
-	coll_bit0 = 0;
+	state->coll_bit1 = 0;
+	state->coll_bit2 = 0;
+	state->coll_bit3 = 0;
+	state->coll_bit6 = 0;
+	state->coll_bit0 = 0;
 
 	// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -266,8 +271,8 @@ VIDEO_EOF( mermaid )
 
 		if (coll != 1) continue;
 
-		code |= rougien_gfxbank1 * 0x2800;
-		code |= rougien_gfxbank2 * 0x2400;
+		code |= state->rougien_gfxbank1 * 0x2800;
+		code |= state->rougien_gfxbank2 * 0x2400;
 
 		if (flip_screen_x_get(machine))
 		{
@@ -297,32 +302,32 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - background
 
-		bitmap_fill(helper,&rect,0);
-		bitmap_fill(helper2,&rect,0);
+		bitmap_fill(state->helper, &rect, 0);
+		bitmap_fill(state->helper2, &rect, 0);
 
-		tilemap_draw(helper, &rect, bg_tilemap, 0, 0);
+		tilemap_draw(state->helper, &rect, state->bg_tilemap, 0, 0);
 
-		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-		coll_bit2 |= collision_check(machine->colortable, &rect);
+		state->coll_bit2 |= collision_check(machine, &rect);
 
 		// check collision sprite - foreground
 
-		bitmap_fill(helper,&rect,0);
-		bitmap_fill(helper2,&rect,0);
+		bitmap_fill(state->helper, &rect, 0);
+		bitmap_fill(state->helper2, &rect, 0);
 
-		tilemap_draw(helper, &rect, fg_tilemap, 0, 0);
+		tilemap_draw(state->helper, &rect, state->fg_tilemap, 0, 0);
 
-		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-		coll_bit1 |= collision_check(machine->colortable, &rect);
+		state->coll_bit1 |= collision_check(machine, &rect);
 
 		// check collision sprite - sprite
 
-		bitmap_fill(helper,&rect,0);
-		bitmap_fill(helper2,&rect,0);
+		bitmap_fill(state->helper, &rect, 0);
+		bitmap_fill(state->helper2, &rect, 0);
 
-		for (offs2 = machine->generic.spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+		for (offs2 = state->spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
 			{
 				int attr2 = spriteram[offs2 + 2];
@@ -336,8 +341,8 @@ VIDEO_EOF( mermaid )
 
 				if (coll2 != 0) continue;
 
-				code2 |= rougien_gfxbank1 * 0x2800;
-				code2 |= rougien_gfxbank2 * 0x2400;
+				code2 |= state->rougien_gfxbank1 * 0x2800;
+				code2 |= state->rougien_gfxbank2 * 0x2400;
 
 				if (flip_screen_x_get(machine))
 				{
@@ -351,17 +356,17 @@ VIDEO_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(helper, &rect,machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->helper, &rect, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-		coll_bit0 |= collision_check(machine->colortable, &rect);
+		state->coll_bit0 |= collision_check(machine, &rect);
 	}
 
 	// check for bit 3 (sprite-sprite)
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -376,8 +381,8 @@ VIDEO_EOF( mermaid )
 
 		if (coll != 2) continue;
 
-		code |= rougien_gfxbank1 * 0x2800;
-		code |= rougien_gfxbank2 * 0x2400;
+		code |= state->rougien_gfxbank1 * 0x2800;
+		code |= state->rougien_gfxbank2 * 0x2400;
 
 		if (flip_screen_x_get(machine))
 		{
@@ -407,10 +412,10 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		bitmap_fill(helper,&rect,0);
-		bitmap_fill(helper2,&rect,0);
+		bitmap_fill(state->helper, &rect, 0);
+		bitmap_fill(state->helper2, &rect, 0);
 
-		for (offs2 = machine->generic.spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+		for (offs2 = state->spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
 			{
 				int attr2 = spriteram[offs2 + 2];
@@ -424,8 +429,8 @@ VIDEO_EOF( mermaid )
 
 				if (coll2 != 0) continue;
 
-				code2 |= rougien_gfxbank1 * 0x2800;
-				code2 |= rougien_gfxbank2 * 0x2400;
+				code2 |= state->rougien_gfxbank1 * 0x2800;
+				code2 |= state->rougien_gfxbank2 * 0x2400;
 
 				if (flip_screen_x_get(machine))
 				{
@@ -439,17 +444,17 @@ VIDEO_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(helper, &rect,machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->helper, &rect, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-		coll_bit3 |= collision_check(machine->colortable, &rect);
+		state->coll_bit3 |= collision_check(machine, &rect);
 	}
 
 	// check for bit 6
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -464,8 +469,8 @@ VIDEO_EOF( mermaid )
 
 		if (coll != 1) continue;
 
-		code |= rougien_gfxbank1 * 0x2800;
-		code |= rougien_gfxbank2 * 0x2400;
+		code |= state->rougien_gfxbank1 * 0x2800;
+		code |= state->rougien_gfxbank2 * 0x2400;
 
 		if (flip_screen_x_get(machine))
 		{
@@ -495,10 +500,10 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		bitmap_fill(helper,&rect,0);
-		bitmap_fill(helper2,&rect,0);
+		bitmap_fill(state->helper, &rect, 0);
+		bitmap_fill(state->helper2, &rect, 0);
 
-		for (offs2 = machine->generic.spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+		for (offs2 = state->spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
 			{
 				int attr2 = spriteram[offs2 + 2];
@@ -512,8 +517,8 @@ VIDEO_EOF( mermaid )
 
 				if (coll2 != 2) continue;
 
-				code2 |= rougien_gfxbank1 * 0x2800;
-				code2 |= rougien_gfxbank2 * 0x2400;
+				code2 |= state->rougien_gfxbank1 * 0x2800;
+				code2 |= state->rougien_gfxbank2 * 0x2400;
 
 				if (flip_screen_x_get(machine))
 				{
@@ -527,12 +532,12 @@ VIDEO_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(helper, &rect,machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->helper, &rect, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-		coll_bit6 |= collision_check(machine->colortable, &rect);
+		state->coll_bit6 |= collision_check(machine, &rect);
 	}
 
 }
