@@ -750,6 +750,12 @@ Notes:
 #include "cpu/h83002/h8.h"
 #include "sound/c352.h"
 
+#define S23_BUSCLOCK	(66664460/2)	// 33 MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal
+#define S23_VSYNC1	(59.8824)
+#define S23_VSYNC2	(59.915)
+#define S23_HSYNC	(16666150)
+#define S23_MODECLOCK	(130205)
+
 static int ss23_vstat = 0, hstat = 0, vstate = 0;
 static tilemap_t *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram;
@@ -1030,7 +1036,7 @@ static READ32_HANDLER(sysctl_stat_r)
 // as with System 22, we need to halt the MCU while checking shared RAM
 static WRITE32_HANDLER( s23_mcuen_w )
 {
-	mame_printf_debug("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
+	logerror("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
 	if (mem_mask == 0x0000ffff)
 	{
 		if (data)
@@ -1059,11 +1065,34 @@ static READ32_HANDLER( gorgon_magic_r )
 	return 0xffffffff;	// must be non-zero (rapidrvr @ 8000229C)
 }
 
+/* 
+	Final Furlong has a bug: it forgets to halt the H8/3002 before it zeros out the shared RAM 
+	which contains the H8's stack and other working set.  This crashes MAME due to the PC going
+	off into the weeds, so we intercept
+*/
+
+static READ32_HANDLER( gorgon_sharedram_r )
+{
+	return namcos23_shared_ram[offset];
+}
+
+static WRITE32_HANDLER( gorgon_sharedram_w )
+{
+	COMBINE_DATA(&namcos23_shared_ram[offset]);
+
+	// hack for final furlong
+	if ((offset == 0x8000/4) && (data == 0) && (mem_mask == 0xff000000))
+	{
+		logerror("S23: Final Furlong hack stopping H8/3002\n");
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	}
+}
+
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
 	AM_RANGE(0x02000000, 0x02000003) AM_READ( gorgon_vbl_r )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
+	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE(&namcos23_shared_ram)
 
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
@@ -1076,7 +1105,7 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
-	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)	// write for LEDs
+	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)	AM_WRITENOP // write for LEDs at d000000, watchdog at d000004
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -1301,6 +1330,7 @@ static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// read on Gorgon, purpose unknown
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
 	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s23_mcu_portB_r, s23_mcu_portB_w )
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_mcu_iob_r, s23_mcu_iob_w )
@@ -1364,10 +1394,10 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6003) AM_RAM // inputs?
 	AM_RANGE(0x7000, 0x700f) AM_RAM	// probably actually the digital inputs, but ignore for now
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
 /*
@@ -1396,6 +1426,8 @@ static DRIVER_INIT(ss23)
 
 	if ((!strcmp(machine->gamedrv->name, "motoxgo")) || 
 	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
+	    (!strcmp(machine->gamedrv->name, "rapidrvr")) ||
+	    (!strcmp(machine->gamedrv->name, "finlflng")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2")))
 	{
 		has_jvsio = 1;
@@ -1454,23 +1486,27 @@ static const mips3_config config =
 static MACHINE_DRIVER_START( gorgon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, 133000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(gorgon_map)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
+	MDRV_CPU_IO_MAP( s23h8iomap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
+
+	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
+	MDRV_CPU_IO_MAP( s23iobrdiomap )
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 30*16-1)
+	MDRV_SCREEN_SIZE(48*16, 30*16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
 
 	MDRV_PALETTE_LENGTH(0x8000)
 
@@ -1492,28 +1528,28 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( s23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
-	MDRV_CPU_IO_MAP( s23h8iomap)
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
+	MDRV_CPU_IO_MAP( s23h8iomap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23iobrdmap)
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
 	MDRV_CPU_IO_MAP( s23iobrdiomap )
 
 	MDRV_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 30*16-1)
+	MDRV_SCREEN_SIZE(48*16, 30*16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
 
 	MDRV_PALETTE_LENGTH(0x8000)
 
@@ -1535,20 +1571,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ss23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
+	MDRV_CPU_IO_MAP( s23h8ionoiobmap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_QUANTUM_TIME(HZ(60*40000))
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*16, 30*16)
@@ -1578,6 +1614,9 @@ ROM_START( rapidrvr )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) ) 
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
         ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000001, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
@@ -1637,6 +1676,9 @@ ROM_START( finlflng )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) ) 
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
         ROM_LOAD16_BYTE( "ff2mtal.1j",   0x000001, 0x400000, CRC(ed1a5bf2) SHA1(bd05388a125a0201a41af95fb2aa5fe1c8b0f270) )
