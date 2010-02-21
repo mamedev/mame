@@ -373,7 +373,7 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 	int offs;
 	int x, y;
 	int bits = 0;
-	UINT8 color_base;
+	UINT8 color_base = 0;
 
 	if (state->game_id == MAZERBLA)
 		color_base = 0x80;	/* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
