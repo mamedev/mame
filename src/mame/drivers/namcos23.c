@@ -1105,6 +1105,8 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
+	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) // BACKUP
+
 	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)	AM_WRITENOP // write for LEDs at d000000, watchdog at d000004
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
@@ -1112,7 +1114,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x02000000, 0x02000003) AM_READ( s23_unk_r )
+	AM_RANGE(0x02000000, 0x02000003) AM_READ( s23_unk_r )	// C417 registers
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
@@ -1156,8 +1158,7 @@ static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
-	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("IN1")
-	AM_RANGE(0x300002, 0x300003) AM_READNOP //AM_READ_PORT("IN2")
+	AM_RANGE(0x300000, 0x300003) AM_NOP	// seems to be more inputs, maybe false leftover code from System 12?
 	AM_RANGE(0x300010, 0x300011) AM_NOP
 	AM_RANGE(0x300030, 0x300031) AM_WRITENOP	// timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 ADDRESS_MAP_END
@@ -1395,7 +1396,7 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
-	AM_RANGE(0x6000, 0x6003) AM_RAM // inputs?
+	AM_RANGE(0x6000, 0x6003) AM_NOP
 	AM_RANGE(0x7000, 0x700f) AM_RAM	// probably actually the digital inputs, but ignore for now
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
@@ -1509,6 +1510,8 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
 
 	MDRV_PALETTE_LENGTH(0x8000)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_GFXDECODE(namcos23)
 
