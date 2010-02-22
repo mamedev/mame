@@ -2053,8 +2053,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 				bitnr = (ext16>>4)&7;
 				if(ext16&0x80)
 				{
-					// bist
-					h8->h8err = 1;
+					h8_bist8(h8, bitnr, udata8);  H8_IFETCH_TIMING(2); H8_BYTE_TIMING(2, address24);
 				}
 				else
 				{
@@ -2065,8 +2064,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 				bitnr = (ext16>>4)&7;
 				if(ext16&0x80)
 				{
-					// bild
-					h8->h8err = 1;
+					h8_bild8(h8, bitnr, udata8);  H8_IFETCH_TIMING(2); H8_BYTE_TIMING(2, address24);
 				}
 				else
 				{
