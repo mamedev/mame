@@ -89,16 +89,48 @@ static VIDEO_UPDATE(luckgrln)
 {
 	int y,x;
 	int count = 0;
+	static int test;
+
+	if(input_code_pressed_once(screen->machine, KEYCODE_Z))
+		test++;
+
+	if(input_code_pressed_once(screen->machine, KEYCODE_X))
+		test--;
+
+	popmessage("%02x",test);
 
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<64;x++)
 		{
-			UINT16 tile = (luck_vram1[count] & 0xff) | ((luck_vram2[count] & 0x1f)<<8);
+			UINT16 tile = (luck_vram1[count] & 0xff);
+			UINT16 enc_tile = (luck_vram2[count] & 0xff) | (luck_vram3[count] << 8);
+			UINT16 dec_tile;
 			UINT8 col = 0;
+			UINT8 region = 0;
 			//UINT8 region = (luck_vram2[count] & 0x20) >> 5;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,col,0,0,x*8,y*8);
+			switch(enc_tile)
+			{
+				case 0x0ed4: dec_tile = 0x1c; break;
+				case 0x0ed5: dec_tile = 0x1d; break;
+				case 0x0ed8: dec_tile = 0x1d; break;
+				case 0x0ad8: dec_tile = 0x1d; break;
+				case 0x0a18: dec_tile = 0x11; break;
+				case 0x0a3a: dec_tile = 0x12; break; //0x12-0x13 or 0x14 (J, Q or K)
+				case 0x16d8: dec_tile = 0x00; break; //???
+				case 0x0831: dec_tile = 0x03; break; //???
+				case 0x0811: dec_tile = 0x01; break;
+				case 0x0821: dec_tile = 0x01; break; //or 0x1f
+				case 0x0840: dec_tile = 0x04; break;
+				case 0x0891: dec_tile = 0x09; break;
+				case 0x0a08: dec_tile = 0x10; break;
+				default: dec_tile = 0; break;
+			}
+
+			tile = tile|(dec_tile<<8);
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,col,0,0,x*8,y*8);
 
 			count++;
 		}
