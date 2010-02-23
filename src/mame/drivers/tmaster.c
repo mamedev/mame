@@ -1165,8 +1165,12 @@ All chips are SGS 27C801 (some kits/upgrades used mask roms)
 
 Name_Board Location        Version               Use                      Checksum
 -----------------------------------------------------------------------------------
+TM4K_v603.u51              6.03 Game Program & Cpu instructions 96B0
+TM4K_v603.u52              6.03 Game Program & Cpu instructions 2842
+
 TM4K_v602.u51              6.02 Game Program & Cpu instructions FEA0
 TM4K_v602.u52              6.02 Game Program & Cpu instructions 9A71
+
 TM4K_graphic.u36           6.0  Video Images & Graphics         54f1 (same as TM3K)
 TM4K_graphic.u37           6.0  Video Images & Graphics         609E
 TM4K_graphic.u38           6.0  Video Images & Graphics         5493 (same as TM3K)
@@ -1184,6 +1188,23 @@ xc3042A      www.xilinx.com
 ***************************************************************************/
 
 ROM_START( tm4k )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm4k_v603.u51", 0x000000, 0x100000, CRC(0c88c856) SHA1(4c60c09812ab05f9dccef3038a5ddbd4632dbf4e) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.03 (Standard 6-23-98) */
+	ROM_LOAD16_BYTE( "tm4k_v603.u52", 0x000001, 0x100000, CRC(9320bfe9) SHA1(cc3a51f439c139ca30efe28a817cf4f68679180e) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.03 (Standard 6-23-98) */
+
+	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u37", 0x200001, 0x100000, CRC(bf49fafa) SHA1(b400667bf654dc9cd01a85c8b99670459400fd60) ) /* Mask rom labeled 5341-15746-02 U37 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u41", 0x400000, 0x100000, CRC(e97edb1e) SHA1(75510676cf1692ad03efd4ccd57d25af1cc8ef2a) ) /* Mask rom labeled 5341-15746-06 U41 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u40", 0x400001, 0x100000, CRC(f6771a09) SHA1(74f71d5e910006c83a38170f24aa811c38a3e020) ) /* Mask rom labeled 5341-15746-05 U40 VIDEO IMAGE */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm4k_sound.u8", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) ) /* Mask rom labeled 5341-15746-07 U8 SOUND IMAGE */
+ROM_END
+
+ROM_START( tm4ka )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm4k_v602.u51", 0x000000, 0x100000, CRC(3d8d7848) SHA1(31638f23cdd5e6cfbb2270e953f84fe1bd437950) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.02 (Standard 4-14-98) */
 	ROM_LOAD16_BYTE( "tm4k_v602.u52", 0x000001, 0x100000, CRC(6d412871) SHA1(ae27c7723b292daf6682c53bafac22e4a3cd1ece) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.02 (Standard 4-14-98) */
@@ -1509,6 +1530,27 @@ static DRIVER_INIT( tm4k )
 	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
 
 	// protection
+	ROM[0x834ce/2] = 0x4e75;
+
+	ROM[0x8349c/2] = 0x6002;
+	ROM[0x834c4/2] = 0x6002;
+/*
+
+Protection resembles that of tm5k rather than tm4ka:
+
+ 83470: addi.w  #$384, D0       0640 0384
+ 83474: move.w  D0, $207a86.l   33C0 0020 7A86
+
+*/
+
+}
+
+
+static DRIVER_INIT( tm4ka )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+
+	// protection
 	ROM[0x83476/2] = 0x4e75;
 
 	ROM[0x8342C/2] = 0x601a;
@@ -1733,7 +1775,8 @@ GAME( 1996, tmdo,     tm,       tm,       tm,       0,        ROT0, "CES Inc., M
 GAME( 1996, tm2k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",   0 )
 GAME( 1997, tm3k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",   0 )
 GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",   0 )
-GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",   0 )
+GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",   0 )
+GAME( 1998, tm4ka,    tm4k,     tm3k,     tmaster,  tm4ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",   0 )
 GAME( 1998, tm5k,     0,        tm3k,     tmaster,  tm5k,     ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",   0 )
 GAME( 1998, tm5kca,   tm5k,     tm3k,     tmaster,  tm5kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)", 0 )
 GAME( 1998, tm5ka,    tm5k,     tm3k,     tmaster,  tm5ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",   0 )
