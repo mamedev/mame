@@ -41,7 +41,7 @@ Notes:
 
 Note MCU labeling:
 
-Bubble Bobble   KiKi KaiKai      Kick and RUN
+Bubble Bobble   KiKi KaiKai      Kick and Run
 -------------   -------------    -------------
 TAITO A78-01    TAITO A85-01     TAITO A87-01
 JPH1011P        JPH1020P         JPH1021P
@@ -57,24 +57,38 @@ PS4  J8635      PS4  J8541       PS4  J8648
 #include "sound/2203intf.h"
 #include "includes/mexico86.h"
 
-//AT
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
 static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 {
 	UINT8 result = ym2203_r(device, offset);
+
 	if (offset == 0)
 		result &= 0x7f;
+
 	return result;
 }
-//ZT
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")  				/* shared with sound cpu */
-	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&mexico86_protection_ram)  /* shared with mcu */
+	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(mexico86_state, objectram, objectram_size)
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(mexico86_state, protection_ram)  /* shared with mcu */
 	AM_RANGE(0xe900, 0xefff) AM_RAM
-	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE(&mexico86_videoram) //AT: corrected size
+	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE_MEMBER(mexico86_state, videoram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)	/* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)  		/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
@@ -91,11 +105,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mexico86_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_portA_r,mexico86_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_portB_r,mexico86_68705_portB_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("IN0") /* COIN */
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddrB_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddr_b_w)
 	AM_RANGE(0x000a, 0x000a) AM_WRITENOP    /* looks like a bug in the code, writes to */
 											/* 0x0a (=10dec) instead of 0x10 */
 	AM_RANGE(0x0010, 0x007f) AM_RAM
@@ -121,8 +135,14 @@ static ADDRESS_MAP_START( mexico86_sub_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc004, 0xc004) AM_WRITE(mexico86_sub_output_w)
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
+
 static INPUT_PORTS_START( mexico86 )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -132,7 +152,7 @@ static INPUT_PORTS_START( mexico86 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -142,7 +162,7 @@ static INPUT_PORTS_START( mexico86 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )    /* service 2 */
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -247,7 +267,7 @@ static INPUT_PORTS_START( mexico86 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kikikai )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -257,7 +277,7 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -267,7 +287,7 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -277,8 +297,7 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-//AT
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -315,7 +334,7 @@ static INPUT_PORTS_START( kikikai )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -337,7 +356,6 @@ static INPUT_PORTS_START( kikikai )
 	PORT_DIPNAME( 0x80, 0x00, "Number Match" )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//ZT
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -351,6 +369,12 @@ static INPUT_PORTS_START( kikikai )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -369,6 +393,12 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Sound interfaces
+ *
+ *************************************/
+
 static const ym2203_interface ym2203_config =
 {
 	{
@@ -383,14 +413,68 @@ static const ym2203_interface ym2203_config =
 };
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( mexico86 )
+{
+	mexico86_state *state = (mexico86_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->address);
+	state_save_register_global(machine, state->latch);
+
+	state_save_register_global(machine, state->mcu_running);
+	state_save_register_global(machine, state->mcu_initialised);
+	state_save_register_global(machine, state->coin_last);
+
+	state_save_register_global(machine, state->charbank);
+}
+
 static MACHINE_RESET( mexico86 )
 {
+	mexico86_state *state = (mexico86_state *)machine->driver_data;
+
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
 	if (devtag_get_device(machine, "sub") != NULL)
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->address = 0;
+	state->latch = 0;
+
+	state->mcu_running = 0;
+	state->mcu_initialised = 0;
+	state->coin_last = 0;
+
+	state->charbank = 0;
 }
 
 static MACHINE_DRIVER_START( mexico86 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mexico86_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
@@ -408,9 +492,9 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-							/* synchronization of the CPUs */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
+	MDRV_MACHINE_START(mexico86)
 	MDRV_MACHINE_RESET(mexico86)
 
 	/* video hardware */
@@ -466,11 +550,11 @@ static MACHINE_DRIVER_START( kikikai )
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( kikikai )
 	ROM_REGION( 0x28000, "maincpu", 0 )
@@ -622,8 +706,14 @@ ROM_START( mexico86 )
 ROM_END
 
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai,  0, ROT90, "Taito Corporation", "KiKi KaiKai", 0 )
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  0, ROT90, "bootleg", "Knight Boy", 0 )
-GAME( 1986, kicknrun, 0,        mexico86, mexico86, 0, ROT0,  "Taito Corporation", "Kick and Run (World)", 0 )
-GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, 0, ROT0,  "Taito America Corp", "Kick and Run (US)", 0 )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, 0, ROT0,  "bootleg", "Mexico 86", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1986, kikikai,  0,        kikikai,  kikikai,  0, ROT90, "Taito Corporation", "KiKi KaiKai", GAME_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  0, ROT90, "bootleg", "Knight Boy", GAME_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        mexico86, mexico86, 0, ROT0,  "Taito Corporation", "Kick and Run (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, 0, ROT0,  "Taito America Corp", "Kick and Run (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, 0, ROT0,  "bootleg", "Mexico 86", GAME_SUPPORTS_SAVE )

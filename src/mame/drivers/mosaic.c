@@ -1,34 +1,25 @@
 /***************************************************************************
 
-Mosaic (c) 1990 Space
+    Mosaic (c) 1990 Space
 
-Notes:
-- the ROM OK / RAM OK message in service mode is fake: ROM and RAM are not tested.
+    Notes:
+    - the ROM OK / RAM OK message in service mode is fake: ROM and RAM are not tested.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/2203intf.h"
-
-
-extern UINT8 *mosaic_fgvideoram;
-extern UINT8 *mosaic_bgvideoram;
-WRITE8_HANDLER( mosaic_fgvideoram_w );
-WRITE8_HANDLER( mosaic_bgvideoram_w );
-VIDEO_START( mosaic );
-VIDEO_UPDATE( mosaic );
-
-
-
-static int prot_val;
+#include "includes/mosaic.h"
 
 static WRITE8_HANDLER( protection_w )
 {
-	if ((data & 0x80) == 0)
+	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+
+	if (!BIT(data, 7))
 	{
 		/* simply increment given value */
-		prot_val = (data + 1) << 8;
+		state->prot_val = (data + 1) << 8;
 	}
 	else
 	{
@@ -43,24 +34,27 @@ static WRITE8_HANDLER( protection_w )
 			0x411f, 0x473f
 		};
 
-		prot_val = jumptable[data & 0x7f];
+		state->prot_val = jumptable[data & 0x7f];
 	}
 }
 
 static READ8_HANDLER( protection_r )
 {
-	int res = (prot_val >> 8) & 0xff;
+	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+	int res = (state->prot_val >> 8) & 0xff;
 
-	logerror("%06x: protection_r %02x\n",cpu_get_pc(space->cpu),res);
+	logerror("%06x: protection_r %02x\n", cpu_get_pc(space->cpu), res);
 
-	prot_val <<= 8;
+	state->prot_val <<= 8;
 
 	return res;
 }
 
 static WRITE8_HANDLER( gfire2_protection_w )
 {
-	logerror("%06x: protection_w %02x\n",cpu_get_pc(space->cpu),data);
+	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+
+	logerror("%06x: protection_w %02x\n", cpu_get_pc(space->cpu), data);
 
 	switch(data)
 	{
@@ -68,28 +62,29 @@ static WRITE8_HANDLER( gfire2_protection_w )
 			/* written repeatedly; no effect?? */
 			break;
 		case 0x02:
-			prot_val = 0x0a10;
+			state->prot_val = 0x0a10;
 			break;
 		case 0x04:
-			prot_val = 0x0a15;
+			state->prot_val = 0x0a15;
 			break;
 		case 0x06:
-			prot_val = 0x80e3;
+			state->prot_val = 0x80e3;
 			break;
 		case 0x08:
-			prot_val = 0x0965;
+			state->prot_val = 0x0965;
 			break;
 		case 0x0a:
-			prot_val = 0x04b4;
+			state->prot_val = 0x04b4;
 			break;
 	}
 }
 
 static READ8_HANDLER( gfire2_protection_r )
 {
-	int res = prot_val & 0xff;
+	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+	int res = state->prot_val & 0xff;
 
-	prot_val >>= 8;
+	state->prot_val >>= 8;
 
 	return res;
 }
@@ -99,16 +94,16 @@ static READ8_HANDLER( gfire2_protection_r )
 static ADDRESS_MAP_START( mosaic_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x20000, 0x21fff) AM_RAM
-	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE(&mosaic_bgvideoram)
-	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE(&mosaic_fgvideoram)
+	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE_MEMBER(mosaic_state, bgvideoram)
+	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE_MEMBER(mosaic_state, fgvideoram)
 	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gfire2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
-	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE(&mosaic_bgvideoram)
-	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE(&mosaic_fgvideoram)
+	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE_MEMBER(mosaic_state, bgvideoram)
+	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE_MEMBER(mosaic_state, fgvideoram)
 	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -258,11 +253,33 @@ static const ym2203_interface ym2203_config =
 
 
 
+static MACHINE_START( mosaic )
+{
+	mosaic_state *state = (mosaic_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->prot_val);
+}
+
+static MACHINE_RESET( mosaic )
+{
+	mosaic_state *state = (mosaic_state *)machine->driver_data;
+
+	state->prot_val = 0;
+}
+
 static MACHINE_DRIVER_START( mosaic )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mosaic_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, 7000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mosaic_map)
 	MDRV_CPU_IO_MAP(mosaic_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(mosaic)
+	MDRV_MACHINE_RESET(mosaic)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

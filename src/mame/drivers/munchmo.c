@@ -28,58 +28,62 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *mnchmobl_vreg;
-extern UINT8 *mnchmobl_status_vram;
-extern UINT8 *mnchmobl_sprite_xpos;
-extern UINT8 *mnchmobl_sprite_attr;
-extern UINT8 *mnchmobl_sprite_tile;
-
-PALETTE_INIT( mnchmobl );
-VIDEO_START( mnchmobl );
-WRITE8_HANDLER( mnchmobl_palette_bank_w );
-WRITE8_HANDLER( mnchmobl_flipscreen_w );
-VIDEO_UPDATE( mnchmobl );
+#include "includes/munchmo.h"
 
 
-/***************************************************************************/
-
-static int mnchmobl_nmi_enable = 0;
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static WRITE8_HANDLER( mnchmobl_nmi_enable_w )
 {
-	mnchmobl_nmi_enable = data;
+	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	state->nmi_enable = data;
 }
 
 static INTERRUPT_GEN( mnchmobl_interrupt )
 {
-	static int which;
-	which = !which;
-	if( which ) cpu_set_input_line(device, 0, HOLD_LINE);
-	else if( mnchmobl_nmi_enable ) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	munchmo_state *state = (munchmo_state *)device->machine->driver_data;
+	state->which = !state->which;
+
+	if (state->which) 
+		cpu_set_input_line(device, 0, HOLD_LINE);
+	else if (state->nmi_enable) 
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
-	soundlatch_w( space, offset, data );
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE );
+	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&mnchmobl_sprite_xpos)
-	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&mnchmobl_sprite_tile)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&mnchmobl_sprite_attr)
-	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_xpos)
+	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_tile)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_attr)
+	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(munchmo_state, videoram)
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
-	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE(&mnchmobl_status_vram)
+	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE_MEMBER(munchmo_state, status_vram)
 	AM_RANGE(0xbe00, 0xbe00) AM_WRITE(mnchmobl_soundlatch_w)
 	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(mnchmobl_palette_bank_w)
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
@@ -89,7 +93,7 @@ static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(mnchmobl_flipscreen_w)
 	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(mnchmobl_nmi_enable_w) /* ENI 1-10C */
-	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE(&mnchmobl_vreg) /* MY0 1-8C */
+	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE_MEMBER(munchmo_state, vreg) /* MY0 1-8C */
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xbf02, 0xbf02) AM_READ_PORT("P1")
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
@@ -108,6 +112,12 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mnchmobl )
 	PORT_START("SYSTEM")
@@ -199,6 +209,12 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout char_layout =
 {
 	8,8,
@@ -268,7 +284,39 @@ static GFXDECODE_START( mnchmobl )
 	GFXDECODE_ENTRY( "gfx4", 0,      sprite_layout2, 128, 16 )	/* colors 128-255 */
 GFXDECODE_END
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( munchmo )
+{
+	munchmo_state *state = (munchmo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->nmi_enable);
+	state_save_register_global(machine, state->which);
+}
+
+static MACHINE_RESET( munchmo )
+{
+	munchmo_state *state = (munchmo_state *)machine->driver_data;
+
+	state->palette_bank = 0;
+	state->flipscreen = 0;
+	state->nmi_enable = 0;
+	state->which = 0;
+}
+
 static MACHINE_DRIVER_START( mnchmobl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(munchmo_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
@@ -278,6 +326,9 @@ static MACHINE_DRIVER_START( mnchmobl )
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_assert)
+
+	MDRV_MACHINE_START(munchmo)
+	MDRV_MACHINE_RESET(munchmo)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -305,6 +356,12 @@ static MACHINE_DRIVER_START( mnchmobl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( joyfulr )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA */
@@ -363,5 +420,11 @@ ROM_START( mnchmobl )
 ROM_END
 
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

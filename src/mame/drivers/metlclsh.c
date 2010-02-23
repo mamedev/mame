@@ -36,20 +36,8 @@ metlclsh:
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "includes/metlclsh.h"
 
-/* Variables defined in video: */
-
-extern UINT8 *metlclsh_bgram, *metlclsh_fgram, *metlclsh_scrollx;
-
-/* Functions defined in video: */
-
-WRITE8_HANDLER( metlclsh_bgram_w );
-WRITE8_HANDLER( metlclsh_fgram_w );
-WRITE8_HANDLER( metlclsh_gfxbank_w );
-WRITE8_HANDLER( metlclsh_rambank_w );
-
-VIDEO_START( metlclsh );
-VIDEO_UPDATE( metlclsh );
 
 /***************************************************************************
 
@@ -59,12 +47,14 @@ VIDEO_UPDATE( metlclsh );
 
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
-	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
+	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -81,9 +71,9 @@ static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 /**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 /**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
-/**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_BASE(&metlclsh_fgram)
+/**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_BASE_MEMBER(metlclsh_state, fgram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_w	)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(metlclsh_state, spriteram, spriteram_size)
 	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
 ADDRESS_MAP_END
 
@@ -96,17 +86,20 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
-	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
+	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
@@ -123,10 +116,10 @@ static ADDRESS_MAP_START( metlclsh_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)			// cause nmi on cpu #1
 	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)			// irq ack
-	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_BASE(&metlclsh_bgram) // this is banked
+	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_BASE_MEMBER(metlclsh_state, bgram) // this is banked
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
-	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE(&metlclsh_scrollx)
+	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE_MEMBER(metlclsh_state, scrollx)
 //  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
 //  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)			// nmi ack
@@ -167,22 +160,22 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")		/* c001 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1			)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2			)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1			)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2			)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN2")		/* c002 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1			) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2			) PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 
@@ -262,7 +255,8 @@ GFXDECODE_END
 
 static void metlclsh_irqhandler(running_device *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, linestate);
+	metlclsh_state *state = (metlclsh_state *)device->machine->driver_data;
+	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -279,12 +273,31 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
+static MACHINE_START( metlclsh )
+{
+	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global(machine, state->write_mask);
+	state_save_register_global(machine, state->gfxbank);
+}
+
 static MACHINE_RESET( metlclsh )
 {
+	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
+
 	flip_screen_set(machine, 0);
+
+	state->write_mask = 0;
+	state->gfxbank = 0;
 }
 
 static MACHINE_DRIVER_START( metlclsh )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(metlclsh_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        // ?
@@ -296,6 +309,7 @@ static MACHINE_DRIVER_START( metlclsh )
 	MDRV_CPU_VBLANK_INT_HACK(metlclsh_interrupt2,2)
 	// IRQ by cpu #1, NMI by coins insertion
 
+	MDRV_MACHINE_START(metlclsh)
 	MDRV_MACHINE_RESET(metlclsh)
 
 	/* video hardware */
@@ -430,4 +444,4 @@ ROM_START( metlclsh )
 	ROM_LOAD( "82s123.prm",   0x0000, 0x20, CRC(6844cc88) SHA1(89d23367aa6ff541205416e82781fe938dfeeb52) )
 ROM_END
 
-GAME( 1985, metlclsh, 0, metlclsh, metlclsh, 0, ROT0, "Data East", "Metal Clash (Japan)", 0 )
+GAME( 1985, metlclsh, 0, metlclsh, metlclsh, 0, ROT0, "Data East", "Metal Clash (Japan)", GAME_SUPPORTS_SAVE )

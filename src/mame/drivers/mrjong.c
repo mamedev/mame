@@ -1,15 +1,16 @@
 /***************************************************************************
 
-Mr.Jong
-(c)1983 Kiwako (This game is distributed by Sanritsu.)
+    Mr. Jong
+    (c)1983 Kiwako (This game is distributed by Sanritsu.)
 
-Crazy Blocks
-(c)1983 Kiwako/ECI
+    Crazy Blocks
+    (c)1983 Kiwako/ECI
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 2000/03/20 -
+    Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 2000/03/20 -
 
-Block Buster
-(c)1983 Kiwako/ECI
+    Block Buster
+    (c)1983 Kiwako/ECI
+
 
 PCB Layout
 ----------
@@ -45,32 +46,14 @@ ROMs 6A, 7A, 8A, 9A: 2764
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "includes/mrjong.h"
 
 
-extern UINT8 *mrjong_videoram;
-extern UINT8 *mrjong_colorram;
-
-extern WRITE8_HANDLER( mrjong_videoram_w );
-extern WRITE8_HANDLER( mrjong_colorram_w );
-extern WRITE8_HANDLER( mrjong_flipscreen_w );
-
-extern PALETTE_INIT( mrjong );
-extern VIDEO_START( mrjong );
-extern VIDEO_UPDATE( mrjong );
-
-
-static ADDRESS_MAP_START( mrjong_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE(&mrjong_videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE(&mrjong_colorram)
-ADDRESS_MAP_END
-
-static WRITE8_HANDLER( io_0x00_w )
-{
-	mrjong_flipscreen_w(space, 0, ((data & 0x04) > 2));
-}
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static READ8_HANDLER( io_0x03_r )
 {
@@ -78,13 +61,33 @@ static READ8_HANDLER( io_0x03_r )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( mrjong_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE_MEMBER(mrjong_state, videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE_MEMBER(mrjong_state, colorram)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( mrjong_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE(io_0x00_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE(mrjong_flipscreen_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0x03, 0x03) AM_READ(io_0x03_r)		// Unknown
 ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mrjong )
 	PORT_START("P2")
@@ -133,6 +136,12 @@ static INPUT_PORTS_START( mrjong )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout tilelayout =
 {
 	8, 8,				/* 8*8 characters */
@@ -163,7 +172,16 @@ static GFXDECODE_START( mrjong )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( mrjong )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mrjong_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,15468000/6)	/* 2.578 MHz?? */
@@ -189,19 +207,19 @@ static MACHINE_DRIVER_START( mrjong )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-   MDRV_SOUND_ADD("sn1", SN76489, 15468000/6)
+	MDRV_SOUND_ADD("sn1", SN76489, 15468000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-   MDRV_SOUND_ADD("sn2", SN76489, 15468000/6)
+	MDRV_SOUND_ADD("sn2", SN76489, 15468000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( mrjong )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* code */
@@ -251,7 +269,12 @@ ROM_START( blkbustr )
 	ROM_LOAD( "clr.g5", 0x0020, 0x0100, CRC(bcb1e2e3) SHA1(c09731836a9d4e50316a84b86f61b599a1ef944d) )
 ROM_END
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", 0 )
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", 0 )
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
+GAME( 1983, mrjong,   0,      mrjong, mrjong, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", GAME_SUPPORTS_SAVE )
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", GAME_SUPPORTS_SAVE )

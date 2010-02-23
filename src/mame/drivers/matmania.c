@@ -39,53 +39,66 @@ The driver has been updated accordingly.
 #include "sound/3526intf.h"
 #include "includes/matmania.h"
 
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
 static WRITE8_HANDLER( matmania_sh_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	matmania_state *state = (matmania_state *)space->machine->driver_data;
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
+	matmania_state *state = (matmania_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( matmania_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&matmania_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(&matmania_videoram) AM_SIZE(&matmania_videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE(&matmania_colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(&matmania_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(&matmania_pageselect)
+	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE_SIZE_MEMBER(matmania_state, spriteram, spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, videoram2, videoram2_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(matmania_state, colorram2)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, videoram, videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE_MEMBER(matmania_state, colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, videoram3, videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE_MEMBER(matmania_state, colorram3)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(matmania_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(&matmania_scroll)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, scroll)
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP /* ?? */
-	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE_MEMBER(matmania_state, paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&matmania_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(&matmania_videoram) AM_SIZE(&matmania_videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE(&matmania_colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(&matmania_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(&matmania_pageselect)
+	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, spriteram, spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, videoram2, videoram2_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(matmania_state, colorram2)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, videoram, videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE_MEMBER(matmania_state, colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, videoram3, videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE_MEMBER(matmania_state, colorram3)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(&matmania_scroll)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, scroll)
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP	/* ?? */
 	AM_RANGE(0x3040, 0x3040) AM_READWRITE(maniach_mcu_r,maniach_mcu_w)
 	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
-	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE_MEMBER(matmania_state, paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -110,16 +123,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_portA_r,maniach_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_portB_r,maniach_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(maniach_68705_portC_r,maniach_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(maniach_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(maniach_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(maniach_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_port_a_r,maniach_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_port_b_r,maniach_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(maniach_68705_port_c_r,maniach_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(maniach_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(maniach_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(maniach_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( matmania )
 	PORT_START("IN0")
@@ -190,6 +209,12 @@ static INPUT_PORTS_START( maniach )
 	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -268,7 +293,25 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( matmania )
+{
+	matmania_state *state = (matmania_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+}
+
 static MACHINE_DRIVER_START( matmania )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(matmania_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
@@ -280,6 +323,8 @@ static MACHINE_DRIVER_START( matmania )
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(matmania)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -314,7 +359,8 @@ MACHINE_DRIVER_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_device *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, linestate);
+	matmania_state *state = (matmania_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 1, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -323,7 +369,50 @@ static const ym3526_interface ym3526_config =
 };
 
 
+static MACHINE_START( maniach )
+{
+	matmania_state *state = (matmania_state *)machine->driver_data;
+
+	MACHINE_START_CALL(matmania);
+
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->port_c_in);
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+}
+
+static MACHINE_RESET( maniach )
+{
+	matmania_state *state = (matmania_state *)machine->driver_data;
+
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->port_c_in = 0;
+	state->port_c_out = 0;
+	state->ddr_c = 0;
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->from_main = 0;
+	state->from_mcu = 0;
+}
+
 static MACHINE_DRIVER_START( maniach )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(matmania_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
@@ -338,6 +427,9 @@ static MACHINE_DRIVER_START( maniach )
 	MDRV_CPU_PROGRAM_MAP(maniach_mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
+
+	MDRV_MACHINE_START(maniach)
+	MDRV_MACHINE_RESET(maniach)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -365,11 +457,11 @@ static MACHINE_DRIVER_START( maniach )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
-/***************************************************************************
-
-  Mat Mania driver
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( matmania )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -593,7 +685,13 @@ ROM_END
 
 
 
-GAME( 1985, matmania, 0,        matmania, matmania, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", 0 )
-GAME( 1985, excthour, matmania, matmania, maniach,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", 0 )
-GAME( 1986, maniach,  0,        maniach,  maniach,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", 0 )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)" , 0)	/* earlier version? */
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1985, matmania, 0,        matmania, matmania, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", GAME_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", GAME_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE )	/* earlier version? */

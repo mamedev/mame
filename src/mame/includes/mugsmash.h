@@ -1,3 +1,4 @@
+
 typedef struct _mugsmash_state mugsmash_state;
 struct _mugsmash_state
 {
@@ -6,8 +7,12 @@ struct _mugsmash_state
 	UINT16 *spriteram;
 	UINT16 *regs1;
 	UINT16 *regs2;
+
 	tilemap_t *tilemap1;
 	tilemap_t *tilemap2;
+
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 
