@@ -2773,9 +2773,10 @@ V-V                           TP-027
 	DRIVER( xmcota )	/* 05/01/1995 (c) 1994 (Euro) */
 	DRIVER( xmcotau )	/* 05/01/1995 (c) 1994 (US) */
 	DRIVER( xmcotah )	/* 31/03/1995 (c) 1994 (Hispanic) */
-	DRIVER( xmcotaj )	/* 22/12/1994 (c) 1994 (Japan) */
-	DRIVER( xmcotaj1 )	/* 19/12/1994 (c) 1994 (Japan) */
-	DRIVER( xmcotaj2 )	/* 17/12/1994 (c) 1994 (Japan) */
+	DRIVER( xmcotaj )	/* 05/01/1995 (c) 1994 (Japan) */
+	DRIVER( xmcotaj1 )	/* 22/12/1994 (c) 1994 (Japan) */
+	DRIVER( xmcotaj2 )	/* 19/12/1994 (c) 1994 (Japan) */
+	DRIVER( xmcotaj3 )	/* 17/12/1994 (c) 1994 (Japan) */
 	DRIVER( xmcotaa )	/* 17/12/1994 (c) 1994 (Asia) */
 	DRIVER( xmcotajr )	/* 08/12/1994 (c) 1994 (Japan Rent) */
 	DRIVER( nwarr )		/* 16/03/1995 (c) 1995 (Euro) */
@@ -5337,6 +5338,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( battlnts )	/* GX777 (c) 1987 */
 	DRIVER( battlntsj )	/* GX777 (c) 1987 (Japan) */
 	DRIVER( bladestl )	/* GX797 (c) 1987 */
+	DRIVER( bladestll )	/* GX797 (c) 1987 */
 	DRIVER( bladestle )	/* GX797 (c) 1987 */
 	DRIVER( hcastle )	/* GX768 (c) 1988 */
 	DRIVER( hcastleo )	/* GX768 (c) 1988 */
@@ -8129,6 +8131,7 @@ Other Sun games
 	DRIVER( janptr96 )	/* 1996 Dynax */
 	DRIVER( sprtmtch )	/* "31" (c) 1989 Dynax + Fabtek license */
 	DRIVER( maya )		/* (c) 1994 Promat */
+	DRIVER( mayaa )		/* (c) 1994 Promat */
 	DRIVER( inca )		/* (c) 199? ???? */
 	DRIVER( blktouch )	/* (c) Yang Gi Co Ltd. */
 	DRIVER( mcnpshnt )	/* "33" Mahjong Campus Hunting 1990 Dynax */
