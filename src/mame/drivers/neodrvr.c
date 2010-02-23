@@ -7901,7 +7901,7 @@ GAME( 1996, aof3,      neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Art
 GAME( 1996, aof3k,     aof3,     neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Art of Fighting 3 - The Path of the Warrior (Korean release)", GAME_SUPPORTS_SAVE ) // no Japanese title / mode
 GAME( 1996, kof96,     neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '96 (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1996, kof96h,    kof96,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '96 (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1996, ssideki4,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero, The", GAME_SUPPORTS_SAVE )
+GAME( 1996, ssideki4,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero", GAME_SUPPORTS_SAVE )
 GAME( 1996, kizuna,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", GAME_SUPPORTS_SAVE )
 GAME( 1996, samsho4,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin", GAME_SUPPORTS_SAVE )
 GAME( 1996, samsho4k,  samsho4,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)", GAME_SUPPORTS_SAVE )
@@ -7910,8 +7910,8 @@ GAME( 1997, kof97,     neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The
 GAME( 1997, kof97h,    kof97,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1997, kof97pls,  kof97,    neogeo,   neogeo,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1997, kog,       kof97,    neogeo,   kog,      kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // protected bootleg
-GAME( 1997, lastblad,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1997, lastbladh, lastblad, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1997, lastblad,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1997, lastbladh, lastblad, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1997, lastsold,  lastblad, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", GAME_SUPPORTS_SAVE )
 GAME( 1997, irrmaze,   neogeo,   neogeo,   irrmaze,  neogeo,   ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", GAME_SUPPORTS_SAVE )
 GAME( 1998, rbff2,     neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 1)", GAME_SUPPORTS_SAVE )
@@ -7921,7 +7921,7 @@ GAME( 1998, mslug2,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Met
 GAME( 1998, kof98,     neogeo,   neogeo,   neogeo,   kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends", GAME_SUPPORTS_SAVE )
 GAME( 1998, kof98k,    kof98,    neogeo,   neogeo,   kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board)", GAME_SUPPORTS_SAVE )
 GAME( 1998, kof98n,    kof98,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1998, lastbld2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi, The", GAME_SUPPORTS_SAVE )
+GAME( 1998, lastbld2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi", GAME_SUPPORTS_SAVE )
 GAME( 1998, neocup98,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Neo-Geo Cup '98 - The Road to the Victory", GAME_SUPPORTS_SAVE )
 GAME( 1999, mslugx,    neogeo,   neogeo,   neogeo,   mslugx,   ROT0, "SNK", "Metal Slug X - Super Vehicle-001", GAME_SUPPORTS_SAVE )
 GAME( 1999, kof99,     neogeo,   neogeo,   neogeo,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (set 1)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
