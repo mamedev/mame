@@ -1468,19 +1468,19 @@ static const samples_interface suna8_samples_interface =
 static MACHINE_DRIVER_START( hardhead )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)			/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hardhead_map)
 	MDRV_CPU_IO_MAP(hardhead_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* No NMI */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)		/* No NMI */
 
-	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		/* No NMI */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.10)  /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -1495,11 +1495,11 @@ static MACHINE_DRIVER_START( hardhead )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)		/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
