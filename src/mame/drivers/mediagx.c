@@ -1000,7 +1000,7 @@ static PIC8259_SET_INT_LINE( mediagx_pic8259_1_set_int_line )
 
 static PIC8259_SET_INT_LINE( mediagx_pic8259_2_set_int_line )
 {
-	pic8259_set_irq_line( mediagx_devices.pic8259_1, 2, interrupt);
+	pic8259_ir2_w(mediagx_devices.pic8259_1, interrupt);
 }
 
 
@@ -1022,7 +1022,7 @@ static const struct pic8259_interface mediagx_pic8259_2_config = {
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	pic8259_set_irq_line( mediagx_devices.pic8259_1, 0, state);
+	pic8259_ir0_w(mediagx_devices.pic8259_1, state);
 }
 
 
@@ -1102,12 +1102,12 @@ static void set_gate_a20(running_machine *machine, int a20)
 
 static void keyboard_interrupt(running_machine *machine, int state)
 {
-	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
+	pic8259_ir1_w(mediagx_devices.pic8259_1, state);
 }
 
 static void ide_interrupt(running_device *device, int state)
 {
-	pic8259_set_irq_line(mediagx_devices.pic8259_2, 6, state);
+	pic8259_ir6_w(mediagx_devices.pic8259_2, state);
 }
 
 static int mediagx_get_out2(running_machine *machine)
@@ -1122,7 +1122,7 @@ static const struct kbdc8042_interface at8042 =
 
 static void mediagx_set_keyb_int(running_machine *machine, int state)
 {
-	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
+	pic8259_ir1_w(mediagx_devices.pic8259_1, state);
 }
 
 static void init_mediagx(running_machine *machine)

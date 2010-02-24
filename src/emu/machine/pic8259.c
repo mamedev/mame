@@ -119,7 +119,7 @@ INLINE void pic8259_set_timer(pic8259_t *pic8259)
 }
 
 
-void pic8259_set_irq_line(running_device *device, int irq, int state)
+static void pic8259_set_irq_line(running_device *device, int irq, int state)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
 	UINT8		old_irq_lines = pic8259->irq_lines;
@@ -149,7 +149,14 @@ void pic8259_set_irq_line(running_device *device, int irq, int state)
 	pic8259_set_timer(pic8259);
 }
 
-
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir0_w ) { pic8259_set_irq_line(device, 0, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir1_w ) { pic8259_set_irq_line(device, 1, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir2_w ) { pic8259_set_irq_line(device, 2, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir3_w ) { pic8259_set_irq_line(device, 3, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir4_w ) { pic8259_set_irq_line(device, 4, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir5_w ) { pic8259_set_irq_line(device, 5, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir6_w ) { pic8259_set_irq_line(device, 6, state); }
+WRITE_LINE_DEVICE_HANDLER( pic8259_ir7_w ) { pic8259_set_irq_line(device, 7, state); }
 
 int pic8259_acknowledge(running_device *device)
 {

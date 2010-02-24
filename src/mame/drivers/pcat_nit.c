@@ -305,7 +305,7 @@ static const struct pic8259_interface pic8259_1_config = {
 
 static PIC8259_SET_INT_LINE( pic8259_2_set_int_line )
 {
-	pic8259_set_irq_line( streetg2_devices.pic8259_1, 2, interrupt);
+	pic8259_ir2_w(streetg2_devices.pic8259_1, interrupt);
 }
 
 static const struct pic8259_interface pic8259_2_config = {
@@ -327,7 +327,7 @@ static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 {
 	if ( streetg2_devices.pic8259_1 )
 	{
-		pic8259_set_irq_line(streetg2_devices.pic8259_1, 0, state);
+		pic8259_ir0_w(streetg2_devices.pic8259_1, state);
 	}
 }
 
@@ -532,7 +532,7 @@ static PALETTE_INIT(pcat_286)
 
 static void streetg2_set_keyb_int(running_machine *machine, int state)
 {
-	pic8259_set_irq_line(streetg2_devices.pic8259_1, 1, state);
+	pic8259_ir1_w(streetg2_devices.pic8259_1, state);
 }
 
 

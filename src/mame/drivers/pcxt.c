@@ -396,7 +396,7 @@ Pit8253
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-    pic8259_set_irq_line(filetto_devices.pic8259_1, 0, state);
+	pic8259_ir0_w(filetto_devices.pic8259_1, state);
 }
 
 static const struct pit8253_config pc_pit8253_config =
@@ -653,7 +653,7 @@ static const struct pic8259_interface pic8259_1_config = {
 };
 
 static PIC8259_SET_INT_LINE( pic8259_2_set_int_line ) {
-	pic8259_set_irq_line( filetto_devices.pic8259_1, 2, interrupt);
+	pic8259_ir2_w(filetto_devices.pic8259_1, interrupt);
 }
 
 static const struct pic8259_interface pic8259_2_config = {

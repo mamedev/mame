@@ -113,7 +113,7 @@ static PIC8259_SET_INT_LINE( quakeat_pic8259_1_set_int_line )
 
 static PIC8259_SET_INT_LINE( quakeat_pic8259_2_set_int_line )
 {
-	pic8259_set_irq_line( quakeat_devices.pic8259_1, 2, interrupt);
+	pic8259_ir2_w(quakeat_devices.pic8259_1, interrupt);
 }
 
 
