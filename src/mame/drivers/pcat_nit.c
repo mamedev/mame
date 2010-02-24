@@ -294,22 +294,19 @@ static I8237_INTERFACE( dma8237_2_config )
 8259 IRQ controller
 ******************/
 
-static PIC8259_SET_INT_LINE( pic8259_1_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct pic8259_interface pic8259_1_config = {
-	pic8259_1_set_int_line
+static const struct pic8259_interface pic8259_1_config =
+{
+	DEVCB_LINE(pic8259_1_set_int_line)
 };
 
-static PIC8259_SET_INT_LINE( pic8259_2_set_int_line )
+static const struct pic8259_interface pic8259_2_config =
 {
-	pic8259_ir2_w(streetg2_devices.pic8259_1, interrupt);
-}
-
-static const struct pic8259_interface pic8259_2_config = {
-	pic8259_2_set_int_line
+	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w)
 };
 
 static IRQ_CALLBACK(irq_callback)

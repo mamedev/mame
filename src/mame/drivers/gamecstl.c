@@ -615,25 +615,19 @@ static MACHINE_RESET(gamecstl)
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( gamecstl_pic8259_1_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( gamecstl_pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-
-static PIC8259_SET_INT_LINE( gamecstl_pic8259_2_set_int_line )
+static const struct pic8259_interface gamecstl_pic8259_1_config =
 {
-	pic8259_ir2_w(gamecstl_devices.pic8259_1, interrupt);
-}
-
-
-static const struct pic8259_interface gamecstl_pic8259_1_config = {
-	gamecstl_pic8259_1_set_int_line
+	DEVCB_LINE(gamecstl_pic8259_1_set_int_line)
 };
 
-
-static const struct pic8259_interface gamecstl_pic8259_2_config = {
-	gamecstl_pic8259_2_set_int_line
+static const struct pic8259_interface gamecstl_pic8259_2_config =
+{
+	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w)
 };
 
 

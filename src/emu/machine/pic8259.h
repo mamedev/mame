@@ -25,19 +25,18 @@
 #ifndef __PIC8259_H__
 #define __PIC8259_H__
 
+#include "devcb.h"
+
 #define PIC8259	DEVICE_GET_INFO_NAME(pic8259)
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*pic8259_set_int_line_func)(running_device *device, int interrupt);
-#define PIC8259_SET_INT_LINE(name)	void name(running_device *device, int interrupt)
-
-
-struct pic8259_interface {
+struct pic8259_interface
+{
 	/* Called when int line changes */
-	pic8259_set_int_line_func	set_int_line;
+	devcb_write_line out_int_func;
 };
 
 

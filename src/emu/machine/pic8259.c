@@ -33,7 +33,7 @@ typedef struct pic8259	pic8259_t;
 
 struct pic8259
 {
-	const struct pic8259_interface	*intf;
+	devcb_resolved_write_line out_int_func;
 
 	emu_timer *timer;
 
@@ -103,13 +103,13 @@ static TIMER_CALLBACK( pic8259_timerproc )
 		{
 			if (LOG_GENERAL)
 				logerror("pic8259_timerproc(): PIC triggering IRQ #%d\n", irq);
-			if ( ! ( pic8259->ocw3 & 0x04 ) && pic8259->intf->set_int_line)
-				pic8259->intf->set_int_line(device, 1);
+			if (!BIT(pic8259->ocw3, 2))
+				devcb_call_write_line(&pic8259->out_int_func, 1);
 			return;
 		}
 	}
-	if ( ! ( pic8259->ocw3 & 0x04 ) && pic8259->intf->set_int_line)
-		pic8259->intf->set_int_line(device, 0);
+	if (!BIT(pic8259->ocw3, 2))
+		devcb_call_write_line(&pic8259->out_int_func, 0);
 }
 
 
@@ -398,12 +398,17 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 
 
 
-static DEVICE_START( pic8259 ) {
+static DEVICE_START( pic8259 )
+{
 	pic8259_t	*pic8259 = get_safe_token(device);
+	const struct pic8259_interface *intf = (const struct pic8259_interface *)device->baseconfig().static_config;
 
-	pic8259->intf = (const struct pic8259_interface *)device->baseconfig().static_config;
+	assert(intf != NULL);
 
 	pic8259->timer = timer_alloc( device->machine, pic8259_timerproc, (void *)device );
+
+	/* resolve callbacks */
+	devcb_resolve_write_line(&pic8259->out_int_func, &intf->out_int_func, device);
 }
 
 
