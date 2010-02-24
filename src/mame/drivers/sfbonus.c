@@ -5026,15 +5026,34 @@ ROM_START( bugfever )
 	ROM_LOAD( "bfd17r.bin", 0x00000, 0x80000, CRC(6fc33307) SHA1(fdb10bd3e463cac2f9050d2d37fdfba9ccee91dc) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, CRC(d0e7ee66) SHA1(3dd08bbe31b8170df5206be454db4993dd186a16) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, CRC(c571591e) SHA1(3233cc9a0f094911f89a0a0d56a28c24d1502e63) )
+	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, CRC(ed7080a5) SHA1(d198019788f5fd70680296a9c2bab17a27589998) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, CRC(a2697da1) SHA1(2a3b03c7d02225ae8ce98b65face6554c37172d5) )
+	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, CRC(28d6810b) SHA1(f446710b34db5bec97f81af0ca83e6b4f1a5ec46) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "bf17re.id", 0x00, 0x20, CRC(a482948d) SHA1(62b802e4906ebb00b2584bb0562a64e9a30aa6ed) )
+ROM_END
+
+ROM_START( bugfevero )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "bfd16r.bin", 0x00000, 0x80000, CRC(3ef176c7) SHA1(d1886ebe89fffd14b93f594ed494084094aa3f49) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, CRC(d0e7ee66) SHA1(3dd08bbe31b8170df5206be454db4993dd186a16) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, CRC(c571591e) SHA1(3233cc9a0f094911f89a0a0d56a28c24d1502e63) )
+	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, CRC(ed7080a5) SHA1(d198019788f5fd70680296a9c2bab17a27589998) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, CRC(a2697da1) SHA1(2a3b03c7d02225ae8ce98b65face6554c37172d5) )
+	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, CRC(28d6810b) SHA1(f446710b34db5bec97f81af0ca83e6b4f1a5ec46) )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "bf17re.id", 0x00, 0x20, CRC(a482948d) SHA1(62b802e4906ebb00b2584bb0562a64e9a30aa6ed) )
@@ -5045,15 +5064,15 @@ ROM_START( bugfeverd )
 	ROM_LOAD( "bfd17e.bin", 0x00000, 0x80000, CRC(35324195) SHA1(ad290912556f4ddbc33667b3bce5d05f321870d0) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, CRC(d0e7ee66) SHA1(3dd08bbe31b8170df5206be454db4993dd186a16) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, CRC(c571591e) SHA1(3233cc9a0f094911f89a0a0d56a28c24d1502e63) )
+	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, CRC(ed7080a5) SHA1(d198019788f5fd70680296a9c2bab17a27589998) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, CRC(a2697da1) SHA1(2a3b03c7d02225ae8ce98b65face6554c37172d5) )
+	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, CRC(28d6810b) SHA1(f446710b34db5bec97f81af0ca83e6b4f1a5ec46) )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "bf17ex.id", 0x00, 0x20, CRC(38bd8ec4) SHA1(4e6b85348f2fa821934f7666f77ba0f016e200ec) )
@@ -5064,15 +5083,15 @@ ROM_START( bugfeverv )
 	ROM_LOAD( "bfv17r.bin", 0x00000, 0x80000, CRC(8b6ee6f5) SHA1(981d60f04ab44ce8fc63019ac3e5b689aa80baf0) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, CRC(d0e7ee66) SHA1(3dd08bbe31b8170df5206be454db4993dd186a16) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, CRC(c571591e) SHA1(3233cc9a0f094911f89a0a0d56a28c24d1502e63) )
+	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, CRC(ed7080a5) SHA1(d198019788f5fd70680296a9c2bab17a27589998) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, CRC(a2697da1) SHA1(2a3b03c7d02225ae8ce98b65face6554c37172d5) )
+	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, CRC(28d6810b) SHA1(f446710b34db5bec97f81af0ca83e6b4f1a5ec46) )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "bf17re.id", 0x00, 0x20, CRC(a482948d) SHA1(62b802e4906ebb00b2584bb0562a64e9a30aa6ed) )
@@ -5083,15 +5102,15 @@ ROM_START( bugfeverv2 )
 	ROM_LOAD( "bfv17e.bin", 0x00000, 0x80000, CRC(b9afd39a) SHA1(d331551f679b8694bf63812e5e1a54361c87c52a) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, CRC(d0e7ee66) SHA1(3dd08bbe31b8170df5206be454db4993dd186a16) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom3.bin", 0x00000, 0x80000, CRC(c571591e) SHA1(3233cc9a0f094911f89a0a0d56a28c24d1502e63) )
+	ROM_LOAD16_BYTE( "bfrom4.bin", 0x00001, 0x80000, CRC(ed7080a5) SHA1(d198019788f5fd70680296a9c2bab17a27589998) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, CRC(a2697da1) SHA1(2a3b03c7d02225ae8ce98b65face6554c37172d5) )
+	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, CRC(28d6810b) SHA1(f446710b34db5bec97f81af0ca83e6b4f1a5ec46) )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "bf17ex.id", 0x00, 0x20, CRC(38bd8ec4) SHA1(4e6b85348f2fa821934f7666f77ba0f016e200ec) )
@@ -5381,6 +5400,7 @@ static DRIVER_INIT(tighookv2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0,
 
 static DRIVER_INIT(version4) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 static DRIVER_INIT(bugfever) { sfbonus_bitswap(machine,   0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(bugfevero) { sfbonus_bitswap(machine,  0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
 static DRIVER_INIT(bugfeverd) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe8, 1,7,6,5,4,3,0,2, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 static DRIVER_INIT(bugfeverv) { sfbonus_bitswap(machine,  0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x22, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xea, 2,7,6,5,4,3,1,0, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
 static DRIVER_INIT(bugfeverv2) { sfbonus_bitswap(machine, 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x26, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
@@ -5640,13 +5660,14 @@ GAME( 2006, fb6sev1,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,          
 GAME( 2006, fb6sed2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT CGA)", 0)
 GAME( 2006, fb6sev2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT Dual)", 0)
 
+GAME( 2006, bugfever,    0,        sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bug Fever (Version 1.7R CGA)", 0) /* Released August 2006 according to Amcoe web site */
+GAME( 2006, bugfeverv,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverv,       ROT0,  "Amcoe", "Bug Fever (Version 1.7R Dual)", 0)
+GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,       ROT0,  "Amcoe", "Bug Fever (Version 1.7E CGA)", 0)
+GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bug Fever (Version 1.7E Dual)", 0)
+GAME( 2006, bugfevero,   bugfever, sfbonus,    amcoe1_reels3,    bugfevero,       ROT0,  "Amcoe", "Bug Fever (Version 1.6R CGA)", 0)
+
 // no gfx / sound roms
 GAME( 200?, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING)
-// no gfx / sound roms
-GAME( 2006, bugfever,    0,        sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bug Fever (set 1)", GAME_NOT_WORKING) /* Released August 2006 according to Amcoe web site */
-GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,       ROT0,  "Amcoe", "Bug Fever (set 2)", GAME_NOT_WORKING)
-GAME( 2006, bugfeverv,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverv,       ROT0,  "Amcoe", "Bug Fever (set 3)", GAME_NOT_WORKING)
-GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bug Fever (set 4)", GAME_NOT_WORKING)
 // no gfx / sound roms
 GAME( 200?, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island", GAME_NOT_WORKING)
 // no gfx / sound roms

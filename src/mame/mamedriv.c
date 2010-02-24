@@ -9682,9 +9682,10 @@ Other Sun games
 	DRIVER( fb6sev2 )	/* (c) 200? Amcoe */
 	DRIVER( version4 )	/* (c) 200? Amcoe - Version 4 ? */
 	DRIVER( bugfever )	/* (c) 200? Amcoe - Bug Fever */
+	DRIVER( bugfevero )	/* (c) 200? Amcoe */
 	DRIVER( bugfeverd )	/* (c) 200? Amcoe */
 	DRIVER( bugfeverv )	/* (c) 200? Amcoe */
-	DRIVER( bugfeverv2 )/* (c) 200? Amcoe */
+	DRIVER( bugfeverv2 )	/* (c) 200? Amcoe */
 	DRIVER( dvisland )	/* (c) 200? Amcoe - Devil's Island */
 	DRIVER( funriver )	/* (c) 200? Amcoe - Fun River */
 	DRIVER( funriverv )	/* (c) 200? Amcoe */
