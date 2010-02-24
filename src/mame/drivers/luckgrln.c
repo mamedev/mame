@@ -89,15 +89,6 @@ static VIDEO_UPDATE(luckgrln)
 {
 	int y,x;
 	int count = 0;
-	static int test;
-
-	if(input_code_pressed_once(screen->machine, KEYCODE_Z))
-		test++;
-
-	if(input_code_pressed_once(screen->machine, KEYCODE_X))
-		test--;
-
-	popmessage("%02x",test);
 
 	for (y=0;y<32;y++)
 	{
@@ -110,23 +101,8 @@ static VIDEO_UPDATE(luckgrln)
 			UINT8 region = 0;
 			//UINT8 region = (luck_vram2[count] & 0x20) >> 5;
 
-			switch(enc_tile)
-			{
-				case 0x0ed4: dec_tile = 0x1c; break;
-				case 0x0ed5: dec_tile = 0x1d; break;
-				case 0x0ed8: dec_tile = 0x1d; break;
-				case 0x0ad8: dec_tile = 0x1d; break;
-				case 0x0a18: dec_tile = 0x11; break;
-				case 0x0a3a: dec_tile = 0x12; break; //0x12-0x13 or 0x14 (J, Q or K)
-				case 0x16d8: dec_tile = 0x00; break; //???
-				case 0x0831: dec_tile = 0x03; break; //???
-				case 0x0811: dec_tile = 0x01; break;
-				case 0x0821: dec_tile = 0x01; break; //or 0x1f
-				case 0x0840: dec_tile = 0x04; break;
-				case 0x0891: dec_tile = 0x09; break;
-				case 0x0a08: dec_tile = 0x10; break;
-				default: dec_tile = 0; break;
-			}
+			dec_tile = enc_tile & 0x0200 ? 0x10 : 0x00;
+			dec_tile |= (enc_tile & 0x00f0)>>4;
 
 			tile = tile|(dec_tile<<8);
 
@@ -145,6 +121,10 @@ static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0c200, 0x0c5ff) AM_RAM
 	AM_RANGE(0x0ca00, 0x0cdff) AM_RAM
+
+	AM_RANGE(0x0d000, 0x0d03f) AM_RAM
+	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
+	AM_RANGE(0x0d400, 0x0d43f) AM_RAM
 
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM
 
@@ -168,10 +148,16 @@ static WRITE8_HANDLER( output_w )
 //	printf("%02x\n",data);
 }
 
+static READ8_HANDLER( test_r )
+{
+	return mame_rand(space->machine);
+}
+
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
+	AM_RANGE(0x0090, 0x009d) AM_READ(test_r)
 	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_register_w)
 ADDRESS_MAP_END
