@@ -586,9 +586,9 @@ static INPUT_PORTS_START( othundu )
 	PORT_INCLUDE( othundrj )
 
 	PORT_MODIFY( "DSWB" )
-    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x40, "Same as Start" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, "Same as Start" )
 INPUT_PORTS_END
 
 
@@ -945,7 +945,7 @@ ROM_END
 
 
 
-GAME( 1988, othunder,   0,        othunder, othunder, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", 0 )
-GAME( 1988, othunderu,  othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", 0 )
-GAME( 1988, othunderuo, othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", 0 )
-GAME( 1988, othunderj,  othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", 0 )
+GAME( 1988, othunder,   0,        othunder, othunder, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunderu,  othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunderuo, othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunderj,  othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", GAME_SUPPORTS_SAVE )
