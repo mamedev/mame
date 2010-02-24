@@ -1677,8 +1677,12 @@ struct polygon
 	float faceNormal[4];		// Normal of the face overall - for calculating visibility and flat-shading...
 	int visible;				// Polygon visibility in scene
 
-	INT8 texIndex;				// Which texture to draw from (0x00-0x0f)
-	INT8 texType;				// How to index into the texture
+	UINT8 texIndex;				// Which texture to draw from (0x00-0x0f)
+	UINT8 texType;				// How to index into the texture
+	UINT8 texPageSmall;         // Does this polygon use 'small' texture pages?
+	UINT8 texPageHorizOffset;   // If it does use small texture pages, how far is this page horizontally offset?
+	UINT8 texPageVertOffset;    // If it does use small texture pages, how far is this page vertically offset?
+
 	UINT32 palOffset;			// The base offset where this object's palette starts.
 	UINT32 palPageSize;			// The size of the palette page that is being pointed to.
 
@@ -1954,7 +1958,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
 	UINT16* threeDPointer = &threeDRoms[threeDOffset * 3];
 
-	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU)
+	if (threeDOffset >= memory_region_length(machine, "verts"))
 	{
 		printf("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
@@ -2022,19 +2026,27 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			////////////////////////////////////////////
 			// GATHER A SINGLE TRIANGLE'S INFORMATION //
 			////////////////////////////////////////////
-			/*/////////////////////////
-            // SINGLE POLY CHUNK FORMAT
-            // [0] ??-- - ???? unused ????
-            // [0] --xx - Chunk type
-            // [1] ?--- - Flags [x000 = ???
-                                 0x00 = ???
-                                 00x0 = ???
-                                 000x = low-res texture flag]
-            // [1] -x-- - Explicit palette index.
-            // [1] --?- - Unknown
-            // [1] ---x - Texture index
-            // [2] ???? - Used in fatfurwa 'hng64' & everywhere in roadedge
-            /////////////////////////*/
+			// SINGLE POLY CHUNK FORMAT
+			// [0] ??-- - ???
+			// [0] --xx - Chunk type
+			//
+			// [1] ?--- - Flags [?000 = ???
+			//                   0?00 = ???
+			//                   00?0 = ???
+			//                   000x = low-res texture flag]
+			// [1] -x-- - Explicit 0x80 palette index.
+			// [1] --x- - Explicit 0x08 palette index.
+			// [1] ---x - Texture page (1024x1024 bytes)
+			//
+			// [2] x--- - Texture Flags [x000 = Uses 4x4 sub-texture pages?
+			//                           0?00 = ??? - differen sub-page size?  SNK logo in RoadEdge.  Always on in bbust2.
+			//                           00xx = Horizontal sub-texture page index]
+			// [2] -?-- - ??? - barely visible (so far) in roadedge
+			// [2] --x- - Texture Flags [?000 = ???
+			//                           0xx0 = Vertical sub-texture page index.
+			//                           000? = ???]
+			// [2] ---? - ???
+			//////////////////////////
 			UINT8 chunkType = chunkOffset[0] & 0x00ff;
 
 			// Debug - ajg
@@ -2056,6 +2068,10 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			/* There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
 			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
 			else						 polys[*numPolys].texType = 0x0;
+
+			polys[*numPolys].texPageSmall       = (chunkOffset[2] & 0x8000) >> 15;	// Just a guess.
+			polys[*numPolys].texPageHorizOffset = (chunkOffset[2] & 0x3000) >> 12;
+			polys[*numPolys].texPageVertOffset  = (chunkOffset[2] & 0x0060) >> 5;
 
 			polys[*numPolys].texIndex = chunkOffset[1] & 0x000f;
 
@@ -2829,11 +2845,14 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 
 struct polygonRasterOptions
 {
-    int texType;
-    int texIndex;
-    int palOffset;
-    int palPageSize;
-    int debugColor;
+	UINT8 texType;
+	UINT8 texIndex;
+	UINT8 texPageSmall;
+	UINT8 texPageHorizOffset;
+	UINT8 texPageVertOffset;
+	int palOffset;
+	int palPageSize;
+	int debugColor;
 };
 
 /*********************************************************************/
@@ -2888,11 +2907,31 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			}
 			else
 			{
-				// TEXTURED
+				float textureS = 0.0f;
+				float textureT = 0.0f;
+
+				// Standard & Half-Res textures
 				if (prOptions.texType == 0x0)
-					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
+				{
+					textureS = s_coord * 1024.0f;
+					textureT = t_coord * 1024.0f;
+				}
 				else if (prOptions.texType == 0x1)
-					paletteEntry = textureOffset[(((int)(s_coord*512.0f))*1024 + (int)(t_coord*512.0f))];
+				{
+					textureS = s_coord * 512.0f;
+					textureT = t_coord * 512.0f;
+				}
+
+				// Small-Page textures
+				if (prOptions.texPageSmall)
+				{
+					textureT = fmod(textureT, 256.0f);
+					textureS = fmod(textureS, 256.0f);
+
+					textureT += (256.0f * prOptions.texPageHorizOffset);
+					textureS += (256.0f * prOptions.texPageVertOffset);
+				}
+				paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
 
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
@@ -3260,6 +3299,9 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 	prOptions.palOffset = p->palOffset;
 	prOptions.palPageSize = p->palPageSize;
 	prOptions.debugColor = p->debugColor;
+	prOptions.texPageSmall = p->texPageSmall;
+	prOptions.texPageHorizOffset = p->texPageHorizOffset;
+	prOptions.texPageVertOffset = p->texPageVertOffset;
 
 	for (j = 1; j < p->n-1; j++)
 	{
