@@ -21,8 +21,8 @@ driver by David Haywood
 
 static ADDRESS_MAP_START( news_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM 	/* 4000-7fff is written to during startup, probably leftover code */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_BASE(&news_fgram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_BASE(&news_bgram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_BASE_MEMBER(news_state, fgram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_BASE_MEMBER(news_state, bgram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
@@ -113,11 +113,32 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( news )
+{
+	news_state *state = (news_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->bgpic);
+}
+
+static MACHINE_RESET( news )
+{
+	news_state *state = (news_state *)machine->driver_data;
+
+	state->bgpic = 0;
+}
+
 static MACHINE_DRIVER_START( news )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(news_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(news_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(news)
+	MDRV_MACHINE_RESET(news)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -167,5 +188,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news,  0, ROT0, "Poby / Virus", "News (set 1)", 0 )
-GAME( 1993, newsa, news, news, newsa, 0, ROT0, "Poby",         "News (set 2)", 0 )
+GAME( 1993, news,  0,    news, news,  0, ROT0, "Poby / Virus", "News (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1993, newsa, news, news, newsa, 0, ROT0, "Poby",         "News (set 2)", GAME_SUPPORTS_SAVE )

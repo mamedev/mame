@@ -15,6 +15,33 @@
 #define NITEDRVR_ATTRACT_EN	NODE_06
 
 
+typedef struct _nitedrvr_state nitedrvr_state;
+struct _nitedrvr_state
+{
+	/* memory pointers */
+	UINT8 *    hvc;
+	UINT8 *    videoram;
+
+	/* video-related */
+	tilemap_t  *bg_tilemap;
+
+	/* input */
+	UINT8 gear;
+	UINT8 track;
+	INT32 steering_buf;
+	INT32 steering_val;
+	UINT8 crash_en;
+	UINT8 crash_data;
+	UINT8 crash_data_en;	// IC D8
+	UINT8 ac_line;
+	INT32 last_steering_val;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *discrete;
+};
+
+
 /*----------- defined in machine/nitedrvr.c -----------*/
 
 READ8_HANDLER( nitedrvr_in0_r );
@@ -36,8 +63,6 @@ DISCRETE_SOUND_EXTERN( nitedrvr );
 
 
 /*----------- defined in video/nitedrvr.c -----------*/
-
-extern UINT8 *nitedrvr_hvc;
 
 WRITE8_HANDLER( nitedrvr_hvc_w );
 WRITE8_HANDLER( nitedrvr_videoram_w );

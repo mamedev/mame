@@ -24,10 +24,28 @@ TODO:
 
 #define MASTER_CLOCK	XTAL_19_968MHz
 
-static UINT8 blit_raw_data[3];
-static UINT8 *blit_buffer;
-static UINT8 pen_data[0x10];
-static UINT8 pen_raw_data[0x10];
+typedef struct _nightgal_state nightgal_state;
+struct _nightgal_state
+{
+	/* memory pointers */
+	UINT8 *    blit_buffer;
+
+	/* video-related */
+	UINT8 blit_raw_data[3];
+	UINT8 true_blit[7];
+	UINT8 pen_data[0x10];
+	UINT8 pen_raw_data[0x10];
+
+	/* misc */
+	UINT8 nsc_latch, z80_latch;
+	UINT8 mux_data;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *subcpu;
+};
+
+
 
 static READ8_HANDLER( blitter_status_r )
 {
@@ -36,16 +54,20 @@ static READ8_HANDLER( blitter_status_r )
 
 static VIDEO_START( nightgal )
 {
-	blit_buffer = auto_alloc_array(machine, UINT8, 256*256);
+	nightgal_state *state = (nightgal_state *)machine->driver_data;
+	state->blit_buffer = auto_alloc_array(machine, UINT8, 256*256);
+
+	state_save_register_global_pointer(machine, state->blit_buffer, 256*256);
 }
 
 static VIDEO_UPDATE( nightgal )
 {
+	nightgal_state *state = (nightgal_state *)screen->machine->driver_data;
 	int x, y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
-		UINT8 *src = &blit_buffer[y * 512/2 + cliprect->min_x];
+		UINT8 *src = &state->blit_buffer[y * 512 / 2 + cliprect->min_x];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
@@ -60,83 +82,82 @@ static VIDEO_UPDATE( nightgal )
 	return 0;
 }
 
-static UINT8 nightgal_gfx_nibble(running_machine *machine,int niboffset)
+static UINT8 nightgal_gfx_nibble( running_machine *machine, int niboffset )
 {
 	UINT8 *blit_rom = memory_region(machine,"gfx1");
 
-	if (niboffset&1)
+	if (niboffset & 1)
 	{
-		return (blit_rom[(niboffset>>1)&0x1ffff] & 0xf0)>>4;
+		return (blit_rom[(niboffset >> 1) & 0x1ffff] & 0xf0) >> 4;
 	}
 	else
 	{
-		return (blit_rom[(niboffset>>1)&0x1ffff] & 0x0f);
+		return (blit_rom[(niboffset >> 1) & 0x1ffff] & 0x0f);
 	}
 }
 
-static void plot_nightgal_gfx_pixel(UINT8 pix, int x, int y)
+static void plot_nightgal_gfx_pixel( running_machine *machine, UINT8 pix, int x, int y )
 {
-	if (y>=512) return;
-	if (x>=512) return;
-	if (y<0) return;
-	if (x<0) return;
+	nightgal_state *state = (nightgal_state *)machine->driver_data;
+	if (y >= 512) return;
+	if (x >= 512) return;
+	if (y < 0) return;
+	if (x < 0) return;
 
-	if (x&1)
-	{
-		blit_buffer[(y*256)+(x>>1)] = (blit_buffer[(y*256)+(x>>1)] & 0x0f) | ((pix<<4) & 0xf0);
-	}
+	if (x & 1)
+		state->blit_buffer[(y * 256) + (x >> 1)] = (state->blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
 	else
-	{
-		blit_buffer[(y*256)+(x>>1)] = (blit_buffer[(y*256)+(x>>1)] & 0xf0) | (pix & 0x0f);
-	}
+		state->blit_buffer[(y * 256) + (x >> 1)] = (state->blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
 }
 
 static WRITE8_HANDLER( nsc_true_blitter_w )
 {
-	static UINT8 true_blit[7];
-
-	int src,x,y,h,w, flipx;
-	true_blit[offset] = data;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	int src, x, y, h, w, flipx;
+	state->true_blit[offset] = data;
 
 	/*trigger blitter write to ram,might not be correct...*/
-	if(offset == 5)
+	if (offset == 5)
 	{
-      //printf("%02x %02x %02x %02x %02x %02x %02x\n",true_blit[0],true_blit[1],true_blit[2],true_blit[3],true_blit[4],true_blit[5],true_blit[6]);
-		w = (true_blit[4] & 0xff)+1;
-		h = (true_blit[5] & 0xff)+1;
-		src = ((true_blit[1]<<8)|(true_blit[0]<<0));
-		src |= (true_blit[6]&3)<<16;
+      //printf("%02x %02x %02x %02x %02x %02x %02x\n", state->true_blit[0], state->true_blit[1], state->true_blit[2], state->true_blit[3], state->true_blit[4], state->true_blit[5], state->true_blit[6]);
+		w = (state->true_blit[4] & 0xff) + 1;
+		h = (state->true_blit[5] & 0xff) + 1;
+		src = ((state->true_blit[1] << 8) | (state->true_blit[0] << 0));
+		src |= (state->true_blit[6] & 3) << 16;
 
-
-		x = (true_blit[2] & 0xff);
-		y = (true_blit[3] & 0xff);
+		x = (state->true_blit[2] & 0xff);
+		y = (state->true_blit[3] & 0xff);
 
 		// lowest bit of src controls flipping / draw direction?
-		flipx=(true_blit[0] & 1);
+		flipx = (state->true_blit[0] & 1);
 
-		if (!flipx) src += (w*h)-1;
-		else src -= (w*h)-1;
+		if (!flipx) 
+			src += (w * h) - 1;
+		else 
+			src -= (w * h) - 1;
 
 		{
 			int count = 0;
-			int xcount,ycount;
-			for(ycount=0;ycount<h;ycount++)
+			int xcount, ycount;
+			for (ycount = 0; ycount < h; ycount++)
 			{
-				for(xcount=0;xcount<w;xcount++)
+				for (xcount = 0; xcount < w; xcount++)
 				{
-					int drawx = (x+xcount) & 0xff;
-					int drawy = (y+ycount) & 0xff;
-					UINT8 dat = nightgal_gfx_nibble(space->machine,src+count);
-					UINT8 cur_pen_hi = pen_data[(dat & 0xf0)>>4];
-					UINT8 cur_pen_lo = pen_data[(dat & 0x0f)>>0];
+					int drawx = (x + xcount) & 0xff;
+					int drawy = (y + ycount) & 0xff;
+					UINT8 dat = nightgal_gfx_nibble(space->machine, src + count);
+					UINT8 cur_pen_hi = state->pen_data[(dat & 0xf0) >> 4];
+					UINT8 cur_pen_lo = state->pen_data[(dat & 0x0f) >> 0];
 
-					dat = cur_pen_lo | cur_pen_hi<<4;
+					dat = cur_pen_lo | (cur_pen_hi << 4);
 
-					if((dat & 0xff) != 0)
-						plot_nightgal_gfx_pixel(dat, drawx,drawy);
+					if ((dat & 0xff) != 0)
+						plot_nightgal_gfx_pixel(space->machine, dat, drawx, drawy);
 
-					if (!flipx)	count--;
-					else count++;
+					if (!flipx)	
+						count--;
+					else 
+						count++;
 				}
 			}
 		}
@@ -146,54 +167,56 @@ static WRITE8_HANDLER( nsc_true_blitter_w )
 /* different register writes (probably a PAL line swapping).*/
 static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 {
-	static UINT8 true_blit[7];
-
-	int src,x,y,h,w, flipx;
-	true_blit[offset] = data;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	int src, x, y, h, w, flipx;
+	state->true_blit[offset] = data;
 
 	/*trigger blitter write to ram,might not be correct...*/
-	if(offset == 6)
+	if (offset == 6)
 	{
-      //printf("%02x %02x %02x %02x %02x %02x %02x\n",true_blit[0],true_blit[1],true_blit[2],true_blit[3],true_blit[4],true_blit[5],true_blit[6]);
-		w = (true_blit[5] & 0xff)+1;
-		h = (true_blit[6] & 0xff)+1;
-		src = ((true_blit[1]<<8)|(true_blit[0]<<0));
-		src |= (true_blit[2]&3)<<16;
+      //printf("%02x %02x %02x %02x %02x %02x %02x\n", state->true_blit[0], state->true_blit[1], state->true_blit[2], state->true_blit[3], state->true_blit[4], state->true_blit[5], state->true_blit[6]);
+		w = (state->true_blit[5] & 0xff) + 1;
+		h = (state->true_blit[6] & 0xff) + 1;
+		src = ((state->true_blit[1] << 8) | (state->true_blit[0] << 0));
+		src |= (state->true_blit[2] & 3) << 16;
 
 
-		x = (true_blit[3] & 0xff);
-		y = (true_blit[4] & 0xff);
+		x = (state->true_blit[3] & 0xff);
+		y = (state->true_blit[4] & 0xff);
 
 		// lowest bit of src controls flipping / draw direction?
-		flipx=(true_blit[0] & 1);
+		flipx = (state->true_blit[0] & 1);
 
-		if (!flipx) src += (w*h)-1;
-		else src -= (w*h)-1;
+		if (!flipx) 
+			src += (w * h) - 1;
+		else 
+			src -= (w * h) - 1;
 
 		{
 			int count = 0;
-			int xcount,ycount;
-			for(ycount=0;ycount<h;ycount++)
+			int xcount, ycount;
+			for (ycount = 0; ycount < h; ycount++)
 			{
-				for(xcount=0;xcount<w;xcount++)
+				for (xcount = 0; xcount < w; xcount++)
 				{
-					int drawx = (x+xcount) & 0xff;
-					int drawy = (y+ycount) & 0xff;
-					UINT8 dat = nightgal_gfx_nibble(space->machine,src+count);
-					UINT8 cur_pen_hi = pen_data[(dat & 0xf0)>>4];
-					UINT8 cur_pen_lo = pen_data[(dat & 0x0f)>>0];
+					int drawx = (x + xcount) & 0xff;
+					int drawy = (y + ycount) & 0xff;
+					UINT8 dat = nightgal_gfx_nibble(space->machine, src + count);
+					UINT8 cur_pen_hi = state->pen_data[(dat & 0xf0) >> 4];
+					UINT8 cur_pen_lo = state->pen_data[(dat & 0x0f) >> 0];
 
-					dat = cur_pen_lo | cur_pen_hi<<4;
+					dat = cur_pen_lo | cur_pen_hi << 4;
 
-					if((dat & 0xff) != 0)
-						plot_nightgal_gfx_pixel(dat, drawx,drawy);
+					if ((dat & 0xff) != 0)
+						plot_nightgal_gfx_pixel(space->machine, dat, drawx, drawy);
 
-					if (!flipx)	count--;
-					else count++;
+					if (!flipx)	
+						count--;
+					else 
+						count++;
 				}
 			}
-			//printf("%02x %02x %02x %02x %02x %02x %02x\n",true_blit[0],true_blit[1],true_blit[2],true_blit[3],true_blit[4],true_blit[5],true_blit[6]);
-			//cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
+			//cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -212,26 +235,26 @@ static PALETTE_INIT( nightgal )
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
 		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
 		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
 		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
@@ -261,59 +284,66 @@ master-slave algorythm
 -executes a wai (i.e. halt) opcode then expects to receive another irq...
 */
 
-#define MAIN_Z80_RUN   if(offset == 2) z80_latch = 0x00
-#define MAIN_Z80_HALT  if(offset == 2) z80_latch = 0x80
-//#define SUB_NCS_RUN ncs_latch = 0x00
-//#define SUB_NCS_HALT ncs_latch = 0x80
-
-static UINT8 nsc_latch,z80_latch;
+#define MAIN_Z80_RUN   if(offset == 2) state->z80_latch = 0x00
+#define MAIN_Z80_HALT  if(offset == 2) state->z80_latch = 0x80
+//#define SUB_NCS_RUN state->ncs_latch = 0x00
+//#define SUB_NCS_HALT state->ncs_latch = 0x80
 
 static WRITE8_HANDLER( nsc_latch_w )
 {
-	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE );
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( nsc_latch_r )
 {
-	return z80_latch;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	return state->z80_latch;
 }
 
 static WRITE8_HANDLER( z80_latch_w )
 {
-	nsc_latch = data;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->nsc_latch = data;
 }
 
 static READ8_HANDLER( z80_latch_r )
 {
-	return nsc_latch;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	return state->nsc_latch;
 }
 
 /*z80 -> MCU video params*/
 static WRITE8_HANDLER( blitter_w )
 {
-	blit_raw_data[offset] = data;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->blit_raw_data[offset] = data;
 	MAIN_Z80_HALT;
 }
 
 static READ8_HANDLER( nsc_blit_r )
 {
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
 	MAIN_Z80_RUN;
-	return blit_raw_data[offset];
+	return state->blit_raw_data[offset];
 }
 
 static WRITE8_HANDLER( blit_vregs_w )
 {
-	pen_raw_data[offset] = data;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->pen_raw_data[offset] = data;
 }
 
 static READ8_HANDLER( blit_vregs_r )
 {
-	return pen_raw_data[offset];
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	return state->pen_raw_data[offset];
 }
 
 static WRITE8_HANDLER( blit_true_vregs_w )
 {
-	pen_data[offset] = data;
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->pen_data[offset] = data;
 }
 
 /********************************************
@@ -322,21 +352,19 @@ static WRITE8_HANDLER( blit_true_vregs_w )
 *
 ********************************************/
 
-static UINT8 mux_data;
-
 static WRITE8_HANDLER( mux_w )
 {
-	mux_data = ~data;
-//  printf("%02x\n",mux_data);
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->mux_data = ~data;
+	//printf("%02x\n", state->mux_data);
 }
 
 static READ8_DEVICE_HANDLER( input_1p_r )
 {
-	static UINT8 cr_clear;
+	nightgal_state *state = (nightgal_state *)device->machine->driver_data;
+	UINT8 cr_clear = input_port_read(device->machine, "CR_CLEAR");
 
-	cr_clear = input_port_read(device->machine, "CR_CLEAR");
-
-	switch(mux_data)
+	switch (state->mux_data)
 	{
 		case 0x01: return input_port_read(device->machine, "PL1_1") | cr_clear;
 		case 0x02: return input_port_read(device->machine, "PL1_2") | cr_clear;
@@ -345,19 +373,18 @@ static READ8_DEVICE_HANDLER( input_1p_r )
 		case 0x10: return input_port_read(device->machine, "PL1_5") | cr_clear;
 		case 0x20: return input_port_read(device->machine, "PL1_6") | cr_clear;
 	}
-//  printf("%04x\n",mux_data);
+	//printf("%04x\n", state->mux_data);
 
 	return (input_port_read(device->machine, "PL1_1") & input_port_read(device->machine, "PL1_2") & input_port_read(device->machine, "PL1_3") &
-	       input_port_read(device->machine, "PL1_4") & input_port_read(device->machine, "PL1_5") & input_port_read(device->machine, "PL1_6")) | cr_clear;//input_port_read(device->machine, "PL1_0") && ;
+	       input_port_read(device->machine, "PL1_4") & input_port_read(device->machine, "PL1_5") & input_port_read(device->machine, "PL1_6")) | cr_clear;
 }
 
 static READ8_DEVICE_HANDLER( input_2p_r )
 {
-	static UINT8 coin_port;
+	nightgal_state *state = (nightgal_state *)device->machine->driver_data;
+	UINT8 coin_port = input_port_read(device->machine, "COINS");
 
-	coin_port = input_port_read(device->machine, "COINS");
-
-	switch(mux_data)
+	switch (state->mux_data)
 	{
 		case 0x01: return input_port_read(device->machine, "PL2_1") | coin_port;
 		case 0x02: return input_port_read(device->machine, "PL2_2") | coin_port;
@@ -366,11 +393,10 @@ static READ8_DEVICE_HANDLER( input_2p_r )
 		case 0x10: return input_port_read(device->machine, "PL2_5") | coin_port;
 		case 0x20: return input_port_read(device->machine, "PL2_6") | coin_port;
 	}
-//  printf("%04x\n",mux_data);
+	//printf("%04x\n", state->mux_data);
 
 	return (input_port_read(device->machine, "PL2_1") & input_port_read(device->machine, "PL2_2") & input_port_read(device->machine, "PL2_3") &
-	       input_port_read(device->machine, "PL2_4") & input_port_read(device->machine, "PL2_5") & input_port_read(device->machine, "PL2_6")) | coin_port;//input_port_read(device->machine, "PL1_0") && ;
-
+	       input_port_read(device->machine, "PL2_4") & input_port_read(device->machine, "PL2_5") & input_port_read(device->machine, "PL2_6")) | coin_port;
 }
 
 /********************************************
@@ -481,6 +507,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+
 	PORT_START("PL1_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
@@ -488,6 +515,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_CODE(KEYCODE_3)//rate button
+
 	PORT_START("PL1_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
@@ -495,12 +523,14 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //another D button
+
 	PORT_START("PL1_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED ) //another opt 1 button
+
 	PORT_START("PL1_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 1")
@@ -508,6 +538,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 4")
+
 	PORT_START("PL1_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Pass") //???
@@ -520,6 +551,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+
 	PORT_START("PL2_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
@@ -527,6 +559,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_CODE(KEYCODE_4) PORT_PLAYER(2)//rate button
+
 	PORT_START("PL2_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
@@ -534,12 +567,14 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //another D button
+
 	PORT_START("PL2_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED ) //another opt 1 button
+
 	PORT_START("PL2_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 1") PORT_PLAYER(2)
@@ -547,6 +582,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 3") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 4") PORT_PLAYER(2)
+
 	PORT_START("PL2_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Pass") PORT_PLAYER(2) //???
@@ -693,7 +729,43 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+
+static MACHINE_START( nightgal )
+{
+	nightgal_state *state = (nightgal_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global(machine, state->nsc_latch);
+	state_save_register_global(machine, state->z80_latch);
+	state_save_register_global(machine, state->mux_data);
+
+	state_save_register_global_array(machine, state->blit_raw_data);
+	state_save_register_global_array(machine, state->true_blit);
+	state_save_register_global_array(machine, state->pen_data);
+	state_save_register_global_array(machine, state->pen_raw_data);
+}
+
+static MACHINE_RESET( nightgal )
+{
+	nightgal_state *state = (nightgal_state *)machine->driver_data;
+
+	state->nsc_latch = 0;
+	state->z80_latch = 0;
+	state->mux_data = 0;
+	
+	memset(state->blit_raw_data, 0, ARRAY_LENGTH(state->blit_raw_data));
+	memset(state->true_blit, 0, ARRAY_LENGTH(state->true_blit));
+	memset(state->pen_data, 0, ARRAY_LENGTH(state->pen_data));
+	memset(state->pen_raw_data, 0, ARRAY_LENGTH(state->pen_raw_data));
+}
+
 static MACHINE_DRIVER_START( nightgal )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(nightgal_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 4)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(nightgal_map)
@@ -704,6 +776,9 @@ static MACHINE_DRIVER_START( nightgal )
 	MDRV_CPU_PROGRAM_MAP(nsc_map)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+
+	MDRV_MACHINE_START(nightgal)
+	MDRV_MACHINE_RESET(nightgal)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1026,11 +1101,11 @@ ROM_END
 
 
 /* Type 1 HW*/
-GAME( 1984, nightgal, 0,       nightgal, sexygal,  0, ROT0,"Nichibutsu", "Night Gal (Japan 840920 AG 1-00)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1984, ngtbunny, 0,       nightgal, sexygal,  0, ROT0,"Nichibutsu", "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1984, royalngt, ngtbunny,nightgal, sexygal,  0, ROT0,"Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1984, nightgal, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1984, ngtbunny, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, nightgal, sexygal,  0, ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 /* Type 2 HW*/
-GAME( 1985, sexygal,  0,       sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1985, sweetgal, sexygal, sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1985, sexygal,  0,        sexygal,  sexygal,  0, ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal,  sexygal,  0, ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 /* Type 3 HW*/
-GAME( 1985, ngalsumr, 0,       nightgal, sexygal,  0, ROT0,"Nichibutsu", "Night Gal Summer", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1985, ngalsumr, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )

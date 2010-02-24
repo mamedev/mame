@@ -1,7 +1,38 @@
-/*----------- defined in drivers/nycaptor.c -----------*/
 
-extern UINT8 *nycaptor_sharedram;
-extern int nyc_gametype;
+typedef struct _nycaptor_state nycaptor_state;
+struct _nycaptor_state
+{
+	/* memory pointers */
+	UINT8 *      sharedram;
+	UINT8 *      scrlram;
+	UINT8 *      videoram;
+	UINT8 *      spriteram;
+	size_t       videoram_size;
+
+	/* video-related */
+	tilemap_t *bg_tilemap;
+	int char_bank, palette_bank, gfxctrl;
+
+	/* mcu */
+	UINT8 from_main, from_mcu;
+	int mcu_sent, main_sent;
+	UINT8 port_a_in, port_a_out, ddr_a;
+	UINT8 port_b_in, port_b_out, ddr_b;
+	UINT8 port_c_in, port_c_out, ddr_c;
+
+	/* misc */
+	int generic_control_reg;
+	int sound_nmi_enable, pending_nmi;
+	UINT8 snd_data;
+	int vol_ctrl[16];
+	int  gametype;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *subcpu;
+	running_device *mcu;
+};
 
 
 /*----------- defined in machine/nycaptor.c -----------*/
@@ -9,26 +40,20 @@ extern int nyc_gametype;
 READ8_HANDLER( nycaptor_mcu_r );
 READ8_HANDLER( nycaptor_mcu_status_r1 );
 READ8_HANDLER( nycaptor_mcu_status_r2 );
-READ8_HANDLER( nycaptor_68705_portC_r );
-READ8_HANDLER( nycaptor_68705_portB_r );
-READ8_HANDLER( nycaptor_68705_portA_r );
+READ8_HANDLER( nycaptor_68705_port_c_r );
+READ8_HANDLER( nycaptor_68705_port_b_r );
+READ8_HANDLER( nycaptor_68705_port_a_r );
 
 WRITE8_HANDLER( nycaptor_mcu_w );
-WRITE8_HANDLER( nycaptor_68705_portA_w );
-WRITE8_HANDLER( nycaptor_68705_portB_w );
-WRITE8_HANDLER( nycaptor_68705_portC_w );
-WRITE8_HANDLER( nycaptor_68705_ddrA_w );
-WRITE8_HANDLER( nycaptor_68705_ddrB_w );
-WRITE8_HANDLER( nycaptor_68705_ddrC_w );
+WRITE8_HANDLER( nycaptor_68705_port_a_w );
+WRITE8_HANDLER( nycaptor_68705_port_b_w );
+WRITE8_HANDLER( nycaptor_68705_port_c_w );
+WRITE8_HANDLER( nycaptor_68705_ddr_a_w );
+WRITE8_HANDLER( nycaptor_68705_ddr_b_w );
+WRITE8_HANDLER( nycaptor_68705_ddr_c_w );
 
 
 /*----------- defined in video/nycaptor.c -----------*/
-
-extern UINT8 *nycaptor_scrlram;
-
-VIDEO_START( nycaptor );
-VIDEO_UPDATE( nycaptor );
-
 
 READ8_HANDLER( nycaptor_videoram_r );
 READ8_HANDLER( nycaptor_spriteram_r );
@@ -41,3 +66,6 @@ WRITE8_HANDLER( nycaptor_spriteram_w );
 WRITE8_HANDLER( nycaptor_palette_w );
 WRITE8_HANDLER( nycaptor_gfxctrl_w );
 WRITE8_HANDLER( nycaptor_scrlram_w );
+
+VIDEO_START( nycaptor );
+VIDEO_UPDATE( nycaptor );

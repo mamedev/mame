@@ -44,13 +44,13 @@
 
 static ADDRESS_MAP_START( nitedrvr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
-	AM_RANGE(0x0200, 0x027f) AM_RAM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_BASE_GENERIC(videoram) // PFW
-	AM_RANGE(0x0400, 0x05ff) AM_WRITE(nitedrvr_hvc_w) AM_BASE(&nitedrvr_hvc) // POSH, POSV, CHAR, Watchdog
+	AM_RANGE(0x0200, 0x027f) AM_RAM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_BASE_MEMBER(nitedrvr_state, videoram) // PFW
+	AM_RANGE(0x0400, 0x05ff) AM_WRITE(nitedrvr_hvc_w) AM_BASE_MEMBER(nitedrvr_state, hvc) // POSH, POSV, CHAR, Watchdog
 	AM_RANGE(0x0600, 0x07ff) AM_READ(nitedrvr_in0_r)
 	AM_RANGE(0x0800, 0x09ff) AM_READ(nitedrvr_in1_r)
 	AM_RANGE(0x0a00, 0x0bff) AM_WRITE(nitedrvr_out0_w)
 	AM_RANGE(0x0c00, 0x0dff) AM_WRITE(nitedrvr_out1_w)
-	AM_RANGE(0x8000, 0x807f) AM_RAM AM_MIRROR(0x380) AM_BASE_GENERIC(videoram) // PFR
+	AM_RANGE(0x8000, 0x807f) AM_RAM AM_MIRROR(0x380) AM_BASE_MEMBER(nitedrvr_state, videoram) // PFR
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(nitedrvr_steering_reset_r, nitedrvr_steering_reset_w)
 	AM_RANGE(0x9000, 0x9fff) AM_ROM // ROM1-ROM2
 	AM_RANGE(0xfff0, 0xffff) AM_ROM // ROM2 for 6502 vectors
@@ -135,7 +135,11 @@ GFXDECODE_END
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( nitedrvr )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(nitedrvr_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(nitedrvr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -146,8 +150,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 
 	MDRV_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(180), 330, CAP_U(1))))
 
-	// video hardware
-
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57) // how is this derived?
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -162,7 +165,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	MDRV_VIDEO_START(nitedrvr)
 	MDRV_VIDEO_UPDATE(nitedrvr)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -201,4 +204,4 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, 0, ROT0, "Atari", "Night Driver", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, 0, ROT0, "Atari", "Night Driver", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
