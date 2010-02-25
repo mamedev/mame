@@ -13,7 +13,6 @@
 #define DE156CPU ARM
 #include "emu.h"
 #include "includes/decocrpt.h"
-#include "includes/deco32.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
@@ -281,8 +280,8 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE(&backfire_180010) // always 180010 ?
 //  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE(&backfire_188010) // always 188010 ?
 
-	AM_RANGE(0x184000, 0x185fff) AM_RAM AM_BASE( &backfire_spriteram32_1 )
-	AM_RANGE(0x18c000, 0x18dfff) AM_RAM AM_BASE( &backfire_spriteram32_2 )
+	AM_RANGE(0x184000, 0x185fff) AM_RAM AM_BASE(&backfire_spriteram32_1)
+	AM_RANGE(0x18c000, 0x18dfff) AM_RAM AM_BASE(&backfire_spriteram32_2)
 	AM_RANGE(0x190000, 0x190003) AM_DEVREAD("eeprom", backfire_eeprom_r)
 	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
 	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE("eeprom", backfire_eeprom_w)

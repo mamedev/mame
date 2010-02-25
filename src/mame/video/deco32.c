@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "includes/deco16ic.h"
 #include "includes/deco32.h"
 
 UINT32 *deco32_pf1_data,*deco32_pf2_data,*deco32_pf3_data,*deco32_pf4_data;
@@ -22,6 +21,85 @@ static int deco32_ace_ram_dirty, has_ace_ram;
 
 int deco32_raster_display_position;
 UINT16 *deco32_raster_display_list;
+
+/******************************************************************************
+
+ This sprite_priority_bitmap handling is the same as in deco16ic.c
+
+******************************************************************************/
+
+static bitmap_t *sprite_priority_bitmap;
+
+static void deco16_clear_sprite_priority_bitmap(void)
+{
+	if (sprite_priority_bitmap)
+		bitmap_fill(sprite_priority_bitmap,NULL,0);
+}
+
+/* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
+static void deco16_pdrawgfx(
+		bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha)
+{
+	int ox,oy,cx,cy;
+	int x_index,y_index,x,y;
+	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
+	const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+
+	/* check bounds */
+	ox = sx;
+	oy = sy;
+
+	if (sx>319 || sy>247 || sx<-15 || sy<-7)
+		return;
+
+	if (sy<0) sy=0;
+	if (sx<0) sx=0;
+	if (sx>319) cx=319;
+	else cx=ox+16;
+
+	cy=(sy-oy);
+
+	if (flipy) y_index=15-cy; else y_index=cy;
+
+	for( y=0; y<16-cy; y++ )
+	{
+		const UINT8 *source = code_base + (y_index * gfx->line_modulo);
+		UINT32 *destb = BITMAP_ADDR32(dest, sy, 0);
+		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
+		UINT8 *spri = BITMAP_ADDR8(sprite_priority_bitmap, sy, 0);
+
+		if (sy >= 0 && sy < 248)
+		{
+			if (flipx) { source+=15-(sx-ox); x_index=-1; } else { x_index=1; source+=(sx-ox); }
+
+			for (x=sx; x<cx; x++)
+			{
+				int c = *source;
+				if( c != transparent_color && x >= 0 && x < 320 )
+				{
+					if (pri_mask>pri[x] && sprite_mask>spri[x]) {
+						if (alpha != 0xff)
+							destb[x] = alpha_blend_r32(destb[x], pal[c], alpha);
+						else
+							destb[x] = pal[c];
+						if (write_pri)
+							pri[x] |= pri_mask;
+					}
+					spri[x]|=sprite_mask;
+				}
+				source+=x_index;
+			}
+		}
+
+		sy++;
+		if (sy>247)
+			return;
+		if (flipy) y_index--; else y_index++;
+	}
+}
 
 /******************************************************************************/
 
@@ -992,7 +1070,10 @@ VIDEO_START( fghthist )
 	pf1a_tilemap =0;
 	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
-	deco_allocate_sprite_bitmap(machine);
+	/* Allow sprite bitmap */
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	sprite_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

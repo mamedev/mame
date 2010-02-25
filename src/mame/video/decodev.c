@@ -137,6 +137,12 @@ Rowscroll style:
 
     Column and rowscroll can both be applied at once.
 
+
+    2010-02: Converted to be a device.
+    TODO:
+      - properly support PCBs with two ICs (i.e. no pf3/pf4 because they actually belong to a 2nd chip)
+      - move here emulation of the sprite chips (currently replicated in each driver)?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1368,8 +1374,8 @@ DEVICE_GET_INFO( deco16ic )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(deco16ic);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Data East Video Custom");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Data East Video Custom");					break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Data East IC 55 / 56 / 74 / 141");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Data East Video IC");					break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
