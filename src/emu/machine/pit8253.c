@@ -102,12 +102,13 @@ struct _pit8253_t
 ***************************************************************************/
 
 /* makes sure that the passed in device is of the right type */
-INLINE pit8253_t *get_safe_token(running_device *device) {
-	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( ( device->type == DEVICE_GET_INFO_NAME(pit8253) ) ||
-		    ( device->type == DEVICE_GET_INFO_NAME(pit8254) ) );
-	return ( pit8253_t * ) device->token;
+INLINE pit8253_t *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == PIT8253) || (device->type == PIT8254));
+
+	return (pit8253_t *) device->token;
 }
 
 
