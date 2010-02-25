@@ -320,7 +320,7 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
-static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
+static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
 	if ( streetg2_devices.pic8259_1 )
 	{
@@ -329,7 +329,7 @@ static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 }
 
 
-static PIT8253_OUTPUT_CHANGED( at_pit8254_out2_changed )
+static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out2_changed )
 {
 	//at_speaker_set_input( state ? 1 : 0 );
 }
@@ -340,13 +340,16 @@ static const struct pit8253_config at_pit8254_config =
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			at_pit8254_out0_changed
+			DEVCB_NULL,
+			DEVCB_LINE(at_pit8254_out0_changed)
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			at_pit8254_out2_changed
+			DEVCB_NULL,
+			DEVCB_LINE(at_pit8254_out2_changed)
 		}
 	}
 };

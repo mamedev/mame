@@ -578,23 +578,21 @@ static const struct pic8259_interface taitowlf_pic8259_2_config =
  *
  *************************************************************/
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
-{
-	pic8259_ir0_w(taitowlf_devices.pic8259_1, state);
-}
-
 static const struct pit8253_config taitowlf_pit8254_config =
 {
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };
