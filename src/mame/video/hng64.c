@@ -1817,16 +1817,16 @@ static void setCameraProjectionMatrix(const UINT16* packet)
     // [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
     // [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
     // [3]  - ???? ... ? Contains a value
-    // [4]  - ???? ... ? Contains a value in buriki
-    // [5]  - ???? ... ? Contains a value
-    // [6]  - xxxx ... camera projection near
-    // [7]  - xxxx ... camera projection far
-    // [8]  - ???? ... ? Contains a value
-    // [9]  - ???? ... ? Contains a value
-    // [10] - xxxx ... camera projection right
-    // [11] - xxxx ... camera projection left
-    // [12] - xxxx ... camera projection top
-    // [13] - xxxx ... camera projection bottom
+    // [4]  - xxxx ... Camera projection near scale
+    // [5]  - xxxx ... Camera projection near height(?)
+    // [6]  - xxxx ... Camera projection near width(?)
+    // [7]  - xxxx ... Camera projection far scale
+    // [8]  - xxxx ... Camera projection far height(?)
+    // [9]  - xxxx ... Camera projection far width(?)
+    // [10] - xxxx ... Camera projection right
+    // [11] - xxxx ... Camera projection left
+    // [12] - xxxx ... Camera projection top
+    // [13] - xxxx ... Camera projection bottom
     // [14] - ???? ... ? Gets data during buriki door-run
     // [15] - ???? ... ? Gets data during buriki door-run
     ////////////*/
@@ -1838,8 +1838,9 @@ static void setCameraProjectionMatrix(const UINT16* packet)
 	right   = uToF(packet[10]);
 	top     = uToF(packet[12]);
 	bottom  = uToF(packet[13]);
-	near_   = uToF(packet[6]);
-	far_    = uToF(packet[7]);
+	near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
+	far_    = uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
+	// (note are likely not 100% correct - I'm not using one of the parameters)
 
 	projectionMatrix[0]  = (2.0f*near_)/(right-left);
 	projectionMatrix[1]  = 0.0f;
@@ -2395,6 +2396,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0010:	// Unknown
+        //printPacket(packet, 1); printf("\n");
 		// Called very interestingly per-frame in every game.  Floats for sure.  Light-related?
 		break;
 
