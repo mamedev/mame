@@ -13,28 +13,32 @@ End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
+#include "includes/supbtime.h"
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	supbtime_state *state = (supbtime_state *)machine->driver_data;
+	UINT16 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0;offs < 0x400;offs += 4)
+	for (offs = 0; offs < 0x400; offs += 4)
 	{
-		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
+		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
-		sprite = spriteram16[offs+1] & 0x3fff;
-		if (!sprite) continue;
+		sprite = spriteram[offs + 1] & 0x3fff;
+		if (!sprite) 
+			continue;
 
-		y = spriteram16[offs];
-		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		y = spriteram[offs];
+		flash = y & 0x1000;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+			continue;
 
-		x = spriteram16[offs+2];
-		colour = (x >>9) & 0x1f;
+		x = spriteram[offs + 2];
+		colour = (x >> 9) & 0x1f;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;
@@ -45,9 +49,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (x >= 320) x -= 512;
 		if (y >= 256) y -= 512;
 		y = 240 - y;
-        x = 304 - x;
+		x = 304 - x;
 
-		if (x>320) continue;
+		if (x > 320) 
+			continue;
 
 		sprite &= ~multi;
 		if (fy)
@@ -60,13 +65,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (flip_screen_get(machine))
 		{
-			y=240-y;
-			x=304-x;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			mult=16;
+			y = 240 - y;
+			x = 304 - x;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
+			mult = 16;
 		}
-		else mult=-16;
+		else mult = -16;
 
 		while (multi >= 0)
 		{
@@ -83,21 +88,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 /******************************************************************************/
 
-VIDEO_START(supbtime)
-{
-	deco16_1_video_init(machine);
-}
-
 VIDEO_UPDATE(supbtime)
 {
-	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
+	supbtime_state *state = (supbtime_state *)screen->machine->driver_data;
+	UINT16 flip = decodev_pf12_control_r(state->deco16ic, 0, 0xffff);
 
-	bitmap_fill(bitmap,cliprect,768);
+	flip_screen_set(screen->machine, BIT(flip, 7));
+	decodev_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
-	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	bitmap_fill(bitmap, cliprect, 768);
+
+	decodev_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	decodev_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
-

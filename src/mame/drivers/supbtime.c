@@ -25,16 +25,15 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 #include "cpu/h6280/h6280.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
+#include "includes/supbtime.h"
 
-VIDEO_START( supbtime );
-VIDEO_UPDATE( supbtime );
 
 /******************************************************************************/
 
 static READ16_HANDLER( supbtime_controls_r )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0:
 			return input_port_read(space->machine, "INPUTS");
@@ -47,14 +46,15 @@ static READ16_HANDLER( supbtime_controls_r )
 			return 0;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(space->cpu),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(space->cpu), offset);
 	return ~0;
 }
 
 static WRITE16_HANDLER( sound_w )
 {
+	supbtime_state *state = (supbtime_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -63,32 +63,32 @@ static ADDRESS_MAP_START( supbtime_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP /* Nothing there */
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, spriteram, spriteram_size)
 	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP /* Nothing there */
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
-	AM_RANGE(0x300000, 0x30000f) AM_RAM AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x300000, 0x30000f) AM_RAM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll)
+	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinatwn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(sound_w)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, spriteram, spriteram_size)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_RAM AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll) // unused
+	AM_RANGE(0x300000, 0x30000f) AM_RAM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll) // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll) // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -311,7 +311,8 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	supbtime_state *driver_state = (supbtime_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -319,7 +320,29 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+static const deco16ic_interface supbtime_deco16ic_intf =
+{
+	"screen",
+	1, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	NULL, NULL, NULL, NULL
+};
+
+static MACHINE_START( supbtime )
+{
+	supbtime_state *state = (supbtime_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+}
+
 static MACHINE_DRIVER_START( supbtime )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(supbtime_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -328,6 +351,8 @@ static MACHINE_DRIVER_START( supbtime )
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)	/* Custom chip 45, audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(supbtime)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -342,8 +367,9 @@ static MACHINE_DRIVER_START( supbtime )
 	MDRV_GFXDECODE(supbtime)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(supbtime)
 	MDRV_VIDEO_UPDATE(supbtime)
+
+	MDRV_DECO16IC_ADD("deco_custom", supbtime_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -361,6 +387,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( chinatwn )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(supbtime_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(chinatwn_map)
@@ -368,6 +397,8 @@ static MACHINE_DRIVER_START( chinatwn )
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(supbtime)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -382,8 +413,9 @@ static MACHINE_DRIVER_START( chinatwn )
 	MDRV_GFXDECODE(supbtime)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(supbtime)
 	MDRV_VIDEO_UPDATE(supbtime)
+
+	MDRV_DECO16IC_ADD("deco_custom", supbtime_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -479,7 +511,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1990, supbtime, 0,        supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", 0 )
-GAME( 1990, supbtimea,supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", 0 )
-GAME( 1990, supbtimej,supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", 0 )
-GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, 0, ROT0, "Data East Corporation", "China Town (Japan)", 0 )
+GAME( 1990, supbtime, 0,        supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, supbtimea,supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, supbtimej,supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, 0, ROT0, "Data East Corporation", "China Town (Japan)", GAME_SUPPORTS_SAVE )

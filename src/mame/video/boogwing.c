@@ -1,10 +1,15 @@
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
+
+UINT16 *boogwing_pf1_rowscroll,*boogwing_pf2_rowscroll;
+UINT16 *boogwing_pf3_rowscroll,*boogwing_pf4_rowscroll;
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
 {
+	running_device *deco16ic = devtag_get_device(machine, "deco_custom");
 	int offs;
 	int flipscreen=!flip_screen_get(machine);
+	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
 
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
@@ -40,7 +45,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			if (spriteram_base[offs+2]&0x2000)
 				alpha = 0x80;
 
-			if (deco16_priority==0x2)
+			if (priority==0x2)
 			{
 				// Additional sprite alpha in this mode
 				if (spriteram_base[offs+2]&0x8000)
@@ -71,7 +76,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				spri=32;
 
 			// Sprite vs playfield
-			if (deco16_priority==0x1)
+			if (priority==0x1)
 			{
 				if ((spriteram_base[offs+2]&0xc000))
 					pri=16;
@@ -94,7 +99,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (x >= 320) x -= 512;
 		if (y >= 256) y -= 512;
 		y = 240 - y;
-        x = 304 - x;
+		x = 304 - x;
 
 		sprite &= ~multi;
 		if (fy)
@@ -117,7 +122,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(
+			decodev_pdrawgfx(
+					deco16ic,
 					bitmap, cliprect, machine->gfx[gfx_region],
 					sprite - multi * inc,
 					colour,
@@ -130,73 +136,64 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static int boogwing_bank_callback(const int bank)
-{
-	return ((bank>>4) & 0x7) * 0x1000;
-}
-
-static int boogwing_bank_callback2(const int bank)
-{
-	int offset=((bank>>4) & 0x7) * 0x1000;
-	if ((bank&0xf)==0xa)
-		offset+=0x800; // strange - transporter level
-	return offset;
-}
-
 VIDEO_START(boogwing)
 {
-	deco16_2_video_init(machine, 0);
+//	deco16_2_video_init(machine, 0);
 
-	deco16_set_tilemap_bank_callback(1,boogwing_bank_callback);
-	deco16_set_tilemap_bank_callback(2,boogwing_bank_callback2);
-	deco16_set_tilemap_bank_callback(3,boogwing_bank_callback2);
-	deco16_set_tilemap_colour_base(1,0);
-	deco16_set_tilemap_transparency_mask(1, 0x1f); // 5bpp graphics
+//	deco16_set_tilemap_bank_callback(1,boogwing_bank_callback);
+//	deco16_set_tilemap_bank_callback(2,boogwing_bank_callback2);
+//	deco16_set_tilemap_bank_callback(3,boogwing_bank_callback2);
+//	deco16_set_tilemap_colour_base(1,0);
+//	deco16_set_tilemap_transparency_mask(1, 0x1f); // 5bpp graphics
 }
 
 VIDEO_UPDATE(boogwing)
 {
-	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
-	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
+	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+
+	flip_screen_set(screen->machine, BIT(flip, 7));
+	decodev_pf12_update(deco16ic, boogwing_pf1_rowscroll, boogwing_pf2_rowscroll);
+	decodev_pf34_update(deco16ic, boogwing_pf3_rowscroll, boogwing_pf4_rowscroll);
 
 	/* Draw playfields */
-	deco16_clear_sprite_priority_bitmap();
-	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x400]); /* pen not confirmed */
-	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
+	decodev_clear_sprite_priority_bitmap(deco16ic);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x400]); /* pen not confirmed */
+	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
 	// bit&0x8 is definitely some kind of palette effect
 	// bit&0x4 combines playfields
-	if ((deco16_priority&0x7)==0x5)
+	if ((priority & 0x7) == 0x5)
 	{
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_34_combine_draw(screen,bitmap,cliprect,0,32);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_34_combine_draw(deco16ic, bitmap, cliprect, 0, 32);
 	}
-	else if ((deco16_priority&0x7)==0x1 || (deco16_priority&0x7)==0x2)
+	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,8);
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,32);
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 8);
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 32);
 	}
-	else if ((deco16_priority&0x7)==0x3)
+	else if ((priority & 0x7) == 0x3)
 	{
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,8);
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
-//      deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA(0x80),32);
+		// decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 32);
 	}
 	else
 	{
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,8);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,32);
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 8);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 32);
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 3);
 	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram2.u16, 4);
 
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -46,19 +46,17 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/deco16ic.h"
+#include "includes/tumblep.h"
+#include "video/decodev.h"
 
 #define TUMBLEP_HACK	0
-
-VIDEO_START( tumblep );
-VIDEO_UPDATE( tumblep );
 
 /******************************************************************************/
 
 #ifdef UNUSED_FUNCTION
 static WRITE16_DEVICE_HANDLER( tumblep_oki_w )
 {
-	okim6295_w(0,data&0xff);
+	okim6295_w(0, data & 0xff);
     /* STUFF IN OTHER BYTE TOO..*/
 }
 
@@ -70,15 +68,17 @@ static READ16_HANDLER( tumblep_prot_r )
 
 static WRITE16_HANDLER( tumblep_sound_w )
 {
+	tumblep_state *state = (tumblep_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jumppop_sound_w )
 {
+	tumblep_state *state = (tumblep_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE );
+	cputag_set_input_line(state->audiocpu, 0, ASSERT_LINE );
 }
 #endif
 
@@ -86,7 +86,7 @@ static WRITE16_HANDLER( jumppop_sound_w )
 
 static READ16_HANDLER( tumblepop_controls_r )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0:
 			return input_port_read(space->machine, "PLAYERS");
@@ -116,12 +116,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x320000, 0x320fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE(&deco16_pf2_rowscroll) // unused
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_MEMBER(tumblep_state, spriteram, spriteram_size)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x320000, 0x320fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x322fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf1_rowscroll) // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf2_rowscroll) // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -274,7 +274,8 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	tumblep_state *driver_state = (tumblep_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -282,7 +283,29 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+static const deco16ic_interface tumblep_deco16ic_intf =
+{
+	"screen",
+	1, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	NULL, NULL, NULL, NULL
+};
+
+static MACHINE_START( tumblep )
+{
+	tumblep_state *state = (tumblep_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+}
+
 static MACHINE_DRIVER_START( tumblep )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tumblep_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -291,6 +314,8 @@ static MACHINE_DRIVER_START( tumblep )
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)	/* Custom chip 45; Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(tumblep)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -303,8 +328,9 @@ static MACHINE_DRIVER_START( tumblep )
 	MDRV_GFXDECODE(tumblep)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(tumblep)
 	MDRV_VIDEO_UPDATE(tumblep)
+
+	MDRV_DECO16IC_ADD("deco_custom", tumblep_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -383,6 +409,6 @@ static DRIVER_INIT( tumblep )
 
 /******************************************************************************/
 
-GAME( 1991, tumblep,  0,       tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (World)", 0 )
-GAME( 1991, tumblepj, tumblep, tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (Japan)", 0 )
+GAME( 1991, tumblep,  0,       tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, tumblepj, tumblep, tumblep,   tumblep,  tumblep,  ROT0, "Data East Corporation", "Tumble Pop (Japan)", GAME_SUPPORTS_SAVE )
 /* for bootlegs and games on similar hardware see tumbleb.c */

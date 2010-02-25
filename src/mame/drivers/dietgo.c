@@ -11,21 +11,19 @@
 #include "sound/okim6295.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "includes/deco16ic.h"
-
-VIDEO_UPDATE( dietgo );
-VIDEO_START( dietgo );
+#include "includes/dietgo.h"
+#include "video/decodev.h"
 
 
 static ADDRESS_MAP_START( dietgo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x210000, 0x211fff) AM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x212000, 0x213fff) AM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_BASE(&deco16_pf2_rowscroll)
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x300000, 0x300bff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("deco_custom", decodev_pf1_data_w)
+	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf1_rowscroll)
+	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf2_rowscroll)
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE_MEMBER(dietgo_state, spriteram, spriteram_size)
+	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x340000, 0x3407ff) AM_READWRITE(dietgo_104_prot_r, dietgo_104_prot_w)
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END
@@ -53,7 +51,7 @@ static INPUT_PORTS_START( dietgo )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START("IN1")	/* 16bit */
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -71,7 +69,7 @@ static INPUT_PORTS_START( dietgo )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW")	/* Dip switch bank 1 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -97,7 +95,6 @@ static INPUT_PORTS_START( dietgo )
 	PORT_DIPSETTING(      0x0080, "1 Start/1 Continue" )
 	PORT_DIPSETTING(      0x0000, "2 Start/1 Continue" )
 
-	/* Dip switch bank 2 */
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
@@ -164,7 +161,8 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	dietgo_state *driver_state = (dietgo_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -172,7 +170,40 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+
+static int dietgo_bank_callback(const int bank)
+{
+	return ((bank >> 4) & 0x7) * 0x1000;
+}
+
+static const deco16ic_interface dietgo_deco16ic_intf =
+{
+	"screen",
+	1, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	dietgo_bank_callback,
+	dietgo_bank_callback,
+	NULL,
+	NULL
+};
+
+
+static MACHINE_START( dietgo )
+{
+	dietgo_state *state = (dietgo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+}
+
 static MACHINE_DRIVER_START( dietgo )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dietgo_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(dietgo_map)
@@ -180,6 +211,8 @@ static MACHINE_DRIVER_START( dietgo )
 
 	MDRV_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(dietgo)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -192,8 +225,9 @@ static MACHINE_DRIVER_START( dietgo )
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_GFXDECODE(dietgo)
 
-	MDRV_VIDEO_START(dietgo)
 	MDRV_VIDEO_UPDATE(dietgo)
+
+	MDRV_DECO16IC_ADD("deco_custom", dietgo_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -334,7 +368,7 @@ static DRIVER_INIT( dietgo )
 	deco102_decrypt_cpu(machine, "maincpu", 0xe9ba, 0x01, 0x19);
 }
 
-GAME( 1992, dietgo,   0,      dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", 0 )
-GAME( 1992, dietgoe,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)" , 0) // weird, still version 1.1 but different date
-GAME( 1992, dietgou,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", 0 )
-GAME( 1992, dietgoj,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", 0 )
+GAME( 1992, dietgo,   0,      dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dietgoe,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)" , GAME_SUPPORTS_SAVE ) // weird, still version 1.1 but different date
+GAME( 1992, dietgou,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dietgoj,  dietgo, dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )

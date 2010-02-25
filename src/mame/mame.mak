@@ -593,6 +593,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(MACHINE)/decocrpt.o \
 	$(MACHINE)/decoprot.o \
 	$(VIDEO)/deco16ic.o \
+	$(VIDEO)/decodev.o \
 
 $(MAMEOBJ)/dooyong.a: \
 	$(DRIVERS)/dooyong.o $(VIDEO)/dooyong.o \

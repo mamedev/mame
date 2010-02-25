@@ -3,7 +3,9 @@
 */
 
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
+
+UINT16 *simpl156_pf1_rowscroll,*simpl156_pf2_rowscroll;
 
 /*
 
@@ -114,45 +116,29 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( simpl156 )
 {
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
 	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
+	decodev_pf12_update(deco16ic, simpl156_pf1_rowscroll, simpl156_pf2_rowscroll);
 
-	bitmap_fill(bitmap,cliprect,256);
+	bitmap_fill(bitmap, cliprect, 256);
 
-	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,4);
+	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
 
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
-
-static int simpl156_bank_callback(const int bank)
-{
-	return ((bank>>4)&0x7) * 0x1000;
-}
-
 
 VIDEO_START( simpl156 )
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	deco16_pf1_data = auto_alloc_array(machine, UINT16, 0x2000/2);
-	deco16_pf2_data = auto_alloc_array(machine, UINT16, 0x2000/2);
-	deco16_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-	deco16_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-	deco16_pf12_control = auto_alloc_array(machine, UINT16, 0x10/2);
+	simpl156_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
+	simpl156_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
 	machine->generic.paletteram.u16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
-	state_save_register_global_pointer(machine, deco16_pf2_data, 0x2000/2);
-	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
+	state_save_register_global_pointer(machine, simpl156_pf1_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, simpl156_pf2_rowscroll, 0x800/2);
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000/2);
-
-	deco16_1_video_init(machine);
-
-	deco16_set_tilemap_bank_callback(0, simpl156_bank_callback);
-	deco16_set_tilemap_bank_callback(1, simpl156_bank_callback);
 }

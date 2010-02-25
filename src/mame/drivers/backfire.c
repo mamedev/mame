@@ -18,8 +18,11 @@
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 #include "rendlay.h"
+
+static UINT16 *backfire_pf1_rowscroll,*backfire_pf2_rowscroll;
+static UINT16 *backfire_pf3_rowscroll,*backfire_pf4_rowscroll;
 
 static UINT32 *backfire_spriteram32_1;
 static UINT32 *backfire_spriteram32_2;
@@ -32,56 +35,20 @@ static UINT32 *backfire_left_priority, *backfire_right_priority;
 
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
 
-static int backfire_bank_callback(int bank)
-{
-//  mame_printf_debug("bank callback %04x\n",bank); // bit 1 gets set too?
-
-	bank = bank >> 4;
-
-	bank = (bank & 1) |  ( (bank & 4) >> 1 ) | ((bank & 2) << 1);
-
-	return bank * 0x1000;
-}
-
-
 
 static VIDEO_START(backfire)
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	deco16_pf1_data = auto_alloc_array(machine, UINT16, 0x2000/2);
-	deco16_pf2_data = auto_alloc_array(machine, UINT16, 0x2000/2);
-	deco16_pf3_data = auto_alloc_array(machine, UINT16, 0x2000/2);
-	deco16_pf4_data = auto_alloc_array(machine, UINT16, 0x2000/2);
-	deco16_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
-	deco16_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
-	deco16_pf3_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
-	deco16_pf4_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
-	deco16_pf12_control = auto_alloc_array(machine, UINT16, 0x10/2);
-	deco16_pf34_control =auto_alloc_array(machine,  UINT16, 0x10/2);
+	backfire_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
+	backfire_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
+	backfire_pf3_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
+	backfire_pf4_rowscroll = auto_alloc_array(machine, UINT16, 0x0800/2);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
-	state_save_register_global_pointer(machine, deco16_pf2_data, 0x2000/2);
-	state_save_register_global_pointer(machine, deco16_pf3_data, 0x2000/2);
-	state_save_register_global_pointer(machine, deco16_pf4_data, 0x2000/2);
-	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, deco16_pf3_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, deco16_pf4_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(machine, deco16_pf34_control, 0x10/2);
-
-	deco16_2_video_init(machine, 0);
-
-	deco16_pf1_colour_bank = 0x00;
-	deco16_pf2_colour_bank = 0x40;
-	deco16_pf3_colour_bank = 0x10;
-	deco16_pf4_colour_bank = 0x50;
-
-	deco16_set_tilemap_bank_callback(0, backfire_bank_callback);
-	deco16_set_tilemap_bank_callback(1, backfire_bank_callback);
-	deco16_set_tilemap_bank_callback(2, backfire_bank_callback);
-	deco16_set_tilemap_bank_callback(3, backfire_bank_callback);
+	state_save_register_global_pointer(machine, backfire_pf1_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, backfire_pf2_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, backfire_pf3_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, backfire_pf4_rowscroll, 0x800/2);
 
 	backfire_left =  auto_bitmap_alloc(machine, 80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	backfire_right = auto_bitmap_alloc(machine, 80*8, 32*8, BITMAP_FORMAT_INDEXED16);
@@ -167,34 +134,35 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 
 
-static VIDEO_UPDATE(backfire)
+static VIDEO_UPDATE( backfire )
 {
 	running_device *left_screen = devtag_get_device(screen->machine, "lscreen");
 	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
 
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
-	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
+	decodev_pf12_update(deco16ic, backfire_pf1_rowscroll, backfire_pf2_rowscroll);
+	decodev_pf34_update(deco16ic, backfire_pf3_rowscroll, backfire_pf4_rowscroll);
 
 	if (screen == left_screen)
 	{
 
-		bitmap_fill(screen->machine->priority_bitmap,NULL,0);
-		bitmap_fill(bitmap,cliprect,0x100);
+		bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+		bitmap_fill(bitmap, cliprect, 0x100);
 
 		if (backfire_left_priority[0] == 0)
 		{
-			deco16_tilemap_3_draw(screen,bitmap,cliprect,0,1);
-			deco16_tilemap_1_draw(screen,bitmap,cliprect,0,2);
-			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
+			decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 1);
+			decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 2);
+			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_1, 3);
 		}
 		else if (backfire_left_priority[0] == 2)
 		{
-			deco16_tilemap_1_draw(screen,bitmap,cliprect,0,2);
-			deco16_tilemap_3_draw(screen,bitmap,cliprect,0,4);
-			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
+			decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 2);
+			decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 4);
+			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_1, 3);
 		}
 		else
 			popmessage( "unknown left priority %08x", backfire_left_priority[0] );
@@ -206,15 +174,15 @@ static VIDEO_UPDATE(backfire)
 
 		if (backfire_right_priority[0] == 0)
 		{
-			deco16_tilemap_4_draw(screen,bitmap,cliprect,0,1);
-			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
-			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
+			decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 1);
+			decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_2, 4);
 		}
 		else if (backfire_right_priority[0] == 2)
 		{
-			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
-			deco16_tilemap_4_draw(screen,bitmap,cliprect,0,4);
-			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
+			decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+			decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 4);
+			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_2, 4);
 		}
 		else
 			popmessage( "unknown right priority %08x", backfire_right_priority[0] );
@@ -259,7 +227,7 @@ static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 }
 
 
-static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
+static WRITE32_HANDLER(backfire_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
@@ -267,26 +235,15 @@ static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 
 /* map 32-bit writes to 16-bit */
 
-static READ32_HANDLER( backfire_pf1_rowscroll_r ) { return deco16_pf1_rowscroll[offset]^0xffff0000; }
-static READ32_HANDLER( backfire_pf2_rowscroll_r ) { return deco16_pf2_rowscroll[offset]^0xffff0000; }
-static READ32_HANDLER( backfire_pf3_rowscroll_r ) { return deco16_pf3_rowscroll[offset]^0xffff0000; }
-static READ32_HANDLER( backfire_pf4_rowscroll_r ) { return deco16_pf4_rowscroll[offset]^0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf3_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf4_rowscroll[offset]); }
-static READ32_HANDLER ( backfire_pf12_control_r ) { return deco16_pf12_control[offset]^0xffff0000; }
-static READ32_HANDLER ( backfire_pf34_control_r ) { return deco16_pf34_control[offset]^0xffff0000; }
-static WRITE32_HANDLER( backfire_pf12_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf12_control[offset]); }
-static WRITE32_HANDLER( backfire_pf34_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf34_control[offset]); }
-static READ32_HANDLER( backfire_pf1_data_r ) {	return deco16_pf1_data[offset]^0xffff0000; }
-static READ32_HANDLER( backfire_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
-static READ32_HANDLER( backfire_pf3_data_r ) {	return deco16_pf3_data[offset]^0xffff0000; }
-static READ32_HANDLER( backfire_pf4_data_r ) {	return deco16_pf4_data[offset]^0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(space,offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(space,offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(space,offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(space,offset,data,mem_mask); }
+static READ32_HANDLER( backfire_pf1_rowscroll_r ) { return backfire_pf1_rowscroll[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf2_rowscroll_r ) { return backfire_pf2_rowscroll[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf3_rowscroll_r ) { return backfire_pf3_rowscroll[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf4_rowscroll_r ) { return backfire_pf4_rowscroll[offset]^0xffff0000; }
+static WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&backfire_pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&backfire_pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&backfire_pf3_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&backfire_pf4_rowscroll[offset]); }
+
 
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
@@ -308,18 +265,18 @@ READ32_HANDLER( backfire_wheel2_r )
 
 static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_READWRITE( backfire_pf12_control_r, backfire_pf12_control_w)
-	AM_RANGE(0x110000, 0x111fff) AM_READWRITE( backfire_pf1_data_r, backfire_pf1_data_w)
-	AM_RANGE(0x114000, 0x115fff) AM_READWRITE( backfire_pf2_data_r, backfire_pf2_data_w)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE( backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
-	AM_RANGE(0x124000, 0x124fff) AM_READWRITE( backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
-	AM_RANGE(0x130000, 0x13001f) AM_READWRITE( backfire_pf34_control_r, backfire_pf34_control_w)
-	AM_RANGE(0x140000, 0x141fff) AM_READWRITE( backfire_pf3_data_r, backfire_pf3_data_w)
-	AM_RANGE(0x144000, 0x145fff) AM_READWRITE( backfire_pf4_data_r, backfire_pf4_data_w)
-	AM_RANGE(0x150000, 0x150fff) AM_READWRITE( backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
-	AM_RANGE(0x154000, 0x154fff) AM_READWRITE( backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
-	AM_RANGE(0x160000, 0x161fff) AM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE( &backfire_mainram )// main ram
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
+	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
+	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
+	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("deco_custom", decodev_pf34_control_dword_r, decodev_pf34_control_dword_w)
+	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_dword_r, decodev_pf3_data_dword_w)
+	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_dword_r, decodev_pf4_data_dword_w)
+	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
+	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
+	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE(&backfire_mainram )// main ram
 
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE(&backfire_180010) // always 180010 ?
 //  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE(&backfire_188010) // always 188010 ?
@@ -462,6 +419,28 @@ static INTERRUPT_GEN( deco32_vbl_interrupt )
 
 
 
+static int backfire_bank_callback( int bank )
+{
+	//  mame_printf_debug("bank callback %04x\n",bank); // bit 1 gets set too?
+	bank = bank >> 4;
+	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
+
+	return bank * 0x1000;
+}
+
+static const deco16ic_interface backfire_deco16ic_intf =
+{
+	"lscreen",
+	0, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x40, 0x10, 0x50, /* color base */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	backfire_bank_callback,
+	backfire_bank_callback,
+	backfire_bank_callback,
+	backfire_bank_callback
+};
+
 static MACHINE_DRIVER_START( backfire )
 
 	/* basic machine hardware */
@@ -492,6 +471,8 @@ static MACHINE_DRIVER_START( backfire )
 
 	MDRV_VIDEO_START(backfire)
 	MDRV_VIDEO_UPDATE(backfire)
+
+	MDRV_DECO16IC_ADD("deco_custom", backfire_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

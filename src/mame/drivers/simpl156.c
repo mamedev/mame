@@ -90,13 +90,13 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 
 #include "emu.h"
 #include "includes/decocrpt.h"
-#include "includes/deco32.h"
 #include "cpu/arm/arm.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 
 static UINT32 *simpl156_systemram;
+extern UINT16 *simpl156_pf1_rowscroll,*simpl156_pf2_rowscroll;
 
 extern VIDEO_START( simpl156 );
 extern VIDEO_UPDATE( simpl156 );
@@ -221,7 +221,7 @@ static WRITE32_HANDLER( simpl156_mainram_w )
 
 static READ32_HANDLER( simpl156_pf1_rowscroll_r )
 {
-	return deco16_pf1_rowscroll[offset]^0xffff0000;
+	return simpl156_pf1_rowscroll[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
@@ -229,12 +229,12 @@ static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
 
-	COMBINE_DATA(&deco16_pf1_rowscroll[offset]);
+	COMBINE_DATA(&simpl156_pf1_rowscroll[offset]);
 }
 
 static READ32_HANDLER( simpl156_pf2_rowscroll_r )
 {
-	return deco16_pf2_rowscroll[offset]^0xffff0000;
+	return simpl156_pf2_rowscroll[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
@@ -242,47 +242,7 @@ static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
 
-	COMBINE_DATA(&deco16_pf2_rowscroll[offset]);
-}
-
-static READ32_HANDLER ( simpl156_pf12_control_r )
-{
-	return deco16_pf12_control[offset]^0xffff0000;
-}
-
-static WRITE32_HANDLER( simpl156_pf12_control_w )
-{
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
-
-	COMBINE_DATA(&deco16_pf12_control[offset]);
-}
-
-
-static READ32_HANDLER( simpl156_pf1_data_r )
-{
-	return deco16_pf1_data[offset]^0xffff0000;
-}
-
-static WRITE32_HANDLER( simpl156_pf1_data_w )
-{
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
-
-	deco16_pf1_data_w(space,offset,data,mem_mask);
-}
-
-static READ32_HANDLER( simpl156_pf2_data_r )
-{
-	return deco16_pf2_data[offset]^0xffff0000;
-}
-
-
-static WRITE32_HANDLER( simpl156_pf2_data_w )
-{
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
-	deco16_pf2_data_w(space,offset,data,mem_mask);
+	COMBINE_DATA(&simpl156_pf2_rowscroll[offset]);
 }
 
 /* Memory Map controled by PALs */
@@ -294,10 +254,10 @@ static ADDRESS_MAP_START( joemacr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x130000, 0x130003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
-	AM_RANGE(0x140000, 0x14001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
-	AM_RANGE(0x150000, 0x151fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x152000, 0x153fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x154000, 0x155fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
+	AM_RANGE(0x140000, 0x14001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
+	AM_RANGE(0x150000, 0x151fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x152000, 0x153fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x154000, 0x155fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
 	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x164000, 0x165fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
 	AM_RANGE(0x170000, 0x170003) AM_READONLY AM_WRITENOP // ?
@@ -318,10 +278,10 @@ static ADDRESS_MAP_START( chainrec_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x420000, 0x420fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x430000, 0x430003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
-	AM_RANGE(0x440000, 0x44001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
-	AM_RANGE(0x450000, 0x451fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x452000, 0x453fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x454000, 0x455fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
+	AM_RANGE(0x440000, 0x44001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
+	AM_RANGE(0x450000, 0x451fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x452000, 0x453fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x454000, 0x455fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
 	AM_RANGE(0x460000, 0x461fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x464000, 0x465fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
 	AM_RANGE(0x470000, 0x470003) AM_READONLY AM_WRITENOP // ??
@@ -339,10 +299,10 @@ static ADDRESS_MAP_START( magdrop_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3a0000, 0x3a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
-	AM_RANGE(0x3c0000, 0x3c001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
-	AM_RANGE(0x3d0000, 0x3d1fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x3d2000, 0x3d3fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x3d4000, 0x3d5fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
+	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
+	AM_RANGE(0x3d0000, 0x3d1fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x3d2000, 0x3d3fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x3d4000, 0x3d5fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x3e4000, 0x3e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
 	AM_RANGE(0x3f0000, 0x3f0003) AM_READONLY AM_WRITENOP //?
@@ -360,10 +320,10 @@ static ADDRESS_MAP_START( magdropp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x6a0000, 0x6a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x6b0000, 0x6b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
-	AM_RANGE(0x6c0000, 0x6c001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
-	AM_RANGE(0x6d0000, 0x6d1fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x6d2000, 0x6d3fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x6d4000, 0x6d5fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
+	AM_RANGE(0x6c0000, 0x6c001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
+	AM_RANGE(0x6d0000, 0x6d1fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x6d2000, 0x6d3fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x6d4000, 0x6d5fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
 	AM_RANGE(0x6e0000, 0x6e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x6e4000, 0x6e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
 	AM_RANGE(0x6f0000, 0x6f0003) AM_READONLY AM_WRITENOP // ?
@@ -380,10 +340,10 @@ static ADDRESS_MAP_START( mitchell156_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x1b0000, 0x1b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_READWRITE(simpl156_pf1_data_r, simpl156_pf1_data_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_READWRITE(simpl156_pf2_data_r, simpl156_pf2_data_w)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x1d2000, 0x1d3fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(simpl156_pf1_rowscroll_r, simpl156_pf1_rowscroll_w)
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
 	AM_RANGE(0x1f0000, 0x1f0003) AM_READONLY AM_WRITENOP // ?
@@ -439,6 +399,24 @@ static INTERRUPT_GEN( simpl156_vbl_interrupt )
 }
 
 
+static int simpl156_bank_callback(const int bank)
+{
+	return ((bank >> 4) & 0x7) * 0x1000;
+}
+
+static const deco16ic_interface simpl156_deco16ic_intf =
+{
+	"screen",
+	1, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	simpl156_bank_callback,
+	simpl156_bank_callback,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( chainrec )
 	/* basic machine hardware */
 
@@ -460,6 +438,8 @@ static MACHINE_DRIVER_START( chainrec )
 	MDRV_GFXDECODE(simpl156)
 	MDRV_VIDEO_START(simpl156)
 	MDRV_VIDEO_UPDATE(simpl156)
+
+	MDRV_DECO16IC_ADD("deco_custom", simpl156_deco16ic_intf)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
