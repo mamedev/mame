@@ -173,7 +173,11 @@ static void avg_apply_flipping(int *x, int *y)
 
 static void vg_flush (running_machine *machine)
 {
-	int i;
+	int i = 0;
+
+	while (vectbuf[i].status == VGCLIP)
+		i++;
+	vector_add_point(machine, vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, 0);
 
 	for (i = 0; i < nvect; i++)
 	{
@@ -1131,6 +1135,19 @@ static void avg_vggo(vgdata *vg)
 	vg->sp = 0;
 }
 
+static void tempest_vggo(vgdata *vg)
+{
+	vg->pc = 0;
+	vg->sp = 0;
+	/*
+	 * Tempest and Quantum trigger VGGO from time to time even though
+	 * the VG runs in an endless loop for these games (see
+	 * avg_common_strobe2). If we don't discard all vectors in the
+	 * current buffer at this point, the screen starts flickering.
+	 */
+	nvect = 0;
+}
+
 static void dvg_vggo(vgdata *vg)
 {
 	vg->dvy = 0;
@@ -1221,13 +1238,6 @@ static TIMER_CALLBACK( run_state_machine )
  *
  ************************************/
 
-#ifdef UNUSED_FUNCTION
-int avgdvg_done(void)
-{
-	return vg->sync_halt;
-}
-#endif
-
 CUSTOM_INPUT( avgdvg_done_r )
 {
 	return vg->sync_halt ? 0x01 : 0x00;
@@ -1235,6 +1245,8 @@ CUSTOM_INPUT( avgdvg_done_r )
 
 WRITE8_HANDLER( avgdvg_go_w )
 {
+	vgc->vggo(vg);
+
 	if (vg->sync_halt && (nvect > 10))
 	{
 		/*
@@ -1246,7 +1258,6 @@ WRITE8_HANDLER( avgdvg_go_w )
 	}
 	vg_flush(space->machine);
 
-	vgc->vggo(vg);
 	vg_set_halt(0);
 	timer_adjust_oneshot(vg_run_timer, attotime_zero, 0);
 }
@@ -1372,7 +1383,7 @@ static const vgconf avg_tempest =
 	},
 	avg_state_addr,
 	avg_data,
-	avg_vggo,
+	tempest_vggo,
 	avg_vgrst
 };
 
@@ -1408,7 +1419,7 @@ static const vgconf avg_quantum =
 	},
 	avg_state_addr,
 	quantum_data,
-	avg_vggo,
+	tempest_vggo,
 	avg_vgrst
 };
 
