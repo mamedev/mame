@@ -18,8 +18,6 @@ Notes:
           except for the Main CPU which is a Z80 here.
         See twincobr.c machine and video drivers to complete the
           hardware setup.
-        Also see Input Port definition header below, for instructions
-          on how to enter test mode.
 
 **************************** Memory & I/O Maps *****************************
 Z80:(0)  Main CPU
@@ -126,6 +124,7 @@ out:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
+#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
 #include "sound/3812intf.h"
 
@@ -255,124 +254,78 @@ static ADDRESS_MAP_START( DSP_io_map, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 
-
-
 /*****************************************************************************
+
     Input Port definitions
 
-    There is a test mode for button/switch tests. To enter Test mode,
-    set the Cross Hatch Pattern DSW to on, restart and then press
-    player 1 start button when in the cross-hatch screen.
 *****************************************************************************/
 
-#define  WARDNER_PLAYER_INPUT( player )		/* Player 1 button 3 skips video RAM tests */	 \
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player)	/* Fire */		 \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player)	/* Jump */		 \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(player)	/* Shot C */	 \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(player)	/* Shot D */
-
-static INPUT_PORTS_START( wardner )
-	PORT_START("SYSTEM")	/* test button doesnt seem to do anything ? */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )		/* Service button */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )	/* Test button */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )	/* V-Blank */
-
-	PORT_START("P1")
-	WARDNER_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	WARDNER_PLAYER_INPUT( 2 )
-
+/* verified from Z80 code */
+static INPUT_PORTS_START( wardner_generic )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_6C ) )
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_WORLD
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x00, "30000 & 80000" )
-	PORT_DIPSETTING(	0x04, "50000 & 100000" )
-	PORT_DIPSETTING(	0x08, "50000" )
-	PORT_DIPSETTING(	0x0c, "100000" )
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
+	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
+	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
+	PORT_DIPSETTING(	0x08, "30k Only" )
+	PORT_DIPSETTING(	0x0c, "50k Only" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x30, "1" )
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x10, "4" )
 	PORT_DIPSETTING(	0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
+
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
+
+	PORT_START("SYSTEM")	/* test button doesnt seem to do anything ? */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* "TEST" in "test mode" - no effect outside */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )            /* "V-BLANKING" in "test mode" */
 INPUT_PORTS_END
 
+/* verified from Z80 code */
+static INPUT_PORTS_START( wardner )
+	PORT_INCLUDE( wardner_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_F1)
+	/* code at 0x6d25 ('wardner'), 0x6d2f ('wardnerj') or 0x6d2c ('pyros') */
+INPUT_PORTS_END
+
+/* verified from Z80 code */
 static INPUT_PORTS_START( wardnerj )
 	PORT_INCLUDE( wardner )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
+	TOAPLAN_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
+/* verified from Z80 code */
 static INPUT_PORTS_START( pyros )
-	PORT_INCLUDE( wardner )
-
-	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
+	PORT_INCLUDE( wardnerj )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce */
+	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
+	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
+	PORT_DIPSETTING(	0x08, "50k Only" )
+	PORT_DIPSETTING(	0x0c, "100k Only" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   /* additional code at 0x6037 */
 	PORT_DIPSETTING(	0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END

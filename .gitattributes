@@ -2819,6 +2819,7 @@ src/mame/includes/tmnt.h svneol=native#text/plain
 src/mame/includes/tnzs.h svneol=native#text/plain
 src/mame/includes/toaplan1.h svneol=native#text/plain
 src/mame/includes/toaplan2.h svneol=native#text/plain
+src/mame/includes/toaplipt.h svneol=native#text/plain
 src/mame/includes/toobin.h svneol=native#text/plain
 src/mame/includes/topspeed.h svneol=native#text/plain
 src/mame/includes/toypop.h svneol=native#text/plain
