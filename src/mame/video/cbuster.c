@@ -5,31 +5,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 
 static int twocrude_pri;
 
-/******************************************************************************/
-
-static int bank_callback(const int bank)
-{
-	return ((bank>>4)&0x7) * 0x1000;
-}
-
-VIDEO_START( twocrude )
-{
-	deco16_2_video_init(machine, 0);
-
-	deco16_set_tilemap_bank_callback(0, bank_callback);
-	deco16_set_tilemap_bank_callback(1, bank_callback);
-	deco16_set_tilemap_bank_callback(2, bank_callback);
-	deco16_set_tilemap_bank_callback(3, bank_callback);
-
-	deco16_pf1_colour_bank=0x00;
-	deco16_pf2_colour_bank=0x20;
-	deco16_pf4_colour_bank=0x40;
-	deco16_pf3_colour_bank=0x30;
-}
+UINT16 *twocrude_pf1_rowscroll,*twocrude_pf2_rowscroll;
+UINT16 *twocrude_pf3_rowscroll,*twocrude_pf4_rowscroll;
 
 /******************************************************************************/
 
@@ -60,12 +41,12 @@ WRITE16_HANDLER( twocrude_palette_24bit_b_w )
 
 void twocrude_pri_w(int pri)
 {
-	twocrude_pri=pri;
+	twocrude_pri = pri;
 }
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
@@ -137,25 +118,30 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( twocrude )
 {
-	flip_screen_set(screen->machine,  !(deco16_pf12_control[0]&0x80) );
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
+	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
 
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
-	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
+	flip_screen_set(screen->machine, !BIT(flip, 7));
+
+	decodev_pf12_update(deco16ic, twocrude_pf1_rowscroll, twocrude_pf2_rowscroll);
+	decodev_pf34_update(deco16ic, twocrude_pf3_rowscroll, twocrude_pf4_rowscroll);
 
 	/* Draw playfields & sprites */
-	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen->machine,bitmap,cliprect,0);
+	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
-	if (twocrude_pri) {
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
+	if (twocrude_pri) 
+	{
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else {
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
+	else 
+	{
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(screen->machine,bitmap,cliprect,1);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

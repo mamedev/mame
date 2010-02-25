@@ -195,8 +195,8 @@ static WRITE16_HANDLER( okim0_rombank_w )
 static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w) // 0x100000 - 0x101fff tested
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w) // 0x102000 - 0x102fff tested
+	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w) // 0x100000 - 0x101fff tested
+	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w) // 0x102000 - 0x102fff tested
 	/* linescroll */
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf1_rowscroll)
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf2_rowscroll)

@@ -118,8 +118,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_MEMBER(tumblep_state, spriteram, spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x320000, 0x320fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
-	AM_RANGE(0x322000, 0x322fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf1_rowscroll) // unused
 	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf2_rowscroll) // unused
 ADDRESS_MAP_END

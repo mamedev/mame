@@ -95,10 +95,11 @@ Notes:
 
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 
-VIDEO_START( funkyjet );
 VIDEO_UPDATE( funkyjet );
+
+extern UINT16 *funkyjet_pf1_rowscroll,*funkyjet_pf2_rowscroll;
 
 /******************************************************************************/
 
@@ -110,11 +111,11 @@ static ADDRESS_MAP_START( funkyjet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_BASE(&deco16_prot_ram)
 	AM_RANGE(0x184000, 0x184001) AM_WRITENOP
 	AM_RANGE(0x188000, 0x188001) AM_WRITENOP
-	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_BASE(&funkyjet_pf1_rowscroll)
+	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_BASE(&funkyjet_pf2_rowscroll)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -287,6 +288,16 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+static const deco16ic_interface funkyjet_deco16ic_intf =
+{
+	"screen",
+	1, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	NULL, NULL, NULL, NULL
+};
+
 static MACHINE_DRIVER_START( funkyjet )
 
 	/* basic machine hardware */
@@ -308,8 +319,9 @@ static MACHINE_DRIVER_START( funkyjet )
 	MDRV_GFXDECODE(funkyjet)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(funkyjet)
 	MDRV_VIDEO_UPDATE(funkyjet)
+
+	MDRV_DECO16IC_ADD("deco_custom", funkyjet_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

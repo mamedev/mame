@@ -5,50 +5,56 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
+
+UINT16 *dassault_pf2_rowscroll,*dassault_pf4_rowscroll;
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority)
+static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority )
 {
+	running_device *deco16ic = devtag_get_device(machine, "deco_custom");
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
-	int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
+	int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 	int offs, bank, gfxbank;
 	const UINT16 *spritebase;
 
 	/* Have to loop over the two sprite sources */
-	for (bank=0; bank<2; bank++)
+	for (bank = 0; bank < 2; bank++)
 	{
-		for (offs = 0x800-4;offs >= 0; offs -= 4)
+		for (offs = 0x800 - 4; offs >= 0; offs -= 4)
 		{
-			int alpha=0xff, pmask=0;
+			int alpha = 0xff, pmask = 0;
 
 			/* Draw the main spritebank after the other one */
-			if (bank==0)
+			if (bank == 0)
 			{
-				spritebase=buffered_spriteram16;
-				gfxbank=3;
+				spritebase = buffered_spriteram16;
+				gfxbank = 3;
 			}
 			else
 			{
-				spritebase=machine->generic.buffered_spriteram2.u16;
-				gfxbank=4;
+				spritebase = machine->generic.buffered_spriteram2.u16;
+				gfxbank = 4;
 			}
 
-			sprite = spritebase[offs+1] & 0x7fff;
-			if (!sprite) continue;
+			sprite = spritebase[offs + 1] & 0x7fff;
+			if (!sprite) 
+				continue;
 
-			x = spritebase[offs+2];
+			x = spritebase[offs + 2];
 
 			/* Alpha on chip 2 only */
-			if (bank==1 && x&0xc000)
-				alpha=0x80;
+			if (bank == 1 && x & 0xc000)
+				alpha = 0x80;
 
 			y = spritebase[offs];
-			flash=y&0x1000;
-			if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
-			colour = (x >> 9) &0x1f;
-			if (y&0x8000) colour+=32;
+			flash = y & 0x1000;
+			if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+				continue;
+			colour = (x >> 9) & 0x1f;
+			if (y & 0x8000) 
+				colour += 32;
 
 			fx = y & 0x2000;
 			fy = y & 0x4000;
@@ -61,7 +67,8 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 			x = 304 - x;
 			y = 240 - y;
 
-			if (x>320) continue; /* Speedup */
+			if (x > 320) 
+				continue; /* Speedup */
 
 			sprite &= ~multi;
 			if (fy)
@@ -72,70 +79,91 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 				inc = 1;
 			}
 
-			if (flip_screen_get(machine)) {
-				y=240-y;
-				x=304-x;
-				if (fx) fx=0; else fx=1;
-				if (fy) fy=0; else fy=1;
-				mult=16;
+			if (flip_screen_get(machine)) 
+			{
+				y = 240 - y;
+				x = 304 - x;
+				if (fx) fx = 0; else fx = 1;
+				if (fy) fy = 0; else fy = 1;
+				mult = 16;
 			}
-			else mult=-16;
+			else mult = -16;
 
 			/* Priority */
-			switch (pf_priority&3) {
+			switch (pf_priority & 3) 
+			{
 			case 0:
-				if (bank==0) {
-					switch (spritebase[offs+2]&0xc000) {
-					case 0xc000: pmask=1; break;
-					case 0x8000: pmask=8; break;
-					case 0x4000: pmask=32; break;
-					case 0x0000: pmask=128; break;
+				if (bank == 0) 
+				{
+					switch (spritebase[offs+2]&0xc000) 
+					{
+					case 0xc000: pmask = 1; break;
+					case 0x8000: pmask = 8; break;
+					case 0x4000: pmask = 32; break;
+					case 0x0000: pmask = 128; break;
 					}
-				} else {
-					if (spritebase[offs+2]&0x8000) pmask=64; /* Check */
-					else pmask=64;
+				} 
+				else 
+				{
+					if (spritebase[offs + 2] & 0x8000) 
+						pmask = 64; /* Check */
+					else 
+						pmask = 64;
 				}
 				break;
 
 			case 1:
-				if (bank==0) {
-					switch (spritebase[offs+2]&0xc000) {
-					case 0xc000: pmask=1; break;
-					case 0x8000: pmask=8; break;
-					case 0x4000: pmask=32; break;
-					case 0x0000: pmask=128; break;
+				if (bank == 0) 
+				{
+					switch (spritebase[offs + 2] & 0xc000) 
+					{
+					case 0xc000: pmask = 1; break;
+					case 0x8000: pmask = 8; break;
+					case 0x4000: pmask = 32; break;
+					case 0x0000: pmask = 128; break;
 					}
-				} else {
-					if (spritebase[offs+2]&0x8000) pmask=16; /* Check */
-					else pmask=16;
+				} 
+				else 
+				{
+					if (spritebase[offs + 2] & 0x8000) 
+						pmask = 16; /* Check */
+					else 
+						pmask = 16;
 				}
 				break;
 
 			case 2: /* Unused */
 			case 3:
-				if (bank==0) {
-					switch (spritebase[offs+2]&0xc000) {
-					case 0xc000: pmask=1; break;
-					case 0x8000: pmask=8; break;
-					case 0x4000: pmask=32; break;
-					case 0x0000: pmask=128; break;
+				if (bank == 0) 
+				{
+					switch (spritebase[offs + 2] & 0xc000) 
+					{
+					case 0xc000: pmask = 1; break;
+					case 0x8000: pmask = 8; break;
+					case 0x4000: pmask = 32; break;
+					case 0x0000: pmask = 128; break;
 					}
-				} else {
-					if (spritebase[offs+2]&0x8000) pmask=64; /* Check */
-					else pmask=64;
+				} 
+				else 
+				{
+					if (spritebase[offs + 2] & 0x8000) 
+						pmask = 64; /* Check */
+					else 
+						pmask = 64;
 				}
 				break;
 			}
 
 			while (multi >= 0)
 			{
-				deco16_pdrawgfx(
+				decodev_pdrawgfx(
+						deco16ic,
 						bitmap,cliprect,machine->gfx[gfxbank],
 						sprite - multi * inc,
 						colour,
-						fx,fy,
-						x,y + mult * multi,
-						0,pmask,1<<bank, 1, alpha);
+						fx, fy,
+						x, y + mult * multi,
+						0, pmask, 1 << bank, 1, alpha);
 
 				multi--;
 			}
@@ -145,52 +173,46 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 /******************************************************************************/
 
-static int dassault_bank_callback(const int bank)
-{
-	return ((bank>>4)&0xf)<<12;
-}
-
-VIDEO_START( dassault )
-{
-	deco16_2_video_init(machine, 0);
-
-	deco16_set_tilemap_bank_callback(0,dassault_bank_callback);
-	deco16_set_tilemap_bank_callback(1,dassault_bank_callback);
-	deco16_set_tilemap_bank_callback(2,dassault_bank_callback);
-	deco16_set_tilemap_bank_callback(3,dassault_bank_callback);
-}
-
-/******************************************************************************/
-
 VIDEO_UPDATE( dassault )
 {
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
+	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+
 	/* Update tilemaps */
-	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
-	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
+	flip_screen_set(screen->machine, BIT(flip, 7));
+	decodev_pf12_update(deco16ic, 0, dassault_pf2_rowscroll);
+	decodev_pf34_update(deco16ic, 0, dassault_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
-	deco16_clear_sprite_priority_bitmap();
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen->machine->pens[3072]);
-	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+	decodev_clear_sprite_priority_bitmap(deco16ic);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[3072]);
+	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
-	if ((deco16_priority&3)==0) {
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,16);
-	} else if ((deco16_priority&3)==1) {
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,64);
-	} else if ((deco16_priority&3)==3) {
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,16);
-	} else {
+	if ((priority & 3) == 0) 
+	{
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 16);
+	} 
+	else if ((priority & 3) == 1) 
+	{
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 64);
+	} 
+	else if ((priority & 3) == 3) 
+	{
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 16);
+	} 
+	else 
+	{
 		/* Unused */
 	}
 
 	/* Draw sprites - two sprite generators, with selectable priority */
-	draw_sprites(screen->machine,bitmap,cliprect,deco16_priority);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	draw_sprites(screen->machine, bitmap, cliprect, priority);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

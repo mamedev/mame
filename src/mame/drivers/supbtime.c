@@ -69,9 +69,9 @@ static ADDRESS_MAP_START( supbtime_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
-	AM_RANGE(0x300000, 0x30000f) AM_RAM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_r, decodev_pf12_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll)
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll)
 ADDRESS_MAP_END
@@ -84,9 +84,9 @@ static ADDRESS_MAP_START( chinatwn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_RAM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_r, decodev_pf12_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll) // unused
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll) // unused
 ADDRESS_MAP_END

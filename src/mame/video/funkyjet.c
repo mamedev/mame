@@ -5,14 +5,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
+
+UINT16 *funkyjet_pf1_rowscroll,*funkyjet_pf2_rowscroll;
 
 /******************************************************************************/
-
-VIDEO_START( funkyjet )
-{
-	deco16_1_video_init(machine);
-}
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -41,7 +38,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (x >= 320) x -= 512;
 		if (y >= 256) y -= 512;
 		y = 240 - y;
-        x = 304 - x;
+		x = 304 - x;
 
 		if (x>320) continue;
 
@@ -79,12 +76,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( funkyjet )
 {
-	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
+	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
 
-	bitmap_fill(bitmap,cliprect,768);
-	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	flip_screen_set(screen->machine, BIT(flip, 7));
+	decodev_pf12_update(deco16ic, funkyjet_pf1_rowscroll, funkyjet_pf2_rowscroll);
+
+	bitmap_fill(bitmap, cliprect, 768);
+	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

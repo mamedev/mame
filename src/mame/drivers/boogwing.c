@@ -90,7 +90,6 @@
 extern UINT16 *boogwing_pf1_rowscroll,*boogwing_pf2_rowscroll;
 extern UINT16 *boogwing_pf3_rowscroll,*boogwing_pf4_rowscroll;
 
-VIDEO_START(boogwing);
 VIDEO_UPDATE(boogwing);
 
 /**********************************************************************************/
@@ -113,8 +112,8 @@ static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE(deco16_104_prot_w) AM_BASE(&deco16_prot_ram)
 
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x264000, 0x265fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
-	AM_RANGE(0x266000, 0x267fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
 	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE(&boogwing_pf1_rowscroll)
 	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE(&boogwing_pf2_rowscroll)
 
@@ -348,7 +347,6 @@ static MACHINE_DRIVER_START( boogwing )
 	MDRV_PALETTE_LENGTH(2048)
 	MDRV_GFXDECODE(boogwing)
 
-	MDRV_VIDEO_START(boogwing)
 	MDRV_VIDEO_UPDATE(boogwing)
 
 	MDRV_DECO16IC_ADD("deco_custom", boogwing_deco16ic_intf)

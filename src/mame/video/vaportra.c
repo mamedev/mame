@@ -10,37 +10,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 
 static UINT16 vaportra_priority[2];
-
-/******************************************************************************/
-
-static int vaportra_bank_callback(const int bank)
-{
-	return ((bank>>4)&0x7) * 0x1000;
-}
-
-
-VIDEO_START( vaportra )
-{
-	deco16_2_video_init(machine, 0);
-
-	deco16_pf1_rowscroll = 0;
-	deco16_pf2_rowscroll = 0;
-	deco16_pf3_rowscroll = 0;
-	deco16_pf4_rowscroll = 0;
-
-	deco16_set_tilemap_bank_callback(0, vaportra_bank_callback);
-	deco16_set_tilemap_bank_callback(1, vaportra_bank_callback);
-	deco16_set_tilemap_bank_callback(2, vaportra_bank_callback);
-	deco16_set_tilemap_bank_callback(3, vaportra_bank_callback);
-
-	deco16_pf1_colour_bank=0x00;
-	deco16_pf2_colour_bank=0x20;
-	deco16_pf4_colour_bank=0x40;
-	deco16_pf3_colour_bank=0x30;
-}
 
 /******************************************************************************/
 
@@ -148,40 +120,45 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( vaportra )
 {
-	int pri=vaportra_priority[0] & 0x03;
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
+	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	int pri = vaportra_priority[0] & 0x03;
 
-	flip_screen_set(screen->machine,  !(deco16_pf12_control[0]&0x80) );
-
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
-	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
+	flip_screen_set(screen->machine, !BIT(flip, 7));
+	decodev_pf12_update(deco16ic, 0, 0);
+	decodev_pf34_update(deco16ic, 0, 0);
 
 	/* Draw playfields */
-	if (pri==0) {
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
+	if (pri == 0) 
+	{
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else if (pri==1) {
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
+	else if (pri == 1) 
+	{
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else if (pri==2) {
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect,0);
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
+	else if (pri == 2) 
+	{
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else {
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect,0);
-		deco16_tilemap_4_draw(screen,bitmap,cliprect,0,0);
+	else 
+	{
+		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(screen->machine,bitmap,cliprect,1);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

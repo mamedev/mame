@@ -22,10 +22,12 @@
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 
-VIDEO_START( twocrude );
 VIDEO_UPDATE( twocrude );
+
+extern UINT16 *twocrude_pf1_rowscroll,*twocrude_pf2_rowscroll;
+extern UINT16 *twocrude_pf3_rowscroll,*twocrude_pf4_rowscroll;
 
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w );
 WRITE16_HANDLER( twocrude_palette_24bit_b_w );
@@ -89,7 +91,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
 static READ16_HANDLER( twocrude_control_r )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
 			return input_port_read(space->machine, "P1_P2");
@@ -114,20 +116,20 @@ static ADDRESS_MAP_START( twocrude_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&twocrude_ram)
 
-	AM_RANGE(0x0a0000, 0x0a1fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x0a2000, 0x0a2fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE(&twocrude_pf1_rowscroll)
+	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE(&twocrude_pf2_rowscroll)
 
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
-	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
-	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
+	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE(&twocrude_pf3_rowscroll)
+	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE(&twocrude_pf4_rowscroll)
 
 	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
-	AM_RANGE(0x0b5000, 0x0b500f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x0b6000, 0x0b600f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("deco_custom", decodev_pf34_control_w)
 	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
@@ -280,6 +282,24 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+static int twocrude_bank_callback( const int bank )
+{
+	return ((bank >> 4) & 0x7) * 0x1000;
+}
+
+static const deco16ic_interface twocrude_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x20, 0x30, 0x40, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	twocrude_bank_callback,
+	twocrude_bank_callback,
+	twocrude_bank_callback,
+	twocrude_bank_callback
+};
+
 static MACHINE_DRIVER_START( twocrude )
 
 	/* basic machine hardware */
@@ -303,8 +323,9 @@ static MACHINE_DRIVER_START( twocrude )
 	MDRV_GFXDECODE(cbuster)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(twocrude)
 	MDRV_VIDEO_UPDATE(twocrude)
+
+	MDRV_DECO16IC_ADD("deco_custom", twocrude_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -14,9 +14,8 @@
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "includes/deco16ic.h"
+#include "video/decodev.h"
 
-VIDEO_START( vaportra );
 VIDEO_UPDATE( vaportra );
 
 WRITE16_HANDLER( vaportra_priority_w );
@@ -35,7 +34,7 @@ static WRITE16_HANDLER( vaportra_sound_w )
 
 static READ16_HANDLER( vaportra_control_r )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 4:
 			return input_port_read(space->machine, "DSW");
@@ -56,12 +55,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100003) AM_WRITE(vaportra_priority_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(vaportra_sound_w)
 	AM_RANGE(0x100000, 0x10000f) AM_READ(vaportra_control_r)
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
-	AM_RANGE(0x240000, 0x24000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
-	AM_RANGE(0x280000, 0x281fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x282000, 0x283fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x2c0000, 0x2c000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom", decodev_pf34_control_w)
+	AM_RANGE(0x280000, 0x281fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x282000, 0x283fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x308000, 0x308001) AM_NOP
@@ -215,6 +214,24 @@ static const ym2151_interface ym2151_config =
 };
 
 
+static int vaportra_bank_callback( const int bank )
+{
+	return ((bank >> 4) & 0x7) * 0x1000;
+}
+
+static const deco16ic_interface vaportra_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x20, 0x30, 0x40, /* color base */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	vaportra_bank_callback,
+	vaportra_bank_callback,
+	vaportra_bank_callback,
+	vaportra_bank_callback
+};
+
 
 static MACHINE_DRIVER_START( vaportra )
 
@@ -238,8 +255,9 @@ static MACHINE_DRIVER_START( vaportra )
 	MDRV_GFXDECODE(vaportra)
 	MDRV_PALETTE_LENGTH(1280)
 
-	MDRV_VIDEO_START(vaportra)
 	MDRV_VIDEO_UPDATE(vaportra)
+
+	MDRV_DECO16IC_ADD("deco_custom", vaportra_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -21,9 +21,9 @@ Protection TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/decocrpt.h"
-#include "includes/deco16ic.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "video/decodev.h"
 
 /*
 
@@ -55,6 +55,7 @@ x = xpos
 */
 
 
+static UINT16 *dblewing_pf1_rowscroll,*dblewing_pf2_rowscroll;
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
@@ -93,7 +94,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (x >= 320) x -= 512;
 		if (y >= 256) y -= 512;
 		y = 240 - y;
-        x = 304 - x;
+		x = 304 - x;
 
 		if (x>320) continue;
 
@@ -141,30 +142,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static int dblewing_bank_callback(const int bank)
-{
-	return ((bank>>4) & 0x7) * 0x1000;
-}
-
-static VIDEO_START(dblewing)
-{
-	deco16_1_video_init(machine);
-
-	deco16_set_tilemap_bank_callback(0,dblewing_bank_callback);
-	deco16_set_tilemap_bank_callback(1,dblewing_bank_callback);
-}
-
 static VIDEO_UPDATE(dblewing)
 {
-	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
-	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
+	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
+	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
 
-	bitmap_fill(bitmap,cliprect,0); /* not Confirmed */
-	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
+	flip_screen_set(screen->machine, BIT(flip, 7));
+	decodev_pf12_update(deco16ic, dblewing_pf1_rowscroll, dblewing_pf2_rowscroll);
 
-	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
-	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,4);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
+	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+
+	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -386,17 +377,17 @@ static WRITE16_HANDLER( dblewing_prot_w )
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE(&dblewing_pf1_rowscroll)
+	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE(&dblewing_pf2_rowscroll)
 
 	/* protection */
 //  AM_RANGE(0x280104, 0x280105) AM_WRITENOP              // ??
 //  AM_RANGE(0x2800ac, 0x2800ad) AM_READ_PORT("DSW")            // dips
 //  AM_RANGE(0x280298, 0x280299) AM_READ_PORT("SYSTEM")         // vbl
 //  AM_RANGE(0x280506, 0x280507) AM_READ_PORT("UNK")
-//  AM_RANGE(0x2802B4, 0x2802B5) AM_READ_PORT("P1_P2")          // inverted?
+//  AM_RANGE(0x2802b4, 0x2802b5) AM_READ_PORT("P1_P2")          // inverted?
 //  AM_RANGE(0x280330, 0x280331) AM_READNOP               // sound?
 //  AM_RANGE(0x280380, 0x280381) AM_WRITENOP              // sound
 
@@ -405,7 +396,7 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28C000, 0x28C00f) AM_RAM AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", decodev_pf12_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
@@ -616,6 +607,24 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
+static int dblewing_bank_callback( const int bank )
+{
+	return ((bank >> 4) & 0x7) * 0x1000;
+}
+
+static const deco16ic_interface dblewing_deco16ic_intf =
+{
+	"screen",
+	1, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	dblewing_bank_callback,
+	dblewing_bank_callback,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( dblewing )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
@@ -639,8 +648,9 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_GFXDECODE(dblewing)
 
-	MDRV_VIDEO_START(dblewing)
 	MDRV_VIDEO_UPDATE(dblewing)
+
+	MDRV_DECO16IC_ADD("deco_custom", dblewing_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -4,7 +4,7 @@
 UINT16 *boogwing_pf1_rowscroll,*boogwing_pf2_rowscroll;
 UINT16 *boogwing_pf3_rowscroll,*boogwing_pf4_rowscroll;
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region )
 {
 	running_device *deco16ic = devtag_get_device(machine, "deco_custom");
 	int offs;
@@ -136,18 +136,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_START(boogwing)
-{
-//	deco16_2_video_init(machine, 0);
-
-//	deco16_set_tilemap_bank_callback(1,boogwing_bank_callback);
-//	deco16_set_tilemap_bank_callback(2,boogwing_bank_callback2);
-//	deco16_set_tilemap_bank_callback(3,boogwing_bank_callback2);
-//	deco16_set_tilemap_colour_base(1,0);
-//	deco16_set_tilemap_transparency_mask(1, 0x1f); // 5bpp graphics
-}
-
-VIDEO_UPDATE(boogwing)
+VIDEO_UPDATE( boogwing )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
 	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);

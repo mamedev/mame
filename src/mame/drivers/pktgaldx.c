@@ -73,8 +73,8 @@ static WRITE16_DEVICE_HANDLER(pktgaldx_oki_bank_w)
 static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
 	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, pf1_rowscroll)
 	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, pf2_rowscroll)
 
