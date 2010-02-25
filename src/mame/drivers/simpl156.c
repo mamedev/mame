@@ -91,19 +91,14 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 #include "emu.h"
 #include "includes/decocrpt.h"
 #include "cpu/arm/arm.h"
+#include "includes/simpl156.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-static UINT32 *simpl156_systemram;
-extern UINT16 *simpl156_pf1_rowscroll,*simpl156_pf2_rowscroll;
-
-extern VIDEO_START( simpl156 );
-extern VIDEO_UPDATE( simpl156 );
-
 
 static INPUT_PORTS_START( simpl156 )
-	PORT_START("IN0")	/* 16bit */
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -112,7 +107,7 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) // eeprom?..
 
 
-	PORT_START("IN1")	/* 16bit */
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -134,12 +129,11 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( simpl156_inputs_read )
 {
-	int eep = eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
-	UINT32 returndata;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	int eep = eeprom_read_bit(state->eeprom);
+	UINT32 returndata = input_port_read(space->machine, "IN0") ^ 0xffff0000;
 
-	returndata = input_port_read(space->machine, "IN0") ^ 0xffff0000;
-
-	returndata^= ( (eep<<8)  );
+	returndata ^= ((eep << 8));
 	return returndata;
 }
 
@@ -153,13 +147,13 @@ static WRITE32_HANDLER( simpl156_palette_w )
 	UINT16 dat;
 	int color;
 
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	color = offset;
 
-	dat = space->machine->generic.paletteram.u16[offset]&0xffff;
+	dat = space->machine->generic.paletteram.u16[offset] & 0xffff;
 	palette_set_color_rgb(space->machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 
@@ -175,16 +169,16 @@ static READ32_HANDLER(  simpl156_system_r )
 
 static WRITE32_HANDLER( simpl156_eeprom_w )
 {
-	running_device *device = devtag_get_device(space->machine, "eeprom");
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
 	//int okibank;
 
 	//okibank = data & 0x07;
 
-	okim6295_set_bank_base(devtag_get_device(space->machine, "okimusic"), 0x40000 * (data & 0x7) );
+	okim6295_set_bank_base(state->okimusic, 0x40000 * (data & 0x7));
 
-	eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_write_bit(device, data & 0x10);
-	eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line(state->eeprom, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(state->eeprom, BIT(data, 4));
+	eeprom_set_cs_line(state->eeprom, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -192,57 +186,61 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 static READ32_HANDLER( simpl156_spriteram_r )
 {
-	return space->machine->generic.spriteram.u32[offset]^0xffff0000;
+	return space->machine->generic.spriteram.u32[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_spriteram_w )
 {
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&space->machine->generic.spriteram.u32[offset]);
 }
 
-static UINT32*simpl156_mainram;
-
 
 static READ32_HANDLER( simpl156_mainram_r )
 {
-	return simpl156_mainram[offset]^0xffff0000;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	return state->mainram[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_mainram_w )
 {
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&simpl156_mainram[offset]);
+	COMBINE_DATA(&state->mainram[offset]);
 }
 
 static READ32_HANDLER( simpl156_pf1_rowscroll_r )
 {
-	return simpl156_pf1_rowscroll[offset]^0xffff0000;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	return state->pf1_rowscroll[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 {
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&simpl156_pf1_rowscroll[offset]);
+	COMBINE_DATA(&state->pf1_rowscroll[offset]);
 }
 
 static READ32_HANDLER( simpl156_pf2_rowscroll_r )
 {
-	return simpl156_pf2_rowscroll[offset]^0xffff0000;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	return state->pf2_rowscroll[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 {
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&simpl156_pf2_rowscroll[offset]);
+	COMBINE_DATA(&state->pf2_rowscroll[offset]);
 }
 
 /* Memory Map controled by PALs */
@@ -250,10 +248,10 @@ static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 /* Joe and Mac Returns */
 static ADDRESS_MAP_START( joemacr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
-	AM_RANGE(0x130000, 0x130003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(simpl156_palette_r, simpl156_palette_w)
+	AM_RANGE(0x130000, 0x130003) AM_READWRITE(simpl156_system_r, simpl156_eeprom_w)
 	AM_RANGE(0x140000, 0x14001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
 	AM_RANGE(0x150000, 0x151fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
 	AM_RANGE(0x152000, 0x153fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
@@ -264,7 +262,7 @@ static ADDRESS_MAP_START( joemacr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x180000, 0x180003) AM_DEVREADWRITE8("okisfx", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x1c0000, 0x1c0003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
+	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 ADDRESS_MAP_END
 
 
@@ -272,9 +270,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chainrec_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // rom (32-bit)
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
+	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 	AM_RANGE(0x3c0000, 0x3c0003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0x400000, 0x407fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram?
+	AM_RANGE(0x400000, 0x407fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram?
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x420000, 0x420fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x430000, 0x430003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
@@ -293,9 +291,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magdrop_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
+	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 	AM_RANGE(0x340000, 0x340003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0x380000, 0x387fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram?
+	AM_RANGE(0x380000, 0x387fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram?
 	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3a0000, 0x3a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
@@ -314,9 +312,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magdropp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
+	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0x680000, 0x687fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram?
+	AM_RANGE(0x680000, 0x687fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram?
 	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x6a0000, 0x6a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x6b0000, 0x6b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
@@ -336,7 +334,7 @@ static ADDRESS_MAP_START( mitchell156_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("okisfx", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram
+	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram
 	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x1b0000, 0x1b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
@@ -348,7 +346,7 @@ static ADDRESS_MAP_START( mitchell156_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_READWRITE(simpl156_pf2_rowscroll_r, simpl156_pf2_rowscroll_w)
 	AM_RANGE(0x1f0000, 0x1f0003) AM_READONLY AM_WRITENOP // ?
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
+	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 ADDRESS_MAP_END
 
 
@@ -417,14 +415,29 @@ static const deco16ic_interface simpl156_deco16ic_intf =
 	NULL
 };
 
-static MACHINE_DRIVER_START( chainrec )
-	/* basic machine hardware */
+static MACHINE_START( simpl156 )
+{
+	simpl156_state *state = (simpl156_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->okimusic = devtag_get_device(machine, "okimusic");
+}
+
+static MACHINE_DRIVER_START( chainrec )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(simpl156_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	MDRV_CPU_PROGRAM_MAP(chainrec_map)
 	MDRV_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")  // 93C45
+
+	MDRV_MACHINE_START(simpl156)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -442,7 +455,6 @@ static MACHINE_DRIVER_START( chainrec )
 	MDRV_DECO16IC_ADD("deco_custom", simpl156_deco16ic_intf)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
 
 	MDRV_SOUND_ADD("okisfx", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
@@ -488,37 +500,6 @@ static MACHINE_DRIVER_START( mitchell156 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_DRIVER_END
 
-
-static DRIVER_INIT(simpl156)
-{
-	UINT8 *rom = memory_region(machine, "okimusic");
-	int length = memory_region_length(machine, "okimusic");
-	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
-
-	UINT32 x;
-
-	/* hmm low address line goes to banking chip instead? */
-	for (x=0;x<length;x++)
-	{
-		UINT32 addr;
-
-		addr = BITSWAP24 (x,23,22,21,0, 20,
-		                    19,18,17,16,
-		                    15,14,13,12,
-		                    11,10,9, 8,
-		                    7, 6, 5, 4,
-		                    3, 2, 1 );
-
-		buf1[addr] = rom[x];
-	}
-
-	memcpy(rom,buf1,length);
-
-	auto_free (machine, buf1);
-
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco156_decrypt(machine);
-}
 
 /*
 
@@ -1050,15 +1031,48 @@ ROM_END
 */
 
 
+static DRIVER_INIT( simpl156 )
+{
+	UINT8 *rom = memory_region(machine, "okimusic");
+	int length = memory_region_length(machine, "okimusic");
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+
+	UINT32 x;
+
+	/* hmm low address line goes to banking chip instead? */
+	for (x = 0; x < length; x++)
+	{
+		UINT32 addr;
+
+		addr = BITSWAP24 (x,23,22,21,0, 20,
+		                    19,18,17,16,
+		                    15,14,13,12,
+		                    11,10,9, 8,
+		                    7, 6, 5, 4,
+		                    3, 2, 1 );
+
+		buf1[addr] = rom[x];
+	}
+
+	memcpy(rom, buf1, length);
+
+	auto_free(machine, buf1);
+
+	deco56_decrypt_gfx(machine, "gfx1");
+	deco156_decrypt(machine);
+}
+
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 static READ32_HANDLER( joemacr_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x284)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
-	return simpl156_systemram[0x18/4];
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	if (cpu_get_pc(space->cpu) == 0x284)  
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
+	return state->systemram[0x18/4];
 }
 
 
-static DRIVER_INIT (joemacr)
+static DRIVER_INIT( joemacr )
 {
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
@@ -1066,11 +1080,13 @@ static DRIVER_INIT (joemacr)
 
 static READ32_HANDLER( chainrec_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x2d4)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
-	return simpl156_systemram[0x18/4];
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	if (cpu_get_pc(space->cpu) == 0x2d4)  
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
+	return state->systemram[0x18/4];
 }
 
-static DRIVER_INIT (chainrec)
+static DRIVER_INIT( chainrec )
 {
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
@@ -1078,11 +1094,13 @@ static DRIVER_INIT (chainrec)
 
 static READ32_HANDLER( prtytime_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4f0)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
-	return simpl156_systemram[0xae0/4];
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	if (cpu_get_pc(space->cpu) == 0x4f0)  
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
+	return state->systemram[0xae0/4];
 }
 
-static DRIVER_INIT (prtytime)
+static DRIVER_INIT( prtytime )
 {
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
@@ -1091,11 +1109,13 @@ static DRIVER_INIT (prtytime)
 
 static READ32_HANDLER( charlien_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc8c8)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
-	return simpl156_systemram[0x10/4];
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	if (cpu_get_pc(space->cpu) == 0xc8c8)  
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
+	return state->systemram[0x10/4];
 }
 
-static DRIVER_INIT (charlien)
+static DRIVER_INIT( charlien )
 {
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
@@ -1103,11 +1123,13 @@ static DRIVER_INIT (charlien)
 
 static READ32_HANDLER( osman_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x5974)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
-	return simpl156_systemram[0x10/4];
+	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	if (cpu_get_pc(space->cpu) == 0x5974)  
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
+	return state->systemram[0x10/4];
 }
 
-static DRIVER_INIT (osman)
+static DRIVER_INIT( osman )
 {
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
@@ -1115,15 +1137,15 @@ static DRIVER_INIT (osman)
 }
 
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
-GAME( 1994, joemacr,  0,        joemacr,     simpl156, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", 0 ) /* bootleg board with genuine DECO parts */
-GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", 0 )
-GAME( 1995, chainrec, 0,        chainrec,    simpl156, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", 0 )
-GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", 0 )
-GAME( 1995, magdropp, chainrec, magdropp,    simpl156, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", 0 )
+GAME( 1994, joemacr,  0,        joemacr,     simpl156, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", GAME_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
+GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", GAME_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    simpl156, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", GAME_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", GAME_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    simpl156, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", GAME_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
-GAME( 1995, charlien, 0,        mitchell156, simpl156, charlien, ROT0,  "Mitchell", "Charlie Ninja" , 0) /* language in service mode */
-GAME( 1995, prtytime, 0,        mitchell156, simpl156, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", 0) /* language in service mode */
-GAME( 1995, gangonta, prtytime, mitchell156, simpl156, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", 0) /* language in service mode */
-GAME( 1996, osman,    0,        mitchell156, simpl156, osman,    ROT0,  "Mitchell", "Osman (World)", 0 )
-GAME( 1996, candance, osman,    mitchell156, simpl156, osman,    ROT0,  "Mitchell (Atlus License)", "Cannon Dancer (Japan)", 0 )
+GAME( 1995, charlien, 0,        mitchell156, simpl156, charlien, ROT0,  "Mitchell", "Charlie Ninja" , GAME_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, prtytime, 0,        mitchell156, simpl156, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", GAME_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, gangonta, prtytime, mitchell156, simpl156, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", GAME_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1996, osman,    0,        mitchell156, simpl156, osman,    ROT0,  "Mitchell", "Osman (World)", GAME_SUPPORTS_SAVE )
+GAME( 1996, candance, osman,    mitchell156, simpl156, osman,    ROT0,  "Mitchell (Atlus License)", "Cannon Dancer (Japan)", GAME_SUPPORTS_SAVE )

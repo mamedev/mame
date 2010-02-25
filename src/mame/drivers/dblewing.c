@@ -25,6 +25,52 @@ Protection TODO:
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
+class dblewing_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dblewing_state(machine)); }
+
+	dblewing_state(running_machine &machine) { }
+
+	/* memory pointers */
+	UINT16 *  pf1_rowscroll;
+	UINT16 *  pf2_rowscroll;
+	UINT16 *  spriteram;
+	size_t    spriteram_size;
+
+	/* protection */
+	UINT16 _008_data;
+	UINT16 _104_data;
+	UINT16 _406_data;
+	UINT16 _608_data;
+	UINT16 _70c_data;
+	UINT16 _78a_data;
+	UINT16 _088_data;
+	UINT16 _58c_data;
+	UINT16 _408_data;
+	UINT16 _40e_data;
+	UINT16 _080_data;
+	UINT16 _788_data;
+	UINT16 _38e_data;
+	UINT16 _580_data;
+	UINT16 _60a_data;
+	UINT16 _200_data;
+	UINT16 _28c_data;
+	UINT16 _18a_data;
+	UINT16 _280_data;
+	UINT16 _384_data;
+
+	UINT16 boss_move, boss_shoot_type, boss_3_data, boss_4_data, boss_5_data ,boss_5sx_data, boss_6_data;
+
+	/* misc */
+	UINT8 sound_irq;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *audiocpu;
+	running_device *deco16ic;
+};
+
 /*
 
 offs +0
@@ -55,34 +101,35 @@ x = xpos
 */
 
 
-static UINT16 *dblewing_pf1_rowscroll,*dblewing_pf2_rowscroll;
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	dblewing_state *state = (dblewing_state *)machine->driver_data;
+	UINT16 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0x400-4;offs >= 0;offs -= 4)
+	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
 	{
-		int x,y,sprite,colour,multi,mult2,fx,fy,inc,flash,mult,xsize,pri;
+		int x, y, sprite, colour, multi, mult2, fx, fy, inc, flash, mult, xsize, pri;
 
-		sprite = spriteram16[offs+1];
+		sprite = spriteram[offs + 1];
 
-		y = spriteram16[offs];
-		flash=y&0x1000;
-		xsize = y&0x0800;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		y = spriteram[offs];
+		flash = y & 0x1000;
+		xsize = y & 0x0800;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+			continue;
 
-		x = spriteram16[offs+2];
-		colour = (x >>9) & 0x1f;
+		x = spriteram[offs + 2];
+		colour = (x >> 9) & 0x1f;
 
-		pri = (x&0xc000); // 2 bits or 1?
+		pri = (x & 0xc000); // 2 bits or 1?
 
-		switch (pri&0xc000) {
-		case 0x0000: pri=0; break;
-		case 0x4000: pri=0xf0; break;
-		case 0x8000: pri=0xf0|0xcc; break;
-		case 0xc000: pri=0xf0|0xcc; break; /*  or 0xf0|0xcc|0xaa ? */
+		switch (pri & 0xc000) 
+		{
+		case 0x0000: pri = 0; break;
+		case 0x4000: pri = 0xf0; break;
+		case 0x8000: pri = 0xf0 | 0xcc; break;
+		case 0xc000: pri = 0xf0 | 0xcc; break; /*  or 0xf0|0xcc|0xaa ? */
 		}
 
 		fx = y & 0x2000;
@@ -96,7 +143,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		y = 240 - y;
 		x = 304 - x;
 
-		if (x>320) continue;
+		if (x > 320) 
+			continue;
 
 		sprite &= ~multi;
 		if (fy)
@@ -109,15 +157,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (flip_screen_get(machine))
 		{
-			y=240-y;
-			x=304-x;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			mult=16;
+			y = 240 - y;
+			x = 304 - x;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
+			mult = 16;
 		}
-		else mult=-16;
+		else 
+			mult = -16;
 
-		mult2 = multi+1;
+		mult2 = multi + 1;
 
 		while (multi >= 0)
 		{
@@ -144,17 +193,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static VIDEO_UPDATE(dblewing)
 {
-	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
+	dblewing_state *state = (dblewing_state *)screen->machine->driver_data;
+	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	deco16ic_pf12_update(deco16ic, dblewing_pf1_rowscroll, dblewing_pf2_rowscroll);
+	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
-	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 4);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
@@ -169,55 +218,32 @@ static VIDEO_UPDATE(dblewing)
  we need to log the PC of each read/write and check to
  see if the code makes any of them move obvious
 */
-static UINT16 dblwings_008_data;
-static UINT16 dblwings_104_data;
-static UINT16 dblwings_406_data;
-static UINT16 dblwings_608_data;
-static UINT16 dblwings_70c_data;
-static UINT16 dblwings_78a_data;
-static UINT16 dblwings_088_data;
-static UINT16 dblwings_58c_data;
-static UINT16 dblwings_408_data;
-static UINT16 dblwings_40e_data;
-static UINT16 dblwings_080_data;
-static UINT16 dblwings_788_data;
-static UINT16 dblwings_38e_data;
-static UINT16 dblwings_580_data;
-static UINT16 dblwings_60a_data;
-static UINT16 dblwings_200_data;
-static UINT16 dblwings_28c_data;
-static UINT16 dblwings_18a_data;
-static UINT16 dblwings_280_data;
-static UINT16 dblwings_384_data;
-
-static UINT16 boss_move,boss_shoot_type,boss_3_data,boss_4_data,boss_5_data,boss_5sx_data,boss_6_data;
-
-static UINT8 dblewing_sound_irq;
-
-static READ16_HANDLER ( dlbewing_prot_r )
+static READ16_HANDLER ( dblewing_prot_r )
 {
-	switch(offset*2)
+	dblewing_state *state = (dblewing_state *)space->machine->driver_data;
+
+	switch (offset * 2)
 	{
-		case 0x16a: return boss_move;          // boss 1 movement
-		case 0x6d6: return boss_move;          // boss 1 2nd pilot
-		case 0x748: return boss_move;          // boss 1 3rd pilot
+		case 0x16a: return state->boss_move;          // boss 1 movement
+		case 0x6d6: return state->boss_move;          // boss 1 2nd pilot
+		case 0x748: return state->boss_move;          // boss 1 3rd pilot
 
 		case 0x566: return 0x0009;  		   // boss BGM,might be a variable one (read->write to the sound latch)
-		case 0x1ea: return boss_shoot_type;    // boss 1 shoot type
-		case 0x596: return boss_3_data;		   // boss 3 appearing
-		case 0x692:	return boss_4_data;
-		case 0x6b0: return boss_5_data;
-		case 0x51e: return boss_5sx_data;
-		case 0x784: return boss_6_data;
+		case 0x1ea: return state->boss_shoot_type;    // boss 1 shoot type
+		case 0x596: return state->boss_3_data;		   // boss 3 appearing
+		case 0x692:	return state->boss_4_data;
+		case 0x6b0: return state->boss_5_data;
+		case 0x51e: return state->boss_5sx_data;
+		case 0x784: return state->boss_6_data;
 
 		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
-		case 0x1d4: return dblwings_70c_data;  //controls restart points
+		case 0x1d4: return state->_70c_data;  //controls restart points
 
-		case 0x0ac: return (input_port_read(space->machine, "DSW") & 0x40)<<4;//flip screen
-		case 0x4b0: return dblwings_608_data;//coinage
+		case 0x0ac: return (input_port_read(space->machine, "DSW") & 0x40) << 4;//flip screen
+		case 0x4b0: return state->_608_data;//coinage
 		case 0x068:
 		{
-			switch(input_port_read(space->machine, "DSW") & 0x0300) //I don't know how to relationate this...
+			switch (input_port_read(space->machine, "DSW") & 0x0300) //I don't know how to relationate this...
 			{
 				case 0x0000: return 0x000;//0
 				case 0x0100: return 0x060;//3
@@ -225,153 +251,155 @@ static READ16_HANDLER ( dlbewing_prot_r )
 				case 0x0300: return 0x160;//b
 			}
 		}
-		case 0x094: return dblwings_104_data;// p1 inputs select screen  OK
-		case 0x24c: return dblwings_008_data;//read DSW (mirror for coinage/territory)
+		case 0x094: return state->_104_data;// p1 inputs select screen  OK
+		case 0x24c: return state->_008_data;//read DSW (mirror for coinage/territory)
 		case 0x298: return input_port_read(space->machine, "SYSTEM");//vblank
 		case 0x476: return input_port_read(space->machine, "SYSTEM");//mirror for coins
 		case 0x506: return input_port_read(space->machine, "DSW");
-		case 0x5d8: return dblwings_406_data;
+		case 0x5d8: return state->_406_data;
 		case 0x2b4: return input_port_read(space->machine, "P1_P2");
 		case 0x1a8: return (input_port_read(space->machine, "DSW") & 0x4000) >> 12;//allow continue
-		case 0x3ec: return dblwings_70c_data; //score entry
-		case 0x246: return dblwings_580_data; // these three controls "perfect bonus" I suppose...
-		case 0x52e: return dblwings_580_data;
-		case 0x532: return dblwings_580_data;
+		case 0x3ec: return state->_70c_data; //score entry
+		case 0x246: return state->_580_data; // these three controls "perfect bonus" I suppose...
+		case 0x52e: return state->_580_data;
+		case 0x532: return state->_580_data;
 	}
 
-//  printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
+//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
 
-	if ((offset*2)==0x0f8) return 0; // dblwings_080_data;
-	if ((offset*2)==0x104) return 0;
-	if ((offset*2)==0x10e) return 0;
-	if ((offset*2)==0x206) return 0; // dblwings_70c_data;
-	if ((offset*2)==0x25c) return 0;
-	if ((offset*2)==0x284) return 0; // 3rd player 2nd boss
-	if ((offset*2)==0x432) return 0; // boss on water level?
-	if ((offset*2)==0x54a) return 0; // 3rd player 2nd boss
-	if ((offset*2)==0x786) return 0;
+	if ((offset*2) == 0x0f8) return 0; // state->_080_data;
+	if ((offset*2) == 0x104) return 0;
+	if ((offset*2) == 0x10e) return 0;
+	if ((offset*2) == 0x206) return 0; // state->_70c_data;
+	if ((offset*2) == 0x25c) return 0;
+	if ((offset*2) == 0x284) return 0; // 3rd player 2nd boss
+	if ((offset*2) == 0x432) return 0; // boss on water level?
+	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
+	if ((offset*2) == 0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
 
 	return 0;//mame_rand(space->machine);
 }
 
 static WRITE16_HANDLER( dblewing_prot_w )
 {
-//  if(offset*2 != 0x380)
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
+	dblewing_state *state = (dblewing_state *)space->machine->driver_data;
 
-	switch(offset*2)
+//  if (offset * 2 != 0x380)
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
+
+	switch (offset * 2)
 	{
 		case 0x088:
-			dblwings_088_data = data;
-			if(dblwings_088_data == 0)          { boss_4_data = 0;    }
-			else if(dblwings_088_data & 0x8000) { boss_4_data = 0x50; }
-			else                                { boss_4_data = 0x40; }
+			state->_088_data = data;
+			if(state->_088_data == 0)          { state->boss_4_data = 0;    }
+			else if(state->_088_data & 0x8000) { state->boss_4_data = 0x50; }
+			else                                { state->boss_4_data = 0x40; }
 
 			return;
 
 		case 0x104:
-			dblwings_104_data = data;
+			state->_104_data = data;
 			return; // p1 inputs select screen  OK
 
 		case 0x18a:
-			dblwings_18a_data = data;
-			switch(dblwings_18a_data)
+			state->_18a_data = data;
+			switch (state->_18a_data)
 			{
-				case 0x6b94: boss_5_data = 0x10; break; //initialize
-				case 0x7c68: boss_5_data = 0x60; break; //go up
-				case 0xfb1d: boss_5_data = 0x50; break;
-				case 0x977c: boss_5_data = 0x50; break;
-				case 0x8a49: boss_5_data = 0x60; break;
+				case 0x6b94: state->boss_5_data = 0x10; break; //initialize
+				case 0x7c68: state->boss_5_data = 0x60; break; //go up
+				case 0xfb1d: state->boss_5_data = 0x50; break;
+				case 0x977c: state->boss_5_data = 0x50; break;
+				case 0x8a49: state->boss_5_data = 0x60; break;
 			}
 			return;
 		case 0x200:
-			dblwings_200_data = data;
-			switch(dblwings_200_data)
+			state->_200_data = data;
+			switch (state->_200_data)
 			{
-				case 0x5a19: boss_move = 1; break;
-				case 0x3b28: boss_move = 2; break;
-				case 0x1d4d: boss_move = 1; break;
+				case 0x5a19: state->boss_move = 1; break;
+				case 0x3b28: state->boss_move = 2; break;
+				case 0x1d4d: state->boss_move = 1; break;
 			}
-			//popmessage("%04x",dblwings_200_data);
+			//popmessage("%04x",state->_200_data);
 			return;
 		case 0x280:
-			dblwings_280_data = data;
-			switch(dblwings_280_data)
+			state->_280_data = data;
+			switch (state->_280_data)
 			{
-				case 0x6b94: boss_5sx_data = 0x10; break;
-				case 0x7519: boss_5sx_data = 0x60; break;
-				case 0xfc68: boss_5sx_data = 0x50; break;
-				case 0x02dd: boss_5sx_data = 0x50; break;
-				case 0x613c: boss_5sx_data = 0x50; break;
+				case 0x6b94: state->boss_5sx_data = 0x10; break;
+				case 0x7519: state->boss_5sx_data = 0x60; break;
+				case 0xfc68: state->boss_5sx_data = 0x50; break;
+				case 0x02dd: state->boss_5sx_data = 0x50; break;
+				case 0x613c: state->boss_5sx_data = 0x50; break;
 			}
-			//printf("%04x\n",dblwings_280_data);
+			//printf("%04x\n",state->_280_data);
 			return;
 		case 0x380: // sound write
 			soundlatch_w(space, 0, data & 0xff);
-			dblewing_sound_irq |= 0x02;
-			cputag_set_input_line(space->machine, "audiocpu", 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+			state->sound_irq |= 0x02;
+			cpu_set_input_line(state->audiocpu, 0, (state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
 		case 0x384:
-			dblwings_384_data = data;
-			switch(dblwings_384_data)
+			state->_384_data = data;
+			switch(state->_384_data)
 			{
-				case 0xaa41: boss_6_data = 1; break;
-				case 0x5a97: boss_6_data = 2; break;
-				case 0xbac5: boss_6_data = 3; break;
-				case 0x0afb: boss_6_data = 4; break;
-				case 0x6a99: boss_6_data = 5; break;
-				case 0xda8f: boss_6_data = 6; break;
+				case 0xaa41: state->boss_6_data = 1; break;
+				case 0x5a97: state->boss_6_data = 2; break;
+				case 0xbac5: state->boss_6_data = 3; break;
+				case 0x0afb: state->boss_6_data = 4; break;
+				case 0x6a99: state->boss_6_data = 5; break;
+				case 0xda8f: state->boss_6_data = 6; break;
 			}
 			return;
 		case 0x38e:
-			dblwings_38e_data = data;
-			switch(dblwings_38e_data)
+			state->_38e_data = data;
+			switch(state->_38e_data)
 			{
-				case 0x6c13: boss_shoot_type = 3; break;
-				case 0xc311: boss_shoot_type = 0; break;
-				case 0x1593: boss_shoot_type = 1; break;
-				case 0xf9db: boss_shoot_type = 2; break;
-				case 0xf742: boss_shoot_type = 3; break;
+				case 0x6c13: state->boss_shoot_type = 3; break;
+				case 0xc311: state->boss_shoot_type = 0; break;
+				case 0x1593: state->boss_shoot_type = 1; break;
+				case 0xf9db: state->boss_shoot_type = 2; break;
+				case 0xf742: state->boss_shoot_type = 3; break;
 
-				case 0xeff5: boss_move = 1; break;
-				case 0xd2f1: boss_move = 2; break;
-				//default:   printf("%04x\n",dblwings_38e_data); break;
-				//case 0xe65a: boss_shoot_type = 0; break;
+				case 0xeff5: state->boss_move = 1; break;
+				case 0xd2f1: state->boss_move = 2; break;
+				//default:   printf("%04x\n",state->_38e_data); break;
+				//case 0xe65a: state->boss_shoot_type = 0; break;
 			}
 			return;
 		case 0x58c: // 3rd player 1st level
-			dblwings_58c_data = data;
-			if(dblwings_58c_data == 0)     { boss_move = 5; }
-			else                           { boss_move = 2; }
+			state->_58c_data = data;
+			if(state->_58c_data == 0)     { state->boss_move = 5; }
+			else                           { state->boss_move = 2; }
 
 			return;
 		case 0x60a:
-			dblwings_60a_data = data;
-			if(dblwings_60a_data & 0x8000) { boss_3_data = 2; }
-			else                           { boss_3_data = 9; }
+			state->_60a_data = data;
+			if(state->_60a_data & 0x8000) { state->boss_3_data = 2; }
+			else                           { state->boss_3_data = 9; }
 
 			return;
 		case 0x580:
-			dblwings_580_data = data;
+			state->_580_data = data;
 			return;
 		case 0x406:
-			dblwings_406_data = data;
+			state->_406_data = data;
 			return;  // p2 inputs select screen  OK
 	}
 
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
 
-	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
-	if ((offset*2)==0x080) { dblwings_080_data = data; return; } // p3 3rd boss?
-	if ((offset*2)==0x28c) { dblwings_28c_data = data; return; }
-	if ((offset*2)==0x408) { dblwings_408_data = data; return; } // 3rd player 1st level?
-	if ((offset*2)==0x40e) { dblwings_40e_data = data; return; } // 3rd player 2nd level?
-	if ((offset*2)==0x608) { dblwings_608_data = data; return; }
-	if ((offset*2)==0x70c) { dblwings_70c_data = data; return; }
-	if ((offset*2)==0x78a) { dblwings_78a_data = data; return; }
-	if ((offset*2)==0x788) { dblwings_788_data = data; return; }
+	if ((offset * 2) == 0x008) { state->_008_data = data; return; }
+	if ((offset * 2) == 0x080) { state->_080_data = data; return; } // p3 3rd boss?
+	if ((offset * 2) == 0x28c) { state->_28c_data = data; return; }
+	if ((offset * 2) == 0x408) { state->_408_data = data; return; } // 3rd player 1st level?
+	if ((offset * 2) == 0x40e) { state->_40e_data = data; return; } // 3rd player 2nd level?
+	if ((offset * 2) == 0x608) { state->_608_data = data; return; }
+	if ((offset * 2) == 0x70c) { state->_70c_data = data; return; }
+	if ((offset * 2) == 0x78a) { state->_78a_data = data; return; }
+	if ((offset * 2) == 0x788) { state->_788_data = data; return; }
 }
 
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -379,8 +407,8 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE(&dblewing_pf1_rowscroll)
-	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE(&dblewing_pf2_rowscroll)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE_MEMBER(dblewing_state, pf1_rowscroll)
+	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE_MEMBER(dblewing_state, pf2_rowscroll)
 
 	/* protection */
 //  AM_RANGE(0x280104, 0x280105) AM_WRITENOP              // ??
@@ -391,23 +419,25 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x280330, 0x280331) AM_READNOP               // sound?
 //  AM_RANGE(0x280380, 0x280381) AM_WRITENOP              // sound
 
-	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(dlbewing_prot_r,dblewing_prot_w)
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(dblewing_prot_r, dblewing_prot_w)
 
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
 	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_MEMBER(dblewing_state, spriteram, spriteram_size)
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
 static READ8_HANDLER(irq_latch_r)
 {
+	dblewing_state *state = (dblewing_state *)space->machine->driver_data;
+
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
-	dblewing_sound_irq &= ~0x02;
-	cputag_set_input_line(space->machine, "audiocpu", 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return dblewing_sound_irq;
+	state->sound_irq &= ~0x02;
+	cpu_set_input_line(state->audiocpu, 0, (state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	return state->sound_irq;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -592,14 +622,16 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq( running_device *device, int state )
 {
+	dblewing_state *driver_state = (dblewing_state *)device->machine->driver_data;
+
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)
-		dblewing_sound_irq |= 0x01;
+		driver_state->sound_irq |= 0x01;
 	else
-		dblewing_sound_irq &= ~0x01;
-	cputag_set_input_line(device->machine, "audiocpu", 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		driver_state->sound_irq &= ~0x01;
+	cpu_set_input_line(driver_state->audiocpu, 0, (driver_state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -625,7 +657,85 @@ static const deco16ic_interface dblewing_deco16ic_intf =
 	NULL
 };
 
+static MACHINE_START( dblewing )
+{
+	dblewing_state *state = (dblewing_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+
+	state_save_register_global(machine, state->_008_data);
+	state_save_register_global(machine, state->_104_data);
+	state_save_register_global(machine, state->_406_data);
+	state_save_register_global(machine, state->_608_data);
+	state_save_register_global(machine, state->_70c_data);
+	state_save_register_global(machine, state->_78a_data);
+	state_save_register_global(machine, state->_088_data);
+	state_save_register_global(machine, state->_58c_data);
+	state_save_register_global(machine, state->_408_data);
+	state_save_register_global(machine, state->_40e_data);
+	state_save_register_global(machine, state->_080_data);
+	state_save_register_global(machine, state->_788_data);
+	state_save_register_global(machine, state->_38e_data);
+	state_save_register_global(machine, state->_580_data);
+	state_save_register_global(machine, state->_60a_data);
+	state_save_register_global(machine, state->_200_data);
+	state_save_register_global(machine, state->_28c_data);
+	state_save_register_global(machine, state->_18a_data);
+	state_save_register_global(machine, state->_280_data);
+	state_save_register_global(machine, state->_384_data);
+
+	state_save_register_global(machine, state->boss_move);
+	state_save_register_global(machine, state->boss_shoot_type);
+	state_save_register_global(machine, state->boss_3_data);
+	state_save_register_global(machine, state->boss_4_data);
+	state_save_register_global(machine, state->boss_5_data);
+	state_save_register_global(machine, state->boss_5sx_data); 
+	state_save_register_global(machine, state->boss_6_data);
+	state_save_register_global(machine, state->sound_irq);
+}
+
+static MACHINE_RESET( dblewing )
+{
+	dblewing_state *state = (dblewing_state *)machine->driver_data;
+
+	state->_008_data = 0;
+	state->_104_data = 0;
+	state->_406_data = 0;
+	state->_608_data = 0;
+	state->_70c_data = 0;
+	state->_78a_data = 0;
+	state->_088_data = 0;
+	state->_58c_data = 0;
+	state->_408_data = 0;
+	state->_40e_data = 0;
+	state->_080_data = 0;
+	state->_788_data = 0;
+	state->_38e_data = 0;
+	state->_580_data = 0;
+	state->_60a_data = 0;
+	state->_200_data = 0;
+	state->_28c_data = 0;
+	state->_18a_data = 0;
+	state->_280_data = 0;
+	state->_384_data = 0;
+
+	state->boss_move = 0;
+	state->boss_shoot_type = 0;
+	state->boss_3_data = 0;
+	state->boss_4_data = 0;
+	state->boss_5_data = 0;
+	state->boss_5sx_data = 0; 
+	state->boss_6_data = 0;
+	state->sound_irq = 0;
+}
+
 static MACHINE_DRIVER_START( dblewing )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dblewing_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
 	MDRV_CPU_PROGRAM_MAP(dblewing_map)
@@ -636,6 +746,9 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_CPU_IO_MAP(sound_io)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_START(dblewing)
+	MDRV_MACHINE_RESET(dblewing)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -742,4 +855,4 @@ static DRIVER_INIT( dblewing )
 }
 
 
-GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1993, dblewing, 0,     dblewing, dblewing,  dblewing,  ROT90, "Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

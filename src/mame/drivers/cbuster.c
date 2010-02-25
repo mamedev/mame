@@ -19,27 +19,17 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
+#include "includes/cbuster.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-VIDEO_UPDATE( twocrude );
-
-extern UINT16 *twocrude_pf1_rowscroll,*twocrude_pf2_rowscroll;
-extern UINT16 *twocrude_pf3_rowscroll,*twocrude_pf4_rowscroll;
-
-WRITE16_HANDLER( twocrude_palette_24bit_rg_w );
-WRITE16_HANDLER( twocrude_palette_24bit_b_w );
-
-static UINT16 *twocrude_ram;
-extern void twocrude_pri_w(int pri);
-static UINT16 prot;
-
-/******************************************************************************/
 
 static WRITE16_HANDLER( twocrude_control_w )
 {
+	cbuster_state *state = (cbuster_state *)space->machine->driver_data;
+
 	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
@@ -51,7 +41,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
     case 2: /* Sound CPU write */
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -71,18 +61,18 @@ static WRITE16_HANDLER( twocrude_control_w )
             protection?!
 
         */
-		if ((data & 0xffff) == 0x9a00) prot = 0;
-		if ((data & 0xffff) == 0xaa)   prot = 0x74;
-		if ((data & 0xffff) == 0x0200) prot = 0x63 << 8;
-		if ((data & 0xffff) == 0x9a)   prot = 0xe;
-		if ((data & 0xffff) == 0x55)   prot = 0x1e;
-		if ((data & 0xffff) == 0x0e)  {prot = 0x0e; twocrude_pri_w(0);} /* start */
-		if ((data & 0xffff) == 0x00)  {prot = 0x0e; twocrude_pri_w(0);} /* level 0 */
-		if ((data & 0xffff) == 0xf1)  {prot = 0x36; twocrude_pri_w(1);} /* level 1 */
-		if ((data & 0xffff) == 0x80)  {prot = 0x2e; twocrude_pri_w(1);} /* level 2 */
-		if ((data & 0xffff) == 0x40)  {prot = 0x1e; twocrude_pri_w(1);} /* level 3 */
-		if ((data & 0xffff) == 0xc0)  {prot = 0x3e; twocrude_pri_w(0);} /* level 4 */
-		if ((data & 0xffff) == 0xff)  {prot = 0x76; twocrude_pri_w(1);} /* level 5 */
+		if ((data & 0xffff) == 0x9a00) state->prot = 0;
+		if ((data & 0xffff) == 0xaa)   state->prot = 0x74;
+		if ((data & 0xffff) == 0x0200) state->prot = 0x63 << 8;
+		if ((data & 0xffff) == 0x9a)   state->prot = 0xe;
+		if ((data & 0xffff) == 0x55)   state->prot = 0x1e;
+		if ((data & 0xffff) == 0x0e)  {state->prot = 0x0e; state->pri = 0;} /* start */
+		if ((data & 0xffff) == 0x00)  {state->prot = 0x0e; state->pri = 0;} /* level 0 */
+		if ((data & 0xffff) == 0xf1)  {state->prot = 0x36; state->pri = 1;} /* level 1 */
+		if ((data & 0xffff) == 0x80)  {state->prot = 0x2e; state->pri = 1;} /* level 2 */
+		if ((data & 0xffff) == 0x40)  {state->prot = 0x1e; state->pri = 1;} /* level 3 */
+		if ((data & 0xffff) == 0xc0)  {state->prot = 0x3e; state->pri = 0;} /* level 4 */
+		if ((data & 0xffff) == 0xff)  {state->prot = 0x76; state->pri = 1;} /* level 5 */
 
 		break;
 	}
@@ -91,6 +81,8 @@ static WRITE16_HANDLER( twocrude_control_w )
 
 static READ16_HANDLER( twocrude_control_r )
 {
+	cbuster_state *state = (cbuster_state *)space->machine->driver_data;
+
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
@@ -100,8 +92,8 @@ static READ16_HANDLER( twocrude_control_r )
 			return input_port_read(space->machine, "DSW");
 
 		case 4: /* Protection */
-			logerror("%04x : protection control read at 30c000 %d\n",cpu_get_pc(space->cpu),offset);
-			return prot;
+			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(space->cpu), offset);
+			return state->prot;
 
 		case 6: /* Credits, VBL in byte 7 */
 			return input_port_read(space->machine, "COINS");
@@ -114,17 +106,17 @@ static READ16_HANDLER( twocrude_control_r )
 
 static ADDRESS_MAP_START( twocrude_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&twocrude_ram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_MEMBER(cbuster_state, ram)
 
 	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE(&twocrude_pf1_rowscroll)
-	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE(&twocrude_pf2_rowscroll)
+	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf1_rowscroll)
+	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf2_rowscroll)
 
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
 	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
-	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE(&twocrude_pf3_rowscroll)
-	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE(&twocrude_pf4_rowscroll)
+	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf3_rowscroll)
+	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf4_rowscroll)
 
 	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
@@ -170,7 +162,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("COINS")	/* Credits */
+	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -274,7 +266,8 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	cbuster_state *driver_state = (cbuster_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -300,7 +293,30 @@ static const deco16ic_interface twocrude_deco16ic_intf =
 	twocrude_bank_callback
 };
 
+static MACHINE_START( cbuster )
+{
+	cbuster_state *state = (cbuster_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+
+	state_save_register_global(machine, state->prot);
+	state_save_register_global(machine, state->pri);
+}
+
+static MACHINE_RESET( cbuster )
+{
+	cbuster_state *state = (cbuster_state *)machine->driver_data;
+
+	state->prot = 0;
+	state->pri = 0;
+}
+
 static MACHINE_DRIVER_START( twocrude )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cbuster_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59 */
@@ -309,6 +325,9 @@ static MACHINE_DRIVER_START( twocrude )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(cbuster)
+	MDRV_MACHINE_RESET(cbuster)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -507,42 +526,46 @@ static DRIVER_INIT( twocrude )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	UINT8 *PTR;
-	int i,j;
+	int i, j;
 
 	/* Main cpu decrypt */
-	for (i=0x00000; i<0x80000; i+=2) {
-		int h = i+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = i+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
+	for (i = 0x00000; i < 0x80000; i += 2) 
+	{
+		int h = i + NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = i + NATIVE_ENDIAN_VALUE_LE_BE(0,1);
 
-		RAM[h]=(RAM[h] & 0xcf) | ((RAM[h] & 0x10) << 1) | ((RAM[h] & 0x20) >> 1);
-		RAM[h]=(RAM[h] & 0x5f) | ((RAM[h] & 0x20) << 2) | ((RAM[h] & 0x80) >> 2);
+		RAM[h] = (RAM[h] & 0xcf) | ((RAM[h] & 0x10) << 1) | ((RAM[h] & 0x20) >> 1);
+		RAM[h] = (RAM[h] & 0x5f) | ((RAM[h] & 0x20) << 2) | ((RAM[h] & 0x80) >> 2);
 
-		RAM[l]=(RAM[l] & 0xbd) | ((RAM[l] & 0x2) << 5) | ((RAM[l] & 0x40) >> 5);
-		RAM[l]=(RAM[l] & 0xf5) | ((RAM[l] & 0x2) << 2) | ((RAM[l] & 0x8) >> 2);
+		RAM[l] = (RAM[l] & 0xbd) | ((RAM[l] & 0x2) << 5) | ((RAM[l] & 0x40) >> 5);
+		RAM[l] = (RAM[l] & 0xf5) | ((RAM[l] & 0x2) << 2) | ((RAM[l] & 0x8) >> 2);
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
 	RAM = memory_region(machine, "gfx3") + 0x080000;
 	PTR = memory_region(machine, "gfx3") + 0x140000;
-	for (i=0; i<0x20000; i+=64) {
-		for (j=0; j<16; j+=1) { /* Copy 16 lines down */
-			RAM[i+      0+j*2]=PTR[i/2+      0+j]; /* Pixels 0-7 for each plane */
-			RAM[i+      1+j*2]=PTR[i/2+0x10000+j];
-			RAM[i+0xa0000+j*2]=PTR[i/2+0x20000+j];
-			RAM[i+0xa0001+j*2]=PTR[i/2+0x30000+j];
+	for (i = 0; i < 0x20000; i += 64) 
+	{
+		for (j = 0; j < 16; j += 1) 
+		{ /* Copy 16 lines down */
+			RAM[i +       0 + j * 2] = PTR[i / 2 +       0 + j]; /* Pixels 0-7 for each plane */
+			RAM[i +       1 + j * 2] = PTR[i / 2 + 0x10000 + j];
+			RAM[i + 0xa0000 + j * 2] = PTR[i / 2 + 0x20000 + j];
+			RAM[i + 0xa0001 + j * 2] = PTR[i / 2 + 0x30000 + j];
 		}
 
-		for (j=0; j<16; j+=1) { /* Copy 16 lines down */
-			RAM[i+   0x20+j*2]=PTR[i/2+   0x10+j]; /* Pixels 8-15 for each plane */
-			RAM[i+   0x21+j*2]=PTR[i/2+0x10010+j];
-			RAM[i+0xa0020+j*2]=PTR[i/2+0x20010+j];
-			RAM[i+0xa0021+j*2]=PTR[i/2+0x30010+j];
+		for (j = 0; j < 16; j += 1) 
+		{ /* Copy 16 lines down */
+			RAM[i +    0x20 + j * 2] = PTR[i / 2 +    0x10 + j]; /* Pixels 8-15 for each plane */
+			RAM[i +    0x21 + j * 2] = PTR[i / 2 + 0x10010 + j];
+			RAM[i + 0xa0020 + j * 2] = PTR[i / 2 + 0x20010 + j];
+			RAM[i + 0xa0021 + j * 2] = PTR[i / 2 + 0x30010 + j];
 		}
 	}
 }
 
 /******************************************************************************/
 
-GAME( 1990, cbuster,  0,       twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", 0 )
-GAME( 1990, cbusterw, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", 0 )
-GAME( 1990, cbusterj, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan)", 0 )
-GAME( 1990, twocrude, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East USA", "Two Crude (US)", 0 )
+GAME( 1990, cbuster,  0,       twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", GAME_SUPPORTS_SAVE )
+GAME( 1990, cbusterw, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", GAME_SUPPORTS_SAVE )
+GAME( 1990, cbusterj, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, twocrude, cbuster, twocrude, twocrude, twocrude, ROT0, "Data East USA", "Two Crude (US)", GAME_SUPPORTS_SAVE )
