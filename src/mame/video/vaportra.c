@@ -10,29 +10,28 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/decodev.h"
-
-static UINT16 vaportra_priority[2];
+#include "video/deco16ic.h"
+#include "includes/vaportra.h"
 
 /******************************************************************************/
 
-
 WRITE16_HANDLER( vaportra_priority_w )
 {
-	COMBINE_DATA(&vaportra_priority[offset]);
+	vaportra_state *state = (vaportra_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->priority[offset]);
 }
 
 /******************************************************************************/
 
-static void update_24bitcol(running_machine *machine, int offset)
+static void update_24bitcol( running_machine *machine, int offset )
 {
-	UINT8 r,g,b;
+	UINT8 r, g, b;
 
 	r = (machine->generic.paletteram.u16[offset] >> 0) & 0xff;
 	g = (machine->generic.paletteram.u16[offset] >> 8) & 0xff;
 	b = (machine->generic.paletteram2.u16[offset] >> 0) & 0xff;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine, offset, MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( vaportra_palette_24bit_rg_w )
@@ -49,28 +48,32 @@ WRITE16_HANDLER( vaportra_palette_24bit_b_w )
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
-	int offs,priority_value;
+	vaportra_state *state = (vaportra_state *)machine->driver_data;
+	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
+	int offs;
+	int priority_value = state->priority[1];
 
-	priority_value=vaportra_priority[1];
-
-	for (offs = 0;offs < 0x400;offs += 4)
+	for (offs = 0; offs < 0x400; offs += 4)
 	{
-		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
+		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
-		y = buffered_spriteram16[offs];
-		if ((y&0x8000) == 0) continue;
+		y = buffered_spriteram[offs];
+		if ((y & 0x8000) == 0) 
+			continue;
 
-		sprite = buffered_spriteram16[offs+1] & 0x1fff;
-		x = buffered_spriteram16[offs+2];
-		colour = (x >> 12) &0xf;
-		if (pri && (colour>=priority_value)) continue;
-		if (!pri && !(colour>=priority_value)) continue;
+		sprite = buffered_spriteram[offs + 1] & 0x1fff;
+		x = buffered_spriteram[offs + 2];
+		colour = (x >> 12) & 0xf;
+		if (pri && (colour >= priority_value)) 
+			continue;
+		if (!pri && !(colour >= priority_value)) 
+			continue;
 
-		flash=x&0x800;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		flash = x & 0x800;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+			continue;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;
@@ -83,7 +86,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		x = 240 - x;
 		y = 240 - y;
 
-		if (x>256) continue; /* Speedup */
+		if (x > 256) 
+			continue; /* Speedup */
 
 		sprite &= ~multi;
 		if (fy)
@@ -96,13 +100,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (flip_screen_get(machine))
 		{
-			y=240-y;
-			x=240-x;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			mult=16;
+			y = 240 - y;
+			x = 240 - x;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
+			mult = 16;
 		}
-		else mult=-16;
+		else mult = -16;
 
 		while (multi >= 0)
 		{
@@ -120,45 +124,45 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( vaportra )
 {
-	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
-	int pri = vaportra_priority[0] & 0x03;
+	vaportra_state *state = (vaportra_state *)screen->machine->driver_data;
+	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
+	int pri = state->priority[0] & 0x03;
 
 	flip_screen_set(screen->machine, !BIT(flip, 7));
-	decodev_pf12_update(deco16ic, 0, 0);
-	decodev_pf34_update(deco16ic, 0, 0);
+	deco16ic_pf12_update(state->deco16ic, 0, 0);
+	deco16ic_pf34_update(state->deco16ic, 0, 0);
 
 	/* Draw playfields */
 	if (pri == 0) 
 	{
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 1) 
 	{
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 2) 
 	{
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
 	else 
 	{
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect, 1);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

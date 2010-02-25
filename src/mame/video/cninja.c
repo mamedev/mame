@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 #include "includes/cninja.h"
 
 UINT16 *cninja_pf1_rowscroll,*cninja_pf2_rowscroll;
@@ -18,9 +18,9 @@ VIDEO_START( stoneage )
 	running_device *deco16ic = devtag_get_device(machine, "deco_custom");
 
 	/* The bootleg has broken scroll registers */
-	decodev_set_scrolldx(deco16ic, 3, 0, -10, -10);	/* pf4 16x16 tilemap */
-	decodev_set_scrolldx(deco16ic, 1, 0, -10, -10);	/* pf2 16x16 tilemap */
-	decodev_set_scrolldx(deco16ic, 0, 1, 2, 2);	/* pf1 8x8 tilemap */
+	deco16ic_set_scrolldx(deco16ic, 3, 0, -10, -10);	/* pf4 16x16 tilemap */
+	deco16ic_set_scrolldx(deco16ic, 1, 0, -10, -10);	/* pf2 16x16 tilemap */
+	deco16ic_set_scrolldx(deco16ic, 0, 1, 2, 2);	/* pf1 8x8 tilemap */
 }
 
 /******************************************************************************/
@@ -374,124 +374,124 @@ static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 VIDEO_UPDATE( cninja )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
 
 	/* Draw playfields */
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 512);
-	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-	decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
+	deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
 	cninja_draw_sprites(screen->machine, bitmap, cliprect);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( cninjabl )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
 
 	/* Draw playfields */
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 512);
-	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-	decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
+	deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
 	cninjabl_draw_sprites(screen->machine, bitmap, cliprect);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( edrandy )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
-	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-	decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 4);
 	cninja_draw_sprites(screen->machine, bitmap, cliprect);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( robocop2 )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
-	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 priority = deco16ic_priority_r(deco16ic, 0, 0xffff);
 
 	/* One of the tilemap chips can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
 	if (priority & 4) 
 	{
-		decodev_set_tilemap_colour_mask(deco16ic, 2, 0);
-		decodev_set_tilemap_colour_mask(deco16ic, 3, 0);
-		decodev_pf34_set_gfxbank(deco16ic, 0, 4);
+		deco16ic_set_tilemap_colour_mask(deco16ic, 2, 0);
+		deco16ic_set_tilemap_colour_mask(deco16ic, 3, 0);
+		deco16ic_pf34_set_gfxbank(deco16ic, 0, 4);
 	} 
 	else 
 	{
-		decodev_set_tilemap_colour_mask(deco16ic, 2, 0xf);
-		decodev_set_tilemap_colour_mask(deco16ic, 3, 0xf);
-		decodev_pf34_set_gfxbank(deco16ic, 0, 2);
+		deco16ic_set_tilemap_colour_mask(deco16ic, 2, 0xf);
+		deco16ic_set_tilemap_colour_mask(deco16ic, 3, 0xf);
+		deco16ic_pf34_set_gfxbank(deco16ic, 0, 2);
 	}
 
 	/* Update playfields */
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
 
 	/* Draw playfields */
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0x200);
 
 	if ((priority & 4) == 0)
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 
 	/* Switchable priority */
 	switch (priority & 0x8) 
 	{
 		case 8:
-			decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
-			decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 4);
+			deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 4);
 			break;
 		default:
 		case 0:
-			decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
-			decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 4);
+			deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 4);
 			break;
 	}
 
 	robocop2_draw_sprites(screen->machine, bitmap, cliprect);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( mutantf )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
-	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 priority = deco16ic_priority_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, cninja_pf1_rowscroll, cninja_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, cninja_pf3_rowscroll, cninja_pf4_rowscroll);
 
 	/* Draw playfields */
 	bitmap_fill(bitmap, cliprect, 0x400); /* Confirmed */
@@ -507,9 +507,9 @@ VIDEO_UPDATE( mutantf )
     The other bits may control alpha blend on the 2nd sprite chip, or
     layer order.
     */
-	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
-	decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
 
 	/* We need to abuse the priority bitmap a little by clearing it before
         drawing each sprite layer.  This is because there is no priority
@@ -531,6 +531,6 @@ VIDEO_UPDATE( mutantf )
 		bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 		mutantf_draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 3);
 	}
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

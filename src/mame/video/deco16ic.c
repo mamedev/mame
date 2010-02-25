@@ -146,7 +146,7 @@ Rowscroll style:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 #include "ui.h"
 
 #if 0
@@ -228,7 +228,7 @@ INLINE const deco16ic_interface *get_interface( running_device *device )
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE16_DEVICE_HANDLER( decodev_nonbuffered_palette_w )
+WRITE16_DEVICE_HANDLER( deco16ic_nonbuffered_palette_w )
 {
 	int r,g,b;
 
@@ -242,7 +242,7 @@ WRITE16_DEVICE_HANDLER( decodev_nonbuffered_palette_w )
 	palette_set_color(device->machine, offset / 2, MAKE_RGB(r,g,b));
 }
 
-WRITE16_DEVICE_HANDLER( decodev_buffered_palette_w )
+WRITE16_DEVICE_HANDLER( deco16ic_buffered_palette_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -251,7 +251,7 @@ WRITE16_DEVICE_HANDLER( decodev_buffered_palette_w )
 	deco16ic->dirty_palette[offset / 2] = 1;
 }
 
-WRITE16_DEVICE_HANDLER( decodev_palette_dma_w )
+WRITE16_DEVICE_HANDLER( deco16ic_palette_dma_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	const int m = device->machine->config->total_colors;
@@ -275,18 +275,18 @@ WRITE16_DEVICE_HANDLER( decodev_palette_dma_w )
 /*****************************************************************************************/
 
 /* */
-READ16_DEVICE_HANDLER( decodev_71_r )
+READ16_DEVICE_HANDLER( deco16ic_71_r )
 {
 	return 0xffff;
 }
 
-WRITE16_DEVICE_HANDLER( decodev_priority_w )
+WRITE16_DEVICE_HANDLER( deco16ic_priority_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	deco16ic->priority = data;
 }
 
-READ16_DEVICE_HANDLER( decodev_priority_r )
+READ16_DEVICE_HANDLER( deco16ic_priority_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->priority;
@@ -589,7 +589,7 @@ static void custom_tilemap_draw(
 /******************************************************************************/
 
 /* robocop 2 can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
-void decodev_set_tilemap_colour_mask( running_device *device, int tmap, int mask )
+void deco16ic_set_tilemap_colour_mask( running_device *device, int tmap, int mask )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -602,7 +602,7 @@ void decodev_set_tilemap_colour_mask( running_device *device, int tmap, int mask
 	}
 }
 
-void decodev_pf34_set_gfxbank( running_device *device, int small, int big )
+void deco16ic_pf34_set_gfxbank( running_device *device, int small, int big )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -619,7 +619,7 @@ void decodev_pf34_set_gfxbank( running_device *device, int small, int big )
 }
 
 /* stoneage has broken scroll registers */
-void decodev_set_scrolldx( running_device *device, int tmap, int size, int dx, int dx_if_flipped )
+void deco16ic_set_scrolldx( running_device *device, int tmap, int size, int dx, int dx_if_flipped )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -650,7 +650,7 @@ void decodev_set_scrolldx( running_device *device, int tmap, int size, int dx, i
 
 /******************************************************************************/
 
-WRITE16_DEVICE_HANDLER( decodev_pf1_data_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf1_data_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -661,7 +661,7 @@ WRITE16_DEVICE_HANDLER( decodev_pf1_data_w )
 		tilemap_mark_tile_dirty(deco16ic->pf1_tilemap_16x16, offset);
 }
 
-WRITE16_DEVICE_HANDLER( decodev_pf2_data_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf2_data_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -672,7 +672,7 @@ WRITE16_DEVICE_HANDLER( decodev_pf2_data_w )
 		tilemap_mark_tile_dirty(deco16ic->pf2_tilemap_16x16, offset);
 }
 
-WRITE16_DEVICE_HANDLER( decodev_pf3_data_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf3_data_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -680,7 +680,7 @@ WRITE16_DEVICE_HANDLER( decodev_pf3_data_w )
 	tilemap_mark_tile_dirty(deco16ic->pf3_tilemap_16x16, offset);
 }
 
-WRITE16_DEVICE_HANDLER( decodev_pf4_data_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf4_data_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -688,115 +688,115 @@ WRITE16_DEVICE_HANDLER( decodev_pf4_data_w )
 	tilemap_mark_tile_dirty(deco16ic->pf4_tilemap_16x16, offset);
 }
 
-READ16_DEVICE_HANDLER( decodev_pf1_data_r )
+READ16_DEVICE_HANDLER( deco16ic_pf1_data_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf1_data[offset];
 }
 
-READ16_DEVICE_HANDLER( decodev_pf2_data_r )
+READ16_DEVICE_HANDLER( deco16ic_pf2_data_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf2_data[offset];
 }
 
-READ16_DEVICE_HANDLER( decodev_pf3_data_r )
+READ16_DEVICE_HANDLER( deco16ic_pf3_data_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf3_data[offset];
 }
 
-READ16_DEVICE_HANDLER( decodev_pf4_data_r )
+READ16_DEVICE_HANDLER( deco16ic_pf4_data_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf4_data[offset];
 }
 
 
-WRITE16_DEVICE_HANDLER( decodev_pf12_control_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf12_control_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	COMBINE_DATA(&deco16ic->pf12_control[offset]);
 }
 
-WRITE16_DEVICE_HANDLER( decodev_pf34_control_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf34_control_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	COMBINE_DATA(&deco16ic->pf34_control[offset]);
 }
 
-READ16_DEVICE_HANDLER( decodev_pf12_control_r )
+READ16_DEVICE_HANDLER( deco16ic_pf12_control_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf12_control[offset];
 }
 
-READ16_DEVICE_HANDLER( decodev_pf34_control_r )
+READ16_DEVICE_HANDLER( deco16ic_pf34_control_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf34_control[offset];
 }
 
 
-READ32_DEVICE_HANDLER ( decodev_pf12_control_dword_r )
+READ32_DEVICE_HANDLER ( deco16ic_pf12_control_dword_r )
 {
-	return decodev_pf12_control_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf12_control_r(device, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_DEVICE_HANDLER( decodev_pf12_control_dword_w )
+WRITE32_DEVICE_HANDLER( deco16ic_pf12_control_dword_w )
 {
-	decodev_pf12_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf12_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_DEVICE_HANDLER ( decodev_pf34_control_dword_r )
+READ32_DEVICE_HANDLER ( deco16ic_pf34_control_dword_r )
 {
-	return decodev_pf34_control_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf34_control_r(device, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_DEVICE_HANDLER( decodev_pf34_control_dword_w )
+WRITE32_DEVICE_HANDLER( deco16ic_pf34_control_dword_w )
 {
-	decodev_pf34_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf34_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
 
-READ32_DEVICE_HANDLER( decodev_pf1_data_dword_r )
+READ32_DEVICE_HANDLER( deco16ic_pf1_data_dword_r )
 {
-	return decodev_pf1_data_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf1_data_r(device, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_DEVICE_HANDLER( decodev_pf1_data_dword_w )
+WRITE32_DEVICE_HANDLER( deco16ic_pf1_data_dword_w )
 {
-	decodev_pf1_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf1_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_DEVICE_HANDLER( decodev_pf2_data_dword_r )
+READ32_DEVICE_HANDLER( deco16ic_pf2_data_dword_r )
 {
-	return decodev_pf2_data_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf2_data_r(device, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_DEVICE_HANDLER( decodev_pf2_data_dword_w )
+WRITE32_DEVICE_HANDLER( deco16ic_pf2_data_dword_w )
 {
-	decodev_pf2_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf2_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_DEVICE_HANDLER( decodev_pf3_data_dword_r )
+READ32_DEVICE_HANDLER( deco16ic_pf3_data_dword_r )
 {
-	return decodev_pf3_data_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf3_data_r(device, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_DEVICE_HANDLER( decodev_pf3_data_dword_w )
+WRITE32_DEVICE_HANDLER( deco16ic_pf3_data_dword_w )
 {
-	decodev_pf3_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf3_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_DEVICE_HANDLER( decodev_pf4_data_dword_r )
+READ32_DEVICE_HANDLER( deco16ic_pf4_data_dword_r )
 {
-	return decodev_pf4_data_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf4_data_r(device, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_DEVICE_HANDLER( decodev_pf4_data_dword_w )
+WRITE32_DEVICE_HANDLER( deco16ic_pf4_data_dword_w )
 {
-	decodev_pf4_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf4_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
 
@@ -970,7 +970,7 @@ static int deco16_pf_update(
 	return use_custom;
 }
 
-void decodev_pf12_update( running_device *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
+void deco16ic_pf12_update( running_device *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	int bank1, bank2;
@@ -1013,7 +1013,7 @@ void decodev_pf12_update( running_device *device, const UINT16 *rowscroll_1_ptr,
 	}
 }
 
-void decodev_pf34_update( running_device *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
+void deco16ic_pf34_update( running_device *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	int bank1, bank2;
@@ -1052,7 +1052,7 @@ void decodev_pf34_update( running_device *device, const UINT16 *rowscroll_1_ptr,
 
 /*****************************************************************************************/
 
-void decodev_print_debug_info(running_device *device, bitmap_t *bitmap)
+void deco16ic_print_debug_info(running_device *device, bitmap_t *bitmap)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	char buf[64*5];
@@ -1083,7 +1083,7 @@ void decodev_print_debug_info(running_device *device, bitmap_t *bitmap)
 
 /*****************************************************************************************/
 
-void decodev_clear_sprite_priority_bitmap( running_device *device )
+void deco16ic_clear_sprite_priority_bitmap( running_device *device )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1092,7 +1092,7 @@ void decodev_clear_sprite_priority_bitmap( running_device *device )
 }
 
 /* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
-void decodev_pdrawgfx(
+void deco16ic_pdrawgfx(
 		running_device *device,
 		bitmap_t *dest, const rectangle *clip, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
@@ -1163,7 +1163,7 @@ void decodev_pdrawgfx(
 
 /*****************************************************************************************/
 
-void decodev_tilemap_1_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
+void deco16ic_tilemap_1_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1180,7 +1180,7 @@ void decodev_tilemap_1_draw( running_device *device, bitmap_t *bitmap, const rec
 	}
 }
 
-void decodev_tilemap_2_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_2_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1197,7 +1197,7 @@ void decodev_tilemap_2_draw(running_device *device, bitmap_t *bitmap, const rect
 	}
 }
 
-void decodev_tilemap_3_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_3_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1207,7 +1207,7 @@ void decodev_tilemap_3_draw(running_device *device, bitmap_t *bitmap, const rect
 		tilemap_draw(bitmap, cliprect, deco16ic->pf3_tilemap_16x16, flags, priority);
 }
 
-void decodev_tilemap_4_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_4_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1220,7 +1220,7 @@ void decodev_tilemap_4_draw(running_device *device, bitmap_t *bitmap, const rect
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void decodev_tilemap_34_combine_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_34_combine_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	custom_tilemap_draw(device, bitmap, 0, deco16ic->pf3_tilemap_16x16, 0, deco16ic->pf4_tilemap_16x16, deco16ic->pf3_rowscroll_ptr, deco16ic->pf34_control[1], deco16ic->pf34_control[2], deco16ic->pf34_control[5] & 0xff, deco16ic->pf34_control[6] & 0xff, 0xf, 4, 0xff, flags, priority);

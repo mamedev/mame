@@ -22,7 +22,7 @@
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 VIDEO_UPDATE( twocrude );
 
@@ -116,20 +116,20 @@ static ADDRESS_MAP_START( twocrude_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&twocrude_ram)
 
-	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE(&twocrude_pf1_rowscroll)
 	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE(&twocrude_pf2_rowscroll)
 
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE(&twocrude_pf3_rowscroll)
 	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE(&twocrude_pf4_rowscroll)
 
 	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
-	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("deco_custom", decodev_pf34_control_w)
+	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)

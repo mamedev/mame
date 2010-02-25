@@ -322,23 +322,20 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #define FNCYWLD_HACK	0
 
 static WRITE16_HANDLER( semicom_soundcmd_w );
-static UINT16* tumblepb_mainram;
-UINT16* jumppop_control;
-UINT16* suprtrio_control;
 
 /******************************************************************************/
 
 static WRITE16_DEVICE_HANDLER( tumblepb_oki_w )
 {
-	if (mem_mask==0xffff)
+	if (mem_mask == 0xffff)
 	{
-		okim6295_w(device,0,data&0xff);
-		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
+		okim6295_w(device, 0, data & 0xff);
+		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		okim6295_w(device,0,(data>>8)&0xff);
-		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
+		okim6295_w(device, 0, (data >> 8) & 0xff);
+		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
     /* STUFF IN OTHER BYTE TOO..*/
 }
@@ -351,22 +348,24 @@ static READ16_HANDLER( tumblepb_prot_r )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( tumblepb_sound_w )
 {
-	soundlatch_w(space,0,data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	soundlatch_w(space, 0, data & 0xff);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 #endif
 
 static WRITE16_HANDLER( jumppop_sound_w )
 {
-	soundlatch_w(space,0,data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE );
+	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	soundlatch_w(space, 0, data & 0xff);
+	cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
 
 /******************************************************************************/
 
 static READ16_HANDLER( tumblepopb_controls_r )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0:
 			return input_port_read(space->machine, "PLAYERS");
@@ -451,21 +450,17 @@ command 1 - stop?
 */
 
 
-
-static int tumblep_music_command;
-static int tumblep_music_bank;
-static int tumbleb2_music_is_playing;
-
-static void tumbleb2_playmusic(running_device *device)
+static void tumbleb2_playmusic( running_device *device )
 {
-	int status = okim6295_r(device,0);
+	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	int status = okim6295_r(device, 0);
 
-	if (tumbleb2_music_is_playing)
+	if (state->music_is_playing)
 	{
-		if ((status&0x08)==0x00)
+		if (!BIT(status, 3))
 		{
-			okim6295_w(device,0,0x80|tumblep_music_command);
-			okim6295_w(device,0,0x00|0x82);
+			okim6295_w(device, 0, 0x80 | state->music_command);
+			okim6295_w(device, 0, 0x00 | 0x82);
 		}
 	}
 }
@@ -473,8 +468,9 @@ static void tumbleb2_playmusic(running_device *device)
 
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
+	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
 	cpu_set_input_line(device, 6, HOLD_LINE);
-	tumbleb2_playmusic(devtag_get_device(device->machine, "oki"));
+	tumbleb2_playmusic(state->oki);
 }
 
 static const int tumbleb_sound_lookup[256] = {
@@ -498,30 +494,30 @@ static const int tumbleb_sound_lookup[256] = {
 };
 
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
-static void tumbleb2_set_music_bank(running_machine *machine, int bank)
+static void tumbleb2_set_music_bank( running_machine *machine, int bank )
 {
 	UINT8 *oki = memory_region(machine, "oki");
-	memcpy(&oki[0x38000], &oki[0x80000+0x38000+0x8000*bank],0x8000);
+	memcpy(&oki[0x38000], &oki[0x80000 + 0x38000 + 0x8000 * bank], 0x8000);
 }
 
-static void tumbleb2_play_sound (running_device *device, int data)
+static void tumbleb2_play_sound( running_device *device, int data )
 {
-	int status = okim6295_r(device,0);
+	int status = okim6295_r(device, 0);
 
-	if ((status&0x01)==0x00)
+	if (!BIT(status, 0))
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x12);
+		okim6295_w(device, 0, 0x80 | data);
+		okim6295_w(device, 0, 0x00 | 0x12);
 	}
-	else if ((status&0x02)==0x00)
+	else if (!BIT(status, 1))
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x22);
+		okim6295_w(device, 0, 0x80 | data);
+		okim6295_w(device, 0, 0x00 | 0x22);
 	}
-	else if ((status&0x04)==0x00)
+	else if (!BIT(status, 2))
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x42);
+		okim6295_w(device, 0, 0x80 | data);
+		okim6295_w(device, 0, 0x00 | 0x42);
 	}
 }
 
@@ -537,116 +533,113 @@ static void tumbleb2_play_sound (running_device *device, int data)
 // bank 7 = how to play?
 // bank 8 = boss???
 
-static void process_tumbleb2_music_command(running_device *device, int data)
+static void process_tumbleb2_music_command( running_device *device, int data )
 {
-	int status = okim6295_r(device,0);
+	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	int status = okim6295_r(device, 0);
 
 	if (data == 1) // stop?
 	{
-		if ((status&0x08)==0x08)
+		if (BIT(status, 3))
 		{
-			okim6295_w(device,0,0x40);		/* Stop playing music */
-			tumbleb2_music_is_playing = 0;
+			okim6295_w(device, 0, 0x40);		/* Stop playing music */
+			state->music_is_playing = 0;
 		}
 	}
 	else
 	{
-		if (tumbleb2_music_is_playing != data)
+		if (state->music_is_playing != data)
 		{
-			tumbleb2_music_is_playing = data;
-			okim6295_w(device,0,0x40); // stop the current music
+			state->music_is_playing = data;
+			okim6295_w(device, 0, 0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen
-					tumblep_music_bank = 1;
-					tumblep_music_command = 0x38;
+					state->music_bank = 1;
+					state->music_command = 0x38;
 					break;
 
 				case 0x05: // america
-					tumblep_music_bank = 6;
-					tumblep_music_command = 0x38;
+					state->music_bank = 6;
+					state->music_command = 0x38;
 					break;
 
 				case 0x06: // asia
-					tumblep_music_bank = 2;
-					tumblep_music_command = 0x38;
+					state->music_bank = 2;
+					state->music_command = 0x38;
 					break;
 
 				case 0x07: // africa/egypt -- don't seem to have a tune for this one
-					tumblep_music_bank = 4;
-					tumblep_music_command = 0x38;
+					state->music_bank = 4;
+					state->music_command = 0x38;
 					break;
 
 				case 0x08: // antartica
-					tumblep_music_bank = 3;
-					tumblep_music_command = 0x38;
+					state->music_bank = 3;
+					state->music_command = 0x38;
 					break;
 
 				case 0x09: // brazil / south america
-					tumblep_music_bank = 4;
-					tumblep_music_command = 0x38;
+					state->music_bank = 4;
+					state->music_command = 0x38;
 					break;
 
 				case 0x0a: // japan -- don't seem to have a tune
-					tumblep_music_bank = 2;
-					tumblep_music_command = 0x38;
+					state->music_bank = 2;
+					state->music_command = 0x38;
 					break;
 
 				case 0x0b: // australia
-					tumblep_music_bank = 5;
-					tumblep_music_command = 0x38;
+					state->music_bank = 5;
+					state->music_command = 0x38;
 					break;
 
 				case 0x0c: // france/europe
-					tumblep_music_bank = 6;
-					tumblep_music_command = 0x38;
+					state->music_bank = 6;
+					state->music_command = 0x38;
 					break;
 
 				case 0x0d: // how to play
-					tumblep_music_bank = 7;
-					tumblep_music_command = 0x38;
+					state->music_bank = 7;
+					state->music_command = 0x38;
 					break;
 
 				case 0x0f: // stage clear
-					tumblep_music_bank = 0;
-					tumblep_music_command = 0x33;
+					state->music_bank = 0;
+					state->music_command = 0x33;
 					break;
 
 				case 0x10: // boss stage
-					tumblep_music_bank = 8;
-					tumblep_music_command = 0x38;
+					state->music_bank = 8;
+					state->music_command = 0x38;
 					break;
 
 				case 0x12: // world clear
-					tumblep_music_bank = 0;
-					tumblep_music_command = 0x34;
+					state->music_bank = 0;
+					state->music_command = 0x34;
 					break;
 
 				default: // anything else..
-					tumblep_music_bank = 8;
-					tumblep_music_command = 0x38;
+					state->music_bank = 8;
+					state->music_command = 0x38;
 					break;
 			}
-			tumbleb2_set_music_bank(device->machine, tumblep_music_bank);
+
+			tumbleb2_set_music_bank(device->machine, state->music_bank);
 			tumbleb2_playmusic(device);
-
 		}
-
-
 	}
 }
 
 
 static WRITE16_DEVICE_HANDLER( tumbleb2_soundmcu_w )
 {
-	int sound;
-
-	sound = tumbleb_sound_lookup[data&0xff];
+	int sound = tumbleb_sound_lookup[data & 0xff];
 
 	if (sound == 0x00)
 	{
 		/* pangpang has more commands than tumbleb2, extra sounds */
-		//mame_printf_debug("Command %04x\n",data);
+		//mame_printf_debug("Command %04x\n", data);
 	}
 	else if (sound == -2)
 	{
@@ -666,16 +659,16 @@ static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	/* To write levels modifications */
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_READ(tumblepb_prot_r) AM_DEVWRITE("oki", tumblepb_oki_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -690,14 +683,14 @@ static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprites */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITEONLY /* goes slightly past the end of spriteram? */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(fncywld_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fncywld_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(fncywld_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fncywld_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -710,53 +703,54 @@ static READ16_HANDLER( semibase_unknown_r )
 {
 	return mame_rand(space->machine);
 }
+
 static ADDRESS_MAP_START( htchctch_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_READ(semibase_unknown_r)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(semicom_soundcmd_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(bcstory_tilebank_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
 	AM_RANGE(0x341000, 0x342fff) AM_RAM				// Extra ram?
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( jumppop_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x180001) AM_NOP	/* IRQ ack? */
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("PLAYERS")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSW")
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(jumppop_sound_w)
 	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
-	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_BASE(&jumppop_control)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
+	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_BASE_MEMBER(tumbleb_state, control)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( jumpkids_sound_w )
 {
+	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
-
 
 static ADDRESS_MAP_START( suprtrio_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE(&suprtrio_control)
-	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size)
+	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE_MEMBER(tumbleb_state, control)
+	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
 	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("PLAYERS") AM_WRITE(suprtrio_tilebank_w)
 	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("SYSTEM")
@@ -767,15 +761,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pangpang_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY // writes past the end of spriteram
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(pangpang_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE(pangpang_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(pangpang_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE(pangpang_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
 ADDRESS_MAP_END
 
 
@@ -785,9 +779,9 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-//      cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
+		// cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
 		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 
 	}
@@ -804,7 +798,7 @@ static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-//  AM_RANGE(0xf006, 0xf006) ??
+	//AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
 ADDRESS_MAP_END
@@ -813,7 +807,7 @@ static ADDRESS_MAP_START( suprtrio_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-//  AM_RANGE(0xf006, 0xf006) ??
+	//AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
 ADDRESS_MAP_END
@@ -831,7 +825,8 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(jumppop_z80latch_r)
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -850,16 +845,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumpkids_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(jumpkids_sound_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -872,7 +867,7 @@ static WRITE8_HANDLER( jumpkids_oki_bank_w )
 	UINT8* sound2 = memory_region(space->machine, "oki2");
 	int bank = data & 0x03;
 
-	memcpy (sound1+0x20000, sound2+bank*0x20000, 0x20000);
+	memcpy(sound1 + 0x20000, sound2 + bank * 0x20000, 0x20000);
 }
 
 static ADDRESS_MAP_START( jumpkids_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1988,12 +1983,47 @@ GFXDECODE_END
 /******************************************************************************/
 
 
+static MACHINE_START( tumbleb )
+{
+	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->oki = devtag_get_device(machine, "oki");
+
+	state_save_register_global(machine, state->music_command);
+	state_save_register_global(machine, state->music_bank);
+	state_save_register_global(machine, state->music_is_playing);
+
+	state_save_register_global_array(machine, state->control_0);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->tilebank);
+}
+
+static MACHINE_RESET( tumbleb )
+{
+	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+
+	state->music_command = 0;
+	state->music_bank = 0;
+	state->music_is_playing = 0;
+	state->flipscreen = 0;
+	state->tilebank = 0;
+	memset(state->control_0, 0, ARRAY_LENGTH(state->control_0));
+}
+
 static MACHINE_DRIVER_START( tumblepb )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2020,10 +2050,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tumbleb2 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_main_map)
 	MDRV_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2049,6 +2085,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jumpkids )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_main_map)
@@ -2057,6 +2096,9 @@ static MACHINE_DRIVER_START( jumpkids )
 	/* z80? */
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_sound_map)
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2081,10 +2123,17 @@ static MACHINE_DRIVER_START( jumpkids )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fncywld )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(fncywld_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2115,9 +2164,10 @@ MACHINE_DRIVER_END
 
 
 
-static void semicom_irqhandler(running_device *device, int irq)
+static void semicom_irqhandler( running_device *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2128,17 +2178,23 @@ static const ym2151_interface semicom_ym2151_interface =
 
 static MACHINE_RESET (htchctch)
 {
-	/* copy protection data every reset */
+	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
 
+	/* copy protection data every reset */
 	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
 	int i, len = memory_region_length(machine, "user1");
 
-	for (i = 0;i < len/2;i++)
-		tumblepb_mainram[0x000/2 + i] = PROTDATA[i];
+	for (i = 0; i < len / 2; i++)
+		state->mainram[0x000/2 + i] = PROTDATA[i];
 
+	MACHINE_RESET_CALL(tumbleb);
 }
 
 static MACHINE_DRIVER_START( htchctch )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(htchctch_main_map)
@@ -2147,7 +2203,8 @@ static MACHINE_DRIVER_START( htchctch )
 	MDRV_CPU_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
 	MDRV_CPU_PROGRAM_MAP(semicom_sound_map)
 
-	MDRV_MACHINE_RESET ( htchctch )
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(htchctch)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2184,7 +2241,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bcstory )
 	MDRV_IMPORT_FROM(htchctch)
-	MDRV_VIDEO_UPDATE( bcstory )
+	MDRV_VIDEO_UPDATE(bcstory)
 
 	MDRV_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
@@ -2214,6 +2271,10 @@ static MACHINE_DRIVER_START( metlsavr )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jumppop )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jumppop_main_map)
@@ -2223,6 +2284,9 @@ static MACHINE_DRIVER_START( jumppop )
 	MDRV_CPU_PROGRAM_MAP(jumppop_sound_map)
 	MDRV_CPU_IO_MAP(jumppop_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2252,6 +2316,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( suprtrio )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
 	MDRV_CPU_PROGRAM_MAP(suprtrio_main_map)
@@ -2259,6 +2326,9 @@ static MACHINE_DRIVER_START( suprtrio )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(suprtrio_sound_map)
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2285,10 +2355,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pangpang )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tumbleb_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(pangpang_main_map)
 	MDRV_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
+
+	MDRV_MACHINE_START(tumbleb)
+	MDRV_MACHINE_RESET(tumbleb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3255,7 +3331,7 @@ static void tumblepb_gfx1_rearrange(running_machine *machine)
 	int i;
 
 	/* gfx data is in the wrong order */
-	for (i = 0;i < len;i++)
+	for (i = 0; i < len; i++)
 	{
 		if ((i & 0x20) == 0)
 		{
@@ -3263,7 +3339,7 @@ static void tumblepb_gfx1_rearrange(running_machine *machine)
 		}
 	}
 	/* low/high half are also swapped */
-	for (i = 0;i < len/2;i++)
+	for (i = 0; i < len/2; i++)
 	{
 		int t = rom[i]; rom[i] = rom[i + len/2]; rom[i + len/2] = t;
 	}
@@ -3315,11 +3391,8 @@ static DRIVER_INIT( fncywld )
 }
 
 
-
-
 static READ16_HANDLER( bcstory_1a0_read )
 {
-
 	//mame_printf_debug("bcstory_io %06x\n",cpu_get_pc(space->cpu));
 
 	if (cpu_get_pc(space->cpu)==0x0560) return 0x1a0;
@@ -3336,6 +3409,7 @@ static DRIVER_INIT ( bcstory )
 static DRIVER_INIT( htchctch )
 {
 
+	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
 //  UINT16 *HCROM = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
 	int i, len = memory_region_length(machine, "user1");
@@ -3347,11 +3421,11 @@ static DRIVER_INIT( htchctch )
 //  };
 
 
-//  for (i = 0;i < sizeof(htchctch_mcu68k)/sizeof(htchctch_mcu68k[0]);i++)
-//      tumblepb_mainram[0x000/2 + i] = htchctch_mcu68k[i];
+//  for (i = 0; i < sizeof(htchctch_mcu68k) / sizeof(htchctch_mcu68k[0]); i++)
+//      state->mainram[0x000/2 + i] = htchctch_mcu68k[i];
 
-	for (i = 0;i < len/2;i++)
-		tumblepb_mainram[0x000/2 + i] = PROTDATA[i];
+	for (i = 0; i < len / 2; i++)
+		state->mainram[0x000/2 + i] = PROTDATA[i];
 
 
 
@@ -3595,8 +3669,8 @@ static void suprtrio_decrypt_code(running_machine *machine)
 	int i;
 
 	/* decrypt main ROMs */
-	memcpy(buf,rom,0x80000);
-	for (i = 0;i < 0x40000;i++)
+	memcpy(buf, rom, 0x80000);
+	for (i = 0; i < 0x40000; i++)
 	{
 		int j = i ^ 0x06;
 		if ((i & 1) == 0) j ^= 0x02;
@@ -3613,8 +3687,8 @@ static void suprtrio_decrypt_gfx(running_machine *machine)
 	int i;
 
 	/* decrypt tiles */
-	memcpy(buf,rom,0x100000);
-	for (i = 0;i < 0x80000;i++)
+	memcpy(buf, rom, 0x100000);
+	for (i = 0; i < 0x80000; i++)
 	{
 		int j = i ^ 0x02;
 		if (i & 1) j ^= 0x04;
@@ -3656,22 +3730,22 @@ static DRIVER_INIT ( dquizgo )
 
 /******************************************************************************/
 
-GAME( 1991, tumbleb,  tumblep, tumblepb,  tumblepb, tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1991, tumbleb2, tumblep, tumbleb2,  tumblepb, tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg set 2)", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
-GAME( 1993, jumpkids, 0,       jumpkids,  tumblepb, jumpkids, ROT0, "Comad", "Jump Kids", 0 )
-GAME( 1994, metlsavr, 0,       metlsavr,  metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", 0 )
-GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
-GAME( 1994, suprtrio, 0,       suprtrio,  suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", 0 )
+GAME( 1991, tumbleb,  tumblep, tumblepb,  tumblepb, tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+GAME( 1991, tumbleb2, tumblep, tumbleb2,  tumblepb, tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
+GAME( 1993, jumpkids, 0,       jumpkids,  tumblepb, jumpkids, ROT0, "Comad", "Jump Kids", GAME_SUPPORTS_SAVE )
+GAME( 1994, metlsavr, 0,       metlsavr,  metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
+GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
+GAME( 1994, suprtrio, 0,       suprtrio,  suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
 // Should also be 'Magicball Fighting' (c)1994  see  http://kmrb.or.kr/Game_Image/1999/%EC%A0%9C1248%ED%98%B8.jpg
-GAME( 1995, htchctch, 0,       htchctch,  htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , 0 ) // not 100% sure about gfx offsets
-GAME( 1995, cookbib,  0,       cookbib,   cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , 0 ) // not 100% sure about gfx offsets
-GAME( 1995, chokchok, 0,       cookbib,   chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS ) // corruption during attract mode (tmap disable?)
-GAME( 1995, wlstar,   0,       cookbib,   wlstar,   wlstar,   ROT0, "Mijin", "Wonder League Star - Sok-Magicball Fighting (Korea)", 0) // translates to 'Wonder League Star - Return of Magicball Fighting'
-GAME( 1996, wondl96,  0,       cookbib,   wondl96,  wlstar,   ROT0, "SemiCom", "Wonder League '96 (Korea)", 0)
-GAME( 1996, fncywld,  0,       fncywld,   fncywld,  fncywld,  ROT0, "Unico", "Fancy World - Earth of Crisis" , 0 ) // game says 1996, testmode 1995?
-GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", 0)
-GAME( 1997, bcstry,   0,       bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS) // gfx offsets?
-GAME( 1997, bcstrya,  bcstry,  bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS) // gfx offsets?
-GAME( 1997, semibase, 0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS)// sprite offsets..
-GAME( 1998, dquizgo,  0,       cookbib,   dquizgo,  dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS) // check layer offsets
-GAME( 2001, jumppop,  0,       jumppop,   jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop", 0 )
+GAME( 1995, htchctch, 0,       htchctch,  htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1995, cookbib,  0,       cookbib,   cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1995, chokchok, 0,       cookbib,   chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)
+GAME( 1995, wlstar,   0,       cookbib,   wlstar,   wlstar,   ROT0, "Mijin", "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
+GAME( 1996, wondl96,  0,       cookbib,   wondl96,  wlstar,   ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1996, fncywld,  0,       fncywld,   fncywld,  fncywld,  ROT0, "Unico", "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
+GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1997, bcstry,   0,       bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
+GAME( 1997, bcstrya,  bcstry,  bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
+GAME( 1997, semibase, 0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )// sprite offsets..
+GAME( 1998, dquizgo,  0,       cookbib,   dquizgo,  dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // check layer offsets
+GAME( 2001, jumppop,  0,       jumppop,   jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop", GAME_SUPPORTS_SAVE )

@@ -3,7 +3,7 @@
 */
 
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 UINT16 *simpl156_pf1_rowscroll,*simpl156_pf2_rowscroll;
 
@@ -119,12 +119,12 @@ VIDEO_UPDATE( simpl156 )
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
 	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 
-	decodev_pf12_update(deco16ic, simpl156_pf1_rowscroll, simpl156_pf2_rowscroll);
+	deco16ic_pf12_update(deco16ic, simpl156_pf1_rowscroll, simpl156_pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256);
 
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

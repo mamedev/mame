@@ -127,7 +127,7 @@ Dip locations verified with US conversion kit manual.
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 extern UINT16 *dassault_pf2_rowscroll,*dassault_pf4_rowscroll;
 
@@ -214,25 +214,25 @@ static READ16_HANDLER( shared_ram_r )
 static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
-	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_custom", decodev_priority_w)
+	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(buffer_spriteram16_2_w)
 	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE(&dassault_pf2_rowscroll)
-	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
 
-	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE(&dassault_pf4_rowscroll)
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", decodev_pf34_control_w)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(&dassault_ram) /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2) /* Spriteram (2nd) */

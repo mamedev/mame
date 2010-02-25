@@ -90,16 +90,13 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/2151intf.h"
-#include "sound/okim6295.h"
-
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "video/decodev.h"
+#include "includes/funkyjet.h"
+#include "sound/2151intf.h"
+#include "sound/okim6295.h"
+#include "video/deco16ic.h"
 
-VIDEO_UPDATE( funkyjet );
-
-extern UINT16 *funkyjet_pf1_rowscroll,*funkyjet_pf2_rowscroll;
 
 /******************************************************************************/
 
@@ -107,15 +104,15 @@ static ADDRESS_MAP_START( funkyjet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(funkyjet_state, spriteram, spriteram_size)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_BASE(&deco16_prot_ram)
 	AM_RANGE(0x184000, 0x184001) AM_WRITENOP
 	AM_RANGE(0x188000, 0x188001) AM_WRITENOP
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
-	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_BASE(&funkyjet_pf1_rowscroll)
-	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_BASE(&funkyjet_pf2_rowscroll)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_BASE_MEMBER(funkyjet_state, pf1_rowscroll)
+	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_BASE_MEMBER(funkyjet_state, pf2_rowscroll)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -278,9 +275,10 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq( running_device *device, int state )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	funkyjet_state *driver_state = (funkyjet_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -298,7 +296,19 @@ static const deco16ic_interface funkyjet_deco16ic_intf =
 	NULL, NULL, NULL, NULL
 };
 
+static MACHINE_START( funkyjet )
+{
+	funkyjet_state *state = (funkyjet_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+}
+
 static MACHINE_DRIVER_START( funkyjet )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(funkyjet_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 28 MHz crystal */
@@ -307,6 +317,8 @@ static MACHINE_DRIVER_START( funkyjet )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4)	/* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(funkyjet)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

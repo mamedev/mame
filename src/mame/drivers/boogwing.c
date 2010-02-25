@@ -82,7 +82,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/decocrpt.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 #include "includes/decoprot.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_custom", decodev_priority_w)
+	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x220002, 0x22000f) AM_NOP
 
 	AM_RANGE(0x240000, 0x240001) AM_WRITE(buffer_spriteram16_w)
@@ -111,22 +111,22 @@ static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE(deco16_104_prot_w) AM_BASE(&deco16_prot_ram)
 
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE(&boogwing_pf1_rowscroll)
 	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE(&boogwing_pf2_rowscroll)
 
-	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("deco_custom", decodev_pf34_control_w)
-	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf3_data_w)
-	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("deco_custom", decodev_pf4_data_w)
+	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
+	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf3_data_w)
+	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf4_data_w)
 	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE(&boogwing_pf3_rowscroll)
 	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE(&boogwing_pf4_rowscroll)
 
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
-	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_custom", decodev_palette_dma_w)
-	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE("deco_custom", decodev_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w)
+	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END

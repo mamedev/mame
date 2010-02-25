@@ -12,18 +12,18 @@
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
 #include "includes/dietgo.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 
 static ADDRESS_MAP_START( dietgo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
-	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("deco_custom", decodev_pf1_data_w)
-	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("deco_custom", decodev_pf2_data_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("deco_custom", deco16ic_pf1_data_w)
+	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("deco_custom", deco16ic_pf2_data_w)
 	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf1_rowscroll)
 	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf2_rowscroll)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE_MEMBER(dietgo_state, spriteram, spriteram_size)
-	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x340000, 0x3407ff) AM_READWRITE(dietgo_104_prot_r, dietgo_104_prot_w)
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END

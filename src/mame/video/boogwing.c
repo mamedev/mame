@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 UINT16 *boogwing_pf1_rowscroll,*boogwing_pf2_rowscroll;
 UINT16 *boogwing_pf3_rowscroll,*boogwing_pf4_rowscroll;
@@ -9,7 +9,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 	running_device *deco16ic = devtag_get_device(machine, "deco_custom");
 	int offs;
 	int flipscreen=!flip_screen_get(machine);
-	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+	UINT16 priority = deco16ic_priority_r(deco16ic, 0, 0xffff);
 
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
@@ -122,7 +122,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 		while (multi >= 0)
 		{
-			decodev_pdrawgfx(
+			deco16ic_pdrawgfx(
 					deco16ic,
 					bitmap, cliprect, machine->gfx[gfx_region],
 					sprite - multi * inc,
@@ -139,15 +139,15 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 VIDEO_UPDATE( boogwing )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
-	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 priority = deco16ic_priority_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, boogwing_pf1_rowscroll, boogwing_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, boogwing_pf3_rowscroll, boogwing_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, boogwing_pf1_rowscroll, boogwing_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, boogwing_pf3_rowscroll, boogwing_pf4_rowscroll);
 
 	/* Draw playfields */
-	decodev_clear_sprite_priority_bitmap(deco16ic);
+	deco16ic_clear_sprite_priority_bitmap(deco16ic);
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x400]); /* pen not confirmed */
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
@@ -155,34 +155,34 @@ VIDEO_UPDATE( boogwing )
 	// bit&0x4 combines playfields
 	if ((priority & 0x7) == 0x5)
 	{
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_34_combine_draw(deco16ic, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_34_combine_draw(deco16ic, bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 8);
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x3)
 	{
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
-		// decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 32);
+		// deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 32);
 	}
 	else
 	{
-		decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 8);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 32);
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 3);
 	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram2.u16, 4);
 
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 UINT16 *dassault_pf2_rowscroll,*dassault_pf4_rowscroll;
 
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 			while (multi >= 0)
 			{
-				decodev_pdrawgfx(
+				deco16ic_pdrawgfx(
 						deco16ic,
 						bitmap,cliprect,machine->gfx[gfxbank],
 						sprite - multi * inc,
@@ -176,35 +176,35 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 VIDEO_UPDATE( dassault )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
-	UINT16 priority = decodev_priority_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 priority = deco16ic_priority_r(deco16ic, 0, 0xffff);
 
 	/* Update tilemaps */
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, 0, dassault_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, 0, dassault_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, 0, dassault_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, 0, dassault_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
-	decodev_clear_sprite_priority_bitmap(deco16ic);
+	deco16ic_clear_sprite_priority_bitmap(deco16ic);
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[3072]);
-	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((priority & 3) == 0) 
 	{
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 16);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 16);
 	} 
 	else if ((priority & 3) == 1) 
 	{
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 64);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 64);
 	} 
 	else if ((priority & 3) == 3) 
 	{
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 16);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 16);
 	} 
 	else 
 	{
@@ -213,6 +213,6 @@ VIDEO_UPDATE( dassault )
 
 	/* Draw sprites - two sprite generators, with selectable priority */
 	draw_sprites(screen->machine, bitmap, cliprect, priority);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

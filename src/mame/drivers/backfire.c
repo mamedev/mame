@@ -17,7 +17,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 #include "rendlay.h"
 
 static UINT16 *backfire_pf1_rowscroll,*backfire_pf2_rowscroll;
@@ -142,8 +142,8 @@ static VIDEO_UPDATE( backfire )
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
 
-	decodev_pf12_update(deco16ic, backfire_pf1_rowscroll, backfire_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, backfire_pf3_rowscroll, backfire_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, backfire_pf1_rowscroll, backfire_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, backfire_pf3_rowscroll, backfire_pf4_rowscroll);
 
 	if (screen == left_screen)
 	{
@@ -153,14 +153,14 @@ static VIDEO_UPDATE( backfire )
 
 		if (backfire_left_priority[0] == 0)
 		{
-			decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 1);
-			decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 1);
+			deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 2);
 			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_1, 3);
 		}
 		else if (backfire_left_priority[0] == 2)
 		{
-			decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 2);
-			decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 4);
+			deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 4);
 			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_1, 3);
 		}
 		else
@@ -173,14 +173,14 @@ static VIDEO_UPDATE( backfire )
 
 		if (backfire_right_priority[0] == 0)
 		{
-			decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 1);
-			decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 1);
+			deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
 			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_2, 4);
 		}
 		else if (backfire_right_priority[0] == 2)
 		{
-			decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
-			decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 4);
+			deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, 0, 4);
 			draw_sprites(screen->machine, bitmap, cliprect, backfire_spriteram32_2, 4);
 		}
 		else
@@ -264,14 +264,14 @@ READ32_HANDLER( backfire_wheel2_r )
 
 static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("deco_custom", decodev_pf12_control_dword_r, decodev_pf12_control_dword_w)
-	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_dword_r, decodev_pf1_data_dword_w)
-	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_dword_r, decodev_pf2_data_dword_w)
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
+	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
 	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
-	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("deco_custom", decodev_pf34_control_dword_r, decodev_pf34_control_dword_w)
-	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_dword_r, decodev_pf3_data_dword_w)
-	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_dword_r, decodev_pf4_data_dword_w)
+	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf34_control_dword_r, deco16ic_pf34_control_dword_w)
+	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_dword_r, deco16ic_pf3_data_dword_w)
+	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_dword_r, deco16ic_pf4_data_dword_w)
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)

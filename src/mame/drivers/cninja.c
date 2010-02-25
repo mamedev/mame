@@ -50,7 +50,7 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 static int cninja_scanline, cninja_irq_mask;
 static running_device *raster_irq_timer;
@@ -145,7 +145,7 @@ static READ16_HANDLER( robocop2_prot_r )
 static WRITE16_HANDLER( deco16_pf12_control_w )
 {
 	running_device *deco16ic = devtag_get_device(space->machine, "deco_custom");
-	decodev_pf12_control_w(deco16ic, offset, data, mem_mask);
+	deco16ic_pf12_control_w(deco16ic, offset, data, mem_mask);
 	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 }
 
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( deco16_pf12_control_w )
 static WRITE16_HANDLER( deco16_pf34_control_w )
 {
 	running_device *deco16ic = devtag_get_device(space->machine, "deco_custom");
-	decodev_pf34_control_w(deco16ic, offset, data, mem_mask);
+	deco16ic_pf34_control_w(deco16ic, offset, data, mem_mask);
 	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 }
 
@@ -162,20 +162,20 @@ static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&cninja_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&cninja_pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&cninja_pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE(&cninja_pf4_rowscroll)
 
 	AM_RANGE(0x184000, 0x187fff) AM_RAM AM_BASE(&cninja_ram)
 	AM_RANGE(0x190000, 0x190007) AM_READWRITE(cninja_irq_r, cninja_irq_w)
-	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) 				/* Sprites */
 	AM_RANGE(0x1b4000, 0x1b4001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
@@ -196,14 +196,14 @@ static ADDRESS_MAP_START( cninjabl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* bootleg sprite-ram (sprites rewritten here in new format) */
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&cninja_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&cninja_pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w)	// not used / incorrect on this
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&cninja_pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE(&cninja_pf4_rowscroll)
 
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( cninjabl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x187fff) AM_RAM // more ram on bootleg?
 
 	AM_RANGE(0x190000, 0x190007) AM_READWRITE(cninja_irq_r, cninja_irq_w)
-	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x1b4000, 0x1b4001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
 ADDRESS_MAP_END
@@ -224,18 +224,18 @@ static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&cninja_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&cninja_pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&cninja_pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE(&cninja_pf4_rowscroll)
 
-	AM_RANGE(0x188000, 0x189fff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x188000, 0x189fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x194000, 0x197fff) AM_RAM AM_BASE(&cninja_ram) /* Main ram */
 	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE(deco16_60_prot_r, deco16_60_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
 	AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
@@ -252,14 +252,14 @@ static ADDRESS_MAP_START( robocop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&cninja_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&cninja_pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&cninja_pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE(&cninja_pf4_rowscroll)
 
@@ -268,10 +268,10 @@ static ADDRESS_MAP_START( robocop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x18c000, 0x18c7ff) AM_READ(robocop2_prot_r) /* Protection device */
 	AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
 	AM_RANGE(0x198000, 0x198001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
-	AM_RANGE(0x1a8000, 0x1a9fff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1a8000, 0x1a9fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1b0000, 0x1b0007) AM_READWRITE(cninja_irq_r, cninja_irq_w)
 	AM_RANGE(0x1b8000, 0x1bbfff) AM_RAM AM_BASE(&cninja_ram) /* Main ram */
-	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVWRITE("deco_custom", decodev_priority_w)
+	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x1f8000, 0x1f8001) AM_READ_PORT("DSW3") /* Dipswitch #3 */
 ADDRESS_MAP_END
 
@@ -280,22 +280,22 @@ static ADDRESS_MAP_START( mutantf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
-	AM_RANGE(0x160000, 0x161fff) AM_RAM_DEVWRITE("deco_custom", decodev_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE("deco_custom", decodev_priority_w)
+	AM_RANGE(0x160000, 0x161fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP /* VBL irq ack */
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE(deco16_66_prot_r, deco16_66_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(buffer_spriteram16_w) AM_DEVREAD("deco_custom", decodev_71_r)
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(buffer_spriteram16_w) AM_DEVREAD("deco_custom", deco16ic_71_r)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w)
 
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(deco16_pf12_control_w)
-	AM_RANGE(0x304000, 0x305fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x306000, 0x307fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x304000, 0x305fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x306000, 0x307fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(&cninja_pf1_rowscroll)
 	AM_RANGE(0x30a000, 0x30a7ff) AM_RAM AM_BASE(&cninja_pf2_rowscroll)
 
 	AM_RANGE(0x310000, 0x31000f) AM_WRITE(deco16_pf34_control_w)
-	AM_RANGE(0x314000, 0x315fff) AM_DEVREADWRITE("deco_custom", decodev_pf3_data_r, decodev_pf3_data_w)
-	AM_RANGE(0x316000, 0x317fff) AM_DEVREADWRITE("deco_custom", decodev_pf4_data_r, decodev_pf4_data_w)
+	AM_RANGE(0x314000, 0x315fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x316000, 0x317fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 	AM_RANGE(0x318000, 0x3187ff) AM_RAM AM_BASE(&cninja_pf3_rowscroll)
 	AM_RANGE(0x31a000, 0x31a7ff) AM_RAM AM_BASE(&cninja_pf4_rowscroll)
 

@@ -1,15 +1,15 @@
 /*************************************************************************
 
-    Pocket Gal Deluxe
+    Funky Jet
 
 *************************************************************************/
 
-class pktgaldx_state
+class funkyjet_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pktgaldx_state(machine)); }
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, funkyjet_state(machine)); }
 
-	pktgaldx_state(running_machine &machine) { }
+	funkyjet_state(running_machine &machine) { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -18,17 +18,14 @@ public:
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco16ic.c)
 	size_t    spriteram_size;
 
-	UINT16*   pktgaldb_fgram;
-	UINT16*   pktgaldb_sprites;
-
 	/* devices */
 	running_device *maincpu;
+	running_device *audiocpu;
 	running_device *deco16ic;
 };
 
 
 
-/*----------- defined in video/pktgaldx.c -----------*/
+/*----------- defined in video/funkyjet.c -----------*/
 
-VIDEO_UPDATE( pktgaldx );
-VIDEO_UPDATE( pktgaldb );
+VIDEO_UPDATE( funkyjet );

@@ -23,7 +23,7 @@ Protection TODO:
 #include "includes/decocrpt.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 /*
 
@@ -145,16 +145,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 static VIDEO_UPDATE(dblewing)
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(deco16ic, dblewing_pf1_rowscroll, dblewing_pf2_rowscroll);
+	deco16ic_pf12_update(deco16ic, dblewing_pf1_rowscroll, dblewing_pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 4);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
@@ -377,8 +377,8 @@ static WRITE16_HANDLER( dblewing_prot_w )
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE(&dblewing_pf1_rowscroll)
 	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE(&dblewing_pf2_rowscroll)
 
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM

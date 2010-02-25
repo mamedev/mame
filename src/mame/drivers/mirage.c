@@ -36,7 +36,7 @@ MR_01-.3A    [a0b758aa]
 #include "cpu/m68000/m68000.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 #include "sound/okim6295.h"
 
 class mirage_state
@@ -50,7 +50,7 @@ public:
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
 	UINT16 *  spriteram;
-//  UINT16 *  paletteram;    // currently this uses generic palette handling (in decodev.c)
+//  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco16ic.c)
 	size_t    spriteram_size;
 
 	/* misc */
@@ -141,16 +141,16 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 static VIDEO_UPDATE( mirage )
 {
 	mirage_state *state = (mirage_state *)screen->machine->driver_data;
-	UINT16 flip = decodev_pf12_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256); /* not verified */
 
-	decodev_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, 1);
-	decodev_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;
@@ -195,8 +195,8 @@ static WRITE16_HANDLER( okim0_rombank_w )
 static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
-	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("deco_custom", decodev_pf1_data_r, decodev_pf1_data_w) // 0x100000 - 0x101fff tested
-	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("deco_custom", decodev_pf2_data_r, decodev_pf2_data_w) // 0x102000 - 0x102fff tested
+	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w) // 0x100000 - 0x101fff tested
+	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w) // 0x102000 - 0x102fff tested
 	/* linescroll */
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf1_rowscroll)
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf2_rowscroll)
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
 //  AM_RANGE(0x150006, 0x150007) AM_READNOP
 	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
-	AM_RANGE(0x168000, 0x16800f) AM_DEVWRITE("deco_custom", decodev_pf12_control_w)
+	AM_RANGE(0x168000, 0x16800f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
 	AM_RANGE(0x16a000, 0x16a001) AM_WRITENOP
 	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(okim1_rombank_w)
 	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(okim0_rombank_w)

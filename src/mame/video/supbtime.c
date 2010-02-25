@@ -13,7 +13,7 @@ End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 #include "includes/supbtime.h"
 
 /******************************************************************************/
@@ -91,15 +91,15 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 VIDEO_UPDATE(supbtime)
 {
 	supbtime_state *state = (supbtime_state *)screen->machine->driver_data;
-	UINT16 flip = decodev_pf12_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	decodev_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 768);
 
-	decodev_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
-	decodev_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/decodev.h"
+#include "video/deco16ic.h"
 
 static int twocrude_pri;
 
@@ -119,29 +119,29 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 VIDEO_UPDATE( twocrude )
 {
 	running_device *deco16ic = devtag_get_device(screen->machine, "deco_custom");
-	UINT16 flip = decodev_pf12_control_r(deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf12_control_r(deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, !BIT(flip, 7));
 
-	decodev_pf12_update(deco16ic, twocrude_pf1_rowscroll, twocrude_pf2_rowscroll);
-	decodev_pf34_update(deco16ic, twocrude_pf3_rowscroll, twocrude_pf4_rowscroll);
+	deco16ic_pf12_update(deco16ic, twocrude_pf1_rowscroll, twocrude_pf2_rowscroll);
+	deco16ic_pf34_update(deco16ic, twocrude_pf3_rowscroll, twocrude_pf4_rowscroll);
 
 	/* Draw playfields & sprites */
-	decodev_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_4_draw(deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	if (twocrude_pri) 
 	{
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
 	else 
 	{
-		decodev_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
-		decodev_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_3_draw(deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_2_draw(deco16ic, bitmap, cliprect, 0, 0);
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect, 1);
-	decodev_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
