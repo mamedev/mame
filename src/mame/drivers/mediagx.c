@@ -1004,7 +1004,7 @@ static const struct pic8259_interface mediagx_pic8259_1_config =
 
 static const struct pic8259_interface mediagx_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w)
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w)
 };
 
 
