@@ -1,8 +1,12 @@
 #include "video/poly.h"
 
-typedef struct _taitojc_state taitojc_state;
-struct _taitojc_state
+class taitojc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitojc_state(machine)); }
+
+	taitojc_state(running_machine &machine) { }
+	
 	int texture_x;
 	int texture_y;
 

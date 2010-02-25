@@ -59,10 +59,13 @@ just a guess:
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
 
-typedef struct _pachifev_state pachifev_state;
-
-struct _pachifev_state
+class pachifev_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pachifev_state(machine)); }
+
+	pachifev_state(running_machine &machine) { }
+
  /* controls related */
 
  int power;

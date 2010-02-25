@@ -7,9 +7,13 @@
 #define MASTER_CLOCK		18432000
 
 
-typedef struct _crgolf_state crgolf_state;
-struct _crgolf_state
+class crgolf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crgolf_state(machine)); }
+
+	crgolf_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram_a;
 	UINT8 *  videoram_b;

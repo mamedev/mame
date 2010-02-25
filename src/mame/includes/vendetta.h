@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _vendetta_state vendetta_state;
-struct _vendetta_state
+class vendetta_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vendetta_state(machine)); }
+
+	vendetta_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 //  UINT8 *    paletteram;    // currently this uses generic palette handling

@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _aeroboto_state aeroboto_state;
-struct _aeroboto_state
+class aeroboto_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, aeroboto_state(machine)); }
+
+	aeroboto_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 * mainram;
 	UINT8 * spriteram;

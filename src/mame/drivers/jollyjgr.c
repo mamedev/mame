@@ -102,9 +102,13 @@ Notes:
 #include "sound/ay8910.h"
 
 
-typedef struct _jollyjgr_state jollyjgr_state;
-struct _jollyjgr_state
+class jollyjgr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jollyjgr_state(machine)); }
+
+	jollyjgr_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  colorram;

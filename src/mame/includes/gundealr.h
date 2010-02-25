@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _gundealr_state gundealr_state;
-struct _gundealr_state
+class gundealr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gundealr_state(machine)); }
+
+	gundealr_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    bg_videoram;
 	UINT8 *    fg_videoram;

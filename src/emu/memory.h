@@ -897,8 +897,9 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_BASEPTR, 8), \
 	TOKEN_PTR(memptr, _base),
 
+#define myoffsetof(_struct, _member)  ((FPTR)&((_struct *)0x1000)->_member - 0x1000)
 #define AM_BASE_MEMBER(_struct, _member) \
-	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_MEMBER, 8, offsetof(_struct, _member), 24),
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_MEMBER, 8, myoffsetof(_struct, _member), 24),
 
 #define AM_BASE_GENERIC(_member) \
 	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_GENERIC, 8, offsetof(generic_pointers, _member), 24),
@@ -908,7 +909,7 @@ union _addrmap64_token
 	TOKEN_PTR(sizeptr, _size),
 
 #define AM_SIZE_MEMBER(_struct, _member) \
-	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_MEMBER, 8, offsetof(_struct, _member), 24),
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_MEMBER, 8, myoffsetof(_struct, _member), 24),
 
 #define AM_SIZE_GENERIC(_member) \
 	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_GENERIC, 8, offsetof(generic_pointers, _member##_size), 24),

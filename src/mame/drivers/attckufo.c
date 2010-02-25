@@ -46,9 +46,13 @@ LOIPOIO-B
 #include "sound/mos6560.h"
 
 
-typedef struct _attckufo_state attckufo_state;
-struct _attckufo_state
+class attckufo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, attckufo_state(machine)); }
+
+	attckufo_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *      mainram;
 	UINT8 *      tileram;

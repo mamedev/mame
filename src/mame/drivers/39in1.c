@@ -27,9 +27,13 @@
 #include "machine/pxa255.h"
 #include "sound/dmadac.h"
 
-typedef struct __39in1_state _39in1_state;
-struct __39in1_state
+class _39in1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _39in1_state(machine)); }
+
+	_39in1_state(running_machine &machine) { }
+
 	UINT32 seed;
 	UINT32 magic;
 	UINT32 state;

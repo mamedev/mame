@@ -13,9 +13,13 @@
 #define BSKTBALL_BOUNCE_EN		NODE_04
 
 
-typedef struct _bsktball_state bsktball_state;
-struct _bsktball_state
+class bsktball_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bsktball_state(machine)); }
+
+	bsktball_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  motion;

@@ -48,9 +48,13 @@ TO DO:
 #define SOUND_CLOCK XTAL_14_31818MHz
 
 
-typedef struct _mazerbla_state mazerbla_state;
-struct _mazerbla_state
+class mazerbla_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mazerbla_state(machine)); }
+
+	mazerbla_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *   cfb_ram;
 	UINT8 *   videoram;

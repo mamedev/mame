@@ -8,9 +8,13 @@
 #define Z80_MASTER_CLOCK         XTAL_10_816MHz
 
 
-typedef struct _cosmic_state cosmic_state;
-struct _cosmic_state
+class cosmic_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cosmic_state(machine)); }
+
+	cosmic_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        spriteram;

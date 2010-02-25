@@ -1,7 +1,11 @@
 
-typedef struct _tmnt_state tmnt_state;
-struct _tmnt_state
+class tmnt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmnt_state(machine)); }
+
+	tmnt_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	INT16 *    sampledata;
 	UINT16 *   tmnt2_1c0800;

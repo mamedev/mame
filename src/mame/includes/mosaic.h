@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _mosaic_state mosaic_state;
-struct _mosaic_state
+class mosaic_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mosaic_state(machine)); }
+
+	mosaic_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        fgvideoram;
 	UINT8 *        bgvideoram;

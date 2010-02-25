@@ -8,9 +8,13 @@ struct f2_tempsprite
 	int primask;
 };
 
-typedef struct _taitof2_state taitof2_state;
-struct _taitof2_state
+class taitof2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitof2_state(machine)); }
+
+	taitof2_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *        sprite_extension;
 	UINT16 *        spriteram;

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _dietgo_state dietgo_state;
-struct _dietgo_state
+class dietgo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dietgo_state(machine)); }
+
+	dietgo_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;

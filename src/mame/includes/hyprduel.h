@@ -2,9 +2,13 @@
 #define FIRST_VISIBLE_LINE 0
 #define LAST_VISIBLE_LINE 223
 
-typedef struct _hyprduel_state hyprduel_state;
-struct _hyprduel_state
+class hyprduel_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hyprduel_state(machine)); }
+
+	hyprduel_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *  videoregs;
 	UINT16 *  screenctrl;

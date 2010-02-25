@@ -1,6 +1,10 @@
-typedef struct _mappy_state mappy_state;
-struct _mappy_state
+class mappy_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mappy_state(machine)); }
+
+	mappy_state(running_machine &machine) { }
+	
 	UINT8 *videoram;
 	UINT8 *spriteram;
 	tilemap_t *bg_tilemap;

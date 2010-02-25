@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _wgp_state wgp_state;
-struct _wgp_state
+class wgp_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, wgp_state(machine)); }
+
+	wgp_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    spritemap;
 	UINT16 *    spriteram;

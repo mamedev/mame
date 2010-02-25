@@ -226,9 +226,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/3812intf.h"
 
 
-typedef struct _nmg5_state nmg5_state;
-struct _nmg5_state
+class nmg5_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nmg5_state(machine)); }
+
+	nmg5_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *    fg_videoram;
 	UINT16 *    bg_videoram;

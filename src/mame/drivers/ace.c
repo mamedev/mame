@@ -43,9 +43,13 @@ A1                   2101            2101
 #define MASTER_CLOCK XTAL_18MHz
 
 
-typedef struct _ace_state ace_state;
-struct _ace_state
+class ace_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ace_state(machine)); }
+
+	ace_state(running_machine &machine) { }
+	
 	/* video-related */
 	UINT8 *  ram2;
 	UINT8 *  scoreram;

@@ -22,9 +22,13 @@
 #define DRAGRACE_ATTRACT_EN     NODE_09
 
 
-typedef struct _dragrace_state dragrace_state;
-struct _dragrace_state
+class dragrace_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dragrace_state(machine)); }
+
+	dragrace_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  playfield_ram;
 	UINT8 *  position_ram;

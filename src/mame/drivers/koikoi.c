@@ -45,9 +45,13 @@ to prevent disabling inputs.
 
 static const int input_tab[]= { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
 
-typedef struct _koikoi_state koikoi_state;
-struct _koikoi_state
+class koikoi_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, koikoi_state(machine)); }
+
+	koikoi_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 

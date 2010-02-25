@@ -5,9 +5,13 @@
 *************************************************************************/
 
 
-typedef struct _exprraid_state exprraid_state;
-struct _exprraid_state
+class exprraid_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, exprraid_state(machine)); }
+
+	exprraid_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        main_ram;
 	UINT8 *        videoram;

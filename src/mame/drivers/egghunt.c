@@ -45,9 +45,13 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 
-typedef struct _egghunt_state egghunt_state;
-struct _egghunt_state
+class egghunt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, egghunt_state(machine)); }
+
+	egghunt_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *   bgram;
 	UINT8 *   atram;

@@ -20,9 +20,13 @@
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 
-typedef struct _laserbas_state laserbas_state;
-struct _laserbas_state
+class laserbas_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, laserbas_state(machine)); }
+
+	laserbas_state(running_machine &machine) { }
+	
 	/* video-related */
 	UINT8    *vram1;
 	UINT8    *vram2;

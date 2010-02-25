@@ -2,9 +2,13 @@
 
 
 
-typedef struct _armedf_state armedf_state;
-struct _armedf_state
+class armedf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, armedf_state(machine)); }
+
+	armedf_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *  text_videoram;
 	UINT16 *  bg_videoram;

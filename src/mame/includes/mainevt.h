@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _mainevt_state mainevt_state;
-struct _mainevt_state
+class mainevt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mainevt_state(machine)); }
+
+	mainevt_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT8 *    paletteram;    // currently this uses generic palette handling
 

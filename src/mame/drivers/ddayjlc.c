@@ -56,9 +56,13 @@ $842f = lives
 #include "sound/ay8910.h"
 
 
-typedef struct _ddayjlc_state ddayjlc_state;
-struct _ddayjlc_state
+class ddayjlc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddayjlc_state(machine)); }
+
+	ddayjlc_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  bgram;
 	UINT8 *  mainram;

@@ -7,9 +7,13 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
-typedef struct _mgolf_state mgolf_state;
-struct _mgolf_state
+class mgolf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mgolf_state(machine)); }
+
+	mgolf_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8*   video_ram;
 

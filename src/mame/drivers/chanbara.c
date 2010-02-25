@@ -51,9 +51,13 @@ ToDo:
 #include "sound/2203intf.h"
 
 
-typedef struct _chanbara_state chanbara_state;
-struct _chanbara_state
+class chanbara_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chanbara_state(machine)); }
+
+	chanbara_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  videoram2;

@@ -5,9 +5,13 @@
 *************************************************************************/
 
 
-typedef struct _malzak_state malzak_state;
-struct _malzak_state
+class malzak_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, malzak_state(machine)); }
+
+	malzak_state(running_machine &machine) { }
+	
 	/* misc */
 //  int playfield_x[256];
 //  int playfield_y[256];

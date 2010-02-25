@@ -150,9 +150,13 @@ Dumped by Chack'n
 #define NUM_PENS (4*8)
 #define VMEM_SIZE 0x100
 
-typedef struct _ssingles_state ssingles_state;
-struct _ssingles_state
+class ssingles_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ssingles_state(machine)); }
+
+	ssingles_state(running_machine &machine) { }
+	
 	UINT8 *videoram;
 	UINT8 *colorram;
 	UINT8 prot_data;

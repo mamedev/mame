@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _mermaid_state mermaid_state;
-struct _mermaid_state
+class mermaid_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mermaid_state(machine)); }
+
+	mermaid_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    colorram;

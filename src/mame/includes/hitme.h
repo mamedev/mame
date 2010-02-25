@@ -12,9 +12,13 @@
 #define HITME_ENABLE_VAL         NODE_03
 #define HITME_OUT1               NODE_04
 
-typedef struct _hitme_state hitme_state;
-struct _hitme_state
+class hitme_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hitme_state(machine)); }
+
+	hitme_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 

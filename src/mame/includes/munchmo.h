@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _munchmo_state munchmo_state;
-struct _munchmo_state
+class munchmo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, munchmo_state(machine)); }
+
+	munchmo_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *      vreg;
 	UINT8 *      status_vram;

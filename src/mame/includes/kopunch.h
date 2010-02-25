@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _kopunch_state kopunch_state;
-struct _kopunch_state
+class kopunch_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kopunch_state(machine)); }
+
+	kopunch_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    videoram2;

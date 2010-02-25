@@ -1,8 +1,12 @@
 
 
-typedef struct _changela_state changela_state;
-struct _changela_state
+class changela_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, changela_state(machine)); }
+
+	changela_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  colorram;

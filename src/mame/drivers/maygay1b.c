@@ -45,8 +45,7 @@ static int  SRSEL;
 static UINT8 Lamps[256];      // 256 multiplexed lamps
 static int optic_pattern;
 
-typedef struct _i8279_state i8279_state;
-struct _i8279_state
+struct i8279_state
 {
 	UINT8		command;
 	UINT8		mode;

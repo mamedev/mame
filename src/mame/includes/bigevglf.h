@@ -1,7 +1,11 @@
 
-typedef struct _bigevglf_state bigevglf_state;
-struct _bigevglf_state
+class bigevglf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bigevglf_state(machine)); }
+
+	bigevglf_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  paletteram;
 	UINT8 *  spriteram1;

@@ -1,7 +1,11 @@
 
-typedef struct _crshrace_state crshrace_state;
-struct _crshrace_state
+class crshrace_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crshrace_state(machine)); }
+
+	crshrace_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *  videoram1;
 	UINT16 *  videoram2;

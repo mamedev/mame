@@ -47,9 +47,13 @@ Notes:
 #define MASTER_CLOCK	XTAL_16MHz
 
 
-typedef struct _k3_state k3_state;
-struct _k3_state
+class k3_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
+
+	k3_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *  spriteram_1;
 	UINT16 *  spriteram_2;

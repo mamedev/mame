@@ -17,9 +17,13 @@
 #define QIX_CHARACTER_CLOCK		(20000000/2/16)
 
 
-typedef struct _qix_state qix_state;
-struct _qix_state
+class qix_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, qix_state(machine)); }
+
+	qix_state(running_machine &machine) { }
+	
 	/* machine state */
 	UINT8 *_68705_port_out;
 	UINT8 *_68705_ddr;

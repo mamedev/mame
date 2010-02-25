@@ -33,9 +33,13 @@ A3-1J
 #include "sound/ay8910.h"
 
 
-typedef struct _supdrapo_state supdrapo_state;
-struct _supdrapo_state
+class supdrapo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supdrapo_state(machine)); }
+
+	supdrapo_state(running_machine &machine) { }
+	
 	UINT8 *char_bank;
 	UINT8 *col_line;
 	UINT8 *videoram;

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _bottom9_state bottom9_state;
-struct _bottom9_state
+class bottom9_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bottom9_state(machine)); }
+
+	bottom9_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT8 *    paletteram;    // currently this uses generic palette handling
 

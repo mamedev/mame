@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _firetrap_state firetrap_state;
-struct _firetrap_state
+class firetrap_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, firetrap_state(machine)); }
+
+	firetrap_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *       bg1videoram;
 	UINT8 *       bg2videoram;

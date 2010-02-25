@@ -89,6 +89,7 @@ typedef void   (*video_reset_func)(running_machine *machine);
 typedef void   (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
 typedef void   (*video_eof_func)(running_machine *machine);
 typedef UINT32 (*video_update_func)(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
+typedef void * (*driver_data_alloc_func)(running_machine &machine);
 
 
 
@@ -192,7 +193,7 @@ struct gfx_decode_entry;
 typedef struct _machine_config machine_config;
 struct _machine_config
 {
-	UINT32					driver_data_size;		/* amount of memory needed for driver_data */
+	driver_data_alloc_func	driver_data_alloc;		/* allocator for driver data */
 
 	attotime				minimum_quantum;		/* minimum scheduling quantum */
 	const char *			perfect_cpu_quantum;	/* tag of CPU to use for "perfect" scheduling */
@@ -247,6 +248,7 @@ union machine_config_token
 	palette_init_func palette_init;
 	video_eof_func video_eof;
 	video_update_func video_update;
+	driver_data_alloc_func driver_data_alloc;
 };
 
 
@@ -276,8 +278,9 @@ union machine_config_token
 
 
 /* core parameters */
-#define MDRV_DRIVER_DATA(_struct) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DRIVER_DATA, 8, sizeof(_struct), 24),
+#define MDRV_DRIVER_DATA(_class) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DRIVER_DATA, 8), \
+	TOKEN_PTR(driver_data_alloc, _class::alloc),
 
 #define MDRV_QUANTUM_TIME(_time) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_QUANTUM_TIME, 8), \

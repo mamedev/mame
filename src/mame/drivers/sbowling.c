@@ -45,9 +45,13 @@ PROMs : NEC B406 (1kx4) x2
 #include "sound/ay8910.h"
 
 
-typedef struct _sbowling_state sbowling_state;
-struct _sbowling_state
+class sbowling_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbowling_state(machine)); }
+
+	sbowling_state(running_machine &machine) { }
+	
 	int bgmap;
 	UINT8 *videoram;
 

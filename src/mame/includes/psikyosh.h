@@ -16,9 +16,13 @@
 #define SPRITE_PRI(n) (((state->vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
 
-typedef struct _psikyosh_state psikyosh_state;
-struct _psikyosh_state
+class psikyosh_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, psikyosh_state(machine)); }
+
+	psikyosh_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT32 *       bgram;
 	UINT32 *       zoomram;

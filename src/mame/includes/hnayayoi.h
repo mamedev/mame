@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _hnayayoi_state hnayayoi_state;
-struct _hnayayoi_state
+class hnayayoi_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hnayayoi_state(machine)); }
+
+	hnayayoi_state(running_machine &machine) { }
+	
 	/* video-related */
 	UINT8      *pixmap[8];
 	int        palbank;

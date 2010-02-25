@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _mrflea_state mrflea_state;
-struct _mrflea_state
+class mrflea_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mrflea_state(machine)); }
+
+	mrflea_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

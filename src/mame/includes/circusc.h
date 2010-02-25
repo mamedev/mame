@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _circusc_state circusc_state;
-struct _circusc_state
+class circusc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, circusc_state(machine)); }
+
+	circusc_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        colorram;

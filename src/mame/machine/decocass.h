@@ -15,9 +15,13 @@ DEVICE_GET_INFO( decocass_tape );
 
 
 
-typedef struct _decocass_state decocass_state;
-struct _decocass_state
+class decocass_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, decocass_state(machine)); }
+
+	decocass_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT8 *   rambase;
 	UINT8 *   charram;

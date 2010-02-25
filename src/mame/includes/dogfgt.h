@@ -3,9 +3,13 @@
 #define BITMAPRAM_SIZE      0x6000
 
 
-typedef struct _dogfgt_state dogfgt_state;
-struct _dogfgt_state
+class dogfgt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dogfgt_state(machine)); }
+
+	dogfgt_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    bgvideoram;
 	UINT8 *    spriteram;

@@ -1,6 +1,10 @@
-typedef struct _shootout_state shootout_state;
-struct _shootout_state
+class shootout_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, shootout_state(machine)); }
+
+	shootout_state(running_machine &machine) { }
+	
 	tilemap_t *background;
 	tilemap_t *foreground;
 	UINT8 *spriteram;

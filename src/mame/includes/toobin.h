@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _toobin_state toobin_state;
-struct _toobin_state
+class toobin_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, toobin_state(machine)); }
+
+	toobin_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 
 	UINT16 *		interrupt_scan;

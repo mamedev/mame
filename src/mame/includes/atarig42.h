@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _atarig42_state atarig42_state;
-struct _atarig42_state
+class atarig42_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarig42_state(machine)); }
+
+	atarig42_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 	UINT16			playfield_base;
 	UINT16			motion_object_base;

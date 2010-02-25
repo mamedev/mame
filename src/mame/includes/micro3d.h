@@ -11,9 +11,13 @@
 #define VGB_MONITOR_DISPLAY			0
 #define DRMATH_MONITOR_DISPLAY		1
 
-typedef struct _micro3d_state micro3d_state;
-struct _micro3d_state
+class micro3d_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, micro3d_state(machine)); }
+
+	micro3d_state(running_machine &machine) { }
+	
 	struct
 	{
 		union

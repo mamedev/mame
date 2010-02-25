@@ -58,9 +58,13 @@ and two large (paddles pretending to be) guns.
 #include "includes/m79amb.h"
 #include "cpu/i8085/i8085.h"
 
-typedef struct _m79amb_state m79amb_state;
-struct _m79amb_state
+class m79amb_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m79amb_state(machine)); }
+
+	m79amb_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        mask;

@@ -43,9 +43,13 @@ Notes:
 
 
 
-typedef struct _discoboy_state discoboy_state;
-struct _discoboy_state
+class discoboy_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, discoboy_state(machine)); }
+
+	discoboy_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  ram_1;
 	UINT8 *  ram_2;

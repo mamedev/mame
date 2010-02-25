@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _yunsung8_state yunsung8_state;
-struct _yunsung8_state
+class yunsung8_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, yunsung8_state(machine)); }
+
+	yunsung8_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     videoram;
 

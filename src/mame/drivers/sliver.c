@@ -76,9 +76,13 @@ Notes:
 #define x_offset 0x45
 #define y_offset 0x0d
 
-typedef struct _sliver_state sliver_state;
-struct _sliver_state
+class sliver_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sliver_state(machine)); }
+
+	sliver_state(running_machine &machine) { }
+	
 	UINT16 io_offset;
 	UINT16 io_reg[IO_SIZE];
 	UINT16 fifo[FIFO_SIZE];

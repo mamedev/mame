@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _megazone_state megazone_state;
-struct _megazone_state
+class megazone_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, megazone_state(machine)); }
+
+	megazone_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *       scrollx;
 	UINT8 *       scrolly;

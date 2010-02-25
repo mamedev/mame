@@ -24,9 +24,13 @@
 #include "sound/ay8910.h"
 
 
-typedef struct _dacholer_state dacholer_state;
-struct _dacholer_state
+class dacholer_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dacholer_state(machine)); }
+
+	dacholer_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  bgvideoram;
 	UINT8 *  fgvideoram;

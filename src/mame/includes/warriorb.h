@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _warriorb_state warriorb_state;
-struct _warriorb_state
+class warriorb_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, warriorb_state(machine)); }
+
+	warriorb_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *   spriteram;
 	size_t     spriteram_size;

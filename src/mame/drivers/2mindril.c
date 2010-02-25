@@ -49,9 +49,13 @@ DAC               -26.6860Mhz
 #include "sound/2610intf.h"
 
 
-typedef struct __2mindril_state _2mindril_state;
-struct __2mindril_state
+class _2mindril_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _2mindril_state(machine)); }
+
+	_2mindril_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *      map1ram;
 	UINT16 *      map2ram;

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _himesiki_state himesiki_state;
-struct _himesiki_state
+class himesiki_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, himesiki_state(machine)); }
+
+	himesiki_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    bg_ram;
 	UINT8 *    spriteram;

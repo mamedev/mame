@@ -1,8 +1,12 @@
 
 
-typedef struct _fuuki16_state fuuki16_state;
-struct _fuuki16_state
+class fuuki16_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fuuki16_state(machine)); }
+
+	fuuki16_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    vram_0;
 	UINT16 *    vram_1;

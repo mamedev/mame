@@ -112,9 +112,13 @@ PCB2  (Top board, CPU board)
 
 #define MASTER_CLOCK			XTAL_18_432MHz
 
-typedef struct _sub_state sub_state;
-struct _sub_state
+class sub_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sub_state(machine)); }
+
+	sub_state(running_machine &machine) { }
+	
 	UINT8* vid;
 	UINT8* attr;
 	UINT8* scrolly;

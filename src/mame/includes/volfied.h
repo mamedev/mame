@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _volfied_state volfied_state;
-struct _volfied_state
+class volfied_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, volfied_state(machine)); }
+
+	volfied_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    video_ram;
 	UINT8  *    cchip_ram;

@@ -17,9 +17,13 @@ struct taitoair_poly {
 };
 
 
-typedef struct _taitoair_state taitoair_state;
-struct _taitoair_state
+class taitoair_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitoair_state(machine)); }
+
+	taitoair_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *      m68000_mainram;
 	UINT16 *      line_ram;

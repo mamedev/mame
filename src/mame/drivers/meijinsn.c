@@ -65,9 +65,13 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
-typedef struct _meijinsn_state meijinsn_state;
-struct _meijinsn_state
+class meijinsn_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, meijinsn_state(machine)); }
+
+	meijinsn_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *   shared_ram;
 	UINT16 *   videoram;

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _blockhl_state blockhl_state;
-struct _blockhl_state
+class blockhl_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blockhl_state(machine)); }
+
+	blockhl_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 //  UINT8 *    paletteram;    // currently this uses generic palette handling

@@ -24,9 +24,13 @@ SOUND : (none)
 #include "cpu/z80/z80.h"
 
 
-typedef struct _dotrikun_state dotrikun_state;
-struct _dotrikun_state
+class dotrikun_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dotrikun_state(machine)); }
+
+	dotrikun_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        videoram;
 	size_t         videoram_size;

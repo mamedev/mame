@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _pktgaldx_state pktgaldx_state;
-struct _pktgaldx_state
+class pktgaldx_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pktgaldx_state(machine)); }
+
+	pktgaldx_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;

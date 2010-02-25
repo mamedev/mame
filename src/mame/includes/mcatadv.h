@@ -1,7 +1,11 @@
 
-typedef struct _mcatadv_state mcatadv_state;
-struct _mcatadv_state
+class mcatadv_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mcatadv_state(machine)); }
+
+	mcatadv_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *     videoram1;
 	UINT16 *     videoram2;

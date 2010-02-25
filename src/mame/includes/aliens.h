@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _aliens_state aliens_state;
-struct _aliens_state
+class aliens_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, aliens_state(machine)); }
+
+	aliens_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 //  UINT8 *    paletteram;    // currently this uses generic palette handling

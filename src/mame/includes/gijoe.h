@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _gijoe_state gijoe_state;
-struct _gijoe_state
+class gijoe_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gijoe_state(machine)); }
+
+	gijoe_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    workram;
 	UINT16 *    spriteram;

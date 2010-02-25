@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _taitoh_state taitoh_state;
-struct _taitoh_state
+class taitoh_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitoh_state(machine)); }
+
+	taitoh_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    m68000_mainram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling

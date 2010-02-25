@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _klax_state klax_state;
-struct _klax_state
+class klax_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, klax_state(machine)); }
+
+	klax_state(running_machine &machine) { }
+	
 	atarigen_state			atarigen;
 };
 

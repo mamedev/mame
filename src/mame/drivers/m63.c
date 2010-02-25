@@ -121,9 +121,13 @@ Dip locations verified for:
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 
-typedef struct _m63_state m63_state;
-struct _m63_state
+class m63_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m63_state(machine)); }
+
+	m63_state(running_machine &machine) { }
+	
 	UINT8 *  videoram;
 	UINT8 *  colorram;
 	UINT8 *  spriteram;

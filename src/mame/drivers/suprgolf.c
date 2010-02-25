@@ -24,9 +24,13 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-typedef struct _suprgolf_state suprgolf_state;
-struct _suprgolf_state
+class suprgolf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, suprgolf_state(machine)); }
+
+	suprgolf_state(running_machine &machine) { }
+	
 	tilemap_t *tilemap;
 	UINT8 *videoram;
 	UINT8 *paletteram;

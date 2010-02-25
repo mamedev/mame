@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _overdriv_state overdriv_state;
-struct _overdriv_state
+class overdriv_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, overdriv_state(machine)); }
+
+	overdriv_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT16 *   paletteram;    // currently this uses generic palette handling
 

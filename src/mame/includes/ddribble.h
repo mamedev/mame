@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _ddribble_state ddribble_state;
-struct _ddribble_state
+class ddribble_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddribble_state(machine)); }
+
+	ddribble_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     sharedram;
 	UINT8 *     snd_sharedram;

@@ -1,7 +1,11 @@
 
-typedef struct _segas1x_state segas1x_state;
-struct _segas1x_state
+class segas1x_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, segas1x_state(machine)); }
+
+	segas1x_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT16 *  workram;  // this is used in the nvram handler, hence it cannot be added here
 //  UINT16 *  paletteram;   // this is used in the segaic16 mapper, hence it cannot be added here (yet)

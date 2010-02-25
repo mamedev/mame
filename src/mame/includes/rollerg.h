@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _rollerg_state rollerg_state;
-struct _rollerg_state
+class rollerg_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rollerg_state(machine)); }
+
+	rollerg_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT8 *    paletteram;    // currently this uses generic palette handling
 

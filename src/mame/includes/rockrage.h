@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _rockrage_state rockrage_state;
-struct _rockrage_state
+class rockrage_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rockrage_state(machine)); }
+
+	rockrage_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    paletteram;
 

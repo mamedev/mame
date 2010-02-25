@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct __4enraya_state _4enraya_state;
-struct __4enraya_state
+class _4enraya_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _4enraya_state(machine)); }
+
+	_4enraya_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT8 *    videoram;
 	size_t     videoram_size;

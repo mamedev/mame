@@ -87,9 +87,13 @@ PROM  : Type MB7051
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 
-typedef struct _shougi_state shougi_state;
-struct _shougi_state
+class shougi_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, shougi_state(machine)); }
+
+	shougi_state(running_machine &machine) { }
+	
 	UINT8 *videoram;
 	int nmi_enabled;
 	//UINT8 *cpu_sharedram;

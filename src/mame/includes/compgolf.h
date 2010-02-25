@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _compgolf_state compgolf_state;
-struct _compgolf_state
+class compgolf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, compgolf_state(machine)); }
+
+	compgolf_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        bg_ram;

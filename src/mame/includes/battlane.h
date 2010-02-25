@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _battlane_state battlane_state;
-struct _battlane_state
+class battlane_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, battlane_state(machine)); }
+
+	battlane_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     tileram;
 	UINT8 *     spriteram;

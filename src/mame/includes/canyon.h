@@ -17,9 +17,13 @@
 
 
 
-typedef struct _canyon_state canyon_state;
-struct _canyon_state
+class canyon_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, canyon_state(machine)); }
+
+	canyon_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 

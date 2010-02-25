@@ -1,8 +1,12 @@
 
 
-typedef struct _funybubl_state funybubl_state;
-struct _funybubl_state
+class funybubl_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, funybubl_state(machine)); }
+
+	funybubl_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    banked_vram;
 	UINT8 *    paletteram;

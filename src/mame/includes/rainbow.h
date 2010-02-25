@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _rainbow_state rainbow_state;
-struct _rainbow_state
+class rainbow_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rainbow_state(machine)); }
+
+	rainbow_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    spriteram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling

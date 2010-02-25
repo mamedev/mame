@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _flkatck_state flkatck_state;
-struct _flkatck_state
+class flkatck_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, flkatck_state(machine)); }
+
+	flkatck_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    k007121_ram;
 //  UINT8 *    paletteram;  // this currently uses generic palette handling

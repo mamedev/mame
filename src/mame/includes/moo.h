@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _moo_state moo_state;
-struct _moo_state
+class moo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, moo_state(machine)); }
+
+	moo_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    workram;
 	UINT16 *    spriteram;

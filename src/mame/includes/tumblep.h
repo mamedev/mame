@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _tumblep_state tumblep_state;
-struct _tumblep_state
+class tumblep_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tumblep_state(machine)); }
+
+	tumblep_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;

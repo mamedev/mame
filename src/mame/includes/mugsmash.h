@@ -1,7 +1,11 @@
 
-typedef struct _mugsmash_state mugsmash_state;
-struct _mugsmash_state
+class mugsmash_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mugsmash_state(machine)); }
+
+	mugsmash_state(running_machine &machine) { }
+	
 	UINT16 *videoram1;
 	UINT16 *videoram2;
 	UINT16 *spriteram;

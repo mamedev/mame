@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _battlnts_state battlnts_state;
-struct _battlnts_state
+class battlnts_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, battlnts_state(machine)); }
+
+	battlnts_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT8 *      paletteram;    // this currently uses generic palette handling
 

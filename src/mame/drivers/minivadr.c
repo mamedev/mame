@@ -14,9 +14,13 @@ Japan). It has no sound.
 #include "cpu/z80/z80.h"
 
 
-typedef struct _minivadr_state minivadr_state;
-struct _minivadr_state
+class minivadr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, minivadr_state(machine)); }
+
+	minivadr_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	size_t   videoram_size;

@@ -15,9 +15,13 @@ struct othunder_tempsprite
 };
 
 
-typedef struct _othunder_state othunder_state;
-struct _othunder_state
+class othunder_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, othunder_state(machine)); }
+
+	othunder_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *   spriteram;
 	size_t     spriteram_size;

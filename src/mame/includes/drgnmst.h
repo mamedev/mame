@@ -1,7 +1,11 @@
 
-typedef struct _drgnmst_state drgnmst_state;
-struct _drgnmst_state
+class drgnmst_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drgnmst_state(machine)); }
+
+	drgnmst_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    vidregs;
 	UINT16 *    fg_videoram;

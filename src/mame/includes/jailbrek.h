@@ -7,9 +7,13 @@
 #define MASTER_CLOCK        XTAL_18_432MHz
 #define VOICE_CLOCK         XTAL_3_579545MHz
 
-typedef struct _jailbrek_state jailbrek_state;
-struct _jailbrek_state
+class jailbrek_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jailbrek_state(machine)); }
+
+	jailbrek_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *      videoram;
 	UINT8 *      colorram;

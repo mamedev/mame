@@ -14,9 +14,13 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-typedef struct _albazc_state albazc_state;
-struct _albazc_state
+class albazc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, albazc_state(machine)); }
+
+	albazc_state(running_machine &machine) { }
+	
 	/* video-related */
 	UINT8 *  spriteram1;
 	UINT8 *  spriteram2;

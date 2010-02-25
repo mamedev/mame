@@ -1426,18 +1426,6 @@ static int validate_devices(int drivnum, const machine_config *config, const iop
 					error |= validate_tag(driver, "bank", entry->write.tag);
 				if (entry->share != NULL)
 					error |= validate_tag(driver, "share", entry->share);
-
-				/* if there are base or size members, check that they are within bounds */
-				if (entry->baseptroffs_plus1 != 0 && (entry->baseptroffs_plus1 - 1) >= config->driver_data_size)
-				{
-					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_BASE_MEMBER entry\n", driver->source_file, driver->name, devconfig->tag.cstr(), address_space_names[spacenum]);
-					error = TRUE;
-				}
-				if (entry->sizeptroffs_plus1 != 0 && (entry->sizeptroffs_plus1 - 1) >= config->driver_data_size)
-				{
-					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_SIZE_MEMBER entry\n", driver->source_file, driver->name, devconfig->tag.cstr(), address_space_names[spacenum]);
-					error = TRUE;
-				}
 			}
 
 			/* release the address map */

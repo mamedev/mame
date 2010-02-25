@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _lethal_state lethal_state;
-struct _lethal_state
+class lethal_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lethal_state(machine)); }
+
+	lethal_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT8 *    paletteram;    // currently this uses generic palette handling
 

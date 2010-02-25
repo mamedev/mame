@@ -24,9 +24,13 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-typedef struct _skyarmy_state skyarmy_state;
-struct _skyarmy_state
+class skyarmy_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skyarmy_state(machine)); }
+
+	skyarmy_state(running_machine &machine) { }
+	
 	UINT8 *spriteram;
 	UINT8 *videoram;
 	UINT8 *colorram;

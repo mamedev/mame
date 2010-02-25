@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _xexex_state xexex_state;
-struct _xexex_state
+class xexex_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, xexex_state(machine)); }
+
+	xexex_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    workram;
 	UINT16 *    spriteram;

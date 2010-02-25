@@ -24,9 +24,13 @@ TODO:
 
 #define MASTER_CLOCK	XTAL_19_968MHz
 
-typedef struct _nightgal_state nightgal_state;
-struct _nightgal_state
+class nightgal_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nightgal_state(machine)); }
+
+	nightgal_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT8 *    blit_buffer;
 

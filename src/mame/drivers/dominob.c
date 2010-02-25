@@ -64,9 +64,13 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-typedef struct _dominob_state dominob_state;
-struct _dominob_state
+class dominob_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dominob_state(machine)); }
+
+	dominob_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  spriteram;
 	UINT8 *  videoram;

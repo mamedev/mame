@@ -9,9 +9,13 @@
 #define BANKP_CPU_CLOCK (BANKP_MASTER_CLOCK/6)
 #define BANKP_SN76496_CLOCK (BANKP_MASTER_CLOCK/6)
 
-typedef struct _bankp_state bankp_state;
-struct _bankp_state
+class bankp_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bankp_state(machine)); }
+
+	bankp_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 * videoram;
 	UINT8 * colorram;

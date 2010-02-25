@@ -1,7 +1,11 @@
 
-typedef struct _news_state news_state;
-struct _news_state
+class news_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, news_state(machine)); }
+
+	news_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT8 *  bgram;
 	UINT8 *  fgram;

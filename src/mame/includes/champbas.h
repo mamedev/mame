@@ -8,9 +8,13 @@
 #define CPUTAG_MCU "mcu"
 
 
-typedef struct _champbas_state champbas_state;
-struct _champbas_state
+class champbas_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, champbas_state(machine)); }
+
+	champbas_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        bg_videoram;
 	UINT8 *        spriteram;

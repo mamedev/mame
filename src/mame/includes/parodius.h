@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _parodius_state parodius_state;
-struct _parodius_state
+class parodius_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, parodius_state(machine)); }
+
+	parodius_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 //  UINT8 *    paletteram;    // currently this uses generic palette handling

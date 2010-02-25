@@ -14,9 +14,13 @@
 #define JEDI_TMS5220_CLOCK		(JEDI_AUDIO_CPU_OSC / 2 / 9) /* div by 9 is via a binary counter that counts from 7 to 16 */
 
 
-typedef struct _jedi_state jedi_state;
-struct _jedi_state
+class jedi_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jedi_state(machine)); }
+
+	jedi_state(running_machine &machine) { }
+	
 	/* machine state */
 	UINT8  a2d_select;
 	UINT8  nvram_enabled;

@@ -1,8 +1,12 @@
 
 
-typedef struct _funkybee_state funkybee_state;
-struct _funkybee_state
+class funkybee_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, funkybee_state(machine)); }
+
+	funkybee_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    colorram;

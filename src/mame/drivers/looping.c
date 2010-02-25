@@ -95,9 +95,13 @@ static UINT8 *cop_io;
  *
  *************************************/
 
-typedef struct _looping_state looping_state;
-struct _looping_state
+class looping_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, looping_state(machine)); }
+
+	looping_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *		videoram;
 	UINT8 *		colorram;

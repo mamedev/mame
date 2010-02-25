@@ -1,7 +1,11 @@
 
-typedef struct _lsasquad_state lsasquad_state;
-struct _lsasquad_state
+class lsasquad_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lsasquad_state(machine)); }
+
+	lsasquad_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *      scrollram;
 	UINT8 *      videoram;

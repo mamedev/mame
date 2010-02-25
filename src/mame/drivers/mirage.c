@@ -39,9 +39,13 @@ MR_01-.3A    [a0b758aa]
 #include "video/decodev.h"
 #include "sound/okim6295.h"
 
-typedef struct _mirage_state mirage_state;
-struct _mirage_state
+class mirage_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mirage_state(machine)); }
+
+	mirage_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;

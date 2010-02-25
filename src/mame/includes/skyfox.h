@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _skyfox_state skyfox_state;
-struct _skyfox_state
+class skyfox_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skyfox_state(machine)); }
+
+	skyfox_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    spriteram;
 	size_t     spriteram_size;

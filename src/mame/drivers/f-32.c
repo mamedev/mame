@@ -17,9 +17,13 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-typedef struct _mosaicf2_state mosaicf2_state;
-struct _mosaicf2_state
+class mosaicf2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mosaicf2_state(machine)); }
+
+	mosaicf2_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT32 *  videoram;
 };

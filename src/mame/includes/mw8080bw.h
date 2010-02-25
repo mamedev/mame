@@ -30,9 +30,13 @@
 #define MW8080BW_HPIXCOUNT                (MW8080BW_HBSTART + 4)
 
 
-typedef struct _mw8080bw_state mw8080bw_state;
-struct _mw8080bw_state
+class mw8080bw_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mw8080bw_state(machine)); }
+
+	mw8080bw_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     main_ram;
 	UINT8 *     colorram;

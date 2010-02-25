@@ -92,9 +92,13 @@ Note
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-typedef struct _spool99_state spool99_state;
-struct _spool99_state
+class spool99_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spool99_state(machine)); }
+
+	spool99_state(running_machine &machine) { }
+	
 	UINT8 *main;
 	tilemap_t *sc0_tilemap;
 	UINT8 *cram;

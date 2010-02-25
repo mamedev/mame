@@ -1,7 +1,11 @@
 
-typedef struct _f1gp_state f1gp_state;
-struct _f1gp_state
+class f1gp_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, f1gp_state(machine)); }
+
+	f1gp_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *  sharedram;
 	UINT16 *  spr1vram;

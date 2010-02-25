@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _blktiger_state blktiger_state;
-struct _blktiger_state
+class blktiger_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blktiger_state(machine)); }
+
+	blktiger_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 * txvideoram;
 //  UINT8 * spriteram;  // currently this uses generic buffer_spriteram_w

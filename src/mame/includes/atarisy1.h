@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _atarisy1_state atarisy1_state;
-struct _atarisy1_state
+class atarisy1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarisy1_state(machine)); }
+
+	atarisy1_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 
 	UINT16 *		bankselect;

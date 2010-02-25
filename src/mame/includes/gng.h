@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _gng_state gng_state;
-struct _gng_state
+class gng_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gng_state(machine)); }
+
+	gng_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    bgvideoram;
 	UINT8 *    fgvideoram;

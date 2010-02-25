@@ -24,10 +24,13 @@
 #define DRACO_PAGERAM_MASK		0x7ff
 #define CIDELSA_CHARRAM_MASK	0x7ff
 
-typedef struct _cidelsa_state cidelsa_state;
-
-struct _cidelsa_state
+class cidelsa_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cidelsa_state(machine)); }
+
+	cidelsa_state(running_machine &machine) { }
+
 	/* cpu state */
 	cdp1802_control_mode cdp1802_mode;
 

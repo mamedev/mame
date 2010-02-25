@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _higemaru_state higemaru_state;
-struct _higemaru_state
+class higemaru_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, higemaru_state(machine)); }
+
+	higemaru_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    colorram;

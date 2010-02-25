@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _macrossp_state macrossp_state;
-struct _macrossp_state
+class macrossp_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, macrossp_state(machine)); }
+
+	macrossp_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT32 *         mainram;
 	UINT32 *         scra_videoram;

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _momoko_state momoko_state;
-struct _momoko_state
+class momoko_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, momoko_state(machine)); }
+
+	momoko_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        bg_scrollx;
 	UINT8 *        bg_scrolly;

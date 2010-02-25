@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _blmbycar_state blmbycar_state;
-struct _blmbycar_state
+class blmbycar_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blmbycar_state(machine)); }
+
+	blmbycar_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    vram_0;
 	UINT16 *    scroll_0;

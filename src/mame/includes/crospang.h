@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _crospang_state crospang_state;
-struct _crospang_state
+class crospang_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crospang_state(machine)); }
+
+	crospang_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *  bg_videoram;
 	UINT16 *  fg_videoram;

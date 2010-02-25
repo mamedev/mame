@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _ginganin_state ginganin_state;
-struct _ginganin_state
+class ginganin_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ginganin_state(machine)); }
+
+	ginganin_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    fgram;
 	UINT16 *    txtram;

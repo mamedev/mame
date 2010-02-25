@@ -1,8 +1,12 @@
 
 
-typedef struct _fantland_state fantland_state;
-struct _fantland_state
+class fantland_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fantland_state(machine)); }
+
+	fantland_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT8 *    spriteram;   // currently directly used in a 16bit map...
 //  UINT8 *    spriteram_2; // currently directly used in a 16bit map...

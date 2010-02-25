@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _spy_state spy_state;
-struct _spy_state
+class spy_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spy_state(machine)); }
+
+	spy_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 	UINT8 *    pmcram;

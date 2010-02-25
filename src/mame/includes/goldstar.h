@@ -1,6 +1,10 @@
-typedef struct _goldstar_state goldstar_state;
-struct _goldstar_state
+class goldstar_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, goldstar_state(machine)); }
+
+	goldstar_state(running_machine &machine) { }
+	
 	int dataoffset;
 
 	UINT8 *nvram;

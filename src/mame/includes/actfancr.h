@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _actfancr_state actfancr_state;
-struct _actfancr_state
+class actfancr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, actfancr_state(machine)); }
+
+	actfancr_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        pf1_data;
 	UINT8 *        pf2_data;

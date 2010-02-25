@@ -1,6 +1,10 @@
-typedef struct _sidearms_state sidearms_state;
-struct _sidearms_state
+class sidearms_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sidearms_state(machine)); }
+
+	sidearms_state(running_machine &machine) { }
+	
 	int gameid;
 
 	UINT8 *videoram;

@@ -14,9 +14,13 @@ struct slapshot_tempsprite
 	int primask;
 };
 
-typedef struct _slapshot_state slapshot_state;
-struct _slapshot_state
+class slapshot_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, slapshot_state(machine)); }
+
+	slapshot_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    color_ram;
 	UINT16 *    spriteram;

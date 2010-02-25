@@ -62,9 +62,13 @@ This is not a bug (real machine behaves the same).
 
 #define SPRITE_DATA_GRANULARITY 0x80
 
-typedef struct _srmp5_state srmp5_state;
-struct _srmp5_state
+class srmp5_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp5_state(machine)); }
+
+	srmp5_state(running_machine &machine) { }
+	
 	UINT32 databank;
 	UINT16 *tileram;
 	UINT16 *palram;

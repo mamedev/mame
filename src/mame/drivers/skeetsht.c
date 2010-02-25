@@ -17,9 +17,13 @@
  *
  *************************************/
 
-typedef struct _skeetsht_state skeetsht_state;
-struct _skeetsht_state
+class skeetsht_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skeetsht_state(machine)); }
+
+	skeetsht_state(running_machine &machine) { }
+	
 	UINT16 *tms_vram;
 	UINT8 porta_latch;
 	UINT8 ay_sel;

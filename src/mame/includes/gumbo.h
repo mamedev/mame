@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _gumbo_state gumbo_state;
-struct _gumbo_state
+class gumbo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gumbo_state(machine)); }
+
+	gumbo_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    bg_videoram;
 	UINT16 *    fg_videoram;

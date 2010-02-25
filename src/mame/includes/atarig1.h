@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _atarig1_state atarig1_state;
-struct _atarig1_state
+class atarig1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarig1_state(machine)); }
+
+	atarig1_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 	UINT8			is_pitfight;
 

@@ -10,9 +10,13 @@
 #define	MYSTSTON_MASTER_CLOCK	(XTAL_12MHz)
 
 
-typedef struct _mystston_state mystston_state;
-struct _mystston_state
+class mystston_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mystston_state(machine)); }
+
+	mystston_state(running_machine &machine) { }
+	
 	/* machine state */
 	UINT8 *ay8910_data;
 	UINT8 *ay8910_select;

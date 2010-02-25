@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _ultraman_state ultraman_state;
-struct _ultraman_state
+class ultraman_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ultraman_state(machine)); }
+
+	ultraman_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT16 *   paletteram;    // currently this uses generic palette handling
 

@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _vindictr_state vindictr_state;
-struct _vindictr_state
+class vindictr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vindictr_state(machine)); }
+
+	vindictr_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 
 	UINT8			playfield_tile_bank;

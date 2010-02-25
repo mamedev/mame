@@ -19,9 +19,13 @@ struct jungler_star
 
 #define JUNGLER_MAX_STARS 1000
 
-typedef struct _timeplt_state timeplt_state;
-struct _timeplt_state
+class timeplt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, timeplt_state(machine)); }
+
+	timeplt_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;	// timeplt, tutankham, junofrst, rocnrope, pooyan, rallyx
 	UINT8 *  colorram;	// timeplt, rocnrope, pooyan

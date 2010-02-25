@@ -15,9 +15,13 @@
 #define NITEDRVR_ATTRACT_EN	NODE_06
 
 
-typedef struct _nitedrvr_state nitedrvr_state;
-struct _nitedrvr_state
+class nitedrvr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nitedrvr_state(machine)); }
+
+	nitedrvr_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT8 *    hvc;
 	UINT8 *    videoram;

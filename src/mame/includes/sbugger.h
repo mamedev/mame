@@ -1,6 +1,10 @@
-typedef struct _sbugger_state sbugger_state;
-struct _sbugger_state
+class sbugger_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbugger_state(machine)); }
+
+	sbugger_state(running_machine &machine) { }
+	
 	UINT8 *videoram;
 	UINT8 *videoram_attr;
 

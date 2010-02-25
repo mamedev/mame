@@ -45,9 +45,13 @@ so it could be by them instead
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
 
-typedef struct _hotblock_state hotblock_state;
-struct _hotblock_state
+class hotblock_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hotblock_state(machine)); }
+
+	hotblock_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  vram;
 	UINT8 *  pal;

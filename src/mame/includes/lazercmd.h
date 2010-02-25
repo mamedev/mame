@@ -17,9 +17,13 @@
 #define MARKER_HORZ_ADJ -1
 #define MARKER_VERT_ADJ -10
 
-typedef struct _lazercmd_state lazercmd_state;
-struct _lazercmd_state
+class lazercmd_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lazercmd_state(machine)); }
+
+	lazercmd_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	size_t   videoram_size;

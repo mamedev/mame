@@ -5,9 +5,13 @@
 *************************************************************************/
 
 
-typedef struct _exedexes_state exedexes_state;
-struct _exedexes_state
+class exedexes_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, exedexes_state(machine)); }
+
+	exedexes_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        colorram;

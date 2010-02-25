@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _bladestl_state bladestl_state;
-struct _bladestl_state
+class bladestl_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bladestl_state(machine)); }
+
+	bladestl_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    paletteram;
 

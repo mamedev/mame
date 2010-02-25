@@ -1,6 +1,10 @@
-typedef struct _sidepckt_state sidepckt_state;
-struct _sidepckt_state
+class sidepckt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sidepckt_state(machine)); }
+
+	sidepckt_state(running_machine &machine) { }
+	
 	tilemap_t *bg_tilemap;
 	UINT8 *colorram;
 	UINT8 *videoram;

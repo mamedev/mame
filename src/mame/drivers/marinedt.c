@@ -97,9 +97,13 @@ p2 ink doesn't always light up in test mode
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-typedef struct _marinedt_state marinedt_state;
-struct _marinedt_state
+class marinedt_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, marinedt_state(machine)); }
+
+	marinedt_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     tx_tileram;
 

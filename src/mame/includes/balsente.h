@@ -25,9 +25,13 @@
 #define POLY17_ADD	0x18000
 
 
-typedef struct _balsente_state balsente_state;
-struct _balsente_state
+class balsente_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, balsente_state(machine)); }
+
+	balsente_state(running_machine &machine) { }
+	
 	/* global data */
 	UINT8 shooter;
 	UINT8 shooter_x;

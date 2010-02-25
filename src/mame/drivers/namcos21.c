@@ -331,8 +331,7 @@ static UINT16 pointram_control;
 
 
 #define DSP_BUF_MAX (4096*12)
-typedef struct _dsp_state dsp_state;
-struct _dsp_state
+struct dsp_state
 {
 	unsigned masterSourceAddr;
 	UINT16 slaveInputBuffer[DSP_BUF_MAX];

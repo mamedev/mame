@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _ambush_state ambush_state;
-struct _ambush_state
+class ambush_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ambush_state(machine)); }
+
+	ambush_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

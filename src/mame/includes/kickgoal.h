@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _kickgoal_state kickgoal_state;
-struct _kickgoal_state
+class kickgoal_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kickgoal_state(machine)); }
+
+	kickgoal_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    fgram;
 	UINT16 *    bgram;

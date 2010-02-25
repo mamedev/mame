@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _gaelco_state gaelco_state;
-struct _gaelco_state
+class gaelco_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gaelco_state(machine)); }
+
+	gaelco_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *     videoram;
 	UINT16 *     spriteram;

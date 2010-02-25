@@ -15,9 +15,13 @@
 #define ATARIFB_HIT_EN			NODE_05
 
 
-typedef struct _atarifb_state atarifb_state;
-struct _atarifb_state
+class atarifb_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarifb_state(machine)); }
+
+	atarifb_state(running_machine &machine) { }
+	
 	/* video-related */
 	UINT8 *  alphap1_videoram;
 	UINT8 *  alphap2_videoram;

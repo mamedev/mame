@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _ninjaw_state ninjaw_state;
-struct _ninjaw_state
+class ninjaw_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ninjaw_state(machine)); }
+
+	ninjaw_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *   spriteram;
 	size_t     spriteram_size;

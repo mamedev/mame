@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _ksayakyu_state ksayakyu_state;
-struct _ksayakyu_state
+class ksayakyu_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ksayakyu_state(machine)); }
+
+	ksayakyu_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

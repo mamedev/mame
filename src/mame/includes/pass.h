@@ -1,6 +1,10 @@
-typedef struct _pass_state pass_state;
-struct _pass_state
+class pass_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pass_state(machine)); }
+
+	pass_state(running_machine &machine) { }
+	
 	tilemap_t *bg_tilemap;
 	tilemap_t *fg_tilemap;
 

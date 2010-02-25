@@ -4,9 +4,13 @@
 
 ****************************************************************************/
 
-typedef struct _astrof_state astrof_state;
-struct _astrof_state
+class astrof_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, astrof_state(machine)); }
+
+	astrof_state(running_machine &machine) { }
+	
 	/* video-related */
 	UINT8 *    videoram;
 	size_t     videoram_size;

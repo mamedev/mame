@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _cbasebal_state cbasebal_state;
-struct _cbasebal_state
+class cbasebal_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cbasebal_state(machine)); }
+
+	cbasebal_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    spriteram;
 //  UINT8 *    paletteram;    // currently this uses generic palette handling

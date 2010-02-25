@@ -13,9 +13,13 @@
 #define MCLK 10000000
 
 
-typedef struct _mayumi_state mayumi_state;
-struct _mayumi_state
+class mayumi_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mayumi_state(machine)); }
+
+	mayumi_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 //	UINT8 *    nvram;		// this currently uses generic nvram handlers

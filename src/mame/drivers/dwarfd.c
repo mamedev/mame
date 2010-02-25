@@ -278,9 +278,13 @@ uPC1352C @ N3
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 
-typedef struct _dwarfd_state dwarfd_state;
-struct _dwarfd_state
+class dwarfd_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dwarfd_state(machine)); }
+
+	dwarfd_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  dw_ram;
 	UINT8 *  videobuf;

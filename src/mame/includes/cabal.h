@@ -1,6 +1,10 @@
-typedef struct _cabal_state cabal_state;
-struct _cabal_state
+class cabal_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cabal_state(machine)); }
+
+	cabal_state(running_machine &machine) { }
+	
 	UINT16 *spriteram;
 	UINT16 *colorram;
 	UINT16 *videoram;

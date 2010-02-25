@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _galivan_state galivan_state;
-struct _galivan_state
+class galivan_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, galivan_state(machine)); }
+
+	galivan_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     videoram;
 	UINT8 *     colorram;

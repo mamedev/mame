@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _tail2nos_state tail2nos_state;
-struct _tail2nos_state
+class tail2nos_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tail2nos_state(machine)); }
+
+	tail2nos_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    bgvideoram;
 	UINT16 *    spriteram;

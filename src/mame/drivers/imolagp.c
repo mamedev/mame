@@ -83,9 +83,13 @@ Known issues:
 #define HLE_COM
 
 
-typedef struct _imolagp_state imolagp_state;
-struct _imolagp_state
+class imolagp_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, imolagp_state(machine)); }
+
+	imolagp_state(running_machine &machine) { }
+	
 	UINT8 *slave_workram; // used only ifdef HLE_COM
 
 #ifdef HLE_COM

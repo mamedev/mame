@@ -7,9 +7,13 @@
 #define DARIUS_VOL_MAX    (3*2 + 2)
 #define DARIUS_PAN_MAX    (2 + 2 + 1)	/* FM 2port + PSG 2port + DA 1port */
 
-typedef struct _darius_state darius_state;
-struct _darius_state
+class darius_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, darius_state(machine)); }
+
+	darius_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    spriteram;
 	UINT16 *    fg_ram;

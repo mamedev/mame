@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _capbowl_state capbowl_state;
-struct _capbowl_state
+class capbowl_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, capbowl_state(machine)); }
+
+	capbowl_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  rowaddress;
 //  UINT8 *  nvram; // currently this uses generic_nvram

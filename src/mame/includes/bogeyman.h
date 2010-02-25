@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _bogeyman_state bogeyman_state;
-struct _bogeyman_state
+class bogeyman_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bogeyman_state(machine)); }
+
+	bogeyman_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    videoram2;

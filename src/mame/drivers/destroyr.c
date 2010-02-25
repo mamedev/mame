@@ -9,9 +9,13 @@ Atari Destroyer Driver
 #include "deprecat.h"
 
 
-typedef struct _destroyr_state destroyr_state;
-struct _destroyr_state
+class destroyr_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, destroyr_state(machine)); }
+
+	destroyr_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *        major_obj_ram;
 	UINT8 *        minor_obj_ram;

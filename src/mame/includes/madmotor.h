@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _madmotor_state madmotor_state;
-struct _madmotor_state
+class madmotor_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, madmotor_state(machine)); }
+
+	madmotor_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *        pf1_rowscroll;
 	UINT16 *        pf1_data;

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _topspeed_state topspeed_state;
-struct _topspeed_state
+class topspeed_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, topspeed_state(machine)); }
+
+	topspeed_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *   spritemap;
 	UINT16 *   raster_ctrl;

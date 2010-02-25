@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _homerun_state homerun_state;
-struct _homerun_state
+class homerun_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, homerun_state(machine)); }
+
+	homerun_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

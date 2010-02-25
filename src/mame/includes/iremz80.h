@@ -6,9 +6,13 @@
 
 /* These share sound hardware (in audio/irem.h) and hence driver data */
 
-typedef struct _irem_z80_state irem_z80_state;
-struct _irem_z80_state
+class irem_z80_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, irem_z80_state(machine)); }
+
+	irem_z80_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT8 *              videoram;	// m52, m57, m58
 	UINT8 *              spriteram;	// m52, m57, m58, m62

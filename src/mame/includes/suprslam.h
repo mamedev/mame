@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _suprslam_state suprslam_state;
-struct _suprslam_state
+class suprslam_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, suprslam_state(machine)); }
+
+	suprslam_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    screen_videoram;
 	UINT16 *    bg_videoram;

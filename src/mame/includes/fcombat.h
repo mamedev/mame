@@ -22,9 +22,13 @@
 #define VISIBLE_Y_MAX			(30*8)
 
 
-typedef struct _fcombat_state fcombat_state;
-struct _fcombat_state
+class fcombat_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fcombat_state(machine)); }
+
+	fcombat_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

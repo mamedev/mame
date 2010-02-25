@@ -173,9 +173,13 @@ Notes:
  *
  *************************************/
 
-typedef struct _spaceg_state spaceg_state;
-struct _spaceg_state
+class spaceg_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spaceg_state(machine)); }
+
+	spaceg_state(running_machine &machine) { }
+	
 	UINT8 *  videoram;
 	UINT8 *  unkram;
 	UINT8 *  io9400;

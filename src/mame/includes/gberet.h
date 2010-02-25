@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _gberet_state gberet_state;
-struct _gberet_state
+class gberet_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gberet_state(machine)); }
+
+	gberet_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *     videoram;
 	UINT8 *     colorram;

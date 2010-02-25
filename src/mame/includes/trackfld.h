@@ -8,9 +8,13 @@
 #include "sound/msm5205.h"
 
 
-typedef struct _trackfld_state trackfld_state;
-struct _trackfld_state
+class trackfld_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, trackfld_state(machine)); }
+
+	trackfld_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;	// trackfld, hyperspt, yiear, sbasketb
 	UINT8 *  colorram;	// trackfld, hyperspt, sbasketb

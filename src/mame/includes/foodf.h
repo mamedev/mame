@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _foodf_state foodf_state;
-struct _foodf_state
+class foodf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, foodf_state(machine)); }
+
+	foodf_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 
 	double			rweights[3];

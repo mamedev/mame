@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _gaiden_state gaiden_state;
-struct _gaiden_state
+class gaiden_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gaiden_state(machine)); }
+
+	gaiden_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    videoram;
 	UINT16 *    videoram2;

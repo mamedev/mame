@@ -1,7 +1,11 @@
 
-typedef struct _fromanc2_state fromanc2_state;
-struct _fromanc2_state
+class fromanc2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fromanc2_state(machine)); }
+
+	fromanc2_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16   *paletteram[2];
 	UINT16   *videoram[2][4];

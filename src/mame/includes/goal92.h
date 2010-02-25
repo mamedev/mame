@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _goal92_state goal92_state;
-struct _goal92_state
+class goal92_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, goal92_state(machine)); }
+
+	goal92_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    bg_data;
 	UINT16 *    fg_data;

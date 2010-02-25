@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _badlands_state badlands_state;
-struct _badlands_state
+class badlands_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, badlands_state(machine)); }
+
+	badlands_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 
 	UINT8			pedal_value[2];

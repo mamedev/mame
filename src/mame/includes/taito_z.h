@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _taitoz_state taitoz_state;
-struct _taitoz_state
+class taitoz_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitoz_state(machine)); }
+
+	taitoz_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *    spriteram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling

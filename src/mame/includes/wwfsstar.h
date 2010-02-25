@@ -1,6 +1,10 @@
-typedef struct _wwfsstar_state wwfsstar_state;
-struct _wwfsstar_state
+class wwfsstar_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, wwfsstar_state(machine)); }
+
+	wwfsstar_state(running_machine &machine) { }
+	
 	int vblank;
 	int scrollx;
 	int scrolly;

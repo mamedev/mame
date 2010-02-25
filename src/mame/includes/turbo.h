@@ -11,8 +11,7 @@
 #define TURBO_X_SCALE		2
 
 
-typedef struct _i8279_state i8279_state;
-struct _i8279_state
+struct i8279_state
 {
 	UINT8		command;
 	UINT8		mode;
@@ -23,9 +22,13 @@ struct _i8279_state
 };
 
 
-typedef struct _turbo_state turbo_state;
-struct _turbo_state
+class turbo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, turbo_state(machine)); }
+
+	turbo_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *		videoram;
 	UINT8 *		spriteram;

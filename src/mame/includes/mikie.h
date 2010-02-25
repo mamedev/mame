@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _mikie_state mikie_state;
-struct _mikie_state
+class mikie_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mikie_state(machine)); }
+
+	mikie_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    colorram;

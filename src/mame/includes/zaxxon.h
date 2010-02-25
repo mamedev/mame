@@ -4,9 +4,13 @@
 
 ***************************************************************************/
 
-typedef struct _zaxxon_state zaxxon_state;
-struct _zaxxon_state
+class zaxxon_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, zaxxon_state(machine)); }
+
+	zaxxon_state(running_machine &machine) { }
+	
 	UINT8 *colorram;
 	UINT8 *videoram;
 	UINT8 *spriteram;

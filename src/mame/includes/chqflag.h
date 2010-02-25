@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _chqflag_state chqflag_state;
-struct _chqflag_state
+class chqflag_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chqflag_state(machine)); }
+
+	chqflag_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 //  UINT8 *    paletteram;    // currently this uses generic palette handling

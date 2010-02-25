@@ -1303,12 +1303,12 @@ running_machine::running_machine(const game_driver *driver)
 		basename = mame_strdup(driver->name);
 		config = machine_config_alloc(driver->machine_config);
 
-		/* allocate the driver data */
-		if (config->driver_data_size != 0)
-			driver_data = auto_alloc_array_clear(this, UINT8, config->driver_data_size);
-
 		/* attach this machine to all the devices in the configuration */
 		devicelist.import_config_list(config->devicelist, *this);
+
+		/* allocate the driver data (after devices) */
+		if (config->driver_data_alloc != NULL)
+			driver_data = (*config->driver_data_alloc)(*this);
 
 		/* find devices */
 		firstcpu = cpu_first(this);

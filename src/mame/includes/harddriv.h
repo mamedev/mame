@@ -7,9 +7,13 @@
 #include "cpu/tms34010/tms34010.h"
 #include "machine/atarigen.h"
 
-typedef struct _harddriv_state harddriv_state;
-struct _harddriv_state
+class harddriv_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
+
+	harddriv_state(running_machine &machine) { }
+	
 	atarigen_state			atarigen;
 
 	running_device *	maincpu;

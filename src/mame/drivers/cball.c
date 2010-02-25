@@ -8,9 +8,13 @@
 #include "cpu/m6800/m6800.h"
 
 
-typedef struct _cball_state cball_state;
-struct _cball_state
+class cball_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cball_state(machine)); }
+
+	cball_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  video_ram;
 

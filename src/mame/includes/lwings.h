@@ -1,7 +1,11 @@
 
-typedef struct _lwings_state lwings_state;
-struct _lwings_state
+class lwings_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lwings_state(machine)); }
+
+	lwings_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  fgvideoram;
 	UINT8 *  bg1videoram;

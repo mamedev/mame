@@ -47,9 +47,13 @@ MM63.10N
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-typedef struct _chinsan_state chinsan_state;
-struct _chinsan_state
+class chinsan_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chinsan_state(machine)); }
+
+	chinsan_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  video;
 

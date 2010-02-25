@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _laserbat_state laserbat_state;
-struct _laserbat_state
+class laserbat_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, laserbat_state(machine)); }
+
+	laserbat_state(running_machine &machine) { }
+	
 	/* video-related */
 	tilemap_t    *bg_tilemap;
 	UINT8      *videoram;

@@ -1,6 +1,10 @@
-typedef struct _xyonix_state xyonix_state;
-struct _xyonix_state
+class xyonix_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, xyonix_state(machine)); }
+
+	xyonix_state(running_machine &machine) { }
+	
 	UINT8 *vidram;
 	tilemap_t *tilemap;
 

@@ -1,9 +1,13 @@
 
 #define TAITOL_SPRITERAM_SIZE 0x400
 
-typedef struct _taitol_state taitol_state;
-struct _taitol_state
+class taitol_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitol_state(machine)); }
+
+	taitol_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *       rambanks;
 	UINT8 *       palette_ram;

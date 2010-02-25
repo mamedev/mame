@@ -71,9 +71,13 @@ Dumped 06/15/2000
 #include "deprecat.h"
 #include "sound/nile.h"
 
-typedef struct _srmp6_state srmp6_state;
-struct _srmp6_state
+class srmp6_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp6_state(machine)); }
+
+	srmp6_state(running_machine &machine) { }
+	
 	UINT16* tileram;
 	UINT16* dmaram;
 

@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _thunderx_state thunderx_state;
-struct _thunderx_state
+class thunderx_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, thunderx_state(machine)); }
+
+	thunderx_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    ram;
 	UINT8 *    pmcram;

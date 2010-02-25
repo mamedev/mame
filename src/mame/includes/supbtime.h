@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _supbtime_state supbtime_state;
-struct _supbtime_state
+class supbtime_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supbtime_state(machine)); }
+
+	supbtime_state(running_machine &machine) { }
+
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;

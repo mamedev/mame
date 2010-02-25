@@ -1,9 +1,13 @@
 
 // later, this might be merged with segas1x_state in segas16.h
 
-typedef struct _segas1x_bootleg_state segas1x_bootleg_state;
-struct _segas1x_bootleg_state
+class segas1x_bootleg_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, segas1x_bootleg_state(machine)); }
+
+	segas1x_bootleg_state(running_machine &machine) { }
+
 	UINT16 *    bg0_tileram;
 	UINT16 *    bg1_tileram;
 	UINT16 *    textram;

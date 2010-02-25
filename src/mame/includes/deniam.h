@@ -5,9 +5,13 @@
 *************************************************************************/
 
 
-typedef struct _deniam_state deniam_state;
-struct _deniam_state
+class deniam_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, deniam_state(machine)); }
+
+	deniam_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT16 *       videoram;
 	UINT16 *       textram;

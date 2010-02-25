@@ -1,9 +1,13 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 
-typedef struct _blockade_state blockade_state;
-struct _blockade_state
+class blockade_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blockade_state(machine)); }
+
+	blockade_state(running_machine &machine) { }
+	
 	UINT8 *  videoram;
 
 	/* video-related */

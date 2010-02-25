@@ -4,9 +4,13 @@
 
 *************************************************************************/
 
-typedef struct _fastlane_state fastlane_state;
-struct _fastlane_state
+class fastlane_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fastlane_state(machine)); }
+
+	fastlane_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *    videoram1;
 	UINT8 *    videoram2;

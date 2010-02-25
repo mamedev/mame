@@ -1,6 +1,10 @@
-typedef struct _toypop_state toypop_state;
-struct _toypop_state
+class toypop_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, toypop_state(machine)); }
+
+	toypop_state(running_machine &machine) { }
+	
 	UINT8 *videoram;
 	UINT8 *spriteram;
 	UINT16 *bg_image;

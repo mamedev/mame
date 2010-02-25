@@ -6,9 +6,13 @@
 
 #include "machine/atarigen.h"
 
-typedef struct _shuuz_state shuuz_state;
-struct _shuuz_state
+class shuuz_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, shuuz_state(machine)); }
+
+	shuuz_state(running_machine &machine) { }
+	
 	atarigen_state	atarigen;
 };
 

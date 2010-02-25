@@ -1,7 +1,11 @@
 
-typedef struct _xmen_state xmen_state;
-struct _xmen_state
+class xmen_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, xmen_state(machine)); }
+
+	xmen_state(running_machine &machine) { }
+	
 	/* memory pointers */
 //  UINT16 *   paletteram;    // currently this uses generic palette handling
 

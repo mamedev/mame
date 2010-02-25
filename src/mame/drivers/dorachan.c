@@ -16,9 +16,13 @@ Todo:
 #define NUM_PENS	(8)
 
 
-typedef struct _dorachan_state dorachan_state;
-struct _dorachan_state
+class dorachan_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dorachan_state(machine)); }
+
+	dorachan_state(running_machine &machine) { }
+	
 	/* memory pointers */
 	UINT8 *  videoram;
 	size_t   videoram_size;
