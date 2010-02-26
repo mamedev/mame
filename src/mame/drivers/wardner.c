@@ -18,6 +18,9 @@ Notes:
           except for the Main CPU which is a Z80 here.
         See twincobr.c machine and video drivers to complete the
           hardware setup.
+        To enter the "test mode", press START1 when the grid is displayed.
+        Press F1 (initially P1 button 3) on startup to skip some video RAM tests
+        (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
 Z80:(0)  Main CPU
@@ -287,7 +290,7 @@ static INPUT_PORTS_START( wardner_generic )
 	PORT_START("P2")
 	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
 
-	PORT_START("SYSTEM")	/* test button doesnt seem to do anything ? */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* "TEST" in "test mode" - no effect outside */

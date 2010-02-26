@@ -26,6 +26,7 @@ Supported games:
     Comad game number:      ???
         GulfWar II (Game play very similar to Twin cobra)
 
+
 Difference between Twin Cobra and Kyukyoko Tiger:
     T.C. supports two simultaneous players.
     K.T. supports two players, but only one at a time.
@@ -45,6 +46,75 @@ Difference between Twin Cobra and Kyukyoko Tiger:
          back further when your next hero appears.
     K.T. Due to this difference in continue sequence, Kyukyoko Tiger is MUCH
          harder, challenging, and nearly impossible to complete !
+
+
+Stephh's notes (based on the games M68000 and Z80 code and some tests) :
+
+1) 'twincobr' and "clones"
+
+  - There is no real "test mode" : only a grid with colors ("Cross Hatch Pattern")
+    is displayed. There is a specific "Show Dip Switches Settings".
+
+1a) 'twincobr'
+
+  - No notice screen.
+  - Game uses TOAPLAN_COINAGE_WORLD (code at 0x0bfd in CPU1).
+  - Press any players buttons on startup to skip some tests (code at 0x025ed8).
+
+1b) 'twincobru'
+
+  - "FOR USE IN U.S.A. ONLY" notice screen.
+  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1).
+  - Press any players buttons on startup to skip some tests (code at 0x025ed6).
+
+1c) 'ktiger'
+
+  - "FOR USE IN JAPAN ONLY" notice screen.
+  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1 - same as in 'twincobru').
+  - Press any players buttons on startup to skip some tests (code at 0x0259d0).
+  - "Bonus Lives" settings are different than the ones in the other sets.
+  - See other differences with 'twincobr' and 'twincobru' above.
+
+1d) 'gulfwar2'
+
+  - No notice screen.
+  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1 - same as in 'twincobru').
+    Surprisingly, when Dip Switches are displayed, it shows TOAPLAN_COINAGE_WORLD.
+  - Press any players buttons on startup to skip some tests (code at 0x025ed8).
+  - VBLANK bit is inverted (ACTIVE_LOW instead of ACTIVE_HIGH).
+
+
+2) 'fshark' and "clones"
+
+  - There is no real "test mode" : only a grid with colors ("Cross Hatch Pattern")
+    is displayed. There is a specific "Show Dip Switches Settings".
+
+2a) 'fshark'
+
+  - No notice screen.
+  - Game uses TOAPLAN_COINAGE_WORLD.
+  - When cabinet set to "Upright", you can use joystick and buttons from both players
+    (code at 0x002434).
+
+2b) 'skyshark'
+
+  - "FOR USE IN U.S.A. ONLY" notice screen.
+  - Game uses a specific coinage.
+  - When cabinet set to "Upright", you can use joystick and buttons from both players
+    (code at 0x002436).
+
+2c) 'hishouza'
+
+  - "FOR USE IN JAPAN ONLY" notice screen.
+  - Game uses TOAPLAN_COINAGE_JAPAN_OLD.
+  - When cabinet set to "Upright", you can use joystick and buttons from both players
+    (code at 0x002456).
+
+2d) 'fsharkbt'
+
+  - This bootleg is heavily based on 'skyshark', so they share the same infos.
+    However, the values written to the DSP (0x030004) are the same as in 'hishouza'
+    and the chars ROMS (gfx1) are the same as in 'fshark' !
 
 **************************** Memory & I/O Maps *****************************
 68000: Main CPU
@@ -191,6 +261,7 @@ Shark   Zame
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
+#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
 #include "sound/3812intf.h"
 
@@ -268,379 +339,156 @@ ADDRESS_MAP_END
     Input Port definitions
 *****************************************************************************/
 
-#define  TOAPLAN_PLAYER_INPUT( player )										 \
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player)					 \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player)					 \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )							 \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-#define  TOAPLAN_JAPAN_DSW_A							\
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		\
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )		\
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )		\
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )	\
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )			\
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )			\
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )	\
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )			\
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )			\
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	\
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )			\
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )			\
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )		\
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )		\
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )		\
-	PORT_DIPSETTING(	0x30, DEF_STR( 2C_3C ) )		\
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )		\
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )		\
-	PORT_DIPSETTING(	0x80, DEF_STR( 2C_1C ) )		\
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )		\
-	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_3C ) )		\
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
-
-#define  TWINCOBR_VBLANK_INPUT( active_level )		\
-	PORT_BIT( 0x7f, active_level, IPT_UNKNOWN )		\
-	PORT_BIT( 0x80, active_level, IPT_VBLANK )
-
-#define  TWINCOBR_SYSTEM_INPUTS							\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )			\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )			\
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )	\
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )			\
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )			\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )			\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )			\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )		\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )		\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-#define TWINCOBR_DSW_B		/* not KTIGER */			\
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	\
-	PORT_DIPSETTING(	0x01, DEF_STR( Easy ) )					\
-	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )				\
-	PORT_DIPSETTING(	0x02, DEF_STR( Hard ) )					\
-	PORT_DIPSETTING(	0x03, DEF_STR( Hardest ) )				\
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	\
-	PORT_DIPSETTING(	0x00, "50K, then every 150K" )	\
-	PORT_DIPSETTING(	0x04, "70K, then every 200K" )	\
-	PORT_DIPSETTING(	0x08, "50000" )					\
-	PORT_DIPSETTING(	0x0c, "100000" )				\
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		\
-	PORT_DIPSETTING(	0x30, "2" )						\
-	PORT_DIPSETTING(	0x00, "3" )						\
-	PORT_DIPSETTING(	0x20, "4" )						\
-	PORT_DIPSETTING(	0x10, "5" )						\
-	PORT_DIPNAME( 0x40, 0x00, "Show DIP SW Settings" )	\
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )			\
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )			\
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )		\
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )			\
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
-
-#define  FSHARK_SYSTEM_INPUTS		/* V-Blank is also here */				 \
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )								 \
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )		/* tilt causes freeze */ \
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )	/* reset button */		 \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )								 \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )								 \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )							 \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )							 \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
-
-#define FSHARK_DSW_B									\
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	\
-	PORT_DIPSETTING(	0x01, DEF_STR( Easy ) )					\
-	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )				\
-	PORT_DIPSETTING(	0x02, DEF_STR( Hard ) )					\
-	PORT_DIPSETTING(	0x03, DEF_STR( Hardest ) )				\
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	\
-	PORT_DIPSETTING(	0x00, "50K, then every 150K" )	\
-	PORT_DIPSETTING(	0x04, "70K, then every 200K" )	\
-	PORT_DIPSETTING(	0x08, "50000" )					\
-	PORT_DIPSETTING(	0x0c, "100000" )				\
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		\
-	PORT_DIPSETTING(	0x20, "1" )						\
-	PORT_DIPSETTING(	0x30, "2" )						\
-	PORT_DIPSETTING(	0x00, "3" )						\
-	PORT_DIPSETTING(	0x10, "5" )						\
-	PORT_DIPNAME( 0x40, 0x00, "Show DIP SW Settings" )	\
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )			\
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )			\
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )		\
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )			\
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
-
-
-
-
+/* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( twincobr )
-	PORT_START("VBLANK")
-	TWINCOBR_VBLANK_INPUT( IP_ACTIVE_HIGH )
-
-	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
-
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_6C ) )
+	TOAPLAN_MACHINE_NO_COCKTAIL
+	TOAPLAN_COINAGE_WORLD                                   /* tables at 0x0c30 (COIN1) and 0x0c38 (COIN2) in CPU1 */
 
 	PORT_START("DSWB")
-	TWINCOBR_DSW_B
-
-	PORT_START("SYSTEM")
-	TWINCOBR_SYSTEM_INPUTS
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( twincobu )
-	PORT_START("VBLANK")
-	TWINCOBR_VBLANK_INPUT( IP_ACTIVE_HIGH )
-
-	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
-
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
-
-	PORT_START("DSWB")
-	TWINCOBR_DSW_B
-
-	PORT_START("SYSTEM")
-	TWINCOBR_SYSTEM_INPUTS
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ktiger )
-	PORT_START("VBLANK")
-	TWINCOBR_VBLANK_INPUT( IP_ACTIVE_HIGH )
-
-	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
-
-	PORT_START("DSWA")
-	TOAPLAN_JAPAN_DSW_A
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x00, "70K, then every 200K" )
-	PORT_DIPSETTING(	0x04, "50K, then every 150K" )
-	PORT_DIPSETTING(	0x08, "100000" )
-	PORT_DIPSETTING(	0x0c, "No Extend" )
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x020988 ('twincobr' and 'twincobru') */
+	PORT_DIPSETTING(	0x00, "50k 200k 150k+" )
+	PORT_DIPSETTING(	0x04, "70k 270k 200k+" )
+	PORT_DIPSETTING(	0x08, "50k Only" )
+	PORT_DIPSETTING(	0x0c, "100k Only" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x30, "2" )
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x20, "4" )
 	PORT_DIPSETTING(	0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show DIP SW Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
+
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* reset button */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("VBLANK")
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+INPUT_PORTS_END
+
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( twincobru )
+	PORT_INCLUDE( twincobr )
+
+	PORT_MODIFY("DSWA")
+	TOAPLAN_COINAGE_JAPAN_OLD                               /* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
+INPUT_PORTS_END
+
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( ktiger )
+	PORT_INCLUDE( twincobru )
+
+	PORT_MODIFY("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x0208d0 */
+	PORT_DIPSETTING(	0x04, "50k 200k 150k+" )
+	PORT_DIPSETTING(	0x00, "70k 270k 200k+" )
+	PORT_DIPSETTING(	0x08, "100k Only" )
+	PORT_DIPSETTING(	0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )   /* additional code at 0x020b3c */
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( gulfwar2 )
+	PORT_INCLUDE( twincobru )
+
+	PORT_MODIFY("VBLANK")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+INPUT_PORTS_END
+
+
+/* verified from M68000 code */
+static INPUT_PORTS_START( fshark )
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_WORLD                                   /* tables at 0x00031c (COIN1) and 0x00032c (COIN2) */
+
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000b96 (fshark), 0x000b80 (skyshark) or 0x000b7e (hishouza) */
+	PORT_DIPSETTING(	0x00, "50k 200k 150k+" )
+	PORT_DIPSETTING(	0x04, "70k 270k 200k+" )
+	PORT_DIPSETTING(	0x08, "50k Only" )
+	PORT_DIPSETTING(	0x0c, "100k Only" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(	0x20, "1" )
+	PORT_DIPSETTING(	0x30, "2" )
+	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(	0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 
-	PORT_START("SYSTEM")
-	TWINCOBR_SYSTEM_INPUTS
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( fshark )
-	PORT_START("VBLANK")
-	FSHARK_SYSTEM_INPUTS
-
 	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
 
 	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
 
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_6C ) )
-
-	PORT_START("DSWB")
-	FSHARK_DSW_B
-
-	PORT_START("SYSTEM")
+	PORT_START("SYSTEM")      /* Port name kept to fit other games in the driver - it doesn't even exist */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("VBLANK")      /* Port name kept to fit other games in the driver - it shall be "SYSTEM" */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* reset button */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
+/* verified from M68000 code */
 static INPUT_PORTS_START( skyshark )
-	PORT_START("VBLANK")
-	FSHARK_SYSTEM_INPUTS
+	PORT_INCLUDE( fshark )
 
-	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
-
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )           /* table at 0x000316 */
 	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-/*  PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )    Same as previous */
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+//	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )            /* duplicated setting */
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )           /* table at 0x000316 */
 	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
-/*  PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )    Same as previous */
-
-	PORT_START("DSWB")
-	FSHARK_DSW_B
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+//	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )            /* duplicated setting */
 INPUT_PORTS_END
 
+/* verified from M68000 code */
 static INPUT_PORTS_START( hishouza )
-	PORT_START("VBLANK")
-	FSHARK_SYSTEM_INPUTS
+	PORT_INCLUDE( fshark )
 
-	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
-
-	PORT_START("DSWA")
-	TOAPLAN_JAPAN_DSW_A
-
-	PORT_START("DSWB")
-	FSHARK_DSW_B
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("DSWA")
+	TOAPLAN_COINAGE_JAPAN_OLD                               /* table at 0x000316 (COIN1 AND COIN2) */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gulfwar2 )
-	PORT_START("VBLANK")
-	TWINCOBR_VBLANK_INPUT( IP_ACTIVE_LOW )
-
-	PORT_START("P1")
-	TOAPLAN_PLAYER_INPUT( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_PLAYER_INPUT( 2 )
-
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Cross Hatch Pattern" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_6C ) )
-
-	PORT_START("DSWB")
-	TWINCOBR_DSW_B
-
-	PORT_START("SYSTEM")
-	TWINCOBR_SYSTEM_INPUTS
-INPUT_PORTS_END
 
 
 
@@ -893,6 +741,56 @@ ROM_START( ktiger )
 	ROM_LOAD( "82s123.b24",	0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )	/* tile to sprite priority ?? */
 ROM_END
 
+ROM_START( gulfwar2 )
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main 68K code */
+	ROM_LOAD16_BYTE( "08-u119.bin", 0x00000, 0x20000, CRC(41ebf9c0) SHA1(85207dda76abded727ed95717024a2ea2bd85dac) )
+	ROM_LOAD16_BYTE( "07-u92.bin",  0x00001, 0x20000, CRC(b73e6b25) SHA1(53cde41e5a2e8f721c3f43abf1fff46479f658d8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_LOAD( "06-u51.bin", 0x00000, 0x08000, CRC(75504f95) SHA1(5bd23e700e1bd4f0fac622dfb7c8cc69ba764956) )
+
+	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
+	/* ROMs are duplicated 4 times */
+	ROM_LOAD16_BYTE( "01-u2.rom", 0x000, 0x800, CRC(01399b65) SHA1(4867ec815e22c9124c7aa00ebb6089c2611fa31f) ) // Same code as Twin Cobra
+	ROM_CONTINUE(                 0x000, 0x800 )
+	ROM_CONTINUE(                 0x000, 0x800 )
+	ROM_CONTINUE(                 0x000, 0x800 )
+	ROM_LOAD16_BYTE( "02-u1.rom", 0x001, 0x800, CRC(abefe4ca) SHA1(f05f12a1ff19411f34f4eee98ce9ba450fec38f2) ) // Same code as Twin Cobra
+	ROM_CONTINUE(                 0x001, 0x800 )
+	ROM_CONTINUE(                 0x001, 0x800 )
+	ROM_CONTINUE(                 0x001, 0x800 )
+
+	ROM_REGION( 0x0c000, "gfx1", 0 )	/* chars */
+	ROM_LOAD( "03-u9.bin",	0x00000, 0x04000, CRC(1b7934b3) SHA1(c7f5ac364dec4c7843c30e098fd02e0901bdf4b7) )
+	ROM_LOAD( "04-u10.bin", 0x04000, 0x04000, CRC(6f7bfb58) SHA1(4c5602668938a52321b70cd971326fe1a4930889) )
+	ROM_LOAD( "05-u11.bin", 0x08000, 0x04000, CRC(31814724) SHA1(bdcf270e6219555a7f776167f6bf971c6ff18a83) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* fg tiles */
+	ROM_LOAD( "16-u202.bin", 0x00000, 0x10000, CRC(d815d175) SHA1(917043d0731226d18bcc22dfe27e5a5a18b03c06) )
+	ROM_LOAD( "13-u199.bin", 0x10000, 0x10000, CRC(d949b0d9) SHA1(1974d3b54e082baa9084dd619c8a879d954644cd) )
+	ROM_LOAD( "14-u200.bin", 0x20000, 0x10000, CRC(c109a6ac) SHA1(3a13ec802e5bafcf599c273a0bb0fd078e01e171) )
+	ROM_LOAD( "15-u201.bin", 0x30000, 0x10000, CRC(ad21f2ab) SHA1(0ab6eeb4dc9c2531c6f19479e7f9bc54fc1c1fdf) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )	/* bg tiles */
+	ROM_LOAD( "09-u195.bin", 0x00000, 0x08000, CRC(b7be3a6d) SHA1(68b9223fd07e81d443a1ae3ff04b2af105b27548) )
+	ROM_LOAD( "12-u198.bin", 0x08000, 0x08000, CRC(fd7032a6) SHA1(8be6315d732b154163a3573e2017fdfc77c92e54) )
+	ROM_LOAD( "11-u197.bin", 0x10000, 0x08000, CRC(7b721ed3) SHA1(afd10229414c65a56e184d56a69460ca3a502a27) )
+	ROM_LOAD( "10-u196.rom", 0x18000, 0x08000, CRC(160f38ab) SHA1(da310ec387d439b26c8b6b881e5dcc07c2b9bb00) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* sprites */
+	ROM_LOAD( "20-u262.bin", 0x00000, 0x10000, CRC(10665ca0) SHA1(0c552c3807e00a7ef4f9fd28c7988a232628a1f5) )
+	ROM_LOAD( "19-u261.bin", 0x10000, 0x10000, CRC(cfa6d417) SHA1(f6c17d938b58dc5756ecf617f00fbfaf701602a7) )
+	ROM_LOAD( "18-u260.bin", 0x20000, 0x10000, CRC(2e6a0c49) SHA1(0b7ddad8775dcebe240a8246ef7816113f517f87) )
+	ROM_LOAD( "17-u259.bin", 0x30000, 0x10000, CRC(66c1b0e6) SHA1(82f3659245913f835c4434131c179b49ee195961) )
+
+	ROM_REGION( 0x260, "proms", 0 )
+	ROM_LOAD( "82s129.d3",	0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )	/* sprite priority control ?? */
+	ROM_LOAD( "82s129.d4",	0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )	/* sprite priority control ?? */
+	ROM_LOAD( "82s123.d2",	0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )	/* sprite control ?? */
+	ROM_LOAD( "82s123.e18",	0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "82s123.b24",	0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )	/* tile to sprite priority ?? */
+ROM_END
+
 ROM_START( fshark )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b02_18-1.m8", 0x00000, 0x10000, CRC(04739e02) SHA1(8a14284adb0f0f33adf9affdec081c90de85d594) )
@@ -1049,16 +947,18 @@ ROM_START( fsharkbt )
 	ROM_LOAD( "b02_16.l5", 0x0000, 0x8000, CRC(cdd1a153) SHA1(de9827a959039cf753ecac6756fb1925c37466d8) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
-	ROMX_LOAD( "82s137-1.mcu",  0x0000, 0x0400, CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-2.mcu",  0x0000, 0x0400, CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-3.mcu",  0x0001, 0x0400, CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-4.mcu",  0x0001, 0x0400, CRC(6edb2de8) SHA1(48459037c3b865f0c0d63a416fa71ba1119f7a09), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-5.mcu",  0x0800, 0x0400, CRC(f35b978a) SHA1(90da4ab12126727cd9510fdfe4f626452116c543), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-6.mcu",  0x0800, 0x0400, CRC(0459e51b) SHA1(b673f5e1fcf60c0ba668aeb98d545d17b988945d), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-7.mcu",  0x0801, 0x0400, CRC(cbf3184b) SHA1(a3eafadc319183ed688dc081c4dfcbe8d476abea), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
-	ROMX_LOAD( "82s137-8.mcu",  0x0801, 0x0400, CRC(8246a05c) SHA1(2511fa99fbdd6c75281fa85ecca2a617d36eb360), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	/* DSP ROMS from 'hishouza' */
+	ROMX_LOAD( "dsp-a1.bpr", 0x0000, 0x0400, CRC(45d4d1b1) SHA1(e776a056f0f72cbeb309c5a23f803330cb8b3763), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-a2.bpr", 0x0000, 0x0400, CRC(edd227fa) SHA1(34aba84b5216ecbe462e7166d0f66785ca049a34), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-a3.bpr", 0x0001, 0x0400, CRC(df88e79b) SHA1(661b057fa2eef37b9d794151381d7d74a7bfa93a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-a4.bpr", 0x0001, 0x0400, CRC(a2094a7f) SHA1(0f1c173643046c76aa89eab66fba6ea51c3f2223), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-b5.bpr", 0x0800, 0x0400, CRC(85ca5d47) SHA1(3c6e21e2897fd35834021ec9f81f57bebfd13ef8), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-b6.bpr", 0x0800, 0x0400, CRC(81816b2c) SHA1(1e58ab7aef2a34f42267debf4cad9558d5e14159), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-b7.bpr", 0x0801, 0x0400, CRC(e87540cd) SHA1(bb6e98c47ed46abbbfa06571806cb2d663880419), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "dsp-b8.bpr", 0x0801, 0x0400, CRC(d3c16c5c) SHA1(a24d9536914734c1875c8a39938a346ff4418dd0), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )	/* chars */
+	/* GFX ROMS from 'fshark' - shouldn't they be the ones from 'skyshark' ? */
 	ROM_LOAD( "b02_07-1.h11", 0x00000, 0x04000, CRC(e669f80e) SHA1(05c1a4ff9adaa6c8035f38a76c5ee333fafba2bf) )
 	ROM_LOAD( "b02_06-1.h10", 0x04000, 0x04000, CRC(5e53ae47) SHA1(55bde4133deebb59a87d9b96c6d0fd7b4bbc0e02) )
 	ROM_LOAD( "b02_05-1.h8",  0x08000, 0x04000, CRC(a8b05bd0) SHA1(37317838ea57cb98cf9599cedf8e72bcae913d29) )
@@ -1089,56 +989,6 @@ ROM_START( fsharkbt )
 	ROM_LOAD( "b02-23.f28", 0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) ) /* bprom type: 82s123AN - tile to sprite priority ?? */
 ROM_END
 
-ROM_START( gulfwar2 )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main 68K code */
-	ROM_LOAD16_BYTE( "08-u119.bin", 0x00000, 0x20000, CRC(41ebf9c0) SHA1(85207dda76abded727ed95717024a2ea2bd85dac) )
-	ROM_LOAD16_BYTE( "07-u92.bin",  0x00001, 0x20000, CRC(b73e6b25) SHA1(53cde41e5a2e8f721c3f43abf1fff46479f658d8) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
-	ROM_LOAD( "06-u51.bin", 0x00000, 0x08000, CRC(75504f95) SHA1(5bd23e700e1bd4f0fac622dfb7c8cc69ba764956) )
-
-	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
-	/* ROMs are duplicated 4 times */
-	ROM_LOAD16_BYTE( "01-u2.rom", 0x000, 0x800, CRC(01399b65) SHA1(4867ec815e22c9124c7aa00ebb6089c2611fa31f) ) // Same code as Twin Cobra
-	ROM_CONTINUE(                 0x000, 0x800 )
-	ROM_CONTINUE(                 0x000, 0x800 )
-	ROM_CONTINUE(                 0x000, 0x800 )
-	ROM_LOAD16_BYTE( "02-u1.rom", 0x001, 0x800, CRC(abefe4ca) SHA1(f05f12a1ff19411f34f4eee98ce9ba450fec38f2) ) // Same code as Twin Cobra
-	ROM_CONTINUE(                 0x001, 0x800 )
-	ROM_CONTINUE(                 0x001, 0x800 )
-	ROM_CONTINUE(                 0x001, 0x800 )
-
-	ROM_REGION( 0x0c000, "gfx1", 0 )	/* chars */
-	ROM_LOAD( "03-u9.bin",	0x00000, 0x04000, CRC(1b7934b3) SHA1(c7f5ac364dec4c7843c30e098fd02e0901bdf4b7) )
-	ROM_LOAD( "04-u10.bin", 0x04000, 0x04000, CRC(6f7bfb58) SHA1(4c5602668938a52321b70cd971326fe1a4930889) )
-	ROM_LOAD( "05-u11.bin", 0x08000, 0x04000, CRC(31814724) SHA1(bdcf270e6219555a7f776167f6bf971c6ff18a83) )
-
-	ROM_REGION( 0x40000, "gfx2", 0 )	/* fg tiles */
-	ROM_LOAD( "16-u202.bin", 0x00000, 0x10000, CRC(d815d175) SHA1(917043d0731226d18bcc22dfe27e5a5a18b03c06) )
-	ROM_LOAD( "13-u199.bin", 0x10000, 0x10000, CRC(d949b0d9) SHA1(1974d3b54e082baa9084dd619c8a879d954644cd) )
-	ROM_LOAD( "14-u200.bin", 0x20000, 0x10000, CRC(c109a6ac) SHA1(3a13ec802e5bafcf599c273a0bb0fd078e01e171) )
-	ROM_LOAD( "15-u201.bin", 0x30000, 0x10000, CRC(ad21f2ab) SHA1(0ab6eeb4dc9c2531c6f19479e7f9bc54fc1c1fdf) )
-
-	ROM_REGION( 0x20000, "gfx3", 0 )	/* bg tiles */
-	ROM_LOAD( "09-u195.bin", 0x00000, 0x08000, CRC(b7be3a6d) SHA1(68b9223fd07e81d443a1ae3ff04b2af105b27548) )
-	ROM_LOAD( "12-u198.bin", 0x08000, 0x08000, CRC(fd7032a6) SHA1(8be6315d732b154163a3573e2017fdfc77c92e54) )
-	ROM_LOAD( "11-u197.bin", 0x10000, 0x08000, CRC(7b721ed3) SHA1(afd10229414c65a56e184d56a69460ca3a502a27) )
-	ROM_LOAD( "10-u196.rom", 0x18000, 0x08000, CRC(160f38ab) SHA1(da310ec387d439b26c8b6b881e5dcc07c2b9bb00) )
-
-	ROM_REGION( 0x40000, "gfx4", 0 )	/* sprites */
-	ROM_LOAD( "20-u262.bin", 0x00000, 0x10000, CRC(10665ca0) SHA1(0c552c3807e00a7ef4f9fd28c7988a232628a1f5) )
-	ROM_LOAD( "19-u261.bin", 0x10000, 0x10000, CRC(cfa6d417) SHA1(f6c17d938b58dc5756ecf617f00fbfaf701602a7) )
-	ROM_LOAD( "18-u260.bin", 0x20000, 0x10000, CRC(2e6a0c49) SHA1(0b7ddad8775dcebe240a8246ef7816113f517f87) )
-	ROM_LOAD( "17-u259.bin", 0x30000, 0x10000, CRC(66c1b0e6) SHA1(82f3659245913f835c4434131c179b49ee195961) )
-
-	ROM_REGION( 0x260, "proms", 0 )
-	ROM_LOAD( "82s129.d3",	0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )	/* sprite priority control ?? */
-	ROM_LOAD( "82s129.d4",	0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )	/* sprite priority control ?? */
-	ROM_LOAD( "82s123.d2",	0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )	/* sprite control ?? */
-	ROM_LOAD( "82s123.e18",	0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "82s123.b24",	0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )	/* tile to sprite priority ?? */
-ROM_END
-
 
 static DRIVER_INIT( twincobr )
 {
@@ -1146,11 +996,12 @@ static DRIVER_INIT( twincobr )
 }
 
 
-GAME( 1987, twincobr, 0,        twincobr, twincobr, twincobr, ROT270, "[Toaplan] Taito Corporation", "Twin Cobra (World)", 0 )
-GAME( 1987, twincobru,twincobr, twincobr, twincobu, twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Twin Cobra (US)", 0 )
-GAME( 1987, ktiger,   twincobr, twincobr, ktiger,   twincobr, ROT270, "[Toaplan] Taito Corporation", "Kyukyoku Tiger (Japan)", 0 )
-GAME( 1987, fshark,   0,        twincobr, fshark,   twincobr, ROT270, "[Toaplan] Taito Corporation", "Flying Shark (World)", 0 )
-GAME( 1987, skyshark, fshark,   twincobr, skyshark, twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Sky Shark (US)", 0 )
-GAME( 1987, hishouza, fshark,   twincobr, hishouza, twincobr, ROT270, "[Toaplan] Taito Corporation", "Hishou Zame (Japan)", 0 )
-GAME( 1987, fsharkbt, fshark,   twincobr, skyshark, twincobr, ROT270, "bootleg", "Flying Shark (bootleg)", 0 )
-GAME( 1991, gulfwar2, 0,        twincobr, gulfwar2, twincobr, ROT270, "Comad", "Gulf War II", 0 )
+GAME( 1987, twincobr,  0,        twincobr, twincobr,  twincobr, ROT270, "[Toaplan] Taito Corporation", "Twin Cobra (World)", 0 )
+GAME( 1987, twincobru, twincobr, twincobr, twincobru, twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Twin Cobra (US)", 0 )
+GAME( 1987, ktiger,    twincobr, twincobr, ktiger,    twincobr, ROT270, "[Toaplan] Taito Corporation", "Kyukyoku Tiger (Japan)", 0 )
+GAME( 1991, gulfwar2,  0,        twincobr, gulfwar2,  twincobr, ROT270, "Comad", "Gulf War II", 0 )
+
+GAME( 1987, fshark,    0,        twincobr, fshark,    twincobr, ROT270, "[Toaplan] Taito Corporation", "Flying Shark (World)", 0 )
+GAME( 1987, skyshark,  fshark,   twincobr, skyshark,  twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Sky Shark (US)", 0 )
+GAME( 1987, hishouza,  fshark,   twincobr, hishouza,  twincobr, ROT270, "[Toaplan] Taito Corporation", "Hishou Zame (Japan)", 0 )
+GAME( 1987, fsharkbt,  fshark,   twincobr, skyshark,  twincobr, ROT270, "bootleg", "Flying Shark (bootleg)", 0 )
