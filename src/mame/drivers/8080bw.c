@@ -183,6 +183,51 @@ INPUT_PORTS_END
 
 /*******************************************************/
 /*                                                     */
+/* Alien Invasion                                      */
+/*                                                     */
+/*******************************************************/
+
+static INPUT_PORTS_START( alieninv )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )		PORT_DIPLOCATION("SW1:3") /* Pence Coin */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )	/* Not bonus */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)			PORT_DIPLOCATION("SW1:5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )					PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "2C/1C 50p/3C (+ Bonus Life)" )
+	PORT_DIPSETTING(    0x80, "1C/1C 50p/5C" )
+
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
+INPUT_PORTS_END
+
+/*******************************************************/
+/*                                                     */
 /* Space Invaders Model Racing                         */
 /*                                                     */
 /*******************************************************/
@@ -2038,13 +2083,21 @@ ROM_END
 
 ROM_START( tst_invd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "test.h",   0x0000, 0x0800, CRC(f86a2eea) SHA1(4a72ff01f3e6d16bbe9bf7f123cd98895bfbed9a) )   /*  The Test ROM */
+	ROM_LOAD( "test.h",       0x0000, 0x0800, CRC(f86a2eea) SHA1(4a72ff01f3e6d16bbe9bf7f123cd98895bfbed9a) )   /*  The Test ROM */
 	ROM_LOAD( "invaders.g",   0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
 	ROM_LOAD( "invaders.f",   0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
 	ROM_LOAD( "invaders.e",   0x1800, 0x0800, CRC(14e538b0) SHA1(1d6ca0c99f9df71e2990b610deb9d7da0125e2d8) )
 ROM_END
 
 ROM_START( alieninv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "alieninv.h",   0x0000, 0x0800, CRC(6ad601c3) SHA1(9fc88698f98ce43992a5044d28d3e19751f82772) )
+	ROM_LOAD( "alieninv.g",   0x0800, 0x0800, CRC(c6bb6fb3) SHA1(01a12163309f967dcffce19890b1e0d079021fc2) )
+	ROM_LOAD( "alieninv.f",   0x1000, 0x0800, CRC(1d2ff324) SHA1(209766a981fdd3a68e36da3d8122a244c883cae7) )
+	ROM_LOAD( "alieninv.e",   0x1800, 0x0800, CRC(2f2e6791) SHA1(08a1f17bcfec598182386f1c43e4fc7b476212de) )
+ROM_END
+
+ROM_START( alieninvp2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1h.bin",       0x0000, 0x0800, CRC(c46df7f4) SHA1(eec34b3d5585bae03c7b80585daaa05ddfcc2164) )
 	ROM_LOAD( "1g.bin",       0x0800, 0x0800, CRC(4b1112d6) SHA1(b693667656e5d8f44eeb2ea730f4d4db436da579) )
@@ -2882,7 +2935,8 @@ GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microse
 GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, alieninv, invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, alieninv, invaders, invaders, alieninv, 0, ROT270, "Margomatics", "Alien Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, alieninvp2,invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders )
 GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
