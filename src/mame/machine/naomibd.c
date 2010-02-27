@@ -196,6 +196,7 @@ struct _naomibd_config_table
 {
 	const char *name;
 	int reverse_bytes;
+	int live_key;
 	UINT32	transtbl[MAX_PROT_REGIONS*3];
 };
 
@@ -219,6 +220,12 @@ struct _naomibd_state
 
 	const UINT32			*prot_translate;
 	int				prot_reverse_bytes;
+
+	// live decrypt vars
+	UINT32				dc_gamekey, dc_seqkey, dc_seed;
+	UINT8				dc_cart_ram[128*1024];	// internal cartridge RAM
+	INT32				dc_m3_ptr, dc_is_m3, dc_m2_ptr, dc_readback;
+
 	#if NAOMIBD_PRINTF_PROTECTION
 	int				prot_pio_count;
 	#endif
@@ -229,66 +236,51 @@ struct _naomibd_state
 // if key is not -1, it's used for the match instead of the address written.
 static const naomibd_config_table naomibd_translate_tbl[] =
 {
-	{ "doa2", 0, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
+	// capsnk/capsnka use a game key of 0.  Seriously.
+	{ "capsnk", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "capsnka", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "wwfroyal",0, 0x627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "crzytaxi", 0, 0xd2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "jambo",    0, 0xfab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "csmash", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "csmasho", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "suchie3", 0, 0x368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+
+	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+//	{ "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 	// uses compression
+	{ "dybb99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "zombrvn", 0, 0x12b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+
+	{ "doa2", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,	// 0x8ad01, has compression
 		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x118a3a, 0x120000,
 		    -1, 0x12c0d8, 0x140000, -1, 0x147e22, 0x160000, -1, 0x1645ce, 0x180000, -1, 0x17c6b2, 0x1a0000,
 		    -1, 0x19902e, 0x1c0000, -1, 0x1b562a, 0x1e0000, -1, 0xffffffff, 0xffffffff } },
-	{ "doa2m", 0, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
+	{ "doa2m", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
 		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x11a5b4, 0x120000,
 		    -1, 0x12e7c4, 0x140000, -1, 0x1471f6, 0x160000, -1, 0x1640c4, 0x180000, -1, 0x1806ca, 0x1a0000,
 		    -1, 0x199df4, 0x1c0000, -1, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
-	{ "csmash", 1, { -1, 0x2000000, 0xbb614, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "csmasho", 1, { -1, 0x2000000, 0xbb5b4, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "capsnk", 0, { 0x8c2a, 0, 0, 0x3d3e, 0, 0x10000, 0x65b7, 0, 0x20000, 0x5896, 0, 0x30000, 0x16d2, 0, 0x40000,
-			0x9147, 0, 0x50000, 0x7ac, 0, 0x60000, 0xee67, 0, 0x70000, 0xeb63, 0, 0x80000, 0x2a04, 0, 0x90000,
-			0x3e41, 0, 0xa0000, 0xb7af, 0, 0xb0000, 0x9651, 0, 0xc0000, 0xd208, 0, 0xd0000, 0x4769, 0, 0xe0000,
-			0xad8c, 0, 0xf0000, 0x923d, 0, 0x100000, 0x4a65, 0, 0x110000, 0x9958, 0, 0x120000, 0x8216, 0, 0x130000,
-			0xaa91, 0, 0x140000, 0xd007, 0, 0x150000, 0xead, 0, 0x160000, 0x492, 0, 0x170000,
-			0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "capsnka", 0, { 0x8c2a, 0, 0, 0x3d3e, 0, 0x10000, 0x65b7, 0, 0x20000, 0x5896, 0, 0x30000, 0x16d2, 0, 0x40000,
-			0x9147, 0, 0x50000, 0x7ac, 0, 0x60000, 0xee67, 0, 0x70000, 0xeb63, 0, 0x80000, 0x2a04, 0, 0x90000,
-			0x3e41, 0, 0xa0000, 0xb7af, 0, 0xb0000, 0x9651, 0, 0xc0000, 0xd208, 0, 0xd0000, 0x4769, 0, 0xe0000,
-			0xad8c, 0, 0xf0000, 0x923d, 0, 0x100000, 0x4a65, 0, 0x110000, 0x9958, 0, 0x120000, 0x8216, 0, 0x130000,
-			0xaa91, 0, 0x140000, 0xd007, 0, 0x150000, 0xead, 0, 0x160000, 0x492, 0, 0x170000,
-			0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pjustic", 0, { 0x923d, 0, 0, 0x3e41, 0, 0x10000, 0xb7af, 0, 0x20000,
-			  0x9651, 0, 0x30000, 0xad8c, 0, 0x40000, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "hmgeo",   0, { 0x6cc8, 0, 0x000000, 0x7b92, 0, 0x010000, 0x69bc, 0, 0x020000,
-			  0x6d16, 0, 0x030000, 0x6134, 0, 0x040000, 0x1340, 0, 0x050000,
-			  0x7716, 0, 0x060000, 0x2e1a, 0, 0x070000, 0x3030, 0, 0x080000,
-			  0x0870, 0, 0x090000, 0x2856, 0, 0x0a0000, 0x4224, 0, 0x0b0000,
-			  0x6df0, 0, 0x0c0000, 0x0dd8, 0, 0x0d0000, 0x576c, 0, 0x0e0000,
-			  0x0534, 0, 0x0f0000, 0x0904, 0, 0x100000, 0x2f14, 0, 0x110000,
-			  0x1792, 0, 0x120000, 0x6866, 0, 0x130000, 0x06fa, 0, 0x140000,
-			  0x2842, 0, 0x150000, 0x7cc8, 0, 0x160000, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "wwfroyal",0, { 0xaaaa, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "gwing2",  0, { -1, 0x85ddc0, 0, 0xd567, 0, 0x10000, 0xe329, 0, 0x30000, 0xc112, 0, 0x50000,
+	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
+	{ "gwing2",  0, -1, { -1, 0x85ddc0, 0, 0xd567, 0, 0x10000, 0xe329, 0, 0x30000, 0xc112, 0, 0x50000,	// 0xb25d0, uses compression
 			  0xabcd, 0, 0x70000, 0xef01, 0, 0x90000, 0x1234, 0, 0xb0000, 0x5678, 0, 0xd0000,
 			  0x5555, 0, 0xf0000, 0x6666, 0, 0x110000, 0xa901, 0, 0x130000, 0xa802, 0, 0x150000,
 			  0x3232, 0, 0x170000, 0x8989, 0, 0x190000, 0x6655, 0, 0x1a0000,
 			  0x3944, 0, 0x1c0000, 0x655a, 0, 0x1d0000, 0xf513, 0, 0x1e0000,
 			  0xb957, 0, 0, 0x37ca, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pstone2", 0, { -2, 0x14db3f4,  0x000000, -2, 0xfbd0179d, 0x010000, -2, 0x9827117, 0x020000, -2, 0x69358f, 0x030000,
-			  -2, 0x193954e, 0x040000, -2, 0xba50eb, 0x050000, -2, 0x9f1523, 0x060000, -2, 0xcb7b03, 0x070000,
-			  -2, 0x8f712b, 0x080000, -2, 0x120f246, 0x090000, -2, 0xacc9fc, 0x0a0000, -2, 0x4eb319, 0x0b0000,
-			  -2, 0x19d0c41, 0x0c0000, -2, 0x1077853, 0x0d0000, -2, 0x100019d, 0x0e0000, -2, 0xfd91596b, 0x0f0000,
-			  -2, 0x63bae7, 0x100000, -2, 0x3e3685, 0x110000, -2, 0x6d08a9, 0x120000, -2, 0xfff85c5d, 0x130000,
-			  -2, 0x5263bf, 0x140000, -2, 0x396180, 0x150000, -2, 0x73af6c, 0x160000, -2, 0xfffa8a76, 0x170000,
-			  -2, 0xc2d9e0, 0x180000, -2, 0x33be72, 0x190000,
-			  0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "toyfight", 0,{ 0x0615, 0, 0x8f058, 0x1999, 0, 0x8ec58, 0x7510, 0, 0x8f458, 0x5736, 0, 0x8e858,
-		          0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "ggx",      0,{ -1, 0x200000, 0x100000, -1, 0x210004, 0x110000, -1, 0x220008, 0x120000, -1, 0x228000, 0x130000,
+	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
+	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "ggx",      0, -1, { -1, 0x200000, 0x100000, -1, 0x210004, 0x110000, -1, 0x220008, 0x120000, -1, 0x228000, 0x130000,	// 0x76110, uses compression
 		          0x3af9, 0, 0x000000, 0x2288, 0, 0x010000, 0xe5e6, 0, 0x020000, 0xebb0, 0, 0x030000,
 			  0x0228, 0, 0x040000, 0x872c, 0, 0x050000, 0xbba0, 0, 0x060000, 0x772f, 0, 0x070000,
 			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
 			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
 		          0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "crzytaxi", 0,{ 0x0219, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "jambo",    0,{ 0x0223, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "18wheelr", 0,{ 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "sgtetris", 0,{ 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "18wheelr", 0, -1, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x7cf54, uses compression
+	{ "sgtetris", 0, -1, { 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x8ae51, uses compression
 };
+
+// forward declaration for decrypt function
+static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UINT8* ciphertext, UINT8* plaintext, int length);
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -377,6 +369,9 @@ static void init_save_state(running_device *device)
 static void soft_reset(naomibd_state *v)
 {
 	v->prot_sum = 0;
+
+	v->dc_m3_ptr = 0;
+	v->dc_seqkey = 0;
 }
 
 
@@ -406,45 +401,77 @@ READ64_DEVICE_HANDLER( naomibd_r )
 
 		if (v->rom_offset_flags & NAOMIBD_FLAG_SPECIAL_MODE)
 		{
-			if (v->rom_offset == 0x1fffe)
+			// can we live-decrypt this game?
+			if (v->dc_gamekey != -1)
 			{
-				UINT8 *prot = (UINT8 *)v->protdata;
-				UINT32 byte_offset = v->prot_offset*2;
-
-				// this is a good time to clear the prot_sum
-				v->prot_sum = 0;
-
-				if (v->prot_translate == NULL)
+				if (v->dc_is_m3)
 				{
-					#if NAOMIBD_PRINTF_PROTECTION
-					v->prot_pio_count += 2;
-					printf("naomibd: reading protection data, but none was supplied (now %x bytes)\n", v->prot_pio_count);
-					#endif
-					return 0;
-				}
-
-				#if NAOMIBD_PRINTF_PROTECTION
-				v->prot_pio_count += 2;
-				printf("naomibd: PIO read count %x\n", v->prot_pio_count);
-				#endif
-
-				if (v->prot_reverse_bytes)
-				{
-					ret = (UINT64)(prot[byte_offset+1] | (prot[byte_offset]<<8));
+					ret = (UINT64)(v->dc_cart_ram[v->dc_readback+1] | (v->dc_cart_ram[v->dc_readback]<<8));
+					v->dc_readback += 2;
 				}
 				else
 				{
-					ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
-				}
+					UINT8 plain[2], crypt[2];
 
-				v->prot_offset++;
+					crypt[0] = ROM[(v->prot_offset*2)+v->dc_seed+1];
+					crypt[1] = ROM[(v->prot_offset*2)+v->dc_seed];
+
+					// decrypt		
+//					stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed>>1, &ROM[(v->prot_offset*2)+v->dc_seed], plain, 2);
+					stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed>>1, crypt, plain, 2);
+
+					ret = (UINT64)(plain[0] | (plain[1]<<8));
+
+					#if NAOMIBD_PRINTF_PROTECTION
+					printf("M2 decrypt: gamekey %x seqkey %x offset %x seed %x src %02x %02x = %02x %02x\n", v->dc_gamekey, v->dc_seqkey, v->prot_offset*2, v->dc_seed>>1, ROM[(v->prot_offset*2)+v->dc_seed], ROM[(v->prot_offset*2)+v->dc_seed+1], plain[0], plain[1]);
+					#endif
+
+					// bump readback pointer
+					v->dc_seed += 2;
+				}
 			}
-			#if NAOMIBD_PRINTF_PROTECTION
 			else
 			{
-				printf("Bad protection offset read %x\n", v->rom_offset);
+				if (v->rom_offset == 0x1fffe)
+				{
+					UINT8 *prot = (UINT8 *)v->protdata;
+					UINT32 byte_offset = v->prot_offset*2;
+
+					// this is a good time to clear the prot_sum
+					v->prot_sum = 0;
+
+					if (v->prot_translate == NULL)
+					{
+						#if NAOMIBD_PRINTF_PROTECTION
+						v->prot_pio_count += 2;
+						printf("naomibd: reading protection data, but none was supplied (now %x bytes)\n", v->prot_pio_count);
+						#endif
+						return 0;
+					}
+
+					#if NAOMIBD_PRINTF_PROTECTION
+					v->prot_pio_count += 2;
+					printf("naomibd: PIO read count %x\n", v->prot_pio_count);
+					#endif
+
+					if (v->prot_reverse_bytes)
+					{
+						ret = (UINT64)(prot[byte_offset+1] | (prot[byte_offset]<<8));
+					}
+					else
+					{
+						ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
+					}
+
+					v->prot_offset++;
+				}
+				#if NAOMIBD_PRINTF_PROTECTION
+				else
+				{
+					printf("Bad protection offset read %x\n", v->rom_offset);
+				}
+				#endif
 			}
-			#endif
 		}
 		else
 		{
@@ -461,7 +488,15 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	else if ((offset == 2) && ACCESSING_BITS_32_63)
 	{
 		//  Actel FPGA ID, used on some games for a "special" ROM test.
+		//
+		//  without this (by returning 0xffff) some games will do a rom test where
+		//  the IC numbers tested do not relate to the actual ROMs on the cart,
+		//  and a fake 'IC1' will be tested, which returns mirrored data from the
+		//  other roms in order to pass if enabled on the real hardware.
+		//  (certain bios / board combinations will also cause this, so it is
+		//   important that we mirror the data in the rom loading using ROM_COPY)
 
+		//return (UINT64)0xffff << 32;
 		return (UINT64)actel_id << 32;
 	}
 	else if ((offset == 7) && ACCESSING_BITS_32_47)
@@ -513,7 +548,6 @@ READ64_DEVICE_HANDLER( naomibd_r )
 WRITE64_DEVICE_HANDLER( naomibd_w )
 {
 	naomibd_state *v = get_safe_token(device);
-	INT32 i;
 
 	// AW board
 	if (v->type == AW_ROM_BOARD)
@@ -657,74 +691,115 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						v->prot_pio_count = 0;
 						#endif
 
-						// translate address if necessary
-						if (v->prot_translate != NULL)
+						// if dc_gamekey isn't -1, we can live-decrypt this one
+						if (v->dc_gamekey != -1)
 						{
-							i = 0;
-							while (v->prot_translate[i+1] != 0xffffffff)
+							v->dc_seed = 0;
+						        v->dc_is_m3 = 0;
+							v->dc_readback = 0;
+							v->dc_seqkey = v->prot_key;
+
+							if (v->prot_offset == 0x2000000/2)	// M3 readback, must decrypt now
 							{
-								// should we match by key, address, or sum?
-								if (v->prot_translate[i] == -2)	// match sum
+								UINT8 temp_ram[128*1024];
+
+								#if NAOMIBD_PRINTF_PROTECTION
+								printf("M3 decrypt: gamekey %x seqkey %x seed %x length %x\n", v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_m3_ptr);
+								#endif
+
+								// decrypt cart ram to temp buffer
+								stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_cart_ram, temp_ram, v->dc_m3_ptr);
+
+								#if NAOMIBD_PRINTF_PROTECTION
+								printf("result: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+									temp_ram[0], temp_ram[1], temp_ram[2], temp_ram[3],
+									temp_ram[4], temp_ram[5], temp_ram[6], temp_ram[7]);
+								#endif
+
+								// copy results to cart ram for readback
+								memcpy(v->dc_cart_ram, temp_ram, 128*1024);
+
+							        v->dc_is_m3 = 1;
+							}
+
+							v->dc_m3_ptr = 0;
+							v->prot_sum = 0;
+						}
+						else
+						{
+							// translate address if necessary
+							if (v->prot_translate != NULL)
+							{
+								int i = 0;
+								while (v->prot_translate[i+1] != 0xffffffff)
 								{
-									if (v->prot_translate[i+1] == v->prot_sum)
+									// should we match by key, address, or sum?
+									if (v->prot_translate[i] == -2)	// match sum
 									{
-										#if NAOMIBD_PRINTF_PROTECTION
-										printf("Protection: got sum %x, translated to %x\n", v->prot_sum, v->prot_translate[i+2]);
-										#endif
-										v->prot_offset = v->prot_translate[i+2]/2;
-										break;
+										if (v->prot_translate[i+1] == v->prot_sum)
+										{
+											#if NAOMIBD_PRINTF_PROTECTION
+											printf("Protection: got sum %x, translated to %x\n", v->prot_sum, v->prot_translate[i+2]);
+											#endif
+											v->prot_offset = v->prot_translate[i+2]/2;
+											break;
+										}
+										else
+										{
+											i+= 3;
+										}
 									}
-									else
+									else if (v->prot_translate[i] == -1)	// match address
 									{
-										i+= 3;
+										if (v->prot_translate[i+1] == (v->prot_offset*2))
+										{
+											#if NAOMIBD_PRINTF_PROTECTION
+											printf("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+2]);
+											#endif
+											v->prot_offset = v->prot_translate[i+2]/2;
+											break;
+										}
+										else
+										{
+											i += 3;
+										}
 									}
-								}
-								else if (v->prot_translate[i] == -1)	// match address
-								{
-									if (v->prot_translate[i+1] == (v->prot_offset*2))
+									else	// match key
 									{
-										#if NAOMIBD_PRINTF_PROTECTION
-										printf("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+2]);
-										#endif
-										v->prot_offset = v->prot_translate[i+2]/2;
-										break;
-									}
-									else
-									{
-										i += 3;
-									}
-								}
-								else	// match key
-								{
-									if (v->prot_translate[i] == v->prot_key)
-									{
-										#if NAOMIBD_PRINTF_PROTECTION
-										printf("Protection: got key %x, translated to %x\n", v->prot_key, v->prot_translate[i+2]);
-										#endif
-										v->prot_offset = v->prot_translate[i+2]/2;
-										break;
-									}
-									else
-									{
-										i+= 3;
+										if (v->prot_translate[i] == v->prot_key)
+										{
+											#if NAOMIBD_PRINTF_PROTECTION
+											printf("Protection: got key %x, translated to %x\n", v->prot_key, v->prot_translate[i+2]);
+											#endif
+											v->prot_offset = v->prot_translate[i+2]/2;
+											break;
+										}
+										else
+										{
+											i+= 3;
+										}
 									}
 								}
 							}
+							#if NAOMIBD_PRINTF_PROTECTION
+							else
+							{
+								printf("naomibd: protection not handled for this game\n");
+							}
+							#endif
 						}
-						#if NAOMIBD_PRINTF_PROTECTION
-						else
-						{
-							printf("naomibd: protection not handled for this game\n");
-						}
-						#endif
 						break;
 
 					case 0x2000000:
 					case 0x2020000:
 						#if NAOMIBD_PRINTF_PROTECTION
-						printf("Protection write %04x to upload\n", (UINT32)(data&0xffff));
+						printf("Protection write %04x to upload @ %x\n", (UINT32)(data&0xffff), v->dc_m3_ptr);
 						#endif
 						v->prot_sum += (INT16)(data&0xffff);
+
+						v->dc_cart_ram[v->dc_m3_ptr] = (data&0xff);
+						v->dc_cart_ram[v->dc_m3_ptr+1] = (data>>8)&0xff;
+						v->dc_m3_ptr += 2;
 						break;
 
 					default:
@@ -971,7 +1046,614 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	cdrom_close(gdromfile);
 }
 
+/***************************************************************************
+    DECRYPTION EMULATION
 
+By convention, we label the tree known cart protection methods this way (using Deunan Knute's wording):
+M1: DMA read of protected ROM area
+M2: special read of ROM area which supplies decryption key first
+M3: normal read followed by write to cart's decryption buffer (up to 64kB), followed by M2 but from buffer area
+
+M1's working is still unclear (more on this later), so we will be speaking of M2 & M3 most of the time.
+
+The encryption is done by a stream cipher operating in counter mode, which use a 16-bits internal block cipher.
+
+There are 2 "control bits" at the start of the decrypted stream which control the mode of operation: bit #1 set to 1 means
+that the decrypted stream needs to be decompressed after being decrypted. More on this later.
+
+The next 16-bits are part of the header (they don't belong to the plaintext), but his meaning is unclear. It has been
+conjectured that it could stablish when to "reset" the process and start processing a new stream (based on some tests
+on WWFROYAL, in which the decryption's output doesn't seem to be valid for more than some dozens of words), but some
+more testing would be needed for clarifying that.
+
+After those 18 heading bits, we find the proper plaintext. It must be noted that, due to the initial 2 special bits,
+the 16-bits words of the plaintext are shifted 2 bits respect to the word-boundaries of the output stream of the
+internal block-cipher. So, at a given step, the internal block cipher will output 16-bits, 14 of which will go to a
+given plaintext word, and the remaining 2 to the next plaintext word.
+
+The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
+the game-key (20 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
+for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
+from the first FN and will output the decrypted word (16 bits).
+
+Each round of the Feistel Networks use four substitution sboxes, each having 6 inputs and 2 outputs. The input can be the
+XOR of at most two "sources bits", being source bits the bits from the previous round and the bits from the different keys.
+
+The underlying block cipher has the same structure than the one used by the CPS-2 (Capcom Play System 2) and,
+indeed, some of the used sboxes are exactly the same and appear in the same FN/round in both systems (this is not evident,
+as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due). However,
+the key scheduling used by this implementation is much weaker than the CPS-2's one. Many s-boxes inputs are XORed with any
+key bit and, indeed, the cart-specific key is just 20-bits long.
+
+Due to the small key-length, no sophisticated attacks are needed to recover the keys; a brute-force attack knowing just
+one or two (encrypted word-decrypted word) pairs suffice.
+
+The only difference in the decryption process between M2 and M3 is the initialization of the counter. In M3, the counter is
+always set to 0 at the beginning of the decryption while, in M2, the bits #1-#16 of the ciphertext's address are used
+to initialize the counter.
+
+Due to the nature of the cipher, there are some degrees of freedom when choosing the s-boxes and keys values; by example,
+you could apply a fixed bitswapping and XOR to the keys and the decryption would remain the same as long as you change
+accordingly the s-boxes' definitions. So the order of the bits in the keys is arbitrary, and the s-boxes values have been
+chosen so as to make the key for CAPSNK equal to 0.
+
+It can be observed that some sboxes have incomplete tables (a 255 value indicate an unknown value). In most of the cases,
+they are apparently unused by the cipher (due to the weak key scheduling mentioned above). As of february/2010, the only
+s-box which have a incomplete table which could be begin used is the 4th s-box of the 1st round of the 2nd FN. It's
+incomplete because we haven't located any game using that part of the s-box till now, but definitively it could be being
+used by some still-not-analyzed carts.
+
+When bit #1 of the heading control bits is set to 1, an additional decompression step seems to be carried out. As of
+february/2010, Deunan Knute has put some work on analyzing the decompression algorithm, but probably much more work will
+be needed to completely reverse engineer it. Interested devs with quick access to hardware tests are welcomed to join
+the task.
+
+Guilty Gear X & Sega Tetris are examples of games using the decompression ingame.
+
+Due to technical details, it's more difficult to get custom decryption data from M1 carts, which hinders some types of
+analysis. The only M1 cart which have received attention until now have been AH! MY GODDESS. The available data clearly
+doesn't have the same structure than M2&M3 carts using only the decryption step. However, due to that some hardware tests
+show cycled structures similar to the ones returned by M2&M3 carts using the decompression algo, it's conjectured that M1
+carts will be using the same decompression algorithm seen in M2&M3 ones.
+
+****************************************************************************************/
+
+struct sbox
+{
+    UINT8 table[64];
+    int inputs[6];      // positions of the inputs bits, -1 means no input except from key
+    int outputs[2];     // positions of the output bits
+};
+
+
+static const struct sbox fn1_sboxes[4][4] =
+{
+    {   // 1st round
+        {
+            {
+                0,3,2,2,1,3,1,2,3,2,1,2,1,2,3,1,3,2,2,0,2,1,3,0,0,3,2,3,2,1,2,0,
+                // unused
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+            },
+            {3,4,5,7,-1,-1},
+            {0,4}
+        },
+
+        {
+            {
+                2,2,2,0,3,3,0,1,2,2,3,2,3,0,2,2,1,1,0,3,3,2,0,2,0,1,0,1,2,3,1,1,
+                0,1,3,3,1,3,3,1,2,3,2,0,0,0,2,2,0,3,1,3,0,3,2,2,0,3,0,3,1,1,0,2,
+            },
+            {0,1,2,5,6,7},
+            {1,6}
+        },
+
+        {
+            {
+                0,1,3,0,3,1,1,1,1,2,3,1,3,0,2,3,3,2,0,2,1,1,2,1,1,3,1,0,0,2,0,1,
+                1,3,1,0,0,3,2,3,2,0,3,3,0,0,0,0,1,2,3,3,2,0,3,2,1,0,0,0,2,2,3,3,
+            },
+            {0,2,5,6,7,-1},
+            {2,3}
+        },
+
+        {
+            {
+                3,2,1,2,1,2,3,2,0,3,2,2,3,1,3,3,0,2,3,0,3,3,2,1,1,1,2,0,2,2,0,1,
+                1,3,3,0,0,3,0,3,0,2,1,3,2,1,0,0,0,1,1,2,0,1,0,0,0,1,3,3,2,0,3,3,
+            },
+            {1,2,3,4,6,7},
+            {5,7}
+        },
+    },
+    {   // 2nd round
+        {
+            {
+                3,3,1,2,0,0,2,2,2,1,2,1,3,1,1,3,3,0,0,3,0,3,3,2,1,1,3,2,3,2,1,3,
+                2,3,0,1,3,2,0,1,2,1,3,1,2,2,3,3,3,1,2,2,0,3,1,2,2,1,3,0,3,0,1,3,
+            },
+            {0,1,3,4,5,7},
+            {0,4}
+        },
+
+        {
+            {
+                2,0,1,0,0,3,2,0,3,3,1,2,1,3,0,2,0,2,0,0,0,2,3,1,3,1,1,2,3,0,3,0,
+                // unused
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+            },
+            {0,1,3,4,6,-1},
+            {1,5}
+        },
+
+        {
+            {
+                2,2,2,3,1,1,0,1,0,1,2,2,3,3,0,2,0,3,2,3,3,0,2,1,0,3,1,0,0,2,3,2,
+                3,2,0,3,2,0,1,0,3,3,1,1,2,2,2,0,2,1,3,1,1,1,1,2,2,2,3,0,1,3,0,0,
+            },
+            {1,2,5,6,7,-1},
+            {2,7}
+        },
+
+        {
+            {
+                0,1,3,3,3,1,3,3,1,0,2,0,2,0,0,3,1,2,1,3,1,2,3,2,2,0,1,3,0,3,3,3,
+                0,0,0,2,1,1,2,3,2,2,3,1,1,2,0,2,0,2,1,3,1,1,3,3,1,1,3,0,2,3,0,0,
+            },
+            {2,3,4,5,6,7},
+            {3,6}
+        },
+    },
+    {   // 3rd round
+        {
+            {
+                0,0,1,0,1,0,0,3,2,0,0,3,0,1,0,2,0,3,0,0,2,0,3,2,2,1,3,2,2,1,1,2,
+                0,0,0,3,0,1,1,0,0,2,1,0,3,1,2,2,2,0,3,1,3,0,1,2,2,1,1,1,0,2,3,1,
+            },
+            {1,2,3,4,5,7},
+            {0,5}
+        },
+
+        {
+            {
+                1,2,1,0,3,1,1,2,0,0,2,3,2,3,1,3,2,0,3,2,2,3,1,1,1,1,0,3,2,0,0,1,
+                1,0,0,1,3,1,2,3,0,0,2,3,3,0,1,0,0,2,3,0,1,2,0,1,3,3,3,1,2,0,2,1,
+            },
+            {0,2,4,5,6,7},
+            {1,6}
+        },
+
+        {
+            {
+                0,3,0,2,1,2,0,0,1,1,0,0,3,1,1,0,0,3,0,0,2,3,3,2,3,1,2,0,0,2,3,0,
+                // unused
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+            },
+            {0,2,4,6,7,-1},
+            {2,3}
+        },
+
+        {
+            {
+                0,0,1,0,0,1,0,2,3,3,0,3,3,2,3,0,2,2,2,0,3,2,0,3,1,0,0,3,3,0,0,0,
+                2,2,1,0,2,0,3,2,0,0,3,1,3,3,0,0,2,1,1,2,1,0,1,1,0,3,1,2,0,2,0,3,
+            },
+            {0,1,2,3,6,-1},
+            {4,7}
+        },
+    },
+    {   // 4th round
+        {
+            {
+                0,3,3,3,3,3,2,0,0,1,2,0,2,2,2,2,1,1,0,2,2,1,3,2,3,2,0,1,2,3,2,1,
+                3,2,2,3,1,0,1,0,0,2,0,1,2,1,2,3,1,2,1,1,2,2,1,0,1,3,2,3,2,0,3,1,
+            },
+            {0,1,3,4,5,6},
+            {0,5}
+        },
+
+        {
+            {
+                0,3,0,0,2,0,3,1,1,1,2,2,2,1,3,1,2,2,1,3,2,2,3,3,0,3,1,0,3,2,0,1,
+                3,0,2,0,1,0,2,1,3,3,1,2,2,0,2,3,3,2,3,0,1,1,3,3,0,2,1,3,0,2,2,3,
+            },
+            {0,1,2,3,5,7},
+            {1,7}
+        },
+
+        {
+            {
+                0,1,2,3,3,3,3,1,2,0,2,3,2,1,0,1,2,2,1,2,0,3,2,0,1,1,0,1,3,1,3,1,
+                3,1,0,0,1,0,0,0,0,1,2,2,1,1,3,3,1,2,3,3,3,2,3,0,2,2,1,3,3,0,2,0,
+            },
+            {2,3,4,5,6,7},
+            {2,3}
+        },
+
+        {
+            {
+                0,2,1,1,3,2,0,3,1,0,1,0,3,2,1,1,2,2,0,3,1,0,1,2,2,2,3,3,0,0,0,0,
+                1,2,1,0,2,1,2,2,2,3,2,3,0,1,3,0,0,1,3,0,0,1,1,0,1,0,0,0,0,2,0,1,
+            },
+            {0,1,2,4,6,7},
+            {4,6}
+        },
+    },
+};
+
+
+static const struct sbox fn2_sboxes[4][4] =
+{
+    {   // 1st round
+        {
+            {
+                3,3,0,1,0,1,0,0,0,3,0,0,1,3,1,2,0,3,3,3,2,1,0,1,1,1,2,2,2,3,2,2,
+                2,1,3,3,1,3,1,1,0,0,1,2,0,2,2,1,1,2,3,1,2,1,3,1,2,2,0,1,3,0,2,2,
+            },
+            {1,3,4,5,6,7},
+            {0,7}
+        },
+
+        {
+            {
+                0,2,3,2,1,1,0,0,2,1,0,3,3,0,0,0,3,2,0,2,1,1,2,1,0,0,3,1,2,2,3,1,
+                3,1,3,0,0,0,1,3,1,0,0,3,2,2,3,1,1,3,0,0,2,1,3,3,1,3,1,2,3,1,2,1,
+            },
+            {0,3,5,6,-1,-1},
+            {1,2}
+        },
+
+        {
+            {
+                0,2,2,1,0,1,2,1,2,0,1,2,3,3,0,1,3,1,1,2,1,2,1,3,3,2,3,3,2,1,0,1,
+                // unused
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+            },
+            {0,2,3,4,7,-1},
+            {3,4}
+        },
+
+        {
+            {
+                2,3,1,3,2,0,1,2,0,0,3,3,3,3,3,1,2,0,2,1,2,3,0,2,0,1,0,3,0,2,1,0,
+                2,3,0,1,3,0,3,2,3,1,2,0,3,1,1,2,
+                // potentially used, but we haven't located any game using it
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+            },
+            {1,2,5,6,-1,-1},
+            {5,6}
+        },
+    },
+    {   // 2nd round
+        {
+            {
+                2,3,1,3,1,0,3,3,3,2,3,3,2,0,0,3,2,3,0,3,1,1,2,3,1,1,2,2,0,1,0,0,
+                2,1,0,1,2,0,1,2,0,3,1,1,2,3,1,2,0,2,0,1,3,0,1,0,2,2,3,0,3,2,3,0,
+            },
+            {0,1,4,5,6,7},
+            {0,7}
+        },
+
+        {
+            {
+                0,2,2,0,2,2,0,3,2,3,2,1,3,2,3,3,1,1,0,0,3,0,2,1,1,3,3,2,3,2,0,1,
+                1,2,3,0,1,0,3,0,3,1,0,2,1,2,0,3,2,3,1,2,2,0,3,2,3,0,0,1,2,3,3,3,
+            },
+            {0,2,3,6,7,-1},
+            {1,5}
+        },
+
+        {
+            {
+                1,2,3,2,0,3,2,3,0,1,1,0,0,2,2,3,2,0,0,3,0,2,3,3,2,2,1,0,2,1,0,3,
+                1,0,2,0,1,1,0,1,0,0,1,0,3,0,3,3,2,2,0,2,1,1,1,0,3,0,1,3,2,3,2,1,
+            },
+            {2,3,4,6,7,-1},
+            {2,3}
+        },
+
+        {
+            {
+                2,3,1,3,1,1,2,3,3,1,1,0,1,0,2,3,2,1,0,0,2,2,0,1,0,2,2,2,0,2,1,0,
+                3,1,2,3,1,3,0,2,1,0,1,0,0,1,2,2,3,2,3,1,3,2,1,1,2,0,2,1,3,3,1,0,
+            },
+            {1,2,3,4,5,6},
+            {4,6}
+        },
+    },
+    {   // 3rd round
+        {
+            {
+                0,3,0,1,0,2,3,3,1,0,1,3,2,2,1,1,3,3,3,0,2,0,2,0,0,0,2,3,1,1,0,0,
+                3,3,0,3,3,0,0,2,1,1,1,0,2,2,2,0,3,0,3,1,2,2,0,3,0,0,3,2,0,3,2,1,
+            },
+            {1,4,5,6,7,-1},
+            {0,5}
+        },
+
+        {
+            {
+                0,3,0,1,3,0,3,1,3,2,2,2,3,0,3,2,2,1,2,2,0,3,2,2,0,0,2,1,1,3,2,3,
+                2,3,3,1,2,0,1,2,2,1,0,0,0,0,2,3,1,2,0,3,1,3,1,2,3,2,1,0,3,0,0,2,
+            },
+            {0,2,3,4,6,7},
+            {1,7}
+        },
+
+        {
+            {
+                2,2,3,2,0,3,2,3,1,1,2,0,2,3,1,3,0,0,0,3,2,0,1,0,1,3,2,3,3,3,1,0,
+                // unused
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+            },
+            {1,2,4,7,-1,-1},
+            {2,4}
+        },
+
+        {
+            {
+                0,2,3,1,3,1,1,0,0,1,3,0,2,1,3,3,2,0,2,1,1,2,3,3,0,0,0,2,0,2,3,0,
+                3,3,3,3,2,3,3,2,3,0,1,0,2,3,3,2,0,1,3,1,0,1,2,3,3,0,2,0,3,0,3,3,
+            },
+            {0,1,2,3,5,7},
+            {3,6}
+        },
+    },
+    {   // 4th round
+        {
+            {
+                0,1,1,0,0,1,0,2,3,3,0,1,2,3,0,2,1,0,3,3,2,0,3,0,0,2,1,0,1,0,1,3,
+                0,3,3,1,2,0,3,0,1,3,2,0,3,3,1,3,0,2,3,3,2,1,1,2,2,1,2,1,2,0,1,1,
+            },
+            {0,1,2,4,7,-1},
+            {0,5}
+        },
+
+        {
+            {
+                2,0,0,2,3,0,2,3,3,1,1,1,2,1,1,0,0,2,1,0,0,3,1,0,0,3,3,0,1,0,1,2,
+                0,2,0,2,0,1,2,3,2,1,1,0,3,3,3,3,3,3,1,0,3,0,0,2,0,3,2,0,2,2,0,1,
+            },
+            {0,1,3,5,6,-1},
+            {1,3}
+        },
+
+        {
+            {
+                0,1,1,2,1,3,1,1,0,0,3,1,1,1,2,0,3,2,0,1,1,2,3,3,3,0,3,0,0,2,0,3,
+                3,2,0,0,3,2,3,1,2,3,0,3,2,0,1,2,2,2,0,2,0,1,2,2,3,1,2,2,1,1,1,1,
+            },
+            {0,2,3,4,5,7},
+            {2,7}
+        },
+
+        {
+            {
+                0,1,2,0,3,3,0,3,2,1,3,3,0,3,1,1,3,2,3,2,3,0,0,0,3,0,2,2,3,2,2,3,
+                2,2,3,1,2,3,1,2,0,3,0,2,3,1,0,0,3,2,1,2,1,2,1,3,1,0,2,3,3,1,3,2,
+            },
+            {2,3,4,5,6,7},
+            {4,6}
+        },
+    },
+};
+
+static const int fn1_game_key_scheduling[30][2] =
+{
+    {1,29},  {1,71},  {1,81},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},
+    {5,11},  {6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},
+    {9,58},  {9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44},
+    {15,40}, {16,69}, {17,15}, {18,23}, {18,43}, {19,82},
+};
+
+static const int fn2_game_key_scheduling[27][2] =
+{
+    {0,0},   {1,3},   {1,35},  {2,11},  {3,20},  {4,22},  {5,23},  {6,29},
+    {7,38},  {8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50},
+    {10,53}, {11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72},
+    {17,83}, {18,88}, {19,94},
+};
+
+static const int fn1_sequence_key_scheduling[20][2] =
+{
+    {0,52},  {1,34},  {2,17},  {3,36}, {4,84},  {4,88},  {5,57},  {6,48},
+    {6,68},  {7,76},  {8,83},  {9,30}, {10,22}, {10,41}, {11,38}, {12,55},
+    {13,74}, {14,19}, {14,80}, {15,26}
+};
+
+static const int fn2_sequence_key_scheduling[16] = {77,34,8,42,36,27,69,66,13,9,79,31,49,7,24,64};
+
+static const int fn2_middle_result_scheduling[16] = {1,10,44,68,74,78,81,95,2,4,30,40,41,51,53,58};
+
+static int feistel_function(int input, const struct sbox* sboxes, UINT32 subkeys)
+{
+    int k,m;
+    int aux;
+    int result=0;
+    
+    for (m=0; m<4; ++m)  // 4 sboxes
+    {
+        for (k=0, aux=0; k<6; ++k)
+        {
+            if (sboxes[m].inputs[k]!=-1)
+            {
+                aux |= (BIT(input, sboxes[m].inputs[k])<<k);
+            }
+        }
+        
+        aux = sboxes[m].table[(aux^subkeys)&0x3f];
+        
+        for (k=0; k<2; ++k)
+        {
+            result |= (BIT(aux,k)<<sboxes[m].outputs[k]);
+        }
+        
+        subkeys >>=6;
+    }
+    
+    return result;
+}
+
+/**************************
+This implementation is an "educational" version. It must be noted that it can be speed-optimized in a number of ways.
+The most evident one is to factor out the parts of the key-scheduling that must only be done once (like the game-key &
+sequence-key parts) as noted in the comments inlined in the function. More sophisticated speed-ups can be gained by
+noticing that the weak key-scheduling would allow to create some pregenerated look-up tables for doing most of the work
+of the function. Even so, it would still be pretty slow, so caching techniques could be a wiser option here.
+**************************/
+
+static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter, UINT16 data)
+{
+    int j;
+    int aux,aux2;
+    int A,B;
+    int middle_result;
+    UINT32 fn1_subkeys[4];
+    UINT32 fn2_subkeys[4];
+
+    /* Game-key scheduling; this could be done just once per game at initialization time */
+    memset(fn1_subkeys,0,sizeof(UINT32)*4);
+    memset(fn2_subkeys,0,sizeof(UINT32)*4);
+
+    for (j=0; j<30; ++j)
+    {
+        if (BIT(game_key, fn1_game_key_scheduling[j][0])!=0)
+        {
+            aux = fn1_game_key_scheduling[j][1]%24;
+            aux2 = fn1_game_key_scheduling[j][1]/24;
+            fn1_subkeys[aux2] ^= (1<<aux);
+        }
+    }
+
+    for (j=0; j<27; ++j)
+    {
+        if (BIT(game_key, fn2_game_key_scheduling[j][0])!=0)
+        {
+            aux = fn2_game_key_scheduling[j][1]%24;
+            aux2 = fn2_game_key_scheduling[j][1]/24;
+            fn2_subkeys[aux2] ^= (1<<aux);
+        }
+    }
+    /********************************************************/
+
+    /* Sequence-key scheduling; this could be done just once per decryption run */
+    for (j=0; j<20; ++j)
+    {
+        if (BIT(sequence_key,fn1_sequence_key_scheduling[j][0])!=0)
+        {
+            aux = fn1_sequence_key_scheduling[j][1]%24;
+            aux2 = fn1_sequence_key_scheduling[j][1]/24;
+            fn1_subkeys[aux2] ^= (1<<aux);
+        }
+    }
+
+    for (j=0; j<16; ++j)
+    {
+        if (BIT(sequence_key,j)!=0)
+        {
+            aux = fn2_sequence_key_scheduling[j]%24;
+            aux2 = fn2_sequence_key_scheduling[j]/24;
+            fn2_subkeys[aux2] ^= (1<<aux);
+        }
+    }
+
+    // subkeys bits 10 & 41
+    fn2_subkeys[0] ^= (BIT(sequence_key,2)<<10);
+    fn2_subkeys[1] ^= (BIT(sequence_key,4)<<17);
+    /**************************************************************/
+
+    // First Feistel Network
+
+    aux = BITSWAP16(counter,5,12,14,13,9,3,6,4,    8,1,15,11,0,7,10,2);
+
+    // 1st round
+    B = aux >> 8;
+    A = (aux & 0xff) ^ feistel_function(B,fn1_sboxes[0],fn1_subkeys[0]);
+
+    // 2nd round
+    B = B ^ feistel_function(A,fn1_sboxes[1],fn1_subkeys[1]);
+
+    // 3rd round
+    A = A ^ feistel_function(B,fn1_sboxes[2],fn1_subkeys[2]);
+
+    // 4th round
+    B = B ^ feistel_function(A,fn1_sboxes[3],fn1_subkeys[3]);
+
+    middle_result = (B<<8)|A;
+
+
+    /* Middle-result-key sheduling */
+    for (j=0; j<16; ++j)
+    {
+        if (BIT(middle_result,j)!=0)
+        {
+            aux = fn2_middle_result_scheduling[j]%24;
+            aux2 = fn2_middle_result_scheduling[j]/24;
+            fn2_subkeys[aux2] ^= (1<<aux);
+        }
+    }
+    /*********************/
+
+    // Second Feistel Network
+
+    aux = BITSWAP16(data,14,3,8,12,13,7,15,4,    6,2,9,5,11,0,1,10);
+
+    // 1st round
+    B = aux >> 8;
+    A = (aux & 0xff) ^ feistel_function(B,fn2_sboxes[0],fn2_subkeys[0]);
+
+    // 2nd round
+    B = B ^ feistel_function(A,fn2_sboxes[1],fn2_subkeys[1]);
+
+    // 3rd round
+    A = A ^ feistel_function(B,fn2_sboxes[2],fn2_subkeys[2]);
+
+    // 4th round
+    B = B ^ feistel_function(A,fn2_sboxes[3],fn2_subkeys[3]);
+
+    aux = (B<<8)|A;
+
+    aux = BITSWAP16(aux,15,7,6,14,13,12,5,4,    3,2,11,10,9,1,0,8);
+
+    return aux;
+}
+
+static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UINT8* ciphertext, UINT8* plaintext, int length)
+{
+    UINT16 counter = seed;
+    UINT16 last_word;
+    UINT16 plain_word;
+    UINT16 aux_word;
+    int control_bits;
+    UINT16 heading_word;
+    
+    last_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
+    control_bits = last_word&3;
+    ++counter; ciphertext+=2;
+    
+    aux_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
+    heading_word = (last_word&~3) | (aux_word&3);
+    last_word = aux_word;
+    ++counter; ciphertext+=2;
+    
+    if (BIT(control_bits,1)==0)  // no decompression, just decryption
+    {
+        for (; length>0; length-=2, ++counter, ciphertext+=2)
+        {
+            aux_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
+            plain_word = (last_word&~3) | (aux_word&3);
+            last_word = aux_word;
+
+            *(plaintext++) = plain_word>>8;
+            *(plaintext++) = plain_word&0xff;
+        }
+    }
+    else  // decryption plus decompression
+    {
+    	fatalerror("NAOMI ASIC compression unsupported\n");
+        return;  // not implemented, decompression has not been fully reverse engineered as of february/2010
+    }
+}
 
 /***************************************************************************
     DEVICE INTERFACE
@@ -1010,6 +1692,7 @@ static DEVICE_START( naomibd )
 		{
 			v->prot_translate = &naomibd_translate_tbl[i].transtbl[0];
 			v->prot_reverse_bytes = naomibd_translate_tbl[i].reverse_bytes;
+			v->dc_gamekey = naomibd_translate_tbl[i].live_key;
 			break;
 		}
 	}

@@ -2227,33 +2227,6 @@ ROM_START( capsnk )
         ROM_LOAD( "mpr-23508.ic5", 0x4800000, 0x1000000, CRC(0a3590aa) SHA1(84c0e1853f069b003d09b268caee97e58c4dacb6) )
         ROM_LOAD( "mpr-23509.ic6", 0x5800000, 0x1000000, CRC(281d633d) SHA1(d773be8e95f7bf9212ee1061f3076220d4fce9e0) )
         ROM_LOAD( "mpr-23510.ic7", 0x6800000, 0x1000000, CRC(b856fef5) SHA1(0634f86740c438b40286256a0269570d24cb845a) )
-
-	// trojaned protection data (filename is address read from)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a63a9260.bin", 0x000000, 0x008760, CRC(54efa963) SHA1(41874253567da56441d83de041f6e82111977fa4) )
-        ROM_LOAD( "a63b19c0.bin", 0x010000, 0x008260, CRC(f0ca72ef) SHA1(87fc4654afaf763cdb3ea5b4501948bfe7b9e9dc) )
-        ROM_LOAD( "a63b9c20.bin", 0x020000, 0x00a0c0, CRC(92eec22c) SHA1(c7267503a828e852edeb26f68f3f4b685b9b163e) )
-        ROM_LOAD( "a63c3ce0.bin", 0x030000, 0x00d7e0, CRC(93201f32) SHA1(5aca43776306a5a5ecd68a7e8699a724703f329a) )
-        ROM_LOAD( "a63d14c0.bin", 0x040000, 0x00a8e0, CRC(fb2e9f7b) SHA1(ae4fc9a82eafb5b511485eef1d65ee9d3adc27b6) )
-        ROM_LOAD( "a63dbda0.bin", 0x050000, 0x008460, CRC(b4b74624) SHA1(6ae2f5d69e45d295a3d0dcf295b1fb76be201e8e) )
-        ROM_LOAD( "a63e4200.bin", 0x060000, 0x00b500, CRC(69ee516d) SHA1(f358aff12b826d1685199a9d5950abd121b54192) )
-        ROM_LOAD( "a63ef700.bin", 0x070000, 0x00cec0, CRC(b2f4df7e) SHA1(4aafcf65e3fc193ee191f06ffcce37e52fc12364) )
-        ROM_LOAD( "a63fc5c0.bin", 0x080000, 0x004cfc, CRC(1d534f98) SHA1(32afbb1d1fd1abba9e49b7b4bcf310860e4e47dc) )
-        ROM_LOAD( "a643a120.bin", 0x090000, 0x00d6e0, CRC(27a0deb7) SHA1(c8da2e212ca8f5985d9336e8200c3382d6d373a5) )
-        ROM_LOAD( "a6447800.bin", 0x0a0000, 0x00c920, CRC(42c9e4b1) SHA1(d7ef0d23956b795fad888f49a4dc42d74899de71) )
-        ROM_LOAD( "a6454120.bin", 0x0b0000, 0x00a540, CRC(69321860) SHA1(675767e9fd18a0d72de2decb68acd7d500b11de2) )
-        ROM_LOAD( "a645e660.bin", 0x0c0000, 0x00ccc0, CRC(4919083d) SHA1(89dfc2837e5298dc691350ac470bc76557657736) )
-        ROM_LOAD( "a646b320.bin", 0x0d0000, 0x00c120, CRC(a66da245) SHA1(48d543244cdc52887131e734e0643c69f9368681) )
-        ROM_LOAD( "a6477440.bin", 0x0e0000, 0x0097a8, CRC(6289f812) SHA1(574459f7c79dd757ae94f8e06dbcefa5b203e510) )
-        ROM_LOAD( "a6480c00.bin", 0x0f0000, 0x00eca0, CRC(a4128a65) SHA1(35625df0109a72cb508bb4a89641bcb86aa697fb) )
-        ROM_LOAD( "a648f8a0.bin", 0x100000, 0x009520, CRC(45a06ed6) SHA1(e9ee99e329cf35a95440312b9d0bed40254481c2) )
-        ROM_LOAD( "a6498dc0.bin", 0x110000, 0x009f40, CRC(2cea7b46) SHA1(5398b8f1ba01e21d5fee0b1c6a796ce396c9697f) )
-        ROM_LOAD( "a64a2d00.bin", 0x120000, 0x00dbe0, CRC(9c75fc98) SHA1(aa1a630c77b29202a4045b1eade455f02f29b81a) )
-        ROM_LOAD( "a64b08e0.bin", 0x130000, 0x00cb40, CRC(72ae0dd2) SHA1(f4e8face14dac9a5cc75c6ccdfb9911929e2d76e) )
-        ROM_LOAD( "a64bd420.bin", 0x140000, 0x00e920, CRC(198e4aa9) SHA1(294b9c3f89b138898c3ef6db60ac5473516d74dc) )
-        ROM_LOAD( "a64cbd40.bin", 0x150000, 0x005e94, CRC(cc4a4e58) SHA1(dce67374a8dc6d2c9b66c0cd7e68b4f9fdab3e27) )
-        ROM_LOAD( "a6617be0.bin", 0x160000, 0x00e480, CRC(b7d6ce86) SHA1(c3d9a8cf6125c50a0129591d807bbb13a836a651) )
-        ROM_LOAD( "a6626060.bin", 0x170000, 0x0078a8, CRC(8c258ad2) SHA1(51d4d227e037992905a7a7f2b5bb13646920670d) )
 ROM_END
 
 // ver 000804
@@ -2271,33 +2244,6 @@ ROM_START( capsnka )
         ROM_LOAD( "mpr-23508.ic5", 0x4800000, 0x1000000, CRC(0a3590aa) SHA1(84c0e1853f069b003d09b268caee97e58c4dacb6) )
         ROM_LOAD( "mpr-23509.ic6", 0x5800000, 0x1000000, CRC(281d633d) SHA1(d773be8e95f7bf9212ee1061f3076220d4fce9e0) )
         ROM_LOAD( "mpr-23510.ic7", 0x6800000, 0x1000000, CRC(b856fef5) SHA1(0634f86740c438b40286256a0269570d24cb845a) )
-
-	// trojaned protection data (filename is address read from)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a63a9260.bin", 0x000000, 0x008760, CRC(54efa963) SHA1(41874253567da56441d83de041f6e82111977fa4) )
-        ROM_LOAD( "a63b19c0.bin", 0x010000, 0x008260, CRC(f0ca72ef) SHA1(87fc4654afaf763cdb3ea5b4501948bfe7b9e9dc) )
-        ROM_LOAD( "a63b9c20.bin", 0x020000, 0x00a0c0, CRC(92eec22c) SHA1(c7267503a828e852edeb26f68f3f4b685b9b163e) )
-        ROM_LOAD( "a63c3ce0.bin", 0x030000, 0x00d7e0, CRC(93201f32) SHA1(5aca43776306a5a5ecd68a7e8699a724703f329a) )
-        ROM_LOAD( "a63d14c0.bin", 0x040000, 0x00a8e0, CRC(fb2e9f7b) SHA1(ae4fc9a82eafb5b511485eef1d65ee9d3adc27b6) )
-        ROM_LOAD( "a63dbda0.bin", 0x050000, 0x008460, CRC(b4b74624) SHA1(6ae2f5d69e45d295a3d0dcf295b1fb76be201e8e) )
-        ROM_LOAD( "a63e4200.bin", 0x060000, 0x00b500, CRC(69ee516d) SHA1(f358aff12b826d1685199a9d5950abd121b54192) )
-        ROM_LOAD( "a63ef700.bin", 0x070000, 0x00cec0, CRC(b2f4df7e) SHA1(4aafcf65e3fc193ee191f06ffcce37e52fc12364) )
-        ROM_LOAD( "a63fc5c0.bin", 0x080000, 0x004cfc, CRC(1d534f98) SHA1(32afbb1d1fd1abba9e49b7b4bcf310860e4e47dc) )
-        ROM_LOAD( "a643a120.bin", 0x090000, 0x00d6e0, CRC(27a0deb7) SHA1(c8da2e212ca8f5985d9336e8200c3382d6d373a5) )
-        ROM_LOAD( "a6447800.bin", 0x0a0000, 0x00c920, CRC(42c9e4b1) SHA1(d7ef0d23956b795fad888f49a4dc42d74899de71) )
-        ROM_LOAD( "a6454120.bin", 0x0b0000, 0x00a540, CRC(69321860) SHA1(675767e9fd18a0d72de2decb68acd7d500b11de2) )
-        ROM_LOAD( "a645e660.bin", 0x0c0000, 0x00ccc0, CRC(4919083d) SHA1(89dfc2837e5298dc691350ac470bc76557657736) )
-        ROM_LOAD( "a646b320.bin", 0x0d0000, 0x00c120, CRC(a66da245) SHA1(48d543244cdc52887131e734e0643c69f9368681) )
-        ROM_LOAD( "a6477440.bin", 0x0e0000, 0x0097a8, CRC(6289f812) SHA1(574459f7c79dd757ae94f8e06dbcefa5b203e510) )
-        ROM_LOAD( "a6480c00.bin", 0x0f0000, 0x00eca0, CRC(a4128a65) SHA1(35625df0109a72cb508bb4a89641bcb86aa697fb) )
-        ROM_LOAD( "a648f8a0.bin", 0x100000, 0x009520, CRC(45a06ed6) SHA1(e9ee99e329cf35a95440312b9d0bed40254481c2) )
-        ROM_LOAD( "a6498dc0.bin", 0x110000, 0x009f40, CRC(2cea7b46) SHA1(5398b8f1ba01e21d5fee0b1c6a796ce396c9697f) )
-        ROM_LOAD( "a64a2d00.bin", 0x120000, 0x00dbe0, CRC(9c75fc98) SHA1(aa1a630c77b29202a4045b1eade455f02f29b81a) )
-        ROM_LOAD( "a64b08e0.bin", 0x130000, 0x00cb40, CRC(72ae0dd2) SHA1(f4e8face14dac9a5cc75c6ccdfb9911929e2d76e) )
-        ROM_LOAD( "a64bd420.bin", 0x140000, 0x00e920, CRC(198e4aa9) SHA1(294b9c3f89b138898c3ef6db60ac5473516d74dc) )
-        ROM_LOAD( "a64cbd40.bin", 0x150000, 0x005e94, CRC(cc4a4e58) SHA1(dce67374a8dc6d2c9b66c0cd7e68b4f9fdab3e27) )
-        ROM_LOAD( "a6617be0.bin", 0x160000, 0x00e480, CRC(b7d6ce86) SHA1(c3d9a8cf6125c50a0129591d807bbb13a836a651) )
-        ROM_LOAD( "a6626060.bin", 0x170000, 0x0078a8, CRC(8c258ad2) SHA1(51d4d227e037992905a7a7f2b5bb13646920670d) )
 ROM_END
 
 /*
@@ -2338,9 +2284,6 @@ ROM_START( csmash )
 	ROM_LOAD("mpr-23425.ic6",   0x3000000, 0x0800000, CRC(47f51da2) SHA1(af5ecd460114caed3a00157ffd3a2df0fbf348c0) )
 	ROM_LOAD("mpr-23426.ic7",   0x3800000, 0x0800000, CRC(7f91b13f) SHA1(2d534f77291ebfedc011bf0e803a1b9243fb477f) )
 	ROM_LOAD("mpr-23427.ic8",   0x4000000, 0x0800000, CRC(5851d525) SHA1(1cb1073542d75a3bcc0d363ed31d49bcaf1fd494) )
-
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-	ROM_COPY("user1", 0, 0, 0x200000)
 ROM_END
 
 ROM_START( csmasho )
@@ -2359,9 +2302,6 @@ ROM_START( csmasho )
 	ROM_LOAD("mpr-23425.ic6", 0x3000000, 0x0800000, CRC(47f51da2) SHA1(af5ecd460114caed3a00157ffd3a2df0fbf348c0) )
 	ROM_LOAD("mpr-23426.ic7", 0x3800000, 0x0800000, CRC(7f91b13f) SHA1(2d534f77291ebfedc011bf0e803a1b9243fb477f) )
 	ROM_LOAD("mpr-23427.ic8", 0x4000000, 0x0800000, CRC(5851d525) SHA1(1cb1073542d75a3bcc0d363ed31d49bcaf1fd494) )
-
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-	ROM_COPY("user1", 0, 0, 0x200000)
 ROM_END
 
 /*
@@ -3066,9 +3006,7 @@ ROM_START( gram2000 )
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-23377.ic11",        0x0000000, 0x0400000, CRC(4ca3149c) SHA1(9d25fc659658b416202b033754669be2f3abcdbe) )
-	/* Test mode returns IC1 as bad dump, it looks like that is data provided by the Actel A54SX32 FPGA present on board
-       and mirrored there.  Provided as documentation until we know more about it. */
-	ROM_LOAD("gram2000.ic1",          0x0800000, 0x0800000, CRC(4a86556a) SHA1(61100dc84c95dd47d9f61c7cc52ea25579b90632) )
+	// the 0x0800000 - 0x0ffffff space mirrors part of roms 17/18, see ROM_COPY below, gets tested as 'IC1' if actel_id is 0xffff
 	ROM_LOAD32_WORD("mpr-23357.ic17", 0x1000000, 0x0800000, CRC(eaf77487) SHA1(bdfc4666a6724441c11b31d89fa30c4bd11cbdd1) ) //ic 2
 	ROM_LOAD32_WORD("mpr-23358.ic18", 0x1000002, 0x0800000, CRC(96819a5b) SHA1(e28c9d7b0579ab5d6116401b49f30dc8e4961618) ) //ic 3
 	ROM_LOAD32_WORD("mpr-23359.ic19", 0x2000000, 0x0800000, CRC(757b9e89) SHA1(b131af1cbcb4fcebb7081b208acc86841192ff14) ) //ic 4
@@ -3089,6 +3027,9 @@ ROM_START( gram2000 )
 	ROM_LOAD32_WORD("mpr-23374.ic34", 0x9000002, 0x0800000, CRC(1f8a2e08) SHA1(ff9b9bfada831baeb4830a3d1a4bfb38570b9972) ) //ic 19
 	ROM_LOAD32_WORD("mpr-23375.ic35", 0xa000000, 0x0800000, CRC(7d4043db) SHA1(cadf22419e5b63c33a179bb6b0742035fc9d8028) ) //ic 20
 	ROM_LOAD32_WORD("mpr-23376.ic36", 0xa000002, 0x0800000, CRC(e09cb473) SHA1(c3ec980f1a56142a0e06bae9594d6038acf0690d) ) //ic 21
+
+	ROM_COPY( "user1", 0x1400000, 0x0800000, 0x0800000 ) // mirror data so IC1 check can pass
+	//ROM_COPY( "user1", 0x1000000, 0x0400000, 0x0c00000 ) // or does it mirror the start of 17/18 from 0x0400000 upwards like this, check on real hw 
 ROM_END
 
 ROM_START( crackndj )
@@ -3206,31 +3147,6 @@ ROM_START( hmgeo )
 	ROM_LOAD("mpr-23713.ic9", 0x4800000, 0x0800000, CRC(2969bac7) SHA1(5f1cf6ac726c2fe183d66e4022962e44592f9ccd) )
 	ROM_LOAD("mpr-23714.ic10",0x5000000, 0x0800000, CRC(da462c44) SHA1(ca450b6c07f939f96eba7b44c45b4e38abd598aa) )
         ROM_LOAD("mpr-23715.ic11",0x5800000, 0x0800000, CRC(c750abbd) SHA1(2a5bedc2b21cd3f991c7145ccfd8c7a9e7f647ae) )
-	// trojaned protection data
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a3075ac0.bin", 0x000000, 0x00ff04, CRC(440dca2a) SHA1(4e261ff309e7e774fa2061de30174b0e4e967c00) )
-        ROM_LOAD( "a30859c4.bin", 0x010000, 0x00ff04, CRC(c22c76a7) SHA1(76d9e47730e4551e6e1a96eeee937296f1153b8b) )
-        ROM_LOAD( "a30958c8.bin", 0x020000, 0x00ff04, CRC(8f29ee4d) SHA1(e1ac1ccf85dc338e9d5381dfa8ededc8af8f3e92) )
-        ROM_LOAD( "a30a57cc.bin", 0x030000, 0x00ff04, CRC(479846c1) SHA1(b063e2f7d521cd8a60b770477c13946679e06dd7) )
-        ROM_LOAD( "a30b56d0.bin", 0x040000, 0x00ff04, CRC(107f777e) SHA1(002f062a2073dff5f0d4722803aef0a8ffc7a61a) )
-        ROM_LOAD( "a30c55d4.bin", 0x050000, 0x00ff04, CRC(d73b35c1) SHA1(951cceaf6a53d4fc4b967c3675d3fa98a6874b2a) )
-        ROM_LOAD( "a30d54d8.bin", 0x060000, 0x00ff04, CRC(969a6957) SHA1(ee6909f832b96ec3e6ae0cec3f18a7983cae89d9) )
-        ROM_LOAD( "a30e53dc.bin", 0x070000, 0x00ff04, CRC(002f7b41) SHA1(12bb33f1229d74b32ab481f5a2e57332f0def6e7) )
-        ROM_LOAD( "a30f52e0.bin", 0x080000, 0x00a904, CRC(97e32fdd) SHA1(a40f412e40544a45784b2f8d9d5494b6491efc4a) )
-        ROM_LOAD( "a30ffbe4.bin", 0x090000, 0x000084, CRC(c4311af6) SHA1(7a53061a1a1a024d72880a9a9c2e6a61d2607a46) )
-        ROM_LOAD( "a30ffc80.bin", 0x0a0000, 0x00ff04, CRC(b1b5e559) SHA1(2f5963d8aa46d7aeb869769a7052d3006d56d5a4) )
-        ROM_LOAD( "a310fb84.bin", 0x0b0000, 0x00ff04, CRC(91bdc0b2) SHA1(3f77fe6b67dba605296c3c038265b4e0e7eabd97) )
-        ROM_LOAD( "a311fa88.bin", 0x0c0000, 0x00ff04, CRC(dc5d1334) SHA1(52287bd3ade05be4511e43a7707de8cc38117316) )
-        ROM_LOAD( "a312f98c.bin", 0x0d0000, 0x00ff04, CRC(e3d9ea36) SHA1(0860f5ac3086d16132f3d0d27266c644470b4f1e) )
-        ROM_LOAD( "a313f890.bin", 0x0e0000, 0x00ff04, CRC(8b23c562) SHA1(fcc9d04c150f007dcd4a9a2bbee1e438a81b7c49) )
-        ROM_LOAD( "a314f794.bin", 0x0f0000, 0x009104, CRC(0c0a9aa2) SHA1(1b9063a18703ce4a03ffe20e3f13e9bae06bdb57) )
-        ROM_LOAD( "a3158898.bin", 0x100000, 0x0000ac, CRC(e23f61d5) SHA1(80ff570a6846f1af2b87e5888675257728e8e253) )
-        ROM_LOAD( "a0800f40.bin", 0x110000, 0x000204, CRC(f4935846) SHA1(d7eaa710274080f378afa4fb2e14f3bd406c45fe) )
-        ROM_LOAD( "a0801144.bin", 0x120000, 0x000034, CRC(28a62ac0) SHA1(d9bb6baf5feaca655f333e2f0b9b200f44ef1726) )
-        ROM_LOAD( "a0801180.bin", 0x130000, 0x00ff04, CRC(4b9e08b7) SHA1(dab208f7af4475210135aeb648e6bed7db7399b9) )
-        ROM_LOAD( "a0811084.bin", 0x140000, 0x00ff04, CRC(4003bab7) SHA1(0b1df4b9b1d1a1072719b559a71f5ae5811be63c) )
-        ROM_LOAD( "a0820f88.bin", 0x150000, 0x007e04, CRC(67fb4342) SHA1(8b8c384a1628756a08aa8131095e49756967b5e2) )
-        ROM_LOAD( "a0828d8c.bin", 0x160000, 0x0000f4, CRC(71c85e2b) SHA1(680b6ee02ea24a502bc42bade23e11e6a7ddc7ad) )
 ROM_END
 
 /*
@@ -3252,9 +3168,6 @@ IC7     64M     191E    2AF3
 IC8     64M     EACA    12CD
 IC9     64M     717F    40ED
 IC10    64M     1E43    0F1A
-
-byteswaped @ e0158 key b957 read count 400, write 404
-e055c key 37ca read count 400, write 404
 
 */
 
@@ -3401,16 +3314,18 @@ ROM_START( mvsc2 )
 	ROM_LOAD("mpr-23059.ic28",  0x6000000, 0x0800000, CRC(64808024) SHA1(1a6c60c330642b273978d3dd02d95d17d36ee3f2) )
 	ROM_LOAD("mpr-23060.ic29",  0x6800000, 0x0800000, CRC(67519942) SHA1(fc758d9075625f8140d5d828c8f6b7a91bcc9119) )
 	ROM_LOAD("mpr-23061.ic30",  0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) )
-        ROM_LOAD("mpr-23083.ic31",  0x7800000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) )
-        ROM_LOAD("mpr-23084.ic32",  0x8000000, 0x0400000, CRC(e228cdfd) SHA1(d02a2e3557bd24cf34c5ddb42d41ca15e78ae885) )
+	ROM_LOAD("mpr-23083.ic31",  0x7800000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) )
+	ROM_LOAD("mpr-23084.ic32",  0x8000000, 0x0400000, CRC(e228cdfd) SHA1(d02a2e3557bd24cf34c5ddb42d41ca15e78ae885) )
+
+
 
 	// DMA protection data
-        ROM_LOAD("88000000.bin", 0x8800000, 0x025f00, CRC(77d79823) SHA1(2545d28eee47114e8ffb9bc6d7a910e90fc48420) )
-        ROM_LOAD("88026440.bin", 0x8830000, 0x016520, CRC(dad9ebbd) SHA1(39c0697caa2b5ee11d99e75726e92ed86a23f10b) )
-        ROM_LOAD("8803bda0.bin", 0x8850000, 0x01e5e0, CRC(9e0b8202) SHA1(729bed557c1a00da13c990603bbadab38d90285e) )
-        ROM_LOAD("8805a560.bin", 0x8870000, 0x0017a0, CRC(7bc27482) SHA1(6ce6074cf47989f42af02deb7aac52883912784a) )
-        ROM_LOAD("8805b720.bin", 0x8880000, 0x02b5a0, CRC(485d0aef) SHA1(853f4b49b489cc512c906edcaf3cd8b5bf4c64c0) )
-        ROM_LOAD("8808b7e0.bin", 0x88a0000, 0x013ec0, CRC(0fc8f363) SHA1(dad30d43cef89d01ce80301b1d796aabad755de6) )
+	ROM_LOAD("88000000.bin", 0x8800000, 0x025f00, CRC(77d79823) SHA1(2545d28eee47114e8ffb9bc6d7a910e90fc48420) )
+	ROM_LOAD("88026440.bin", 0x8830000, 0x016520, CRC(dad9ebbd) SHA1(39c0697caa2b5ee11d99e75726e92ed86a23f10b) )
+	ROM_LOAD("8803bda0.bin", 0x8850000, 0x01e5e0, CRC(9e0b8202) SHA1(729bed557c1a00da13c990603bbadab38d90285e) )
+	ROM_LOAD("8805a560.bin", 0x8870000, 0x0017a0, CRC(7bc27482) SHA1(6ce6074cf47989f42af02deb7aac52883912784a) )
+	ROM_LOAD("8805b720.bin", 0x8880000, 0x02b5a0, CRC(485d0aef) SHA1(853f4b49b489cc512c906edcaf3cd8b5bf4c64c0) )
+	ROM_LOAD("8808b7e0.bin", 0x88a0000, 0x013ec0, CRC(0fc8f363) SHA1(dad30d43cef89d01ce80301b1d796aabad755de6) )
 ROM_END
 
 /* toy fighter - 1999 sega */
@@ -3433,14 +3348,9 @@ ROM_START( toyfight )
 	ROM_LOAD("mpr-22032.ic8", 0x4000000, 0x0800000, CRC(3c48c9ba) SHA1(00be199b23040f8e81db2ec489ba98cbf615652c) )
 	ROM_LOAD("mpr-22033.ic9", 0x4800000, 0x0800000, CRC(5fe5586e) SHA1(3ff41ae1f81469597684faadd88e62b5e0634352) )
 	ROM_LOAD("mpr-22034.ic10",0x5000000, 0x0800000, CRC(3aa5ce5e) SHA1(f00a906235e4522d6fc2ac771324114346875314) )
-
-	// protection data (also found in cleartext in the program ROM!)
-	ROM_REGION( 0x400000, "naomibd_prot", ROMREGION_ERASE00 )
-	ROM_COPY("user1", 0, 0, 0x400000)
 ROM_END
 
 /* Crazy Taxi */
-/* protection: crypt data at 0x3ff000, key 0x0219, feed 0x504, read 0x500 */
 ROM_START( crzytaxi )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
@@ -3461,9 +3371,6 @@ ROM_START( crzytaxi )
         ROM_LOAD( "mpr21681.ic13s", 0x6800000, 0x800000, CRC(e5dcde7d) SHA1(8a90d9fb4ce0d2ceb609fcf4c54cf5b55c266c50) )
         ROM_LOAD( "mpr21682.ic14s", 0x7000000, 0x800000, CRC(54c0290e) SHA1(6e07ab6e95c29a2aabed0ba1a7af0d7d605e0309) )
         ROM_LOAD( "mpr21683.ic15s", 0x7800000, 0x800000, CRC(ac8a27e0) SHA1(8e71d853a102dd6c164d5326e6d157ccfb8c7b36) )
-
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a03ff000.bin", 0x000000, 0x000500, CRC(be5e415d) SHA1(baf87191236f332c8df7674a080c2be4824a4bcb) )
 ROM_END
 
 /* Jambo! Safari */
@@ -3482,9 +3389,6 @@ ROM_START( jambo )
         ROM_LOAD( "mpr22823.ic6",  0x3000000, 0x800000, CRC(00c33e51) SHA1(c55646a146ed259e6c61fd912c93fa784b5e6910) )
         ROM_LOAD( "mpr22824.ic7",  0x3800000, 0x800000, CRC(cc55304a) SHA1(e548d8de83469e5816c55dbbb00afbb894282fd6) )
         ROM_LOAD( "mpr22825.ic8",  0x4000000, 0x800000, CRC(85bada10) SHA1(b6e15d8f1d6bca12ffa4816ed0393c04ca500fba) )
-
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a03ff000.bin", 0x000000, 0x000500, CRC(74ffc580) SHA1(8de297303b14a6773c0d944de1bc1dcc3b1d042e) )
 ROM_END
 
 /* 18 Wheeler */
@@ -3660,14 +3564,6 @@ ROM_START( pjustic )
         ROM_LOAD( "mpr-23545.ic9",  0x8800000, 0x1000000, CRC(60bd692f) SHA1(37b508f4a821d832eafff81574e7df3fe1c729f8) )
         ROM_LOAD( "mpr-23546.ic10", 0x9800000, 0x1000000, CRC(85db2248) SHA1(37845c269a2e65ee6181a8e7500c2e7dd9b2e343) )
         ROM_LOAD( "mpr-23547.ic11", 0xa800000, 0x1000000, CRC(18b369c7) SHA1(b61cb3fda8cc685865684f7afc7dad0b29d93ca5) )
-
-	// trojaned protection data (filename is address read from)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a0820000.bin", 0x000000, 0x00267e, CRC(15db53ed) SHA1(a28ba1abc77ca559cff2fd34f3499c556ad8674e) )
-        ROM_LOAD( "a0920000.bin", 0x010000, 0x00c91c, CRC(431436f8) SHA1(0136d6b210689b2023f982300bc8842b5c0914b4) )
-        ROM_LOAD( "a092c920.bin", 0x020000, 0x00a53c, CRC(43e1a419) SHA1(34020cc7b10a1c5b2860db84d133489bce53d3d4) )
-        ROM_LOAD( "a0936e60.bin", 0x030000, 0x001a32, CRC(2a998df6) SHA1(c7bed2777b2358bc0f1d7a3c23f3029591eb674d) )
-        ROM_LOAD( "a3480000.bin", 0x040000, 0x008e9c, CRC(c8939e48) SHA1(a8d26c2b32211a50b8cc49b51c0d2e34416cc715) )
 ROM_END
 
 /*
@@ -3749,35 +3645,6 @@ ROM_START( pstone2 )
 	ROM_LOAD("mpr-23124.ic7", 0x3800000, 0x0800000, CRC(508c0207) SHA1(e50d97a17cdd6771fbc63a254a4d638e7daa8f57) )
 	ROM_LOAD("mpr-23125.ic8", 0x4000000, 0x0800000, CRC(b9938bbc) SHA1(d55d7adecb5a5a4a276a5a17c12808085d980fd9) )
 	ROM_LOAD("mpr-23126.ic9", 0x4800000, 0x0800000, CRC(fbb0325b) SHA1(21b965519d7508d84344641d43e8af2c3ca29ba4) )
-
-	// trojaned protection data (filename is address read from)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a2785e20.bin", 0x000000, 0x0072f0, CRC(52912418) SHA1(ec0992eda50953001801d152e09195a17132cb0f) )
-        ROM_LOAD( "a2765e00.bin", 0x010000, 0x00e47c, CRC(d9acaa94) SHA1(6ab7ebc2dd78c0bc007f3656a67f3c24d23d48ae) )
-        ROM_LOAD( "a2774280.bin", 0x020000, 0x00c61c, CRC(8dd9581f) SHA1(f852c44e423effa894769d3e156325a132b2df8e) )
-        ROM_LOAD( "a27808a0.bin", 0x030000, 0x005568, CRC(4f4aee03) SHA1(453c0ec08ca69ad844f24be290e92bf16231a713) )
-        ROM_LOAD( "a154bdc0.bin", 0x040000, 0x00ec9c, CRC(755a7343) SHA1(a4355850e1cb6f81d53d461e70884a5c51083454) )
-        ROM_LOAD( "a155aa60.bin", 0x050000, 0x00951c, CRC(fc7a23d8) SHA1(a428114d89471f4b4c8af6d932376e7b0887c4cc) )
-        ROM_LOAD( "a1563f80.bin", 0x060000, 0x009f3c, CRC(90903b9c) SHA1(da6fcda74710497bab97c4c8342d93b5dfb14184) )
-        ROM_LOAD( "a156dec0.bin", 0x070000, 0x00dbdc, CRC(fb7b0b77) SHA1(ace73e925e5ffa3f805ff0ef68b564119cf4ce41) )
-        ROM_LOAD( "a157baa0.bin", 0x080000, 0x00cb3c, CRC(60e5dad6) SHA1(db8880ebbc3ebb02d861aa3bcf2cc34071d613e8) )
-        ROM_LOAD( "a15885e0.bin", 0x090000, 0x00e91c, CRC(6b2e1400) SHA1(8965e97e3d85a568c2bef2d1d0faf5b8aee289d0) )
-        ROM_LOAD( "a1596f00.bin", 0x0a0000, 0x00a3bc, CRC(cf538afa) SHA1(b7f94195760a0b14c18654823ead2e28fe526b07) )
-        ROM_LOAD( "a15a12c0.bin", 0x0b0000, 0x007f04, CRC(e07d589b) SHA1(60bc7f3e91d1f22b4854777644add346e5df58bb) )
-        ROM_LOAD( "a15a91e0.bin", 0x0c0000, 0x00c91c, CRC(124fce0b) SHA1(8949df4586c736e22c88b7594221ae114848284a) )
-        ROM_LOAD( "a15b5b00.bin", 0x0d0000, 0x00a53c, CRC(453bb126) SHA1(d5251f54e80504f3c427f6cc3443fe56edcd62c0) )
-        ROM_LOAD( "a15c0040.bin", 0x0e0000, 0x0088e0, CRC(7d601fb3) SHA1(ff2aca546e0db05b79f48fdb086f0e8e7e0853e4) )
-        ROM_LOAD( "a16203e0.bin", 0x0f0000, 0x00c61c, CRC(300c8e1e) SHA1(25f9c4af3bed0da5fc9e440096fb5cf4c29a89b3) )
-        ROM_LOAD( "a162ca00.bin", 0x100000, 0x009e9c, CRC(8f0ccd81) SHA1(0ae2209912e31195bb8110e28d0791fc398b49cd) )
-        ROM_LOAD( "a16368a0.bin", 0x110000, 0x00b2dc, CRC(e497f060) SHA1(05d8ffc0ead6c31ddc3197c877466fec354a71d9) )
-        ROM_LOAD( "a1641b80.bin", 0x120000, 0x00ac5c, CRC(e6d81d57) SHA1(97cfe0b14e1e23c7428dad426848de3fe2496ddb) )
-        ROM_LOAD( "a164c7e0.bin", 0x130000, 0x008b7c, CRC(ab6ca421) SHA1(84979f01f82f34a9d708b645e9f2cc45abed03a9) )
-        ROM_LOAD( "a1655360.bin", 0x140000, 0x00c8bc, CRC(c5554803) SHA1(06b712aed14a489d167876217cec48ad0aee495f) )
-        ROM_LOAD( "a1661c20.bin", 0x150000, 0x0083dc, CRC(4f5abf07) SHA1(3d03f8728ce445b6070f182d84f843f08420ad05) )
-        ROM_LOAD( "a166a000.bin", 0x160000, 0x00f73c, CRC(bfddc3bf) SHA1(a89bdebefaffc235e163a022d85b7c3bdbffcaf6) )
-        ROM_LOAD( "a1679740.bin", 0x170000, 0x00fb5c, CRC(ec9889a5) SHA1(d7f04b62a8a78b3bfc9a25f1b21be08dcb986546) )
-        ROM_LOAD( "a1688d00.bin", 0x180000, 0x00e080, CRC(ad7adaf6) SHA1(516858081ebab25ef0561e4b0f8842026504c5dd) )
-        ROM_LOAD( "a1696d80.bin", 0x190000, 0x007c10, CRC(4e0c7365) SHA1(0d564956c8330aa57c504a247aef6a230b1e8884) )
 ROM_END
 
 
@@ -3878,6 +3745,8 @@ ROM_START( qmegamis )
 	ROM_LOAD32_WORD("mpr-23224.ic30", 0x7000002, 0x0800000, CRC(bed270e1) SHA1(342199ac5903681f2bfdb9dfd57ce06202f14685) ) //ic 15
 	ROM_LOAD32_WORD("mpr-23225.ic31", 0x8000000, 0x0800000, CRC(ea558614) SHA1(b7dfe5598639a8e59e3cbbee38b1d9a1d8e022ea) ) //ic 16
 	ROM_LOAD32_WORD("mpr-23226.ic32", 0x8000002, 0x0800000, CRC(cd5da506) SHA1(2e76c8892c1d389b0f12a0046213f43d2ab07d78) ) //ic 17
+
+	ROM_COPY( "user1", 0x1400000, 0x0800000, 0x0800000 ) // mirror data for IC1 (no test on this game, but layout is the same as gram2000)
 
 	// trojaned protection data (must be in the "user1" region because it's accessed via DMA)
 	ROM_LOAD( "81452000_dma.bin", 0x9000000, 0x000120, CRC(96049488) SHA1(e2b98e8986f8cbf026db50a652300081a8e470b0) )
@@ -4297,10 +4166,6 @@ ROM_START( wwfroyal )
         ROM_LOAD( "mpr-22267.ic6", 0x5800000, 0x1000000, CRC(67ec1027) SHA1(2432b33983bbc9b07477459adb5ee1a62b6c0ea3) )
         ROM_LOAD( "mpr-22268.ic7", 0x6800000, 0x1000000, CRC(536f5eea) SHA1(f1de8624f82595adf75693b604fb026bf3f778ee) )
         ROM_LOAD( "mpr-22269.ic8", 0x7800000, 0x1000000, CRC(6c0cf740) SHA1(da10b33a6e54afbe1d7e52801216e7119b0b33b1) )
-
-	// trojaned protection data (filename is address read from)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-	ROM_LOAD( "a24db210.bin", 0x000000, 0x00005e, CRC(79fc852b) SHA1(58229b71d1a7067dd6ce3a617edc7d8bdd132036) )
 ROM_END
 
 /*
@@ -5699,15 +5564,7 @@ ROM_START( vf4cart )
 ROM_END
 
 /*
-    This is the same nonsense layout rom board as gram2000, and just like
-    that it tests IC1 which doesn't exist - is it a mirror, or protection
-    related?  There is no physical rom for it, also note, the roms are
-    interleaved, so each test is testing 2 roms and the labeling / ic
-    positions on the cart don't relate to the display in test mode.
-
-    Desired IC1 @ 0x800000 sums from the header = 9f39 fdc4
-
-    We need a USB dump of this from 0x800000 to 0x1000000.
+	Tests IC1 like gram2000 if actel_id is 0xffff, see ROM_COPY
 */
 ROM_START( vf4evoct )
 	NAOMI2_BIOS
@@ -5735,6 +5592,8 @@ ROM_START( vf4evoct )
         ROM_LOAD32_WORD( "mpr-23929.ic34s", 0x9000002, 0x800000, CRC(d768f242) SHA1(3ade29b094308d870ecac53cfe77b843d50af85a) )
         ROM_LOAD32_WORD( "mpr-23930.ic35",  0xa000000, 0x800000, CRC(0e45e4c4) SHA1(974b83d4cc35e8ac9f83d04ebd395f1e2196e829) )
         ROM_LOAD32_WORD( "mpr-23931.ic36s", 0xa000002, 0x800000, CRC(12ecd2f0) SHA1(3222d4d9d3e30c297a072a8888c28503306db40c) )
+
+	ROM_COPY( "user1", 0x1400000, 0x0800000, 0x0800000 ) // mirror data so IC1 check can pass
 ROM_END
 
 ROM_START( clubkrte )
