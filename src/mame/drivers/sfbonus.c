@@ -88,9 +88,9 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (socketted)
 
-HM86171-120 - HMC 28 DIP Color Pallete RAMDAC 
-   ULN2003A - 16 DIP Seven Darlington Arrays
-      51864 - V62C5164L-35P 64Kb SRAM
+HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC 
+   ULN2003A - 16 pin DIP Seven Darlington Arrays
+      51864 - V62C51864L-35P 64Kb SRAM
       75176 - SN75176BP Differential BUS Transceiver (Bidirectional data communication on multipoint bus transmission line)
        386D - JRC 386D low voltage AMP
         VR1 - Sound adjust pot
@@ -100,7 +100,7 @@ RST - Reset switch (to clear ram?)
 
 CN1 & CN2 are 4 pin link connectors
 
-U15 & U21 are unpopulated 32 DIP ROM sockets
+U15 & U21 are unpopulated 32 pin DIP ROM sockets
 SW1 - SW4 are unpopulated
 
 ------------------------------------------------------------
@@ -123,7 +123,7 @@ Model No. S2000C SALTIRE
 |e           +------+   |  AMCOE   |                 |
 |r                      |  SALTIRE |                 |
 |                       |          |                 |
-|C                      +----------+   H1   25MHz SW1|
+|C                      +----------+        25MHz SW1|
 |o                                                   |
 |n                                                 +-+
 |n                      12MHz      4.9152MHz       |P|
@@ -138,7 +138,7 @@ Model No. S2000C SALTIRE
   +----------+-------+-------------------------------+
 
 Basicly the same as the VCG-1 SALTIRE below, but the
-XILINX chip is socketted and no H2 connector.
+XILINX chip is socketted and no H1 or H2 connector.
 
 ------------------------------------------------------------
 
@@ -180,14 +180,14 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (used for programable protection, connected to H2)
 
-HM86171-120 - HMC 28 DIP Color Pallete RAMDAC 
+HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC 
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
-   ULN2003A - 16 DIP Seven Darlington Arrays
+   ULN2003A - 16 pin DIP Seven Darlington Arrays
       75176 - SN75176BP Differential BUS Transceiver (Bidirectional data communication on multipoint bus transmission line)
        386D - JRC 386D low voltage AMP
         VR1 - Sound adjust pot
 
-H1 - 3 pin Jumer
+H1 - 3 pin Jumper
 H2 - 6 pin header used to program the XC9536XL (JTAG?)
 H3 - 20 pin dual row connector
 
