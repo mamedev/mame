@@ -1379,7 +1379,7 @@ static WRITE32_HANDLER( gorgon_sharedram_w )
 	COMBINE_DATA(&namcos23_shared_ram[offset]);
 
 	// hack for final furlong
-	if ((offset == 0x8000/4) && (data == 0) && (mem_mask == 0xff000000))
+	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
 	{
 		logerror("S23: Final Furlong hack stopping H8/3002\n");
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1710,10 +1710,15 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 	namcos23_jvssense = (data & 0x04) ? 0 : 1;
 }
 
+static READ8_HANDLER(iob_r)
+{
+	return 0xff;
+}
+
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
-	AM_RANGE(0x6000, 0x6003) AM_NOP
+	AM_RANGE(0x6000, 0x6003) AM_READ( iob_r )
 	AM_RANGE(0x7000, 0x700f) AM_RAM	// probably actually the digital inputs, but ignore for now
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
@@ -2046,7 +2051,7 @@ ROM_START( finlflng )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "ff2wavel.2s",  0x000000, 0x800000, CRC(6235c605) SHA1(521eaee80ac17c0936877d49394e5390fa0ff8a0) )
-        ROM_LOAD( "ff2waveh.3s",  0x00000, 0x800000, CRC(2a59492a) SHA1(886ec0a4a71048d65f93c52df96416e74d23b3ec) )
+        ROM_LOAD( "ff2waveh.3s",  0x800000, 0x800000, CRC(2a59492a) SHA1(886ec0a4a71048d65f93c52df96416e74d23b3ec) )
 ROM_END
 
 ROM_START( motoxgo )
