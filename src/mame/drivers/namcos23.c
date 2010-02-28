@@ -45,6 +45,52 @@
       - write offset & ffff to a2000004 (yes, same address, hence the reset)
       - read 2 bytes from one rom at a200000a
       - read 2 bytes from one rom at a200000c
+
+    - Super System 23 tests irqs in the post.  timecrs2c's code can
+    potentially test 7 sources, but only actually test 5.  With each
+    source there is code to clear the interrupt and code to raise it.
+    Levels 0 and 1 are not connected to anything according to the code.
+
+      VBlank (level 2):
+        clear: ad00000a.h = 0
+        raise: just wait for it
+
+      C361   (level 3):
+        clear: a6820008.h = 1ff
+               a100005c.w = 0
+               a100005c.w = 1
+               a4c3ff04.w = 0
+        raise: a6820008.h = c8
+               a100005c.w = 1
+
+      Subcpu (level 3, same as C361):
+        clear: same as C361
+        raise: a4405002.h = 3170
+
+      C435   (level 4):
+        clear: a200000e.h = 1
+               a200000e.h = 0
+        raise: a2000000.h = a200
+               a2000000.h = 1
+               a2000000.h = 1 (yes, twice)
+
+      C422   (level 5):
+        clear: a6400002.h = f
+               ad000008.h = 0
+        raise: a640000e.h = 0
+               a6400006.h = 1
+               a640000a.h = 1
+               a6400006.h = fffb
+               a6400006.h = 0
+
+      RS323  (level 6, not tested by timecrs2c):
+        clear: nothing
+        raise: nothing
+
+      Timer  (level 7, not tested by timecrs2c):
+        clear: c0.Compare = 10d880
+        raise: c0.Count   = 10c8e0
+               c0.Compare = 10d880
 */
 
 /*
