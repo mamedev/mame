@@ -14,58 +14,40 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "includes/ohmygod.h"
 
-
-extern UINT16 *ohmygod_videoram;
-
-WRITE16_HANDLER( ohmygod_videoram_w );
-WRITE16_HANDLER( ohmygod_spritebank_w );
-WRITE16_HANDLER( ohmygod_scrollx_w );
-WRITE16_HANDLER( ohmygod_scrolly_w );
-VIDEO_START( ohmygod );
-VIDEO_UPDATE( ohmygod );
-
-
-static int adpcm_bank_shift;
-static int sndbank;
-
-static MACHINE_RESET( ohmygod )
-{
-	UINT8 *rom = memory_region(machine, "oki");
-
-	sndbank = 0;
-	memcpy(rom + 0x20000,rom + 0x40000 + 0x20000 * sndbank,0x20000);
-}
 
 static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
+	ohmygod_state *state = (ohmygod_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *rom = memory_region(space->machine, "oki");
 
 		/* ADPCM bank switch */
-		if (sndbank != ((data >> adpcm_bank_shift) & 0x0f))
+		if (state->sndbank != ((data >> state->adpcm_bank_shift) & 0x0f))
 		{
-			sndbank = (data >> adpcm_bank_shift) & 0x0f;
-			memcpy(rom + 0x20000,rom + 0x40000 + 0x20000 * sndbank,0x20000);
+			state->sndbank = (data >> state->adpcm_bank_shift) & 0x0f;
+			memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->sndbank, 0x20000);
 		}
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine, 0,data & 0x1000);
-		coin_counter_w(space->machine, 1,data & 0x2000);
+		coin_counter_w(space->machine, 0, data & 0x1000);
+		coin_counter_w(space->machine, 1, data & 0x2000);
 	}
 }
 
 static ADDRESS_MAP_START( ohmygod_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_BASE(&ohmygod_videoram)
+	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_BASE_MEMBER(ohmygod_state, videoram)
 	AM_RANGE(0x308000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(ohmygod_scrollx_w)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(ohmygod_scrolly_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE_MEMBER(ohmygod_state, spriteram, spriteram_size)
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM 	/* Work RAM */
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
@@ -312,15 +294,43 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( ohmygod )
+{
+	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->spritebank);
+	state_save_register_global(machine, state->scrollx);
+	state_save_register_global(machine, state->scrolly);
+	state_save_register_global(machine, state->sndbank);
+}
+
+static MACHINE_RESET( ohmygod )
+{
+	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	UINT8 *rom = memory_region(machine, "oki");
+
+	state->sndbank = 0;
+	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->sndbank, 0x20000);
+
+	state->spritebank = 0;
+	state->scrollx = 0;
+	state->scrolly = 0;
+}
+
 static MACHINE_DRIVER_START( ohmygod )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ohmygod_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(ohmygod_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_MACHINE_RESET(ohmygod)
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+
+	MDRV_MACHINE_START(ohmygod)
+	MDRV_MACHINE_RESET(ohmygod)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -387,14 +397,16 @@ ROM_END
 
 static DRIVER_INIT( ohmygod )
 {
-	adpcm_bank_shift = 4;
+	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	state->adpcm_bank_shift = 4;
 }
 
 static DRIVER_INIT( naname )
 {
-	adpcm_bank_shift = 0;
+	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	state->adpcm_bank_shift = 0;
 }
 
 
-GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)", GAME_NO_COCKTAIL )
-GAME( 1994, naname,  0, ohmygod, naname,  naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", GAME_NO_COCKTAIL )
+GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1994, naname,  0, ohmygod, naname,  naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

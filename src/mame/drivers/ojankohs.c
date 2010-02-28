@@ -20,8 +20,8 @@
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2000/06/10 -
     Driver by Uki 2001/12/10 -
 
-******************************************************************************/
-/******************************************************************************
+******************************************************************************
+
 Memo:
 
 - Sometimes RAM check in testmode fails (reason unknown).
@@ -33,115 +33,90 @@ Memo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "includes/ojankohs.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
 
-VIDEO_UPDATE( ojankohs );
-PALETTE_INIT( ojankoy );
-VIDEO_START( ojankohs );
-VIDEO_START( ojankoy );
-WRITE8_HANDLER( ojankohs_palette_w );
-WRITE8_HANDLER( ccasino_palette_w );
-WRITE8_HANDLER( ojankohs_videoram_w );
-WRITE8_HANDLER( ojankohs_colorram_w );
-WRITE8_HANDLER( ojankohs_gfxreg_w );
-WRITE8_HANDLER( ojankohs_flipscreen_w );
-VIDEO_UPDATE( ojankoc );
-VIDEO_START( ojankoc );
-WRITE8_HANDLER( ojankoc_palette_w );
-WRITE8_HANDLER( ojankoc_videoram_w );
-void ojankoc_flipscreen(const address_space *space, int data);
-
-
-static int ojankohs_portselect;
-static int ojankohs_adpcm_reset;
-static int ojankohs_adpcm_data;
-static int ojankohs_vclk_left;
-
-
-static MACHINE_RESET( ojankohs )
-{
-	ojankohs_portselect = 0;
-
-	ojankohs_adpcm_reset = 0;
-	ojankohs_adpcm_data = 0;
-	ojankohs_vclk_left = 0;
-}
-
 static WRITE8_HANDLER( ojankohs_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
+	memory_set_bank(space->machine, "bank1", data & 0x3f);
 }
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
+	memory_set_bank(space->machine, "bank1", data & 0x1f);
 
-	ojankohs_adpcm_reset = ((data & 0x20) >> 5);
-	if (!ojankohs_adpcm_reset) ojankohs_vclk_left = 0;
+	state->adpcm_reset = BIT(data, 5);
+	if (!state->adpcm_reset) 
+		state->vclk_left = 0;
 
-	msm5205_reset_w(devtag_get_device(space->machine, "msm"), !ojankohs_adpcm_reset);
+	msm5205_reset_w(state->msm, !state->adpcm_reset);
 }
 
 static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 {
-	ojankohs_adpcm_reset = (data & 0x01);
-	ojankohs_vclk_left = 0;
+	ojankohs_state *state = (ojankohs_state *)device->machine->driver_data;
+	state->adpcm_reset = BIT(data, 0);
+	state->vclk_left = 0;
 
-	msm5205_reset_w(device, !ojankohs_adpcm_reset);
+	msm5205_reset_w(device, !state->adpcm_reset);
 }
 
 static WRITE8_HANDLER( ojankohs_msm5205_w )
 {
-	ojankohs_adpcm_data = data;
-	ojankohs_vclk_left = 2;
+	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	state->adpcm_data = data;
+	state->vclk_left = 2;
 }
 
-static void ojankohs_adpcm_int(running_device *device)
+static void ojankohs_adpcm_int( running_device *device )
 {
+	ojankohs_state *state = (ojankohs_state *)device->machine->driver_data;
+
 	/* skip if we're reset */
-	if (!ojankohs_adpcm_reset)
+	if (!state->adpcm_reset)
 		return;
 
 	/* clock the data through */
-	if (ojankohs_vclk_left) {
-		msm5205_data_w(device, (ojankohs_adpcm_data >> 4));
-		ojankohs_adpcm_data <<= 4;
-		ojankohs_vclk_left--;
+	if (state->vclk_left) 
+	{
+		msm5205_data_w(device, (state->adpcm_data >> 4));
+		state->adpcm_data <<= 4;
+		state->vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
-	if (!ojankohs_vclk_left)
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->vclk_left)
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )
 {
-	UINT8 *BANKROM = memory_region(space->machine, "user1");
-	UINT32 bank_address = (data & 0x0f) * 0x8000;
+	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 
-	memory_set_bankptr(space->machine, "bank1", &BANKROM[bank_address]);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 
-	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
-	msm5205_reset_w(devtag_get_device(space->machine, "msm"), (!(data & 0x10) >> 4));
+	state->adpcm_reset = BIT(data, 4);
+	msm5205_reset_w(state->msm, !BIT(data, 4));
 	ojankoc_flipscreen(space, data);
 }
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
 {
-	ojankohs_portselect = data;
+	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	state->portselect = data;
 }
 
 static READ8_HANDLER( ojankohs_keymatrix_r )
 {
+	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 	int ret;
 
-	switch (ojankohs_portselect) {
+	switch (state->portselect) 
+	{
 		case 0x01:	ret = input_port_read(space->machine, "KEY0");	break;
 		case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
 		case 0x04:	ret = input_port_read(space->machine, "KEY2"); break;
@@ -156,7 +131,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 					ret &= input_port_read(space->machine, "KEY4");
 					break;
 		default:	ret = 0xff;
-					logerror("PC:%04X unknown %02X\n", cpu_get_pc(space->cpu), ojankohs_portselect);
+					logerror("PC:%04X unknown %02X\n", cpu_get_pc(space->cpu), state->portselect);
 					break;
 	}
 
@@ -165,6 +140,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 
 static READ8_HANDLER( ojankoc_keymatrix_r )
 {
+	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 	int i;
 	int ret = 0;
 	static const char *const keynames[2][5] =
@@ -173,8 +149,9 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 				{ "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" }
 			};
 
-	for (i = 0; i < 5; i++) {
-		if (~ojankohs_portselect & (1 << i))
+	for (i = 0; i < 5; i++) 
+	{
+		if (!BIT(state->portselect, i))
 			ret |= input_port_read(space->machine, keynames[offset][i]);
 	}
 
@@ -211,12 +188,12 @@ static READ8_HANDLER( ccasino_dipsw4_r )
 
 static WRITE8_HANDLER( ojankoy_coinctr_w )
 {
-	coin_counter_w( space->machine, 0, (data & 0x01));
+	coin_counter_w(space->machine, 0, BIT(data, 0));
 }
 
 static WRITE8_HANDLER( ccasino_coinctr_w )
 {
-	coin_counter_w(space->machine, 0, (data & 0x02));
+	coin_counter_w(space->machine, 0, BIT(data, 1));
 }
 
 
@@ -299,7 +276,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( mahjong_p1 )
-	PORT_START("KEY0")	/* PORT 1-0 */
+	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -309,7 +286,7 @@ static INPUT_PORTS_START( mahjong_p1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")	/* PORT 1-1 */
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -319,7 +296,7 @@ static INPUT_PORTS_START( mahjong_p1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")	/* PORT 1-2 */
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -329,7 +306,7 @@ static INPUT_PORTS_START( mahjong_p1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")	/* PORT 1-3 */
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -339,7 +316,7 @@ static INPUT_PORTS_START( mahjong_p1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")	/* PORT 1-4 */
+	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -351,7 +328,7 @@ static INPUT_PORTS_START( mahjong_p1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ojankohs )
-	PORT_START("IN0")	/* TEST SW */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
@@ -361,7 +338,7 @@ static INPUT_PORTS_START( ojankohs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")	/* COIN SW */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -412,7 +389,7 @@ static INPUT_PORTS_START( ojankohs )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ojankoy )
-	PORT_START("IN0")	/* TEST SW */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
@@ -422,7 +399,7 @@ static INPUT_PORTS_START( ojankoy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")	/* COIN SW */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -483,7 +460,7 @@ static INPUT_PORTS_START( ojankoy )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ccasino )
-	PORT_START("IN0")	/* TEST SW */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
@@ -493,7 +470,7 @@ static INPUT_PORTS_START( ccasino )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")	/* COIN SW */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -661,7 +638,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("KEY0")	/* PORT 1-0 */
+	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I )
@@ -671,7 +648,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("KEY1")	/* PORT 1-1 */
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J )
@@ -681,7 +658,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("KEY2")	/* PORT 1-2 */
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K )
@@ -691,7 +668,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("KEY3")	/* PORT 1-3 */
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_L )
@@ -701,7 +678,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("KEY4")	/* PORT 1-4 */
+	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_DOUBLE_UP )
@@ -711,7 +688,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("KEY5")	/* PORT 2-0 */
+	PORT_START("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_PLAYER(2)
@@ -720,7 +697,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("KEY6")	/* PORT 2-1 */
+	PORT_START("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J ) PORT_PLAYER(2)
@@ -729,7 +706,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_BET ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("KEY7")	/* PORT 2-2 */
+	PORT_START("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K ) PORT_PLAYER(2)
@@ -738,7 +715,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("KEY8")	/* PORT 2-3 */
+	PORT_START("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_L ) PORT_PLAYER(2)
@@ -747,7 +724,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("KEY9")	/* PORT 2-4 */
+	PORT_START("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
@@ -815,7 +792,74 @@ static const msm5205_interface msm5205_config =
 };
 
 
+static MACHINE_START( common )
+{
+	ojankohs_state *state = (ojankohs_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->msm = devtag_get_device(machine, "msm");
+
+	state_save_register_global(machine, state->gfxreg);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->flipscreen_old);
+	state_save_register_global(machine, state->scrollx);
+	state_save_register_global(machine, state->scrolly);
+	state_save_register_global(machine, state->screen_refresh);
+	state_save_register_global(machine, state->portselect);
+	state_save_register_global(machine, state->adpcm_reset);
+	state_save_register_global(machine, state->adpcm_data);
+	state_save_register_global(machine, state->vclk_left);
+}
+
+static MACHINE_START( ojankohs )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 0x40, &ROM[0x10000], 0x4000);
+
+	MACHINE_START_CALL(common);
+}
+
+static MACHINE_START( ojankoy )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x10000], 0x4000);
+
+	MACHINE_START_CALL(common);
+}
+
+static MACHINE_START( ojankoc )
+{
+	UINT8 *ROM = memory_region(machine, "user1");
+
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x0000], 0x8000);
+
+	MACHINE_START_CALL(common);
+}
+
+static MACHINE_RESET( ojankohs )
+{
+	ojankohs_state *state = (ojankohs_state *)machine->driver_data;
+
+	state->portselect = 0;
+
+	state->adpcm_reset = 0;
+	state->adpcm_data = 0;
+	state->vclk_left = 0;
+
+	state->gfxreg = 0;
+	state->flipscreen = 0;
+	state->flipscreen_old = 0;
+	state->scrollx = 0;
+	state->scrolly = 0;
+	state->screen_refresh = 0;
+}
+
 static MACHINE_DRIVER_START( ojankohs )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ojankohs_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -823,6 +867,7 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_CPU_IO_MAP(ojankohs_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(ojankohs)
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -854,12 +899,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ojankoy )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(ojankohs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ojankoy_map)
 	MDRV_CPU_IO_MAP(ojankoy_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(ojankoy)
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -892,12 +941,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ccasino )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(ojankohs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ojankoy_map)
 	MDRV_CPU_IO_MAP(ccasino_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(ojankohs)
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -929,12 +982,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ojankoc )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(ojankohs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(ojankoc_map)
 	MDRV_CPU_IO_MAP(ojankoc_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(ojankoc)
 	MDRV_MACHINE_RESET(ojankohs)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -1056,8 +1113,8 @@ ROM_START( ojankoc )
 ROM_END
 
 
-GAME( 1986, ojankoc,  0, ojankoc,  ojankoc,  0, ROT0, "V-System Co.", "Ojanko Club (Japan)", 0 )
-GAME( 1986, ojankoy,  0, ojankoy,  ojankoy,  0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)", 0 )
-GAME( 1987, ojanko2,  0, ojankoy,  ojankoy,  0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)", 0 )
-GAME( 1987, ccasino,  0, ccasino,  ccasino,  0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)", 0 )
-GAME( 1988, ojankohs, 0, ojankohs, ojankohs, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)", 0 )
+GAME( 1986, ojankoc,  0, ojankoc,  ojankoc,  0, ROT0, "V-System Co.", "Ojanko Club (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0, ojankoy,  ojankoy,  0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0, ojankoy,  ojankoy,  0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0, ccasino,  ccasino,  0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ojankohs, 0, ojankohs, ojankohs, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)", GAME_SUPPORTS_SAVE )
