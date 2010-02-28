@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 // MAME headers
+#include "osdcomm.h"
 #include "osdcore.h"
 
 #include "sdlsync.h"

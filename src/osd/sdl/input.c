@@ -22,7 +22,6 @@
 #include "ui.h"
 #include "uiinput.h"
 #include "emuopts.h"
-#include "osdepend.h"
 
 
 // MAMEOS headers

@@ -128,7 +128,7 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 
 #else  /* SDLMAME_WIN32 */
 
-#include "emu.h"
+#include "emucore.h"
 
 //============================================================
 //  Stub for win32

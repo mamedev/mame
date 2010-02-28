@@ -21,7 +21,6 @@
 #include <os2.h>
 
 // MAME headers
-#include "osdepend.h"
 #include "osdcore.h"
 
 //============================================================

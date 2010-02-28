@@ -10,7 +10,7 @@
 #ifndef __SDLSTRCONV__
 #define __SDLSTRCONV__
 
-#include "osdcore.h"
+#include "osdcomm.h"
 
 
 
