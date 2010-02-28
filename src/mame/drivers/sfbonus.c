@@ -49,6 +49,14 @@ In a couple of cases, due to too many older revisions, I used: parent + version 
 
 ------------------------------------------------------------
 
+There is known to be a "Classic Edition Compact Format" PCB
+
+ROM1 (program rom) and ROM2 (sound sample) are stadard 32 pin
+style PROMs.  The graphics are stored in ROM3 & ROM4 which
+appear to be surface mounted 8 Mbit roms.
+
+------------------------------------------------------------
+
 Model No. S2000-B
 +---------+   +-------------+   +--------------------+
 |         +---+  Connector  +---+                    |
@@ -142,6 +150,8 @@ XILINX chip is socketted and no H1 or H2 connector.
 
 ------------------------------------------------------------
 
+Starting in 2005 with Money Machine and later
+
 Model No. VCG-1 SALTIRE
   +-------+   +-------------+   +---+----++----+-----+
   |       +---+  Connector  +---+   |CN2 ||CN1 |75176|
@@ -187,7 +197,7 @@ HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
        386D - JRC 386D low voltage AMP
         VR1 - Sound adjust pot
 
-H1 - 3 pin Jumper
+H1 - 3 pin Jumper (Pins 1+2 is CGA, pins 2+3 is XVGA)
 H2 - 6 pin header used to program the XC9536XL (JTAG?)
 H3 - 20 pin dual row connector
 
@@ -4745,45 +4755,6 @@ ROM_START( moneymacv2 )
 	ROM_LOAD_OPTIONAL( "mm17lt.id", 0x00, 0x20,  CRC(b6b08ea0) SHA1(a56c7648424ca4dd0d405059f07af6f7cee0111a) )
 ROM_END
 
-/* Around The World */
-ROM_START( atworld )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "aw_rom3.bin", 0x00000, 0x80000, CRC(36db794a) SHA1(a5cb32fc401faf52e221f0a4d8bbfae819e7d08b) )
-	ROM_LOAD16_BYTE( "aw_rom4.bin", 0x00001, 0x80000, CRC(3927d187) SHA1(4d6e509ec6cc33e6985142894bbce547e1ee9f4f) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
-	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
-
-	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "aw13ex.id", 0x00, 0x1000, CRC(c26305c9) SHA1(ee3aea8926ee4890d45896cf0be175c2262c7341) )
-ROM_END
-
-ROM_START( atworldd1 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "awd13r.bin", 0x00000, 0x80000, CRC(786079a8) SHA1(862abc511c5ac0d667c6b9abd914ce6035e9aed9) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "aw_rom3.bin", 0x00000, 0x80000, CRC(36db794a) SHA1(a5cb32fc401faf52e221f0a4d8bbfae819e7d08b) )
-	ROM_LOAD16_BYTE( "aw_rom4.bin", 0x00001, 0x80000, CRC(3927d187) SHA1(4d6e509ec6cc33e6985142894bbce547e1ee9f4f) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
-	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
-
-	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "aw13re.id", 0x00, 0x1000,  CRC(0f9991fb) SHA1(5ea9e49c6b8b00c2c3638cc39e479d6e5e112b7a) )
-ROM_END
-
 // incomplete / mixed sets etc. sort these first before doing anything else with them
 /* Fruit Bonus 2005 */
 ROM_START( fb5 )
@@ -5136,6 +5107,7 @@ ROM_START( fb6sev2 )
 	ROM_LOAD_OPTIONAL( "fb6se14lt.id", 0x00, 0x20, CRC(8d72c5a4) SHA1(51d874c14f4fcb5e0f72cbc0bef053170bdc5ee5) )
 ROM_END
 
+/* Bugs Fever */
 ROM_START( bugfever )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfd17r.bin", 0x00000, 0x80000, CRC(6fc33307) SHA1(fdb10bd3e463cac2f9050d2d37fdfba9ccee91dc) )
@@ -5229,6 +5201,45 @@ ROM_START( bugfeverv2 )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "bf17ex.id", 0x00, 0x20, CRC(38bd8ec4) SHA1(4e6b85348f2fa821934f7666f77ba0f016e200ec) )
+ROM_END
+
+/* Around The World */
+ROM_START( atworld )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "aw_rom3.bin", 0x00000, 0x80000, CRC(36db794a) SHA1(a5cb32fc401faf52e221f0a4d8bbfae819e7d08b) )
+	ROM_LOAD16_BYTE( "aw_rom4.bin", 0x00001, 0x80000, CRC(3927d187) SHA1(4d6e509ec6cc33e6985142894bbce547e1ee9f4f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
+	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
+
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "aw13ex.id", 0x00, 0x1000, CRC(c26305c9) SHA1(ee3aea8926ee4890d45896cf0be175c2262c7341) )
+ROM_END
+
+ROM_START( atworldd1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "awd13r.bin", 0x00000, 0x80000, CRC(786079a8) SHA1(862abc511c5ac0d667c6b9abd914ce6035e9aed9) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "aw_rom3.bin", 0x00000, 0x80000, CRC(36db794a) SHA1(a5cb32fc401faf52e221f0a4d8bbfae819e7d08b) )
+	ROM_LOAD16_BYTE( "aw_rom4.bin", 0x00001, 0x80000, CRC(3927d187) SHA1(4d6e509ec6cc33e6985142894bbce547e1ee9f4f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
+	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
+
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "aw13re.id", 0x00, 0x1000,  CRC(0f9991fb) SHA1(5ea9e49c6b8b00c2c3638cc39e479d6e5e112b7a) )
 ROM_END
 
 /* Not working sets (due to incomplete dumps) */
@@ -5795,14 +5806,14 @@ GAME( 2004, classice2,   classice, sfbonus,    amcoe1_reels3,    classice,      
 GAME( 2004, classiced2,  classice, sfbonus,    amcoe1_reels3,    classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", 0)
 GAME( 2004, classicev2,  classice, sfbonus,    amcoe1_reels3,    classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", 0)
 
-GAME( 200?, seawld,      0,        sfbonus,    amcoe1_reels3,    seawldv,         ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", 0)
-GAME( 200?, seawldd1,    seawld,   sfbonus,    amcoe1_reels3,    seawld,          ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", 0)
+GAME( 2005, seawld,      0,        sfbonus,    amcoe1_reels3,    seawldv,         ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", 0)
+GAME( 2005, seawldd1,    seawld,   sfbonus,    amcoe1_reels3,    seawld,          ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", 0)
 
-GAME( 200?, moneymac,    0,        sfbonus,    amcoe1_reels3,    moneymacv,       ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", 0)
-GAME( 200?, moneymacd1,  moneymac, sfbonus,    amcoe1_reels3,    moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7R)", 0)
-GAME( 200?, moneymacv1,  moneymac, sfbonus,    amcoe1_reels3,    moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", 0)
-GAME( 200?, moneymacd2,  moneymac, sfbonus,    amcoe1_reels3,    moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7LT)", 0)
-GAME( 200?, moneymacv2,  moneymac, sfbonus,    amcoe1_reels3,    moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual)", 0)
+GAME( 2005, moneymac,    0,        sfbonus,    amcoe1_reels3,    moneymacv,       ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", 0)
+GAME( 2005, moneymacd1,  moneymac, sfbonus,    amcoe1_reels3,    moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7R)", 0)
+GAME( 2005, moneymacv1,  moneymac, sfbonus,    amcoe1_reels3,    moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", 0)
+GAME( 2005, moneymacd2,  moneymac, sfbonus,    amcoe1_reels3,    moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7LT)", 0)
+GAME( 2005, moneymacv2,  moneymac, sfbonus,    amcoe1_reels3,    moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual)", 0)
 
 GAME( 2005, fb5,         0,        sfbonus,    amcoe2_reels3,    fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 1)", 0)
 GAME( 2005, fb5c,        fb5,      sfbonus,    amcoe1_reels3,    fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 2)", 0)
@@ -5825,22 +5836,22 @@ GAME( 2006, fb6sev1,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,          
 GAME( 2006, fb6sed2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT CGA)", 0)
 GAME( 2006, fb6sev2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT Dual)", 0)
 
-GAME( 2006, bugfever,    0,        sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bug Fever (Version 1.7R CGA)", 0) /* Released August 2006 according to Amcoe web site */
-GAME( 2006, bugfeverv,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverv,       ROT0,  "Amcoe", "Bug Fever (Version 1.7R Dual)", 0)
-GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,       ROT0,  "Amcoe", "Bug Fever (Version 1.7E CGA)", 0)
-GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bug Fever (Version 1.7E Dual)", 0)
-GAME( 2006, bugfevero,   bugfever, sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bug Fever (Version 1.6R CGA)", 0)
+GAME( 2006, bugfever,    0,        sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.7R CGA)", 0) /* Released August 2006 according to Amcoe web site */
+GAME( 2006, bugfeverv,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverv,       ROT0,  "Amcoe", "Bugs Fever (Version 1.7R Dual)", 0)
+GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,       ROT0,  "Amcoe", "Bugs Fever (Version 1.7E CGA)", 0)
+GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bugs Fever (Version 1.7E Dual)", 0)
+GAME( 2006, bugfevero,   bugfever, sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.6R CGA)", 0)
 
 GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site - too new */
 GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site - too new */
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
-GAME( 200?, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING)
-GAME( 200?, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island", GAME_NOT_WORKING)
-GAME( 200?, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)
-GAME( 200?, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING)
-GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (Version 2.0.4)", GAME_NOT_WORKING)
-GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING)
+GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)
+GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING)
+GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING)
+GAME( 2006, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island", GAME_NOT_WORKING)
+GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (Version 2.0.4)", GAME_NOT_WORKING) /* After Around The World */
+GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING) /* After Around The World */
 
 // Known sets but no roms dumped at all for these:
 // Merry Circus
