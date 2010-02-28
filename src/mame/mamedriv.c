@@ -1295,7 +1295,7 @@ const game_driver * const drivers[] =
 	DRIVER( indianbt )	/* (c) 1980 Taito */
 	DRIVER( steelwkr )	/* (c) 1980 Taito */
 	DRIVER( m79amb )	/* (c) 1977 RamTek */
-	DRIVER( alieninv )	/* Margomatics */
+	DRIVER( alieninv )	/* Margamatics */
 	DRIVER( alieninvp2 )	/* bootleg */
 	DRIVER( tst_invd )	/* Test ROM */
 	DRIVER( sitv )		/* (c) 1979 Taito */
