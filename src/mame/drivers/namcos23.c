@@ -808,6 +808,11 @@ static UINT32 *namcos23_textram, *namcos23_shared_ram;
 static UINT32 *namcos23_charram;
 static UINT8 namcos23_jvssense;
 static INT32 has_jvsio;
+
+static bool ctl_vbl_active;
+static UINT8 ctl_led;
+static UINT16 ctl_inp_buffer[2];
+
 static UINT16 c417_ram[0x10000], c417_adr = 0;
 
 static UINT16 c412_sdram_a[0x100000];
@@ -1070,18 +1075,10 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 	UpdatePalette(space->machine, (offset % (0x10000/4))*2);
 }
 
-// must return this magic number
-static UINT32 s23_vbl = 0;
-
-static INTERRUPT_GEN(s23_interrupt)
-{
-	s23_vbl ^= 0x80008000;
-}
-
 static READ16_HANDLER(s23_c417_16_r)
 {
 	switch(offset) {
-	case 0: return 0x8e | s23_vbl;
+	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x8000 : 0);
 	case 1: return c417_adr;
 	case 4:
 		//		logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1264,14 +1261,83 @@ static WRITE32_HANDLER(s23_c421_32_w)
         s23_c421_16_w(space, offset*2+1, data, mem_mask);
 }
 
+static WRITE16_HANDLER(s23_ctl_16_w)
+{
+	switch(offset) {
+	case 0: {
+		if(ctl_led != (data & 0xff)) {
+			ctl_led = data;
+			logerror("LEDS %c%c%c%c%c%c%c%c\n",
+					 ctl_led & 0x80 ? '.' : '#',
+					 ctl_led & 0x40 ? '.' : '#',
+					 ctl_led & 0x20 ? '.' : '#',
+					 ctl_led & 0x10 ? '.' : '#',
+					 ctl_led & 0x08 ? '.' : '#',
+					 ctl_led & 0x04 ? '.' : '#',
+					 ctl_led & 0x02 ? '.' : '#',
+					 ctl_led & 0x01 ? '.' : '#');
+		}
+		break;
+	}
+
+	case 2: case 3:
+		// These may be coming from another CPU, in particular the I/O one
+		ctl_inp_buffer[offset-2] = input_port_read(space->machine, offset == 2 ? "P1" : "P2");
+		break;
+	case 5:
+		if(ctl_vbl_active) {
+			ctl_vbl_active = false;
+			cpu_set_input_line(space->cpu, MIPS3_IRQ0, CLEAR_LINE);
+		}
+		break;
+
+	default:
+		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+	}
+}
+
+static READ16_HANDLER(s23_ctl_16_r)
+{
+	switch(offset) {
+	case 1: return 0xfeff; // 0x0100 set freezes gorgon, dips?
+	case 2: case 3: {
+		UINT16 res = ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
+		ctl_inp_buffer[offset-2] = (ctl_inp_buffer[offset-2] << 1) | 1;
+		return res;
+	}
+	}
+	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+	return 0xffff;
+}
+
+static WRITE32_HANDLER(s23_ctl_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_ctl_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_ctl_16_w(space, offset*2+1, data, mem_mask);
+}
+
 // this & 8 and this & 4 are checked
 // offset = 1 for magic latch
-static READ32_HANDLER(sysctl_stat_r)
+static READ32_HANDLER(s23_ctl_32_r)
 {
-	if (offset == 1) return 0x0000ffff;	// all inputs in
-
-	return 0xfffffeff;	// gorgon wants & 0x100 clear
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_ctl_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_ctl_16_r(space, offset*2+1, mem_mask);
+    return data;       
 }
+
+static INTERRUPT_GEN(s23_interrupt)
+{
+	if(!ctl_vbl_active) {
+		ctl_vbl_active = true;
+		cpu_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
+	}
+}
+
 
 // as with System 22, we need to halt the MCU while checking shared RAM
 static WRITE32_HANDLER( s23_mcuen_w )
@@ -1341,7 +1407,7 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) // BACKUP
 
-	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)	AM_WRITENOP // write for LEDs at d000000, watchdog at d000004
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE (s23_ctl_32_r, s23_ctl_32_w ) // write for LEDs at d000000, watchdog at d000004
 
 	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
 
@@ -1366,7 +1432,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x08000000, 0x09ffffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE( s23_c412_32_r, s23_c412_32_w )
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE( s23_c421_32_r, s23_c421_32_w )
-	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r) AM_WRITENOP
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE (s23_ctl_32_r, s23_ctl_32_w )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -1554,6 +1620,16 @@ static WRITE8_HANDLER( s23_mcu_iob_w )
 
 static INPUT_PORTS_START( ss23 )
 	PORT_START("H8PORT")
+
+	// No idea if start is actually there, but we need buttons to pass error screens
+	PORT_START("P1")
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 
@@ -1657,7 +1733,7 @@ static DRIVER_INIT(ss23)
 {
 	mi_rd = mi_wr = im_rd = im_wr = 0;
 	namcos23_jvssense = 1;
-	s23_vbl = 0;
+	ctl_vbl_active = false;
 	s23_lastpB = 0x50;
 	s23_setstate = 0;
 	s23_setnum = 0;
@@ -1745,7 +1821,7 @@ static MACHINE_DRIVER_START( gorgon )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
@@ -1790,7 +1866,7 @@ static MACHINE_DRIVER_START( s23 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
@@ -1831,7 +1907,7 @@ static MACHINE_DRIVER_START( ss23 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
