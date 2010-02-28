@@ -1299,7 +1299,11 @@ static WRITE16_HANDLER(s23_ctl_16_w)
 static READ16_HANDLER(s23_ctl_16_r)
 {
 	switch(offset) {
-	case 1: return 0xfeff; // 0x0100 set freezes gorgon, dips?
+		// dips ?
+		// 0100 set freezes gorgon
+		// 0004 unset freezes ss23 at the boot level
+		// 0002 unset skips the post on ss23
+	case 1: return 0x0006;
 	case 2: case 3: {
 		UINT16 res = ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
 		ctl_inp_buffer[offset-2] = (ctl_inp_buffer[offset-2] << 1) | 1;
