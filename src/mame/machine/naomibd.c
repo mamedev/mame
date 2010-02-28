@@ -224,7 +224,7 @@ struct _naomibd_state
 	// live decrypt vars
 	UINT32				dc_gamekey, dc_seqkey, dc_seed;
 	UINT8				dc_cart_ram[128*1024];	// internal cartridge RAM
-	INT32				dc_m3_ptr, dc_is_m3, dc_m2_ptr, dc_readback;
+	INT32				dc_m3_ptr, dc_m2_ptr, dc_readback;
 
 	#if NAOMIBD_PRINTF_PROTECTION
 	int				prot_pio_count;
@@ -236,22 +236,39 @@ struct _naomibd_state
 // if key is not -1, it's used for the match instead of the address written.
 static const naomibd_config_table naomibd_translate_tbl[] =
 {
-	// capsnk/capsnka use a game key of 0.  Seriously.
+	// games where on-the-fly decryption works (many of these are fully playable in MAME, just slow)
+	{ "18wheelr", 0, 0x7cf54, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "alpilota", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "alpiltdx", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
 	{ "capsnk", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnka", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "wwfroyal",0, 0x627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "crzytaxi", 0, 0xd2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "jambo",    0, 0xfab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "csmash", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "csmasho", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "suchie3", 0, 0x368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-
-	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-//	{ "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 	// uses compression
+	{ "cspike", 0, 0xe2010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "deathcox", 0, 0xb64d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
 	{ "dybb99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "f355twin", 0, 0x6efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "f355twn2", 0, 0x666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "ggram2", 0, 0x74a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "gwing2",  0, 0xb25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },                                                                        
+	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
+	{ "jambo",    0, 0xfab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "otrigger", 0, 0xfea94, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
+	{ "pstone", 0, 0xe69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "samba", 0, 0xa8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "slasho", 0, 0xa66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "smlg99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "spawn", 0, 0x78d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "suchie3", 0, 0x368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "wwfroyal",0, 0x627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "zombrvn", 0, 0x12b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
 
+	// games where the encryption is stacked with the ASIC's compression
 	{ "doa2", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,	// 0x8ad01, has compression
 		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x118a3a, 0x120000,
 		    -1, 0x12c0d8, 0x140000, -1, 0x147e22, 0x160000, -1, 0x1645ce, 0x180000, -1, 0x17c6b2, 0x1a0000,
@@ -260,27 +277,20 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x11a5b4, 0x120000,
 		    -1, 0x12e7c4, 0x140000, -1, 0x1471f6, 0x160000, -1, 0x1640c4, 0x180000, -1, 0x1806ca, 0x1a0000,
 		    -1, 0x199df4, 0x1c0000, -1, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
-	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
-	{ "gwing2",  0, -1, { -1, 0x85ddc0, 0, 0xd567, 0, 0x10000, 0xe329, 0, 0x30000, 0xc112, 0, 0x50000,	// 0xb25d0, uses compression
-			  0xabcd, 0, 0x70000, 0xef01, 0, 0x90000, 0x1234, 0, 0xb0000, 0x5678, 0, 0xd0000,
-			  0x5555, 0, 0xf0000, 0x6666, 0, 0x110000, 0xa901, 0, 0x130000, 0xa802, 0, 0x150000,
-			  0x3232, 0, 0x170000, 0x8989, 0, 0x190000, 0x6655, 0, 0x1a0000,
-			  0x3944, 0, 0x1c0000, 0x655a, 0, 0x1d0000, 0xf513, 0, 0x1e0000,
-			  0xb957, 0, 0, 0x37ca, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
-	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
 	{ "ggx",      0, -1, { -1, 0x200000, 0x100000, -1, 0x210004, 0x110000, -1, 0x220008, 0x120000, -1, 0x228000, 0x130000,	// 0x76110, uses compression
 		          0x3af9, 0, 0x000000, 0x2288, 0, 0x010000, 0xe5e6, 0, 0x020000, 0xebb0, 0, 0x030000,
 			  0x0228, 0, 0x040000, 0x872c, 0, 0x050000, 0xbba0, 0, 0x060000, 0x772f, 0, 0x070000,
 			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
 			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
 		          0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "18wheelr", 0, -1, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x7cf54, uses compression
 	{ "sgtetris", 0, -1, { 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x8ae51, uses compression
+//	{ "virnbao", 0, 0x68b58, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 	// note: "virnba" set doesn't have protection
+//	{ "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 };
 
 // forward declaration for decrypt function
 static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UINT8* ciphertext, UINT8* plaintext, int length);
+static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter, UINT16 data);
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -404,31 +414,8 @@ READ64_DEVICE_HANDLER( naomibd_r )
 			// can we live-decrypt this game?
 			if (v->dc_gamekey != -1)
 			{
-				if (v->dc_is_m3)
-				{
-					ret = (UINT64)(v->dc_cart_ram[v->dc_readback+1] | (v->dc_cart_ram[v->dc_readback]<<8));
-					v->dc_readback += 2;
-				}
-				else
-				{
-					UINT8 plain[2], crypt[2];
-
-					crypt[0] = ROM[(v->prot_offset*2)+v->dc_seed+1];
-					crypt[1] = ROM[(v->prot_offset*2)+v->dc_seed];
-
-					// decrypt		
-//					stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed>>1, &ROM[(v->prot_offset*2)+v->dc_seed], plain, 2);
-					stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed>>1, crypt, plain, 2);
-
-					ret = (UINT64)(plain[0] | (plain[1]<<8));
-
-					#if NAOMIBD_PRINTF_PROTECTION
-					printf("M2 decrypt: gamekey %x seqkey %x offset %x seed %x src %02x %02x = %02x %02x\n", v->dc_gamekey, v->dc_seqkey, v->prot_offset*2, v->dc_seed>>1, ROM[(v->prot_offset*2)+v->dc_seed], ROM[(v->prot_offset*2)+v->dc_seed+1], plain[0], plain[1]);
-					#endif
-
-					// bump readback pointer
-					v->dc_seed += 2;
-				}
+				ret = (UINT64)(v->dc_cart_ram[v->dc_readback+1] | (v->dc_cart_ram[v->dc_readback]<<8));
+				v->dc_readback += 2;
 			}
 			else
 			{
@@ -694,33 +681,37 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						// if dc_gamekey isn't -1, we can live-decrypt this one
 						if (v->dc_gamekey != -1)
 						{
+							UINT8 temp_ram[128*1024];
+							UINT8 *ROM = (UINT8 *)v->memory;
+
 							v->dc_seed = 0;
-						        v->dc_is_m3 = 0;
 							v->dc_readback = 0;
 							v->dc_seqkey = v->prot_key;
 
-							if (v->prot_offset == 0x2000000/2)	// M3 readback, must decrypt now
+							#if NAOMIBD_PRINTF_PROTECTION
+							printf("M2/M3 decrypt: gamekey %x seqkey %x seed %x length %x\n", v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_m3_ptr);
+							#endif
+
+							// M2: just decrypt up to the size limit since we don't know the size in advance
+							if (v->prot_offset != 0x2000000/2)
 							{
-								UINT8 temp_ram[128*1024];
-
-								#if NAOMIBD_PRINTF_PROTECTION
-								printf("M3 decrypt: gamekey %x seqkey %x seed %x length %x\n", v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_m3_ptr);
-								#endif
-
+								// decrypt to temp buffer
+								stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->prot_offset&0xffff, &ROM[v->prot_offset*2], temp_ram, 128*1024);
+							}
+							else
+							{
 								// decrypt cart ram to temp buffer
 								stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_cart_ram, temp_ram, v->dc_m3_ptr);
-
-								#if NAOMIBD_PRINTF_PROTECTION
-								printf("result: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-									temp_ram[0], temp_ram[1], temp_ram[2], temp_ram[3],
-									temp_ram[4], temp_ram[5], temp_ram[6], temp_ram[7]);
-								#endif
-
-								// copy results to cart ram for readback
-								memcpy(v->dc_cart_ram, temp_ram, 128*1024);
-
-							        v->dc_is_m3 = 1;
 							}
+
+							#if NAOMIBD_PRINTF_PROTECTION
+							printf("result: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+								temp_ram[0], temp_ram[1], temp_ram[2], temp_ram[3],
+								temp_ram[4], temp_ram[5], temp_ram[6], temp_ram[7]);
+							#endif
+
+							// copy results to cart ram for readback
+							memcpy(v->dc_cart_ram, temp_ram, 128*1024);
 
 							v->dc_m3_ptr = 0;
 							v->prot_sum = 0;
@@ -1049,7 +1040,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 /***************************************************************************
     DECRYPTION EMULATION
 
-By convention, we label the tree known cart protection methods this way (using Deunan Knute's wording):
+By convention, we label the three known cart protection methods this way (using Deunan Knute's wording):
 M1: DMA read of protected ROM area
 M2: special read of ROM area which supplies decryption key first
 M3: normal read followed by write to cart's decryption buffer (up to 64kB), followed by M2 but from buffer area
