@@ -153,32 +153,32 @@ void gfx_init(running_machine *machine)
 			/* loop over all the planes, converting fractions */
 			for (j = 0; j < planes; j++)
 			{
-				UINT32 value = extpoffs[j];
-				if (IS_FRAC(value))
+				UINT32 value1 = extpoffs[j];
+				if (IS_FRAC(value1))
 				{
 					assert(region_length != 0);
-					extpoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+					extpoffs[j] = FRAC_OFFSET(value1) + region_length * FRAC_NUM(value1) / FRAC_DEN(value1);
 				}
 			}
 
 			/* loop over all the X/Y offsets, converting fractions */
 			for (j = 0; j < width; j++)
 			{
-				UINT32 value = extxoffs[j];
-				if (IS_FRAC(value))
+				UINT32 value2 = extxoffs[j];
+				if (IS_FRAC(value2))
 				{
 					assert(region_length != 0);
-					extxoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+					extxoffs[j] = FRAC_OFFSET(value2) + region_length * FRAC_NUM(value2) / FRAC_DEN(value2);
 				}
 			}
 
 			for (j = 0; j < height; j++)
 			{
-				UINT32 value = extyoffs[j];
-				if (IS_FRAC(value))
+				UINT32 value3 = extyoffs[j];
+				if (IS_FRAC(value3))
 				{
 					assert(region_length != 0);
-					extyoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+					extyoffs[j] = FRAC_OFFSET(value3) + region_length * FRAC_NUM(value3) / FRAC_DEN(value3);
 				}
 			}
 		}
