@@ -238,6 +238,7 @@ Notes:
                      Soul Calibur              SOC1 Ver.A   SOC11/VER.A2     MOTHER(B)
                      Soul Calibur              SOC3 Ver.B   SOC13/VER.B      MOTHER(B)
                      Soul Calibur              SOC1 Ver.C   SOC11/VER.C      MOTHER(B)
+                     Soul Calibur              SOC4 Ver.B   SOC14/VER.B      MOTHER(B)
                      Super World Stadium 2000  SS01 Ver.A   SS01/VER.A3      MOTHER(C) (ROMs serialised)
                      Super World Stadium 2001  SS11 Ver.A   SS11/VER.A2      MOTHER(C) (ROMs serialised)
                      Tekken Tag Tournament     TEG3 Ver.B   TEG3/VER.B       MOTHER(B)
