@@ -53,6 +53,79 @@ Notes:
     level sequence compared to the Taito licensed version.
 
 
+Stephh's notes (based on the games M68000 and Z80 code and some tests) :
+
+1) 'rallybik'
+
+  - Region read from DSWB (port 0x50 in CPU1) then stored at 0x8004 (CPU1 shared RAM) =
+    0x180008.w (CPU0 shared RAM) then stored at 0x0804f4.w .
+  - Coinage relies on bits 4 and 5 of the region (code at 0x0ccc in CPU1) :
+      * ..10.... : TOAPLAN_COINAGE_WORLD     (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
+      *  else    : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
+  - Title screen relies on bits 4 and 5 of the region (code at 0x00220e) :
+      * ..00.... : "Dash Yarou"
+      *  else    : "Rally Bike"
+  - Notice screen relies on bits 4 and 5 of the region (code at 0x001ac0) :
+      * ..00.... : "FOR USE IN JAPAN ONLY"
+      *  else    : no notice screen
+  - Copyright relies on bits 4 and 5 of the region (code at 0x001e68) :
+      * ..00.... : "TAITO CORPORATION" / "ALL RIGHTS RESERVED"
+      * ..01.... : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED"
+      * ..10.... : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED"
+      * ..11.... : "TAITO AMERICA CORP." / "LICENCED TO ROMSTAR"
+  - Number of letters for initials relies on bits 4 and 5 of the region
+    (code at 0x0008fe = init - code at 0x0022e8 = enter) :
+      * ..00.... : 6 letters
+      *  else    : 3 letters
+  - To enter the "test mode", press START1 when the grid is displayed.
+  - When "TEST" Switch is ON, you can do the following with the STARTn buttons :
+      * press START2 to pause game
+      * press START1 to unpause game
+      * when START1 and START2 are pressed, the game enters in "slow motion" mode
+  - When "TEST" Switch is ON, collision and fuel consuption routines are not called.
+    Don't forget to turn the Debug Switch OFF when time is over on bonus stage,
+    or the level will never end !
+  - When cabinet is set to "Upright", you can use joystick and buttons from both players
+    (code at 0x001c44).
+
+2) 'truxton'
+
+  - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
+    0x18000a.w (CPU0 shared RAM) then stored at 0x081b7c.w .
+  - Coinage relies on bits 0 and 1 of the region (code at 0x0ccc in CPU1) :
+      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
+      * ......10 : TOAPLAN_COINAGE_WORLD     (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
+      * ......11 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+  - Title screen relies on bits 0 to 2 of the region (code at 0x002c58) :
+      * .....000 : "Tatsujin"
+      *     else : "Truxton"
+  - Notice screen relies on bits 0 to 2 of the region (code at 0x004eb0) :
+      * .....000 : "FOR USE IN JAPAN ONLY"
+      * ......01 : "FOR USE IN U.S.A. ONLY"
+      * ......1. : no notice screen
+  - Copyright relies on bits 0 to 2 of the region (code at 0x003050) :
+      * .....000 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED"
+      * .....001 : "TAITO AMERICA CORP." / "LICENCED TO ROMSTAR FOR U.S.A."
+      * .....01. : "TAITO CORPORATION" / "ALL RIGHTS RESERVED"
+      * .....1.. : "TAITO AMERICA CORP."
+  - Number of letters for initials relies on bits 0 to 2 of the region
+    (code at 0x000976 = init - code at 0x0004a6 = enter) :
+      * .....000 : 6 letters
+      *     else : 3 letters
+  - Jumper displayed in the Dip Switches screen relies on bits 0 and 1 of the region
+    (code at 0x004546) :
+      * ......00 : "FOR JAPAN"
+      * ......01 : "FOR U.S.A."
+      * ......1. : "FOR EUROPE"
+    So when territory is set to "USA/Taito America" (0x04), it will display "FOR JAPAN" !
+    Jumpers 3 and 4 status is updated but they are always listed as unused.
+  - To enter the "test mode", press START1 when the grid is displayed.
+  - The "TEST" switch has the same effect as the "Service Mode" Dip Switch (DSWA bit 2).
+  - When cabinet is set to "Upright", you can use joystick and buttons from both players
+    (code at 0x002856).
+
+
 To Do:
     Add support for HD647180 (Z180) sound CPUs (once their internal
     ROMS are dumped). These are:
@@ -65,6 +138,7 @@ To Do:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
+#include "includes/toaplipt.h"
 #include "includes/toaplan1.h"
 #include "sound/3812intf.h"
 
@@ -365,8 +439,40 @@ ADDRESS_MAP_END
 
 
 /*****************************************************************************
-    Input Port definitions
+    Generic Input Port definitions
 *****************************************************************************/
+static INPUT_PORTS_START( toaplan1_2b )
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
+
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )           /* "TEST" switch - see notes */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("VBLANK")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( toaplan1_3b )
+	PORT_INCLUDE( toaplan1_2b )
+
+	PORT_MODIFY("P1")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 1 )
+
+	PORT_MODIFY("P2")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
+INPUT_PORTS_END
+
 
 #define  TOAPLAN1_PLAYER_INPUT( player, button3, options )										\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY		\
@@ -395,151 +501,100 @@ ADDRESS_MAP_END
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 
+/*****************************************************************************
+    Game-specific Input Port definitions
+*****************************************************************************/
+
+/* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( rallybik )
-	TOAPLAN1_VBLANK_INPUT
+	PORT_INCLUDE( toaplan1_2b )
 
-	PORT_START("P1")
-	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
+	/* in 0x40 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x180006.w (CPU0 shared RAM) -> 0x0804f2.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(DSWB, 0x30, 0x20)                  /* see notes */
 
-	PORT_START("P2")
-	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
-
-	PORT_START("DSWA")	/* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-
-	PORT_START("DSWB")	/* DSW B */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x20, "Territory/Copyright" )
+	/* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x0804f4.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x30, 0x20, "Territory/Copyright" )       /* bits 4 and 5 listed as unused in the Dip Switches screen */
 	PORT_DIPSETTING(    0x20, "World/Taito Corp Japan" )
 	PORT_DIPSETTING(    0x10, "USA/Taito America" )
-	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
 	PORT_DIPSETTING(    0x30, "USA/Taito America (Romstar)" )
-	PORT_DIPNAME( 0x40, 0x00, "Dip Switch Display" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   /* not on race 1 */
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	TOAPLAN1_SYSTEM_INPUTS
+	PORT_START("TJUMP")       /* Territory Jumper Block (not present ? this port isn't even read) */
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("TJUMP")	/* Territory Jumper Block (not present?) */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* P1 : in 0x00 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x18000c.w (CPU0 shared RAM) */
+	/* P2 : in 0x10 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x18000e.w (CPU0 shared RAM) */
+
+	/* in 0x20 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x18000a.w (CPU0 shared RAM) -> 0x0804f4.w */
+	PORT_MODIFY("SYSTEM")
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )             /* see notes */
+
+	/* VBLANK : 0x140000.w */
 INPUT_PORTS_END
 
+/* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( truxton )
-	TOAPLAN1_VBLANK_INPUT
+	PORT_INCLUDE( toaplan1_2b )
 
-	PORT_START("P1")
-	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
+	/* in 0x40 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x180006.w (CPU0 shared RAM) -> 0x081b78.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x03, 0x02)                 /* see notes */
 
-	PORT_START("P2")
-	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
-
-	PORT_START("DSWA")	/* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-/* credits per coin options change, depending on the territory setting */
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-/* The following are coin settings for Japan
-    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-    PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-    PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-*/
-
-	PORT_START("DSWB")	/* DSW B */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x04, "50K, every 150K" )
-	PORT_DIPSETTING(    0x00, "70K, every 200K" )
-	PORT_DIPSETTING(    0x08, "100K only" )
+	/* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x081b7a.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000930 */ 
+	PORT_DIPSETTING(    0x04, "50k 200k 150k+" )
+	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
+	PORT_DIPSETTING(    0x08, "100k Only" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Dip Switch Display" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	TOAPLAN1_SYSTEM_INPUTS
-
-	PORT_START("TJUMP")	/* Territory Jumper Block */
+	/* in 0x70 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x18000a.w (CPU0 shared RAM) -> 0x081b7c.w */
+	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x07, 0x02, "Territory/Copyright" )
-	PORT_DIPSETTING(    0x02, "World/Taito Corp" )
-	PORT_DIPSETTING(    0x06, "World/Taito America" )
-	PORT_DIPSETTING(    0x04, "US/Taito America" )
-	PORT_DIPSETTING(    0x01, "US/Romstar" )
-	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
-//  PORT_DIPSETTING(    0x05, "Same as 0x04" )
-//  PORT_DIPSETTING(    0x03, "Same as 0x02" )
-//  PORT_DIPSETTING(    0x07, "Same as 0x06" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPSETTING(    0x02, "World/Taito Corp" )          /* TOAPLAN_COINAGE_WORLD */
+//	PORT_DIPSETTING(    0x03, "World/Taito Corp" )          /* TOAPLAN_COINAGE_JAPAN_OLD */
+//	PORT_DIPSETTING(    0x06, "World/Taito America" )       /* TOAPLAN_COINAGE_WORLD */
+//	PORT_DIPSETTING(    0x07, "World/Taito America" )       /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x04, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
+//	PORT_DIPSETTING(    0x05, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x01, "USA/Taito America (Romstar)" )/*TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )          /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x18000e.w (CPU0 shared RAM) -> 0x081b82.w */
+	/* P2 : in 0x10 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x180010.w (CPU0 shared RAM) -> 0x081b84.w */
+
+	/* SYSTEM : in 0x20 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x18000c.w (CPU0 shared RAM) -> 0x081b7e.w */
+
+	/* VBLANK : 0x140000.w */
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( hellfire )
 	TOAPLAN1_VBLANK_INPUT
@@ -2284,7 +2339,7 @@ static DRIVER_INIT( vimana )
 
 
 
-GAME( 1988, rallybik, 0,        rallybik, rallybik, toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, rallybik, 0,        rallybik, rallybik, toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", GAME_NO_COCKTAIL )
 GAME( 1988, truxton,  0,        truxton,  truxton,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 )
 GAME( 1989, hellfire, 0,        hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
 GAME( 1989, hellfire1,hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )

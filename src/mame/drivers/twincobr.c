@@ -371,7 +371,7 @@ static INPUT_PORTS_START( twincobr )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* reset button */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* same effect as the DSWA bit 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
@@ -947,7 +947,7 @@ ROM_START( fsharkbt )
 	ROM_LOAD( "b02_16.l5", 0x0000, 0x8000, CRC(cdd1a153) SHA1(de9827a959039cf753ecac6756fb1925c37466d8) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
-	/* DSP ROMS from 'hishouza' */
+	/* FIXME : DSP ROMS from 'hishouza' (the only way to play the game) */
 	ROMX_LOAD( "dsp-a1.bpr", 0x0000, 0x0400, CRC(45d4d1b1) SHA1(e776a056f0f72cbeb309c5a23f803330cb8b3763), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
 	ROMX_LOAD( "dsp-a2.bpr", 0x0000, 0x0400, CRC(edd227fa) SHA1(34aba84b5216ecbe462e7166d0f66785ca049a34), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "dsp-a3.bpr", 0x0001, 0x0400, CRC(df88e79b) SHA1(661b057fa2eef37b9d794151381d7d74a7bfa93a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
@@ -958,7 +958,6 @@ ROM_START( fsharkbt )
 	ROMX_LOAD( "dsp-b8.bpr", 0x0801, 0x0400, CRC(d3c16c5c) SHA1(a24d9536914734c1875c8a39938a346ff4418dd0), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )	/* chars */
-	/* GFX ROMS from 'fshark' - shouldn't they be the ones from 'skyshark' ? */
 	ROM_LOAD( "b02_07-1.h11", 0x00000, 0x04000, CRC(e669f80e) SHA1(05c1a4ff9adaa6c8035f38a76c5ee333fafba2bf) )
 	ROM_LOAD( "b02_06-1.h10", 0x04000, 0x04000, CRC(5e53ae47) SHA1(55bde4133deebb59a87d9b96c6d0fd7b4bbc0e02) )
 	ROM_LOAD( "b02_05-1.h8",  0x08000, 0x04000, CRC(a8b05bd0) SHA1(37317838ea57cb98cf9599cedf8e72bcae913d29) )
