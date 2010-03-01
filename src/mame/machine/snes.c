@@ -295,6 +295,8 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
 }
 
+/* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but 
+using these timers breaks e.g. Chrono Trigger intro and Super Tennis gameplay. */
 
 static TIMER_CALLBACK(snes_div_callback)
 {
@@ -1323,13 +1325,39 @@ WRITE8_HANDLER( snes_w_io )
 		case WRMPYA:	/* Multiplier A */
 			break;
 		case WRMPYB:	/* Multiplier B */
-			timer_adjust_oneshot(snes_mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+			snes_ram[WRMPYB] = data;
+//			timer_adjust_oneshot(snes_mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+			{
+				UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
+				snes_ram[RDMPYL] = c & 0xff;
+				snes_ram[RDMPYH] = (c >> 8) & 0xff;
+			}
 			break;
 		case WRDIVL:	/* Dividend (low) */
 		case WRDIVH:	/* Dividend (high) */
 			break;
 		case WRDVDD:	/* Divisor */
-			timer_adjust_oneshot(snes_div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+			snes_ram[WRDVDD] = data;
+//			timer_adjust_oneshot(snes_div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 16), 0);
+			{
+				UINT16 value, dividend, remainder;
+				dividend = remainder = 0;
+				value = (snes_ram[WRDIVH] << 8) + snes_ram[WRDIVL];
+				if (snes_ram[WRDVDD] > 0)
+				{
+					dividend = value / data;
+					remainder = value % data;
+				}
+				else
+				{
+					dividend = 0xffff;
+					remainder = value;
+				}
+				snes_ram[RDDIVL] = dividend & 0xff;
+				snes_ram[RDDIVH] = (dividend >> 8) & 0xff;
+				snes_ram[RDMPYL] = remainder & 0xff;
+				snes_ram[RDMPYH] = (remainder >> 8) & 0xff;
+			}
 			break;
 		case HTIMEL:	/* H-Count timer settings (low)  */
 		case HTIMEH:	/* H-Count timer settings (high) */
@@ -1337,7 +1365,7 @@ WRITE8_HANDLER( snes_w_io )
 		case VTIMEH:	/* V-Count timer settings (high) */
 			break;
 		case MDMAEN:	/* GDMA channel designation and trigger */
-			snes_gdma( space, data );
+			snes_gdma(space, data);
 			data = 0;	/* Once DMA is done we need to reset all bits to 0 */
 			break;
 		case HDMAEN:	/* HDMA channel designation */
