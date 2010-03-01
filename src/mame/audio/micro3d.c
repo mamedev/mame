@@ -214,7 +214,8 @@ INLINE noise_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == SOUND_MICRO3D);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_MICRO3D);
 
 	return (noise_state *)device->token;
 }
