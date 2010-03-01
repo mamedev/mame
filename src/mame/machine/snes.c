@@ -817,7 +817,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.screen_brightness = (data & 0x0f) + 1;
 			break;
 		case OBSEL:		/* Object size and data area designation */
-			snes_ppu.layer[SNES_OAM].data = ((data & 0x3) * 0x2000) << 1;
+			snes_ppu.layer[SNES_OAM].charmap = (data & 0x03) << 1;
 			snes_ppu.oam.name_select = (((data & 0x18) >> 3) * 0x1000) << 1;
 			/* Determine object size */
 			switch ((data & 0xe0) >> 5)
@@ -932,16 +932,16 @@ WRITE8_HANDLER( snes_w_io )
 		case BG2SC:		/* Address for storing SC data BG2 SC size designation  */
 		case BG3SC:		/* Address for storing SC data BG3 SC size designation  */
 		case BG4SC:		/* Address for storing SC data BG4 SC size designation  */
-			snes_ppu.layer[offset - BG1SC].map = (data & 0xfc) << 9;
-			snes_ppu.layer[offset - BG1SC].map_size = data & 0x3;
+			snes_ppu.layer[offset - BG1SC].tilemap = data & 0xfc;
+			snes_ppu.layer[offset - BG1SC].tilemap_size = data & 0x3;
 			break;
 		case BG12NBA:	/* Address for BG 1 and 2 character data */
-			snes_ppu.layer[SNES_BG1].data = (data & 0xf) << 13;
-			snes_ppu.layer[SNES_BG2].data = (data & 0xf0) << 9;
+			snes_ppu.layer[SNES_BG1].charmap = (data & 0x0f);
+			snes_ppu.layer[SNES_BG2].charmap = (data & 0xf0) >> 4;
 			break;
 		case BG34NBA:	/* Address for BG 3 and 4 character data */
-			snes_ppu.layer[SNES_BG3].data = (data & 0xf) << 13;
-			snes_ppu.layer[SNES_BG4].data = (data & 0xf0) << 9;
+			snes_ppu.layer[SNES_BG3].charmap = (data & 0x0f);
+			snes_ppu.layer[SNES_BG4].charmap = (data & 0xf0) >> 4;
 			break;
 
 		// Anomie says "H Current = (Byte<<8) | (Prev&~7) | ((Current>>8)&7); V Current = (Current<<8) | Prev;" and Prev is shared by all scrolls but in Mode 7!
@@ -999,10 +999,10 @@ WRITE8_HANDLER( snes_w_io )
 
 			if (data & 0xc)
 			{
-				int md = (data & 0xc)>>2;
+				int md = (data & 0xc) >> 2;
 
 				vram_fgr_count = vram_fgr_inccnts[md];
-				vram_fgr_mask = (vram_fgr_count*8)-1;
+				vram_fgr_mask = (vram_fgr_count * 8) - 1;
 				vram_fgr_shift = vram_fgr_shiftab[md];
 			}
 			else
@@ -1022,8 +1022,7 @@ WRITE8_HANDLER( snes_w_io )
 				if (vram_fgr_count)
 				{
 					UINT32 rem = addr & vram_fgr_mask;
-					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
-						       ((rem & (vram_fgr_count - 1)) << 3);
+					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
 
 					vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
 				}
@@ -1041,8 +1040,7 @@ WRITE8_HANDLER( snes_w_io )
 				if (vram_fgr_count)
 				{
 					UINT32 rem = addr & vram_fgr_mask;
-					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
-						       ((rem & (vram_fgr_count - 1)) << 3);
+					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
 
 					snes_vram[(faddr<<1)&0x1ffff] = data;
 				}
@@ -1066,8 +1064,7 @@ WRITE8_HANDLER( snes_w_io )
 				if (vram_fgr_count)
 				{
 					UINT32 rem = addr & vram_fgr_mask;
-					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
-						       ((rem & (vram_fgr_count - 1)) << 3);
+					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
 
 					snes_vram[((faddr<<1)+1)&0x1ffff] = data;
 				}
