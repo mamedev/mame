@@ -471,10 +471,6 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		{
 			UINT16 horizontal;
 			UINT16 vertical;
-			UINT16 tile_horz;
-			UINT8 shift_horz;
-			UINT16 tile_vert;
-			UINT16 shift_vert;
 		} offset;
 	} layer[6];	// this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
 
