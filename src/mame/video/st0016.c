@@ -659,14 +659,6 @@ VIDEO_UPDATE( st0016 )
 	}
 	else
 	{
-		if(ISMACS1)
-		{
-			if(!(input_port_read(screen->machine, "SYS1")&1))	//fake coins - MACS2 system
-			{
-				macs_ram2[0]++;
-			}
-		}
-
 		bitmap_fill(bitmap,cliprect,UNUSED_PEN);
 		draw_bgmap(screen->machine, bitmap,cliprect,0);
 		draw_sprites(screen->machine, bitmap,cliprect);

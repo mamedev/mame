@@ -328,7 +328,7 @@ static INPUT_PORTS_START( macs_base )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( macs_m)
+static INPUT_PORTS_START( macs_m )
 	PORT_INCLUDE( macs_base )
 
 	/*MAHJONG PANEL*/
@@ -375,7 +375,35 @@ static INPUT_PORTS_START( macs_m)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( macs_h)
+static INPUT_PORTS_START( kisekaem )
+	PORT_INCLUDE( macs_m )
+
+	PORT_MODIFY("SYS1")
+	PORT_DIPNAME( 0x01, 0x01, "SYS1 - BIT 1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x04, 0x04, "BIT 4" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "BIT 8" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "BIT 10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "BIT 20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "BIT 40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "BIT 80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( macs_h )
 	PORT_INCLUDE( macs_base )
 
 	/*HANAFUDA PANEL*/
@@ -711,8 +739,8 @@ static DRIVER_INIT(kisekaem)
 GAME( 1995, macsbios, 0,        macs, macs_m, macs,     ROT0, "I'Max", "Multi Amenity Cassette System BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1995, mac2bios, 0,        macs, macs_m, macs2,     ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
-GAME( 1995, kisekaem, macsbios, macs, macs_m, kisekaem, ROT0, "I'Max", "Kisekae Mahjong",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1995, kisekaeh, macsbios, macs, macs_h, kisekaeh, ROT0, "I'Max", "Kisekae Hanafuda",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
-GAME( 1996, cultname, macsbios, macs, macs_m, macs,     ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
-GAME( 1999, yuka,     macsbios, macs, macs_h, macs2,     ROT0, "Yubis / T.System", "Yu-Ka",  0 )
-GAME( 1999, yujan,    macsbios, macs, macs_m, macs2,     ROT0, "Yubis / T.System", "Yu-Jan",  0 )
+GAME( 1995, kisekaem, macsbios, macs, kisekaem, kisekaem,   ROT0, "I'Max", "Kisekae Mahjong",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1995, kisekaeh, macsbios, macs, macs_h,   kisekaeh,   ROT0, "I'Max", "Kisekae Hanafuda",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
+GAME( 1996, cultname, macsbios, macs, macs_m,   macs,       ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
+GAME( 1999, yuka,     macsbios, macs, macs_h,   macs2,      ROT0, "Yubis / T.System", "Yu-Ka",  0 )
+GAME( 1999, yujan,    macsbios, macs, macs_m,   macs2,      ROT0, "Yubis / T.System", "Yu-Jan",  0 )
