@@ -1303,7 +1303,7 @@ static READ16_HANDLER(s23_ctl_16_r)
 		// 0100 set freezes gorgon
 		// 0004 unset freezes ss23 at the boot level
 		// 0002 unset skips the post on ss23
-	case 1: return 0x0006;
+	case 1: return 0x0004;
 	case 2: case 3: {
 		UINT16 res = ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
 		ctl_inp_buffer[offset-2] = (ctl_inp_buffer[offset-2] << 1) | 1;
@@ -1329,6 +1329,43 @@ static READ32_HANDLER(s23_ctl_32_r)
         data |= s23_ctl_16_r(space, offset*2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_0_15)
         data |= s23_ctl_16_r(space, offset*2+1, mem_mask);
+    return data;       
+}
+
+
+static WRITE16_HANDLER(s23_c361_16_w)
+{
+	switch(offset) {
+	default:
+		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+	}
+}
+
+static READ16_HANDLER(s23_c361_16_r)
+{
+	switch(offset) {
+	case 5: return video_screen_get_vpos(space->machine->primary_screen);
+	case 6: return video_screen_get_vblank(space->machine->primary_screen);
+	}
+	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+	return 0xffff;
+}
+
+static WRITE32_HANDLER(s23_c361_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_c361_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_c361_16_w(space, offset*2+1, data, mem_mask);
+}
+
+static READ32_HANDLER(s23_c361_32_r)
+{
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_c361_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_c361_16_r(space, offset*2+1, mem_mask);
     return data;       
 }
 
@@ -1419,6 +1456,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE( s23_c417_32_r, s23_c417_32_w )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
@@ -1428,14 +1466,14 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06800000, 0x06807fff) AM_READWRITE( s23_txtchar_r, s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_READWRITE(namcos23_textram_r, namcos23_textram_w) AM_BASE(&namcos23_textram)
+	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE( s23_c361_32_r, s23_c361_32_w )	// C361
 	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	// GAMMA (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READWRITE(namcos23_paletteram_r, namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06820008, 0x0682000f) AM_READ( ss23_vstat_r )	// vblank status?
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x01000000)	// data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x01000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE( s23_c412_32_r, s23_c412_32_w )
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE( s23_c421_32_r, s23_c421_32_w )
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE (s23_ctl_32_r, s23_ctl_32_w )
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE( s23_ctl_32_r, s23_ctl_32_w )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
