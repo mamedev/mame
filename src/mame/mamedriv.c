@@ -3166,8 +3166,9 @@ V-V                           TP-027
 	DRIVER( ehrgeizj )	/* 1998.05 Ehrgeiz (EG1, Japan) */
 	DRIVER( sws98 )		/* 1998.06 Super World Stadium '98 (SS81/VER.A, Japan) */
 	DRIVER( soulclbr )	/* 1998.?? Soul Calibur (SOC14/VER.C) */
+	DRIVER( soulclbrb )	/* 1998.?? Soul Calibur (SOC14/VER.B) */
 	DRIVER( soulclbrj )	/* 1998.07 Soul Calibur (SOC11/VER.C, Japan) */
-	DRIVER( soulclbrb )	/* 1998.?? Soul Calibur (SOC13/VER.B) */
+	DRIVER( soulclbrb2 )	/* 1998.?? Soul Calibur (SOC13/VER.B) */
 	DRIVER( soulclbrjb )/* 1998.?? Soul Calibur (SOC11/VER.B, Japan) */
 	DRIVER( soulclbrja )/* 1998.?? Soul Calibur (SOC11/VER.A2, Japan) */
 						/* 1998.07 Techno Drive */
