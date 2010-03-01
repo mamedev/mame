@@ -420,6 +420,7 @@ ifneq ($(TARGETOS),os2)
 ifndef NOWERROR
 CCOMFLAGS += -Werror -fno-strict-aliasing $(ARCHOPTS)
 else
+CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
 endif
 else
 CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
