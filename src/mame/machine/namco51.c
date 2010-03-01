@@ -397,6 +397,14 @@ static DEVICE_START( namco_51xx )
 	devcb_resolve_write8(&state->out[0], &config->out[0], device);
 	devcb_resolve_write8(&state->out[1], &config->out[1], device);
 
+	INT32 lastcoins,lastbuttons;
+	INT32 credits;
+	INT32 coins[2];
+	INT32 coins_per_cred[2];
+	INT32 creds_per_coin[2];
+	INT32 in_count;
+	INT32 mode,coincred_mode,remap_joy;
+
 	state_save_register_device_item(device, 0, state->lastcoins);
 	state_save_register_device_item(device, 0, state->lastbuttons);
 	state_save_register_device_item(device, 0, state->credits);
@@ -404,6 +412,9 @@ static DEVICE_START( namco_51xx )
 	state_save_register_device_item_array(device, 0, state->coins_per_cred);
 	state_save_register_device_item_array(device, 0, state->creds_per_coin);
 	state_save_register_device_item(device, 0, state->in_count);
+	state_save_register_device_item(device, 0, state->mode);
+	state_save_register_device_item(device, 0, state->coincred_mode);
+	state_save_register_device_item(device, 0, state->remap_joy);
 }
 
 
