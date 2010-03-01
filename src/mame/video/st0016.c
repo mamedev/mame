@@ -13,6 +13,8 @@ UINT8 *macs_ram1,*macs_ram2;
 
 UINT32 st0016_game;
 
+extern UINT8 macs_cart_slot;
+
 static INT32 st0016_spr_bank,st0016_spr2_bank,st0016_pal_bank,st0016_char_bank;
 static int spr_dx,spr_dy;
 
@@ -191,6 +193,9 @@ WRITE8_HANDLER(st0016_vregs_w)
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
 		UINT32 srclen = (memory_region_length(space->machine, "maincpu")-0x10000);
 		UINT8 *mem = memory_region(space->machine, "maincpu");
+
+		srcadr += macs_cart_slot*0x400000;
+
 		while(length>0)
 		{
 			if( srcadr < srclen && (dstadr < ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE))

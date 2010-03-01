@@ -63,12 +63,14 @@ KISEKAE -- info
 
 
 static UINT8 macs_mux_data;
+static UINT8 macs_rev;
+UINT8 macs_cart_slot;
 
 static MACHINE_RESET(macs);
 
 
 static ADDRESS_MAP_START( macs_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
@@ -118,11 +120,40 @@ static READ8_HANDLER( macs_input_r )
 	return 0xff;
 }
 
+
+static WRITE8_HANDLER( macs_rom_bank_w )
+{
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+
+	st0016_rom_bank=data;
+}
+
 static WRITE8_HANDLER( macs_output_w )
 {
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
 	switch(offset)
 	{
-		case 0: memory_set_bankptr(space->machine,  "bank2", &macs_ram1[((data&0x20)>>5)*0x1000+0x800] );break;
+		case 0:
+		/*
+		--x- ---- sets RAM bank?
+		---- -x-- Cassette B slot
+		---- --x- Cassette A slot
+		*/
+
+		if(macs_rev == 1)
+		{
+			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
+			          but then MACS2 games locks up. */
+			memory_set_bankptr(space->machine,  "bank3", &macs_ram1[((data&0x20)>>5)*0x1000+0x000] );
+
+			macs_cart_slot = (data & 0xc) >> 2;
+
+			memory_set_bankptr(space->machine,  "bank4", &ROM[macs_cart_slot*0x400000+0x10000] );
+		}
+
+		memory_set_bankptr(space->machine,  "bank2", &macs_ram1[((data&0x20)>>5)*0x1000+0x800] );
+		break;
 		case 2: macs_mux_data = data; break;
 
 	}
@@ -133,7 +164,7 @@ static ADDRESS_MAP_START( macs_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc7) AM_READWRITE(macs_input_r,macs_output_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(macs_rom_bank_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
@@ -475,8 +506,9 @@ ROM_START( kisekaem )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x008000 )
+	ROM_COPY( "user2",   0x00000, 0x410000, 0x400000 )
 ROM_END
 
 ROM_START( kisekaeh )
@@ -492,21 +524,22 @@ ROM_START( kisekaeh )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x008000 )
+	ROM_COPY( "user2",   0x00000, 0x410000, 0x400000 )
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
 	MACS_BIOS
 
-	ROM_REGION( 0x400000, "user3", 0 ) // Slot A
+	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
 	ROM_LOAD16_BYTE( "cult-d0.u8", 0x000000, 0x100000, CRC(394bc1a6) SHA1(98df5406862234815b46c7b0ac0b19e4b597d1b6) )
 	ROM_LOAD16_BYTE( "cult-d1.u7", 0x000001, 0x100000, CRC(f628133b) SHA1(f06e20212074e5d95cc7d419ac8ce98fb9be3b62) )
 	ROM_LOAD16_BYTE( "cult-d2.u6", 0x200000, 0x100000, CRC(c5521bc6) SHA1(7554b56b0201b7d81754defa2244fb7ff7452bf6) )
 	ROM_LOAD16_BYTE( "cult-d3.u5", 0x200001, 0x100000, CRC(4325b09b) SHA1(45699a0444a221f893724754c917d33041cabcb9) )
 
 
-	ROM_REGION( 0x400000, "user2", 0 ) // Slot B
+	ROM_REGION( 0x400000, "user3", 0 ) // Slot B
 	ROM_LOAD16_BYTE( "cult-g0.u8", 0x000000, 0x100000, CRC(f5ab977b) SHA1(e7ee758cc2864500b339e236b944f98df9a1c10e) )
 	ROM_LOAD16_BYTE( "cult-g1.u7", 0x000001, 0x100000, CRC(32ae15a4) SHA1(061992efec1ed5527f200bf4c111344b156e759d) )
 	ROM_LOAD16_BYTE( "cult-g2.u6", 0x200000, 0x100000, CRC(30ed056d) SHA1(71735339bb501b94402ef403b5a2a60effa39c36) )
@@ -514,8 +547,10 @@ ROM_START( cultname ) // uses printer - two different games ? (slot a - checks f
 
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x008000 )
+	ROM_COPY( "user2",   0x00000, 0x410000, 0x400000 )
+	ROM_COPY( "user3",   0x00000, 0x810000, 0x400000 )
 ROM_END
 
 /* these are listed as MACS2 sub-boards, is it the same?  - it's not ;) */
@@ -569,6 +604,7 @@ static const UINT8 ramdata[160]=
 
 static MACHINE_RESET(macs)
 {
+	#if 0
 /*
         BIOS ram init:
 
@@ -635,36 +671,48 @@ static MACHINE_RESET(macs)
 
 		macs_ram1[0x0ff9]=0x07;
 		macs_ram1[0x1ff9]=0x07;
+		#endif
 
 		memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 );
 		memory_set_bankptr(machine,  "bank2", macs_ram1+0x800);
 		memory_set_bankptr(machine,  "bank3", macs_ram1+0x10000);
+		memory_set_bankptr(machine,  "bank4", memory_region(machine, "maincpu") );
 }
 
 static DRIVER_INIT(macs)
 {
 	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
 	st0016_game=10|0x80;
+	macs_rev = 1;
+}
+
+static DRIVER_INIT(macs2)
+{
+	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
+	st0016_game=10|0x80;
+	macs_rev = 2;
 }
 
 static DRIVER_INIT(kisekaeh)
 {
 	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
 	st0016_game=11|0x180;
+	macs_rev = 1;
 }
 
 static DRIVER_INIT(kisekaem)
 {
 	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
 	st0016_game=10|0x180;
+	macs_rev = 1;
 }
 
 
 GAME( 1995, macsbios, 0,        macs, macs_m, macs,     ROT0, "I'Max", "Multi Amenity Cassette System BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1995, mac2bios, 0,        macs, macs_m, macs,     ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1995, mac2bios, 0,        macs, macs_m, macs2,     ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 GAME( 1995, kisekaem, macsbios, macs, macs_m, kisekaem, ROT0, "I'Max", "Kisekae Mahjong",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
 GAME( 1995, kisekaeh, macsbios, macs, macs_h, kisekaeh, ROT0, "I'Max", "Kisekae Hanafuda",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
 GAME( 1996, cultname, macsbios, macs, macs_m, macs,     ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
-GAME( 1999, yuka,     macsbios, macs, macs_h, macs,     ROT0, "Yubis / T.System", "Yu-Ka",  0 )
-GAME( 1999, yujan,    macsbios, macs, macs_m, macs,     ROT0, "Yubis / T.System", "Yu-Jan",  0 )
+GAME( 1999, yuka,     macsbios, macs, macs_h, macs2,     ROT0, "Yubis / T.System", "Yu-Ka",  0 )
+GAME( 1999, yujan,    macsbios, macs, macs_m, macs2,     ROT0, "Yubis / T.System", "Yu-Jan",  0 )
