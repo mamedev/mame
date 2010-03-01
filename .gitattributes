@@ -2705,6 +2705,7 @@ src/mame/includes/ojankohs.h svneol=native#text/plain
 src/mame/includes/oneshot.h svneol=native#text/plain
 src/mame/includes/opwolf.h svneol=native#text/plain
 src/mame/includes/orbit.h svneol=native#text/plain
+src/mame/includes/othldrby.h svneol=native#text/plain
 src/mame/includes/othunder.h svneol=native#text/plain
 src/mame/includes/overdriv.h svneol=native#text/plain
 src/mame/includes/pacman.h svneol=native#text/plain

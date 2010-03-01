@@ -37,42 +37,64 @@ Limit for help/undo (matta):
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/i8243.h"
+#include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "machine/i8243.h"
-#include "cpu/mcs48/mcs48.h"
-#include "sound/dac.h"
 
-static int	ay_select=0;
-static int	ack_data=0;
-
-static UINT8 n7751_command;
-//static UINT32 n7751_rom_address;
-
-static int tile_bank=0;
-
-static int sound_addr;
-static int n7751_busy;
 
 #define	TILE_WIDTH 6
 
+
+class othello_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, othello_state(machine)); }
+
+	othello_state(running_machine &machine) { }
+	
+	/* memory pointers */
+	UINT8 *  videoram;
+
+	/* video-related */
+	int    tile_bank;
+
+	/* misc */
+	int   ay_select;
+	int   ack_data;
+	UINT8 n7751_command;
+//	UINT32 n7751_rom_address;
+	int sound_addr;
+	int n7751_busy;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *mc6845;
+	running_device *n7751;
+	running_device *ay1;
+	running_device *ay2;
+};
+
+
 static MC6845_UPDATE_ROW( update_row )
 {
-	int cx,x;
+	othello_state *state = (othello_state *)device->machine->driver_data;
+	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;
 
 	const UINT8 *gfx = memory_region(device->machine, "gfx");
 
-	for(cx=0;cx<x_count;++cx)
+	for(cx = 0; cx < x_count; ++cx)
 	{
-		data_address=((device->machine->generic.videoram.u8[ma+cx]+tile_bank)<<4)|ra;
-		tmp=gfx[data_address]|(gfx[data_address+0x2000]<<8)|(gfx[data_address+0x4000]<<16);
+		data_address = ((state->videoram[ma + cx] + state->tile_bank) << 4) | ra;
+		tmp = gfx[data_address] | (gfx[data_address + 0x2000] << 8) | (gfx[data_address + 0x4000] << 16);
 
-		for(x=0;x<TILE_WIDTH;++x)
+		for(x = 0; x < TILE_WIDTH; ++x)
 		{
-			*BITMAP_ADDR16(bitmap, y, (cx*TILE_WIDTH+x)^1) = tmp&0x0f;
-			tmp>>=4;
+			*BITMAP_ADDR16(bitmap, y, (cx * TILE_WIDTH + x) ^ 1) = tmp & 0x0f;
+			tmp >>= 4;
 		}
 	}
 }
@@ -80,32 +102,33 @@ static MC6845_UPDATE_ROW( update_row )
 static PALETTE_INIT( othello )
 {
 	int i;
-	for (i = 0;i < machine->config->total_colors;i++)
-    {
-        palette_set_color(machine,i,MAKE_RGB(0xff,0x00,0xff));
-    }
+	for (i = 0; i < machine->config->total_colors; i++)
+	{
+		palette_set_color(machine, i, MAKE_RGB(0xff, 0x00, 0xff));
+	}
 
-    /* only colors  2,3,7,9,c,d,f are used */
-    palette_set_color(machine,0x02,MAKE_RGB(0x00,0xff,0x00));
-    palette_set_color(machine,0x03,MAKE_RGB(0xff,0x7f,0x00));
-    palette_set_color(machine,0x07,MAKE_RGB(0x00,0x00,0x00));
-    palette_set_color(machine,0x09,MAKE_RGB(0xff,0x00,0x00));
-    palette_set_color(machine,0x0c,MAKE_RGB(0x00,0x00,0xff));
-    palette_set_color(machine,0x0d,MAKE_RGB(0x7f,0x7f,0x00));
-    palette_set_color(machine,0x0f,MAKE_RGB(0xff,0xff,0xff));
+	/* only colors  2,3,7,9,c,d,f are used */
+	palette_set_color(machine, 0x02, MAKE_RGB(0x00, 0xff, 0x00));
+	palette_set_color(machine, 0x03, MAKE_RGB(0xff, 0x7f, 0x00));
+	palette_set_color(machine, 0x07, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 0x09, MAKE_RGB(0xff, 0x00, 0x00));
+	palette_set_color(machine, 0x0c, MAKE_RGB(0x00, 0x00, 0xff));
+	palette_set_color(machine, 0x0d, MAKE_RGB(0x7f, 0x7f, 0x00));
+	palette_set_color(machine, 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 static VIDEO_UPDATE( othello )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	othello_state *state = (othello_state *)screen->machine->driver_data;
+
+	mc6845_update(state->mc6845, bitmap, cliprect);
 	return 0;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(othello_state, videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -115,21 +138,23 @@ static READ8_HANDLER( unk_87_r )
 	return mame_rand(space->machine);
 }
 
-static WRITE8_HANDLER(unk_8a_w)
+static WRITE8_HANDLER( unk_8a_w )
 {
 	/*
-    n7751_command = (data & 0x07);
-    cputag_set_input_line(space->machine, "n7751", 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-    //cputag_set_input_line(device->machine, "n7751", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+    othello_state *state = (othello_state *)space->machine->driver_data;
+
+    state->n7751_command = (data & 0x07);
+    cpu_set_input_line(state->n7751, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+    //cpu_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
     cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
     */
 
-	logerror("8a -> %x\n",data);
+	logerror("8a -> %x\n", data);
 }
 
-static WRITE8_HANDLER(unk_8c_w)
+static WRITE8_HANDLER( unk_8c_w )
 {
-	logerror("8c -> %x\n",data);
+	logerror("8c -> %x\n", data);
 }
 
 static READ8_HANDLER( unk_8c_r )
@@ -137,20 +162,22 @@ static READ8_HANDLER( unk_8c_r )
 	return mame_rand(space->machine);
 }
 
-static READ8_HANDLER(sound_ack_r)
+static READ8_HANDLER( sound_ack_r )
 {
-	return ack_data;
+	othello_state *state = (othello_state *)space->machine->driver_data;
+	return state->ack_data;
 }
 
-static WRITE8_HANDLER(unk_8f_w)
+static WRITE8_HANDLER( unk_8f_w )
 {
-	logerror("8f -> %x\n",data);
+	logerror("8f -> %x\n", data);
 }
 
-static WRITE8_HANDLER(tilebank_w)
+static WRITE8_HANDLER( tilebank_w )
 {
-	tile_bank=data==0x0f?0x100:0x00;
-	logerror("tilebank -> %x\n",data);
+	othello_state *state = (othello_state *)space->machine->driver_data;
+	state->tile_bank = (data == 0x0f) ? 0x100 : 0x00;
+	logerror("tilebank -> %x\n", data);
 }
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
@@ -168,34 +195,39 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
-static READ8_HANDLER(latch_r)
+static READ8_HANDLER( latch_r )
 {
-	int retval=soundlatch_r(space,0);
-	soundlatch_clear_w(space,0,0);
+	int retval = soundlatch_r(space, 0);
+	soundlatch_clear_w(space, 0, 0);
 	return retval;
 }
 
-static WRITE8_HANDLER(ay_select_w)
+static WRITE8_HANDLER( ay_select_w )
 {
-	ay_select=data;
+	othello_state *state = (othello_state *)space->machine->driver_data;
+	state->ay_select = data;
 }
 
-static WRITE8_HANDLER(ack_w)
+static WRITE8_HANDLER( ack_w )
 {
-	ack_data=data;
+	othello_state *state = (othello_state *)space->machine->driver_data;
+	state->ack_data = data;
 }
 
-static WRITE8_HANDLER(ay_address_w)
+static WRITE8_HANDLER( ay_address_w )
 {
-	if(ay_select&1) ay8910_address_w(devtag_get_device(space->machine, "ay1"),0,data);
-	if(ay_select&2) ay8910_address_w(devtag_get_device(space->machine, "ay2"),0,data);
+	othello_state *state = (othello_state *)space->machine->driver_data;
+
+	if (state->ay_select & 1) ay8910_address_w(state->ay1, 0, data);
+	if (state->ay_select & 2) ay8910_address_w(state->ay2, 0, data);
 }
 
-static WRITE8_HANDLER(ay_data_w)
+static WRITE8_HANDLER( ay_data_w )
 {
-	if(ay_select&1) ay8910_data_w(devtag_get_device(space->machine, "ay1"),0,data);
-	if(ay_select&2) ay8910_data_w(devtag_get_device(space->machine, "ay2"),0,data);
+	othello_state *state = (othello_state *)space->machine->driver_data;
 
+	if (state->ay_select & 1) ay8910_data_w(state->ay1, 0, data);
+	if (state->ay_select & 2) ay8910_data_w(state->ay2, 0, data);
 }
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -214,6 +246,8 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 {
+	othello_state *state = (othello_state *)device->machine->driver_data;
+
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
 	/* P6 - address lines 8-11 */
@@ -221,25 +255,25 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 	switch (offset)
 	{
 		case 0:
-			sound_addr = (sound_addr & ~0x00f) | ((data & 0x0f) << 0);
+			state->sound_addr = (state->sound_addr & ~0x00f) | ((data & 0x0f) << 0);
 			break;
 
 		case 1:
-			sound_addr = (sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
+			state->sound_addr = (state->sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
 			break;
 
 		case 2:
-			sound_addr = (sound_addr & ~0xf00) | ((data & 0x0f) << 8);
+			state->sound_addr = (state->sound_addr & ~0xf00) | ((data & 0x0f) << 8);
 			break;
 
 		case 3:
-			sound_addr &= 0xfff;
+			state->sound_addr &= 0xfff;
 			{
 
-				if (!(data & 0x01) ) sound_addr |= 0x0000;
-				if (!(data & 0x02) ) sound_addr |= 0x1000;
-				if (!(data & 0x04) ) sound_addr |= 0x2000;
-				if (!(data & 0x08) ) sound_addr |= 0x3000;
+				if (!BIT(data, 0)) state->sound_addr |= 0x0000;
+				if (!BIT(data, 1)) state->sound_addr |= 0x1000;
+				if (!BIT(data, 2)) state->sound_addr |= 0x2000;
+				if (!BIT(data, 3)) state->sound_addr |= 0x3000;
 			}
 			break;
 	}
@@ -247,22 +281,26 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 
 static READ8_HANDLER( n7751_rom_r )
 {
-	return memory_region(space->machine, "n7751data")[sound_addr];
+	othello_state *state = (othello_state *)space->machine->driver_data;
+	return memory_region(space->machine, "n7751data")[state->sound_addr];
 }
 
 static READ8_HANDLER( n7751_command_r )
 {
-	return 0x80 | ((n7751_command & 0x07) << 4);
+	othello_state *state = (othello_state *)space->machine->driver_data;
+	return 0x80 | ((state->n7751_command & 0x07) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
+	othello_state *state = (othello_state *)device->machine->driver_data;
+
 	/* write to P2; low 4 bits go to 8243 */
 	i8243_p2_w(device, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
-	n7751_busy = data;
+	state->n7751_busy = data;
 }
 
 static READ8_HANDLER( n7751_t1_r )
@@ -340,7 +378,41 @@ static const mc6845_interface h46505_intf =
 	NULL		/* update address callback */
 };
 
+
+static MACHINE_START( othello )
+{
+	othello_state *state = (othello_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->mc6845 = devtag_get_device(machine, "crtc");
+	state->n7751 = devtag_get_device(machine, "n7751");
+	state->ay1 = devtag_get_device(machine, "ay1");
+	state->ay2 = devtag_get_device(machine, "ay2");
+
+	state_save_register_global(machine, state->tile_bank);
+	state_save_register_global(machine, state->ay_select);
+	state_save_register_global(machine, state->ack_data);
+	state_save_register_global(machine, state->n7751_command);
+	state_save_register_global(machine, state->sound_addr);
+	state_save_register_global(machine, state->n7751_busy);
+}
+
+static MACHINE_RESET( othello )
+{
+	othello_state *state = (othello_state *)machine->driver_data;
+
+	state->tile_bank = 0;
+	state->ay_select = 0;
+	state->ack_data = 0;
+	state->n7751_command = 0;
+	state->sound_addr = 0;
+	state->n7751_busy = 0;
+}
+
 static MACHINE_DRIVER_START( othello )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(othello_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
@@ -357,6 +429,8 @@ static MACHINE_DRIVER_START( othello )
 
 	MDRV_I8243_ADD("n7751_8243", NULL, n7751_rom_control_w)
 
+	MDRV_MACHINE_START(othello)
+	MDRV_MACHINE_RESET(othello)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -406,4 +480,4 @@ ROM_START( othello )
 	ROM_LOAD( "7.ic42",   0x4000, 0x2000, CRC(a76705f7) SHA1(b7d2a65d65d065732ddd0b3b738749369b382b48))
 ROM_END
 
-GAME( 1984, othello,  0,       othello,  othello,  0, ROT0, "Success", "Othello (version 3.0)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, othello,  0,       othello,  othello,  0, ROT0, "Success", "Othello (version 3.0)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

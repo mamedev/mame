@@ -17,24 +17,13 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-
-WRITE16_HANDLER( othldrby_videoram_addr_w );
-READ16_HANDLER( othldrby_videoram_r );
-WRITE16_HANDLER( othldrby_videoram_w );
-WRITE16_HANDLER( othldrby_vreg_addr_w );
-WRITE16_HANDLER( othldrby_vreg_w );
-
-VIDEO_START( othldrby );
-VIDEO_EOF( othldrby );
-VIDEO_UPDATE( othldrby );
-
-static int toggle;
+#include "includes/othldrby.h"
 
 
 static READ16_HANDLER( pip )
 {
-	return toggle ^= 1;
+	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	return state->toggle ^= 1;
 }
 
 static READ16_HANDLER( pap )
@@ -53,10 +42,10 @@ static WRITE16_HANDLER( coinctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,data & 1);
-		coin_counter_w(space->machine, 1,data & 2);
-		coin_lockout_w(space->machine, 0,~data & 4);
-		coin_lockout_w(space->machine, 1,~data & 8);
+		coin_counter_w(space->machine, 0, data & 1);
+		coin_counter_w(space->machine, 1, data & 2);
+		coin_lockout_w(space->machine, 0, ~data & 4);
+		coin_lockout_w(space->machine, 1, ~data & 8);
 	}
 }
 
@@ -93,18 +82,17 @@ static READ16_HANDLER( calendar_r )
 }
 
 
-
 static ADDRESS_MAP_START( othldrby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(calendar_r,calendar_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(calendar_r, calendar_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(othldrby_videoram_addr_w)
-	AM_RANGE(0x300004, 0x300007) AM_READWRITE(othldrby_videoram_r,othldrby_videoram_w)
+	AM_RANGE(0x300004, 0x300007) AM_READWRITE(othldrby_videoram_r, othldrby_videoram_w)
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(othldrby_vreg_addr_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
 	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSW2")
@@ -228,12 +216,39 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( othldrby )
+{
+	othldrby_state *state = (othldrby_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->toggle);
+	state_save_register_global(machine, state->vram_addr);
+	state_save_register_global(machine, state->vreg_addr);
+	state_save_register_global_array(machine, state->vreg);
+}
+
+static MACHINE_RESET( othldrby )
+{
+	othldrby_state *state = (othldrby_state *)machine->driver_data;
+
+	state->toggle = 0xff;
+	state->vram_addr = 0;
+	state->vreg_addr = 0;
+
+	memset(state->vreg, 0, ARRAY_LENGTH(state->vreg));
+}
+
 static MACHINE_DRIVER_START( othldrby )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(othldrby_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(othldrby_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+
+	MDRV_MACHINE_START(othldrby)
+	MDRV_MACHINE_RESET(othldrby)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -278,9 +293,4 @@ ROM_START( othldrby )
 	ROM_LOAD( "db0.4",        0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 
-static DRIVER_INIT( othldrby )
-{
-	toggle = 0xff;
-}
-
-GAME( 1995, othldrby, 0, othldrby, othldrby, othldrby, ROT0, "Sunwise", "Othello Derby (Japan)", 0 )
+GAME( 1995, othldrby, 0, othldrby, othldrby, 0, ROT0, "Sunwise", "Othello Derby (Japan)", GAME_SUPPORTS_SAVE )

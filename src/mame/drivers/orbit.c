@@ -25,11 +25,6 @@ Atari Orbit Driver
 
 #define MASTER_CLOCK		XTAL_12_096MHz
 
-
-static UINT8 orbit_misc_flags;
-
-
-
 /*************************************
  *
  *  Interrupts and timing
@@ -38,15 +33,17 @@ static UINT8 orbit_misc_flags;
 
 static TIMER_DEVICE_CALLBACK( nmi_32v )
 {
+	orbit_state *state = (orbit_state *)timer->machine->driver_data;
 	int scanline = param;
-	int nmistate = (scanline & 32) && (orbit_misc_flags & 4);
-	cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	int nmistate = (scanline & 32) && (state->misc_flags & 4);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_off )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	orbit_state *state = (orbit_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -66,9 +63,9 @@ static INTERRUPT_GEN( orbit_interrupt )
 
 static void update_misc_flags(running_machine *machine, UINT8 val)
 {
-	running_device *discrete = devtag_get_device(machine, "discrete");
+	orbit_state *state = (orbit_state *)machine->driver_data;
 
-	orbit_misc_flags = val;
+	state->misc_flags = val;
 
 	/* BIT0 => UNUSED       */
 	/* BIT1 => LOCKOUT      */
@@ -79,37 +76,25 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(discrete, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
+	discrete_sound_w(state->discrete, ORBIT_WARNING_EN, BIT(state->misc_flags, 7));
 
-	set_led_status(machine, 0, orbit_misc_flags & 0x08);
-	set_led_status(machine, 1, orbit_misc_flags & 0x40);
+	set_led_status(machine, 0, BIT(state->misc_flags, 3));
+	set_led_status(machine, 1, BIT(state->misc_flags, 6));
 
-	coin_lockout_w(machine, 0, !(orbit_misc_flags & 0x02));
-	coin_lockout_w(machine, 1, !(orbit_misc_flags & 0x02));
+	coin_lockout_w(machine, 0, !BIT(state->misc_flags, 1));
+	coin_lockout_w(machine, 1, !BIT(state->misc_flags, 1));
 }
 
 
 static WRITE8_HANDLER( orbit_misc_w )
 {
+	orbit_state *state = (orbit_state *)space->machine->driver_data;
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(space->machine, orbit_misc_flags | (1 << bit));
+		update_misc_flags(space->machine, state->misc_flags | (1 << bit));
 	else
-		update_misc_flags(space->machine, orbit_misc_flags & ~(1 << bit));
-}
-
-
-
-/*************************************
- *
- *  Machine setup
- *
- *************************************/
-
-static MACHINE_RESET( orbit )
-{
-	update_misc_flags(machine, 0);
+		update_misc_flags(space->machine, state->misc_flags & ~(1 << bit));
 }
 
 
@@ -128,8 +113,8 @@ static ADDRESS_MAP_START( orbit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x07ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07ff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x07ff) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_BASE(&orbit_playfield_ram)
-	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&orbit_sprite_ram)
+	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_BASE_MEMBER(orbit_state, playfield_ram)
+	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(orbit_state, sprite_ram)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_note_w)
 	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_noise_amp_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_note_amp_w)
@@ -283,11 +268,40 @@ GFXDECODE_END
 
 /*************************************
  *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( orbit )
+{
+	orbit_state *state = (orbit_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->discrete = devtag_get_device(machine, "discrete");
+
+	state_save_register_global(machine, state->misc_flags);
+	state_save_register_global(machine, state->flip_screen);
+}
+
+static MACHINE_RESET( orbit )
+{
+	orbit_state *state = (orbit_state *)machine->driver_data;
+
+	update_misc_flags(machine, 0);
+	state->flip_screen = 0;
+}
+
+
+/*************************************
+ *
  *  Machine drivers
  *
  *************************************/
 
 static MACHINE_DRIVER_START( orbit )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(orbit_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
@@ -296,6 +310,7 @@ static MACHINE_DRIVER_START( orbit )
 
 	MDRV_TIMER_ADD_SCANLINE("32v", nmi_32v, "screen", 0, 32)
 
+	MDRV_MACHINE_START(orbit)
 	MDRV_MACHINE_RESET(orbit)
 
 	/* video hardware */
@@ -362,4 +377,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, 0, 0, "Atari", "Orbit", 0 )
+GAME( 1978, orbit, 0, orbit, orbit, 0, 0, "Atari", "Orbit", GAME_SUPPORTS_SAVE )
