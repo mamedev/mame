@@ -2340,7 +2340,7 @@ static DRIVER_INIT( vimana )
 
 
 GAME( 1988, rallybik, 0,        rallybik, rallybik, toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", GAME_NO_COCKTAIL )
-GAME( 1988, truxton,  0,        truxton,  truxton,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1988, truxton,  0,        truxton,  truxton,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", GAME_NO_COCKTAIL )
 GAME( 1989, hellfire, 0,        hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
 GAME( 1989, hellfire1,hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
 GAME( 1989, hellfire2,hellfire, hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
