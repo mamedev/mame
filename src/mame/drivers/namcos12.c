@@ -37,7 +37,7 @@ Soul Calibur (SOC11/VER.A2)              (C) Namco,        1998  COH-700     SYS
 Soul Calibur (SOC11/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
 Soul Calibur (SOC11/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
 Soul Calibur (SOC13/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
-Soul Calibur (SOC14/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)	 SYSTEM12 M5F4    none
+Soul Calibur (SOC14/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)	 SYSTEM12 M5F4    KC020
 Soul Calibur (SOC14/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER     JO 11-04-98      none
 Super World Stadium '98 (SS81/VER.A)     (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC025
 Super World Stadium '99 (SS91/VER.A3)    (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC043
