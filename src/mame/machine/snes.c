@@ -296,7 +296,10 @@ static TIMER_CALLBACK( snes_hblank_tick )
 }
 
 /* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but 
-using these timers breaks e.g. Chrono Trigger intro and Super Tennis gameplay. */
+using these timers breaks e.g. Chrono Trigger intro and Super Tennis gameplay. 
+On the other hand, timers are needed for the translation of Breath of Fire 2
+to work. More weirdness: we might need to leave 8 CPU cycles for division at
+first, since using 16 produces bugs (see e.g. Triforce pieces in Zelda 3 intro) */
 
 static TIMER_CALLBACK(snes_div_callback)
 {
@@ -949,7 +952,7 @@ WRITE8_HANDLER( snes_w_io )
 		// Anomie says "H Current = (Byte<<8) | (Prev&~7) | ((Current>>8)&7); V Current = (Current<<8) | Prev;" and Prev is shared by all scrolls but in Mode 7!
 		case BG1HOFS:	/* BG1 - horizontal scroll (DW) */
 			/* In Mode 0->6 we use ppu_last_scroll as Prev */
-			snes_ppu.layer[SNES_BG1].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG1].offset.horizontal >> 8) & 7);
+			snes_ppu.layer[SNES_BG1].hoffs = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG1].hoffs >> 8) & 7);
 			snes_ppu.ppu_last_scroll = data;
 			/* In Mode 7 we use mode7_last_scroll as Prev */
 			snes_ppu.mode7.hor_offset = (data << 8) | (snes_ppu.mode7_last_scroll & ~7) | ((snes_ppu.mode7.hor_offset >> 8) & 7);
@@ -958,7 +961,7 @@ WRITE8_HANDLER( snes_w_io )
 			return;
 		case BG1VOFS:	/* BG1 - vertical scroll (DW) */
 			/* In Mode 0->6 we use ppu_last_scroll as Prev */
-			snes_ppu.layer[SNES_BG1].offset.vertical = (data << 8) | snes_ppu.ppu_last_scroll;
+			snes_ppu.layer[SNES_BG1].voffs = (data << 8) | snes_ppu.ppu_last_scroll;
 			snes_ppu.ppu_last_scroll = data;
 			/* In Mode 7 we use mode7_last_scroll as Prev */
 			snes_ppu.mode7.ver_offset = (data << 8) | snes_ppu.mode7_last_scroll;
@@ -966,32 +969,32 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG2HOFS:	/* BG2 - horizontal scroll (DW) */
-			snes_ppu.layer[SNES_BG2].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG2].offset.horizontal >> 8) & 7);
+			snes_ppu.layer[SNES_BG2].hoffs = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG2].hoffs >> 8) & 7);
 			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG2VOFS:	/* BG2 - vertical scroll (DW) */
-			snes_ppu.layer[SNES_BG2].offset.vertical = (data << 8) | (snes_ppu.ppu_last_scroll);
+			snes_ppu.layer[SNES_BG2].voffs = (data << 8) | (snes_ppu.ppu_last_scroll);
 			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG3HOFS:	/* BG3 - horizontal scroll (DW) */
-			snes_ppu.layer[SNES_BG3].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG3].offset.horizontal >> 8) & 7);
+			snes_ppu.layer[SNES_BG3].hoffs = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG3].hoffs >> 8) & 7);
 			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG3VOFS:	/* BG3 - vertical scroll (DW) */
-			snes_ppu.layer[SNES_BG3].offset.vertical = (data << 8) | (snes_ppu.ppu_last_scroll);
+			snes_ppu.layer[SNES_BG3].voffs = (data << 8) | (snes_ppu.ppu_last_scroll);
 			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG4HOFS:	/* BG4 - horizontal scroll (DW) */
-			snes_ppu.layer[SNES_BG4].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG4].offset.horizontal >> 8) & 7);
+			snes_ppu.layer[SNES_BG4].hoffs = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[SNES_BG4].hoffs >> 8) & 7);
 			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG4VOFS:	/* BG4 - vertical scroll (DW) */
-			snes_ppu.layer[SNES_BG4].offset.vertical = (data << 8) | (snes_ppu.ppu_last_scroll);
+			snes_ppu.layer[SNES_BG4].voffs = (data << 8) | (snes_ppu.ppu_last_scroll);
 			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
@@ -1026,7 +1029,7 @@ WRITE8_HANDLER( snes_w_io )
 					UINT32 rem = addr & vram_fgr_mask;
 					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
 
-					vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
+					vram_read_buffer = snes_vram[(faddr << 1) & 0x1ffff] | snes_vram[((faddr << 1) + 1) & 0x1ffff] << 8;
 				}
 				else
 				{

@@ -467,11 +467,9 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT8 mosaic_enabled;	// actually used only for layers 0->3!
 		UINT8 main_window_enabled;
 		UINT8 sub_window_enabled;
-		struct
-		{
-			UINT16 horizontal;
-			UINT16 vertical;
-		} offset;
+
+		UINT16 hoffs;
+		UINT16 voffs;
 	} layer[6];	// this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
 
 	struct

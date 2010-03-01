@@ -456,10 +456,10 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	tile_size = snes_ppu.layer[layer].tile_size;
 
 	/* Find scroll info */
-	hscroll = (snes_ppu.layer[layer].offset.horizontal & 0x3ff) >> (3 + tile_size);
-	hshift = snes_ppu.layer[layer].offset.horizontal & ((8 << tile_size) - 1);
-	vscroll = ((snes_ppu.layer[layer].offset.vertical & 0x3ff) + curline) >> (3 + tile_size);
-	vshift = ((snes_ppu.layer[layer].offset.vertical & 0x3ff) + curline) & ((8 << tile_size) - 1);
+	hscroll = (snes_ppu.layer[layer].hoffs & 0x3ff) >> (3 + tile_size);
+	hshift = snes_ppu.layer[layer].hoffs & ((8 << tile_size) - 1);
+	vscroll = ((snes_ppu.layer[layer].voffs & 0x3ff) + curline) >> (3 + tile_size);
+	vshift = ((snes_ppu.layer[layer].voffs & 0x3ff) + curline) & ((8 << tile_size) - 1);
 
 	/* figure out which line to draw */
 	if (vshift > ((8 << tile_size) - 1))	/* scrolled into the next tile */
