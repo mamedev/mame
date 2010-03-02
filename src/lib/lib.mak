@@ -17,6 +17,7 @@ OBJDIRS += \
 	$(LIBOBJ)/util \
 	$(LIBOBJ)/expat \
 	$(LIBOBJ)/zlib \
+	$(LIBOBJ)/softfloat \
 
 
 
@@ -93,3 +94,18 @@ $(OBJ)/libz.a: $(ZLIBOBJS)
 $(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
+
+#-------------------------------------------------
+# SoftFloat library objects
+#-------------------------------------------------
+
+PROCESSOR_H = $(LIBSRC)/softfloat/processors/mamesf.h
+SOFTFLOAT_MACROS = $(LIBSRC)/softfloat/softfloat/bits64/softfloat-macros
+
+SOFTFLOATOBJS = \
+	$(LIBOBJ)/softfloat/softfloat.o
+
+$(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
+
+$(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
+
