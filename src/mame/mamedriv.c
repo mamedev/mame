@@ -9281,6 +9281,7 @@ Other Sun games
 	DRIVER( leader )	/* Bootleg? */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
 	DRIVER( cowrace )	/* (c) 20?? hack */
+	DRIVER( kingdrbb )  /* (c) 199? hack */
 	DRIVER( discoboy )	/* (c) 1993 Soft Art Co. */
 	DRIVER( pangofun )	/* (c) 1995 InfoCube */
 	DRIVER( 2mindril )	/* (c) 1993 Taito */
