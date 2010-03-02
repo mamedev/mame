@@ -342,6 +342,7 @@ const game_driver * const drivers[] =
 	DRIVER( scorpion )	/* (c) 1982 Zaccaria */
 	DRIVER( scorpiona )	/* (c) 1982 Zaccaria */
 	DRIVER( scorpionb )	/* (c) 1982 Zaccaria */
+	DRIVER( aracnis )	/* bootleg */
 	DRIVER( ad2083 )	/* (c) 1983 Midcoin */
 	DRIVER( turpins )	/* (c) 1981 bootleg */
 
@@ -7074,6 +7075,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( thepit )	/* (c) 1982 Taito */
 	DRIVER( thepitc )	/* (c) 1982 Centuri */
 	DRIVER( thepitb )	/* bootleg */
+	DRIVER( thepitm )	/* bootleg */
 	DRIVER( dockman )	/* (c) 1982 Taito Corp. */
 	DRIVER( portman )	/* (c) 1982 Nova Games Ltd. */
 	DRIVER( funnymou )	/* (c) 1982 Chuo Co. Ltd */

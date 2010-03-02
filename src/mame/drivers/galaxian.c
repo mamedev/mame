@@ -2876,7 +2876,23 @@ static DRIVER_INIT( scorpnmc )
 	memory_unmap_readwrite(space, 0x8000, 0x87ff, 0, 0);
 }
 
+static DRIVER_INIT( thepitm )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
+	/* video extensions */
+	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+
+	/* move the interrupt enable from $b000 to $b001 */
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
+	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
+	
+	/* disable the stars */
+	memory_unmap_write(space, 0xb004, 0xb004, 0, 0x07f8);
+
+	/* extend ROM */
+	memory_install_rom(space, 0x0000, 0x47ff, 0, 0, memory_region(machine, "maincpu"));
+}
 
 /*************************************
  *

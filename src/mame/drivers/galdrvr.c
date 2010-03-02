@@ -1456,6 +1456,57 @@ static INPUT_PORTS_START( kingball )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( thepitm )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // turning both of these on boots with 9 credits?
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN2")
+    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -2045,6 +2096,93 @@ static INPUT_PORTS_START( scorpnmc )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( aracnis )
+	PORT_START("IN0")      /* 0xa000 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )		// COIN2? (it ALWAYS adds 1 credit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_8WAY
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+
+	PORT_START("IN1")      /* 0xa800 - needs verifying */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start 1 / P1 Button 1")		/* also P1 Button 1 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start 2 / P1 Button 2")		/* also P1 Button 2 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_START("IN2")      /* 0xb001 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")      /* 0xb002 */
+    PORT_DIPNAME( 0x01, 0x01, "0xb002" )
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -5100,6 +5238,26 @@ ROM_START( scorpionmc )
 	ROM_LOAD( "mmi6331.bpr",  0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( aracnis )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "00sc.bin",       0x0000, 0x1000, CRC(c7e0d6b9) SHA1(3aac51d22939da8a595237ad26fe0f06a3acfb6a) )
+	ROM_LOAD( "01sc.bin",       0x1000, 0x1000, CRC(03eb27dc) SHA1(8dae30006c9e81ab0d2b5c5faa7257813ea00a89) )
+	ROM_LOAD( "02sc.bin",       0x2000, 0x1000, CRC(f3d49d4f) SHA1(19f603a2bda88e51608414f2748a33b4fb6e31c1) )
+	ROM_LOAD( "03sc.bin",       0x3000, 0x1000, CRC(0e741984) SHA1(6e2c7820bbb1834c49f312664c786b50af0cff26) )
+	ROM_LOAD( "05sc.bin",       0x5000, 0x1000, CRC(f27ee3e4) SHA1(e034507b99705492b6a8aa34764a1e3222ba31b2) )
+	ROM_LOAD( "06sc.bin",       0x6000, 0x0800, CRC(fdfc2c82) SHA1(6b8914d6496c216de5bf160cd798b8f6facd44d2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "08sc.1h",        0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
+	ROM_LOAD( "07sc.1k",        0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	// colours are wrong, but this is the prom that was on the board
+
+	// note: pin 13 is marked with red paint, and is not connected
+	//  ^ this is important for getting correct colours on real hw
+	ROM_LOAD( "mmi6331-1.6l",  0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+ROM_END
 
 ROM_START( sfx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5578,6 +5736,58 @@ ROM_START( tdpgal )
 	ROM_LOAD( "bprom.bin",       0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) )
 ROM_END
 
+/*
+
+The Pit (on Moon Quasar hardware)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Dumped by Andrew Welburn 
+on the sunny morning of 2/03/10
+
+http://www.andys-arcade.com
+
+*************************************************
+**Do not seperate this text file from the roms.**
+*************************************************
+
+Nichibutsu Moon Quasar pcb largely unhacked, but
+with an odd looking set of roms. One gfx rom 
+identifies itself as 'The Pit' so that is my only 
+guess at what the game actually is.
+
+Roms 1 through 8 read well in-circuit in the right 
+places in the memory map for moon cresta, 
+(through the fluke 9100) but the game does not 
+currently run. Roms dumped adn verified with no 
+anomolies.
+
+Rom 9 was placed on the through-socket and has
+pins 20 and 18 (/E and A11 respectively) tied to
+pin 5 of 8E (A14/A15/MREQ demux). This demux has 
+some patches, the trace to pin 13 is cut, and is 
+instead wired to pin 3.
+
+*/
+
+ROM_START( thepitm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",          0x0000, 0x0800, CRC(0f78d6ea) SHA1(e224b2fb9b4a26295b03af720fa647d4488a1287) )
+	ROM_LOAD( "2.bin",          0x0800, 0x0800, CRC(ebacc6eb) SHA1(8b73d96ebe8070fbbb16434aa6a30ec8985ddec6) )
+	ROM_LOAD( "3.bin",          0x1000, 0x0800, CRC(14fd0706) SHA1(5d905d8272731c307dc9f96caf4973b28413198e) )
+	ROM_LOAD( "4.bin",          0x1800, 0x0800, CRC(613e920f) SHA1(078c7f36ba0145fbbd24bdae4cb6b03c5c27c1cc) )
+	ROM_LOAD( "5.bin",          0x2000, 0x0800, CRC(5a791f3f) SHA1(166f07f7fe260e53e611784976792638a25485c1) )
+	ROM_LOAD( "6.bin",          0x2800, 0x0800, CRC(0bb37f51) SHA1(32e31678388bad048c829bd43a18dc4e24869840) )
+	ROM_LOAD( "7.bin",          0x3000, 0x0800, CRC(4dfdec6f) SHA1(eb88a278860998c343f94e27c8c6c723cffb2dd9) )
+	ROM_LOAD( "8.bin",          0x3800, 0x0800, CRC(a39a9189) SHA1(aacd54edca6bc7f7feacd651a0de57b3d9592aad) )
+	ROM_LOAD( "9.bin",          0x4000, 0x0800, CRC(2eb90e07) SHA1(92678fc5cfeb7119ce27f042571daa831fa1dad5) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "1h.bin",      0x0000, 0x0800, CRC(00dce65f) SHA1(ba0cce484d1f8693a85b85e0689d107588df9043) )
+	ROM_LOAD( "1k.bin",      0x1000, 0x0800, CRC(3ec0056e) SHA1(1dd19e7535ab9abd62b4b32663437f8e8acb91b5) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bin",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
 
 /*************************************
  *
@@ -5695,6 +5905,10 @@ GAME( 1980, moonqsr,  0,        mooncrst, moonqsr,  moonqsr,  ROT90,  "Nichibuts
 GAME( 1980, moonal2,  galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonal2b, galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
 
+/* larger romspace, interrupt enable moved */
+GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "KZH", "The Pit (bootleg on Moon Quasar hardware)", GAME_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
+
+
 /* other games on basic mooncrst hardware */
 GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
 
@@ -5773,6 +5987,7 @@ GAME( 1982, scorpion, 0,		scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Sco
 GAME( 1982, scorpiona,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1982, scorpionb,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 19??, scorpionmc,scorpion, mooncrst, scorpnmc, scorpnmc, ROT90,  "Dorneer",  "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 19??, aracnis,   scorpion, mooncrst, aracnis,  scorpnmc, ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
