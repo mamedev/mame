@@ -9757,6 +9757,7 @@ Other Sun games
 
 	DRIVER( chsuper3 )	/* unknown */
 	DRIVER( chsuper2 )	/* unknown */
+	DRIVER( chmpnum )	/* unknown */
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */
