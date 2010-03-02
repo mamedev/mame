@@ -3,6 +3,7 @@
 King Derby (c) 1981 Tatsumi
 
 driver by Andrew Gardner, Angelo Salese & Roberto Fresca
+original cowrace.c by Luca Elia
 
 TODO:
 - remaining video issues, priorities, sprites etc.;
@@ -13,9 +14,8 @@ TODO:
 - unknown memories;
 - Garbage on the window tilemap if you win, it could be a BTANB (masked by the color prom).
 - the name "King Derby" is a raw guess, there's a chance that it uses a different name
-  (but there isn't any title screen on the game?)
+  (but there isn't any title screen in the game?)
 - Fix I/O in the 1986 bootleg version;
-- Merge kingdrby.c and cowrace.c drivers;
 
 ============================================================================================
 
@@ -67,6 +67,8 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
+#include "sound/okim6295.h"
+#include "sound/2203intf.h"
 
 #define CLK_1	XTAL_20MHz
 #define CLK_2	XTAL_3_579545MHz
@@ -396,6 +398,17 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cowrace_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cowrace_sound_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ym2203_w)
+ADDRESS_MAP_END
+
 
 /*************************************
 *
@@ -838,9 +851,29 @@ static const gfx_layout layout16x16x2 =
 	16*16
 };
 
+/* seems more suitable with 2bpp?*/
+static const gfx_layout cowrace_layout16x16x2 =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	2,
+	{
+		RGN_FRAC(1,2),
+		RGN_FRAC(0,2),
+	},
+	{ 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7,0,1,2,3,4,5,6,7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8  },
+	16*16
+};
+
 static GFXDECODE_START( kingdrby )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0x000, 0x80 )
+GFXDECODE_END
+
+static GFXDECODE_START( cowrace )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, cowrace_layout16x16x2, 0x080, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0x000, 0x80 )
 GFXDECODE_END
 
 /**********************************************************************************************************
@@ -882,6 +915,19 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, /* discrete read? */
 	DEVCB_NULL,
 	DEVCB_NULL /* discrete write? */
+};
+
+static const ym2203_interface cowrace_ym2203_interface =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_HANDLER(sound_cmd_r),									// read A
+		DEVCB_DEVICE_HANDLER("oki", okim6295_r),					// read B
+		DEVCB_NULL,													// write A
+		DEVCB_DEVICE_HANDLER("oki", okim6295_w)						// write B
+	},
+	NULL
 };
 
 static PALETTE_INIT(kingdrby)
@@ -965,6 +1011,24 @@ static MACHINE_DRIVER_START( kingdrbb )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", ppi8255_1986_intf[1] )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( cowrace )
+	MDRV_IMPORT_FROM( kingdrbb )
+
+	MDRV_CPU_MODIFY("soundcpu")
+	MDRV_CPU_PROGRAM_MAP(cowrace_sound_map)
+	MDRV_CPU_IO_MAP(cowrace_sound_io)
+
+	MDRV_GFXDECODE(cowrace)
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_REPLACE("aysnd", YM2203, 3000000)
+	MDRV_SOUND_CONFIG(cowrace_ym2203_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
+
 ROM_START( kingdrby )
 	ROM_REGION( 0x3000, "master", 0 )
 	ROM_LOAD( "im4_d.d6",  0x0000, 0x1000, CRC(20f2d999) SHA1(91db46059f32b4791460df3330260f4e60f016a5) )
@@ -1043,6 +1107,34 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 	ROM_LOAD( "palce16v8q.u87.jed", 0x0000, 0x892, CRC(b7956421) SHA1(57db38b571adf6cf49d7c221cd65a068a9a3383a) )
 ROM_END
 
+ROM_START( cowrace )
+	ROM_REGION( 0x8000, "master", 0 )
+	ROM_LOAD( "u3.bin", 0x0000, 0x8000, CRC(c05c3bd3) SHA1(b7199a069ab45edd25e021589b79105cdfa5511a) )
+
+	ROM_REGION( 0x8000, "slave", ROMREGION_ERASEFF ) // slave z80?
+	/* I've tried the kingdrbb slave CPU rom ... game works until the auto race in attract mode. We need to locate and dump this on the PCB. */
+	ROM_LOAD( "slave.bin", 0x0000, 0x8000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x8000, 0xff ) // <- to remove once that the above is dumped
+
+	ROM_REGION( 0x2000, "soundcpu", 0 )
+	ROM_LOAD( "u164.bin", 0x0000, 0x2000, CRC(9affa1c8) SHA1(bfc07693e8f749cbf20ab8cda33975b66f567962) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "u94.bin", 0x8000, 0x8000, CRC(945dc115) SHA1(bdd145234e6361c42ed20e8ca4cac64f07332748) )
+	ROM_LOAD( "u95.bin", 0x0000, 0x8000, CRC(fc1fc006) SHA1(326a67c1ea0f487ecc8b7aef2d90124a01e6dee3) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "u139.bin", 0x2000, 0x2000, CRC(b746bb2f) SHA1(5f5f48752689079ed65fe7bb4a69512ada5db05d) )
+	ROM_LOAD( "u140.bin", 0x0000, 0x2000, CRC(7e24b674) SHA1(c774efeb8e4e833e73c29007d5294c93df1abef4) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u4.bin", 0x00000, 0x20000, CRC(f92a3ab5) SHA1(fc164492793597eadb8a50154410936edb74fa23) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "u149.bin", 0x00000, 0x200, CRC(f41a5eca) SHA1(797f2d95d4e00f96e5a99604935810e1add59689) )
+ROM_END
+
 
 GAME( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS| GAME_IMPERFECT_SOUND )
 GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg",  "King Derby (1986 Taiwan bootleg)",   GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 2000, cowrace,   kingdrby,      cowrace,    kingdrbb,   0,       ROT0,   "bootleg",  "Cow Race (1986 King Derby hack)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
