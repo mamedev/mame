@@ -2323,6 +2323,7 @@ const game_driver * const drivers[] =
 	DRIVER( batridj )	/* (c) 1998 Raizing/8ing */
 	DRIVER( batridk )	/* (c) 1998 Raizing/8ing */
 	DRIVER( batridja )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridta )	/* (c) 1998 Raizing/8ing */
 	DRIVER( bkraidu )	/* (c) 1999 8ing */
 	DRIVER( bkraiduj )	/* (c) 1999 8ing */
 	DRIVER( bkraidj )	/* (c) 1999 8ing */

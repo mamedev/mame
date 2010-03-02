@@ -5257,7 +5257,7 @@ ROM_START( batridk )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-/* Version A is older, might have been only released in Japan? */
+/* Version A is older, might have been only released in Japan and Taiwan? */
 ROM_START( batridja )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f93ea27c) SHA1(41023c2ee1efd70b5aa9c70e1ddd9e5c3d51d68a) )
@@ -5282,6 +5282,29 @@ ROM_START( batridja )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
+ROM_START( batridta )
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
+	ROM_LOAD16_BYTE( "u22.bin",  0x000000, 0x080000, CRC(b135820e) SHA1(c222887d18a0a3ea0fcc973b95b29d69c86f7ec3) )
+	ROM_LOAD16_BYTE( "u23.bin",  0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
+	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
+	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
+
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
+	ROM_CONTINUE(        0x10000, 0x38000 )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
+	ROM_LOAD( "rom-3.bin", 0x400000, 0x400000, CRC(60167d38) SHA1(fd2429808c59ef51fd5f5db84ea89a8dc504186e) )
+	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
+	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
+
+	ROM_REGION( 0x140000, "oki1", 0 )		/* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+
+	ROM_REGION( 0x140000, "oki2", 0 )		/* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+ROM_END
 
 
 
@@ -5466,7 +5489,8 @@ GAME( 1998, batridc,  batrid,   batrider, batrider, batrider, ROT270, "Raizing /
 GAME( 1998, batridj,  batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batridk,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 // version A is older code
-GAME( 1998, batridja, batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridja, batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - A Version (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridta, batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - A Version (Taiwan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code.
