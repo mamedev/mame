@@ -802,7 +802,7 @@ Notes:
 #define S23_HSYNC	(16666150)
 #define S23_MODECLOCK	(130205)
 
-static int ss23_vstat = 0, hstat = 0, vstate = 0;
+//static int ss23_vstat = 0, hstat = 0, vstate = 0;
 static tilemap_t *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram;
 static UINT32 *namcos23_charram;
@@ -1023,7 +1023,7 @@ static WRITE32_HANDLER( s23_txtchar_w )
 	COMBINE_DATA(&namcos23_charram[offset]);
 	gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 }
-
+#if 0
 static READ32_HANDLER( ss23_vstat_r )
 {
 	if (offset == 1)
@@ -1040,7 +1040,7 @@ static READ32_HANDLER( ss23_vstat_r )
 	}
 	return ss23_vstat;
 }
-
+#endif
 static UINT8 nthbyte( const UINT32 *pSource, int offs )
 {
 	pSource += offs/4;
