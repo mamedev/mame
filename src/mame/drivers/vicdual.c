@@ -2364,6 +2364,24 @@ ROM_START( safari )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
+ROM_START( safaria ) // bootleg board, but possibly a legit alt revision
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hu1.22c",      0x0000, 0x0400, CRC(f27d5961) SHA1(9780e9659746c959206b8700598cfb3925ae7938) )
+	ROM_LOAD( "hu2.20c",      0x0400, 0x0400, CRC(11a9cb59) SHA1(5132151a97146d973292b15284e4d58de9ee7cc6) )
+	ROM_LOAD( "hu3.19c",      0x0800, 0x0400, CRC(4fe746cb) SHA1(b4b6eac78dd9a76c102994990c219ae832442cc1) )
+	ROM_LOAD( "hu4.17c",      0x0c00, 0x0400, CRC(f0bad948) SHA1(5dda4513e96cfb0b6535184c611ac5832afbbfde) )
+	ROM_LOAD( "hu5.16c",      0x1000, 0x0400, CRC(d994f98a) SHA1(a51db8b8975f1fa7ca3bae56d4d929b8d3d7bfb7) )
+	ROM_LOAD( "hu6.15c",      0x1400, 0x0400, CRC(174b5964) SHA1(dfa88aaa572d4d46ffe3c8f247dbc370e624f5c4) )
+	ROM_LOAD( "hu7.13c",      0x1800, 0x0400, CRC(3e94caa1) SHA1(520ae5924b970126c07368bba900b7603997c5cc) )
+	ROM_LOAD( "hu8.12c",      0x1c00, 0x0400, CRC(a8a5dca0) SHA1(2424d9e3b4ed2c73b14ec0c26d63453fb4f7f6c2) )
+	ROM_LOAD( "hu9.11c",      0x2000, 0x0400, CRC(0ace0939) SHA1(34704b836445628341fb6a77b1ebd47a76c5640d) )
+	ROM_LOAD( "hu10.9c",      0x2400, 0x0400, CRC(9dae33ca) SHA1(91472e3b60ff055724ae574b182a450d2a00081c) )
+
+	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
+	ROM_LOAD( "32.21e", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
+	ROM_LOAD( "31.22e", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
+ROM_END
+
 
 ROM_START( frogs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3245,7 +3263,8 @@ ROM_END
 GAMEL(1977, depthch,  0,        depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge", GAME_IMPERFECT_SOUND, layout_depthch )
 GAMEL(1977, depthcho, depthch,  depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge (older)", GAME_IMPERFECT_SOUND, layout_depthch )
 GAME( 1977, subhunt,  depthch,  depthch,  depthch,  0, ROT0,   "Taito", "Sub Hunter", GAME_IMPERFECT_SOUND )
-GAME( 1977, safari,   0,        safari,   safari,   0, ROT0,   "Gremlin", "Safari", GAME_NO_SOUND )
+GAME( 1977, safari,   0,        safari,   safari,   0, ROT0,   "Gremlin", "Safari (set 1)", GAME_NO_SOUND )
+GAME( 1977, safaria,  safari,   safari,   safari,   0, ROT0,   "Gremlin", "Safari (set 2, bootleg?)", GAME_NO_SOUND ) // on a bootleg board, but seems a different code revision too
 GAME( 1978, frogs,    0,        frogs,    frogs,    0, ROT0,   "Gremlin", "Frogs", GAME_IMPERFECT_SOUND )
 GAME( 1979, sspaceat, 0,        sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 1)", GAME_NO_SOUND )
 GAME( 1979, sspaceat2,sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 2)", GAME_NO_SOUND )

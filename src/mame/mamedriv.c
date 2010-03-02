@@ -191,6 +191,7 @@ const game_driver * const drivers[] =
 	DRIVER( mooncrstu )	/* (c) 1980 Nichibutsu USA */
 	DRIVER( mooncrsto )	/* (c) 1980 Nichibutsu */
 	DRIVER( mooncrstg )	/* (c) 1980 Gremlin */
+	DRIVER( mooncrstuk )/* (c) 1980 Nichibutsu UK */
 	DRIVER( smooncrs )	/* Gremlin */
 	DRIVER( mooncmw )	/* bootleg */
 	DRIVER( mooncrsb )	/* bootleg */
@@ -3551,6 +3552,7 @@ V-V                           TP-027
 	DRIVER( depthcho )	/*   ?   [1977 Gremlin?] */
 	DRIVER( subhunt )	/*   ?   [1977 Taito] */
 	DRIVER( safari )	/* 57-66 [1977 Gremlin?] */
+	DRIVER( safaria )	/* bootleg? */
 	DRIVER( frogs )		/* 112-119 [1978 Gremlin?] */
 	DRIVER( sspaceat )	/* 155-162 (c) */
 	DRIVER( sspaceat2 )	/* 155-162 (c) 1979 Sega */
