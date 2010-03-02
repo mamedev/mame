@@ -9438,6 +9438,8 @@ Other Sun games
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmv4 )		/* (c) 1992 Dyna Electronics */
 	DRIVER( cmv4a )		/* (c) 1992 Dyna Electronics */
+	DRIVER( cmvm )		/* (c) 199? Dyna Electronics */
+	DRIVER( cmfun )		/* (c) 1995 Dyna Electronics */
 	DRIVER( cmaster )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
