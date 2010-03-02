@@ -22,11 +22,154 @@ static READ64_HANDLER( naomi_bios_idle_skip_r )
 	return naomi_ram64[0x2ad238/8];
 }
 
+static UINT8 asciihex_to_dec(UINT8 in)
+{
+	if (in>=0x30 && in<=0x39)
+	{
+		return in - 0x30;
+	}
+	else
+	if (in>=0x41 && in<=0x46)
+	{
+		return in - 0x37;
+	}
+	/*
+	else
+	if (in>=0x61 && in<=0x66)
+	{
+		return in - 0x57;
+	}
+	*/
+	else
+	{
+		fatalerror("unexpected value in asciihex_to_dec");
+	}
+
+
+}
+
+// development helper function
+static void create_pic_from_retdat(running_machine* machine)
+{
+	{
+		UINT8* hexregion = memory_region(machine,"pichex");
+		UINT8* retregion = memory_region(machine,"picreturn");
+		UINT8* newregion = memory_region(machine,"pic");
+		int outcount = 0;
+
+		if (hexregion && retregion && newregion)
+		{
+			int hexoffs = 0;
+			int line;
+
+			hexoffs += 0x11; // skip first line  // :020000040000FA
+
+			for (line=0;line<0x200;line++)
+			{
+				int offs2;
+
+				hexoffs+= 0x1; // skip :
+				hexoffs+= 0x8; // skip line #  (:20xxxxxx incrementing in 0x2000)
+
+				for (offs2=0;offs2<0x20;offs2++)
+				{
+					UINT8 ascii1 = hexregion[hexoffs+0];
+					UINT8 ascii2 = hexregion[hexoffs+1];
+					UINT8 dec1 = asciihex_to_dec(ascii1);
+					UINT8 dec2 = asciihex_to_dec(ascii2);
+					UINT8 val = dec1 << 4 | dec2;
+
+					//printf("%02x%02x", ascii1, ascii2); 
+					
+					printf("%02x", val);
+					
+					newregion[outcount] = val;
+
+					hexoffs+=2;
+					outcount++;
+				}
+
+				hexoffs+=0x4; // skip running checksum + newline
+				
+				printf("\n");
+
+
+			}
+			
+			{
+				int i;
+				printf("string 1 (key1)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x780+i*2], retregion[0x31+i]);
+
+					newregion[0x780+i*2] = retregion[0x31+i]; // patch with extracted data
+				}
+
+				printf("string 2 (key2)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7a0+i*2], retregion[0x29+i]);
+
+					newregion[0x7a0+i*2] = retregion[0x29+i]; // patch with extracted data
+				}
+
+				printf("string 3 (filename)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7c0+i*2], retregion[0x21+i]);
+
+					newregion[0x7c0+i*2] = retregion[0x21+i]; // patch with extracted data
+				}
+
+				printf("string 4 (filename?)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7e0+i*2], retregion[0x19+i]);
+
+					newregion[0x7e0+i*2] = retregion[0x19+i]; // patch with extracted data
+				}
+			}
+			
+			
+			{
+				FILE *fp;
+				char filename[256];
+				sprintf(filename,"picbin_%s", machine->gamedrv->name);
+				fp=fopen(filename, "w+b");
+				if (fp)
+				{
+					fwrite(newregion, outcount, 1, fp);
+					fclose(fp);
+				}
+
+				printf("wrote %04x bytes\n", outcount);
+			}
+
+			// hex dumps end with
+			//:10400000000000000000000000000000000082002E
+			//:00000001FF
+		
+
+		}
+	}
+}
+
 DRIVER_INIT(naomi)
 {
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
+
+	create_pic_from_retdat(machine);
+}
+
+DRIVER_INIT(naomi2)
+{
+	jvsboard_type = JVSBD_DEFAULT;
+	actel_id = 0xffff;
+
+	create_pic_from_retdat(machine);
 }
 
 DRIVER_INIT(naomi_mp)
@@ -34,6 +177,8 @@ DRIVER_INIT(naomi_mp)
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
+
+	create_pic_from_retdat(machine);
 }
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
@@ -102,6 +247,6 @@ DRIVER_INIT( gram2000 )
 
 DRIVER_INIT( vf4evoct )
 {
-//  DRIVER_INIT_CALL(naomi2);
+	DRIVER_INIT_CALL(naomi2);
 	actel_id = 0; //FIXME: correct value
 }

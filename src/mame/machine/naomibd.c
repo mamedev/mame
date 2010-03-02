@@ -879,10 +879,33 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	int pos,len,a;
 	char name[128];
 	UINT64 key;
+	UINT8* realpic; // todo, add to device
 
 	memset(name,'\0',128);
-	memcpy(name, v->picdata+33, 7);
-	memcpy(name+7, v->picdata+25, 7);
+
+	realpic = memory_region(machine,"pic");
+
+	if (realpic)
+	{
+		//printf("Real PIC binary found\n");
+		int i;
+		for (i=0;i<7;i++)
+		{
+			name[i] = realpic[0x7c0+i*2];
+		}
+		for (i=0;i<7;i++)
+		{
+			name[i+7] = realpic[0x7e0+i*2];
+		}
+	}
+	else
+	{
+		// use extracted pic data
+		logerror("This PIC key hasn't been converted to a proper PIC binary yet!\n");
+		memcpy(name, v->picdata+33, 7);
+		memcpy(name+7, v->picdata+25, 7);
+	}
+
 	gdromfile = cdrom_open(v->gdromchd);
 	// primary volume descriptor
 	// read frame 0xb06e (frame=sector+150)
@@ -904,7 +927,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	// find data of file
 	start = 0;
 	size = 0;
-	printf("Looking for file %s\n", name);
+	logerror("Looking for file %s\n", name);
 	for (pos = 0;pos < 2048;pos += buffer[pos])
 	{
 		a=0;
@@ -941,7 +964,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 				   (buffer[pos+12] << 16) |
 				   (buffer[pos+13] << 24));
 
-			printf("start %08x size %08x\n", start,size);
+			logerror("start %08x size %08x\n", start,size);
 			break;
 		}
 		if (buffer[pos] == 0)
@@ -963,7 +986,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		start = 0;
 		size = 0;
 
-		printf("Looking for file %s\n", name);
+		logerror("Looking for file %s\n", name);
 		for (pos = 0;pos < 2048;pos += buffer[pos])
 		{
 			a = 0;
@@ -1000,7 +1023,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 					   (buffer[pos+12] << 16) |
 					   (buffer[pos+13] << 24));
 
-				printf("start %08x size %08x\n", start,size);
+				logerror("start %08x size %08x\n", start,size);
 				break;
 			}
 			if (buffer[pos] == 0)
@@ -1021,16 +1044,32 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		}
 	}
 	// get des key
-	key =(((UINT64)v->picdata[0x31] << 56) |
-		  ((UINT64)v->picdata[0x32] << 48) |
-		  ((UINT64)v->picdata[0x33] << 40) |
-		  ((UINT64)v->picdata[0x34] << 32) |
-		  ((UINT64)v->picdata[0x35] << 24) |
-		  ((UINT64)v->picdata[0x36] << 16) |
-		  ((UINT64)v->picdata[0x37] << 8)  |
-		  ((UINT64)v->picdata[0x29] << 0));
+	realpic = memory_region(machine,"pic");
 
-	printf("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
+	if (realpic)
+	{
+		int i;
+		key = 0;
+		for (i=0;i<7;i++)
+		{
+			key |= (UINT64)realpic[0x780+i*2] << (56 - i*8);
+		}
+
+		key |= (UINT64)realpic[0x7a0];
+	}
+	else
+	{
+		key =(((UINT64)v->picdata[0x31] << 56) |
+			  ((UINT64)v->picdata[0x32] << 48) |
+			  ((UINT64)v->picdata[0x33] << 40) |
+			  ((UINT64)v->picdata[0x34] << 32) |
+			  ((UINT64)v->picdata[0x35] << 24) |
+			  ((UINT64)v->picdata[0x36] << 16) |
+			  ((UINT64)v->picdata[0x37] << 8)  |
+			  ((UINT64)v->picdata[0x29] << 0));
+	}
+
+	logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
 
 	// decrypt loaded data
 	naomi_game_decrypt(machine, key, v->memory, size);
