@@ -2036,6 +2036,7 @@ src/mame/drivers/redclash.c svneol=native#text/plain
 src/mame/drivers/relief.c svneol=native#text/plain
 src/mame/drivers/renegade.c svneol=native#text/plain
 src/mame/drivers/retofinv.c svneol=native#text/plain
+src/mame/drivers/rgum.c svneol=native#text/plain
 src/mame/drivers/rmhaihai.c svneol=native#text/plain
 src/mame/drivers/rockrage.c svneol=native#text/plain
 src/mame/drivers/rocnrope.c svneol=native#text/plain

@@ -9491,6 +9491,7 @@ Other Sun games
 
 	/* Eagle */
 	DRIVER( janshi )
+	DRIVER( pinkiri8 )
 
 	/* Wing */
 	DRIVER( slotcarn )	/* (c) 1985 Wing Co. Ltd */
@@ -10020,8 +10021,8 @@ Other Sun games
 	DRIVER( am_mg24 )	/* (c) Amatic 2000 */
 	DRIVER( am_mg3 )	/* (c) Amatic 2000 */
 
-	DRIVER( pinkiri8 )
 	DRIVER( neptunp2 )
+	DRIVER( rgum )
 
 	/* Diatec */
 	DRIVER( unclepoo )
