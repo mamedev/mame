@@ -4276,14 +4276,14 @@ DokiDoki Penguin Land *not confirmed
 
 	/* Step 2.1 */
 	DRIVER( daytona2 )	/* 1998.06 Daytona USA 2 */
-						/* 1998.09 Ocean Hunter */
+	DRIVER( oceanhun )	/* 1998.09 Ocean Hunter */
 	DRIVER( spikeout )	/* 1998.09 Spikeout */
 	DRIVER( dirtdvls )	/* 1998.10 Dirt Devils */
 	DRIVER( dirtdvlsa )
 	DRIVER( swtrilgy )	/* 1998.11 Star Wars Trilogy Arcade */
 	DRIVER( swtrilgya )
 						/* 1998.11 Magical Torokko Adventure (Japan) */
-						/* 1998.12 L.A. Machine Guns */
+	DRIVER( lamachin )	/* 1998.12 L.A. Machine Guns */
 	DRIVER( dayto2pe )	/* 1998.12 Daytone USA 2 Power Edition */
 						/* 1998.12 Virtua Striker 2 ver.99 */
 	DRIVER( spikeofe )	/* 1999.01 Spikeout Final Edition */
