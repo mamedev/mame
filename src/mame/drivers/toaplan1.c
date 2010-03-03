@@ -817,7 +817,7 @@ static INPUT_PORTS_START( zerowing2 )
 
 	/* in 0x20 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x440006.w (CPU0 shared RAM) -> 0x081ade.w */
 	PORT_MODIFY("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_MACHINE_NO_COCKTAIL
 
 	/* in 0x28 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x440008.w (CPU0 shared RAM) -> 0x081ae0.w */
 	PORT_MODIFY("DSWB")
