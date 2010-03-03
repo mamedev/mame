@@ -552,6 +552,93 @@ Notes:
       PIC16F84 - Microchip PIC16F84 Programmable Interrupt Controller stamped 'CAP10' (SOIC20)
       MCU      - Fujitsu MB90F574 Microcontroller, stamped 'FCAF10' (QFP120)
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
+
+I/O Boards for Gun games
+------------------------
+
+Type 1:
+
+V185 I/O PCB
+2479961102 (2479971102)
+|-----------------------------------------|
+|   J601      LED1 LED2         |-------| |
+|   DSW(4)JP1 |-------|         |TSSIO  | |
+|     |-----| | C78   |14.746MHz|PLD    | |
+|     |TSSIO| |       |PST592   |-------| |
+|     |PROG | |-------|                   |
+|     |-----|                             |
+|                                         |
+|     62256                               |
+|ADM485                                   |
+|J1               SLA4060               J5|
+|                          J3       J4    |
+|-----------------------------------------|
+Notes:
+      TSSIOPROG - Atmel AT29C020 EEPROM stamped 'TSSIOP8' (PLCC32)
+      C78       - Namco Custom C78, actually a rebadged Hitachi HD643334 MCU (PLCC84)
+      TSSIOPLD  - Altera MAX EPM7128ELC84 CPLD with label 'TSSIOPLD' (PLCC84)
+      SLA4060   -
+      J1        - 12 position connector for power and I/O
+      J3        - 12 position connector for buttons and gun connection
+      J4        - not used?
+      J5        - 6 position connector for network
+      J601      - not used?
+      JP1       - jumper set to 1-2 (lower position), labelled 'WR'
+      DSW       - 4 position dipswitch block, all off
+
+This board is used only on Time Crisis II.
+Note the gun is a standard light gun.
+--------------
+
+Type 2:
+
+V221 MIU PCB
+2512960101 (2512970101)
+additional sticker for Time Crisis 3 says '2591961001 V291 XMIU PCB'
+|---------------------------------------------|
+|J10      J9    29C020     LC35256  DSW(4)    |
+|    M0105          PRG.8F                LED |
+|2267     6393                            LED |
+|    T082  T082                 |------|      |
+|           |--------|          | C78  |   J8 |
+|           |ALTERA  |          |      |      |
+|J11        |MAX     |          |------|    J7|
+|   LM1881  |EPM7128 |                  3771  |
+|R305526    |--------|                        |
+|      ZUW1R51212            14.746MHz        |
+|                                 ADM485    J6|
+|                                             |
+|  J1       J2   J3          J4    J5         |
+|---------------------------------------------|
+Notes:
+      2267    - JRC2267 Current limiting diode array? (SOIC8)
+      R305526 - Some kind of mini transformer or regulator?
+      LC35256 - Sanyo LC35256 32k x8 SRAM (SOP28)
+      LM1881  - National Semiconductor LM1881 Video Sync Separator (SOIC8)
+      M0105   - Matsushita Panasonic 0105 = ? (SOIC16)
+      T082    - Texas Instruments T082 (=TL082) JFET-Input operational amplifier (SOIC8)
+      6393    - Sanyo 6393 (LA6393) High Performance Dual Comparator (SOIC8)
+      ADM485  - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      3771    - Fujitsu MB3771 Power Supply Monitor and Master Reset IC (SOIC8)
+      EPM7128 - Altera MAX EPM7128SLC84-15 PLD labelled 'TMIU1/PLD0' (Time Crisis 3)
+      29C020  - location for 29C020 PLCC32 Flash/EP ROM (not populated)
+      ZUW1R51212 - Cosel ZUW1R51212 DC to DC Power Supply Module (input 9-18VDC, output +-12VDC or +24VDC)
+      DSW     - 4 position dipswitch block, all off
+      J1      - 6-pin power input connector
+      J2      - 12-pin connector (cabinet buttons UP/DOWN/ENTER plus TEST/SERVICE/COIN etc)
+      J3      - 4 pin connector (not used)
+      J4      - 9 pin Namco female plug connector for gun (solenoid +24V/trigger/pedal/sensor)
+      J5      - 5 pin connector used for I/O --> S246 communications (connects to USB link connection on main unit)
+      J6      - 7-pin connector (not used)
+      J9      - 6-pin connector (not used)
+      J10     - 2-pin Namco female plug connector (not used)
+      J11     - 6-pin Namco female plug connector (video input from CCD camera)
+      PRG.8F  - 27C1001 EPROM with label...
+                                           'XMIU1 PRG0' (I/O program for Time Crisis 3)
+                                           'CSZ1 PRG0A' (I/O program for Crisis Zone)
+
+This board is used on Crisis Zone (System 23 Evolution2) and Time Crisis 3 (System 246)
+Note both games use a CCD camera for the gun sensor.
 */
 
 /*
