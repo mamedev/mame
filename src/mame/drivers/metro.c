@@ -50,6 +50,7 @@ Year + Game                     PCB         Video Chip  Issues / Notes
 
 Not dumped yet:
 94  Toride II
+94  Mouse Shooter GoGo (might be a prequel to Bang Bang Ball)
 
 To Do:
 
