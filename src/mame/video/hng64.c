@@ -1657,6 +1657,9 @@ static float projectionMatrix[16];
 static float modelViewMatrix[16];
 static float cameraMatrix[16];
 
+static float lightStrength;
+static float lightVector[3];
+
 struct polyVert
 {
 	float worldCoords[4];	// World space coordinates (X Y Z 1.0)
@@ -1692,8 +1695,8 @@ struct polygon
 static void setIdentity(float *matrix);
 static void matmul4(float *product, const float *a, const float *b);
 static void vecmatmul4(float *product, const float *a, const float *b);
-//static float vecDotProduct( const float *a, const float *b);
-//static void normalize(float* x);
+static float vecDotProduct(const float *a, const float *b);
+static void normalize(float* x);
 
 static void performFrustumClip(struct polygon *p);
 static void drawShaded(running_machine *machine, struct polygon *p);
@@ -1779,6 +1782,38 @@ static void setCameraTransformation(const UINT16* packet)
 	cameraMatrix[13] = uToF(packet[11]);
 	cameraMatrix[14] = uToF(packet[12]);
 	cameraMatrix[15] = 1.0f;
+}
+
+// Operation 0010
+// Lighting information
+static void setLighting(const UINT16* packet)
+{
+	/*//////////////
+    // PACKET FORMAT
+    // [0]  - 0010 ... ID
+    // [1]  - ???? ... ? Always zero
+    // [2]  - ???? ... ? Always zero
+    // [3]  - xxxx ... X light vector direction
+    // [4]  - xxxx ... Y light vector direction
+    // [5]  - xxxx ... Z light vector direction
+    // [6]  - ???? ... ? Seems to be another light vector ?
+    // [7]  - ???? ... ? Seems to be another light vector ?
+    // [8]  - ???? ... ? Seems to be another light vector ?
+    // [9]  - xxxx ... Strength according to sams64_2 [0000,01ff]
+    // [10] - ???? ... ? Used in fatfurwa
+    // [11] - ???? ... ? Used in fatfurwa
+    // [12] - ???? ... ? Used in fatfurwa
+    // [13] - ???? ... ? Used in fatfurwa
+    // [14] - ???? ... ? Used in fatfurwa
+    // [15] - ???? ... ? Used in fatfurwa
+    ////////////*/
+	if (packet[1] != 0x0000) printf("ZOMG!  packet[1] in setLighting function is non-zero!\n");
+	if (packet[2] != 0x0000) printf("ZOMG!  packet[2] in setLighting function is non-zero!\n");
+
+    lightVector[0] = uToF(packet[3]);
+    lightVector[1] = uToF(packet[4]);
+    lightVector[2] = uToF(packet[5]);
+    lightStrength = uToF(packet[9]);
 }
 
 // Operation 0011
@@ -1870,7 +1905,22 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	/*//////////////
     // PACKET FORMAT
     // [0]  - 0100 ... ID
-    // [1]  - xxxx ... Flags
+    // [1]  - ?--- ... Flags [?000 = ???
+    //                        0?00 = ???
+    //                        00?0 = ???
+    //                        000? = ???]
+    // [1]  - -?-- ... Flags [?000 = ???
+    //                        0?00 = ???
+    //                        00?0 = ???
+    //                        000x = Dynamic palette bit]
+    // [1]  - --?- ... Flags [?000 = ???
+    //                        0?00 = ???
+    //                        00?0 = ???
+    //                        000? = ???]
+    // [1]  - ---? ... Flags [x000 = Apply lighting bit
+    //                        0?00 = ???
+    //                        00?0 = ???
+    //                        000? = ???]
     // [2]  - xxxx ... offset into ROM
     // [3]  - xxxx ... offset into ROM
     // [4]  - xxxx ... Transformation matrix
@@ -2042,7 +2092,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// [2] x--- - Texture Flags [x000 = Uses 4x4 sub-texture pages?
 			//                           0?00 = ??? - differen sub-page size?  SNK logo in RoadEdge.  Always on in bbust2.
 			//                           00xx = Horizontal sub-texture page index]
-			// [2] -?-- - ??? - barely visible (so far) in roadedge
+			// [2] -?-- - ??? - barely visible (thus far) in roadedge
 			// [2] --x- - Texture Flags [?000 = ???
 			//                           0xx0 = Vertical sub-texture page index.
 			//                           000? = ???]
@@ -2060,7 +2110,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// Debug - Colors polygons with certain flags bright blue! ajg
 			polys[*numPolys].debugColor = 0;
 			//polys[*numPolys].debugColor = tdColor;
-
+            
 			// Debug - ajg
 			//printf("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
@@ -2304,6 +2354,39 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			}
 			matmul4(modelViewMatrix, modelViewMatrix, objectMatrix);
 
+			// LIGHTING
+			if (packet[1] & 0x0008 && lightStrength > 0.0f)
+			{
+				for (int v = 0; v < 3; v++)
+				{
+					float transformedNormal[4];
+					vecmatmul4(transformedNormal, objectMatrix, polys[*numPolys].vert[v].normal);
+					normalize(transformedNormal);
+					normalize(lightVector);
+					
+					float intensity = vecDotProduct(transformedNormal, lightVector) * -1.0f;
+					intensity = (intensity <= 0.0f) ? (0.0f) : (intensity);
+					intensity *= lightStrength * 128.0f * 0.5f;     // HACK.  This 0.5 is completely arbitrary.
+					intensity *= 255.0f;
+					if (intensity >= 255.0f) intensity = 255.0f;
+
+					polys[*numPolys].vert[v].light[0] = intensity;
+					polys[*numPolys].vert[v].light[1] = intensity;
+					polys[*numPolys].vert[v].light[2] = intensity;
+				}
+			}
+			else
+			{
+				// Just clear out the light values
+				for (int v = 0; v < 3; v++)
+				{
+					polys[*numPolys].vert[v].light[0] = 0;
+					polys[*numPolys].vert[v].light[1] = 0;
+					polys[*numPolys].vert[v].light[2] = 0;
+				}
+			}
+
+
 			// BACKFACE CULL //
 			// EMPIRICAL EVIDENCE SEEMS TO SHOW THE HNG64 HARDWARE DOES NOT BACKFACE CULL //
 			/*
@@ -2323,6 +2406,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             else
                 polys[*numPolys].visible = 0;
             */
+
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
@@ -2395,9 +2479,9 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		setCameraTransformation(packet);
 		break;
 
-	case 0x0010:	// Unknown
-        //printPacket(packet, 1); printf("\n");
-		// Called very interestingly per-frame in every game.  Floats for sure.  Light-related?
+	case 0x0010:	// Lighting information.
+		//if (packet[9]) printPacket(packet, 1);
+		setLighting(packet);
 		break;
 
 	case 0x0011:	// Palette / Model flags?
@@ -2517,7 +2601,7 @@ static void clear3d(running_machine *machine)
 /////////////////////
 
 /* 4x4 matrix multiplication */
-static void matmul4( float *product, const float *a, const float *b )
+static void matmul4(float *product, const float *a, const float *b )
 {
    int i;
    for (i = 0; i < 4; i++)
@@ -2535,7 +2619,7 @@ static void matmul4( float *product, const float *a, const float *b )
 }
 
 /* vector by 4x4 matrix multiply */
-static void vecmatmul4( float *product, const float *a, const float *b)
+static void vecmatmul4(float *product, const float *a, const float *b)
 {
 	const float bi0 = b[0];
 	const float bi1 = b[1];
@@ -2548,12 +2632,10 @@ static void vecmatmul4( float *product, const float *a, const float *b)
 	product[3] = bi0 * a[3] + bi1 * a[7] + bi2 * a[11] + bi3 * a[15];
 }
 
-#ifdef UNUSED_FUNCTION
-static float vecDotProduct( const float *a, const float *b)
+static float vecDotProduct(const float *a, const float *b)
 {
 	return ((a[0]*b[0]) + (a[1]*b[1]) + (a[2]*b[2]));
 }
-#endif
 
 static void setIdentity(float *matrix)
 {
@@ -2581,17 +2663,15 @@ static float uToF(UINT16 input)
 */
 }
 
-#ifdef UNUSED_FUNCTION
 static void normalize(float* x)
 {
 	double l2 = (x[0]*x[0]) + (x[1]*x[1]) + (x[2]*x[2]);
-	double l=sqrt(l2);
+	double l = sqrt(l2);
 
 	x[0] = (float)(x[0] / l);
 	x[1] = (float)(x[1] / l);
 	x[2] = (float)(x[2] / l);
 }
-#endif
 
 
 
@@ -2938,11 +3018,22 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
+					// The color out of the texture
 					paletteEntry %= prOptions.palPageSize;
-                    
-					// Greyscale texture test.
-					// *cb = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
-					*cb = machine->pens[prOptions.palOffset + paletteEntry];
+					UINT32 color = machine->pens[prOptions.palOffset + paletteEntry];
+
+					// Application of the lighting
+					UINT32 red   = RGB_RED(color)   + (UINT8)(r_start/w_start);
+					UINT32 green = RGB_GREEN(color) + (UINT8)(g_start/w_start);
+					UINT32 blue  = RGB_BLUE(color)  + (UINT8)(b_start/w_start);
+
+					// Clamp and finalize
+					if (red >= 255) red = 255;
+					if (green >= 255) green = 255;
+					if (blue >= 255) blue = 255;
+					color = MAKE_ARGB(255, (UINT8)red, (UINT8)green, (UINT8)blue);
+
+					*cb = color;
 					*db = z_start;
 				}
 			}
