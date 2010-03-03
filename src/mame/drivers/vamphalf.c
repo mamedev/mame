@@ -22,6 +22,9 @@
     Mr. Kicker                 (c) 2001 SemiCom
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
 
+Known games on simular hardware but not dumped:
+    Mr. Dig (c) 2000 Sun (Mr. Driller clone) on a F-E1-16-002 PCB
+
  Real games bugs:
  - dquizgo2: bugged video test
 
