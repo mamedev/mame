@@ -126,11 +126,96 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
     (code at 0x002856).
 
 
+3) 'hellfire' and "clones"
+
+    TO DO !
+ 
+
+4) 'zerowing' and "clones"
+
+4a) 'zerowing'
+
+  - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
+    0x44000a.w (CPU0 shared RAM) then stored at 0x081810.w .
+  - Coinage relies on bits 0 and 1 of the region (code at 0x0c59 in CPU1) :
+      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cae (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
+      * ......1. : TOAPLAN_COINAGE_WORLD     (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
+  - Notice screen relies on bit 0 of the region (code at 0x000564) :
+      * .......0 : "FOR USE IN JAPAN ONLY"
+      * .......1 : "FOR USE IN U.S.A. ONLY"
+    But this routine is only called if both bits 0 and 1 of the region are set to 0
+    (code at 0x000530), so there is a notice screen only when "Territory" is set to "Japan".
+  - Copyright does NOT rely on the region, it is hard-coded in the M68000 ROMS.
+  - Number of letters for initials relies on bits 0 and 1 of the region, but it is buggy :
+    in the init routine (code at 0x000de0), bit 1 is tested (0 = 6 letters - 1 = 3 letters),
+    but in the enter routine (code at 0x001bf4), bit 0 is tested ! So you get the following :
+      * ......00 : 6 letters with default high-scores initials filled with "......"
+      * ......01 : 3 letters with default high-scores initials filled with "   ..."
+      * ......10 : 6 letters with default high-scores initials filled with "...000"
+      * ......11 : 3 letters with default high-scores initials filled with "   ..."
+  - Jumper displayed in the Dip Switches screen relies on bits 0 and 1 of the region
+    (code at 0x000922) :
+      * ......00 : "FOR JAPAN."
+      * ......01 : "FOR U.S.A."
+      * ......1. : "FOR EUROPE"
+  - When "Invulnerability" Dip Switch is ON, you can do the following with the STARTn buttons :
+      * press START2 to pause game
+      * press START1 to unpause game
+      * when START1 and START2 are pressed, the game enters in "slow motion" mode
+  - When "Invulnerability" Dip Switch is ON, you can't die (of course), but you also can't move
+    nor shoot while "captured" by an enemy or the background ! So you have to wait until enemy
+    gives up or background scrolls enough to "free" you.
+  - When cabinet is set to "Upright", you can use joystick and buttons from both players
+    (code at 0x00541a).
+
+4b) 'zerowing2'
+
+  - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
+    0x44000a.w (CPU0 shared RAM) then stored at 0x081ae2.w .
+  - Same sound CPU as in 'zerowing', so same coinage infos.
+  - Notice screen relies on bit 0 of the region (code at 0x0005f4) :
+      * .......0 : "FOR USE IN JAPAN ONLY"
+      * .......1 : "FOR USE IN U.S.A. ONLY"
+    But this routine is only called if bit 1 of the region is set to 0 (code at 0x0005c2),
+    so there shall be a notice screen only when "Territory" is not set to "Europe".
+    Furthermore, because of the 'bra' instruction at 0x00059e, there is never a notice screen !
+  - Copyright does NOT rely on the region, it is hard-coded in the M68000 ROMS.
+    It is different from the one in 'zerowing' though.
+  - Number of letters for initials relies on bit 1 of the region in the init routine (code at 0x000e64) :
+      * ......0. : 6 letters
+      * ......1. : 3 letters
+    But there are then no more tests on the region and only 3 letters can be entered (display ". . .") .
+  - Jumper displayed in the Dip Switches screen relies on bits 0 and 1 of the region
+    (code at 0x0009b2), but some data has been altered not to display "FOR JAPAN." !
+    So you get the following :
+      * ......0. : "FOR U.S.A."
+      * ......1. : "FOR EUROPE"
+  - When "Invulnerability" Dip Switch is ON, you can do the following with the STARTn buttons :
+      * press START2 to pause game
+      * press START1 to unpause game
+      * when START1 and START2 are pressed, the game enters in "slow motion" mode
+  - When "Invulnerability" Dip Switch is ON, you can't die (of course), but you also can't move
+    nor shoot while "captured" by an enemy or the background ! So you have to wait until enemy
+    gives up or background scrolls enough to "free" you.
+  - As you can play with 2 players at the same time, there is no need of a "Cabinet" setting,
+    so DSWA bit 0 is unused (it is even no more tested).
+  - As other player can join in at any time, there is no need of a "Continue" setting,
+    so DSWB bit 7 is unused (it is even no more tested).
+  - Here are some differences I noticed with 'zerowing' :
+      * you get the twin ships when starting a new life
+      * speed range is 0x14-0x2c instead of 0x10-0x30 (but still +0x08)
+    There might be some other differences, but as the M68000 code is heavily modified and as
+    many addresses in RAM are different, it isn't very easy to spot which ones :( Any help is welcome !
+
+
 To Do:
-    Add support for HD647180 (Z180) sound CPUs (once their internal
-    ROMS are dumped). These are:
-        Fire Shark/Same! Same! Same!
+    Add support for HD647180 (Z180) sound CPUs (once their internal ROMS are dumped).
+    These are:
+        Fire Shark / Same! Same! Same!
         Vimana
+    In the meantime, it can be interesting to simulate the basic communications (coinage and credits)
+    between the M68000 and the Z180 based on what is done for games with a Z80 sound CPU.  [stephh]
 
 ***************************************************************************/
 
@@ -520,7 +605,7 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x30, 0x20, "Territory/Copyright" )       /* bits 4 and 5 listed as unused in the Dip Switches screen */
-	PORT_DIPSETTING(    0x20, "World/Taito Corp Japan" )
+	PORT_DIPSETTING(    0x20, "Europe/Taito Corp Japan" )
 	PORT_DIPSETTING(    0x10, "USA/Taito America" )
 	PORT_DIPSETTING(    0x30, "USA/Taito America (Romstar)" )
 	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
@@ -543,6 +628,7 @@ static INPUT_PORTS_START( rallybik )
 
 	/* VBLANK : 0x140000.w */
 INPUT_PORTS_END
+
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( truxton )
@@ -576,10 +662,10 @@ static INPUT_PORTS_START( truxton )
 	/* in 0x70 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x18000a.w (CPU0 shared RAM) -> 0x081b7c.w */
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x07, 0x02, "Territory/Copyright" )
-	PORT_DIPSETTING(    0x02, "World/Taito Corp" )          /* TOAPLAN_COINAGE_WORLD */
-//	PORT_DIPSETTING(    0x03, "World/Taito Corp" )          /* TOAPLAN_COINAGE_JAPAN_OLD */
-//	PORT_DIPSETTING(    0x06, "World/Taito America" )       /* TOAPLAN_COINAGE_WORLD */
-//	PORT_DIPSETTING(    0x07, "World/Taito America" )       /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x02, "Europe/Taito Corp" )         /* TOAPLAN_COINAGE_WORLD */
+//	PORT_DIPSETTING(    0x03, "Europe/Taito Corp" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
+//	PORT_DIPSETTING(    0x06, "Europe/Taito America" )      /* TOAPLAN_COINAGE_WORLD */
+//	PORT_DIPSETTING(    0x07, "Europe/Taito America" )      /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x04, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
 //	PORT_DIPSETTING(    0x05, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x01, "USA/Taito America (Romstar)" )/*TOAPLAN_COINAGE_JAPAN_OLD */
@@ -667,7 +753,7 @@ static INPUT_PORTS_START( hellfire )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( hellfir1 )
+static INPUT_PORTS_START( hellfire1 )
 	PORT_INCLUDE( hellfire )
 
 	PORT_MODIFY("DSWA")
@@ -676,47 +762,23 @@ static INPUT_PORTS_START( hellfir1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+
+/* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( zerowing )
-	TOAPLAN1_VBLANK_INPUT
+	PORT_INCLUDE( toaplan1_2b )
 
-	PORT_START("P1")
-	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
+	/* in 0x20 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x440006.w (CPU0 shared RAM) -> 0x08180c.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x02, 0x02)                 /* see notes */
 
-	PORT_START("P2")
-	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
-
-	PORT_START("DSWA")		/* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-
-	PORT_START("DSWB")		/* DSW B */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "200K, every 500K" )
-	PORT_DIPSETTING(    0x04, "500K, every 1M" )
-	PORT_DIPSETTING(    0x08, "500K" )
+	/* in 0x28 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x440008.w (CPU0 shared RAM) -> 0x08180e.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x00216c ('zerowing') or 0x002606 ('zerowing2') */
+	PORT_DIPSETTING(    0x00, "200k 700k 500k+" )
+	PORT_DIPSETTING(    0x04, "500k 1500k 1000k+" )
+	PORT_DIPSETTING(    0x08, "500k Only" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x30, "2" )
@@ -730,35 +792,55 @@ static INPUT_PORTS_START( zerowing )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	TOAPLAN1_SYSTEM_INPUTS
-
-	PORT_START("TJUMP")		/* Territory Jumper block */
-	PORT_DIPNAME( 0x03, 0x02, "Territory" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	/* in 0x88 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x44000a.w (CPU0 shared RAM) -> 0x081810.w */
+	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x03, 0x03, "Territory" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* 3 letters initials - right */
+//  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )           /* 6 letters initials - wrong */
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x44000e.w (CPU0 shared RAM) -> 0x081818.w */
+	/* P2 : in 0x08 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x440010.w (CPU0 shared RAM) -> 0x08181a.w */
+
+	/* SYSTEM : in 0x80 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x44000c.w (CPU0 shared RAM) -> 0x081812.w */
+
+	/* VBLANK : 0x400000.w */
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( zerowng2 ) /* Always shows "Williams Electronics Games, Inc" */
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( zerowing2 )
 	PORT_INCLUDE( zerowing )
 
+	/* in 0x20 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x440006.w (CPU0 shared RAM) -> 0x081ade.w */
+	PORT_MODIFY("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+
+	/* in 0x28 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x440008.w (CPU0 shared RAM) -> 0x081ae0.w */
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+
+	/* in 0x88 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x44000a.w (CPU0 shared RAM) -> 0x081ae2.w */
 	PORT_MODIFY("TJUMP")		/* Territory Jumper block */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x44000e.w (CPU0 shared RAM) -> 0x081aea.w */
+	/* P2 : in 0x08 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x440010.w (CPU0 shared RAM) -> 0x081aec.w */
+
+	/* SYSTEM : in 0x80 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x44000c.w (CPU0 shared RAM) -> 0x081ae4.w */
+
+	/* VBLANK : 0x400000.w */
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( demonwld )
 	TOAPLAN1_VBLANK_INPUT
@@ -832,7 +914,7 @@ static INPUT_PORTS_START( demonwld )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( demonwl1 )
+static INPUT_PORTS_START( demonwld1 )
 	PORT_INCLUDE( demonwld )
 
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
@@ -843,7 +925,8 @@ static INPUT_PORTS_START( demonwl1 )
 	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( samesame )
+
+static INPUT_PORTS_START( fireshrk )
 	TOAPLAN1_VBLANK_INPUT
 
 	PORT_START("P1")
@@ -863,30 +946,16 @@ static INPUT_PORTS_START( samesame )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-/* settings listed in service mode, but not actually used ???
-    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-*/
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSWB")		/* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
@@ -914,6 +983,43 @@ static INPUT_PORTS_START( samesame )
 	TOAPLAN1_SYSTEM_INPUTS
 
 	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x06, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x00, "USA (Romstar)" )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( samesame )
+	PORT_INCLUDE( fireshrk )
+
+	PORT_MODIFY("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+/* settings listed in service mode, but not actually used ???
+    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+*/
+
+	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -929,7 +1035,7 @@ static INPUT_PORTS_START( samesame )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( samesam2 )
+static INPUT_PORTS_START( samesame2 )
 	PORT_INCLUDE( samesame )
 
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
@@ -947,28 +1053,6 @@ static INPUT_PORTS_START( samesam2 )
 //  PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Mask bit 2 aswell */
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( fireshrk )
-	PORT_INCLUDE( samesame )
-
-	PORT_MODIFY("DSWA")		/* DSW A */
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-
-	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x06, 0x02, "Territory" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x00, "USA (Romstar)" )
 INPUT_PORTS_END
 
 
@@ -2339,29 +2423,29 @@ static DRIVER_INIT( vimana )
 
 
 
-GAME( 1988, rallybik, 0,        rallybik, rallybik, toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", GAME_NO_COCKTAIL )
-GAME( 1988, truxton,  0,        truxton,  truxton,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", GAME_NO_COCKTAIL )
-GAME( 1989, hellfire, 0,        hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
-GAME( 1989, hellfire1,hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
-GAME( 1989, hellfire2,hellfire, hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
-GAME( 1989, hellfire3,hellfire, hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver., alt)", 0 )
-GAME( 1989, zerowing, 0,        zerowing, zerowing, toaplan1, ROT0,   "Toaplan", "Zero Wing", 0 )
-GAME( 1989, zerowing2,zerowing, zerowing, zerowng2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (2 player simultaneous ver.)", 0 )
-GAME( 1990, demonwld, 0,        demonwld, demonwld, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwld1,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
-GAME( 1989, demonwld2,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
-GAME( 1989, demonwld3,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
-GAME( 1989, demonwld4,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 5)", 0 )
-GAME( 1990, fireshrk, 0,        samesame, fireshrk, toaplan1, ROT270, "Toaplan", "Fire Shark", GAME_NO_SOUND )
-GAME( 1990, fireshrkd,  fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 1, easier)", GAME_NO_SOUND )
-GAME( 1990, fireshrkdh, fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
-GAME( 1989, samesame, fireshrk, samesame, samesame, toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2 player alternating ver.)", GAME_NO_SOUND )
-GAME( 1989, samesame2,fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan", "Same! Same! Same!", GAME_NO_SOUND )
-GAME( 1990, outzone,  0,        outzone,  outzone,  toaplan1, ROT270, "Toaplan", "Out Zone (set 1)", 0 ) // later fixed version
-GAME( 1990, outzonea, outzone,  outzone,  outzone,  toaplan1, ROT270, "Toaplan", "Out Zone (set 2)", 0 )
-GAME( 1990, outzoneb, outzone,  outzone,  outzoneb, toaplan1, ROT270, "Toaplan", "Out Zone (set 3, prototype?)", 0 ) // early revision at least
-GAME( 1990, outzonec, outzone,  outzone,  outzonec, toaplan1, ROT270, "Toaplan", "Out Zone (set 4)", 0 )
-GAME( 1990, outzoned, outzone,  outzone,  outzonec, toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
-GAME( 1991, vimana,   0,        vimana,   vimana,   vimana,   ROT270, "Toaplan", "Vimana", GAME_NO_SOUND )
-GAME( 1991, vimana1,  vimana,   vimana,   vimana,   vimana,   ROT270, "Toaplan", "Vimana (old set)", GAME_NO_SOUND )
-GAME( 1991, vimanan,  vimana,   vimana,   vimanan,  vimana,   ROT270, "Toaplan (Nova Apparate GMBH & Co license)", "Vimana (Nova Apparate GMBH & Co)", GAME_NO_SOUND )
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", GAME_NO_COCKTAIL )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", GAME_NO_COCKTAIL )
+GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
+GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
+GAME( 1989, hellfire2,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
+GAME( 1989, hellfire3,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver., alt)", 0 )
+GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1, ROT0,   "Toaplan", "Zero Wing (single players)", GAME_NO_COCKTAIL )
+GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (dual players)", GAME_NO_COCKTAIL )
+GAME( 1990, demonwld,   0,        demonwld, demonwld,  demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
+GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
+GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 5)", 0 )
+GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1, ROT270, "Toaplan", "Fire Shark", GAME_NO_SOUND )
+GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 1, easier)", GAME_NO_SOUND )
+GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
+GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2 player alternating ver.)", GAME_NO_SOUND )
+GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1, ROT270, "Toaplan", "Same! Same! Same!", GAME_NO_SOUND )
+GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1, ROT270, "Toaplan", "Out Zone (set 1)", 0 ) // later fixed version
+GAME( 1990, outzonea,   outzone,  outzone,  outzone,   toaplan1, ROT270, "Toaplan", "Out Zone (set 2)", 0 )
+GAME( 1990, outzoneb,   outzone,  outzone,  outzoneb,  toaplan1, ROT270, "Toaplan", "Out Zone (set 3, prototype?)", 0 ) // early revision at least
+GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1, ROT270, "Toaplan", "Out Zone (set 4)", 0 )
+GAME( 1990, outzoned,   outzone,  outzone,  outzonec,  toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
+GAME( 1991, vimana,     0,        vimana,   vimana,    vimana,   ROT270, "Toaplan", "Vimana", GAME_NO_SOUND )
+GAME( 1991, vimana1,    vimana,   vimana,   vimana,    vimana,   ROT270, "Toaplan", "Vimana (old set)", GAME_NO_SOUND )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   vimana,   ROT270, "Toaplan (Nova Apparate GMBH & Co license)", "Vimana (Nova Apparate GMBH & Co)", GAME_NO_SOUND )
