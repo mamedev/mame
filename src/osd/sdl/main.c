@@ -45,7 +45,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 #endif
 
 	/* convert arguments to UTF-8 */
-	utf8_argv = (char **) osd_malloc(argc * sizeof(*argv));
+	utf8_argv = (char **) malloc(argc * sizeof(*argv));
 	if (utf8_argv == NULL)
 		return 999;
 	for (i = 0; i < argc; i++)
@@ -61,7 +61,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	/* free arguments */
 	for (i = 0; i < argc; i++)
 		free(utf8_argv[i]);
-	osd_free(utf8_argv);
+	free(utf8_argv);
 
 #ifdef MALLOC_DEBUG
 	{
