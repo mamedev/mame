@@ -1760,8 +1760,9 @@ static INPUT_PORTS_START( ss23 )
 	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TC2P0")
-	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) 
@@ -1860,7 +1861,7 @@ static READ8_HANDLER(iob_r)
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal 		
 	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r )
 	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
