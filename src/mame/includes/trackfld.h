@@ -14,7 +14,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, trackfld_state(machine)); }
 
 	trackfld_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram;	// trackfld, hyperspt, yiear, sbasketb
 	UINT8 *  colorram;	// trackfld, hyperspt, sbasketb

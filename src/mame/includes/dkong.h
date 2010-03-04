@@ -75,7 +75,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dkong_state(machine)); }
 
 	dkong_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *           video_ram;
 	UINT8 *           sprite_ram;

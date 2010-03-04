@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, grchamp_state(machine)); }
 
 	grchamp_state(running_machine &machine) { }
-	
+
 	UINT8		cpu0_out[16];
 	UINT8		cpu1_out[16];
 

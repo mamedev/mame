@@ -2601,7 +2601,7 @@ ROM_END
     - 2x HY18CV85 (electrically-erasable PLD)
 
     Some versions have Mexican Rockwell R65c02.
-	The game doesn't work with a regular 65c02 CPU.
+    The game doesn't work with a regular 65c02 CPU.
 */
 
 ROM_START( magicrd2 )	/* Impera */
@@ -2747,7 +2747,7 @@ ROM_END
   |   |  |   |  |  |  |         _________      ____                      |       |   |  |        ___|
   |   |__|   |  |  |  |        |    E    |    | F  |                     |       |   |__|        ___|
   |          |__|  |__|        |_________|    |____|                     |_______|               ___|
-  |                                                                                             | 
+  |                                                                                             |
   |_____________________________________________________________________________________________|
 
 
@@ -2821,7 +2821,7 @@ Surely selectable through a PLD.
 ROM_START( jolyjokrb )
 	ROM_REGION( 0x18000, "maincpu", 0 )	/* Two slightly different programs. Using the 1st one...*/
 	ROM_LOAD( "unbekannt.bin", 0x8000, 0x10000, CRC(327fa3d7) SHA1(2435aada2377b2f8f01d059a7aba9bc7a8993537) )	/* 1st prg */
-//	ROM_LOAD( "unbekannt.bin", 0x0000, 0x10000, CRC(327fa3d7) SHA1(2435aada2377b2f8f01d059a7aba9bc7a8993537) )	/* 2nd prg */
+//  ROM_LOAD( "unbekannt.bin", 0x0000, 0x10000, CRC(327fa3d7) SHA1(2435aada2377b2f8f01d059a7aba9bc7a8993537) )  /* 2nd prg */
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "ic25.bin", 0x00000, 0x10000, CRC(1bd067af) SHA1(9436fe085ba63c00a12ea80903470a84535e3dc1) )

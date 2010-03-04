@@ -7,7 +7,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, aquarium_state(machine)); }
 
 	aquarium_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  scroll;
 	UINT16 *  txt_videoram;

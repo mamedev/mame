@@ -111,7 +111,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supertnk_state(machine)); }
 
 	supertnk_state(running_machine &machine) { }
-	
+
 	UINT8 *videoram[3];
 	UINT8 rom_bank;
 	UINT8 bitplane_select;

@@ -50,7 +50,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, galaxi_state(machine)); }
 
 	galaxi_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  bg1_ram;
 	UINT16 *  bg2_ram;

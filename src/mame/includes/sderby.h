@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sderby_state(machine)); }
 
 	sderby_state(running_machine &machine) { }
-	
+
 	UINT16 *spriteram;
 	size_t spriteram_size;
 

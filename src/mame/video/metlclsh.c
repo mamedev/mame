@@ -174,7 +174,7 @@ VIDEO_START( metlclsh )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ) 
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
 	UINT8 *spriteram = state->spriteram;
@@ -196,7 +196,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		code = ((attr & 0x60) << 3) + spriteram[offs + 1];
 
 		sx = 240 - spriteram[offs + 3];
-		if (sx < -7) 
+		if (sx < -7)
 			sx += 256;
 
 		sy = 240 - spriteram[offs + 2];

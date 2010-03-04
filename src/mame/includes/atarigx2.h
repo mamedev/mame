@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarigx2_state(machine)); }
 
 	atarigx2_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 	UINT16			playfield_base;
 	UINT16			motion_object_base;

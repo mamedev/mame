@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, stactics_state(machine)); }
 
 	stactics_state(running_machine &machine) { }
-	
+
 	/* machine state */
 	int    vert_pos;
 	int    horiz_pos;

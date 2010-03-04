@@ -64,7 +64,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m79amb_state(machine)); }
 
 	m79amb_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        mask;
@@ -301,12 +301,12 @@ static DRIVER_INIT( m79amb )
 		rom[i] = ~rom[i];
 
 	/* gun positions */
-	for (i = 0; i < 0x100; i++) 
+	for (i = 0; i < 0x100; i++)
 	{
 		/* gun 1, start at left 18 */
-		for (j = 0; j < 0x20; j++) 
+		for (j = 0; j < 0x20; j++)
 		{
-			if (i <= lut_cross[j]) 
+			if (i <= lut_cross[j])
 			{
 				state->lut_gun1[i] = lut_pos[j];
 				break;
@@ -314,9 +314,9 @@ static DRIVER_INIT( m79amb )
 		}
 
 		/* gun 2, start at right 235 */
-		for (j = 0; j < 0x20; j++) 
+		for (j = 0; j < 0x20; j++)
 		{
-			if (i >= (253 - lut_cross[j])) 
+			if (i >= (253 - lut_cross[j]))
 			{
 				state->lut_gun2[i] = lut_pos[j];
 				break;

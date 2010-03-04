@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (code & 0xf000) >> 12;
 
 	code &= 0x0fff;
-	if ((code & 0x0e00) == 0x0e00) 
+	if ((code & 0x0e00) == 0x0e00)
 		code = (code & 0x1ff) | (state->bgpic << 9);
 
 	SET_TILE_INFO(

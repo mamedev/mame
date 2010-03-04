@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( unclepoo )
 	MDRV_CPU_ADD("subcpu", Z80,18000000/12)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(unclepoo_sub_map)
 	MDRV_CPU_IO_MAP(unclepoo_sub_portmap)
-//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

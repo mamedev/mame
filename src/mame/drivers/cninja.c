@@ -81,7 +81,7 @@ static READ16_HANDLER( cninja_irq_r )
 {
 	cninja_state *state = (cninja_state *)space->machine->driver_data;
 
-	switch (offset) 
+	switch (offset)
 	{
 
 	case 1: /* Raster IRQ scanline position */
@@ -101,7 +101,7 @@ static WRITE16_HANDLER( cninja_irq_w )
 {
 	cninja_state *state = (cninja_state *)space->machine->driver_data;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0:
 		/* IRQ enable:
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( cninja_irq_w )
 
 static READ16_HANDLER( robocop2_prot_r )
 {
-	switch (offset << 1) 
+	switch (offset << 1)
 	{
 		case 0x41a: /* Player 1 & 2 input ports */
 			return input_port_read(space->machine, "IN0");
@@ -754,7 +754,7 @@ static const ym2151_interface ym2151_interface2 =
 
 static int cninja_bank_callback( const int bank )
 {
-	if ((bank >> 4) & 0xf) 
+	if ((bank >> 4) & 0xf)
 		return 0x0000; /* Only 2 banks */
 	return 0x1000;
 }
@@ -1933,16 +1933,16 @@ static void cninja_patch( running_machine *machine )
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	int i;
 
-	for (i = 0; i < 0x80000 / 2; i++) 
+	for (i = 0; i < 0x80000 / 2; i++)
 	{
 		int aword = RAM[i];
 
-		if (aword == 0x66ff || aword == 0x67ff) 
+		if (aword == 0x66ff || aword == 0x67ff)
 		{
 			UINT16 doublecheck = RAM[i - 4];
 
 			/* Cmpi + btst controlling opcodes */
-			if (doublecheck == 0xc39 || doublecheck == 0x839) 
+			if (doublecheck == 0xc39 || doublecheck == 0x839)
 			{
 				RAM[i]     = 0x4e71;
 				RAM[i - 1] = 0x4e71;

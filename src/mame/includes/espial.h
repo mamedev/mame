@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, espial_state(machine)); }
 
 	espial_state(running_machine &machine) { }
-	
+
 	UINT8 *   videoram;	// espial, zodiack, marineb
 	UINT8 *   colorram;	// espial, marineb
 	UINT8 *   attributeram;	// espial, zodiack

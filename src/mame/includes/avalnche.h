@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, avalnche_state(machine)); }
 
 	avalnche_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT8 *  videoram;
 	size_t   videoram_size;

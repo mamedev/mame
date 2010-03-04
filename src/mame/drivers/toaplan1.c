@@ -129,7 +129,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 3) 'hellfire' and "clones"
 
     TO DO !
- 
+
 
 4) 'zerowing' and "clones"
 
@@ -642,7 +642,7 @@ static INPUT_PORTS_START( truxton )
 	/* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x081b7a.w */
 	PORT_START("DSWB")
 	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000930 */ 
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000930 */
 	PORT_DIPSETTING(    0x04, "50k 200k 150k+" )
 	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
 	PORT_DIPSETTING(    0x08, "100k Only" )
@@ -663,11 +663,11 @@ static INPUT_PORTS_START( truxton )
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x07, 0x02, "Territory/Copyright" )
 	PORT_DIPSETTING(    0x02, "Europe/Taito Corp" )         /* TOAPLAN_COINAGE_WORLD */
-//	PORT_DIPSETTING(    0x03, "Europe/Taito Corp" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
-//	PORT_DIPSETTING(    0x06, "Europe/Taito America" )      /* TOAPLAN_COINAGE_WORLD */
-//	PORT_DIPSETTING(    0x07, "Europe/Taito America" )      /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x03, "Europe/Taito Corp" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x06, "Europe/Taito America" )      /* TOAPLAN_COINAGE_WORLD */
+//  PORT_DIPSETTING(    0x07, "Europe/Taito America" )      /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x04, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
-//	PORT_DIPSETTING(    0x05, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x05, "USA/Taito America" )         /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x01, "USA/Taito America (Romstar)" )/*TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )          /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )

@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beathead_state(machine)); }
 
 	beathead_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 
 	UINT32 *		vram_bulk_latch;

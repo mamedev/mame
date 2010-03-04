@@ -27,7 +27,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gameplan_state(machine)); }
 
 	gameplan_state(running_machine &machine) { }
-	
+
 	/* machine state */
 	UINT8   current_port;
 	UINT8   *trvquest_question;

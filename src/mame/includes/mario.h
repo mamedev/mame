@@ -36,7 +36,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mario_state(machine)); }
 
 	mario_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 
 	/* machine states */

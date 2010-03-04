@@ -72,7 +72,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lastfght_state(machine)); }
 
 	lastfght_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  colorram;
 //  UINT8 *  nvram; // currently this uses generic nvram handling

@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skullxbo_state(machine)); }
 
 	skullxbo_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 };
 

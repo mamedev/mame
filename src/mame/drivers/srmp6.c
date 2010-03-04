@@ -77,7 +77,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp6_state(machine)); }
 
 	srmp6_state(running_machine &machine) { }
-	
+
 	UINT16* tileram;
 	UINT16* dmaram;
 

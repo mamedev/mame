@@ -98,7 +98,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spool99_state(machine)); }
 
 	spool99_state(running_machine &machine) { }
-	
+
 	UINT8 *main;
 	tilemap_t *sc0_tilemap;
 	UINT8 *cram;

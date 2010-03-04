@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rampart_state(machine)); }
 
 	rampart_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 	UINT16 *		bitmap;
 	UINT8			has_mo;

@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, yunsung8_state(machine)); }
 
 	yunsung8_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *     videoram;
 

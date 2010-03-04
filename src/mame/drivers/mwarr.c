@@ -52,7 +52,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mwarr_state(machine)); }
 
 	mwarr_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram, *sprites_buffer;
 	UINT16 *bg_scrollram, *mlow_scrollram, *mhigh_scrollram, *vidattrram;

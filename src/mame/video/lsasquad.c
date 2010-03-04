@@ -15,7 +15,7 @@ static void draw_layer( running_machine *machine, bitmap_t *bitmap, const rectan
 
 		base = 64 * scrollram[offs + 1];
 		sx = 8 * (offs / 4) + scrollx;
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 			sx = 248 - sx;
 
 		sx &= 0xff;
@@ -25,7 +25,7 @@ static void draw_layer( running_machine *machine, bitmap_t *bitmap, const rectan
 			int attr;
 
 			sy = 8 * y + scrolly;
-			if (flip_screen_get(machine)) 
+			if (flip_screen_get(machine))
 				sy = 248 - sy;
 			sy &= 0xff;
 
@@ -102,7 +102,7 @@ static int draw_layer_daikaiju( running_machine *machine, bitmap_t *bitmap, cons
 		base = 64 * state->scrollram[offs + 1];
 		sx = scrollx + stepx;
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 			sx = 248 - sx;
 		sx &= 0xff;
 
@@ -111,7 +111,7 @@ static int draw_layer_daikaiju( running_machine *machine, bitmap_t *bitmap, cons
 			int attr;
 
 			sy = 8 * y + scrolly;
-			if (flip_screen_get(machine)) 
+			if (flip_screen_get(machine))
 				sy = 248 - sy;
 			sy &= 0xff;
 

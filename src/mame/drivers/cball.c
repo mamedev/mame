@@ -14,7 +14,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cball_state(machine)); }
 
 	cball_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  video_ram;
 

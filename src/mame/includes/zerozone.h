@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, zerozone_state(machine)); }
 
 	zerozone_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *    videoram;
 //  UINT16 *    paletteram; // currently this uses generic palette handling

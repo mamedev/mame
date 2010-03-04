@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lemmings_state(machine)); }
 
 	lemmings_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  pixel_0_data;
 	UINT16 *  pixel_1_data;

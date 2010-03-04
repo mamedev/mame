@@ -132,7 +132,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gstream_state(machine)); }
 
 	gstream_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT32 *  vram;
 	UINT32 *  workram;

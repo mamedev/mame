@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dbz_state(machine)); }
 
 	dbz_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *      bg1_videoram;
 	UINT16 *      bg2_videoram;

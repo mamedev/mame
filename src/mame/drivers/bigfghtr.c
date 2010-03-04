@@ -123,7 +123,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bigfghtr_state(machine)); }
 
 	bigfghtr_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT16 *      text_videoram;
 	UINT16 *      bg_videoram;

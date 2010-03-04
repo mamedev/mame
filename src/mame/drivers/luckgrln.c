@@ -145,7 +145,7 @@ static WRITE8_HANDLER( output_w )
 	/* correct? */
 	nmi_enable = data & 1;
 	// other values unknown
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 }
 
 static READ8_HANDLER( test_r )
@@ -257,7 +257,7 @@ static DRIVER_INIT( luckgrln )
 	#endif
 
 	// ??
-//	memory_set_bankptr(machine, "bank1",&rom[0x010000]);
+//  memory_set_bankptr(machine, "bank1",&rom[0x010000]);
 }
 
 ROM_START( luckgrln )

@@ -20,7 +20,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jedi_state(machine)); }
 
 	jedi_state(running_machine &machine) { }
-	
+
 	/* machine state */
 	UINT8  a2d_select;
 	UINT8  nvram_enabled;

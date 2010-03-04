@@ -135,9 +135,9 @@ static WRITE8_HANDLER( nsc_true_blitter_w )
 		// lowest bit of src controls flipping / draw direction?
 		flipx = (state->true_blit[0] & 1);
 
-		if (!flipx) 
+		if (!flipx)
 			src += (w * h) - 1;
-		else 
+		else
 			src -= (w * h) - 1;
 
 		{
@@ -158,9 +158,9 @@ static WRITE8_HANDLER( nsc_true_blitter_w )
 					if ((dat & 0xff) != 0)
 						plot_nightgal_gfx_pixel(space->machine, dat, drawx, drawy);
 
-					if (!flipx)	
+					if (!flipx)
 						count--;
-					else 
+					else
 						count++;
 				}
 			}
@@ -191,9 +191,9 @@ static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 		// lowest bit of src controls flipping / draw direction?
 		flipx = (state->true_blit[0] & 1);
 
-		if (!flipx) 
+		if (!flipx)
 			src += (w * h) - 1;
-		else 
+		else
 			src -= (w * h) - 1;
 
 		{
@@ -214,9 +214,9 @@ static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 					if ((dat & 0xff) != 0)
 						plot_nightgal_gfx_pixel(space->machine, dat, drawx, drawy);
 
-					if (!flipx)	
+					if (!flipx)
 						count--;
-					else 
+					else
 						count++;
 				}
 			}
@@ -758,7 +758,7 @@ static MACHINE_RESET( nightgal )
 	state->nsc_latch = 0;
 	state->z80_latch = 0;
 	state->mux_data = 0;
-	
+
 	memset(state->blit_raw_data, 0, ARRAY_LENGTH(state->blit_raw_data));
 	memset(state->true_blit, 0, ARRAY_LENGTH(state->true_blit));
 	memset(state->pen_data, 0, ARRAY_LENGTH(state->pen_data));

@@ -1140,11 +1140,11 @@ static void tempest_vggo(vgdata *vg)
 	vg->pc = 0;
 	vg->sp = 0;
 	/*
-	 * Tempest and Quantum trigger VGGO from time to time even though
-	 * the VG runs in an endless loop for these games (see
-	 * avg_common_strobe2). If we don't discard all vectors in the
-	 * current buffer at this point, the screen starts flickering.
-	 */
+     * Tempest and Quantum trigger VGGO from time to time even though
+     * the VG runs in an endless loop for these games (see
+     * avg_common_strobe2). If we don't discard all vectors in the
+     * current buffer at this point, the screen starts flickering.
+     */
 	nvect = 0;
 }
 

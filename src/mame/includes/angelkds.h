@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, angelkds_state(machine)); }
 
 	angelkds_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    paletteram;
 	UINT8 *    spriteram;

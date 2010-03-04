@@ -52,7 +52,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 		y = spriteram[offs] & 0xffff;
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram[offs + 2] & 0xffff;
@@ -60,7 +60,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 		pri = (x & 0xc000); // 2 bits or 1?
 
-		switch (pri & 0xc000) 
+		switch (pri & 0xc000)
 		{
 		case 0x0000: pri = 0; break;
 		case 0x4000: pri = 0xf0; break;
@@ -79,7 +79,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 		y = 240 - y;
 		x = 304 - x;
 
-		if (x > 320) 
+		if (x > 320)
 			continue;
 
 		sprite &= ~multi;
@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)

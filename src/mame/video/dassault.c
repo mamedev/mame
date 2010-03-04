@@ -38,7 +38,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 			}
 
 			sprite = spritebase[offs + 1] & 0x7fff;
-			if (!sprite) 
+			if (!sprite)
 				continue;
 
 			x = spritebase[offs + 2];
@@ -49,10 +49,10 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 			y = spritebase[offs];
 			flash = y & 0x1000;
-			if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+			if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 				continue;
 			colour = (x >> 9) & 0x1f;
-			if (y & 0x8000) 
+			if (y & 0x8000)
 				colour += 32;
 
 			fx = y & 0x2000;
@@ -66,7 +66,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 			x = 304 - x;
 			y = 240 - y;
 
-			if (x > 320) 
+			if (x > 320)
 				continue; /* Speedup */
 
 			sprite &= ~multi;
@@ -78,7 +78,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 				inc = 1;
 			}
 
-			if (flip_screen_get(machine)) 
+			if (flip_screen_get(machine))
 			{
 				y = 240 - y;
 				x = 304 - x;
@@ -89,65 +89,65 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 			else mult = -16;
 
 			/* Priority */
-			switch (pf_priority & 3) 
+			switch (pf_priority & 3)
 			{
 			case 0:
-				if (bank == 0) 
+				if (bank == 0)
 				{
-					switch (spritebase[offs+2]&0xc000) 
+					switch (spritebase[offs+2]&0xc000)
 					{
 					case 0xc000: pmask = 1; break;
 					case 0x8000: pmask = 8; break;
 					case 0x4000: pmask = 32; break;
 					case 0x0000: pmask = 128; break;
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (spritebase[offs + 2] & 0x8000) 
+					if (spritebase[offs + 2] & 0x8000)
 						pmask = 64; /* Check */
-					else 
+					else
 						pmask = 64;
 				}
 				break;
 
 			case 1:
-				if (bank == 0) 
+				if (bank == 0)
 				{
-					switch (spritebase[offs + 2] & 0xc000) 
+					switch (spritebase[offs + 2] & 0xc000)
 					{
 					case 0xc000: pmask = 1; break;
 					case 0x8000: pmask = 8; break;
 					case 0x4000: pmask = 32; break;
 					case 0x0000: pmask = 128; break;
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (spritebase[offs + 2] & 0x8000) 
+					if (spritebase[offs + 2] & 0x8000)
 						pmask = 16; /* Check */
-					else 
+					else
 						pmask = 16;
 				}
 				break;
 
 			case 2: /* Unused */
 			case 3:
-				if (bank == 0) 
+				if (bank == 0)
 				{
-					switch (spritebase[offs + 2] & 0xc000) 
+					switch (spritebase[offs + 2] & 0xc000)
 					{
 					case 0xc000: pmask = 1; break;
 					case 0x8000: pmask = 8; break;
 					case 0x4000: pmask = 32; break;
 					case 0x0000: pmask = 128; break;
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (spritebase[offs + 2] & 0x8000) 
+					if (spritebase[offs + 2] & 0x8000)
 						pmask = 64; /* Check */
-					else 
+					else
 						pmask = 64;
 				}
 				break;
@@ -190,22 +190,22 @@ VIDEO_UPDATE( dassault )
 	deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
-	if ((priority & 3) == 0) 
+	if ((priority & 3) == 0)
 	{
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 16);
-	} 
-	else if ((priority & 3) == 1) 
+	}
+	else if ((priority & 3) == 1)
 	{
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 64);
-	} 
-	else if ((priority & 3) == 3) 
+	}
+	else if ((priority & 3) == 3)
 	{
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 16);
-	} 
-	else 
+	}
+	else
 	{
 		/* Unused */
 	}

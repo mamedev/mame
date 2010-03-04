@@ -93,7 +93,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		color = sr[offs + 2] & 0x000f;
 		sx = sr[offs + 0] - 29;
 		sy = sr[offs + 1];
-		if (sy >= 32768) 
+		if (sy >= 32768)
 			sy -= 65536;
 		flipx = sr[offs + 3] & 0x8000;
 

@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, simpsons_state(machine)); }
 
 	simpsons_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    ram;
 	UINT8 *    xtraram;

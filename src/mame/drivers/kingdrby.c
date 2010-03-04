@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( slave_1986_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-//	AM_RANGE(0x7800, 0x7803) AM_READ(test_r)
+//  AM_RANGE(0x7800, 0x7803) AM_READ(test_r)
 	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -1091,7 +1091,7 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
-//	ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
+//  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected
 	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )

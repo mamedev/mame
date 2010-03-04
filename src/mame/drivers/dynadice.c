@@ -43,7 +43,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dynadice_state(machine)); }
 
 	dynadice_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram;
 //  UINT8 *  nvram;     // currently this uses generic nvram handling

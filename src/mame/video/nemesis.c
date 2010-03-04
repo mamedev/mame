@@ -30,20 +30,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 	color = state->colorram2[tile_index];
 	flags = 0;
 
-	if (color & 0x80) 
+	if (color & 0x80)
 		flags |= TILE_FLIPX;
 
-	if (code & 0x0800) 
+	if (code & 0x0800)
 		flags |= TILE_FLIPY;
 
 	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
 		 flags |= TILE_FORCE_LAYER0;		/* no transparency */
 
-	if (code & 0xf800) 
+	if (code & 0xf800)
 	{
 		SET_TILE_INFO( 0, code & 0x7ff, color & 0x7f, flags );
-	} 
-	else 
+	}
+	else
 	{
 		SET_TILE_INFO( 0, 0, 0x00, 0 );
 		tileinfo->pen_data = state->blank_tile;
@@ -66,20 +66,20 @@ static TILE_GET_INFO( get_fg_tile_info )
 	color = state->colorram1[tile_index];
 	flags = 0;
 
-	if (color & 0x80) 
+	if (color & 0x80)
 		flags |= TILE_FLIPX;
 
-	if (code & 0x0800) 
+	if (code & 0x0800)
 		flags |= TILE_FLIPY;
 
 	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
 		 flags |= TILE_FORCE_LAYER0;		/* no transparency */
 
-	if (code & 0xf800) 
+	if (code & 0xf800)
 	{
 		SET_TILE_INFO( 0, code & 0x7ff, color & 0x7f, flags );
-	} 
-	else 
+	}
+	else
 	{
 		SET_TILE_INFO( 0, 0, 0x00, 0 );
 		tileinfo->pen_data = state->blank_tile;
@@ -373,7 +373,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	{
 		for (adress = state->spriteram_words - 8; adress >= 0; adress -= 8)
 		{
-			if((spriteram[adress] & 0xff) != priority) 
+			if((spriteram[adress] & 0xff) != priority)
 				continue;
 
 			zoom = spriteram[adress + 2] & 0xff;

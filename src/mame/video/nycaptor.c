@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_tile_info )
 	{
 		if (nycaptor_spot(machine))
 			pal = 0xe;
-		else 
+		else
 			pal = 4;
 	}
 #endif
@@ -237,7 +237,7 @@ static void nycaptor_setmask( running_machine *machine )
 
 	mKEY_MASK(KEYCODE_Q, 1); /* bg */
 	mKEY_MASK(KEYCODE_W, 2);
-	mKEY_MASK(KEYCODE_E, 4);	
+	mKEY_MASK(KEYCODE_E, 4);
 	mKEY_MASK(KEYCODE_R, 8);
 
 	mKEY_MASK(KEYCODE_A, 0x10); /* sprites */

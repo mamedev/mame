@@ -54,7 +54,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mazerbla_state(machine)); }
 
 	mazerbla_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *   cfb_ram;
 	UINT8 *   videoram;
@@ -69,7 +69,7 @@ public:
 
 	UINT8 bknd_col;
 	UINT8 port02_status;
-	UINT8 vbank; 		/* video page select signal, likely for double buffering ?*/
+	UINT8 vbank;		/* video page select signal, likely for double buffering ?*/
 	UINT32 xpos, ypos, pix_xsize, pix_ysize;
 	UINT8 color1, color2, mode, plane;
 	UINT8 lookup_ram[0x100*4];

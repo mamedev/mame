@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, arabian_state(machine)); }
 
 	arabian_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  blitter;
 	UINT8 *  custom_cpu_ram;

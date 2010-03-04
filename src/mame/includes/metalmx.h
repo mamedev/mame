@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, metalmx_state(machine)); }
 
 	metalmx_state(running_machine &machine) { }
-	
+
 	running_device *maincpu;
 	running_device *gsp;
 	running_device *adsp;

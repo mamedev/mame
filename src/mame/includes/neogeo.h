@@ -34,7 +34,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, neogeo_state(machine)); }
 
 	neogeo_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 //  UINT8      *memcard_data;   // this currently uses generic handlers
 //  UINT16     *save_ram;       // this currently uses generic handlers

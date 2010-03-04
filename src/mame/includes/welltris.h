@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, welltris_state(machine)); }
 
 	welltris_state(running_machine &machine) { }
-	
+
 	int pending_command;
 
 	UINT16 *spriteram;

@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, labyrunr_state(machine)); }
 
 	labyrunr_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    videoram1;
 	UINT8 *    videoram2;

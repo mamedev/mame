@@ -9,7 +9,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, buggychl_state(machine)); }
 
 	buggychl_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *     videoram;	// buggychl, 40love, msisaac
 	UINT8 *     videoram2;	// msisaac

@@ -17,7 +17,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, micro3d_state(machine)); }
 
 	micro3d_state(running_machine &machine) { }
-	
+
 	struct
 	{
 		union

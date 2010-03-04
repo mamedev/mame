@@ -246,8 +246,8 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-//	PORT_DIPSETTING(    0x05, "5" )                         /* duplicated setting */
-//	PORT_DIPSETTING(    0x06, "5" )                         /* duplicated setting */
+//  PORT_DIPSETTING(    0x05, "5" )                         /* duplicated setting */
+//  PORT_DIPSETTING(    0x06, "5" )                         /* duplicated setting */
 	PORT_DIPSETTING(    0x07, "254 (Cheat)")
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "10000" )

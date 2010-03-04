@@ -22,7 +22,7 @@ PALETTE_INIT( ojankoy )
 	int i;
 	int bit0, bit1, bit2, bit3, bit4, r, g, b;
 
-	for (i = 0; i < machine->config->total_colors; i++) 
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		bit0 = BIT(color_prom[0], 2);
 		bit1 = BIT(color_prom[0], 3);
@@ -88,7 +88,7 @@ WRITE8_HANDLER( ojankoc_palette_w )
 	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 	int r, g, b, color;
 
-	if (state->paletteram[offset] == data) 
+	if (state->paletteram[offset] == data)
 		return;
 
 	state->paletteram[offset] = data;
@@ -128,7 +128,7 @@ WRITE8_HANDLER( ojankohs_gfxreg_w )
 {
 	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 
-	if (state->gfxreg != data) 
+	if (state->gfxreg != data)
 	{
 		state->gfxreg = data;
 		tilemap_mark_all_tiles_dirty(state->tilemap);
@@ -139,19 +139,19 @@ WRITE8_HANDLER( ojankohs_flipscreen_w )
 {
 	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 
-	if (state->flipscreen != BIT(data, 0)) 
+	if (state->flipscreen != BIT(data, 0))
 	{
 
 		state->flipscreen = BIT(data, 0);
 
 		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			state->scrollx = -0xe0;
 			state->scrolly = -0x20;
 		}
-		else 
+		else
 		{
 			state->scrollx = 0;
 			state->scrolly = 0;
@@ -165,7 +165,7 @@ static TILE_GET_INFO( ojankohs_get_tile_info )
 	int tile = state->videoram[tile_index] | ((state->colorram[tile_index] & 0x0f) << 8);
 	int color = (state->colorram[tile_index] & 0xe0) >> 5;
 
-	if (state->colorram[tile_index] & 0x10) 
+	if (state->colorram[tile_index] & 0x10)
 	{
 		tile |= (state->gfxreg & 0x07) << 12;
 		color |= (state->gfxreg & 0xe0) >> 2;
@@ -200,12 +200,12 @@ void ojankoc_flipscreen( const address_space *space, int data )
 
 	state->flipscreen = BIT(data, 7);
 
-	if (state->flipscreen == state->flipscreen_old) 
+	if (state->flipscreen == state->flipscreen_old)
 		return;
 
-	for (y = 0; y < 0x40; y++) 
+	for (y = 0; y < 0x40; y++)
 	{
-		for (x = 0; x < 0x100; x++) 
+		for (x = 0; x < 0x100; x++)
 		{
 			color1 = state->videoram[0x0000 + ((y * 256) + x)];
 			color2 = state->videoram[0x3fff - ((y * 256) + x)];
@@ -238,14 +238,14 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 	x = (offset & 0x3f) << 2;
 	xx = 0;
 
-	if (state->flipscreen) 
+	if (state->flipscreen)
 	{
 		x = 0xfc - x;
 		y = 0xff - y;
 		xx = 3;
 	}
 
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)
 	{
 		color = ((color1 & 0x01) >> 0) | ((color1 & 0x10) >> 3) | ((color2 & 0x01) << 2) | ((color2 & 0x10) >> 1);
 
@@ -335,7 +335,7 @@ VIDEO_UPDATE( ojankoc )
 		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* redraw bitmap */
-		for (offs = 0; offs < 0x8000; offs++) 
+		for (offs = 0; offs < 0x8000; offs++)
 		{
 			ojankoc_videoram_w(space, offs, state->videoram[offs]);
 		}

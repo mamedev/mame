@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mjkjidai_state(machine)); }
 
 	mjkjidai_state(running_machine &machine) { }
-	
+
 	UINT8 *videoram;
 	UINT8 *spriteram1;
 	UINT8 *spriteram2;

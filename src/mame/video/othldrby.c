@@ -146,7 +146,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int x, y, color, code, sx, sy, flipx, flipy, sizex, sizey, pri;
 
 		pri = (state->buf_spriteram[offs] & 0x0600) >> 9;
-		if (pri != priority) 
+		if (pri != priority)
 			continue;
 
 		flipx = state->buf_spriteram[offs] & 0x1000;
@@ -229,6 +229,6 @@ VIDEO_EOF( othldrby )
 	othldrby_state *state = (othldrby_state *)machine->driver_data;
 
 	/* sprites need to be delayed two frames */
-	memcpy(state->buf_spriteram, state->buf_spriteram2, SPRITERAM_SIZE * sizeof(state->buf_spriteram[0]));	
+	memcpy(state->buf_spriteram, state->buf_spriteram2, SPRITERAM_SIZE * sizeof(state->buf_spriteram[0]));
 	memcpy(state->buf_spriteram2, &state->vram[SPRITERAM_START], SPRITERAM_SIZE * sizeof(state->buf_spriteram[0]));
 }

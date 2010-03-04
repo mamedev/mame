@@ -506,7 +506,7 @@ void mos6560_raster_interrupt_gen( running_device *device )
 
 
 /*-------------------------------------------------
- mos6560_video_update - copy the VIC bitmap to 
+ mos6560_video_update - copy the VIC bitmap to
      main screen bitmap
 -------------------------------------------------*/
 

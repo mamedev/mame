@@ -1168,7 +1168,7 @@ static READ16_HANDLER(s23_c417_16_r)
 	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x8000 : 0);
 	case 1: return c417_adr;
 	case 4:
-		//		logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 		return c417_ram[c417_adr];
 	}
 
@@ -1200,7 +1200,7 @@ static READ32_HANDLER(s23_c417_32_r)
         data |= s23_c417_16_r(space, offset*2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_0_15)
         data |= s23_c417_16_r(space, offset*2+1, mem_mask);
-    return data;       
+    return data;
 }
 
 static WRITE32_HANDLER(s23_c417_32_w)
@@ -1213,7 +1213,7 @@ static WRITE32_HANDLER(s23_c417_32_w)
 
 static READ16_HANDLER(s23_c412_ram_r)
 {
-	//	logerror("c412_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	if(offset < 0x100000)
 		return c412_sdram_a[offset & 0xfffff];
 	else if(offset < 0x200000)
@@ -1228,7 +1228,7 @@ static READ16_HANDLER(s23_c412_ram_r)
 
 static WRITE16_HANDLER(s23_c412_ram_w)
 {
-	//	logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	if(offset < 0x100000)
 		COMBINE_DATA(c412_sdram_a + (offset & 0xfffff));
 	else if(offset < 0x200000)
@@ -1270,7 +1270,7 @@ static READ32_HANDLER(s23_c412_32_r)
         data |= s23_c412_16_r(space, offset*2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_0_15)
         data |= s23_c412_16_r(space, offset*2+1, mem_mask);
-    return data;       
+    return data;
 }
 
 static WRITE32_HANDLER(s23_c412_32_w)
@@ -1284,7 +1284,7 @@ static WRITE32_HANDLER(s23_c412_32_w)
 
 static READ16_HANDLER(s23_c421_ram_r)
 {
-	//	logerror("c421_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	if(offset < 0x40000)
 		return c421_dram_a[offset & 0x3ffff];
 	else if(offset < 0x80000)
@@ -1297,7 +1297,7 @@ static READ16_HANDLER(s23_c421_ram_r)
 
 static WRITE16_HANDLER(s23_c421_ram_w)
 {
-	//	logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	if(offset < 0x40000)
 		COMBINE_DATA(c421_dram_a + (offset & 0x3ffff));
 	else if(offset < 0x80000)
@@ -1337,7 +1337,7 @@ static READ32_HANDLER(s23_c421_32_r)
         data |= s23_c421_16_r(space, offset*2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_0_15)
         data |= s23_c421_16_r(space, offset*2+1, mem_mask);
-    return data;       
+    return data;
 }
 
 static WRITE32_HANDLER(s23_c421_32_w)
@@ -1379,7 +1379,7 @@ static WRITE16_HANDLER(s23_ctl_16_w)
 		break;
 
 	default:
-		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	}
 }
 
@@ -1398,7 +1398,7 @@ static READ16_HANDLER(s23_ctl_16_r)
 		return res;
 	}
 	}
-	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0xffff;
 }
 
@@ -1417,7 +1417,7 @@ static READ32_HANDLER(s23_ctl_32_r)
         data |= s23_ctl_16_r(space, offset*2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_0_15)
         data |= s23_ctl_16_r(space, offset*2+1, mem_mask);
-    return data;       
+    return data;
 }
 
 
@@ -1425,7 +1425,7 @@ static WRITE16_HANDLER(s23_c361_16_w)
 {
 	switch(offset) {
 	default:
-		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	}
 }
 
@@ -1435,7 +1435,7 @@ static READ16_HANDLER(s23_c361_16_r)
 	case 5: return video_screen_get_vpos(space->machine->primary_screen);
 	case 6: return video_screen_get_vblank(space->machine->primary_screen);
 	}
-	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));	
+	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0xffff;
 }
 
@@ -1454,7 +1454,7 @@ static READ32_HANDLER(s23_c361_32_r)
         data |= s23_c361_16_r(space, offset*2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_0_15)
         data |= s23_c361_16_r(space, offset*2+1, mem_mask);
-    return data;       
+    return data;
 }
 
 static INTERRUPT_GEN(s23_interrupt)
@@ -1490,10 +1490,10 @@ static READ32_HANDLER( gorgon_magic_r )
 	return 0xffffffff;	// must be non-zero (rapidrvr @ 8000229C)
 }
 
-/* 
-	Final Furlong has a bug: it forgets to halt the H8/3002 before it zeros out the shared RAM 
-	which contains the H8's stack and other working set.  This crashes MAME due to the PC going
-	off into the weeds, so we intercept
+/*
+    Final Furlong has a bug: it forgets to halt the H8/3002 before it zeros out the shared RAM
+    which contains the H8's stack and other working set.  This crashes MAME due to the PC going
+    off into the weeds, so we intercept
 */
 
 static READ32_HANDLER( gorgon_sharedram_r )
@@ -1765,7 +1765,7 @@ static INPUT_PORTS_START( ss23 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) 
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
@@ -1862,7 +1862,7 @@ static READ8_HANDLER(iob_r)
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal 		
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
 	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r )
 	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
 
@@ -1892,7 +1892,7 @@ static DRIVER_INIT(ss23)
 	s23_tssio_port_4 = 0;
 	s23_porta = 0, s23_rtcstate = 0;
 
-	if ((!strcmp(machine->gamedrv->name, "motoxgo")) || 
+	if ((!strcmp(machine->gamedrv->name, "motoxgo")) ||
 	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
 	    (!strcmp(machine->gamedrv->name, "rapidrvr")) ||
 	    (!strcmp(machine->gamedrv->name, "finlflng")) ||
@@ -2091,7 +2091,7 @@ ROM_START( rapidrvr )
 	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
-        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) ) 
+        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
         ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000000, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
@@ -2153,7 +2153,7 @@ ROM_START( finlflng )
         ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
-        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) ) 
+        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
         ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000000, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )

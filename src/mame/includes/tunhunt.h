@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tunhunt_state(machine)); }
 
 	tunhunt_state(running_machine &machine) { }
-	
+
 	UINT8 control;
 	UINT8 *workram;
 	UINT8 *spriteram;

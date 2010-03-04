@@ -30,12 +30,12 @@ static void tumblepb_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 		sprite = spriteram[offs + 1] & 0x3fff;
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram[offs + 2];
@@ -69,7 +69,7 @@ static void tumblepb_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)
@@ -96,12 +96,12 @@ static void jumpkids_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 		sprite = spriteram[offs + 1] & 0x7fff;
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram[offs+2];
@@ -135,7 +135,7 @@ static void jumpkids_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)
@@ -163,12 +163,12 @@ static void fncywld_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 		sprite = spriteram[offs + 1] & 0x3fff;
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram[offs + 2];
@@ -611,14 +611,14 @@ VIDEO_UPDATE( tumblepb )
 	state->flipscreen = state->control_0[0] & 0x80;
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->flipscreen) 
-		offs = 1; 
-	else 
+	if (state->flipscreen)
+		offs = 1;
+	else
 		offs = -1;
 
-	if (state->flipscreen) 
-		offs2 = -3; 
-	else 
+	if (state->flipscreen)
+		offs2 = -3;
+	else
 		offs2 = -5;
 
 	tilemap_set_scrollx(state->pf1_tilemap,     0, state->control_0[1] + offs2);
@@ -647,14 +647,14 @@ VIDEO_UPDATE( jumpkids )
 	state->flipscreen = state->control_0[0] & 0x80;
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->flipscreen) 
-		offs = 1; 
-	else 
+	if (state->flipscreen)
+		offs = 1;
+	else
 		offs = -1;
 
-	if (state->flipscreen) 
-		offs2 = -3; 
-	else 
+	if (state->flipscreen)
+		offs2 = -3;
+	else
 		offs2 = -5;
 
 	tilemap_set_scrollx(state->pf1_tilemap,     0, state->control_0[1] + offs2);
@@ -683,14 +683,14 @@ VIDEO_UPDATE( semicom )
 	state->flipscreen = state->control_0[0] & 0x80;
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->flipscreen) 
-		offs = 1; 
-	else 
+	if (state->flipscreen)
+		offs = 1;
+	else
 		offs = -1;
 
-	if (state->flipscreen) 
-		offs2 = -3; 
-	else 
+	if (state->flipscreen)
+		offs2 = -3;
+	else
 		offs2 = -5;
 
 	tilemap_set_scrollx(state->pf1_tilemap,     0, state->control_0[1] + offs2);
@@ -749,15 +749,15 @@ VIDEO_UPDATE( bcstory )
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* not sure of this */
-	if (state->flipscreen) 
-		offs = 1; 
-	else 
+	if (state->flipscreen)
+		offs = 1;
+	else
 		offs = 8;
 
 	/* not sure of this */
-	if (state->flipscreen) 
-		offs2 = -3; 
-	else 
+	if (state->flipscreen)
+		offs2 = -3;
+	else
 		offs2 = 8;
 
 	tilemap_set_scrollx(state->pf1_tilemap,     0, state->control_0[1] + offs2);
@@ -845,14 +845,14 @@ VIDEO_UPDATE( fncywld )
 	state->flipscreen = state->control_0[0] & 0x80;
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->flipscreen) 
-		offs = 1; 
-	else 
+	if (state->flipscreen)
+		offs = 1;
+	else
 		offs = -1;
 
-	if (state->flipscreen) 
-		offs2 = -3; 
-	else 
+	if (state->flipscreen)
+		offs2 = -3;
+	else
 		offs2 = -5;
 
 	tilemap_set_scrollx(state->pf1_tilemap,     0, state->control_0[1] + offs2);
@@ -942,14 +942,14 @@ VIDEO_UPDATE( pangpang )
 	state->flipscreen = state->control_0[0] & 0x80;
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->flipscreen) 
-		offs = 1; 
-	else 
+	if (state->flipscreen)
+		offs = 1;
+	else
 		offs = -1;
 
-	if (state->flipscreen) 
-		offs2 = -3; 
-	else 
+	if (state->flipscreen)
+		offs2 = -3;
+	else
 		offs2 = -5;
 
 	tilemap_set_scrollx(state->pf1_tilemap,     0, state->control_0[1] + offs2);

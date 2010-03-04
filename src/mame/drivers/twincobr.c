@@ -473,12 +473,12 @@ static INPUT_PORTS_START( skyshark )
 	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-//	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )            /* duplicated setting */
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )           /* table at 0x000316 */
 	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
-//	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )            /* duplicated setting */
 INPUT_PORTS_END
 
 /* verified from M68000 code */

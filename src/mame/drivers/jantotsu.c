@@ -105,7 +105,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jantotsu_state(machine)); }
 
 	jantotsu_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT8    *bitmap;
 	UINT8    vram_bank, col_bank;

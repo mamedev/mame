@@ -70,7 +70,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dominob_state(machine)); }
 
 	dominob_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  spriteram;
 	UINT8 *  videoram;

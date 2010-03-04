@@ -15,12 +15,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int alpha = 0xff;
 
 		sprite = spriteram_base[offs + 1];
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		y = spriteram_base[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram_base[offs + 2];
@@ -118,7 +118,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)

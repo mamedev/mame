@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mcatadv_state(machine)); }
 
 	mcatadv_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *     videoram1;
 	UINT16 *     videoram2;
@@ -15,7 +15,7 @@ public:
 	UINT16 *     spriteram_old;
 	UINT16 *     vidregs;
 	UINT16 *     vidregs_old;
-//	UINT16 *     paletteram;	// this currently uses generic palette handlers
+//  UINT16 *     paletteram;    // this currently uses generic palette handlers
 	size_t       spriteram_size;
 
 	/* video-related */

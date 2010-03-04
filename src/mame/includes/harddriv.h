@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
 
 	harddriv_state(running_machine &machine) { }
-	
+
 	atarigen_state			atarigen;
 
 	running_device *	maincpu;

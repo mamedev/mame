@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp2_state(machine)); }
 
 	srmp2_state(running_machine &machine) { }
-	
+
 	int color_bank;
 	int gfx_bank;
 

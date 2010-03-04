@@ -179,7 +179,7 @@ static WRITE16_HANDLER( dassault_sound_w )
 static READ16_HANDLER( dassault_irq_r )
 {
 	dassault_state *state = (dassault_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: cpu_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
 	case 1: cpu_set_input_line(state->subcpu, 6, CLEAR_LINE); break;

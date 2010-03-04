@@ -26,9 +26,9 @@ static int nitedrvr_steering( running_machine *machine )
 
 	state->last_steering_val = this_val;
 
-	if (delta > 128) 
+	if (delta > 128)
 		delta -= 256;
-	else if (delta < -128) 
+	else if (delta < -128)
 		delta += 256;
 
 	/* Divide by four to make our steering less sensitive */
@@ -115,13 +115,13 @@ READ8_HANDLER( nitedrvr_in0_r )
 		case 0x01:						/* No remapping necessary */
 			return input_port_read(space->machine, "DSW1");
 		case 0x02:						/* Remap our gear shift */
-			if (state->gear == 1)		
+			if (state->gear == 1)
 				return 0xe0;
-			else if (state->gear == 2)	
+			else if (state->gear == 2)
 				return 0xd0;
-			else if (state->gear == 3)	
+			else if (state->gear == 3)
 				return 0xb0;
-			else			
+			else
 				return 0x70;
 		case 0x03:						/* Remap our steering */
 			return (input_port_read(space->machine, "DSW2") | nitedrvr_steering(space->machine));
@@ -262,7 +262,7 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 	{
 		state->crash_data--;
 		discrete_sound_w(state->discrete, NITEDRVR_BANG_DATA, state->crash_data);	// Crash Volume
-		if (!state->crash_data) 
+		if (!state->crash_data)
 			state->crash_data_en = 0;	// Done counting?
 
 		if (state->crash_data & 0x01)

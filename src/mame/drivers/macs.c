@@ -136,15 +136,15 @@ static WRITE8_HANDLER( macs_output_w )
 	{
 		case 0:
 		/*
-		--x- ---- sets RAM bank?
-		---- -x-- Cassette B slot
-		---- --x- Cassette A slot
-		*/
+        --x- ---- sets RAM bank?
+        ---- -x-- Cassette B slot
+        ---- --x- Cassette A slot
+        */
 
 		if(macs_rev == 1)
 		{
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
-			          but then MACS2 games locks up. */
+                      but then MACS2 games locks up. */
 			memory_set_bankptr(space->machine,  "bank3", &macs_ram1[((data&0x20)>>5)*0x1000+0x000] );
 
 			macs_cart_slot = (data & 0xc) >> 2;

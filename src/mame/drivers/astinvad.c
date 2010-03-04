@@ -47,7 +47,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, astinvad_state(machine)); }
 
 	astinvad_state(running_machine &machine) { }
-	
+
 	UINT8 *    colorram;
 	UINT8 *    videoram;
 	size_t     videoram_size;

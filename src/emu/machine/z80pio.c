@@ -4,7 +4,7 @@
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
-	
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -106,7 +106,7 @@ static void check_interrupts(running_device *device)
 	z80pio_t *z80pio = get_safe_token(device);
 
 	int state = CLEAR_LINE;
-	
+
 	for (int index = PORT_A; index < PORT_COUNT; index++)
 	{
 		pio_port *port = &z80pio->port[index];
@@ -333,7 +333,7 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 	case MASK: /* interrupt mask */
 		port->mask = data;
 		if (LOG) logerror("Z80PIO '%s' Port %c Mask: %02x\n", device->tag.cstr(), 'A' + index, data);
-		
+
 		/* set interrupt enable */
 		port->ie = BIT(port->icw, 7);
 		check_interrupts(device);
@@ -509,7 +509,7 @@ READ8_DEVICE_HANDLER( z80pio_pa_r )
 {
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[PORT_A];
-	
+
 	UINT8 data = 0xff;
 
 	switch (port->mode)
@@ -538,7 +538,7 @@ WRITE8_DEVICE_HANDLER( z80pio_pa_w )
 {
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[PORT_A];
-	
+
 	if (port->mode == MODE_BIT_CONTROL)
 	{
 		/* latch data */
@@ -555,7 +555,7 @@ READ8_DEVICE_HANDLER( z80pio_pb_r )
 {
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[PORT_B];
-	
+
 	UINT8 data = 0xff;
 
 	switch (port->mode)
@@ -580,7 +580,7 @@ WRITE8_DEVICE_HANDLER( z80pio_pb_w )
 {
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[PORT_B];
-	
+
 	if (port->mode == MODE_BIT_CONTROL)
 	{
 		/* latch data */
@@ -616,7 +616,7 @@ static void strobe(running_device *device, int index, int state)
 				else if (!port->stb && state) /* rising edge */
 				{
 					trigger_interrupt(device, index);
-					
+
 					/* clear ready line */
 					set_rdy(device, index, 0);
 				}
@@ -705,7 +705,7 @@ static int z80pio_irq_state(running_device *device)
 	z80pio_t *z80pio = get_safe_token(device);
 
 	int state = 0;
-	
+
 	for (int index = PORT_A; index < PORT_COUNT; index++)
 	{
 		pio_port *port = &z80pio->port[index];

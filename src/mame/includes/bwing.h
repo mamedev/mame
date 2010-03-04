@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bwing_state(machine)); }
 
 	bwing_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

@@ -36,10 +36,10 @@ VIDEO_UPDATE( mexico86 )
 	{
 		int height;
 
-		if (offs >= state->objectram_size && offs < state->objectram_size + 0x180) 
+		if (offs >= state->objectram_size && offs < state->objectram_size + 0x180)
 			continue;
 
-		if (offs >= state->objectram_size + 0x1c0) 
+		if (offs >= state->objectram_size + 0x1c0)
 			continue;
 
 		/* skip empty sprites */
@@ -113,7 +113,7 @@ VIDEO_UPDATE( kikikai )
 	sx = 0;
 	for (offs = 0; offs < state->objectram_size; offs += 4)
 	{
-		if (*(UINT32*)(state->objectram + offs) == 0) 
+		if (*(UINT32*)(state->objectram + offs) == 0)
 			continue;
 
 		ty = state->objectram[offs];

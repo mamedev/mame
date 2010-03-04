@@ -21,7 +21,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lockon_state(machine)); }
 
 	lockon_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16	*char_ram;
 	UINT16	*hud_ram;

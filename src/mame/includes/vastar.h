@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vastar_state(machine)); }
 
 	vastar_state(running_machine &machine) { }
-	
+
 	UINT8 *spriteram1;
 	UINT8 *spriteram2;
 	UINT8 *spriteram3;

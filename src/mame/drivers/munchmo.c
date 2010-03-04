@@ -48,9 +48,9 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 	munchmo_state *state = (munchmo_state *)device->machine->driver_data;
 	state->which = !state->which;
 
-	if (state->which) 
+	if (state->which)
 		cpu_set_input_line(device, 0, HOLD_LINE);
-	else if (state->nmi_enable) 
+	else if (state->nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 

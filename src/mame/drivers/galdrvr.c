@@ -2109,7 +2109,7 @@ static INPUT_PORTS_START( aracnis )
     PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
     PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 
 	PORT_START("IN1")      /* 0xa800 - needs verifying */
@@ -5762,7 +5762,7 @@ ROM_END
 The Pit (on Moon Quasar hardware)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Dumped by Andrew Welburn 
+Dumped by Andrew Welburn
 on the sunny morning of 2/03/10
 
 http://www.andys-arcade.com
@@ -5772,20 +5772,20 @@ http://www.andys-arcade.com
 *************************************************
 
 Nichibutsu Moon Quasar pcb largely unhacked, but
-with an odd looking set of roms. One gfx rom 
-identifies itself as 'The Pit' so that is my only 
+with an odd looking set of roms. One gfx rom
+identifies itself as 'The Pit' so that is my only
 guess at what the game actually is.
 
-Roms 1 through 8 read well in-circuit in the right 
-places in the memory map for moon cresta, 
-(through the fluke 9100) but the game does not 
-currently run. Roms dumped adn verified with no 
+Roms 1 through 8 read well in-circuit in the right
+places in the memory map for moon cresta,
+(through the fluke 9100) but the game does not
+currently run. Roms dumped adn verified with no
 anomolies.
 
 Rom 9 was placed on the through-socket and has
 pins 20 and 18 (/E and A11 respectively) tied to
-pin 5 of 8E (A14/A15/MREQ demux). This demux has 
-some patches, the trace to pin 13 is cut, and is 
+pin 5 of 8E (A14/A15/MREQ demux). This demux has
+some patches, the trace to pin 13 is cut, and is
 instead wired to pin 3.
 
 */

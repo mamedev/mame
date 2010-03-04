@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, relief_state(machine)); }
 
 	relief_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 
 	UINT8			ym2413_volume;

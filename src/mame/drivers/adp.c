@@ -158,7 +158,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, adp_state(machine)); }
 
 	adp_state(running_machine &machine) { }
-	
+
 	/* misc */
 	UINT8 mux_data;
 	UINT8 register_active;

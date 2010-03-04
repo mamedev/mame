@@ -826,7 +826,7 @@ INPUT_PORTS_END
 
 INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, UINT16 *vram, int color )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	SET_TILE_INFO(0, vram[tile_index] | (state->gfx_bank << 16), color, 0);
 }
 
@@ -835,7 +835,7 @@ static TILE_GET_INFO( bg_get_tile_info ) { nmg5_state *state = (nmg5_state *)mac
 
 static VIDEO_START( nmg5 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 
 	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
@@ -844,7 +844,7 @@ static VIDEO_START( nmg5 )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -880,7 +880,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_bitmap( running_machine *machine, bitmap_t *bitmap )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	int yyy = 256;
 	int xxx = 512 / 4;
 	UINT16 x, y, count;
@@ -999,7 +999,7 @@ GFXDECODE_END
 
 static void soundirq( running_device *device, int state )
 {
-	nmg5_state *driver_state = (nmg5_state *)device->machine->driver_data;	
+	nmg5_state *driver_state = (nmg5_state *)device->machine->driver_data;
 	cpu_set_input_line(driver_state->soundcpu, 0, state);
 }
 
@@ -1010,7 +1010,7 @@ static const ym3812_interface ym3812_intf =
 
 static MACHINE_START( nmg5 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
@@ -1022,7 +1022,7 @@ static MACHINE_START( nmg5 )
 
 static MACHINE_RESET( nmg5 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 
 	/* some games don't set the priority register so it should be hard-coded to a normal layout */
 	state->priority_reg = 7;
@@ -1528,25 +1528,25 @@ ROM_END
 
 static DRIVER_INIT( prot_val_00 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	state->prot_val = 0x00;
 }
 
 static DRIVER_INIT( prot_val_10 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	state->prot_val = 0x10;
 }
 
 static DRIVER_INIT( prot_val_20 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	state->prot_val = 0x20;
 }
 
 static DRIVER_INIT( prot_val_40 )
 {
-	nmg5_state *state = (nmg5_state *)machine->driver_data;	
+	nmg5_state *state = (nmg5_state *)machine->driver_data;
 	state->prot_val = 0x40;
 }
 

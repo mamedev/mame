@@ -90,7 +90,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		y = spriteram[offs] & 0xffff;
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram[offs + 2] & 0xffff;
@@ -98,7 +98,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		pri = (x & 0xc000); // 2 bits or 1?
 
-		switch (pri & 0xc000) 
+		switch (pri & 0xc000)
 		{
 			case 0x0000: pri = 0;   break; // numbers, people, cars when in the air, status display..
 			case 0x4000: pri = 0xf0;break; // cars most of the time
@@ -244,7 +244,7 @@ static READ32_HANDLER(backfire_control3_r)
 static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 {
 	logerror("%s:write eprom %08x (%08x) %08x\n",cpuexec_describe_context(device->machine),offset<<1,mem_mask,data);
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_set_clock_line(device, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, BIT(data, 0));

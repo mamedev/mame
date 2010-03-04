@@ -12,9 +12,9 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
 
-	if (state->sound_nmi_enable) 
+	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	else 
+	else
 		state->pending_nmi = 1;
 }
 
@@ -155,7 +155,7 @@ WRITE8_HANDLER( lsasquad_68705_port_b_w )
 	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
 	{
 		state->port_a_in = state->from_main;
-		if (state->main_sent) 
+		if (state->main_sent)
 			cpu_set_input_line(state->mcu, 0, CLEAR_LINE);
 		state->main_sent = 0;
 		//logerror("read command %02x from main cpu\n", state->port_a_in);
@@ -204,9 +204,9 @@ READ8_HANDLER( lsasquad_mcu_status_r )
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
 	//logerror("%04x: mcu_status_r\n",cpu_get_pc(space->cpu));
-	if (!state->main_sent) 
+	if (!state->main_sent)
 		res |= 0x01;
-	if (!state->mcu_sent) 
+	if (!state->mcu_sent)
 		res |= 0x02;
 
 	return res ^ state->invertcoin;

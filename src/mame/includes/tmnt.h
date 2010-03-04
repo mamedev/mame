@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmnt_state(machine)); }
 
 	tmnt_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	INT16 *    sampledata;
 	UINT16 *   tmnt2_1c0800;

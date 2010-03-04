@@ -88,9 +88,9 @@ TODO:
 static TIMER_CALLBACK( nmi_callback )
 {
 	lkage_state *state = (lkage_state *)machine->driver_data;
-	if (state->sound_nmi_enable) 
+	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	else 
+	else
 		state->pending_nmi = 1;
 }
 
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
-	{ 
+	{
 		/* probably wrong but commands may go lost otherwise */
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;

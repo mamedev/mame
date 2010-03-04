@@ -30,7 +30,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skyarmy_state(machine)); }
 
 	skyarmy_state(running_machine &machine) { }
-	
+
 	UINT8 *spriteram;
 	UINT8 *videoram;
 	UINT8 *colorram;

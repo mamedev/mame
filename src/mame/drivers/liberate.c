@@ -35,18 +35,18 @@ static READ8_HANDLER( deco16_bank_r )
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset < 0x400) 
+	if (offset < 0x400)
 		return state->colorram[offset];
-	if (offset < 0x800) 
+	if (offset < 0x800)
 		return state->videoram[offset - 0x400];
-	if (offset < 0x1000) 
+	if (offset < 0x1000)
 		return state->spriteram[offset - 0x800];
-	if (offset < 0x2200) 
-	{ 
-		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset); 
-		return 0; 
+	if (offset < 0x2200)
+	{
+		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
+		return 0;
 	}
-	if (offset < 0x2800) 
+	if (offset < 0x2800)
 		return state->scratchram[offset - 0x2200];
 
 	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
@@ -86,20 +86,20 @@ static READ8_HANDLER( prosoccr_bank_r )
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset < 0x400) 
+	if (offset < 0x400)
 		return state->colorram[offset];
-	if (offset < 0x800) 
+	if (offset < 0x800)
 		return state->videoram[offset - 0x400];
-	if (offset < 0xc00) 
+	if (offset < 0xc00)
 		return state->colorram[offset - 0x800];
-	if (offset < 0x1000) 
+	if (offset < 0x1000)
 		return state->spriteram[offset - 0xc00];
-	if (offset < 0x2200) 
-	{ 
-		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset); 
-		return 0; 
+	if (offset < 0x2200)
+	{
+		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
+		return 0;
 	}
-	if (offset < 0x2800) 
+	if (offset < 0x2800)
 		return state->scratchram[offset - 0x2200];
 
 	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);

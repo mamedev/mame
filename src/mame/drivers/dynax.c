@@ -6979,7 +6979,7 @@ GAME( 1989, drgpunch, 0,        sprtmtch, sprtmtch, 0,        ROT0,   "Dynax",  
 GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                 0 )
 /* these 4 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
 GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                 0 ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,    maya,     sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                 0 ) 
+GAME( 1994, mayaa,    maya,     sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                 0 )
 GAME( 199?, inca,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",                "Inca",                                                         0 )
 GAME( 199?, blktouch, 0,        sprtmtch, sprtmtch, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                          0 )
 

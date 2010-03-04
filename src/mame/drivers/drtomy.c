@@ -17,7 +17,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drtomy_state(machine)); }
 
 	drtomy_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  spriteram;
 	UINT16 *  videoram_bg;

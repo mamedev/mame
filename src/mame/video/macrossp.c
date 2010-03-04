@@ -240,16 +240,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if (xpos > 0x1ff) xpos -=0x400;
 			if (ypos > 0x1ff) ypos -=0x400;
 
-			if (!flipx) 
+			if (!flipx)
 			{
-				if (!flipy) 
-				{ 
+				if (!flipy)
+				{
 					/* noxflip, noyflip */
 					yoffset = 0; /* I'm doing this so rounding errors are cumulative, still looks a touch crappy when multiple sprites used together */
-					for (ycnt = 0; ycnt <= high; ycnt++) 
+					for (ycnt = 0; ycnt <= high; ycnt++)
 					{
 						xoffset = 0;
-						for (xcnt = 0; xcnt <= wide; xcnt++) 
+						for (xcnt = 0; xcnt <= wide; xcnt++)
 						{
 							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
@@ -260,13 +260,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					}
 				}
 				else
-				{ 
+				{
 					/* noxflip, flipy */
 					yoffset = ((high * yzoom * 16) >> 8);
-					for (ycnt = high; ycnt >= 0; ycnt--) 
+					for (ycnt = high; ycnt >= 0; ycnt--)
 					{
 						xoffset = 0;
-						for (xcnt = 0; xcnt <= wide; xcnt++) 
+						for (xcnt = 0; xcnt <= wide; xcnt++)
 						{
 							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
@@ -279,14 +279,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 			else
 			{
-				if (!flipy) 
-				{ 
+				if (!flipy)
+				{
 					/* xflip, noyflip */
 					yoffset = 0;
-					for (ycnt = 0; ycnt <= high; ycnt++) 
+					for (ycnt = 0; ycnt <= high; ycnt++)
 					{
 						xoffset = ((wide*xzoom*16) >> 8);
-						for (xcnt = wide; xcnt >= 0; xcnt--) 
+						for (xcnt = wide; xcnt >= 0; xcnt--)
 						{
 							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
@@ -297,13 +297,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					}
 				}
 				else
-				{ 
+				{
 					/* xflip, yflip */
 					yoffset = ((high * yzoom * 16) >> 8);
-					for (ycnt = high; ycnt >= 0; ycnt--) 
+					for (ycnt = high; ycnt >= 0; ycnt--)
 					{
 						xoffset = ((wide * xzoom * 16) >> 8);
-						for (xcnt = wide; xcnt >=0 ; xcnt--) 	
+						for (xcnt = wide; xcnt >=0 ; xcnt--)
 						{
 							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 

@@ -32,13 +32,13 @@ static void cninja_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri = 0;
 
 		sprite = buffered_spriteram[offs + 1];
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		x = buffered_spriteram[offs + 2];
 
 		/* Sprite/playfield priority */
-		switch (x & 0xc000) 
+		switch (x & 0xc000)
 		{
 		case 0x0000: pri = 0; break;
 		case 0x4000: pri = 0xf0; break;
@@ -48,7 +48,7 @@ static void cninja_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 		y = buffered_spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		colour = (x >> 9) & 0x1f;
@@ -73,7 +73,7 @@ static void cninja_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -81,7 +81,7 @@ static void cninja_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)
@@ -126,13 +126,13 @@ static void cninjabl_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		sprite = buffered_spriteram[offs + 0]; // changed on bootleg!
 		y = buffered_spriteram[offs + 1]; // changed on bootleg!
 
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		x = buffered_spriteram[offs + 2];
 
 		/* Sprite/playfield priority */
-		switch (x & 0xc000) 
+		switch (x & 0xc000)
 		{
 		case 0x0000: pri = 0; break;
 		case 0x4000: pri = 0xf0; break;
@@ -141,7 +141,7 @@ static void cninjabl_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		}
 
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		colour = (x >> 9) & 0x1f;
@@ -170,7 +170,7 @@ static void cninjabl_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -178,7 +178,7 @@ static void cninjabl_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)
@@ -205,13 +205,13 @@ static void robocop2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	{
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri = 0;
 		sprite = buffered_spriteram[offs + 1];
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		x = buffered_spriteram[offs + 2];
 
 		/* Sprite/playfield priority */
-		switch (x & 0xc000) 
+		switch (x & 0xc000)
 		{
 		case 0x0000: pri = 0; break;
 		case 0x4000: pri = 0xf0; break;
@@ -221,7 +221,7 @@ static void robocop2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 		y = buffered_spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 		colour = (x >> 9) & 0x1f;
 
@@ -245,7 +245,7 @@ static void robocop2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			y = 240 - y;
 			x = 304 - x;
@@ -253,7 +253,7 @@ static void robocop2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		while (multi >= 0)
@@ -295,13 +295,13 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 	/* This may look strange, but the alpha-blended sprite chip definitely draws end to
         front, ie, reversed from normal pdrawgfx style. */
-	if (gfxbank == 4) 
+	if (gfxbank == 4)
 	{
 		offs = 0;
 		end = 0x400;
 		inc = 4;
-	} 
-	else 
+	}
+	else
 	{
 		offs = 0x3fc;
 		end = -4;
@@ -314,7 +314,7 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 		int alpha = 0xff;
 
 		sprite = spriteptr[offs + 3];
-		if (!sprite) 
+		if (!sprite)
 		{
 			offs += inc;
 			continue;
@@ -326,7 +326,7 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 		w = (spriteptr[offs + 2] & 0x0f00) >>  8;
 
 		sy = spriteptr[offs];
-		if ((sy & 0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if ((sy & 0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1))
 		{
 			offs += inc;
 			continue;
@@ -334,7 +334,7 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 		colour = (spriteptr[offs + 2] >> 0) & 0x1f;
 
-		if (gfxbank == 4) 
+		if (gfxbank == 4)
 		{ /* Seems to be always alpha'd */
 			alpha = 0x80;
 			colour &= 0xf;
@@ -343,7 +343,7 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 		fx = (spriteptr[offs + 0] & 0x4000);
 		fy = (spriteptr[offs + 0] & 0x8000);
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			if (fx) fx = 0; else fx = 1;
 			if (fy) fy = 0; else fy = 1;
@@ -355,8 +355,8 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 			if (fx) { x_mult = -16; sx += 16 * w; } else { x_mult = 16; sx -= 16; }
 			if (fy) { y_mult = -16; sy += 16 * h; } else { y_mult = 16; sy -= 16; }
-		} 
-		else 
+		}
+		else
 		{
 			sx = sx & 0x01ff;
 			sy = sy & 0x01ff;
@@ -370,9 +370,9 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 			if (fy) { y_mult = -16; sy += 16; } else { y_mult = 16; sy -= 16*h; }
 		}
 
-		for (x = 0; x < w; x++) 
+		for (x = 0; x < w; x++)
 		{
-			for (y = 0; y < h; y++) 
+			for (y = 0; y < h; y++)
 			{
 				pdrawgfx_alpha(bitmap,cliprect,machine->gfx[gfxbank],
 						sprite + y + h * x,
@@ -457,13 +457,13 @@ VIDEO_UPDATE( robocop2 )
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
 	/* One of the tilemap chips can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
-	if (priority & 4) 
+	if (priority & 4)
 	{
 		deco16ic_set_tilemap_colour_mask(state->deco16ic, 2, 0);
 		deco16ic_set_tilemap_colour_mask(state->deco16ic, 3, 0);
 		deco16ic_pf34_set_gfxbank(state->deco16ic, 0, 4);
-	} 
-	else 
+	}
+	else
 	{
 		deco16ic_set_tilemap_colour_mask(state->deco16ic, 2, 0xf);
 		deco16ic_set_tilemap_colour_mask(state->deco16ic, 3, 0xf);
@@ -483,7 +483,7 @@ VIDEO_UPDATE( robocop2 )
 		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 
 	/* Switchable priority */
-	switch (priority & 0x8) 
+	switch (priority & 0x8)
 	{
 		case 8:
 			deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
@@ -535,14 +535,14 @@ VIDEO_UPDATE( mutantf )
         priority between sprites in each layer.  Ie, if we didn't do this,
         then when two alpha blended shadows overlapped then they would be 25%
         transparent against the background, rather than 50% */
-	if (priority & 1) 
+	if (priority & 1)
 	{
 		bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 		mutantf_draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 3);
 		bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 		mutantf_draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram2.u16, 4);
-	} 
-	else 
+	}
+	else
 	{
 		bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 		mutantf_draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram2.u16, 4);

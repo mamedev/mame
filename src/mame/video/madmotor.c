@@ -188,7 +188,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			incy = 1;
 		}
 
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -196,7 +196,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			if (flipy) flipy = 0; else flipy = 1;
 			mult = 16;
 		}
-		else 
+		else
 			mult = -16;
 
 		for (x = 0; x < w; x++)

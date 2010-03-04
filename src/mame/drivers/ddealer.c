@@ -119,7 +119,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddealer_state(machine)); }
 
 	ddealer_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  mcu_shared_ram;
 	UINT16 *  work_ram;

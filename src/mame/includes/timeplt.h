@@ -25,7 +25,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, timeplt_state(machine)); }
 
 	timeplt_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram;	// timeplt, tutankham, junofrst, rocnrope, pooyan, rallyx
 	UINT8 *  colorram;	// timeplt, rocnrope, pooyan

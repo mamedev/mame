@@ -23,7 +23,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitoair_state(machine)); }
 
 	taitoair_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *      m68000_mainram;
 	UINT16 *      line_ram;

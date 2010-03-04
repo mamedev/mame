@@ -238,35 +238,35 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 {
 	// games where on-the-fly decryption works (many of these are fully playable in MAME, just slow)
 	{ "18wheelr", 0, 0x7cf54, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "alpilota", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "alpiltdx", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "alpilota", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "alpiltdx", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnk", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnka", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "crzytaxi", 0, 0xd2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "csmash", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "csmasho", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "cspike", 0, 0xe2010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "deathcox", 0, 0xb64d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "dybb99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "f355twin", 0, 0x6efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "f355twn2", 0, 0x666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "ggram2", 0, 0x74a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "gwing2",  0, 0xb25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },                                                                        
-	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
+	{ "cspike", 0, 0xe2010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "deathcox", 0, 0xb64d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "dybb99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "f355twin", 0, 0x6efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "f355twn2", 0, 0x666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "ggram2", 0, 0x74a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "gwing2",  0, 0xb25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "jambo",    0, 0xfab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "otrigger", 0, 0xfea94, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },  
-	{ "pstone", 0, 0xe69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "samba", 0, 0xa8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "slasho", 0, 0xa66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "smlg99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "spawn", 0, 0x78d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "suchie3", 0, 0x368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
-	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "otrigger", 0, 0xfea94, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pstone", 0, 0xe69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "samba", 0, 0xa8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "slasho", 0, 0xa66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "smlg99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "spawn", 0, 0x78d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "suchie3", 0, 0x368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "wwfroyal",0, 0x627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "zombrvn", 0, 0x12b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "zombrvn", 0, 0x12b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 
 	// games where the encryption is stacked with the ASIC's compression
 	{ "doa2", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,	// 0x8ad01, has compression
@@ -284,8 +284,8 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
 		          0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "sgtetris", 0, -1, { 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x8ae51, uses compression
-//	{ "virnbao", 0, 0x68b58, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 	// note: "virnba" set doesn't have protection
-//	{ "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+//  { "virnbao", 0, 0x68b58, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },     // note: "virnba" set doesn't have protection
+//  { "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 };
 
 // forward declaration for decrypt function
@@ -1500,7 +1500,7 @@ static int feistel_function(int input, const struct sbox* sboxes, UINT32 subkeys
     int k,m;
     int aux;
     int result=0;
-    
+
     for (m=0; m<4; ++m)  // 4 sboxes
     {
         for (k=0, aux=0; k<6; ++k)
@@ -1510,17 +1510,17 @@ static int feistel_function(int input, const struct sbox* sboxes, UINT32 subkeys
                 aux |= (BIT(input, sboxes[m].inputs[k])<<k);
             }
         }
-        
+
         aux = sboxes[m].table[(aux^subkeys)&0x3f];
-        
+
         for (k=0; k<2; ++k)
         {
             result |= (BIT(aux,k)<<sboxes[m].outputs[k]);
         }
-        
+
         subkeys >>=6;
     }
-    
+
     return result;
 }
 
@@ -1656,16 +1656,16 @@ static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UI
     UINT16 aux_word;
     int control_bits;
     UINT16 heading_word;
-    
+
     last_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
     control_bits = last_word&3;
     ++counter; ciphertext+=2;
-    
+
     aux_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
     heading_word = (last_word&~3) | (aux_word&3);
     last_word = aux_word;
     ++counter; ciphertext+=2;
-    
+
     if (BIT(control_bits,1)==0)  // no decompression, just decryption
     {
         for (; length>0; length-=2, ++counter, ciphertext+=2)

@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skyfox_state(machine)); }
 
 	skyfox_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    spriteram;
 	size_t     spriteram_size;

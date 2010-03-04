@@ -103,7 +103,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, marinedt_state(machine)); }
 
 	marinedt_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *     tx_tileram;
 
@@ -163,9 +163,9 @@ static READ8_HANDLER( marinedt_obj1_x_r )
 	marinedt_state *state = (marinedt_state *)space->machine->driver_data;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	if (RAM[0x430e]) 
-		--state->cx; 
-	else 
+	if (RAM[0x430e])
+		--state->cx;
+	else
 		++state->cx;
 
 	//figure out why inc/dec based on 430e?
@@ -181,7 +181,7 @@ static READ8_HANDLER( marinedt_obj1_yr_r )
 	marinedt_state *state = (marinedt_state *)space->machine->driver_data;
 
 	//has to be +1 if cx went over?
-	if (state->cx == 0x10) 
+	if (state->cx == 0x10)
 		state->cyr++;
 
 	return state->cyr | (state->cyrh << 4);

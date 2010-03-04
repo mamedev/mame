@@ -8,7 +8,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hyprduel_state(machine)); }
 
 	hyprduel_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  videoregs;
 	UINT16 *  screenctrl;

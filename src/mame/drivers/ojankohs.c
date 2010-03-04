@@ -50,7 +50,7 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 	memory_set_bank(space->machine, "bank1", data & 0x1f);
 
 	state->adpcm_reset = BIT(data, 5);
-	if (!state->adpcm_reset) 
+	if (!state->adpcm_reset)
 		state->vclk_left = 0;
 
 	msm5205_reset_w(state->msm, !state->adpcm_reset);
@@ -81,7 +81,7 @@ static void ojankohs_adpcm_int( running_device *device )
 		return;
 
 	/* clock the data through */
-	if (state->vclk_left) 
+	if (state->vclk_left)
 	{
 		msm5205_data_w(device, (state->adpcm_data >> 4));
 		state->adpcm_data <<= 4;
@@ -115,7 +115,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
 	int ret;
 
-	switch (state->portselect) 
+	switch (state->portselect)
 	{
 		case 0x01:	ret = input_port_read(space->machine, "KEY0");	break;
 		case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
@@ -149,7 +149,7 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 				{ "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" }
 			};
 
-	for (i = 0; i < 5; i++) 
+	for (i = 0; i < 5; i++)
 	{
 		if (!BIT(state->portselect, i))
 			ret |= input_port_read(space->machine, keynames[offset][i]);

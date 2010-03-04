@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, glass_state(machine)); }
 
 	glass_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *    videoram;
 	UINT16 *    vregs;

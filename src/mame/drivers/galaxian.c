@@ -2886,7 +2886,7 @@ static DRIVER_INIT( thepitm )
 	/* move the interrupt enable from $b000 to $b001 */
 	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
-	
+
 	/* disable the stars */
 	memory_unmap_write(space, 0xb004, 0xb004, 0, 0x07f8);
 

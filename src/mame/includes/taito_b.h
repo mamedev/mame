@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitob_state(machine)); }
 
 	taitob_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *      spriteram;
 	UINT16 *      pixelram;

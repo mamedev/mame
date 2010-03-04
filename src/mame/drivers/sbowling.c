@@ -51,7 +51,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbowling_state(machine)); }
 
 	sbowling_state(running_machine &machine) { }
-	
+
 	int bgmap;
 	UINT8 *videoram;
 

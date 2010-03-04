@@ -16,7 +16,7 @@
     with a 68705 for protection.
 
     Pushman is known to be released in a 2 PCB stack as well as a large
-    single plane board. 
+    single plane board.
 
  **************************************************************************
 

@@ -122,15 +122,15 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		xpos = xpos >> 7;
 
 
-		if (source[0] == 0x0001) 
+		if (source[0] == 0x0001)
 			break;
 
 		xpos -= 8;
 		ypos -= 6;
 
-		for (blockx = 0; blockx < xsize; blockx++) 
+		for (blockx = 0; blockx < xsize; blockx++)
 		{
-			for (blocky = 0; blocky < ysize; blocky++) 
+			for (blocky = 0; blocky < ysize; blocky++)
 			{
 				drawgfx_transpen(
 						bitmap,

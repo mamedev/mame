@@ -6,7 +6,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, freekick_state(machine)); }
 
 	freekick_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;

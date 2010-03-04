@@ -22,7 +22,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, psikyosh_state(machine)); }
 
 	psikyosh_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT32 *       bgram;
 	UINT32 *       zoomram;

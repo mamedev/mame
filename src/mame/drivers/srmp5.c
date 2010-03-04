@@ -68,7 +68,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp5_state(machine)); }
 
 	srmp5_state(running_machine &machine) { }
-	
+
 	UINT32 databank;
 	UINT16 *tileram;
 	UINT16 *palram;

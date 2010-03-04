@@ -10,11 +10,11 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mrflea_state(machine)); }
 
 	mrflea_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;
-//	UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int     gfx_bank;

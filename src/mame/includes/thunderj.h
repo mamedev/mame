@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, thunderj_state(machine)); }
 
 	thunderj_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 	UINT8			alpha_tile_bank;
 };

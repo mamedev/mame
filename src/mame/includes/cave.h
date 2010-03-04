@@ -27,7 +27,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cave_state(machine)); }
 
 	cave_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *     videoregs;
 	UINT16 *     vram_0;

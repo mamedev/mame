@@ -24,7 +24,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spoker_state(machine)); }
 
 	spoker_state(running_machine &machine) { }
-	
+
 	UINT8   *bg_tile_ram;
 	tilemap_t *bg_tilemap;
 

@@ -67,12 +67,12 @@ static INTERRUPT_GEN( konamigt_interrupt )
 
 	if (cpu_getiloops(device) == 0)
 	{
-		if ((state->irq_on) && (state->gx400_irq1_cnt++ & 1)) 
+		if ((state->irq_on) && (state->gx400_irq1_cnt++ & 1))
 			cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 	else
 	{
-		if (state->irq2_on) 
+		if (state->irq2_on)
 			cpu_set_input_line(device, 2, HOLD_LINE);
 	}
 }
@@ -84,17 +84,17 @@ static INTERRUPT_GEN( gx400_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (state->irq2_on) 
+			if (state->irq2_on)
 				cpu_set_input_line(device, 2, HOLD_LINE);
 			break;
 
 		case 1:
-			if ((state->irq1_on) && (state->gx400_irq1_cnt++ & 1)) 
+			if ((state->irq1_on) && (state->gx400_irq1_cnt++ & 1))
 				cpu_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 2:
-			if (state->irq4_on) 
+			if (state->irq4_on)
 				cpu_set_input_line(device, 4, HOLD_LINE);
 			break;
 	}
@@ -212,10 +212,10 @@ static READ16_HANDLER( konamigt_input_word_r )
 
 //  if (BIT(data, 4)) ret |= 0x0800;          // turbo/gear?
 //  if (BIT(data, 7)) ret |= 0x0400;          // turbo?
-	if (BIT(data, 5)) 
+	if (BIT(data, 5))
 		ret |= 0x0300;			// brake        (0-3)
 
-	if (BIT(data, 6)) 
+	if (BIT(data, 6))
 		ret |= 0xf000;			// accel        (0-f)
 
 	ret |= data2 & 0x7f;					// steering wheel, not exactly sure if DIAL works ok.
@@ -227,7 +227,7 @@ static WRITE16_HANDLER( selected_ip_word_w )
 {
 	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 		state->selected_ip = data & 0xff;	// latch the value
 }
 

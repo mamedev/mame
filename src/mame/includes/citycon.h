@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, citycon_state(machine)); }
 
 	citycon_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *        videoram;
 	UINT8 *        linecolor;

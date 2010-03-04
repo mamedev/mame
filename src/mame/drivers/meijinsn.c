@@ -71,7 +71,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, meijinsn_state(machine)); }
 
 	meijinsn_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *   shared_ram;
 	UINT16 *   videoram;
@@ -116,7 +116,7 @@ static READ16_HANDLER( alpha_mcu_r )
 
 			state->credits = 0;
 
-			if ((input_port_read(space->machine, "COINS") & 0x3) == 3) 
+			if ((input_port_read(space->machine, "COINS") & 0x3) == 3)
 				state->mcu_latch = 0;
 
 			if ((input_port_read(space->machine, "COINS") & 0x1) == 0 && !state->mcu_latch)

@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bigstrkb_state(machine)); }
 
 	bigstrkb_state(running_machine &machine) { }
-	
+
 	tilemap_t *tilemap;
 	tilemap_t *tilemap2;
 	tilemap_t *tilemap3;

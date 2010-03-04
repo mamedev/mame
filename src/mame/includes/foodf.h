@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, foodf_state(machine)); }
 
 	foodf_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 
 	double			rweights[3];

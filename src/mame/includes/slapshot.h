@@ -20,7 +20,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, slapshot_state(machine)); }
 
 	slapshot_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *    color_ram;
 	UINT16 *    spriteram;

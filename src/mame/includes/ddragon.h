@@ -11,7 +11,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddragon_state(machine)); }
 
 	ddragon_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *        rambase;
 	UINT8 *        bgvideoram;

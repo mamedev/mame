@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, circus_state(machine)); }
 
 	circus_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram;
 

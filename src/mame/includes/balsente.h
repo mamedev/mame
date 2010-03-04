@@ -31,7 +31,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, balsente_state(machine)); }
 
 	balsente_state(running_machine &machine) { }
-	
+
 	/* global data */
 	UINT8 shooter;
 	UINT8 shooter_x;

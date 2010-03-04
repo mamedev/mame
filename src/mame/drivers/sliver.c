@@ -82,7 +82,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sliver_state(machine)); }
 
 	sliver_state(running_machine &machine) { }
-	
+
 	UINT16 io_offset;
 	UINT16 io_reg[IO_SIZE];
 	UINT16 fifo[FIFO_SIZE];

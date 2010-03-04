@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cyberbal_state(machine)); }
 
 	cyberbal_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 
 	UINT16 *		paletteram_0;

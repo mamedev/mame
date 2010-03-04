@@ -56,7 +56,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, safarir_state(machine)); }
 
 	safarir_state(running_machine &machine) { }
-	
+
 	UINT8 *ram_1, *ram_2;
 	size_t ram_size;
 	UINT8 ram_bank;

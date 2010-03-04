@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _1942_state(machine)); }
 
 	_1942_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 * fg_videoram;
 	UINT8 * bg_videoram;

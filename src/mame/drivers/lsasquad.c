@@ -809,16 +809,16 @@ ROM_END
 
 
 /* coin inputs are inverted in storming */
-static DRIVER_INIT( lsasquad ) 
-{ 
+static DRIVER_INIT( lsasquad )
+{
 	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
-	state->invertcoin = 0x00; 
+	state->invertcoin = 0x00;
 }
 
-static DRIVER_INIT( storming ) 
-{ 
+static DRIVER_INIT( storming )
+{
 	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
-	state->invertcoin = 0x0c; 
+	state->invertcoin = 0x0c;
 }
 
 

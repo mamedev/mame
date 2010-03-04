@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, asuka_state(machine)); }
 
 	asuka_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
 

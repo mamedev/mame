@@ -295,8 +295,8 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
 }
 
-/* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but 
-using these timers breaks e.g. Chrono Trigger intro and Super Tennis gameplay. 
+/* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but
+using these timers breaks e.g. Chrono Trigger intro and Super Tennis gameplay.
 On the other hand, timers are needed for the translation of Breath of Fire 2
 to work. More weirdness: we might need to leave 8 CPU cycles for division at
 first, since using 16 produces bugs (see e.g. Triforce pieces in Zelda 3 intro) */
@@ -1329,7 +1329,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case WRMPYB:	/* Multiplier B */
 			snes_ram[WRMPYB] = data;
-//			timer_adjust_oneshot(snes_mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+//          timer_adjust_oneshot(snes_mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
 			{
 				UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
 				snes_ram[RDMPYL] = c & 0xff;
@@ -1341,7 +1341,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case WRDVDD:	/* Divisor */
 			snes_ram[WRDVDD] = data;
-//			timer_adjust_oneshot(snes_div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 16), 0);
+//          timer_adjust_oneshot(snes_div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 16), 0);
 			{
 				UINT16 value, dividend, remainder;
 				dividend = remainder = 0;

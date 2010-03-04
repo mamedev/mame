@@ -49,7 +49,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ace_state(machine)); }
 
 	ace_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT8 *  ram2;
 	UINT8 *  scoreram;

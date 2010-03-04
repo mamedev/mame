@@ -10,14 +10,14 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, metlclsh_state(machine)); }
 
 	metlclsh_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *        bgram;
 	UINT8 *        fgram;
 	UINT8 *        scrollx;
 	UINT8 *        otherram;
-//  	UINT8 *        paletteram;    // currently this uses generic palette handling
-//  	UINT8 *        paletteram2;    // currently this uses generic palette handling
+//      UINT8 *        paletteram;    // currently this uses generic palette handling
+//      UINT8 *        paletteram2;    // currently this uses generic palette handling
 	UINT8 *        spriteram;
 	size_t         spriteram_size;
 

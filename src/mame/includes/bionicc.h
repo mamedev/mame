@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bionicc_state(machine)); }
 
 	bionicc_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  bgvideoram;
 	UINT16 *  fgvideoram;

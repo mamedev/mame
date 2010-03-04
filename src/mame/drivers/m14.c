@@ -60,7 +60,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m14_state(machine)); }
 
 	m14_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	tilemap_t  *m14_tilemap;
 	UINT8 *  video_ram;

@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, aerofgt_state(machine)); }
 
 	aerofgt_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  bg1videoram;
 	UINT16 *  bg2videoram;

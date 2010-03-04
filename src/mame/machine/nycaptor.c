@@ -51,7 +51,7 @@ WRITE8_HANDLER( nycaptor_68705_port_b_w )
 	{
 		state->port_a_in = state->from_main;
 
-		if (state->main_sent) 
+		if (state->main_sent)
 			cpu_set_input_line(state->mcu, 0, CLEAR_LINE);
 		state->main_sent = 0;
 
@@ -78,9 +78,9 @@ READ8_HANDLER( nycaptor_68705_port_c_r )
 	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
 	state->port_c_in = 0;
 
-	if (state->main_sent) 
+	if (state->main_sent)
 		state->port_c_in |= 0x01;
-	if (!state->mcu_sent) 
+	if (!state->mcu_sent)
 		state->port_c_in |= 0x02;
 
 	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);

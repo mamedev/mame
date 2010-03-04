@@ -59,7 +59,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, diverboy_state(machine)); }
 
 	diverboy_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  spriteram;
 //  UINT16 *  paletteram;   // currently this uses generic palette handling

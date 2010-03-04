@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crimfght_state(machine)); }
 
 	crimfght_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 //  UINT8 *    paletteram;    // currently this uses generic palette handling
 

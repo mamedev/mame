@@ -52,7 +52,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, attckufo_state(machine)); }
 
 	attckufo_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *      mainram;
 	UINT8 *      tileram;

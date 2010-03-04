@@ -2110,7 +2110,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// Debug - Colors polygons with certain flags bright blue! ajg
 			polys[*numPolys].debugColor = 0;
 			//polys[*numPolys].debugColor = tdColor;
-            
+
 			// Debug - ajg
 			//printf("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
@@ -2363,7 +2363,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					vecmatmul4(transformedNormal, objectMatrix, polys[*numPolys].vert[v].normal);
 					normalize(transformedNormal);
 					normalize(lightVector);
-					
+
 					float intensity = vecDotProduct(transformedNormal, lightVector) * -1.0f;
 					intensity = (intensity <= 0.0f) ? (0.0f) : (intensity);
 					intensity *= lightStrength * 128.0f * 0.5f;     // HACK.  This 0.5 is completely arbitrary.

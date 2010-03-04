@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nemesis_state(machine)); }
 
 	nemesis_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  videoram1;
 	UINT16 *  videoram2;

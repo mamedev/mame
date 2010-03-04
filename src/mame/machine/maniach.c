@@ -93,10 +93,10 @@ READ8_HANDLER( maniach_68705_port_c_r )
 
 	state->port_c_in = 0;
 
-	if (state->main_sent) 
+	if (state->main_sent)
 		state->port_c_in |= 0x01;
 
-	if (!state->mcu_sent) 
+	if (!state->mcu_sent)
 		state->port_c_in |= 0x02;
 
 	//logerror("%04x: 68705 port C read %02x\n",state->cpu_get_pc(space->cpu), state->port_c_in);
@@ -145,9 +145,9 @@ READ8_HANDLER( maniach_mcu_status_r )
 	/* bit 0 = when 0, mcu has sent data to the main cpu */
 	/* bit 1 = when 1, mcu is ready to receive data from main cpu */
 	//logerror("%04x: 3041_r\n", cpu_get_pc(space->cpu));
-	if (!state->mcu_sent) 
+	if (!state->mcu_sent)
 		res |= 0x01;
-	if (!state->main_sent) 
+	if (!state->main_sent)
 		res |= 0x02;
 
 	return res;

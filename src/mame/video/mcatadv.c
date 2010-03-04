@@ -117,26 +117,26 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			if(!flipy) { ystart = 0;        yend = height; yinc = 1; }
 			else       { ystart = height-1; yend = -1;     yinc = -1; }
 
-			for (ycnt = ystart; ycnt != yend; ycnt += yinc) 
+			for (ycnt = ystart; ycnt != yend; ycnt += yinc)
 			{
 				drawypos = y + ycnt - global_y;
 
-				if ((drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y)) 
+				if ((drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y))
 				{
 					destline = BITMAP_ADDR16(bitmap, drawypos, 0);
 					priline = BITMAP_ADDR8(machine->priority_bitmap, drawypos, 0);
 
-					for (xcnt = xstart; xcnt != xend; xcnt += xinc) 
+					for (xcnt = xstart; xcnt != xend; xcnt += xinc)
 					{
 						drawxpos = x + xcnt - global_x;
 
-						if((priline[drawxpos] < pri)) 
+						if((priline[drawxpos] < pri))
 						{
-							if (offset >= 0x500000 * 2) 
+							if (offset >= 0x500000 * 2)
 								offset = 0;
 							pix = sprdata[offset / 2];
 
-							if (offset & 1)  
+							if (offset & 1)
 								pix = pix >> 4;
 							pix &= 0x0f;
 
@@ -146,7 +146,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						offset++;
 					}
 				}
-				else  
+				else
 				{
 					offset += width;
 				}
@@ -208,13 +208,13 @@ VIDEO_UPDATE( mcatadv )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	if (state->scroll1[2] != state->palette_bank1) 
+	if (state->scroll1[2] != state->palette_bank1)
 	{
 		state->palette_bank1 = state->scroll1[2];
 		tilemap_mark_all_tiles_dirty(state->tilemap1);
 	}
 
-	if (state->scroll2[2] != state->palette_bank2) 
+	if (state->scroll2[2] != state->palette_bank2)
 	{
 		state->palette_bank2 = state->scroll2[2];
 		tilemap_mark_all_tiles_dirty(state->tilemap2);

@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, stlforce_state(machine)); }
 
 	stlforce_state(running_machine &machine) { }
-	
+
 	tilemap_t *bg_tilemap;
 	tilemap_t *mlow_tilemap;
 	tilemap_t *mhigh_tilemap;

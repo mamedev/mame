@@ -9,7 +9,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chaknpop_state(machine)); }
 
 	chaknpop_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  mcu_ram;
 	UINT8 *  tx_ram;

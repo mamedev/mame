@@ -23,7 +23,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, clayshoo_state(machine)); }
 
 	clayshoo_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *   videoram;
 	size_t    videoram_size;

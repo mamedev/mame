@@ -17,7 +17,7 @@
                    PA6   8 |             | 33  PB6
                    PA5   9 |             | 32  PB5
                    PA4  10 |    Z8420    | 31  PB4
-                   GND  11 |         	 | 30  PB3
+                   GND  11 |             | 30  PB3
                    PA3  12 |             | 29  PB2
                    PA2  13 |             | 28  PB1
                    PA1  14 |             | 27  PB0

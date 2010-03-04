@@ -35,13 +35,13 @@ static void rohga_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 	{
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri = 0;
 		sprite = spriteptr[offs + 1];
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		x = spriteptr[offs + 2];
 
 		/* Sprite/playfield priority */
-		switch (x & 0x6000) 
+		switch (x & 0x6000)
 		{
 		case 0x0000: pri = 0; break;
 		case 0x4000: pri = 0xf0; break;
@@ -51,7 +51,7 @@ static void rohga_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 		y = spriteptr[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		// Sprite colour is different between Rohga (6bpp) and Schmeisr (4bpp plus wire mods on pcb)
@@ -84,7 +84,7 @@ static void rohga_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			x = 304 - x;
 			y = 240 - y;
@@ -92,7 +92,7 @@ static void rohga_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 			if (fy) fy = 0; else fy = 1;
 			mult = -16;
 		}
-		else 
+		else
 			mult = +16;
 
 		while (multi >= 0)
@@ -119,7 +119,7 @@ static void wizdfire_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		int alpha = 0xff;
 
 		sprite = spriteptr[offs + 1];
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		x = spriteptr[offs + 2];
@@ -131,7 +131,7 @@ static void wizdfire_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
         Hence, we rely on the hardware sorting everything correctly and not relying on any orthoganality
         effects (it doesn't seem to), and instead draw seperate passes for each sprite priority.  :(
         */
-		switch (mode) 
+		switch (mode)
 		{
 		case 4:
 			if ((x & 0xc000) != 0xc000)
@@ -155,11 +155,11 @@ static void wizdfire_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 		y = spriteptr[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 		colour = (x >> 9) & 0x1f;
 
-		if (bank == 4 && colour & 0x10) 
+		if (bank == 4 && colour & 0x10)
 		{
 			alpha = 0x80;
 			colour &= 0xf;
@@ -183,7 +183,7 @@ static void wizdfire_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			x = 304 - x;
 			y = 240 - y;
@@ -256,7 +256,7 @@ Sprites 2:
 		int alpha = 0xff;
 
 		sprite = spriteptr[offs + 3];
-		if (!sprite) 
+		if (!sprite)
 		{
 			offs += inc;
 			continue;
@@ -268,7 +268,7 @@ Sprites 2:
 		w = (spriteptr[offs + 2] & 0x0f00) >>  8;
 
 		sy = spriteptr[offs];
-		if ((sy & 0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if ((sy & 0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1))
 		{
 			offs += inc;
 			continue;
@@ -277,10 +277,10 @@ Sprites 2:
 		colour = (spriteptr[offs + 2] >> 0) & 0x1f;
 
 		// PRIORITIES - TODO
-		if (gfxbank == 3) 
+		if (gfxbank == 3)
 		{
 			/* Sprite chip 1 */
-			switch (spriteptr[offs + 2] & 0xe0) 
+			switch (spriteptr[offs + 2] & 0xe0)
 			{
 //          case 0xc0: colour = rand()%0xff; tilemap_pri = 256; break; //todo
 			case 0xc0: tilemap_pri = 8; break; //? under other sprites
@@ -343,8 +343,8 @@ sprite 2:
   */
 
 			sprite_pri = 1;
-		} 
-		else 
+		}
+		else
 		{
 			/* Sprite chip 2 (with alpha blending) */
 
@@ -362,7 +362,7 @@ sprite 2:
 			sprite_pri = 2;
 		}
 
-		if (gfxbank == 4 && colour & 0x10) 
+		if (gfxbank == 4 && colour & 0x10)
 		{
 			alpha = 0x80;
 			colour &= 0xf;
@@ -371,7 +371,7 @@ sprite 2:
 		fx = (spriteptr[offs + 0] & 0x4000);
 		fy = (spriteptr[offs + 0] & 0x8000);
 
-		if (!flip_screen_get(machine)) 
+		if (!flip_screen_get(machine))
 		{ /* Inverted from Mutant Fighter! */
 			if (fx) fx = 0; else fx = 1;
 			if (fy) fy = 0; else fy = 1;
@@ -383,8 +383,8 @@ sprite 2:
 
 			if (fx) { x_mult = -16; sx += 16 * w; } else { x_mult = 16; sx -= 16; }
 			if (fy) { y_mult = -16; sy += 16 * h; } else { y_mult = 16; sy -= 16; }
-		} 
-		else 
+		}
+		else
 		{
 			sx = sx & 0x01ff;
 			sy = sy & 0x01ff;
@@ -398,9 +398,9 @@ sprite 2:
 			if (fy) { y_mult = -16; sy += 16; } else { y_mult = 16; sy -= 16 * h; }
 		}
 
-		for (x = 0; x < w; x++) 
+		for (x = 0; x < w; x++)
 		{
-			for (y = 0; y < h; y++) 
+			for (y = 0; y < h; y++)
 			{
 				deco16ic_pdrawgfx(
 						state->deco16ic,

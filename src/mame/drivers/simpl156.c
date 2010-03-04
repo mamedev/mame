@@ -1066,7 +1066,7 @@ static DRIVER_INIT( simpl156 )
 static READ32_HANDLER( joemacr_speedup_r )
 {
 	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0x284)  
+	if (cpu_get_pc(space->cpu) == 0x284)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x18/4];
 }
@@ -1081,7 +1081,7 @@ static DRIVER_INIT( joemacr )
 static READ32_HANDLER( chainrec_speedup_r )
 {
 	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0x2d4)  
+	if (cpu_get_pc(space->cpu) == 0x2d4)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x18/4];
 }
@@ -1095,7 +1095,7 @@ static DRIVER_INIT( chainrec )
 static READ32_HANDLER( prtytime_speedup_r )
 {
 	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0x4f0)  
+	if (cpu_get_pc(space->cpu) == 0x4f0)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0xae0/4];
 }
@@ -1110,7 +1110,7 @@ static DRIVER_INIT( prtytime )
 static READ32_HANDLER( charlien_speedup_r )
 {
 	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0xc8c8)  
+	if (cpu_get_pc(space->cpu) == 0xc8c8)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x10/4];
 }
@@ -1124,7 +1124,7 @@ static DRIVER_INIT( charlien )
 static READ32_HANDLER( osman_speedup_r )
 {
 	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0x5974)  
+	if (cpu_get_pc(space->cpu) == 0x5974)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x10/4];
 }

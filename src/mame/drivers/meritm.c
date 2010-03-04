@@ -318,13 +318,13 @@ static INTERRUPT_GEN( meritm_interrupt )
 static void meritm_vdp0_interrupt(running_machine *machine, int i)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
- 	   interrupts seem to be fired quite randomly */
+       interrupts seem to be fired quite randomly */
 }
 
 static void meritm_vdp1_interrupt(running_machine *machine, int i)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
- 	   interrupts seem to be fired quite randomly */
+       interrupts seem to be fired quite randomly */
 }
 
 static int layer0_enabled, layer1_enabled;
@@ -819,18 +819,18 @@ static READ8_DEVICE_HANDLER(meritm_audio_pio_port_a_r)
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		BANK0
-		1		BANK1
-		2		BANK2
-		3		/VINT1		V9938 #1 INT
-		4		/VINT2		V9938 #2 INT
-		5		BANK3
-		6
-		7
+        0       BANK0
+        1       BANK1
+        2       BANK2
+        3       /VINT1      V9938 #1 INT
+        4       /VINT2      V9938 #2 INT
+        5       BANK3
+        6
+        7
 
-	*/
+    */
 
 	return meritm_vint;
 };
@@ -839,18 +839,18 @@ static READ8_DEVICE_HANDLER(meritm_audio_pio_port_b_r)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		J4 D0
-		1		J4 D1
-		2		J4 D2
-		3		J4 D3
-		4		J4 D4
-		5		J4 D5
-		6		J4 D6
-		7		J4 D7
+        0       J4 D0
+        1       J4 D1
+        2       J4 D2
+        3       J4 D3
+        4       J4 D4
+        5       J4 D5
+        6       J4 D6
+        7       J4 D7
 
-	*/
+    */
 
 	return ds1204_r();
 };
@@ -859,18 +859,18 @@ static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_a_w)
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		BANK0
-		1		BANK1
-		2		BANK2
-		3		/VINT1		V9938 #1 INT
-		4		/VINT2		V9938 #2 INT
-		5		BANK3
-		6
-		7
+        0       BANK0
+        1       BANK1
+        2       BANK2
+        3       /VINT1      V9938 #1 INT
+        4       /VINT2      V9938 #2 INT
+        5       BANK3
+        6
+        7
 
-	*/
+    */
 
 	meritm_bank = (data & 7) | ((data >> 2) & 0x18);
 	//logerror("Writing BANK with %x (raw = %x)\n", meritm_bank, data);
@@ -880,18 +880,18 @@ static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_b_w)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		J4 D0
-		1		J4 D1
-		2		J4 D2
-		3		J4 D3
-		4		J4 D4
-		5		J4 D5
-		6		J4 D6
-		7		J4 D7
+        0       J4 D0
+        1       J4 D1
+        2       J4 D2
+        3       J4 D3
+        4       J4 D4
+        5       J4 D5
+        6       J4 D6
+        7       J4 D7
 
-	*/
+    */
 
 	ds1204_w((data & 0x4) >> 2, (data & 0x2) >> 1, data & 0x01);
 };
@@ -900,36 +900,36 @@ static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_a_w)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		J3 PE0
-		1		J3 PE1
-		2		J3 PE2
-		3		J3 PE3
-		4		J3 PE4
-		5		J3 PE5
-		6		J3 PE6
-		7		J3 PE7
+        0       J3 PE0
+        1       J3 PE1
+        2       J3 PE2
+        3       J3 PE3
+        4       J3 PE4
+        5       J3 PE5
+        6       J3 PE6
+        7       J3 PE7
 
-	*/
+    */
 };
 
 static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_b_w)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		J3 PF0
-		1		J3 PF1
-		2		J3 PF2
-		3		J3 PF3
-		4		J3 PF4
-		5		J3 PF5
-		6		J3 PF6
-		7		J3 PF7
+        0       J3 PF0
+        1       J3 PF1
+        2       J3 PF2
+        3       J3 PF3
+        4       J3 PF4
+        5       J3 PF5
+        6       J3 PF6
+        7       J3 PF7
 
-	*/
+    */
 };
 
 static Z80PIO_INTERFACE( meritm_audio_pio_intf )

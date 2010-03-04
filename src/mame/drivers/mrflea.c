@@ -114,7 +114,7 @@ static READ8_HANDLER( mrflea_interrupt_type_r )
 */
 	mrflea_state *state = (mrflea_state *)space->machine->driver_data;
 
-	if (state->status & 0x08 ) 
+	if (state->status & 0x08 )
 		return 0x00; /* process command */
 
 	return 0x01; /* music/sound update? */

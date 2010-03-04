@@ -60,9 +60,9 @@ static TILE_GET_INFO( get_back_tile_info )
 	}
 
 	tile = RAM[tile_index];
-	if (tile > 0x7f) 
-		bank = 3; 
-	else 
+	if (tile > 0x7f)
+		bank = 3;
+	else
 		bank = 2;
 	SET_TILE_INFO(bank, tile & 0x7f, state->background_color, 0);
 }
@@ -323,7 +323,7 @@ static void liberate_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		fy = spriteram[offs + 0] & 0x02;
 		multi = spriteram[offs + 0] & 0x10;
 
-		if (multi && fy == 0) 
+		if (multi && fy == 0)
 			sy -= 16;
 
 		if (flip_screen_get(machine))
@@ -367,7 +367,7 @@ static void prosport_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
-		if ((spriteram[offs + 0] & 1) != 1) 
+		if ((spriteram[offs + 0] & 1) != 1)
 			continue;
 
 		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0x3) << 8);
@@ -382,7 +382,7 @@ static void prosport_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		multi = spriteram[offs + 0] & 0x10;
 
 		sy = spriteram[offs + 2];
-		if (multi) 
+		if (multi)
 			sy += 16;
 		sx = (240 - spriteram[offs + 3]);
 //      sy = (240 - spriteram[offs + 2]);//-16;
@@ -432,9 +432,9 @@ static void boomrang_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
-		if ((spriteram[offs + 0] & 1) != 1) 
+		if ((spriteram[offs + 0] & 1) != 1)
 			continue;
-		if ((spriteram[offs + 0] & 0x8) != pri) 
+		if ((spriteram[offs + 0] & 0x8) != pri)
 			continue;
 
 		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0xe0) << 3);
@@ -443,7 +443,7 @@ static void boomrang_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		multi = spriteram[offs + 0] & 0x10;
 
 		sy=spriteram[offs + 2];
-		if (multi) 
+		if (multi)
 			sy += 16;
 		sx = (240 - spriteram[offs + 3]);
 //      sy = (240-spriteram[offs + 2]);//-16;
@@ -493,7 +493,7 @@ static void prosoccr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 	for (offs = 0x000; offs < 0x400; offs += 4)
 	{
-		if ((spriteram[offs + 0] & 1) != 1) 
+		if ((spriteram[offs + 0] & 1) != 1)
 			continue;
 
 		code = spriteram[offs + 1];

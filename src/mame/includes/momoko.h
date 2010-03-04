@@ -10,13 +10,13 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, momoko_state(machine)); }
 
 	momoko_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *        bg_scrollx;
 	UINT8 *        bg_scrolly;
 	UINT8 *        videoram;
 	UINT8 *        spriteram;
-//	UINT8 *        paletteram;    // currently this uses generic palette handling
+//  UINT8 *        paletteram;    // currently this uses generic palette handling
 	size_t         spriteram_size;
 	size_t         videoram_size;
 

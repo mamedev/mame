@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rainbow_state(machine)); }
 
 	rainbow_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *    spriteram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling

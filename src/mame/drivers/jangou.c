@@ -39,7 +39,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jangou_state(machine)); }
 
 	jangou_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT8        *blit_buffer;
 	UINT8        pen_data[0x10];

@@ -216,9 +216,9 @@ WRITE8_HANDLER( mrdo_scrolly_w )
 	mrdo_state *state = (mrdo_state *)space->machine->driver_data;
 
 	/* This is NOT affected by flipscreen (so stop it happening) */
-	if (state->flipscreen) 
+	if (state->flipscreen)
 		tilemap_set_scrolly(state->bg_tilemap, 0,((256 - data) & 0xff));
-	else 
+	else
 		tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 

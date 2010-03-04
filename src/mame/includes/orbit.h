@@ -21,7 +21,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, orbit_state(machine)); }
 
 	orbit_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *    playfield_ram;
 	UINT8 *    sprite_ram;

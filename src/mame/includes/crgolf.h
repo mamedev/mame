@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crgolf_state(machine)); }
 
 	crgolf_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram_a;
 	UINT8 *  videoram_b;

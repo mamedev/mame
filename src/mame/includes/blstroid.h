@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blstroid_state(machine)); }
 
 	blstroid_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 
 	UINT16 *		priorityram;

@@ -30,7 +30,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, suprgolf_state(machine)); }
 
 	suprgolf_state(running_machine &machine) { }
-	
+
 	tilemap_t *tilemap;
 	UINT8 *videoram;
 	UINT8 *paletteram;

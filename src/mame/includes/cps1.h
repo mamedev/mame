@@ -63,7 +63,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cps_state(machine)); }
 
 	cps_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	// cps1
 	UINT16 *     gfxram;

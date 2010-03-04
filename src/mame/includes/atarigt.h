@@ -17,7 +17,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarigt_state(machine)); }
 
 	atarigt_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 	UINT8			is_primrage;
 	UINT16 *		colorram;

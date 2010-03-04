@@ -17,7 +17,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, flyball_state(machine)); }
 
 	flyball_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  rombase;
 	UINT8 *  playfield_ram;

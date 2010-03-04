@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lkage_state(machine)); }
 
 	lkage_state(running_machine &machine) { }
-	
+
 	UINT8 *      scroll;
 	UINT8 *      vreg;
 	UINT8 *      videoram;

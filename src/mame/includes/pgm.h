@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pgm_state(machine)); }
 
 	pgm_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 //  UINT16 *      mainram;  // currently this is also used by nvram handler
 	UINT16 *      bg_videoram;

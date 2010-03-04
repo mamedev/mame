@@ -88,7 +88,7 @@
   Thanks to PlgDavid for providing samples which helped immensely here.
   Added true clock divider emulation, so sn94624 and sn76494 run 8x faster than
   the others, as in real life.
-  
+
   15/02/2010: Lord Nightmare & Michael Zapf (additional testing by PlgDavid)
   Fix noise period when set to mirror channel 3 and channel 3 period is set to 0 (tested on hardware for noise, wave needs tests) - MZ
   Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only inversion is the output itself - LN, Plgdavid

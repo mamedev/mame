@@ -149,7 +149,7 @@ struct _z80dma_t
 	UINT8	read_regs_follow[7];
 	UINT8	status;
 	UINT8	dma_enabled;
-	
+
 	UINT16 addressA;
 	UINT16 addressB;
 	UINT16 count;
@@ -378,14 +378,14 @@ static TIMER_CALLBACK( z80dma_timerproc )
 	{
 		z80dma->dma_enabled = 0; //FIXME: Correct?
         z80dma->status = 0x19;
-        
+
 		if(!(z80dma->rdy ^ READY_ACTIVE_HIGH(z80dma))) z80dma->status |= 0x02;   // ready line status
-		
+
 		if(TRANSFER_MODE(z80dma) == TM_TRANSFER)     z80dma->status |= 0x10;   // no match found
-		
+
 		z80dma_update_status(device);
 		if (LOG) logerror("Z80DMA '%s' End of Block\n", device->tag.cstr());
-        
+
 		if (INT_ON_END_OF_BLOCK(z80dma))
         {
 			trigger_interrupt(device, INT_END_OF_BLOCK);
@@ -721,14 +721,14 @@ static int z80dma_irq_ack(running_device *device)
 	if (z80dma->ip)
 	{
 	    if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", device->tag.cstr());
-		
+
 		/* clear interrupt pending flag */
 		z80dma->ip = 0;
 	    interrupt_check(z80dma);
 
 		/* set interrupt under service flag */
 		z80dma->ius = 1;
-		
+
 		/* disable DMA */
 		z80dma->dma_enabled = 0;
 

@@ -28,12 +28,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 		sprite = spriteram[offs + 1];
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spriteram[offs + 2];

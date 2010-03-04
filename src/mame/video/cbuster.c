@@ -46,23 +46,23 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 		sprite = buffered_spriteram[offs + 1] & 0x7fff;
-		if (!sprite) 
+		if (!sprite)
 			continue;
 
 		y = buffered_spriteram[offs];
 		x = buffered_spriteram[offs + 2];
 
-		if ((y & 0x8000) && pri == 1) 
+		if ((y & 0x8000) && pri == 1)
 			continue;
-		if (!(y & 0x8000) && pri == 0) 
+		if (!(y & 0x8000) && pri == 0)
 			continue;
 
 		colour = (x >> 9) & 0xf;
-		if (x & 0x2000) 
+		if (x & 0x2000)
 			colour += 64;
 
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		fx = y & 0x2000;
@@ -76,7 +76,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		x = 240 - x;
 		y = 240 - y;
 
-		if (x > 256) 
+		if (x > 256)
 			continue; /* Speedup */
 
 		sprite &= ~multi;
@@ -88,7 +88,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -127,12 +127,12 @@ VIDEO_UPDATE( twocrude )
 	deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
-	if (state->pri) 
+	if (state->pri)
 	{
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else 
+	else
 	{
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);

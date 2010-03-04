@@ -46,9 +46,9 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 	for (i = 0; i < 3; i++)
 	{
 		int C = 0;
-		if (data & 1) 
+		if (data & 1)
 			C +=  10000;	/*  10000pF = 0.01uF */
-		if (data & 2) 
+		if (data & 2)
 			C += 220000;	/* 220000pF = 0.22uF */
 
 		data >>= 2;

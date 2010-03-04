@@ -33,7 +33,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, superdq_state(machine)); }
 
 	superdq_state(running_machine &machine) { }
-	
+
 	running_device *laserdisc;
 	UINT8 ld_in_latch;
 	UINT8 ld_out_latch;

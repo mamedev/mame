@@ -10,7 +10,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, volfied_state(machine)); }
 
 	volfied_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *    video_ram;
 	UINT8  *    cchip_ram;

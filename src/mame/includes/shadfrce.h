@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, shadfrce_state(machine)); }
 
 	shadfrce_state(running_machine &machine) { }
-	
+
 	tilemap_t *fgtilemap;
 	tilemap_t *bg0tilemap;
 	tilemap_t *bg1tilemap;

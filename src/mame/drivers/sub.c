@@ -118,7 +118,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sub_state(machine)); }
 
 	sub_state(running_machine &machine) { }
-	
+
 	UINT8* vid;
 	UINT8* attr;
 	UINT8* scrolly;

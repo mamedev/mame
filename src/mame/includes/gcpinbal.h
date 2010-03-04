@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gcpinbal_state(machine)); }
 
 	gcpinbal_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *    tilemapram;
 	UINT16 *    ioc_ram;

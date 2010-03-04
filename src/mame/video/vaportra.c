@@ -60,19 +60,19 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 		y = buffered_spriteram[offs];
-		if ((y & 0x8000) == 0) 
+		if ((y & 0x8000) == 0)
 			continue;
 
 		sprite = buffered_spriteram[offs + 1] & 0x1fff;
 		x = buffered_spriteram[offs + 2];
 		colour = (x >> 12) & 0xf;
-		if (pri && (colour >= priority_value)) 
+		if (pri && (colour >= priority_value))
 			continue;
-		if (!pri && !(colour >= priority_value)) 
+		if (!pri && !(colour >= priority_value))
 			continue;
 
 		flash = x & 0x800;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		fx = y & 0x2000;
@@ -86,7 +86,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		x = 240 - x;
 		y = 240 - y;
 
-		if (x > 256) 
+		if (x > 256)
 			continue; /* Speedup */
 
 		sprite &= ~multi;
@@ -133,28 +133,28 @@ VIDEO_UPDATE( vaportra )
 	deco16ic_pf34_update(state->deco16ic, 0, 0);
 
 	/* Draw playfields */
-	if (pri == 0) 
+	if (pri == 0)
 	{
 		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else if (pri == 1) 
+	else if (pri == 1)
 	{
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else if (pri == 2) 
+	else if (pri == 2)
 	{
 		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
-	else 
+	else
 	{
 		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);

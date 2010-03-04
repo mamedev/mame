@@ -62,7 +62,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, olibochu_state(machine)); }
 
 	olibochu_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  colorram;
@@ -234,9 +234,9 @@ static WRITE8_HANDLER( sound_command_w )
 	olibochu_state *state = (olibochu_state *)space->machine->driver_data;
 	int c;
 
-	if (offset == 0) 
+	if (offset == 0)
 		state->cmd = (state->cmd & 0x00ff) | (data << 8);
-	else 
+	else
 		state->cmd = (state->cmd & 0xff00) | data;
 
 	for (c = 15; c >= 0; c--)

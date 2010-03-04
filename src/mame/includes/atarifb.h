@@ -21,7 +21,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarifb_state(machine)); }
 
 	atarifb_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT8 *  alphap1_videoram;
 	UINT8 *  alphap2_videoram;

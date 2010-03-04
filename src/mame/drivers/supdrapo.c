@@ -39,7 +39,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supdrapo_state(machine)); }
 
 	supdrapo_state(running_machine &machine) { }
-	
+
 	UINT8 *char_bank;
 	UINT8 *col_line;
 	UINT8 *videoram;

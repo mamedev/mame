@@ -13,7 +13,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fromance_state(machine)); }
 
 	fromance_state(running_machine &machine) { }
-	
+
 	/* memory pointers (used by pipedrm) */
 	UINT8 *  videoram;
 	UINT8 *  spriteram;

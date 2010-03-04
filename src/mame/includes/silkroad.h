@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, silkroad_state(machine)); }
 
 	silkroad_state(running_machine &machine) { }
-	
+
 	UINT32 *vidram;
 	UINT32 *vidram2;
 	UINT32 *vidram3;

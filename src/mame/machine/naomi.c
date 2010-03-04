@@ -34,12 +34,12 @@ static UINT8 asciihex_to_dec(UINT8 in)
 		return in - 0x37;
 	}
 	/*
-	else
-	if (in>=0x61 && in<=0x66)
-	{
-		return in - 0x57;
-	}
-	*/
+    else
+    if (in>=0x61 && in<=0x66)
+    {
+        return in - 0x57;
+    }
+    */
 	else
 	{
 		fatalerror("unexpected value in asciihex_to_dec");
@@ -79,10 +79,10 @@ static void create_pic_from_retdat(running_machine* machine)
 					UINT8 dec2 = asciihex_to_dec(ascii2);
 					UINT8 val = dec1 << 4 | dec2;
 
-					//printf("%02x%02x", ascii1, ascii2); 
-					
+					//printf("%02x%02x", ascii1, ascii2);
+
 					printf("%02x", val);
-					
+
 					newregion[outcount] = val;
 
 					hexoffs+=2;
@@ -90,12 +90,12 @@ static void create_pic_from_retdat(running_machine* machine)
 				}
 
 				hexoffs+=0x4; // skip running checksum + newline
-				
+
 				printf("\n");
 
 
 			}
-			
+
 			{
 				int i;
 				printf("string 1 (key1)\n");
@@ -130,8 +130,8 @@ static void create_pic_from_retdat(running_machine* machine)
 					newregion[0x7e0+i*2] = retregion[0x19+i]; // patch with extracted data
 				}
 			}
-			
-			
+
+
 			{
 				FILE *fp;
 				char filename[256];
@@ -149,7 +149,7 @@ static void create_pic_from_retdat(running_machine* machine)
 			// hex dumps end with
 			//:10400000000000000000000000000000000082002E
 			//:00000001FF
-		
+
 
 		}
 	}

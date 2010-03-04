@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gauntlet_state(machine)); }
 
 	gauntlet_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 	UINT16			sound_reset_val;
 	UINT8			vindctr2_screen_refresh;

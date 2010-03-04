@@ -5,7 +5,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, inufuku_state(machine)); }
 
 	inufuku_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *  bg_videoram;
 	UINT16 *  bg_rasterram;

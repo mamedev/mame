@@ -96,7 +96,7 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (socketted)
 
-HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC 
+HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
    ULN2003A - 16 pin DIP Seven Darlington Arrays
       51864 - V62C51864L-35P 64Kb SRAM
       75176 - SN75176BP Differential BUS Transceiver (Bidirectional data communication on multipoint bus transmission line)
@@ -190,7 +190,7 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (used for programable protection, connected to H2)
 
-HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC 
+HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
    ULN2003A - 16 pin DIP Seven Darlington Arrays
       75176 - SN75176BP Differential BUS Transceiver (Bidirectional data communication on multipoint bus transmission line)

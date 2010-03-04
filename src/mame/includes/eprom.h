@@ -12,7 +12,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, eprom_state(machine)); }
 
 	eprom_state(running_machine &machine) { }
-	
+
 	atarigen_state	atarigen;
 	int 			screen_intensity;
 	int 			video_disable;

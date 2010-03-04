@@ -34,7 +34,7 @@ WRITE8_HANDLER( mrflea_spriteram_w )
 	mrflea_state *state = (mrflea_state *)space->machine->driver_data;
 
 	if (offset & 2)
-	{ 
+	{
 		/* tile_number */
 		state->spriteram[offset | 1] = offset & 1;
 		offset &= ~1;
@@ -85,7 +85,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	if (BIT(state->gfx_bank, 2))
 		base |= 0x400;
 
-	if (BIT(state->gfx_bank, 4)) 
+	if (BIT(state->gfx_bank, 4))
 		base |= 0x200;
 
 	for (sy = 0; sy < 256; sy += 8)

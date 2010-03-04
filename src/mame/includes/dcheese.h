@@ -11,7 +11,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dcheese_state(machine)); }
 
 	dcheese_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT16   blitter_color[2];
 	UINT16   blitter_xparam[16];

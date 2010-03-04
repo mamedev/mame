@@ -4,7 +4,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sslam_state(machine)); }
 
 	sslam_state(running_machine &machine) { }
-	
+
 	emu_timer *music_timer;
 
 	int sound;

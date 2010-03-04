@@ -93,7 +93,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, shougi_state(machine)); }
 
 	shougi_state(running_machine &machine) { }
-	
+
 	UINT8 *videoram;
 	int nmi_enabled;
 	//UINT8 *cpu_sharedram;

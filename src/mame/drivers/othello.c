@@ -53,7 +53,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, othello_state(machine)); }
 
 	othello_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT8 *  videoram;
 
@@ -64,7 +64,7 @@ public:
 	int   ay_select;
 	int   ack_data;
 	UINT8 n7751_command;
-//	UINT32 n7751_rom_address;
+//  UINT32 n7751_rom_address;
 	int sound_addr;
 	int n7751_busy;
 

@@ -26,7 +26,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, laserbas_state(machine)); }
 
 	laserbas_state(running_machine &machine) { }
-	
+
 	/* video-related */
 	UINT8    *vram1;
 	UINT8    *vram2;
