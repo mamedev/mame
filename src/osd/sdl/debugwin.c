@@ -1189,7 +1189,7 @@ on_memoryview_key_press_event             (GtkWidget   *widget,
 
 #else
 
-#include "emucore.h"
+#include "emu.h"
 
 // win32 stubs for linking
 void osd_wait_for_debugger(running_device *device, int firststop)
