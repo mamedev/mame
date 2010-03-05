@@ -536,7 +536,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 window1_left, window1_right, window2_left, window2_right;
 
 	UINT16 mosaic_table[16][4096];
-	UINT8 clipmasks[6][SNES_SCR_WIDTH + 8];
+	UINT8 clipmasks[6][SNES_SCR_WIDTH];
 	UINT8 update_windows;
 	UINT8 update_offsets;
 	UINT8 mode;
