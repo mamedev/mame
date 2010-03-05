@@ -108,16 +108,13 @@ static const UINT16 table_obj_offset[8][8] =
 	{ (96*32),  (96*32)+32,  (96*32)+64,  (96*32)+96,  (96*32)+128,  (96*32)+160,  (96*32)+192,  (96*32)+224 },
 	{ (112*32), (112*32)+32, (112*32)+64, (112*32)+96, (112*32)+128, (112*32)+160, (112*32)+192, (112*32)+224 }
 };
-/* Scroll tables                             32x32      64x32              32x64              64x64 */
-static const UINT16 table_hscroll[4][4] = { {0,0,0,0}, {0,0x800,0,0x800}, {0,0,0,0}, {0,0x800,0,0x800} };
-static const UINT16 table_vscroll[4][4] = { {0,0,0,0}, {0,0,0,0}, {0,0x800,0,0x800}, {0,0x1000,0,0x1000} };
 
 struct SCANLINE
 {
-	UINT16 buffer[(SNES_SCR_WIDTH * 2) + 16];
-	UINT8  priority[(SNES_SCR_WIDTH * 2) + 16];
-	UINT8  layer[(SNES_SCR_WIDTH * 2) + 16];
-	UINT8  blend_exception[(SNES_SCR_WIDTH * 2) + 16];
+	UINT16 buffer[(SNES_SCR_WIDTH * 2)];
+	UINT8  priority[(SNES_SCR_WIDTH * 2)];
+	UINT8  layer[(SNES_SCR_WIDTH * 2)];
+	UINT8  blend_exception[(SNES_SCR_WIDTH * 2)];
 };
 
 static struct SCANLINE scanlines[2];
@@ -602,14 +599,14 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 		tile_line <<= 1;
 
 		/* below, only color_planes depends on color_depth */
-		if (tile_size)
+		if (hires)	/* Hi-Res: 2bpp & 4bpp */
 		{
-			snes_draw_tile_x2(screen, color_planes, layer, charaddr + (tile  * 8 * color_planes) + tile_line, ii, priority, hflip, pal, direct_colors, hires);
-			ii += 16;
+			snes_draw_tile_x2(screen, color_planes, layer, charaddr + (tile  * 8 * color_planes) + tile_line, ii * 2, priority, hflip, pal, direct_colors, hires);
+			ii += 8;
 		}
 		else	/* tile_size = 0 */
 		{
-			if (hires)	/* Hi-Res: 2bpp & 4bpp */
+			if (tile_size)
 			{
 				snes_draw_tile_x2(screen, color_planes, layer, charaddr + (tile  * 8 * color_planes) + tile_line, ii, priority, hflip, pal, direct_colors, hires);
 				ii += 16;
@@ -802,8 +799,8 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	if (snes_ppu.mode == 5 || snes_ppu.mode == 6)
-		widemode = 1;
+//	if (snes_ppu.mode == 5 || snes_ppu.mode == 6)
+//		widemode = 1;
 
 	curline /= snes_ppu.interlace;
 	curline *= snes_ppu.obj_interlace;
@@ -1199,7 +1196,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 
 		for (x = 0; x < SNES_SCR_WIDTH * 2; x += 2)
 		{
-			if (snes_ppu.mode != 5 && snes_ppu.mode != 6)
+//			if (snes_ppu.mode != 5 && snes_ppu.mode != 6)
 			{
 				int r, g, b;
 				c = scanline->buffer[x];
@@ -1229,6 +1226,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 				*BITMAP_ADDR32(bitmap, curline, (x + 1) * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 
 			}
+#if 0
 			else
 			{
 				int r, g, b;
@@ -1259,6 +1257,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 
 				*BITMAP_ADDR32(bitmap, curline, x + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
+#endif
 		}
 	}
 
