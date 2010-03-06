@@ -951,152 +951,12 @@ static VIDEO_START( ss23 )
 	tilemap_set_transparent_pen(bgtilemap, 0xf);
 }
 
-#if 0
-static double
-Normalize( UINT32 data )
-{
-	data &=  0xffffff;
-	if( data&0x800000 )
-	{
-		data |= 0xff000000;
-	}
-	return (INT32)data;
-}
-
-static void
-DrawLine( bitmap_t *bitmap, int x0, int y0, int x1, int y1 )
-{
-	if( x0>=0 && x0<bitmap->width &&
-		x1>=0 && x1<bitmap->width &&
-		y0>=0 && y0<bitmap->height &&
-		y1>=0 && y1<bitmap->height )
-	{
-		int sx,sy,dy;
-		if( x0>x1 )
-		{
-			int temp = x0;
-			x0 = x1;
-			x1 = temp;
-
-			temp = y0;
-			y0 = y1;
-			y1 = temp;
-		}
-
-		if( x1>x0 )
-		{
-			sy = y0<<16;
-			dy = ((y1-y0)<<16)/(x1-x0);
-			for( sx=x0; sx<x1; sx++ )
-			{
-				UINT16 *pDest = BITMAP_ADDR16(bitmap, sy>>16, 0);
-				pDest[sx] = 1;
-				sy += dy;
-			}
-		}
-	}
-} /* DrawLine */
-
-static void
-DrawPoly( bitmap_t *bitmap, const UINT32 *pSource, int n, int bNew )
-{
-	UINT32 flags = *pSource++;
-	UINT32 unk = *pSource++;
-	UINT32 intensity = *pSource++;
-	double x[4],y[4],z[4];
-	int i;
-	if( bNew )
-	{
-		mame_printf_debug( "polydata: 0x%08x 0x%08x 0x%08x\n", flags, unk, intensity );
-	}
-	for( i=0; i<n; i++ )
-	{
-		x[i] = Normalize(*pSource++);
-		y[i] = Normalize(*pSource++);
-		z[i] = Normalize(*pSource++);
-
-		if( bNew )
-		{
-			mame_printf_debug( "\t(%f,%f,%f)\n", x[i], y[i], z[i] );
-		}
-	}
-	for( i=0; i<n; i++ )
-	{
-		#define KDIST 0x400
-		int j = (i+1)%n;
-		double z0 = z[i]+KDIST;
-		double z1 = z[j]+KDIST;
-
-		if( z0>0 && z1>0 )
-		{
-			int x0 = bitmap->width*x[i]/z0 + bitmap->width/2;
-			int y0 = bitmap->width*y[i]/z0 + bitmap->height/2;
-			int x1 = bitmap->width*x[j]/z1 + bitmap->width/2;
-			int y1 = bitmap->width*y[j]/z1 + bitmap->height/2;
-			if( bNew )
-			{
-				mame_printf_debug( "[%d,%d]..[%d,%d]\n", x0,y0,x1,y1 );
-			}
-			DrawLine( bitmap, x0,y0,x1,y1 );
-		}
-	}
-}
-#endif
-
 static VIDEO_UPDATE( ss23 )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
-
-#if 0
-	static int bNew = 1;
-	static int code = 0x80;
-	const UINT32 *pSource = (UINT32 *)memory_region(machine, "pointrom");
-
-	pSource = pSource + pSource[code];
-
-	bitmap_fill( bitmap, 0 , 0);
-	for(;;)
-	{
-		UINT32 opcode = *pSource++;
-		int bDone = (opcode&0x10000);
-
-		switch( opcode&0x0f00 )
-		{
-		case 0x0300:
-			DrawPoly( bitmap, pSource, 3, bNew );
-			pSource += 3 + 3*3;
-			break;
-
-		case 0x0400:
-			DrawPoly( bitmap, pSource, 4, bNew );
-			pSource += 3 + 4*3;
-			break;
-
-		default:
-			mame_printf_debug( "unk opcode: 0x%x\n", opcode );
-			bDone = 1;
-			break;
-		}
-
-
-		if( bDone )
-		{
-			break;
-		}
-	}
-
-	bNew = 0;
-
-	if( keyboard_pressed(KEYCODE_SPACE) )
-	{
-		while( keyboard_pressed(KEYCODE_SPACE) ){}
-		code++;
-		bNew = 1;
-	}
-#endif
 	return 0;
 }
 
@@ -1110,24 +970,7 @@ static WRITE32_HANDLER( s23_txtchar_w )
 	COMBINE_DATA(&namcos23_charram[offset]);
 	gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 }
-#if 0
-static READ32_HANDLER( ss23_vstat_r )
-{
-	if (offset == 1)
-	{
-		hstat ^= 0xffffffff;
-		return hstat;
-	}
 
-	vstate++;
-	if (vstate >= 2)
-	{
-	ss23_vstat ^= 0xffffffff;
-		vstate = 0;
-	}
-	return ss23_vstat;
-}
-#endif
 static UINT8 nthbyte( const UINT32 *pSource, int offs )
 {
 	pSource += offs/4;
@@ -1136,7 +979,7 @@ static UINT8 nthbyte( const UINT32 *pSource, int offs )
 
 INLINE void UpdatePalette( running_machine *machine, int entry )
 {
-         int j;
+	int j;
 
 	for( j=0; j<2; j++ )
 	{
@@ -1162,7 +1005,7 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 	UpdatePalette(space->machine, (offset % (0x10000/4))*2);
 }
 
-static READ16_HANDLER(s23_c417_16_r)
+static READ16_HANDLER(s23_c417_r)
 {
 	switch(offset) {
 	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x8000 : 0);
@@ -1172,11 +1015,11 @@ static READ16_HANDLER(s23_c417_16_r)
 		return c417_ram[c417_adr];
 	}
 
-	logerror("c417_16_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0;
 }
 
-static WRITE16_HANDLER(s23_c417_16_w)
+static WRITE16_HANDLER(s23_c417_w)
 {
     switch(offset) {
     case 1:
@@ -1188,27 +1031,9 @@ static WRITE16_HANDLER(s23_c417_16_w)
         COMBINE_DATA(c417_ram + c417_adr);
         break;
     default:
-        logerror("c417_16_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         break;
     }
-}
-
-static READ32_HANDLER(s23_c417_32_r)
-{
-    UINT32 data = 0;
-    if (ACCESSING_BITS_16_31)
-        data |= s23_c417_16_r(space, offset*2, mem_mask >> 16) << 16;
-    if (ACCESSING_BITS_0_15)
-        data |= s23_c417_16_r(space, offset*2+1, mem_mask);
-    return data;
-}
-
-static WRITE32_HANDLER(s23_c417_32_w)
-{
-    if (ACCESSING_BITS_16_31)
-        s23_c417_16_w(space, offset*2, data >> 16, mem_mask >> 16);
-    if (ACCESSING_BITS_0_15)
-        s23_c417_16_w(space, offset*2+1, data, mem_mask);
 }
 
 static READ16_HANDLER(s23_c412_ram_r)
@@ -1239,7 +1064,7 @@ static WRITE16_HANDLER(s23_c412_ram_w)
 		COMBINE_DATA(c412_pczram  + (offset & 0x001ff));
 }
 
-static READ16_HANDLER(s23_c412_16_r)
+static READ16_HANDLER(s23_c412_r)
 {
 	switch(offset) {
 	case 8: return c412_adr;
@@ -1247,40 +1072,21 @@ static READ16_HANDLER(s23_c412_16_r)
 	case 10: return s23_c412_ram_r(space, c412_adr, mem_mask);
 	}
 
-	logerror("c412_16_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0;
 }
 
-static WRITE16_HANDLER(s23_c412_16_w)
+static WRITE16_HANDLER(s23_c412_w)
 {
     switch(offset) {
 	case 8: c412_adr = (data & mem_mask) | (c412_adr & (0xffffffff ^ mem_mask)); break;
 	case 9: c412_adr = ((data & mem_mask) << 16) | (c412_adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); break;
     default:
-        logerror("c412_16_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         break;
     }
 }
-
-static READ32_HANDLER(s23_c412_32_r)
-{
-    UINT32 data = 0;
-    if (ACCESSING_BITS_16_31)
-        data |= s23_c412_16_r(space, offset*2, mem_mask >> 16) << 16;
-    if (ACCESSING_BITS_0_15)
-        data |= s23_c412_16_r(space, offset*2+1, mem_mask);
-    return data;
-}
-
-static WRITE32_HANDLER(s23_c412_32_w)
-{
-    if (ACCESSING_BITS_16_31)
-        s23_c412_16_w(space, offset*2, data >> 16, mem_mask >> 16);
-    if (ACCESSING_BITS_0_15)
-        s23_c412_16_w(space, offset*2+1, data, mem_mask);
-}
-
 
 static READ16_HANDLER(s23_c421_ram_r)
 {
@@ -1306,7 +1112,7 @@ static WRITE16_HANDLER(s23_c421_ram_w)
 		COMBINE_DATA(c421_sram   + (offset & 0x07fff));
 }
 
-static READ16_HANDLER(s23_c421_16_r)
+static READ16_HANDLER(s23_c421_r)
 {
 	switch(offset) {
 	case 0: return s23_c421_ram_r(space, c421_adr & 0xfffff, mem_mask);
@@ -1314,41 +1120,23 @@ static READ16_HANDLER(s23_c421_16_r)
 	case 3: return c421_adr;
 	}
 
-	logerror("c421_16_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0;
 }
 
-static WRITE16_HANDLER(s23_c421_16_w)
+static WRITE16_HANDLER(s23_c421_w)
 {
     switch(offset) {
 	case 0: s23_c421_ram_w(space, c421_adr & 0xfffff, data, mem_mask); break;
 	case 2: c421_adr = ((data & mem_mask) << 16) | (c421_adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 3: c421_adr = (data & mem_mask) | (c421_adr & (0xffffffff ^ mem_mask)); break;
     default:
-        logerror("c421_16_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         break;
     }
 }
 
-static READ32_HANDLER(s23_c421_32_r)
-{
-    UINT32 data = 0;
-    if (ACCESSING_BITS_16_31)
-        data |= s23_c421_16_r(space, offset*2, mem_mask >> 16) << 16;
-    if (ACCESSING_BITS_0_15)
-        data |= s23_c421_16_r(space, offset*2+1, mem_mask);
-    return data;
-}
-
-static WRITE32_HANDLER(s23_c421_32_w)
-{
-    if (ACCESSING_BITS_16_31)
-        s23_c421_16_w(space, offset*2, data >> 16, mem_mask >> 16);
-    if (ACCESSING_BITS_0_15)
-        s23_c421_16_w(space, offset*2+1, data, mem_mask);
-}
-
-static WRITE16_HANDLER(s23_ctl_16_w)
+static WRITE16_HANDLER(s23_ctl_w)
 {
 	switch(offset) {
 	case 0: {
@@ -1383,7 +1171,7 @@ static WRITE16_HANDLER(s23_ctl_16_w)
 	}
 }
 
-static READ16_HANDLER(s23_ctl_16_r)
+static READ16_HANDLER(s23_ctl_r)
 {
 	switch(offset) {
 		// dips ?
@@ -1402,26 +1190,7 @@ static READ16_HANDLER(s23_ctl_16_r)
 	return 0xffff;
 }
 
-static WRITE32_HANDLER(s23_ctl_32_w)
-{
-    if (ACCESSING_BITS_16_31)
-        s23_ctl_16_w(space, offset*2, data >> 16, mem_mask >> 16);
-    if (ACCESSING_BITS_0_15)
-        s23_ctl_16_w(space, offset*2+1, data, mem_mask);
-}
-
-static READ32_HANDLER(s23_ctl_32_r)
-{
-    UINT32 data = 0;
-    if (ACCESSING_BITS_16_31)
-        data |= s23_ctl_16_r(space, offset*2, mem_mask >> 16) << 16;
-    if (ACCESSING_BITS_0_15)
-        data |= s23_ctl_16_r(space, offset*2+1, mem_mask);
-    return data;
-}
-
-
-static WRITE16_HANDLER(s23_c361_16_w)
+static WRITE16_HANDLER(s23_c361_w)
 {
 	switch(offset) {
 	default:
@@ -1429,7 +1198,7 @@ static WRITE16_HANDLER(s23_c361_16_w)
 	}
 }
 
-static READ16_HANDLER(s23_c361_16_r)
+static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
 	case 5: return video_screen_get_vpos(space->machine->primary_screen);
@@ -1437,24 +1206,6 @@ static READ16_HANDLER(s23_c361_16_r)
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0xffff;
-}
-
-static WRITE32_HANDLER(s23_c361_32_w)
-{
-    if (ACCESSING_BITS_16_31)
-        s23_c361_16_w(space, offset*2, data >> 16, mem_mask >> 16);
-    if (ACCESSING_BITS_0_15)
-        s23_c361_16_w(space, offset*2+1, data, mem_mask);
-}
-
-static READ32_HANDLER(s23_c361_32_r)
-{
-    UINT32 data = 0;
-    if (ACCESSING_BITS_16_31)
-        data |= s23_c361_16_r(space, offset*2, mem_mask >> 16) << 16;
-    if (ACCESSING_BITS_0_15)
-        data |= s23_c361_16_r(space, offset*2+1, mem_mask);
-    return data;
 }
 
 static INTERRUPT_GEN(s23_interrupt)
@@ -1516,7 +1267,7 @@ static WRITE32_HANDLER( gorgon_sharedram_w )
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE( s23_c417_32_r, s23_c417_32_w )
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE(&namcos23_shared_ram)
 
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
@@ -1534,7 +1285,7 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) // BACKUP
 
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE (s23_ctl_32_r, s23_ctl_32_w ) // write for LEDs at d000000, watchdog at d000004
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
 
 	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
 
@@ -1545,7 +1296,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE( s23_c417_32_r, s23_c417_32_w )
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
@@ -1554,14 +1305,14 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06800000, 0x06807fff) AM_READWRITE( s23_txtchar_r, s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_READWRITE(namcos23_textram_r, namcos23_textram_w) AM_BASE(&namcos23_textram)
-	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE( s23_c361_32_r, s23_c361_32_w )	// C361
+	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16( s23_c361_r, s23_c361_w, 0xffffffff )	// C361
 	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	// GAMMA (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READWRITE(namcos23_paletteram_r, namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x01000000)	// data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x01000000)
-	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE( s23_c412_32_r, s23_c412_32_w )
-	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE( s23_c421_32_r, s23_c421_32_w )
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE( s23_ctl_32_r, s23_ctl_32_w )
+	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16( s23_c412_r, s23_c412_w, 0xffffffff )
+	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16( s23_c421_r, s23_c421_w, 0xffffffff )
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
