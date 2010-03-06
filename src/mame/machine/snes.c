@@ -638,27 +638,28 @@ READ8_HANDLER( snes_r_io )
 			{
 				if (snes_ram[offset] & 0x1)
 				{
-					return 0 | (snes_open_bus_r(space,0) & 0xfc); //correct?
+					return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 				}
-				value = ((joy1l | (joy1h << 8) | 0x10000) >> (16 - (joypad[0].oldrol & 0xf))) & 0x1;
-				joypad[0].oldrol++;
-				joypad[0].oldrol&=0xf;
-				if (!(joypad[0].oldrol % 17))
-					value = 0x1;
-				return (value & 0x03) | (snes_open_bus_r(space,0) & 0xfc); //correct?
+
+				if (joypad[0].oldrol >= 16)
+					value = 0x01;
+				else
+					value = ((joypad[0].low | (joypad[0].high << 8)) >> (15 - joypad[0].oldrol++)) & 0x01;
+
+				return (value & 0x03) | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 			}
 		case OLDJOY2:	/* Data for old NES controllers (JOYSER2) */
 			{
 				if (snes_ram[OLDJOY1] & 0x1)
 				{
-					return 0 | 0x1c | (snes_open_bus_r(space,0) & 0xe0); //correct?
+					return 0 | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 				}
-				value = ((joy2l | (joy2h << 8) | 0x10000) >> (16 - (joypad[1].oldrol & 0xf))) & 0x1;
-				joypad[1].oldrol++;
-				joypad[1].oldrol &= 0xf;
-				if (!(joypad[1].oldrol % 17))
-					value = 0x1;
-				//value |= 0x1c;    // bits 4, 3, and 2 are always set
+
+				if (joypad[1].oldrol >= 16)
+					value = 0x01;
+				else
+					value = ((joypad[1].low | (joypad[1].high << 8)) >> (15 - joypad[1].oldrol++)) & 0x01;
+
 				return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 			}
 		case HTIMEL:
@@ -1307,7 +1308,7 @@ WRITE8_HANDLER( snes_w_io )
 		case WMADDH:	/* Address to read/write to wram (high) */
 			break;
 		case OLDJOY1:	/* Old NES joystick support */
-			if (((data & 0x1) && !(snes_ram[offset] & 0x1)) || ((!(data & 0x1)) && (snes_ram[offset] & 0x1)))
+			if (((!(data & 0x1)) && (snes_ram[offset] & 0x1)))
 			{
 				joypad[0].oldrol = 0;
 				joypad[1].oldrol = 0;
