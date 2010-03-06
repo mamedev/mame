@@ -698,7 +698,7 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 			UINT32 haddr = 0, vaddr = 0;
 			UINT16 hval = 0, vval = 0;
 
-		      if (opt_x >= 8)
+			if (opt_x >= 8)
 			{
 				switch (offset_per_tile)
 				{
@@ -725,7 +725,7 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 					}
 					break;
 				}
-
+			vshift = ypos & ((8 << tile_size) - 1);
 			}
 		}
 
