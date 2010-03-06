@@ -9449,6 +9449,7 @@ Other Sun games
 	DRIVER( cmfun )		/* (c) 1995 Dyna Electronics */
 	DRIVER( cmaster )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmezspin )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterbv )	/* (c) 1991 Dyna Electronics / Gerald Duhamel?*/
 	DRIVER( cmasterd )	/* (c) 1991 Dyna Electronics */
@@ -9456,6 +9457,11 @@ Other Sun games
 	DRIVER( cmasterf )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast92 )	/* (c) 1992 Dyna Electronics */
+
+	DRIVER( jkrmast )	/* (c) 199? unknown */
+	DRIVER( pkrmast )	/* (c) 199? unknown */
+	DRIVER( pkrmasta )	/* (c) 199? unknown */
+
 	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
 	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
 
