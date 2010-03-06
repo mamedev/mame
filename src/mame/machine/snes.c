@@ -19,6 +19,7 @@
 #include "cpu/superfx/superfx.h"
 #include "cpu/g65816/g65816.h"
 
+
 /* -- Globals -- */
 UINT8  *snes_ram = NULL;		/* 65816 ram */
 UINT8  *spc_ram = NULL;			/* spc700 ram */
@@ -30,7 +31,6 @@ static UINT8  vram_read_offset;	/* VRAM read offset */
 UINT8  spc_port_in[4];	/* Port for sending data to the SPC700 */
 UINT8  spc_port_out[4];	/* Port for receiving data from the SPC700 */
 static UINT8 snes_hdma_chnl;	/* channels enabled for HDMA */
-static UINT8 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
 static UINT8 read_ophct = 0, read_opvct = 0;
 static emu_timer *snes_scanline_timer;
 static emu_timer *snes_hblank_timer;
@@ -50,14 +50,6 @@ static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 struct snes_cart_info snes_cart;
-
-static struct
-{
-	UINT8 low;
-	UINT8 high;
-	UINT32 value;
-	UINT8 oldrol;
-} joypad[4];
 
 // add-on chip emulators
 #include "machine/snesdsp1.c"
@@ -134,6 +126,8 @@ static TIMER_CALLBACK( snes_reset_hdma )
 
 static TIMER_CALLBACK( snes_scanline_tick )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
+
 	/* Increase current line - we want to latch on this line during it, not after it */
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
 
@@ -204,43 +198,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* three lines after start of vblank we update the controllers (value from snes9x) */
 	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line + 2)
 	{
-		int i;
-
-		joypad[0].low  = input_port_read(machine, "PAD1L");
-		joypad[0].high = input_port_read(machine, "PAD1H");
-		joypad[1].low  = input_port_read(machine, "PAD2L");
-		joypad[1].high = input_port_read(machine, "PAD2H");
-		joypad[2].low  = input_port_read(machine, "PAD3L");
-		joypad[2].high = input_port_read(machine, "PAD3H");
-		joypad[3].low  = input_port_read(machine, "PAD4L");
-		joypad[3].high = input_port_read(machine, "PAD4H");
-
-		// avoid sending signals that could crash games
-		for (i = 0; i < 4; i++)
-		{
-			// if left, no right
-			if (joypad[i].high & 2)	joypad[i].high &= ~1;
-			// if up, no down
-			if (joypad[i].high & 8)	joypad[i].high &= ~4;
-		}
-
-		// is automatic reading on?
-		if (snes_ram[NMITIMEN] & 1)
-		{
-			joy1l = joypad[0].low;
-			joy1h = joypad[0].high;
-			joy2l = joypad[1].low;
-			joy2h = joypad[1].high;
-			joy3l = joypad[2].low;
-			joy3h = joypad[2].high;
-			joy4l = joypad[3].low;
-			joy4h = joypad[3].high;
-
-			// make sure oldrol starts returning all 1s because the auto-read reads it :-)
-			joypad[0].oldrol = 16;
-			joypad[1].oldrol = 16;
-		}
-
+		state->io_read(machine);
 		snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 	}
 
@@ -387,6 +345,7 @@ static READ8_HANDLER( snes_open_bus_r )
  */
 READ8_HANDLER( snes_r_io )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0;
 
 	// APU is mirrored from 2140 to 217f
@@ -641,10 +600,7 @@ READ8_HANDLER( snes_r_io )
 					return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 				}
 
-				if (joypad[0].oldrol >= 16)
-					value = 0x01;
-				else
-					value = ((joypad[0].low | (joypad[0].high << 8)) >> (15 - joypad[0].oldrol++)) & 0x01;
+				value = state->oldjoy1_read(space->machine);
 
 				return (value & 0x03) | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 			}
@@ -655,10 +611,7 @@ READ8_HANDLER( snes_r_io )
 					return 0 | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 				}
 
-				if (joypad[1].oldrol >= 16)
-					value = 0x01;
-				else
-					value = ((joypad[1].low | (joypad[1].high << 8)) >> (15 - joypad[1].oldrol++)) & 0x01;
+				value = state->oldjoy2_read(space->machine);
 
 				return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 			}
@@ -689,21 +642,21 @@ READ8_HANDLER( snes_r_io )
 		case RDMPYH:		/* Product/Remainder of mult/div result (high) */
 			return snes_ram[offset];
 		case JOY1L:			/* Joypad 1 status register (low) */
-			return joy1l;
+			return state->joy1l;
 		case JOY1H:			/* Joypad 1 status register (high) */
-			return joy1h;
+			return state->joy1h;
 		case JOY2L:			/* Joypad 2 status register (low) */
-			return joy2l;
+			return state->joy2l;
 		case JOY2H:			/* Joypad 2 status register (high) */
-			return joy2h;
+			return state->joy2h;
 		case JOY3L:			/* Joypad 3 status register (low) */
-			return joy3l;
+			return state->joy3l;
 		case JOY3H:			/* Joypad 3 status register (high) */
-			return joy3h;
+			return state->joy3h;
 		case JOY4L:			/* Joypad 4 status register (low) */
-			return joy4l;
+			return state->joy4l;
 		case JOY4H:			/* Joypad 4 status register (high) */
-			return joy4h;
+			return state->joy4h;
 		case DMAP0:
 		case DMAP1:
 		case DMAP2:
@@ -762,6 +715,8 @@ READ8_HANDLER( snes_r_io )
  */
 WRITE8_HANDLER( snes_w_io )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
+
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
@@ -1310,10 +1265,10 @@ WRITE8_HANDLER( snes_w_io )
 		case OLDJOY1:	/* Old NES joystick support */
 			if (((!(data & 0x1)) && (snes_ram[offset] & 0x1)))
 			{
-				joypad[0].oldrol = 0;
-				joypad[1].oldrol = 0;
-				joypad[2].oldrol = 0;
-				joypad[3].oldrol = 0;
+				state->joypad[0].oldrol = 0;
+				state->joypad[1].oldrol = 0;
+				state->joypad[2].oldrol = 0;
+				state->joypad[3].oldrol = 0;
 			}
 			break;
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
@@ -2015,6 +1970,83 @@ WRITE8_HANDLER( snes_w_bank7 )
 
 /*************************************
 
+    Input Callbacks
+
+*************************************/
+
+static void nss_io_read( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	int i;
+
+	state->joypad[0].low  = input_port_read(machine, "SERIAL1_DATA1_L");
+	state->joypad[0].high = input_port_read(machine, "SERIAL1_DATA1_H");
+	state->joypad[1].low  = input_port_read(machine, "SERIAL2_DATA1_L");
+	state->joypad[1].high = input_port_read(machine, "SERIAL2_DATA1_H");
+	state->joypad[2].low  = input_port_read(machine, "SERIAL1_DATA2_L");
+	state->joypad[2].high = input_port_read(machine, "SERIAL1_DATA2_H");
+	state->joypad[3].low  = input_port_read(machine, "SERIAL2_DATA2_L");
+	state->joypad[3].high = input_port_read(machine, "SERIAL2_DATA2_H");
+
+	// avoid sending signals that could crash games
+	for (i = 0; i < 4; i++)
+	{
+		// if left, no right
+		if (state->joypad[i].high & 2)
+			state->joypad[i].high &= ~1;
+		// if up, no down
+		if (state->joypad[i].high & 8)
+			state->joypad[i].high &= ~4;
+	}
+
+	// is automatic reading on?
+	if (snes_ram[NMITIMEN] & 1)
+	{
+		state->joy1l = state->joypad[0].low;
+		state->joy1h = state->joypad[0].high;
+		state->joy2l = state->joypad[1].low;
+		state->joy2h = state->joypad[1].high;
+		state->joy3l = state->joypad[2].low;
+		state->joy3h = state->joypad[2].high;
+		state->joy4l = state->joypad[3].low;
+		state->joy4h = state->joypad[3].high;
+
+		// make sure oldrol starts returning all 1s because the auto-read reads it :-)
+		state->joypad[0].oldrol = 16;
+		state->joypad[1].oldrol = 16;
+	}
+
+}
+
+static UINT8 nss_oldjoy1_read( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 res;
+
+	// joysticks
+	if (state->joypad[0].oldrol >= 16)
+		res = 0x01;
+	else
+		res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->joypad[0].oldrol++)) & 0x01;
+
+	return res;
+}
+
+static UINT8 nss_oldjoy2_read( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 res;
+
+	if (state->joypad[1].oldrol >= 16)
+		res = 0x01;
+	else
+		res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->joypad[1].oldrol++)) & 0x01;
+
+	return res;
+}
+
+/*************************************
+
     Driver Init
 
 *************************************/
@@ -2044,6 +2076,7 @@ static void snes_init_timers(running_machine *machine)
 
 static void snes_init_ram(running_machine *machine)
 {
+	snes_state *state = (snes_state *)machine->driver_data;
 	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, j;
 
@@ -2075,7 +2108,14 @@ static void snes_init_ram(running_machine *machine)
 	snes_ppu.ppu2_version = 3;	// 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
 	cgram_address = 0;
 	vram_read_offset = 2;
-	joy1l = joy1h = joy2l = joy2h = joy3l = joy3h = 0;
+
+	state->joy1l = state->joy1h = state->joy2l = state->joy2h = state->joy3l = state->joy3h = 0;
+	state->joypad[0].low = state->joypad[1].low = state->joypad[2].low = state->joypad[3].low = 0;
+	state->joypad[0].high = state->joypad[1].high = state->joypad[2].high = state->joypad[3].high = 0;
+
+	state->io_read = nss_io_read;
+	state->oldjoy1_read = nss_oldjoy1_read;
+	state->oldjoy2_read = nss_oldjoy2_read;
 
 	/* Inititialize mosaic table */
 	for (j = 0; j < 16; j++)

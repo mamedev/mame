@@ -355,6 +355,32 @@
 #define DSP_FIR_C6		0x6F
 #define DSP_FIR_C7		0x7F
 
+struct snes_controller_port
+{
+	UINT8 low;
+	UINT8 high;
+	UINT8 oldrol;
+};
+
+typedef void (*snes_io_read)(running_machine *machine);
+typedef UINT8 (*snes_oldjoy_read)(running_machine *machine);
+
+class snes_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, snes_state(machine)); }
+
+	snes_state(running_machine &machine) { }
+
+	/* input-related */
+	UINT8                 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
+	snes_controller_port  joypad[4];
+
+	/* input callbacks (to allow MESS to have its own input handlers) */
+	snes_io_read          io_read;
+	snes_oldjoy_read      oldjoy1_read, oldjoy2_read;
+};
+
 /* Special chips, checked at init and used in memory handlers */
 enum
 {
