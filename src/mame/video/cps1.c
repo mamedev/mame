@@ -1289,12 +1289,14 @@ static const struct CPS1config cps1_config_table[]=
 	{"dinoj",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinopic",  CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinopic2", CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinohunt", CPS_B_21_DEF, mapper_CD63B },	/* Chinese bootleg */
 	{"punisher", CPS_B_21_QS3, mapper_PS63B },
 	{"punisheru",CPS_B_21_QS3, mapper_PS63B },
 	{"punisherj",CPS_B_21_QS3, mapper_PS63B },
 	{"punipic",  CPS_B_21_QS3, mapper_PS63B },
 	{"punipic2", CPS_B_21_QS3, mapper_PS63B },
 	{"punipic3", CPS_B_21_QS3, mapper_PS63B },
+	{"punisherbz", CPS_B_21_DEF, mapper_PS63B },	/* Chinese bootleg */
 	{"slammast", CPS_B_21_QS4, mapper_MB63B },
 	{"slammastu",CPS_B_21_QS4, mapper_MB63B },
 	{"mbomberj", CPS_B_21_QS4, mapper_MB63B },
