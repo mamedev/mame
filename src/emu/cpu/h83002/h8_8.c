@@ -567,6 +567,33 @@ static READ8_HANDLER( h8330_itu_r )
 	case 0xdd:		// serial Rx 0
 		val = memory_read_byte(h8->io, H8_SERIAL_0);
 		break;
+	case 0xe0:	// ADC 0 low byte
+		val = memory_read_byte(h8->io, H8_ADC_0_L);
+		break;
+	case 0xe1:	// ADC 0 high byte
+		val = memory_read_byte(h8->io, H8_ADC_0_H);
+		break;
+	case 0xe2:	// ADC 1 low byte
+		val = memory_read_byte(h8->io, H8_ADC_1_L);
+		break;
+	case 0xe3:	// ADC 1 high byte
+		val = memory_read_byte(h8->io, H8_ADC_1_H);
+		break;
+	case 0xe4:	// ADC 2 low byte
+		val = memory_read_byte(h8->io, H8_ADC_2_L);
+		break;
+	case 0xe5:	// ADC 2 high byte
+		val = memory_read_byte(h8->io, H8_ADC_2_H);
+		break;
+	case 0xe6:	// ADC 3 low byte
+		val = memory_read_byte(h8->io, H8_ADC_3_L);
+		break;
+	case 0xe7:	// ADC 3 high byte
+		val = memory_read_byte(h8->io, H8_ADC_3_H);
+		break;
+	case 0xe8:	// ADCSR: A/D control/status
+		val = 0x80;	// return conversion completed
+		break;
 	default:
 		val = h8->per_regs[reg];
 		break;
