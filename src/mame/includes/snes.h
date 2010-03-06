@@ -359,7 +359,6 @@ struct snes_controller_port
 {
 	UINT8 low;
 	UINT8 high;
-	UINT8 oldrol;
 };
 
 typedef void (*snes_io_read)(running_machine *machine);
@@ -374,6 +373,7 @@ public:
 
 	/* input-related */
 	UINT8                 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
+	UINT8                 read_idx[2];
 	snes_controller_port  joypad[4];
 
 	/* input callbacks (to allow MESS to have its own input handlers) */

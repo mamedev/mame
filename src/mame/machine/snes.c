@@ -1265,10 +1265,8 @@ WRITE8_HANDLER( snes_w_io )
 		case OLDJOY1:	/* Old NES joystick support */
 			if (((!(data & 0x1)) && (snes_ram[offset] & 0x1)))
 			{
-				state->joypad[0].oldrol = 0;
-				state->joypad[1].oldrol = 0;
-				state->joypad[2].oldrol = 0;
-				state->joypad[3].oldrol = 0;
+				state->read_idx[0] = 0;
+				state->read_idx[1] = 0;
 			}
 			break;
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
@@ -2011,9 +2009,9 @@ static void nss_io_read( running_machine *machine )
 		state->joy4l = state->joypad[3].low;
 		state->joy4h = state->joypad[3].high;
 
-		// make sure oldrol starts returning all 1s because the auto-read reads it :-)
-		state->joypad[0].oldrol = 16;
-		state->joypad[1].oldrol = 16;
+		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
+		state->read_idx[0] = 16;
+		state->read_idx[1] = 16;
 	}
 
 }
@@ -2024,10 +2022,10 @@ static UINT8 nss_oldjoy1_read( running_machine *machine )
 	UINT8 res;
 
 	// joysticks
-	if (state->joypad[0].oldrol >= 16)
+	if (state->read_idx[0] >= 16)
 		res = 0x01;
 	else
-		res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->joypad[0].oldrol++)) & 0x01;
+		res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->read_idx[0]++)) & 0x01;
 
 	return res;
 }
@@ -2037,10 +2035,10 @@ static UINT8 nss_oldjoy2_read( running_machine *machine )
 	snes_state *state = (snes_state *)machine->driver_data;
 	UINT8 res;
 
-	if (state->joypad[1].oldrol >= 16)
+	if (state->read_idx[1] >= 16)
 		res = 0x01;
 	else
-		res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->joypad[1].oldrol++)) & 0x01;
+		res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->read_idx[1]++)) & 0x01;
 
 	return res;
 }
