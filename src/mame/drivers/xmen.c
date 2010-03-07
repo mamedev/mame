@@ -595,6 +595,9 @@ ROM_START( xmen )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_ubb.nv", 0x0000, 0x0080, CRC(52f334ba) SHA1(171c22b5ac41bcbbcfc31528cf49c096f6829a72) )	
 ROM_END
 
 ROM_START( xmenj )
@@ -620,6 +623,9 @@ ROM_START( xmenj )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_jba.nv", 0x0000, 0x0080, CRC(7439cea7) SHA1(d34b8ed0549b0457362159098e5c86b1356e35d0) )		
 ROM_END
 
 ROM_START( xmene )
@@ -645,6 +651,9 @@ ROM_START( xmene )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_eba.nv", 0x0000, 0x0080, CRC(37f8e77a) SHA1(0b92caba33486c6fd104806aa96f735743bb2221) )			
 ROM_END
 
 ROM_START( xmen2pe )
@@ -670,6 +679,9 @@ ROM_START( xmen2pe )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_eaa.nv", 0x0000, 0x0080, CRC(1cbcb653) SHA1(a86b4ad34ccbd868662ff8c61eb21ec07e8bf8b1) )				
 ROM_END
 
 ROM_START( xmen2pa )
@@ -695,6 +707,9 @@ ROM_START( xmen2pa )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_aaa.nv", 0x0000, 0x0080, CRC(750fd447) SHA1(27884c1ceb0b5174f7d06e1e06bbbd6d6c5b47e7) )					
 ROM_END
 
 ROM_START( xmen2pj )
@@ -720,6 +735,9 @@ ROM_START( xmen2pj )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_jaa.nv", 0x0000, 0x0080, CRC(849a9e19) SHA1(bd335a2d33bf4433de4fd57b8108b216eb3a2cf1) )						
 ROM_END
 
 /*
@@ -799,6 +817,9 @@ ROM_START( xmen6p )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1d",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_ecb.nv", 0x0000, 0x0080, CRC(462c6e1a) SHA1(a57087163d7a760d5922c70842cfae20e6a2f5b5) )							
 ROM_END
 
 
@@ -825,6 +846,9 @@ ROM_START( xmen6pu )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1d",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_ucb.nv", 0x0000, 0x0080, CRC(f3d0f682) SHA1(b0d4655c651238ae028ffb59a704acba798f93f8) )								
 ROM_END
 
 GAME( 1992, xmen,    0,    xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", GAME_SUPPORTS_SAVE ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
