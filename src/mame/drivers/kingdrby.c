@@ -451,26 +451,32 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
+static WRITE8_DEVICE_HANDLER( outportb_w )
+{
+	printf("%02x B\n",data);
+}
+
+
 static const ppi8255_interface ppi8255_1986_intf[2] =
 {
 	/* C as input, (all) as output */
 	{
 		DEVCB_NULL,	                        /* Port A read */
 		DEVCB_INPUT_PORT("IN0"),	        /* Port B read */
-		DEVCB_INPUT_PORT("IN1"),		/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL   /* Port C write */
+		DEVCB_INPUT_PORT("IN1"),			/* Port C read */
+		DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
+		DEVCB_HANDLER(outportb_w),			/* Port B write */
+		DEVCB_NULL						    /* Port C write */
 	},
 
 	/* actually unused */
 	{
 		DEVCB_NULL,					/* Port A read */
-		DEVCB_HANDLER(key_matrix_r),/* Port B read */
-		DEVCB_HANDLER(input_mux_r),	/* Port C read */
-		DEVCB_HANDLER(sound_cmd_w),  /* Port A write */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL,  				/* Port A write */
 		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(outport2_w)	/* Port C write */
+		DEVCB_NULL					/* Port C write */
 	}
 };
 
