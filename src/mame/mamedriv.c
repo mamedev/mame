@@ -5174,7 +5174,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( skullfng )	/* MCH (c) 1996 Data East Corporation (World) */
 	DRIVER( skullfngj )	/* MCH (c) 1996 Data East Corporation (Japan) */
 	DRIVER( stadhr96 )	/* MCM (c) 1996 Data East */
-	DRIVER( stadhr96a )	/* MCM (c) 1996 Data East */
+	DRIVER( stadhr96j )	/* MCM (c) 1996 Data East */
 
 	/* Tehkan / Tecmo games (Tehkan became Tecmo in 1986) */
 	DRIVER( senjyo )	/* (c) 1983 Tehkan */

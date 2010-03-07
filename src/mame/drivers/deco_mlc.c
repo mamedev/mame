@@ -537,31 +537,8 @@ ROM_START( avengrgsj )
 	ROM_LOAD( "avengrgsj.nv",  0x00, 0x80, CRC(7ea70843) SHA1(f010b77b824e37c5e8c5722d5fff79751118f0b7) )	
 ROM_END
 
+
 ROM_START( stadhr96 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD32_WORD( "ead00-4.2a", 0x000000, 0x80000, CRC(b0adfc39) SHA1(3094dfb7c7f8fa9d7e10d98dff8fb8aba285d710) )
-	ROM_LOAD32_WORD( "ead01-4.2b", 0x000002, 0x80000, CRC(0b332820) SHA1(28b757fe529250711fcb82424ba63c222a9329b9) )
-
-	ROM_REGION( 0x1800000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
-	ROM_LOAD16_BYTE( "mcm-01.8m", 0x0000000, 0x400000, CRC(2255d47d) SHA1(ba3298e781fce1c84f68290bc464f2bc991382c0) )
-	ROM_LOAD16_BYTE( "mcm-02.4e", 0x0800001, 0x400000, CRC(38c39822) SHA1(393d2c1c3c0bcb99df706d32ee3f8b681891dcac) )
-	ROM_LOAD16_BYTE( "mcm-03.10m",0x0800000, 0x400000, CRC(4bd84ca7) SHA1(43dad8ced344f8d629d36f30ab2332879ba067d2) )
-	ROM_LOAD16_BYTE( "mcm-04.6e", 0x1000001, 0x400000, CRC(7c0bd84c) SHA1(730b085a893d3c70592a8b4aecaeeaf4aceede56) )
-	ROM_LOAD16_BYTE( "mcm-05.11m",0x1000000, 0x400000, CRC(476f03d7) SHA1(5c58ab4fc0e29f76619827bc27fa64cce2627e48) )
-
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "ead02-0.6h", 0x000000, 0x80000, CRC(f95ad7ce) SHA1(878dcc1d5f76c8523c788e66bb4a8c5740d515e5) )
-
-	ROM_REGION( 0x800000, "ymz", 0 )
-	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000,  CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "stadhr96.nv",  0x00, 0x80, CRC(cf98098f) SHA1(54fc9bdd1ce9b836dad7b4a9909608e8f9842f71) )	
-ROM_END
-
-
-ROM_START( stadhr96a )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "sh-eaj.2a", 0x000000, 0x80000, CRC(10d1496a) SHA1(1dc151547463a38d717159b3dfce7ffd78a943ad) )
 	ROM_LOAD32_WORD( "sh-eaj.2b", 0x000002, 0x80000, CRC(608a9144) SHA1(15e2fa99dc96e8ebd9868713ae7708cb824fc6c5) )
@@ -581,8 +558,31 @@ ROM_START( stadhr96a )
 	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000,  CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "stadhr96a.nv",  0x00, 0x80, CRC(77861793) SHA1(df43b3ee55b7eb840cd6d3e5c5e04c68ce64bb57) )	
+	ROM_LOAD( "eeprom-stadhr96.bin",  0x00, 0x80, CRC(77861793) SHA1(df43b3ee55b7eb840cd6d3e5c5e04c68ce64bb57) )	
 ROM_END	
+
+ROM_START( stadhr96j )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "ead00-4.2a", 0x000000, 0x80000, CRC(b0adfc39) SHA1(3094dfb7c7f8fa9d7e10d98dff8fb8aba285d710) )
+	ROM_LOAD32_WORD( "ead01-4.2b", 0x000002, 0x80000, CRC(0b332820) SHA1(28b757fe529250711fcb82424ba63c222a9329b9) )
+
+	ROM_REGION( 0x1800000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
+	ROM_LOAD16_BYTE( "mcm-01.8m", 0x0000000, 0x400000, CRC(2255d47d) SHA1(ba3298e781fce1c84f68290bc464f2bc991382c0) )
+	ROM_LOAD16_BYTE( "mcm-02.4e", 0x0800001, 0x400000, CRC(38c39822) SHA1(393d2c1c3c0bcb99df706d32ee3f8b681891dcac) )
+	ROM_LOAD16_BYTE( "mcm-03.10m",0x0800000, 0x400000, CRC(4bd84ca7) SHA1(43dad8ced344f8d629d36f30ab2332879ba067d2) )
+	ROM_LOAD16_BYTE( "mcm-04.6e", 0x1000001, 0x400000, CRC(7c0bd84c) SHA1(730b085a893d3c70592a8b4aecaeeaf4aceede56) )
+	ROM_LOAD16_BYTE( "mcm-05.11m",0x1000000, 0x400000, CRC(476f03d7) SHA1(5c58ab4fc0e29f76619827bc27fa64cce2627e48) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "ead02-0.6h", 0x000000, 0x80000, CRC(f95ad7ce) SHA1(878dcc1d5f76c8523c788e66bb4a8c5740d515e5) )
+
+	ROM_REGION( 0x800000, "ymz", 0 )
+	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000,  CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "eeprom-stadhr96j.bin",  0x00, 0x80, CRC(cf98098f) SHA1(54fc9bdd1ce9b836dad7b4a9909608e8f9842f71) )	
+ROM_END
 
 
 ROM_START( hoops96 )
@@ -768,10 +768,10 @@ static DRIVER_INIT( mlc )
 
 GAME( 1995, avengrgs, 0,        avengrgs, mlc, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US)", 0 )
 GAME( 1995, avengrgsj,avengrgs, avengrgs, mlc, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan)", 0 )
-GAME( 1996, stadhr96, 0,        mlc_6bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Stadium Hero 96 (Version EAD)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1996, stadhr96a,stadhr96, mlc_6bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Stadium Hero 96 (Version EAJ)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1996, stadhr96, 0,        mlc_6bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Stadium Hero 96 (World, EAJ)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // Rom labels are EAJ  ^^
+GAME( 1996, stadhr96j,stadhr96, mlc_6bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Stadium Hero 96 (Japan, EAD)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // Rom labels are EAD (this isn't a Konami region code!)
 GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, mlc,      ROT270, "Data East Corporation", "Skull Fang (World)", 0 ) /* Version 1.13, Europe, Master 96.02.19 */
 GAME( 1996, skullfngj,skullfng, mlc_6bpp, mlc, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan)", 0 ) /* Version 1.09, Japan, Master 96.02.08 */
 GAME( 1996, hoops96,  0,        mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)", 0 )
-GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4 EAM)", 0 )
+GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)", 0 )
 GAME( 1995, hoops95,  hoops96,  mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)", 0 )
