@@ -1200,6 +1200,7 @@ static UINT16 c421_dram_b[0x40000];
 static UINT16 c421_sram[0x8000];
 static UINT32 c421_adr = 0;
 
+static INT16 s23_c422_regs[0x10];
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -1509,6 +1510,37 @@ static READ16_HANDLER(s23_c361_r)
 	return 0xffff;
 }
 
+static READ16_HANDLER(s23_c422_r)
+{
+	return s23_c422_regs[offset];;
+}
+
+static WRITE16_HANDLER(s23_c422_w)
+{
+	switch (offset)
+	{
+		case 1:
+			if (data == 0xfffb)
+			{
+				logerror("c422_w: raise IRQ 3\n");
+				cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ3, ASSERT_LINE);
+			}
+			else if (data == 0x000f)
+			{
+				logerror("c422_w: ack IRQ 3\n");
+				cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ3, CLEAR_LINE);
+			}
+			break;
+
+		default:
+			logerror("c422_w: %04x @ %x\n", data, offset);
+			break;
+
+	}
+
+	COMBINE_DATA(&s23_c422_regs[offset]);
+}
+
 static INTERRUPT_GEN(s23_interrupt)
 {
 	if(!ctl_vbl_active) {
@@ -1603,6 +1635,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
+	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16( s23_c422_r, s23_c422_w, 0xffffffff )	// C422 registers
 	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE(&namcos23_textram)
