@@ -1168,6 +1168,7 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h8.h"
+#include "cpu/sh2/sh2.h"
 #include "sound/c352.h"
 
 #define S23_BUSCLOCK	(66664460/2)	// 33 MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal
@@ -1426,7 +1427,7 @@ static WRITE16_HANDLER(s23_ctl_w)
 	case 0: {
 		if(ctl_led != (data & 0xff)) {
 			ctl_led = data;
-			logerror("LEDS %c%c%c%c%c%c%c%c\n",
+/*			logerror("LEDS %c%c%c%c%c%c%c%c\n",
 					 ctl_led & 0x80 ? '.' : '#',
 					 ctl_led & 0x40 ? '.' : '#',
 					 ctl_led & 0x20 ? '.' : '#',
@@ -1434,7 +1435,7 @@ static WRITE16_HANDLER(s23_ctl_w)
 					 ctl_led & 0x08 ? '.' : '#',
 					 ctl_led & 0x04 ? '.' : '#',
 					 ctl_led & 0x02 ? '.' : '#',
-					 ctl_led & 0x01 ? '.' : '#');
+					 ctl_led & 0x01 ? '.' : '#');*/
 		}
 		break;
 	}
@@ -1651,10 +1652,41 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gmen_map, ADDRESS_SPACE_PROGRAM, 32 )
+static READ32_HANDLER( gmen_trigger_sh2 )
+{
+	logerror("gmen_trigger_sh2: booting SH-2\n");
+	cputag_set_input_line(space->machine, "gmen", INPUT_LINE_RESET, CLEAR_LINE);
+
+	return 0;
+}
+
+static READ32_HANDLER( sh2_shared_r )
+{
+	return gmen_sh2_shared[offset];
+}
+
+static WRITE32_HANDLER( sh2_shared_w )
+{
+	COMBINE_DATA(&gmen_sh2_shared[offset]);
+}
+
+static ADDRESS_MAP_START( gmen_mips_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_IMPORT_FROM(ss23_map)
-	AM_RANGE(0x0e700000, 0x0e707fff) AM_RAM	AM_BASE(&gmen_sh2_shared) // SH-2 shared RAM (incl. program)
+	AM_RANGE(0x0e400000, 0x0e400003) AM_READ( gmen_trigger_sh2 )
+	AM_RANGE(0x0e700000, 0x0e707fff) AM_READWRITE( sh2_shared_r, sh2_shared_w )
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( gmen_sh2_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE(&gmen_sh2_shared)
+	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
+ADDRESS_MAP_END
+
+static MACHINE_RESET(gmen)
+{
+	// halt the SH-2 until we need it
+	cputag_set_input_line(machine, "gmen", INPUT_LINE_RESET, ASSERT_LINE);
+}
 
 static WRITE16_HANDLER( sharedram_sub_w )
 {
@@ -2041,6 +2073,7 @@ ADDRESS_MAP_END
 
 // version without serial hookup to I/O board for games where the PIC isn't dumped
 static ADDRESS_MAP_START( s23h8ionoiobmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
@@ -2139,6 +2172,8 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine->gamedrv->name, "rapidrvr")) ||
 	    (!strcmp(machine->gamedrv->name, "finlflng")) ||
 	    (!strcmp(machine->gamedrv->name, "gunwars")) ||
+	    (!strcmp(machine->gamedrv->name, "finfurl2")) ||
+	    (!strcmp(machine->gamedrv->name, "finfurl2j")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2")))
 	{
 		has_jvsio = 1;
@@ -2310,7 +2345,12 @@ static MACHINE_DRIVER_START( gmen )
 	MDRV_IMPORT_FROM( s23 )
 
 	MDRV_CPU_REPLACE("maincpu", R4650BE, S23_BUSCLOCK*5) 
-	MDRV_CPU_PROGRAM_MAP(gmen_map)
+	MDRV_CPU_PROGRAM_MAP(gmen_mips_map)
+
+	MDRV_CPU_ADD("gmen", SH2, 28700000)
+	MDRV_CPU_PROGRAM_MAP(gmen_sh2_map)
+
+	MDRV_MACHINE_RESET(gmen)
 MACHINE_DRIVER_END
 
 ROM_START( rapidrvr )
@@ -2650,6 +2690,9 @@ ROM_START( finfurl2 )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+        ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
         ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000000, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
         ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000001, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
@@ -2688,6 +2731,9 @@ ROM_START( finfurl2j )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+        ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
         ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000000, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
@@ -2817,5 +2863,5 @@ GAME( 1997, timecrs2c,timecrs2, ss23,   ss23, ss23, ROT0, "Namco", "Time Crisis 
 GAME( 1998, panicprk, 0,         s23,    s23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, gunwars,  0,        gmen,   ss23, ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, 500gp,    0,        ss23,   ss23, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1999, finfurl2, 0,        ss23,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1999, finfurl2j,finfurl2, ss23,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1999, finfurl2, 0,        gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1999, finfurl2j,finfurl2, gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
