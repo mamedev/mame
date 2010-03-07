@@ -46,6 +46,8 @@
       - read 2 bytes from one rom at a200000a
       - read 2 bytes from one rom at a200000c
 
+    - Add the sh2 in Gunmen Wars (no rom, controls the camera)
+
     - Super System 23 tests irqs in the post.  timecrs2c's code can
     potentially test 7 sources, but only actually test 5.  With each
     source there is code to clear the interrupt and code to raise it.
@@ -2350,10 +2352,10 @@ ROM_START( panicprk )
         ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000001, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
 
 	ROM_REGION( 0x4000000, "textile", 0 )	/* texture tiles */
-        ROM_LOAD( "pnp1cguu.5f",  0x000000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
-        ROM_LOAD( "pnp1cgum.4j",  0x800000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
+        ROM_LOAD( "pnp1cguu.5f",  0x0000000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
+        ROM_LOAD( "pnp1cgum.4j",  0x0800000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
         ROM_LOAD( "pnp1cgll.4m",  0x1000000, 0x800000, CRC(d03932cf) SHA1(49240e44923cc6e815e9457b6290fd18466658af) )
-        ROM_LOAD( "pnp1cglm.5k",  0x180000, 0x800000, CRC(abf4ccf2) SHA1(3848e26d0ba6c872bbc6d5e0eb23a9d4b34152d5) )
+        ROM_LOAD( "pnp1cglm.5k",  0x1800000, 0x800000, CRC(abf4ccf2) SHA1(3848e26d0ba6c872bbc6d5e0eb23a9d4b34152d5) )
         ROM_LOAD( "pnp1cguu.4f",  0x2000000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
         ROM_LOAD( "pnp1cgum.5j",  0x2800000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
         ROM_LOAD( "pnp1cgll.5m",  0x3000000, 0x800000, CRC(d03932cf) SHA1(49240e44923cc6e815e9457b6290fd18466658af) )
@@ -2376,6 +2378,41 @@ ROM_START( panicprk )
         ROM_LOAD( "pnp1waveh.2a", 0x800000, 0x800000, CRC(6fa1826a) SHA1(20a5af49e65ae2bc57c016b5cd9bafa5a5220d35) )
 ROM_END
 
+ROM_START( gunwars )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "gm1vera.ic2", 0x000000, 0x200000, CRC(cf61467f) SHA1(eae79e4e540340cba7d576a36085f802b8032f4f) )
+	ROM_LOAD16_BYTE( "gm1vera.ic1", 0x000001, 0x200000, CRC(abc9ffe6) SHA1(d833b9b9d8bb0cc4b53f30507c9603df9e63fa2f) )
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "gm1vera.ic3", 0x000000, 0x080000, CRC(5582fdd4) SHA1(8aae8bc6688d531888f2de509c07502ee355b3ab) )
+
+	ROM_REGION( 0x20000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_LOAD( "asc5_io-a.ic14", 0x000000, 0x020000, CRC(5964767f) SHA1(320db5e78ae23c5f94e368432d51573b409995db) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+	ROM_LOAD16_BYTE( "gm1mtah.2j",  0x000000, 0x800000, CRC(3cea9094) SHA1(497395425e409de47e1114de9aeeaf05e4f6a9a1) )
+	ROM_LOAD16_BYTE( "gm1mtal.2h",  0x000001, 0x800000, CRC(d531dfcd) SHA1(9f7cbe9a03c1f7649bf05a7a30d47511573b50ba) )
+
+	ROM_REGION( 0x4000000, "textile", 0 )	/* texture tiles (two copies on the board) */
+	ROM_LOAD( "gm1cguu.5f",  0x0000000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) )
+	ROM_LOAD( "gm1cgum.4j",  0x0800000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) )
+	ROM_LOAD( "gm1cgll.4m",  0x1000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) )
+	ROM_LOAD( "gm1cglm.5k",  0x1800000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) )
+
+	ROM_REGION( 0x600000, "textilemap", 0 )	/* texture tilemap (two copies on the board) */
+	ROM_LOAD( "gm1ccrl.7f",  0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) )
+	ROM_LOAD( "gm1ccrh.7e",  0x400000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) )
+
+	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+	ROM_LOAD32_WORD( "gm1pt0l.7c",  0x000000, 0x400000, CRC(62e9bedb) SHA1(7043c5e6f26139c9e6e18d4f35fac6a16d4dabd1) )
+	ROM_LOAD32_WORD( "gm1pt0h.7a",  0x000002, 0x400000, CRC(5ebd658c) SHA1(9e7b89a726b11b6da3327d72ec6adcc30fbb384d) )
+	ROM_LOAD32_WORD( "gm1pt1l.5c",  0x800000, 0x400000, CRC(f44c149f) SHA1(9f995de02ea6ac35ccbabbba5bb473a10e1ec667) )
+	ROM_LOAD32_WORD( "gm1pt1h.5a",  0x800002, 0x400000, CRC(5f6cebab) SHA1(95bd30d30ea25509b66a107fb255d0af1e6a357e) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "gm1wave.2c", 0x000000, 0x800000, CRC(7d5c79a4) SHA1(b800a46bcca10cb0d0d9e0acfa68af63ae64dcaf) )
+ROM_END
+
 
 /* Games */
 GAME( 1997, rapidrvr, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
@@ -2385,6 +2422,7 @@ GAME( 1997, timecrs2, 0,         s23,    s23, ss23, ROT0, "Namco", "Time Crisis 
 GAME( 1997, timecrs2b,timecrs2,  s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2c,timecrs2, ss23,   ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, panicprk, 0,         s23,    s23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1998, gunwars,  0,        ss23,   ss23, ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, 500gp,    0,        ss23,   ss23, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2, 0,        ss23,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2j,finfurl2, ss23,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
