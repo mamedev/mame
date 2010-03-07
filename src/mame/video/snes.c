@@ -287,21 +287,21 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 
 		if (!hires)
 		{
-			if (scanlines[SNES_MAINSCREEN].enable)
+			if (ii >= 0 && ii < (SNES_SCR_WIDTH << hires) && scanlines[SNES_MAINSCREEN].enable)
 			{
-				UINT8 clr = colour;
+				if (scanlines[SNES_MAINSCREEN].priority[ii] <= priority)
+				{
+					UINT8 clr = colour;
 
 #ifdef SNES_LAYER_DEBUG
-				if (!debug_options.windows_disabled)
+					if (!debug_options.windows_disabled)
 #endif /* SNES_LAYER_DEBUG */
-				/* Clip to windows */
-				if (scanlines[SNES_MAINSCREEN].clip)
-					clr &= snes_ppu.clipmasks[layer][ii];
+					/* Clip to windows */
+					if (scanlines[SNES_MAINSCREEN].clip)
+						clr &= snes_ppu.clipmasks[layer][ii];
 
 				/* Only draw if we have a colour (0 == transparent) */
-				if (clr)
-				{
-					if ((scanlines[SNES_MAINSCREEN].priority[ii] <= priority) && (ii >= 0))
+					if (clr)
 					{
 						if (direct_colors)
 						{
@@ -336,21 +336,21 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 				}
 			}
 
-			if (scanlines[SNES_SUBSCREEN].enable)
+			if (ii >= 0 && ii < (SNES_SCR_WIDTH << hires) && scanlines[SNES_SUBSCREEN].enable)
 			{
-				UINT8 clr = colour;
+				if (scanlines[SNES_SUBSCREEN].priority[ii] <= priority)
+				{
+					UINT8 clr = colour;
 
 #ifdef SNES_LAYER_DEBUG
-				if (!debug_options.windows_disabled)
+					if (!debug_options.windows_disabled)
 #endif /* SNES_LAYER_DEBUG */
-				/* Clip to windows */
-				if (scanlines[SNES_SUBSCREEN].clip)
-					clr &= snes_ppu.clipmasks[layer][ii];
+					/* Clip to windows */
+					if (scanlines[SNES_SUBSCREEN].clip)
+						clr &= snes_ppu.clipmasks[layer][ii];
 
-				/* Only draw if we have a colour (0 == transparent) */
-				if (clr)
-				{
-					if ((scanlines[SNES_SUBSCREEN].priority[ii] <= priority) && (ii >= 0))
+					/* Only draw if we have a colour (0 == transparent) */
+					if (clr)
 					{
 						if (direct_colors)
 						{
@@ -387,9 +387,9 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 		}
 		else /* hires */
 		{
-			if (ii >= 0 && (ii & 1) && scanlines[SNES_MAINSCREEN].enable)
+			if (ii >= 0 && ii < (SNES_SCR_WIDTH << hires) && (ii & 1) && scanlines[SNES_MAINSCREEN].enable)
 			{
-				if ((scanlines[SNES_MAINSCREEN].priority[ii >> 1] <= priority))
+				if (scanlines[SNES_MAINSCREEN].priority[ii >> 1] <= priority)
 				{
 					UINT8 clr = colour;
 
@@ -435,9 +435,9 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 				}
 			}
 
-			if (ii >= 0 && !(ii & 1) && scanlines[SNES_SUBSCREEN].enable)
+			if (ii >= 0 && ii < (SNES_SCR_WIDTH << hires) && !(ii & 1) && scanlines[SNES_SUBSCREEN].enable)
 			{
-				if ((scanlines[SNES_SUBSCREEN].priority[ii >> 1] <= priority))
+				if (scanlines[SNES_SUBSCREEN].priority[ii >> 1] <= priority)
 				{
 					UINT8 clr = colour;
 
@@ -480,7 +480,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 							scanlines[SNES_SUBSCREEN].layer[ii >> 1] = layer;
 						}
 					}
-				}
+				}	
 			}
 		}
 	}
@@ -636,7 +636,8 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 	UINT32 tmap, tile, xoff, yoff;
 	UINT32 charaddr;
 	UINT16 ii = 0, vflip, hflip, pal, pal_direct;
-	INT8 tile_line;
+	INT8 yscroll;
+	UINT8 xscroll;
 	UINT8 priority;
 	UINT32 addr;
 	UINT16 tilemap;
@@ -676,11 +677,13 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 	xoff = snes_ppu.layer[layer].hoffs;
 	yoff = snes_ppu.layer[layer].voffs;
 
+	xscroll = xoff & ((1 << (3 + tile_size)) - 1);
+
 	/* Jump to base map address */
 	tmap = snes_ppu.layer[layer].tilemap << 9;
 	charaddr = snes_ppu.layer[layer].charmap << 13;
 
-	while (ii < 256)
+	while (ii < 256 + (8 << tile_size))
 	{
 		// determine the horizontal position (Bishojo Janshi Suchi Pai & Desert Figther have tile_size & hires == 1)
 		UINT32 xpos = xoff + (ii << (tile_size * hires));
@@ -749,52 +752,52 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 		}
 
 		/* figure out which line to draw */
-		tile_line = ypos & ((8 << tile_size) - 1);
+		yscroll = ypos & ((8 << tile_size) - 1);
 
-		if (tile_line > ((8 << tile_size) - 1))	/* scrolled into the next tile */
-			tile_line -= (8 << tile_size);
+		if (yscroll > ((8 << tile_size) - 1))	/* scrolled into the next tile */
+			yscroll -= (8 << tile_size);
 
 		if (vflip)
 		{
 			if (tile_size)
 			{
-				if (tile_line > 7)
+				if (yscroll > 7)
 				{
-					tile_line -= 8;
+					yscroll -= 8;
 				}
 				else
 				{
 					tile += 32 / tile_divider;
 				}
 			}
-			tile_line = -tile_line + 7;
+			yscroll = -yscroll + 7;
 		}
 		else
 		{
-			if (tile_line > 7)
+			if (yscroll > 7)
 			{
 				tile += 32 / tile_divider;
-				tile_line -= 8;
+				yscroll -= 8;
 			}
 		}
-		tile_line <<= 1;
+		yscroll <<= 1;
 
 		/* below, only color_planes depends on color_depth */
 		if (hires)	/* Hi-Res: 2bpp & 4bpp */
 		{
-			snes_draw_tile_x2(color_planes, layer, charaddr + (tile  * 8 * color_planes) + tile_line, ii * 2, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+			snes_draw_tile_x2(color_planes, layer, charaddr + (tile  * 8 * color_planes) + yscroll, (ii - xscroll) * 2, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
 			ii += 8;
 		}
 		else	/* tile_size = 0 */
 		{
 			if (tile_size)
 			{
-				snes_draw_tile_x2(color_planes, layer, charaddr + (tile  * 8 * color_planes) + tile_line, ii, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+				snes_draw_tile_x2(color_planes, layer, charaddr + (tile  * 8 * color_planes) + yscroll, ii - xscroll, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
 				ii += 16;
 			}
 			else	/* No Hi-Res: 2bpp, 4bpp & 8bpp */
 			{
-				snes_draw_tile(color_planes, layer, charaddr + (tile  * 8 * color_planes) + tile_line, ii, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+				snes_draw_tile(color_planes, layer, charaddr + (tile  * 8 * color_planes) + yscroll, ii - xscroll, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
 				ii += 8;
 			}
 		}
