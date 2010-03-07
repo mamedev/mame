@@ -1122,23 +1122,87 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	// buriki tm1 = roz
 
 	// my life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
-	if ((tileregs & 0x1800)==0x1000) // floor mode
+	if ((tileregs & 0x0800)==0x0000) // floor mode
 	{
 		/* Floor mode - per pixel simple / complex modes? -- every other line?
           (there doesn't seem to be enough data in Buriki for every line at least)
         */
-		if ((tileregs&0xf000) == 0x1000)
+		//if ((tileregs&0xf000) == 0x1000)
+		//{
+		//	popmessage("Floor is Active");
+		//}
+		int line;
+		rectangle clip;
+		INT32 xtopleft,xmiddle;
+		INT32 ytopleft,ymiddle;
+		int xinc,yinc;
+
+		const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+		clip.min_x = visarea->min_x;
+		clip.max_x = visarea->max_x;
+		clip.min_y = visarea->min_y;
+		clip.max_y = visarea->max_y;
+
+		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
-			popmessage("Floor is Active");
+			/* logic would dictate that this should be the 'complex' scroll register layout,
+			   but per-line.  That doesn't work however.
+
+			   You only have line data for the number of lines on the screen, not enough for
+			   the complex register layout
+			   
+			   HOWEVER, using the code below doesn't work either.  This might be because
+			   they have mosaic turned on, and it adopts a new meaning in linescroll modes?
+
+			   The code below could also be wrong, and rowscroll simply acts the same in all
+			   modes, this is hard to know because ss64_2 barely uses it.
+
+			*/
+		
+			popmessage("Unhandled rowscroll %02x", tileregs>>12);
 		}
-		else
+		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
-			popmessage("Unknown Floor/Mosaic combo %04x", tileregs&0xf800);
+			for (line=0;line<448;line++)
+			{
+				clip.min_y = clip.max_y = line;
+
+				if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
+				{
+					/* If this bit is active the scroll registers don't seem valid at all?
+					   It either disables zooming, or disables use of the scroll registers completely
+					   - used at startup
+				   */
+
+					xtopleft = 0;
+					xmiddle = 256<<16;
+
+					ytopleft = 0;
+					ymiddle = 256<<16;
+				}
+				else
+				{
+					xtopleft = (hng64_videoram[(0x40000+(line*0x10)+(scrollbase<<4))/4]);
+					xmiddle   = (hng64_videoram[(0x40004+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
+					ytopleft = (hng64_videoram[(0x40008+(line*0x10)+(scrollbase<<4))/4]);
+					ymiddle   = (hng64_videoram[(0x4000c+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
+				}
+
+				xinc = (xmiddle - xtopleft) / 512;
+				yinc = (ymiddle - ytopleft) / 512;
+
+				hng64_tilemap_draw_roz(machine, bitmap,&clip,tilemap,xtopleft,ytopleft,
+						xinc<<1,0,0,yinc<<1,
+						1,
+						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
+
+
+			}
 		}
 	}
 	else
 	{
-		if ((tileregs&0xf000) > 0x1000)
+		if ((tileregs&0xf000))
 			popmessage("Tilemap Mosaic? %02x", tileregs>>12);
 		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 
@@ -1384,16 +1448,16 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
     // 0940 - samurai shodown 64
     // 0880 - buriki
 
-    // mmml dbr? ???? ????
-    // m = mosaic related?  (xrally, l maybe too)
-    // l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3) - also enables for rotating logo on buriki ?!
+    // mmmm dbr? ??e? ????
+    // m = mosaic related?
+	//  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
+	//     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
     // r = tile size (seems correct)
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-    // d = floor / mosaic toggle
-    //  when d = 0 then l = floor enable
-    //  when d = 1 then l = lower part of mosaic?
-    //   (buriki one floor vs. 2nd game logo sequence seems a good example)
-    //    could have other meanings too?
+    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
+    // e = enable according to sams64_2 debug mode, buriki and xrally.. but NOT fatal fury :-(
+
+
  */
 
 
@@ -1413,6 +1477,17 @@ VIDEO_UPDATE( hng64 )
 	UINT32 animbits;
 	UINT16 tileflags0, tileflags1;
 	UINT16 tileflags2, tileflags3;
+
+#if 0
+	// press in sams64_2 attract mode for a nice debug screen from the game
+	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
+	// but it could be useful
+	if ( input_code_pressed_once(screen->machine, KEYCODE_L) )
+	{
+		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		memory_write_byte(space, 0x2f27c8, 0x2);
+	}
+#endif
 
 	bitmap_fill(bitmap, 0, hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen->machine) : screen->machine->pens[0]); //FIXME: Is the register correct? check with HW tests
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
@@ -1525,10 +1600,10 @@ VIDEO_UPDATE( hng64 )
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
 	 hng64_videoregs[0x00],
 	 hng64_videoregs[0x01],
-	(hng64_videoregs[0x02]>>16)&0xf9ff, // bits we're sure about are masked out
-	(hng64_videoregs[0x02]>>0)&0xf9ff,
-	(hng64_videoregs[0x03]>>16)&0xf9ff,
-	(hng64_videoregs[0x03]>>0)&0xf9ff,
+	(hng64_videoregs[0x02]>>16)&0xf9ff, // ----  bits we're sure about are masked out
+	(hng64_videoregs[0x02]>>0)&0xf9ff,  //  ss64_2 debug mode indicates that 0x0040 is enable!
+	(hng64_videoregs[0x03]>>16)&0xf9ff, //   buriki agrees (debug data on text layer) xrally agress (pink layer)
+	(hng64_videoregs[0x03]>>0)&0xf9ff,  //   fatal fury doesn't (all backgrounds have it set) joy
 	(hng64_videoregs[0x04]>>16)&0xffff,
 	(hng64_videoregs[0x04]>>0)&0xffff,
 	(hng64_videoregs[0x05]>>16)&0xffff,
@@ -1554,7 +1629,7 @@ VIDEO_UPDATE( hng64 )
 		hng64_tcram[0x00/4],
 		hng64_tcram[0x04/4],
 		hng64_tcram[0x08/4], // tilemaps 0/1 ?
-		hng64_tcram[0x0c/4], // tilemaps 2/3 ?
+		hng64_tcram[0x0c/4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
 		hng64_tcram[0x10/4],
 		hng64_tcram[0x14/4],
 		hng64_tcram[0x18/4],
