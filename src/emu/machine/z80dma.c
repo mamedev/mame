@@ -154,7 +154,8 @@ struct _z80dma_t
 	UINT16 addressB;
 	UINT16 count;
 
-	UINT8 rdy;
+	int rdy;
+	int force_ready;
 	UINT8 reset_pointer;
 
 	UINT8 is_read;
@@ -225,6 +226,11 @@ static void trigger_interrupt(running_device *device, int level)
 
 		interrupt_check(z80dma);
 	}
+}
+
+static int is_ready(z80dma_t *z80dma)
+{
+	return (z80dma->force_ready) || (z80dma->rdy == READY_ACTIVE_HIGH(z80dma));
 }
 
 /*-------------------------------------------------
@@ -379,7 +385,7 @@ static TIMER_CALLBACK( z80dma_timerproc )
 		z80dma->dma_enabled = 0; //FIXME: Correct?
         z80dma->status = 0x19;
 
-		if(!(z80dma->rdy ^ READY_ACTIVE_HIGH(z80dma))) z80dma->status |= 0x02;   // ready line status
+		z80dma->status |= !is_ready(z80dma) << 1; // ready line status
 
 		if(TRANSFER_MODE(z80dma) == TM_TRANSFER)     z80dma->status |= 0x10;   // no match found
 
@@ -404,7 +410,7 @@ static void z80dma_update_status(running_device *device)
 	attotime next;
 
 	/* no transfer is active right now; is there a transfer pending right now? */
-	pending_transfer = z80dma->rdy & z80dma->dma_enabled;
+	pending_transfer = is_ready(z80dma) & z80dma->dma_enabled;
 
 	if (pending_transfer)
 	{
@@ -419,8 +425,11 @@ static void z80dma_update_status(running_device *device)
 	}
 	else
 	{
-		/* no transfers active right now */
-		timer_reset(z80dma->timer, attotime_never);
+		if (z80dma->is_read)
+		{
+			/* no transfers active right now */
+			timer_reset(z80dma->timer, attotime_never);
+		}
 	}
 
 	/* set the busreq line */
@@ -503,7 +512,10 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 		}
 		else if ((data & 0x83) == 0x83) // WR6
 		{
+			z80dma->dma_enabled = 0;
+
 			WR6(z80dma) = data;
+
 			switch (data)
 			{
 				case COMMAND_ENABLE_AFTER_RETI:
@@ -517,7 +529,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					WR3(z80dma) &= ~0x20;
 					z80dma->ip = 0;
 					z80dma->ius = 0;
-					z80dma->rdy = 0;
+					z80dma->force_ready = 0;
 					z80dma->status |= 0x08;
 					break;
 				case COMMAND_INITIATE_READ_SEQUENCE:
@@ -534,7 +546,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case COMMAND_RESET:
 					if (LOG) logerror("Reset\n");
 					z80dma->dma_enabled = 0;
-					z80dma->rdy = 1;
+					z80dma->force_ready = 0;
 					/* Needs six reset commands to reset the DMA */
 					{
 						UINT8 WRi;
@@ -557,14 +569,11 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case COMMAND_DISABLE_DMA:
 					if (LOG) logerror("Disable DMA\n");
 					z80dma->dma_enabled = 0;
-					z80dma->rdy = 1 ^ ((WR5(z80dma) & 0x8)>>3);
-					z80dma_rdy_w(device, z80dma->rdy);
 					break;
 				case COMMAND_ENABLE_DMA:
 					if (LOG) logerror("Enable DMA\n");
 					z80dma->dma_enabled = 1;
-					z80dma->rdy = (WR5(z80dma) & 0x8)>>3;
-					z80dma_rdy_w(device, z80dma->rdy);
+					z80dma_update_status(device);
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
 					if (LOG) logerror("Set Read Mask\n");
@@ -587,8 +596,8 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					break;
 				case COMMAND_FORCE_READY:
 					if (LOG) logerror("Force ready\n");
-					z80dma->rdy = (WR5(z80dma) & 0x8)>>3;
-					z80dma_rdy_w(device, z80dma->rdy);
+					z80dma->force_ready = 1;
+					z80dma_update_status(device);
 					break;
 				case COMMAND_ENABLE_INTERRUPTS:
 					if (LOG) logerror("Enable IRQ\n");
@@ -640,16 +649,14 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
 	running_device *device = (running_device *)ptr;
-	int state = param & 0x01;
 	z80dma_t *z80dma = get_safe_token(device);
 
-	/* normalize state */
-	z80dma->rdy = 1 ^ state ^ READY_ACTIVE_HIGH(z80dma);
-	z80dma->status = (z80dma->status & 0xFD) | (z80dma->rdy<<1);
+	z80dma->rdy = param;
+	z80dma->status = (z80dma->status & 0xFD) | (!is_ready(z80dma) << 1);
 
 	z80dma_update_status(device);
 
-	if (z80dma->rdy && INT_ON_READY(z80dma))
+	if (is_ready(z80dma) && INT_ON_READY(z80dma))
     {
 		trigger_interrupt(device, INT_RDY);
     }
@@ -662,11 +669,10 @@ static TIMER_CALLBACK( z80dma_rdy_write_callback )
 WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w )
 {
 	z80dma_t *z80dma = get_safe_token(device);
-	int param;
 
-	param = (state ? 1 : 0);
 	if (LOG) logerror("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(z80dma));
-	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
+
+	timer_call_after_resynch(device->machine, (void *) device, state, z80dma_rdy_write_callback);
 }
 
 /*-------------------------------------------------
@@ -797,6 +803,7 @@ static DEVICE_START( z80dma )
 	state_save_register_device_item(device, 0, z80dma->addressB);
 	state_save_register_device_item(device, 0, z80dma->count);
 	state_save_register_device_item(device, 0, z80dma->rdy);
+	state_save_register_device_item(device, 0, z80dma->force_ready);
 	state_save_register_device_item(device, 0, z80dma->is_read);
 	state_save_register_device_item(device, 0, z80dma->cur_cycle);
 	state_save_register_device_item(device, 0, z80dma->latch);
@@ -812,6 +819,7 @@ static DEVICE_RESET( z80dma )
 
 	z80dma->status = 0;
 	z80dma->rdy = 0;
+	z80dma->force_ready = 0;
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
 	z80dma->read_num_follow = z80dma->read_cur_follow = 0;
