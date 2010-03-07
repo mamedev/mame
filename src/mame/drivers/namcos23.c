@@ -2767,8 +2767,8 @@ ROM_START( gunwars )
 	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "gm1pt0l.7c",   0x000000, 0x400000, CRC(62e9bedb) SHA1(7043c5e6f26139c9e6e18d4f35fac6a16d4dabd1) ) 
         ROM_LOAD32_WORD( "gm1pt0h.7a",   0x000002, 0x400000, CRC(5ebd658c) SHA1(9e7b89a726b11b6da3327d72ec6adcc30fbb384d) ) 
-        ROM_LOAD32_WORD( "gm1pt1h.5a",   0x800000, 0x400000, CRC(5f6cebab) SHA1(95bd30d30ea25509b66a107fb255d0af1e6a357e) ) 
-        ROM_LOAD32_WORD( "gm1pt1l.5c",   0x800002, 0x400000, CRC(f44c149f) SHA1(9f995de02ea6ac35ccbabbba5bb473a10e1ec667) ) 
+        ROM_LOAD32_WORD( "gm1pt1l.5c",   0x800000, 0x400000, CRC(f44c149f) SHA1(9f995de02ea6ac35ccbabbba5bb473a10e1ec667) ) 
+        ROM_LOAD32_WORD( "gm1pt1h.5a",   0x800002, 0x400000, CRC(5f6cebab) SHA1(95bd30d30ea25509b66a107fb255d0af1e6a357e) ) 
 
 	ROM_REGION( 0x800000, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "gm1wave.2c",   0x000000, 0x800000, CRC(7d5c79a4) SHA1(b800a46bcca10cb0d0d9e0acfa68af63ae64dcaf) ) 
