@@ -10,9 +10,10 @@ TODO:
 - inputs;
 - Understand how tilemap color offsets really works;
 - Discrete sound part? There's a Rossini's "William Tell" bgm on the Chinese bootlegs,
-  I think it's tied with ay8910 port B.
+  I think it's tied with ay8910 port B. Update: the 1986 version sounds that just fine, could be
+  that this is a btanb;
 - unknown memories;
-- Garbage on the window tilemap if you win, it could be a BTANB (masked by the color prom).
+- Garbage on the window tilemap if you win, it could be a btanb (masked by the color prom).
 - the name "King Derby" is a raw guess, there's a chance that it uses a different name
   (but there isn't any title screen in the game?)
 - Fix I/O in the 1986 bootleg version;
@@ -388,7 +389,7 @@ static ADDRESS_MAP_START( slave_1986_map, ADDRESS_SPACE_PROGRAM, 8 )
   	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
   	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
   	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
-	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
+	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
@@ -453,7 +454,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static WRITE8_DEVICE_HANDLER( outportb_w )
 {
-	printf("%02x B\n",data);
+//	printf("%02x B\n",data);
 }
 
 
@@ -638,7 +639,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x40, 0x40, "POST Check" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Backup RAM" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -717,6 +718,28 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START("SYSTEM")	// ppi0 (5001)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x02, 0x02, "SYSTEM" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) //causes "hopper overpay" msg
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("KEY0") // (7800)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
@@ -767,7 +790,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x40, 0x40, "POST Check" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Backup RAM" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1091,5 +1114,5 @@ ROM_END
 
 
 GAME( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS| GAME_IMPERFECT_SOUND )
-GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg",  "King Derby (1986 Taiwan bootleg)",   GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg",  "King Derby (1986 Taiwan bootleg)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
 GAME( 2000, cowrace,   kingdrby,      cowrace,    kingdrbb,   0,       ROT0,   "bootleg",  "Cow Race (1986 King Derby hack)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
