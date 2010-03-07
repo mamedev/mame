@@ -5694,7 +5694,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( windheat )	/* GX677 (c)1996 */
 	DRIVER( windheatu )	/* GX677 (c)1996 */
 	DRIVER( windheatj )	/* GX677 (c)1996 */
-	DRIVER( jetwave )	/* GX678 (c)1996 */
+	DRIVER( waveshrk )	/* GX678 (c)1996 */
 
 	/* Konami M2 games */
 	DRIVER( polystar )	/* GX623 (c)1997 */
