@@ -642,7 +642,7 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 	UINT16 tilemap;
 	/* scrolling */
 	UINT16 opt_bit = (layer == SNES_BG1) ? 13 : (layer == SNES_BG2) ? 14 : 0;
-	UINT8 vshift, hshift, tile_size;
+	UINT8 tile_size;
 	/* variables depending on color_depth */
 	UINT8 tile_divider = (color_depth == SNES_COLOR_DEPTH_8BPP) ? 4 : 2;
 	UINT8 color_planes = 2 << color_depth;
@@ -675,12 +675,6 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 	/* Find scroll info */
 	xoff = snes_ppu.layer[layer].hoffs;
 	yoff = snes_ppu.layer[layer].voffs;
-	hshift = xoff & ((8 << tile_size) - 1);
-	vshift = (yoff + curline) & ((8 << tile_size) - 1);
-
-	/* figure out which line to draw */
-	if (vshift > ((8 << tile_size) - 1))	/* scrolled into the next tile */
-		vshift -= (8 << tile_size);
 
 	/* Jump to base map address */
 	tmap = snes_ppu.layer[layer].tilemap << 9;
@@ -725,7 +719,6 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 					}
 					break;
 				}
-			vshift = ypos & ((8 << tile_size) - 1);
 			}
 		}
 
@@ -755,7 +748,12 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 			pal += (layer << 5);
 		}
 
-		tile_line = vshift;
+		/* figure out which line to draw */
+		tile_line = ypos & ((8 << tile_size) - 1);
+
+		if (tile_line > ((8 << tile_size) - 1))	/* scrolled into the next tile */
+			tile_line -= (8 << tile_size);
+
 		if (vflip)
 		{
 			if (tile_size)
