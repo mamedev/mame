@@ -3450,6 +3450,9 @@ ROM_START( blswhstl )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "060e04.d1",  0x0000, 0x100000, CRC(c680395d) SHA1(acde593a5ec501e89c8aaca6c4fbacf707a727e1) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "blswhstl.nv", 0x0000, 0x080, CRC(87434e3f) SHA1(458d21cfc0ef3415c0b09d8d748263b9218bdb24) )	
 ROM_END
 
 ROM_START( detatwin )
@@ -3472,6 +3475,9 @@ ROM_START( detatwin )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "060e04.d1",  0x0000, 0x100000, CRC(c680395d) SHA1(acde593a5ec501e89c8aaca6c4fbacf707a727e1) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "blswhstl.nv", 0x0000, 0x080, CRC(87434e3f) SHA1(458d21cfc0ef3415c0b09d8d748263b9218bdb24) )	
 ROM_END
 
 ROM_START( glfgreat )
@@ -3558,6 +3564,9 @@ ROM_START( tmnt2 )
 
 	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "tmnt2_uaa.nv", 0x0000, 0x080, CRC(284357bd) SHA1(4f1c78b7cc86379678b1b84bcf59f8599a8c3686) )
 ROM_END
 
 ROM_START( tmnt22pu )
@@ -3584,7 +3593,11 @@ ROM_START( tmnt22pu )
 
 	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with invisible error message
+	ROM_LOAD( "tmnt2_uda.nv", 0x0000, 0x080, CRC(44928d33) SHA1(44024927987f6bb8bdac3dbd1fdc81d7b55c0f5a) )
 ROM_END
+	
 
 ROM_START( tmht22pe )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*128k for 68000 code */
@@ -3610,7 +3623,11 @@ ROM_START( tmht22pe )
 
 	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with invisible error message
+	ROM_LOAD( "tmnt2_eba.nv", 0x0000, 0x080, CRC(c0a3ed50) SHA1(6deec720c7f1c607740076cb8b5b5becd175aed0) )
 ROM_END
+	
 
 ROM_START( tmnt2a )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*128k for 68000 code */
@@ -3636,7 +3653,11 @@ ROM_START( tmnt2a )
 
 	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "063b06",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "tmnt2_ada.nv", 0x0000, 0x080, CRC(063068a0) SHA1(c1da5319428fd8fb60305a2d7cc166596b2fe5a4) )
 ROM_END
+
 
 ROM_START( qgakumon )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*256k for 68000 code */
@@ -3658,6 +3679,9 @@ ROM_START( qgakumon )
 
 	ROM_REGION( 0x200000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "248a06.1d",       0x0000, 0x200000, CRC(0fba1def) SHA1(f2ba23213effd06f14c7a179acea974c78c2198f) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "qgakumon.nv", 0x0000, 0x080, CRC(847bd238) SHA1(d6f7bf215055b7e9ea1027f4b4e34fea25b3273b) )
 ROM_END
 
 ROM_START( ssriders )
@@ -3680,6 +3704,9 @@ ROM_START( ssriders )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_eac.nv", 0x0000, 0x080, CRC(f6d641a7) SHA1(6c680d49e1b07a47b29ff263a6009d226bd120cf) )	
 ROM_END
 
 ROM_START( ssridersebd )
@@ -3702,6 +3729,9 @@ ROM_START( ssridersebd )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_ebd.nv", 0x0000, 0x080, CRC(cbc903f6) SHA1(43cb8e7f9b1da05da93878bd236f63036e32e379) )	
 ROM_END
 
 ROM_START( ssridersebc )
@@ -3724,6 +3754,9 @@ ROM_START( ssridersebc )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_ebc.nv", 0x0000, 0x080, CRC(1918e90f) SHA1(edddbe80a5c9dd64411596b1aa4d7fce7b7090ae) )	
 ROM_END
 
 ROM_START( ssriderseaa )
@@ -3746,6 +3779,9 @@ ROM_START( ssriderseaa )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_eaa.nv", 0x0000, 0x080, CRC(74a45ef5) SHA1(da01f14684315bfb5c180f0c64a14350c34ae945) )	
 ROM_END
 
 ROM_START( ssridersuda )
@@ -3768,6 +3804,9 @@ ROM_START( ssridersuda )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_uda.nv", 0x0000, 0x080, CRC(148c6d64) SHA1(38016ba7e29f821a4c0de67a7ddc686d307e4659) )	
 ROM_END
 
 ROM_START( ssridersuac )
@@ -3790,6 +3829,9 @@ ROM_START( ssridersuac )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_uac.nv", 0x0000, 0x080, CRC(26c8f1a0) SHA1(56b933d61fb3a3da787db8e6714b53178f3c98db) )	
 ROM_END
 
 ROM_START( ssridersubc )
@@ -3812,6 +3854,9 @@ ROM_START( ssridersubc )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_ubc.nv", 0x0000, 0x080, CRC(31c5504f) SHA1(fa6ed1860122552e94abb27a6ea75f4cb8054e76) )	
 ROM_END
 
 ROM_START( ssridersabd )
@@ -3834,6 +3879,9 @@ ROM_START( ssridersabd )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_abd.nv", 0x0000, 0x080, CRC(bfdafedf) SHA1(bc786d4fb3495a6baf2ae13c19392c6740a2be6d) )	
 ROM_END
 
 ROM_START( ssridersadd )
@@ -3856,6 +3904,9 @@ ROM_START( ssridersadd )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_add.nv", 0x0000, 0x080, CRC(f06242d5) SHA1(181732b07c74c3f5cfa7838ec029ed42d5216b17) )	
 ROM_END
 
 ROM_START( ssridersjbd )
@@ -3878,6 +3929,9 @@ ROM_START( ssridersjbd )
 
 	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with invisible error
+	ROM_LOAD( "ssriders_jbd.nv", 0x0000, 0x080, CRC(006200e3) SHA1(a6a0640c1a6d69a41db90f1fc935e97f2fa68553) )	
 ROM_END
 
 ROM_START( ssridersb )
@@ -3919,6 +3973,9 @@ ROM_START( thndrx2 )
 
 	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "thndrx2.nv", 0x0000, 0x080, CRC(ca613e98) SHA1(bde0d1722acfef19cf8ec091bdc296f8b9fa8125) )		
 ROM_END
 
 ROM_START( thndrx2a )
@@ -3939,6 +3996,9 @@ ROM_START( thndrx2a )
 
 	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "thndrx2a.nv", 0x0000, 0x080, CRC(f7893d00) SHA1(1165ad3485749015458df2840a34b5b0e1810aad) )		
 ROM_END
 
 ROM_START( thndrx2j )
@@ -3959,7 +4019,11 @@ ROM_START( thndrx2j )
 
 	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for the 053260 */
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "thndrx2j.nv", 0x0000, 0x080, CRC(83b4799b) SHA1(da4f443cbcb06aa5983423cb6fecc1f803235f61) )		
 ROM_END
+
 
 ROM_START( prmrsocr )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 2*256k for 68000 code */
@@ -3987,6 +4051,9 @@ ROM_START( prmrsocr )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "101a06.1d",    0x0000, 0x200000, CRC(4f48e043) SHA1(f50e8642d9d3a028c243777640e7cd13da1abf86) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "prmrsocr_eab.nv", 0x0000, 0x080, CRC(daf60801) SHA1(de21774c4276ec399745c26a9278f7c58dbe6ad0) )
 ROM_END
 
 ROM_START( prmrsocrj )
@@ -4015,6 +4082,9 @@ ROM_START( prmrsocrj )
 
 	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "101a06.1d",    0x0000, 0x200000, CRC(4f48e043) SHA1(f50e8642d9d3a028c243777640e7cd13da1abf86) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "prmrsocr_jab.nv", 0x0000, 0x080, CRC(5a88f95a) SHA1(18fdb598eee3958c45694bdac77e02790c936968) )
 ROM_END
 
 

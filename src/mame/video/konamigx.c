@@ -2080,7 +2080,7 @@ VIDEO_START(konamigx_5bpp)
 		konamigx_mixer_primode(4);
 	} else
 
-	if (!strcmp(machine->gamedrv->name,"gokuparo") || !strcmp(machine->gamedrv->name,"fantjour"))
+	if (!strcmp(machine->gamedrv->name,"gokuparo") || !strcmp(machine->gamedrv->name,"fantjour") || !strcmp(machine->gamedrv->name,"fantjoura"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 	} else

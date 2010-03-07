@@ -1511,6 +1511,17 @@ static INPUT_PORTS_START( le2 )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( le2_flip )
+	PORT_INCLUDE( le2 )
+
+	PORT_MODIFY("LIGHT0_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+
+	PORT_MODIFY("LIGHT1_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gokuparo )
 	PORT_INCLUDE( common )
 
@@ -1998,6 +2009,9 @@ ROM_START( gokuparo )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "321b17.9g", 0x000000, 2*1024*1024, CRC(b3e8d5d8) SHA1(6644a414e7f0e69ded9aa1bf892566002cebae26) )
 	ROM_LOAD( "321b18.7g", 0x200000, 2*1024*1024, CRC(2c561ad0) SHA1(6265054072ba1c2837dd96e0259b20bc50457160) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "gokuparo.nv", 0x0000, 0x080, CRC(15c0f2d9) SHA1(57c7462e3b1e15652ec5d682a1be3786926ddecd) )													
 ROM_END
 
 /* Fantastic Journey version EAA (Euro) */
@@ -2028,6 +2042,9 @@ ROM_START( fantjour )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "321b17.9g", 0x000000, 2*1024*1024, CRC(b3e8d5d8) SHA1(6644a414e7f0e69ded9aa1bf892566002cebae26) )
 	ROM_LOAD( "321b18.7g", 0x200000, 2*1024*1024, CRC(2c561ad0) SHA1(6265054072ba1c2837dd96e0259b20bc50457160) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "fantjour.nv", 0x0000, 0x080, CRC(35b7d8e1) SHA1(5f0e3799ff9c63af3e55b040cc52b2a9e7a76168) )											
 ROM_END
 
 /* Fantastic Journey version AAA (Asia) */
@@ -2058,6 +2075,9 @@ ROM_START( fantjoura )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "321b17.9g", 0x000000, 2*1024*1024, CRC(b3e8d5d8) SHA1(6644a414e7f0e69ded9aa1bf892566002cebae26) )
 	ROM_LOAD( "321b18.7g", 0x200000, 2*1024*1024, CRC(2c561ad0) SHA1(6265054072ba1c2837dd96e0259b20bc50457160) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "fantjoura.nv", 0x0000, 0x080, CRC(d13b1ec1) SHA1(0f4aedd0aa9682b0b68b9f7745946a3bc1e76714) )												
 ROM_END
 
 /* Salamander 2 version JAA (Japan) */
@@ -2089,6 +2109,9 @@ ROM_START( salmndr2 )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "521-a12.9g", 0x000000, 2*1024*1024, CRC(66614d3b) SHA1(e1e5ebe546bced6ab74b0af500acf0f3308902a4) )
 	ROM_LOAD( "521-a13.7g", 0x200000, 1*1024*1024, CRC(c3322475) SHA1(1774524ff031e0c4a7f3432810e968d37f9c6331) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "salmndr2.nv", 0x0000, 0x080, CRC(60cdea03) SHA1(6aa597d391b5d7db67e599ec54d98600983966fc) )						
 ROM_END
 
 /* Salamander 2 version AAB (Asia) */
@@ -2120,9 +2143,12 @@ ROM_START( salmndr2a )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "521-a12.9g", 0x000000, 2*1024*1024, CRC(66614d3b) SHA1(e1e5ebe546bced6ab74b0af500acf0f3308902a4) )
 	ROM_LOAD( "521-a13.7g", 0x200000, 1*1024*1024, CRC(c3322475) SHA1(1774524ff031e0c4a7f3432810e968d37f9c6331) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "salmndr2a.nv", 0x0000, 0x080, CRC(3a98a8f9) SHA1(08c2d164620a4d8ad902d502acea8ad621931198) )					
 ROM_END
 
-/* Twinbee Yahoo! */
+/* Twinbee Yahhoo! */
 ROM_START( tbyahhoo )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2150,6 +2176,10 @@ ROM_START( tbyahhoo )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "424a17.9g", 0x000000, 2*1024*1024, CRC(e9dd9692) SHA1(c289019c8d1dd71b3cec26479c39b649de804707) )
 	ROM_LOAD( "424a18.7g", 0x200000, 2*1024*1024, CRC(0f0d9f3a) SHA1(57f6b113b80f06964b7e672ad517c1654c5569c5) )
+	
+	// reports RAMs as bad on first boot due to TMS emulation problems, but automatically resets
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "tbyahhoo.nv", 0x0000, 0x080, CRC(1e6fa2f8) SHA1(fceb6617a4e02babfc1678bae9f6a131c1d759f5) )				
 ROM_END
 
 /* Daisu-Kiss */
@@ -2383,6 +2413,9 @@ ROM_START( tokkae )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "615a22.9g", 0x000000, 2*1024*1024, CRC(ea7e47dd) SHA1(5bf5bad9427b083757c400eaf58c63a6267c1caf) )
 	ROM_LOAD( "615a23.7g", 0x200000, 2*1024*1024, CRC(22d71f36) SHA1(3f24bb4cd8e1d693b42219e05960ad0c756b08cb) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "tokkae.nv", 0x0000, 0x080, CRC(5a6f8da6) SHA1(f68c67c98e99669904e23d5eac7e13a9c57bc394) )		
 ROM_END
 
 /* Tokimeki Memorial Taisen Puzzle-dama */
@@ -2415,6 +2448,9 @@ ROM_START( tkmmpzdm )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "515a13.9g", 0x000000, 2*1024*1024, CRC(4b066b00) SHA1(874dd49847b10e6d9c39decb81557534baa36d79) )
 	ROM_LOAD( "515a14.7g", 0x200000, 2*1024*1024, CRC(128cc944) SHA1(b0cd2ec1b9a2ac936d57b6d6c2a70f9c13dc97a5) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "tkmmpzdm.nv", 0x0000, 0x080, CRC(850ab8c4) SHA1(fea5ceb3f2cea61fb19bdb1b8f1496d1c06bfff1) )			
 ROM_END
 
 /* Winning Spike - Version EAA (Euro) */
@@ -2433,15 +2469,15 @@ ROM_START( winspike )
 	/* tiles: length of 1 meg each is TRUSTED by the internal checksum code */
 	/* do NOT change these to the 4 meg dumps again, those are WRONG!!!!!!! */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
-    	ROM_LOAD16_BYTE( "705a19.17h", 0x000000, 0x100000, CRC(bab84b30) SHA1(8522a0dc5e37524f51d632e9d975e949a14c0dc3) )
+	ROM_LOAD16_BYTE( "705a19.17h", 0x000000, 0x100000, CRC(bab84b30) SHA1(8522a0dc5e37524f51d632e9d975e949a14c0dc3) )
 	ROM_LOAD16_BYTE( "705a18.22h", 0x000001, 0x100000, CRC(eb97fb5f) SHA1(13de0ad060fd6f1312fa10edde1fef6481e8df64) )
 
 	/* sprites */
 	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )
-        _64_WORD_ROM_LOAD( "705a10.33g",   0x000000, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
-        _64_WORD_ROM_LOAD( "705a11.30g",   0x000002, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
-        _64_WORD_ROM_LOAD( "705a13.28g",   0x000004, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
-        _64_WORD_ROM_LOAD( "705a17.25g",   0x000006, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	_64_WORD_ROM_LOAD( "705a10.33g",   0x000000, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
+	_64_WORD_ROM_LOAD( "705a11.30g",   0x000002, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
+	_64_WORD_ROM_LOAD( "705a13.28g",   0x000004, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
+	_64_WORD_ROM_LOAD( "705a17.25g",   0x000006, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -2492,15 +2528,15 @@ ROM_START( winspikej )
 	/* tiles: length of 1 meg each is TRUSTED by the internal checksum code */
 	/* do NOT change these to the 4 meg dumps again, those are WRONG!!!!!!! */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
-    	ROM_LOAD16_BYTE( "705a19.17h", 0x000000, 0x100000, CRC(bab84b30) SHA1(8522a0dc5e37524f51d632e9d975e949a14c0dc3) )
+	ROM_LOAD16_BYTE( "705a19.17h", 0x000000, 0x100000, CRC(bab84b30) SHA1(8522a0dc5e37524f51d632e9d975e949a14c0dc3) )
 	ROM_LOAD16_BYTE( "705a18.22h", 0x000001, 0x100000, CRC(eb97fb5f) SHA1(13de0ad060fd6f1312fa10edde1fef6481e8df64) )
 
 	/* sprites */
 	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )
-        _64_WORD_ROM_LOAD( "705a10.33g",   0x000000, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
-        _64_WORD_ROM_LOAD( "705a11.30g",   0x000002, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
-        _64_WORD_ROM_LOAD( "705a13.28g",   0x000004, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
-        _64_WORD_ROM_LOAD( "705a17.25g",   0x000006, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	_64_WORD_ROM_LOAD( "705a10.33g",   0x000000, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
+	_64_WORD_ROM_LOAD( "705a11.30g",   0x000002, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
+	_64_WORD_ROM_LOAD( "705a13.28g",   0x000004, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
+	_64_WORD_ROM_LOAD( "705a17.25g",   0x000006, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -2535,6 +2571,10 @@ ROM_START( puzldama )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "315a17.9g", 0x000000, 2*1024*1024, CRC(ea763d61) SHA1(2a7dcb2a2a23c9fea62fb82ffc18949bf15b9f6f) )
 	ROM_LOAD( "315a18.7g", 0x200000, 2*1024*1024, CRC(6e416cee) SHA1(145a766ad2fa2b692692053dd36e0caf51d67a56) )
+
+	// the TMS emulation is causing problems which means you have to reset this one anyway
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "puzldama.nv", 0x0000, 0x080, CRC(bda98b84) SHA1(f4b03130bdc2a5bc6f0fc9ca21603109d82703b4) )		
 ROM_END
 
 /* Dragoon Might */
@@ -2572,6 +2612,10 @@ ROM_START( dragoonj )
 	/* sound data */
 	ROM_REGION( 0x200000, "shared", 0 )
 	ROM_LOAD( "417a17.9g", 0x000000, 2*1024*1024, CRC(88d47dfd) SHA1(b5d6dd7ee9ac0c427dc3e714a97945c954260913) )
+
+	// game is currently broken due to TMS emulation anyway..
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "dragoonj.nv", 0x0000, 0x080, CRC(cbe16082) SHA1(da48893f3584ae2e034c73d4338b220107a884da) )						
 ROM_END
 
 /* Dragoon Might (Asia) */
@@ -2609,6 +2653,10 @@ ROM_START( dragoona )
 	/* sound data */
 	ROM_REGION( 0x200000, "shared", 0 )
 	ROM_LOAD( "417a17.9g", 0x000000, 2*1024*1024, CRC(88d47dfd) SHA1(b5d6dd7ee9ac0c427dc3e714a97945c954260913) )
+
+	// game is currently broken due to TMS emulation anyway..
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "dragoona.nv", 0x0000, 0x080, CRC(7980ad2b) SHA1(dccaab02d23edbd81ae13441fbac0dbd7112c258) )					
 ROM_END
 
 /* Soccer Superstars (Europe ver EAA)*/
@@ -2665,6 +2713,9 @@ ROM_START( soccerss )
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "soccerss.nv", 0x0000, 0x080, CRC(f222dae4) SHA1(fede48a4e1fe91cf2b17ff3f3996bca4816fc283) )		
 ROM_END
 
 /* Soccer Superstars (Japan ver JAC)*/
@@ -2709,6 +2760,9 @@ ROM_START( soccerssj )
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "soccerssj.nv", 0x0000, 0x080, CRC(7440255e) SHA1(af379b5b1f765f9050f18fbd41c5031c5ad4918b) )			
 ROM_END
 
 /* Soccer Superstars (Japan ver JAA)*/
@@ -2753,6 +2807,9 @@ ROM_START( soccerssja )
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "soccerssja.nv", 0x0000, 0x080, CRC(60dba700) SHA1(087b086b29748727b41fdd4c154ff9b4bef42959) )				
 ROM_END
 
 /* Soccer Superstars (Asian ver AAA) */
@@ -2797,15 +2854,14 @@ ROM_START( soccerssa )
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "soccerssa.nv", 0x0000, 0x080, CRC(e3a3f3d5) SHA1(374cf5bbcc459c56ebbba5068406f6d767bcb608) )					
 ROM_END
 
 /* Vs. Net Soccer TODO:
 
  Redump sound ROM
- Check naming of data roms, I believe they're swapped on either this or all the other games.
- Add 'Roz Doubling' support to the Type-4 roz rendering when width > 512
- Fix issues with FG Tilemaps (the hack used for Soccer Superstars clearly doesn't work here causing most of the left screen tilemaps to vanish)
- See if there is any other protection
  Hook up ROM tests.
 
 */
@@ -3160,6 +3216,9 @@ ROM_START( le2 )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "312a17.9g", 0x000000, 2*1024*1024, CRC(ed101448) SHA1(ef1342f37fbbb092eddee0c237b40989ad42cf26) )
 	ROM_LOAD( "312a18.7g", 0x200000, 1*1024*1024, CRC(5717abd7) SHA1(d304d733e7fca0363ea6b3872c2d3bbe4edf1179) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with invisible error
+	ROM_LOAD( "le2.nv", 0x0000, 0x080, CRC(fec3bc2e) SHA1(64040364d7db12f54e5c11f28a28e030bcf9a0f7) )		
 ROM_END
 
 /* Lethal Enforcers II (US Version) */
@@ -3195,17 +3254,21 @@ ROM_START( le2u )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "312a17.9g", 0x000000, 2*1024*1024, CRC(ed101448) SHA1(ef1342f37fbbb092eddee0c237b40989ad42cf26) )
 	ROM_LOAD( "312a18.7g", 0x200000, 1*1024*1024, CRC(5717abd7) SHA1(d304d733e7fca0363ea6b3872c2d3bbe4edf1179) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with invisible error
+	ROM_LOAD( "le2u.nv", 0x0000, 0x080, CRC(d46b3878) SHA1(81bf4331547ce977eaa185f7281625fb695f6deb) )		
 ROM_END
 
-/* Lethal Enforcers II (version) */
+/* Lethal Enforcers II (Japan version) */
 ROM_START( le2j )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-        ROM_LOAD32_BYTE( "312jaa05.26b", 0x200000, 0x020000, BAD_DUMP CRC(7eaa6ce2) SHA1(59d3460be98ac32ebea0422c2a9962556a9e964e) )
-        ROM_LOAD32_BYTE( "312jaa04.28b", 0x200001, 0x020000, BAD_DUMP CRC(c3d19ddc) SHA1(3bc3e705567e8e59e56a40ae64381082c4f22271) )
-        ROM_LOAD32_BYTE( "312jaa03.30b", 0x200002, 0x020000, BAD_DUMP CRC(465e3d03) SHA1(8efeb775f6d9f1dfcebdbc79d0c832107278c063) )
-        ROM_LOAD32_BYTE( "312jaa02.33b", 0x200003, 0x020000, BAD_DUMP CRC(e971cb87) SHA1(53e2e7c4b96e4331df27d4788aa1bb81efddf9f0) )
+	
+	ROM_LOAD32_BYTE( "312jaa05.26b", 0x200000, 0x020000, CRC(7eaa6ce2) SHA1(59d3460be98ac32ebea0422c2a9962556a9e964e) )
+    ROM_LOAD32_BYTE( "312jaa04.28b", 0x200001, 0x020000, CRC(c3d19ddc) SHA1(3bc3e705567e8e59e56a40ae64381082c4f22271) )
+    ROM_LOAD32_BYTE( "312jaa03.30b", 0x200002, 0x020000, CRC(9ad95a7c) SHA1(397b301f8bc4d5f039f47263ad73da5afc14712c) )
+    ROM_LOAD32_BYTE( "312jaa02.33b", 0x200003, 0x020000, CRC(e971cb87) SHA1(53e2e7c4b96e4331df27d4788aa1bb81efddf9f0) )
 
 	/* sound program */
 	ROM_REGION( 0x40000, "soundcpu", 0 )
@@ -3230,6 +3293,9 @@ ROM_START( le2j )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "312a17.9g", 0x000000, 2*1024*1024, CRC(ed101448) SHA1(ef1342f37fbbb092eddee0c237b40989ad42cf26) )
 	ROM_LOAD( "312a18.7g", 0x200000, 1*1024*1024, CRC(5717abd7) SHA1(d304d733e7fca0363ea6b3872c2d3bbe4edf1179) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with invisible error
+	ROM_LOAD( "le2j.nv", 0x0000, 0x080, CRC(f6790425) SHA1(f233f3c09c4cdbd1c6e5204fc6554a4826b44c59) )		
 ROM_END
 
 /* Racin' Force */
@@ -3277,6 +3343,10 @@ ROM_START( racinfrc )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "250a17.14y", 0x000000, 2*1024*1024, CRC(adefa079) SHA1(d25911e3a02d92dc936c3d7e9d76fc270bd1a75a) )
 	ROM_LOAD( "250a18.12y", 0x200000, 2*1024*1024, CRC(8014a2eb) SHA1(d82f0a7d559340ae05a78ecc8bb69bb35b9c0658) )
+
+	// note, it seems impossible to calibrate the controls (again!), this has nothing to do with the default eeprom!
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "racinfrc.nv", 0x0000, 0x080, CRC(dc88c693) SHA1(a7967f390db043570803c79edf984a3e6bdbd172) )						
 ROM_END
 
 
@@ -3325,6 +3395,10 @@ ROM_START( racinfrcu )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "250a17.14y", 0x000000, 2*1024*1024, CRC(adefa079) SHA1(d25911e3a02d92dc936c3d7e9d76fc270bd1a75a) )
 	ROM_LOAD( "250a18.12y", 0x200000, 2*1024*1024, CRC(8014a2eb) SHA1(d82f0a7d559340ae05a78ecc8bb69bb35b9c0658) )
+
+	// note, it seems impossible to calibrate the controls (again!), this has nothing to do with the default eeprom!
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "racinfrcu.nv", 0x0000, 0x080, CRC(369e1a84) SHA1(bfed0145d89550b1a1661f3ccc612505053063f8) )					
 ROM_END
 
 
@@ -3408,6 +3482,9 @@ ROM_START( opengolf )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "218a17.14y", 0x000000, 2*1024*1024, CRC(0b525127) SHA1(218b306c12e1094a676815b7dddaf13bf19be2d5) )
 	ROM_LOAD( "218a18.12y", 0x200000, 1*1024*1024, CRC(98ec4cfb) SHA1(638753f9d9269719a37133b9c39c242507fdd8ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "opengolf.nv", 0x0000, 0x080, CRC(d49bf7c3) SHA1(294c772a2f562c01e7c4d15068ba4e80e9522f9f) )				
 ROM_END
 
 /* Konami's Open Golf Championship - version EAD */
@@ -3460,6 +3537,9 @@ ROM_START( opengolf2 )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "218a17.14y", 0x000000, 2*1024*1024, CRC(0b525127) SHA1(218b306c12e1094a676815b7dddaf13bf19be2d5) )
 	ROM_LOAD( "218a18.12y", 0x200000, 1*1024*1024, CRC(98ec4cfb) SHA1(638753f9d9269719a37133b9c39c242507fdd8ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "opengolf2.nv", 0x0000, 0x080, CRC(c09fc0e6) SHA1(32807752344763613440bee46da24d605e62eace) )			
 ROM_END
 
 /* Golfing Greats 2 */
@@ -3467,8 +3547,9 @@ ROM_START( ggreats2 )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-        ROM_LOAD32_WORD_SWAP( "218jac02.34n", 0x200000, 0x080000, CRC(e4d47f92) SHA1(4761cf69670d97db548b146b127c9af04f8809d6) )
-        ROM_LOAD32_WORD_SWAP( "218jac03.31n", 0x200002, 0x080000, CRC(ec10c0b2) SHA1(4084d8420c53e73630786adf1a4f0fde548fa212) )
+
+	ROM_LOAD32_WORD_SWAP( "218jac02.34n", 0x200000, 0x080000, CRC(e4d47f92) SHA1(4761cf69670d97db548b146b127c9af04f8809d6) )
+	ROM_LOAD32_WORD_SWAP( "218jac03.31n", 0x200002, 0x080000, CRC(ec10c0b2) SHA1(4084d8420c53e73630786adf1a4f0fde548fa212) )
 
 	/* data roms */
 	ROM_LOAD32_WORD_SWAP( "218a04.34s", 0x400000, 512*1024, CRC(e50043a7) SHA1(d3a8e214362c34c4151408f422c9b1c723f7f01c) )
@@ -3510,6 +3591,9 @@ ROM_START( ggreats2 )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "218a17.14y", 0x000000, 2*1024*1024, CRC(0b525127) SHA1(218b306c12e1094a676815b7dddaf13bf19be2d5) )
 	ROM_LOAD( "218a18.12y", 0x200000, 1*1024*1024, CRC(98ec4cfb) SHA1(638753f9d9269719a37133b9c39c242507fdd8ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "ggreats2.nv", 0x0000, 0x080, CRC(4db10b5c) SHA1(29e3a59e4101349ace33d49b5fe59f0c785979b3) )		
 ROM_END
 
 /**********************************************************************************/
@@ -3585,8 +3669,10 @@ static const GXGameInfoT gameDefs[] =
 	{ "ggreats2", 11, 12, 0, BPP4 },
 	{ "le2",      13, 1, 1, BPP4 },
 	{ "le2u",     13, 1, 1, BPP4 },
+	{ "le2j",     13, 1, 1, BPP4 },
 	{ "gokuparo",  7, 0, 0, BPP5 },
 	{ "fantjour",  7, 0, 9, BPP5 },
+	{ "fantjoura", 7, 0, 9, BPP5 },
 	{ "puzldama",  7, 0, 0, BPP5 },
 	{ "tbyahhoo",  7, 0, 8, BPP5 },
 	{ "tkmmpzdm",  7, 0, 2, BPP6 },
@@ -3722,52 +3808,75 @@ static DRIVER_INIT(konamigx)
 /* dummy parent for the BIOS */
 GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx, ROT0, "Konami", "System GX", GAME_IS_BIOS_ROOT )
 
-
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
 /* and optional LAN capability (only on Racin' Force - chips aren't present on the golf games) */
 /* needs the ROZ layer to be playable */
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver EAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1994, racinfrcu,racinfrc, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+
 GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1994, opengolf2,opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
-
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 2: totally stock, sometimes with funny protection chips on the ROM board */
 /* these games work and are playable with minor graphics glitches */
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 GAME( 1994, le2,      konamigx, le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, le2u,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, le2j,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING)
+GAME( 1994, le2u,     le2,      le2,      le2_flip, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, le2j,     le2,      le2,      le2_flip, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1994, fantjour, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantjoura,fantjour, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+GAME( 1994, fantjoura,fantjour, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gokuparo, fantjour, konamigx, gokuparo, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1994, puzldama, konamigx, konamigx, puzldama, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1995, tbyahhoo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver AAB)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1996, sexyparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 /* protection controls player ship direction in attract mode - doesn't impact playability */
 GAME( 1996, salmndr2, konamigx, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, salmndr2a,salmndr2, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
 GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, winspikej,winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 GAME( 1994, soccerss,  konamigx, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, soccerssj, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAC)", GAME_IMPERFECT_GRAPHICS ) // writes JAB to EEPROM, but should be version JAC according to labels
 GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, soccerssa, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+
 GAME( 1996, rungun2,   konamigx, gxtype4sd2,  type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2,  type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1996, rushhero,  konamigx, gxtype4,     type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_IMPERFECT_GRAPHICS  )

@@ -16,7 +16,7 @@ Other Features: Memory Blitter (part of Imagetek 15000)
 Year + Game                     PCB         Video Chip  Issues / Notes
 ---------------------------------------------------------------------------
 97  Rabbit                      VG5330-B    15000
-97? Tokimeki Mahjong Paradise   VG5550-B    15000
+97? Tokimeki Mahjong Paradise(1)VG5550-B    15000
 ---------------------------------------------------------------------------
 Not dumped yet:
 unknown
@@ -27,7 +27,13 @@ To Do:
 - clean up zoom code and make zoom effect more accurate
 - sound (adpcm of some kind)
 - status bar in rabbit is the wrong colour, timing of blitter / interrupts?
-- eeprom hookup seems flakey
+
+Notes:
+
+(1) This is currently in it's own driver "tmmjprd.c" because it uses the
+    chip in a completely different way to Rabbit.  They should be merged
+	again later, once the chip is better understood.
+
 
 */
 
@@ -1003,7 +1009,9 @@ ROM_START( rabbit )
 	ROM_REGION( 0x400000, "unknown", 0 ) /* sound rom */
 	ROM_LOAD( "jsn0.11", 0x0000000, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) )
 
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "rabbit.nv", 0x0000, 0x0080, CRC(73d471ed) SHA1(45e045f5ea9036342b88013e021d402741d98537) )
 ROM_END
 
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Electronic Arts / Aorn", "Rabbit", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) // somewhat playable
+GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Electronic Arts / Aorn", "Rabbit (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) // somewhat playable
