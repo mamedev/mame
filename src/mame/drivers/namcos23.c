@@ -932,11 +932,6 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 	SET_TILE_INFO( 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10) );
 } /* TextTilemapGetInfo */
 
-static READ32_HANDLER( namcos23_textram_r )
-{
-	return namcos23_textram[offset];
-}
-
 static WRITE32_HANDLER( namcos23_textram_w )
 {
 	COMBINE_DATA( &namcos23_textram[offset] );
@@ -958,11 +953,6 @@ static VIDEO_UPDATE( ss23 )
 
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
 	return 0;
-}
-
-static READ32_HANDLER( s23_txtchar_r )
-{
-	return namcos23_charram[offset];
 }
 
 static WRITE32_HANDLER( s23_txtchar_w )
@@ -989,11 +979,6 @@ INLINE void UpdatePalette( running_machine *machine, int entry )
 		int b = nthbyte(machine->generic.paletteram.u32, which+0x20001);
 		palette_set_color( machine, which/2, MAKE_RGB(r,g,b) );
 	}
-}
-
-static READ32_HANDLER( namcos23_paletteram_r )
-{
-	return space->machine->generic.paletteram.u32[offset];
 }
 
 /* each LONGWORD is 2 colors.  each OFFSET is 2 colors */
@@ -1272,10 +1257,10 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06080000, 0x06081fff) AM_RAM
 
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_READWRITE(namcos23_paletteram_r, namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06400000, 0x06403fff) AM_READWRITE( s23_txtchar_r, s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
+	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
 	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_READWRITE(namcos23_textram_r, namcos23_textram_w) AM_BASE(&namcos23_textram)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE(&namcos23_textram)
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
@@ -1298,12 +1283,12 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
-	AM_RANGE(0x06800000, 0x06807fff) AM_READWRITE( s23_txtchar_r, s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
+	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_READWRITE(namcos23_textram_r, namcos23_textram_w) AM_BASE(&namcos23_textram)
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE(&namcos23_textram)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16( s23_c361_r, s23_c361_w, 0xffffffff )	// C361
 	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	// GAMMA (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READWRITE(namcos23_paletteram_r, namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x01000000)	// data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x01000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16( s23_c412_r, s23_c412_w, 0xffffffff )
@@ -1800,27 +1785,6 @@ static const gfx_layout namcos23_cg_layout =
 	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7,64*8,64*9,64*10,64*11,64*12,64*13,64*14,64*15 },
 	64*16
 }; /* cg_layout */
-
-#if 0
-static const gfx_layout sprite_layout =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{
-		0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
-		8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8,
-		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
-		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8 },
-	{
-		0*32*8,1*32*8,2*32*8,3*32*8,4*32*8,5*32*8,6*32*8,7*32*8,
-		8*32*8,9*32*8,10*32*8,11*32*8,12*32*8,13*32*8,14*32*8,15*32*8,
-		16*32*8,17*32*8,18*32*8,19*32*8,20*32*8,21*32*8,22*32*8,23*32*8,
-		24*32*8,25*32*8,26*32*8,27*32*8,28*32*8,29*32*8,30*32*8,31*32*8 },
-	32*32*8
-};
-#endif
 
 static GFXDECODE_START( namcos23 )
 	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0x7f00, 0x80 )
