@@ -2573,7 +2573,7 @@ Notes:
 
 ROM_START( ckongg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ck1.bin",       0x2400, 0x0400, CRC(a4323b94) SHA1(1fed47e1df5efa8f40585bedab07b60067edc2bb) )
+	ROM_LOAD( "g_ck1.bin",     0x2400, 0x0400, CRC(a4323b94) SHA1(1fed47e1df5efa8f40585bedab07b60067edc2bb) )
 	ROM_CONTINUE(              0x1C00, 0x0400)
 	ROM_CONTINUE(              0x4800, 0x0400)
 	ROM_CONTINUE(              0x0C00, 0x0400)

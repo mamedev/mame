@@ -1633,7 +1633,7 @@ ROM_START( 48in1 )
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD16_WORD_SWAP( "48in1_93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
 ROM_START( 48in1a )
@@ -1647,7 +1647,7 @@ ROM_START( 48in1a )
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD16_WORD_SWAP( "48in1_93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
 GAME(2004, 39in1,  0,     39in1, 39in1, 39in1, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)

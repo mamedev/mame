@@ -983,7 +983,7 @@ ROM_START( boobhack )
 	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) /* clut */
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, NO_DUMP CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
+	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, BAD_DUMP CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 ROM_END
 
 static DRIVER_INIT( amazon )

@@ -1423,8 +1423,8 @@ ROM_START( ckongalc )
 	ROM_LOAD( "ck3.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "ck2.bin",      0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
-	ROM_LOAD( "ck1.bin",      0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
+	ROM_LOAD( "alc_ck2.bin",  0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
+	ROM_LOAD( "alc_ck1.bin",  0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "ck6v.bin",     0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
@@ -1481,8 +1481,8 @@ ROM_START( monkeyd )
 	ROM_LOAD( "ck3.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "ck2.bin",      0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
-	ROM_LOAD( "ck1.bin",      0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
+	ROM_LOAD( "md_ck2.bin",   0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
+	ROM_LOAD( "md_ck1.bin",   0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "ck6v.bin",     0x0000, 0x0020, BAD_DUMP CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a)  )

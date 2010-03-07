@@ -603,8 +603,8 @@ ROM_START( eforesta )
 	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
 	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(03c2890f) SHA1(10d479b7ccece813676ad815a96169bbf259c49d)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(36125194) SHA1(dc681dc60b25893ca3ee101f6813c22b914771f5)) // game code
+	ROM_LOAD("a_u87.bin", 0x06000, 0x2000, CRC(03c2890f) SHA1(10d479b7ccece813676ad815a96169bbf259c49d)) // game code
+	ROM_LOAD("a_u86.bin", 0x08000, 0x8000, CRC(36125194) SHA1(dc681dc60b25893ca3ee101f6813c22b914771f5)) // game code
 
 	/* SHAPE EPROMS */
 	ROM_REGION(0xc000, "tile_gfx", 0 )

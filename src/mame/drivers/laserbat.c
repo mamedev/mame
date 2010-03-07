@@ -1031,7 +1031,7 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "82s100.13m", 0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, NO_DUMP )
 ROM_END
 
 

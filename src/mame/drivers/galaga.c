@@ -2915,9 +2915,9 @@ ROM_END
 
 ROM_START( digdug1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
-	ROM_LOAD( "dd1a.1",       0x0000, 0x1000, CRC(b9198079) SHA1(1d3fe04020f584ed250e32fdc6f6a3b769342884) )
-	ROM_LOAD( "dd1a.2",       0x1000, 0x1000, CRC(b2acbe49) SHA1(c8f713e8cfa70d3bc64d3002ff7bffc65ee138e2) )
-	ROM_LOAD( "dd1a.3",       0x2000, 0x1000, CRC(d6407b49) SHA1(0e71a8f02778286488865e20439776dbb2a8ec78) )
+	ROM_LOAD( "dd1.1",        0x0000, 0x1000, CRC(b9198079) SHA1(1d3fe04020f584ed250e32fdc6f6a3b769342884) )
+	ROM_LOAD( "dd1.2",        0x1000, 0x1000, CRC(b2acbe49) SHA1(c8f713e8cfa70d3bc64d3002ff7bffc65ee138e2) )
+	ROM_LOAD( "dd1.3",        0x2000, 0x1000, CRC(d6407b49) SHA1(0e71a8f02778286488865e20439776dbb2a8ec78) )
 	ROM_LOAD( "dd1.4b",       0x3000, 0x1000, CRC(f4cebc16) SHA1(19b568f92069a1cfe1c07287408efe3b0e253375) )
 
 	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */

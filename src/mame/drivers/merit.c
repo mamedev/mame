@@ -1819,7 +1819,7 @@ it doesn't jump to the backup ram area and it gives an extra play if you reach a
 amount of points (there is a dip switch to select the trigger: 150.000 or 200.000*/
 ROM_START( couplep )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) )
+	ROM_LOAD( "p_1.1d", 0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -1838,7 +1838,7 @@ ROM_END
 it has same dips as set1, but remaining machine code is the same as set2*/
 ROM_START( couplei )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) )
+	ROM_LOAD( "i_1.1d", 0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
