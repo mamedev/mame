@@ -92,6 +92,10 @@ WRITE8_DEVICE_HANDLER( z80pio_pa_w );
 READ8_DEVICE_HANDLER( z80pio_pb_r );
 WRITE8_DEVICE_HANDLER( z80pio_pb_w );
 
+/* ready */
+READ_LINE_DEVICE_HANDLER( z80pio_ardy_r );
+READ_LINE_DEVICE_HANDLER( z80pio_brdy_r );
+
 /* strobe */
 WRITE_LINE_DEVICE_HANDLER( z80pio_astb_w );
 WRITE_LINE_DEVICE_HANDLER( z80pio_bstb_w );

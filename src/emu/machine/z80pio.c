@@ -590,6 +590,30 @@ WRITE8_DEVICE_HANDLER( z80pio_pb_w )
 }
 
 /*-------------------------------------------------
+    z80pio_ardy_r - port A ready
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( z80pio_ardy_r )
+{
+	z80pio_t *z80pio = get_safe_token(device);
+	pio_port *port = &z80pio->port[PORT_A];
+
+	return port->rdy;
+}
+
+/*-------------------------------------------------
+    z80pio_brdy_r - port B ready
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( z80pio_brdy_r )
+{
+	z80pio_t *z80pio = get_safe_token(device);
+	pio_port *port = &z80pio->port[PORT_B];
+
+	return port->rdy;
+}
+
+/*-------------------------------------------------
     strobe - handle strobe signal
 -------------------------------------------------*/
 
