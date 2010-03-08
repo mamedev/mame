@@ -548,21 +548,21 @@ INLINE void snes_draw_tile_object( UINT16 tileaddr, INT16 x, UINT8 priority, UIN
 			mask >>= 1;
 		}
 
-		if (scanlines[SNES_MAINSCREEN].enable)
+		if (ii >= 0 && ii < SNES_SCR_WIDTH && scanlines[SNES_MAINSCREEN].enable)
 		{
-			UINT8 clr = colour;
+			if (scanlines[SNES_MAINSCREEN].priority[ii] <= priority)
+			{
+				UINT8 clr = colour;
 
 #ifdef SNES_LAYER_DEBUG
-			if (!debug_options.windows_disabled)
+				if (!debug_options.windows_disabled)
 #endif /* SNES_LAYER_DEBUG */
-			/* Clip to windows */
-			if (scanlines[SNES_MAINSCREEN].clip)
-				clr &= snes_ppu.clipmasks[SNES_OAM][ii];
+				/* Clip to windows */
+				if (scanlines[SNES_MAINSCREEN].clip)
+					clr &= snes_ppu.clipmasks[SNES_OAM][ii];
 
-			/* Only draw if we have a colour (0 == transparent) */
-			if (clr)
-			{
-				if ((scanlines[SNES_MAINSCREEN].priority[ii] <= priority) && (ii >= 0))
+				/* Only draw if we have a colour (0 == transparent) */
+				if (clr)
 				{
 					c = snes_cgram[(pal + clr) % FIXED_COLOUR];
 
@@ -574,21 +574,21 @@ INLINE void snes_draw_tile_object( UINT16 tileaddr, INT16 x, UINT8 priority, UIN
 			}
 		}
 
-		if (scanlines[SNES_SUBSCREEN].enable)
+		if (ii >= 0 && ii < SNES_SCR_WIDTH && scanlines[SNES_SUBSCREEN].enable)
 		{
-			UINT8 clr = colour;
+			if (scanlines[SNES_SUBSCREEN].priority[ii] <= priority)
+			{
+				UINT8 clr = colour;
 
 #ifdef SNES_LAYER_DEBUG
-			if (!debug_options.windows_disabled)
+				if (!debug_options.windows_disabled)
 #endif /* SNES_LAYER_DEBUG */
-			/* Clip to windows */
-			if (scanlines[SNES_SUBSCREEN].clip)
-				clr &= snes_ppu.clipmasks[SNES_OAM][ii];
+				/* Clip to windows */
+				if (scanlines[SNES_SUBSCREEN].clip)
+					clr &= snes_ppu.clipmasks[SNES_OAM][ii];
 
-			/* Only draw if we have a colour (0 == transparent) */
-			if (clr)
-			{
-				if ((scanlines[SNES_SUBSCREEN].priority[ii] <= priority) && (ii >= 0))
+				/* Only draw if we have a colour (0 == transparent) */
+				if (clr)
 				{
 					c = snes_cgram[(pal + clr) % FIXED_COLOUR];
 
@@ -1083,7 +1083,7 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 				UINT8 count = 0;
 				for (xs = (snes_ppu.oam.size[size] - 1); xs >= 0; xs--)
 				{
-					if ((x + (count << 3) < SNES_SCR_WIDTH + 8))
+					if ((x + (count << 3) < SNES_SCR_WIDTH))
 					{
 						snes_draw_tile_object(charaddr + name_sel + tile + table_obj_offset[ys][xs] + line, x + (count++ << 3), priority, hflip, pal, blend);
 					}
@@ -1094,7 +1094,7 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 			{
 				for (xs = 0; xs < snes_ppu.oam.size[size]; xs++)
 				{
-					if ((x + (xs << 3) < SNES_SCR_WIDTH + 8))
+					if ((x + (xs << 3) < SNES_SCR_WIDTH))
 					{
 						snes_draw_tile_object(charaddr + name_sel + tile + table_obj_offset[ys][xs] + line, x + (xs << 3), priority, hflip, pal, blend);
 					}
