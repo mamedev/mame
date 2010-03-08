@@ -2337,7 +2337,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ss23 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
