@@ -179,9 +179,11 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/x76f041.o \
 	$(EMUMACHINE)/x76f100.o \
 	$(EMUMACHINE)/z80ctc.o \
+	$(EMUMACHINE)/z80dart.o \
 	$(EMUMACHINE)/z80dma.o \
 	$(EMUMACHINE)/z80pio.o \
 	$(EMUMACHINE)/z80sio.o \
+	$(EMUMACHINE)/z80sti.o \
 
 EMUVIDEOOBJS = \
 	$(EMUVIDEO)/generic.o \
