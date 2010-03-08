@@ -620,7 +620,7 @@ static void check_osd_inputs(running_machine *machine)
 
 static void extract_window_config(running_machine *machine, int index, sdl_window_config *conf)
 {
-	char buf[10];
+	char buf[20];
 
 	sprintf(buf,SDLOPTION_RESOLUTION("%d"), index);
 	// per-window options: extract the data
