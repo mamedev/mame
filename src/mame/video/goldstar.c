@@ -155,6 +155,72 @@ static TILE_GET_INFO( get_goldstar_reel3_tile_info )
 			0);
 }
 
+WRITE8_HANDLER( unkch_reel1_attrram_w )
+{
+	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+
+	state->reel1_attrram[offset] = data;
+	tilemap_mark_tile_dirty(state->reel1_tilemap,offset);
+}
+
+WRITE8_HANDLER( unkch_reel2_attrram_w )
+{
+	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+
+	state->reel2_attrram[offset] = data;
+	tilemap_mark_tile_dirty(state->reel2_tilemap,offset);
+}
+
+
+WRITE8_HANDLER( unkch_reel3_attrram_w )
+{
+	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+
+	state->reel3_attrram[offset] = data;
+	tilemap_mark_tile_dirty(state->reel3_tilemap,offset);
+}
+
+
+static TILE_GET_INFO( get_unkch_reel1_tile_info )
+{
+	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	int code = state->reel1_ram[tile_index];
+	int attr = state->reel1_attrram[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code | (attr & 0x0f)<<8,
+			(attr&0xf0)>>4,
+			0);
+}
+
+static TILE_GET_INFO( get_unkch_reel2_tile_info )
+{
+	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	int code = state->reel2_ram[tile_index];
+	int attr = state->reel2_attrram[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code | (attr & 0x0f)<<8,
+			(attr&0xf0)>>4,
+			0);
+}
+
+static TILE_GET_INFO( get_unkch_reel3_tile_info )
+{
+	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	int code = state->reel3_ram[tile_index];
+	int attr = state->reel3_attrram[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code | (attr & 0x0f)<<8,
+			(attr&0xf0)>>4,
+			0);
+}
+
+
 
 
 VIDEO_START( goldstar )
@@ -173,6 +239,28 @@ VIDEO_START( goldstar )
 	tilemap_set_transparent_pen(state->fg_tilemap,0);
 
 	// is there an enable reg for this game?
+	state->cm_enable_reg = 0x0b;
+}
+
+VIDEO_START( unkch )
+{
+	goldstar_state *state = (goldstar_state *)machine->driver_data;
+
+	state->reel1_tilemap = tilemap_create(machine,get_unkch_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	state->reel2_tilemap = tilemap_create(machine,get_unkch_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	state->reel3_tilemap = tilemap_create(machine,get_unkch_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
+
+	tilemap_set_scroll_cols(state->reel1_tilemap, 32);
+	tilemap_set_scroll_cols(state->reel2_tilemap, 32);
+	tilemap_set_scroll_cols(state->reel3_tilemap, 32);
+
+	state->cmaster_girl_num = 0;
+	state->cmaster_girl_pal = 0;
+	state->unkch_vidreg = 0x00;
+
+	state->fg_tilemap = tilemap_create(machine,get_cherrym_fg_tile_info,tilemap_scan_rows,8,8, 64, 32);
+	tilemap_set_transparent_pen(state->fg_tilemap,0);
+
 	state->cm_enable_reg = 0x0b;
 }
 
@@ -263,6 +351,9 @@ static const rectangle am1a_visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+6)*8-1 };
 static const rectangle am1a_visible2 = { 0*8, (14+48)*8-1, 10*8, (10+6)*8-1 };
 static const rectangle am1a_visible3 = { 0*8, (14+48)*8-1, 16*8, (16+6)*8-1 };
 
+static const rectangle unkch_visible1 = { 0*8, (14+48)*8-1,  3*8,  (3+7)*8-1 };
+static const rectangle unkch_visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
+static const rectangle unkch_visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
 
 VIDEO_UPDATE( goldstar )
 {
@@ -298,6 +389,57 @@ VIDEO_UPDATE( goldstar )
 			int girlxscroll = (INT8)((state->cm_girl_scroll & 0x0f)<<4);
 
 			drawgfxzoom_transpen(bitmap,cliprect,gfx,state->cmaster_girl_num,state->cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+		}
+	}
+
+	if (state->cm_enable_reg &0x02)
+	{
+		tilemap_draw(bitmap,cliprect, state->fg_tilemap, 0, 0);
+	}
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( unkch )
+{
+	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	int i;
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	if (!state->cm_enable_reg &0x01)
+		return 0;
+
+	if (state->cm_enable_reg &0x08)
+	{
+		// guess, this could be something else completely!!
+		// only draw the first 'reels' tilemap, but fullscreen, using alt registers? (or no scrolling at all? - doubtful, see girl)
+		if (state->unkch_vidreg & 0x40)
+		{
+			for (i= 0;i < 32;i++)
+			{
+				tilemap_set_scrolly(state->reel1_tilemap, i, -0x08/*state->reel1_scroll[(i*2)+1]*/);
+			//	tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[(i*2)+1]);
+			//	tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[(i*2)+1]);
+			}
+
+			tilemap_draw(bitmap, cliprect, state->reel1_tilemap, 0, 0);
+
+		}
+		// or draw the reels normally?
+		else
+		{
+			for (i= 0;i < 32;i++)
+			{
+				tilemap_set_scrolly(state->reel1_tilemap, i, state->reel1_scroll[i*2]);
+				tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[i*2]);
+				tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[i*2]);
+			}
+			
+			tilemap_draw(bitmap, &unkch_visible1, state->reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, &unkch_visible2, state->reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, &unkch_visible3, state->reel3_tilemap, 0, 0);			
 		}
 	}
 
