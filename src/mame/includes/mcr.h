@@ -64,8 +64,6 @@ WRITE16_HANDLER( mcr68_6840_lower_w );
 READ16_HANDLER( mcr68_6840_upper_r );
 READ16_HANDLER( mcr68_6840_lower_r );
 
-READ8_DEVICE_HANDLER( mcr_ipu_sio_r );
-WRITE8_DEVICE_HANDLER( mcr_ipu_sio_w );
 WRITE8_HANDLER( mcr_ipu_laserdisk_w );
 READ8_HANDLER( mcr_ipu_watchdog_r );
 WRITE8_HANDLER( mcr_ipu_watchdog_w );

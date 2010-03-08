@@ -346,28 +346,6 @@ static WRITE8_HANDLER( laserdisc_w )
 
 /*************************************
  *
- *  Z80 SIO/DART handlers
- *
- *************************************/
-
-static READ8_DEVICE_HANDLER( sio_r )
-{
-	return (offset & 1) ? z80sio_c_r(device, (offset >> 1) & 1) : z80sio_d_r(device, (offset >> 1) & 1);
-}
-
-
-static WRITE8_DEVICE_HANDLER( sio_w )
-{
-	if (offset & 1)
-		z80sio_c_w(device, (offset >> 1) & 1, data);
-	else
-		z80sio_d_w(device, (offset >> 1) & 1, data);
-}
-
-
-
-/*************************************
- *
  *  U.S. version memory map
  *
  *************************************/
@@ -420,7 +398,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", sio_r, sio_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_ba_cd_r, z80sio_ba_cd_w)
 ADDRESS_MAP_END
 
 

@@ -486,6 +486,58 @@ READ8_DEVICE_HANDLER( z80sio_d_r )
 }
 
 
+/***************************************************************************
+    CONTROL/DATA REGISTER
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( z80sio_cd_ba_r )
+{
+	switch (offset & 3)
+	{
+	case 0: return z80sio_d_r(device, 0);
+	case 1: return z80sio_d_r(device, 1);
+	case 2: return z80sio_c_r(device, 0);
+	case 3: return z80sio_c_r(device, 1);
+	}
+
+	return 0xff;
+}
+
+WRITE8_DEVICE_HANDLER( z80sio_cd_ba_w )
+{
+	switch (offset & 3)
+	{
+	case 0: z80sio_d_w(device, 0, data); break;
+	case 1: z80sio_d_w(device, 1, data); break;
+	case 2: z80sio_c_w(device, 0, data); break;
+	case 3: z80sio_c_w(device, 1, data); break;
+	}
+}
+
+READ8_DEVICE_HANDLER( z80sio_ba_cd_r )
+{
+	switch (offset & 3)
+	{
+	case 0: return z80sio_d_r(device, 0);
+	case 1: return z80sio_c_r(device, 0);
+	case 2: return z80sio_d_r(device, 1);
+	case 3: return z80sio_c_r(device, 1);
+	}
+
+	return 0xff;
+}
+
+WRITE8_DEVICE_HANDLER( z80sio_ba_cd_w )
+{
+	switch (offset & 3)
+	{
+	case 0: z80sio_d_w(device, 0, data); break;
+	case 1: z80sio_c_w(device, 0, data); break;
+	case 2: z80sio_d_w(device, 1, data); break;
+	case 3: z80sio_c_w(device, 1, data); break;
+	}
+}
+
 
 /***************************************************************************
     CONTROL LINE READ/WRITE

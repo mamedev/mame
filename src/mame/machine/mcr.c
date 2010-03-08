@@ -940,21 +940,6 @@ static WRITE8_DEVICE_HANDLER( ipu_break_changed )
 }
 
 
-READ8_DEVICE_HANDLER( mcr_ipu_sio_r )
-{
-	return (offset & 2) ? z80sio_c_r(device, offset & 1) : z80sio_d_r(device, offset & 1);
-}
-
-
-WRITE8_DEVICE_HANDLER( mcr_ipu_sio_w )
-{
-	if (offset & 2)
-		z80sio_c_w(device, offset & 1, data);
-	else
-		z80sio_d_w(device, offset & 1, data);
-}
-
-
 WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 {
 	/* bit 3 enables (1) LD video regardless of PIX SW */
