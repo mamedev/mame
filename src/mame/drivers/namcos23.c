@@ -1202,6 +1202,7 @@ static UINT16 c421_sram[0x8000];
 static UINT32 c421_adr = 0;
 
 static INT16 s23_c422_regs[0x10];
+static int s23_subcpu_running;
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -1560,12 +1561,21 @@ static WRITE32_HANDLER( s23_mcuen_w )
 		if (data)
 		{
 			logerror("S23: booting H8/3002\n");
+
+			// Panic Park: writing 1 when it's already running means reboot?
+			if (s23_subcpu_running)
+			{
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+			}
+
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+			s23_subcpu_running = 1;
 		}
 		else
 		{
 			logerror("S23: stopping H8/3002\n");
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+			s23_subcpu_running = 0;
 		}
 	}
 }
@@ -1598,6 +1608,12 @@ static WRITE32_HANDLER( gorgon_sharedram_w )
 	}
 }
 
+// Panic Park sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
+static READ32_HANDLER( s23_unk_status_r )
+{
+	return 0x00020002;
+}
+
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
@@ -1620,6 +1636,8 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) // BACKUP
 
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
+
+	AM_RANGE(0x0f000000, 0x0f000003) AM_READ( s23_unk_status_r )
 
 	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
 
@@ -1648,6 +1666,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16( s23_c412_r, s23_c412_w, 0xffffffff )
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16( s23_c421_r, s23_c421_w, 0xffffffff )
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff )
+	AM_RANGE(0x0e800000, 0x0e800003) AM_READ( s23_unk_status_r )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -1894,20 +1913,23 @@ static INPUT_PORTS_START( gorgon )
 	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TC2P0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_START("RRP0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0xef, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TC2P1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// gun trigger
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// foot pedal
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("RRP1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("RRP2")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("RRP3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -2072,7 +2094,7 @@ static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 // version without serial hookup to I/O board for games where the PIC isn't dumped
-static ADDRESS_MAP_START( s23h8ionoiobmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( s23h8noiobmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
@@ -2133,7 +2155,21 @@ static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
-	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r ) AM_WRITENOP
+	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r ) 
+	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
+	AM_RANGE(0x6006, 0x6007) AM_NOP
+	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
+
+	AM_RANGE(0xc000, 0xf7ff) AM_RAM
+ADDRESS_MAP_END
+
+// gorgon map
+static ADDRESS_MAP_START( gorgoniobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("RRP0")	  // 0-5 = start
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("RRP1")	  // 
+	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("RRP2")	  // 0-4 = coin
+	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("RRP3")	  // 1-1 = button?  1-4 = start?
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
 	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
@@ -2166,6 +2202,7 @@ static DRIVER_INIT(ss23)
 	memset(s23_settings, 0, sizeof(s23_settings));
 	s23_tssio_port_4 = 0;
 	s23_porta = 0, s23_rtcstate = 0;
+	s23_subcpu_running = 1;
 
 	if ((!strcmp(machine->gamedrv->name, "motoxgo")) ||
 	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
@@ -2174,6 +2211,7 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine->gamedrv->name, "gunwars")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2j")) ||
+	    (!strcmp(machine->gamedrv->name, "timecrs2b")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2")))
 	{
 		has_jvsio = 1;
@@ -2222,7 +2260,7 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
+	MDRV_CPU_PROGRAM_MAP( gorgoniobrdmap )
 	MDRV_CPU_IO_MAP( s23iobrdiomap )
 
 	MDRV_QUANTUM_TIME(HZ(60000))
@@ -2254,7 +2292,6 @@ static MACHINE_DRIVER_START( gorgon )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( s23 )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(config)
@@ -2299,19 +2336,18 @@ static MACHINE_DRIVER_START( s23 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ss23 )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap )
+	MDRV_CPU_IO_MAP( s23h8noiobmap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
-	MDRV_QUANTUM_TIME(HZ(60*18000))
+	MDRV_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -2339,9 +2375,18 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( ss23io )
+	MDRV_IMPORT_FROM( ss23 )
+
+	MDRV_CPU_MODIFY("audiocpu")
+	MDRV_CPU_IO_MAP( s23h8iomap )
+
+	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
+	MDRV_CPU_IO_MAP( s23iobrdiomap )
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( gmen )
-	// NOTE: importing from ss23 and adding the io CPU results in the io CPU not booting properly. 
-	//       for now we import plain s23 and modify the main CPU to SS23 spec.
 	MDRV_IMPORT_FROM( s23 )
 
 	MDRV_CPU_REPLACE("maincpu", R4650BE, S23_BUSCLOCK*5) 
@@ -2649,7 +2694,7 @@ ROM_START( 500gp )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
         ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
-		ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000001, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
+	ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000001, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
 
 		/* COMMON FUJII YASUI WAKAO KURE INOUE
          * 0x000000..0x57ffff: all 0xff
@@ -2859,7 +2904,7 @@ GAME( 1997, finlflng, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Final Furlon
 GAME( 1997, motoxgo,  0,         s23,    s23, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2b,timecrs2,  s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, timecrs2c,timecrs2, ss23,   ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1997, timecrs2c,timecrs2, ss23io, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, panicprk, 0,         s23,    s23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, gunwars,  0,        gmen,   ss23, ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, 500gp,    0,        ss23,   ss23, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
