@@ -70,7 +70,7 @@ struct snes_cart_info snes_cart;
 *************************************/
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-static void snes_latch_counters(running_machine *machine)
+void snes_latch_counters(running_machine *machine)
 {
 	snes_ppu.beam.current_horz = video_screen_get_hpos(machine->primary_screen) / snes_htmult;
 	snes_ppu.beam.latch_vert = video_screen_get_vpos(machine->primary_screen);
@@ -572,7 +572,6 @@ READ8_HANDLER( snes_r_io )
 			read_ophct = 0;
 			read_opvct = 0;
 			value = snes_ram[offset];
-			value &= ~0x40;	// clear 'latched counters' flag
 			value |= (snes_ppu.ppu1_open_bus & 0x20);
 			value |= (snes_ppu.ppu2_version & 0x0f);
 			snes_ram[offset] = value;	// not sure if this is needed...
