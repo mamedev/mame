@@ -9,8 +9,9 @@
 
   Games running on this hardware:
 
-  * Five Clown (english),      1993, IGS.
-  * Five Clown (spanish hack), 1993, IGS.
+  * Five Clown (english, set 1), 1993, IGS.
+  * Five Clown (english, set 2), 1993, IGS.
+  * Five Clown (spanish hack),   1993, IGS.
 
 
   This hardware seems to be based on Bonanza's Golden Poker, but on steroids...
@@ -1078,6 +1079,37 @@ MACHINE_DRIVER_END
 
 ROM_START( 5clown )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "five_clown.u2",	0x2000, 0x8000, CRC(96e3e8ab) SHA1(fec20b9a8bde5306162f8288cdc9580f445cadf5) )
+	ROM_COPY( "maincpu",		0x2000, 0x8000, 0x8000 )
+
+
+	ROM_REGION( 0x8000,  "gfxbanks", 0 )
+	ROM_LOAD( "7.u34",	0x0000, 0x8000, CRC(64c9f4ee) SHA1(6e695feee826e319f84d91f6bbf7cfacd443fc8f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "9.u35",	0xe000, 0x2000, CRC(7e3c3af5) SHA1(ebc09da981dbdf4eac90bcf982e5bc8ede47e81a) )
+
+	ROM_REGION( 0x40000, "oki6295", 0 )
+	ROM_LOAD( "8.u50",	0x0000, 0x10000, CRC(e1e37180) SHA1(e162abcb01952e26deee74ece5719239961e1b69) )
+
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(				0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_COPY( "gfxbanks",	0x7000, 0x2000, 0x1000 )
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_COPY( "gfxbanks",	0x6000, 0x0000, 0x1000 )
+	ROM_COPY( "gfxbanks",	0x5000, 0x1000, 0x1000 )
+	ROM_COPY( "gfxbanks",	0x4000, 0x2000, 0x1000 )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dm74s287an.u32",	0x0000, 0x0100, CRC(2d207266) SHA1(374b4830a0a8ed3001cf0df16daa8dffee503cbe) )
+
+ROM_END
+
+
+ROM_START( 5clowna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.u2",	0x2000, 0x2000, BAD_DUMP CRC(15ecca37) SHA1(d8d0a43f559168cccc3a46418557ccfc30c8108e) )
 	ROM_LOAD( "5.u2",	0x4000, 0x2000, BAD_DUMP CRC(2e962007) SHA1(86599ba5030068c08ff5a19ada7250c410b2ba35) )
 	ROM_LOAD( "7.u2",	0xe000, 0x2000, BAD_DUMP CRC(308c4771) SHA1(f6ee402c120ff16601347cc994a45a7092511050) )
@@ -1108,10 +1140,10 @@ ROM_START( 5clown )
 ROM_END
 
 
-ROM_START( 5clowna )
+ROM_START( 5clownsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "five_clown.u2",	0x2000, 0x8000, CRC(fa18090d) SHA1(47feb5dbc77ae8621fc35b707c24d64a95227a39) )
-	ROM_COPY( "maincpu",		0x2000, 0x8000, 0x8000 )
+	ROM_LOAD( "five_clown_sp.u2",	0x2000, 0x8000, CRC(fa18090d) SHA1(47feb5dbc77ae8621fc35b707c24d64a95227a39) )
+	ROM_COPY( "maincpu",			0x2000, 0x8000, 0x8000 )
 
 
 	ROM_REGION( 0x8000,  "gfxbanks", 0 )
@@ -1205,6 +1237,7 @@ static DRIVER_INIT( fclown )
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME     PARENT  MACHINE INPUT   INIT    ROT    COMPANY  FULLNAME                    FLAGS... */
-GAME( 1993, 5clown,  0,      fclown, fclown, fclown, ROT0, "IGS",   "Five Clown (english)",      GAME_IMPERFECT_SOUND )
-GAME( 1993, 5clowna, 5clown, fclown, fclown, fclown, ROT0, "IGS",   "Five Clown (spanish hack)", GAME_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT  MACHINE INPUT   INIT    ROT    COMPANY  FULLNAME                      FLAGS... */
+GAME( 1993, 5clown,   0,      fclown, fclown, fclown, ROT0, "IGS",   "Five Clown (english, set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1993, 5clowna,  5clown, fclown, fclown, fclown, ROT0, "IGS",   "Five Clown (english, set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1993, 5clownsp, 5clown, fclown, fclown, fclown, ROT0, "IGS",   "Five Clown (spanish hack)",   GAME_IMPERFECT_SOUND )

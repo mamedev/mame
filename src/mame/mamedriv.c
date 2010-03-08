@@ -8258,6 +8258,7 @@ Other Sun games
 	DRIVER( grndtour )	/* (c) 1993 */
 	DRIVER( 5clown )	/* (c) IGS 1993 */
 	DRIVER( 5clowna )	/* (c) IGS 1993 */
+	DRIVER( 5clownsp )	/* (c) IGS 1993 */
 
 	/* IGS005 + IGS006 + IGS007 + IGS008 Games */
 	DRIVER( lordgun )	/* (c) 1994 */
