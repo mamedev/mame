@@ -1662,7 +1662,7 @@ void memory_dump(running_machine *machine, FILE *file)
 		              "====================================================\n"
 		              "Device '%s' %s address space write handler dump\n"
 		              "====================================================\n", space->cpu->tag.cstr(), space->name);
-		dump_map(file, space, &space->read);
+		dump_map(file, space, &space->write);
 	}
 }
 
