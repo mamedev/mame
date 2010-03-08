@@ -1801,7 +1801,7 @@ static DEVICE_START( ide_controller )
 
 	/* set MAME harddisk handle */
 	config = (const ide_config *)device->baseconfig().inline_config;
-	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag.cstr());
+	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag());
 	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 

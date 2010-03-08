@@ -312,7 +312,7 @@ void cpuexec_timeslice(running_machine *machine)
 				{
 					/* compute how many cycles we want to execute */
 					ran = classdata->cycles_running = divu_64x32((UINT64)delta >> classdata->divshift, classdata->divisor);
-					LOG(("  cpu '%s': %d cycles\n", classdata->device->tag.cstr(), classdata->cycles_running));
+					LOG(("  cpu '%s': %d cycles\n", classdata->device->tag(), classdata->cycles_running));
 
 					/* if we're not suspended, actually execute */
 					if (classdata->suspend == 0)
@@ -423,7 +423,7 @@ const char *cpuexec_describe_context(running_machine *machine)
 	if (executingcpu != NULL)
 	{
 		const address_space *space = cpu_get_address_space(executingcpu, ADDRESS_SPACE_PROGRAM);
-		sprintf(global->statebuf, "'%s' (%s)", executingcpu->tag.cstr(), core_i64_hex_format(cpu_get_pc(executingcpu), space->logaddrchars));
+		sprintf(global->statebuf, "'%s' (%s)", executingcpu->tag(), core_i64_hex_format(cpu_get_pc(executingcpu), space->logaddrchars));
 	}
 	else
 		strcpy(global->statebuf, "(no context)");
@@ -530,9 +530,9 @@ static DEVICE_START( cpu )
 	/* if no state registered for saving, we can't save */
 	if (num_regs == 0)
 	{
-		logerror("CPU '%s' did not register any state to save!\n", device->tag.cstr());
+		logerror("CPU '%s' did not register any state to save!\n", device->tag());
 		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("CPU '%s' did not register any state to save!", device->tag.cstr());
+			fatalerror("CPU '%s' did not register any state to save!", device->tag());
 	}
 
 	/* register some internal states as well */
@@ -1212,7 +1212,7 @@ void cpu_set_input_line_vector(running_device *device, int line, int vector)
 		classdata->input[line].vector = vector;
 		return;
 	}
-	LOG(("cpu_set_input_line_vector CPU '%s' line %d > max input lines\n", device->tag.cstr(), line));
+	LOG(("cpu_set_input_line_vector CPU '%s' line %d > max input lines\n", device->tag(), line));
 }
 
 
@@ -1228,7 +1228,7 @@ void cpu_set_input_line_and_vector(running_device *device, int line, int state, 
 
 	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
 	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
-		fatalerror("CPU %s: PULSE_LINE can only be used for NMI and RESET lines\n", device->tag.cstr());
+		fatalerror("CPU %s: PULSE_LINE can only be used for NMI and RESET lines\n", device->tag());
 
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
@@ -1236,7 +1236,7 @@ void cpu_set_input_line_and_vector(running_device *device, int line, int state, 
 		INT32 input_event = (state & 0xff) | (vector << 8);
 		int event_index = inputline->qindex++;
 
-		LOG(("cpu_set_input_line_and_vector('%s',%d,%d,%02x)\n", device->tag.cstr(), line, state, vector));
+		LOG(("cpu_set_input_line_and_vector('%s',%d,%d,%02x)\n", device->tag(), line, state, vector));
 
 		/* if we're full of events, flush the queue and log a message */
 		if (event_index >= ARRAY_LENGTH(inputline->queue))
@@ -1244,7 +1244,7 @@ void cpu_set_input_line_and_vector(running_device *device, int line, int state, 
 			inputline->qindex--;
 			empty_event_queue(device->machine, (void *)device, line);
 			event_index = inputline->qindex++;
-			logerror("Exceeded pending input line event queue on CPU '%s'!\n", device->tag.cstr());
+			logerror("Exceeded pending input line event queue on CPU '%s'!\n", device->tag());
 		}
 
 		/* enqueue the event */
@@ -1391,7 +1391,7 @@ static void on_vblank(running_device *device, void *param, int vblank_state)
 
 			/* for new style declaration, we need to compare the tags */
 			else if (config->vblank_interrupt_screen != NULL)
-				cpu_interested = (strcmp(config->vblank_interrupt_screen, device->tag) == 0);
+				cpu_interested = (strcmp(config->vblank_interrupt_screen, device->tag()) == 0);
 
 			/* no VBLANK interrupt, not interested */
 			else
@@ -1541,7 +1541,7 @@ static TIMER_CALLBACK( empty_event_queue )
 					break;
 
 				default:
-					logerror("empty_event_queue cpu '%s', line %d, unknown state %d\n", device->tag.cstr(), param, state);
+					logerror("empty_event_queue cpu '%s', line %d, unknown state %d\n", device->tag(), param, state);
 					break;
 			}
 
@@ -1568,12 +1568,12 @@ static IRQ_CALLBACK( standard_irq_callback )
 	cpu_input_data *inputline = &classdata->input[irqline];
 	int vector = inputline->curvector;
 
-	LOG(("standard_irq_callback('%s', %d) $%04x\n", device->tag.cstr(), irqline, vector));
+	LOG(("standard_irq_callback('%s', %d) $%04x\n", device->tag(), irqline, vector));
 
 	/* if the IRQ state is HOLD_LINE, clear it */
 	if (inputline->curstate == HOLD_LINE)
 	{
-		LOG(("->set_irq_line('%s',%d,%d)\n", device->tag.cstr(), irqline, CLEAR_LINE));
+		LOG(("->set_irq_line('%s',%d,%d)\n", device->tag(), irqline, CLEAR_LINE));
 		cpu_set_info(device, CPUINFO_INT_INPUT_STATE + irqline, CLEAR_LINE);
 		inputline->curstate = CLEAR_LINE;
 	}

@@ -187,7 +187,7 @@ static tilemap_t *tx_tilemap;
 static UINT16 *tx_vram,*bg_vram,*fg_vram,*spr_ram;
 static UINT16 *io_ram;
 
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 
 static TILE_GET_INFO( get_tx_tile_info )
 {

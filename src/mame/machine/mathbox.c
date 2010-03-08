@@ -320,7 +320,6 @@ static DEVICE_START( mathbox )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(strlen(device->tag) < 20);
 
 	/* set static values */
 	mb->device = device;

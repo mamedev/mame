@@ -476,7 +476,7 @@ READ8_DEVICE_HANDLER( i8255a_r )
 		case MODE_1: data = read_mode1(i8255a, PORT_A); break;
 		case MODE_2: data = read_mode2(i8255a); break;
 		}
-		if (LOG) logerror("8255A '%s' Port A Read: %02x\n", device->tag.cstr(), data);
+		if (LOG) logerror("8255A '%s' Port A Read: %02x\n", device->tag(), data);
 		break;
 
 	case PORT_B:
@@ -485,17 +485,17 @@ READ8_DEVICE_HANDLER( i8255a_r )
 		case MODE_0: data = read_mode0(i8255a, PORT_B); break;
 		case MODE_1: data = read_mode1(i8255a, PORT_B); break;
 		}
-		if (LOG) logerror("8255A '%s' Port B Read: %02x\n", device->tag.cstr(), data);
+		if (LOG) logerror("8255A '%s' Port B Read: %02x\n", device->tag(), data);
 		break;
 
 	case PORT_C:
 		data = read_pc(i8255a);
-		//if (LOG) logerror("8255A '%s' Port C Read: %02x\n", device->tag.cstr(), data);
+		//if (LOG) logerror("8255A '%s' Port C Read: %02x\n", device->tag(), data);
 		break;
 
 	case CONTROL:
 		data = i8255a->control;
-		if (LOG) logerror("8255A '%s' Mode Control Word Read: %02x\n", device->tag.cstr(), data);
+		if (LOG) logerror("8255A '%s' Mode Control Word Read: %02x\n", device->tag(), data);
 		break;
 	}
 
@@ -599,12 +599,12 @@ static void set_mode(running_device *device, UINT8 data)
 		devcb_call_write8(&i8255a->out_port_func[PORT_A], 0, 0xff);
 	}
 
-	if (LOG) logerror("8255A '%s' Group A Mode: %u\n", device->tag.cstr(), group_mode(i8255a, GROUP_A));
-	if (LOG) logerror("8255A '%s' Port A Mode: %s\n", device->tag.cstr(), (port_mode(i8255a, PORT_A) == MODE_OUTPUT) ? "output" : "input");
-	if (LOG) logerror("8255A '%s' Port C Upper Mode: %s\n", device->tag.cstr(), (port_c_upper_mode(i8255a) == MODE_OUTPUT) ? "output" : "input");
-	if (LOG) logerror("8255A '%s' Group B Mode: %u\n", device->tag.cstr(), group_mode(i8255a, GROUP_B));
-	if (LOG) logerror("8255A '%s' Port B Mode: %s\n", device->tag.cstr(), (port_mode(i8255a, PORT_B) == MODE_OUTPUT) ? "output" : "input");
-	if (LOG) logerror("8255A '%s' Port C Lower Mode: %s\n", device->tag.cstr(), (port_c_lower_mode(i8255a) == MODE_OUTPUT) ? "output" : "input");
+	if (LOG) logerror("8255A '%s' Group A Mode: %u\n", device->tag(), group_mode(i8255a, GROUP_A));
+	if (LOG) logerror("8255A '%s' Port A Mode: %s\n", device->tag(), (port_mode(i8255a, PORT_A) == MODE_OUTPUT) ? "output" : "input");
+	if (LOG) logerror("8255A '%s' Port C Upper Mode: %s\n", device->tag(), (port_c_upper_mode(i8255a) == MODE_OUTPUT) ? "output" : "input");
+	if (LOG) logerror("8255A '%s' Group B Mode: %u\n", device->tag(), group_mode(i8255a, GROUP_B));
+	if (LOG) logerror("8255A '%s' Port B Mode: %s\n", device->tag(), (port_mode(i8255a, PORT_B) == MODE_OUTPUT) ? "output" : "input");
+	if (LOG) logerror("8255A '%s' Port C Lower Mode: %s\n", device->tag(), (port_c_lower_mode(i8255a) == MODE_OUTPUT) ? "output" : "input");
 
 	/* group B */
 	i8255a->output[PORT_B] = 0;
@@ -697,7 +697,7 @@ WRITE8_DEVICE_HANDLER( i8255a_w )
 	switch (offset & 0x03)
 	{
 	case PORT_A:
-		if (LOG) logerror("8255A '%s' Port A Write: %02x\n", device->tag.cstr(), data);
+		if (LOG) logerror("8255A '%s' Port A Write: %02x\n", device->tag(), data);
 
 		switch (group_mode(i8255a, GROUP_A))
 		{
@@ -708,7 +708,7 @@ WRITE8_DEVICE_HANDLER( i8255a_w )
 		break;
 
 	case PORT_B:
-		if (LOG) logerror("8255A '%s' Port B Write: %02x\n", device->tag.cstr(), data);
+		if (LOG) logerror("8255A '%s' Port B Write: %02x\n", device->tag(), data);
 
 		switch (group_mode(i8255a, GROUP_B))
 		{
@@ -718,7 +718,7 @@ WRITE8_DEVICE_HANDLER( i8255a_w )
 		break;
 
 	case PORT_C:
-		if (LOG) logerror("8255A '%s' Port C Write: %02x\n", device->tag.cstr(), data);
+		if (LOG) logerror("8255A '%s' Port C Write: %02x\n", device->tag(), data);
 
 		write_pc(i8255a, data);
 		break;
@@ -726,7 +726,7 @@ WRITE8_DEVICE_HANDLER( i8255a_w )
 	case CONTROL:
 		if (data & I8255A_CONTROL_MODE_SET)
 		{
-			if (LOG) logerror("8255A '%s' Mode Control Word: %02x\n", device->tag.cstr(), data);
+			if (LOG) logerror("8255A '%s' Mode Control Word: %02x\n", device->tag(), data);
 
 			set_mode(device, data);
 		}
@@ -735,7 +735,7 @@ WRITE8_DEVICE_HANDLER( i8255a_w )
 			int bit = (data >> 1) & 0x07;
 			int state = BIT(data, 0);
 
-			if (LOG) logerror("8255A '%s' %s Bit %u\n", device->tag.cstr(), state ? "Set" : "Reset", bit);
+			if (LOG) logerror("8255A '%s' %s Bit %u\n", device->tag(), state ? "Set" : "Reset", bit);
 
 			set_pc_bit(device, bit, state);
 		}
@@ -782,7 +782,7 @@ WRITE_LINE_DEVICE_HANDLER( i8255a_pc2_w )
 			/* port B acknowledge */
 			if (!i8255a->obf[PORT_B] && !state)
 			{
-				if (LOG) logerror("8255A '%s' Port B Acknowledge\n", device->tag.cstr());
+				if (LOG) logerror("8255A '%s' Port B Acknowledge\n", device->tag());
 
 				/* clear output buffer flag */
 				set_obf(i8255a, PORT_B, 1);
@@ -793,7 +793,7 @@ WRITE_LINE_DEVICE_HANDLER( i8255a_pc2_w )
 			/* port B strobe */
 			if (!i8255a->ibf[PORT_B] && !state)
 			{
-				if (LOG) logerror("8255A '%s' Port B Strobe\n", device->tag.cstr());
+				if (LOG) logerror("8255A '%s' Port B Strobe\n", device->tag());
 
 				/* read port into latch */
 				i8255a->input[PORT_B] = devcb_call_read8(&i8255a->in_port_func[PORT_B], 0);
@@ -814,7 +814,7 @@ WRITE_LINE_DEVICE_HANDLER( i8255a_pc4_w )
 		/* port A strobe */
 		if (!i8255a->ibf[PORT_A] && !state)
 		{
-			if (LOG) logerror("8255A '%s' Port A Strobe\n", device->tag.cstr());
+			if (LOG) logerror("8255A '%s' Port A Strobe\n", device->tag());
 
 			/* read port into latch */
 			i8255a->input[PORT_A] = devcb_call_read8(&i8255a->in_port_func[PORT_A], 0);
@@ -834,7 +834,7 @@ WRITE_LINE_DEVICE_HANDLER( i8255a_pc6_w )
 		/* port A acknowledge */
 		if (!i8255a->obf[PORT_A] && !state)
 		{
-			if (LOG) logerror("8255A '%s' Port A Acknowledge\n", device->tag.cstr());
+			if (LOG) logerror("8255A '%s' Port A Acknowledge\n", device->tag());
 
 			/* clear output buffer flag */
 			set_obf(i8255a, PORT_A, 1);

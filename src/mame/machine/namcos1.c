@@ -99,13 +99,13 @@ static READ8_HANDLER( faceoff_inputs_r );
 
 static READ8_HANDLER( no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset);
 	return 0;
 }
 
 static WRITE8_HANDLER( no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset, data);
+	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -210,7 +210,7 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 static READ8_HANDLER( key_type1_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset);
 
 	if (offset < 3)
 	{
@@ -241,7 +241,7 @@ static READ8_HANDLER( key_type1_r )
 
 static WRITE8_HANDLER( key_type1_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset, data);
 
 	if (offset < 4)
 		key[offset] = data;
@@ -393,7 +393,7 @@ CPU #0 PC e574: keychip read 0001
 
 static READ8_HANDLER( key_type2_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset);
 
 	key_numerator_high_word = 0;
 
@@ -412,7 +412,7 @@ static READ8_HANDLER( key_type2_r )
 
 static WRITE8_HANDLER( key_type2_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset, data);
 
 	if (offset < 5)
 	{
@@ -521,7 +521,7 @@ static READ8_HANDLER( key_type3_r )
 {
 	int op;
 
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
        using it as temporary storage, so maybe it expects to act as RAM, however
@@ -537,14 +537,14 @@ static READ8_HANDLER( key_type3_r )
 	if (op == key_bottom4)	return (offset << 4) | (key[key_swap4_arg] & 0x0f);
 	if (op == key_top4)		return (offset << 4) | (key[key_swap4_arg] >> 4);
 
-	popmessage("CPU %s PC %08x: keychip read %04x", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x", space->cpu->tag(), cpu_get_pc(space->cpu), offset);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( key_type3_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset, data);
 
 	key[(offset & 0x70) >> 4] = data;
 }
@@ -647,21 +647,21 @@ static WRITE8_HANDLER( soundram_w )
 
 static WRITE8_HANDLER( rom_w )
 {
-	logerror("CPU %s PC %04x: warning - write %02x to rom address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	logerror("CPU %s PC %04x: warning - write %02x to rom address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 }
 
 /* error handlers */
 static READ8_HANDLER( unknown_r )
 {
-	logerror("CPU %s PC %04x: warning - read from unknown chip\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu) );
-//  popmessage("CPU %s PC %04x: read from unknown chip", space->cpu->tag.cstr(), cpu_get_pc(space->cpu) );
+	logerror("CPU %s PC %04x: warning - read from unknown chip\n", space->cpu->tag(), cpu_get_pc(space->cpu) );
+//  popmessage("CPU %s PC %04x: read from unknown chip", space->cpu->tag(), cpu_get_pc(space->cpu) );
 	return 0;
 }
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("CPU %s PC %04x: warning - wrote to unknown chip\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu) );
-//  popmessage("CPU %s PC %04x: wrote to unknown chip", space->cpu->tag.cstr(), cpu_get_pc(space->cpu) );
+	logerror("CPU %s PC %04x: warning - wrote to unknown chip\n", space->cpu->tag(), cpu_get_pc(space->cpu) );
+//  popmessage("CPU %s PC %04x: wrote to unknown chip", space->cpu->tag(), cpu_get_pc(space->cpu) );
 }
 
 /* Main bankswitching routine */
@@ -737,7 +737,7 @@ static void namcos1_bankswitch(running_machine *machine, int cpu, offs_t offset,
 
 WRITE8_HANDLER( namcos1_bankswitch_w )
 {
-//  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag.cstr(), offset, data);
+//  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag(), offset, data);
 
 	namcos1_bankswitch(space->machine, (space->cpu == devtag_get_device(space->machine, "maincpu")) ? 0 : 1, offset, data);
 }

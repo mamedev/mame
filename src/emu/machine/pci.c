@@ -136,7 +136,7 @@ READ32_DEVICE_HANDLER( pci_32le_r )
 	}
 
 	if (LOG_PCI)
-		logerror("pci_32le_r('%s'): offset=%d result=0x%08X\n", device->tag.cstr(), offset, result);
+		logerror("pci_32le_r('%s'): offset=%d result=0x%08X\n", device->tag(), offset, result);
 
 	return result;
 }
@@ -150,7 +150,7 @@ WRITE32_DEVICE_HANDLER( pci_32le_w )
 	offset %= 2;
 
 	if (LOG_PCI)
-		logerror("pci_32le_w('%s'): offset=%d data=0x%08X\n", device->tag.cstr(), offset, data);
+		logerror("pci_32le_w('%s'): offset=%d data=0x%08X\n", device->tag(), offset, data);
 
 	switch (offset)
 	{

@@ -217,7 +217,7 @@ void msm5205_vclk_w (running_device *device, int vclk)
 
 	if( voice->prescaler != 0 )
 	{
-		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", device->tag.cstr());
+		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", device->tag());
 	}
 	else
 	{

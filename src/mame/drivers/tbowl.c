@@ -181,7 +181,7 @@ static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 
 static void tbowl_adpcm_int(running_device *device)
 {
-	int num = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
+	int num = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[num] >= adpcm_end[num] ||
 				adpcm_pos[num] >= memory_region_length(device->machine, "adpcm")/2)
 		msm5205_reset_w(device,1);

@@ -496,7 +496,7 @@ static DEVICE_START( discrete )
 	info->total_stream_updates = 0;
 
 	/* create the logfile */
-	sprintf(name, "discrete%s.log", device->tag.cstr());
+	sprintf(name, "discrete%s.log", device->tag());
 	if (DISCRETE_DEBUGLOG)
 		info->disclogfile = fopen(name, "w");
 

@@ -122,12 +122,12 @@ static TIMER_CALLBACK( nmi_generate )
 
 	if (!cpu_is_suspended(state->nmicpu, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		LOG(("NMI cpu '%s'\n",state->nmicpu->tag.cstr()));
+		LOG(("NMI cpu '%s'\n",state->nmicpu->tag()));
 
 		cpu_set_input_line(state->nmicpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		LOG(("NMI not generated because cpu '%s' is suspended\n",state->nmicpu->tag.cstr()));
+		LOG(("NMI not generated because cpu '%s' is suspended\n",state->nmicpu->tag()));
 }
 
 
@@ -137,11 +137,11 @@ READ8_DEVICE_HANDLER( namco_06xx_data_r )
 	UINT8 result = 0xff;
 	int devnum;
 
-	LOG(("%s: 06XX '%s' read offset %d\n",cpuexec_describe_context(device->machine),device->tag.cstr(),offset));
+	LOG(("%s: 06XX '%s' read offset %d\n",cpuexec_describe_context(device->machine),device->tag(),offset));
 
 	if (!(state->control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",cpuexec_describe_context(device->machine),device->tag.cstr(),state->control);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",cpuexec_describe_context(device->machine),device->tag(),state->control);
 		return 0;
 	}
 
@@ -158,11 +158,11 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' write offset %d = %02x\n",cpuexec_describe_context(device->machine),device->tag.cstr(),offset,data));
+	LOG(("%s: 06XX '%s' write offset %d = %02x\n",cpuexec_describe_context(device->machine),device->tag(),offset,data));
 
 	if (state->control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",cpuexec_describe_context(device->machine),device->tag.cstr(),state->control);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",cpuexec_describe_context(device->machine),device->tag(),state->control);
 		return;
 	}
 
@@ -175,7 +175,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 READ8_DEVICE_HANDLER( namco_06xx_ctrl_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	LOG(("%s: 06XX '%s' ctrl_r\n",cpuexec_describe_context(device->machine),device->tag.cstr()));
+	LOG(("%s: 06XX '%s' ctrl_r\n",cpuexec_describe_context(device->machine),device->tag()));
 	return state->control;
 }
 
@@ -184,7 +184,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' control %02x\n",cpuexec_describe_context(device->machine),device->tag.cstr(),data));
+	LOG(("%s: 06XX '%s' control %02x\n",cpuexec_describe_context(device->machine),device->tag(),data));
 
 	state->control = data;
 

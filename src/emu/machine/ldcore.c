@@ -1141,7 +1141,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 			int changed = FALSE;
 
 			/* output the basics */
-			xml_set_attribute(ldnode, "tag", device->tag);
+			xml_set_attribute(ldnode, "tag", device->tag());
 
 			/* add an overlay node */
 			overnode = xml_add_child(ldnode, "overlay", NULL);
@@ -1333,7 +1333,7 @@ static void init_disc(running_device *device)
 	if (config->getdisc != NULL)
 		ldcore->disc = (*config->getdisc)(device);
 	else
-		ldcore->disc = get_disk_handle(device->machine, device->tag);
+		ldcore->disc = get_disk_handle(device->machine, device->tag());
 
 	/* set default parameters */
 	ldcore->width = 720;

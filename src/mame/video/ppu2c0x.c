@@ -1029,7 +1029,7 @@ READ8_DEVICE_HANDLER( ppu2c0x_r )
 
 	if (offset >= PPU_MAX_REG)
 	{
-		logerror("PPU %s(r): Attempting to read past the chip\n", device->tag.cstr());
+		logerror("PPU %s(r): Attempting to read past the chip\n", device->tag());
 		offset &= PPU_MAX_REG - 1;
 	}
 

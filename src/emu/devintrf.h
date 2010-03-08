@@ -404,6 +404,7 @@ public:
 	virtual const char *version() const { return get_config_string(DEVINFO_STR_VERSION); }
 	virtual const char *source_file() const { return get_config_string(DEVINFO_STR_SOURCE_FILE); }
 	virtual const char *credits() const { return get_config_string(DEVINFO_STR_CREDITS); }
+	const char *tag() const { return m_tag; }
 
 	INT64 get_config_int(UINT32 state) const;
 	void *get_config_ptr(UINT32 state) const;
@@ -418,7 +419,6 @@ public:
 	device_config *			owner;					// device that owns us, or NULL if nobody
 
 	// device properties
-	astring 				tag;					// tag for this instance
 	device_type				type;					// device type
 	device_class			devclass;				// device class
 
@@ -427,6 +427,9 @@ public:
 	const addrmap_token *	address_map[ADDRESS_SPACES]; // address maps for each address space
 	const void *			static_config;			// static device configuration
 	void *					inline_config;			// inline device configuration
+
+private:
+	astring 				m_tag;					// tag for this instance
 };
 
 
@@ -490,6 +493,7 @@ public:
 	const char *version() const { return m_baseconfig.version(); }
 	const char *source_file() const { return m_baseconfig.source_file(); }
 	const char *credits() const { return m_baseconfig.credits(); }
+	const char *tag() const { return m_tag; }
 
 	INT64 get_config_int(UINT32 state) const { return m_baseconfig.get_config_int(state); }
 	void *get_config_ptr(UINT32 state) const { return m_baseconfig.get_config_ptr(state); }
@@ -510,7 +514,6 @@ public:
 	running_device *		owner;					// device that owns us, or NULL if nobody
 
 	// device properties
-	astring 				tag;					// tag for this instance
 	device_type				type;					// device type
 	device_class			devclass;				// device class
 
@@ -525,6 +528,9 @@ public:
 
 	device_execute_func 	execute;				// quick pointer to execute callback
 	device_get_runtime_info_func get_runtime_info;
+
+private:
+	astring					m_tag;
 };
 
 

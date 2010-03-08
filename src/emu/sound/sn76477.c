@@ -650,7 +650,7 @@ static void log_enable_line(sn76477_state *sn)
 		"Enabled", "Inhibited"
 	};
 
-	LOG(1, ("SN76477 '%s':              Enable line (9): %d [%s]\n", sn->device->tag.cstr(), sn->enable, desc[sn->enable]));
+	LOG(1, ("SN76477 '%s':              Enable line (9): %d [%s]\n", sn->device->tag(), sn->enable, desc[sn->enable]));
 }
 
 
@@ -662,7 +662,7 @@ static void log_mixer_mode(sn76477_state *sn)
 		"SLF/Noise", "SLF/VCO/Noise", "SLF/VCO", "Inhibit"
 	};
 
-	LOG(1, ("SN76477 '%s':           Mixer mode (25-27): %d [%s]\n", sn->device->tag.cstr(), sn->mixer_mode, desc[sn->mixer_mode]));
+	LOG(1, ("SN76477 '%s':           Mixer mode (25-27): %d [%s]\n", sn->device->tag(), sn->mixer_mode, desc[sn->mixer_mode]));
 }
 
 
@@ -673,7 +673,7 @@ static void log_envelope_mode(sn76477_state *sn)
 		"VCO", "One-Shot", "Mixer Only", "VCO with Alternating Polarity"
 	};
 
-	LOG(1, ("SN76477 '%s':         Envelope mode (1,28): %d [%s]\n", sn->device->tag.cstr(), sn->envelope_mode, desc[sn->envelope_mode]));
+	LOG(1, ("SN76477 '%s':         Envelope mode (1,28): %d [%s]\n", sn->device->tag(), sn->envelope_mode, desc[sn->envelope_mode]));
 }
 
 
@@ -684,7 +684,7 @@ static void log_vco_mode(sn76477_state *sn)
 		"External (Pin 16)", "Internal (SLF)"
 	};
 
-	LOG(1, ("SN76477 '%s':                VCO mode (22): %d [%s]\n", sn->device->tag.cstr(), sn->vco_mode, desc[sn->vco_mode]));
+	LOG(1, ("SN76477 '%s':                VCO mode (22): %d [%s]\n", sn->device->tag(), sn->vco_mode, desc[sn->vco_mode]));
 }
 
 
@@ -694,16 +694,16 @@ static void log_one_shot_time(sn76477_state *sn)
 	{
 		if (compute_one_shot_cap_charging_rate(sn) > 0)
 		{
-			LOG(1, ("SN76477 '%s':        One-shot time (23,24): %.4f sec\n", sn->device->tag.cstr(), ONE_SHOT_CAP_VOLTAGE_RANGE * (1 / compute_one_shot_cap_charging_rate(sn))));
+			LOG(1, ("SN76477 '%s':        One-shot time (23,24): %.4f sec\n", sn->device->tag(), ONE_SHOT_CAP_VOLTAGE_RANGE * (1 / compute_one_shot_cap_charging_rate(sn))));
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s':        One-shot time (23,24): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s':        One-shot time (23,24): N/A\n", sn->device->tag()));
 		}
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s':        One-shot time (23,24): External (cap = %.2fV)\n", sn->device->tag.cstr(), sn->one_shot_cap_voltage));
+		LOG(1, ("SN76477 '%s':        One-shot time (23,24): External (cap = %.2fV)\n", sn->device->tag(), sn->one_shot_cap_voltage));
 	}
 }
 
@@ -717,29 +717,29 @@ static void log_slf_freq(sn76477_state *sn)
 			double charging_time = (1 / compute_slf_cap_charging_rate(sn)) * SLF_CAP_VOLTAGE_RANGE;
 			double discharging_time = (1 / compute_slf_cap_discharging_rate(sn)) * SLF_CAP_VOLTAGE_RANGE;
 
-			LOG(1, ("SN76477 '%s':        SLF frequency (20,21): %.2f Hz\n", sn->device->tag.cstr(), 1 / (charging_time + discharging_time)));
+			LOG(1, ("SN76477 '%s':        SLF frequency (20,21): %.2f Hz\n", sn->device->tag(), 1 / (charging_time + discharging_time)));
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s':        SLF frequency (20,21): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s':        SLF frequency (20,21): N/A\n", sn->device->tag()));
 		}
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s':        SLF frequency (20,21): External (cap = %.2fV)\n", sn->device->tag.cstr(), sn->slf_cap_voltage));
+		LOG(1, ("SN76477 '%s':        SLF frequency (20,21): External (cap = %.2fV)\n", sn->device->tag(), sn->slf_cap_voltage));
 	}
 }
 
 
 static void log_vco_pitch_voltage(sn76477_state *sn)
 {
-	LOG(1, ("SN76477 '%s':       VCO pitch voltage (19): %.2fV\n", sn->device->tag.cstr(), sn->pitch_voltage));
+	LOG(1, ("SN76477 '%s':       VCO pitch voltage (19): %.2fV\n", sn->device->tag(), sn->pitch_voltage));
 }
 
 
 static void log_vco_duty_cycle(sn76477_state *sn)
 {
-	LOG(1, ("SN76477 '%s':       VCO duty cycle (16,19): %.0f%%\n", sn->device->tag.cstr(), compute_vco_duty_cycle(sn) * 100.0));
+	LOG(1, ("SN76477 '%s':       VCO duty cycle (16,19): %.0f%%\n", sn->device->tag(), compute_vco_duty_cycle(sn) * 100.0));
 }
 
 
@@ -752,16 +752,16 @@ static void log_vco_freq(sn76477_state *sn)
 			double min_freq = compute_vco_cap_charging_discharging_rate(sn) / (2 * VCO_CAP_VOLTAGE_RANGE);
 			double max_freq = compute_vco_cap_charging_discharging_rate(sn) / (2 * VCO_TO_SLF_VOLTAGE_DIFF);
 
-			LOG(1, ("SN76477 '%s':        VCO frequency (17,18): %.2f Hz - %.1f Hz\n", sn->device->tag.cstr(), min_freq, max_freq));
+			LOG(1, ("SN76477 '%s':        VCO frequency (17,18): %.2f Hz - %.1f Hz\n", sn->device->tag(), min_freq, max_freq));
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s':        VCO frequency (17,18): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s':        VCO frequency (17,18): N/A\n", sn->device->tag()));
 		}
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s':        VCO frequency (17,18): External (cap = %.2fV)\n", sn->device->tag.cstr(), sn->vco_cap_voltage));
+		LOG(1, ("SN76477 '%s':        VCO frequency (17,18): External (cap = %.2fV)\n", sn->device->tag(), sn->vco_cap_voltage));
 	}
 }
 
@@ -773,13 +773,13 @@ static void log_vco_ext_voltage(sn76477_state *sn)
 		double min_freq = compute_vco_cap_charging_discharging_rate(sn) / (2 * VCO_CAP_VOLTAGE_RANGE);
 		double max_freq = compute_vco_cap_charging_discharging_rate(sn) / (2 * VCO_TO_SLF_VOLTAGE_DIFF);
 
-		LOG(1, ("SN76477 '%s':        VCO ext. voltage (16): %.2fV (%.2f Hz)\n", sn->device->tag.cstr(),
+		LOG(1, ("SN76477 '%s':        VCO ext. voltage (16): %.2fV (%.2f Hz)\n", sn->device->tag(),
 				sn->vco_voltage,
 				min_freq + ((max_freq - min_freq) * sn->vco_voltage / VCO_MAX_EXT_VOLTAGE)));
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s':        VCO ext. voltage (16): %.2fV (saturated, no output)\n", sn->device->tag.cstr(), sn->vco_voltage));
+		LOG(1, ("SN76477 '%s':        VCO ext. voltage (16): %.2fV (saturated, no output)\n", sn->device->tag(), sn->vco_voltage));
 	}
 }
 
@@ -788,17 +788,17 @@ static void log_noise_gen_freq(sn76477_state *sn)
 {
 	if (sn->noise_clock_ext)
 	{
-		LOG(1, ("SN76477 '%s':      Noise gen frequency (4): External\n", sn->device->tag.cstr()));
+		LOG(1, ("SN76477 '%s':      Noise gen frequency (4): External\n", sn->device->tag()));
 	}
 	else
 	{
 		if (compute_noise_gen_freq(sn) > 0)
 		{
-			LOG(1, ("SN76477 '%s':      Noise gen frequency (4): %d Hz\n", sn->device->tag.cstr(), compute_noise_gen_freq(sn)));
+			LOG(1, ("SN76477 '%s':      Noise gen frequency (4): %d Hz\n", sn->device->tag(), compute_noise_gen_freq(sn)));
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s':      Noise gen frequency (4): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s':      Noise gen frequency (4): N/A\n", sn->device->tag()));
 		}
 	}
 }
@@ -817,21 +817,21 @@ static void log_noise_filter_freq(sn76477_state *sn)
 				double charging_time = (1 / charging_rate) * NOISE_CAP_VOLTAGE_RANGE;
 				double discharging_time = (1 / charging_rate) * NOISE_CAP_VOLTAGE_RANGE;
 
-				LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): %.0f Hz\n", sn->device->tag.cstr(), 1 / (charging_time + discharging_time)));
+				LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): %.0f Hz\n", sn->device->tag(), 1 / (charging_time + discharging_time)));
 			}
 			else
 			{
-				LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): Very Large (Filtering Disabled)\n", sn->device->tag.cstr()));
+				LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): Very Large (Filtering Disabled)\n", sn->device->tag()));
 			}
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): N/A\n", sn->device->tag()));
 		}
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): External (cap = %.2fV)\n", sn->device->tag.cstr(), sn->noise_filter_cap));
+		LOG(1, ("SN76477 '%s': Noise filter frequency (5,6): External (cap = %.2fV)\n", sn->device->tag(), sn->noise_filter_cap));
 	}
 }
 
@@ -842,16 +842,16 @@ static void log_attack_time(sn76477_state *sn)
 	{
 		if (compute_attack_decay_cap_charging_rate(sn) > 0)
 		{
-			LOG(1, ("SN76477 '%s':           Attack time (8,10): %.4f sec\n", sn->device->tag.cstr(), AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_charging_rate(sn))));
+			LOG(1, ("SN76477 '%s':           Attack time (8,10): %.4f sec\n", sn->device->tag(), AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_charging_rate(sn))));
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s':           Attack time (8,10): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s':           Attack time (8,10): N/A\n", sn->device->tag()));
 		}
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s':           Attack time (8,10): External (cap = %.2fV)\n", sn->device->tag.cstr(), sn->attack_decay_cap_voltage));
+		LOG(1, ("SN76477 '%s':           Attack time (8,10): External (cap = %.2fV)\n", sn->device->tag(), sn->attack_decay_cap_voltage));
 	}
 }
 
@@ -862,16 +862,16 @@ static void log_decay_time(sn76477_state *sn)
 	{
 		if (compute_attack_decay_cap_discharging_rate(sn) > 0)
 		{
-			LOG(1, ("SN76477 '%s':             Decay time (7,8): %.4f sec\n", sn->device->tag.cstr(), AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_discharging_rate(sn))));
+			LOG(1, ("SN76477 '%s':             Decay time (7,8): %.4f sec\n", sn->device->tag(), AD_CAP_VOLTAGE_RANGE * (1 / compute_attack_decay_cap_discharging_rate(sn))));
 		}
 		else
 		{
-			LOG(1, ("SN76477 '%s':            Decay time (8,10): N/A\n", sn->device->tag.cstr()));
+			LOG(1, ("SN76477 '%s':            Decay time (8,10): N/A\n", sn->device->tag()));
 		}
 	}
 	else
 	{
-		LOG(1, ("SN76477 '%s':             Decay time (7, 8): External (cap = %.2fV)\n", sn->device->tag.cstr(), sn->attack_decay_cap_voltage));
+		LOG(1, ("SN76477 '%s':             Decay time (7, 8): External (cap = %.2fV)\n", sn->device->tag(), sn->attack_decay_cap_voltage));
 	}
 }
 
@@ -879,7 +879,7 @@ static void log_decay_time(sn76477_state *sn)
 static void log_voltage_out(sn76477_state *sn)
 {
 	LOG(1, ("SN76477 '%s':    Voltage OUT range (11,12): %.2fV - %.2fV (clips above %.2fV)\n",
-			sn->device->tag.cstr(),
+			sn->device->tag(),
 			OUT_CENTER_LEVEL_VOLTAGE + compute_center_to_peak_voltage_out(sn) * out_neg_gain[(int)(AD_CAP_VOLTAGE_MAX * 10)],
 			OUT_CENTER_LEVEL_VOLTAGE + compute_center_to_peak_voltage_out(sn) * out_pos_gain[(int)(AD_CAP_VOLTAGE_MAX * 10)],
 			OUT_HIGH_CLIP_THRESHOLD));
@@ -918,10 +918,10 @@ static void open_wav_file(sn76477_state *sn)
 {
 	char wav_file_name[30];
 
-	sprintf(wav_file_name, LOG_WAV_FILE_NAME, sn->device->tag.cstr());
+	sprintf(wav_file_name, LOG_WAV_FILE_NAME, sn->device->tag());
 	sn->file = wav_open(wav_file_name, sn->sample_rate, 2);
 
-	LOG(1, ("SN76477 '%s':         Logging output: %s\n", sn->device->tag.cstr(), wav_file_name));
+	LOG(1, ("SN76477 '%s':         Logging output: %s\n", sn->device->tag(), wav_file_name));
 }
 
 

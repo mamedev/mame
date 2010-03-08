@@ -129,7 +129,7 @@ static void check_interrupts(running_device *device)
 			{
 				/* trigger interrupt */
 				port->ip = 1;
-				if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", device->tag.cstr(), 'A' + index);
+				if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", device->tag(), 'A' + index);
 			}
 
 			port->match = match;
@@ -150,7 +150,7 @@ static void trigger_interrupt(running_device *device, int index)
 	pio_port *port = &z80pio->port[index];
 
 	port->ip = 1;
-	if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", device->tag.cstr(), 'A' + index);
+	if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", device->tag(), 'A' + index);
 
 	check_interrupts(device);
 }
@@ -162,7 +162,7 @@ static void set_rdy(running_device *device, int index, int state)
 
 	if (port->rdy == state) return;
 
-	if (LOG) logerror("Z80PIO '%s' Port %c Ready: %u\n", device->tag.cstr(), 'A' + index, state);
+	if (LOG) logerror("Z80PIO '%s' Port %c Ready: %u\n", device->tag(), 'A' + index, state);
 
 	port->rdy = state;
 	devcb_call_write_line(&port->out_rdy_func, state);
@@ -188,7 +188,7 @@ static void set_mode(running_device *device, int index, int mode)
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[index];
 
-	if (LOG) logerror("Z80PIO '%s' Port %c Mode: %u\n", device->tag.cstr(), 'A' + index, mode);
+	if (LOG) logerror("Z80PIO '%s' Port %c Mode: %u\n", device->tag(), 'A' + index, mode);
 
 	switch (mode)
 	{
@@ -211,7 +211,7 @@ static void set_mode(running_device *device, int index, int mode)
 	case MODE_BIDIRECTIONAL:
 		if (index == PORT_B)
 		{
-			logerror("Z80PIO '%s' Port %c Invalid Mode: %u!\n", device->tag.cstr(), 'A' + index, mode);
+			logerror("Z80PIO '%s' Port %c Invalid Mode: %u!\n", device->tag(), 'A' + index, mode);
 		}
 		else
 		{
@@ -260,7 +260,7 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 		{
 			/* load interrupt vector */
 			port->vector = data;
-			if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Vector: %02x\n", device->tag.cstr(), 'A' + index, data);
+			if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Vector: %02x\n", device->tag(), 'A' + index, data);
 
 			/* set interrupt enable */
 			port->icw |= ICW_ENABLE_INT;
@@ -280,10 +280,10 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 				if (LOG)
 				{
-					logerror("Z80PIO '%s' Port %c Interrupt Enable: %u\n", device->tag.cstr(), 'A' + index, BIT(data, 7));
-					logerror("Z80PIO '%s' Port %c Logic: %s\n", device->tag.cstr(), 'A' + index, BIT(data, 6) ? "AND" : "OR");
-					logerror("Z80PIO '%s' Port %c Active %s\n", device->tag.cstr(), 'A' + index, BIT(data, 5) ? "High" : "Low");
-					logerror("Z80PIO '%s' Port %c Mask Follows: %u\n", device->tag.cstr(), 'A' + index, BIT(data, 4));
+					logerror("Z80PIO '%s' Port %c Interrupt Enable: %u\n", device->tag(), 'A' + index, BIT(data, 7));
+					logerror("Z80PIO '%s' Port %c Logic: %s\n", device->tag(), 'A' + index, BIT(data, 6) ? "AND" : "OR");
+					logerror("Z80PIO '%s' Port %c Active %s\n", device->tag(), 'A' + index, BIT(data, 5) ? "High" : "Low");
+					logerror("Z80PIO '%s' Port %c Mask Follows: %u\n", device->tag(), 'A' + index, BIT(data, 4));
 				}
 
 				if (port->icw & ICW_MASK_FOLLOWS)
@@ -305,7 +305,7 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 			case 0x03: /* set interrupt enable flip-flop */
 				port->icw = (data & 0x80) | (port->icw & 0x7f);
-				if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Enable: %u\n", device->tag.cstr(), 'A' + index, BIT(data, 7));
+				if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Enable: %u\n", device->tag(), 'A' + index, BIT(data, 7));
 
 				/* set interrupt enable */
 				port->ie = BIT(port->icw, 7);
@@ -313,14 +313,14 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 				break;
 
 			default:
-				logerror("Z80PIO '%s' Port %c Invalid Control Word: %02x!\n", device->tag.cstr(), 'A' + index, data);
+				logerror("Z80PIO '%s' Port %c Invalid Control Word: %02x!\n", device->tag(), 'A' + index, data);
 			}
 		}
 		break;
 
 	case IOR: /* data direction register */
 		port->ior = data;
-		if (LOG) logerror("Z80PIO '%s' Port %c IOR: %02x\n", device->tag.cstr(), 'A' + index, data);
+		if (LOG) logerror("Z80PIO '%s' Port %c IOR: %02x\n", device->tag(), 'A' + index, data);
 
 		/* set interrupt enable */
 		port->ie = BIT(port->icw, 7);
@@ -332,7 +332,7 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 	case MASK: /* interrupt mask */
 		port->mask = data;
-		if (LOG) logerror("Z80PIO '%s' Port %c Mask: %02x\n", device->tag.cstr(), 'A' + index, data);
+		if (LOG) logerror("Z80PIO '%s' Port %c Mask: %02x\n", device->tag(), 'A' + index, data);
 
 		/* set interrupt enable */
 		port->ie = BIT(port->icw, 7);
@@ -622,7 +622,7 @@ static void strobe(running_device *device, int index, int state)
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[index];
 
-	if (LOG) logerror("Z80PIO '%s' Port %c Strobe: %u\n", device->tag.cstr(), 'A' + index, state);
+	if (LOG) logerror("Z80PIO '%s' Port %c Strobe: %u\n", device->tag(), 'A' + index, state);
 
 	if (z80pio->port[PORT_A].mode == MODE_BIDIRECTIONAL)
 	{
@@ -763,7 +763,7 @@ static int z80pio_irq_ack(running_device *device)
 
 		if (port->ip)
 		{
-			if (LOG) logerror("Z80PIO '%s' Interrupt Acknowledge\n", device->tag.cstr());
+			if (LOG) logerror("Z80PIO '%s' Interrupt Acknowledge\n", device->tag());
 
 			/* clear interrupt pending flag */
 			port->ip = 0;
@@ -796,7 +796,7 @@ static void z80pio_irq_reti(running_device *device)
 
 		if (port->ius)
 		{
-			if (LOG) logerror("Z80PIO '%s' Return from Interrupt\n", device->tag.cstr());
+			if (LOG) logerror("Z80PIO '%s' Return from Interrupt\n", device->tag());
 
 			/* clear interrupt under service flag */
 			port->ius = 0;

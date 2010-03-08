@@ -167,7 +167,7 @@ static DEVICE_START( ym2610 )
 	/* setup adpcm buffers */
 	pcmbufa  = *device->region;
 	pcmsizea = device->region->bytes();
-	name.printf("%s.deltat", device->tag.cstr());
+	name.printf("%s.deltat", device->tag());
 	pcmbufb  = (void *)(memory_region(device->machine, name));
 	pcmsizeb = memory_region_length(device->machine, name);
 	if (pcmbufb == NULL || pcmsizeb == 0)

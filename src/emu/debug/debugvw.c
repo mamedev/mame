@@ -1036,7 +1036,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 		/* populate the subview */
 		subview->next = NULL;
 		subview->index = curindex++;
-		subview->name.printf("CPU '%s' (%s)", cpu->tag.cstr(), cpu->name());
+		subview->name.printf("CPU '%s' (%s)", cpu->tag(), cpu->name());
 		subview->device = cpu;
 
 		/* add to the list */
@@ -1492,7 +1492,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 			/* populate the subview */
 			subview->next = NULL;
 			subview->index = curindex++;
-			subview->name.printf("CPU '%s' (%s)", cpu->tag.cstr(), cpu->name());
+			subview->name.printf("CPU '%s' (%s)", cpu->tag(), cpu->name());
 			subview->space = space;
 
 			/* add to the list */
@@ -2365,9 +2365,9 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 				subview->next = NULL;
 				subview->index = curindex++;
 				if (device->type == CPU)
-					subview->name.printf("CPU '%s' (%s) %s memory", device->tag.cstr(), device->name(), space->name);
+					subview->name.printf("CPU '%s' (%s) %s memory", device->tag(), device->name(), space->name);
 				else
-					subview->name.printf("%s '%s' space #%d memory", device->name(), device->tag.cstr(), spacenum);
+					subview->name.printf("%s '%s' space #%d memory", device->name(), device->tag(), spacenum);
 				subview->space = space;
 				subview->endianness = space->endianness;
 				subview->prefsize = space->dbits / 8;

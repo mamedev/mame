@@ -554,7 +554,7 @@ void debug_cpu_interrupt_hook(running_device *device, int irqline)
 	if (info != NULL && (info->flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (info->stopirq == -1 || info->stopirq == irqline))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(device->machine, "Stopped on interrupt (CPU '%s', IRQ %d)\n", device->tag.cstr(), irqline);
+		debug_console_printf(device->machine, "Stopped on interrupt (CPU '%s', IRQ %d)\n", device->tag(), irqline);
 		compute_debug_flags(device);
 	}
 }
@@ -574,7 +574,7 @@ void debug_cpu_exception_hook(running_device *device, int exception)
 	if ((info->flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (info->stopexception == -1 || info->stopexception == exception))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(device->machine, "Stopped on exception (CPU '%s', exception %d)\n", device->tag.cstr(), exception);
+		debug_console_printf(device->machine, "Stopped on exception (CPU '%s', exception %d)\n", device->tag(), exception);
 		compute_debug_flags(device);
 	}
 }
@@ -641,7 +641,7 @@ void debug_cpu_instruction_hook(running_device *device, offs_t curpc)
 		/* check the temp running breakpoint and break if we hit it */
 		else if ((info->flags & DEBUG_FLAG_STOP_PC) != 0 && info->stopaddr == curpc)
 		{
-			debug_console_printf(device->machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", info->stopaddr, device->tag.cstr());
+			debug_console_printf(device->machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", info->stopaddr, device->tag());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -2448,7 +2448,7 @@ static running_device *expression_get_device(running_machine *machine, const cha
 	running_device *device;
 
 	for (device = machine->devicelist.first(); device != NULL; device = device->next)
-		if (mame_stricmp(device->tag, tag) == 0)
+		if (mame_stricmp(device->tag(), tag) == 0)
 			return device;
 
 	return NULL;

@@ -462,7 +462,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 
 	offset &= 0xf;
 
-	LOG(( "Reading 68681 (%s) reg %x (%s) ", device->tag.cstr(), offset, duart68681_reg_read_names[offset] ));
+	LOG(( "Reading 68681 (%s) reg %x (%s) ", device->tag(), offset, duart68681_reg_read_names[offset] ));
 
 	switch (offset)
 	{
@@ -582,7 +582,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 	duart68681_state* duart68681 = get_safe_token(device);
 
 	offset &= 0x0f;
-	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", device->tag.cstr(), offset, duart68681_reg_write_names[offset], data ));
+	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", device->tag(), offset, duart68681_reg_write_names[offset], data ));
 
 	switch(offset)
 	{
@@ -605,7 +605,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 			switch ((data >> 4) & 0x07)
 			{
 				case 0: case 1: case 2: case 4: case 5: // TODO: handle these cases!
-				logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag.cstr(), (data >> 4) & 0x07);
+				logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (data >> 4) & 0x07);
 				break;
 				case 3: case 6: case 7:
 				break;
@@ -641,7 +641,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 			break;
 		case 0x0d: /* OPCR */
 			if (data != 0x00)
-				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", device->tag.cstr(), data);
+				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", device->tag(), data);
 			duart68681->OPCR = data;
 			break;
 		case 0x0e: /* Set Output Port Bits */

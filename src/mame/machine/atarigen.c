@@ -70,7 +70,7 @@ INLINE const atarigen_screen_timer *get_screen_timer(running_device *screen)
 		if (state->screen_timer[i].screen == screen)
 			return &state->screen_timer[i];
 
-	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen->tag.cstr());
+	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen->tag());
 	return NULL;
 }
 

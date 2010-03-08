@@ -197,18 +197,18 @@ static void wiggle_i860_common(running_device *device, UINT16 data)
 
 	if (bus_hold)
 	{
-		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag.cstr());
+		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag());
 		i860_set_pin(device, DEC_PIN_BUS_HOLD, 1);
 	}
 	else
 	{
-		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag.cstr());
+		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag());
 		i860_set_pin(device, DEC_PIN_BUS_HOLD, 0);
 	}
 
 	if (reset)
 	{
-		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag.cstr());
+		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag());
 		i860_set_pin(device, DEC_PIN_RESET, 1);
 	}
 	else

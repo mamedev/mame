@@ -527,7 +527,7 @@ GALPANI3_MCU_COM_W(3)
 
 static READ16_HANDLER( galpani3_mcu_status_r )
 {
-	logerror("cpu '%s' (PC=%06X): read mcu status\n", space->cpu->tag.cstr(), cpu_get_previouspc(space->cpu));
+	logerror("cpu '%s' (PC=%06X): read mcu status\n", space->cpu->tag(), cpu_get_previouspc(space->cpu));
 	return 0;
 }
 
@@ -549,7 +549,7 @@ static READ16_HANDLER( galpani3_regs1_r )
 		}
 
 		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space->cpu->tag.cstr(), cpu_get_previouspc(space->cpu), offset, mem_mask);
+			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space->cpu->tag(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 			break;
 
 	}
@@ -574,7 +574,7 @@ static READ16_HANDLER( galpani3_regs2_r )
 		}
 
 		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs2_r %02x %04x\n", space->cpu->tag.cstr(), cpu_get_previouspc(space->cpu), offset, mem_mask);
+			logerror("cpu '%s' (PC=%06X): galpani3_regs2_r %02x %04x\n", space->cpu->tag(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 			break;
 
 	}
@@ -599,7 +599,7 @@ static READ16_HANDLER( galpani3_regs3_r )
 		}
 
 		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs3_r %02x %04x\n", space->cpu->tag.cstr(), cpu_get_previouspc(space->cpu), offset, mem_mask);
+			logerror("cpu '%s' (PC=%06X): galpani3_regs3_r %02x %04x\n", space->cpu->tag(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 			break;
 
 	}

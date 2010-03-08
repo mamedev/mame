@@ -340,7 +340,7 @@ WRITE8_DEVICE_HANDLER( saa1099_control_w )
 	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%s: (SAA1099 '%s') Unknown register selected\n",cpuexec_describe_context(device->machine), device->tag.cstr());
+                logerror("%s: (SAA1099 '%s') Unknown register selected\n",cpuexec_describe_context(device->machine), device->tag());
 	}
 
 	saa->selected_reg = data & 0x1f;
@@ -426,7 +426,7 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n",cpuexec_describe_context(device->machine), device->tag.cstr());
+			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n",cpuexec_describe_context(device->machine), device->tag());
 			for (i = 0; i < 6; i++)
 			{
                 saa->channels[i].level = 0;
@@ -435,7 +435,7 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 		}
 		break;
 	default:	/* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n",cpuexec_describe_context(device->machine), device->tag.cstr(), reg, data);
+		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n",cpuexec_describe_context(device->machine), device->tag(), reg, data);
 	}
 }
 

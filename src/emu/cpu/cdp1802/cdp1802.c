@@ -923,7 +923,7 @@ static CPU_EXECUTE( cdp1802 )
 			{
 			case CDP1802_MODE_LOAD:
 				// RUN mode cannot be initiated from LOAD mode
-				logerror("CDP1802 '%s' Tried to initiate RUN mode from LOAD mode\n", device->tag.cstr());
+				logerror("CDP1802 '%s' Tried to initiate RUN mode from LOAD mode\n", device->tag());
 				cpustate->mode = CDP1802_MODE_LOAD;
 				break;
 

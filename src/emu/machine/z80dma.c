@@ -222,7 +222,7 @@ static void trigger_interrupt(running_device *device, int level)
 
 		z80dma->status &= ~0x08;
 
-		if (LOG) logerror("Z80DMA '%s' Interrupt Pending\n", device->tag.cstr());
+		if (LOG) logerror("Z80DMA '%s' Interrupt Pending\n", device->tag());
 
 		interrupt_check(z80dma);
 	}
@@ -390,7 +390,7 @@ static TIMER_CALLBACK( z80dma_timerproc )
 		if(TRANSFER_MODE(z80dma) == TM_TRANSFER)     z80dma->status |= 0x10;   // no match found
 
 		z80dma_update_status(device);
-		if (LOG) logerror("Z80DMA '%s' End of Block\n", device->tag.cstr());
+		if (LOG) logerror("Z80DMA '%s' End of Block\n", device->tag());
 
 		if (INT_ON_END_OF_BLOCK(z80dma))
         {
@@ -711,7 +711,7 @@ static int z80dma_irq_state(running_device *device)
 		state = Z80_DAISY_IEO;
 	}
 
-	if (LOG) logerror("Z80DMA '%s' Interrupt State: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("Z80DMA '%s' Interrupt State: %u\n", device->tag(), state);
 
 	return state;
 }
@@ -726,7 +726,7 @@ static int z80dma_irq_ack(running_device *device)
 
 	if (z80dma->ip)
 	{
-	    if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", device->tag.cstr());
+	    if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", device->tag());
 
 		/* clear interrupt pending flag */
 		z80dma->ip = 0;
@@ -756,7 +756,7 @@ static void z80dma_irq_reti(running_device *device)
 
 	if (z80dma->ius)
 	{
-	    if (LOG) logerror("Z80DMA '%s' Return from Interrupt\n", device->tag.cstr());
+	    if (LOG) logerror("Z80DMA '%s' Return from Interrupt\n", device->tag());
 
 		/* clear interrupt under service flag */
 		z80dma->ius = 0;

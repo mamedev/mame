@@ -49,7 +49,7 @@ void system24temp_sys16_io_set_callbacks(UINT8 (*io_r)(running_machine *machine,
 
 READ16_HANDLER ( system24temp_sys16_io_r )
 {
-	//  logerror("IO read %02x (%s:%x)\n", offset, space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+	//  logerror("IO read %02x (%s:%x)\n", offset, space->cpu->tag(), cpu_get_pc(space->cpu));
 	if(offset < 8)
 		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(space->machine,offset) : 0xff;
 	else if (offset < 0x20) {
@@ -67,7 +67,7 @@ READ16_HANDLER ( system24temp_sys16_io_r )
 		case 0xf:
 			return system24temp_sys16_io_dir;
 		default:
-			logerror("IO control read %02x (%s:%x)\n", offset, space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+			logerror("IO control read %02x (%s:%x)\n", offset, space->cpu->tag(), cpu_get_pc(space->cpu));
 			return 0xff;
 		}
 	} else
@@ -85,7 +85,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 	if(ACCESSING_BITS_0_7) {
 		if(offset < 8) {
 			if(!(system24temp_sys16_io_dir & (1 << offset))) {
-				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, system24temp_sys16_io_dir, data & 0xff, space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, system24temp_sys16_io_dir, data & 0xff, space->cpu->tag(), cpu_get_pc(space->cpu));
 				return;
 			}
 			if(system24temp_sys16_io_io_w)
@@ -101,7 +101,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 				system24temp_sys16_io_dir = data;
 				break;
 			default:
-				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space->cpu->tag(), cpu_get_pc(space->cpu));
 			}
 		}
 	}

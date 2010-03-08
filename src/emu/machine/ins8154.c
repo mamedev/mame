@@ -80,7 +80,7 @@ READ8_DEVICE_HANDLER( ins8154_r )
 	if (offset > 0x24)
 	{
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", cpuexec_describe_context(device->machine), device->tag.cstr(), offset);
+			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", cpuexec_describe_context(device->machine), device->tag(), offset);
 		return 0xff;
 	}
 
@@ -146,7 +146,7 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 	if (offset > 0x24)
 	{
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", cpuexec_describe_context(device->machine), device->tag.cstr(), data, offset);
+			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", cpuexec_describe_context(device->machine), device->tag(), data, offset);
 		return;
 	}
 
@@ -162,21 +162,21 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 
 	case 0x22:
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' ODRA set to %02x\n", cpuexec_describe_context(device->machine), device->tag.cstr(), data);
+			logerror("%s: INS8154 '%s' ODRA set to %02x\n", cpuexec_describe_context(device->machine), device->tag(), data);
 
 		ins8154->odra = data;
 		break;
 
 	case 0x23:
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' ODRB set to %02x\n", cpuexec_describe_context(device->machine), device->tag.cstr(), data);
+			logerror("%s: INS8154 '%s' ODRB set to %02x\n", cpuexec_describe_context(device->machine), device->tag(), data);
 
 		ins8154->odrb = data;
 		break;
 
 	case 0x24:
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' MDR set to %02x\n", cpuexec_describe_context(device->machine), device->tag.cstr(), data);
+			logerror("%s: INS8154 '%s' MDR set to %02x\n", cpuexec_describe_context(device->machine), device->tag(), data);
 
 		ins8154->mdr = data;
 		break;
@@ -232,13 +232,13 @@ static DEVICE_START( ins8154 )
 	devcb_resolve_write_line(&ins8154->out_irq_func, &intf->out_irq_func, device);
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->in_a);
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->in_b);
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->out_a);
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->out_b);
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->mdr);
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->odra);
-	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->odrb);
+	state_save_register_device_item(device, 0, ins8154->in_a);
+	state_save_register_device_item(device, 0, ins8154->in_b);
+	state_save_register_device_item(device, 0, ins8154->out_a);
+	state_save_register_device_item(device, 0, ins8154->out_b);
+	state_save_register_device_item(device, 0, ins8154->mdr);
+	state_save_register_device_item(device, 0, ins8154->odra);
+	state_save_register_device_item(device, 0, ins8154->odrb);
 }
 
 static DEVICE_RESET( ins8154 )

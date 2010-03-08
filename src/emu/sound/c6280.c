@@ -112,7 +112,7 @@ static void c6280_init(running_device *device, c6280_t *p, double clk, double ra
     p->device = device;
     p->cpudevice = device->machine->device(intf->cpu);
     if (p->cpudevice == NULL)
-    	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag.cstr());
+    	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag());
 
     /* Make waveform frequency table */
     for(i = 0; i < 4096; i += 1)

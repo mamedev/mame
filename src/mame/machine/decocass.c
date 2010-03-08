@@ -59,7 +59,7 @@ WRITE8_HANDLER( decocass_coin_counter_w )
 WRITE8_HANDLER( decocass_sound_command_w )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	LOG(2,("CPU %s sound command -> $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(2,("CPU %s sound command -> $%02x\n", space->cpu->tag(), data));
 	soundlatch_w(space, 0, data);
 	state->sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
@@ -70,7 +70,7 @@ WRITE8_HANDLER( decocass_sound_command_w )
 READ8_HANDLER( decocass_sound_data_r )
 {
 	UINT8 data = soundlatch2_r(space, 0);
-	LOG(2,("CPU %s sound data    <- $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(2,("CPU %s sound data    <- $%02x\n", space->cpu->tag(), data));
 	return data;
 }
 
@@ -78,14 +78,14 @@ READ8_HANDLER( decocass_sound_ack_r )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
 	UINT8 data = state->sound_ack;	/* D6+D7 */
-	LOG(4,("CPU %s sound ack     <- $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(4,("CPU %s sound ack     <- $%02x\n", space->cpu->tag(), data));
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_w )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	LOG(2,("CPU %s sound data    -> $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(2,("CPU %s sound data    -> $%02x\n", space->cpu->tag(), data));
 	soundlatch2_w(space, 0, data);
 	state->sound_ack |= 0x40;
 }
@@ -94,7 +94,7 @@ READ8_HANDLER( decocass_sound_command_r )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
 	UINT8 data = soundlatch_r(space, 0);
-	LOG(4,("CPU %s sound command <- $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(4,("CPU %s sound command <- $%02x\n", space->cpu->tag(), data));
 	cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, CLEAR_LINE);
 	state->sound_ack &= ~0x80;
 	return data;
@@ -127,7 +127,7 @@ READ8_HANDLER( decocass_sound_data_ack_reset_r )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
 	UINT8 data = 0xff;
-	LOG(2,("CPU %s sound ack rst <- $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(2,("CPU %s sound ack rst <- $%02x\n", space->cpu->tag(), data));
 	state->sound_ack &= ~0x40;
 	return data;
 }
@@ -135,7 +135,7 @@ READ8_HANDLER( decocass_sound_data_ack_reset_r )
 WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	LOG(2,("CPU %s sound ack rst -> $%02x\n", space->cpu->tag.cstr(), data));
+	LOG(2,("CPU %s sound ack rst -> $%02x\n", space->cpu->tag(), data));
 	state->sound_ack &= ~0x40;
 }
 

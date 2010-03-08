@@ -546,7 +546,7 @@ INLINE void WM16(m6800_state *cpustate, UINT32 Addr, PAIR *p )
 /* IRQ enter */
 static void enter_interrupt(m6800_state *cpustate, const char *message,UINT16 irq_vector)
 {
-	LOG((message, cpustate->device->tag.cstr()));
+	LOG((message, cpustate->device->tag()));
 	if( cpustate->wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( cpustate->wai_state & M6800_WAI )
@@ -965,7 +965,7 @@ static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 	{
 		//int eddge;
 
-		LOG(("M6800 '%s' set_irq_line %d,%d\n", cpustate->device->tag.cstr(), irqline, state));
+		LOG(("M6800 '%s' set_irq_line %d,%d\n", cpustate->device->tag(), irqline, state));
 		cpustate->irq_state[irqline] = state;
 
 		if (irqline == M6800_TIN_LINE && state != cpustate->irq_state[irqline])
@@ -2411,7 +2411,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x0e:
 			return (cpustate->input_capture >> 8) & 0xff;
 		case 0x0f:
-			logerror("CPU '%s' PC %04x: warning - read from unsupported register %02x\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu),offset);
+			logerror("CPU '%s' PC %04x: warning - read from unsupported register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),offset);
 			return 0;
 		case 0x10:
 			return cpustate->rmcr;
@@ -2428,7 +2428,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x13:
 			return cpustate->tdr;
 		case 0x14:
-			logerror("CPU '%s' PC %04x: read RAM control register\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu));
+			logerror("CPU '%s' PC %04x: read RAM control register\n",space->cpu->tag(),cpu_get_pc(space->cpu));
 			return cpustate->ram_ctrl;
 		case 0x15:
 		case 0x16:
@@ -2442,7 +2442,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU '%s' PC %04x: warning - read from reserved internal register %02x\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu),offset);
+			logerror("CPU '%s' PC %04x: warning - read from reserved internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),offset);
 			return 0;
 	}
 }
@@ -2475,7 +2475,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 						| (memory_read_byte_8be(cpustate->io, M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
 
 				if (cpustate->port2_ddr & 2)
-					logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu));
+					logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag(),cpu_get_pc(space->cpu));
 			}
 			break;
 		case 0x02:
@@ -2574,10 +2574,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x0d:
 		case 0x0e:
 		case 0x12:
-			logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu),data,offset);
+			logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x0f:
-			logerror("CPU '%s' PC %04x: warning - write %02x to unsupported internal register %02x\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu),data,offset);
+			logerror("CPU '%s' PC %04x: warning - write %02x to unsupported internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x10:
 			cpustate->rmcr = data & 0x0f;
@@ -2617,7 +2617,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			cpustate->tdr = data;
 			break;
 		case 0x14:
-			logerror("CPU '%s' PC %04x: write %02x to RAM control register\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu),data);
+			logerror("CPU '%s' PC %04x: write %02x to RAM control register\n",space->cpu->tag(),cpu_get_pc(space->cpu),data);
 			cpustate->ram_ctrl = data;
 			break;
 		case 0x15:
@@ -2632,7 +2632,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->cpu->tag.cstr(),cpu_get_pc(space->cpu),data,offset);
+			logerror("CPU '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
 			break;
 	}
 }

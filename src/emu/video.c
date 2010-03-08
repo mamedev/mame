@@ -610,7 +610,7 @@ int video_screen_update_partial(running_device *screen, int scanline)
 	/* validate arguments */
 	assert(scanline >= 0);
 
-	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%s, %d): ", screen->tag.cstr(), scanline));
+	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%s, %d): ", screen->tag(), scanline));
 
 	/* these two checks only apply if we're allowed to skip frames */
 	if (!(screen->machine->config->video_attributes & VIDEO_ALWAYS_UPDATE))
@@ -2078,7 +2078,7 @@ static void create_snapshot_bitmap(running_device *screen)
 	/* select the appropriate view in our dummy target */
 	if (global.snap_native && screen != NULL)
 	{
-		view_index = screen->machine->devicelist.index(VIDEO_SCREEN, screen->tag.cstr());
+		view_index = screen->machine->devicelist.index(VIDEO_SCREEN, screen->tag());
 		assert(view_index != -1);
 		render_target_set_view(global.snap_target, view_index);
 	}
@@ -2587,7 +2587,7 @@ static void video_finalize_burnin(running_device *screen)
 		/* write the final PNG */
 
 		/* compute the name and create the file */
-		fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", screen->machine->basename, screen->tag.cstr());
+		fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", screen->machine->basename, screen->tag());
 		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{

@@ -805,7 +805,7 @@ static void pokey_potgo(pokey_state *p)
 		{
 			int r = devcb_call_read8(&p->pot_r[pot], pot);
 
-			LOG(("POKEY %s pot_r(%d) returned $%02x\n", p->device->tag.cstr(), pot, r));
+			LOG(("POKEY %s pot_r(%d) returned $%02x\n", p->device->tag(), pot, r));
 			if( r != -1 )
 			{
 				if (r > 228)
@@ -840,16 +840,16 @@ READ8_DEVICE_HANDLER( pokey_r )
 			if( p->ALLPOT & (1 << pot) )
 			{
 				data = timer_timeelapsed(p->ptimer[pot]).attoseconds / AD_TIME.attoseconds;
-				LOG(("POKEY '%s' read POT%d (interpolated) $%02x\n", p->device->tag.cstr(), pot, data));
+				LOG(("POKEY '%s' read POT%d (interpolated) $%02x\n", p->device->tag(), pot, data));
             }
 			else
 			{
 				data = p->POTx[pot];
-				LOG(("POKEY '%s' read POT%d (final value)  $%02x\n", p->device->tag.cstr(), pot, data));
+				LOG(("POKEY '%s' read POT%d (final value)  $%02x\n", p->device->tag(), pot, data));
 			}
 		}
 		else
-			logerror("%s: warning - read '%s' POT%d\n", cpuexec_describe_context(p->device->machine), p->device->tag.cstr(), pot);
+			logerror("%s: warning - read '%s' POT%d\n", cpuexec_describe_context(p->device->machine), p->device->tag(), pot);
 		break;
 
     case ALLPOT_C:
@@ -860,17 +860,17 @@ READ8_DEVICE_HANDLER( pokey_r )
 		if( (p->SKCTL & SK_RESET) == 0)
 		{
 			data = 0;
-			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", p->device->tag.cstr(), data));
+			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", p->device->tag(), data));
 		}
 		else if( p->allpot_r.read )
 		{
 			data = devcb_call_read8(&p->allpot_r, offset);
-			LOG(("POKEY '%s' ALLPOT callback $%02x\n", p->device->tag.cstr(), data));
+			LOG(("POKEY '%s' ALLPOT callback $%02x\n", p->device->tag(), data));
 		}
 		else
 		{
 			data = p->ALLPOT;
-			LOG(("POKEY '%s' ALLPOT internal $%02x\n", p->device->tag.cstr(), data));
+			LOG(("POKEY '%s' ALLPOT internal $%02x\n", p->device->tag(), data));
 		}
 		break;
 
@@ -898,17 +898,17 @@ READ8_DEVICE_HANDLER( pokey_r )
 			adjust = 1;
 			p->r9 = 0;
 			p->r17 = 0;
-            LOG_RAND(("POKEY '%s' rand17 frozen (SKCTL): $%02x\n", p->device->tag.cstr(), p->RANDOM));
+            LOG_RAND(("POKEY '%s' rand17 frozen (SKCTL): $%02x\n", p->device->tag(), p->RANDOM));
 		}
 		if( p->AUDCTL & POLY9 )
 		{
 			p->RANDOM = p->rand9[p->r9];
-			LOG_RAND(("POKEY '%s' adjust %u rand9[$%05x]: $%02x\n", p->device->tag.cstr(), adjust, p->r9, p->RANDOM));
+			LOG_RAND(("POKEY '%s' adjust %u rand9[$%05x]: $%02x\n", p->device->tag(), adjust, p->r9, p->RANDOM));
 		}
 		else
 		{
 			p->RANDOM = p->rand17[p->r17];
-			LOG_RAND(("POKEY '%s' adjust %u rand17[$%05x]: $%02x\n", p->device->tag.cstr(), adjust, p->r17, p->RANDOM));
+			LOG_RAND(("POKEY '%s' adjust %u rand17[$%05x]: $%02x\n", p->device->tag(), adjust, p->r17, p->RANDOM));
 		}
 		if (adjust > 0)
 			timer_adjust_oneshot(p->rtimer, attotime_never, 0);
@@ -919,24 +919,24 @@ READ8_DEVICE_HANDLER( pokey_r )
 		if( p->serin_r.read )
 			p->SERIN = devcb_call_read8(&p->serin_r, offset);
 		data = p->SERIN;
-		LOG(("POKEY '%s' SERIN  $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' SERIN  $%02x\n", p->device->tag(), data));
 		break;
 
 	case IRQST_C:
 		/* IRQST is an active low input port; we keep it active high */
 		/* internally to ease the (un-)masking of bits */
 		data = p->IRQST ^ 0xff;
-		LOG(("POKEY '%s' IRQST  $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' IRQST  $%02x\n", p->device->tag(), data));
 		break;
 
 	case SKSTAT_C:
 		/* SKSTAT is also an active low input port */
 		data = p->SKSTAT ^ 0xff;
-		LOG(("POKEY '%s' SKSTAT $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' SKSTAT $%02x\n", p->device->tag(), data));
 		break;
 
 	default:
-		LOG(("POKEY '%s' register $%02x\n", p->device->tag.cstr(), offset));
+		LOG(("POKEY '%s' register $%02x\n", p->device->tag(), offset));
         break;
     }
     return data;
@@ -966,7 +966,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDF1_C:
 		if( data == p->AUDF[CHAN1] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDF1  $%02x\n", p->device->tag.cstr(), data));
+		LOG_SOUND(("POKEY '%s' AUDF1  $%02x\n", p->device->tag(), data));
 		p->AUDF[CHAN1] = data;
         ch_mask = 1 << CHAN1;
 		if( p->AUDCTL & CH12_JOINED )		/* if ch 1&2 tied together */
@@ -976,7 +976,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDC1_C:
 		if( data == p->AUDC[CHAN1] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDC1  $%02x (%s)\n", p->device->tag.cstr(), data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC1  $%02x (%s)\n", p->device->tag(), data, audc2str(data)));
 		p->AUDC[CHAN1] = data;
         ch_mask = 1 << CHAN1;
         break;
@@ -984,7 +984,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDF2_C:
 		if( data == p->AUDF[CHAN2] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDF2  $%02x\n", p->device->tag.cstr(), data));
+		LOG_SOUND(("POKEY '%s' AUDF2  $%02x\n", p->device->tag(), data));
 		p->AUDF[CHAN2] = data;
         ch_mask = 1 << CHAN2;
         break;
@@ -992,7 +992,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDC2_C:
 		if( data == p->AUDC[CHAN2] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDC2  $%02x (%s)\n", p->device->tag.cstr(), data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC2  $%02x (%s)\n", p->device->tag(), data, audc2str(data)));
 		p->AUDC[CHAN2] = data;
         ch_mask = 1 << CHAN2;
         break;
@@ -1000,7 +1000,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDF3_C:
 		if( data == p->AUDF[CHAN3] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDF3  $%02x\n", p->device->tag.cstr(), data));
+		LOG_SOUND(("POKEY '%s' AUDF3  $%02x\n", p->device->tag(), data));
 		p->AUDF[CHAN3] = data;
         ch_mask = 1 << CHAN3;
 
@@ -1011,7 +1011,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDC3_C:
 		if( data == p->AUDC[CHAN3] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDC3  $%02x (%s)\n", p->device->tag.cstr(), data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC3  $%02x (%s)\n", p->device->tag(), data, audc2str(data)));
 		p->AUDC[CHAN3] = data;
         ch_mask = 1 << CHAN3;
         break;
@@ -1019,7 +1019,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDF4_C:
 		if( data == p->AUDF[CHAN4] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDF4  $%02x\n", p->device->tag.cstr(), data));
+		LOG_SOUND(("POKEY '%s' AUDF4  $%02x\n", p->device->tag(), data));
 		p->AUDF[CHAN4] = data;
         ch_mask = 1 << CHAN4;
         break;
@@ -1027,7 +1027,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDC4_C:
 		if( data == p->AUDC[CHAN4] )
             return;
-		LOG_SOUND(("POKEY '%s' AUDC4  $%02x (%s)\n", p->device->tag.cstr(), data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC4  $%02x (%s)\n", p->device->tag(), data, audc2str(data)));
 		p->AUDC[CHAN4] = data;
         ch_mask = 1 << CHAN4;
         break;
@@ -1035,7 +1035,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case AUDCTL_C:
 		if( data == p->AUDCTL )
             return;
-		LOG_SOUND(("POKEY '%s' AUDCTL $%02x (%s)\n", p->device->tag.cstr(), data, audctl2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDCTL $%02x (%s)\n", p->device->tag(), data, audctl2str(data)));
 		p->AUDCTL = data;
         ch_mask = 15;       /* all channels */
         /* determine the base multiplier for the 'div by n' calculations */
@@ -1044,7 +1044,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
     case STIMER_C:
         /* first remove any existing timers */
-		LOG_TIMER(("POKEY '%s' STIMER $%02x\n", p->device->tag.cstr(), data));
+		LOG_TIMER(("POKEY '%s' STIMER $%02x\n", p->device->tag(), data));
 
 		timer_adjust_oneshot(p->timer[TIMER1], attotime_never, p->timer_param[TIMER1]);
 		timer_adjust_oneshot(p->timer[TIMER2], attotime_never, p->timer_param[TIMER2]);
@@ -1062,7 +1062,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         {
 			if( p->divisor[CHAN2] > 4 )
 			{
-				LOG_TIMER(("POKEY '%s' timer1+2 after %d clocks\n", p->device->tag.cstr(), p->divisor[CHAN2]));
+				LOG_TIMER(("POKEY '%s' timer1+2 after %d clocks\n", p->device->tag(), p->divisor[CHAN2]));
 				/* set timer #1 _and_ #2 event after timer_div clocks of joined CHAN1+CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
 				p->timer_param[TIMER2] = IRQ_TIMR2|IRQ_TIMR1;
@@ -1073,7 +1073,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         {
 			if( p->divisor[CHAN1] > 4 )
 			{
-				LOG_TIMER(("POKEY '%s' timer1 after %d clocks\n", p->device->tag.cstr(), p->divisor[CHAN1]));
+				LOG_TIMER(("POKEY '%s' timer1 after %d clocks\n", p->device->tag(), p->divisor[CHAN1]));
 				/* set timer #1 event after timer_div clocks of CHAN1 */
 				p->timer_period[TIMER1] = attotime_mul(p->clock_period, p->divisor[CHAN1]);
 				p->timer_param[TIMER1] = IRQ_TIMR1;
@@ -1082,7 +1082,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
 			if( p->divisor[CHAN2] > 4 )
 			{
-				LOG_TIMER(("POKEY '%s' timer2 after %d clocks\n", p->device->tag.cstr(), p->divisor[CHAN2]));
+				LOG_TIMER(("POKEY '%s' timer2 after %d clocks\n", p->device->tag(), p->divisor[CHAN2]));
 				/* set timer #2 event after timer_div clocks of CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
 				p->timer_param[TIMER2] = IRQ_TIMR2;
@@ -1099,7 +1099,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
             {
 				if( p->divisor[CHAN4] > 4 )
 				{
-					LOG_TIMER(("POKEY '%s' timer4 after %d clocks\n", p->device->tag.cstr(), p->divisor[CHAN4]));
+					LOG_TIMER(("POKEY '%s' timer4 after %d clocks\n", p->device->tag(), p->divisor[CHAN4]));
 					/* set timer #4 event after timer_div clocks of CHAN4 */
 					p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
 					p->timer_param[TIMER4] = IRQ_TIMR4;
@@ -1111,7 +1111,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         {
 			if( p->divisor[CHAN4] > 4 )
 			{
-				LOG_TIMER(("POKEY '%s' timer4 after %d clocks\n", p->device->tag.cstr(), p->divisor[CHAN4]));
+				LOG_TIMER(("POKEY '%s' timer4 after %d clocks\n", p->device->tag(), p->divisor[CHAN4]));
 				/* set timer #4 event after timer_div clocks of CHAN4 */
 				p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
 				p->timer_param[TIMER4] = IRQ_TIMR4;
@@ -1126,17 +1126,17 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
     case SKREST_C:
         /* reset SKSTAT */
-		LOG(("POKEY '%s' SKREST $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' SKREST $%02x\n", p->device->tag(), data));
 		p->SKSTAT &= ~(SK_FRAME|SK_OVERRUN|SK_KBERR);
         break;
 
     case POTGO_C:
-		LOG(("POKEY '%s' POTGO  $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' POTGO  $%02x\n", p->device->tag(), data));
 		pokey_potgo(p);
         break;
 
     case SEROUT_C:
-		LOG(("POKEY '%s' SEROUT $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' SEROUT $%02x\n", p->device->tag(), data));
 		devcb_call_write8(&p->serout_w, offset, data);
 		p->SKSTAT |= SK_SEROUT;
         /*
@@ -1150,7 +1150,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         break;
 
     case IRQEN_C:
-		LOG(("POKEY '%s' IRQEN  $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' IRQEN  $%02x\n", p->device->tag(), data));
 
         /* acknowledge one or more IRQST bits ? */
 		if( p->IRQST & ~data )
@@ -1176,7 +1176,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
     case SKCTL_C:
 		if( data == p->SKCTL )
             return;
-		LOG(("POKEY '%s' SKCTL  $%02x\n", p->device->tag.cstr(), data));
+		LOG(("POKEY '%s' SKCTL  $%02x\n", p->device->tag(), data));
 		p->SKCTL = data;
         if( !(data & SK_RESET) )
         {
@@ -1204,7 +1204,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         else
 			new_val = (p->AUDF[CHAN1] + DIVADD_LOCLK) * p->clockmult;
 
-		LOG_SOUND(("POKEY '%s' chan1 %d\n", p->device->tag.cstr(), new_val));
+		LOG_SOUND(("POKEY '%s' chan1 %d\n", p->device->tag(), new_val));
 
 		p->volume[CHAN1] = (p->AUDC[CHAN1] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         p->divisor[CHAN1] = new_val;
@@ -1234,12 +1234,12 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 				new_val = p->AUDF[CHAN2] * 256 + p->AUDF[CHAN1] + DIVADD_HICLK_JOINED;
             else
 				new_val = (p->AUDF[CHAN2] * 256 + p->AUDF[CHAN1] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY '%s' chan1+2 %d\n", p->device->tag.cstr(), new_val));
+			LOG_SOUND(("POKEY '%s' chan1+2 %d\n", p->device->tag(), new_val));
         }
         else
 		{
 			new_val = (p->AUDF[CHAN2] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY '%s' chan2 %d\n", p->device->tag.cstr(), new_val));
+			LOG_SOUND(("POKEY '%s' chan2 %d\n", p->device->tag(), new_val));
 		}
 
 		p->volume[CHAN2] = (p->AUDC[CHAN2] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
@@ -1269,7 +1269,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         else
 			new_val = (p->AUDF[CHAN3] + DIVADD_LOCLK) * p->clockmult;
 
-		LOG_SOUND(("POKEY '%s' chan3 %d\n", p->device->tag.cstr(), new_val));
+		LOG_SOUND(("POKEY '%s' chan3 %d\n", p->device->tag(), new_val));
 
 		p->volume[CHAN3] = (p->AUDC[CHAN3] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
 		p->divisor[CHAN3] = new_val;
@@ -1299,12 +1299,12 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 				new_val = p->AUDF[CHAN4] * 256 + p->AUDF[CHAN3] + DIVADD_HICLK_JOINED;
             else
 				new_val = (p->AUDF[CHAN4] * 256 + p->AUDF[CHAN3] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY '%s' chan3+4 %d\n", p->device->tag.cstr(), new_val));
+			LOG_SOUND(("POKEY '%s' chan3+4 %d\n", p->device->tag(), new_val));
         }
         else
 		{
 			new_val = (p->AUDF[CHAN4] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY '%s' chan4 %d\n", p->device->tag.cstr(), new_val));
+			LOG_SOUND(("POKEY '%s' chan4 %d\n", p->device->tag(), new_val));
 		}
 
 		p->volume[CHAN4] = (p->AUDC[CHAN4] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;

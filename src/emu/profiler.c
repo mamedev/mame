@@ -186,7 +186,7 @@ astring &_profiler_get_text(running_machine *machine, astring &string)
 
 			/* and then the text */
 			if (curtype >= PROFILER_CPU_FIRST && curtype <= PROFILER_CPU_MAX)
-				string.catprintf("CPU '%s'", machine->devicelist.find(CPU, curtype - PROFILER_CPU_FIRST)->tag.cstr());
+				string.catprintf("CPU '%s'", machine->devicelist.find(CPU, curtype - PROFILER_CPU_FIRST)->tag());
 			else
 				for (nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)

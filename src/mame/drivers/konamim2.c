@@ -317,7 +317,7 @@ static WRITE64_HANDLER(unk4_w)
 	{
 		if (data & 0x800000)
 		{
-			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag(), cpu_get_pc(space->cpu));
 			cputag_set_input_line(space->machine, "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 

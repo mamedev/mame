@@ -392,7 +392,7 @@ static VIDEO_UPDATE( hornet )
 
 static VIDEO_UPDATE( hornet_2board )
 {
-	if (strcmp(screen->tag, "lscreen") == 0)
+	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
 		running_device *k037122 = devtag_get_device(screen->machine, "k037122_1");
 		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
@@ -401,7 +401,7 @@ static VIDEO_UPDATE( hornet_2board )
 		/* TODO: tilemaps per screen */
 		k037122_tile_draw(k037122, bitmap, cliprect);
 	}
-	else if (strcmp(screen->tag, "rscreen") == 0)
+	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
 		running_device *k037122 = devtag_get_device(screen->machine, "k037122_2");
 		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");

@@ -87,7 +87,7 @@ static void set_output(running_device *device)
 
 	timer_set( device->machine, attotime_zero, (void *) device, output, output_callback );
 
-	if (LOG) logerror("74123 %s:  Output: %d\n", device->tag.cstr(), output);
+	if (LOG) logerror("74123 %s:  Output: %d\n", device->tag(), output);
 }
 
 
@@ -118,11 +118,11 @@ static void start_pulse(running_device *device)
 		{
 			timer_adjust_oneshot(chip->timer, duration, 0);
 
-			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", device->tag.cstr(), attotime_to_double(duration));
+			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", device->tag(), attotime_to_double(duration));
 		}
 		else
 		{
-			if (LOG) logerror("74123 %s:  Retriggering failed.\n", device->tag.cstr());
+			if (LOG) logerror("74123 %s:  Retriggering failed.\n", device->tag());
 		}
 	}
 	else
@@ -132,7 +132,7 @@ static void start_pulse(running_device *device)
 
 		set_output(device);
 
-		if (LOG) logerror("74123 %s:  Starting pulse.  Duration: %f\n", device->tag.cstr(), attotime_to_double(duration));
+		if (LOG) logerror("74123 %s:  Starting pulse.  Duration: %f\n", device->tag(), attotime_to_double(duration));
 	}
 }
 
@@ -172,7 +172,7 @@ WRITE8_DEVICE_HANDLER( ttl74123_clear_w )
 	{
 		timer_adjust_oneshot(chip->timer, attotime_zero, 0);
 
-		if (LOG) logerror("74123 #%s:  Cleared\n", device->tag.cstr() );
+		if (LOG) logerror("74123 #%s:  Cleared\n", device->tag() );
 	}
 	chip->clear = data;
 }

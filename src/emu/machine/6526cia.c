@@ -173,8 +173,8 @@ static DEVICE_RESET( cia )
 	cia->sp = 0;
 
 	/* initialize data direction registers */
-	cia->port[0].ddr = !strcmp(device->tag, "cia_0") ? 0x03 : 0xff;
-	cia->port[1].ddr = !strcmp(device->tag, "cia_0") ? 0x00 : 0xff;
+	cia->port[0].ddr = !strcmp(device->tag(), "cia_0") ? 0x03 : 0xff;
+	cia->port[1].ddr = !strcmp(device->tag(), "cia_0") ? 0x00 : 0xff;
 
 	/* TOD running by default */
 	cia->tod_running = TRUE;

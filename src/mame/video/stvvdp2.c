@@ -5365,7 +5365,7 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 			h_count = video_screen_get_hpos(space->machine->primary_screen) & 0x3ff;
 			v_count = video_screen_get_vpos(space->machine->primary_screen) & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
 			stv_vdp2_regs[offset] = (h_count<<16)|(v_count);
-			if(LOG_VDP2) logerror("CPU %s PC(%08x) = VDP2: H/V counter read : %08x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu),stv_vdp2_regs[offset]);
+			if(LOG_VDP2) logerror("CPU %s PC(%08x) = VDP2: H/V counter read : %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),stv_vdp2_regs[offset]);
 			break;
 		}
 	}

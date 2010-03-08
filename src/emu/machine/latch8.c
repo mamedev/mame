@@ -197,7 +197,7 @@ static DEVICE_START( latch8 )
 		if (latch8->intf->node_map[i] )
 		{
 			if (!latch8->intf->node_device[i])
-				fatalerror("Device %s: Bit %d has invalid discrete device\n", device->tag.cstr(), i);
+				fatalerror("Device %s: Bit %d has invalid discrete device\n", device->tag(), i);
 			latch8->has_node_map = 1;
 		}
 
@@ -206,10 +206,10 @@ static DEVICE_START( latch8 )
 		if (latch8->intf->devread[i].tag != NULL)
 		{
 			if (latch8->devices[i] != NULL)
-				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag.cstr(), i);
+				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag(), i);
 			latch8->devices[i] = device->machine->device(latch8->intf->devread[i].tag);
 			if (latch8->devices[i] == NULL)
-				fatalerror("Device %s: Unable to find device %s\n", device->tag.cstr(), latch8->intf->devread[i].tag);
+				fatalerror("Device %s: Unable to find device %s\n", device->tag(), latch8->intf->devread[i].tag);
 			latch8->has_devread = 1;
 		}
 
@@ -218,7 +218,7 @@ static DEVICE_START( latch8 )
 		if (latch8->intf->devread[i].read_handler != NULL)
 		{
 			if (latch8->devices[i] != NULL)
-				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag.cstr(), i);
+				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag(), i);
 			latch8->has_read = 1;
 		}
 

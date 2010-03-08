@@ -676,7 +676,7 @@
 		PULL(temp);								\
 		P=(P&F_E)|F_B|(temp&~F_E);						\
 		if( IRQ_STATE != CLEAR_LINE && !(P & F_I) ) {			\
-			LOG(("M65ce02 '%s' PLP sets after_cli\n", cpustate->device->tag.cstr()));	\
+			LOG(("M65ce02 '%s' PLP sets after_cli\n", cpustate->device->tag()));	\
 			AFTER_CLI = 1;						\
 		}									\
 	} else {									\
@@ -756,7 +756,7 @@
 	PULL(PCH);									\
 	if( IRQ_STATE != CLEAR_LINE && !(P & F_I) )				\
 	{										\
-		LOG(("M65ce02 '%s' RTI sets after_cli\n", cpustate->device->tag.cstr()));		\
+		LOG(("M65ce02 '%s' RTI sets after_cli\n", cpustate->device->tag()));		\
 		AFTER_CLI = 1;							\
 	}
 
@@ -787,7 +787,7 @@
 	PULL(PCL);									\
 	PULL(PCH);									\
 	if( IRQ_STATE != CLEAR_LINE && !(P & F_I) ) {				\
-	LOG(("M65ce02 '%s' RTI sets after_cli\n", cpustate->device->tag.cstr()));			\
+	LOG(("M65ce02 '%s' RTI sets after_cli\n", cpustate->device->tag()));			\
 		AFTER_CLI = 1;							\
 	}
 

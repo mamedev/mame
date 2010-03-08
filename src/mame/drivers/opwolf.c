@@ -469,7 +469,7 @@ static MACHINE_RESET( opwolf )
 static void opwolf_msm5205_vck( running_device *device )
 {
 	opwolf_state *state = (opwolf_state *)device->machine->driver_data;
-	int chip = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
+	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (state->adpcm_data[chip] != -1)
 	{
 		msm5205_data_w(device, state->adpcm_data[chip] & 0x0f);

@@ -676,7 +676,7 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 					case DEVICE_CLASS_TIMER:		printf("  Timer: ");	break;
 					default:						printf("  Other: ");	break;
 				}
-				printf("%s ('%s')", devconfig->name(), devconfig->tag.cstr());
+				printf("%s ('%s')", devconfig->name(), devconfig->tag());
 				if (devconfig->clock >= 1000000000)
 					printf(" @ %d.%02d GHz\n", devconfig->clock / 1000000000, (devconfig->clock / 10000000) % 100);
 				else if (devconfig->clock >= 1000000)

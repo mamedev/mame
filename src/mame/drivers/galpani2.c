@@ -276,14 +276,14 @@ static WRITE8_HANDLER( galpani2_coin_lockout_w )
 static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
 		UINT8 *ROM = memory_region(device->machine, "oki1");
-		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag.cstr(),data);
+		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
 static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 {
 		okim6295_set_bank_base(device, 0x40000 * (data & 0xf) );
-		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag.cstr(),data);
+		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
 }
 
 

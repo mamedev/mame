@@ -87,7 +87,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 
 static void spd_adpcm_int(running_device *device)
 {
-	int chip = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
+	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;

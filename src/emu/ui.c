@@ -1618,7 +1618,7 @@ static slider_state *slider_init(running_machine *machine)
 		for (device = machine->firstcpu; device != NULL; device = cpu_next(device))
 		{
 			void *param = (void *)device;
-			string.printf("Overclock CPU %s", device->tag.cstr());
+			string.printf("Overclock CPU %s", device->tag());
 			*tailptr = slider_alloc(machine, string, 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}
@@ -2112,7 +2112,7 @@ static char *slider_get_screen_desc(running_device *screen)
 	static char descbuf[256];
 
 	if (screen_count > 1)
-		sprintf(descbuf, "Screen '%s'", screen->tag.cstr());
+		sprintf(descbuf, "Screen '%s'", screen->tag());
 	else
 		strcpy(descbuf, "Screen");
 
@@ -2131,7 +2131,7 @@ static char *slider_get_laserdisc_desc(running_device *laserdisc)
 	static char descbuf[256];
 
 	if (ldcount > 1)
-		sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag.cstr());
+		sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag());
 	else
 		strcpy(descbuf, "Laserdisc");
 

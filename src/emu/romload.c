@@ -272,7 +272,7 @@ astring &rom_region_name(astring &result, const game_driver *drv, const rom_sour
 	else
 	{
 		const device_config *devconfig = (const device_config *)source;
-		result.printf("%s:%s", devconfig->tag.cstr(), ROMREGION_GETTAG(romp));
+		result.printf("%s:%s", devconfig->tag(), ROMREGION_GETTAG(romp));
 	}
 	return result;
 }

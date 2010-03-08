@@ -233,7 +233,7 @@ INLINE void set_irq(z8000_state *cpustate, int type)
             cpustate->irq_req = type;
             break;
         case Z8000_SYSCALL >> 8:
-            LOG(("Z8K '%s' SYSCALL $%02x\n", cpustate->device->tag.cstr(), type & 0xff));
+            LOG(("Z8K '%s' SYSCALL $%02x\n", cpustate->device->tag(), type & 0xff));
             cpustate->irq_req = type;
             break;
         default:
@@ -271,7 +271,7 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_srv = cpustate->irq_req;
         cpustate->irq_req &= ~Z8000_TRAP;
         cpustate->pc = TRAP;
-        LOG(("Z8K '%s' trap $%04x\n", cpustate->device->tag.cstr(), cpustate->pc));
+        LOG(("Z8K '%s' trap $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
     if (cpustate->irq_req & Z8000_SYSCALL)
@@ -283,7 +283,7 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_srv = cpustate->irq_req;
         cpustate->irq_req &= ~Z8000_SYSCALL;
         cpustate->pc = SYSCALL;
-        LOG(("Z8K '%s' syscall $%04x\n", cpustate->device->tag.cstr(), cpustate->pc));
+        LOG(("Z8K '%s' syscall $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
     if (cpustate->irq_req & Z8000_SEGTRAP)
@@ -295,7 +295,7 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_srv = cpustate->irq_req;
         cpustate->irq_req &= ~Z8000_SEGTRAP;
         cpustate->pc = SEGTRAP;
-        LOG(("Z8K '%s' segtrap $%04x\n", cpustate->device->tag.cstr(), cpustate->pc));
+        LOG(("Z8K '%s' segtrap $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
     if (cpustate->irq_req & Z8000_NMI)
@@ -310,7 +310,7 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->irq_req &= ~Z8000_NMI;
         CHANGE_FCW(cpustate, fcw);
         cpustate->pc = NMI;
-        LOG(("Z8K '%s' NMI $%04x\n", cpustate->device->tag.cstr(), cpustate->pc));
+        LOG(("Z8K '%s' NMI $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
     if ((cpustate->irq_req & Z8000_NVI) && (cpustate->fcw & F_NVIE))
@@ -324,7 +324,7 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->pc = RDMEM_W(cpustate,  NVI + 2);
         cpustate->irq_req &= ~Z8000_NVI;
         CHANGE_FCW(cpustate, fcw);
-        LOG(("Z8K '%s' NVI $%04x\n", cpustate->device->tag.cstr(), cpustate->pc));
+        LOG(("Z8K '%s' NVI $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
     if ((cpustate->irq_req & Z8000_VI) && (cpustate->fcw & F_VIE))
@@ -338,7 +338,7 @@ INLINE void Interrupt(z8000_state *cpustate)
         cpustate->pc = RDMEM_W(cpustate,  VEC00 + 2 * (cpustate->irq_req & 0xff));
         cpustate->irq_req &= ~Z8000_VI;
         CHANGE_FCW(cpustate, fcw);
-        LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpustate->device->tag.cstr(), cpustate->irq_vec, VEC00 + VEC00 + 2 * (cpustate->irq_req & 0xff), cpustate->fcw, cpustate->pc));
+        LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpustate->device->tag(), cpustate->irq_vec, VEC00 + VEC00 + 2 * (cpustate->irq_req & 0xff), cpustate->fcw, cpustate->pc));
     }
 }
 

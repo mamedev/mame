@@ -599,7 +599,7 @@ static void check_interrupt(tms34010_state *tms)
 	/* check for NMI first */
 	if (IOREG(tms, REG_HSTCTLH) & 0x0100)
 	{
-		LOG(("TMS34010 '%s' takes NMI\n", tms->device->tag.cstr()));
+		LOG(("TMS34010 '%s' takes NMI\n", tms->device->tag()));
 
 		/* ack the NMI */
 		IOREG(tms, REG_HSTCTLH) &= ~0x0100;
@@ -626,28 +626,28 @@ static void check_interrupt(tms34010_state *tms)
 	/* host interrupt */
 	if (irq & TMS34010_HI)
 	{
-		LOG(("TMS34010 '%s' takes HI\n", tms->device->tag.cstr()));
+		LOG(("TMS34010 '%s' takes HI\n", tms->device->tag()));
 		vector = 0xfffffec0;
 	}
 
 	/* display interrupt */
 	else if (irq & TMS34010_DI)
 	{
-		LOG(("TMS34010 '%s' takes DI\n", tms->device->tag.cstr()));
+		LOG(("TMS34010 '%s' takes DI\n", tms->device->tag()));
 		vector = 0xfffffea0;
 	}
 
 	/* window violation interrupt */
 	else if (irq & TMS34010_WV)
 	{
-		LOG(("TMS34010 '%s' takes WV\n", tms->device->tag.cstr()));
+		LOG(("TMS34010 '%s' takes WV\n", tms->device->tag()));
 		vector = 0xfffffe80;
 	}
 
 	/* external 1 interrupt */
 	else if (irq & TMS34010_INT1)
 	{
-		LOG(("TMS34010 '%s' takes INT1\n", tms->device->tag.cstr()));
+		LOG(("TMS34010 '%s' takes INT1\n", tms->device->tag()));
 		vector = 0xffffffc0;
 		irqline = 0;
 	}
@@ -655,7 +655,7 @@ static void check_interrupt(tms34010_state *tms)
 	/* external 2 interrupt */
 	else if (irq & TMS34010_INT2)
 	{
-		LOG(("TMS34010 '%s' takes INT2\n", tms->device->tag.cstr()));
+		LOG(("TMS34010 '%s' takes INT2\n", tms->device->tag()));
 		vector = 0xffffffa0;
 		irqline = 1;
 	}
@@ -781,7 +781,7 @@ static CPU_EXIT( tms34010 )
 
 static void set_irq_line(tms34010_state *tms, int irqline, int linestate)
 {
-	LOG(("TMS34010 '%s' set irq line %d state %d\n", tms->device->tag.cstr(), irqline, linestate));
+	LOG(("TMS34010 '%s' set irq line %d state %d\n", tms->device->tag(), irqline, linestate));
 
 	/* set the pending interrupt */
 	switch (irqline)
@@ -815,7 +815,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 
 	/* call through to the CPU to generate the int */
 	IOREG(tms, REG_INTPEND) |= type;
-	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tms->device->tag.cstr(), type));
+	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tms->device->tag(), type));
 
 	/* generate triggers so that spin loops can key off them */
 	cpu_triggerint(tms->device);
@@ -1151,7 +1151,7 @@ VIDEO_UPDATE( tms340x0 )
 		}
 	}
 	if (tms == NULL)
-		fatalerror("Unable to locate matching CPU for screen '%s'\n", screen->tag.cstr());
+		fatalerror("Unable to locate matching CPU for screen '%s'\n", screen->tag());
 
 	/* get the display parameters for the screen */
 	tms34010_get_display_params(tms->device, &params);

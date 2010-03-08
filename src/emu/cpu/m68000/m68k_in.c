@@ -3288,7 +3288,7 @@ M68KMAKE_OP(callm, 32, ., .)
 		REG_PC += 2;
 (void)ea;	/* just to avoid an 'unused variable' warning */
 		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_illegal(m68k);
@@ -4366,7 +4366,7 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		logerror( "%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4378,7 +4378,7 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4390,7 +4390,7 @@ M68KMAKE_OP(cpgen, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4402,7 +4402,7 @@ M68KMAKE_OP(cpscc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4414,7 +4414,7 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -8812,7 +8812,7 @@ M68KMAKE_OP(rtm, 32, ., .)
 	{
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 		logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
-					 m68k->device->tag.cstr(), REG_PC - 2, m68k->ir);
+					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_illegal(m68k);

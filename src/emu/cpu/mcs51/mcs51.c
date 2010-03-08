@@ -2026,7 +2026,7 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", mcs51_state->device->tag.cstr(), (UINT32)offset,PC,data));
+			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", mcs51_state->device->tag(), (UINT32)offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
@@ -2066,7 +2066,7 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 			return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", mcs51_state->device->tag.cstr(), (UINT32)offset,PC));
+			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", mcs51_state->device->tag(), (UINT32)offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
@@ -2318,8 +2318,8 @@ static CPU_INIT( i80c31 )
  ****************************************************************************/
 
 
-#define DS5_LOGW(a, d)	LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", mcs51_state->device->tag.cstr(), PC, d))
-#define DS5_LOGR(a, d)	LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", mcs51_state->device->tag.cstr(), PC))
+#define DS5_LOGW(a, d)	LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", mcs51_state->device->tag(), PC, d))
+#define DS5_LOGR(a, d)	LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", mcs51_state->device->tag(), PC))
 
 INLINE UINT8 ds5002fp_protected(mcs51_state_t *mcs51_state, size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
 {
@@ -2345,7 +2345,7 @@ static void ds5002fp_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 
 			if ((data == 0xaa) && (mcs51_state->ds5002fp.ta_window == 0))
 			{
 				mcs51_state->ds5002fp.ta_window = 6; /* 4*12 + 2*12 */
-				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", mcs51_state->device->tag.cstr(), PC));
+				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", mcs51_state->device->tag(), PC));
 			}
 			break;
 		case ADDR_MCON: 	data = ds5002fp_protected(mcs51_state, ADDR_MCON, data, 0x0f, 0xf7);	DS5_LOGW(MCON, data); break;

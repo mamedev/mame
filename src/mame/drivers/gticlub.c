@@ -262,7 +262,7 @@ static VIDEO_UPDATE( hangplt )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
-	if (strcmp(screen->tag, "lscreen") == 0)
+	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
 		running_device *k001604 = devtag_get_device(screen->machine, "k001604_1");
 		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
@@ -273,7 +273,7 @@ static VIDEO_UPDATE( hangplt )
 
 		k001604_draw_front_layer(k001604, bitmap, cliprect);
 	}
-	else if (strcmp(screen->tag, "rscreen") == 0)
+	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
 		running_device *k001604 = devtag_get_device(screen->machine, "k001604_2");
 		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");

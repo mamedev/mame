@@ -699,7 +699,7 @@ static void reset_reset(running_machine *machine)
 static void resetcontrol_w(const address_space *space, UINT8 data)
 {
 	resetcontrol = data;
-	logerror("Reset control %02x ('%s':%x)\n", resetcontrol, space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+	logerror("Reset control %02x ('%s':%x)\n", resetcontrol, space->cpu->tag(), cpu_get_pc(space->cpu));
 	reset_reset(space->machine);
 }
 
@@ -756,7 +756,7 @@ static WRITE16_HANDLER( mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space->cpu->tag(), cpu_get_pc(space->cpu));
 			return;
 		}
 
@@ -767,9 +767,9 @@ static WRITE16_HANDLER( mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space->cpu->tag(), cpu_get_pc(space->cpu));
 		} else {
-			logerror("Magic latch reset (%s:%x)\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+			logerror("Magic latch reset (%s:%x)\n", space->cpu->tag(), cpu_get_pc(space->cpu));
 			mlatch = 0x00;
 		}
 	}

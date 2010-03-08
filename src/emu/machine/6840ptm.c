@@ -290,7 +290,7 @@ static UINT16 compute_counter( running_device *device, int counter )
 	/* If there's no timer, return the count */
 	if (!ptm6840->enabled[counter])
 	{
-		PLOG(("MC6840 #%s: read counter(%d): %d\n", device->tag.cstr(), counter, ptm6840->counter[counter]));
+		PLOG(("MC6840 #%s: read counter(%d): %d\n", device->tag(), counter, ptm6840->counter[counter]));
 		return ptm6840->counter[counter];
 	}
 
@@ -298,12 +298,12 @@ static UINT16 compute_counter( running_device *device, int counter )
 	if (ptm6840->control_reg[counter] & 0x02)
 	{
 		clock = ptm6840->internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag.cstr(), counter, clock));
+		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag(), counter, clock));
 	}
 	else
 	{
 		clock = ptm6840->external_clock[counter];
-		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag.cstr(), counter, clock));
+		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag(), counter, clock));
 	}
 	/* See how many are left */
 	remaining = attotime_to_double(attotime_mul(timer_timeleft(ptm6840->timer[counter]), clock));
@@ -316,7 +316,7 @@ static UINT16 compute_counter( running_device *device, int counter )
 		int lsb = remaining % divisor;
 		remaining = (msb << 8) | lsb;
 	}
-	PLOG(("MC6840 #%s: read counter(%d): %d\n", device->tag.cstr(), counter, remaining));
+	PLOG(("MC6840 #%s: read counter(%d): %d\n", device->tag(), counter, remaining));
 	return remaining;
 }
 
@@ -338,12 +338,12 @@ static void reload_count( running_device *device, int idx )
 	if (ptm6840->control_reg[idx] & 0x02)
 	{
 		clock = ptm6840->internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag.cstr(), idx, clock));
+		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag(), idx, clock));
 	}
 	else
 	{
 		clock = ptm6840->external_clock[idx];
-		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag.cstr(), idx, clock));
+		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag(), idx, clock));
 	}
 
 	/* Determine the number of clock periods before we expire */
@@ -363,13 +363,13 @@ static void reload_count( running_device *device, int idx )
 	}
 
 	/* Set the timer */
-	PLOG(("MC6840 #%s: reload_count(%d): clock = %d  count = %d\n", device->tag.cstr(), idx, clock, count));
+	PLOG(("MC6840 #%s: reload_count(%d): clock = %d  count = %d\n", device->tag(), idx, clock, count));
 
 	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 	if (idx == 2)
 		duration = attotime_mul(duration, ptm6840->t3_divisor);
 
-	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", device->tag.cstr(), idx, attotime_to_double(duration)));
+	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", device->tag(), idx, attotime_to_double(duration)));
 
 	if (!(ptm6840->control_reg[idx] & 0x02))
 	{
@@ -407,7 +407,7 @@ READ8_DEVICE_HANDLER( ptm6840_read )
 
 		case PTM_6840_STATUS:
 		{
-			PLOG(("%s: MC6840 #%s: Status read = %04X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), ptm6840->status_reg));
+			PLOG(("%s: MC6840 #%s: Status read = %04X\n", cpuexec_describe_context(device->machine), device->tag(), ptm6840->status_reg));
 			ptm6840->status_read_since_int |= ptm6840->status_reg & 0x07;
 			val = ptm6840->status_reg;
 			break;
@@ -429,7 +429,7 @@ READ8_DEVICE_HANDLER( ptm6840_read )
 
 			ptm6840->lsb_buffer = result & 0xff;
 
-			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), idx, result >> 8));
+			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", cpuexec_describe_context(device->machine), device->tag(), idx, result >> 8));
 			val = result >> 8;
 			break;
 		}
@@ -474,7 +474,7 @@ WRITE8_DEVICE_HANDLER( ptm6840_write )
 			ptm6840->mode[idx] = (data >> 3) & 0x07;
 			ptm6840->control_reg[idx] = data;
 
-			PLOG(("MC6840 #%s : Control register %d selected\n", device->tag.cstr(), idx));
+			PLOG(("MC6840 #%s : Control register %d selected\n", device->tag(), idx));
 			PLOG(("operation mode   = %s\n", opmode[ ptm6840->mode[idx] ]));
 			PLOG(("value            = %04X\n", ptm6840->control_reg[idx]));
 			PLOG(("t3divisor        = %d\n", ptm6840->t3_divisor));
@@ -491,7 +491,7 @@ WRITE8_DEVICE_HANDLER( ptm6840_write )
 				/* Holding reset down */
 				if (data & 0x01)
 				{
-					PLOG(("MC6840 #%s : Timer reset\n", device->tag.cstr()));
+					PLOG(("MC6840 #%s : Timer reset\n", device->tag()));
 					for (i = 0; i < 3; i++)
 					{
 						timer_enable(ptm6840->timer[i], FALSE);
@@ -519,7 +519,7 @@ WRITE8_DEVICE_HANDLER( ptm6840_write )
 		case PTM_6840_MSBBUF2:
 		case PTM_6840_MSBBUF3:
 		{
-			PLOG(("MC6840 #%s msbbuf%d = %02X\n", device->tag.cstr(), offset / 2, data));
+			PLOG(("MC6840 #%s msbbuf%d = %02X\n", device->tag(), offset / 2, data));
 			ptm6840->msb_buffer = data;
 			break;
 		}
@@ -539,7 +539,7 @@ WRITE8_DEVICE_HANDLER( ptm6840_write )
 			if (!(ptm6840->control_reg[idx] & 0x10))
 				reload_count(device,idx);
 
-			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", cpuexec_describe_context(device->machine), device->tag.cstr(), idx, ptm6840->latch[idx]));
+			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", cpuexec_describe_context(device->machine), device->tag(), idx, ptm6840->latch[idx]));
 			break;
 		}
 	}
@@ -553,7 +553,7 @@ static void ptm6840_timeout( running_device *device, int idx )
 {
 	ptm6840_state *ptm6840 = get_safe_token(device);
 
-	PLOG(("**ptm6840 %s t%d timeout**\n", device->tag.cstr(), idx + 1));
+	PLOG(("**ptm6840 %s t%d timeout**\n", device->tag(), idx + 1));
 
 	if ( ptm6840->control_reg[idx] & 0x40 )
 	{
@@ -568,7 +568,7 @@ static void ptm6840_timeout( running_device *device, int idx )
 		if ((ptm6840->mode[idx] == 0)||(ptm6840->mode[idx] == 2))
 		{
 			ptm6840->output[idx] = ptm6840->output[idx] ? 0 : 1;
-			PLOG(("**ptm6840 %s t%d output %d **\n", device->tag.cstr(), idx + 1, ptm6840->output[idx]));
+			PLOG(("**ptm6840 %s t%d output %d **\n", device->tag(), idx + 1, ptm6840->output[idx]));
 
 			if (ptm6840->out_func[idx].write != NULL)
 				devcb_call_write8(&ptm6840->out_func[idx], 0, ptm6840->output[idx]);
@@ -578,7 +578,7 @@ static void ptm6840_timeout( running_device *device, int idx )
 			if (!ptm6840->fired[idx])
 			{
 				ptm6840->output[idx] = 1;
-				PLOG(("**ptm6840 %s t%d output %d **\n", device->tag.cstr(), idx + 1, ptm6840->output[idx]));
+				PLOG(("**ptm6840 %s t%d output %d **\n", device->tag(), idx + 1, ptm6840->output[idx]));
 
 				if (ptm6840->out_func[idx].write != NULL)
 					devcb_call_write8(&ptm6840->out_func[idx], 0, ptm6840->output[idx]);

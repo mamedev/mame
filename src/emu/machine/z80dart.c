@@ -242,7 +242,7 @@ static void take_interrupt(running_device *device, int channel, int level)
 	UINT8 vector = ch->wr[2];
 	int priority = (channel << 2) | level;
 
-	LOG(("Z80DART \"%s\" Channel %c : Interrupt Request %u\n", device->tag.cstr(), 'A' + channel, level));
+	LOG(("Z80DART \"%s\" Channel %c : Interrupt Request %u\n", device->tag(), 'A' + channel, level));
 
 	if ((channel == Z80DART_CH_B) && (ch->wr[1] & Z80DART_WR1_STATUS_VECTOR))
 	{
@@ -696,7 +696,7 @@ READ8_DEVICE_HANDLER( z80dart_c_r )
 		break;
 	}
 
-	LOG(("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", device->tag.cstr(), 'A' + channel, data));
+	LOG(("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", device->tag(), 'A' + channel, data));
 
 	return data;
 }
@@ -713,7 +713,7 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 
 	int reg = ch->wr[0] & Z80DART_WR0_REGISTER_MASK;
 
-	LOG(("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", device->tag.cstr(), 'A' + channel, data));
+	LOG(("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", device->tag(), 'A' + channel, data));
 
 	/* write data to selected register */
 	ch->wr[reg] = data;
@@ -739,62 +739,62 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 
 			ch->rx_rr0_latch = 0;
 
-			LOG(("Z80DART \"%s\" Channel %c : Reset External/Status Interrupt\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Reset External/Status Interrupt\n", device->tag(), 'A' + channel));
 			break;
 
 		case Z80DART_WR0_CHANNEL_RESET:
 			/* channel reset */
-			LOG(("Z80DART \"%s\" Channel %c : Channel Reset\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Channel Reset\n", device->tag(), 'A' + channel));
 			reset_channel(device, channel);
 			break;
 
 		case Z80DART_WR0_ENABLE_INT_NEXT_RX:
 			/* enable interrupt on next receive character */
-			LOG(("Z80DART \"%s\" Channel %c : Enable Interrupt on Next Received Character\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Enable Interrupt on Next Received Character\n", device->tag(), 'A' + channel));
 			ch->rx_first = 1;
 			break;
 
 		case Z80DART_WR0_RESET_TX_INT:
 			/* reset transmitter interrupt pending */
-			LOG(("Z80DART \"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", device->tag(), 'A' + channel));
 			break;
 
 		case Z80DART_WR0_ERROR_RESET:
 			/* error reset */
-			LOG(("Z80DART \"%s\" Channel %c : Error Reset\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Error Reset\n", device->tag(), 'A' + channel));
 			ch->rr[1] &= ~(Z80DART_RR1_FRAMING_ERROR | Z80DART_RR1_RX_OVERRUN_ERROR | Z80DART_RR1_PARITY_ERROR);
 			break;
 
 		case Z80DART_WR0_RETURN_FROM_INT:
 			/* return from interrupt */
-			LOG(("Z80DART \"%s\" Channel %c : Return from Interrupt\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Return from Interrupt\n", device->tag(), 'A' + channel));
 			z80dart_irq_reti(device);
 			break;
 		}
 		break;
 
 	case 1:
-		LOG(("Z80DART \"%s\" Channel %c : External Interrupt Enable %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR1_EXT_INT_ENABLE) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Transmit Interrupt Enable %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR1_TX_INT_ENABLE) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Status Affects Vector %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR1_STATUS_VECTOR) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Wait/Ready Enable %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR1_WRDY_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : External Interrupt Enable %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR1_EXT_INT_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Transmit Interrupt Enable %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR1_TX_INT_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Status Affects Vector %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR1_STATUS_VECTOR) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Wait/Ready Enable %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR1_WRDY_ENABLE) ? 1 : 0));
 
 		switch (data & Z80DART_WR1_RX_INT_ENABLE_MASK)
 		{
 		case Z80DART_WR1_RX_INT_DISABLE:
-			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt Disabled\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt Disabled\n", device->tag(), 'A' + channel));
 			break;
 
 		case Z80DART_WR1_RX_INT_FIRST:
-			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt on First Character\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt on First Character\n", device->tag(), 'A' + channel));
 			break;
 
 		case Z80DART_WR1_RX_INT_ALL_PARITY:
-			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", device->tag(), 'A' + channel));
 			break;
 
 		case Z80DART_WR1_RX_INT_ALL:
-			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters\n", device->tag.cstr(), 'A' + channel));
+			LOG(("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters\n", device->tag(), 'A' + channel));
 			break;
 		}
 
@@ -804,28 +804,28 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 	case 2:
 		/* interrupt vector */
 		check_interrupts(device);
-		LOG(("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", device->tag.cstr(), 'A' + channel, data));
+		LOG(("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", device->tag(), 'A' + channel, data));
 		break;
 
 	case 3:
-		LOG(("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR3_RX_ENABLE) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Auto Enables %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR3_AUTO_ENABLES) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", device->tag.cstr(), 'A' + channel, get_rx_word_length(ch)));
+		LOG(("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR3_RX_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Auto Enables %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR3_AUTO_ENABLES) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", device->tag(), 'A' + channel, get_rx_word_length(ch)));
 		break;
 
 	case 4:
-		LOG(("Z80DART \"%s\" Channel %c : Parity Enable %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR4_PARITY_ENABLE) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Parity %s\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR4_PARITY_EVEN) ? "Even" : "Odd"));
-		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", device->tag.cstr(), 'A' + channel, get_stop_bits(ch)));
-		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", device->tag.cstr(), 'A' + channel, get_clock_mode(ch)));
+		LOG(("Z80DART \"%s\" Channel %c : Parity Enable %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR4_PARITY_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Parity %s\n", device->tag(), 'A' + channel, (data & Z80DART_WR4_PARITY_EVEN) ? "Even" : "Odd"));
+		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", device->tag(), 'A' + channel, get_stop_bits(ch)));
+		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", device->tag(), 'A' + channel, get_clock_mode(ch)));
 		break;
 
 	case 5:
-		LOG(("Z80DART \"%s\" Channel %c : Transmitter Enable %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR5_TX_ENABLE) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", device->tag.cstr(), 'A' + channel, get_tx_word_length(ch)));
-		LOG(("Z80DART \"%s\" Channel %c : Send Break %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR5_SEND_BREAK) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Request to Send %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR5_RTS) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", device->tag.cstr(), 'A' + channel, (data & Z80DART_WR5_DTR) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Transmitter Enable %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR5_TX_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", device->tag(), 'A' + channel, get_tx_word_length(ch)));
+		LOG(("Z80DART \"%s\" Channel %c : Send Break %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR5_SEND_BREAK) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Request to Send %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR5_RTS) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", device->tag(), 'A' + channel, (data & Z80DART_WR5_DTR) ? 1 : 0));
 
 		if (data & Z80DART_WR5_RTS)
 		{
@@ -876,7 +876,7 @@ READ8_DEVICE_HANDLER( z80dart_d_r )
 		}
 	}
 
-	LOG(("Z80DART \"%s\" Channel %c : Data Register Read '%02x'\n", device->tag.cstr(), 'A' + channel, data));
+	LOG(("Z80DART \"%s\" Channel %c : Data Register Read '%02x'\n", device->tag(), 'A' + channel, data));
 
 	return data;
 }
@@ -896,7 +896,7 @@ WRITE8_DEVICE_HANDLER( z80dart_d_w )
 	ch->rr[0] &= ~Z80DART_RR0_TX_BUFFER_EMPTY;
 	ch->rr[1] &= ~Z80DART_RR1_ALL_SENT;
 
-	LOG(("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", device->tag.cstr(), 'A' + channel, data));
+	LOG(("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", device->tag(), 'A' + channel, data));
 }
 
 /*-------------------------------------------------
@@ -908,7 +908,7 @@ void z80dart_receive_data(running_device *device, int channel, UINT8 data)
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 
-	LOG(("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", device->tag.cstr(), 'A' + channel, data));
+	LOG(("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", device->tag(), 'A' + channel, data));
 
 	if (ch->rx_fifo == 2)
 	{
@@ -969,7 +969,7 @@ static void cts_w(running_device *device, int channel, int state)
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 
-	LOG(("Z80DART \"%s\" Channel %c : CTS %u\n", device->tag.cstr(), 'A' + channel, state));
+	LOG(("Z80DART \"%s\" Channel %c : CTS %u\n", device->tag(), 'A' + channel, state));
 
 	if (ch->cts != state)
 	{
@@ -1028,7 +1028,7 @@ static void dcd_w(running_device *device, int channel, int state)
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 
-	LOG(("Z80DART \"%s\" Channel %c : DCD %u\n", device->tag.cstr(), 'A' + channel, state));
+	LOG(("Z80DART \"%s\" Channel %c : DCD %u\n", device->tag(), 'A' + channel, state));
 
 	if (ch->dcd != state)
 	{
@@ -1088,7 +1088,7 @@ static void ri_w(running_device *device, int channel, int state)
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 
-	LOG(("Z80DART \"%s\" Channel %c : RI %u\n", device->tag.cstr(), 'A' + channel, state));
+	LOG(("Z80DART \"%s\" Channel %c : RI %u\n", device->tag(), 'A' + channel, state));
 
 	if (ch->ri != state)
 	{
@@ -1145,7 +1145,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w )
 
 	if (!state) return;
 
-	LOG(("Z80DART \"%s\" Channel A : Receiver Clock Pulse\n", device->tag.cstr()));
+	LOG(("Z80DART \"%s\" Channel A : Receiver Clock Pulse\n", device->tag()));
 
 	ch->rx_clock++;
 
@@ -1171,7 +1171,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w )
 
 	if (!state) return;
 
-	LOG(("Z80DART \"%s\" Channel A : Transmitter Clock Pulse\n", device->tag.cstr()));
+	LOG(("Z80DART \"%s\" Channel A : Transmitter Clock Pulse\n", device->tag()));
 
 	ch->tx_clock++;
 
@@ -1198,7 +1198,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w )
 
 	if (!state) return;
 
-	LOG(("Z80DART \"%s\" Channel A : Receiver/Transmitter Clock Pulse\n", device->tag.cstr()));
+	LOG(("Z80DART \"%s\" Channel A : Receiver/Transmitter Clock Pulse\n", device->tag()));
 
 	ch->rx_clock++;
 	ch->tx_clock++;
@@ -1251,7 +1251,7 @@ static int z80dart_irq_state(running_device *device)
 	int state = 0;
 	int i;
 
-	LOG(("Z80DART \"%s\" : Interrupt State B:%d%d%d%d A:%d%d%d%d\n", device->tag.cstr(),
+	LOG(("Z80DART \"%s\" : Interrupt State B:%d%d%d%d A:%d%d%d%d\n", device->tag(),
 				z80dart->int_state[0], z80dart->int_state[1], z80dart->int_state[2], z80dart->int_state[3],
 				z80dart->int_state[4], z80dart->int_state[5], z80dart->int_state[6], z80dart->int_state[7]));
 
@@ -1267,7 +1267,7 @@ static int z80dart_irq_state(running_device *device)
 		state |= z80dart->int_state[i];
 	}
 
-	LOG(("Z80DART \"%s\" : Interrupt State %u\n", device->tag.cstr(), state));
+	LOG(("Z80DART \"%s\" : Interrupt State %u\n", device->tag(), state));
 
 	return state;
 }
@@ -1281,7 +1281,7 @@ static int z80dart_irq_ack(running_device *device)
 	z80dart_t *z80dart = get_safe_token( device );
 	int i;
 
-	LOG(("Z80DART \"%s\" Interrupt Acknowledge\n", device->tag.cstr()));
+	LOG(("Z80DART \"%s\" Interrupt Acknowledge\n", device->tag()));
 
 	/* loop over all interrupt sources */
 	for (i = 0; i < 8; i++)
@@ -1294,7 +1294,7 @@ static int z80dart_irq_ack(running_device *device)
 			z80dart->channel[Z80DART_CH_A].rr[0] &= ~Z80DART_RR0_INTERRUPT_PENDING;
 			check_interrupts(device);
 
-			LOG(("Z80DART \"%s\" : Interrupt Acknowledge Vector %02x\n", device->tag.cstr(), z80dart->channel[Z80DART_CH_B].rr[2]));
+			LOG(("Z80DART \"%s\" : Interrupt Acknowledge Vector %02x\n", device->tag(), z80dart->channel[Z80DART_CH_B].rr[2]));
 
 			return z80dart->channel[Z80DART_CH_B].rr[2];
 		}
@@ -1314,7 +1314,7 @@ static void z80dart_irq_reti(running_device *device)
 	z80dart_t *z80dart = get_safe_token( device );
 	int i;
 
-	LOG(("Z80DART \"%s\" Return from Interrupt\n", device->tag.cstr()));
+	LOG(("Z80DART \"%s\" Return from Interrupt\n", device->tag()));
 
 	/* loop over all interrupt sources */
 	for (i = 0; i < 8; i++)
@@ -1463,7 +1463,7 @@ static DEVICE_RESET( z80dart )
 {
 	int channel;
 
-	LOG(("Z80DART \"%s\" Reset\n", device->tag.cstr()));
+	LOG(("Z80DART \"%s\" Reset\n", device->tag()));
 
 	for (channel = Z80DART_CH_A; channel <= Z80DART_CH_B; channel++)
 	{

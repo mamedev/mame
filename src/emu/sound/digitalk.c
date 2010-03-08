@@ -651,7 +651,7 @@ static DEVICE_START(digitalker)
 {
 	digitalker *dg = get_safe_token(device);
 	dg->device = device;
-	dg->rom = memory_region(device->machine, device->tag);
+	dg->rom = memory_region(device->machine, device->tag());
 	dg->stream = stream_create(device, 0, 1, device->clock/4, dg, digitalker_update);
 	dg->dac_index = 128;
 	dg->data = 0xff;

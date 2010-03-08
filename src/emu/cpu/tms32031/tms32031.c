@@ -388,7 +388,7 @@ static CPU_INIT( tms32031 )
 
 	state_save_register_device_item(device, 0, tms->pc);
 	for (i = 0; i < 36; i++)
-		state_save_register_generic(device->machine, "tms32031", device->tag, i, "reg", tms->r[i].i8, UINT8, 8);
+		state_save_register_generic(device->machine, "tms32031", device->tag(), i, "reg", tms->r[i].i8, UINT8, 8);
 	state_save_register_device_item(device, 0, tms->bkmask);
 	state_save_register_device_item(device, 0, tms->irq_state);
 	state_save_register_device_item(device, 0, tms->delayed);

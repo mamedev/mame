@@ -315,9 +315,9 @@ static DEVICE_START( sound )
 	/* if no state registered for saving, we can't save */
 	if (num_regs == 0)
 	{
-		logerror("Sound chip '%s' did not register any state to save!\n", device->tag.cstr());
+		logerror("Sound chip '%s' did not register any state to save!\n", device->tag());
 		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Sound chip '%s' did not register any state to save!", device->tag.cstr());
+			fatalerror("Sound chip '%s' did not register any state to save!", device->tag());
 	}
 }
 
@@ -488,7 +488,7 @@ static void route_sound(running_machine *machine)
 						speaker_info *speakerinfo = get_safe_token(target_device);
 
 						/* generate text for the UI */
-						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag.cstr(), sound->name(), sound->tag.cstr());
+						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag(), sound->name(), sound->tag());
 						if (numoutputs > 1)
 							tempstring.catprintf(" Ch.%d", outputnum);
 
@@ -864,7 +864,7 @@ static DEVICE_START( speaker_output )
 
 	/* copy in all the relevant info */
 	info->speaker = (const speaker_config *)device->baseconfig().inline_config;
-	info->tag = device->tag;
+	info->tag = device->tag();
 }
 
 

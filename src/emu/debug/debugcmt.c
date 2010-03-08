@@ -393,7 +393,7 @@ int debug_comment_save(running_machine *machine)
 		xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
 		if (curnode == NULL)
 			goto error;
-		xml_set_attribute(curnode, "tag", cpu->tag);
+		xml_set_attribute(curnode, "tag", cpu->tag());
 
 		for (j = 0; j < comments->comment_count; j++)
 		{

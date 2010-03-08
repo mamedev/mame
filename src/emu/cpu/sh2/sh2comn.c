@@ -101,7 +101,7 @@ static void sh2_timer_activate(SH2 *sh2)
 			sh2->frc_base = cpu_get_total_cycles(sh2->device);
 			timer_adjust_oneshot(sh2->timer, cpu_clocks_to_attotime(sh2->device, max_delta), 0);
 		} else {
-			logerror("SH2.%s: Timer event in %d cycles of external clock", sh2->device->tag.cstr(), max_delta);
+			logerror("SH2.%s: Timer event in %d cycles of external clock", sh2->device->tag(), max_delta);
 		}
 	}
 }
@@ -138,7 +138,7 @@ static TIMER_CALLBACK( sh2_dmac_callback )
 	int dma = param & 1;
 	SH2 *sh2 = (SH2 *)ptr;
 
-	LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag.cstr(), dma));
+	LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag(), dma));
 	sh2->m[0x63+4*dma] |= 2;
 	sh2->dma_timer_active[dma] = 0;
 	sh2_recalc_irq(sh2);
@@ -306,7 +306,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
 			sh2_timer_resync(sh2);
-//      printf("SH2.%s: TIER write %04x @ %04x\n", sh2->device->tag.cstr(), data >> 16, mem_mask>>16);
+//      printf("SH2.%s: TIER write %04x @ %04x\n", sh2->device->tag(), data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
 		if((mem_mask & 0x00ffffff) != 0)
@@ -314,7 +314,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		sh2_recalc_irq(sh2);
 		break;
 	case 0x05: // OCRx, TCR, TOCR
-//      printf("SH2.%s: TCR write %08x @ %08x\n", sh2->device->tag.cstr(), data, mem_mask);
+//      printf("SH2.%s: TCR write %08x @ %08x\n", sh2->device->tag(), data, mem_mask);
 		sh2_timer_resync(sh2);
 		if(sh2->m[5] & 0x10)
 			sh2->ocrb = (sh2->ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
@@ -358,7 +358,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT32 a = sh2->m[0x41];
 			INT32 b = sh2->m[0x40];
-			LOG(("SH2 '%s' div+mod %d/%d\n", sh2->device->tag.cstr(), a, b));
+			LOG(("SH2 '%s' div+mod %d/%d\n", sh2->device->tag(), a, b));
 			if (b)
 			{
 				sh2->m[0x45] = a / b;
@@ -386,7 +386,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT64 a = sh2->m[0x45] | ((UINT64)(sh2->m[0x44]) << 32);
 			INT64 b = (INT32)sh2->m[0x40];
-			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", sh2->device->tag.cstr(), a, b));
+			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", sh2->device->tag(), a, b));
 			if (b)
 			{
 				INT64 q = a / b;
@@ -536,7 +536,7 @@ void sh2_set_frt_input(running_device *device, int state)
 	sh2_timer_resync(sh2);
 	sh2->icr = sh2->frc;
 	sh2->m[4] |= ICF;
-	logerror("SH2.%s: ICF activated (%x)\n", sh2->device->tag.cstr(), sh2->pc & AM);
+	logerror("SH2.%s: ICF activated (%x)\n", sh2->device->tag(), sh2->pc & AM);
 	sh2_recalc_irq(sh2);
 }
 
@@ -550,11 +550,11 @@ void sh2_set_irq_line(SH2 *sh2, int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 '%s' cleared nmi\n", sh2->device->tag.cstr()));
+			LOG(("SH-2 '%s' cleared nmi\n", sh2->device->tag()));
 		}
 		else
 		{
-			LOG(("SH-2 '%s' assert nmi\n", sh2->device->tag.cstr()));
+			LOG(("SH-2 '%s' assert nmi\n", sh2->device->tag()));
 
 			sh2_exception(sh2, "Set IRQ line", 16);
 
@@ -571,12 +571,12 @@ void sh2_set_irq_line(SH2 *sh2, int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 '%s' cleared irq #%d\n", sh2->device->tag.cstr(), irqline));
+			LOG(("SH-2 '%s' cleared irq #%d\n", sh2->device->tag(), irqline));
 			sh2->pending_irq &= ~(1 << irqline);
 		}
 		else
 		{
-			LOG(("SH-2 '%s' assert irq #%d\n", sh2->device->tag.cstr(), irqline));
+			LOG(("SH-2 '%s' assert irq #%d\n", sh2->device->tag(), irqline));
 			sh2->pending_irq |= 1 << irqline;
 			#ifdef USE_SH2DRC
 			sh2->test_irq = 1;
@@ -647,27 +647,27 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 		if (sh2->internal_irq_level == irqline)
 		{
 			vector = sh2->internal_irq_vector;
-			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", sh2->device->tag.cstr(), irqline, vector, message));
+			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
 		}
 		else
 		{
 			if(sh2->m[0x38] & 0x00010000)
 			{
 				vector = sh2->irq_callback(sh2->device, irqline);
-				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", sh2->device->tag.cstr(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
 			}
 			else
 			{
 				sh2->irq_callback(sh2->device, irqline);
 				vector = 64 + irqline/2;
-				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", sh2->device->tag.cstr(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
 			}
 		}
 	}
 	else
 	{
 		vector = 11;
-		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", sh2->device->tag.cstr(), vector, message));
+		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", sh2->device->tag(), vector, message));
 	}
 
 	#ifdef USE_SH2DRC

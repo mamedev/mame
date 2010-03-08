@@ -2425,7 +2425,7 @@ TOYBOX_MCU_COM_W(3)
 */
 READ16_HANDLER( toybox_mcu_status_r )
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space->cpu->tag.cstr(), cpu_get_previouspc(space->cpu));
+	logerror("CPU %s (PC=%06X) : read MCU status\n", space->cpu->tag(), cpu_get_previouspc(space->cpu));
 	return 0; // most games test bit 0 for failure
 }
 

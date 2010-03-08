@@ -943,7 +943,7 @@ static READ8_HANDLER( routex_prot_read )
 {
 	if (cpu_get_pc(space->cpu) == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space->cpu->tag(), cpu_get_pc(space->cpu));
 	return 0x00;
 
 }

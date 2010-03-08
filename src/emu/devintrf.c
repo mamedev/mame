@@ -76,7 +76,7 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 
 	// append each device from the configuration list
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next)
-		append(devconfig->tag, new running_device(_machine, *devconfig));
+		append(devconfig->tag(), new running_device(_machine, *devconfig));
 }
 
 
@@ -169,12 +169,12 @@ void device_list::static_reset(running_machine *machine)
 device_config::device_config(const device_config *_owner, device_type _type, const char *_tag, UINT32 _clock)
 	: next(NULL),
 	  owner(const_cast<device_config *>(_owner)),
-	  tag(_tag),
 	  type(_type),
 	  devclass(DEVICE_CLASS_GENERAL),
 	  clock(_clock),
 	  static_config(NULL),
-	  inline_config(NULL)
+	  inline_config(NULL),
+	  m_tag(_tag)
 {
 	// initialize remaining members
 	memset(address_map, 0, sizeof(address_map));
@@ -303,7 +303,7 @@ const char *device_config::get_config_string(UINT32 state) const
 
 astring &device_config::subtag(astring &dest, const char *_tag) const
 {
-	return (this != NULL) ? dest.cpy(tag).cat(":").cat(_tag) : dest.cpy(_tag);
+	return (this != NULL) ? dest.cpy(m_tag).cat(":").cat(_tag) : dest.cpy(_tag);
 }
 
 
@@ -333,8 +333,7 @@ running_device::running_device(running_machine &_machine, const device_config &_
 	: m_baseconfig(_config),
 	  machine(&_machine),
 	  next(NULL),
-	  owner((_config.owner != NULL) ? _machine.devicelist.find(_config.owner->tag) : NULL),
-	  tag(_config.tag),
+	  owner((_config.owner != NULL) ? _machine.devicelist.find(_config.owner->tag()) : NULL),
 	  type(_config.type),
 	  devclass(_config.devclass),
 	  clock(_config.clock),
@@ -343,12 +342,13 @@ running_device::running_device(running_machine &_machine, const device_config &_
 	  tokenbytes(_config.get_config_int(DEVINFO_INT_TOKEN_BYTES)),
 	  region(NULL),
 	  execute(NULL),
-	  get_runtime_info(NULL)
+	  get_runtime_info(NULL),
+	  m_tag(_config.tag())
 {
 	memset(addrspace, 0, sizeof(addrspace));
 
 	if (tokenbytes == 0)
-		throw emu_fatalerror("Device %s specifies a 0 token length!\n", tag.cstr());
+		throw emu_fatalerror("Device %s specifies a 0 token length!\n", tag());
 
 	// allocate memory for the token
 	token = auto_alloc_array_clear(machine, UINT8, tokenbytes);
@@ -433,7 +433,7 @@ void running_device::set_clock(UINT32 _clock)
 void running_device::start()
 {
 	// find our region
-	region = machine->regionlist.find(baseconfig().tag);
+	region = machine->regionlist.find(baseconfig().tag());
 
 	// start functions are required
 	device_start_func start = (device_start_func)get_config_fct(DEVINFO_FCT_START);

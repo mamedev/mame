@@ -250,7 +250,7 @@ static WRITE8_HANDLER( lnc_w )
 	else if (offset == 0x9000)                     { return; }  /* AM_NOP */
 	else if (offset == 0x9002)                     { audio_command_w(space, 0, data); return; }
 	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 
 	state->rambase[offset] = data;
 
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( mmonkey_w )
 	else if (offset == 0x9000)                     { return; }  /* AM_NOP */
 	else if (offset == 0x9002)                     { audio_command_w(space, 0, data); return; }
 	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(space, offset - 0xb000, data); return; }
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 
 	state->rambase[offset] = data;
 
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( btime_w )
 	else if (offset == 0x4002)                     btime_video_control_w(space, 0, data);
 	else if (offset == 0x4003)                     audio_command_w(space, 0, data);
 	else if (offset == 0x4004)                     bnj_scroll1_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 
 	state->rambase[offset] = data;
 
@@ -311,7 +311,7 @@ static WRITE8_HANDLER( tisland_w )
 	else if (offset == 0x4004)                     bnj_scroll1_w(space, 0, data);
 	else if (offset == 0x4005)			     bnj_scroll2_w(space, 0, data);
 //  else if (offset == 0x8000)                     btime_video_control_w(space,0,data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 
 	state->rambase[offset] = data;
 
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( zoar_w )
 	else if (offset == 0x9804)                     bnj_scroll2_w(space, 0, data);
 	else if (offset == 0x9805)                     bnj_scroll1_w(space, 0, data);
 	else if (offset == 0x9806)                     audio_command_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 
 	state->rambase[offset] = data;
 
@@ -347,7 +347,7 @@ static WRITE8_HANDLER( disco_w )
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
 	else if (offset == 0x9a00)                     audio_command_w(space, 0, data);
 	else if (offset == 0x9c00)                     disco_video_control_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data, offset);
 
 	state->rambase[offset] = data;
 
