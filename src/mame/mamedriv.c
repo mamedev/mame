@@ -8256,6 +8256,8 @@ Other Sun games
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
+	DRIVER( 5clown )	/* (c) IGS 1993 */
+	DRIVER( 5clowna )	/* (c) IGS 1993 */
 
 	/* IGS005 + IGS006 + IGS007 + IGS008 Games */
 	DRIVER( lordgun )	/* (c) 1994 */
@@ -9075,6 +9077,7 @@ Other Sun games
 	DRIVER( vegasfte )	/* (c) 1993 Soft Design */
 	DRIVER( jolyjokr )	/* (c) 198? Impera */
 	DRIVER( jolyjokra )	/* (c) 198? Impera */
+	DRIVER( jolyjokrb )	/* (c) 198? Impera */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */

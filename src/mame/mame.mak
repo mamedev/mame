@@ -1478,6 +1478,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/3super8.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/4roses.o \
+	$(DRIVERS)/5clown.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
 	$(DRIVERS)/amaticmg.o \
