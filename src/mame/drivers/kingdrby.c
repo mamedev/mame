@@ -933,6 +933,38 @@ static PALETTE_INIT(kingdrby)
 	}
 }
 
+static PALETTE_INIT(kingdrbb)
+{
+	UINT8 *raw_prom = memory_region(machine, "raw_prom");
+	UINT8 *prom = memory_region(machine, "proms");
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for(i = 0; i < 0x200; i++)
+	{
+		/* this set has an extra address line shuffle applied on the prom */
+		prom[i] = raw_prom[BITSWAP16(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
+	}
+
+	for(i = 0; i < 0x200; i++)
+	{
+		bit0 = 0;
+		bit1 = (prom[i] >> 1) & 0x01;
+		bit2 = (prom[i] >> 0) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (prom[i] >> 4) & 0x01;
+		bit1 = (prom[i] >> 3) & 0x01;
+		bit2 = (prom[i] >> 2) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (prom[i] >> 7) & 0x01;
+		bit1 = (prom[i] >> 6) & 0x01;
+		bit2 = (prom[i] >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map)
@@ -985,6 +1017,8 @@ static MACHINE_DRIVER_START( kingdrbb )
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(slave_1986_map)
 
+	MDRV_PALETTE_INIT(kingdrbb)
+
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", ppi8255_1986_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", ppi8255_1986_intf[1] )
 MACHINE_DRIVER_END
@@ -997,6 +1031,7 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_CPU_IO_MAP(cowrace_sound_io)
 
 	MDRV_GFXDECODE(cowrace)
+	MDRV_PALETTE_INIT(kingdrby)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
@@ -1067,8 +1102,8 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 	ROM_REGION( 0x4000, "raw_prom", 0 )
 	ROM_LOAD( "kingdrbb_u1.bin", 0x0000, 0x4000, CRC(97931952) SHA1(a0ef3be105f2ed7f744c73e92c583d25bb322e6a) ) // palette but in a normal rom?
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 ) // address shuffled, decoded inside PALETTE_INIT
+//	ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected
