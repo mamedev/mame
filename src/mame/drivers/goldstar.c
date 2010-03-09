@@ -400,7 +400,8 @@ static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb850, 0xb850) AM_WRITENOP //lamps
 	AM_RANGE(0xb860, 0xb860) AM_WRITENOP //watchdog
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76496_w)	/* sound */
-	AM_RANGE(0xf800, 0xffff) AM_RAM //AM_REGION("maincpu",0xc000)
+//	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_REGION("maincpu", 0xf000)
+	AM_RANGE(0xc000, 0xffff) AM_RAM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kkojnoli_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4940,6 +4941,16 @@ static const ppi8255_interface cm_ppi8255_intf[2] =
 	}
 };
 
+
+static WRITE8_DEVICE_HANDLER( system_output_w )
+{
+	goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+
+	state->lucky8_nmi_enable = data & 8;
+//	printf("%02x C\n",data);
+}
+
+
 static const ppi8255_interface lucky8_ppi8255_intf[3] =
 {
 	{	/* A, B & C set as input */
@@ -4964,7 +4975,7 @@ static const ppi8255_interface lucky8_ppi8255_intf[3] =
 		DEVCB_NULL,					/* Port C read */
 		DEVCB_NULL,					/* Port A write */
 		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
+		DEVCB_HANDLER(system_output_w)			/* Port C write */
 	}
 };
 
@@ -5435,6 +5446,14 @@ static MACHINE_DRIVER_START( cmast91 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+static INTERRUPT_GEN( lucky8_irq )
+{
+	goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+
+	if(state->lucky8_nmi_enable)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_DRIVER_START( lucky8 )
 
 	MDRV_DRIVER_DATA(goldstar_state)
@@ -5443,8 +5462,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lucky8_map)
 	//MDRV_CPU_IO_MAP(goldstar_readport)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // causes 'magical' to display 'wait' instead
+	MDRV_CPU_VBLANK_INT("screen", lucky8_irq)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
@@ -5487,8 +5505,7 @@ static MACHINE_DRIVER_START( magical )
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(magical_map)
 	//MDRV_CPU_IO_MAP(goldstar_readport)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) // causes nested nmis and 'error ff' (needs enable?)
-	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // causes 'magical' to display 'wait' instead
+	MDRV_CPU_VBLANK_INT("screen", goldstar_irq)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )

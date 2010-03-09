@@ -38,6 +38,7 @@ public:
 	UINT8 cmaster_girl_pal;
 	UINT8 cm_enable_reg;
 	UINT8 cm_girl_scroll;
+	UINT8 lucky8_nmi_enable;
 };
 
 
