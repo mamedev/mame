@@ -510,8 +510,11 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 
 		UINT8 tile_size;
 		UINT8 mosaic_enabled;	// actually used only for layers 0->3!
+
 		UINT8 main_window_enabled;
 		UINT8 sub_window_enabled;
+		UINT8 main_bg_enabled;
+		UINT8 sub_bg_enabled;
 
 		UINT16 hoffs;
 		UINT16 voffs;
@@ -568,8 +571,8 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	} mode7;
 
 	UINT8 mosaic_size;
-	UINT8 main_color_mask;
-	UINT8 sub_color_mask;
+	UINT8 clip_to_black;
+	UINT8 prevent_color_math;
 	UINT8 sub_add_mode;
 	UINT8 bg3_priority_bit;
 	UINT8 direct_color;
@@ -577,8 +580,6 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
                                     'previous' scroll value */
 	UINT8 mode7_last_scroll;	/* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
 
-	UINT8 main_bg_enabled[5];	// these would probably better fit the layer struct, but it would make worse the code in snes_update_mode_X()
-	UINT8 sub_bg_enabled[5];
 	UINT8 ppu1_open_bus, ppu2_open_bus;
 	UINT8 ppu1_version, ppu2_version;
 	UINT8 window1_left, window1_right, window2_left, window2_right;

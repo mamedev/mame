@@ -1133,18 +1133,18 @@ WRITE8_HANDLER( snes_w_io )
 			}
 			break;
 		case TM:		/* Main screen designation */
-			snes_ppu.main_bg_enabled[0] = BIT(data, 0);
-			snes_ppu.main_bg_enabled[1] = BIT(data, 1);
-			snes_ppu.main_bg_enabled[2] = BIT(data, 2);
-			snes_ppu.main_bg_enabled[3] = BIT(data, 3);
-			snes_ppu.main_bg_enabled[4] = BIT(data, 4);
+			snes_ppu.layer[SNES_BG1].main_bg_enabled = BIT(data, 0);
+			snes_ppu.layer[SNES_BG2].main_bg_enabled = BIT(data, 1);
+			snes_ppu.layer[SNES_BG3].main_bg_enabled = BIT(data, 2);
+			snes_ppu.layer[SNES_BG4].main_bg_enabled = BIT(data, 3);
+			snes_ppu.layer[SNES_OAM].main_bg_enabled = BIT(data, 4);
 			break;
 		case TS:		/* Subscreen designation */
-			snes_ppu.sub_bg_enabled[0] = BIT(data, 0);
-			snes_ppu.sub_bg_enabled[1] = BIT(data, 1);
-			snes_ppu.sub_bg_enabled[2] = BIT(data, 2);
-			snes_ppu.sub_bg_enabled[3] = BIT(data, 3);
-			snes_ppu.sub_bg_enabled[4] = BIT(data, 4);
+			snes_ppu.layer[SNES_BG1].sub_bg_enabled = BIT(data, 0);
+			snes_ppu.layer[SNES_BG2].sub_bg_enabled = BIT(data, 1);
+			snes_ppu.layer[SNES_BG3].sub_bg_enabled = BIT(data, 2);
+			snes_ppu.layer[SNES_BG4].sub_bg_enabled = BIT(data, 3);
+			snes_ppu.layer[SNES_OAM].sub_bg_enabled = BIT(data, 4);
 			break;
 		case TMW:		/* Window mask for main screen designation */
 			snes_ppu.layer[SNES_BG1].main_window_enabled = BIT(data, 0);
@@ -1162,8 +1162,8 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case CGWSEL:	/* Initial settings for Fixed colour addition or screen addition */
 			/* FIXME: We don't support direct select for modes 3 & 4 or subscreen window stuff */
-			snes_ppu.main_color_mask = (data >> 6) & 0x03;
-			snes_ppu.sub_color_mask = (data >> 4) & 0x03;
+			snes_ppu.clip_to_black = (data >> 6) & 0x03;
+			snes_ppu.prevent_color_math = (data >> 4) & 0x03;
 			snes_ppu.sub_add_mode = BIT(data, 1);
 			snes_ppu.direct_color = BIT(data, 0);
 #ifdef SNES_DBG_REG_W

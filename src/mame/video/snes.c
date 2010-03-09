@@ -76,10 +76,10 @@
 
 #define SNES_MAINSCREEN    0
 #define SNES_SUBSCREEN     1
-#define SNES_CLIP_ALL      0
+#define SNES_CLIP_NEVER    0
 #define SNES_CLIP_IN       1
 #define SNES_CLIP_OUT      2
-#define SNES_CLIP_ALL2     3
+#define SNES_CLIP_ALWAYS   3
 
 #ifdef SNES_LAYER_DEBUG
 struct DEBUGOPTS
@@ -136,27 +136,27 @@ enum
  * between the main and sub screens.
  *****************************************/
 
-INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 clip, UINT8 black_pen_clip, int switch_screens )
+INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
 {
 	/* when color math is applied to subscreen pixels, the blending depends on the blending used by the previous mainscreen 
 	pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in snes_refresh_scanline */
 	if (switch_screens && offset > 0)
 		offset -= 1;
 
-	if ((black_pen_clip == SNES_CLIP_ALL2) ||
+	if ((black_pen_clip == SNES_CLIP_ALWAYS) ||
 		(black_pen_clip == SNES_CLIP_IN && snes_ppu.clipmasks[SNES_COLOR][offset]) ||
 		(black_pen_clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[SNES_COLOR][offset]))
 		*colour = 0; //clip to black before color math
 
-	if (clip == SNES_CLIP_ALL2) // blending mode 3 == always OFF
+	if (prevent_color_math == SNES_CLIP_ALWAYS) // blending mode 3 == always OFF
 		return;
 
 #ifdef SNES_LAYER_DEBUG
 	if (!debug_options.transparency_disabled)
 #endif /* SNES_LAYER_DEBUG */
-	if ((clip == SNES_CLIP_ALL) ||
-		(clip == SNES_CLIP_IN  && !snes_ppu.clipmasks[SNES_COLOR][offset]) ||
-		(clip == SNES_CLIP_OUT && snes_ppu.clipmasks[SNES_COLOR][offset]))
+	if ((prevent_color_math == SNES_CLIP_NEVER) ||
+		(prevent_color_math == SNES_CLIP_IN  && !snes_ppu.clipmasks[SNES_COLOR][offset]) ||
+		(prevent_color_math == SNES_CLIP_OUT && snes_ppu.clipmasks[SNES_COLOR][offset]))
 	{
 		UINT16 r, g, b;
 		struct SCANLINE *subscreen;
@@ -655,8 +655,8 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	scanlines[SNES_MAINSCREEN].enable = snes_ppu.main_bg_enabled[layer];
-	scanlines[SNES_SUBSCREEN].enable = snes_ppu.sub_bg_enabled[layer];
+	scanlines[SNES_MAINSCREEN].enable = snes_ppu.layer[layer].main_bg_enabled;
+	scanlines[SNES_SUBSCREEN].enable = snes_ppu.layer[layer].sub_bg_enabled;
 	scanlines[SNES_MAINSCREEN].clip = snes_ppu.layer[layer].main_window_enabled;
 	scanlines[SNES_SUBSCREEN].clip = snes_ppu.layer[layer].sub_window_enabled;
 
@@ -828,8 +828,8 @@ static void snes_update_line_mode7( UINT8 priority_a, UINT8 priority_b, UINT8 la
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	scanlines[SNES_MAINSCREEN].enable = snes_ppu.main_bg_enabled[layer];
-	scanlines[SNES_SUBSCREEN].enable = snes_ppu.sub_bg_enabled[layer];
+	scanlines[SNES_MAINSCREEN].enable = snes_ppu.layer[layer].main_bg_enabled;
+	scanlines[SNES_SUBSCREEN].enable = snes_ppu.layer[layer].sub_bg_enabled;
 	scanlines[SNES_MAINSCREEN].clip = snes_ppu.layer[layer].main_window_enabled;
 	scanlines[SNES_SUBSCREEN].clip = snes_ppu.layer[layer].sub_window_enabled;
 
@@ -1120,8 +1120,8 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	scanlines[SNES_MAINSCREEN].enable = snes_ppu.main_bg_enabled[SNES_OAM];
-	scanlines[SNES_SUBSCREEN].enable = snes_ppu.sub_bg_enabled[SNES_OAM];
+	scanlines[SNES_MAINSCREEN].enable = snes_ppu.layer[SNES_OAM].main_bg_enabled;
+	scanlines[SNES_SUBSCREEN].enable = snes_ppu.layer[SNES_OAM].sub_bg_enabled;
 	scanlines[SNES_MAINSCREEN].clip = snes_ppu.layer[SNES_OAM].main_window_enabled;
 	scanlines[SNES_SUBSCREEN].clip = snes_ppu.layer[SNES_OAM].sub_window_enabled;
 
@@ -1531,7 +1531,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 
 			/* perform color math if the layer wants it (except if it's an object > 192) */
 			if (!scanline1->blend_exception[x] && snes_ppu.layer[scanline1->layer[x]].color_math)
-				snes_draw_blend(x, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask, 0);
+				snes_draw_blend(x, &c, snes_ppu.prevent_color_math, snes_ppu.clip_to_black, 0);
 
 			r = ((c & 0x1f) * fade) >> 4;
 			g = (((c & 0x3e0) >> 5) * fade) >> 4;
@@ -1552,9 +1552,9 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 				the same color math as the *next* mainscreen pixel (i.e. mainscreen pixel 0) */
 
 				if (x == 0 && !scanline1->blend_exception[0] && snes_ppu.layer[scanline1->layer[0]].color_math)
-					snes_draw_blend(0, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask, 1);
+					snes_draw_blend(0, &c, snes_ppu.prevent_color_math, snes_ppu.clip_to_black, 1);
 				else if (x > 0  && !scanline1->blend_exception[x - 1] && snes_ppu.layer[scanline1->layer[x - 1]].color_math)
-					snes_draw_blend(x, &c, snes_ppu.sub_color_mask, snes_ppu.main_color_mask, 1);
+					snes_draw_blend(x, &c, snes_ppu.prevent_color_math, snes_ppu.clip_to_black, 1);
 
 
 				r = ((c & 0x1f) * fade) >> 4;
