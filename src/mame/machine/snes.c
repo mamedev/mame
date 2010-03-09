@@ -1938,39 +1938,41 @@ WRITE8_HANDLER( snes_w_bank7 )
 static void nss_io_read( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
-	int i;
+	static const char *const portnames[2][4] =
+			{
+				{ "SERIAL1_DATA1_L", "SERIAL1_DATA1_H", "SERIAL1_DATA2_L", "SERIAL1_DATA2_H" },
+				{ "SERIAL2_DATA1_L", "SERIAL2_DATA1_H", "SERIAL2_DATA2_L", "SERIAL2_DATA2_H" },
+			};
+	int port;
 
-	state->joypad[0].low  = input_port_read(machine, "SERIAL1_DATA1_L");
-	state->joypad[0].high = input_port_read(machine, "SERIAL1_DATA1_H");
-	state->joypad[1].low  = input_port_read(machine, "SERIAL2_DATA1_L");
-	state->joypad[1].high = input_port_read(machine, "SERIAL2_DATA1_H");
-	state->joypad[2].low  = input_port_read(machine, "SERIAL1_DATA2_L");
-	state->joypad[2].high = input_port_read(machine, "SERIAL1_DATA2_H");
-	state->joypad[3].low  = input_port_read(machine, "SERIAL2_DATA2_L");
-	state->joypad[3].high = input_port_read(machine, "SERIAL2_DATA2_H");
-
-	// avoid sending signals that could crash games
-	for (i = 0; i < 4; i++)
+	for (port = 0; port < 2; port++)
 	{
+		state->data1[port] = input_port_read(machine, portnames[port][0]) | (input_port_read(machine, portnames[port][1]) << 8);
+		state->data2[port] = input_port_read(machine, portnames[port][2]) | (input_port_read(machine, portnames[port][3]) << 8);
+
+		// avoid sending signals that could crash games
 		// if left, no right
-		if (state->joypad[i].high & 2)
-			state->joypad[i].high &= ~1;
+		if (state->data1[port] & 0x200)
+			state->data1[port] &= ~0x100;
 		// if up, no down
-		if (state->joypad[i].high & 8)
-			state->joypad[i].high &= ~4;
+		if (state->data1[port] & 0x800)
+			state->data1[port] &= ~0x400;
+
+		state->joypad[port].buttons = state->data1[port];
 	}
 
-	// is automatic reading on?
+	// is automatic reading on? if so, copy port data1/data2 to joy1l->joy4h
+	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
 	if (snes_ram[NMITIMEN] & 1)
 	{
-		state->joy1l = state->joypad[0].low;
-		state->joy1h = state->joypad[0].high;
-		state->joy2l = state->joypad[1].low;
-		state->joy2h = state->joypad[1].high;
-		state->joy3l = state->joypad[2].low;
-		state->joy3h = state->joypad[2].high;
-		state->joy4l = state->joypad[3].low;
-		state->joy4h = state->joypad[3].high;
+		state->joy1l = (state->data1[0] & 0x00ff) >> 0;
+		state->joy1h = (state->data1[0] & 0xff00) >> 8;
+		state->joy2l = (state->data1[1] & 0x00ff) >> 0;
+		state->joy2h = (state->data1[1] & 0xff00) >> 8;
+		state->joy3l = (state->data2[0] & 0x00ff) >> 0;
+		state->joy3h = (state->data2[0] & 0xff00) >> 8;
+		state->joy4l = (state->data2[1] & 0x00ff) >> 0;
+		state->joy4h = (state->data2[1] & 0xff00) >> 8;
 
 		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->read_idx[0] = 16;
@@ -1984,11 +1986,10 @@ static UINT8 nss_oldjoy1_read( running_machine *machine )
 	snes_state *state = (snes_state *)machine->driver_data;
 	UINT8 res;
 
-	// joysticks
 	if (state->read_idx[0] >= 16)
 		res = 0x01;
 	else
-		res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->read_idx[0]++)) & 0x01;
+		res = (state->joypad[0].buttons >> (15 - state->read_idx[0]++)) & 0x01;
 
 	return res;
 }
@@ -2001,7 +2002,7 @@ static UINT8 nss_oldjoy2_read( running_machine *machine )
 	if (state->read_idx[1] >= 16)
 		res = 0x01;
 	else
-		res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->read_idx[1]++)) & 0x01;
+		res = (state->joypad[1].buttons >> (15 - state->read_idx[1]++)) & 0x01;
 
 	return res;
 }

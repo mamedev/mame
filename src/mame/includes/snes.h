@@ -355,10 +355,9 @@
 #define DSP_FIR_C6		0x6F
 #define DSP_FIR_C7		0x7F
 
-struct snes_controller_port
+struct snes_joypad
 {
-	UINT8 low;
-	UINT8 high;
+	UINT16 buttons;
 };
 
 struct snes_mouse
@@ -389,8 +388,9 @@ public:
 
 	/* input-related */
 	UINT8                 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
+	UINT16                data1[2], data2[2];
 	UINT8                 read_idx[2];
-	snes_controller_port  joypad[4];
+	snes_joypad           joypad[2];
 	snes_mouse            mouse[2];
 	snes_superscope       scope[2];
 
