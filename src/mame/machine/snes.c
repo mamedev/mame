@@ -777,45 +777,9 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.screen_brightness = (data & 0x0f) + 1;
 			break;
 		case OBSEL:		/* Object size and data area designation */
-			snes_ppu.layer[SNES_OAM].charmap = (data & 0x03) << 1;
-			snes_ppu.oam.name_select = (((data & 0x18) >> 3) * 0x1000) << 1;
-			/* Determine object size */
-			switch ((data & 0xe0) >> 5)
-			{
-				case 0:			/* 8 & 16 */
-					snes_ppu.oam.size[0] = 1;
-					snes_ppu.oam.size[1] = 2;
-					break;
-				case 1:			/* 8 & 32 */
-					snes_ppu.oam.size[0] = 1;
-					snes_ppu.oam.size[1] = 4;
-					break;
-				case 2:			/* 8 & 64 */
-					snes_ppu.oam.size[0] = 1;
-					snes_ppu.oam.size[1] = 8;
-					break;
-				case 3:			/* 16 & 32 */
-					snes_ppu.oam.size[0] = 2;
-					snes_ppu.oam.size[1] = 4;
-					break;
-				case 4:			/* 16 & 64 */
-					snes_ppu.oam.size[0] = 2;
-					snes_ppu.oam.size[1] = 8;
-					break;
-				case 5:			/* 32 & 64 */
-					snes_ppu.oam.size[0] = 4;
-					snes_ppu.oam.size[1] = 8;
-					break;
-				default:
-					/* Unknown size so default to 8 & 16 */
-					logerror("Object size unsupported: %d\n", (data & 0xe0) >> 5);
-
-					snes_ppu.oam.size[0] = 1;
-					snes_ppu.oam.size[1] = 2;
-#ifdef SNES_DBG_REG_W
-					mame_printf_debug("Object size unsupported: %d\n", (data & 0xe0) >> 5);
-#endif
-			}
+			snes_ppu.oam.next_charmap = (data & 0x03) << 1;
+			snes_ppu.oam.next_name_select = (((data & 0x18) >> 3) * 0x1000) << 1;
+			snes_ppu.oam.next_size = (data & 0xe0) >> 5;
 			break;
 		case OAMADDL:	/* Address for accessing OAM (low) */
 			snes_ppu.oam.address_low = data;
@@ -827,7 +791,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.oam.address_high = data & 0x1;
 			snes_ppu.oam.saved_address_high = data;
 			snes_ppu.oam.address = ((data & 0x1) << 8) + snes_ppu.oam.address_low;
-			snes_ppu.oam.priority_rotation = (data & 0x80) ? 1 : 0;
+			snes_ppu.oam.priority_rotation = BIT(data, 7);
 			snes_ram[OAMDATA] = 0;
 			break;
 		case OAMDATA:	/* Data for OAM write (DW) */

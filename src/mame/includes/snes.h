@@ -525,7 +525,10 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT8 saved_address_high;
 		UINT16 address;
 		UINT16 priority_rotation;
-		UINT8 size[2];
+		UINT8 next_charmap;
+		UINT8 next_size;
+		UINT8 size;
+		UINT32 next_name_select;
 		UINT32 name_select;
 		UINT8 first_sprite;
 		UINT8 flip;
@@ -584,6 +587,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 clipmasks[6][SNES_SCR_WIDTH];
 	UINT8 update_windows;
 	UINT8 update_offsets;
+	UINT8 update_oam_list;
 	UINT8 mode;
 	UINT8 interlace; //doubles the visible resolution
 	UINT8 obj_interlace;
