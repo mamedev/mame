@@ -1133,6 +1133,9 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 
 	charaddr = snes_ppu.layer[SNES_OAM].charmap << 13;
 
+	snes_update_obsel();
+	snes_oam_list_build();
+
 	for (i = 128; i > 0; i--)
 	{
 		tile = oam_list[i].tile;
@@ -1337,8 +1340,6 @@ static void snes_update_mode_7( UINT16 curline )
 
 static void snes_draw_screens( UINT16 curline )
 {
-	snes_oam_list_build();
-
 	switch (snes_ppu.mode)
 	{
 		case 0: snes_update_mode_0(curline); break;		/* Mode 0 */
@@ -1581,13 +1582,10 @@ VIDEO_UPDATE( snes )
 {
 	int y;
 
-	snes_update_obsel();
-
 	/*NTSC SNES draw range is 1-225. */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		snes_refresh_scanline(screen->machine, bitmap, y + 1);
-		snes_update_obsel();
 	}
 	return 0;
 }
