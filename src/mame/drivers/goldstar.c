@@ -5505,7 +5505,7 @@ static MACHINE_DRIVER_START( magical )
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(magical_map)
 	//MDRV_CPU_IO_MAP(goldstar_readport)
-	MDRV_CPU_VBLANK_INT("screen", goldstar_irq)
+	MDRV_CPU_VBLANK_INT("screen", lucky8_irq)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
