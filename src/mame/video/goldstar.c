@@ -79,6 +79,20 @@ static TILE_GET_INFO( get_goldstar_fg_tile_info )
 			0);
 }
 
+static TILE_GET_INFO( get_magical_fg_tile_info )
+{
+	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	int code = state->fg_vidram[tile_index];
+	int attr = state->fg_atrram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code | (attr & 0xf0)<<4)+state->tile_bank*0x1000,
+			attr&0x0f,
+			0);
+}
+
+
 // colour / high tile bits are swapped around
 static TILE_GET_INFO( get_cherrym_fg_tile_info )
 {
@@ -242,6 +256,25 @@ VIDEO_START( goldstar )
 	state->cm_enable_reg = 0x0b;
 }
 
+VIDEO_START( magical )
+{
+	goldstar_state *state = (goldstar_state *)machine->driver_data;
+
+	state->reel1_tilemap = tilemap_create(machine,get_goldstar_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	state->reel2_tilemap = tilemap_create(machine,get_goldstar_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	state->reel3_tilemap = tilemap_create(machine,get_goldstar_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
+
+	tilemap_set_scroll_cols(state->reel1_tilemap, 32);
+	tilemap_set_scroll_cols(state->reel2_tilemap, 32);
+	tilemap_set_scroll_cols(state->reel3_tilemap, 32);
+
+	state->fg_tilemap = tilemap_create(machine,get_magical_fg_tile_info,tilemap_scan_rows,8,8, 64, 32);
+	tilemap_set_transparent_pen(state->fg_tilemap,0);
+
+	// is there an enable reg for this game?
+	state->cm_enable_reg = 0x0b;
+}
+
 VIDEO_START( unkch )
 {
 	goldstar_state *state = (goldstar_state *)machine->driver_data;
@@ -355,6 +388,14 @@ static const rectangle unkch_visible1 = { 0*8, (14+48)*8-1,  3*8,  (3+7)*8-1 };
 static const rectangle unkch_visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
 static const rectangle unkch_visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
 
+static const rectangle magical_visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+8)*8-1 };
+static const rectangle magical_visible2 = { 0*8, (14+48)*8-1, 12*8, (12+8)*8-1 };
+static const rectangle magical_visible3 = { 0*8, (14+48)*8-1, 20*8, (20+8)*8-1 };
+
+static const rectangle magical_visible1alt = { 0*8, (16+48)*8-1,  4*8,  16*8-1 };
+static const rectangle magical_visible2alt = { 0*8, (16+48)*8-1, 16*8,  28*8-1 };
+
+
 VIDEO_UPDATE( goldstar )
 {
 	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
@@ -389,6 +430,58 @@ VIDEO_UPDATE( goldstar )
 			int girlxscroll = (INT8)((state->cm_girl_scroll & 0x0f)<<4);
 
 			drawgfxzoom_transpen(bitmap,cliprect,gfx,state->cmaster_girl_num,state->cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+		}
+	}
+
+	if (state->cm_enable_reg &0x02)
+	{
+		tilemap_draw(bitmap,cliprect, state->fg_tilemap, 0, 0);
+	}
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( magical )
+{
+	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	int i;
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	if (!state->cm_enable_reg &0x01)
+		return 0;
+
+	if (state->cm_enable_reg &0x08)
+	{
+		// guess, could be wrong, but different screens clearly need different reel layouts
+		if (state->unkch_vidreg & 2)
+		{
+			for (i= 0;i < 32;i++)
+			{
+				tilemap_set_scrolly(state->reel1_tilemap, i, state->reel1_scroll[i*2]);
+				tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[i*2]);
+			//	tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[i*2]);
+			}
+
+
+			tilemap_draw(bitmap, &magical_visible1alt, state->reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, &magical_visible2alt, state->reel2_tilemap, 0, 0);
+			//tilemap_draw(bitmap, &magical_visible3, state->reel3_tilemap, 0, 0);
+		}
+		else
+		{
+			for (i= 0;i < 32;i++)
+			{
+				tilemap_set_scrolly(state->reel1_tilemap, i, state->reel1_scroll[i*2]);
+				tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[i*2]);
+				tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[i*2]);
+			}
+
+
+			tilemap_draw(bitmap, &magical_visible1, state->reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, &magical_visible2, state->reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, &magical_visible3, state->reel3_tilemap, 0, 0);
 		}
 	}
 

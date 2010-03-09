@@ -378,6 +378,28 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( magical_outb850_w )
+{
+	// guess, could be wrong, this might just be lights
+
+	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	
+	if (data&0x20)
+		state->tile_bank = 1;
+	else 
+		state->tile_bank = 0;
+
+	//popmessage("magical_outb850_w %02x\n", data);
+
+	tilemap_mark_all_tiles_dirty (state->fg_tilemap);
+
+}
+
+static WRITE8_HANDLER( magical_outb860_w )
+{
+//	popmessage("magical_outb860_w %02x\n", data);
+}
+
 static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
@@ -386,8 +408,7 @@ static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE_MEMBER(goldstar_state,reel2_ram)
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE_MEMBER(goldstar_state,reel3_ram)
-	AM_RANGE(0xaa00, 0xaaff) AM_RAM //???
+	AM_RANGE(0xa900, 0xaaff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE_MEMBER(goldstar_state,reel3_ram) // +0x100 compared to lucky8
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE_MEMBER(goldstar_state,reel1_scroll)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE_MEMBER(goldstar_state,reel2_scroll)
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE_MEMBER(goldstar_state,reel3_scroll)
@@ -397,11 +418,10 @@ static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITENOP //lamps
-	AM_RANGE(0xb860, 0xb860) AM_WRITENOP //watchdog
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(magical_outb850_w) //lamps
+	AM_RANGE(0xb860, 0xb860) AM_WRITE(magical_outb860_w) //watchdog
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76496_w)	/* sound */
-//	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_REGION("maincpu", 0xf000)
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_REGION("maincpu",0xc000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kkojnoli_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4942,12 +4962,29 @@ static const ppi8255_interface cm_ppi8255_intf[2] =
 };
 
 
-static WRITE8_DEVICE_HANDLER( system_output_w )
+
+
+static WRITE8_DEVICE_HANDLER( system_outputa_w )
+{
+	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//popmessage("system_outputa_w %02x",data);
+}
+
+
+static WRITE8_DEVICE_HANDLER( system_outputb_w )
+{
+	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//popmessage("system_outputb_w %02x",data);
+}
+
+
+static WRITE8_DEVICE_HANDLER( system_outputc_w )
 {
 	goldstar_state *state = (goldstar_state *)device->machine->driver_data;
 
 	state->lucky8_nmi_enable = data & 8;
-//	printf("%02x C\n",data);
+	state->unkch_vidreg = data & 2;
+	//popmessage("system_outputc_w %02x",data);
 }
 
 
@@ -4973,9 +5010,9 @@ static const ppi8255_interface lucky8_ppi8255_intf[3] =
 		DEVCB_INPUT_PORT("DSW2"),	/* Port A read */
 		DEVCB_NULL,					/* Port B read */
 		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(system_output_w)			/* Port C write */
+		DEVCB_HANDLER(system_outputa_w),					/* Port A write */
+		DEVCB_HANDLER(system_outputb_w),					/* Port B write */
+		DEVCB_HANDLER(system_outputc_w)			/* Port C write */
 	}
 };
 
@@ -5047,14 +5084,26 @@ static const ay8910_interface cm_ay8910_config =
 	DEVCB_NULL
 };
 
+static WRITE8_DEVICE_HANDLER( ay8910_outputa_w )
+{
+	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//popmessage("ay8910_outputa_w %02x",data);
+}
+
+static WRITE8_DEVICE_HANDLER( ay8910_outputb_w )
+{
+	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//popmessage("ay8910_outputb_w %02x",data);
+}
+
 static const ay8910_interface lucky8_ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW3"),
 	DEVCB_INPUT_PORT("DSW4"),
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(ay8910_outputa_w),
+	DEVCB_HANDLER(ay8910_outputb_w)
 };
 
 static const ay8910_interface ladylinr_ay8910_config =
@@ -5525,18 +5574,18 @@ static MACHINE_DRIVER_START( magical )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_NVRAM_HANDLER(goldstar)
 
-	MDRV_VIDEO_START(goldstar)
-	MDRV_VIDEO_UPDATE(goldstar)
+	MDRV_VIDEO_START(magical)
+	MDRV_VIDEO_UPDATE(magical)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)  // shut up annoying whine
 
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 
@@ -6951,7 +7000,7 @@ ROM_START( magical )
 	ROM_LOAD( "proms", 0x0000, 0x0200, NO_DUMP )
 
 	ROM_REGION( 0x20, "proms2", ROMREGION_ERASE00 )
-	//ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+	ROM_COPY( "proms", 0x00000, 0x00000, 0x20 ) // copy some fake colours from the no dump region
 
 	ROM_REGION( 0x100, "unkprom", ROMREGION_ERASE00 )
 	//ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
@@ -9319,8 +9368,8 @@ GAME( 198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austr
 GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",                   GAME_IMPERFECT_COLORS )
 GAME( 198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                  GAME_NOT_WORKING )
 
-GAME( 198?, mtonic,    0,        magical,   lucky8,   mtonic,    ROT0, "Pal Company Ltd.",             "Magical Odds",                              GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND) // Magical Odds logo / company in GFX
-GAME( 1992, magical,   0,        magical,   magical,   0,        ROT0, "Micro Manufacturing Inc.", "Magical Tonic / Magical Odds?",                   GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 198?, mtonic,    0,        magical,   magical,   mtonic,    ROT0, "Pal Company Ltd.",             "Magical Odds (set 1)",                              GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND) // Magical Odds logo / company in GFX
+GAME( 1991, magical,   0,        magical,   lucky8a,   0,        ROT0, "Osaka Japan / Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2, alt hardware)",                   GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
 /* --- Amcoe games --- */

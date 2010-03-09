@@ -39,6 +39,8 @@ public:
 	UINT8 cm_enable_reg;
 	UINT8 cm_girl_scroll;
 	UINT8 lucky8_nmi_enable;
+	int tile_bank;
+
 };
 
 
@@ -62,7 +64,9 @@ WRITE8_HANDLER( cm_outport0_w );
 VIDEO_START( goldstar );
 VIDEO_START( cherrym );
 VIDEO_START( unkch );
+VIDEO_START( magical );
 VIDEO_UPDATE( goldstar );
 VIDEO_UPDATE( cmast91 );
 VIDEO_UPDATE( amcoe1a );
 VIDEO_UPDATE( unkch );
+VIDEO_UPDATE( magical );
