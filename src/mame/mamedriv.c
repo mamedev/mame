@@ -6891,6 +6891,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( smashtv6 )	/* (c) 1990 Williams */
 	DRIVER( smashtv5 )	/* (c) 1990 Williams */
 	DRIVER( smashtv4 )	/* (c) 1990 Williams */
+	DRIVER( smashtv3 )	/* (c) 1990 Williams */
 	DRIVER( hiimpact )	/* (c) 1990 Williams */
 	DRIVER( hiimpact4 )	/* (c) 1990 Williams */
 	DRIVER( hiimpact3 )	/* (c) 1990 Williams */
