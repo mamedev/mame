@@ -54,6 +54,14 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static INTERRUPT_GEN( mnchmobl_sound_irq )
+{
+	munchmo_state *state = (munchmo_state *)device->machine->driver_data;
+
+	if (!(state->sound_nmi_enable))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
 	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
@@ -61,6 +69,13 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE );
 }
+
+static WRITE8_HANDLER( sound_nmi_enable_w )
+{
+	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	state->sound_nmi_enable = data & 1;
+}
+
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
@@ -107,7 +122,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP /* ? */
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_nmi_ack_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -325,7 +340,7 @@ static MACHINE_DRIVER_START( mnchmobl )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", mnchmobl_sound_irq)
 
 	MDRV_MACHINE_START(munchmo)
 	MDRV_MACHINE_RESET(munchmo)
