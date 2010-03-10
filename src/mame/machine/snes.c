@@ -2072,8 +2072,7 @@ static void snes_init_ram(running_machine *machine)
 	vram_read_offset = 2;
 
 	state->joy1l = state->joy1h = state->joy2l = state->joy2h = state->joy3l = state->joy3h = 0;
-	state->joypad[0].low = state->joypad[1].low = state->joypad[2].low = state->joypad[3].low = 0;
-	state->joypad[0].high = state->joypad[1].high = state->joypad[2].high = state->joypad[3].high = 0;
+	state->data1[0] = state->data2[0] = state->data1[1] = state->data2[1] = 0;
 
 	state->io_read = nss_io_read;
 	state->oldjoy1_read = nss_oldjoy1_read;
