@@ -2573,7 +2573,49 @@ SCU register[36] is the timer zero compare register.
 SCU register[40] is for IRQ masking.
 */
 
-/* to do, update bios idle skips so they work better with this arrangement.. */
+#ifdef UNUSED_FUNCTION
+
+/* theoretical function about how this irq system should work, not yet implemented because the performance speed hits very very badly.
+   It's not tested much either, but I'm aware that timer 1 doesn't work with this for whatever reason ... */
+static TIMER_CALLBACK( stv_irq_callback )
+{
+	int hpos = video_screen_get_hpos(machine->primary_screen);
+	int vpos = video_screen_get_vpos(machine->primary_screen);
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+
+	h_sync = visarea.max_x+1;//horz
+	v_sync = visarea.max_y+1;//vert
+
+	if(vpos == v_sync && hpos == 0)
+		VBLANK_IN_IRQ;
+	if(hpos == 0 && vpos == 0)
+		VBLANK_OUT_IRQ;
+	if(hpos == h_sync)
+		TIMER_0_IRQ;
+	if(hpos == h_sync && (vpos != 0 && vpos != v_sync))
+	{
+		HBLANK_IN_IRQ;
+		timer_0++;
+	}
+
+	/*TODO: timing of this one (related to the VDP1 speed)*/
+	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
+	if(hpos == 40 && vpos == 0)
+		VDP1_IRQ;
+
+	if(hpos == timer_1)
+		TIMER_1_IRQ;
+
+	if(hpos <= h_sync)
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, hpos+1), 0);
+	else if(vpos <= v_sync)
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos+1, 0), 0);
+	else
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+}
+
+#endif
+
 
 static running_device *vblank_out_timer,*scan_timer,*t1_timer;
 static int h_sync,v_sync;
