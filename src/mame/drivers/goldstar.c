@@ -4908,6 +4908,35 @@ static GFXDECODE_START(cherrys )
 GFXDECODE_END
 
 
+static const gfx_layout tiles8x8x4pkr_layout =
+{
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,1),    /* 4096 characters */
+	4,      /* 3 bits per pixel */
+	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 0*8+0, 0*8+1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+static const gfx_layout tiles8x32x4pkr_layout =
+{
+	8,32,    /* 8*8 characters */
+	RGN_FRAC(1,1),    /* 4096 characters */
+	4,      /* 3 bits per pixel */
+	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 0*8+0, 0*8+1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
+	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32,24*32,25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32},
+	32*8*4   /* every char takes 32 consecutive bytes */
+};
+
+static GFXDECODE_START( pkrmast )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4pkr_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 0, 16 )
+GFXDECODE_END
+
+
 
 /*************************************
 *      PPI 8255 (x3) Interfaces      *
@@ -5918,6 +5947,44 @@ static MACHINE_DRIVER_START( cherrys )
 
 MACHINE_DRIVER_END
 
+// hw unknown
+static MACHINE_DRIVER_START( pkrmast )
+
+	MDRV_DRIVER_DATA(goldstar_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(cm_portmap)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	/* 2x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(pkrmast)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MDRV_SOUND_CONFIG(cm_ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -6789,9 +6856,10 @@ ROM_START( jkrmast )
 	ROM_LOAD( "jokermaster.rom",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
 
 	// unknown # of roms / sizes
-	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "gfx_roms", 0x00000,  0x8000, NO_DUMP )
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "proms", 0x00000,  0x200, NO_DUMP )
@@ -6802,10 +6870,12 @@ ROM_START( pkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokermastera.rom",  0x0000, 0x10000, CRC(467249f7) SHA1(efbab56896dc58d22ec921e7f5fd0befcfaadc52) )
 
-	// unknown # of roms / sizes
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "gfx_roms", 0x00000,  0x8000, NO_DUMP )
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "103-2.bin", 0x00000,  0x20000, CRC(ed0dfbfe) SHA1(c3a5b68e821461b161293eaec1515e2b0f26c4f9) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) // reels + girl?
+	ROM_LOAD( "103-1.bin", 0x00000,  0x20000, CRC(e375cd4b) SHA1(68888126ff9743cd589f3426205231bc3a896588) )
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "proms", 0x00000,  0x200, NO_DUMP )
@@ -6813,14 +6883,17 @@ ROM_START( pkrmast )
 ROM_END
 
 
+
 ROM_START( pkrmasta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokermasterb.rom",  0x0000, 0x10000, CRC(f59e0273) SHA1(160426b86dbb8a718cb3b886f90a231baed86a40) )
 
-	// unknown # of roms / sizes
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "gfx_roms", 0x00000,  0x8000, NO_DUMP )
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "103-2.bin", 0x00000,  0x20000, CRC(ed0dfbfe) SHA1(c3a5b68e821461b161293eaec1515e2b0f26c4f9) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) // reels + girl?
+	ROM_LOAD( "103-1.bin", 0x00000,  0x20000, CRC(e375cd4b) SHA1(68888126ff9743cd589f3426205231bc3a896588) )
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "proms", 0x00000,  0x200, NO_DUMP )
@@ -9350,9 +9423,9 @@ GAME( 1991, cmasterd,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",   
 GAME( 1991, cmastere,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)", 0 )
 GAME( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)", 0 )
 
-GAME( 199?, jkrmast,   0,        cm,       cmasterb, cmv4,      ROT0, "<unknown>",              "Joker Master", GAME_NOT_WORKING ) // incomplete dump + encrypted?
-GAME( 199?, pkrmast,   jkrmast,  cm,       cmasterb, cmv4,      ROT0, "<unknown>",              "Poker Master (set 1)", GAME_NOT_WORKING ) // incomplete dump + encrypted?
-GAME( 199?, pkrmasta,  jkrmast,  cm,       cmasterb, cmv4,      ROT0, "<unknown>",              "Poker Master (set 2)", GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME( 199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",              "Joker Master", GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME( 199?, pkrmast,   jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",              "Poker Master (set 1)", GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME( 199?, pkrmasta,  jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",              "Poker Master (set 2)", GAME_NOT_WORKING ) // incomplete dump + encrypted?
 
 
 GAME( 1991, cmast91,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )

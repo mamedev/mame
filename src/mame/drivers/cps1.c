@@ -9047,6 +9047,14 @@ static DRIVER_INIT( sf2mdt )
 	DRIVER_INIT_CALL(cps1);
 }
 
+static DRIVER_INIT( dinohunt )
+{
+	// is this shared with the new sound hw?
+	UINT8* ram = (UINT8*)memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf18000, 0xf19fff, 0, 0, 0);
+	memset(ram,0xff,0x2000);
+	DRIVER_INIT_CALL(cps1);
+}
+
 
 GAME( 1988, forgottn, 0,        cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Forgotten Worlds (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, forgottnu,forgottn, cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Forgotten Worlds (US)", GAME_SUPPORTS_SAVE )
@@ -9169,7 +9177,7 @@ GAME( 1993, dinou,    dino,     qsound,     dino,     dino,     ROT0,   "Capcom"
 GAME( 1993, dinoj,    dino,     qsound,     dino,     dino,     ROT0,   "Capcom", "Cadillacs Kyouryuu-Shinseiki (Japan 930201)", GAME_SUPPORTS_SAVE )
 GAME( 1993, dinopic,  dino,     cpspicb,    dinopic,  dino,     ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, dinopic2, dino,     cpspicb,    dinopic,  dino,     ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, dinohunt, dino,     wofhfh,     dinoh,    cps1,     ROT0,   "bootleg", "Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1993, dinohunt, dino,     wofhfh,     dinoh,    dinohunt, ROT0,   "bootleg", "Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1993, punisher, 0,        qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (World 930422)", GAME_SUPPORTS_SAVE )		// "ETC"
 GAME( 1993, punisheru,punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (US 930422)", GAME_SUPPORTS_SAVE )
 GAME( 1993, punisherj,punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (Japan 930422)", GAME_SUPPORTS_SAVE )
