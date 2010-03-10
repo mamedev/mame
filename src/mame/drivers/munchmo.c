@@ -59,7 +59,7 @@ static INTERRUPT_GEN( mnchmobl_sound_irq )
 	munchmo_state *state = (munchmo_state *)device->machine->driver_data;
 
 	if (!(state->sound_nmi_enable))
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
