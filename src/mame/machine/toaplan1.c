@@ -14,14 +14,30 @@
 #define ASSERT 1
 
 
+/* List of possible regions for coinage (for games with unemulated sound CPU) */
+enum {
+	TOAPLAN1_REGION_JAPAN=0,
+	TOAPLAN1_REGION_US,
+	TOAPLAN1_REGION_WORLD,
+	TOAPLAN1_REGION_OTHER
+};
+
+static UINT8 toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER+1][2][4];
+static UINT8 toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4];
+
+
 static int toaplan1_coin_count; /* coin count increments on startup ? , so dont count it */
 static int toaplan1_intenable;
-static int vimana_credits;
-static int vimana_latch;
+
 static int demonwld_dsp_on;
 static int demonwld_dsp_BIO;
-static int dsp_execute;							/* Demon world */
-static UINT32 dsp_addr_w, main_ram_seg;	/* Demon world */
+static int dsp_execute;                 /* Demon world */
+static UINT32 dsp_addr_w, main_ram_seg; /* Demon world */
+
+static UINT8 vimana_coins[2];
+static UINT8 vimana_credits;
+static UINT8 vimana_latch;
+
 
 int toaplan1_unk_reset_port;
 
@@ -169,21 +185,69 @@ READ16_HANDLER( samesame_port_6_word_r )
 	return (0x80 | input_port_read(space->machine, "TJUMP")) & 0xff;
 }
 
-READ16_HANDLER( vimana_input_port_5_word_r )
+READ16_HANDLER ( vimana_system_port_r )
 {
-	int data, p;
+	int data, p, r, d, slot, reg, dsw;
 
+    UINT8 vimana_region[16] = { TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_US   , TOAPLAN1_REGION_WORLD, TOAPLAN1_REGION_JAPAN,
+    							TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_US   ,
+    							TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER,
+    							TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_JAPAN };
+
+	slot = -1;
+	d = input_port_read(space->machine, "DSWA");
+	r = input_port_read(space->machine, "TJUMP");
 	p = input_port_read(space->machine, "SYSTEM");
 	vimana_latch ^= p;
-	data = (vimana_latch & p );
+	data = (vimana_latch & p);
 
-	/* simulate the mcu keeping track of credits */
-	/* latch so it doesn't add more than one */
-	/* credit per keypress */
-	if (data & 0x18)
+	/* simulate the mcu keeping track of credits based on region and coinage settings */
+	/* latch so it doesn't add more than one coin per keypress */
+	if (d & 0x04)   /* "test mode" ON */
 	{
-		vimana_credits++ ;
+		vimana_coins[0] = vimana_coins[1] = 0;
+		vimana_credits = 0;
 	}
+	else            /* "test mode" OFF */
+	{
+		if (data & 0x02)      /* TILT */
+		{
+			vimana_coins[0] = vimana_coins[1] = 0;
+			vimana_credits = 0;
+		}
+		if (data & 0x01)      /* SERVICE1 */
+		{
+			vimana_credits++ ;
+		}
+		if (data & 0x08)      /* COIN1 */
+		{
+			slot = 0;
+		}
+		if (data & 0x10)      /* COIN2 */
+		{
+			slot = 1 ;
+		}
+
+		if (slot != -1)
+		{
+			reg = vimana_region[r];
+			dsw = (d & 0xf0) >> (4 + 2 * slot);
+			vimana_coins[slot]++;
+			if (vimana_coins[slot] >= toaplan1_coins_for_credit[reg][slot][dsw])
+			{
+				vimana_credits += toaplan1_credits_for_coin[reg][slot][dsw];
+				vimana_coins[slot] -= toaplan1_coins_for_credit[reg][slot][dsw];
+			}
+			coin_counter_w(space->machine, slot, 1);
+			coin_counter_w(space->machine, slot, 0);
+		}
+
+		if (vimana_credits >= 9)
+			vimana_credits = 9;
+	}
+
+	coin_lockout_global_w(space->machine, (vimana_credits >= 9));
+
 	vimana_latch = p;
 
 	return p & 0xffff;
@@ -195,7 +259,7 @@ READ16_HANDLER( vimana_mcu_r )
 	switch (offset)
 	{
 		case 0:  data = 0xff; break;
-		case 1:  data = 0; break;
+		case 1:  data = 0x00; break;
 		case 2:  data = vimana_credits; break;
 	}
 	return data & 0xff;
@@ -205,9 +269,14 @@ WRITE16_HANDLER( vimana_mcu_w )
 {
 	switch (offset)
 	{
-		case 0:  break;
-		case 1:  break;
-		case 2:  if (ACCESSING_BITS_0_7) vimana_credits = data & 0xff; break;
+		case 0:	break;
+		case 1:	break;
+		case 2:	if (ACCESSING_BITS_0_7)
+				{	
+					vimana_credits = data & 0xff;
+					coin_lockout_global_w(space->machine, (vimana_credits >= 9));
+				}
+				break;
 	}
 }
 
@@ -297,6 +366,46 @@ WRITE16_HANDLER( samesame_coin_w )
 }
 
 
+void toaplan1_init_coinage_tables(running_machine *machine)
+{
+	/* Japan */
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][0][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][0][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][0][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][0][1] = 2;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][0][2] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][0][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][0][3] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][0][3] = 3;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][1][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][1][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][1][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][1][1] = 2;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][1][2] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][1][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][1][3] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][1][3] = 3;
+	/* US = Japan */
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][0][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][0][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][0][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][0][1] = 2;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][0][2] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][0][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][0][3] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][0][3] = 3;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][1][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][1][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][1][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][1][1] = 2;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][1][2] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][1][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_US   ][1][3] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_US   ][1][3] = 3;
+	/* World */
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][0][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][0][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][0][1] = 2; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][0][1] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][0][2] = 3; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][0][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][0][3] = 4; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][0][3] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][1][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][1][0] = 2;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][1][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][1][1] = 3;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][1][2] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][1][2] = 4;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_WORLD][1][3] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_WORLD][1][3] = 6;
+	/* Other - as it is an unknown or invalid setting, I set everything to 1C_1C */
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][0][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][0][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][0][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][0][1] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][0][2] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][0][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][0][3] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][0][3] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][1][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][1][0] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][1][1] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][1][1] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][1][2] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][1][2] = 1;
+	toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER][1][3] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER][1][3] = 1;
+}
+
 MACHINE_RESET( toaplan1 )
 {
 	toaplan1_intenable = 0;
@@ -337,11 +446,15 @@ void demonwld_driver_savestate(running_machine *machine)
 MACHINE_RESET( vimana )
 {
 	MACHINE_RESET_CALL(toaplan1);
+	toaplan1_init_coinage_tables(machine);
+	vimana_coins[0] = vimana_coins[1] = 0;
 	vimana_credits = 0;
 	vimana_latch = 0;
 }
 void vimana_driver_savestate(running_machine *machine)
 {
+	state_save_register_global(machine, vimana_coins[0]);
+	state_save_register_global(machine, vimana_coins[1]);
 	state_save_register_global(machine, vimana_credits);
 	state_save_register_global(machine, vimana_latch);
 }
