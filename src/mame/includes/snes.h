@@ -530,7 +530,8 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT16 priority_rotation;
 		UINT8 next_charmap;
 		UINT8 next_size;
-		UINT8 size;
+		UINT8 size_;
+		UINT8 size[2];
 		UINT32 next_name_select;
 		UINT32 name_select;
 		UINT8 first_sprite;
