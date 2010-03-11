@@ -39,6 +39,7 @@ static INT32 gx_tilebanks[8], gx_oldbanks[8];
 static int gx_tilemode, gx_rozenable, psac_colorbase, last_psac_colorbase;
 static int gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 static int gx_rushingheroes_hack;
+static int gx_le2_textcolour_hack;
 static tilemap_t *gx_psac_tilemap, *gx_psac_tilemap2;
 extern UINT32 *gx_psacram, *gx_subpaletteram32;
 static bitmap_t* type3_roz_temp_bitmap;
@@ -1006,6 +1007,10 @@ int K055555GX_decode_vmixcolor(int layer, int *color) // (see p.62 7.2.6 and p.2
 	emx   |=  vmx;
 	pal   |=  vcb;
 
+	if (gx_le2_textcolour_hack)
+		if (layer==0)
+			pal |= 0x1c0;
+
 	if (von == 3) emx = -1; // invalidate external mix code if all bits are from internal
 	*color =  pal;
 
@@ -1189,10 +1194,12 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	if (!disp) return;
 	cltc_shdpri = K054338_read_register(K338_REG_CONTROL);
 
+
 	if (!rushingheroes_hack) // Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
 	{
 		if (!(cltc_shdpri & K338_CTL_KILL)) return;
 	}
+
 
 	// demote shadows by one layer when this bit is set??? (see p.73 8.6)
 	cltc_shdpri &= K338_CTL_SHDPRI;
@@ -2025,6 +2032,7 @@ static void _gxcommoninitnosprites(running_machine *machine)
 	gx_rozenable = 0;
 	gx_specialrozenable = 0;
 	gx_rushingheroes_hack = 0;
+	gx_le2_textcolour_hack = 0;
 
 	// Documented relative offsets of non-flipped games are (-2, 0, 2, 3),(0, 0, 0, 0).
 	// (+ve values move layers to the right and -ve values move layers to the left)
@@ -2120,6 +2128,9 @@ VIDEO_START(le2)
 	_gxcommoninitnosprites(machine);
 
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
+
+	gx_le2_textcolour_hack = 1; // force text layer to use the right palette
+	K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON?
 }
 
 VIDEO_START(konamigx_6bpp)
