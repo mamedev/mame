@@ -43,25 +43,19 @@
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
 #endif
 
-	int i, j;
-	int x1, x2, y1, y2;
-	int s, t;
-
-	int clipx1, clipx2, clipy1, clipy2;
-
 	UINT32 tilenum = rect->tilenum;
 	TILE *tex_tile = &tile[rect->tilenum];
 
-	x1 = (rect->xh / 4);
-	x2 = (rect->xl / 4);
-	y1 = (rect->yh / 4);
-	y2 = (rect->yl / 4);
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 
-	if (x2<=x1)
+	if (x2 <= x1)
 	{
 		x2 = x1 + 1;
 	}
-	if (y1==y2)
+	if (y1 == y2)
 	{
 		y2 = y1 + 1; // Needed by Goldeneye
 	}
@@ -75,51 +69,46 @@
 		y2++;
 	}
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 	calculate_clamp_diffs(tilenum);
 
 	shade_color.c = 0;	// Needed by Pilotwings 64
 
 	CACHE_TEXTURE_PARAMS(tex_tile);
 
-	if(y1 < clipy1)
+	if(y1 < clip.yh)
 	{
-		rect->t += rect->dtdy * (clipy1 - y1);
-		y1 = clipy1;
+		rect->t += rect->dtdy * (clip.yh - y1);
+		y1 = clip.yh;
 	}
-	if(y2 > clipy2)
+	if(y2 > clip.yl)
 	{
-		y2 = clipy2;
+		y2 = clip.yl;
 	}
-	if(x1 < clipx1)
+	if(x1 < clip.xh)
 	{
-		rect->s += rect->dsdx * (clipx1 - x1);
-		x1 = clipx1;
+		rect->s += rect->dsdx * (clip.xh - x1);
+		x1 = clip.xh;
 	}
-	if(x2 > clipx2)
+	if(x2 > clip.xl)
 	{
-		x2 = clipx2;
+		x2 = clip.xl;
 	}
 	rect->dsdx >>= 5;
 	rect->dtdy >>= 5;
 
-	t = ((int)(rect->t));
+	int t = ((int)(rect->t));
 
 	if(rect->flip)
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
 #if defined(MAGICDITHER) || defined(BAYERDITHER)
 			int mline = (j & 3) << 2;
 #endif
-			s = ((int)(rect->s));
+			int s = ((int)(rect->s));
 
-			for (i = x1; i < x2; i++)
+			for (int i = x1; i < x2; i++)
 			{
 				COLOR c;
 #if defined(ZUPDATE)
@@ -184,16 +173,16 @@
 	}
 	else
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
 #if defined(MAGICDITHER) || defined(BAYERDITHER)
 			int mline = (j & 3) << 2;
 #endif
 
-			s = ((int)(rect->s));
+			int s = ((int)(rect->s));
 
-			for (i = x1; i < x2; i++)
+			for (int i = x1; i < x2; i++)
 			{
 				COLOR c;
 #if defined(ZUPDATE)
@@ -308,27 +297,21 @@
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
 #endif
 
-	int i, j;
-	int x1, x2, y1, y2;
-	int s, t;
-
-	int clipx1, clipx2, clipy1, clipy2;
-
 	UINT32 tilenum = rect->tilenum;
 	UINT32 tilenum2 = 0;
 	TILE *tex_tile = &tile[rect->tilenum];
 	TILE *tex_tile2 = NULL;
 
-	x1 = (rect->xh / 4);
-	x2 = (rect->xl / 4);
-	y1 = (rect->yh / 4);
-	y2 = (rect->yl / 4);
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 
-	if (x2<=x1)
+	if (x2 <= x1)
 	{
 		x2 = x1 + 1;
 	}
-	if (y1==y2)
+	if (y1 == y2)
 	{
 		y2 = y1 + 1; // Needed by Goldeneye
 	}
@@ -341,11 +324,6 @@
 	{
 		y2++;
 	}
-
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
 
 	calculate_clamp_diffs(tilenum);
 
@@ -362,44 +340,42 @@
 
 	shade_color.c = 0;	// Needed by Pilotwings 64
 
-	if(y1 < clipy1)
+	if(y1 < clip.yh)
 	{
-		rect->t += rect->dtdy * (clipy1 - y1);
-		y1 = clipy1;
+		rect->t += rect->dtdy * (clip.yh - y1);
+		y1 = clip.yh;
 	}
-	if(y2 > clipy2)
+	if(y2 > clip.yl)
 	{
-		y2 = clipy2;
+		y2 = clip.yl;
 	}
-	if(x1 < clipx1)
+	if(x1 < clip.xh)
 	{
-		rect->s += rect->dsdx * (clipx1 - x1);
-		x1 = clipx1;
+		rect->s += rect->dsdx * (clip.xh - x1);
+		x1 = clip.xh;
 	}
-	if(x2 > clipx2)
+	if(x2 > clip.xl)
 	{
-		x2 = clipx2;
+		x2 = clip.xl;
 	}
 	rect->dsdx >>= 5;
 	rect->dtdy >>= 5;
 
-	t = ((int)(rect->t));
+	int t = ((int)(rect->t));
 
 	if(rect->flip)
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
-			//if (j >= clipy1 && j < clipy2)
 			{
 				int fb_index = j * fb_width;
 #if defined(MAGICDITHER) || defined(BAYERDITHER)
 				int mline = (j & 3) << 2;
 #endif
-				s = (int)(rect->s);
+				int s = (int)(rect->s);
 
-				for (i = x1; i < x2; i++)
+				for (int i = x1; i < x2; i++)
 				{
-					//if (i >= clipx1 && i < clipx2)
 					{
 						COLOR c1, c2;
 #if defined(ZUPDATE)
@@ -470,19 +446,17 @@
 	}
 	else
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
-			//if (j >= clipy1 && j < clipy2)
 			{
 				int fb_index = j * fb_width;
 #if defined(MAGICDITHER) || defined(BAYERDITHER)
 				int mline = (j & 3) << 2;
 #endif
-				s = (int)(rect->s);
+				int s = (int)(rect->s);
 
-				for (i = x1; i < x2; i++)
+				for (int i = x1; i < x2; i++)
 				{
-					//if (i >= clipx1 && i < clipx2)
 					{
 						COLOR c1, c2;
 #if defined(ZUPDATE)
@@ -593,25 +567,19 @@
 {
 	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
 
-	int i, j;
-	int x1, x2, y1, y2;
-	int s, t;
-
-	int clipx1, clipx2, clipy1, clipy2;
-
 	UINT32 tilenum = rect->tilenum;
 	TILE *tex_tile = &tile[rect->tilenum];
 
-	x1 = (rect->xh / 4);
-	x2 = (rect->xl / 4);
-	y1 = (rect->yh / 4);
-	y2 = (rect->yl / 4);
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 
-	if (x2<=x1)
+	if (x2 <= x1)
 	{
 		x2 = x1 + 1;
 	}
-	if (y1==y2)
+	if (y1 == y2)
 	{
 		y2 = y1 + 1; // Needed by Goldeneye
 	}
@@ -620,52 +588,45 @@
 	x2 += 1;
 	y2 += 1;
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 	calculate_clamp_diffs(tilenum);
 
 	shade_color.c = 0;	// Needed by Pilotwings 64
 
 	CACHE_TEXTURE_PARAMS(tex_tile);
 
-	if(y1 < clipy1)
+	if(y1 < clip.yh)
 	{
-		rect->t += rect->dtdy * (clipy1 - y1);
-		y1 = clipy1;
+		rect->t += rect->dtdy * (clip.yh - y1);
+		y1 = clip.yh;
 	}
-	if(y2 > clipy2)
+	if(y2 > clip.yl)
 	{
-		y2 = clipy2;
+		y2 = clip.yl;
 	}
-	if(x1 < clipx1)
+	if(x1 < clip.xh)
 	{
-		rect->s += rect->dsdx * (clipx1 - x1);
-		x1 = clipx1;
+		rect->s += rect->dsdx * (clip.xh - x1);
+		x1 = clip.xh;
 	}
-	if(x2 > clipx2)
+	if(x2 > clip.xl)
 	{
-		x2 = clipx2;
+		x2 = clip.xl;
 	}
 	rect->dsdx >>= 5;
 	rect->dtdy >>= 5;
 
-	t = ((int)(rect->t));
+	int t = ((int)(rect->t));
 
 	if(rect->flip)
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
-			//if (j >= clipy1 && j < clipy2)
 			{
-				s = (int)(rect->s);
+				int s = (int)(rect->s);
 
-				for (i = x1; i < x2; i++)
+				for (int i = x1; i < x2; i++)
 				{
-					//if (i >= clipx1 && i < clipx2)
 					{
 						texel0_color.c = TEXTURE_PIPELINE(t, s, tex_tile);
 
@@ -684,25 +645,21 @@
 	}
 	else
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
-			//if (j >= clipy1 && j < clipy2)
 			{
-				s = (int)(rect->s);
+				int s = (int)(rect->s);
 
-				for (i = x1; i < x2; i++)
+				for (int i = x1; i < x2; i++)
 				{
-					//if (i >= clipx1 && i < clipx2)
+					texel0_color.c = TEXTURE_PIPELINE(s, t, tex_tile);
+
+					curpixel_cvg = 8;
+
+					if ((texel0_color.i.a != 0)||(!other_modes.alpha_compare_en))
 					{
-						texel0_color.c = TEXTURE_PIPELINE(s, t, tex_tile);
-
-						curpixel_cvg = 8;
-
-						if ((texel0_color.i.a != 0)||(!other_modes.alpha_compare_en))
-						{
-							fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((texel0_color.i.r >> 3) << 11) | ((texel0_color.i.g >> 3) << 6) | ((texel0_color.i.b >> 3) << 1)|1;
-						}
+						fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((texel0_color.i.r >> 3) << 11) | ((texel0_color.i.g >> 3) << 6) | ((texel0_color.i.b >> 3) << 1)|1;
 					}
 					s += rect->dsdx;
 				}

@@ -5,11 +5,7 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
 	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -28,12 +24,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -71,11 +67,7 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
 	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -94,12 +86,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -129,11 +121,7 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
 	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -152,12 +140,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -187,11 +175,7 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
 	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -210,12 +194,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -245,10 +229,6 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -267,12 +247,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -309,10 +289,6 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -331,12 +307,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -365,10 +341,6 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -387,12 +359,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -421,10 +393,6 @@
 #endif
 {
 #undef CVG_DRAW
-	UINT16 finalcolor;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 #ifdef CVG_DRAW
 	int covdraw;
 	if (curpixel_cvg == 8)
@@ -443,12 +411,12 @@
 		curpixel_overlap = 0;
 	}
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
 
-	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -478,13 +446,10 @@
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
 	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -520,13 +485,10 @@
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
 	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -555,13 +517,10 @@
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
 	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -591,13 +550,10 @@
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
 	UINT32 memory_alphachannel = *fb & 0xff;
 	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + memory_cvg;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + memory_cvg;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -625,13 +581,10 @@
 #endif
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -665,13 +618,10 @@
 #endif
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -698,13 +648,10 @@
 #endif
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;
@@ -732,13 +679,10 @@
 {
 	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
 	UINT32 memory_alphachannel = *fb & 0xff;
-	UINT32 newcvg;
-	UINT32 wrapflag;
-	UINT32 clampcvg;
 
-	newcvg = curpixel_cvg + 8;
-	wrapflag = (newcvg > 8) ? 1 : 0;
-	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	UINT32 newcvg = curpixel_cvg + 8;
+	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
 	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
 
 	curpixel_cvg--;

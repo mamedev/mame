@@ -124,8 +124,6 @@
 	#endif
 #endif
 {
-	int r, g, b;
-	int special_bsel = 0;
 	UINT16 mem = *fb;
 #if defined(IMGREAD)
 	UINT32 memory_cvg = ((mem & 1) << 2) + (*hb & 3);
@@ -144,6 +142,7 @@
 		return 0;
 	}
 
+	int special_bsel = 0;
 	if (blender2b_a[0] == &memory_color.i.a)
 	{
 		special_bsel = 1;
@@ -163,6 +162,7 @@
 	memory_color.i.a = 0xe0;
 #endif
 
+	int r, g, b;
 #if defined(ZCOMPARE)
 #if defined(FORCEBLEND)
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
@@ -331,8 +331,6 @@
 	#endif
 #endif
 {
-	int r, g, b;
-	int special_bsel = 0;
 	UINT16 mem = *fb;
 #if defined(IMGREAD)
 	UINT32 memory_cvg = ((mem & 1) << 2) + (*hb & 3);
@@ -351,6 +349,7 @@
 		return 0;
 	}
 
+	int special_bsel = 0;
 	if (blender2b_a[0] == &memory_color.i.a)
 	{
 		special_bsel = 1;
@@ -372,6 +371,7 @@
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
+	int r, g, b;
 #if defined(FORCEBLEND)
 	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
 #else
@@ -496,8 +496,6 @@
 	#endif
 #endif
 {
-	int r, g, b;
-	int special_bsel = 0;
 	UINT16 mem = *fb;
 #if defined(IMGREAD)
 	UINT32 memory_cvg = ((mem & 1) << 2) + (*hb & 3);
@@ -516,6 +514,7 @@
 		return 0;
 	}
 
+	int special_bsel = 0;
 	if (blender2b_a[0] == &memory_color.i.a)
 	{
 		special_bsel = 1;
@@ -535,6 +534,7 @@
 	memory_color.i.a = 0xe0;
 #endif
 
+	int r, g, b;
 #if defined(ZCOMPARE)
 #if defined(FORCEBLEND)
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
@@ -631,8 +631,6 @@
 	#endif
 #endif
 {
-	int r, g, b;
-	int special_bsel = 0;
 	UINT16 mem = *fb;
 #if defined(IMGREAD)
 	UINT32 memory_cvg = ((mem & 1) << 2) + (*hb & 3);
@@ -651,6 +649,7 @@
 		return 0;
 	}
 
+	int special_bsel = 0;
 	if (blender2b_a[0] == &memory_color.i.a)
 	{
 		special_bsel = 1;
@@ -672,6 +671,7 @@
 
 	inv_pixel_color.i.a = 0xff - *blender1b_a[0];
 
+	int r, g, b;
 #if defined(FORCEBLEND)
 	BLENDER_EQUATION0_FORCE(&r, &g, &b, special_bsel);
 #else

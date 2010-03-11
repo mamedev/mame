@@ -10,11 +10,10 @@
 	UINT8* hb = &hidden_bits[fb_address >> 1];
 
 	int index, i, j;
-	int x1 = rect->xh / 4;
-	int x2 = rect->xl / 4;
-	int y1 = rect->yh / 4;
-	int y2 = rect->yl / 4;
-	int clipx1, clipx2, clipy1, clipy2;
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 	UINT16 fill_color1, fill_color2;
 	int fill_cvg1;
 	int fill_cvg2;
@@ -34,27 +33,22 @@
 	fill_cvg1 = (fill_color1 & 1) ? 8 : 1;
 	fill_cvg2 = (fill_color2 & 1) ? 8 : 1;
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 	// clip
-	if (x1 < clipx1)
+	if (x1 < clip.xh)
 	{
-		x1 = clipx1;
+		x1 = clip.xh;
 	}
-	if (y1 < clipy1)
+	if (y1 < clip.yh)
 	{
-		y1 = clipy1;
+		y1 = clip.yh;
 	}
-	if (x2 >= clipx2)
+	if (x2 >= clip.xl)
 	{
-		x2 = clipx2-1;
+		x2 = clip.xl - 1;
 	}
-	if (y2 >= clipy2)
+	if (y2 >= clip.yl)
 	{
-		y2 = clipy2-1;
+		y2 = clip.yl - 1;
 	}
 
 	shade_color.c = 0;	// Needed by Command & Conquer menus
@@ -114,11 +108,10 @@
 	UINT8* hb = &hidden_bits[fb_address >> 1];
 
 	int index, i, j;
-	int x1 = rect->xh / 4;
-	int x2 = rect->xl / 4;
-	int y1 = rect->yh / 4;
-	int y2 = rect->yl / 4;
-	int clipx1, clipx2, clipy1, clipy2;
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 	UINT16 fill_color1, fill_color2;
 	int fill_cvg1;
 	int fill_cvg2;
@@ -138,27 +131,22 @@
 	fill_cvg1 = (fill_color1 & 1) ? 8 : 1;
 	fill_cvg2 = (fill_color2 & 1) ? 8 : 1;
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 	// clip
-	if (x1 < clipx1)
+	if (x1 < clip.xh)
 	{
-		x1 = clipx1;
+		x1 = clip.xh;
 	}
-	if (y1 < clipy1)
+	if (y1 < clip.yh)
 	{
-		y1 = clipy1;
+		y1 = clip.yh;
 	}
-	if (x2 >= clipx2)
+	if (x2 >= clip.xl)
 	{
-		x2 = clipx2-1;
+		x2 = clip.xl - 1;
 	}
-	if (y2 >= clipy2)
+	if (y2 >= clip.yl)
 	{
-		y2 = clipy2-1;
+		y2 = clip.yl - 1;
 	}
 
 	shade_color.c = 0;	// Needed by Command & Conquer menus
@@ -223,11 +211,10 @@ static void fill_rectangle_16bit_cf(RECTANGLE *rect)
 	UINT8* hb = &hidden_bits[fb_address >> 1];
 
 	int index, i, j;
-	int x1 = rect->xh / 4;
-	int x2 = rect->xl / 4;
-	int y1 = rect->yh / 4;
-	int y2 = rect->yl / 4;
-	int clipx1, clipx2, clipy1, clipy2;
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 	UINT16 fill_color1, fill_color2;
 	int fill_cvg1;
 	int fill_cvg2;
@@ -247,27 +234,22 @@ static void fill_rectangle_16bit_cf(RECTANGLE *rect)
 	fill_cvg1 = (fill_color1 & 1) ? 8 : 1;
 	fill_cvg2 = (fill_color2 & 1) ? 8 : 1;
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 	// clip
-	if (x1 < clipx1)
+	if (x1 < clip.xh)
 	{
-		x1 = clipx1;
+		x1 = clip.xh;
 	}
-	if (y1 < clipy1)
+	if (y1 < clip.yh)
 	{
-		y1 = clipy1;
+		y1 = clip.yh;
 	}
-	if (x2 >= clipx2)
+	if (x2 >= clip.xl)
 	{
-		x2 = clipx2-1;
+		x2 = clip.xl - 1;
 	}
-	if (y2 >= clipy2)
+	if (y2 >= clip.yl)
 	{
-		y2 = clipy2-1;
+		y2 = clip.yl - 1;
 	}
 
 	shade_color.c = 0;	// Needed by Command & Conquer menus

@@ -205,6 +205,14 @@ CPU_DISASSEMBLE( unsp )
 			}
 			return UNSP_DASM_OK;
 
+		// Far Jump
+		case 0x2f: case 0x3f: case 0x6f: case 0x7f:
+			if (OPA == 7 && OPA == 2)
+			{
+				print("goto %06x", ((OPIMM << 16) | imm16) << 1);
+			}
+			return UNSP_DASM_OK;
+
 		// Multiply, Unsigned * Signed
 		case 0x0f:
 			if(OPN == 1 && OPA != 7)

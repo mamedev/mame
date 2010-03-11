@@ -81,12 +81,12 @@
 	#endif
 
 	#if defined(COPY)
-		#define CLAMP_LIGHT(SSS, SST, maxs, maxt) \
+		#define CLAMP_LIGHT(SSS, SST) \
 			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
 			SST = (SIGN17(SST) >> 5) & 0x1fff;
 	#else
 	#if defined(DOS) && defined(DOT)
-		#define CLAMP_LIGHT(SSS, SST, maxs, maxt) \
+		#define CLAMP_LIGHT(SSS, SST) \
 			if (SSS & 0x10000) \
 			{ \
 				SSS = 0; \
@@ -113,7 +113,7 @@
 				SST = (SIGN17(SST) >> 5) & 0x1fff; \
 			}
 	#elif defined(DOS) && !defined(DOT)
-		#define CLAMP_LIGHT(SSS, SST, maxs, maxt) \
+		#define CLAMP_LIGHT(SSS, SST) \
 			if (SSS & 0x10000) \
 			{ \
 				SSS = 0; \
@@ -129,7 +129,7 @@
  \
 			SST = (SIGN17(SST) >> 5) & 0x1fff;
 	#elif !defined(DOS) && defined(DOT)
-		#define CLAMP_LIGHT(SSS, SST, maxs, maxt) \
+		#define CLAMP_LIGHT(SSS, SST) \
 			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
  \
 			if (SST & 0x10000) \
@@ -145,7 +145,7 @@
 				SST = (SIGN17(SST) >> 5) & 0x1fff; \
 			}
 	#else
-		#define CLAMP_LIGHT(SSS, SST, maxs, maxt) \
+		#define CLAMP_LIGHT(SSS, SST) \
 			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
 			SST = (SIGN17(SST) >> 5) & 0x1fff;
 	#endif
@@ -336,60 +336,53 @@
 #endif
 {
 	INT32 maxs, maxt;
-	COLOR t0, t1, t2, t3, TEX;
-	int sss2, sst2;
-
-	INT32 SFRAC = 0, TFRAC = 0, INVSF = 0, INVTF = 0;
-	INT32 R32, G32, B32, A32;
-	INT32 maxs2, maxt2;
+	int sss2 = SSS + 32;
+	int sst2 = SST + 32;
 
 	TEXSHIFT(SSS, SST, maxs, maxt)
-
-	sss2 = SSS + 32; sst2 = SST + 32;
-	maxs2 = ((sss2 >> 3) >= tex_tile->sh);
-	maxt2 = ((sst2 >> 3) >= tex_tile->th);
 
 	SSS = RELATIVE(SSS, tex_tile->sl);
 	SST = RELATIVE(SST, tex_tile->tl);
 	sss2 = RELATIVE(sss2, tex_tile->sl);
 	sst2 = RELATIVE(sst2, tex_tile->tl);
 
-	SFRAC = SSS & 0x1f;
-	TFRAC = SST & 0x1f;
+	INT32 SFRAC = SSS & 0x1f;
+	INT32 TFRAC = SST & 0x1f;
 
 	CLAMP(SSS, SST, maxs, maxt)
-	CLAMP_LIGHT(sss2, sst2, maxs2, maxt2)
+	CLAMP_LIGHT(sss2, sst2)
 
 	MASK(&SSS, &SST, tex_tile);
 	MASK(&sss2, &sst2, tex_tile);
 
-	t1.c = FETCH_TEXEL(sss2, SST);
-	t2.c = FETCH_TEXEL(SSS, sst2);
+	COLOR t1 = { { FETCH_TEXEL(sss2, SST) } };
+	COLOR t2 = { { FETCH_TEXEL(SSS, sst2) } };
 
+	COLOR TEX;
 	if ((SFRAC + TFRAC) < 0x20)
 	{
-		t0.c = FETCH_TEXEL(SSS, SST);
-		R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
+		COLOR t0 = { { FETCH_TEXEL(SSS, SST) } };
+		INT32 R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
+		INT32 G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
+		INT32 B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
+		INT32 A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
 		TEX.i.r = (R32 < 0) ? 0 : R32;
-		G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
 		TEX.i.g = (G32 < 0) ? 0 : G32;
-		B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
 		TEX.i.b = (B32 < 0) ? 0 : B32;
-		A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
 		TEX.i.a = (A32 < 0) ? 0 : A32;
 	}
 	else
 	{
-		INVSF = 0x20 - SFRAC;
-		INVTF = 0x20 - TFRAC;
-		t3.c = FETCH_TEXEL(sss2, sst2);
-		R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
+		INT32 INVSF = 0x20 - SFRAC;
+		INT32 INVTF = 0x20 - TFRAC;
+		COLOR t3 = { { FETCH_TEXEL(sss2, sst2) } };
+		INT32 R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
+		INT32 G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
+		INT32 B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
+		INT32 A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
 		TEX.i.r = (R32 < 0) ? 0 : R32;
-		G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
 		TEX.i.g = (G32 < 0) ? 0 : G32;
-		B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
 		TEX.i.b = (B32 < 0) ? 0 : B32;
-		A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
 		TEX.i.a = (A32 < 0) ? 0 : A32;
 	}
 
@@ -523,63 +516,56 @@
 #endif
 {
 	INT32 maxs, maxt;
-	COLOR t0, t1, t2, t3, TEX;
 	int sss2, sst2;
-
-	INT32 SFRAC = 0, TFRAC = 0, INVSF = 0, INVTF = 0;
-	INT32 R32, G32, B32, A32;
-	INT32 maxs2, maxt2;
 
 	TEXSHIFT(SSS, SST, maxs, maxt)
 
 	sss2 = SSS + 32; sst2 = SST + 32;
-	maxs2 = ((sss2 >> 3) >= tex_tile->sh);
-	maxt2 = ((sst2 >> 3) >= tex_tile->th);
 
 	SSS = RELATIVE(SSS, tex_tile->sl);
 	SST = RELATIVE(SST, tex_tile->tl);
 	sss2 = RELATIVE(sss2, tex_tile->sl);
 	sst2 = RELATIVE(sst2, tex_tile->tl);
 
-	SFRAC = SSS & 0x1f;
-	TFRAC = SST & 0x1f;
+	INT32 SFRAC = SSS & 0x1f;
+	INT32 TFRAC = SST & 0x1f;
 
 	CLAMP(SSS, SST, maxs, maxt)
-	CLAMP_LIGHT(sss2, sst2, maxs2, maxt2)
+	CLAMP_LIGHT(sss2, sst2)
 
 	MASK(&SSS, &SST, tex_tile);
 	MASK(&sss2, &sst2, tex_tile);
 
+	COLOR t0 = { { FETCH_TEXEL(SSS, SST)   } };
+	COLOR t1 = { { FETCH_TEXEL(sss2, SST)  } };
+	COLOR t2 = { { FETCH_TEXEL(SSS, sst2)  } };
+	COLOR t3 = { { FETCH_TEXEL(sss2, sst2) } };
 
-	t0.c = FETCH_TEXEL(SSS, SST);
-	t1.c = FETCH_TEXEL(sss2, SST);
-	t2.c = FETCH_TEXEL(SSS, sst2);
-	t3.c = FETCH_TEXEL(sss2, sst2);
-
+	COLOR TEX;
 	if (SFRAC!= 0x10 || TFRAC != 0x10)
 	{
 		if ((SFRAC + TFRAC) >= 0x20)
 		{
-			INVSF = 0x20 - SFRAC;
-			INVTF = 0x20 - TFRAC;
-			R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
+			INT32 INVSF = 0x20 - SFRAC;
+			INT32 INVTF = 0x20 - TFRAC;
+			INT32 R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
+			INT32 G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
+			INT32 B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
+			INT32 A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
 			TEX.i.r = (R32 < 0) ? 0 : R32;
-			G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
 			TEX.i.g = (G32 < 0) ? 0 : G32;
-			B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
 			TEX.i.b = (B32 < 0) ? 0 : B32;
-			A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
 			TEX.i.a = (A32 < 0) ? 0 : A32;
 		}
 		else
 		{
-			R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
+			INT32 R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
+			INT32 G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
+			INT32 B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
+			INT32 A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
 			TEX.i.r = (R32 < 0) ? 0 : R32;
-			G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
 			TEX.i.g = (G32 < 0) ? 0 : G32;
-			B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
 			TEX.i.b = (B32 < 0) ? 0 : B32;
-			A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
 			TEX.i.a = (A32 < 0) ? 0 : A32;
 		}
 	}

@@ -134,18 +134,18 @@ typedef struct
 typedef struct
 {
 	int cycle_type;
-	int persp_tex_en;
-	int detail_tex_en;
-	int sharpen_tex_en;
-	int tex_lod_en;
-	int en_tlut;
-	int tlut_type;
-	int sample_type;
-	int mid_texel;
-	int bi_lerp0;
-	int bi_lerp1;
-	int convert_one;
-	int key_en;
+	bool persp_tex_en;
+	bool detail_tex_en;
+	bool sharpen_tex_en;
+	bool tex_lod_en;
+	bool en_tlut;
+	bool tlut_type;
+	bool sample_type;
+	bool mid_texel;
+	bool bi_lerp0;
+	bool bi_lerp1;
+	bool convert_one;
+	bool key_en;
 	int rgb_dither_sel;
 	int alpha_dither_sel;
 	int blend_m1a_0;
@@ -157,19 +157,19 @@ typedef struct
 	int blend_m2b_0;
 	int blend_m2b_1;
     int tex_edge;
-	int force_blend;
-	int alpha_cvg_select;
-	int cvg_times_alpha;
+	bool force_blend;
+	bool alpha_cvg_select;
+	bool cvg_times_alpha;
 	int z_mode;
 	int cvg_dest;
-	int color_on_cvg;
-	int image_read_en;
-	int z_update_en;
-	int z_compare_en;
-	int antialias_en;
-	int z_source_sel;
-	int dither_alpha_en;
-	int alpha_compare_en;
+	bool color_on_cvg;
+	bool image_read_en;
+	bool z_update_en;
+	bool z_compare_en;
+	bool antialias_en;
+	bool z_source_sel;
+	bool dither_alpha_en;
+	bool alpha_compare_en;
 } OTHER_MODES;
 
 /*****************************************************************************/
@@ -318,7 +318,7 @@ INLINE void z_build_com_table(void);
 INLINE void z_store(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz);
 INLINE INT32 normalize_dzpix(INT32 sum);
 INLINE INT32 CLIP(INT32 value,INT32 min,INT32 max);
-INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, UINT32 hres);
+INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres);
 INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index);
 INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);
 INLINE UINT32 getlog2(UINT32 lod_clamp);
@@ -430,12 +430,13 @@ static int special_bsel0, special_bsel1;
 
 VIDEO_START(n64)
 {
-	int i = 0, j = 0;
 	UINT8 *normpoint = memory_region(machine, "normpoint");
 	UINT8 *normslope = memory_region(machine, "normslope");
 
 	if (LOG_RDP_EXECUTION)
+	{
 		rdp_exec = fopen("rdp_execute.txt", "wt");
+	}
 
 	TMEM = auto_alloc_array(machine, UINT8, 0x1004); // 4 guard bytes
 	memset(TMEM, 0, 0x1000);
@@ -446,7 +447,7 @@ VIDEO_START(n64)
 	one_color.c = 0xffffffff;
 	zero_color.c = 0;
 
-	for(i = 0; i < (1 << 21); i++)
+	for(int i = 0; i < (1 << 21); i++)
 	{
 		INT32 frac = i >> 16;
 		INT32 left = (i >> 8) & 0x000000ff;
@@ -454,7 +455,7 @@ VIDEO_START(n64)
 		tex_lerp_lut[i] = (frac*(left - right))>>5;
 	}
 
-	for(i = 0; i < (1 << 24); i++)
+	for(int i = 0; i < (1 << 24); i++)
 	{
 		UINT8 A = (i >> 16) & 0x000000ff;
 		UINT8 B = (i >> 8) & 0x000000ff;
@@ -462,9 +463,9 @@ VIDEO_START(n64)
 		cc_lut1[i] = (INT16)((((((INT32)A - (INT32)B) * (INT32)C) + 0x80) >> 8) & 0x0000ffff);
 	}
 
-	for(i = 0; i < (1 << 16); i++)
+	for(int i = 0; i < (1 << 16); i++)
 	{
-		for(j = 0; j < (1 << 8); j++)
+		for(int j = 0; j < (1 << 8); j++)
 		{
 			INT32 temp = (INT32)((INT16)i) + j;
 			if(temp > 255)
@@ -482,7 +483,7 @@ VIDEO_START(n64)
 		}
 	}
 
-	for(i = 0; i < (1 << 16); i++)
+	for(int i = 0; i < (1 << 16); i++)
 	{
 		UINT8 r = ((i >> 8) & 0xf8) | (i >> 13);
 		UINT8 g = ((i >> 3) & 0xf8) | ((i >>  8) & 0x07);
@@ -524,18 +525,18 @@ VIDEO_START(n64)
 
 	memset(hidden_bits, 3, 4194304); // Hack / fix for letters in Rayman 2
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		tile[i].num = i;
 	}
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		gamma_table[i] = sqrt((float)(i << 6));
 		gamma_table[i] <<= 1;
 	}
 
-	for (i = 0; i < 0x4000; i++)
+	for (int i = 0; i < 0x4000; i++)
 	{
 		gamma_dither_table[i] = sqrt((float)i);
 		gamma_dither_table[i] <<= 1;
@@ -544,12 +545,12 @@ VIDEO_START(n64)
 	z_build_com_table();
 
 	maskbits_table[0] = 0x3ff;
-	for(i = 1; i < 16; i++)
+	for(int i = 1; i < 16; i++)
 	{
 		maskbits_table[i] = ((UINT16)(0xffff) >> (16 - i)) & 0x3ff;
 	}
 
-	for(i = 0; i < 64; i++)
+	for(int i = 0; i < 64; i++)
 	{
 		NormPointRom[i] = (normpoint[(i << 1) + 1] << 8) | normpoint[i << 1];
 		NormSlopeRom[i] = (normslope[(i << 1) + 1] << 8) | normslope[i << 1];
@@ -569,37 +570,25 @@ VIDEO_START(n64)
 
 static void video_update_n64_32(bitmap_t *bitmap)
 {
-	int i, j;
     int gamma = (n64_vi_control >> 3) & 1;
     int gamma_dither = (n64_vi_control >> 2) & 1;
     //int vibuffering = ((n64_vi_control & 2) && fsaa && divot);
 
-    UINT32 *frame_buffer32;
-	UINT16 *frame_buffer;
-	UINT32 hb;
-	UINT8* hidden_buffer;
+    UINT32 *frame_buffer32 = (UINT32*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
 
-	int r, g, b;
-	int dith = 0;
-
-	INT32 hdiff = (n64_vi_hstart & 0x3ff) - ((n64_vi_hstart >> 16) & 0x3ff);
-	float hcoeff = ((float)(n64_vi_xscale & 0xfff) / (1 << 10));
+	const INT32 hdiff = (n64_vi_hstart & 0x3ff) - ((n64_vi_hstart >> 16) & 0x3ff);
+	const float hcoeff = ((float)(n64_vi_xscale & 0xfff) / (1 << 10));
 	UINT32 hres = ((float)hdiff * hcoeff);
 	INT32 invisiblewidth = n64_vi_width - hres;
 
-	INT32 vdiff = ((n64_vi_vstart & 0x3ff) - ((n64_vi_vstart >> 16) & 0x3ff)) >> 1;
-	float vcoeff = ((float)(n64_vi_yscale & 0xfff) / (1 << 10));
-	UINT32 vres = ((float)vdiff * vcoeff);
+	const INT32 vdiff = ((n64_vi_vstart & 0x3ff) - ((n64_vi_vstart >> 16) & 0x3ff)) >> 1;
+	const float vcoeff = ((float)(n64_vi_yscale & 0xfff) / (1 << 10));
+	const UINT32 vres = ((float)vdiff * vcoeff);
 
 	if (vdiff <= 0 || hdiff <= 0)
 	{
-
 		return;
 	}
-
-	frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
-	hb = ((n64_vi_origin & 0xffffff) >> 2) >> 1;
-	hidden_buffer = &hidden_bits[hb];
 
 	if (hres > 640) // Needed by Top Gear Overdrive (E)
 	{
@@ -607,20 +596,20 @@ static void video_update_n64_32(bitmap_t *bitmap)
 		hres = 640;
 	}
 
-	frame_buffer32 = (UINT32*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
 	if (frame_buffer32)
 	{
-		for (j=0; j < vres; j++)
+		for (int j = 0; j < vres; j++)
 		{
 			UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
-			for (i=0; i < hres; i++)
+			for (int i = 0; i < hres; i++)
 			{
 				UINT32 pix = *frame_buffer32++;
 				if (gamma || gamma_dither)
 				{
-					r = (pix >> 24) & 0xff;
-					g = (pix >> 16) & 0xff;
-					b = (pix >> 8) & 0xff;
+					int r = (pix >> 24) & 0xff;
+					int g = (pix >> 16) & 0xff;
+					int b = (pix >> 8) & 0xff;
+					int dith = 0;
 					if (gamma_dither)
 					{
 						dith = rdp_rand() & 0x3f;
@@ -662,10 +651,11 @@ static void video_update_n64_32(bitmap_t *bitmap)
 
 VIDEO_UPDATE(n64)
 {
-	int i, j;
     int fsaa = (((n64_vi_control >> 8) & 3) < 2);
     int divot = (n64_vi_control >> 4) & 1;
     int height = fb_height;
+	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
+	//UINT8  *cvg_buffer = &hidden_bits[((n64_vi_origin & 0xffffff) >> 2) >> 1];
     //int vibuffering = ((n64_vi_control & 2) && fsaa && divot);
 
 	//vibuffering = 0; // Disabled for now
@@ -681,10 +671,10 @@ VIDEO_UPDATE(n64)
                 {
                     UINT16 pix;
                     pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
-                    curpixel_cvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3); // Reuse of this variable
+                    curpixel_cvg = ((pix & 1) << 2) | (cvg_buffer[pixels ^ BYTE_ADDR_XOR] & 3); // Reuse of this variable
                     if (curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
                     {
-                        newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
+                        newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &cvg_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
                         ViBuffer[i][j] = newc;
                     }
                     else
@@ -704,10 +694,10 @@ VIDEO_UPDATE(n64)
 
     if (n64_vi_blank)
     {
-        for (j=0; j <height; j++)
+        for (int j = 0; j <height; j++)
         {
             UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
-            for (i=0; i < fb_width; i++)
+            for (int i = 0; i < fb_width; i++)
             {
                 d[BYTE_XOR_BE(i)] = 0;
             }
@@ -949,6 +939,10 @@ static const UINT8 magic_matrix[16] =
 
 /*****************************************************************************/
 
+#define XOR_SWAP_BYTE_SHIFT		2
+#define XOR_SWAP_WORD_SHIFT		1
+#define XOR_SWAP_DWORD_SHIFT	0
+
 #define XOR_SWAP_BYTE	4
 #define XOR_SWAP_WORD	2
 #define XOR_SWAP_DWORD	1
@@ -980,8 +974,7 @@ INLINE UINT32 z_decompress(UINT16 *zb)
 
 INLINE void z_build_com_table(void) // Thanks to angrylion, Gonetz and Orkin
 {
-	int j = 0;
-	for(j = 0; j < 0x40000; j++)
+	for(int j = 0; j < 0x40000; j++)
 	{
 		UINT32 exponent = 0;
 		UINT32 testbit = 0x20000;
@@ -1000,10 +993,9 @@ INLINE void z_build_com_table(void) // Thanks to angrylion, Gonetz and Orkin
 INLINE void z_store(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz)
 {
 	UINT8 deltazmem = 15;
-	int j = 0;
 	z &= 0x3ffff;
 	deltaz &= 0xffff;
-	for(j = 15; j >= 0; j--)
+	for(int j = 15; j >= 0; j--)
 	{
 		if( (deltaz >> j) == 1 )
 		{
@@ -1083,7 +1075,6 @@ static UINT32 (*z_compare)(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 s
 
 INLINE INT32 normalize_dzpix(INT32 sum)
 {
-	int count = 0;
 	if (sum & 0xc000)
 	{
 		return 0x8000;
@@ -1092,7 +1083,7 @@ INLINE INT32 normalize_dzpix(INT32 sum)
 	{
 		return 1;
 	}
-	for(count = 0x2000; count > 0; count >>= 1)
+	for(int count = 0x2000; count > 0; count >>= 1)
     {
 		if (sum & count)
 		{
@@ -1118,16 +1109,14 @@ INLINE INT32 CLIP(INT32 value,INT32 min,INT32 max)
 	}
 }
 
-INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, UINT32 hres)
+INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres)
 {
+
 	COLOR penumax, penumin, max, min;
 	UINT16 pix = *vbuff;
-	UINT32 centercvg = (*hbuff & 3) + ((pix & 1) << 2) + 1;
+	const UINT8 centercvg = (*hbuff & 3) + ((pix & 1) << 2) + 1;
 	UINT32 numoffull = 1;
 	UINT32 cvg;
-	UINT32 r = ((pix >> 8) & 0xf8) | (pix >> 13);
-	UINT32 g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
-	UINT32 b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
 	UINT32 backr[7], backg[7], backb[7];
 	UINT32 invr[7], invg[7], invb[7];
 	INT32 coeff;
@@ -1136,7 +1125,9 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 	INT32 toleft = -2;
 	UINT32 colr, colg, colb;
 	UINT32 enb;
-	int i = 0;
+	UINT32 r = ((pix >> 8) & 0xf8) | (pix >> 13);
+	UINT32 g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
+	UINT32 b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
 
 	*out_r = *out_g = *out_b = 0;
 
@@ -1155,7 +1146,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		return;
 	}
 
-	for(i = 0; i < 5; i++)
+	for(int i = 0; i < 5; i++)
 	{
 		pix = vbuff[leftup ^ WORD_ADDR_XOR];
 		cvg = hbuff[leftup ^ BYTE_ADDR_XOR] & 3;
@@ -1181,7 +1172,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		leftup++;
 	}
 
-	for(i = 0; i < 5; i++)
+	for(int i = 0; i < 5; i++)
 	{
 		pix = vbuff[leftdown ^ WORD_ADDR_XOR];
 		cvg = hbuff[leftdown ^ BYTE_ADDR_XOR] & 3;
@@ -1207,7 +1198,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		leftdown++;
 	}
 
-	for(i = 0; i < 5; i++)
+	for(int i = 0; i < 5; i++)
 	{
 		pix = vbuff[toleft ^ WORD_ADDR_XOR];
 		cvg = hbuff[toleft ^ BYTE_ADDR_XOR] & 3;
@@ -1234,7 +1225,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 	}
 
 	video_max(&backr[0], &max.i.r, &enb);
-	for(i = 1; i < 7; i++)
+	for(int i = 1; i < 7; i++)
 	{
 		if (!((enb >> i) & 1))
 		{
@@ -1242,7 +1233,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		}
 	}
 	video_max(&backg[0], &max.i.g, &enb);
-	for (i = 1; i < 7; i++)
+	for (int i = 1; i < 7; i++)
 	{
 		if (!((enb >> i) & 1))
 		{
@@ -1250,7 +1241,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		}
 	}
 	video_max(&backb[0], &max.i.b, &enb);
-	for (i = 1; i < 7; i++)
+	for (int i = 1; i < 7; i++)
 	{
 		if (!((enb >> i) & 1))
 		{
@@ -1258,7 +1249,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		}
 	}
 	video_max(&invr[0], &min.i.r, &enb);
-	for (i = 1; i < 7; i++)
+	for (int i = 1; i < 7; i++)
 	{
 		if (!((enb >> i) & 1))
 		{
@@ -1266,7 +1257,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		}
 	}
 	video_max(&invg[0], &min.i.g, &enb);
-	for (i = 1; i < 7; i++)
+	for (int i = 1; i < 7; i++)
 	{
 		if (!((enb >> i) & 1))
 		{
@@ -1274,7 +1265,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 		}
 	}
 	video_max(&invb[0], &min.i.b, &enb);
-	for (i = 1; i < 7; i++)
+	for (int i = 1; i < 7; i++)
 	{
 		if (!((enb >> i) & 1))
 		{
@@ -1283,28 +1274,22 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 	}
 
 	video_max(&backr[0], &penumax.i.r, &enb);
-	i = ge_two(enb);
-	penumax.i.r = i ? max.i.r : penumax.i.r;
+	penumax.i.r = ge_two(enb) ? max.i.r : penumax.i.r;
 
 	video_max(&backg[0], &penumax.i.g, &enb);
-	i = ge_two(enb);
-	penumax.i.g = i ? max.i.g : penumax.i.g;
+	penumax.i.g = ge_two(enb) ? max.i.g : penumax.i.g;
 
 	video_max(&backb[0], &penumax.i.b, &enb);
-	i = ge_two(enb);
-	penumax.i.b = i ? max.i.b : penumax.i.b;
+	penumax.i.b = ge_two(enb) ? max.i.b : penumax.i.b;
 
 	video_max(&invr[0], &penumin.i.r, &enb);
-	i = ge_two(enb);
-	penumin.i.r = i ? min.i.r : penumin.i.r;
+	penumin.i.r = ge_two(enb) ? min.i.r : penumin.i.r;
 
 	video_max(&invg[0], &penumin.i.g, &enb);
-	i = ge_two(enb);
-	penumin.i.g = i ? min.i.g : penumin.i.g;
+	penumin.i.g = ge_two(enb) ? min.i.g : penumin.i.g;
 
 	video_max(&invb[0], &penumin.i.b, &enb);
-	i = ge_two(enb);
-	penumin.i.b = i ? min.i.b : penumin.i.b;
+	penumin.i.b = ge_two(enb) ? min.i.b : penumin.i.b;
 
 	penumin.i.r = ~penumin.i.r;
 	penumin.i.g = ~penumin.i.g;
@@ -1313,7 +1298,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 	colr = (UINT32)penumin.i.r + (UINT32)penumax.i.r - (r << 1);
 	colg = (UINT32)penumin.i.g + (UINT32)penumax.i.g - (g << 1);
 	colb = (UINT32)penumin.i.b + (UINT32)penumax.i.b - (b << 1);
-	coeff = 8 - (INT32)centercvg;
+	coeff = 8 - centercvg;
 	colr = (((colr * coeff) + 4) >> 3) + r;
 	colg = (((colg * coeff) + 4) >> 3) + g;
 	colb = (((colb * coeff) + 4) >> 3) + b;
@@ -1373,21 +1358,20 @@ INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 f
 
 INLINE void divot_filter16_buffer(int* r, int* g, int* b, COLOR* vibuffer)
 {
-	UINT32 leftr, leftg, leftb, rightr, rightg, rightb;
-	COLOR leftpix, rightpix, filtered;
-	leftpix = vibuffer[-1];
-	rightpix = vibuffer[1];
-	filtered = *vibuffer;
+	COLOR leftpix = vibuffer[-1];
+	COLOR rightpix = vibuffer[1];
+	COLOR filtered = *vibuffer;
 
 	*r = filtered.i.r;
 	*g = filtered.i.g;
 	*b = filtered.i.b;
-	leftr = leftpix.i.r;
-	leftg = leftpix.i.g;
-	leftb = leftpix.i.b;
-	rightr = rightpix.i.r;
-	rightg = rightpix.i.g;
-	rightb = rightpix.i.b;
+	UINT32 leftr = leftpix.i.r;
+	UINT32 leftg = leftpix.i.g;
+	UINT32 leftb = leftpix.i.b;
+	UINT32 rightr = rightpix.i.r;
+	UINT32 rightg = rightpix.i.g;
+	UINT32 rightb = rightpix.i.b;
+
 	if ((leftr >= *r && rightr >= leftr) || (leftr >= rightr && *r >= leftr))
 	{
 		*r = leftr; //left = median value
@@ -1624,7 +1608,9 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		temp |= 1;
 	}
 	else if (Pixels[0] < Pixels[pos])
+	{
 		temp |= 1;
+	}
 
 	if (Pixels[1] > Pixels[pos])
 	{
@@ -1632,9 +1618,13 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 1;
 	}
 	else if (Pixels[1] < Pixels[pos])
+	{
 		temp |= 2;
+	}
 	else
+	{
 		pos = 1;
+	}
 
 	if (Pixels[2] > Pixels[pos])
 	{
@@ -1642,9 +1632,13 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 2;
 	}
 	else if (Pixels[2] < Pixels[pos])
+	{
 		temp |= 4;
+	}
 	else
+	{
 		pos = 2;
+	}
 
 	if (Pixels[3] > Pixels[pos])
 	{
@@ -1652,9 +1646,13 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 3;
 	}
 	else if (Pixels[3] < Pixels[pos])
+	{
 		temp |= 8;
+	}
 	else
+	{
 		pos = 3;
+	}
 
 	if (Pixels[4] > Pixels[pos])
 	{
@@ -1662,9 +1660,13 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 4;
 	}
 	else if (Pixels[4] < Pixels[pos])
+	{
 		temp |= 16;
+	}
 	else
+	{
 		pos = 4;
+	}
 
 	if (Pixels[5] > Pixels[pos])
 	{
@@ -1672,9 +1674,13 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 5;
 	}
 	else if (Pixels[5] < Pixels[pos])
+	{
 		temp |= 32;
+	}
 	else
+	{
 		pos = 5;
+	}
 
 	if (Pixels[6] > Pixels[pos])
 	{
@@ -1682,9 +1688,13 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 6;
 	}
 	else if (Pixels[6] < Pixels[pos])
+	{
 		temp |= 64;
+	}
 	else
+	{
 		pos = 6;
+	}
 
 	if (Pixels[7] > Pixels[pos])
 	{
@@ -1692,13 +1702,18 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 		pos = 7;
 	}
 	else if (Pixels[7] < Pixels[pos])
+	{
 		temp |= 128;
+	}
 	else
+	{
 		pos = 7;
+	}
 
 	*enb = temp;
 	*max = Pixels[pos];
 }
+
 /*
 INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 {
@@ -1858,14 +1873,13 @@ INLINE void rgb_dither(INT32* r, INT32* g, INT32* b, int dith)
 
 INLINE UINT32 getlog2(UINT32 lod_clamp)
 {
-	int i;
 	if (lod_clamp < 2)
 	{
 		return 0;
 	}
 	else
 	{
-		for (i = 7; i > 0; i--)
+		for (int i = 7; i > 0; i--)
 		{
 			if ((lod_clamp >> i) & 1)
 			{
@@ -1883,12 +1897,11 @@ INLINE void copy_colors(COLOR* dst, COLOR* src)
 
 INLINE void BILERP_AND_WRITE(UINT32* src0, UINT32* src1, UINT32* dest)
 {
-	UINT32 r1, g1, b1, col0, col1;
-	col0 = *src0;
-	col1 = *src1;
-	r1 = (((col0 >> 16)&0xff) + ((col1 >> 16)&0xff))>>1;
-	g1 = (((col0 >> 8)&0xff) + ((col1 >> 8)&0xff))>>1;
-	b1 = (((col0 >> 0)&0xff) + ((col1 >> 0)&0xff))>>1;
+	UINT32 col0 = *src0;
+	UINT32 col1 = *src1;
+	UINT32 r1 = (((col0 >> 16) & 0xff) + ((col1 >> 16) & 0xff))>>1;
+	UINT32 g1 = (((col0 >> 8) & 0xff) + ((col1 >> 8) & 0xff))>>1;
+	UINT32 b1 = (((col0 >> 0) & 0xff) + ((col1 >> 0) & 0xff))>>1;
 	*dest = (r1 << 16) | (g1 << 8) | b1;
 }
 
@@ -1896,10 +1909,6 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 {
 	int w_carry;
 	int shift;
-	int normout;
-	int wnorm;
-	int tlu_rcp;
-	int shift_value;
 
 	if (!(sw & 0x7fff))
 	{
@@ -1914,10 +1923,10 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	for(shift = 1; shift <= 14 && !((sw << shift) & 0x8000); shift++);
 	shift -= 1;
 
-	normout = ((sw << shift) & 0x3fff) >> 8;
-	wnorm = ((sw << shift) & 0xff) << 2;
+	int normout = ((sw << shift) & 0x3fff) >> 8;
+	int wnorm = ((sw << shift) & 0xff) << 2;
 
-	tlu_rcp = ((-(NormSlopeRom[normout] * wnorm)) >> 10) + NormPointRom[normout];
+	int tlu_rcp = ((-(NormSlopeRom[normout] * wnorm)) >> 10) + NormPointRom[normout];
 
 	if(shift == 14)
 	{
@@ -1926,7 +1935,7 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	}
 	else
 	{
-		shift_value = 13 - shift;
+		int shift_value = 13 - shift;
 		*sss = (SIGN16(ss) * tlu_rcp) >> shift_value;
 		*sst = (SIGN16(st) * tlu_rcp) >> shift_value;
 	}
@@ -2084,36 +2093,28 @@ INLINE int BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 static void fill_rectangle_32bit(RECTANGLE *rect)
 {
 	UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
-	int index, i, j;
-	int x1 = rect->xh / 4;
-	int x2 = rect->xl / 4;
-	int y1 = rect->yh / 4;
-	int y2 = rect->yl / 4;
-	int clipx1, clipx2, clipy1, clipy2;
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 	int fill_cvg = 0;
 
-	// TODO: clip
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 	// clip
-	if (x1 < clipx1)
+	if (x1 < clip.xh)
 	{
-		x1 = clipx1;
+		x1 = clip.xh;
 	}
-	if (y1 < clipy1)
+	if (y1 < clip.yh)
 	{
-		y1 = clipy1;
+		y1 = clip.yh;
 	}
-	if (x2 >= clipx2)
+	if (x2 >= clip.xl)
 	{
-		x2 = clipx2-1;
+		x2 = clip.xl - 1;
 	}
-	if (y2 >= clipy2)
+	if (y2 >= clip.yl)
 	{
-		y2 = clipy2-1;
+		y2 = clip.yl - 1;
 	}
 
 	shade_color.c = 0;
@@ -2122,11 +2123,11 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 
 	if (other_modes.cycle_type == CYCLE_TYPE_FILL)
 	{
-		for (j=y1; j <= y2; j++)
+		for (int j = y1; j <= y2; j++)
 		{
-			index = j * fb_width;
+			int index = j * fb_width;
 
-			for (i=x1; i <= x2; i++)
+			for (int i = x1; i <= x2; i++)
 			{
 				fb[(index + i)^1] = fill_color;
 			}
@@ -2134,11 +2135,11 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 	}
 	else if (other_modes.cycle_type == CYCLE_TYPE_1)
 	{
-		for (j=y1; j <= y2; j++)
+		for (int j = y1; j <= y2; j++)
 		{
 			COLOR c;
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
+			int index = j * fb_width;
+			for (int i = x1; i <= x2; i++)
 			{
 				curpixel_cvg = fill_cvg;
 				COLOR_COMBINER1(c);
@@ -2148,11 +2149,11 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 	}
 	else if (other_modes.cycle_type == CYCLE_TYPE_2)
 	{
-		for (j=y1; j <= y2; j++)
+		for (int j = y1; j <= y2; j++)
 		{
 			COLOR c1, c2;
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
+			int index = j * fb_width;
+			for (int i = x1; i <= x2; i++)
 			{
 				curpixel_cvg = fill_cvg;
 				COLOR_COMBINER2_C0(c1);
@@ -2170,22 +2171,16 @@ static void fill_rectangle_32bit(RECTANGLE *rect)
 INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 {	// TODO: Z-compare and Z-update
 	UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
-	int i, j;
-	int x1, x2, y1, y2;
-	int s, t;
-	int ss, st;
-
-	int clipx1, clipx2, clipy1, clipy2;
 
 	UINT32 tilenum = rect->tilenum;
 	UINT32 tilenum2 = 0;
 	TILE *tex_tile = &tile[rect->tilenum];
 	TILE *tex_tile2 = NULL;
 
-	x1 = (rect->xh / 4);
-	x2 = (rect->xl / 4);
-	y1 = (rect->yh / 4);
-	y2 = (rect->yl / 4);
+	int x1 = rect->xh;
+	int x2 = rect->xl;
+	int y1 = rect->yh;
+	int y2 = rect->yl;
 
 	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
 	{
@@ -2194,10 +2189,23 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 		y2 += 1;
 	}
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
+	// clip
+	if (x1 < clip.xh)
+	{
+		x1 = clip.xh;
+	}
+	if (y1 < clip.yh)
+	{
+		y1 = clip.yh;
+	}
+	if (x2 >= clip.xl)
+	{
+		x2 = clip.xl - 1;
+	}
+	if (y2 >= clip.yl)
+	{
+		y2 = clip.yl - 1;
+	}
 
 	calculate_clamp_diffs(tex_tile->num);
 
@@ -2217,24 +2225,26 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 
 	shade_color.c = 0;	// Needed by Pilotwings 64
 
-	t = (int)(rect->t) << 5;
+	int t = (int)(rect->t) << 5;
 
 	if (other_modes.cycle_type == CYCLE_TYPE_1)
 	{
 		CACHE_TEXTURE_PARAMS(tex_tile);
 
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
 
-			s = (int)(rect->s) << 5;
+			int s = (int)(rect->s) << 5;
 
-			for (i = x1; i < x2; i++)
+			for (int i = x1; i < x2; i++)
 			{
 				COLOR c;
-				curpixel_cvg=8;
-				ss = s >> 5;
-				st = t >> 5;
+				int ss = s >> 5;
+				int st = t >> 5;
+
+				curpixel_cvg = 8;
+
 				if (rect->flip)
 				{
 					texel0_color.c = TEXTURE_PIPELINE(st, ss, tex_tile);
@@ -2256,18 +2266,20 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 	}
 	else if (other_modes.cycle_type == CYCLE_TYPE_2)
 	{
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
 
-			s = (int)(rect->s) << 5;
+			int s = (int)(rect->s) << 5;
 
-			for (i = x1; i < x2; i++)
+			for (int i = x1; i < x2; i++)
 			{
 				COLOR c1, c2;
+				int ss = s >> 5;
+				int st = t >> 5;
+
 				curpixel_cvg=8;
-				ss = s >> 5;
-				st = t >> 5;
+
 				if (rect->flip)
 				{
 					CACHE_TEXTURE_PARAMS(tex_tile);
@@ -2300,16 +2312,16 @@ INLINE void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 	{
 		CACHE_TEXTURE_PARAMS(tex_tile);
 
-		for (j = y1; j < y2; j++)
+		for (int j = y1; j < y2; j++)
 		{
 			int fb_index = j * fb_width;
 
-			s = (int)(rect->s) << 5;
+			int s = (int)(rect->s) << 5;
 
-			for (i = x1; i < x2; i++)
+			for (int i = x1; i < x2; i++)
 			{
-				ss = s >> 5;
-				st = t >> 5;
+				int ss = s >> 5;
+				int st = t >> 5;
 				if (rect->flip)
 				{
 					texel0_color.c = TEXTURE_PIPELINE(st, ss, tex_tile);
@@ -2339,10 +2351,7 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 	UINT32 *fb = (UINT32*)&rdram[fb_address / 4];
 	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
-	int i, j;
 	int tilenum = tex_tile->num;
-
-	int clipx1, clipx2, clipy1, clipy2;
 
 	UINT32 tilenum2 = 0;
 	TILE *tex_tile2 = NULL;
@@ -2356,15 +2365,9 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 	SPAN_PARAM dt = span[0].dt;
 	SPAN_PARAM dw = span[0].dw;
 	int dzpix = span[0].dzpix;
-	int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
 	int xinc = flip ? 1 : -1;
 
 	calculate_clamp_diffs(tilenum);
-
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
 
 	if (other_modes.cycle_type == CYCLE_TYPE_2 && texture)
 	{
@@ -2380,31 +2383,31 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 		}
 	}
 
-	if (start < clipy1)
+	if (start < clip.yh)
 	{
-		start = clipy1;
+		start = clip.yh;
 	}
-	if (start >= clipy2)
+	if (start >= clip.yl)
 	{
-		start = clipy2-1;
+		start = clip.yl - 1;
 	}
-	if (end < clipy1)
+	if (end < clip.yh)
 	{
-		end = clipy1;
+		end = clip.yh;
 	}
-	if (end >= clipy2)
+	if (end >= clip.yl)
 	{
-		end = clipy2-1;
+		end = clip.yl - 1;
 	}
 
-	drinc = flip ? (dr.w) : -dr.w;
-	dginc = flip ? (dg.w) : -dg.w;
-	dbinc = flip ? (db.w) : -db.w;
-	dainc = flip ? (da.w) : -da.w;
-	dzinc = flip ? (dz.w) : -dz.w;
-	dsinc = flip ? (ds.w) : -ds.w;
-	dtinc = flip ? (dt.w) : -dt.w;
-	dwinc = flip ? (dw.w) : -dw.w;
+	int drinc = flip ? (dr.w) : -dr.w;
+	int dginc = flip ? (dg.w) : -dg.w;
+	int dbinc = flip ? (db.w) : -db.w;
+	int dainc = flip ? (da.w) : -da.w;
+	int dzinc = flip ? (dz.w) : -dz.w;
+	int dsinc = flip ? (ds.w) : -ds.w;
+	int dtinc = flip ? (dt.w) : -dt.w;
+	int dwinc = flip ? (dw.w) : -dw.w;
 
 	if(!shade)
 	{
@@ -2413,7 +2416,7 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 
 	CACHE_TEXTURE_PARAMS(tex_tile);
 
-	for (i = start; i <= end; i++)
+	for (int i = start; i <= end; i++)
 	{
 		int xstart = span[i].lx;
 		int xend = span[i].rx;
@@ -2426,32 +2429,20 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 		SPAN_PARAM t = span[i].t;
 		SPAN_PARAM w = span[i].w;
 
-		int x;
+		int x = xend;
 		int fb_index = fb_width * i;
-		int length;
+		int length = flip ? (xstart - xend) : (xend - xstart);
 
-		x = xend;
-
-		length = flip ? (xstart - xend) : (xend - xstart);
-
-		for (j=0; j <= length; j++)
+		for (int j = 0; j <= length; j++)
 		{
-			int sr = r.h.h;
-			int sg = g.h.h;
-			int sb = b.h.h;
-			int sa = a.h.h;
-			int ss = s.h.h;
-			int st = t.h.h;
-			int sw = w.h.h;
 			UINT32 sz = z.w >> 13;
-			int sss = 0, sst = 0;
 			if (other_modes.z_source_sel)
 			{
 				sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
 				dzpix = primitive_delta_z;
 			}
 
-			if (x >= clipx1 && x < clipx2)
+			if (x >= clip.xh && x < clip.xl)
 			{
 				curpixel_cvg = span[i].cvg[x];
 				if (curpixel_cvg)
@@ -2467,18 +2458,13 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 					c1.i.r = c1.i.g = c1.i.b = c1.i.a = 0;
 					c2.i.r = c2.i.g = c2.i.b = c2.i.a = 0;
 
-					if (other_modes.persp_tex_en)
-					{
-						tcdiv(ss, st, sw, &sss, &sst);
-					}
-					else
-					{
-						sss = ss;
-						sst = st;
-					}
-
 					if (shade)
 					{
+						int sr = r.h.h;
+						int sg = g.h.h;
+						int sb = b.h.h;
+						int sa = a.h.h;
+
 						// Needed by Superman
 						if (sr > 0xff) sr = 0xff;
 						if (sg > 0xff) sg = 0xff;
@@ -2496,6 +2482,22 @@ static void render_spans_32(int start, int end, TILE* tex_tile, int shade, int t
 
 					if (texture)
 					{
+						int ss = s.h.h;
+						int st = t.h.h;
+						int sw = w.h.h;
+						int sss = 0;
+						int sst = 0;
+
+						if (other_modes.persp_tex_en)
+						{
+							tcdiv(ss, st, sw, &sss, &sst);
+						}
+						else
+						{
+							sss = ss;
+							sst = st;
+						}
+
 						if (other_modes.cycle_type == CYCLE_TYPE_1)
 						{
 							texel0_color.c = TEXTURE_PIPELINE(sss, sst, tex_tile);
@@ -3469,17 +3471,15 @@ static RDP_COMMAND( rdp_tri_texshade_z )
 
 static RDP_COMMAND( rdp_tex_rect )
 {
-	UINT32 w3, w4;
 	TEX_RECTANGLE rect;
-
-	w3 = rdp_cmd_data[rdp_cmd_cur+2];
-	w4 = rdp_cmd_data[rdp_cmd_cur+3];
+	UINT32 w3 = rdp_cmd_data[rdp_cmd_cur+2];
+	UINT32 w4 = rdp_cmd_data[rdp_cmd_cur+3];
 
 	rect.tilenum	= (w2 >> 24) & 0x7;
-	rect.xl			= (w1 >> 12) & 0xfff;
-	rect.yl			= (w1 >>  0) & 0xfff;
-	rect.xh			= (w2 >> 12) & 0xfff;
-	rect.yh			= (w2 >>  0) & 0xfff;
+	rect.xl			= ((w1 >> 12) & 0xfff) >> 2;
+	rect.yl			= ((w1 >>  0) & 0xfff) >> 2;
+	rect.xh			= ((w2 >> 12) & 0xfff) >> 2;
+	rect.yh			= ((w2 >>  0) & 0xfff) >> 2;
 	rect.s			= (w3 >> 16) & 0xffff;
 	rect.t			= (w3 >>  0) & 0xffff;
 	rect.dsdx		= (w4 >> 16) & 0xffff;
@@ -3495,17 +3495,15 @@ static RDP_COMMAND( rdp_tex_rect )
 
 static RDP_COMMAND( rdp_tex_rect_flip )
 {
-	UINT32 w3, w4;
 	TEX_RECTANGLE rect;
-
-	w3 = rdp_cmd_data[rdp_cmd_cur+2];
-	w4 = rdp_cmd_data[rdp_cmd_cur+3];
+	UINT32 w3 = rdp_cmd_data[rdp_cmd_cur+2];
+	UINT32 w4 = rdp_cmd_data[rdp_cmd_cur+3];
 
 	rect.tilenum	= (w2 >> 24) & 0x7;
-	rect.xl			= (w1 >> 12) & 0xfff;
-	rect.yl			= (w1 >>  0) & 0xfff;
-	rect.xh			= (w2 >> 12) & 0xfff;
-	rect.yh			= (w2 >>  0) & 0xfff;
+	rect.xl			= ((w1 >> 12) & 0xfff) >> 2;
+	rect.yl			= ((w1 >>  0) & 0xfff) >> 2;
+	rect.xh			= ((w2 >> 12) & 0xfff) >> 2;
+	rect.yh			= ((	w2 >>  0) & 0xfff) >> 2;
 	rect.t			= (w3 >> 16) & 0xffff;
 	rect.s			= (w3 >>  0) & 0xffff;
 	rect.dtdy		= (w4 >> 16) & 0xffff;
@@ -3573,6 +3571,11 @@ static RDP_COMMAND( rdp_set_scissor )
 	clip.xl = (w2 >> 12) & 0xfff;
 	clip.yl = (w2 >>  0) & 0xfff;
 
+	clip.xh >>= 2;
+	clip.yh >>= 2;
+	clip.xl >>= 2;
+	clip.yl >>= 2;
+
 	// TODO: handle f & o?
 }
 
@@ -3584,21 +3587,19 @@ static RDP_COMMAND( rdp_set_prim_depth )
 
 static RDP_COMMAND( rdp_set_other_modes )
 {
-	int index;
-
 	other_modes.cycle_type			= (w1 >> 20) & 0x3;
-	other_modes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0;
-	other_modes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0;
-	other_modes.sharpen_tex_en		= (w1 & 0x20000) ? 1 : 0;
-	other_modes.tex_lod_en			= (w1 & 0x10000) ? 1 : 0;
-	other_modes.en_tlut				= (w1 & 0x08000) ? 1 : 0;
-	other_modes.tlut_type			= (w1 & 0x04000) ? 1 : 0;
-	other_modes.sample_type			= (w1 & 0x02000) ? 1 : 0;
-	other_modes.mid_texel			= (w1 & 0x01000) ? 1 : 0;
-	other_modes.bi_lerp0			= (w1 & 0x00800) ? 1 : 0;
-	other_modes.bi_lerp1			= (w1 & 0x00400) ? 1 : 0;
-	other_modes.convert_one			= (w1 & 0x00200) ? 1 : 0;
-	other_modes.key_en				= (w1 & 0x00100) ? 1 : 0;
+	other_modes.persp_tex_en		= (w1 & 0x80000) ? true : false;
+	other_modes.detail_tex_en		= (w1 & 0x40000) ? true : false;
+	other_modes.sharpen_tex_en		= (w1 & 0x20000) ? true : false;
+	other_modes.tex_lod_en			= (w1 & 0x10000) ? true : false;
+	other_modes.en_tlut				= (w1 & 0x08000) ? true : false;
+	other_modes.tlut_type			= (w1 & 0x04000) ? true : false;
+	other_modes.sample_type			= (w1 & 0x02000) ? true : false;
+	other_modes.mid_texel			= (w1 & 0x01000) ? true : false;
+	other_modes.bi_lerp0			= (w1 & 0x00800) ? true : false;
+	other_modes.bi_lerp1			= (w1 & 0x00400) ? true : false;
+	other_modes.convert_one			= (w1 & 0x00200) ? true : false;
+	other_modes.key_en				= (w1 & 0x00100) ? true : false;
 	other_modes.rgb_dither_sel		= (w1 >> 6) & 0x3;
 	other_modes.alpha_dither_sel	= (w1 >> 4) & 0x3;
 	other_modes.blend_m1a_0			= (w2 >> 30) & 0x3;
@@ -3609,19 +3610,19 @@ static RDP_COMMAND( rdp_set_other_modes )
 	other_modes.blend_m2a_1			= (w2 >> 20) & 0x3;
 	other_modes.blend_m2b_0			= (w2 >> 18) & 0x3;
 	other_modes.blend_m2b_1			= (w2 >> 16) & 0x3;
-	other_modes.force_blend			= (w2 & 0x4000) ? 1 : 0;
-	other_modes.alpha_cvg_select	= (w2 & 0x2000) ? 1 : 0;
-	other_modes.cvg_times_alpha		= (w2 & 0x1000) ? 1 : 0;
+	other_modes.force_blend			= (w2 & 0x4000) ? true : false;
+	other_modes.alpha_cvg_select	= (w2 & 0x2000) ? true : false;
+	other_modes.cvg_times_alpha		= (w2 & 0x1000) ? true : false;
 	other_modes.z_mode				= (w2 >> 10) & 0x3;
 	other_modes.cvg_dest			= (w2 >> 8) & 0x3;
-	other_modes.color_on_cvg		= (w2 & 0x80) ? 1 : 0;
-	other_modes.image_read_en		= (w2 & 0x40) ? 1 : 0;
-	other_modes.z_update_en			= (w2 & 0x20) ? 1 : 0;
-	other_modes.z_compare_en		= (w2 & 0x10) ? 1 : 0;
-	other_modes.antialias_en		= (w2 & 0x08) ? 1 : 0;
-	other_modes.z_source_sel		= (w2 & 0x04) ? 1 : 0;
-	other_modes.dither_alpha_en		= (w2 & 0x02) ? 1 : 0;
-	other_modes.alpha_compare_en	= (w2 & 0x01) ? 1 : 0;
+	other_modes.color_on_cvg		= (w2 & 0x80) ? true : false;
+	other_modes.image_read_en		= (w2 & 0x40) ? true : false;
+	other_modes.z_update_en			= (w2 & 0x20) ? true : false;
+	other_modes.z_compare_en		= (w2 & 0x10) ? true : false;
+	other_modes.antialias_en		= (w2 & 0x08) ? true : false;
+	other_modes.z_source_sel		= (w2 & 0x04) ? true : false;
+	other_modes.dither_alpha_en		= (w2 & 0x02) ? true : false;
+	other_modes.alpha_compare_en	= (w2 & 0x01) ? true : false;
 
 	texture_rectangle_16bit = rdp_texture_rectangle_16bit_func[((((other_modes.z_update_en | other_modes.z_source_sel) << 3) | ((other_modes.z_compare_en | other_modes.z_source_sel) << 2) | other_modes.cycle_type) << 2) | other_modes.rgb_dither_sel];
 	fill_rectangle_16bit = rdp_fill_rectangle_16bit_func[(other_modes.cycle_type << 2) | other_modes.rgb_dither_sel];
@@ -3649,7 +3650,7 @@ static RDP_COMMAND( rdp_set_other_modes )
 	render_spans_16_s_t_nz_f = rdp_render_spans_16_func[28 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
 	render_spans_16_s_t_z_f = rdp_render_spans_16_func[30 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
 
-	for(index = 0; index < 8; index++)
+	for(int index = 0; index < 8; index++)
 	{
 		tile[index].fetch_index = (tile[index].size << 5) | (tile[index].format << 2) | (other_modes.en_tlut << 1) | other_modes.tlut_type;
 	}
@@ -3677,15 +3678,12 @@ static RDP_COMMAND( rdp_set_other_modes )
 
 static RDP_COMMAND( rdp_load_tlut )
 {
-	int i;
-	int tl, th, sl, sh;
-	int tilenum = (w2 >> 24) & 7;
+	const int tilenum = (w2 >> 24) & 7;
 	TILE* tex_tile = &tile[tilenum];
 
-	sl = tex_tile->sl = ((w1 >> 12) & 0xfff);
-	tl = tex_tile->tl =  w1 & 0xfff;
-	sh = tex_tile->sh = ((w2 >> 12) & 0xfff);
-	th = tex_tile->th = w2 & 0xfff;
+	int sl = tex_tile->sl = ((w1 >> 12) & 0xfff);
+	int tl = tex_tile->tl =  w1 & 0xfff;
+	int sh = tex_tile->sh = ((w2 >> 12) & 0xfff);
 
 	switch (ti_size)
 	{
@@ -3697,7 +3695,7 @@ static RDP_COMMAND( rdp_load_tlut )
 			UINT16 *dst = (UINT16*)&TMEM[tex_tile->tmem];
 			int count = ((sh >> 2) - (sl >> 2)) + 1;
 
-			for (i = 0; i < count; i++)
+			for (int i = 0; i < count; i++)
 			{
 				if((i*4) < 0x400)
 				{
@@ -3737,34 +3735,22 @@ static RDP_COMMAND( rdp_set_tile_size )
 
 static RDP_COMMAND( rdp_load_block )
 {
-	int i, width;
-	UINT16 sl, sh, tl, dxt;
-	int tilenum = (w2 >> 24) & 0x7;
-	UINT32 *src, *tc;
-	UINT32 tb;
+	const int tilenum = (w2 >> 24) & 0x7;
+	const UINT32 ti_address2 = ti_address - ((ti_address & 3) ? 4 : 0);
 	UINT16 *ram16 = (UINT16*)rdram;
-	UINT32 ti_address2 = ti_address - ((ti_address & 3) ? 4 : 0);
 	int ti_width2 = ti_width;
 	int slindwords = 0;
 
-	tile[tilenum].sl = sl = ((w1 >> 12) & 0xfff);
-	tile[tilenum].tl = tl = ((w1 >>  0) & 0xfff);
-	tile[tilenum].sh = sh = ((w2 >> 12) & 0xfff);
-	dxt	= ((w2 >>  0) & 0xfff);
+	UINT32 sl = tile[tilenum].sl = ((w1 >> 12) & 0xfff);
+	UINT32 tl = tile[tilenum].tl = ((w1 >>  0) & 0xfff);
+	UINT32 sh = tile[tilenum].sh = ((w2 >> 12) & 0xfff);
+	UINT32 dxt	= ((w2 >>  0) & 0xfff);
 
-	width = (sh - sl) + 1;
+	int width = (sh - sl) + 1;
 
 	if (width > 2048) // Hack for Magical Tetris Challenge
 	{
 		width = 2048;
-	}
-
-	switch (ti_size)
-	{
-		case PIXEL_SIZE_4BIT:	width >>= 1; break;
-		case PIXEL_SIZE_8BIT:	break;
-		case PIXEL_SIZE_16BIT:	width <<= 1; break;
-		case PIXEL_SIZE_32BIT:	width <<= 2; break;
 	}
 
 	if ((ti_address & 3) && (ti_address & 0xffffff00) != 0xf8a00)
@@ -3772,30 +3758,23 @@ static RDP_COMMAND( rdp_load_block )
 		fatalerror( "load block: unaligned ti_address 0x%x",ti_address ); // Rat Attack, Frogger 2 prototype
 	}
 
-	src = (UINT32*)&ram16[ti_address2 >> 1];
-	tc = (UINT32*)TMEM;
-	tb = tile[tilenum].tmem >> 2;
+	UINT32* src = (UINT32*)&ram16[ti_address2 >> 1];
+	UINT32* tc = (UINT32*)TMEM;
+	UINT32 tb = tile[tilenum].tmem >> 2;
+
+	slindwords = sl;
+
+	switch (ti_size) // slindwords Neededby Vigilante 8
+	{
+		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1; 	slindwords >>= 3; 	width >>= 1;	break;
+		case PIXEL_SIZE_8BIT:	 					slindwords >>= 2;					break;
+		case PIXEL_SIZE_16BIT:	ti_width2 <<= 1;	slindwords >>= 1;	width <<= 1;	break;
+		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2; 						width <<= 2;	break;
+	}
 
 	if ((tb + (width >> 2)) > 0x400)
 	{
 		width = 0x1000 - tb*4; // Hack for Magical Tetris Challenge
-	}
-
-	switch (ti_size)
-	{
-		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1; break;
-		case PIXEL_SIZE_8BIT:	break;
-		case PIXEL_SIZE_16BIT:	ti_width2 <<= 1; break;
-		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2; break;
-	}
-
-	slindwords = sl;
-	switch (ti_size) // Needed by Vigilante 8
-	{
-		case PIXEL_SIZE_4BIT:	slindwords >>= 3; break;
-		case PIXEL_SIZE_8BIT:	slindwords >>= 2;break;
-		case PIXEL_SIZE_16BIT:	slindwords >>= 1; break;
-		case PIXEL_SIZE_32BIT:	break;
 	}
 
 	if (width & 7)	// Sigh... another Rat Attack-specific thing.
@@ -3805,14 +3784,14 @@ static RDP_COMMAND( rdp_load_block )
 
 	if (dxt != 0)
 	{
-		int j= 0;
+		int j = 0;
 		int t = 0;
 		int oldt = 0;
 		int ptr;
 		int xorval = (fb_size == PIXEL_SIZE_16BIT && ti_size == PIXEL_SIZE_32BIT ) ? 2 : 1; // Wave Race-specific
 		UINT32 srcstart = ((tl * ti_width2) >> 2) + slindwords;
 		src = &src[srcstart];
-		for (i = 0; i < (width >> 2); i += 2)
+		for (int i = 0; i < (width >> 2); i += 2)
 		{
 			oldt = t;
 			t = ((j >> 11) & 1) ? xorval : 0;
@@ -3837,13 +3816,10 @@ static RDP_COMMAND( rdp_load_block )
 
 static RDP_COMMAND( rdp_load_tile )
 {
-	int i, j;
-	UINT16 sl, sh, tl, th;
-	int width, height;
-	int tilenum = (w2 >> 24) & 0x7;
+	const int tilenum = (w2 >> 24) & 0x7;
 	TILE *tex_tile = &tile[tilenum];
 	int line = tex_tile->line; // Per Ziggy
-	int toppad;
+	int toppad = 0;
 
 	if (!line)
 	{
@@ -3854,13 +3830,14 @@ static RDP_COMMAND( rdp_load_tile )
 	tex_tile->tl = ((w1 >>  0) & 0xfff);
 	tex_tile->sh = ((w2 >> 12) & 0xfff);
 	tex_tile->th = ((w2 >>  0) & 0xfff);
-	sl = tex_tile->sl / 4;
-	tl = tex_tile->tl / 4;
-	sh = tex_tile->sh / 4;
-	th = tex_tile->th / 4;
 
-	width = (sh - sl) + 1;
-	height = (th - tl) + 1;
+	UINT16 sl = tex_tile->sl / 4;
+	UINT16 tl = tex_tile->tl / 4;
+	UINT16 sh = tex_tile->sh / 4;
+	UINT16 th = tex_tile->th / 4;
+
+	int width = (sh - sl) + 1;
+	int height = (th - tl) + 1;
 
 	if (ti_size < 3)
 	{
@@ -3885,14 +3862,14 @@ static RDP_COMMAND( rdp_load_tile )
 				height = (4096 - tb) / line; // Per Ziggy
 			}
 
-			for (j=0; j < height; j++)
+			for (int j = 0; j < height; j++)
 			{
 				int tline = tb + (tex_tile->line * j);
 				int s = ((j + tl) * ti_width) + sl;
 #define BYTE_XOR_DWORD_SWAP 7
 				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR); // Per Ziggy
 
-				for (i=0; i < width; i++)
+				for (int i = 0; i < width; i++)
 				{
 					tc[(tline + i) ^ xorval8] = src[(ti_address + s + i) ^ BYTE_ADDR_XOR];
 				}
@@ -3912,7 +3889,7 @@ static RDP_COMMAND( rdp_load_tile )
 				height = (2048 - tb) / (line / 2); // Per Ziggy
 			}
 
-			for (j = 0; j < height; j++)
+			for (int j = 0; j < height; j++)
 			{
 				int tline = tb + ((tex_tile->line / 2) * j);
 				int s = 0;
@@ -3925,7 +3902,7 @@ static RDP_COMMAND( rdp_load_tile )
 #define WORD_XOR_DWORD_SWAP 3
 				xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 
-				for (i = 0; i < width; i++)
+				for (int i = 0; i < width; i++)
 				{
 					taddr = (tline+i) ^ xorval16;
 					if (taddr < 2048) // Needed by World Driver Championship
@@ -3952,12 +3929,12 @@ static RDP_COMMAND( rdp_load_tile )
 				height = (1024 - tb) / (line/4); // Per Ziggy
 			}
 
-			for (j=0; j < height; j++)
+			for (int j = 0; j < height; j++)
 			{
 				int tline = tb + ((tex_tile->line / 2) * j);
 				int s = ((j + tl) * ti_width) + sl;
 				int xorval32cur = (j & 1) ? xorval32 : 0;
-				for (i=0; i < width; i++)
+				for (int i = 0; i < width; i++)
 				{
 					tc[(tline + i) ^ xorval32cur] = src[s + i];
 				}
@@ -3997,10 +3974,10 @@ static RDP_COMMAND( rdp_set_tile )
 static RDP_COMMAND( rdp_fill_rect )
 {
 	RECTANGLE rect;
-	rect.xl = (w1 >> 12) & 0xfff;
-	rect.yl = (w1 >>  0) & 0xfff;
-	rect.xh = (w2 >> 12) & 0xfff;
-	rect.yh = (w2 >>  0) & 0xfff;
+	rect.xl = (w1 >> 14) & 0x3ff;
+	rect.yl = (w1 >>  2) & 0x3ff;
+	rect.xh = (w2 >> 14) & 0x3ff;
+	rect.yh = (w2 >>  2) & 0x3ff;
 
 	switch (fb_size)
 	{

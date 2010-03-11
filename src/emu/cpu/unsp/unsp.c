@@ -648,6 +648,16 @@ static CPU_EXECUTE( unsp )
 					}
 					break;
 
+				// Far Jump
+				case 0x2f: case 0x3f: case 0x6f: case 0x7f:
+					if (OPA == 7 && OP1 == 2)
+					{
+						UNSP_REG(PC) = READ16(unsp, UNSP_LPC);
+						UNSP_REG(SR) &= 0xffc0;
+						UNSP_REG(SR) |= OPIMM;
+					}
+					break;
+
 				// Multiply, Unsigned * Signed
 				case 0x0f:
 					if(OPN == 1 && OPA != 7)

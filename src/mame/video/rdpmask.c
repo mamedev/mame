@@ -13,14 +13,7 @@
 #endif
 {
 #if defined(MASK_S)
-	INT32 swrap;
-#endif
-#if defined(MASK_T)
-	INT32 twrap;
-#endif
-
-#if defined(MASK_S)
-	swrap = *S >> tex_tile->mask_s;
+	INT32 swrap = *S >> tex_tile->mask_s;
 	swrap &= 1;
 	if (tex_tile->ms && swrap)
 	{
@@ -33,7 +26,7 @@
 #endif
 
 #if defined(MASK_T)
-	twrap = *T >> tex_tile->mask_t;
+	INT32 twrap = *T >> tex_tile->mask_t;
 	twrap &= 1;
 	if (tex_tile->mt && twrap)
 	{

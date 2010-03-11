@@ -1,60 +1,42 @@
-static void triangle_ns_nt_nz(UINT32 w1, UINT32 w2)
-{
-	int j;
-	int xleft, xright, xleft_inc, xright_inc;
-	int xstart, xend;
-	int flip = (w1 & 0x800000) ? 1 : 0;
-
-	INT32 yl, ym, yh;
-	INT32 xl, xm, xh;
-	INT32 dxldy, dxhdy, dxmdy;
-	UINT32 w3, w4, w5, w6, w7, w8;
-
-	int k = 0;
-
-	INT32 limcvg = 0;
-	INT32 startcvg = 0;
-
-	int sign_dxldy = 0;
-	int sign_dxmdy = 0;
-	int samesign = 0;
-
-	int sign_dxhdy = 0;
-
-	int xfrac = 0;
-
-	int m_inc;
-	UINT32 min=0, max=3;
-	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
-
-	int spix = 0; // Current subpixel
-	int ycur;
-	int ylfar;
-	int ldflag;
-	int yhpix;
-	int ympix;
-	int ylpix;
-
 #define addleft(x) addleftcvg(x,k)
 #define addright(x) addrightcvg(x,k)
 
-	w3 = rdp_cmd_data[rdp_cmd_cur+2];
-	w4 = rdp_cmd_data[rdp_cmd_cur+3];
-	w5 = rdp_cmd_data[rdp_cmd_cur+4];
-	w6 = rdp_cmd_data[rdp_cmd_cur+5];
-	w7 = rdp_cmd_data[rdp_cmd_cur+6];
-	w8 = rdp_cmd_data[rdp_cmd_cur+7];
+#define setvalues()	\
+{					\
+	addvalues();	\
+	adjust_attr();	\
+}
 
-	yl = (w1 & 0x3fff);
-	ym = ((w2 >> 16) & 0x3fff);
-	yh = ((w2 >>  0) & 0x3fff);
-	xl = (INT32)(w3 & 0x3fffffff);
-	xh = (INT32)(w5 & 0x3fffffff);
-	xm = (INT32)(w7 & 0x3fffffff);
+static void triangle_ns_nt_nz(UINT32 w1, UINT32 w2)
+{
+	int flip     = (w1 & 0x800000) ?  1 :  0;
+	int sign     = (w1 & 0x800000) ? -1 :  1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
+
+	int xfrac = 0;
+
+	INT32 maxxmx = 0;
+	INT32 minxmx = 0;
+	INT32 maxxhx = 0;
+	INT32 minxhx = 0;
+
+	UINT32 w3 = rdp_cmd_data[rdp_cmd_cur+2];
+	UINT32 w4 = rdp_cmd_data[rdp_cmd_cur+3];
+	UINT32 w5 = rdp_cmd_data[rdp_cmd_cur+4];
+	UINT32 w6 = rdp_cmd_data[rdp_cmd_cur+5];
+	UINT32 w7 = rdp_cmd_data[rdp_cmd_cur+6];
+	UINT32 w8 = rdp_cmd_data[rdp_cmd_cur+7];
+
+	INT32 yl = (w1 & 0x3fff);
+	INT32 ym = ((w2 >> 16) & 0x3fff);
+	INT32 yh = ((w2 >>  0) & 0x3fff);
+	INT32 xl = (INT32)(w3 & 0x3fffffff);
+	INT32 xh = (INT32)(w5 & 0x3fffffff);
+	INT32 xm = (INT32)(w7 & 0x3fffffff);
 	// Inverse slopes in 16.16 format
-	dxldy = (INT32)(w4);
-	dxhdy = (INT32)(w6);
-	dxmdy = (INT32)(w8);
+	INT32 dxldy = (INT32)(w4);
+	INT32 dxhdy = (INT32)(w6);
+	INT32 dxmdy = (INT32)(w8);
 
 	max_level = ((w1 >> 19) & 7);
 
@@ -68,40 +50,38 @@ static void triangle_ns_nt_nz(UINT32 w1, UINT32 w2)
 
 	span[0].dymax = 0;
 
-	xleft_inc = dxmdy >> 2;
-	xright_inc = dxhdy >> 2;
+	int xleft_inc = dxmdy >> 2;
+	int xright_inc = dxhdy >> 2;
 
-	xright = xh;
-	xleft = xm;
+	int xright = xh;
+	int xleft = xm;
 
-	limcvg = ((yl>>2) <= 1023) ? (yl>>2) : 1023; // Needed by 40 Winks
+	INT32 limcvg = ((yl>>2) <= 1023) ? (yl>>2) : 1023; // Needed by 40 Winks
 	if (limcvg < 0)
 	{
 		limcvg = 0;
 	}
 
-	startcvg = ((yh>>2)>=0) ? (yh>>2) : 0;
-	for (k = startcvg; k <= limcvg; k++)
+	INT32 startcvg = ((yh>>2)>=0) ? (yh>>2) : 0;
+	for (int k = startcvg; k <= limcvg; k++)
 	{
 		memset((void*)&span[k].cvg[0],0,640);
 	}
 
-	sign_dxldy = (dxldy & 0x80000000) ? 1 : 0;
-	sign_dxmdy = (dxmdy & 0x80000000) ? 1 : 0;
-	samesign = !(sign_dxldy ^ sign_dxmdy);
+	int sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
 
-	sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
+	int ycur =	yh & ~3;
+	int ylfar = yl | 3;
+	int ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
+	int yhpix = yh >> 2;
+	int ylpix = yl >> 2;
 
-	m_inc = flip ? 1 : -1;
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
-	ycur =	yh & ~3;
-	ylfar = yl | 3;
-	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
-	yhpix = yh >> 2;
-	ympix = ym >> 2;
-	ylpix = yl >> 2;
-
-	for (k = ycur; k <= ylfar; k++)
+	for (int k = ycur; k <= ylfar; k++)
 	{
 		if (k == ym)
 		{
@@ -109,115 +89,110 @@ static void triangle_ns_nt_nz(UINT32 w1, UINT32 w2)
 			xleft_inc = dxldy >> 2;
 		}
 
-		xstart = xleft >> 16;
-		xend = xright >> 16;
-		j = k >> 2;
-		spix = k & 3;
+		int xstart = xleft >> 16;
+		int xend = xright >> 16;
+		int j = k >> 2;
+		int spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		UINT32 min = 0;
+		UINT32 max = 3;
+		if (j == yhpix)
 		{
-			int m = 0;
-			int n = 0;
-			int length = 0;
-			min = 0; max = 3;
-			if (j == yhpix)
+			min = yh & 3;
+		}
+		if (j == ylpix)
+		{
+			max = yl & 3;
+		}
+		if (spix >= min && spix <= max)
+		{
+			if (spix == min)
 			{
-				min = yh & 3;
+				minxmx = maxxmx = xstart;
+				minxhx = maxxhx = xend;
 			}
-			if (j == ylpix)
+			else
 			{
-				max = yl & 3;
+				minxmx = (xstart < minxmx) ? xstart : minxmx;
+				maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
+				minxhx = (xend < minxhx) ? xend : minxhx;
+				maxxhx = (xend > maxxhx) ? xend : maxxhx;
 			}
-			if (spix >= min && spix <= max)
+		}
+
+		if (spix == max)
+		{
+			if (flip)
 			{
-				if (spix == min)
+				span[j].lx = maxxmx;
+				span[j].rx = minxhx;
+			}
+			else
+			{
+				span[j].lx = minxmx;
+				span[j].rx = maxxhx;
+			}
+		}
+
+		int length = (xend - xstart) * sign;
+
+		if (spix == ldflag)
+		{
+			xfrac = ((xright >> 8) & 0xff);
+		}
+
+		int m = flip ? (xend+1) : (xend-1);
+
+		if (k >= yh && length >= 0 && k <= yl)
+		{
+			if (xstart>=0 && xstart <1024)
+			{
+				if (!flip)
 				{
-					minxmx = maxxmx = xstart;
-					minxhx = maxxhx = xend;
+					span[j].cvg[xstart] += addleft(xleft);
 				}
 				else
 				{
-					minxmx = (xstart < minxmx) ? xstart : minxmx;
-					maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
-					minxhx = (xend < minxhx) ? xend : minxhx;
-					maxxhx = (xend > maxxhx) ? xend : maxxhx;
+					span[j].cvg[xstart] += addright(xleft);
 				}
 			}
-
-			if (spix == max)
+			if (xend>=0 && xend<1024)
 			{
-				if (flip)
-				{
-					span[j].lx = maxxmx;
-					span[j].rx = minxhx;
-				}
-				else
-				{
-					span[j].lx = minxmx;
-					span[j].rx = maxxhx;
-				}
-			}
-
-			length = flip ? (xstart - xend) : (xend - xstart);
-
-			if (spix == ldflag)
-			{
-				xfrac = ((xright >> 8) & 0xff);
-			}
-
-			m = flip ? (xend+1) : (xend-1);
-
-			if (k >= yh && length >= 0 && k <= yl)
-			{
-				if (xstart>=0 && xstart <1024)
+				if (xstart != xend)
 				{
 					if (!flip)
 					{
-						span[j].cvg[xstart] += addleft(xleft);
+						span[j].cvg[xend] += addright(xright);
 					}
 					else
 					{
-						span[j].cvg[xstart] += addright(xleft);
+						span[j].cvg[xend] += addleft(xright);
 					}
 				}
-				if (xend>=0 && xend<1024)
+				else
 				{
-					if (xstart != xend)
+					if (!flip)
 					{
-						if (!flip)
-						{
-							span[j].cvg[xend] += addright(xright);
-						}
-						else
-						{
-							span[j].cvg[xend] += addleft(xright);
-						}
+						span[j].cvg[xend] -= (2 - addright(xright));
 					}
 					else
 					{
-						if (!flip)
-						{
-							span[j].cvg[xend] -= (2 - addright(xright));
-						}
-						else
-						{
-							span[j].cvg[xend] -= (2 - addleft(xright));
-						}
-						if (span[j].cvg[xend] > 200)
-						{
-							span[j].cvg[xend] = 0;
-						}
+						span[j].cvg[xend] -= (2 - addleft(xright));
+					}
+					if (span[j].cvg[xend] > 200)
+					{
+						span[j].cvg[xend] = 0;
 					}
 				}
-				for (n = 0; n < (length - 1); n++)
+			}
+			for (int n = 0; n < (length - 1); n++)
+			{
+				if (m >= 0 && m < 640)
 				{
-					if (m>=0 && m < 640)
-					{
-						span[j].cvg[m] += 2;
-					}
+					span[j].cvg[m] += 2;
+				}
 
-					m += m_inc;
-				}
+				m += inv_sign;
 			}
 		}
 
@@ -243,76 +218,36 @@ static void triangle_ns_nt_nz(UINT32 w1, UINT32 w2)
 
 static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 {
-	int j;
-	int xleft, xright, xleft_inc, xright_inc;
-	int xstart, xend;
-	int z = 0;
-	int dzdx = 0;
-	int dzdy = 0;
-	int dzde = 0;
-	int tilenum;
-	int flip = (w1 & 0x800000) ? 1 : 0;
-
-	INT32 yl, ym, yh;
-	INT32 xl, xm, xh;
-	INT32 dxldy, dxhdy, dxmdy;
-	int dzdy_dz, dzdx_dz;
-	UINT32 w3, w4, w5, w6, w7, w8;
-
-	int k = 0;
-
-	INT32 limcvg = 0;
-	INT32 startcvg = 0;
-
-	int sign_dxldy = 0;
-	int sign_dxmdy = 0;
-	int samesign = 0;
-
-	int dzdiff = 0;
-	int sign_dxhdy = 0;
-
-	int dzdeh = 0, dzdyh = 0;
-	int do_offset = 0;
+	int flip     = (w1 & 0x800000) ? 1 : 0;
+	int sign     = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ? 1 : -1;
 
 	int xfrac = 0;
-	int dzeoff = 0;
 
-	int dzdxh = 0;
-
-	int m_inc;
-	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
-
-	int spix = 0; // Current subpixel
-	int ycur;
-	int ylfar;
-	int ldflag;
-	int yhpix;
-	int ympix;
-	int ylpix;
 
 	int zbuffer_base = rdp_cmd_cur + 8;
 
-	w3 = rdp_cmd_data[rdp_cmd_cur+2];
-	w4 = rdp_cmd_data[rdp_cmd_cur+3];
-	w5 = rdp_cmd_data[rdp_cmd_cur+4];
-	w6 = rdp_cmd_data[rdp_cmd_cur+5];
-	w7 = rdp_cmd_data[rdp_cmd_cur+6];
-	w8 = rdp_cmd_data[rdp_cmd_cur+7];
+	UINT32 w3 = rdp_cmd_data[rdp_cmd_cur+2];
+	UINT32 w4 = rdp_cmd_data[rdp_cmd_cur+3];
+	UINT32 w5 = rdp_cmd_data[rdp_cmd_cur+4];
+	UINT32 w6 = rdp_cmd_data[rdp_cmd_cur+5];
+	UINT32 w7 = rdp_cmd_data[rdp_cmd_cur+6];
+	UINT32 w8 = rdp_cmd_data[rdp_cmd_cur+7];
 
-	yl = (w1 & 0x3fff);
-	ym = ((w2 >> 16) & 0x3fff);
-	yh = ((w2 >>  0) & 0x3fff);
-	xl = (INT32)(w3 & 0x3fffffff);
-	xh = (INT32)(w5 & 0x3fffffff);
-	xm = (INT32)(w7 & 0x3fffffff);
+	INT32 yl = (w1 & 0x3fff);
+	INT32 ym = ((w2 >> 16) & 0x3fff);
+	INT32 yh = ((w2 >>  0) & 0x3fff);
+	INT32 xl = (INT32)(w3 & 0x3fffffff);
+	INT32 xh = (INT32)(w5 & 0x3fffffff);
+	INT32 xm = (INT32)(w7 & 0x3fffffff);
 	// Inverse slopes in 16.16 format
-	dxldy = (INT32)(w4);
-	dxhdy = (INT32)(w6);
-	dxmdy = (INT32)(w8);
+	INT32 dxldy = (INT32)(w4);
+	INT32 dxhdy = (INT32)(w6);
+	INT32 dxmdy = (INT32)(w8);
 
 	max_level = ((w1 >> 19) & 7);
-	tilenum = (w1 >> 16) & 0x7;
+	int tilenum = (w1 >> 16) & 0x7;
 
 	if (yl & 0x2000)  yl |= 0xffffc000;
 	if (ym & 0x2000)  ym |= 0xffffc000;
@@ -322,71 +257,55 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 	if (xm & 0x20000000)  xm |= 0xc0000000;
 	if (xh & 0x20000000)  xh |= 0xc0000000;
 
-	z    = rdp_cmd_data[zbuffer_base+0];
-	dzdx = rdp_cmd_data[zbuffer_base+1];
-	dzde = rdp_cmd_data[zbuffer_base+2];
-	dzdy = rdp_cmd_data[zbuffer_base+3];
+	int z    = rdp_cmd_data[zbuffer_base+0];
+	int dzdx = rdp_cmd_data[zbuffer_base+1];
+	int dzde = rdp_cmd_data[zbuffer_base+2];
+	int dzdy = rdp_cmd_data[zbuffer_base+3];
 
+	int dzdiff = 0;
+	int dzeoff = 0;
+	int dzdeh = 0;
+	int dzdyh = 0;
+	int dzdxh = dzdx >> 8;
+
+	int dzdy_dz = (dzdy >> 16) & 0xffff;
+	int dzdx_dz = (dzdx >> 16) & 0xffff;
 	span[0].dz.w = dzdx;
-	dzdy_dz = (dzdy >> 16) & 0xffff;
-	dzdx_dz = (dzdx >> 16) & 0xffff;
 	span[0].dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
 	span[0].dzpix = normalize_dzpix(span[0].dzpix);
 
-	xleft_inc = dxmdy >> 2;
-	xright_inc = dxhdy >> 2;
+	int xleft_inc = dxmdy >> 2;
+	int xright_inc = dxhdy >> 2;
 
-	xright = xh;
-	xleft = xm;
+	int xright = xh;
+	int xleft = xm;
 
-	limcvg = ((yl>>2) <= 1023) ? (yl>>2) : 1023; // Needed by 40 Winks
+	INT32 limcvg = ((yl>>2) <= 1023) ? (yl>>2) : 1023; // Needed by 40 Winks
 	if (limcvg < 0)
 	{
 		limcvg = 0;
 	}
 
-	startcvg = ((yh>>2)>=0) ? (yh>>2) : 0;
-	for (k = startcvg; k <= limcvg; k++)
+	INT32 startcvg = ((yh>>2)>=0) ? (yh>>2) : 0;
+	for (int k = startcvg; k <= limcvg; k++)
 	{
 		memset((void*)&span[k].cvg[0],0,640);
 	}
 
-	sign_dxldy = (dxldy & 0x80000000) ? 1 : 0;
-	sign_dxmdy = (dxmdy & 0x80000000) ? 1 : 0;
-	samesign = !(sign_dxldy ^ sign_dxmdy);
+	int sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
 
-	sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
-
-	do_offset = !(sign_dxhdy ^ (flip));
-
-	if (do_offset)
+	if (!(sign_dxhdy ^ (flip)))
 	{
-		dzdeh = dzde >> 9;	dzdyh = dzdy >> 9;
-
+		dzdeh = dzde >> 9;
+		dzdyh = dzdy >> 9;
 		dzdiff = (dzdeh*3 - dzdyh*3) << 7;
-	}
-	else
-	{
-		dzdiff = 0;
-	}
-
-	if (do_offset)
-	{
 		dzeoff = (dzdeh*3) << 7;
 	}
 	else
 	{
+		dzdiff = 0;
 		dzeoff = 0;
 	}
-
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
-	dzdxh = dzdx >> 8;
 
 #define adjust_attr()		\
 {							\
@@ -397,16 +316,18 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 			z += dzde; \
 }
 
-	m_inc = flip ? 1 : -1;
+	int ycur =	yh & ~3;
+	int ylfar = yl | 3;
+	int ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
+	int yhpix = yh >> 2;
+	int ylpix = yl >> 2;
 
-	ycur =	yh & ~3;
-	ylfar = yl | 3;
-	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
-	yhpix = yh >> 2;
-	ympix = ym >> 2;
-	ylpix = yl >> 2;
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
-	for (k = ycur; k <= ylfar; k++)
+	for (int k = ycur; k <= ylfar; k++)
 	{
 		if (k == ym)
 		{
@@ -414,17 +335,16 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 			xleft_inc = dxldy >> 2;
 		}
 
-		xstart = xleft >> 16;
-		xend = xright >> 16;
-		j = k >> 2;
-		spix = k & 3;
+		int xstart = xleft >> 16;
+		int xend = xright >> 16;
+		int j = k >> 2;
+		int spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		//if (k >= 0 && k < 0x1000)
 		{
-			int m = 0;
 			int n = 0;
-			int length = 0;
-			min = 0; max = 3;
+			UINT32 min = 0;
+			UINT32 max = 3;
 			if (j == yhpix)
 			{
 				min = yh & 3;
@@ -463,7 +383,7 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 				}
 			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+			int length = (xend - xstart) * sign;
 
 			if (spix == ldflag)
 			{
@@ -471,7 +391,7 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 				adjust_attr();
 			}
 
-			m = flip ? (xend+1) : (xend-1);
+			int m = flip ? (xend+1) : (xend-1);
 
 			if (k >= yh && length >= 0 && k <= yl)
 			{
@@ -522,7 +442,7 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 						span[j].cvg[m] += 2;
 					}
 
-					m += m_inc;
+					m += inv_sign;
 				}
 			}
 		}
@@ -552,9 +472,6 @@ static void triangle_ns_nt_z(UINT32 w1, UINT32 w2)
 }
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues
 
 static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 {
@@ -567,6 +484,8 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 	int dsde = 0, dtde = 0, dwde = 0;
 	int tilenum;
 	int flip = (w1 & 0x800000) ? 1 : 0;
+	int sign = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
 
 	INT32 yl, ym, yh;
 	INT32 xl, xm, xh;
@@ -593,7 +512,6 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 
 	int dsdxh = 0, dtdxh = 0, dwdxh = 0;
 
-	int m_inc;
 	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
@@ -707,13 +625,6 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 		dseoff = dteoff = dweoff;
 	}
 
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
 	dsdxh = dsdx >> 8;
 	dtdxh = dtdx >> 8;
 	dwdxh = dwdx >> 8;
@@ -731,14 +642,17 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 			w += dwde; \
 }
 
-	m_inc = flip ? 1 : -1;
-
 	ycur =	yh & ~3;
 	ylfar = yl | 3;
 	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
 	yhpix = yh >> 2;
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
+
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
 	for (k = ycur; k <= ylfar; k++)
 	{
@@ -753,11 +667,10 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 		j = k >> 2;
 		spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		//if (k >= 0 && k < 0x1000)
 		{
 			int m = 0;
 			int n = 0;
-			int length = 0;
 			min = 0; max = 3;
 			if (j == yhpix)
 			{
@@ -797,7 +710,7 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 				}
 			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+			int length = (xend - xstart) * sign;
 
 			if (spix == ldflag)
 			{
@@ -856,7 +769,7 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 						span[j].cvg[m] += 2;
 					}
 
-					m += m_inc;
+					m += inv_sign;
 				}
 			}
 		}
@@ -886,9 +799,6 @@ static void triangle_ns_t_nz(UINT32 w1, UINT32 w2)
 }
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues
 
 static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 {
@@ -901,6 +811,8 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 	int dzde = 0, dsde = 0, dtde = 0, dwde = 0;
 	int tilenum;
 	int flip = (w1 & 0x800000) ? 1 : 0;
+	int sign = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
 
 	INT32 yl, ym, yh;
 	INT32 xl, xm, xh;
@@ -929,7 +841,6 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 
 	int dsdxh = 0, dtdxh = 0, dwdxh = 0, dzdxh = 0;
 
-	int m_inc;
 	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
@@ -1070,13 +981,6 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 		dseoff = dteoff = dweoff = dzeoff = 0;
 	}
 
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
 	dsdxh = dsdx >> 8;
 	dtdxh = dtdx >> 8;
 	dwdxh = dwdx >> 8;
@@ -1097,14 +1001,17 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 			z += dzde; \
 }
 
-	m_inc = flip ? 1 : -1;
-
 	ycur =	yh & ~3;
 	ylfar = yl | 3;
 	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
 	yhpix = yh >> 2;
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
+
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
 	for (k = ycur; k <= ylfar; k++)
 	{
@@ -1119,11 +1026,10 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 		j = k >> 2;
 		spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		//if (k >= 0 && k < 0x1000)
 		{
 			int m = 0;
 			int n = 0;
-			int length = 0;
 			min = 0; max = 3;
 			if (j == yhpix)
 			{
@@ -1163,7 +1069,7 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 				}
 			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+			int length = (xend - xstart) * sign;
 
 			if (spix == ldflag)
 			{
@@ -1222,7 +1128,7 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 						span[j].cvg[m] += 2;
 					}
 
-					m += m_inc;
+					m += inv_sign;
 				}
 			}
 		}
@@ -1252,9 +1158,6 @@ static void triangle_ns_t_z(UINT32 w1, UINT32 w2)
 }
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues
 
 static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 {
@@ -1268,6 +1171,8 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 	int drde = 0, dgde = 0, dbde = 0, dade = 0;
 	int tilenum;
 	int flip = (w1 & 0x800000) ? 1 : 0;
+	int sign = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
 
 	INT32 yl, ym, yh;
 	INT32 xl, xm, xh;
@@ -1294,7 +1199,6 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 
 	int drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0;
 
-	int m_inc;
 	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
@@ -1416,13 +1320,6 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 		dreoff = dgeoff = dbeoff = daeoff;
 	}
 
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
 	drdxh = drdx >> 8;
 	dgdxh = dgdx >> 8;
 	dbdxh = dbdx >> 8;
@@ -1443,14 +1340,17 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 			a += dade; \
 }
 
-	m_inc = flip ? 1 : -1;
-
 	ycur =	yh & ~3;
 	ylfar = yl | 3;
 	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
 	yhpix = yh >> 2;
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
+
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
 	for (k = ycur; k <= ylfar; k++)
 	{
@@ -1465,11 +1365,10 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 		j = k >> 2;
 		spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		//if (k >= 0 && k < 0x1000)
 		{
 			int m = 0;
 			int n = 0;
-			int length = 0;
 			min = 0; max = 3;
 			if (j == yhpix)
 			{
@@ -1509,7 +1408,7 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 				}
 			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+			int length = (xend - xstart) * sign;
 
 			if (spix == ldflag)
 			{
@@ -1568,7 +1467,7 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 						span[j].cvg[m] += 2;
 					}
 
-					m += m_inc;
+					m += inv_sign;
 				}
 			}
 		}
@@ -1598,9 +1497,6 @@ static void triangle_s_nt_nz(UINT32 w1, UINT32 w2)
 }
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues
 
 static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 {
@@ -1614,6 +1510,8 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 	int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0;
 	int tilenum;
 	int flip = (w1 & 0x800000) ? 1 : 0;
+	int sign = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
 
 	INT32 yl, ym, yh;
 	INT32 xl, xm, xh;
@@ -1641,7 +1539,6 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 
 	int drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0, dzdxh = 0;
 
-	int m_inc;
 	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
@@ -1779,13 +1676,6 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 		dreoff = dgeoff = dbeoff = daeoff = dzeoff = 0;
 	}
 
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
 	drdxh = drdx >> 8;
 	dgdxh = dgdx >> 8;
 	dbdxh = dbdx >> 8;
@@ -1809,14 +1699,17 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 			z += dzde; \
 }
 
-	m_inc = flip ? 1 : -1;
-
 	ycur =	yh & ~3;
 	ylfar = yl | 3;
 	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
 	yhpix = yh >> 2;
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
+
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
 	for (k = ycur; k <= ylfar; k++)
 	{
@@ -1831,11 +1724,10 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 		j = k >> 2;
 		spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		//if (k >= 0 && k < 0x1000)
 		{
 			int m = 0;
 			int n = 0;
-			int length = 0;
 			min = 0; max = 3;
 			if (j == yhpix)
 			{
@@ -1875,7 +1767,7 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 				}
 			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+			int length = (xend - xstart) * sign;
 
 			if (spix == ldflag)
 			{
@@ -1934,7 +1826,7 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 						span[j].cvg[m] += 2;
 					}
 
-					m += m_inc;
+					m += inv_sign;
 				}
 			}
 		}
@@ -1964,9 +1856,6 @@ static void triangle_s_nt_z(UINT32 w1, UINT32 w2)
 }
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues
 
 static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 {
@@ -1980,6 +1869,8 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 	int drde = 0, dgde = 0, dbde = 0, dade = 0, dsde = 0, dtde = 0, dwde = 0;
 	int tilenum;
 	int flip = (w1 & 0x800000) ? 1 : 0;
+	int sign = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
 
 	INT32 yl, ym, yh;
 	INT32 xl, xm, xh;
@@ -2007,7 +1898,6 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 
 	int dsdxh = 0, dtdxh = 0, dwdxh = 0, drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0;
 
-	int m_inc;
 	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
@@ -2168,13 +2058,6 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 		dseoff = dteoff = dweoff = dreoff = dgeoff = dbeoff = daeoff = 0;
 	}
 
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
 	dsdxh = dsdx >> 8;
 	dtdxh = dtdx >> 8;
 	dwdxh = dwdx >> 8;
@@ -2204,14 +2087,17 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 			a += dade; \
 }
 
-	m_inc = flip ? 1 : -1;
-
 	ycur =	yh & ~3;
 	ylfar = yl | 3;
 	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
 	yhpix = yh >> 2;
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
+
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
 	for (k = ycur; k <= ylfar; k++)
 	{
@@ -2226,11 +2112,10 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 		j = k >> 2;
 		spix = k & 3;
 
-		if (k >= 0 && k < 0x1000)
+		//if (k >= 0 && k < 0x1000)
 		{
 			int m = 0;
 			int n = 0;
-			int length = 0;
 			min = 0; max = 3;
 			if (j == yhpix)
 			{
@@ -2270,7 +2155,7 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 				}
 			}
 
-			length = flip ? (xstart - xend) : (xend - xstart);
+			int length = (xend - xstart) * sign;
 
 			if (spix == ldflag)
 			{
@@ -2329,7 +2214,7 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 						span[j].cvg[m] += 2;
 					}
 
-					m += m_inc;
+					m += inv_sign;
 				}
 			}
 		}
@@ -2359,9 +2244,6 @@ static void triangle_s_t_nz(UINT32 w1, UINT32 w2)
 }
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues
 
 static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 {
@@ -2375,6 +2257,8 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 	int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0, dsde = 0, dtde = 0, dwde = 0;
 	int tilenum;
 	int flip = (w1 & 0x800000) ? 1 : 0;
+	int sign = (w1 & 0x800000) ? -1 : 1;
+	int inv_sign = (w1 & 0x800000) ?  1 : -1;
 
 	INT32 yl, ym, yh;
 	INT32 xl, xm, xh;
@@ -2403,7 +2287,6 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 
 	int dsdxh = 0, dtdxh = 0, dwdxh = 0, drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0, dzdxh = 0;
 
-	int m_inc;
 	UINT32 min=0, max=3;
 	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
@@ -2576,13 +2459,6 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 		dseoff = dteoff = dweoff = dreoff = dgeoff = dbeoff = daeoff = dzeoff = 0;
 	}
 
-#define addleft(x) addleftcvg(x,k)
-#define addright(x) addrightcvg(x,k)
-#define setvalues() {					\
-			addvalues();				\
-			adjust_attr();	\
-}
-
 	dsdxh = dsdx >> 8;
 	dtdxh = dtdx >> 8;
 	dwdxh = dwdx >> 8;
@@ -2615,14 +2491,17 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 			z += dzde; \
 }
 
-	m_inc = flip ? 1 : -1;
-
 	ycur =	yh & ~3;
 	ylfar = yl | 3;
 	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
 	yhpix = yh >> 2;
 	ympix = ym >> 2;
 	ylpix = yl >> 2;
+
+	if(ylfar >= 0x1000)
+	{
+		ylfar = 0x0fff;
+	}
 
 	if(flip)
 	{
@@ -2639,11 +2518,10 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 			j = k >> 2;
 			spix = k & 3;
 
-			if (k >= 0 && k < 0x1000)
+			//if (k >= 0 && k < 0x1000)
 			{
 				int m = 0;
 				int n = 0;
-				int length = 0;
 				min = 0; max = 3;
 				if (j == yhpix)
 				{
@@ -2675,7 +2553,7 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 					span[j].rx = minxhx;
 				}
 
-				length = xstart - xend;
+				int length = (xend - xstart) * sign;
 
 				if (spix == ldflag)
 				{
@@ -2713,7 +2591,7 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 							span[j].cvg[m] += 2;
 						}
 
-						m += m_inc;
+						m += inv_sign;
 					}
 				}
 			}
@@ -2745,7 +2623,6 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 			{
 				int m = 0;
 				int n = 0;
-				int length = 0;
 				min = 0; max = 3;
 				if (j == yhpix)
 				{
@@ -2777,7 +2654,7 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 					span[j].rx = maxxhx;
 				}
 
-				length = xend - xstart;
+				int length = (xend - xstart) * sign;
 
 				if (spix == ldflag)
 				{
@@ -2815,7 +2692,7 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 							span[j].cvg[m] += 2;
 						}
 
-						m += m_inc;
+						m += inv_sign;
 					}
 				}
 			}
@@ -2844,8 +2721,6 @@ static void triangle_s_t_z(UINT32 w1, UINT32 w2)
 		default: break; // V-Rally2 does this, fb_size=0
 	}
 }
+
 #undef addvalues
 #undef adjust_attr
-#undef addleft
-#undef addright
-#undef setvalues

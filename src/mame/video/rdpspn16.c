@@ -769,10 +769,6 @@
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
 #endif
 
-	int i, j;
-
-	int clipx1, clipx2, clipy1, clipy2;
-
 #if defined(SHADE)
 	SPAN_PARAM dr = span[0].dr;
 	SPAN_PARAM dg = span[0].dg;
@@ -828,11 +824,6 @@
 	}
 #endif
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
 #if defined(TEXTURE)
 	calculate_clamp_diffs(tex_tile->num);
 
@@ -847,21 +838,21 @@
 	}
 #endif
 
-	if (start < clipy1)
+	if (start < clip.yh)
 	{
-		start = clipy1;
+		start = clip.yh;
 	}
-	if (start >= clipy2)
+	if (start >= clip.yl)
 	{
-		start = clipy2 - 1;
+		start = clip.yl - 1;
 	}
-	if (end < clipy1)
+	if (end < clip.yh)
 	{
-		end = clipy1;
+		end = clip.yh;
 	}
-	if (end >= clipy2) // Needed by 40 Winks
+	if (end >= clip.yl) // Needed by 40 Winks
 	{
-		end = clipy2 - 1;
+		end = clip.yl - 1;
 	}
 
 #if !defined(SHADE)
@@ -870,15 +861,11 @@
 
 	CACHE_TEXTURE_PARAMS(tex_tile);
 
-	for (i = start; i <= end; i++)
+	for (int i = start; i <= end; i++)
 	{
-		int xstart = span[i].lx;
-		int xend = span[i].rx;
-
-		int x;
+		int x = span[i].rx;
 
 		int fb_index = fb_width * i;
-		int length;
 
 #if defined(SHADE)
 		SPAN_PARAM r = span[i].r;
@@ -895,15 +882,13 @@
 		SPAN_PARAM z = span[i].z;
 #endif
 
-		x = xend;
-
 #if defined(FLIP)
-		length = (xstart - xend);
+		int length = (span[i].lx - span[i].rx);
 #else
-		length = (xend - xstart);
+		int length = (span[i].rx - span[i].lx);
 #endif
 
-		for (j = 0; j <= length; j++)
+		for (int j = 0; j <= length; j++)
 		{
 #if defined(SHADE)
 			int sr = r.h.h;
@@ -931,7 +916,7 @@
 			}
 #endif
 
-			if (x >= clipx1 && x < clipx2)
+			if (x >= clip.xh && x < clip.xl)
 			{
 #if defined(ZCOMPARE)
 				int z_compare_result = 1;
@@ -994,7 +979,6 @@
 #endif
 					{
 #if defined(ZUPDATE)
-						int rendered = 0;
 #endif
 #if defined(MAGICDITHER)
 						int dith = magic_matrix[(((i) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
@@ -1004,9 +988,9 @@
 
 #if defined(ZUPDATE)
 #if defined(MAGICDITHER) || defined(BAYERDITHER)
-						rendered = BLENDER1_16_DITH(fbcur, hbcur, c1, dith);
+						int rendered = BLENDER1_16_DITH(fbcur, hbcur, c1, dith);
 #else
-						rendered = BLENDER1_16_NDITH(fbcur, hbcur, c1);
+						int rendered = BLENDER1_16_NDITH(fbcur, hbcur, c1);
 #endif
 
 						if (rendered)
@@ -1819,10 +1803,6 @@
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
 #endif
 
-	int i, j;
-
-	int clipx1, clipx2, clipy1, clipy2;
-
 #if defined(SHADE)
 	SPAN_PARAM dr = span[0].dr;
 	SPAN_PARAM dg = span[0].dg;
@@ -1847,14 +1827,9 @@
 	TILE *tex_tile2 = NULL;
 	int tilenum;
 
-	int LOD = 0;
-	INT32 horstep, vertstep;
-	INT32 l_tile;
-	UINT32 magnify = 0;
-	UINT32 distant = 0;
-
-	int nexts, nextt, nextsw;
-	int lodclamp = 0;
+	int nexts;// = 0;
+	int nextt;// = 0;
+	int nextsw;// = 0;
 
 	SPAN_PARAM ds = span[0].ds;
 	SPAN_PARAM dt = span[0].dt;
@@ -1900,36 +1875,29 @@
 	}
 #endif
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
-	if (start < clipy1)
+	if (start < clip.yh)
 	{
-		start = clipy1;
+		start = clip.yh;
 	}
-	if (start >= clipy2)
+	if (start >= clip.yl)
 	{
-		start = clipy2 - 1;
+		start = clip.yl - 1;
 	}
-	if (end < clipy1)
+	if (end < clip.yh)
 	{
-		end = clipy1;
+		end = clip.yh;
 	}
-	if (end >= clipy2) // Needed by 40 Winks
+	if (end >= clip.yl) // Needed by 40 Winks
 	{
-		end = clipy2 - 1;
+		end = clip.yl - 1;
 	}
 
 #if !defined(SHADE)
 	shade_color.c = prim_color.c;
 #endif
 
-	for (i = start; i <= end; i++)
+	for (int i = start; i <= end; i++)
 	{
-		int xstart = span[i].lx;
-		int xend = span[i].rx;
 #if defined(SHADE)
 		SPAN_PARAM r = span[i].r;
 		SPAN_PARAM g = span[i].g;
@@ -1945,20 +1913,16 @@
 		SPAN_PARAM z = span[i].z;
 #endif
 
-		int x;
-
 		int fb_index = fb_width * i;
-		int length;
-
-		x = xend;
+		int x = span[i].rx;
 
 #if defined(FLIP)
-		length = (xstart - xend);
+		int length = (span[i].lx - span[i].rx);
 #else
-		length = (xend - xstart);
+		int length = (span[i].rx - span[i].lx);
 #endif
 
-		for (j = 0; j <= length; j++)
+		for (int j = 0; j <= length; j++)
 		{
 #if defined(SHADE)
 			int sr = r.h.h;
@@ -1987,7 +1951,7 @@
 			}
 #endif
 
-			if (x >= clipx1 && x < clipx2)
+			if (x >= clip.xh && x < clip.xl)
 			{
 #if defined(ZCOMPARE)
 				int z_compare_result = 1;
@@ -2046,10 +2010,10 @@
 							nextt = (t.w + dtinc)>>16;
 						}
 
-						lodclamp = 0;
+						int lodclamp = 0;
 
-						horstep = SIGN17(nexts & 0x1ffff) - SIGN17(sss & 0x1ffff);
-						vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(sst & 0x1ffff);
+						INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(sss & 0x1ffff);
+						INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(sst & 0x1ffff);
 						if (horstep & 0x20000)
 						{
 							horstep = ~horstep & 0x1ffff;
@@ -2058,7 +2022,7 @@
 						{
 							vertstep = ~vertstep & 0x1ffff;
 						}
-						LOD = ((horstep >= vertstep) ? horstep : vertstep);
+						int LOD = ((horstep >= vertstep) ? horstep : vertstep);
 						LOD = (LOD >= span[0].dymax) ? LOD : span[0].dymax;
 
 						if ((LOD & 0x1c000) || lodclamp)
@@ -2070,9 +2034,9 @@
 							LOD = min_level;
 						}
 
-						magnify = (LOD < 32) ? 1: 0;
-						l_tile = getlog2((LOD >> 5) & 0xff);
-						distant = ((LOD & 0x6000) || (l_tile >= max_level)) ? 1 : 0;
+						bool magnify = (LOD < 32);
+						INT32 l_tile = getlog2((LOD >> 5) & 0xff);
+						bool distant = ((LOD & 0x6000) || (l_tile >= max_level));
 
 						lod_frac = ((LOD << 3) >> l_tile) & 0xff;
 
