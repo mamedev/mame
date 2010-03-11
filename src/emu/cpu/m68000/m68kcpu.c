@@ -540,6 +540,17 @@ static const cpu_state_entry state_array[] =
 
 	M68K_STATE_ENTRY(CACR, "%08X", cacr, 0xffffffff, 0, MASK_020_OR_LATER)
 	M68K_STATE_ENTRY(CAAR, "%08X", caar, 0xffffffff, 0, MASK_020_OR_LATER)
+
+	M68K_STATE_ENTRY(FP0, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP1, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP2, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP3, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP4, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP5, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP6, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FP7, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FPSR, "%08X", fpsr, 0xffffffff, 0, MASK_040_OR_LATER)
+	M68K_STATE_ENTRY(FPCR, "%08X", fpcr, 0xffffffff, 0, MASK_040_OR_LATER)
 };
 
 static const cpu_state_table state_table_template =
@@ -847,6 +858,16 @@ static CPU_EXPORT_STATE( m68k )
 			m68k->iotemp = (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP;
 			break;
 
+		case M68K_FP0:
+		case M68K_FP1:
+		case M68K_FP2:
+		case M68K_FP3:
+		case M68K_FP4:
+		case M68K_FP5:
+		case M68K_FP6:
+		case M68K_FP7:
+			break;
+
 		default:
 			fatalerror("CPU_EXPORT_STATE(m68k) called for unexpected value\n");
 			break;
@@ -870,6 +891,47 @@ static CPU_SET_INFO( m68k )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
 			set_irq_line(m68k, state - CPUINFO_INT_INPUT_STATE, info->i);
 			break;
+	}
+}
+
+static CPU_EXPORT_STRING( m68k )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	switch (entry->index)
+	{
+		case M68K_FP0:
+			sprintf(string, "%f", REG_FP[0].f);
+			break;
+
+		case M68K_FP1:
+			sprintf(string, "%f", REG_FP[1].f);
+			break;
+
+		case M68K_FP2:
+			sprintf(string, "%f", REG_FP[2].f);
+			break;
+
+		case M68K_FP3:
+			sprintf(string, "%f", REG_FP[3].f);
+			break;
+
+		case M68K_FP4:
+			sprintf(string, "%f", REG_FP[4].f);
+			break;
+
+		case M68K_FP5:
+			sprintf(string, "%f", REG_FP[5].f);
+			break;
+
+		case M68K_FP6:
+			sprintf(string, "%f", REG_FP[6].f);
+			break;
+
+		case M68K_FP7:
+			sprintf(string, "%f", REG_FP[7].f);
+			break;
+
 	}
 }
 
@@ -913,6 +975,7 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(m68k);			break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(m68k);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(m68k);		break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(m68k);		break;
 		case CPUINFO_FCT_TRANSLATE:	    	info->translate = CPU_TRANSLATE_NAME(m68k);		break;
 
 		/* --- the following bits of info are returned as pointers --- */
