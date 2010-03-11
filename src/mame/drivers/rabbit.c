@@ -32,7 +32,7 @@ Notes:
 
 (1) This is currently in it's own driver "tmmjprd.c" because it uses the
     chip in a completely different way to Rabbit.  They should be merged
-	again later, once the chip is better understood.
+    again later, once the chip is better understood.
 
 
 */

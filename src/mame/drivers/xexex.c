@@ -620,7 +620,7 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "xexex.nv", 0x0000, 0x080, CRC(155624cc) SHA1(457f921e3a5d053c53e4f1a44941eb0a1f22e1b2) )	
+	ROM_LOAD( "xexex.nv", 0x0000, 0x080, CRC(155624cc) SHA1(457f921e3a5d053c53e4f1a44941eb0a1f22e1b2) )
 ROM_END
 
 ROM_START( xexexa ) /* Asia, Version AA */
@@ -652,7 +652,7 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "xexexa.nv", 0x0000, 0x080, CRC(051c14c6) SHA1(23addbaa2ce323c06551b343ca45dea4fd2b9eee) )		
+	ROM_LOAD( "xexexa.nv", 0x0000, 0x080, CRC(051c14c6) SHA1(23addbaa2ce323c06551b343ca45dea4fd2b9eee) )
 ROM_END
 
 ROM_START( xexexj ) /* Japan, Version AA */
@@ -684,7 +684,7 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "xexexj.nv", 0x0000, 0x080, CRC(79a79c7b) SHA1(02eb235226949af0147d6d0fd2bd3d7a68083ae6) )			
+	ROM_LOAD( "xexexj.nv", 0x0000, 0x080, CRC(79a79c7b) SHA1(02eb235226949af0147d6d0fd2bd3d7a68083ae6) )
 ROM_END
 
 

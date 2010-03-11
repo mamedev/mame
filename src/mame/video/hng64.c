@@ -1129,7 +1129,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
         */
 		//if ((tileregs&0xf000) == 0x1000)
 		//{
-		//	popmessage("Floor is Active");
+		//  popmessage("Floor is Active");
 		//}
 		int line;
 		rectangle clip;
@@ -1146,19 +1146,19 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
 			/* logic would dictate that this should be the 'complex' scroll register layout,
-			   but per-line.  That doesn't work however.
+               but per-line.  That doesn't work however.
 
-			   You only have line data for the number of lines on the screen, not enough for
-			   the complex register layout
-			   
-			   HOWEVER, using the code below doesn't work either.  This might be because
-			   they have mosaic turned on, and it adopts a new meaning in linescroll modes?
+               You only have line data for the number of lines on the screen, not enough for
+               the complex register layout
 
-			   The code below could also be wrong, and rowscroll simply acts the same in all
-			   modes, this is hard to know because ss64_2 barely uses it.
+               HOWEVER, using the code below doesn't work either.  This might be because
+               they have mosaic turned on, and it adopts a new meaning in linescroll modes?
 
-			*/
-		
+               The code below could also be wrong, and rowscroll simply acts the same in all
+               modes, this is hard to know because ss64_2 barely uses it.
+
+            */
+
 			popmessage("Unhandled rowscroll %02x", tileregs>>12);
 		}
 		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
@@ -1170,9 +1170,9 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 				if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
 				{
 					/* If this bit is active the scroll registers don't seem valid at all?
-					   It either disables zooming, or disables use of the scroll registers completely
-					   - used at startup
-				   */
+                       It either disables zooming, or disables use of the scroll registers completely
+                       - used at startup
+                   */
 
 					xtopleft = 0;
 					xmiddle = 256<<16;
@@ -1450,8 +1450,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 
     // mmmm dbr? ??e? ????
     // m = mosaic related?
-	//  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
-	//     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
+    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
+    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
     // r = tile size (seems correct)
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
     // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2

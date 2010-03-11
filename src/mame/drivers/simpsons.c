@@ -390,7 +390,7 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "simpsons.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )					
+	ROM_LOAD( "simpsons.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
 ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
@@ -420,7 +420,7 @@ ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "simpsons4pa.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )						
+	ROM_LOAD( "simpsons4pa.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
 
@@ -451,7 +451,7 @@ ROM_START( simpsons2p ) /* World 2 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "simpsons2p.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )							
+	ROM_LOAD( "simpsons2p.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( simpsons2p2 ) /* World 2 Player, alt */
@@ -481,7 +481,7 @@ ROM_START( simpsons2p2 ) /* World 2 Player, alt */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "simpsons2p2.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )								
+	ROM_LOAD( "simpsons2p2.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( simpsons2pa ) /* Asia 2 Player */
@@ -511,7 +511,7 @@ ROM_START( simpsons2pa ) /* Asia 2 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "simpsons2pa.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )									
+	ROM_LOAD( "simpsons2pa.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( simpsons2pj ) /* Japan 2 Player */
@@ -541,7 +541,7 @@ ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "simpsons2pj.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )										
+	ROM_LOAD( "simpsons2pj.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
 
 /***************************************************************************

@@ -383,10 +383,10 @@ static WRITE8_HANDLER( magical_outb850_w )
 	// guess, could be wrong, this might just be lights
 
 	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
-	
+
 	if (data&0x20)
 		state->tile_bank = 1;
-	else 
+	else
 		state->tile_bank = 0;
 
 	//popmessage("magical_outb850_w %02x\n", data);
@@ -397,7 +397,7 @@ static WRITE8_HANDLER( magical_outb850_w )
 
 static WRITE8_HANDLER( magical_outb860_w )
 {
-//	popmessage("magical_outb860_w %02x\n", data);
+//  popmessage("magical_outb860_w %02x\n", data);
 }
 
 static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -512,7 +512,7 @@ ADDRESS_MAP_END
 /*
 static READ8_HANDLER( unkch_unk_r )
 {
-	return 0xff;
+    return 0xff;
 }
 */
 
@@ -566,7 +566,7 @@ static WRITE8_HANDLER( unkcm_0x11_w )
 
 static WRITE8_HANDLER( unkcm_0x12_w )
 {
-//	popmessage("unkcm_0x12_w %02x", data);
+//  popmessage("unkcm_0x12_w %02x", data);
 }
 
 
@@ -6095,9 +6095,9 @@ static MACHINE_DRIVER_START( unkch )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-//	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-//	MDRV_SOUND_CONFIG(ay8910_config)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//  MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+//  MDRV_SOUND_CONFIG(ay8910_config)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cherrys )

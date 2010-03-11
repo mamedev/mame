@@ -43,7 +43,7 @@
 
   - PLDs: 1x PEEL 18CV8P. (u33)
           1x PALCE22V10H. (u43)
-		  2x PALCE16V6Q.  (u13, u14)
+          2x PALCE16V6Q.  (u13, u14)
 
   - PROM: 1x Fairchild Semiconductor DM74S287AN. (u32)
 
@@ -147,7 +147,7 @@
   | |o|o|o|o|o| | | | |   | |o| | | | |o|o|o| |   | |o| |o|o| |o|o|o| |   | |o|o|o|o| |
   | +---------------+ |   | +---------------+ |   | +---------------+ |   | +-------+ |
   |  1 2 3 4 5 6 7 8  |   |  1 2 3 4 5 6 7 8  |   |  1 2 3 4 5 6 7 8  |   |  1 2 3 4  |
-  +-------------------+   +-------------------+   +-------------------+   +-----------+     
+  +-------------------+   +-------------------+   +-------------------+   +-----------+
 
 
 *******************************************************************************
@@ -213,61 +213,61 @@
 
   DIP Switches Settings:
 
-  DIP SW.1	Win-Up "7" Rate		1		2
-			Lowest				on		on
-			Low					off		on
-			Medium				on		off
-			High				off		off
+  DIP SW.1  Win-Up "7" Rate     1       2
+            Lowest              on      on
+            Low                 off     on
+            Medium              on      off
+            High                off     off
 
-			Two Pair			3
-			High				on	
-			Low					off
+            Two Pair            3
+            High                on
+            Low                 off
 
-			One Joker Rate		5		6
-			Lowest				on		on
-			Low					on		off
-			Medium				off		on
-			High				off		off
-				
-			Three of a kind		7
-			High				on
-			Low					off
+            One Joker Rate      5       6
+            Lowest              on      on
+            Low                 on      off
+            Medium              off     on
+            High                off     off
 
-  DIP SW.2	Key In				1		2
-			10					on		on
-			20					on		off
-			50					off		on
-			100					off		off
+            Three of a kind     7
+            High                on
+            Low                 off
 
-  DIP SW.3	2 Jokers Rate		1		8
-			Lowest				on		on
-			Low					on 		off
-			Medium				off		on
-			High				off		off
-				
-			3,4,5 Jokers Rate	2		3
-			Lowest				on		on
-			Low					off		on
-			Medium				on		off
-			High				off		off
+  DIP SW.2  Key In              1       2
+            10                  on      on
+            20                  on      off
+            50                  off     on
+            100                 off     off
 
-			Max Bet				4		5
-			80					on		on
-			40					on		off
-			50					off		on
-			10					off		off
+  DIP SW.3  2 Jokers Rate       1       8
+            Lowest              on      on
+            Low                 on      off
+            Medium              off     on
+            High                off     off
 
-  DIP SW.4	"J" Pair			1
-			Win					on
-			Lose				off
+            3,4,5 Jokers Rate   2       3
+            Lowest              on      on
+            Low                 off     on
+            Medium              on      off
+            High                off     off
 
-			Pay Mode			2
-			Key out				on
-			Coin out			off
+            Max Bet             4       5
+            80                  on      on
+            40                  on      off
+            50                  off     on
+            10                  off     off
 
-			Coin				3
-			1 Coin 1 Credit		on
-			1 Coin 10 Credit	off
+  DIP SW.4  "J" Pair            1
+            Win                 on
+            Lose                off
+
+            Pay Mode            2
+            Key out             on
+            Coin out            off
+
+            Coin                3
+            1 Coin 1 Credit     on
+            1 Coin 10 Credit    off
 
 
 
@@ -275,7 +275,7 @@
   ---------------
 
   Settings Table:
-	
+
   -----+-----------------+-----------+-------------------------------------
   Loc. |    Function     | Val.Range |      Comment
   -----+-----------------+-----------+-------------------------------------
@@ -317,37 +317,37 @@
 
   Suggestion One:
 
-	Dip.Sw. Setting
-	Dip.Sw. 2	3=On	4=On	Others=Off
-	Dip.Sw. 3	2=On	4=On	Others=Off
-	
-	Chance Setting
-	A	B	C	D	E	F	G	H	I	J
-	1	2	2	4	6	7	8	8	8	0
-	5	10	20	40	40	-	-	-	-	-					
+    Dip.Sw. Setting
+    Dip.Sw. 2   3=On    4=On    Others=Off
+    Dip.Sw. 3   2=On    4=On    Others=Off
+
+    Chance Setting
+    A   B   C   D   E   F   G   H   I   J
+    1   2   2   4   6   7   8   8   8   0
+    5   10  20  40  40  -   -   -   -   -
 
 
   Suggestion Two:
 
-	Dip.Sw. Setting
-	Dip.Sw. 2	4=On	7=On	Others=Off
-	Dip.Sw. 3	2=On	4=On	Others=Off
-	
-	Chance Setting
-	A	B	C	D	E	F	G	H	I	J
-	1	2	2	3	5	6	6	7	8	0
-	5	10	20	40	40	-	-	-	-	-					
+    Dip.Sw. Setting
+    Dip.Sw. 2   4=On    7=On    Others=Off
+    Dip.Sw. 3   2=On    4=On    Others=Off
+
+    Chance Setting
+    A   B   C   D   E   F   G   H   I   J
+    1   2   2   3   5   6   6   7   8   0
+    5   10  20  40  40  -   -   -   -   -
 
 
 *******************************************************************************
 
-	Keyboard Matrix 
-	---------------
+    Keyboard Matrix
+    ---------------
 
-	Com. A		Bet			Record		W-Up		Start		N/U
-	Com. B		Payout		Keyout		Small		Big			Collect
-	Com. C		Hold 1		Hold 2		Hold 3		Hold 4		Hold 5	
-	Com. D		Key In		Coin		Setting		N/U			N/U
+    Com. A      Bet         Record      W-Up        Start       N/U
+    Com. B      Payout      Keyout      Small       Big         Collect
+    Com. C      Hold 1      Hold 2      Hold 3      Hold 4      Hold 5
+    Com. D      Key In      Coin        Setting     N/U         N/U
 
 
 *******************************************************************************
@@ -605,7 +605,7 @@ static WRITE8_DEVICE_HANDLER( trigsnd_w )
 {
 	/************ Interrupts trigger **************
 
-	Writes 0x07 & 0x0F each time a sound is triggered through $D800 */
+    Writes 0x07 & 0x0F each time a sound is triggered through $D800 */
 
 	if ( (data & 0x0f) == 0x07 )
 	{
@@ -771,8 +771,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fcaudio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(snd_800_w) 
-	AM_RANGE(0x0a02, 0x0a02) AM_WRITE(snd_a02_w) 
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(snd_800_w)
+	AM_RANGE(0x0a02, 0x0a02) AM_WRITE(snd_a02_w)
 	AM_RANGE(0x0c04, 0x0c04) AM_DEVWRITE("oki6295", okim6295_w)
 	AM_RANGE(0x0c06, 0x0c06) AM_DEVREAD("oki6295", okim6295_r)
 	AM_RANGE(0x0e06, 0x0e06) AM_READ(snd_e06_r)
@@ -798,7 +798,7 @@ static INPUT_PORTS_START( fclown )
 
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )	PORT_NAME("Collect")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )	PORT_NAME("Big")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )		PORT_NAME("Small")
@@ -977,14 +977,14 @@ static const mc6845_interface mc6845_intf =
 
 static const pia6821_interface fclown_pia0_intf =
 {
-	DEVCB_HANDLER(mux_port_r),	/* Port A IN		Multiplexed Ports read */
-	DEVCB_HANDLER(pia0_b_r),	/* Port B IN		unknown (used) */
+	DEVCB_HANDLER(mux_port_r),	/* Port A IN        Multiplexed Ports read */
+	DEVCB_HANDLER(pia0_b_r),	/* Port B IN        unknown (used) */
 	DEVCB_NULL,					/* Line CA1 IN */
 	DEVCB_NULL,					/* Line CB1 IN */
 	DEVCB_NULL,					/* Line CA2 IN */
 	DEVCB_NULL,					/* Line CA2 IN */
-	DEVCB_NULL,					/* Port A OUT		NULL */
-	DEVCB_HANDLER(counters_w),	/* Port B OUT		Counters */
+	DEVCB_NULL,					/* Port A OUT       NULL */
+	DEVCB_HANDLER(counters_w),	/* Port B OUT       Counters */
 	DEVCB_NULL,					/* Line CA2 OUT */
 	DEVCB_NULL,					/* Line CB2 OUT */
 	DEVCB_NULL,					/* IRQA */
@@ -993,14 +993,14 @@ static const pia6821_interface fclown_pia0_intf =
 
 static const pia6821_interface fclown_pia1_intf =
 {
-	DEVCB_INPUT_PORT("SW4"),	/* Port A IN		4th DIP Switchs bank */
-	DEVCB_HANDLER(pia1_b_r),	/* Port B IN		Check bit 2 to allow key out system to work */
+	DEVCB_INPUT_PORT("SW4"),	/* Port A IN        4th DIP Switchs bank */
+	DEVCB_HANDLER(pia1_b_r),	/* Port B IN        Check bit 2 to allow key out system to work */
 	DEVCB_NULL,					/* Line CA1 IN */
 	DEVCB_NULL,					/* Line CB1 IN */
 	DEVCB_NULL,					/* Line CA2 IN */
 	DEVCB_NULL,					/* Line CB2 IN */
-	DEVCB_HANDLER(trigsnd_w),	/* Port A OUT		Trigger the audio CPU interrupts */
-	DEVCB_HANDLER(mux_w),		/* Port B OUT		Multiplexed Ports selector */
+	DEVCB_HANDLER(trigsnd_w),	/* Port A OUT       Trigger the audio CPU interrupts */
+	DEVCB_HANDLER(mux_w),		/* Port B OUT       Multiplexed Ports selector */
 	DEVCB_NULL,					/* Line CA2 OUT */
 	DEVCB_NULL,					/* Line CB2 OUT */
 	DEVCB_NULL,					/* IRQA */

@@ -1157,7 +1157,7 @@ ROM_START( mystwarr )
 	ROM_LOAD( "128a07.1d", 0x200000, 2*1024*1024, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mystwarr.nv", 0x0000, 0x080, CRC(28df2269) SHA1(3f071c97662745a199f96964e2e79f795bd5a391) )	
+	ROM_LOAD( "mystwarr.nv", 0x0000, 0x080, CRC(28df2269) SHA1(3f071c97662745a199f96964e2e79f795bd5a391) )
 ROM_END
 
 ROM_START( mystwarru )
@@ -1197,7 +1197,7 @@ ROM_START( mystwarru )
 	ROM_LOAD( "128a07.1d", 0x200000, 2*1024*1024, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mystwarru.nv", 0x0000, 0x080, CRC(1a2597c7) SHA1(3d85817fe42776c862a5930b8ad131443bc0172e) )	
+	ROM_LOAD( "mystwarru.nv", 0x0000, 0x080, CRC(1a2597c7) SHA1(3d85817fe42776c862a5930b8ad131443bc0172e) )
 ROM_END
 
 ROM_START( mystwarrj )
@@ -1237,7 +1237,7 @@ ROM_START( mystwarrj )
 	ROM_LOAD( "128a07.1d", 0x200000, 2*1024*1024, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mystwarrj.nv", 0x0000, 0x080, CRC(8e259918) SHA1(5eb46b0d96278648e8d2e84304d9bccd8dd68430) )	
+	ROM_LOAD( "mystwarrj.nv", 0x0000, 0x080, CRC(8e259918) SHA1(5eb46b0d96278648e8d2e84304d9bccd8dd68430) )
 ROM_END
 
 ROM_START( viostorm )
@@ -1272,7 +1272,7 @@ ROM_START( viostorm )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "viostorm.nv", 0x0000, 0x080, CRC(28b5fe49) SHA1(0ef51ae4b012a7d680543747fd4b6dd9dfb5f560) )	
+	ROM_LOAD( "viostorm.nv", 0x0000, 0x080, CRC(28b5fe49) SHA1(0ef51ae4b012a7d680543747fd4b6dd9dfb5f560) )
 ROM_END
 
 ROM_START( viostormu )
@@ -1307,7 +1307,7 @@ ROM_START( viostormu )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "viostormu.nv", 0x0000, 0x080, CRC(797042a1) SHA1(f33eb8b1b21f3d41372694fa6297bc2cc802c2eb) )	
+	ROM_LOAD( "viostormu.nv", 0x0000, 0x080, CRC(797042a1) SHA1(f33eb8b1b21f3d41372694fa6297bc2cc802c2eb) )
 ROM_END
 
 ROM_START( viostormub )
@@ -1342,7 +1342,7 @@ ROM_START( viostormub )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "viostormub.nv", 0x0000, 0x080, CRC(b6937413) SHA1(eabc2ea661201f5ed42ab541aee765480bbdd5bc) )	
+	ROM_LOAD( "viostormub.nv", 0x0000, 0x080, CRC(b6937413) SHA1(eabc2ea661201f5ed42ab541aee765480bbdd5bc) )
 ROM_END
 
 ROM_START( viostorma )
@@ -1377,7 +1377,7 @@ ROM_START( viostorma )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "viostorma.nv", 0x0000, 0x080, CRC(2cfbf966) SHA1(fb9c4a47bac20a7f820a1fa178fc9f9079101cb8) )	
+	ROM_LOAD( "viostorma.nv", 0x0000, 0x080, CRC(2cfbf966) SHA1(fb9c4a47bac20a7f820a1fa178fc9f9079101cb8) )
 ROM_END
 
 ROM_START( viostormj )
@@ -1412,7 +1412,7 @@ ROM_START( viostormj )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "viostormj.nv", 0x0000, 0x080, CRC(32f5d8bc) SHA1(0c486ce80b62bfaf4f3c0be7653c0beaf4cfafbd) )	
+	ROM_LOAD( "viostormj.nv", 0x0000, 0x080, CRC(32f5d8bc) SHA1(0c486ce80b62bfaf4f3c0be7653c0beaf4cfafbd) )
 ROM_END
 
 ROM_START( metamrph )
@@ -1450,7 +1450,7 @@ ROM_START( metamrph )
 	ROM_LOAD( "224a07", 0x200000, 1*1024*1024, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "metamrph.nv", 0x0000, 0x080, CRC(2c51229a) SHA1(7f056792cc44ec3d4aacc33c825ab796a913488e) )	
+	ROM_LOAD( "metamrph.nv", 0x0000, 0x080, CRC(2c51229a) SHA1(7f056792cc44ec3d4aacc33c825ab796a913488e) )
 ROM_END
 
 ROM_START( metamrphu )
@@ -1488,7 +1488,7 @@ ROM_START( metamrphu )
 	ROM_LOAD( "224a07", 0x200000, 1*1024*1024, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "metamrphu.nv", 0x0000, 0x080, CRC(1af2f855) SHA1(5f2fbb172f56867ee6f782cda8da65451b02435e) )	
+	ROM_LOAD( "metamrphu.nv", 0x0000, 0x080, CRC(1af2f855) SHA1(5f2fbb172f56867ee6f782cda8da65451b02435e) )
 ROM_END
 
 ROM_START( metamrphj )
@@ -1526,7 +1526,7 @@ ROM_START( metamrphj )
 	ROM_LOAD( "224a07", 0x200000, 1*1024*1024, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "metamrphj.nv", 0x0000, 0x080, CRC(30497478) SHA1(60acfbd25ac29c7b5a2571e274704205fc64424a) )		
+	ROM_LOAD( "metamrphj.nv", 0x0000, 0x080, CRC(30497478) SHA1(60acfbd25ac29c7b5a2571e274704205fc64424a) )
 ROM_END
 
 ROM_START( mtlchamp )
@@ -1563,7 +1563,7 @@ ROM_START( mtlchamp )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mtlchamp.nv", 0x0000, 0x080, CRC(cd47858e) SHA1(8effdcd631516d537f956509111cb3d4d18040db) )			
+	ROM_LOAD( "mtlchamp.nv", 0x0000, 0x080, CRC(cd47858e) SHA1(8effdcd631516d537f956509111cb3d4d18040db) )
 ROM_END
 
 ROM_START( mtlchamp1 )
@@ -1600,7 +1600,7 @@ ROM_START( mtlchamp1 )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mtlchamp1.nv", 0x0000, 0x080, CRC(202f6968) SHA1(38fc82a77896607c7fc09b75309f80048b52eb05) )			
+	ROM_LOAD( "mtlchamp1.nv", 0x0000, 0x080, CRC(202f6968) SHA1(38fc82a77896607c7fc09b75309f80048b52eb05) )
 ROM_END
 
 ROM_START( mtlchampa )
@@ -1637,7 +1637,7 @@ ROM_START( mtlchampa )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mtlchampa.nv", 0x0000, 0x080, CRC(79a6f420) SHA1(c2889bbb86a3f56d4f5544b6dadede0c715c59ca) )				
+	ROM_LOAD( "mtlchampa.nv", 0x0000, 0x080, CRC(79a6f420) SHA1(c2889bbb86a3f56d4f5544b6dadede0c715c59ca) )
 ROM_END
 
 ROM_START( mtlchampj )
@@ -1674,7 +1674,7 @@ ROM_START( mtlchampj )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mtlchampj.nv", 0x0000, 0x080, CRC(e311816f) SHA1(1e8ece157e6b3978d11bc9a4a6015c6004f7a375) )					
+	ROM_LOAD( "mtlchampj.nv", 0x0000, 0x080, CRC(e311816f) SHA1(1e8ece157e6b3978d11bc9a4a6015c6004f7a375) )
 ROM_END
 
 ROM_START( mtlchampu )
@@ -1711,7 +1711,7 @@ ROM_START( mtlchampu )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mtlchampu.nv", 0x0000, 0x080, CRC(f5d84df7) SHA1(a14dca3ca275a754f1f46eab220a24b77ada23a5) )						
+	ROM_LOAD( "mtlchampu.nv", 0x0000, 0x080, CRC(f5d84df7) SHA1(a14dca3ca275a754f1f46eab220a24b77ada23a5) )
 ROM_END
 
 ROM_START( gaiapols )
@@ -1759,7 +1759,7 @@ ROM_START( gaiapols )
 	ROM_LOAD( "123e15.2m", 0x200000, 2*1024*1024, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "gaiapols.nv", 0x0000, 0x080, CRC(44c78184) SHA1(19343b47b60bf4e212d844fce28e7a1bd54c7012) )							
+	ROM_LOAD( "gaiapols.nv", 0x0000, 0x080, CRC(44c78184) SHA1(19343b47b60bf4e212d844fce28e7a1bd54c7012) )
 ROM_END
 
 ROM_START( gaiapolsu )
@@ -1807,7 +1807,7 @@ ROM_START( gaiapolsu )
 	ROM_LOAD( "123e15.2m", 0x200000, 2*1024*1024, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "gaiapolsu.nv", 0x0000, 0x080, CRC(7ece27b6) SHA1(f0671c5e6db665c86afcef563ff1dbcbf083b380) )								
+	ROM_LOAD( "gaiapolsu.nv", 0x0000, 0x080, CRC(7ece27b6) SHA1(f0671c5e6db665c86afcef563ff1dbcbf083b380) )
 ROM_END
 
 ROM_START( gaiapolsj )
@@ -1855,7 +1855,7 @@ ROM_START( gaiapolsj )
 	ROM_LOAD( "123e15.2m", 0x200000, 2*1024*1024, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "gaiapolsj.nv", 0x0000, 0x080, CRC(c4b970df) SHA1(d4a24b4950ee33a832342c752c24b58e033d9240) )									
+	ROM_LOAD( "gaiapolsj.nv", 0x0000, 0x080, CRC(c4b970df) SHA1(d4a24b4950ee33a832342c752c24b58e033d9240) )
 ROM_END
 
 ROM_START( mmaulers )
@@ -1903,7 +1903,7 @@ ROM_START( mmaulers )
 	ROM_LOAD("170a15.2m", 0x200000, 2*1024*1024, CRC(d4113ae9) SHA1(e234d06f462e3db64455c384c2f42174f9ef9c6a) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "mmaulers.nv", 0x0000, 0x080, CRC(8324f517) SHA1(4697d091a1924e1a5d6c3ffc64a40fd36eebe557) )										
+	ROM_LOAD( "mmaulers.nv", 0x0000, 0x080, CRC(8324f517) SHA1(4697d091a1924e1a5d6c3ffc64a40fd36eebe557) )
 ROM_END
 
 ROM_START( dadandrn )
@@ -1951,7 +1951,7 @@ ROM_START( dadandrn )
 	ROM_LOAD("170a15.2m", 0x200000, 2*1024*1024, CRC(d4113ae9) SHA1(e234d06f462e3db64455c384c2f42174f9ef9c6a) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "dadandrn.nv", 0x0000, 0x080, CRC(346ae0cf) SHA1(1f79b2e21766f7a971c7d0f618700deb8a32f78a) )										
+	ROM_LOAD( "dadandrn.nv", 0x0000, 0x080, CRC(346ae0cf) SHA1(1f79b2e21766f7a971c7d0f618700deb8a32f78a) )
 ROM_END
 
 static DRIVER_INIT(metamrph)

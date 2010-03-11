@@ -367,7 +367,7 @@ ROM_START( gijoe )
 	ROM_LOAD( "069a04", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "gijoe.nv", 0x0000, 0x080, CRC(a0d50a79) SHA1(972533ea45a0e84d9dd14c55f58cd7247926792e) )					
+	ROM_LOAD( "gijoe.nv", 0x0000, 0x080, CRC(a0d50a79) SHA1(972533ea45a0e84d9dd14c55f58cd7247926792e) )
 ROM_END
 
 ROM_START( gijoeu )
@@ -394,7 +394,7 @@ ROM_START( gijoeu )
 	ROM_LOAD( "069a04", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "gijoeu.nv", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) )						
+	ROM_LOAD( "gijoeu.nv", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) )
 ROM_END
 
 ROM_START( gijoej )
@@ -421,7 +421,7 @@ ROM_START( gijoej )
 	ROM_LOAD( "069a04", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "gijoej.nv", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) )							
+	ROM_LOAD( "gijoej.nv", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) )
 ROM_END
 
 

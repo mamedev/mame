@@ -503,7 +503,7 @@ ROM_START( avengrgs )
 	ROM_LOAD( "mcg-14.6a",  0x400000, 0x200000, CRC(c0d8b5f0) SHA1(08eecf6e7d0273e41cda3472709a67e2b16068c9) ) // music
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "avengrgs.nv",  0x00, 0x80, CRC(c0e84b4e) SHA1(e7afca68cc5fa69ded32bc0a1dcc6a59fe7f081b) )	
+	ROM_LOAD( "avengrgs.nv",  0x00, 0x80, CRC(c0e84b4e) SHA1(e7afca68cc5fa69ded32bc0a1dcc6a59fe7f081b) )
 ROM_END
 
 ROM_START( avengrgsj )
@@ -534,7 +534,7 @@ ROM_START( avengrgsj )
 	ROM_LOAD( "mcg-14.6a",  0x400000, 0x200000, CRC(c0d8b5f0) SHA1(08eecf6e7d0273e41cda3472709a67e2b16068c9) ) // music
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "avengrgsj.nv",  0x00, 0x80, CRC(7ea70843) SHA1(f010b77b824e37c5e8c5722d5fff79751118f0b7) )	
+	ROM_LOAD( "avengrgsj.nv",  0x00, 0x80, CRC(7ea70843) SHA1(f010b77b824e37c5e8c5722d5fff79751118f0b7) )
 ROM_END
 
 
@@ -558,8 +558,8 @@ ROM_START( stadhr96 )
 	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000,  CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "eeprom-stadhr96.bin",  0x00, 0x80, CRC(77861793) SHA1(df43b3ee55b7eb840cd6d3e5c5e04c68ce64bb57) )	
-ROM_END	
+	ROM_LOAD( "eeprom-stadhr96.bin",  0x00, 0x80, CRC(77861793) SHA1(df43b3ee55b7eb840cd6d3e5c5e04c68ce64bb57) )
+ROM_END
 
 ROM_START( stadhr96j )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -581,7 +581,7 @@ ROM_START( stadhr96j )
 	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000,  CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "eeprom-stadhr96j.bin",  0x00, 0x80, CRC(cf98098f) SHA1(54fc9bdd1ce9b836dad7b4a9909608e8f9842f71) )	
+	ROM_LOAD( "eeprom-stadhr96j.bin",  0x00, 0x80, CRC(cf98098f) SHA1(54fc9bdd1ce9b836dad7b4a9909608e8f9842f71) )
 ROM_END
 
 
@@ -604,7 +604,7 @@ ROM_START( hoops96 )
 	ROM_LOAD( "mce-05.6a",  0x000000, 0x400000,  CRC(e7a9355a) SHA1(039b23666e224c33ebb02baa80e496f8bce0514f) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "hoops.nv",  0x00, 0x80, CRC(67b18457) SHA1(5d6a0034bfc3d395ecd941ed024c8884b43f2a31) )	
+	ROM_LOAD( "hoops.nv",  0x00, 0x80, CRC(67b18457) SHA1(5d6a0034bfc3d395ecd941ed024c8884b43f2a31) )
 ROM_END
 
 ROM_START( hoops95 )
@@ -626,7 +626,7 @@ ROM_START( hoops95 )
 	ROM_LOAD( "mce-05.6a",  0x000000, 0x400000,  CRC(e7a9355a) SHA1(039b23666e224c33ebb02baa80e496f8bce0514f) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "hoops.nv",  0x00, 0x80, CRC(67b18457) SHA1(5d6a0034bfc3d395ecd941ed024c8884b43f2a31) )	
+	ROM_LOAD( "hoops.nv",  0x00, 0x80, CRC(67b18457) SHA1(5d6a0034bfc3d395ecd941ed024c8884b43f2a31) )
 ROM_END
 
 ROM_START( ddream95 )
@@ -648,7 +648,7 @@ ROM_START( ddream95 )
 	ROM_LOAD( "mce-05.6a",  0x000000, 0x400000,  CRC(e7a9355a) SHA1(039b23666e224c33ebb02baa80e496f8bce0514f) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "hoops.nv",  0x00, 0x80, CRC(67b18457) SHA1(5d6a0034bfc3d395ecd941ed024c8884b43f2a31) )		
+	ROM_LOAD( "hoops.nv",  0x00, 0x80, CRC(67b18457) SHA1(5d6a0034bfc3d395ecd941ed024c8884b43f2a31) )
 ROM_END
 
 ROM_START( skullfng )

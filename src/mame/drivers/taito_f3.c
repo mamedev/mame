@@ -14,14 +14,14 @@
     - Dsp isn't hooked up.
     - Crowd/boards not shown in the football games
     - Sound doesn't work in RidingF/RingRage?
-	  (for RingRage it's probably a timing / cpu sync bug, if you go into test mode
-	   for a while then exit you'll have sound, this doesn't work on RidingF)
+      (for RingRage it's probably a timing / cpu sync bug, if you go into test mode
+       for a while then exit you'll have sound, this doesn't work on RidingF)
     - It does work in ringrage but you have to enter test mode first
     - Sound balance is not emulated (see arabianm test mode)
     - When playing space invaders dx in original mode, t.t. with overlay, the
     alpha blending effect is wrong (see Taito B version of game)
     - Bubble Symphony has an alpha transition effect that doesn't appear in Mame
-	- Various other missing blending effects (see Mametesters)
+    - Various other missing blending effects (see Mametesters)
 
     Feel free to report any other issues to me.
 
@@ -2833,7 +2833,7 @@ ROM_START( bubblem )
 	ROM_LOAD16_BYTE("e21-04.rom", 0x400000, 0x200000, CRC(e5af2a2d) SHA1(62a49504decc7160b710260218920d2d6d2af8f0) )	// CC CD -std-
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "bubblem.nv", 0x0000, 0x0080, CRC(9a59326e) SHA1(071dbfbfd77f7020476ddb54c93f5fafa7a08159) )		
+	ROM_LOAD( "bubblem.nv", 0x0000, 0x0080, CRC(9a59326e) SHA1(071dbfbfd77f7020476ddb54c93f5fafa7a08159) )
 ROM_END
 
 ROM_START( bubblemj )
@@ -2863,7 +2863,7 @@ ROM_START( bubblemj )
 	ROM_LOAD16_BYTE("e21-04.rom", 0x400000, 0x200000, CRC(e5af2a2d) SHA1(62a49504decc7160b710260218920d2d6d2af8f0) )	// CC CD -std-
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "bubblemj.nv", 0x0000, 0x0080, CRC(cb4ef35c) SHA1(e0202b775d2494b77b1c08bafbfd239e40555dc6) )	
+	ROM_LOAD( "bubblemj.nv", 0x0000, 0x0080, CRC(cb4ef35c) SHA1(e0202b775d2494b77b1c08bafbfd239e40555dc6) )
 ROM_END
 
 ROM_START( cleopatr )

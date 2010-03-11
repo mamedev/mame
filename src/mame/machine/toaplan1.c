@@ -272,7 +272,7 @@ WRITE16_HANDLER( vimana_mcu_w )
 		case 0:	break;
 		case 1:	break;
 		case 2:	if (ACCESSING_BITS_0_7)
-				{	
+				{
 					vimana_credits = data & 0xff;
 					coin_lockout_global_w(space->machine, (vimana_credits >= 9));
 				}

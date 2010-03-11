@@ -138,8 +138,8 @@ enum
 
 INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
 {
-	/* when color math is applied to subscreen pixels, the blending depends on the blending used by the previous mainscreen 
-	pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in snes_refresh_scanline */
+	/* when color math is applied to subscreen pixels, the blending depends on the blending used by the previous mainscreen
+    pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in snes_refresh_scanline */
 	if (switch_screens && offset > 0)
 		offset -= 1;
 
@@ -480,7 +480,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 							scanlines[SNES_SUBSCREEN].layer[ii >> 1] = layer;
 						}
 					}
-				}	
+				}
 			}
 		}
 	}
@@ -1003,7 +1003,7 @@ static struct OAM oam_list[SNES_SCR_WIDTH / 2];
 
 // FIXME: The following functions should be used to create sprite list with
 // obsel data from the previous line. Unfortunately, some games are very picky
-// about when you set up sprite attributes (e.g. Super Star Wars - The Empire 
+// about when you set up sprite attributes (e.g. Super Star Wars - The Empire
 // Strikes Back and Super Street Fighter II) and they would freeze if we only build
 // part of the sprite attributes at the right moment and part of them later, during
 // scanline drawing. Hence, these functions are on hold until more OAM refactoring
@@ -1060,37 +1060,37 @@ static void snes_oam_list_build( void )
 		{
 		case 0:			/* 8x8 or 16x16 */
 			oam_list[i].width  = oam_list[i].size ? 2 : 1;
-			oam_list[i].height = oam_list[i].size ? 2 : 1; 
+			oam_list[i].height = oam_list[i].size ? 2 : 1;
 			break;
 		case 1:			/* 8x8 or 32x32 */
 			oam_list[i].width  = oam_list[i].size ? 4 : 1;
-			oam_list[i].height = oam_list[i].size ? 4 : 1; 
+			oam_list[i].height = oam_list[i].size ? 4 : 1;
 			break;
 		case 2:			/* 8x8 or 64x64 */
 			oam_list[i].width  = oam_list[i].size ? 8 : 1;
-			oam_list[i].height = oam_list[i].size ? 8 : 1; 
+			oam_list[i].height = oam_list[i].size ? 8 : 1;
 			break;
 		case 3:			/* 16x16 or 32x32 */
 			oam_list[i].width  = oam_list[i].size ? 4 : 2;
-			oam_list[i].height = oam_list[i].size ? 4 : 2; 
+			oam_list[i].height = oam_list[i].size ? 4 : 2;
 			break;
 		case 4:			/* 16x16 or 64x64 */
 			oam_list[i].width  = oam_list[i].size ? 8 : 2;
-			oam_list[i].height = oam_list[i].size ? 8 : 2; 
+			oam_list[i].height = oam_list[i].size ? 8 : 2;
 			break;
 		case 5:			/* 32x32 or 64x64 */
 			oam_list[i].width  = oam_list[i].size ? 8 : 4;
-			oam_list[i].height = oam_list[i].size ? 8 : 4; 
+			oam_list[i].height = oam_list[i].size ? 8 : 4;
 			break;
 		case 6:			/* undocumented: 16x32 or 32x64 */
 			oam_list[i].width  = oam_list[i].size ? 4 : 2;
-			oam_list[i].height = oam_list[i].size ? 8 : 4; 
+			oam_list[i].height = oam_list[i].size ? 8 : 4;
 			if (snes_ppu.obj_interlace && !oam_list[i].size)
 				oam_list[i].height = 2;
 			break;
 		case 7:			/* undocumented: 16x32 or 32x32 */
 			oam_list[i].width  = oam_list[i].size ? 4 : 2;
-			oam_list[i].height = oam_list[i].size ? 4 : 4; 
+			oam_list[i].height = oam_list[i].size ? 4 : 4;
 			if (snes_ppu.obj_interlace && !oam_list[i].size)
 				oam_list[i].height = 2;
 			break;
@@ -1146,7 +1146,7 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 	curline *= snes_ppu.obj_interlace;
 
 	charaddr = snes_ppu.oam.next_charmap << 13;
-	
+
 	for (i = 128; i > 0; i--)
 	{
 		if ((i % 4) == 0)
@@ -1385,7 +1385,7 @@ static void snes_draw_screens( UINT16 curline )
 		case 7: snes_update_mode_7(curline); break;		/* Mode 7 - Supports direct colour */
 	}
 }
-	
+
 /*********************************************
  * snes_update_windowmasks()
  *
@@ -1580,10 +1580,10 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 			{
 				c = scanline2->buffer[x];
 
-				/* in hires, subscreen pixels are blended as well: for each subscreen pixel, color math is applied if 
-				it had been applied to the previous mainscreen pixel. What happens at subscreen pixel 0 (which has no
-				previous mainscreen pixel) is undocumented. Until more info are discovered, we (arbitrarily) apply to it 
-				the same color math as the *next* mainscreen pixel (i.e. mainscreen pixel 0) */
+				/* in hires, subscreen pixels are blended as well: for each subscreen pixel, color math is applied if
+                it had been applied to the previous mainscreen pixel. What happens at subscreen pixel 0 (which has no
+                previous mainscreen pixel) is undocumented. Until more info are discovered, we (arbitrarily) apply to it
+                the same color math as the *next* mainscreen pixel (i.e. mainscreen pixel 0) */
 
 				if (x == 0 && !scanline1->blend_exception[0] && snes_ppu.layer[scanline1->layer[0]].color_math)
 					snes_draw_blend(0, &c, snes_ppu.prevent_color_math, snes_ppu.clip_to_black, 1);

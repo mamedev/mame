@@ -1428,15 +1428,15 @@ static WRITE16_HANDLER(s23_ctl_w)
 	case 0: {
 		if(ctl_led != (data & 0xff)) {
 			ctl_led = data;
-/*			logerror("LEDS %c%c%c%c%c%c%c%c\n",
-					 ctl_led & 0x80 ? '.' : '#',
-					 ctl_led & 0x40 ? '.' : '#',
-					 ctl_led & 0x20 ? '.' : '#',
-					 ctl_led & 0x10 ? '.' : '#',
-					 ctl_led & 0x08 ? '.' : '#',
-					 ctl_led & 0x04 ? '.' : '#',
-					 ctl_led & 0x02 ? '.' : '#',
-					 ctl_led & 0x01 ? '.' : '#');*/
+/*          logerror("LEDS %c%c%c%c%c%c%c%c\n",
+                     ctl_led & 0x80 ? '.' : '#',
+                     ctl_led & 0x40 ? '.' : '#',
+                     ctl_led & 0x20 ? '.' : '#',
+                     ctl_led & 0x10 ? '.' : '#',
+                     ctl_led & 0x08 ? '.' : '#',
+                     ctl_led & 0x04 ? '.' : '#',
+                     ctl_led & 0x02 ? '.' : '#',
+                     ctl_led & 0x01 ? '.' : '#');*/
 		}
 		break;
 	}
@@ -1453,8 +1453,8 @@ static WRITE16_HANDLER(s23_ctl_w)
 		break;
 
 	case 6:	// gmen wars spams this heavily with 0 prior to starting the GMEN board test
-		if (data != 0) 
-			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31)); 
+		if (data != 0)
+			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 		break;
 
 	default:
@@ -2155,7 +2155,7 @@ static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
-	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r ) 
+	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r )
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
 	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
@@ -2167,7 +2167,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gorgoniobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("RRP0")	  // 0-5 = start
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("RRP1")	  // 
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("RRP1")	  //
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("RRP2")	  // 0-4 = coin
 	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("RRP3")	  // 1-1 = button?  1-4 = start?
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
@@ -2389,7 +2389,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gmen )
 	MDRV_IMPORT_FROM( s23 )
 
-	MDRV_CPU_REPLACE("maincpu", R4650BE, S23_BUSCLOCK*5) 
+	MDRV_CPU_REPLACE("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_PROGRAM_MAP(gmen_mips_map)
 
 	MDRV_CPU_ADD("gmen", SH2, 28700000)
@@ -2855,47 +2855,47 @@ ROM_END
 
 ROM_START( gunwars )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_BYTE( "gm1vera.ic2",  0x000000, 0x200000, CRC(cf61467f) SHA1(eae79e4e540340cba7d576a36085f802b8032f4f) ) 
-	ROM_LOAD16_BYTE( "gm1vera.ic1",  0x000001, 0x200000, CRC(abc9ffe6) SHA1(d833b9b9d8bb0cc4b53f30507c9603df9e63fa2f) ) 
+	ROM_LOAD16_BYTE( "gm1vera.ic2",  0x000000, 0x200000, CRC(cf61467f) SHA1(eae79e4e540340cba7d576a36085f802b8032f4f) )
+	ROM_LOAD16_BYTE( "gm1vera.ic1",  0x000001, 0x200000, CRC(abc9ffe6) SHA1(d833b9b9d8bb0cc4b53f30507c9603df9e63fa2f) )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "gm1vera.ic3",  0x000000, 0x080000, CRC(5582fdd4) SHA1(8aae8bc6688d531888f2de509c07502ee355b3ab) ) 
+	ROM_LOAD16_WORD_SWAP( "gm1vera.ic3",  0x000000, 0x080000, CRC(5582fdd4) SHA1(8aae8bc6688d531888f2de509c07502ee355b3ab) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "ASCA-5;Ver 2.09;JPN,Multipurpose" */
 	ROM_LOAD( "asc5_io-a.ic14", 0x000000, 0x020000, CRC(5964767f) SHA1(320db5e78ae23c5f94e368432d51573b409995db) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
-        ROM_LOAD16_BYTE( "gm1mtah.2j",   0x000000, 0x800000, CRC(3cea9094) SHA1(497395425e409de47e1114de9aeeaf05e4f6a9a1) ) 
-        ROM_LOAD16_BYTE( "gm1mtal.2h",   0x000001, 0x800000, CRC(d531dfcd) SHA1(9f7cbe9a03c1f7649bf05a7a30d47511573b50ba) ) 
+        ROM_LOAD16_BYTE( "gm1mtah.2j",   0x000000, 0x800000, CRC(3cea9094) SHA1(497395425e409de47e1114de9aeeaf05e4f6a9a1) )
+        ROM_LOAD16_BYTE( "gm1mtal.2h",   0x000001, 0x800000, CRC(d531dfcd) SHA1(9f7cbe9a03c1f7649bf05a7a30d47511573b50ba) )
 
 	ROM_REGION( 0x4000000, "textile", 0 )	/* texture tiles */
-        ROM_LOAD( "gm1cguu.5f",   0x0000000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) ) 
-        ROM_LOAD( "gm1cgum.4j",   0x0800000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) ) 
-        ROM_LOAD( "gm1cgll.4m",   0x1000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) ) 
-        ROM_LOAD( "gm1cglm.4k",   0x1800000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) ) 
+        ROM_LOAD( "gm1cguu.5f",   0x0000000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) )
+        ROM_LOAD( "gm1cgum.4j",   0x0800000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) )
+        ROM_LOAD( "gm1cgll.4m",   0x1000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) )
+        ROM_LOAD( "gm1cglm.4k",   0x1800000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) )
 
 	ROM_REGION( 0x4000000, "textile2", 0 )	/* second copy of texture tiles */
-        ROM_LOAD( "gm1cguu.4f",   0x0000000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) ) 
-        ROM_LOAD( "gm1cgum.5j",   0x0800000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) ) 
-        ROM_LOAD( "gm1cgll.5m",   0x1000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) ) 
-        ROM_LOAD( "gm1cglm.5k",   0x1800000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) ) 
+        ROM_LOAD( "gm1cguu.4f",   0x0000000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) )
+        ROM_LOAD( "gm1cgum.5j",   0x0800000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) )
+        ROM_LOAD( "gm1cgll.5m",   0x1000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) )
+        ROM_LOAD( "gm1cglm.5k",   0x1800000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) )
 
 	ROM_REGION( 0x800000, "textilemap", 0 )	/* texture tilemap */
-        ROM_LOAD( "gm1ccrl.7f",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) ) 
-        ROM_LOAD( "gm1ccrh.7e",   0x400000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) ) 
+        ROM_LOAD( "gm1ccrl.7f",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) )
+        ROM_LOAD( "gm1ccrh.7e",   0x400000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) )
 
 	ROM_REGION( 0x800000, "textilemap2", 0 )	/* second copy of texture tilemap */
-        ROM_LOAD( "gm1ccrl.7m",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) ) 
-        ROM_LOAD( "gm1ccrh.7k",   0x400000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) ) 
+        ROM_LOAD( "gm1ccrl.7m",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) )
+        ROM_LOAD( "gm1ccrh.7k",   0x400000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) )
 
 	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
-        ROM_LOAD32_WORD( "gm1pt0l.7c",   0x000000, 0x400000, CRC(62e9bedb) SHA1(7043c5e6f26139c9e6e18d4f35fac6a16d4dabd1) ) 
-        ROM_LOAD32_WORD( "gm1pt0h.7a",   0x000002, 0x400000, CRC(5ebd658c) SHA1(9e7b89a726b11b6da3327d72ec6adcc30fbb384d) ) 
-        ROM_LOAD32_WORD( "gm1pt1l.5c",   0x800000, 0x400000, CRC(f44c149f) SHA1(9f995de02ea6ac35ccbabbba5bb473a10e1ec667) ) 
-        ROM_LOAD32_WORD( "gm1pt1h.5a",   0x800002, 0x400000, CRC(5f6cebab) SHA1(95bd30d30ea25509b66a107fb255d0af1e6a357e) ) 
+        ROM_LOAD32_WORD( "gm1pt0l.7c",   0x000000, 0x400000, CRC(62e9bedb) SHA1(7043c5e6f26139c9e6e18d4f35fac6a16d4dabd1) )
+        ROM_LOAD32_WORD( "gm1pt0h.7a",   0x000002, 0x400000, CRC(5ebd658c) SHA1(9e7b89a726b11b6da3327d72ec6adcc30fbb384d) )
+        ROM_LOAD32_WORD( "gm1pt1l.5c",   0x800000, 0x400000, CRC(f44c149f) SHA1(9f995de02ea6ac35ccbabbba5bb473a10e1ec667) )
+        ROM_LOAD32_WORD( "gm1pt1h.5a",   0x800002, 0x400000, CRC(5f6cebab) SHA1(95bd30d30ea25509b66a107fb255d0af1e6a357e) )
 
 	ROM_REGION( 0x800000, "c352", 0 ) /* C352 PCM samples */
-        ROM_LOAD( "gm1wave.2c",   0x000000, 0x800000, CRC(7d5c79a4) SHA1(b800a46bcca10cb0d0d9e0acfa68af63ae64dcaf) ) 
+        ROM_LOAD( "gm1wave.2c",   0x000000, 0x800000, CRC(7d5c79a4) SHA1(b800a46bcca10cb0d0d9e0acfa68af63ae64dcaf) )
 ROM_END
 
 /* Games */

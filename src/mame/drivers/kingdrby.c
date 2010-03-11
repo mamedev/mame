@@ -379,16 +379,16 @@ static ADDRESS_MAP_START( slave_1986_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) //backup ram
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-//	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-  	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
+	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
     AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
-  	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
-  	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
-  	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
+	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
+	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
+	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
 	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -454,7 +454,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static WRITE8_DEVICE_HANDLER( outportb_w )
 {
-//	printf("%02x B\n",data);
+//  printf("%02x B\n",data);
 }
 
 
@@ -475,7 +475,7 @@ static const ppi8255_interface ppi8255_1986_intf[2] =
 		DEVCB_NULL,					/* Port A read */
 		DEVCB_NULL,					/* Port B read */
 		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,  				/* Port A write */
+		DEVCB_NULL, 				/* Port A write */
 		DEVCB_NULL,					/* Port B write */
 		DEVCB_NULL					/* Port C write */
 	}
@@ -1103,7 +1103,7 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 	ROM_LOAD( "kingdrbb_u1.bin", 0x0000, 0x4000, CRC(97931952) SHA1(a0ef3be105f2ed7f744c73e92c583d25bb322e6a) ) // palette but in a normal rom?
 
 	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 ) // address shuffled, decoded inside PALETTE_INIT
-//	ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
+//  ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected

@@ -775,7 +775,7 @@ ROM_START( lethalenj )	// Japan version JAD
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "lethalenj.nv", 0x0000, 0x0080, CRC(20b28f2f) SHA1(53d212f2c006729a01dfdb49cb36b67b9425172e) )	
+	ROM_LOAD( "lethalenj.nv", 0x0000, 0x0080, CRC(20b28f2f) SHA1(53d212f2c006729a01dfdb49cb36b67b9425172e) )
 ROM_END
 
 ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other sets
@@ -812,7 +812,7 @@ ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other 
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "lethalenux.nv", 0x0000, 0x0080, CRC(5d69c39d) SHA1(e468df829ee5094792289f9166d7e39b638ab70d) )		
+	ROM_LOAD( "lethalenux.nv", 0x0000, 0x0080, CRC(5d69c39d) SHA1(e468df829ee5094792289f9166d7e39b638ab70d) )
 ROM_END
 
 ROM_START( lethaleneab )	// Euro ver. EAB
@@ -849,7 +849,7 @@ ROM_START( lethaleneab )	// Euro ver. EAB
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "lethaleneab.nv", 0x0000, 0x0080, CRC(4e9bb34d) SHA1(9502583bc9f5f6fc5bba333869398b24bf154b73) )			
+	ROM_LOAD( "lethaleneab.nv", 0x0000, 0x0080, CRC(4e9bb34d) SHA1(9502583bc9f5f6fc5bba333869398b24bf154b73) )
 ROM_END
 
 ROM_START( lethaleneae )	// Euro ver. EAE
@@ -886,7 +886,7 @@ ROM_START( lethaleneae )	// Euro ver. EAE
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "lethaleneae.nv", 0x0000, 0x0080, CRC(eb369a67) SHA1(6c67294669614e96de5efb38372dbed435ee04d3) )				
+	ROM_LOAD( "lethaleneae.nv", 0x0000, 0x0080, CRC(eb369a67) SHA1(6c67294669614e96de5efb38372dbed435ee04d3) )
 ROM_END
 
 ROM_START( lethalenua )	// *might* be UAA (writes UA to Eeprom)
@@ -923,7 +923,7 @@ ROM_START( lethalenua )	// *might* be UAA (writes UA to Eeprom)
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "lethalenua.nv", 0x0000, 0x0080, CRC(f71ad1c3) SHA1(04c7052d0895797af8a06183b8a877795bf2dbb3) )					
+	ROM_LOAD( "lethalenua.nv", 0x0000, 0x0080, CRC(f71ad1c3) SHA1(04c7052d0895797af8a06183b8a877795bf2dbb3) )
 ROM_END
 
 

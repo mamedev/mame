@@ -1062,7 +1062,7 @@ ROM_START( gticlubj ) /* Japan version JAA */
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )	
+	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
 ROM_START( thunderh ) /* Euro version EAA */
@@ -1178,7 +1178,7 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "hangplt.nv", 0x0000, 0x0200, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )	
+	ROM_LOAD( "hangplt.nv", 0x0000, 0x0200, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )
 ROM_END
 
 static DRIVER_INIT(gticlub)

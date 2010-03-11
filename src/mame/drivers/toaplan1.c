@@ -310,7 +310,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
     However, as the text at the "end" (after the "CONGRATULATIONS" message) is in English,
     I've decided to disable the ones related to Japan (0x00 and 0x0f).
   - Routine at 0x017c18 is sound related and is seems to share memory with the Z180.
-    Unfortunately I haven't been able to understand yet how to produce a sound :( 
+    Unfortunately I haven't been able to understand yet how to produce a sound :(
     Routine at 0x017ca6 stops producing a sound by reseting values in shared memory with the Z180.
 
 8b) 'vimanan'
@@ -1327,19 +1327,19 @@ static INPUT_PORTS_START( vimana )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
-//	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
-//	PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
 	PORT_DIPSETTING(    0x04, "Korea" )
 	PORT_DIPSETTING(    0x03, "Hong Kong" )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
 	PORT_DIPSETTING(    0x05, "Taiwan" )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
-//	PORT_DIPSETTING(    0x09, "???" )
-//	PORT_DIPSETTING(    0x0a, "???" )
-//	PORT_DIPSETTING(    0x0b, "???" )
-//	PORT_DIPSETTING(    0x0c, "???" )
-//	PORT_DIPSETTING(    0x0d, "???" )
-//	PORT_DIPSETTING(    0x0e, "???" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* P1 : 0x44000b.b */
@@ -1366,19 +1366,19 @@ static INPUT_PORTS_START( vimanan )
 	PORT_DIPSETTING(    0x02, "Europe (Nova Apparate license)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
-//	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
-//	PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
+//  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
 	PORT_DIPSETTING(    0x04, "Korea" )
 	PORT_DIPSETTING(    0x03, "Hong Kong" )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
 	PORT_DIPSETTING(    0x05, "Taiwan" )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
-//	PORT_DIPSETTING(    0x09, "???" )
-//	PORT_DIPSETTING(    0x0a, "???" )
-//	PORT_DIPSETTING(    0x0b, "???" )
-//	PORT_DIPSETTING(    0x0c, "???" )
-//	PORT_DIPSETTING(    0x0d, "???" )
-//	PORT_DIPSETTING(    0x0e, "???" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
 
 	/* P1 : 0x44000b.b */
 	/* P2 : 0x44000d.b */
@@ -1398,22 +1398,22 @@ static INPUT_PORTS_START( vimana1 )
 	/* 0x440011.b */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x0f, 0x00, "Territory" )
-//	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-//	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
-//	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+//  PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
 	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
-//	PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
-//	PORT_DIPSETTING(    0x04, "Korea" )
-//	PORT_DIPSETTING(    0x03, "Hong Kong" )
-//	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
-//	PORT_DIPSETTING(    0x05, "Taiwan" )
-//	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
-//	PORT_DIPSETTING(    0x09, "???" )
-//	PORT_DIPSETTING(    0x0a, "???" )
-//	PORT_DIPSETTING(    0x0b, "???" )
-//	PORT_DIPSETTING(    0x0c, "???" )
-//	PORT_DIPSETTING(    0x0d, "???" )
-//	PORT_DIPSETTING(    0x0e, "???" )
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x04, "Korea" )
+//  PORT_DIPSETTING(    0x03, "Hong Kong" )
+//  PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+//  PORT_DIPSETTING(    0x05, "Taiwan" )
+//  PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* P1 : 0x44000b.b */

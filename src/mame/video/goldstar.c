@@ -461,7 +461,7 @@ VIDEO_UPDATE( magical )
 			{
 				tilemap_set_scrolly(state->reel1_tilemap, i, state->reel1_scroll[i*2]);
 				tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[i*2]);
-			//	tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[i*2]);
+			//  tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[i*2]);
 			}
 
 
@@ -513,8 +513,8 @@ VIDEO_UPDATE( unkch )
 			for (i= 0;i < 32;i++)
 			{
 				tilemap_set_scrolly(state->reel1_tilemap, i, -0x08/*state->reel1_scroll[(i*2)+1]*/);
-			//	tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[(i*2)+1]);
-			//	tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[(i*2)+1]);
+			//  tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[(i*2)+1]);
+			//  tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[(i*2)+1]);
 			}
 
 			tilemap_draw(bitmap, cliprect, state->reel1_tilemap, 0, 0);
@@ -529,10 +529,10 @@ VIDEO_UPDATE( unkch )
 				tilemap_set_scrolly(state->reel2_tilemap, i, state->reel2_scroll[i*2]);
 				tilemap_set_scrolly(state->reel3_tilemap, i, state->reel3_scroll[i*2]);
 			}
-			
+
 			tilemap_draw(bitmap, &unkch_visible1, state->reel1_tilemap, 0, 0);
 			tilemap_draw(bitmap, &unkch_visible2, state->reel2_tilemap, 0, 0);
-			tilemap_draw(bitmap, &unkch_visible3, state->reel3_tilemap, 0, 0);			
+			tilemap_draw(bitmap, &unkch_visible3, state->reel3_tilemap, 0, 0);
 		}
 	}
 

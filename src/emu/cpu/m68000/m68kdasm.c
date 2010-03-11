@@ -1826,7 +1826,7 @@ static void d68040_fpu(void)
 							sprintf(temp, "FP%d ", 7-i);
 						}
 						else			// predecrement
-						{	
+						{
 							sprintf(temp, "FP%d ", i);
 						}
 						strcat(g_dasm_str, temp);
@@ -1859,7 +1859,7 @@ static void d68040_fpu(void)
 							sprintf(temp, "FP%d ", 7-i);
 						}
 						else			// predecrement
-						{	
+						{
 							sprintf(temp, "FP%d ", i);
 						}
 						strcat(g_dasm_str, temp);

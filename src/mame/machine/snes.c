@@ -769,7 +769,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 		case INIDISP:	/* Initial settings for screen */
 			if ((snes_ppu.screen_disabled & 0x80) && (!(data & 0x80))) //a 1->0 force blank transition causes a reset OAM address
-			{	
+			{
 				memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low);
 				memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high);
 			}
@@ -809,7 +809,7 @@ WRITE8_HANDLER( snes_w_io )
 		            default:
 		               /* Unknown size so default to 8 & 16 */
 		               logerror("Object size unsupported: %d\n", (data & 0xe0) >> 5);
-		
+
 		               snes_ppu.oam.size[0] = 1;
 		               snes_ppu.oam.size[1] = 2;
 				break;
