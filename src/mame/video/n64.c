@@ -412,7 +412,7 @@ static void (*MASK)(INT32* S, INT32* T, TILE* tex_tile);
 	#include "video/rdpcc.c"
 
 #define CACHE_TEXTURE_PARAMS(TEX) \
-	TEXTURE_PIPELINE = rdp_texture_pipeline_func[(TEX->shift_t ? 64 : 0) | (TEX->shift_s ? 32 : 0) | ((TEX->ct || !TEX->mask_t) ? 16 : 0) | ((TEX->cs || !TEX->mask_s) ? 8 : 0) | ((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | (other_modes.mid_texel << 1) | other_modes.sample_type]; \
+	TEXTURE_PIPELINE = rdp_texture_pipeline_func[(TEX->shift_t ? 64 : 0) | (TEX->shift_s ? 32 : 0) | ((TEX->ct || !TEX->mask_t) ? 16 : 0) | ((TEX->cs || !TEX->mask_s) ? 8 : 0) | ((other_modes.cycle_type == CYCLE_TYPE_COPY) ? 4 : 0) | (other_modes.mid_texel << 1) | (other_modes.sample_type ? 1 : 0)]; \
 	MASK = rdp_mask_func[(TEX->mask_s ? 2 : 0) | (TEX->mask_t ? 1 : 0)]; \
 	cached_twidth  = TEX->line; \
 	cached_tbase   = TEX->tmem; \
@@ -3627,11 +3627,11 @@ static RDP_COMMAND( rdp_set_other_modes )
 	texture_rectangle_16bit = rdp_texture_rectangle_16bit_func[((((other_modes.z_update_en | other_modes.z_source_sel) << 3) | ((other_modes.z_compare_en | other_modes.z_source_sel) << 2) | other_modes.cycle_type) << 2) | other_modes.rgb_dither_sel];
 	fill_rectangle_16bit = rdp_fill_rectangle_16bit_func[(other_modes.cycle_type << 2) | other_modes.rgb_dither_sel];
 
-	alpha_cvg_get = rdp_alpha_cvg_func[(other_modes.cvg_times_alpha << 1) | other_modes.alpha_cvg_select];
+	alpha_cvg_get = rdp_alpha_cvg_func[(other_modes.cvg_times_alpha << 1) | (other_modes.alpha_cvg_select ? 1 : 0)];
 
-	alpha_compare = rdp_alpha_compare_func[(other_modes.alpha_compare_en << 1) | other_modes.dither_alpha_en];
+	alpha_compare = rdp_alpha_compare_func[(other_modes.alpha_compare_en << 1) | (other_modes.dither_alpha_en ? 1 : 0)];
 
-	z_compare = rdp_z_compare_func[(other_modes.z_mode << 2) | (other_modes.antialias_en << 1) | other_modes.image_read_en];
+	z_compare = rdp_z_compare_func[(other_modes.z_mode << 2) | (other_modes.antialias_en << 1) | (other_modes.image_read_en ? 1 : 0)];
 
 	render_spans_16_ns_nt_nz_nf = rdp_render_spans_16_func[0 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
 	render_spans_16_ns_nt_z_nf = rdp_render_spans_16_func[2 + ((other_modes.cycle_type & 1) | (other_modes.z_compare_en << 5) | (other_modes.z_update_en << 6) | (other_modes.rgb_dither_sel << 7))];
@@ -3652,16 +3652,16 @@ static RDP_COMMAND( rdp_set_other_modes )
 
 	for(int index = 0; index < 8; index++)
 	{
-		tile[index].fetch_index = (tile[index].size << 5) | (tile[index].format << 2) | (other_modes.en_tlut << 1) | other_modes.tlut_type;
+		tile[index].fetch_index = (tile[index].size << 5) | (tile[index].format << 2) | (other_modes.en_tlut << 1) | (other_modes.tlut_type ? 1 : 0);
 	}
 
 	FBWRITE_16 = rdp_fbwrite_16_func[(other_modes.color_on_cvg << 3) | (other_modes.image_read_en << 2) | other_modes.cvg_dest];
 	FBWRITE_32 = rdp_fbwrite_32_func[(other_modes.color_on_cvg << 3) | (other_modes.image_read_en << 2) | other_modes.cvg_dest];
 
-	BLENDER1_16_DITH = rdp_blender1_16_dith_func[(other_modes.force_blend << 4) | (other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
-	BLENDER2_16_DITH = rdp_blender2_16_dith_func[(other_modes.force_blend << 4) | (other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | other_modes.alpha_compare_en];
-	BLENDER1_16_NDITH = rdp_blender1_16_ndith_func[(other_modes.force_blend << 3) | (other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
-	BLENDER2_16_NDITH = rdp_blender2_16_ndith_func[(other_modes.force_blend << 3) | (other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | other_modes.alpha_compare_en];
+	BLENDER1_16_DITH = rdp_blender1_16_dith_func[(other_modes.force_blend << 4) | (other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | (other_modes.alpha_compare_en ? 1 : 0)];
+	BLENDER2_16_DITH = rdp_blender2_16_dith_func[(other_modes.force_blend << 4) | (other_modes.image_read_en << 3) | (other_modes.z_compare_en << 2) | ((other_modes.rgb_dither_sel >> 1) << 1) | (other_modes.alpha_compare_en ? 1 : 0)];
+	BLENDER1_16_NDITH = rdp_blender1_16_ndith_func[(other_modes.force_blend << 3) | (other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | (other_modes.alpha_compare_en ? 1 : 0)];
+	BLENDER2_16_NDITH = rdp_blender2_16_ndith_func[(other_modes.force_blend << 3) | (other_modes.image_read_en << 2) | (other_modes.z_compare_en << 1) | (other_modes.alpha_compare_en ? 1 : 0)];
 
 	SET_BLENDER_INPUT(0, 0, &blender1a_r[0], &blender1a_g[0], &blender1a_b[0], &blender1b_a[0],
 					  other_modes.blend_m1a_0, other_modes.blend_m1b_0);
@@ -3965,7 +3965,7 @@ static RDP_COMMAND( rdp_set_tile )
 	tex_tile->ms		= (w2 >>  8) & 0x1;
 	tex_tile->mask_s	= (w2 >>  4) & 0xf;
 	tex_tile->shift_s	= (w2 >>  0) & 0xf;
-	tex_tile->fetch_index = (tex_tile->size << 5) | (tex_tile->format << 2) | (other_modes.en_tlut << 1) | other_modes.tlut_type;
+	tex_tile->fetch_index = (tex_tile->size << 5) | (tex_tile->format << 2) | (other_modes.en_tlut << 1) | (other_modes.tlut_type ? 1 : 0);
 
 	tex_tile->mask_s = (tex_tile->mask_s > 10) ? 10 : tex_tile->mask_s;
 	tex_tile->mask_t = (tex_tile->mask_t > 10) ? 10 : tex_tile->mask_t;
