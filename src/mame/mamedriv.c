@@ -7176,8 +7176,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raiden2f )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndx )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxj )	/* (c) 1993 Seibu Kaihatsu */
+	DRIVER( raidndxu )	/* (c) 1993 Seibu Kaihatsu + Fabtek license */
 	DRIVER( raidndxm )	/* (c) 1993 Seibu Kaihatsu + Metrotainment license */
-	DRIVER( raidndxt )	/* (c) 1993 Seibu Kaihatsu + Tuning license*/
+	DRIVER( raidndxt )	/* (c) 1993 Seibu Kaihatsu + Tuning license */
 	DRIVER( zeroteam )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteama )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteamb )	/* (c) 1993 Seibu Kaihatsu */
