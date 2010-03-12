@@ -5,7 +5,7 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.55 (2009-10-31)\n"
+"Version 4.60 (2010-03-12)\n"
 "A portable Motorola M680x0 processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
@@ -549,8 +549,8 @@ static const cpu_state_entry state_array[] =
 	M68K_STATE_ENTRY(FP5, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
 	M68K_STATE_ENTRY(FP6, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
 	M68K_STATE_ENTRY(FP7, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FPSR, "%08X", fpsr, 0xffffffff, 0, MASK_040_OR_LATER)
-	M68K_STATE_ENTRY(FPCR, "%08X", fpcr, 0xffffffff, 0, MASK_040_OR_LATER)
+	M68K_STATE_ENTRY(FPSR, "%08X", fpsr, 0xffffffff, 0, MASK_030_OR_LATER)
+	M68K_STATE_ENTRY(FPCR, "%08X", fpcr, 0xffffffff, 0, MASK_030_OR_LATER)
 };
 
 static const cpu_state_table state_table_template =
@@ -901,37 +901,36 @@ static CPU_EXPORT_STRING( m68k )
 	switch (entry->index)
 	{
 		case M68K_FP0:
-			sprintf(string, "%f", REG_FP[0].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[0]));
 			break;
 
 		case M68K_FP1:
-			sprintf(string, "%f", REG_FP[1].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[1]));
 			break;
 
 		case M68K_FP2:
-			sprintf(string, "%f", REG_FP[2].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[2]));
 			break;
 
 		case M68K_FP3:
-			sprintf(string, "%f", REG_FP[3].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[3]));
 			break;
 
 		case M68K_FP4:
-			sprintf(string, "%f", REG_FP[4].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[4]));
 			break;
 
 		case M68K_FP5:
-			sprintf(string, "%f", REG_FP[5].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[5]));
 			break;
 
 		case M68K_FP6:
-			sprintf(string, "%f", REG_FP[6].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[6]));
 			break;
 
 		case M68K_FP7:
-			sprintf(string, "%f", REG_FP[7].f);
+			sprintf(string, "%f", fx80_to_double(REG_FP[7]));
 			break;
-
 	}
 }
 
@@ -985,9 +984,9 @@ static CPU_GET_INFO( m68k )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.50");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.60");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68ki_get_sr(m68k);

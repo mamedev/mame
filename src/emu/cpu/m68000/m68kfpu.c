@@ -9,30 +9,57 @@
 #define DOUBLE_EXPONENT					U64(0x7ff0000000000000)
 #define DOUBLE_MANTISSA					U64(0x000fffffffffffff)
 
-INLINE void SET_CONDITION_CODES(m68ki_cpu_core *m68k, fp_reg reg)
+extern flag floatx80_is_nan( floatx80 a );
+
+INLINE double fx80_to_double(floatx80 fx)
 {
+	UINT64 d;
+	double *foo;
+
+	foo = (double *)&d;
+
+	d = floatx80_to_float64(fx);
+
+	return *foo;
+}
+
+INLINE floatx80 double_to_fx80(double in)
+{
+	UINT64 *d;
+
+	d = (UINT64 *)&in;
+
+	return float64_to_floatx80(*d);
+}
+
+INLINE void SET_CONDITION_CODES(m68ki_cpu_core *m68k, floatx80 reg)
+{
+	UINT64 *regi;
+
+	regi = (UINT64 *)&reg;
+
 	REG_FPSR &= ~(FPCC_N|FPCC_Z|FPCC_I|FPCC_NAN);
 
 	// sign flag
-	if (reg.i & U64(0x8000000000000000))
+	if (reg.high & 0x8000)
 	{
 		REG_FPSR |= FPCC_N;
 	}
 
 	// zero flag
-	if ((reg.i & U64(0x7fffffffffffffff)) == 0)
+	if (((reg.high & 0x7fff) == 0) && ((reg.low<<1) == 0))
 	{
 		REG_FPSR |= FPCC_Z;
 	}
 
 	// infinity flag
-	if ((reg.i & U64(0x7fffffffffffffff)) == DOUBLE_INFINITY)
+	if (((reg.high & 0x7fff) == 0x7fff) && ((reg.low<<1) == 0))
 	{
 		REG_FPSR |= FPCC_I;
 	}
 
 	// NaN flag
-	if (((reg.i & DOUBLE_EXPONENT) == DOUBLE_EXPONENT) && ((reg.i & DOUBLE_MANTISSA) != 0))
+	if (floatx80_is_nan(reg))
 	{
 		REG_FPSR |= FPCC_NAN;
 	}
@@ -46,20 +73,43 @@ INLINE int TEST_CONDITION(m68ki_cpu_core *m68k, int condition)
 	int r = 0;
 	switch (condition)
 	{
-		case 0x00:		return 0;							// False
-		case 0x01:		return (z);							// Equal
-		case 0x0e:		return (!z);						// Not Equal
-		case 0x0f:		return 1;							// True
-		case 0x12:		return (!(nan || z || n));			// Greater Than
-		case 0x13:		return (z || !(nan || n));			// Greater or Equal
-		case 0x14:		return (n && !(nan || z));			// Less Than
-		case 0x15:		return (z || (n && !nan));			// Less Than or Equal
-		case 0x1a:		return (nan || !(n || z));			// Not Less Than or Equal
-		case 0x1b:		return (nan || z || !n);			// Not Less Than
-		case 0x1c:		return (nan || (n && !z));			// Not Greater or Equal Than
-		case 0x1d:		return (nan || z || n);				// Not Greater Than
+		case 0x10:
+		case 0x00:		return 0;					// False
 
-		default:		fatalerror("M68040: test_condition: unhandled condition %02X\n", condition);
+		case 0x11:
+		case 0x01:		return (z);					// Equal
+
+		case 0x12:
+		case 0x02:		return (!(nan || z || n));			// Greater Than
+
+		case 0x13:
+		case 0x03:		return (z || !(nan || n));			// Greater or Equal
+
+		case 0x14:
+		case 0x04:		return (n && !(nan || z));			// Less Than
+
+		case 0x15:
+		case 0x05:		return (z || (n && !nan));			// Less Than or Equal
+
+		case 0x1a:
+		case 0x0a:		return (nan || !(n || z));			// Not Less Than or Equal
+
+		case 0x1b:
+		case 0x0b:		return (nan || z || !n);			// Not Less Than
+
+		case 0x1c:
+		case 0x0c:		return (nan || (n && !z));			// Not Greater or Equal Than
+
+		case 0x1d:
+		case 0x0d:		return (nan || z || n);				// Not Greater Than
+
+		case 0x1e:
+		case 0x0e:		return (!z);					// Not Equal
+
+		case 0x1f:
+		case 0x0f:		return 1;					// True
+
+		default:		fatalerror("M68kFPU: test_condition: unhandled condition %02X\n", condition);
 	}
 
 	return r;
@@ -111,11 +161,11 @@ static UINT8 READ_EA_8(m68ki_cpu_core *m68k, int ea)
 				{
 					return  OPER_I_8(m68k);
 				}
-				default:	fatalerror("MC68040: READ_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: READ_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: READ_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+		default:	fatalerror("M68kFPU: READ_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 	}
 
 	return 0;
@@ -168,11 +218,11 @@ static UINT16 READ_EA_16(m68ki_cpu_core *m68k, int ea)
 					return OPER_I_16(m68k);
 				}
 
-				default:	fatalerror("MC68040: READ_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: READ_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: READ_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+		default:	fatalerror("M68kFPU: READ_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 	}
 
 	return 0;
@@ -234,11 +284,11 @@ static UINT32 READ_EA_32(m68ki_cpu_core *m68k, int ea)
 				{
 					return  OPER_I_32(m68k);
 				}
-				default:	fatalerror("MC68040: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+		default:	fatalerror("M68kFPU: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 	}
 	return 0;
 }
@@ -290,11 +340,11 @@ static UINT64 READ_EA_64(m68ki_cpu_core *m68k, int ea)
 					h2 = m68ki_read_32(m68k, ea+4);
 					return  (UINT64)(h1) << 32 | (UINT64)(h2);
 				}
-				default:	fatalerror("MC68040: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+		default:	fatalerror("M68kFPU: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 	}
 
 	return 0;
@@ -360,11 +410,11 @@ static void WRITE_EA_8(m68ki_cpu_core *m68k, int ea, UINT8 data)
 					m68ki_write_8(m68k, ea, data);
 					break;
 				}
-				default:	fatalerror("MC68040: WRITE_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: WRITE_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: WRITE_EA_8: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
+		default:	fatalerror("M68kFPU: WRITE_EA_8: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
 	}
 }
 
@@ -428,11 +478,11 @@ static void WRITE_EA_16(m68ki_cpu_core *m68k, int ea, UINT16 data)
 					m68ki_write_16(m68k, ea, data);
 					break;
 				}
-				default:	fatalerror("MC68040: WRITE_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: WRITE_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: WRITE_EA_16: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
+		default:	fatalerror("M68kFPU: WRITE_EA_16: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
 	}
 }
 
@@ -501,11 +551,11 @@ static void WRITE_EA_32(m68ki_cpu_core *m68k, int ea, UINT32 data)
 					m68ki_write_32(m68k, ea, data);
 					break;
 				}
-				default:	fatalerror("MC68040: WRITE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("M68kFPU: WRITE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 			}
 			break;
 		}
-		default:	fatalerror("MC68040: WRITE_EA_32: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
+		default:	fatalerror("M68kFPU: WRITE_EA_32: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
 	}
 }
 
@@ -539,57 +589,101 @@ static void WRITE_EA_64(m68ki_cpu_core *m68k, int ea, UINT64 data)
 			m68ki_write_32(m68k, ea+4, (UINT32)(data));
 			break;
 		}
-		default:	fatalerror("MC68040: WRITE_EA_64: unhandled mode %d, reg %d, data %08X%08X at %08X\n", mode, reg, (UINT32)(data >> 32), (UINT32)(data), REG_PC);
+		default:	fatalerror("M68kFPU: WRITE_EA_64: unhandled mode %d, reg %d, data %08X%08X at %08X\n", mode, reg, (UINT32)(data >> 32), (UINT32)(data), REG_PC);
 	}
 }
 
-static fp_reg READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
+static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
 {
-	fp_reg r;
+	floatx80 fpr;
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
 
-	// TODO: convert to extended floating-point!
-
 	switch (mode)
 	{
-		case 3:		// (An)+
+		case 2:		// (An)
 		{
-			UINT32 d1,d2,d3;
+			UINT32 d1,d2;
+			UINT16 d3;
 			UINT32 ea = REG_A[reg];
-			REG_A[reg] += 12;
-			d1 = m68ki_read_32(m68k, ea+0);
-			d2 = m68ki_read_32(m68k, ea+4);
-			d3 = m68ki_read_32(m68k, ea+8);
-			r.i = (UINT64)(d1) << 32 | (UINT64)(d2);
+			d3 = m68ki_read_16(m68k, ea);
+			d1 = m68ki_read_32(m68k, ea+4);
+			d2 = m68ki_read_32(m68k, ea+8);
+			fpr.high = d3;
+			fpr.low = ((UINT64)d1<<32) | (d2 & 0xffffffff);
 			break;
 		}
-		default:	fatalerror("MC68040: READ_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
+
+		case 3:		// (An)+
+		{
+			UINT32 d1,d2;
+			UINT16 d3;
+			UINT32 ea = REG_A[reg];
+			REG_A[reg] += 12;
+			d3 = m68ki_read_16(m68k, ea);
+			d1 = m68ki_read_32(m68k, ea+4);
+			d2 = m68ki_read_32(m68k, ea+8);
+			fpr.high = d3;
+			fpr.low = ((UINT64)d1<<32) | (d2 & 0xffffffff);
+			break;
+		}
+		default:	fatalerror("M68kFPU: READ_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
 	}
 
-	return r;
+	return fpr;
 }
 
-static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, fp_reg fpr)
+static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
 
-	// TODO: convert to extended floating-point!
-
 	switch (mode)
 	{
+		case 2:		// (An)
+		{
+			UINT32 ea;
+			ea = REG_A[reg];
+			m68ki_write_16(m68k, ea+0, fpr.high);
+			m68ki_write_16(m68k, ea+2, 0);
+			m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
+			m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
+			break;
+		}
+
+		case 3:		// (An)+
+		{
+			UINT32 ea;
+			ea = REG_A[reg];
+			m68ki_write_16(m68k, ea+0, fpr.high);
+			m68ki_write_16(m68k, ea+2, 0);
+			m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
+			m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
+			REG_A[reg] += 12;
+			break;
+		}
+
 		case 4:		// -(An)
 		{
 			UINT32 ea;
 			REG_A[reg] -= 12;
 			ea = REG_A[reg];
-			m68ki_write_32(m68k, ea+0, (UINT32)(fpr.i >> 32));
-			m68ki_write_32(m68k, ea+4, (UINT32)(fpr.i));
-			m68ki_write_32(m68k, ea+8, 0);
+			m68ki_write_16(m68k, ea+0, fpr.high);
+			m68ki_write_16(m68k, ea+2, 0);
+			m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
+			m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
 			break;
 		}
-		default:	fatalerror("MC68040: WRITE_EA_FPE: unhandled mode %d, reg %d, data %f at %08X\n", mode, reg, fpr.f, REG_PC);
+
+		case 7:
+		{
+			switch (reg)
+			{
+				case 3:	// (d8,PC,Xn)
+				default:	fatalerror("M68kFPU: WRITE_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
+			}
+		}
+		default:	fatalerror("M68kFPU: WRITE_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
 	}
 }
 
@@ -601,8 +695,8 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 	int src = (w2 >> 10) & 0x7;
 	int dst = (w2 >>  7) & 0x7;
 	int opmode = w2 & 0x7f;
-	double source;
-
+	floatx80 source;
+	
 	if (rm)
 	{
 		switch (src)
@@ -610,18 +704,18 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			case 0:		// Long-Word Integer
 			{
 				INT32 d = READ_EA_32(m68k, ea);
-				source = (double)(d);
+				source = int32_to_floatx80(d);
 				break;
 			}
 			case 1:		// Single-precision Real
 			{
 				UINT32 d = READ_EA_32(m68k, ea);
-				source = (double)(*(float*)&d);
+				source = float32_to_floatx80(d);
 				break;
 			}
 			case 2:		// Extended-precision Real
 			{
-				fatalerror("fpgen_rm_reg: extended-precision real load unimplemented at %08X\n", REG_PC-4);
+				source = READ_EA_FPE(m68k, ea);
 				break;
 			}
 			case 3:		// Packed-decimal Real
@@ -632,19 +726,20 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			case 4:		// Word Integer
 			{
 				INT16 d = READ_EA_16(m68k, ea);
-				source = (double)(d);
+				source = int32_to_floatx80((INT32)d);
 				break;
 			}
 			case 5:		// Double-precision Real
 			{
 				UINT64 d = READ_EA_64(m68k, ea);
-				source = *(double*)&d;
+
+				source = float64_to_floatx80(d);
 				break;
 			}
 			case 6:		// Byte Integer
 			{
 				INT8 d = READ_EA_8(m68k, ea);
-				source = (double)(d);
+				source = int32_to_floatx80((INT32)d);
 				break;
 			}
 			default:	fatalerror("fmove_rm_reg: invalid source specifier at %08X\n", REG_PC-4);
@@ -652,77 +747,95 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 	}
 	else
 	{
-		source = REG_FP[src].f;
+		source = REG_FP[src];
 	}
+
+	
 
 	switch (opmode)
 	{
 		case 0x00:		// FMOVE
 		{
-			REG_FP[dst].f = source;
+			REG_FP[dst] = source;
 			m68k->remaining_cycles -= 4;
+			break;
+		}
+		case 0x01:		// FINT
+		{
+			INT32 temp;
+			temp = floatx80_to_int32(source);
+			REG_FP[dst] = int32_to_floatx80(temp);
+			break;
+		}
+		case 0x03:		// FINTRZ
+		{
+			INT32 temp;
+			temp = floatx80_to_int32_round_to_zero(source);
+			REG_FP[dst] = int32_to_floatx80(temp);
 			break;
 		}
 		case 0x04:		// FSQRT
 		{
-			REG_FP[dst].f = sqrt(source);
+			REG_FP[dst] = floatx80_sqrt(source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 109;
 			break;
 		}
 		case 0x18:		// FABS
 		{
-			REG_FP[dst].f = fabs(source);
+			REG_FP[dst] = source;
+			REG_FP[dst].high &= 0x7fff;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 3;
 			break;
 		}
 		case 0x1a:		// FNEG
-		{
-			REG_FP[dst].f = -source;
+		{				    
+			REG_FP[dst] = source;
+			REG_FP[dst].high ^= 0x8000;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 3;
 			break;
 		}
 		case 0x20:		// FDIV
 		{
-			REG_FP[dst].f /= source;
+			REG_FP[dst] = floatx80_div(REG_FP[dst], source);
 			m68k->remaining_cycles -= 43;
 			break;
 		}
 		case 0x22:		// FADD
 		{
-			REG_FP[dst].f += source;
+			REG_FP[dst] = floatx80_add(REG_FP[dst], source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 9;
 			break;
 		}
 		case 0x23:		// FMUL
 		{
-			REG_FP[dst].f *= source;
+			REG_FP[dst] = floatx80_mul(REG_FP[dst], source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 11;
 			break;
 		}
 		case 0x28:		// FSUB
 		{
-			REG_FP[dst].f -= source;
+			REG_FP[dst] = floatx80_sub(REG_FP[dst], source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 9;
 			break;
 		}
 		case 0x38:		// FCMP
 		{
-			fp_reg res;
-			res.f = REG_FP[dst].f - source;
+			floatx80 res;
+			res = floatx80_sub(REG_FP[dst], source);
 			SET_CONDITION_CODES(m68k, res);
 			m68k->remaining_cycles -= 7;
 			break;
 		}
 		case 0x3a:		// FTST
 		{
-			fp_reg res;
-			res.f = source;
+			floatx80 res;
+			res = source;
 			SET_CONDITION_CODES(m68k, res);
 			m68k->remaining_cycles -= 7;
 			break;
@@ -743,20 +856,19 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 	{
 		case 0:		// Long-Word Integer
 		{
-			INT32 d = (INT32)(REG_FP[src].f);
+			INT32 d = (INT32)floatx80_to_int32(REG_FP[src]);
 			WRITE_EA_32(m68k, ea, d);
 			break;
 		}
 		case 1:		// Single-precision Real
 		{
-			float f = (float)(REG_FP[src].f);
-			UINT32 d = *(UINT32 *)&f;
+			UINT32 d = floatx80_to_float32(REG_FP[src]); 
 			WRITE_EA_32(m68k, ea, d);
 			break;
 		}
 		case 2:		// Extended-precision Real
 		{
-			fatalerror("fmove_reg_mem: extended-precision real store unimplemented at %08X\n", REG_PC-4);
+		 	WRITE_EA_FPE(m68k, ea, REG_FP[src]);	
 			break;
 		}
 		case 3:		// Packed-decimal Real with Static K-factor
@@ -766,20 +878,21 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 4:		// Word Integer
 		{
-			INT16 d = (INT16)(REG_FP[src].f);
-			WRITE_EA_16(m68k, ea, d);
+			WRITE_EA_16(m68k, ea, (INT16)floatx80_to_int32(REG_FP[src]));
 			break;
 		}
 		case 5:		// Double-precision Real
 		{
-			UINT64 d = REG_FP[src].i;
+			UINT64 d;
+
+			d = floatx80_to_float64(REG_FP[src]);
+
 			WRITE_EA_64(m68k, ea, d);
 			break;
 		}
 		case 6:		// Byte Integer
 		{
-			INT8 d = (INT16)(REG_FP[src].f);
-			WRITE_EA_8(m68k, ea, d);
+			WRITE_EA_8(m68k, ea, (INT8)floatx80_to_int32(REG_FP[src]));
 			break;
 		}
 		case 7:		// Packed-decimal Real with Dynamic K-factor
@@ -943,7 +1056,7 @@ void m68040_fpu_op0(m68ki_cpu_core *m68k)
 					break;
 				}
 
-				default:	fatalerror("m68040_fpu_op0: unimplemented subop %d at %08X\n", (w2 >> 13) & 0x7, REG_PC-4);
+				default:	fatalerror("M68kFPU: unimplemented subop %d at %08X\n", (w2 >> 13) & 0x7, REG_PC-4);
 			}
 			break;
 		}
@@ -959,7 +1072,7 @@ void m68040_fpu_op0(m68ki_cpu_core *m68k)
 			break;
 		}
 
-		default:	fatalerror("m68040_fpu_op0: unimplemented main op %d\n", (m68k->ir >> 6)	& 0x3);
+		default:	fatalerror("M68kFPU: unimplemented main op %d\n", (m68k->ir >> 6)	& 0x3);
 	}
 }
 

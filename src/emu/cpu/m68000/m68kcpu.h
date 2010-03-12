@@ -29,6 +29,8 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
 
 #include "m68000.h"
+#include "../../../lib/softfloat/milieu.h"
+#include "../../../lib/softfloat/softfloat.h"
 
 #include <limits.h>
 #include <setjmp.h>
@@ -560,7 +562,7 @@ struct _m68ki_cpu_core
 	UINT32 cacr;         /* Cache Control Register (m68020, unemulated) */
 	UINT32 caar;         /* Cache Address Register (m68020, unemulated) */
 	UINT32 ir;           /* Instruction Register */
-    fp_reg fpr[8];     /* FPU Data Register (m68040) */
+	floatx80 fpr[8];     /* FPU Data Register (m68030/040) */
 	UINT32 fpiar;        /* FPU Instruction Address Register (m68040) */
 	UINT32 fpsr;         /* FPU Status Register (m68040) */
 	UINT32 fpcr;         /* FPU Control Register (m68040) */
