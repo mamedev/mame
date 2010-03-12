@@ -84,15 +84,17 @@ sprite.
 
 
 Abnormalities:
- The equations for flipscreen, don't suite the horizontal games. So a minor
- hack is implemented for them, though it still isn't 100% right - see below.
-
  How/when do priority 0 Tile layers really get displayed ?
 
  What are the video PROMs for ? Priority maybe ?
 
-
- ***** Notes on the horizontal game scroll Y probs (Eg, Zero Wing) *****
+ Zerowing flashes red when an enemy is shot, and this is done by flipping
+ layer 2 into its oversized second half which is all red. In flipscreen
+ mode, this doesn't work properly as the flip scroll value doesn't equate
+ properly.
+ Possibly a bug with the game itself using a wrong scroll value ??
+ Here's some notes:
+ First values are non red flash scrolls. Second values are red flash scrolls.
 
  Scrolls    PF1-X  PF1-Y    PF2-X  PF2-Y    PF3-X  PF3-Y    PF4-X  PF4-Y
  ------>    #4180  #f880    #1240  #f880    #4380  #f880    #e380  #f880
@@ -102,17 +104,17 @@ Abnormalities:
  -flip->    #1500  #7f00    #e8c0  #8580??  #1300  #7f00    #bb00  #7f00
                                       |
                                       |
-                                    f880 = 1111 1000 1000 = 1f1 scroll
-                                    7f00 - 0111 1111 0000 = 0fe scroll
-                                    7880 = 0111 1000 1000 = 0f1 scroll
-                                    8580 = 1000 0101 1000 = 10b scroll
+                                    f880 = 111110001xxxxxxx -> 1f1 scroll
+                                    7f00 = 011111110xxxxxxx -> 0fe scroll
+                                    7880 = 011110001xxxxxxx -> 0f1 scroll
+                                    8580 = 100001011xxxxxxx -> 10b scroll
 
- So a snapshot of the scroll equations become (from the functions below):
-    1f1 - (102 - 10f) == 1fe   star background
-    0Fe - (00d - 10f) == 200   star background (flipscreen)
-    0f1 - (102 - 10f) == 0fe   red  background
-    10B - (00d - 10f) == 20d   red  background (flipscreen) wrong!
-    10B - (00d - 002) == 100   red  background (flipscreen) should equate to this (100)
+ So a snapshot of the scroll equations become: (from the functions below)
+    1f1 - (102 - 101) == 1f0   star background
+    0fe - (00d - 1ef) == 0e0   star background (flipscreen)
+    0f1 - (102 - 101) == 0f0   red  background
+    10b - (00d - 1ef) == 0ed   red  background (flipscreen) wrong!
+    10b - (00d - 0ef) == 1ed   red  background (flipscreen) should somehow equate to this
 
 
 ***************************************************************************/
@@ -329,10 +331,10 @@ VIDEO_START( rallybik )
 	toaplan1_paletteram_alloc(machine);
 	toaplan1_vram_alloc(machine);
 
-	scrollx_offs1 = 0x0d + 6;
-	scrollx_offs2 = 0x0d + 4;
-	scrollx_offs3 = 0x0d + 2;
-	scrollx_offs4 = 0x0d + 0;
+	scrollx_offs1 = 0x00d + 6;
+	scrollx_offs2 = 0x00d + 4;
+	scrollx_offs3 = 0x00d + 2;
+	scrollx_offs4 = 0x00d + 0;
 	scrolly_offs  = 0x111;
 
 	bcu_flipscreen = -1;
@@ -453,18 +455,18 @@ WRITE16_HANDLER( rallybik_bcu_flipscreen_w )
 		tilemap_set_flip_all(space->machine, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 		if (bcu_flipscreen)
 		{
-			scrollx_offs1 = 0x080 - 6;
-			scrollx_offs2 = 0x080 - 4;
-			scrollx_offs3 = 0x080 - 2;
-			scrollx_offs4 = 0x080 - 0;
-			scrolly_offs  = 0x1f8;
+			scrollx_offs1 = 0x1c0 - 6;
+			scrollx_offs2 = 0x1c0 - 4;
+			scrollx_offs3 = 0x1c0 - 2;
+			scrollx_offs4 = 0x1c0 - 0;
+			scrolly_offs  = 0x0e8;
 		}
 		else
 		{
-			scrollx_offs1 = 0x0d + 6;
-			scrollx_offs2 = 0x0d + 4;
-			scrollx_offs3 = 0x0d + 2;
-			scrollx_offs4 = 0x0d + 0;
+			scrollx_offs1 = 0x00d + 6;
+			scrollx_offs2 = 0x00d + 4;
+			scrollx_offs3 = 0x00d + 2;
+			scrollx_offs4 = 0x00d + 0;
 			scrolly_offs  = 0x111;
 		}
 		toaplan1_set_scrolls();
@@ -480,11 +482,14 @@ WRITE16_HANDLER( toaplan1_bcu_flipscreen_w )
 		tilemap_set_flip_all(space->machine, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 		if (bcu_flipscreen)
 		{
-			scrollx_offs1 = 0x011 - 6;
-			scrollx_offs2 = 0x011 - 4;
-			scrollx_offs3 = 0x011 - 2;
-			scrollx_offs4 = 0x011 - 0;
-			scrolly_offs = 0x10f;
+			const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
+			
+			scrollx_offs1 = 0x151 - 6;
+			scrollx_offs2 = 0x151 - 4;
+			scrollx_offs3 = 0x151 - 2;
+			scrollx_offs4 = 0x151 - 0;
+			scrolly_offs  = 0x1ef;
+			scrolly_offs += ((visarea->max_y + 1) - ((visarea->max_y + 1) - visarea->min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
 		}
 		else
 		{
@@ -1074,10 +1079,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			/****** flip the sprite layer ******/
 			if (fcu_flipscreen)
 			{
-				sx_base += 8;
-				sy_base -= 24;
-				sx_base = 320 - sx_base;
-				sy_base = 240 - sy_base;
+				const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
+				sx_base = ((visarea->max_x + 1) - visarea->min_x) - (sx_base + 8);	/* visarea.x = 320 */
+				sy_base = ((visarea->max_y + 1) - visarea->min_y) - (sy_base + 8);	/* visarea.y = 240 */
+				sy_base += ((visarea->max_y + 1) - ((visarea->max_y + 1) - visarea->min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
 			}
 
 			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)

@@ -19,7 +19,7 @@ Supported games:
     hellfir1    B90         HellFire (1 Player version) Uses Taito rom ID number
     hellfir2    B90         HellFire (2 Player, ealier version) Uses Taito rom ID number
     zerowing    TP-O15      Zero Wing
-    zerowng2    TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
+    zerowing2   TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
     demonwld    TP-O16      Demon's World/Horror Story [1990]
     demonwl1    TP-O16      Demon's World/Horror Story [1989] (Taito license)
     demonwl2    TP-O16      Demon's World/Horror Story [1989] (early edition)
@@ -337,8 +337,9 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
 #include "cpu/tms32010/tms32010.h"
 #include "includes/toaplipt.h"
 #include "includes/toaplan1.h"
@@ -636,6 +637,14 @@ static ADDRESS_MAP_START( DSP_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(1, 1) AM_READWRITE(demonwld_dsp_r, demonwld_dsp_w)
 	AM_RANGE(3, 3) AM_WRITE(demonwld_dsp_bio_w)
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(demonwld_BIO_r)
+ADDRESS_MAP_END
+
+
+/***************************** HD647180 Memory Map **************************/
+
+static ADDRESS_MAP_START( hd647180_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x03fff) AM_ROM	/* Internal 16k byte ROM */
+	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM	/* Internal 512 byte RAM */
 ADDRESS_MAP_END
 
 
@@ -1155,6 +1164,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( samesame2 )
 	PORT_INCLUDE( samesame )
 
+	PORT_MODIFY("P2")
+	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, )
+
+	PORT_MODIFY("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )	/* No cocktail */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
 /* settings listed in service mode, but not actually used
     PORT_DIPNAME( 0x03, 0x00, "Territory" )
@@ -1496,11 +1513,11 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( rallybik )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(rallybik_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MDRV_CPU_IO_MAP(rallybik_sound_io_map)
 
@@ -1512,9 +1529,9 @@ static MACHINE_DRIVER_START( rallybik )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55.14)    /* verified on pcb */
+	MDRV_SCREEN_REFRESH_RATE(55.14)		/* verified on pcb */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x288 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(rallybik)
@@ -1527,7 +1544,7 @@ static MACHINE_DRIVER_START( rallybik )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1536,11 +1553,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(truxton_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MDRV_CPU_IO_MAP(truxton_sound_io_map)
 
@@ -1552,9 +1569,9 @@ static MACHINE_DRIVER_START( truxton )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.59)   /* verified on pcb */
+	MDRV_SCREEN_REFRESH_RATE(57.59)		/* verified on pcb */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x320 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan1)
@@ -1567,7 +1584,7 @@ static MACHINE_DRIVER_START( truxton )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1576,11 +1593,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hellfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(hellfire_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MDRV_CPU_IO_MAP(hellfire_sound_io_map)
 
@@ -1594,7 +1611,7 @@ static MACHINE_DRIVER_START( hellfire )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x240 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 255)
 
 	MDRV_GFXDECODE(toaplan1)
@@ -1607,7 +1624,7 @@ static MACHINE_DRIVER_START( hellfire )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1616,11 +1633,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zerowing )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(zerowing_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MDRV_CPU_IO_MAP(zerowing_sound_io_map)
 
@@ -1632,9 +1649,9 @@ static MACHINE_DRIVER_START( zerowing )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (28000000.0 / 4) / (450 * 282) )	/* fixed by SUZ */
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_28MHz / 4) / (450 * 282) )	/* fixed by SUZ */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x240 mostly active, 512x512 actually used */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 255)
 
 	MDRV_GFXDECODE(toaplan1)
@@ -1647,7 +1664,7 @@ static MACHINE_DRIVER_START( zerowing )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1656,15 +1673,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( demonwld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(demonwld_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MDRV_CPU_IO_MAP(demonwld_sound_io_map)
 
-	MDRV_CPU_ADD("dsp", TMS32010,28000000/2)	/* 14MHz CLKin */
+	MDRV_CPU_ADD("dsp", TMS32010, XTAL_28MHz/2)
 	MDRV_CPU_PROGRAM_MAP(DSP_program_map)
 	MDRV_CPU_IO_MAP(DSP_io_map)
 
@@ -1676,9 +1693,9 @@ static MACHINE_DRIVER_START( demonwld )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55.14)      /* verified on pcb */
+	MDRV_SCREEN_REFRESH_RATE(55.14)		/* verified on pcb */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x240 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 255)
 
 	MDRV_GFXDECODE(toaplan1)
@@ -1691,7 +1708,7 @@ static MACHINE_DRIVER_START( demonwld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1700,9 +1717,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( samesame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(samesame_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+
+	MDRV_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
+	MDRV_CPU_PROGRAM_MAP(hd647180_mem_map)
+	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped */
 
 	MDRV_MACHINE_RESET(toaplan1)
 
@@ -1712,7 +1733,7 @@ static MACHINE_DRIVER_START( samesame )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x320 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan1)
@@ -1725,7 +1746,7 @@ static MACHINE_DRIVER_START( samesame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1734,11 +1755,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( outzone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(outzone_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MDRV_CPU_IO_MAP(outzone_sound_io_map)
 
@@ -1752,7 +1773,7 @@ static MACHINE_DRIVER_START( outzone )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x256 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(outzone)
@@ -1765,7 +1786,7 @@ static MACHINE_DRIVER_START( outzone )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 28000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1774,9 +1795,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vimana )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vimana_main_map)
 	MDRV_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+
+	MDRV_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
+	MDRV_CPU_PROGRAM_MAP(hd647180_mem_map)
+	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped */
 
 	MDRV_MACHINE_RESET(vimana)
 
@@ -1784,9 +1809,9 @@ static MACHINE_DRIVER_START( vimana )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.59)   /* verified on pcb */
+	MDRV_SCREEN_REFRESH_RATE(57.59)		/* verified on pcb */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
+	MDRV_SCREEN_SIZE(512, 512)	/* 512x256 active */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(vm)
@@ -1799,7 +1824,7 @@ static MACHINE_DRIVER_START( vimana )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -2173,7 +2198,7 @@ ROM_START( samesame )
 	ROM_LOAD16_BYTE( "o17_11.bin",  0x040000, 0x20000, CRC(be07d101) SHA1(1eda14ba24532b565d6ad57490b73ff312f98b53) )
 	ROM_LOAD16_BYTE( "o17_12.bin",  0x040001, 0x20000, CRC(ef698811) SHA1(4c729704eba0bf469599c79009327e4fa5dc540b) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2201,7 +2226,7 @@ ROM_START( samesame2 )
 	ROM_LOAD16_BYTE( "o17_11ii.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12ii.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2229,7 +2254,7 @@ ROM_START( fireshrk )
 	ROM_LOAD16_BYTE( "o17_11ii.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12ii.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2257,7 +2282,7 @@ ROM_START( fireshrkd )
 	ROM_LOAD16_BYTE( "o17_11ii.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12ii.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2285,7 +2310,7 @@ ROM_START( fireshrkdh )
 	ROM_LOAD16_BYTE( "o17_11x.bin", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12x.bin", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2456,7 +2481,7 @@ ROM_START( vimana )			/* From board serial number 1547.04 (July '94) */
 	ROM_LOAD16_BYTE( "tp019-7a.bin",  0x000000, 0x20000, CRC(5a4bf73e) SHA1(9a43d822bc24b59278f294d0b3275595de997d16) )
 	ROM_LOAD16_BYTE( "tp019-8a.bin",  0x000001, 0x20000, CRC(03ba27e8) SHA1(edb5fe741d2a6a7fe5cde9a82317ea1e9447cf73) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.019",  0x00000, 0x08000, NO_DUMP )
 
@@ -2480,7 +2505,7 @@ ROM_START( vimanan )
 	ROM_LOAD16_BYTE( "tp019-07.rom",  0x000000, 0x20000, CRC(78888ff2) SHA1(7e1d248f806d585952eb35ceec6a7e63ae4e22f9) )
 	ROM_LOAD16_BYTE( "tp019-08.rom",  0x000001, 0x20000, CRC(6cd2dc3c) SHA1(029d974eb938c5e2fbe7575f0dda342b4b12b731) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.019",  0x00000, 0x08000, NO_DUMP )
 
@@ -2504,7 +2529,7 @@ ROM_START( vimana1 )
 	ROM_LOAD16_BYTE( "vim07.bin",  0x000000, 0x20000, CRC(1efaea84) SHA1(f9c5d2365d8948fa66dbe61d355919db15843a28) )
 	ROM_LOAD16_BYTE( "vim08.bin",  0x000001, 0x20000, CRC(e45b7def) SHA1(6b92a91d64581954da8ecdbeb5fed79bcc9c5217) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.019",  0x00000, 0x08000, NO_DUMP )
 
@@ -2543,14 +2568,14 @@ static DRIVER_INIT( vimana )
 
 
 
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", GAME_NO_COCKTAIL )
-GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", GAME_NO_COCKTAIL )
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 )
 GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
 GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
 GAME( 1989, hellfire2,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
 GAME( 1989, hellfire3,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver., alt)", 0 )
-GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1, ROT0,   "Toaplan", "Zero Wing (single players)", GAME_NO_COCKTAIL )
-GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (dual players)", GAME_NO_COCKTAIL )
+GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1, ROT0,   "Toaplan", "Zero Wing (single players)", 0 )
+GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (dual players)", 0 )
 GAME( 1990, demonwld,   0,        demonwld, demonwld,  demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
 GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
 GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
