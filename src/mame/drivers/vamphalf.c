@@ -17,13 +17,11 @@
     Vamp 1/2                   (c) 1999 Danbi & F2 System  (Korea version)
     Date Quiz Go Go Episode 2  (c) 2000 SemiCom
     Mission Craft              (c) 2000 Sun                (version 2.4)
+    Mr. Dig                    (c) 2000 Sun
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
     Mr. Kicker                 (c) 2001 SemiCom
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
-
-Known games on simular hardware but not dumped:
-    Mr. Dig (c) 2000 Sun (Mr. Driller clone) on a F-E1-16-002 PCB
 
  Real games bugs:
  - dquizgo2: bugged video test
@@ -114,7 +112,6 @@ static WRITE32_HANDLER( flipscreen32_w )
 {
 	flipscreen = data & flip_bit;
 }
-
 
 static WRITE16_HANDLER( jmpbreak_flipscreen_w )
 {
@@ -305,6 +302,16 @@ static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mrdig_io, ADDRESS_SPACE_IO, 16 )
+
+	AM_RANGE(0x500, 0x503) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE(0x180, 0x183) AM_DEVREAD("eeprom", eeprom_r)
+	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
+	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&wram32)
@@ -721,6 +728,15 @@ static MACHINE_DRIVER_START( jmpbreak )
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( mrdig )
+	MDRV_IMPORT_FROM(common)
+	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(mrdig_io)
+
+	MDRV_IMPORT_FROM(sound_ym_oki)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( wyvernwg )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
@@ -1030,6 +1046,69 @@ ROM_START( jmpbreak )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+ROM_END
+
+/*
+
+Mr. Dig
+SUN, 2000
+
+Rip-off of Mr. Driller series
+
+F-E1-16-002
++----------------------------------------------+
+|     VR1                   M6295  VROM1 28MHz |
+|                 YM3012                       |
+|                 YM2151            MEM2       |
+|                                   MEM3       |
+|               CRAM1               MEM5       |
+|               CRAM2               MEM7       |
+|J                                             |
+|A              MEM1U  +----------++----------+|
+|M                     |          ||          ||
+|M              MEM1L  |Quicklogic||Quicklogic||
+|A                     | QL2003-  || QL2003-  ||
+|                      | XPL84C   || XPL84C   ||
+|                      |          ||          ||
+|                      +----------++----------+|
+|                                              |
+| 93C46          DRAM1      ROM1 ROML00  ROMH00|
+|P1 P2   50MHz  GMS30C2116  ROM2   *       *   |
+|                                              |
++----------------------------------------------+
+
+Notes:
+CPU: HYUNDAI GMS30C2116 (Hyperstone E1-16T compatible) @ 50.000MHz
+
+     DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as KA12/KB2001
+
+ P1 - Setup push button
+ P2 - Reset push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+  * ROML01 & ROMH01 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1           - Atmel AT27C020 2MBit DIP32 EPROM
+    ROM1/2          - MX 27C4000 4MBit DIP32 EPROM
+
+*/
+
+ROM_START( mrdig )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(5b960320) SHA1(adf5499a39987041fc93e409bdb5fd07dacec4f9) )
+	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(75d48b64) SHA1(c9c492fb9cabafcf0bc05f44bf80ee6df3c21a1b) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(f6b161ea) SHA1(c417a4c877ffa2fdf5857ecc9c78ffc0c09dc516) )
+	ROM_LOAD32_WORD( "romh00.bin", 0x000002, 0x200000, CRC(5477efed) SHA1(e4991ee1b41d512eaa508351b6a78261dfde5a3d) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(5fd9e1c6) SHA1(fef82ef816af69f31d12fc4634d06d825e8b7416) )
 ROM_END
 
 /*
@@ -1672,6 +1751,19 @@ static READ16_HANDLER( jmpbreak_speedup_r )
 	return wram[(0x00906fc / 2)+offset];
 }
 
+static READ16_HANDLER( mrdig_speedup_r )
+{
+	if(cpu_get_pc(space->cpu) == 0x1710)
+	{
+		if(irq_active(space))
+			cpu_spinuntil_int(space->cpu);
+		else
+			cpu_eat_cycles(space->cpu, 50);
+	}
+
+	return wram[(0x00a99c / 2)+offset];
+}
+
 static DRIVER_INIT( vamphalf )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0004a840, 0x0004a843, 0, 0, vamphalf_speedup_r );
@@ -1800,6 +1892,14 @@ static DRIVER_INIT( jmpbreak )
 	palshift = 0;
 }
 
+static DRIVER_INIT( mrdig )
+{
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00a99c, 0x00a99f, 0, 0, mrdig_speedup_r );
+	//memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
+
+	palshift = 0;
+}
+
 GAME( 1999, coolmini, 0,        coolmini, common,   coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
 GAME( 1999, jmpbreak, 0,        jmpbreak, common,   jmpbreak, ROT0,   "F2 System",         "Jumping Break" , 0 )
 GAME( 1999, suplup,   0,        suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0 )
@@ -1810,6 +1910,7 @@ GAME( 1999, vamphalf, 0,        vamphalf, common,   vamphalf, ROT0,   "Danbi & F
 GAME( 1999, vamphalfk,vamphalf, vamphalf, common,   vamphafk, ROT0,   "Danbi & F2 System", "Vamp x1/2 (Korea)", 0 )
 GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
+GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 ) /* Some PCB in game pics show a 2 VS mode, but how do you select? */
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, mrkicker, 0,        finalgdr, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING )
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )

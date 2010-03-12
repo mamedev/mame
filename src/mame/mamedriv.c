@@ -8881,6 +8881,7 @@ Other Sun games
 	DRIVER( vamphalfk )	/* (c) 1999 DanBi & F2 System */
 	DRIVER( dquizgo2 )	/* (c) 2000 Semicom */
 	DRIVER( misncrft )	/* (c) 2000 Sun */
+	DRIVER( mrdig )		/* (c) 2000 Sun */
 	DRIVER( hidnctch )	/* (c) 1998 Eolith */
 	DRIVER( ironfort )	/* (c) 1998 Eolith */
 	DRIVER( puzzlekg )	/* (c) 1998 Eolith */
