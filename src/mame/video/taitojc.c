@@ -323,8 +323,16 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	float dz = extent->param[0].dpdx;
 	float dcolor = extent->param[1].dpdx;
 	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
-	UINT16 *zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
+	UINT16 *zb;
 	int x;
+
+	// avoid crash in landgear/dangcurv
+	if (!extra->zbuffer)
+	{
+		return;
+	}
+
+	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
