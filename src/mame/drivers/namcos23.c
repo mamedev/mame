@@ -2209,6 +2209,7 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine->gamedrv->name, "rapidrvr")) ||
 	    (!strcmp(machine->gamedrv->name, "finlflng")) ||
 	    (!strcmp(machine->gamedrv->name, "gunwars")) ||
+	    (!strcmp(machine->gamedrv->name, "downhill")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2j")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2b")) ||
@@ -2898,9 +2899,58 @@ ROM_START( gunwars )
         ROM_LOAD( "gm1wave.2c",   0x000000, 0x800000, CRC(7d5c79a4) SHA1(b800a46bcca10cb0d0d9e0acfa68af63ae64dcaf) )
 ROM_END
 
+ROM_START( downhill )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+        ROM_LOAD16_BYTE( "dh3vera.ic2",  0x000000, 0x200000, CRC(5d9952e9) SHA1(d38422330bd708c247b9968429fbff36fe706598) ) 
+        ROM_LOAD16_BYTE( "dh3vera.ic1",  0x000001, 0x200000, CRC(64a236f3) SHA1(aac59e0db5cfefc4b442e6c3a5189a8418742201) ) 
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+        ROM_LOAD16_WORD_SWAP( "dh3vera.ic3",  0x000000, 0x080000, CRC(98f9fc8b) SHA1(5152b9e11773033a26da11d1f3774a261e61a2c5) ) 
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "ASCA-3;Ver 2.04;JPN,Multipurpose + Rotary Encoder" */
+        ROM_LOAD( "asc3_io-c.ic14", 0x000000, 0x020000, CRC(2f272a7b) SHA1(9d7ebe274c0d26f5f38747224d42d0375e2ed14c) ) 
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "dh1mtah.2j",   0x000000, 0x800000, CRC(3b56faa7) SHA1(861db7f549bedbb2b837516fcc966ad5890007ce) ) 
+        ROM_LOAD16_BYTE( "dh1mtal.2h",   0x000001, 0x800000, CRC(9fa07bfe) SHA1(a6b847ff7d5eadbf60b434a0d905051ea4227113) ) 
+
+	ROM_REGION( 0x4000000, "textile", 0 )	/* texture tiles */
+        ROM_LOAD( "dh1cguu.5f",   0x000000, 0x800000, CRC(66cb0dd7) SHA1(1f67320f150f1b55c97eae4b9fe4890fabc8dc7e) ) 
+        ROM_LOAD( "dh1cgum.4j",   0x000000, 0x800000, CRC(1044d0a0) SHA1(e0bf843616e166495fcdc76f076eb53a28287d30) ) 
+        ROM_LOAD( "dh1cgll.4m",   0x000000, 0x800000, CRC(c0d5ad87) SHA1(bc1992516c63aebdae0322def77f082d799a327a) ) 
+        ROM_LOAD( "dh1cglm.4k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) ) 
+
+	ROM_REGION( 0x4000000, "textile2", 0 )	/* second copy of texture tiles */
+        ROM_LOAD( "dh1cguu.4f",   0x000000, 0x800000, CRC(66cb0dd7) SHA1(1f67320f150f1b55c97eae4b9fe4890fabc8dc7e) ) 
+        ROM_LOAD( "dh1cgum.5j",   0x000000, 0x800000, CRC(1044d0a0) SHA1(e0bf843616e166495fcdc76f076eb53a28287d30) ) 
+        ROM_LOAD( "dh1cgll.5m",   0x000000, 0x800000, CRC(c0d5ad87) SHA1(bc1992516c63aebdae0322def77f082d799a327a) ) 
+        ROM_LOAD( "dh1cglm.5k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) ) 
+
+	ROM_REGION( 0x800000, "textilemap", 0 )	/* texture tilemap */
+        ROM_LOAD( "dh1ccrl.7f",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) ) 
+        ROM_LOAD( "dh1ccrh.7e",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) ) 
+
+	ROM_REGION( 0x800000, "textilemap2", 0 )	/* second copy of texture tilemap */
+        ROM_LOAD( "dh1ccrl.7m",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) ) 
+        ROM_LOAD( "dh1ccrh.7k",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) ) 
+
+	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+        ROM_LOAD32_WORD( "dh1pt0l.7c", 0x0000000, 0x400000, CRC(d120eee5) SHA1(fa1269d891f4e0510491aa70c4abd5f36852e691) ) 
+        ROM_LOAD32_WORD( "dh1pt0h.7a", 0x0000002, 0x400000, CRC(0e84a5d8) SHA1(28559f978b86d88bb18c3e58e28a97ecfb5f7fa9) ) 
+        ROM_LOAD32_WORD( "dh1pt1l.5c", 0x0800000, 0x400000, CRC(dee2f2bf) SHA1(258f9a6e324502550d27b8feaf36244766fa19da) ) 
+        ROM_LOAD32_WORD( "dh1pt1h.5a", 0x0800002, 0x400000, CRC(88cd4c90) SHA1(94016c72a9da983e55c74cbdd3691b596ea50c31) ) 
+        ROM_LOAD32_WORD( "dh1pt2l.4c", 0x1000000, 0x400000, CRC(714e3090) SHA1(39827f645dacbb57c7c40193f3f58e879899a4f3) ) 
+        ROM_LOAD32_WORD( "dh1pt2h.4a", 0x1000002, 0x400000, CRC(7e167c65) SHA1(018bf6aea4c1640ef728cf7b8e491f11742ede0d) ) 
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+        ROM_LOAD( "dh1wavel.2c",  0x000000, 0x800000, CRC(10954726) SHA1(50ee0346c46194dada7b5c0d8b1efe9a7f211b90) ) 
+        ROM_LOAD( "dh1waveh.2a",  0x800000, 0x800000, CRC(2adfa312) SHA1(d01a46af2c95d1ea64e9778979ae147298d921e3) ) 
+ROM_END
+
 /* Games */
 GAME( 1997, rapidrvr, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, finlflng, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1997, downhill, 0,         s23,    s23, ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, motoxgo,  0,         s23,    s23, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2b,timecrs2,  s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
