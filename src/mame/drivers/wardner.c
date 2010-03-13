@@ -204,8 +204,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_CRTC_reg_sel_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(wardner_CRTC_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x10, 0x13) AM_WRITE(wardner_txscroll_w)		/* scroll text layer */
 	AM_RANGE(0x14, 0x15) AM_WRITE(wardner_txlayer_w)		/* offset in text video RAM */
 	AM_RANGE(0x20, 0x23) AM_WRITE(wardner_bgscroll_w)		/* scroll bg layer */
@@ -390,35 +390,39 @@ static GFXDECODE_START( wardner )
 GFXDECODE_END
 
 
+
+
 static MACHINE_DRIVER_START( wardner )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map)
 	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", wardner_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,24000000/7)			/* 3.43MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4)		/* 3.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_program_map)
 	MDRV_CPU_IO_MAP(sound_io_map)
 
-	MDRV_CPU_ADD("dsp", TMS32010,14000000)	/* 14MHz Crystal CLKin */
+	MDRV_CPU_ADD("dsp", TMS32010, XTAL_14MHz)		/* 14MHz Crystal CLKin */
 	MDRV_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(DSP_io_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))					/* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000))						/* 100 CPU slices per frame */
 
 	MDRV_MACHINE_RESET(wardner)
 
 	/* video hardware */
+	MDRV_MC6845_ADD("crtc", HD6845, XTAL_14MHz/4, twincobr_mc6845_intf)	/* 3.5MHz measured on CLKin */
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_14MHz / 2) / (446 * 286) )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
 	MDRV_GFXDECODE(wardner)
@@ -431,7 +435,7 @@ static MACHINE_DRIVER_START( wardner )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 24000000/7)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

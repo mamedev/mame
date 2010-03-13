@@ -2,8 +2,8 @@
   video.c
 
   Functions to emulate the video hardware of these machines.
-  Video is 30x40 tiles. (200x320 for Twin Cobra/Flying shark)
-  Video is 40x30 tiles. (320x200 for Wardner)
+  Video is 40x30 tiles. (320x240 for Twin Cobra/Flying shark)
+  Video is 40x30 tiles. (320x240 for Wardner)
 
   Video has 3 scrolling tile layers (Background, Foreground and Text) and
   Sprites that have 4 priorities. Lowest priority is "Off".
@@ -47,6 +47,23 @@ static INT32 twincobr_display_on;
 static INT32 twincobr_flip_screen;
 
 static tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
+
+
+/* 6845 used for video sync signals only */
+const mc6845_interface twincobr_mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	2,			/* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
 
 
 /***************************************************************************
@@ -171,25 +188,15 @@ void twincobr_flipscreen(running_machine *machine, int flip)
 	tilemap_set_flip_all(machine, (flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 	twincobr_flip_screen = flip;
 	if (flip) {
-		scroll_x = -58;
-		scroll_y = -29;
-		if (toaplan_main_cpu == 1) scroll_y += 256;		/* Wardner */
+		scroll_x = 0x008;
+		scroll_y = 0x0c5;
 	}
 	else {
-		scroll_x = 55;
-		scroll_y = 30;
+		scroll_x = 0x037;
+		scroll_y = 0x01e;
 	}
 }
 
-WRITE16_HANDLER( twincobr_crtc_reg_sel_w )
-{
-//  mc6845_address_w(offset, data);
-}
-
-WRITE16_HANDLER( twincobr_crtc_data_w )
-{
-//  mc6845_register_w(offset, data);
-}
 
 WRITE16_HANDLER( twincobr_txoffs_w )
 {
@@ -363,15 +370,6 @@ WRITE8_HANDLER( wardner_sprite_w )
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0xff00) | data;
 }
 
-WRITE8_HANDLER( wardner_CRTC_reg_sel_w )
-{
-//  mc6845_address_w(offset, data);
-}
-
-WRITE8_HANDLER( wardner_CRTC_data_w )
-{
-//  mc6845_register_w(0, data);
-}
 
 
 /***************************************************************************

@@ -1,8 +1,10 @@
 /***************************************************************************
-        Twincobr/Flying shark/Wardner  game hardware from 1986-1987
+        Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------
 ****************************************************************************/
 
+
+#include "video/mc6845.h"
 
 
 /*----------- defined in drivers/wardner.c -----------*/
@@ -33,6 +35,7 @@ WRITE8_HANDLER(   wardner_control_w );
 WRITE8_HANDLER(   wardner_coin_dsp_w );
 
 MACHINE_RESET( twincobr );
+MACHINE_RESET( fsharkbt );
 MACHINE_RESET( wardner );
 
 extern void twincobr_driver_savestate(running_machine *machine);
@@ -45,6 +48,7 @@ extern UINT8 *twincobr_sharedram;
 
 
 /*----------- defined in video/twincobr.c -----------*/
+extern const mc6845_interface twincobr_mc6845_intf;
 
 extern void twincobr_flipscreen(running_machine *machine, int flip);
 extern void twincobr_display(int enable);
@@ -62,8 +66,6 @@ WRITE16_HANDLER( twincobr_exscroll_w );
 WRITE16_HANDLER( twincobr_txoffs_w );
 WRITE16_HANDLER( twincobr_bgoffs_w );
 WRITE16_HANDLER( twincobr_fgoffs_w );
-WRITE16_HANDLER( twincobr_crtc_reg_sel_w );
-WRITE16_HANDLER( twincobr_crtc_data_w );
 WRITE8_HANDLER( wardner_videoram_w );
 READ8_HANDLER(  wardner_videoram_r );
 WRITE8_HANDLER( wardner_bglayer_w );
@@ -75,8 +77,6 @@ WRITE8_HANDLER( wardner_txscroll_w );
 WRITE8_HANDLER( wardner_exscroll_w );
 READ8_HANDLER(  wardner_sprite_r );
 WRITE8_HANDLER( wardner_sprite_w );
-WRITE8_HANDLER( wardner_CRTC_reg_sel_w );
-WRITE8_HANDLER( wardner_CRTC_data_w );
 
 extern INT32 twincobr_fg_rom_bank;
 extern INT32 twincobr_bg_ram_bank;

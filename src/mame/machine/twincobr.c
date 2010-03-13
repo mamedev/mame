@@ -327,9 +327,14 @@ MACHINE_RESET( twincobr )
 	dsp_addr_w = 0;
 	main_ram_seg = 0;
 	dsp_execute = 0;
-	fsharkbt_8741 = -1;			/* Reset the Flying Shark Bootleg MCU */
 	twincobr_dsp_BIO = CLEAR_LINE;
 }
+MACHINE_RESET( fsharkbt )
+{
+	MACHINE_RESET_CALL(twincobr);
+	fsharkbt_8741 = -1;			/* Reset the Flying Shark Bootleg MCU */
+}
+
 void twincobr_driver_savestate(running_machine *machine)
 {
 	state_save_register_global(machine, toaplan_main_cpu);
