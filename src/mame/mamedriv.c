@@ -925,18 +925,22 @@ const game_driver * const drivers[] =
 	DRIVER( aquajet )	/* (c) 1996 */
 
 	/* Namco System 23 */
-	DRIVER( rapidrvr )	/* (c) 1997 */
-	DRIVER( finlflng )	/* (c) 1997 */
-	DRIVER( downhill )	/* (c) 1997 */
-	DRIVER( motoxgo )	/* (c) 1997 */
-	DRIVER( timecrs2 )	/* (c) 1997 */
-	DRIVER( timecrs2b )	/* (c) 1997 */
-	DRIVER( timecrs2c )	/* (c) 1997 */
-	DRIVER( panicprk )	/* (c) 1998 */
-	DRIVER( gunwars )	/* (c) 1998 */
-	DRIVER( 500gp )		/* (c) 1998 */
-	DRIVER( finfurl2 )	/* (c) 1999 */
-	DRIVER( finfurl2j )	/* (c) 1999 */
+	DRIVER( finlflng )	/* July 1997 */
+	DRIVER( motoxgo )	/* November 1997 */
+	DRIVER( rapidrvr )	/* December 1997 */
+	DRIVER( downhill )	/* March 1998 */
+	DRIVER( timecrs2 )	/* April 1998 */
+	DRIVER( timecrs2b )	/* April 1998 */
+	DRIVER( timecrs2c )	/* April 1998 */
+	DRIVER( panicprk )	/* May 1998 */
+				/* Race On - September 1998 */
+	DRIVER( gunwars )	/* September 1998 */
+				/* Angler King - March 1999 */
+	DRIVER( 500gp )		/* March 1999 */
+	DRIVER( finfurl2 )	/* March 1999 */
+	DRIVER( finfurl2j )	/* March 1999 */
+				/* Guitar Jam - July 1999 */
+				/* Crisis Zone - December 1999 */
 
 	/* Namco System 246 */
 	DRIVER( sys246 )
