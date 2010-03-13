@@ -934,7 +934,7 @@ const game_driver * const drivers[] =
 	DRIVER( timecrs2c )	/* (c) 1997 */
 	DRIVER( panicprk )	/* (c) 1998 */
 	DRIVER( gunwars )	/* (c) 1998 */
-	DRIVER( 500gp )		/* (c) 1999 */
+	DRIVER( 500gp )		/* (c) 1998 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfurl2j )	/* (c) 1999 */
 
