@@ -307,6 +307,24 @@
   This game should be moved to a new driver in a near future, as soon as we know a bit more about it.
 
 
+  * Fun World Quiz
+
+  Beschreibung / Description
+  --------------------------
+
+  Für OES 5,-- Einwurf werden 3 Kredite gegeben. Für einen Kredit bekommt der Spieler 
+  500 Spielpunkte. Bei jeder Frage kann der Spieler 100, 500 oder alle Punkte einsetzen.
+  Wird die Frage richtig beantwortet, wird der Einsatz aufaddiert. Erreicht der Spieler
+  nach 5 Fragen mehr als 2500 Punkte, bekommt er Bonusfragen. Das Spiel endet bei einer
+  falschen Beantwortung der Frage.
+
+  Insertion of ATS 5,- (Austrian Schilling coin) yields 5 credits. For 1 credit a player 
+  receives 500 points. At each question a player can bet 100, 500 or all points. If a
+  question is answered correctly, the bet is added to the points. If a player reaches
+  more than 2500 points after 5 questions, he gets bonus questions. The game is over
+  after an incorrect answer.
+
+
 
 ***********************************************************************************
 
@@ -609,6 +627,7 @@
      custom CPU. Seems similar hardware than (multi) Joker Card.
   - Added Fun World Quiz. Needs proper banking, and both graphics and
      bipolar PROM redumps.
+  - Added Fun World Quiz description, and hardware notes.
 
 
   *** TO DO ***
@@ -3249,8 +3268,63 @@ ROM_START( saloon )
 ROM_END
 
 
-/**** Fun Quiz ****/
+/**** Fun World Quiz ****
 
+  Fun World Quiz
+  Öhlinger Ges.m.b.H.
+
+  Horizontal Display
+  Currents
+  +5V   2A
+  +12V  0.5A
+  -5V   -
+
+  4 way joystick.
+  1 action button.
+
+
+                Pinouts
+  --------------+--+--+--------------
+            GND |A |01| GND
+            GND |B |02| GND
+            GND |C |03| GND
+            +5V |D |04| +5V
+           +12V |E |05| +12V
+                |F |06|
+                |H |07|
+            ... |J |08| ... (empty, normally used in System Austria pinout)
+        Credits |K |09| ...
+            ... |L |10| ...
+            ... |M |11| 1P Start
+            ... |N |12| 2P Start
+    1P Action 1 |P |13| 1P Action 2
+    2P Action 1 |R |14| 2P Action 2
+        1P Left |S |15| 1P Right 
+        1P Down |T |16| 1P Up
+        2P Left |U |17| 2P Right
+        2P Down |V |18| 2P Up
+    Video Green |W |19| Video Red
+     Video Sync |X |20| Video Blue
+        Speaker |Y |21| Video GND
+            ... |Z |22| Speaker
+
+  (some pinout letters are missing - this was a decision made by engineers to
+  avoid mix-ups)
+
+
+  DIP Switches (simple on/off)
+  --+-----------------------------------------------------------------------
+  1 | Buchhaltung / Bookkeeping.
+  2 | Nicht verwendet / Not used.
+  3 | Ohne Zahlen (Wien) / No numbers (Vienna).
+  4 | Nicht verwendet / Not used.
+  5 | Nicht verwendet / Not used.
+  6 | Richtige Antwort wird angezeigt / Right answer is shown.
+  7 | Frage wird bei Einsatz angezeigt / Question is shown when bet is made.
+  8 | Spiel mit Einsatzwahl / Game with betting.
+  --+-----------------------------------------------------------------------
+
+*/
 ROM_START( funquiz )	/* Fun World Quiz */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kqu_6.bin", 0xc000, 0x4000, CRC(50f0e586) SHA1(85ce5b95283113e2ac94fd882c57ce1b26135ed0) )
