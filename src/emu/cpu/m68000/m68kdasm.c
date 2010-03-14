@@ -1710,6 +1710,13 @@ static void d68040_fpu(void)
 	src = (w2 >> 10) & 0x7;
 	dst_reg = (w2 >> 7) & 0x7;
 
+	// special override for FMOVECR
+	if ((((w2 >> 13) & 0x7) == 2) && (((w2>>10)&0x7) == 7))
+	{
+		sprintf(g_dasm_str, "fmovecr   #$%0x, fp%d", (w2&0x7f), dst_reg);
+		return;
+	}
+
 	switch ((w2 >> 13) & 0x7)
 	{
 		case 0x0:

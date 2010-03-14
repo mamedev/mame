@@ -593,6 +593,21 @@ static void WRITE_EA_64(m68ki_cpu_core *m68k, int ea, UINT64 data)
 	}
 }
 
+INLINE floatx80 load_extended_float80(m68ki_cpu_core *m68k, UINT32 ea)
+{
+	UINT32 d1,d2;
+	UINT16 d3;
+	floatx80 fp;
+
+	d3 = m68ki_read_16(m68k, ea);
+	d1 = m68ki_read_32(m68k, ea+4);
+	d2 = m68ki_read_32(m68k, ea+8);
+	fp.high = d3;
+	fp.low = ((UINT64)d1<<32) | (d2 & 0xffffffff);
+
+	return fp;
+}
+
 static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
 {
 	floatx80 fpr;
@@ -603,34 +618,49 @@ static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
 	{
 		case 2:		// (An)
 		{
-			UINT32 d1,d2;
-			UINT16 d3;
 			UINT32 ea = REG_A[reg];
-			d3 = m68ki_read_16(m68k, ea);
-			d1 = m68ki_read_32(m68k, ea+4);
-			d2 = m68ki_read_32(m68k, ea+8);
-			fpr.high = d3;
-			fpr.low = ((UINT64)d1<<32) | (d2 & 0xffffffff);
+			fpr = load_extended_float80(m68k, ea);
 			break;
 		}
 
 		case 3:		// (An)+
 		{
-			UINT32 d1,d2;
-			UINT16 d3;
 			UINT32 ea = REG_A[reg];
 			REG_A[reg] += 12;
-			d3 = m68ki_read_16(m68k, ea);
-			d1 = m68ki_read_32(m68k, ea+4);
-			d2 = m68ki_read_32(m68k, ea+8);
-			fpr.high = d3;
-			fpr.low = ((UINT64)d1<<32) | (d2 & 0xffffffff);
+			fpr = load_extended_float80(m68k, ea);
 			break;
 		}
-		default:	fatalerror("M68kFPU: READ_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
+
+		case 7:	// extended modes
+		{
+			switch (reg)
+			{
+				case 3:	// (d16,PC,Dx.w)
+					{
+						UINT32 ea = EA_PCIX_32(m68k);
+						fpr = load_extended_float80(m68k, ea);
+					}
+					break;
+
+				default:	
+					fatalerror("M68kFPU: READ_EA_FPE0: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
+					break;
+			}
+		}
+		break;
+
+		default:	fatalerror("M68kFPU: READ_EA_FPE1: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC); break;
 	}
 
 	return fpr;
+}
+
+INLINE void store_extended_float80(m68ki_cpu_core *m68k, UINT32 ea, floatx80 fpr)
+{
+	m68ki_write_16(m68k, ea+0, fpr.high);
+	m68ki_write_16(m68k, ea+2, 0);
+	m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
+	m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
 }
 
 static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
@@ -644,10 +674,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
 		{
 			UINT32 ea;
 			ea = REG_A[reg];
-			m68ki_write_16(m68k, ea+0, fpr.high);
-			m68ki_write_16(m68k, ea+2, 0);
-			m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
-			m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
+			store_extended_float80(m68k, ea, fpr);
 			break;
 		}
 
@@ -655,10 +682,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
 		{
 			UINT32 ea;
 			ea = REG_A[reg];
-			m68ki_write_16(m68k, ea+0, fpr.high);
-			m68ki_write_16(m68k, ea+2, 0);
-			m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
-			m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
+			store_extended_float80(m68k, ea, fpr);
 			REG_A[reg] += 12;
 			break;
 		}
@@ -668,10 +692,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
 			UINT32 ea;
 			REG_A[reg] -= 12;
 			ea = REG_A[reg];
-			m68ki_write_16(m68k, ea+0, fpr.high);
-			m68ki_write_16(m68k, ea+2, 0);
-			m68ki_write_32(m68k, ea+4, (fpr.low>>32)&0xffffffff);
-			m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
+			store_extended_float80(m68k, ea, fpr);
 			break;
 		}
 
@@ -679,7 +700,6 @@ static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
 		{
 			switch (reg)
 			{
-				case 3:	// (d8,PC,Xn)
 				default:	fatalerror("M68kFPU: WRITE_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
 			}
 		}
@@ -696,6 +716,8 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 	int dst = (w2 >>  7) & 0x7;
 	int opmode = w2 & 0x7f;
 	floatx80 source;
+
+	// fmovecr #$f, fp0	f200 5c0f
 	
 	if (rm)
 	{
@@ -742,7 +764,72 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 				source = int32_to_floatx80((INT32)d);
 				break;
 			}
-			default:	fatalerror("fmove_rm_reg: invalid source specifier at %08X\n", REG_PC-4);
+			case 7:		// FMOVECR load from constant ROM
+			{
+				switch (w2 & 0x7f)
+				{
+					case 0x0:	// Pi
+						source.high = 0x4000;
+						source.low = U64(0xc90fdaa22168c235);
+						break;
+
+					case 0xb:	// log10(2)
+						source.high = 0x3ffd;
+						source.low = U64(0x9a209a84fbcff798);
+						break;
+
+					case 0xc:	// e
+						source.high = 0x4000;
+						source.low = U64(0xadf85458a2bb4a9b);
+						break;
+
+					case 0xd:	// log2(e)
+						source.high = 0x3fff;
+						source.low = U64(0xb8aa3b295c17f0bc);
+						break;
+
+					case 0xe:	// log10(e)
+						source.high = 0x3ffd;
+						source.low = U64(0xde5bd8a937287195);
+						break;
+
+					case 0xf:	// 0.0
+						source = int32_to_floatx80((INT32)0);
+						break;
+
+					case 0x30:	// ln(2)
+						source.high = 0x3ffe;
+						source.low = U64(0xb17217f7d1cf79ac);
+						break;
+
+					case 0x31:	// ln(10)
+						source.high = 0x4000;
+						source.low = U64(0x935d8dddaaa8ac17);
+						break;
+
+					case 0x32:	// 1 (or 100?  manuals are unclear, but 1 would make more sense)
+						source = int32_to_floatx80((INT32)1);
+						break;
+
+					case 0x33:	// 10^1
+						source = int32_to_floatx80((INT32)10);
+						break;
+
+					case 0x34:	// 10^2
+						source = int32_to_floatx80((INT32)10*10);
+						break;
+
+					default:
+						fatalerror("fmove_rm_reg: unknown constant ROM offset %x at %08x\n", w2&0x7f, REG_PC-4);
+						break;
+				}
+
+				// handle it right here, the usual opmode bits aren't valid in the FMOVECR case
+				REG_FP[dst] = source;
+				m68k->remaining_cycles -= 4;
+				return;
+			}
+			default:	fatalerror("fmove_rm_reg: invalid source specifier %x at %08X\n", src, REG_PC-4);
 		}
 	}
 	else
