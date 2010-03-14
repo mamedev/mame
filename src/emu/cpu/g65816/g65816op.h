@@ -658,93 +658,60 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			SRC    = OPER_8_##MODE(cpustate);										\
 			if(FLAG_D)														\
 			{																\
-				unsigned tmp1, tmp2, tmpA, tmpB;							\
-				tmp1 = REGISTER_A & 0x0F;									\
-				tmp2 = (REGISTER_A >> 4) & 0x0F;							\
-				tmpA = SRC&0x0F;											\
-				tmpB = (SRC >> 4) & 0x0F;									\
-				tmp1 = tmp1 + tmpA + CFLAG_AS_1();							\
-				tmp2 = tmp2 + tmpB;											\
-				FLAG_C = CFLAG_CLEAR;										\
-				if(tmp1 > 0x09)												\
-				{															\
-					tmp2++;													\
-					tmp1 = ((tmp1 + 6) & 0x0F);								\
-				}															\
-				if(tmp2 > 0x09)												\
-				{															\
-					tmp2=((tmp2 + 6) & 0x0F);								\
-					FLAG_C = CFLAG_SET;										\
-				}															\
-				tmp16 = tmp1 | (tmp2 << 4);									\
-				FLAG_V = VFLAG_ADD_8(SRC, REGISTER_A, tmp16);				\
+				INT32 result, r0, r1, carry;													\
+				r0 = REGISTER_A;	\
+				r1 = SRC;		\
+				carry = CFLAG_AS_1();	\
+				result = (r0 & 0x0f) + (r1 & 0x0f) + (carry << 0);							\
+				if (result > 0x09) result += 0x06;										\
+				carry = result > 0x0f;												\
+				result = (r0 & 0xf0) + (r1 & 0xf0) + (carry << 4) + (result & 0x0f);					\
+				FLAG_V = ~(r0 ^ SRC) & (r0 ^ result) & 0x80;							\
+				if (result > 0x9f) result += 0x60;										\
+				FLAG_C = (result > 0xff) ? 0x100 : 0;											\
+				FLAG_N = (result & 0x80);												\
+				FLAG_Z = REGISTER_A = MAKE_UINT_8(result);										\
 			}																\
 			else															\
 			{																\
 				FLAG_C = tmp16 = REGISTER_A + SRC + CFLAG_AS_1();			\
 				FLAG_V = VFLAG_ADD_8(SRC, REGISTER_A, FLAG_C);				\
+				FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(tmp16);				\
 			}																\
-			FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(tmp16);				\
 	}
 
 #else
 #define OP_ADC(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);								\
 			SRC    = OPER_16_##MODE(cpustate);										\
-			if(!FLAG_D)														\
-			{																\
-				FLAG_C = REGISTER_A + SRC + CFLAG_AS_1();					\
-				FLAG_V = VFLAG_ADD_16(SRC, REGISTER_A, FLAG_C);				\
-				FLAG_Z = REGISTER_A = MAKE_UINT_16(FLAG_C);					\
-				FLAG_N = NFLAG_16(REGISTER_A);								\
-				FLAG_C = CFLAG_16(FLAG_C);									\
-				BREAKOUT;													\
-			}																\
-			else															\
-			{																\
-				unsigned tmp16;												\
-				unsigned tmp1,tmp2,tmp3, tmp4, tmpA, tmpB, tmpC, tmpD;		\
-				tmp1 = REGISTER_A & 0x0F;									\
-				tmp2 = (REGISTER_A >> 4) & 0x0F;							\
-				tmp3 = (REGISTER_A >> 8) & 0x0F;							\
-				tmp4 = (REGISTER_A >> 12) & 0x0F;							\
-				tmpA = SRC & 0x0F;											\
-				tmpB = (SRC >> 4) & 0x0F;									\
-				tmpC = (SRC >> 8) & 0x0F;									\
-				tmpD = (SRC >> 12) & 0x0F;									\
-				tmp1 = tmp1 + tmpA + CFLAG_AS_1();							\
-				tmp2 = tmp2 + tmpB;											\
-				tmp3 = tmp3 + tmpC;											\
-				tmp4 = tmp4 + tmpD;											\
-				FLAG_C = CFLAG_CLEAR;										\
-				if(tmp1 > 9)												\
-				{															\
-					tmp2++;													\
-					tmp1 = ((tmp1 + 6) & 0x0F);								\
-				}															\
-				if(tmp2 > 9)												\
-				{															\
-					tmp3++;													\
-					tmp2 = ((tmp2 + 6) & 0x0F);								\
-				}															\
-				if(tmp3 > 9)												\
-				{															\
-					tmp4++;													\
-					tmp3 = ((tmp3 + 6) & 0x0F);								\
-				}															\
-				if(tmp4 > 9)												\
-				{															\
-					FLAG_C = CFLAG_SET;										\
-					tmp4 = ((tmp4 + 6) & 0x0F);								\
-				}															\
-				tmp16 = tmp1 | (tmp2 << 4) | (tmp3 << 8) | (tmp4 << 12);	\
-				FLAG_V = VFLAG_ADD_16(SRC, REGISTER_A, tmp16);				\
-				FLAG_Z = REGISTER_A = MAKE_UINT_16(tmp16);					\
-				FLAG_N = NFLAG_16(REGISTER_A);								\
-			}
-
+			INT32 result, r0, r1, carry;													\
+			r0 = REGISTER_A;	\
+			r1 = SRC;		\
+			carry = CFLAG_AS_1();	\
+			if (!FLAG_D) 	\
+			{	\
+				result = r0 + r1 + carry;	\
+			} 	\
+			else 	\
+			{	\
+				result = (r0 & 0x000f) + (r1 & 0x000f) + (carry <<  0);	\
+				if(result > 0x0009) result += 0x0006;	\
+				carry = result > 0x000f;	\
+				result = (r0 & 0x00f0) + (r1 & 0x00f0) + (carry <<  4) + (result & 0x000f);	\
+				if(result > 0x009f) result += 0x0060;	\
+				carry = result > 0x00ff;	\
+				result = (r0 & 0x0f00) + (r1 & 0x0f00) + (carry <<  8) + (result & 0x00ff);	\
+				if(result > 0x09ff) result += 0x0600;	\
+				carry = result > 0x0fff;		\
+				result = (r0 & 0xf000) + (r1 & 0xf000) + (carry << 12) + (result & 0x0fff);	\
+			}	\
+			FLAG_V = ~(r0 ^ r1) & (r0 ^ result) & 0x8000;	\
+			FLAG_V >>= 8;	\
+			if (FLAG_D && result > 0x9fff) result += 0x6000;	\
+			FLAG_C = (result > 0xffff) ? 0x100 : 0;	\
+			FLAG_Z = REGISTER_A = MAKE_UINT_16(result);			\
+			FLAG_N = NFLAG_16(REGISTER_A);								
 #endif
-
 
 /* M6502   Logical AND with accumulator */
 #undef OP_AND
@@ -1546,9 +1513,9 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_SBC(MODE)														\
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);								\
 			SRC = OPER_8_##MODE(cpustate);											\
-			FLAG_C = ~FLAG_C;												\
 			if(!FLAG_D)														\
 			{																\
+				FLAG_C = ~FLAG_C;												\
 				FLAG_C = REGISTER_A - SRC - CFLAG_AS_1();					\
 				FLAG_V = VFLAG_SUB_8(SRC, REGISTER_A, FLAG_C);				\
 				FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(FLAG_C);			\
@@ -1557,93 +1524,53 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			}																\
 			else															\
 			{																\
-				unsigned tmp16;												\
-				signed tmp1, tmp2, tmpA, tmpB;							\
-				DST = CFLAG_AS_1();											\
-				tmp1 = REGISTER_A & 0x0F;									\
-				tmp2 = (REGISTER_A >> 4) & 0x0F;							\
-				tmpA = SRC&0x0F;											\
-				tmpB = (SRC >> 4) & 0x0F;									\
-				tmp1 = tmp1 - tmpA - DST;									\
-				tmp2 = tmp2 - tmpB;											\
-				FLAG_C = CFLAG_CLEAR;										\
-				if(tmp1 < 0)												\
-					tmp2--;													\
-				if((tmp1 > 0x09) || (tmp1 < 0 ))							\
-				{															\
-					tmp1 = ((tmp1 + 10) & 0x0F);							\
-				}															\
-				if(!(tmp2 < 0))												\
-					FLAG_C = CFLAG_SET;										\
-				if((tmp2 > 0x09) || (tmp2 < 0))								\
-				{															\
-						tmp2=((tmp2 + 10) & 0x0F);							\
-				}															\
-				tmp16 = tmp1 | (tmp2 << 4);									\
-				FLAG_V = VFLAG_SUB_8(SRC, REGISTER_A, tmp16);				\
-				FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(tmp16);			\
+				INT32 result, r0, r1, carry;													\
+				r0 = REGISTER_A;	\
+				r1 = SRC;		\
+				r1 ^= 0xff;		\
+				carry = CFLAG_AS_1();	\
+				result = (r0 & 0x0f) + (r1 & 0x0f) + (carry << 0);	\
+				if (result <= 0x0f) result -= 0x06;	\
+				carry = result > 0x0f;	\
+				result = (r0 & 0xf0) + (r1 & 0xf0) + (carry << 4) + (result & 0x0f);	\
+				FLAG_V = ~(r0 ^ r1) & (r0 ^ result) & 0x80;	\
+				if (result <= 0xff) result -= 0x60;	\
+    				FLAG_C = (result > 0xff) ? 0x100 : 0;											\
+				FLAG_N = (result & 0x80);												\
+				FLAG_Z = REGISTER_A = MAKE_UINT_8(result);										\
 			}
 #else
 #define OP_SBC(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);								\
-			SRC = OPER_16_##MODE(cpustate);											\
-			FLAG_C = ~FLAG_C;												\
-			if(!FLAG_D)														\
-			{																\
-				FLAG_C = REGISTER_A - SRC - CFLAG_AS_1();					\
-				FLAG_V = VFLAG_SUB_16(SRC, REGISTER_A, FLAG_C);				\
-				FLAG_Z = REGISTER_A = MAKE_UINT_16(FLAG_C);					\
-				FLAG_N = NFLAG_16(REGISTER_A);								\
-				FLAG_C = ~CFLAG_16(FLAG_C);									\
-				BREAKOUT;													\
-			}																\
-			else															\
-			{																\
-				unsigned tmp16;												\
-				signed tmp1,tmp2,tmp3, tmp4, tmpA, tmpB, tmpC, tmpD;		\
-				DST = CFLAG_AS_1();											\
-				tmp1 = REGISTER_A & 0x0F;									\
-				tmp2 = (REGISTER_A >> 4) & 0x0F;							\
-				tmp3 = (REGISTER_A >> 8) & 0x0F;							\
-				tmp4 = (REGISTER_A >> 12) & 0x0F;							\
-				tmpA = SRC & 0x0F;											\
-				tmpB = (SRC >> 4) & 0x0F;									\
-				tmpC = (SRC >> 8) & 0x0F;									\
-				tmpD = (SRC >> 12) & 0x0F;									\
-				tmp1 = tmp1 - tmpA - CFLAG_AS_1();							\
-				tmp2 = tmp2 - tmpB;											\
-				tmp3 = tmp3 - tmpC;											\
-				tmp4 = tmp4 - tmpD;											\
-				FLAG_C = CFLAG_CLEAR;										\
-				if(tmp1 < 0)												\
-					tmp2--;													\
-				if((tmp1 > 0x09) || (tmp1 < 0 ))							\
-				{															\
-					tmp1 = ((tmp1 + 10) & 0x0F);							\
-				}															\
-				if(tmp2 < 0)												\
-					tmp3--;													\
-				if((tmp2 > 0x09) || (tmp2 < 0))								\
-				{															\
-						tmp2=((tmp2 + 10) & 0x0F);							\
-				}															\
-				if(tmp3 < 0)												\
-					tmp4--;													\
-				if((tmp3 > 0x09) || (tmp3 < 0 ))							\
-				{															\
-					tmp3 = ((tmp3 + 10) & 0x0F);							\
-				}															\
-				if(!(tmp4 < 0))												\
-					FLAG_C = CFLAG_SET;										\
-				if((tmp4 > 0x09) || (tmp4 < 0))								\
-				{															\
-					tmp4=((tmp4 + 10) & 0x0F);								\
-				}															\
-				tmp16 = tmp1 | (tmp2 << 4) | (tmp3 << 8) | (tmp4 << 12);	\
-				FLAG_V = VFLAG_SUB_16(SRC, REGISTER_A, tmp16);				\
-				FLAG_Z = REGISTER_A = MAKE_UINT_16(tmp16);					\
-				FLAG_N = NFLAG_16(REGISTER_A);								\
-			}
+			SRC    = OPER_16_##MODE(cpustate);										\
+			INT32 result, r0, r1, carry;													\
+			r0 = REGISTER_A;	\
+			r1 = SRC;		\
+			r1 ^= 0xffff;		\
+			carry = CFLAG_AS_1();	\
+			if (!FLAG_D) 	\
+			{	\
+				result = r0 + r1 + carry;	\
+			} 	\
+			else 	\
+			{	\
+				result = (r0 & 0x000f) + (r1 & 0x000f) + (carry <<  0);	\
+				if(result <= 0x000f) result -= 0x0006;	\
+				carry = result > 0x000f;	\
+				result = (r0 & 0x00f0) + (r1 & 0x00f0) + (carry <<  4) + (result & 0x000f);	\
+				if(result <= 0x00ff) result -= 0x0060;	\
+				carry = result > 0x00ff;	\
+				result = (r0 & 0x0f00) + (r1 & 0x0f00) + (carry <<  8) + (result & 0x00ff);	\
+				if(result <= 0x0fff) result -= 0x0600;	\
+				carry = result > 0x0fff;		\
+				result = (r0 & 0xf000) + (r1 & 0xf000) + (carry << 12) + (result & 0x0fff);	\
+			}	\
+			FLAG_V = ~(r0 ^ r1) & (r0 ^ result) & 0x8000;	\
+			FLAG_V >>= 8;	\
+			if (FLAG_D && result <= 0xffff) result -= 0x6000;	\
+			FLAG_C = (result > 0xffff) ? 0x100 : 0;	\
+			FLAG_Z = REGISTER_A = MAKE_UINT_16(result);			\
+			FLAG_N = NFLAG_16(REGISTER_A);								
 #endif
 
 
