@@ -9087,10 +9087,12 @@ Other Sun games
 	DRIVER( jolyjokr )	/* (c) 198? Impera */
 	DRIVER( jolyjokra )	/* (c) 198? Impera */
 	DRIVER( jolyjokrb )	/* (c) 198? Impera */
+	DRIVER( multiwin )	/* (c) 1992 Funworld */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( saloon )	/* 199? unknown */
+	DRIVER( funquiz )	/* (c) 198? Funworld */
 	DRIVER( photoply )
 
 	/* Sandii' */

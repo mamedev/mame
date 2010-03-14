@@ -48,10 +48,12 @@
   * Jolly Joker (98bet, set 1).                       Impera,             198?.
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
+  * Multi Win (Ver.0167, encrypted),                  Funworld,           1992.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
   * Mongolfier New (italian),                         bootleg,            199?.
   * Soccer New (italian),                             bootleg,            199?.
   * Saloon (french, encrypted),                       unknown,            199?.
+  * Fun World Quiz (austrian),                        Funworld,           198?.
 
 
 ***********************************************************************************/
