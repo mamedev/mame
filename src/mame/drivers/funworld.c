@@ -324,6 +324,22 @@
   more than 2500 points after 5 questions, he gets bonus questions. The game is over
   after an incorrect answer.
 
+  Besides notes....
+
+  This machine is meant to work as "amusement", with high scores like another regular arcade.
+  You can set it as "bet mode", allowing to choose the amount of points to play, but can't be
+  turned to gambling mode (no payout, keyout, etc) for pubs, etc...
+
+  In bookkeeping mode (DIP switch #1):
+
+  Keep joystick left to clear bookkeeping.
+  Keep joystick up to clear high scores.
+  Keep joystick down to clear credits.
+  Keep joystick right to exit bookkeeping.
+
+  If the game has credits loaded, the bookkeeping mode will start
+  as soon as the current game ends.
+
 
 
 ***********************************************************************************
@@ -629,6 +645,14 @@
      bipolar PROM redumps.
   - Added Fun World Quiz description, and hardware notes.
 
+  - Improved inputs for Fun World Quiz.
+  - Proper handlers and banking for Fun World Quiz questions.
+  - Partial decryption for royalcdc and multiwin.
+  - Complete Fun World Quiz DIP switches with dip locations.
+  - Promoted Fun World Quiz to working state.
+  - Added Fun World Quiz bookkeeping instructions notes.
+
+
 
   *** TO DO ***
 
@@ -716,6 +740,43 @@ static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&funworld_colorram)
 	AM_RANGE(0x4000, 0x4000) AM_READNOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static UINT8 funquiz_question_bank = 0x80;
+
+static READ8_HANDLER( questions_r )
+{
+	UINT8* quiz = memory_region(space->machine,"questions");
+	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
+
+	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
+	if (funquiz_question_bank & 0x80) extraoffset += 0x4000;
+
+	return quiz[offset + extraoffset];
+}
+
+static WRITE8_HANDLER( question_bank_w )
+{
+//	printf("question bank write %02x\n", data);
+	funquiz_question_bank = data;
+}
+
+static ADDRESS_MAP_START( funquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(question_bank_w)
+
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&funworld_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&funworld_colorram)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(questions_r)
+
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1519,68 +1580,68 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( funquiz )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )	// start?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )	// start?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )	// start?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START4 )	// start or clear?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY	// joystick right, enter & exit bookkeeping???
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY	// joystick left
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY		// joystick up
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY	// joystick down
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )											// coin 2
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_U)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-7") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-8") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )											// coin 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-7") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-8") PORT_CODE(KEYCODE_J)
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_L)
-
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+/*
+  1 | Buchhaltung / Bookkeeping.
+  2 | Nicht verwendet / Not used.
+  3 | Ohne Zahlen (Wien) / No numbers (Vienna).
+  4 | Nicht verwendet / Not used.
+  5 | Nicht verwendet / Not used.
+  6 | Richtige Antwort wird angezeigt / Right answer is shown.
+  7 | Frage wird bei Einsatz angezeigt / Question is shown when bet is made.
+  8 | Spiel mit Einsatzwahl / Game with betting.
+*/
+	PORT_DIPNAME( 0x01, 0x00, "Game with betting" )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "Show question in bet stage" )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Right answer is shown" )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "No numbers (Vienna)" )	PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Bookkeeping" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1676,6 +1737,16 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL		/* IRQB */
 };
 
+/* these ports are set to output anyway, but this quietens the log */
+static READ8_DEVICE_HANDLER( funquiz_ay8910_a_r )
+{
+	return 0x00;
+}
+
+static READ8_DEVICE_HANDLER( funquiz_ay8910_b_r )
+{
+	return 0x00;
+}
 
 /************************
 *    Sound Interface    *
@@ -1691,6 +1762,15 @@ static const ay8910_interface ay8910_intf =
 	DEVCB_HANDLER(funworld_lamp_b_w)	/* portB out */
 };
 
+static const ay8910_interface funquiz_ay8910_intf =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_HANDLER(funquiz_ay8910_a_r),							/* portA in  */
+	DEVCB_HANDLER(funquiz_ay8910_b_r),							/* portB in  */
+	DEVCB_HANDLER(funworld_lamp_a_w),	/* portA out */
+	DEVCB_HANDLER(funworld_lamp_b_w)	/* portB out */
+};
 
 /************************
 *    CRTC Interface    *
@@ -1753,6 +1833,18 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( funquiz )
+	MDRV_IMPORT_FROM(funworld)
+
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_PROGRAM_MAP(funquiz_map)
+
+	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_SOUND_CONFIG(funquiz_ay8910_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( magicrd2 )
 	MDRV_IMPORT_FROM(funworld)
@@ -2698,7 +2790,7 @@ ROM_END
 */
 
 ROM_START( royalcdc )	/* encrypted program rom */
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000*2, "maincpu", 0 ) // *2 for decrypted opcodes (see init)
 	ROM_LOAD( "rc_1.bin", 0x8000, 0x8000, CRC(8cdcc978) SHA1(489b58760a7c8646399c8cdfb86ec4341823e7dd) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -3046,7 +3138,7 @@ ROM_END
     Unknown or encrypted CPU.
 */
 ROM_START( multiwin )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000*2, "maincpu", 0 )  // *2 for decrypted opcodes (see init)
 	ROM_LOAD( "multiwin3.bin",	0x8000, 0x8000, CRC(995ca34d) SHA1(4d6ec10810ece493447a01af149ad8387d5f3c2f) )	/* just the 2nd half */
 	ROM_LOAD( "multiwin4.bin",  0x4000, 0x8000, CRC(f062125c) SHA1(93c9aa518810798f3449a28e851eb6433ba7bbf8) )	/* just the 2nd half */
 
@@ -3292,7 +3384,7 @@ ROM_END
            +12V |E |05| +12V
                 |F |06|
                 |H |07|
-            ... |J |08| ... (empty, normally used in System Austria pinout)
+            ... |J |08| ... Empty (*)
         Credits |K |09| ...
             ... |L |10| ...
             ... |M |11| 1P Start
@@ -3308,8 +3400,11 @@ ROM_END
         Speaker |Y |21| Video GND
             ... |Z |22| Speaker
 
-  (some pinout letters are missing - this was a decision made by engineers to
-  avoid mix-ups)
+  Some pinout letters are missing.
+  This was a decision made by engineers
+  to avoid mix-ups.
+
+  (*) Normally used in System Austria pinout.
 
 
   DIP Switches (simple on/off)
@@ -3338,15 +3433,14 @@ ROM_START( funquiz )	/* Fun World Quiz */
 	ROM_REGION( 0x10000, "badgfx", 0 ) /* just a temporal container */
 	ROM_LOAD( "q_2_nec.bin", 0xc000, 0x4000, BAD_DUMP CRC(8e3bfcc7) SHA1(81b35e786fab088a439a4423becf08a78a0b2df0) )
 
-
 	/* One unpopulated questions socket... Maybe sport_1 is missing */ 
-	ROM_REGION( 0x68000, "questions", 0 )
+	ROM_REGION( 0x100000, "questions", ROMREGION_ERASEFF )
 
 	/* 01 - Allgemein */
 	ROM_LOAD( "allg_1.bin",  0x00000, 0x8000, CRC(1351cf56) SHA1(50e89c3e6d256bcf7f1d3c0dbef935e4e8561096) )
 	ROM_LOAD( "allg_2.bin",	 0x08000, 0x8000, CRC(021492a4) SHA1(b59e1303f17c9e5af05a808118ae729205690bb2) )
 	ROM_LOAD( "allg_3.bin",	 0x10000, 0x8000, CRC(de8e055f) SHA1(593fce143ee5994087bbac8b51ac7e2d02e8701c) )
-	ROM_LOAD( "allg_4.bin",  0x18000, 0x8000, CRC(5c87177a) SHA1(a8a8318165008cb3295e25d4b4d38146f44a32fc) )
+	ROM_LOAD( "allg_4.bin",  0x18000, 0x8000, CRC(5c87177a) SHA1(a8a8318165008cb3295e25d4b4d38146f44a32fc) ) // this one has the category in the rom in ALL caps, is it official?
 	ROM_LOAD( "allg_5.bin",  0x20000, 0x8000, CRC(83056686) SHA1(00f14ded371751d54a391bf583d940b32ddeae58) )
 
 	/* 02 - Geschichte */
@@ -3366,7 +3460,6 @@ ROM_START( funquiz )	/* Fun World Quiz */
 	/* 07 - Pop */
 	ROM_LOAD( "pop_1.bin",   0x58000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
 	ROM_LOAD( "pop_2.bin",   0x60000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
-
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, BAD_DUMP CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -3580,6 +3673,89 @@ static DRIVER_INIT( saloon )
 
 }
 
+static DRIVER_INIT( multiwin )
+/*****************************************************
+
+  This only decrypt the text strings.
+  Need more work to get the opcodes properly decrypted 
+
+******************************************************/
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	int x;
+
+	for (x=0x8000; x < 0x10000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x91;
+		UINT8 code; 
+
+		ROM[x] = BITSWAP8(ROM[x],5,6,7,2,3,0,1,4);
+
+		code = ROM[x];
+		
+		/* decrypt code here */
+
+		ROM[x+0x10000] = code;
+	}
+
+	memory_set_decrypted_region(space, 0x8000, 0xffff, memory_region(machine, "maincpu") + 0x18000);
+}
+
+static DRIVER_INIT( royalcdc )
+{
+/*****************************************************
+
+  This only decrypt the text strings.
+  The opcode encryption seems to be conditional, and
+  bits of the XOR (and bitswap?) can be turned on and
+  off, possibly depending on the address
+
+******************************************************/
+
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	int x;
+
+	for (x=0x8000; x < 0x10000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x22;
+		UINT8 code; 
+
+		// this seems correct for the data, plaintext decrypts fine
+		ROM[x] = BITSWAP8(ROM[x],2,6,7,4,3,1,5,0);
+		
+		// the code uses different encryption, there are conflicts here
+		// so it's probably address based
+		code = ROM[x];
+		if      (code==0x12) code = 0x10; // ^0x02
+		else if (code==0x1a) code = 0x18; // ^0x02
+		else if (code==0x20) code = 0xa2; // ^0x82
+		else if (code==0x26) code = 0xa2; // ^0x84
+		else if (code==0x39) code = 0xbd; // ^0x84
+		else if (code==0x5a) code = 0x58; // ^0x02
+		else if (code==0x5c) code = 0xd8; // ^0x84
+		else if (code==0x84) code = 0xa2; // ^0x26
+		else if (code==0x8f) code = 0xa9; // ^0x26
+		else if (code==0xaf) code = 0xa9; // ^0x06
+		else if (code==0xa2) code = 0x80; // ^0x22
+		else if (code==0xa3) code = 0x85; // ^0x26
+		else if (code==0xa8) code = 0x8e; // ^0x26
+		else if (code==0xa9) code = 0x8d; // ^0x24
+		else if (code==0xbb) code = 0xbd; // ^0x06
+		else if (code==0xc8) code = 0xca; // ^0x02
+		else if (code==0xc6) code = 0xe0; // ^0x26
+		else if (code==0xce) code = 0xe8; // ^0x26
+		else if (code==0xf4) code = 0xd0; // ^0x24
+
+		ROM[x+0x10000] = code;
+	}
+
+	memory_set_decrypted_region(space, 0x6000, 0xffff, memory_region(machine, "maincpu") + 0x16000);
+}
+
 
 /*************************
 *      Game Drivers      *
@@ -3612,7 +3788,7 @@ GAME( 1996, bottle10,  0,        cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.", 
 GAME( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Bottle 10 (italian, set 2)",                      0 )
 GAME( 1991, royalcrd,  0,        royalcrd, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
 GAME( 1991, royalcdb,  royalcrd, royalcrd, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
-GAME( 1991, royalcdc,  royalcrd, royalcrd, royalcrd,  0,        ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1991, royalcdc,  royalcrd, royalcrd, royalcrd,  royalcdc, ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 1993, royalcdp,  royalcrd, cuoreuno, royalcrd,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_NOT_WORKING )
 GAME( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  0,        ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0 )
 GAME( 1991, lluck4x1,  royalcrd, royalcrd, royalcrd,  0,        ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0 )
@@ -3625,10 +3801,10 @@ GAME( 1993, vegasfte,  vegasslw, funworld, funworld,  0,        ROT0, "Soft Desi
 GAME( 198?, jolyjokr,  0,        funworld, funworld,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0 )
 GAME( 198?, jolyjokra, jolyjokr, funworld, jolyjokra, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0 )
 GAME( 198?, jolyjokrb, jolyjokr, funworld, funworld,  0,        ROT0, "Impera",          "Jolly Joker (40bet, croatian hack)",              0 )
-GAME( 1992, multiwin,  0,        funworld, funworld,  0,        ROT0, "Funworld",        "Multi Win (Ver.0167, encrypted)",                 GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1992, multiwin,  0,        funworld, funworld,  multiwin, ROT0, "Funworld",        "Multi Win (Ver.0167, encrypted)",                 GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 1993, jokercrd,  0,        funworld, funworld,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 199?, mongolnw,  0,        royalcrd, royalcrd,  0,        ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw,  0,        royalcrd, royalcrd,  soccernw, ROT0, "bootleg",         "Soccer New (italian)",                            GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 198?, saloon,    0,        saloon,   saloon,    saloon,   ROT0, "<unknown>",       "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 198?, funquiz,   0,        funworld, funquiz,   0,        ROT0, "Funworld",        "Fun World Quiz (austrian)",                       GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 198?, funquiz,   0,        funquiz,  funquiz,   0,        ROT0, "Funworld",        "Fun World Quiz (austrian)",                       GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
 
