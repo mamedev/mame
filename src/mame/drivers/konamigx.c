@@ -1045,8 +1045,13 @@ static WRITE32_HANDLER( type4_prot_w )
 				}
 				else if(last_prot_op == 0x57a)	// winspike
 				{
+					/* player 1 input buffer protection */
 					memory_write_dword(space, 0xc10f00, memory_read_dword(space, 0xc00f10));
 					memory_write_dword(space, 0xc10f04, memory_read_dword(space, 0xc00f14));
+					/* player 2 input buffer protection */
+					memory_write_dword(space, 0xc10f20, memory_read_dword(space, 0xc00f20));
+					memory_write_dword(space, 0xc10f24, memory_read_dword(space, 0xc00f24));
+					/* ... */
 					memory_write_dword(space, 0xc0fe00, memory_read_dword(space, 0xc00f30));
 					memory_write_dword(space, 0xc0fe04, memory_read_dword(space, 0xc00f34));
 				}
