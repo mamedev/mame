@@ -2,12 +2,12 @@
     Namco System FL
     Driver by R. Belmont and ElSemi
 
-    IMPORTANT
+    IMPORTANT (for Manual Calibration, MAME now loads these defaults instead)
     ---------
     To calibrate the steering, do the following:
     1) Delete the .nv file
     2) Start the game.  Speed Racer will guide you through the calibration
-       (the "jump button" is the same as player 1 start).
+       (the "jump button" is mapped to Space).
        For Final Lap R, hold down service (9) and tap test (F2).  If you do
        not get an "initializing" message followed by the input test, keep doing
        it until you do.
@@ -163,6 +163,7 @@ OSC3: 48.384MHz
 #include "cpu/i960/i960.h"
 #include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
+#include "namcofl.lh"
 
 
 static emu_timer *raster_interrupt_timer;
@@ -353,7 +354,71 @@ static ADDRESS_MAP_START( namcoc75_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static INPUT_PORTS_START( namcofl )
+static INPUT_PORTS_START( speedrcr )
+	PORT_START("MISC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) // enters pages in test menu
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no gear button on this
+	PORT_DIPNAME( 0x20, 0x20, "Freeze Screen" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // buttons are named because their use in navigating test mode isn't clear
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Weapon 1 / Test Menu Down") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Weapon 2 / Test Menu Modify") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Weapon 3 / Test Menu Up") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Start / Jump") PORT_CODE(KEYCODE_SPACE) // jump / start button
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ACCEL")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // no brake
+
+	PORT_START("WHEEL")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( finalapr )
 	PORT_START("MISC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -379,7 +444,7 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_LSHIFT) PORT_TOGGLE // gear
 	PORT_DIPNAME( 0x20, 0x20, "Freeze Screen" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -391,10 +456,10 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // freezes the game
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -407,14 +472,15 @@ static INPUT_PORTS_START( namcofl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ACCEL")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(6)
 
 	PORT_START("BRAKE")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(6)
 
 	PORT_START("WHEEL")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(6)
 INPUT_PORTS_END
+
 
 static const gfx_layout obj_layout =
 {
@@ -516,6 +582,11 @@ static MACHINE_RESET( namcofl )
 {
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 3, 0), NULL, 0, network_interrupt_callback);
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
+
+	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine,  "bank2", namcofl_workram );
+
+	memset(namcofl_workram, 0x00, 0x100000);
 }
 
 
@@ -601,9 +672,15 @@ ROM_START( speedrcr )
     ROM_LOAD( "sysfl-3.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 12S */
     ROM_LOAD( "sysfl-4.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL20L8BCNS at 20N */
     ROM_LOAD( "sysfl-5.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 19D */
+
+	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
+	ROM_LOAD("speedrcr.nv",   0x000000, 0x2000, CRC(58b41c70) SHA1(c30ea7f4951ce208781deafef8d99bdb4902e5b8) )		
 ROM_END
 
-ROM_START( finalaprb )
+
+
+
+ROM_START( finalapr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpeb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2mpob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
@@ -640,6 +717,9 @@ ROM_START( finalaprb )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
+	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )		
 ROM_END
 
 ROM_START( finalapro )
@@ -679,9 +759,13 @@ ROM_START( finalapro )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
+	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )
 ROM_END
 
-ROM_START( finalapr )
+
+ROM_START( finalaprj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr1_mpec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
 	ROM_LOAD32_WORD("flr1_mpoc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
@@ -718,6 +802,9 @@ ROM_START( finalapr )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
+	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )	
 ROM_END
 
 static void namcofl_common_init(running_machine *machine)
@@ -740,7 +827,7 @@ static DRIVER_INIT(finalapr)
 	namcos2_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME( 1995, speedrcr,         0, namcofl, namcofl, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapr,         0, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND )
-GAME( 1995, finalaprb, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapro, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND )
+GAME ( 1995, speedrcr,         0, namcofl, speedrcr, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND, layout_namcofl )

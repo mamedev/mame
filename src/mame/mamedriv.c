@@ -833,7 +833,7 @@ const game_driver * const drivers[] =
 	/* Namco FL games */
 	DRIVER( speedrcr )	/* (c) 1995 */
 	DRIVER( finalapr )	/* (c) 1995 */
-	DRIVER( finalaprb )	/* (c) 1995 */
+	DRIVER( finalaprj )	/* (c) 1995 */
 	DRIVER( finalapro )	/* (c) 1995 */
 
 	/* Namco NA-1 / NA-2 System games */

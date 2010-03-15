@@ -795,7 +795,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) \
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) \
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) \
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1) /* Make it accessible by default*/ \
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_0) /* Make it accessible by default*/ \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 #define NAMCOS2_MCU_ANALOG_PORT_DEFAULT \
@@ -1007,7 +1007,7 @@ static INPUT_PORTS_START( finallap )
 	PORT_START("AN4")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")		/* Steering Wheel */		/* sensitivity, delta, min, max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(75) PORT_KEYDELTA(100)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 	PORT_START("AN6")		/* Brake Pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
 	PORT_START("AN7")		/* Accelerator Pedal */
@@ -1143,7 +1143,7 @@ static INPUT_PORTS_START( fourtrax )
 	PORT_DIPSETTING(	0x00, "L" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("AN0")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 2 */
@@ -1285,6 +1285,21 @@ static INPUT_PORTS_START( suzuka )
 	NAMCOS2_MCU_DIAL_DEFAULT
 INPUT_PORTS_END
 
+/* note, even with perfectly calibrated gun settings the on-screen cursor won't align with the MAME cursor
+   because the game assumes the screen space isn't a linear mapping to the gun.  This is especially noticeable
+   with the P2 cursor.  You should turn off the internal cursor with F1
+
+   This game has a rather unique control setup, 2 lightguns, plus steering hardware.  Defaults have been set
+   up to avoid a large number of duplicae buttons.  Using these settings (with -mouse) the following mapping is
+   given
+
+     Z, X - Steer Car
+	 Ctrl - Accelerate
+	 Alt - Brake
+	 Mouse - Aim Gun
+	 Left Shift - Fire Gun
+ */
+
 static INPUT_PORTS_START( luckywld )
 	PORT_START("MCUB")		/* 63B05Z0 - PORT B */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1304,7 +1319,7 @@ static INPUT_PORTS_START( luckywld )
 	PORT_START("AN4")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 	PORT_START("AN5")		/* Steering Wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(70)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE(0) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 	PORT_START("AN6")		/* Brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
 	PORT_START("AN7")		/* Accelerator pedal */
@@ -1312,8 +1327,8 @@ static INPUT_PORTS_START( luckywld )
 
 	PORT_START("MCUH")		/* 63B05Z0 - PORT H */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Fire") PORT_CODE(KEYCODE_RSHIFT) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	NAMCOS2_MCU_DIPSW_DEFAULT
@@ -3828,6 +3843,9 @@ ROM_START( sgunner )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "sn_voi1.3m",  0x000000, 0x080000, CRC(464e616d) SHA1(7279a2af64bdf76972bcf326611e6bff57a9cd39) )
 	ROM_LOAD( "sn_voi2.3l",  0x080000, 0x080000, CRC(8c3251b5) SHA1(fa364c8462f490c636605262c5492a6a9b00e5b1) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "sgunner.nv",  0x000000, 0x2000, CRC(106026f8) SHA1(e4be6701d4eef6c18406593c6dee10644f29a15b) )		
 ROM_END
 
 /* STEEL GUNNER (Japan) */
@@ -3876,6 +3894,9 @@ ROM_START( sgunnerj )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "sn_voi1.3m",  0x000000, 0x080000, CRC(464e616d) SHA1(7279a2af64bdf76972bcf326611e6bff57a9cd39) )
 	ROM_LOAD( "sn_voi2.3l",  0x080000, 0x080000, CRC(8c3251b5) SHA1(fa364c8462f490c636605262c5492a6a9b00e5b1) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "sgunner.nv",  0x000000, 0x2000, CRC(106026f8) SHA1(e4be6701d4eef6c18406593c6dee10644f29a15b) )	
 ROM_END
 
 /* STEEL GUNNER 2 */
@@ -3928,6 +3949,9 @@ ROM_START( sgunner2 )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "sns_voi1.bin",  0x000000, 0x080000, CRC(219c97f7) SHA1(d4b1d81e3d0e2585bc2fa305c0d80beef15b2a9f) )
 	ROM_LOAD( "sns_voi2.bin",  0x080000, 0x080000, CRC(562ec86b) SHA1(c9874c7e1f38c5b38d21f45a82028651cf9089a5) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "sgunner2.nv",  0x000000, 0x2000, CRC(57a521c6) SHA1(d60b4f6f099b7f9fb1e575c5f9a74397986c6dac) )		
 ROM_END
 
 /* STEEL GUNNER 2 (Japan) */
@@ -3980,6 +4004,9 @@ ROM_START( sgunner2j )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "sns_voi1.bin",  0x000000, 0x080000, CRC(219c97f7) SHA1(d4b1d81e3d0e2585bc2fa305c0d80beef15b2a9f) )
 	ROM_LOAD( "sns_voi2.bin",  0x080000, 0x080000, CRC(562ec86b) SHA1(c9874c7e1f38c5b38d21f45a82028651cf9089a5) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "sgunner2j.nv",  0x000000, 0x2000, CRC(014bccf9) SHA1(b6437fadf3e71df7a71fde9ec7ffc95fe6c057b3) )			
 ROM_END
 
 /* SUPER WORLD STADIUM */
@@ -4751,6 +4778,9 @@ ROM_START( luckywld )
 
 	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
+	ROM_LOAD( "luckywld.nv",  0x000000, 0x2000, CRC(0c185d2a) SHA1(6a4876361731df423515a0f3b37ba1496d6b1964) )		
 ROM_END
 
 /* LUCKY & WILD (Japan) */
@@ -4814,6 +4844,9 @@ ROM_START( luckywldj )
 
 	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
+	ROM_LOAD( "luckywld.nv",  0x000000, 0x2000, CRC(0c185d2a) SHA1(6a4876361731df423515a0f3b37ba1496d6b1964) )			
 ROM_END
 
 

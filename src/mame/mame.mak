@@ -1767,6 +1767,8 @@ $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
 $(DRIVERS)/mil4000.o:	$(LAYOUT)/mil4000.lh
 
+$(DRIVERS)/namcofl.o:    $(LAYOUT)/namcofl.lh
+
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
 
 $(DRIVERS)/namcos2.o:	$(LAYOUT)/finallap.lh
