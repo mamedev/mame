@@ -819,6 +819,7 @@ const game_driver * const drivers[] =
 	DRIVER( cosmogngj )	/* (c) 1991 (Japan) */
 	DRIVER( bubbletr )	/* (c) 1992 */
 	DRIVER( finalap3 )	/* 92.9  Final Lap 3 */
+	DRIVER( finalap3a )	/* 92.9  Final Lap 3 */
 	DRIVER( finalap3j )	/* 92.9  Final Lap 3 */
 	DRIVER( luckywld )	/* (c) 1992 */
 	DRIVER( luckywldj )	/* (c) 1992 */
