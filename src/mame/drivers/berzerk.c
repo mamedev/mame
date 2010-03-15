@@ -15,7 +15,6 @@
 #include "sound/s14001a.h"
 #include "video/resnet.h"
 
-
 #define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")
 
 #define MASTER_CLOCK				(XTAL_10MHz)
@@ -709,6 +708,17 @@ static INPUT_PORTS_START( berzerk )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
+// this set has German speech roms, so default the language to German
+static INPUT_PORTS_START( berzerkg )
+	PORT_INCLUDE( berzerk )
+
+	PORT_MODIFY("F3")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )	
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( frenzy )
 	PORT_INCLUDE( common )
@@ -777,7 +787,7 @@ static INPUT_PORTS_START( frenzy )
 
 	PORT_START("F5")
 	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit A" ) PORT_DIPLOCATION("F5:1,2,3,4")	// F5:1,8
-	/*PORT_DIPSETTING(    0x00, "0" )    Can't insert coins  */
+	PORT_DIPSETTING(    0x00, "0 (invalid)" ) //   Can't insert coins
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -797,7 +807,7 @@ static INPUT_PORTS_START( frenzy )
 
 	PORT_START("F6")
 	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit B" ) PORT_DIPLOCATION("F6:1,2,3,4")	// F6:1,8
-	/*PORT_DIPSETTING(    0x00, "0" )    Can't insert coins  */
+	PORT_DIPSETTING(    0x00, "0 (invalid)" ) //   Can't insert coins
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -821,6 +831,238 @@ static INPUT_PORTS_START( frenzy )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
+// this is wrong :/
+static READ8_HANDLER( moonwarp_p1_r )
+{
+	static int lastdial = -1;
+	int dial = input_port_read(space->machine,"P1_DIAL");
+	UINT8 ret;
+	UINT8 buttons = (input_port_read(space->machine,"P1")&0xe0);
+
+	if (dial>lastdial)	
+		ret=  ((dial&0xf) ^ 0x10)
+			  | buttons;
+	else if (dial<lastdial)
+		ret=  (0xf-(dial&0xf) )
+			  | buttons;
+	else
+		ret = 0x0 | buttons;
+
+	lastdial = dial;
+
+	return ret;
+}
+
+static INPUT_PORTS_START( moonwarp )
+	PORT_START("P1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("P1_DIAL")
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x01, 0x00, "P2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* fake port for monitor type */
+	PORT_START(MONITOR_TYPE_PORT_TAG)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
+	PORT_CONFSETTING(    0x01, "Electrohome" )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("F2")
+	PORT_DIPNAME( 0x01, 0x00, "F2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("F3")
+	PORT_DIPNAME( 0x01, 0x00, "Input Test Mode" ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION("F2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("F4")
+	PORT_DIPNAME( 0x01, 0x00, "F4")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("F5")
+	PORT_DIPNAME( 0x01, 0x00, "F5")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_START("F6")
+	PORT_DIPNAME( 0x01, 0x00, "F6")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x00, "SW2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+INPUT_PORTS_END
 
 
 /*************************************
@@ -908,6 +1150,22 @@ ROM_START( berzerk1 )
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )
 ROM_END
 
+ROM_START( berzerkg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cpu rom 00.bin",      0x0000, 0x0800, CRC(77923a9e) SHA1(3760800b7aa1245f2141897b2406f0f5af5a8d71) )
+	ROM_LOAD( "cpu rom 01.bin",      0x1000, 0x0800, CRC(19bb3aac) SHA1(11341521fd880d55ea01bceb4a321ec571f0b759) )
+	ROM_LOAD( "cpu rom 02.bin",      0x1800, 0x0800, CRC(b0888ff7) SHA1(ac76400482fe37b6c8e309cd9b10855dac86ed24) )
+	ROM_LOAD( "cpu rom 03.bin",      0x2000, 0x0800, CRC(e23239a9) SHA1(a0505efdee4cb1962243638c641e94983673f70f) )
+	ROM_LOAD( "cpu rom 04.bin",      0x2800, 0x0800, CRC(651b31b7) SHA1(890f424a5a73a95af642435c1b0cca78a9413aae) )
+	ROM_LOAD( "cpu rom 05.bin",      0x3000, 0x0800, CRC(8a403bba) SHA1(686a9b58a245df6c947d14991a2e4cbaf511e2ca) )
+	ROM_FILL( 0x3800, 0x0800, 0xff )
+
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
+	ROM_LOAD( "snd rom 1c.bin",           0x0000, 0x0800, CRC(fc1da15f) SHA1(f759a017d9e95acf0e1d35b16d8820acee7d7e3d) )	/* VSU-1000 board */
+	ROM_LOAD( "snd rom 2c.bin",           0x0800, 0x0800, CRC(7f6808fb) SHA1(8a9c43597f924221f68d1b31e033f1dc492cddc5) )
+ROM_END
+
+
 
 ROM_START( frenzy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -927,30 +1185,38 @@ ROM_END
 
 
 /*
-   The original / prototype version of moon war appears to run on Frenzy hardware, however the only board found
-   had been stripped for parts, leaving only the sound ROMs.
+   The original / prototype version of moon war runs on Frenzy Hardware.
 
    The more common version of Moon War runs on modified Super Cobra (scobra.c) hardware and is often called
-   'Moon War 2' because it is the second version, and many of the PCBs are labeled as such
+   'Moon War 2' because it is the second version, and many of the PCBs are labeled as such.
+
+   So far only 2 original boards of this have been found, one with only the sound roms on it, and the other
+   with only the program roms on it.  This set is a combination of dumps from those two boards, so there
+   is a small chance they could be mismatched, however, the game seems to produce the correct voices at
+   the correct times, although it refers to 'Hyperflip' for which I haven't been able to locate a button yet
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1c",         0x0000, 0x1000, NO_DUMP )
-	/*ROM_LOAD( "3c",         0x?000, 0x?000, NO_DUMP ) */ /* likely unused */
-	ROM_LOAD( "1d",         0x1000, 0x1000, NO_DUMP )
-	ROM_LOAD( "3d",         0x2000, 0x1000, NO_DUMP )
-	ROM_LOAD( "5d",         0x3000, 0x1000, NO_DUMP )
-	ROM_LOAD( "6d",         0xc000, 0x1000, NO_DUMP )
+	ROM_LOAD( "1d.bin",      0x0000, 0x1000, CRC(75470634) SHA1(1a811fef39724fd227e06b694841d3dad5659622) )
+	ROM_LOAD( "3d.bin",      0x1000, 0x1000, CRC(a9d046dc) SHA1(88afccd09d2809cafd12dd40ab3be77e3707cfc5) )
+	ROM_LOAD( "5d.bin",      0x2000, 0x1000, CRC(bf671737) SHA1(cdfae1eb8995c2251813cc5633fc809aa9e6a36f) )
+	ROM_LOAD( "6d.bin",      0x3000, 0x1000, CRC(cef2d697) SHA1(5c31c6e7002f0d944b3028d1b804480acf3af042) )
+	ROM_LOAD( "5c.bin",      0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )	/* VSU-1000 board */
 	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )    /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */
+	ROM_LOAD( "n82s123 po. e6 select decoder",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom - from board with prg roms, same as Frenzy*/
+	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-
+static DRIVER_INIT( moonwarp )
+{
+	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	memory_install_read8_handler (io, 0x48, 0x48, 0, 0, moonwarp_p1_r);
+}
 
 /*************************************
  *
@@ -960,5 +1226,6 @@ ROM_END
 
 GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 1)", 0 )
 GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 2)", 0 )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg,0, ROT0, "Stern", "Berzerk (German Speech)", 0 )
 GAME( 1981, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern", "Frenzy", 0 )
-GAME( 1981, moonwarp, 0,       frenzy,  frenzy,  0, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", GAME_NOT_WORKING )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp,moonwarp, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", GAME_NOT_WORKING ) // inputs need fixing!
