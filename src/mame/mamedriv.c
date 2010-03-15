@@ -928,6 +928,7 @@ const game_driver * const drivers[] =
 	DRIVER( finlflng )	/* July 1997 */
 	DRIVER( motoxgo )	/* November 1997 */
 	DRIVER( rapidrvr )	/* December 1997 */
+	DRIVER( rapidrvr2 )	/* December 1997 */
 	DRIVER( downhill )	/* March 1998 */
 	DRIVER( timecrs2 )	/* April 1998 */
 	DRIVER( timecrs2b )	/* April 1998 */
