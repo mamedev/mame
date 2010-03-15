@@ -34,6 +34,7 @@ Year + Game                     PCB         Video Chip  Issues / Notes
 94  Blazing Tornado             ?           14220       Also has Konami 053936 gfx chip
 96  Grand Striker 2             HUM-003(A)  14220       Also has Konami 053936 gfx chip
 95  Daitoride                   MTR5260-A   14220
+95  Mouse Shooter GoGo          -           14220       No sound CPU
 95  Pururun                     MTR5260-A   14220
 95  Puzzli                      MTR5260-A   14220
 96  Sankokushi                  MTR5260-A   14220
@@ -50,11 +51,10 @@ Year + Game                     PCB         Video Chip  Issues / Notes
 
 Not dumped yet:
 94  Toride II
-94  Mouse Shooter GoGo (might be a prequel to Bang Bang Ball)
 
 To Do:
 
--   1 pixel granularity in the window's placement (8 pixels now, see daitorid title)
+-   1 pixel granularity in the window's placement (8 pixels now, see daitorid and msgogo title)
 -   Coin lockout
 -   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai
 -   Are the 16x16 tiles used by Mouja a Imagetek 14300-only feature?
@@ -996,14 +996,48 @@ static ADDRESS_MAP_START( batlbubl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("IN2")
 	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w)					// Coin Lockout
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)									// read but ignored?
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("ymf", ymf278b_r,ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)					//
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM													// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_RAM													// RAM (bug in the ram test routine)
 ADDRESS_MAP_END
 
 
 /***************************************************************************
-                                Dai Toride
+                             Mouse Shooter GoGo
+***************************************************************************/
+
+static ADDRESS_MAP_START( msgogo_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM													// ROM
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0)	// Layer 0
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
+	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
+	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)					// Sprites
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
+	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
+	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
+	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll
+	AM_RANGE(0x178880, 0x178881) AM_WRITENOP											// ? increasing
+	AM_RANGE(0x178890, 0x178891) AM_WRITENOP											// ? increasing
+	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause / IRQ Acknowledge
+	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
+	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_BASE(&metro_rombank)					// Rom Bank
+	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_BASE(&metro_screenctrl)				// Screen Control
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("COINS")									// Inputs
+	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("JOYS")									//
+	AM_RANGE(0x200006, 0x200007) AM_READNOP												//
+	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w)					// Coin Lockout
+	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)									// 3 x DSW
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)					//
+	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM													// RAM
+ADDRESS_MAP_END
+
+/***************************************************************************
+                                Daitoride
 ***************************************************************************/
 
 static ADDRESS_MAP_START( daitorid_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1999,7 +2033,7 @@ static INPUT_PORTS_START( batlbubl )
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 	JOY_MSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 
-	PORT_START("DSW0")	// Strangely mapped in the 0xc00000-0xc1ffff range
+	PORT_START("DSW0")	// Strangely mapped in the 0x300000-0x31ffff range
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy )    )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal )  )
@@ -2045,10 +2079,10 @@ static INPUT_PORTS_START( batlbubl )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START("IN0")	// $d00000
+	PORT_START("IN0")	// $200004
 	COINS
 
-	PORT_START("IN2")	// Strangely mapped in the 0xc00000-0xc1ffff range
+	PORT_START("IN2")	// Strangely mapped in the 0x300000-0x31ffff range
 	PORT_DIPNAME( 0x0001, 0x0001, "0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -2096,6 +2130,72 @@ static INPUT_PORTS_START( batlbubl )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+/***************************************************************************
+                             Mouse Shooter GoGo
+***************************************************************************/
+
+static INPUT_PORTS_START( msgogo )
+	PORT_START("COINS")	// $200000
+	COINS
+
+	PORT_START("JOYS")	// $200002
+	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
+	JOY_MSB(2, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
+
+	PORT_START("DSW0")	// Strangely mapped in the 0x300000-0x31ffff range
+	COINAGE_DSW
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy )    )	// 0
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal )  )	// 1
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard )    )	// 2
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )	// 3
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x2000, "2" )
+	PORT_DIPSETTING(      0x0000, "3" )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Language ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
+
+	PORT_START("IN2")	// Strangely mapped in the 0x300000-0x31ffff range
+	// DSW3 is used for debug (it's not soldered on the PCB)
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Debug: Offset" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Debug: Menu" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -2353,7 +2453,7 @@ static INPUT_PORTS_START( gstrik2 )
 INPUT_PORTS_END
 
 /***************************************************************************
-                                Dai Toride
+                                Daitoride
 ***************************************************************************/
 
 /* If only ONE of the "Coinage" is set to "Free Play", it is in fact "5C_1C".
@@ -3496,6 +3596,40 @@ static MACHINE_DRIVER_START( daitoa )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( msgogo )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(msgogo_map)
+	MDRV_CPU_VBLANK_INT("screen", bangball_interrupt)
+
+	MDRV_MACHINE_RESET(metro)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(320, 224)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+
+	MDRV_GFXDECODE(14220)
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(metro_14220)
+	MDRV_VIDEO_UPDATE(metro)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MDRV_SOUND_CONFIG(ymf278b_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( bangball )
 
 	/* basic machine hardware */
@@ -4558,8 +4692,8 @@ ROM_START( daitoa )
 	ROMX_LOAD( "dt_ja-3.3", 0x000006, 0x080000, CRC(32353e04) SHA1(16ac82de9e6e43eabef3adab2d3a006bb50100fb) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x280000, "ymf", 0 )
-	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )	    // Yamaha YRW801 2MB ROM with samples for the OPL4.
-	ROM_LOAD( "dt_ja-7.7",        0x200000, 0x080000, CRC(7a2d3222) SHA1(1a16bf483a5a086ad48029dd23dd16ad47c3740e) )	    // PCM 16 Bit (Signed)
+	ROM_LOAD( "yrw801-m",  0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )	    // Yamaha YRW801 2MB ROM with samples for the OPL4.
+	ROM_LOAD( "dt_ja-7.7", 0x200000, 0x080000, CRC(7a2d3222) SHA1(1a16bf483a5a086ad48029dd23dd16ad47c3740e) )	    // PCM 16 Bit (Signed)
 ROM_END
 
 
@@ -5449,6 +5583,39 @@ ROM_END
 
 /***************************************************************************
 
+Mouse Shooter GoGO, Metro, 1995
+
+ms_ja-1.1    tms27c240
+ms_wa-2.2    tms27c240
+ms_wa-3.3    tms27c240
+ms_wa-4.4    tms27c240
+ms_wa-5.5    tms27c020
+ms_wa-6.6    tms27c020
+ms_wa-7.7    hn27c4001g
+
+Stefan Lindberg
+
+***************************************************************************/
+
+ROM_START( msgogo )
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "ms_wa-6.6", 0x000000, 0x040000, CRC(986acac8) SHA1(97c24f5b730aa811951db4c7e9c894c0701c58fd) )
+	ROM_LOAD16_BYTE( "ms_wa-5.5", 0x000001, 0x040000, CRC(746d9f99) SHA1(6e3e34dfb67fecc93213fe040465eccd88575822) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "ms_wa-2.2", 0x000000, 0x080000, CRC(0d36c2b9) SHA1(3fd6631ad657c73e7e6bfdff9d9caf5ab044bdeb), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "ms_wa-4.4", 0x000002, 0x080000, CRC(fd387126) SHA1(a2f82a66b098a97d8f245e3c2f96c31c63642fec), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "ms_ja-1.1", 0x000004, 0x080000, CRC(8ec4e81d) SHA1(46947ad2941af154f91e47acee281302a12e3aa5), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "ms_wa-3.3", 0x000006, 0x080000, CRC(06cb6807) SHA1(d7303b4047983117cd33e057b1f4b98ed3f7dd32), ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x280000, "ymf", 0 )
+	ROM_LOAD( "yrw801-m",  0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )
+	ROM_LOAD( "ms_wa-7.7", 0x200000, 0x080000, CRC(e19941cb) SHA1(93777c9cd22ddd33d9584b6edad33b95c1e28bde) )
+ROM_END
+
+
+/***************************************************************************
+
 Pang Pom's (c) 1992 Metro
 
 Pcb code:  VG420 (Same as Toride)
@@ -5891,9 +6058,10 @@ GAME( 1994, toride2gg,toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",  
 GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                                  "Gun Master",                        0 )
 GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, daitoa,   daitorid, daitoa,   daitorid, balcube,  ROT0,   "Metro",                                  "Daitoride (YMF278B version)",                          0 )
+GAME( 1996, daitoa,   daitorid, daitoa,   daitorid, balcube,  ROT0,   "Metro",                                  "Daitoride (YMF278B version)",       0 )
 GAME( 1995, dokyusei, 0,        dokyusei, dokyusei, gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei",                0 )
 GAME( 1995, dokyusp,  0,        dokyusp,  gakusai,  gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei Special",        0 )
+GAME( 1995, msgogo,   0,        msgogo,   msgogo,   balcube,  ROT0,   "Metro",                                  "Mouse Shooter GoGo",                GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, pururun,  0,        pururun,  pururun,  daitorid, ROT0,   "Metro / Banpresto",                      "Pururun",                           0 )
 GAME( 1995, puzzli,   0,        daitorid, puzzli,   daitorid, ROT0,   "Metro / Banpresto",                      "Puzzli",                            GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, 3kokushi, 0,        3kokushi, 3kokushi, karatour, ROT0,   "Mitchell",                               "Sankokushi (Japan)",                GAME_IMPERFECT_GRAPHICS )

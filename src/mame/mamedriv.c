@@ -8001,6 +8001,7 @@ Other Sun games
 	DRIVER( daitoa )	/* (c) 1995 */
 	DRIVER( dokyusei )	/* (c) 1995 Make Software / Elf / Media Trading */
 	DRIVER( dokyusp )	/* (c) 1995 Make Software / Elf / Media Trading */
+	DRIVER( msgogo )	/* (c) 1995 Metro */
 	DRIVER( puzzli )	/* (c) 1995 Metro / Banpresto */
 	DRIVER( 3kokushi )	/* (c) 1996 Mitchell */
 	DRIVER( pururun )	/* (c) 1995 Metro / Banpresto */
