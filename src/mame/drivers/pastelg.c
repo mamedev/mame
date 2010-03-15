@@ -43,6 +43,7 @@ extern WRITE8_HANDLER( pastelg_clut_w );
 extern WRITE8_HANDLER( pastelg_romsel_w );
 extern WRITE8_HANDLER( threeds_romsel_w );
 extern WRITE8_HANDLER( pastelg_blitter_w );
+extern READ8_HANDLER( threeds_rom_readback_r );
 extern int pastelg_blitter_src_addr_r(void);
 
 
@@ -63,6 +64,11 @@ static ADDRESS_MAP_START( pastelg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
 ADDRESS_MAP_END
 
+static READ8_HANDLER( pastelg_irq_ack_r )
+{
+	cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
+	return 0;
+}
 
 static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -76,7 +82,7 @@ static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r, pastelg_romsel_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", DAC_WRITE)					// unknown
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
 
@@ -122,10 +128,10 @@ static ADDRESS_MAP_START( threeds_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE( threeds_romsel_w )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r)
+	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) //writes: bit 3 is coin lockout, bit 1 is coin counter
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSWC")
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", DAC_WRITE)					// unknown
+	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", DAC_WRITE)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pastelg )
@@ -404,7 +410,7 @@ static MACHINE_DRIVER_START( pastelg )
 	MDRV_CPU_PROGRAM_MAP(pastelg_map)
 	MDRV_CPU_IO_MAP(pastelg_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
-	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
@@ -463,7 +469,7 @@ static MACHINE_DRIVER_START( threeds )
 	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pastelg_map)
 	MDRV_CPU_IO_MAP(threeds_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
