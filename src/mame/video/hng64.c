@@ -2441,8 +2441,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 					float intensity = vecDotProduct(transformedNormal, lightVector) * -1.0f;
 					intensity = (intensity <= 0.0f) ? (0.0f) : (intensity);
-					intensity *= lightStrength * 128.0f * 0.5f;     // HACK.  This 0.5 is completely arbitrary.
-					intensity *= 255.0f;
+					intensity *= lightStrength * 128.0f;    // Turns 0x0100 into 1.0
+					intensity *= 128.0;                     // Maps intensity to the range [0.0, 2.0]
 					if (intensity >= 255.0f) intensity = 255.0f;
 
 					polys[*numPolys].vert[v].light[0] = intensity;
@@ -3097,15 +3097,23 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 					paletteEntry %= prOptions.palPageSize;
 					UINT32 color = machine->pens[prOptions.palOffset + paletteEntry];
 
-					// Application of the lighting
-					UINT32 red   = RGB_RED(color)   + (UINT8)(r_start/w_start);
-					UINT32 green = RGB_GREEN(color) + (UINT8)(g_start/w_start);
-					UINT32 blue  = RGB_BLUE(color)  + (UINT8)(b_start/w_start);
+					// Apply the lighting
+					float rIntensity = (r_start/w_start) / 255.0f;
+					float gIntensity = (g_start/w_start) / 255.0f;
+					float bIntensity = (b_start/w_start) / 255.0f;
+					float red   = RGB_RED(color)   * rIntensity;
+					float green = RGB_GREEN(color) * gIntensity;
+					float blue  = RGB_BLUE(color)  * bIntensity;
 
 					// Clamp and finalize
+					red = RGB_RED(color) + red;
+					green = RGB_GREEN(color) + green;
+					blue = RGB_BLUE(color) + blue;
+
 					if (red >= 255) red = 255;
 					if (green >= 255) green = 255;
 					if (blue >= 255) blue = 255;
+
 					color = MAKE_ARGB(255, (UINT8)red, (UINT8)green, (UINT8)blue);
 
 					*cb = color;
