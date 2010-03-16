@@ -90,6 +90,8 @@ struct DEBUGOPTS
 	UINT8 draw_subscreen;
 	UINT8 windows_disabled;
 	UINT8 transparency_disabled;
+	UINT8 sprite_reversed;
+	UINT8 select_oam;
 };
 static struct DEBUGOPTS debug_options;
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
@@ -1102,8 +1104,9 @@ static void snes_oam_list_build( void )
 static UINT8 oam_itemlist[32];
 
 struct TILELIST {
-  UINT16 x, priority, pal, tileaddr;
-  int   hflip;
+	INT16 x;
+	UINT16 priority, pal, tileaddr;
+	int hflip;
 };
 
 struct TILELIST oam_tilelist[34];
@@ -1265,11 +1268,27 @@ static void snes_update_objects( UINT8 priority_tbl )
 	/* finally draw the tiles from the tilelist */
 	for (i = 0; i < 34; i++)
 	{
-		if (oam_tilelist[i].tileaddr == 0xffff)
+		int tile = i;
+#ifdef SNES_LAYER_DEBUG
+		if (debug_options.sprite_reversed)
+			tile = 33 - i;
+#endif /* SNES_LAYER_DEBUG */
+
+		if (oam_tilelist[tile].tileaddr == 0xffff)
 			continue;
 
-		priority = table_obj_priority[priority_tbl][oam_tilelist[i].priority];
-		snes_draw_tile_object(charaddr + oam_tilelist[i].tileaddr, oam_tilelist[i].x, priority, oam_tilelist[i].hflip, oam_tilelist[i].pal);
+		priority = table_obj_priority[priority_tbl][oam_tilelist[tile].priority];
+
+#ifdef SNES_LAYER_DEBUG
+		if (debug_options.select_oam)
+		{
+			int oam_draw = debug_options.select_oam - 1;
+			if (oam_draw != oam_tilelist[tile].priority)
+				priority = 0;
+		}
+#endif /* SNES_LAYER_DEBUG */
+
+		snes_draw_tile_object(charaddr + oam_tilelist[tile].tileaddr, oam_tilelist[tile].x, priority, oam_tilelist[tile].hflip, oam_tilelist[tile].pal);
 	}
 }
 
@@ -1675,7 +1694,11 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 
 		if (!debug_options.input_count--)
 		{
-			UINT8 toggles = input_port_read_safe(machine, "DEBUG2", 0);
+			UINT8 toggles = input_port_read_safe(machine, "DEBUG1", 0);
+			debug_options.sprite_reversed = BIT(toggles, 7);
+			debug_options.select_oam = (toggles & 0x70) >> 4;
+
+			toggles = input_port_read_safe(machine, "DEBUG2", 0);
 			if (BIT(toggles, 0))
 				debug_options.bg_disabled[0] = !debug_options.bg_disabled[0];
 			if (BIT(toggles, 1))
