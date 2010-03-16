@@ -26,28 +26,20 @@ UINT8  *spc_ram = NULL;			/* spc700 ram */
 UINT8  *snes_vram = NULL;		/* Video RAM (Should be 16-bit, but it's easier this way) */
 UINT16 *snes_cgram = NULL;		/* Colour RAM */
 UINT16 *snes_oam = NULL;		/* Object Attribute Memory */
-static UINT16 cgram_address;	/* CGRAM address */
-static UINT8  vram_read_offset;	/* VRAM read offset */
 UINT8  spc_port_in[4];	/* Port for sending data to the SPC700 */
 UINT8  spc_port_out[4];	/* Port for receiving data from the SPC700 */
-static UINT8 snes_hdma_chnl;	/* channels enabled for HDMA */
-static UINT8 read_ophct = 0, read_opvct = 0;
-static emu_timer *snes_scanline_timer;
-static emu_timer *snes_hblank_timer;
-static emu_timer *snes_nmi_timer;
-static emu_timer *snes_hirq_timer;
-static emu_timer *snes_div_timer;
-static emu_timer *snes_mult_timer;
-static UINT16 hblank_offset;
-UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
+
 UINT8 snes_has_addon_chip;
 UINT32 snes_rom_size;
 
 // full graphic variables
-static UINT16 vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
 static const UINT16 vram_fgr_inctab[4] = { 1, 32, 128, 128 };
 static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
+
+static void snes_dma(const address_space *space, UINT8 channels);
+static void snes_hdma_init(running_machine *machine);
+static void snes_hdma(const address_space *space);
 
 struct snes_cart_info snes_cart;
 
@@ -70,36 +62,42 @@ struct snes_cart_info snes_cart;
 *************************************/
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-void snes_latch_counters(running_machine *machine)
+void snes_latch_counters( running_machine *machine )
 {
-	snes_ppu.beam.current_horz = video_screen_get_hpos(machine->primary_screen) / snes_htmult;
+	snes_state *state = (snes_state *)machine->driver_data;
+
+	snes_ppu.beam.current_horz = video_screen_get_hpos(machine->primary_screen) / state->htmult;
 	snes_ppu.beam.latch_vert = video_screen_get_vpos(machine->primary_screen);
 	snes_ppu.beam.latch_horz = snes_ppu.beam.current_horz;
 	snes_ram[STAT78] |= 0x40;	// indicate we latched
-//  read_ophct = read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
+//  state->read_ophct = state->read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
 
 //  printf("latched @ H %d V %d\n", snes_ppu.beam.latch_horz, snes_ppu.beam.latch_vert);
 }
 
 static TIMER_CALLBACK( snes_nmi_tick )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
+
 	// pull NMI
-	cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, ASSERT_LINE );
+	cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, ASSERT_LINE);
 
 	// don't happen again
-	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->nmi_timer, attotime_never, 0);
 }
 
-static void snes_hirq_tick(running_machine *machine)
+static void snes_hirq_tick( running_machine *machine )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
+
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
-	cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, ASSERT_LINE );
+	cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, ASSERT_LINE);
 
 	// don't happen again
-	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hirq_timer, attotime_never, 0);
 }
 
 static TIMER_CALLBACK( snes_hirq_tick_callback )
@@ -122,7 +120,7 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 
 static TIMER_CALLBACK( snes_reset_hdma )
 {
-	snes_hdma_init();
+	snes_hdma_init(machine);
 }
 
 static TIMER_CALLBACK( snes_scanline_tick )
@@ -163,14 +161,14 @@ static TIMER_CALLBACK( snes_scanline_tick )
 
 		if (setirq)
 		{
-//          printf("HIRQ @ %d, %d\n", pixel*snes_htmult, snes_ppu.beam.current_vert);
+//          printf("HIRQ @ %d, %d\n", pixel * state->htmult, snes_ppu.beam.current_vert);
 			if (pixel == 0)
 			{
 				snes_hirq_tick(machine);
 			}
 			else
 			{
-				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
+				timer_adjust_oneshot(state->hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel * state->htmult), 0);
 			}
 		}
 	}
@@ -186,14 +184,14 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if (snes_ram[NMITIMEN] & 0x80)	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			timer_adjust_oneshot(snes_nmi_timer, cputag_clocks_to_attotime(machine, "maincpu", 12), 0);
+			timer_adjust_oneshot(state->nmi_timer, cputag_clocks_to_attotime(machine, "maincpu", 12), 0);
 		}
 	}
 
 	// hdma reset happens at scanline 0, H=~6
 	if (snes_ppu.beam.current_vert == 0)
 	{
-		snes_hdma_init();
+		snes_hdma_init(machine);
 	}
 
 	/* three lines after start of vblank we update the controllers (value from snes9x) */
@@ -213,20 +211,21 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, CLEAR_LINE );
 	}
 
-	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
-	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0);
+	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, state->hblank_offset * state->htmult), 0);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
 static TIMER_CALLBACK( snes_hblank_tick )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
 	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int nextscan;
 
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
 
 	/* make sure we halt */
-	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hblank_timer, attotime_never, 0);
 
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
@@ -251,7 +250,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
+	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
 }
 
 /* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but
@@ -298,6 +297,7 @@ static TIMER_CALLBACK(snes_mult_callback)
 
 static void snes_dynamic_res_change( running_machine *machine )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 	attoseconds_t refresh;
 
@@ -307,9 +307,9 @@ static void snes_dynamic_res_change( running_machine *machine )
 
 	// fixme: should compensate for SNES_DBG_video
 	if (snes_ppu.mode == 5 || snes_ppu.mode == 6 )
-		snes_htmult = 2;
+		state->htmult = 2;
 	else
-		snes_htmult = 1;
+		state->htmult = 1;
 
 	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
 	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
@@ -470,26 +470,25 @@ READ8_HANDLER( snes_r_io )
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				snes_ppu.ppu1_open_bus = vram_read_buffer & 0xff;
+				snes_ppu.ppu1_open_bus = state->vram_read_buffer & 0xff;
 
-				if (!vram_fgr_high)
+				if (!state->vram_fgr_high)
 				{
-					if (vram_fgr_count)
+					if (state->vram_fgr_count)
 					{
-						UINT32 rem = addr & vram_fgr_mask;
-						UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
-							       ((rem & (vram_fgr_count - 1)) << 3);
+						UINT32 rem = addr & state->vram_fgr_mask;
+						UINT32 faddr = (addr & ~state->vram_fgr_mask) + (rem >> state->vram_fgr_shift) + ((rem & (state->vram_fgr_count - 1)) << 3);
 
-						vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
+						state->vram_read_buffer = snes_vram[(faddr << 1) & 0x1ffff] | snes_vram[((faddr << 1) + 1) & 0x1ffff] << 8;
 					}
 					else
 					{
-						vram_read_buffer = snes_vram[(addr<<1)&0x1ffff] | snes_vram[((addr<<1)+1) & 0x1ffff]<<8;
+						state->vram_read_buffer = snes_vram[(addr<<1)&0x1ffff] | snes_vram[((addr<<1)+1) & 0x1ffff]<<8;
 					}
 
-					addr += vram_fgr_increment;
-					snes_ram[VMADDL] = addr&0xff;
-					snes_ram[VMADDH] = (addr>>8)&0xff;
+					addr += state->vram_fgr_increment;
+					snes_ram[VMADDL] = addr & 0xff;
+					snes_ram[VMADDH] = (addr >> 8) & 0xff;
 				}
 			}
 			return snes_ppu.ppu1_open_bus;
@@ -497,45 +496,44 @@ READ8_HANDLER( snes_r_io )
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				snes_ppu.ppu1_open_bus = (vram_read_buffer>>8) & 0xff;
+				snes_ppu.ppu1_open_bus = (state->vram_read_buffer >> 8) & 0xff;
 
-				if (vram_fgr_high)
+				if (state->vram_fgr_high)
 				{
-					if (vram_fgr_count)
+					if (state->vram_fgr_count)
 					{
-						UINT32 rem = addr & vram_fgr_mask;
-						UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
-							       ((rem & (vram_fgr_count - 1)) << 3);
+						UINT32 rem = addr & state->vram_fgr_mask;
+						UINT32 faddr = (addr & ~state->vram_fgr_mask) + (rem >> state->vram_fgr_shift) + ((rem & (state->vram_fgr_count - 1)) << 3);
 
-						vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
+						state->vram_read_buffer = snes_vram[(faddr << 1) & 0x1ffff] | snes_vram[((faddr << 1) + 1) & 0x1ffff] << 8;
 					}
 					else
 					{
-						vram_read_buffer = snes_vram[(addr<<1)&0x1ffff] | snes_vram[((addr<<1)+1) & 0x1ffff]<<8;
+						state->vram_read_buffer = snes_vram[(addr << 1) & 0x1ffff] | snes_vram[((addr << 1) + 1) & 0x1ffff] << 8;
 					}
 
-					addr += vram_fgr_increment;
-					snes_ram[VMADDL] = addr&0xff;
-					snes_ram[VMADDH] = (addr>>8)&0xff;
+					addr += state->vram_fgr_increment;
+					snes_ram[VMADDL] = addr & 0xff;
+					snes_ram[VMADDH] = (addr >> 8) & 0xff;
 				}
 			}
 			return snes_ppu.ppu1_open_bus;
 		case RCGDATA:	/* Read data from CGRAM */
-				if (!(cgram_address & 0x01))
+				if (!(state->cgram_address & 0x01))
 				{
-					snes_ppu.ppu2_open_bus = ((UINT8 *)snes_cgram)[cgram_address] & 0xff;
+					snes_ppu.ppu2_open_bus = ((UINT8 *)snes_cgram)[state->cgram_address] & 0xff;
 				}
 				else
 				{
 					snes_ppu.ppu2_open_bus &= 0x80;
-					snes_ppu.ppu2_open_bus |= ((UINT8 *)snes_cgram)[cgram_address] & 0x7f;
+					snes_ppu.ppu2_open_bus |= ((UINT8 *)snes_cgram)[state->cgram_address] & 0x7f;
 				}
 
-				cgram_address = (cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
+				state->cgram_address = (state->cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 				return snes_ppu.ppu2_open_bus;
 		case OPHCT:		/* Horizontal counter data by ext/soft latch */
 			{
-				if (read_ophct)
+				if (state->read_ophct)
 				{
 					snes_ppu.ppu2_open_bus &= 0xfe;
 					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_horz >> 8) & 0x01;
@@ -544,12 +542,12 @@ READ8_HANDLER( snes_r_io )
 				{
 					snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_horz & 0xff;
 				}
-				read_ophct ^= 1;
+				state->read_ophct ^= 1;
 				return snes_ppu.ppu2_open_bus;
 			}
 		case OPVCT:		/* Vertical counter data by ext/soft latch */
 			{
-				if (read_opvct)
+				if (state->read_opvct)
 				{
 					snes_ppu.ppu2_open_bus &= 0xfe;
 					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_vert >> 8) & 0x01;
@@ -558,7 +556,7 @@ READ8_HANDLER( snes_r_io )
 				{
 					snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_vert & 0xff;
 				}
-				read_opvct ^= 1;
+				state->read_opvct ^= 1;
 				return snes_ppu.ppu2_open_bus;
 			}
 		case STAT77:	/* PPU status flag and version number */
@@ -570,8 +568,8 @@ READ8_HANDLER( snes_r_io )
 			snes_ppu.ppu1_open_bus = value;
 			return snes_ppu.ppu1_open_bus;
 		case STAT78:	/* PPU status flag and version number */
-			read_ophct = 0;
-			read_opvct = 0;
+			state->read_ophct = 0;
+			state->read_opvct = 0;
 			value = snes_ram[offset];
 			value |= (snes_ppu.ppu1_open_bus & 0x20);
 			value |= (snes_ppu.ppu2_version & 0x0f);
@@ -778,40 +776,6 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.oam.next_charmap = (data & 0x03) << 1;
 			snes_ppu.oam.next_name_select = (((data & 0x18) >> 3) * 0x1000) << 1;
 			snes_ppu.oam.next_size = (data & 0xe0) >> 5;
-			switch ((data & 0xe0) >> 5)
-			{
-				case 0:         /* 8 & 16 */
-		               snes_ppu.oam.size[0] = 1;
-		               snes_ppu.oam.size[1] = 2;
-		               break;
-		            case 1:         /* 8 & 32 */
-		               snes_ppu.oam.size[0] = 1;
-		               snes_ppu.oam.size[1] = 4;
-		               break;
-		            case 2:         /* 8 & 64 */
-		               snes_ppu.oam.size[0] = 1;
-		               snes_ppu.oam.size[1] = 8;
-		               break;
-		            case 3:         /* 16 & 32 */
-		               snes_ppu.oam.size[0] = 2;
-		               snes_ppu.oam.size[1] = 4;
-		               break;
-		            case 4:         /* 16 & 64 */
-		               snes_ppu.oam.size[0] = 2;
-		               snes_ppu.oam.size[1] = 8;
-		               break;
-		            case 5:         /* 32 & 64 */
-		               snes_ppu.oam.size[0] = 4;
-		               snes_ppu.oam.size[1] = 8;
-		               break;
-		            default:
-		               /* Unknown size so default to 8 & 16 */
-		               logerror("Object size unsupported: %d\n", (data & 0xe0) >> 5);
-
-		               snes_ppu.oam.size[0] = 1;
-		               snes_ppu.oam.size[1] = 2;
-				break;
-			}
 			break;
 		case OAMADDL:	/* Address for accessing OAM (low) */
 			snes_ppu.oam.saved_address_low = data;
@@ -950,22 +914,22 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			return;
 		case VMAIN:		/* VRAM address increment value designation */
-			vram_fgr_high = (data & 0x80);
-			vram_fgr_increment = vram_fgr_inctab[data & 3];
+			state->vram_fgr_high = (data & 0x80);
+			state->vram_fgr_increment = vram_fgr_inctab[data & 3];
 
 			if (data & 0xc)
 			{
 				int md = (data & 0xc) >> 2;
 
-				vram_fgr_count = vram_fgr_inccnts[md];
-				vram_fgr_mask = (vram_fgr_count * 8) - 1;
-				vram_fgr_shift = vram_fgr_shiftab[md];
+				state->vram_fgr_count = vram_fgr_inccnts[md];
+				state->vram_fgr_mask = (state->vram_fgr_count * 8) - 1;
+				state->vram_fgr_shift = vram_fgr_shiftab[md];
 			}
 			else
 			{
-				vram_fgr_count = 0;
+				state->vram_fgr_count = 0;
 			}
-//          printf("VMAIN: high %x inc %x count %x mask %x shift %x\n", vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift);
+//          printf("VMAIN: high %x inc %x count %x mask %x shift %x\n", state->vram_fgr_high, state->vram_fgr_increment, state->vram_fgr_count, state->vram_fgr_mask, state->vram_fgr_shift);
 			break;
 		case VMADDL:	/* Address for VRAM read/write (low) */
 		case VMADDH:	/* Address for VRAM read/write (high) */
@@ -975,16 +939,16 @@ WRITE8_HANDLER( snes_w_io )
 				snes_ram[offset] = data;
 				addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				if (vram_fgr_count)
+				if (state->vram_fgr_count)
 				{
-					UINT32 rem = addr & vram_fgr_mask;
-					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
+					UINT32 rem = addr & state->vram_fgr_mask;
+					UINT32 faddr = (addr & ~state->vram_fgr_mask) + (rem >> state->vram_fgr_shift) + ((rem & (state->vram_fgr_count - 1)) << 3);
 
-					vram_read_buffer = snes_vram[(faddr << 1) & 0x1ffff] | snes_vram[((faddr << 1) + 1) & 0x1ffff] << 8;
+					state->vram_read_buffer = snes_vram[(faddr << 1) & 0x1ffff] | snes_vram[((faddr << 1) + 1) & 0x1ffff] << 8;
 				}
 				else
 				{
-					vram_read_buffer = snes_vram[(addr << 1) & 0x1ffff] | snes_vram[((addr << 1) + 1) & 0x1ffff] << 8;
+					state->vram_read_buffer = snes_vram[(addr << 1) & 0x1ffff] | snes_vram[((addr << 1) + 1) & 0x1ffff] << 8;
 				}
 
 			}
@@ -993,10 +957,10 @@ WRITE8_HANDLER( snes_w_io )
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				if (vram_fgr_count)
+				if (state->vram_fgr_count)
 				{
-					UINT32 rem = addr & vram_fgr_mask;
-					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
+					UINT32 rem = addr & state->vram_fgr_mask;
+					UINT32 faddr = (addr & ~state->vram_fgr_mask) + (rem >> state->vram_fgr_shift) + ((rem & (state->vram_fgr_count - 1)) << 3);
 
 					snes_vram[(faddr << 1) & 0x1ffff] = data;
 				}
@@ -1005,9 +969,9 @@ WRITE8_HANDLER( snes_w_io )
 					snes_vram[(addr << 1) & 0x1ffff] = data;
 				}
 
-				if (!vram_fgr_high)
+				if (!state->vram_fgr_high)
 				{
-					addr += vram_fgr_increment;
+					addr += state->vram_fgr_increment;
 					snes_ram[VMADDL] = addr & 0xff;
 					snes_ram[VMADDH] = (addr >> 8) & 0xff;
 				}
@@ -1017,10 +981,10 @@ WRITE8_HANDLER( snes_w_io )
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				if (vram_fgr_count)
+				if (state->vram_fgr_count)
 				{
-					UINT32 rem = addr & vram_fgr_mask;
-					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) + ((rem & (vram_fgr_count - 1)) << 3);
+					UINT32 rem = addr & state->vram_fgr_mask;
+					UINT32 faddr = (addr & ~state->vram_fgr_mask) + (rem >> state->vram_fgr_shift) + ((rem & (state->vram_fgr_count - 1)) << 3);
 
 					snes_vram[((faddr << 1) + 1) & 0x1ffff] = data;
 				}
@@ -1029,9 +993,9 @@ WRITE8_HANDLER( snes_w_io )
 					snes_vram[((addr << 1) + 1) & 0x1ffff] = data;
 				}
 
-				if (vram_fgr_high)
+				if (state->vram_fgr_high)
 				{
-					addr += vram_fgr_increment;
+					addr += state->vram_fgr_increment;
 					snes_ram[VMADDL] = addr & 0xff;
 					snes_ram[VMADDH] = (addr >> 8) & 0xff;
 				}
@@ -1070,11 +1034,11 @@ WRITE8_HANDLER( snes_w_io )
 		case CGADD:		/* Initial address for colour RAM writing */
 			/* CGRAM is 16-bit, but when reading/writing we treat it as
                  * 8-bit, so we need to double the address */
-			cgram_address = data << 1;
+			state->cgram_address = data << 1;
 			break;
 		case CGDATA:	/* Data for colour RAM */
-			((UINT8 *)snes_cgram)[cgram_address] = data;
-			cgram_address = (cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
+			((UINT8 *)snes_cgram)[state->cgram_address] = data;
+			state->cgram_address = (state->cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:	/* Window mask settings for BG1-2 */
 			if (data != snes_ram[offset])
@@ -1278,7 +1242,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case WRMPYB:	/* Multiplier B */
 			snes_ram[WRMPYB] = data;
-//          timer_adjust_oneshot(snes_mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
+//          timer_adjust_oneshot(state->mult_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 8), 0);
 			{
 				UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
 				snes_ram[RDMPYL] = c & 0xff;
@@ -1290,7 +1254,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case WRDVDD:	/* Divisor */
 			snes_ram[WRDVDD] = data;
-//          timer_adjust_oneshot(snes_div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 16), 0);
+//          timer_adjust_oneshot(state->div_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 16), 0);
 			{
 				UINT16 value, dividend, remainder;
 				dividend = remainder = 0;
@@ -1316,8 +1280,8 @@ WRITE8_HANDLER( snes_w_io )
 		case VTIMEL:	/* V-Count timer settings (low)  */
 		case VTIMEH:	/* V-Count timer settings (high) */
 			break;
-		case MDMAEN:	/* GDMA channel designation and trigger */
-			snes_gdma(space, data);
+		case MDMAEN:	/* DMA channel designation and trigger */
+			snes_dma(space, data);
 			data = 0;	/* Once DMA is done we need to reset all bits to 0 */
 			break;
 		case HDMAEN:	/* HDMA channel designation */
@@ -2045,27 +2009,28 @@ static UINT8 nss_oldjoy2_read( running_machine *machine )
 
 *************************************/
 
-static void snes_init_timers(running_machine *machine)
+static void snes_init_timers( running_machine *machine )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
+
 	/* init timers and stop them */
-	snes_scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
-	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
-	snes_hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
-	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
-	snes_nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
-	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
-	snes_hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
-	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
-	snes_div_timer = timer_alloc(machine, snes_div_callback, NULL);
-	timer_adjust_oneshot(snes_div_timer, attotime_never, 0);
-	snes_mult_timer = timer_alloc(machine, snes_mult_callback, NULL);
-	timer_adjust_oneshot(snes_mult_timer, attotime_never, 0);
+	state->scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
+	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+	state->hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
+	timer_adjust_oneshot(state->hblank_timer, attotime_never, 0);
+	state->nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
+	timer_adjust_oneshot(state->nmi_timer, attotime_never, 0);
+	state->hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
+	timer_adjust_oneshot(state->hirq_timer, attotime_never, 0);
+	state->div_timer = timer_alloc(machine, snes_div_callback, NULL);
+	timer_adjust_oneshot(state->div_timer, attotime_never, 0);
+	state->mult_timer = timer_alloc(machine, snes_mult_callback, NULL);
+	timer_adjust_oneshot(state->mult_timer, attotime_never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
-	hblank_offset = 268;
-	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
-
+	state->hblank_offset = 268;
+	timer_adjust_oneshot(state->hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->hblank_offset), 0);
 }
 
 static void snes_init_ram(running_machine *machine)
@@ -2075,13 +2040,13 @@ static void snes_init_ram(running_machine *machine)
 	int i, j;
 
 	/* Init VRAM */
-	memset(snes_vram, 0, SNES_VRAM_SIZE );
+	memset(snes_vram, 0, SNES_VRAM_SIZE);
 
 	/* Init Colour RAM */
 	memset((UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
-	memset(snes_oam, 0xff, SNES_OAM_SIZE );
+	memset(snes_oam, 0xff, SNES_OAM_SIZE);
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
 	/* make sure it happens to the 65816 (CPU 0) */
@@ -2100,8 +2065,11 @@ static void snes_init_ram(running_machine *machine)
 	snes_ppu.mode = 0;
 	snes_ppu.ppu1_version = 1;	// 5C77 chip version number, read by STAT77, only '1' is known
 	snes_ppu.ppu2_version = 3;	// 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
-	cgram_address = 0;
-	vram_read_offset = 2;
+
+	state->cgram_address = 0;
+	state->vram_read_offset = 2;
+	state->read_ophct = 0;
+	state->read_opvct = 0;
 
 	state->joy1l = state->joy1h = state->joy2l = state->joy2h = state->joy3l = state->joy3h = 0;
 	state->data1[0] = state->data2[0] = state->data1[1] = state->data2[1] = 0;
@@ -2172,33 +2140,15 @@ static void snes_init_ram(running_machine *machine)
 	}
 }
 
-void snes_hdma_init()
-{
-	UINT8 mask = 1, dma = 0, i;
-
-	snes_hdma_chnl = snes_ram[HDMAEN];
-	for (i = 0; i < 8; i++)
-	{
-		if (snes_ram[HDMAEN] & mask)
-		{
-			snes_ram[SNES_DMA_BASE + dma + 8] = snes_ram[SNES_DMA_BASE + dma + 2];
-			snes_ram[SNES_DMA_BASE + dma + 9] = snes_ram[SNES_DMA_BASE + dma + 3];
-			snes_ram[SNES_DMA_BASE + dma + 0xa] = 0;
-		}
-		dma += 0x10;
-		mask <<= 1;
-	}
-}
-
 
 /* should we treat this as nvram in MAME? */
-static DIRECT_UPDATE_HANDLER(spc_direct)
+static DIRECT_UPDATE_HANDLER( spc_direct )
 {
 	direct->raw = direct->decrypted = spc_ram;
 	return ~0;
 }
 
-static DIRECT_UPDATE_HANDLER(snes_direct)
+static DIRECT_UPDATE_HANDLER( snes_direct )
 {
 	direct->raw = direct->decrypted = snes_ram;
 	return ~0;
@@ -2237,6 +2187,8 @@ MACHINE_START( snes )
 
 MACHINE_RESET( snes )
 {
+	snes_state *state = (snes_state *)machine->driver_data;
+
 	snes_init_ram(machine);
 
 	/* Set STAT78 to NTSC or PAL */
@@ -2252,7 +2204,7 @@ MACHINE_RESET( snes )
 	snes_ram[VTIMEL] = 0xff;
 	snes_ram[VTIMEH] = 0x1;
 
-	snes_htmult = 1;
+	state->htmult = 1;
 	snes_ppu.interlace = 1;
 	snes_ppu.obj_interlace = 1;
 }
@@ -2391,9 +2343,37 @@ DRIVER_INIT( snes_hirom )
 
 *************************************/
 
-
-void snes_hdma(const address_space *space)
+INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abus, UINT16 bbus )
 {
+	/* TODO: implement open bus access when DMA tries to transfer from not accessible regs */
+	if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
+		memory_write_byte(space, abus, memory_read_byte(space, bbus));
+	else									/* CPU->PPU */
+		memory_write_byte(space, bbus, memory_read_byte(space, abus));
+}
+
+static void snes_hdma_init( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 mask = 1, dma = 0, i;
+
+	state->hdma_chnl = snes_ram[HDMAEN];
+	for (i = 0; i < 8; i++)
+	{
+		if (snes_ram[HDMAEN] & mask)
+		{
+			snes_ram[SNES_DMA_BASE + dma + 8] = snes_ram[SNES_DMA_BASE + dma + 2];
+			snes_ram[SNES_DMA_BASE + dma + 9] = snes_ram[SNES_DMA_BASE + dma + 3];
+			snes_ram[SNES_DMA_BASE + dma + 0xa] = 0;
+		}
+		dma += 0x10;
+		mask <<= 1;
+	}
+}
+
+static void snes_hdma( const address_space *space )
+{
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 mask = 1, dma = 0, i, contmode;
 	UINT16 bbus;
 	UINT32 abus;
@@ -2401,7 +2381,7 @@ void snes_hdma(const address_space *space)
 	/* Assume priority of the 8 DMA channels is 0-7 */
 	for (i = 0; i < 8; i++)
 	{
-		if (snes_hdma_chnl & mask)
+		if (state->hdma_chnl & mask)
 		{
 			/* Check if we need to read a new line from the table */
 			if (!(snes_ram[SNES_DMA_BASE + dma + 0xa] & 0x7f))
@@ -2413,7 +2393,7 @@ void snes_hdma(const address_space *space)
 				if (!snes_ram[SNES_DMA_BASE + dma + 0xa])
 				{
 					/* No more lines so clear HDMA */
-					snes_hdma_chnl &= ~mask;
+					state->hdma_chnl &= ~mask;
 					continue;
 				}
 				abus++;
@@ -2438,53 +2418,47 @@ void snes_hdma(const address_space *space)
 			bbus = 0x2100 + snes_ram[SNES_DMA_BASE + dma + 1];
 
 #ifdef SNES_DBG_HDMA
-			mame_printf_debug( "HDMA-Ch: %d(%s) abus: %X bbus: %X type: %d(%X %X)\n", i, snes_ram[SNES_DMA_BASE + dma] & 0x40 ? "Indirect" : "Absolute", abus, bbus, snes_ram[SNES_DMA_BASE + dma] & 0x7, snes_ram[SNES_DMA_BASE + dma + 8],snes_ram[SNES_DMA_BASE + dma + 9] );
+			mame_printf_debug( "HDMA-Ch: %d(%s) abus: %X bbus: %X type: %d(%X %X)\n", i, snes_ram[SNES_DMA_BASE + dma] & 0x40 ? "Indirect" : "Absolute", abus, bbus, snes_ram[SNES_DMA_BASE + dma] & 0x07, snes_ram[SNES_DMA_BASE + dma + 8],snes_ram[SNES_DMA_BASE + dma + 9] );
 #endif
 
-			switch (snes_ram[SNES_DMA_BASE + dma] & 0x7)
+			switch (snes_ram[SNES_DMA_BASE + dma] & 0x07)
 			{
-				case 0:		/* 1 address */
-				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-				} break;
-				case 5:		/* 4 bytes to 2 addresses (l,h,l,h) */
-				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-				} break;
-				case 1:		/* 2 addresses (l,h) */
-				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-				} break;
-				case 2:		/* Write twice (l,l) */
-				case 6:
-				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-				} break;
-				case 3:		/* 2 addresses/Write twice (l,l,h,h) */
-				case 7:
-				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-				} break;
-				case 4:		/* 4 addresses (l,h,l,h) */
-				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 2, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 3, memory_read_byte(space, abus++));
-				} break;
-				default:
+			case 0:		/* 1 register write once             (1 byte:  p               ) */
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				break;
+			case 5:		/* 2 registers write twice alternate (4 bytes: p, p+1, p,   p+1) */
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+				break;
+			case 1:		/* 2 registers write once            (2 bytes: p, p+1          ) */
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+				break;
+			case 2:		/* 1 register write twice            (2 bytes: p, p            ) */
+			case 6:
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				break;
+			case 3:		/* 2 registers write twice each      (4 bytes: p, p,   p+1, p+1) */
+			case 7:
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+				break;
+			case 4:		/* 4 registers write once            (4 bytes: p, p+1, p+2, p+3) */
+				memory_write_byte(space, bbus,     memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 2, memory_read_byte(space, abus++));
+				memory_write_byte(space, bbus + 3, memory_read_byte(space, abus++));
+				break;
+			default:
 #ifdef MAME_DEBUG
-					mame_printf_debug( "  HDMA of unsupported type: %d\n", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
+				mame_printf_debug( "  HDMA of unsupported type: %d\n", snes_ram[SNES_DMA_BASE + dma] & 0x07);
 #endif
-					break;
+				break;
 			}
 
 			/* Update address */
@@ -2519,8 +2493,9 @@ void snes_hdma(const address_space *space)
 	}
 }
 
-void snes_gdma( const address_space *space, UINT8 channels )
+static void snes_dma( const address_space *space, UINT8 channels )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 mask = 1, dma = 0, i;
 	INT8 increment;
 	UINT16 bbus;
@@ -2531,6 +2506,10 @@ void snes_gdma( const address_space *space, UINT8 channels )
 	{
 		if (channels & mask)
 		{
+			/* FIXME: the following should be used to stop DMA if the same channel is used by HDMA (being set to 1 in snes_hdma)
+            However, this cannot be implemented as is atm, because currently DMA transfers always happen as soon as they are enabled... */
+			state->dma_disabled[i] = 0;
+
 			//printf( "Making a transfer on channel %d\n", i );
 			/* Find transfer addresses */
 			abus = (snes_ram[SNES_DMA_BASE + dma + 3] << 8) + snes_ram[SNES_DMA_BASE + dma + 2];
@@ -2556,116 +2535,80 @@ void snes_gdma( const address_space *space, UINT8 channels )
 			if (!length)
 				length = 0x10000;	/* 0x0000 really means 0x10000 */
 
-//          printf( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
+//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x07);
 
-#ifdef SNES_DBG_GDMA
-			mame_printf_debug( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
+#ifdef SNES_DBG_DMA
+			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x07);
 #endif
 
-			switch (snes_ram[SNES_DMA_BASE + dma] & 0x7)
+			switch (snes_ram[SNES_DMA_BASE + dma] & 0x07)
 			{
-				case 0:		/* 1 address */
-				case 2:		/* 1 address ?? */
-				case 6:
+			case 0:		/* 1 register write once */
+			case 2:		/* 1 register write twice */
+			case 6:		/* 1 register write twice */
+
+				while (length-- && !state->dma_disabled[i])
 				{
-					while (length--)
-					{
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-					}
-				} break;
-				case 1:		/* 2 addresses (l,h) */
-				case 5:
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus);
+					abus += increment;
+				}
+				break;
+			case 1:		/* 2 registers write once */
+			case 5:		/* 2 registers write twice alternate */
+				while (length-- && !state->dma_disabled[i])
 				{
-					while (length--)
-					{
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus + 1) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-					}
-				} break;
-				case 3:		/* 2 addresses/write twice (l,l,h,h) */
-				case 7:
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus + 1);
+					abus += increment;
+				}
+				break;
+			case 3:		/* 2 registers write twice each */
+			case 7:		/* 2 registers write twice each */
+				while (length-- && !state->dma_disabled[i])
 				{
-					while (length--)
-					{
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus + 1) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus + 1) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-					}
-				} break;
-				case 4:		/* 4 addresses (l,h,l,h) */
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus + 1);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus + 1);
+					abus += increment;
+				}
+				break;
+			case 4:		/* 4 registers write once */
+				while (length-- && !state->dma_disabled[i])
 				{
-					while (length--)
-					{
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus + 1) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus + 2) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus + 2, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-						if (!(length--))
-							break;
-						if (snes_ram[SNES_DMA_BASE + dma] & 0x80)	/* PPU->CPU */
-							memory_write_byte(space, ((abus & 0xffff) | (abus_bank)), memory_read_byte(space, bbus + 3) );
-						else									/* CPU->PPU */
-							memory_write_byte(space, bbus + 3, memory_read_byte(space, ((abus & 0xffff) | (abus_bank))) );
-						abus += increment;
-					}
-				} break;
-				default:
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus + 1);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus + 2);
+					abus += increment;
+					if (!(length--) || state->dma_disabled[i])
+						break;
+					snes_dma_transfer(space, dma, (abus & 0xffff) | abus_bank, bbus + 3);
+					abus += increment;
+				}
+				break;
+			default:
 #ifdef MAME_DEBUG
-					mame_printf_debug( "  GDMA of unsupported type: %d\n", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
+				mame_printf_debug( "  DMA of unsupported type: %d\n", snes_ram[SNES_DMA_BASE + dma] & 0x07);
 #endif
-					break;
+				break;
 			}
 
 			/* We're done so write the new abus back to the registers */
@@ -2673,10 +2616,6 @@ void snes_gdma( const address_space *space, UINT8 channels )
 			snes_w_io(space, SNES_DMA_BASE + dma + 3, (abus >> 8) & 0xff);
 			snes_w_io(space, SNES_DMA_BASE + dma + 5, 0);
 			snes_w_io(space, SNES_DMA_BASE + dma + 6, 0);
-			//snes_ram[SNES_DMA_BASE + dma + 2] = abus & 0xff;
-			//snes_ram[SNES_DMA_BASE + dma + 3] = (abus >> 8) & 0xff;
-			//snes_ram[SNES_DMA_BASE + dma + 5] = 0;
-			//snes_ram[SNES_DMA_BASE + dma + 6] = 0;
 		}
 		dma += 0x10;
 		mask <<= 1;

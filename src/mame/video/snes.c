@@ -1011,9 +1011,9 @@ static void snes_update_obsel( void )
 	snes_ppu.layer[SNES_OAM].charmap = snes_ppu.oam.next_charmap;
 	snes_ppu.oam.name_select = snes_ppu.oam.next_name_select;
 
-	if (snes_ppu.oam.size_ != snes_ppu.oam.next_size)
+	if (snes_ppu.oam.size != snes_ppu.oam.next_size)
 	{
-		snes_ppu.oam.size_ = snes_ppu.oam.next_size;
+		snes_ppu.oam.size = snes_ppu.oam.next_size;
 		snes_ppu.update_oam_list = 1;
 	}
 }
@@ -1055,7 +1055,7 @@ static void snes_oam_list_build( void )
 		oam_spritelist[i].x &= 0x1ff;
 
 		/* Determine object size */
-		switch (snes_ppu.oam.size_)
+		switch (snes_ppu.oam.size)
 		{
 		case 0:			/* 8x8 or 16x16 */
 			oam_spritelist[i].width  = oam_spritelist[i].size ? 2 : 1;
@@ -1095,7 +1095,7 @@ static void snes_oam_list_build( void )
 			break;
 		default:
 			/* we should never enter here... */
-			logerror("Object size unsupported: %d\n", snes_ppu.oam.size_);
+			logerror("Object size unsupported: %d\n", snes_ppu.oam.size);
 			break;
 		}
 	}

@@ -29,7 +29,7 @@
 #ifdef MAME_DEBUG
 /* #define SNES_DBG_GENERAL*/		/* Display general debug info */
 /* #define SNES_DBG_VIDEO */		/* Display video debug info */
-/* #define SNES_DBG_GDMA*/			/* Display GDMA debug info */
+/* #define SNES_DBG_DMA*/			/* Display DMA debug info */
 /* #define SNES_DBG_HDMA*/			/* Display HDMA debug info */
 /* #define SNES_DBG_REG_R*/			/* Display register read info */
 /* #define SNES_DBG_REG_W*/			/* Display register write info */
@@ -386,6 +386,26 @@ public:
 
 	snes_state(running_machine &machine) { }
 
+	/* misc */
+	UINT16                htmult;		/* in 512 wide, we run HTOTAL double and halve it on latching */
+	UINT16                cgram_address;	/* CGRAM address */
+	UINT8                 vram_read_offset;	/* VRAM read offset */
+	UINT8                 read_ophct, read_opvct;
+	UINT16                hblank_offset;
+	UINT16                vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
+
+	/* timers */
+	emu_timer             *scanline_timer;
+	emu_timer             *hblank_timer;
+	emu_timer             *nmi_timer;
+	emu_timer             *hirq_timer;
+	emu_timer             *div_timer;
+	emu_timer             *mult_timer;
+
+	/* DMA/HDMA-related */
+	int                   dma_disabled[8];	// used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
+	UINT8                 hdma_chnl;	/* channels enabled for HDMA */
+
 	/* input-related */
 	UINT8                 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
 	UINT16                data1[2], data2[2];
@@ -402,24 +422,24 @@ public:
 /* Special chips, checked at init and used in memory handlers */
 enum
 {
-HAS_NONE = 0,
-HAS_DSP1,
-HAS_DSP2,
-HAS_DSP3,
-HAS_DSP4,
-HAS_SUPERFX,
-HAS_SA1,
-HAS_SDD1,
-HAS_OBC1,
-HAS_RTC,
-HAS_Z80GB,
-HAS_CX4,
-HAS_ST010,
-HAS_ST011,
-HAS_ST018,
-HAS_SPC7110,
-HAS_SPC7110_RTC,
-HAS_UNK
+	HAS_NONE = 0,
+	HAS_DSP1,
+	HAS_DSP2,
+	HAS_DSP3,
+	HAS_DSP4,
+	HAS_SUPERFX,
+	HAS_SA1,
+	HAS_SDD1,
+	HAS_OBC1,
+	HAS_RTC,
+	HAS_Z80GB,
+	HAS_CX4,
+	HAS_ST010,
+	HAS_ST011,
+	HAS_ST018,
+	HAS_SPC7110,
+	HAS_SPC7110_RTC,
+	HAS_UNK
 };
 
 /* offset-per-tile modes */
@@ -478,11 +498,7 @@ WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
 
 extern UINT8 snes_has_addon_chip;
 extern UINT32 snes_rom_size;
-extern UINT16 snes_htmult;
 
-extern void snes_gdma(const address_space *space, UINT8 channels);
-extern void snes_hdma_init(void);
-extern void snes_hdma(const address_space *space);
 extern void snes_latch_counters(running_machine *machine);
 
 /* (PPU) Video related */
@@ -530,8 +546,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT16 priority_rotation;
 		UINT8 next_charmap;
 		UINT8 next_size;
-		UINT8 size_;
-		UINT8 size[2];
+		UINT8 size;
 		UINT32 next_name_select;
 		UINT32 name_select;
 		UINT8 first_sprite;
