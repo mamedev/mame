@@ -889,8 +889,8 @@ const game_driver * const drivers[] =
 	DRIVER( starblad )	/* (c) 1991 */
 	DRIVER( driveyes )	/* (c) 1992? */
 				/* 1992, ShimDrive */
+	DRIVER( aircomb )	/* (c) 1992 (US) */
 	DRIVER( aircombj )	/* (c) 1992 (Japan) */
-	DRIVER( aircombu )	/* (c) 1992 (US) */
 	DRIVER( cybsled )	/* (c) 1993 */
 	DRIVER( cybsledj )	/* (c) 1993 */
 
@@ -2387,6 +2387,7 @@ V-V                           TP-027
 	DRIVER( plegends )	/* (c) 1994 Atlus */
 	DRIVER( plegendsj )	/* (c) 1994 Atlus */
 	DRIVER( mazinger )	/* (c) 1994 Banpresto (country is in EEPROM) */
+	DRIVER( mazingerj )	/* (c) 1994 Banpresto (country is in EEPROM) */
 	DRIVER( donpachi )	/* (c) 1995 Atlus/Cave */
 	DRIVER( donpachij )	/* (c) 1995 Atlus/Cave */
 	DRIVER( donpachikr )	/* (c) 1995 Atlus/Cave */
@@ -2394,8 +2395,23 @@ V-V                           TP-027
 	DRIVER( metmqstr )	/* (c) 1995 Banpresto / Pandorabox */
 	DRIVER( nmaster )	/* (c) 1995 Banpresto / Pandorabox */
 	DRIVER( sailormn )	/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnu )	/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnj )	/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnk )	/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnt )	/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnh )	/* (c) 1995 Banpresto (country is in EEPROM) */
 	DRIVER( sailormno )	/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnou )/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnoj )/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnok )/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnot )/* (c) 1995 Banpresto (country is in EEPROM) */
+	DRIVER( sailormnoh )/* (c) 1995 Banpresto (country is in EEPROM) */
 	DRIVER( agallet )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
+	DRIVER( agalletu )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
+	DRIVER( agalletj )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
+	DRIVER( agalletk )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
+	DRIVER( agallett )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
+	DRIVER( agalleth )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */	
 	DRIVER( hotdogst )	/* (c) 1996 Marble */
 	DRIVER( ddonpach )	/* (c) 1997 Atlus/Cave */
 	DRIVER( ddonpachj )	/* (c) 1997 Atlus/Cave */
@@ -2410,6 +2426,7 @@ V-V                           TP-027
 	DRIVER( gaia )		/* (c) 1999 Noise Factory */
 	DRIVER( theroes )	/* (c) 2001 Primetek Investments */
 	DRIVER( korokoro )	/* (c) 1999 Takumi */
+	DRIVER( crusherm )	/* (c) 1999 Takumi */
 
 	/* Kyugo games */
 	/* Kyugo only made four games: Repulse, Flash Gal, SRD Mission and Air Wolf. */

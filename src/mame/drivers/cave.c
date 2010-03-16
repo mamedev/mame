@@ -16,24 +16,25 @@ Other        :  93C46 EEPROM
 
 
 -----------------------------------------------------------------------------------------
-Year + Game         License       PCB         Tilemaps        Sprites         Other
+Year + Game          License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
-94  Mazinger Z      Banpresto     ?           038 9335EX706   013 9341E7009   Z80
-94  PowerInstinct 2 Atlus         ATG02?      038 9429WX709   013             Z80 NMK 112
-95  P.I. Legends    Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
-95  Metamoqester    Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
-95  Sailor Moon     Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
-95  Donpachi        Atlus         AT-C01DP-2  038 9429WX727   013 8647-01     NMK 112
-96  Air Gallet      Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
-96  Hotdog Storm    Marble        ASTC9501    038 9341EX702                   Z80
-97  Dodonpachi      Atlus         ATC03D2     ?
-98  Dangun Feveron  Nihon System  CV01        038 9808WX003   013 9807EX004
-98  ESP Ra.De.      Atlus         ATC04       ?
-98  Uo Poko         Jaleco        CV02        038 9749WX001   013 9749EX004
-99  Guwange         Atlus         ATC05       ?
-99  Gaia Crusaders  Noise Factory ?           038 9838WX003   013 9918EX008
-99  Koro Koro Quest Takumi        TUG-01B     038 9838WX004   013 9838EX004
-01  Thunder Heroes  Primetek      ?           038 9838WX003   013 9918EX008
+94  Mazinger Z       Banpresto     ?           038 9335EX706   013 9341E7009   Z80
+94  PowerInstinct 2  Atlus         ATG02?      038 9429WX709   013             Z80 NMK 112
+95  P.I. Legends     Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
+95  Metamoqester     Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
+95  Sailor Moon      Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
+95  Donpachi         Atlus         AT-C01DP-2  038 9429WX727   013 8647-01     NMK 112
+96  Air Gallet       Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
+96  Hotdog Storm     Marble        ASTC9501    038 9341EX702                   Z80
+97  Dodonpachi       Atlus         ATC03D2     ?
+98  Dangun Feveron   Nihon System  CV01        038 9808WX003   013 9807EX004
+98  ESP Ra.De.       Atlus         ATC04       ?
+98  Uo Poko          Jaleco        CV02        038 9749WX001   013 9749EX004
+99  Guwange          Atlus         ATC05       ?
+99  Gaia Crusaders   Noise Factory ?           038 9838WX003   013 9918EX008
+99  Koro Koro Quest  Takumi        TUG-01B     038 9838WX004   013 9838EX004
+99  Crusher Makochan Takumi        TUG-01B
+01  Thunder Heroes   Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
 
 To Do:
@@ -692,6 +693,7 @@ static CUSTOM_INPUT( korokoro_hopper_r )
 	return state->hopper ? 1 : 0;
 }
 
+
 static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 //  AM_RANGE(0x100000, 0x107fff) AM_READONLY                                                           // Layer 0
@@ -714,7 +716,22 @@ static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																		// RAM
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( crusherm_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
+	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, vram_0)								// Layer 0
+	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, vctrl_0)									// Layer 0 Control
+	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)			// Sprites
+	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cave_state, paletteram, paletteram_size)	// Palette
+	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( "ymz", ymz280b_w, 0x00ff)									// YMZ280
+	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
+	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
+	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)
+	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE("eeprom", korokoro_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP															// 0 (watchdog?)
+	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)													// IRQ Cause
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, videoregs)									// Video Regs
+	AM_RANGE(0x340000, 0x34ffff) AM_RAM																		// RAM
+ADDRESS_MAP_END
 /***************************************************************************
                                 Mazinger Z
 ***************************************************************************/
@@ -835,20 +852,6 @@ static READ16_HANDLER( sailormn_input0_r )
 {
 //  watchdog_reset16_r(0, 0);    // written too rarely for mame.
 	return input_port_read(space->machine, "IN0");
-}
-
-static READ16_HANDLER( agallet_irq_cause_r )
-{
-	UINT16 irq_cause = cave_irq_cause_r(space, offset, mem_mask);
-
-	if (offset == 0)
-	{
-// Speed hack for agallet
-		if ((cpu_get_pc(space->cpu) == 0xcdca) && (irq_cause & 4))
-			cpu_spinuntil_int(space->cpu);
-	}
-
-	return irq_cause;
 }
 
 static ADDRESS_MAP_START( sailormn_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1286,29 +1289,6 @@ static INPUT_PORTS_START( theroes )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-/* Mazinger Z (has region stored in Eeprom) */
-static INPUT_PORTS_START( mazinger )
-	PORT_INCLUDE( cave )
-
-	PORT_START("EEPROM")	// Eeprom Region
-	PORT_DIPNAME( 0xff, 0x31, DEF_STR( Region ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x31, DEF_STR( World ) )
-INPUT_PORTS_END
-
-/* Sailor Moon / Air Gallet (has region stored in Eeprom) */
-static INPUT_PORTS_START( sailormn )
-	PORT_INCLUDE( cave )
-
-	PORT_START("EEPROM")	// Eeprom Region
-	PORT_DIPNAME( 0xff, 0x02, DEF_STR( Region ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Taiwan" )
-	PORT_DIPSETTING(    0x05, "Korea" )
-INPUT_PORTS_END
 
 /* Normal layout but with 4 buttons */
 static INPUT_PORTS_START( metmqstr )
@@ -1640,10 +1620,6 @@ static MACHINE_RESET( cave )
 
 	memset(state->soundbuf_data, 0, 32);
 	state->soundbuf_len = 0;
-
-	/* modify the eeprom on a reset with the desired region for the games that have the region factory set in eeprom */
-	if (state->region_byte >= 0)
-		memory_write_byte(cputag_get_address_space(machine, "eeprom", ADDRESS_SPACE_0), state->region_byte, input_port_read(machine, "EEPROM"));
 
 	state->vblank_irq = 0;
 	state->sound_irq = 0;
@@ -2043,6 +2019,16 @@ static MACHINE_DRIVER_START( korokoro )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( crusherm )
+
+	/* driver data */
+	MDRV_IMPORT_FROM( korokoro )
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_DRIVER_END
 
 
@@ -2446,45 +2432,82 @@ BP962A.U77  23C16000    GFX
 
 ***************************************************************************/
 
-ROM_START( agallet ) /* PCB showed "Taiwan Only" on the copyright notice screen. Region byte in EEPROM */
-	ROM_REGION( 0x400000, "maincpu", 0 )		/* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) )
-	//empty
 
-	ROM_REGION( 0x88000, "audiocpu", 0 )	/* Z80 code */
-	ROM_LOAD( "bp962a.u9",  0x00000, 0x08000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF
-	ROM_CONTINUE(           0x10000, 0x78000             )
 
-	ROM_REGION( 0x400000 * 2, "gfx1", 0 )		/* Sprites (do not dispose) */
-	ROM_LOAD( "bp962a.u76", 0x000000, 0x200000, CRC(858da439) SHA1(33a3d2a3ec3fa3364b00e1e43b405e5030a5b2a3) )
-	ROM_LOAD( "bp962a.u77", 0x200000, 0x200000, CRC(ea2ba35e) SHA1(72487f21d44fe7be9a98068ce7f57a43c132945f) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
-	ROM_LOAD( "bp962a.u53", 0x000000, 0x100000, CRC(fcd9a107) SHA1(169b94db8389e7d47d4d77f36907a62c30fea727) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(           0x000000, 0x100000             )
-
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
-	ROM_LOAD( "bp962a.u54", 0x000000, 0x200000, CRC(0cfa3409) SHA1(17107e26762ef7e3b902fb29a6d7bc534a4d09aa) )
-
-	ROM_REGION( (1*0x200000)*2, "gfx4", 0 )	/* Layer 2 */
-	/* 4 bit part */
-	ROM_LOAD( "bp962a.u57", 0x000000, 0x200000, CRC(6d608957) SHA1(15f6e8346f5f95eb229505b1b4666dabeb810ee8) )
-	/* 2 bit part */
-	ROM_LOAD( "bp962a.u65", 0x200000, 0x100000, CRC(135fcf9a) SHA1(2e8c89c2627bbdef160d96724d07883fb2fa1a57) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(           0x200000, 0x100000             )
-
-	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #0 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp962a.u48", 0x040000, 0x200000, CRC(ae00a1ce) SHA1(5e8c74df0ac77efb3080406870856f958be14f79) )	// 16 x $20000, FIRST AND SECOND HALF IDENTICAL
-
-	ROM_REGION( 0x240000, "oki2", 0 )	/* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp962a.u47", 0x040000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) )	// 16 x $20000, FIRST AND SECOND HALF IDENTICAL
-
+#define ROMS_AGALLET \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) ) \
+	\
+	ROM_REGION( 0x88000, "audiocpu", 0 ) \
+	ROM_LOAD( "bp962a.u9",  0x00000, 0x08000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
+	ROM_CONTINUE(           0x10000, 0x78000             ) \
+	\
+	ROM_REGION( 0x400000 * 2, "gfx1", 0 ) \
+	ROM_LOAD( "bp962a.u76", 0x000000, 0x200000, CRC(858da439) SHA1(33a3d2a3ec3fa3364b00e1e43b405e5030a5b2a3) ) \
+	ROM_LOAD( "bp962a.u77", 0x200000, 0x200000, CRC(ea2ba35e) SHA1(72487f21d44fe7be9a98068ce7f57a43c132945f) ) \
+	\
+	ROM_REGION( 0x100000, "gfx2", 0 ) \
+	ROM_LOAD( "bp962a.u53", 0x000000, 0x100000, CRC(fcd9a107) SHA1(169b94db8389e7d47d4d77f36907a62c30fea727) ) \
+	ROM_CONTINUE(           0x000000, 0x100000             ) \
+	\
+	ROM_REGION( 0x200000, "gfx3", 0 )	\
+	ROM_LOAD( "bp962a.u54", 0x000000, 0x200000, CRC(0cfa3409) SHA1(17107e26762ef7e3b902fb29a6d7bc534a4d09aa) ) \
+	\
+	ROM_REGION( (1*0x200000)*2, "gfx4", 0 )	\
+	\
+	ROM_LOAD( "bp962a.u57", 0x000000, 0x200000, CRC(6d608957) SHA1(15f6e8346f5f95eb229505b1b4666dabeb810ee8) ) \
+	\
+	ROM_LOAD( "bp962a.u65", 0x200000, 0x100000, CRC(135fcf9a) SHA1(2e8c89c2627bbdef160d96724d07883fb2fa1a57) ) \
+	ROM_CONTINUE(           0x200000, 0x100000             ) \
+	\
+	ROM_REGION( 0x240000, "oki1", 0 ) \
+	ROM_LOAD( "bp962a.u48", 0x040000, 0x200000, CRC(ae00a1ce) SHA1(5e8c74df0ac77efb3080406870856f958be14f79) ) \
+	\
+	ROM_REGION( 0x240000, "oki2", 0 )	\
+	ROM_LOAD( "bp962a.u47", 0x040000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) ) \
+	
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
+ROM_START( agallet ) 
+	ROMS_AGALLET
+	
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-agallet.bin", 0x0000, 0x0080, CRC(ec38bf65) SHA1(cb8d9eacc0cf55a0c6b187e6673e3354554314b5) )
+	ROM_LOAD16_WORD( "agallet_europe.nv", 0x0000, 0x0080, CRC(ec38bf65) SHA1(cb8d9eacc0cf55a0c6b187e6673e3354554314b5) )
 ROM_END
 
+ROM_START( agalletu ) 
+	ROMS_AGALLET
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_usa.nv", 0x0000, 0x0080, CRC(72e65056) SHA1(abf1a86df01064d9d5d8c418e8367817319ec335) )
+ROM_END
+
+ROM_START( agalletj ) 
+	ROMS_AGALLET
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_japan.nv", 0x0000, 0x0080, CRC(0753f547) SHA1(aabb987470406b8729894108bc4d050f7200917d) )
+ROM_END
+
+ROM_START( agalletk ) 
+	ROMS_AGALLET
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_korea.nv", 0x0000, 0x0080, CRC(7f41c253) SHA1(50793d4da0ad6eb590941d26a729a1cf4b3c25c2) )
+ROM_END
+
+ROM_START( agallett ) // the dumped board was this region
+	ROMS_AGALLET
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_taiwan.nv", 0x0000, 0x0080, CRC(0af46742) SHA1(37b704c4c573b2aabd6f016e9e8dd458f95148f7) )
+ROM_END
+
+ROM_START( agalleth ) 
+	ROMS_AGALLET
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_hongkong.nv", 0x0000, 0x0080, CRC(998d1a74) SHA1(13e7e27a18417949d49e97d521781fc0feeef792) )
+ROM_END
 
 /***************************************************************************
 
@@ -3242,6 +3265,21 @@ ROM_START( korokoro )
 	ROM_LOAD( "mp-001_ver01.u1186", 0x000000, 0x100000, CRC(d16e7c5d) SHA1(1f825ace3ed2e23c8d3212320c4645d3d52214c7) )
 ROM_END
 
+ROM_START( crusherm )
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "mp-003ver01.u0130", 0x000000, 0x080000, CRC(a4f56e6b) SHA1(1d3af7602c48a6b6c76c376dbc8ad3823b56868a) )
+
+	ROM_REGION( 0x200000 * 2, "gfx1", 0 )		/* Sprites: * 2 , do not dispose */
+	ROM_LOAD( "mp-003ver01.u1067", 0x000000, 0x100000, CRC(268a4921) SHA1(8bb818466616051af01680b381af53b8b6a18428) )
+	ROM_LOAD( "mp-003ver01.u1066", 0x100000, 0x100000, CRC(79e77a6e) SHA1(9d03dd083769851d628ba6b3d77cfde9603e74f4) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
+	ROM_LOAD( "mp-003ver01.u1060", 0x000000, 0x100000, CRC(7661893e) SHA1(d51645c96247b039214393ba5eae7357144dfd65) )
+
+	ROM_REGION( 0x200000, "ymz", 0 )	/* Samples */
+	ROM_LOAD( "mp-003ver01.u1186", 0x000000, 0x100000, CRC(c3aeb745) SHA1(1bb8ab0512a9a9b0d3ce15f90b49cda431fb14eb) )
+	ROM_LOAD( "mp-003ver01.u1187", 0x100000, 0x100000, CRC(d9312497) SHA1(a349cfdbcad96701a74f06394e87f0e0614e115d) )
+ROM_END
 
 /***************************************************************************
 
@@ -3268,35 +3306,46 @@ U55
 
 ***************************************************************************/
 
+
+
+#define ROMS_MAZINGER \
+	ROM_REGION( 0x80000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mzp-0.u24", 0x00000, 0x80000, CRC(43a4279f) SHA1(2c17eb31040bb7f1554bc1c9a968eec5e72af097) ) \
+	\
+	ROM_REGION16_BE( 0x80000, "user1", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mzp-1.924", 0x00000, 0x80000, CRC(db40acba) SHA1(797a3046b6ab33773c5c4d6bb6d045ea60c1eb45) ) \
+	\
+	ROM_REGION( 0x28000, "audiocpu", 0 ) \
+	ROM_LOAD( "mzs.u21", 0x00000, 0x08000, CRC(c5b4f7ed) SHA1(01f3cd1dd4045029260544e0e1c15dd08817012e) ) \
+	ROM_CONTINUE(        0x10000, 0x18000             ) \
+	\
+	ROM_REGION( 0x400000 * 2, "gfx1", ROMREGION_ERASEFF ) \
+	ROM_LOAD( "bp943a-2.u56", 0x000000, 0x200000, CRC(97e13959) SHA1(c30b1093aacebafefcae701af767dd36fc55fac7) ) \
+	ROM_LOAD( "bp943a-3.u55", 0x200000, 0x080000, CRC(9c4957dd) SHA1(e775605a01b6cadc318855ac046dad03c4fc5bb4) ) \
+	\
+	ROM_REGION( 0x200000, "gfx2", 0 ) \
+	ROM_LOAD( "bp943a-1.u60", 0x000000, 0x200000, CRC(46327415) SHA1(679d26caefa975569198fac550105c370e2be00d) ) \
+	\
+	ROM_REGION( 0x200000, "gfx3", 0 ) \
+	ROM_LOAD( "bp943a-0.u63", 0x000000, 0x200000, CRC(c1fed98a) SHA1(c276505f80a49b129862966a19db507f97153e45) ) \
+	\
+	ROM_REGION( 0x0c0000, "oki", 0 ) \
+	ROM_LOAD( "bp943a-4.u64", 0x040000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) ) \
+
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( mazinger )
-	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "mzp-0.u24", 0x00000, 0x80000, CRC(43a4279f) SHA1(2c17eb31040bb7f1554bc1c9a968eec5e72af097) )
-
-	ROM_REGION16_BE( 0x80000, "user1", 0 )		/* 68000 code (mapped at d00000) */
-	ROM_LOAD16_WORD_SWAP( "mzp-1.924", 0x00000, 0x80000, CRC(db40acba) SHA1(797a3046b6ab33773c5c4d6bb6d045ea60c1eb45) )
-
-	ROM_REGION( 0x28000, "audiocpu", 0 )		/* Z80 code */
-	ROM_LOAD( "mzs.u21", 0x00000, 0x08000, CRC(c5b4f7ed) SHA1(01f3cd1dd4045029260544e0e1c15dd08817012e) )
-	ROM_CONTINUE(        0x10000, 0x18000             )
-
-	ROM_REGION( 0x400000 * 2, "gfx1", ROMREGION_ERASEFF )		/* Sprites: * 2 , do not dispose */
-	ROM_LOAD( "bp943a-2.u56", 0x000000, 0x200000, CRC(97e13959) SHA1(c30b1093aacebafefcae701af767dd36fc55fac7) )
-	ROM_LOAD( "bp943a-3.u55", 0x200000, 0x080000, CRC(9c4957dd) SHA1(e775605a01b6cadc318855ac046dad03c4fc5bb4) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
-	ROM_LOAD( "bp943a-1.u60", 0x000000, 0x200000, CRC(46327415) SHA1(679d26caefa975569198fac550105c370e2be00d) )
-
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
-	ROM_LOAD( "bp943a-0.u63", 0x000000, 0x200000, CRC(c1fed98a) SHA1(c276505f80a49b129862966a19db507f97153e45) )	// FIXED BITS (xxxxxxxx00000000)
-
-	ROM_REGION( 0x0c0000, "oki", 0 )	/* Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp943a-4.u64", 0x040000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) )	// 4 x $20000
-
+	ROMS_MAZINGER
+	
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-mazinger.bin", 0x0000, 0x0080, CRC(4f6225c6) SHA1(ed8e1c3ca9b961778cd317deb0dd8a0143eaab4f) )
+	ROM_LOAD16_WORD( "mazinger_world.nv", 0x0000, 0x0080, CRC(4f6225c6) SHA1(ed8e1c3ca9b961778cd317deb0dd8a0143eaab4f) )
 ROM_END
 
+ROM_START( mazingerj )
+	ROMS_MAZINGER
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "mazinger_japan.nv", 0x0000, 0x0080, CRC(f84a2a45) SHA1(2e8ad10994bba9a3952889ed0ec3bcaca9b41d03) )
+ROM_END
 
 /***************************************************************************
 
@@ -3727,98 +3776,175 @@ BPSM.U77    23C16000    GFX
 
 ***************************************************************************/
 
+
+
+#define ROMS_SAILORMN \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "bpsm945a.u45", 0x000000, 0x080000, CRC(898c9515) SHA1(0fe8d7f13f5cfe2f6e79a0a21b2e8e7e70e65c4b) ) \
+	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) ) \
+	\
+	ROM_REGION( 0x88000, "audiocpu", 0 ) \
+	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x08000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
+	ROM_CONTINUE(             0x10000, 0x78000             ) \
+	\
+	ROM_REGION( 0x400000 * 2, "gfx1", 0 ) \
+	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
+	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
+	\
+	ROM_REGION( 0x200000, "gfx2", 0 ) \
+	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) ) \
+	\
+	ROM_REGION( 0x200000, "gfx3", 0 ) \
+	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) ) \
+	\
+	ROM_REGION( (5*0x200000)*2, "gfx4", 0 ) \
+	\
+	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) ) \
+	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) ) \
+	ROM_LOAD( "bpsm.u62", 0x400000, 0x200000, CRC(a1e3bfac) SHA1(4528887d57e519df8dd60b2392db4c175c57b239) ) \
+	ROM_LOAD( "bpsm.u61", 0x600000, 0x200000, CRC(6a014b52) SHA1(107c687479b59c455fc514cd61d290853c95ad9a) ) \
+	ROM_LOAD( "bpsm.u60", 0x800000, 0x200000, CRC(992468c0) SHA1(3c66cc08313a9a326badc44f53a98cdfe0643da4) ) \
+	\
+	ROM_LOAD( "bpsm.u65", 0xa00000, 0x200000, CRC(f60fb7b5) SHA1(72cb8908cd687a330e14657664cd35037a52c39e) ) \
+	ROM_LOAD( "bpsm.u64", 0xc00000, 0x200000, CRC(6559d31c) SHA1(bf688123a4beff625652cc1844bf0dc192f5c90f) ) \
+	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) ) \
+	ROM_CONTINUE(         0xe00000, 0x100000             ) \
+	\
+	ROM_REGION( 0x240000, "oki1", 0 ) \
+	ROM_LOAD( "bpsm.u48", 0x040000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
+	\
+	ROM_REGION( 0x240000, "oki2", 0 ) \
+	ROM_LOAD( "bpsm.u47", 0x040000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
+	ROM_RELOAD(           0x0c0000, 0x080000             ) \
+	ROM_RELOAD(           0x140000, 0x080000             ) \
+	ROM_RELOAD(           0x1c0000, 0x080000             ) \
+
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( sailormn )
-	ROM_REGION( 0x400000, "maincpu", 0 )		/* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "bpsm945a.u45", 0x000000, 0x080000, CRC(898c9515) SHA1(0fe8d7f13f5cfe2f6e79a0a21b2e8e7e70e65c4b) )
-	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) )
-
-	ROM_REGION( 0x88000, "audiocpu", 0 )	/* Z80 code */
-	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x08000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) )
-	ROM_CONTINUE(             0x10000, 0x78000             )
-
-	ROM_REGION( 0x400000 * 2, "gfx1", 0 )		/* Sprites (do not dispose) */
-	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) )
-	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
-	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) )
-
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
-	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) )
-
-	ROM_REGION( (5*0x200000)*2, "gfx4", 0 )	/* Layer 2 */
-	/* 4 bit part */
-	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) )
-	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) )
-	ROM_LOAD( "bpsm.u62", 0x400000, 0x200000, CRC(a1e3bfac) SHA1(4528887d57e519df8dd60b2392db4c175c57b239) )
-	ROM_LOAD( "bpsm.u61", 0x600000, 0x200000, CRC(6a014b52) SHA1(107c687479b59c455fc514cd61d290853c95ad9a) )
-	ROM_LOAD( "bpsm.u60", 0x800000, 0x200000, CRC(992468c0) SHA1(3c66cc08313a9a326badc44f53a98cdfe0643da4) )
-	/* 2 bit part */
-	ROM_LOAD( "bpsm.u65", 0xa00000, 0x200000, CRC(f60fb7b5) SHA1(72cb8908cd687a330e14657664cd35037a52c39e) )
-	ROM_LOAD( "bpsm.u64", 0xc00000, 0x200000, CRC(6559d31c) SHA1(bf688123a4beff625652cc1844bf0dc192f5c90f) )
-	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(         0xe00000, 0x100000             )
-
-	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #0 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bpsm.u48", 0x040000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) )	// 16 x $20000
-
-	ROM_REGION( 0x240000, "oki2", 0 )	/* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bpsm.u47", 0x040000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) )	// 4 x $20000
-	ROM_RELOAD(           0x0c0000, 0x080000             )
-	ROM_RELOAD(           0x140000, 0x080000             )
-	ROM_RELOAD(           0x1c0000, 0x080000             )
+	ROMS_SAILORMN
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-sailormn.bin", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
+	ROM_LOAD16_WORD( "sailormn_europe.nv", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
 ROM_END
 
-ROM_START( sailormno )
-	ROM_REGION( 0x400000, "maincpu", 0 )		/* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "smprg.u45",    0x000000, 0x080000, CRC(234f1152) SHA1(8fc6d4a8995d550862d328011d3357c09334f0fa) )
-	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) )
-
-	ROM_REGION( 0x88000, "audiocpu", 0 )	/* Z80 code */
-	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x08000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) )
-	ROM_CONTINUE(             0x10000, 0x78000             )
-
-	ROM_REGION( 0x400000 * 2, "gfx1", 0 )		/* Sprites (do not dispose) */
-	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) )
-	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
-	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) )
-
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
-	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) )
-
-	ROM_REGION( (5*0x200000)*2, "gfx4", 0 )	/* Layer 2 */
-	/* 4 bit part */
-	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) )
-	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) )
-	ROM_LOAD( "bpsm.u62", 0x400000, 0x200000, CRC(a1e3bfac) SHA1(4528887d57e519df8dd60b2392db4c175c57b239) )
-	ROM_LOAD( "bpsm.u61", 0x600000, 0x200000, CRC(6a014b52) SHA1(107c687479b59c455fc514cd61d290853c95ad9a) )
-	ROM_LOAD( "bpsm.u60", 0x800000, 0x200000, CRC(992468c0) SHA1(3c66cc08313a9a326badc44f53a98cdfe0643da4) )
-	/* 2 bit part */
-	ROM_LOAD( "bpsm.u65", 0xa00000, 0x200000, CRC(f60fb7b5) SHA1(72cb8908cd687a330e14657664cd35037a52c39e) )
-	ROM_LOAD( "bpsm.u64", 0xc00000, 0x200000, CRC(6559d31c) SHA1(bf688123a4beff625652cc1844bf0dc192f5c90f) )
-	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(         0xe00000, 0x100000             )
-
-	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #0 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bpsm.u48", 0x040000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) )	// 16 x $20000
-
-	ROM_REGION( 0x240000, "oki2", 0 )	/* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bpsm.u47", 0x040000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) )	// 4 x $20000
-	ROM_RELOAD(           0x0c0000, 0x080000             )
-	ROM_RELOAD(           0x140000, 0x080000             )
-	ROM_RELOAD(           0x1c0000, 0x080000             )
+ROM_START( sailormnu )
+	ROMS_SAILORMN
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-sailormn.bin", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
+	ROM_LOAD16_WORD( "sailormn_usa.nv", 0x0000, 0x0080, CRC(3915abe3) SHA1(1b8d3b8c65cf2298939c27607ec52630c017c7ea) )
+ROM_END
+
+ROM_START( sailormnj )
+	ROMS_SAILORMN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
+ROM_END
+
+ROM_START( sailormnk )
+	ROMS_SAILORMN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_korea.nv", 0x0000, 0x0080, CRC(0e7de398) SHA1(b495bf43d8596a0dc9843c74fc04fd21499bd115) )
+ROM_END
+
+ROM_START( sailormnt )
+	ROMS_SAILORMN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_taiwan.nv", 0x0000, 0x0080, CRC(6c7e8c2a) SHA1(68ef4e6593e4c12e6488a20dcc6dda920b01de67) )
+ROM_END
+
+ROM_START( sailormnh )
+	ROMS_SAILORMN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_hongkong.nv", 0x0000, 0x0080, CRC(4d24c874) SHA1(93b87ef18cff98e4f6a60234692e7a9a9c8e7552) )
+ROM_END
+
+
+#define ROMS_SAILORMNO \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "smprg.u45",    0x000000, 0x080000, CRC(234f1152) SHA1(8fc6d4a8995d550862d328011d3357c09334f0fa) ) \
+	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) ) \
+	\
+	ROM_REGION( 0x88000, "audiocpu", 0 ) \
+	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x08000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
+	ROM_CONTINUE(             0x10000, 0x78000             ) \
+	\
+	ROM_REGION( 0x400000 * 2, "gfx1", 0 ) \
+	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
+	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
+	\
+	ROM_REGION( 0x200000, "gfx2", 0 ) \
+	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) ) \
+	\
+	ROM_REGION( 0x200000, "gfx3", 0 ) \
+	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) ) \
+	\
+	ROM_REGION( (5*0x200000)*2, "gfx4", 0 ) \
+	\
+	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) ) \
+	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) ) \
+	ROM_LOAD( "bpsm.u62", 0x400000, 0x200000, CRC(a1e3bfac) SHA1(4528887d57e519df8dd60b2392db4c175c57b239) ) \
+	ROM_LOAD( "bpsm.u61", 0x600000, 0x200000, CRC(6a014b52) SHA1(107c687479b59c455fc514cd61d290853c95ad9a) ) \
+	ROM_LOAD( "bpsm.u60", 0x800000, 0x200000, CRC(992468c0) SHA1(3c66cc08313a9a326badc44f53a98cdfe0643da4) ) \
+	\
+	ROM_LOAD( "bpsm.u65", 0xa00000, 0x200000, CRC(f60fb7b5) SHA1(72cb8908cd687a330e14657664cd35037a52c39e) ) \
+	ROM_LOAD( "bpsm.u64", 0xc00000, 0x200000, CRC(6559d31c) SHA1(bf688123a4beff625652cc1844bf0dc192f5c90f) ) \
+	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) ) \
+	ROM_CONTINUE(         0xe00000, 0x100000             ) \
+	\
+	ROM_REGION( 0x240000, "oki1", 0 ) \
+	ROM_LOAD( "bpsm.u48", 0x040000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
+	\
+	ROM_REGION( 0x240000, "oki2", 0 ) \
+	ROM_LOAD( "bpsm.u47", 0x040000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
+	ROM_RELOAD(           0x0c0000, 0x080000             ) \
+	ROM_RELOAD(           0x140000, 0x080000             ) \
+	ROM_RELOAD(           0x1c0000, 0x080000             ) \
+
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
+ROM_START( sailormno )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_europe.nv", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
+ROM_END
+
+ROM_START( sailormnou )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_usa.nv", 0x0000, 0x0080, CRC(3915abe3) SHA1(1b8d3b8c65cf2298939c27607ec52630c017c7ea) )
+ROM_END
+
+ROM_START( sailormnoj )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
+ROM_END
+
+ROM_START( sailormnok )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_korea.nv", 0x0000, 0x0080, CRC(0e7de398) SHA1(b495bf43d8596a0dc9843c74fc04fd21499bd115) )
+ROM_END
+
+ROM_START( sailormnot )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_taiwan.nv", 0x0000, 0x0080, CRC(6c7e8c2a) SHA1(68ef4e6593e4c12e6488a20dcc6dda920b01de67) )
+ROM_END
+
+ROM_START( sailormnoh )
+	ROMS_SAILORMNO
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_hongkong.nv", 0x0000, 0x0080, CRC(4d24c874) SHA1(93b87ef18cff98e4f6a60234692e7a9a9c8e7552) )
 ROM_END
 
 
@@ -3903,7 +4029,6 @@ static void sailormn_unpack_tiles( running_machine *machine, const char *region 
 static void init_cave(running_machine *machine)
 {
 	cave_state *state = (cave_state *)machine->driver_data;
-	state->region_byte = -1;
 
 	state->spritetype[0] = 0;	// Normal sprites
 	state->kludge = 0;
@@ -3915,7 +4040,6 @@ static void init_cave(running_machine *machine)
 
 static DRIVER_INIT( agallet )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	init_cave(machine);
 
@@ -3924,20 +4048,13 @@ static DRIVER_INIT( agallet )
 
 	sailormn_unpack_tiles(machine, "gfx4");
 
-	state->region_byte = 0x1f;
-
 	unpack_sprites(machine);
-
-	//  Speed Hack
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb80000, 0xb80001, 0, 0, agallet_irq_cause_r);
 }
 
 static DRIVER_INIT( dfeveron )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
-
-	state->region_byte = -1;
 
 	unpack_sprites(machine);
 	state->kludge = 2;
@@ -3948,8 +4065,6 @@ static DRIVER_INIT( feversos )
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
 
-	state->region_byte = -1;
-
 	unpack_sprites(machine);
 	state->kludge = 2;
 }
@@ -3958,8 +4073,6 @@ static DRIVER_INIT( ddonpach )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
-
-	state->region_byte = -1;
 
 	ddonpach_unpack_sprites(machine);
 	state->spritetype[0] = 1;	// "different" sprites (no zooming?)
@@ -3971,8 +4084,6 @@ static DRIVER_INIT( donpachi )
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
 
-	state->region_byte = -1;
-
 	ddonpach_unpack_sprites(machine);
 	state->spritetype[0] = 1;	// "different" sprites (no zooming?)
 	state->time_vblank_irq = 90;
@@ -3983,8 +4094,6 @@ static DRIVER_INIT( esprade )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
-
-	state->region_byte = -1;
 
 	esprade_unpack_sprites(machine);
 	state->time_vblank_irq = 2000;	/**/
@@ -4014,8 +4123,6 @@ static DRIVER_INIT( guwange )
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
 
-	state->region_byte = -1;
-
 	esprade_unpack_sprites(machine);
 	state->time_vblank_irq = 2000;	/**/
 }
@@ -4029,8 +4136,6 @@ static DRIVER_INIT( hotdogst )
 
 	memory_configure_bank(machine, "bank2", 0, 0x2, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank2", 2, 0xe, &ROM[0x10000], 0x4000);
-
-	state->region_byte = -1;
 
 	unpack_sprites(machine);
 	state->spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4059,8 +4164,6 @@ static DRIVER_INIT( mazinger )
 		memcpy(src, buffer, len);
 		auto_free(machine, buffer);
 	}
-
-	state->region_byte = 0x05;
 
 	unpack_sprites(machine);
 	state->spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4164,8 +4267,6 @@ static DRIVER_INIT( sailormn )
 
 	sailormn_unpack_tiles( machine, "gfx4" );
 
-	state->region_byte = 0x11;
-
 	unpack_sprites(machine);
 	state->spritetype[0] = 2;	// Normal sprites with different position handling
 	state->kludge = 1;
@@ -4179,8 +4280,6 @@ static DRIVER_INIT( uopoko )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
 	init_cave(machine);
-
-	state->region_byte = -1;
 
 	unpack_sprites(machine);
 	state->kludge = 2;
@@ -4214,30 +4313,65 @@ static DRIVER_INIT( korokoro )
 
 GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus/Cave",                           "Power Instinct 2 (US, Ver. 94/04/08)"			, 0 )
 GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)"		, 0 )
-GAME( 1994, mazinger,   0,        mazinger, mazinger, mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (International/Japan)"			, 0 ) // region in eeprom
+
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1994, mazinger,   0,        mazinger, cave,     mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (World)"			, 0 )
+GAME( 1994, mazingerj,  mazinger, mazinger, cave,     mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (Japan)"			, 0 )
+
 GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (US)"						, 0 )
 GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Japan)"					, 0 )
 GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Korea)"					, 0 )
-GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Hong Kong)"					, 0 )
+GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Hong Kong)"				, 0 )
+
 GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Metamoqester (International)"				, 0 )
 GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Oni - The Ninja Master (Japan)"				, 0 )
+
 GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Power Instinct Legends (US, Ver. 95/06/20)"		, 0 )
 GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
-GAME( 1995, sailormn,   0,        sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22B)"	, 0 ) // region in eeprom
-GAME( 1995, sailormno,  sailormn, sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22)"	, 0 ) // region in eeprom
-GAME( 1996, agallet,    0,        sailormn, sailormn, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (JUEHTK)"					, 0 ) // board was taiwan, region in eeprom
+
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1995, sailormn,   0,        sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)"	, 0 )
+GAME( 1995, sailormnu,  sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)"	    , 0 )
+GAME( 1995, sailormnj,  sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)"	, 0 )
+GAME( 1995, sailormnk,  sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)"	, 0 )
+GAME( 1995, sailormnt,  sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)"	, 0 )
+GAME( 1995, sailormnh,  sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", 0 )
+GAME( 1995, sailormno,  sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)"	, 0 ) 
+GAME( 1995, sailormnou, sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)"	    , 0 ) 
+GAME( 1995, sailormnoj, sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)"	    , 0 ) 
+GAME( 1995, sailormnok, sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)"	    , 0 ) 
+GAME( 1995, sailormnot, sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)"	, 0 ) 
+GAME( 1995, sailormnoh, sailormn, sailormn, cave, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)"	, 0 ) 
+
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1996, agallet,    0,        sailormn, cave, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Europe)"					, 0 )
+GAME( 1996, agalletu,   agallet,  sailormn, cave, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (USA)"				     	, 0 )
+GAME( 1996, agalletj,   agallet,  sailormn, cave, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Japan)"					, 0 )
+GAME( 1996, agalletk,   agallet,  sailormn, cave, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Korea)"					, 0 )
+GAME( 1996, agallett,   agallet,  sailormn, cave, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Taiwan)"					, 0 )
+GAME( 1996, agalleth,   agallet,  sailormn, cave, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Hong Kong)"				, 0 )
+
 GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                               "Hotdog Storm (International)"				, 0 )
+
 GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (International, Master Ver. 97/02/05)"	, 0 )
 GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (Japan, Master Ver. 97/02/05)"		, 0 )
+
 GAME( 1998, dfeveron,   feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",          "Dangun Feveron (Japan, Ver. 98/09/17)"			, 0 )
 GAME( 1998, feversos,   0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",          "Fever SOS (International, Ver. 98/09/25)"		, 0 )
+
 GAME( 1998, esprade,    0,        esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (International, Ver. 98/04/22)"		, 0 )
 GAME( 1998, espradej,   esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/21)"			, 0 )
 GAME( 1998, espradejo,  esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/14)"			, 0 )
+
 GAME( 1998, uopoko,     0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (International)"				, 0 )
 GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (Japan)"					, 0 )
+
 GAME( 1999, guwange,    0,        guwange,  guwange,  guwange,  ROT270, "Atlus/Cave",                           "Guwange (Japan, Master Ver. 99/06/24)"			, 0 )
+
 GAME( 1999, gaia,       0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                        "Gaia Crusaders",		GAME_IMPERFECT_SOUND ) // cuts out occasionally
+
 GAME( 2001, theroes,    0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                 "Thunder Heroes",		GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
 GAME( 1999, korokoro,   0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                               "Koro Koro Quest (Japan)"					, 0 )
+
+GAME( 1999, crusherm,   0,        crusherm, korokoro, korokoro, ROT0,   "Takumi",                               "Crusher Makochan (Japan)"					, 0 )
