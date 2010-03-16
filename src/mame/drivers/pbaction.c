@@ -68,41 +68,26 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "machine/segacrpt.h"
-
-
-extern UINT8 *pbaction_videoram,*pbaction_colorram;
-extern UINT8 *pbaction_videoram2,*pbaction_colorram2;
-
-extern WRITE8_HANDLER( pbaction_videoram_w );
-extern WRITE8_HANDLER( pbaction_colorram_w );
-extern WRITE8_HANDLER( pbaction_videoram2_w );
-extern WRITE8_HANDLER( pbaction_colorram2_w );
-extern WRITE8_HANDLER( pbaction_flipscreen_w );
-extern WRITE8_HANDLER( pbaction_scroll_w );
-
-extern VIDEO_START( pbaction );
-extern VIDEO_UPDATE( pbaction );
+#include "includes/pbaction.h"
 
 
 static WRITE8_HANDLER( pbaction_sh_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0x00);
+	pbaction_state *state = (pbaction_state *)space->machine->driver_data;
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
 }
-
-
-static UINT8 *work_ram;
 
 
 static ADDRESS_MAP_START( pbaction_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&work_ram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE(&pbaction_videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE(&pbaction_colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE(&pbaction_videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE(&pbaction_colorram)
-	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(pbaction_state, work_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE_MEMBER(pbaction_state, videoram2)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE_MEMBER(pbaction_state, colorram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE_MEMBER(pbaction_state, videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE_MEMBER(pbaction_state, colorram)
+	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_MEMBER(pbaction_state, spriteram, spriteram_size)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
@@ -267,7 +252,27 @@ static INTERRUPT_GEN( pbaction_interrupt )
 }
 
 
+static MACHINE_START( pbaction )
+{
+	pbaction_state *state = (pbaction_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->scroll);
+}
+
+static MACHINE_RESET( pbaction )
+{
+	pbaction_state *state = (pbaction_state *)machine->driver_data;
+
+	state->scroll = 0;
+}
+
 static MACHINE_DRIVER_START( pbaction )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(pbaction_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
@@ -279,6 +284,9 @@ static MACHINE_DRIVER_START( pbaction )
 	MDRV_CPU_IO_MAP(pbaction_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(pbaction_interrupt,2)	/* ??? */
 									/* IRQs are caused by the main CPU */
+
+	MDRV_MACHINE_START(pbaction)
+	MDRV_MACHINE_RESET(pbaction)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -455,11 +463,13 @@ ROM_END
 
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
+	pbaction_state *state = (pbaction_state *)space->machine->driver_data;
+
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (cpu_get_pc(space->cpu) == 0xab80)
 		return 0;
 
-	return work_ram[0];
+	return state->work_ram[0];
 }
 
 static DRIVER_INIT( pbactio3 )
@@ -468,7 +478,7 @@ static DRIVER_INIT( pbactio3 )
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* first of all, do a simple bitswap */
-	for (i = 0;i < 0xc000;i++)
+	for (i = 0; i < 0xc000; i++)
 	{
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,1,2,3,0);
 	}
@@ -488,8 +498,8 @@ static DRIVER_INIT( pbactio4 )
 
 
 
-GAME( 1985, pbaction, 0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", 0 )
-GAME( 1985, pbaction2,pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 )
-GAME( 1985, pbaction3,pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 )
-GAME( 1985, pbaction4,pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", 0 )
-GAME( 1985, pbaction5,pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", 0 )
+GAME( 1985, pbaction,  0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )

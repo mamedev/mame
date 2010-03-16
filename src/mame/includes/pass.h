@@ -15,7 +15,8 @@ public:
 
 /*----------- defined in video/pass.c -----------*/
 
-VIDEO_START( pass );
-VIDEO_UPDATE( pass );
 WRITE16_HANDLER( pass_fg_videoram_w );
 WRITE16_HANDLER( pass_bg_videoram_w );
+
+VIDEO_START( pass );
+VIDEO_UPDATE( pass );

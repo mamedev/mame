@@ -2725,6 +2725,7 @@ src/mame/includes/pandoras.h svneol=native#text/plain
 src/mame/includes/paradise.h svneol=native#text/plain
 src/mame/includes/parodius.h svneol=native#text/plain
 src/mame/includes/pass.h svneol=native#text/plain
+src/mame/includes/pbaction.h svneol=native#text/plain
 src/mame/includes/pgm.h svneol=native#text/plain
 src/mame/includes/phoenix.h svneol=native#text/plain
 src/mame/includes/pitnrun.h svneol=native#text/plain

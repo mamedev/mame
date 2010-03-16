@@ -1,8 +1,8 @@
 /***************************************************************************
 
-                              -= Paradise / Target Ball / Torus =-
+                 -= Paradise / Target Ball / Torus =-
 
-                    driver by   Luca Elia (l.elia@tin.it)
+                 driver by   Luca Elia (l.elia@tin.it)
 
 
 CPU          :  Z8400B
@@ -44,20 +44,21 @@ paradise: I'm not sure it's working correctly:
 static WRITE8_HANDLER( paradise_rombank_w )
 {
 	int bank = data;
-	int bank_n = memory_region_length(space->machine, "maincpu")/0x4000 - 1;
+	int bank_n = memory_region_length(space->machine, "maincpu") / 0x4000 - 1;
+
 	if (bank >= bank_n)
 	{
-		logerror("PC %04X - invalid rom bank %x\n",cpu_get_pc(space->cpu),bank);
+		logerror("PC %04X - invalid rom bank %x\n", cpu_get_pc(space->cpu), bank);
 		bank %= bank_n;
 	}
 
-	if (bank >= 3)	bank+=1;
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + bank * 0x4000);
+	memory_set_bank(space->machine, "bank1", bank);
 }
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 {
-	if (data & ~0x02)	logerror("%s: unknown oki bank bits %02X\n",cpuexec_describe_context(device->machine),data);
+	if (data & ~0x02)	
+		logerror("%s: unknown oki bank bits %02X\n", cpuexec_describe_context(device->machine), data);
 
 	okim6295_set_bank_base(device, (data & 0x02) ? 0x40000 : 0);
 }
@@ -70,61 +71,61 @@ static WRITE8_HANDLER( torus_coin_counter_w )
 #define STANDARD_MAP	\
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* ROM */	\
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* ROM (banked) */ \
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paradise_vram_2_w) AM_BASE(&paradise_vram_2	)	/* Background */ \
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paradise_vram_1_w) AM_BASE(&paradise_vram_1	)	/* Midground */ \
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_BASE(&paradise_vram_0	)	/* Foreground */ \
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paradise_vram_2_w) AM_BASE_MEMBER(paradise_state, vram_2)	/* Background */ \
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paradise_vram_1_w) AM_BASE_MEMBER(paradise_state, vram_1)	/* Midground */ \
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_BASE_MEMBER(paradise_state, vram_0)	/* Foreground */ \
 
 
 static ADDRESS_MAP_START( paradise_map, ADDRESS_SPACE_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
-	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(paradise_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tgtball_map, ADDRESS_SPACE_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
-	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE_SIZE_MEMBER(paradise_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	STANDARD_MAP
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(paradise_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
-	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE("oki2", paradise_okibank_w	)	// OKI 1 samples bank
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_MEMBER(paradise_state, paletteram)	// Palette
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)	// Layers priority
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)	// Layers palette bank
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
+	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE("oki2", paradise_okibank_w)	// OKI 1 samples bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// OKI 0
-	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
-	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
-	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
-	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
-	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
+	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
+	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
+	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
+	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE_GENERIC(videoram) 	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram) 	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_MEMBER(paradise_state, paletteram)	// Palette
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)	// Layers priority
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)	// Layers palette bank
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// OKI 0
-	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
-	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
-	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
-	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
-	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE_GENERIC(videoram) 	// Pixmap
+	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
+	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
+	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
+	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram) 	// Pixmap
 ADDRESS_MAP_END
 
 
@@ -540,13 +541,40 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static MACHINE_START( paradise )
+{
+	paradise_state *state = (paradise_state *)machine->driver_data;
+	int bank_n = memory_region_length(machine, "maincpu") / 0x4000 - 1;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank1", 3, bank_n - 4, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->palbank);
+	state_save_register_global(machine, state->priority);
+}
+
+static MACHINE_RESET( paradise )
+{
+	paradise_state *state = (paradise_state *)machine->driver_data;
+
+	state->palbank = 0;
+	state->priority = 0;
+}
+
 static MACHINE_DRIVER_START( paradise )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(paradise_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MDRV_CPU_PROGRAM_MAP(paradise_map)
 	MDRV_CPU_IO_MAP(paradise_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
+
+	MDRV_MACHINE_START(paradise)
+	MDRV_MACHINE_RESET(paradise)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1017,19 +1045,22 @@ ROM_END
 
 static DRIVER_INIT (paradise)
 {
-	paradise_sprite_inc = 0x20;
+	paradise_state *state = (paradise_state *)machine->driver_data;
+	state->sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
 static DRIVER_INIT (tgtball)
 {
-	paradise_sprite_inc = 4;
+	paradise_state *state = (paradise_state *)machine->driver_data;
+	state->sprite_inc = 4;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
 }
 
 static DRIVER_INIT (torus)
 {
-	paradise_sprite_inc = 4;
+	paradise_state *state = (paradise_state *)machine->driver_data;
+	state->sprite_inc = 4;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
 }
 
@@ -1040,11 +1071,11 @@ static DRIVER_INIT (torus)
 
 ***************************************************************************/
 
-GAME( 1994+, paradise, 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise", 0 )
-GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994+, para2dx , 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", 0 )
-GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", 0 )
-GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", 0 )
-GAME( 1998,  madball,  0,       madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", 0 )
-GAME( 1997,  madballn, madball, madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", 0 )
+GAME( 1994+, paradise, 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise", GAME_SUPPORTS_SAVE )
+GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994+, para2dx , 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
+GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
+GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
+GAME( 1998,  madball,  0,       madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", GAME_SUPPORTS_SAVE )
+GAME( 1997,  madballn, madball, madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", GAME_SUPPORTS_SAVE )
