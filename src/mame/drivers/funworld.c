@@ -723,7 +723,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 	coin_counter_w(device->machine, 0, data & 0x01);	/* credit in counter */
 	coin_counter_w(device->machine, 7, data & 0x04);	/* credit out counter, mapped as coin 8 */
 
-	popmessage("Lamps A: %02X", data);
+//	popmessage("Lamps A: %02X", data);
 }
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
