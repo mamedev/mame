@@ -1721,7 +1721,9 @@ $(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
-$(DRIVERS)/funworld.o:	$(LAYOUT)/funworld.lh
+$(DRIVERS)/funworld.o:	$(LAYOUT)/jollycrd.lh \
+						$(LAYOUT)/bigdeal.lh \
+						$(LAYOUT)/royalcrd.lh
 
 $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 

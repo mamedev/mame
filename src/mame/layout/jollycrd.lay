@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="hold1" defstate="1">
+	<element name="hold1" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
@@ -9,11 +9,11 @@
 		</rect>
 		<text string="HOLD 1">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
 		</text>
 	</element>
 
-	<element name="hold2" defstate="1">
+	<element name="hold2" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
@@ -22,11 +22,15 @@
 		</rect>
 		<text string="HOLD 2">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="LOW">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
-	<element name="hold3" defstate="1">
+	<element name="hold3" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
@@ -35,11 +39,11 @@
 		</rect>
 		<text string="HOLD 3">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
 		</text>
 	</element>
 
-	<element name="hold4" defstate="1">
+	<element name="hold4" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
@@ -48,11 +52,15 @@
 		</rect>
 		<text string="HOLD 4">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HIGH">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
-	<element name="hold5" defstate="1">
+	<element name="hold5" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
@@ -61,11 +69,15 @@
 		</rect>
 		<text string="HOLD 5">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HALF">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
-	<element name="cancel" defstate="1">
+	<element name="cancel" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
@@ -74,11 +86,11 @@
 		</rect>
 		<text string="CANCEL">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
 		</text>
 	</element>
 
-	<element name="start" defstate="1">
+	<element name="start" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
@@ -87,7 +99,7 @@
 		</rect>
 		<text string="START">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
 		</text>
 	</element>
 
