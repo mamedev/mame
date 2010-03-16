@@ -812,6 +812,7 @@ WRITE8_HANDLER( snes_w_io )
 		               snes_ppu.oam.size[1] = 2;
 				break;
 			}
+			break;
 		case OAMADDL:	/* Address for accessing OAM (low) */
 			snes_ppu.oam.saved_address_low = data;
 			snes_ppu.oam.address = (snes_ppu.oam.address & 0xff00) + data;
