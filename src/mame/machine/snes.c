@@ -116,6 +116,7 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 	{
 		memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low ); /* Reset oam address */
 		memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high );
+		snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 	}
 }
 
@@ -462,6 +463,7 @@ READ8_HANDLER( snes_r_io )
 					snes_ppu.oam.address++;
 					snes_ppu.oam.address_low = snes_ram[OAMADDL] = snes_ppu.oam.address & 0xff;
 					snes_ppu.oam.address_high = snes_ram[OAMADDH] = (snes_ppu.oam.address >> 8) & 0x1;
+					snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 				}
 				return snes_ppu.ppu1_open_bus;
 			}
@@ -772,6 +774,7 @@ WRITE8_HANDLER( snes_w_io )
 			{
 				memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low);
 				memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high);
+				snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 			}
 			snes_ppu.screen_disabled = data & 0x80;
 			snes_ppu.screen_brightness = (data & 0x0f) + 1;
@@ -818,6 +821,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.oam.address_low = data;
 			snes_ppu.oam.saved_address_low = data;
 			snes_ppu.oam.address = ((snes_ppu.oam.address_high & 0x1) << 8) + data;
+			snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 			snes_ram[OAMDATA] = 0;
 			break;
 		case OAMADDH:	/* Address for accessing OAM (high) */
@@ -825,6 +829,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.oam.saved_address_high = data;
 			snes_ppu.oam.address = ((data & 0x1) << 8) + snes_ppu.oam.address_low;
 			snes_ppu.oam.priority_rotation = BIT(data, 7);
+			snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 			snes_ram[OAMDATA] = 0;
 			break;
 		case OAMDATA:	/* Data for OAM write (DW) */
@@ -864,6 +869,7 @@ WRITE8_HANDLER( snes_w_io )
 					snes_ppu.oam.address++;
 					snes_ppu.oam.address_low = snes_ram[OAMADDL] = snes_ppu.oam.address & 0xff;
 					snes_ppu.oam.address_high = snes_ram[OAMADDH] = (snes_ppu.oam.address >> 8) & 0x1;
+					snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 				}
 				return;
 			}

@@ -997,17 +997,8 @@ struct OAM
 	int height, width;
 };
 
-static struct OAM oam_list[SNES_SCR_WIDTH / 2];
+static struct OAM oam_spritelist[SNES_SCR_WIDTH / 2];
 
-#if 0
-
-// FIXME: The following functions should be used to create sprite list with
-// obsel data from the previous line. Unfortunately, some games are very picky
-// about when you set up sprite attributes (e.g. Super Star Wars - The Empire
-// Strikes Back and Super Street Fighter II) and they would freeze if we only build
-// part of the sprite attributes at the right moment and part of them later, during
-// scanline drawing. Hence, these functions are on hold until more OAM refactoring
-// is done (soon-ish)
 static void snes_update_obsel( void )
 {
 	snes_ppu.layer[SNES_OAM].charmap = snes_ppu.oam.next_charmap;
@@ -1030,69 +1021,70 @@ static void snes_oam_list_build( void )
 
 	snes_ppu.update_oam_list = 0;		// eventually, we can optimize the code by only calling this function when there is a change in size
 
-	for (i = 128; i > 0; i--)
+	for (i = 127; i >= 0; i--)
 	{
-		if ((i % 4) == 0)
+		if (((i + 1) % 4) == 0)
 			extra = oamram[oam_extra--];
 
-		oam_list[i].vflip = (oamram[oam] & 0x80) >> 7;
-		oam_list[i].hflip = (oamram[oam] & 0x40) >> 6;
-		oam_list[i].priority_bits = (oamram[oam] & 0x30) >> 4;
-		oam_list[i].pal = 128 + ((oamram[oam] & 0x0e) << 3);
-		oam_list[i].tile = (oamram[oam--] & 0x1) << 8;
-		oam_list[i].tile |= oamram[oam--];
-		oam_list[i].y = oamram[oam--] + 1;	/* We seem to need to add one here.... */
-		oam_list[i].x = oamram[oam--];
-		oam_list[i].size = (extra & 0x80) >> 7;
+		oam_spritelist[i].vflip = (oamram[oam] & 0x80) >> 7;
+		oam_spritelist[i].hflip = (oamram[oam] & 0x40) >> 6;
+		oam_spritelist[i].priority_bits = (oamram[oam] & 0x30) >> 4;
+		oam_spritelist[i].pal = 128 + ((oamram[oam] & 0x0e) << 3);
+		oam_spritelist[i].tile = (oamram[oam--] & 0x1) << 8;
+		oam_spritelist[i].tile |= oamram[oam--];
+		oam_spritelist[i].y = oamram[oam--] + 1;	/* We seem to need to add one here.... */
+		oam_spritelist[i].x = oamram[oam--];
+		oam_spritelist[i].size = (extra & 0x80) >> 7;
 		extra <<= 1;
-		oam_list[i].x |= ((extra & 0x80) << 1);
+		oam_spritelist[i].x |= ((extra & 0x80) << 1);
 		extra <<= 1;
-		oam_list[i].y *= snes_ppu.obj_interlace;
+
+		oam_spritelist[i].y *= snes_ppu.obj_interlace;
 
 		/* Adjust if past maximum position */
-		if (oam_list[i].y >= snes_ppu.beam.last_visible_line * snes_ppu.interlace)
-			oam_list[i].y -= 256 * snes_ppu.interlace;
-		if (oam_list[i].x > 255)
-			oam_list[i].x -= 512;
+		if (oam_spritelist[i].y >= snes_ppu.beam.last_visible_line * snes_ppu.interlace)
+			oam_spritelist[i].y -= 256 * snes_ppu.interlace;
+
+		oam_spritelist[i].x &= 0x1ff;
 
 		/* Determine object size */
-		switch (snes_ppu.oam.next_size)
+		switch (snes_ppu.oam.size_)
 		{
 		case 0:			/* 8x8 or 16x16 */
-			oam_list[i].width  = oam_list[i].size ? 2 : 1;
-			oam_list[i].height = oam_list[i].size ? 2 : 1;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 2 : 1;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 2 : 1;
 			break;
 		case 1:			/* 8x8 or 32x32 */
-			oam_list[i].width  = oam_list[i].size ? 4 : 1;
-			oam_list[i].height = oam_list[i].size ? 4 : 1;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 1;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 4 : 1;
 			break;
 		case 2:			/* 8x8 or 64x64 */
-			oam_list[i].width  = oam_list[i].size ? 8 : 1;
-			oam_list[i].height = oam_list[i].size ? 8 : 1;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 8 : 1;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 1;
 			break;
 		case 3:			/* 16x16 or 32x32 */
-			oam_list[i].width  = oam_list[i].size ? 4 : 2;
-			oam_list[i].height = oam_list[i].size ? 4 : 2;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 2;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 4 : 2;
 			break;
 		case 4:			/* 16x16 or 64x64 */
-			oam_list[i].width  = oam_list[i].size ? 8 : 2;
-			oam_list[i].height = oam_list[i].size ? 8 : 2;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 8 : 2;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 2;
 			break;
 		case 5:			/* 32x32 or 64x64 */
-			oam_list[i].width  = oam_list[i].size ? 8 : 4;
-			oam_list[i].height = oam_list[i].size ? 8 : 4;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 8 : 4;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 4;
 			break;
 		case 6:			/* undocumented: 16x32 or 32x64 */
-			oam_list[i].width  = oam_list[i].size ? 4 : 2;
-			oam_list[i].height = oam_list[i].size ? 8 : 4;
-			if (snes_ppu.obj_interlace && !oam_list[i].size)
-				oam_list[i].height = 2;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 2;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 4;
+			if (snes_ppu.obj_interlace && !oam_spritelist[i].size)
+				oam_spritelist[i].height = 2;
 			break;
 		case 7:			/* undocumented: 16x32 or 32x32 */
-			oam_list[i].width  = oam_list[i].size ? 4 : 2;
-			oam_list[i].height = oam_list[i].size ? 4 : 4;
-			if (snes_ppu.obj_interlace && !oam_list[i].size)
-				oam_list[i].height = 2;
+			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 2;
+			oam_spritelist[i].height = oam_spritelist[i].size ? 4 : 4;
+			if (snes_ppu.obj_interlace && !oam_spritelist[i].size)
+				oam_spritelist[i].height = 2;
 			break;
 		default:
 			/* we should never enter here... */
@@ -1101,17 +1093,142 @@ static void snes_oam_list_build( void )
 		}
 	}
 }
-#endif
 
-static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
+static UINT8 oam_itemlist[32];
+
+struct TILELIST {
+  UINT16 x, priority, pal, tileaddr;
+  int   hflip;
+};
+
+struct TILELIST oam_tilelist[34];
+
+static int is_sprite_on_scanline( UINT16 curline, UINT8 sprite )
 {
+	//if sprite is entirely offscreen and doesn't wrap around to the left side of the screen,
+	//then it is not counted. this *should* be 256, and not 255, even though dot 256 is offscreen.
+	int spr_height = (oam_spritelist[sprite].height << 3);
+
+	if (oam_spritelist[sprite].x > 256 && (oam_spritelist[sprite].x + (oam_spritelist[sprite].width << 3) - 1) < 512)
+		return 0;
+
+	if (curline >= oam_spritelist[sprite].y && curline < (oam_spritelist[sprite].y + spr_height))
+		return 1;
+
+	if ((oam_spritelist[sprite].y + spr_height) >= 256 && curline < ((oam_spritelist[sprite].y + spr_height) & 255))
+		return 1;
+
+	return 0;
+}
+
+static void snes_update_objects_rto( UINT16 curline )
+{
+	int active_sprite;
+	UINT8 range_over, time_over;
 	INT8 xs, ys;
 	UINT8 line;
-	UINT8 range_over = 0, time_over = 0;
-	UINT8 height, width, vflip, hflip, priority, pal, blend;
+	UINT8 height, width, vflip, hflip, priority, pal;
 	UINT16 tile;
 	INT16 i, x, y;
-	UINT32 name_sel = 0, charaddr;
+	UINT32 name_sel = 0;
+
+	snes_oam_list_build();
+
+	/* initialize counters */
+	range_over = 0;
+	time_over = 0;
+
+	/* setup the proper line */
+	curline /= snes_ppu.interlace;
+	curline *= snes_ppu.obj_interlace;
+
+	/* reset the list of first 32 objects which intersect current scanline */
+	memset(oam_itemlist, 0xff, 32);
+
+	/* populate the list of 32 objects */
+	for (i = 0; i < 128; i++)
+	{
+		active_sprite = (i + snes_ppu.oam.first_sprite) & 0x7f;
+
+		if (!is_sprite_on_scanline(curline, active_sprite))
+			continue;
+
+		if (range_over++ >= 32)
+			break;
+
+		oam_itemlist[range_over - 1] = active_sprite;
+	}
+
+	/* reset the list of first 34 tiles to be drawn */
+	for (i = 0; i < 34; i++)
+		oam_tilelist[i].tileaddr = 0xffff;
+
+	/* populate the list of 34 tiles */
+	for (i = 31; i >= 0; i--)
+	{
+		if (oam_itemlist[i] == 0xff)
+			continue;
+
+		active_sprite = oam_itemlist[i];
+
+		tile = oam_spritelist[active_sprite].tile;
+		x = oam_spritelist[active_sprite].x;
+		y = oam_spritelist[active_sprite].y;
+		height = oam_spritelist[active_sprite].height;
+		width = oam_spritelist[active_sprite].width;
+		vflip = oam_spritelist[active_sprite].vflip;
+		hflip = oam_spritelist[active_sprite].hflip;
+		priority = oam_spritelist[active_sprite].priority_bits;
+		pal = oam_spritelist[active_sprite].pal;
+
+		/* Only objects using tiles over 255 use name select */
+		name_sel = (tile < 256) ? 0 : snes_ppu.oam.name_select;
+
+		ys = (curline - y) >> 3;
+		line = (curline - y) % 8;
+		if (vflip)
+		{
+			ys = height - ys - 1;
+			line = (-1 * line) + 7;
+		}
+		line <<= 1;
+		tile <<= 5;
+
+		int ii;
+
+		for (ii = 0; ii < width; ii++)
+		{
+			INT16 xx = (x + (ii << 3)) & 0x1ff;
+
+			if (x != 256 && xx >= 256 && (xx + 7) < 512)
+				continue;
+
+			if (time_over++ >= 34)
+				break;
+
+			xs = (hflip) ? (width - 1 - ii) : ii;
+			oam_tilelist[time_over - 1].tileaddr = name_sel + tile + table_obj_offset[ys][xs] + line;
+			oam_tilelist[time_over - 1].hflip = hflip;
+			oam_tilelist[time_over - 1].x = xx;
+			oam_tilelist[time_over - 1].pal = pal;
+			oam_tilelist[time_over - 1].priority = priority;
+		}
+	}
+
+	/* set Range Over flag if necessary */
+	if (range_over > 32)
+		snes_ppu.stat77_flags |= 0x40;
+
+	/* set Time Over flag if necessary */
+	if (time_over > 34)
+		snes_ppu.stat77_flags |= 0x80;
+}
+
+static void snes_update_objects( UINT8 priority_tbl )
+{
+	UINT8 blend, priority;
+	UINT32 charaddr;
+	int i;
 	static const UINT8 table_obj_priority[10][4] = {
 						{2, 5, 8, 11},	// mode 0
 						{1, 3, 6, 9},	// mode 1
@@ -1124,10 +1241,6 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 						{1, 3, 5, 6},	// mode 7 EXTBG
 						{1, 2, 5, 8}	// mode 1 + BG3 priority bit
 	};
-	UINT8 *oamram = (UINT8 *)snes_oam;
-	INT16 oam = 0x1ff;
-	UINT16 oam_extra = oam + 0x20;
-	UINT16 extra = 0;
 
 #ifdef SNES_LAYER_DEBUG
 	if (debug_options.bg_disabled[SNES_OAM])
@@ -1142,103 +1255,17 @@ static void snes_update_objects( UINT8 priority_tbl, UINT16 curline )
 	if (!scanlines[SNES_MAINSCREEN].enable && !scanlines[SNES_SUBSCREEN].enable)
 		return;
 
-	curline /= snes_ppu.interlace;
-	curline *= snes_ppu.obj_interlace;
+	charaddr = snes_ppu.layer[SNES_OAM].charmap << 13;
 
-	charaddr = snes_ppu.oam.next_charmap << 13;
-
-	for (i = 128; i > 0; i--)
+	/* finally draw the tiles from the tilelist */
+	for (i = 0; i < 34; i++)
 	{
-		if ((i % 4) == 0)
-			extra = oamram[oam_extra--];
+		if (oam_tilelist[i].tileaddr == 0xffff)
+			continue;
 
-		oam_list[i].vflip = (oamram[oam] & 0x80) >> 7;
-		oam_list[i].hflip = (oamram[oam] & 0x40) >> 6;
-		oam_list[i].priority_bits = (oamram[oam] & 0x30) >> 4;
-		oam_list[i].pal = 128 + ((oamram[oam] & 0x0e) << 3);
-		oam_list[i].tile = (oamram[oam--] & 0x1) << 8;
-		oam_list[i].tile |= oamram[oam--];
-		oam_list[i].y = oamram[oam--] + 1;	/* We seem to need to add one here.... */
-		oam_list[i].x = oamram[oam--];
-		oam_list[i].size = (extra & 0x80) >> 7;
-		extra <<= 1;
-		oam_list[i].x |= ((extra & 0x80) << 1);
-		extra <<= 1;
-		oam_list[i].y *= snes_ppu.obj_interlace;
-
-		/* Adjust if past maximum position */
-		if (oam_list[i].y >= snes_ppu.beam.last_visible_line * snes_ppu.interlace)
-			oam_list[i].y -= 256 * snes_ppu.interlace;
-		if (oam_list[i].x > 255)
-			oam_list[i].x -= 512;
-		tile = oam_list[i].tile;
-		x = oam_list[i].x;
-		y = oam_list[i].y;
-		height = oam_list[i].height;
-		width = oam_list[i].width;
-		vflip = oam_list[i].vflip;
-		hflip = oam_list[i].hflip;
-		priority = table_obj_priority[priority_tbl][oam_list[i].priority_bits];
-		pal = oam_list[i].pal;
-
-		/* Draw sprite if it intersects the current line */
-		if (curline >= y && curline < (y + (snes_ppu.oam.size[oam_list[i].size] << 3)))
-		{
-			/* Only objects using palettes 4-7 can be transparent */
-			blend = (pal < 192) ? 1 : 0;
-
-			/* Only objects using tiles over 255 use name select */
-			name_sel = (tile < 256) ? 0 : snes_ppu.oam.next_name_select;
-
-			ys = (curline - y) >> 3;
-			line = (curline - y) % 8;
-			if (vflip)
-			{
-				ys = snes_ppu.oam.size[oam_list[i].size] - ys - 1;
-				line = (-1 * line) + 7;
-			}
-			line <<= 1;
-			tile <<= 5;
-			if (hflip)
-			{
-				UINT8 count = 0;
-				for (xs = (snes_ppu.oam.size[oam_list[i].size] - 1); xs >= 0; xs--)
-				{
-					if ((x + (count << 3) < SNES_SCR_WIDTH))
-					{
-						snes_draw_tile_object(charaddr + name_sel + tile + table_obj_offset[ys][xs] + line, x + (count++ << 3), priority, hflip, pal, blend);
-					}
-					time_over++;	/* Increase time_over. Should we stop drawing if exceeded 34 tiles? */
-				}
-			}
-			else
-			{
-				for (xs = 0; xs < snes_ppu.oam.size[oam_list[i].size]; xs++)
-				{
-					if ((x + (xs << 3) < SNES_SCR_WIDTH))
-					{
-						snes_draw_tile_object(charaddr + name_sel + tile + table_obj_offset[ys][xs] + line, x + (xs << 3), priority, hflip, pal, blend);
-					}
-					time_over++;	/* Increase time_over. Should we stop drawing if exceeded 34 tiles? */
-				}
-			}
-
-			/* Increase range_over. Stop drawing if exceeded 32 objects and enforcing that limit is enabled */
-			range_over++;
-			if (range_over == 32) //&& (input_port_read(machine, "INTERNAL") & 0x01) )
-			{
-				/* Set the flag in STAT77 register */
-				snes_ppu.stat77_flags |= 0x40;
-				/* FIXME: This stops the SNESTest rom from drawing the object test properly.  Maybe we shouldn't stop drawing? */
-				/* return; */
-			}
-		}
-	}
-
-	if (time_over >= 34)
-	{
-		/* Set the flag in STAT77 register */
-		snes_ppu.stat77_flags |= 0x80;
+		blend = (oam_tilelist[i].pal < 192) ? 1 : 0;
+		priority = table_obj_priority[priority_tbl][oam_tilelist[i].priority];
+		snes_draw_tile_object(charaddr + oam_tilelist[i].tileaddr, oam_tilelist[i].x, priority, oam_tilelist[i].hflip, oam_tilelist[i].pal, blend);
 	}
 }
 
@@ -1260,7 +1287,7 @@ static void snes_update_mode_0( UINT16 curline )
 	snes_update_line(SNES_COLOR_DEPTH_2BPP, 0, 1, 4, SNES_BG3, curline, SNES_OPT_NONE, 0);
 	snes_update_line(SNES_COLOR_DEPTH_2BPP, 0, 6, 9, SNES_BG2, curline, SNES_OPT_NONE, 0);
 	snes_update_line(SNES_COLOR_DEPTH_2BPP, 0, 7, 10, SNES_BG1, curline, SNES_OPT_NONE, 0);
-	snes_update_objects(0, curline);
+	snes_update_objects(0);
 }
 
 static void snes_update_mode_1( UINT16 curline )
@@ -1275,14 +1302,14 @@ static void snes_update_mode_1( UINT16 curline )
 		snes_update_line(SNES_COLOR_DEPTH_2BPP, 0, 0, 2, SNES_BG3, curline, SNES_OPT_NONE, 0);
 		snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 4, 7, SNES_BG2, curline, SNES_OPT_NONE, 0);
 		snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 5, 8, SNES_BG1, curline, SNES_OPT_NONE, 0);
-		snes_update_objects(1, curline);
+		snes_update_objects(1);
 	}
 	else
 	{
 		snes_update_line(SNES_COLOR_DEPTH_2BPP, 0, 0, 9, SNES_BG3, curline, SNES_OPT_NONE, 0);
 		snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 3, 6, SNES_BG2, curline, SNES_OPT_NONE, 0);
 		snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 4, 7, SNES_BG1, curline, SNES_OPT_NONE, 0);
-		snes_update_objects(9, curline);
+		snes_update_objects(9);
 	}
 }
 
@@ -1295,7 +1322,7 @@ static void snes_update_mode_2( UINT16 curline )
 
 	snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 0, 4, SNES_BG2, curline, SNES_OPT_MODE2, 0);
 	snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 2, 6, SNES_BG1, curline, SNES_OPT_MODE2, 0);
-	snes_update_objects(2, curline);
+	snes_update_objects(2);
 }
 
 static void snes_update_mode_3( UINT16 curline )
@@ -1307,7 +1334,7 @@ static void snes_update_mode_3( UINT16 curline )
 
 	snes_update_line(SNES_COLOR_DEPTH_4BPP, 0, 0, 4, SNES_BG2, curline, SNES_OPT_NONE, 0);
 	snes_update_line(SNES_COLOR_DEPTH_8BPP, 0, 2, 6, SNES_BG1, curline, SNES_OPT_NONE, snes_ppu.direct_color);
-	snes_update_objects(3, curline);
+	snes_update_objects(3);
 }
 
 static void snes_update_mode_4( UINT16 curline )
@@ -1319,7 +1346,7 @@ static void snes_update_mode_4( UINT16 curline )
 
 	snes_update_line(SNES_COLOR_DEPTH_2BPP, 0, 0, 4, SNES_BG2, curline, SNES_OPT_MODE4, 0);
 	snes_update_line(SNES_COLOR_DEPTH_8BPP, 0, 2, 6, SNES_BG1, curline, SNES_OPT_MODE4, snes_ppu.direct_color);
-	snes_update_objects(4, curline);
+	snes_update_objects(4);
 }
 
 static void snes_update_mode_5( UINT16 curline )
@@ -1331,7 +1358,7 @@ static void snes_update_mode_5( UINT16 curline )
 
 	snes_update_line(SNES_COLOR_DEPTH_4BPP, 1, 2, 6, SNES_BG1, curline, SNES_OPT_NONE, 0);
 	snes_update_line(SNES_COLOR_DEPTH_2BPP, 1, 0, 4, SNES_BG2, curline, SNES_OPT_NONE, 0);
-	snes_update_objects(5, curline);
+	snes_update_objects(5);
 }
 
 static void snes_update_mode_6( UINT16 curline )
@@ -1342,7 +1369,7 @@ static void snes_update_mode_6( UINT16 curline )
 #endif /* SNES_LAYER_DEBUG */
 
 	snes_update_line(SNES_COLOR_DEPTH_4BPP, 1, 1, 4, SNES_BG1, curline, SNES_OPT_MODE6, 0);
-	snes_update_objects(6, curline);
+	snes_update_objects(6);
 }
 
 static void snes_update_mode_7( UINT16 curline )
@@ -1355,13 +1382,13 @@ static void snes_update_mode_7( UINT16 curline )
 	if (!snes_ppu.mode7.extbg)
 	{
 		snes_update_line_mode7(1, 1, SNES_BG1, curline);
-		snes_update_objects(7, curline);
+		snes_update_objects(7);
 	}
 	else
 	{
 		snes_update_line_mode7(0, 4, SNES_BG2, curline);
 		snes_update_line_mode7(2, 2, SNES_BG1, curline);
-		snes_update_objects(8, curline);
+		snes_update_objects(8);
 	}
 }
 
@@ -1531,8 +1558,13 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 			scanlines[SNES_MAINSCREEN].buffer[ii] = snes_cgram[0];
 		}
 
-		/* Draw screens */
+		/* Prepare OAM for this scanline */
+		snes_update_objects_rto(curline);
+
+		/* Draw scanline */
 		snes_draw_screens(curline);
+
+		snes_update_obsel();
 
 #ifdef SNES_LAYER_DEBUG
 		if (snes_dbg_video(machine, bitmap, curline))
@@ -1554,7 +1586,8 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 			scanline2 = &scanlines[SNES_SUBSCREEN];
 		}
 
-		/* Phew! Draw the line to screen */
+		/* Draw the scanline to screen */
+
 		fade = snes_ppu.screen_brightness;
 
 		for (x = 0; x < SNES_SCR_WIDTH; x++)
