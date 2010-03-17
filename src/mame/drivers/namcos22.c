@@ -1960,7 +1960,15 @@ static NVRAM_HANDLER( namcos22 )
 		else
 		{
 			memset( namcos22_nvmem, 0x00, namcos22_nvmem_size );
-			/* TBA: default eprom initialization */
+			if (memory_region_length(machine, "nvram") == namcos22_nvmem_size)
+			{
+				UINT8* nvram = memory_region(machine,"nvram");
+
+				for( i=0; i<namcos22_nvmem_size/4; i++ )
+				{
+					namcos22_nvmem[i] = (nvram[0+i*4]<<24)|(nvram[1+i*4]<<16)|(nvram[2+i*4]<<8)|nvram[3+i*4];
+				}
+			}
 		}
 	}
 }
@@ -3696,8 +3704,9 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 
-	ROM_REGION( 0x2000, "user2", 0 )
-	ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(4e1d294b) SHA1(954ce04dcdba65214f5d0690ca59264f9090a1d6) ) /* EPROM */
+	ROM_REGION( 0x2000, "nvram", 0 )
+//	ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(4e1d294b) SHA1(954ce04dcdba65214f5d0690ca59264f9090a1d6) ) /* EPROM (dumped?) */
+	ROM_LOAD( "cybrcomm.nv", 0x0000, 0x2000, CRC(8432c066) SHA1(99d4bfda3f8aec288dbeaf291bce85fe9009a1de) ) /* EPROM (useful defaults) */
 ROM_END
 
 ROM_START( cybrcycc )
@@ -5156,14 +5165,20 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("STICKY1")	/* VOLUME1 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(1)   /* right joystick: vertical */
-	PORT_START("STICKY2")	/* VOLUME2 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(2)   /* left joystick: vertical */
-	PORT_START("STICKX1")	/* VOLUME3 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(1)   /* right joystick: horizontal */
-	PORT_START("STICKX2")	/* VOLUME4 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(2)   /* left joystick: horizontal */
+	/* Note(s)
+	   The ranges here are based on the test mode which displays +-224
+	   The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
+	    end up needing to change again too
+	   Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
+    */
+	PORT_START("STICKY1")		/* VOLUME 0 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
+	PORT_START("STICKY2")		/* VOLUME 0 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: vertical */
+	PORT_START("STICKX1")		/* VOLUME 0 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: horizontal */
+	PORT_START("STICKX2")		/* VOLUME 0 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: horizontal */
 INPUT_PORTS_END /* Cyber Commando */
 
 static INPUT_PORTS_START( timecris )

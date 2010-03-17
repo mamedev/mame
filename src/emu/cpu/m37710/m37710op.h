@@ -932,7 +932,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_BRK
 #define OP_BRK()															\
 			REG_PC++;													\
-			fatalerror("BRK at PC=%06x", REG_PB|REG_PC);									\
+			logerror("fatalerror M37710: BRK at PC=%06x", REG_PB|REG_PC);									\
 			m37710i_interrupt_software(cpustate, 0xfffa)
 
 /* M37710  Branch Always */
@@ -2313,7 +2313,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 /* M37710 unimplemented opcode */
 #undef OP_UNIMP
 #define OP_UNIMP()															\
-	fatalerror("M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x", REG_PB, REG_PPC);
+	logerror("fatalerror: M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x", REG_PB, REG_PPC);
 
 /* M37710 load data bank register */
 #undef OP_LDTAAA
