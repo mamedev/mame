@@ -153,10 +153,10 @@ WRITE16_HANDLER( metro_paletteram_w )
 
 /* A smaller 512 x 256 window defines the actual tilemap */
 
-#define WIN_NX		0x40
-#define WIN_NY		0x20
-//#define WIN_NX        0x40 + 1
-//#define WIN_NY        0x20 + 1
+#define WIN_NX		(0x40)
+#define WIN_NY		(0x20)
+//#define WIN_NX        (0x40 + 1)
+//#define WIN_NY        (0x20 + 1)
 
 
 /* 8x8x4 tiles only */
