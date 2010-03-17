@@ -9,8 +9,6 @@ driver by David Haywood and Angelo Salese
 TODO:
 -merge with jack.c driver, this is a modification of that HW (with colscroll)
 -accurate game speed (controlled by an irq)
--title screen colors are wrong? But I can't see how I could fix it without breaking anything
- else
 -a bunch of unmapped read / writes
 -writes to ROM regions
 
@@ -48,6 +46,7 @@ Other bits from DSW2 (but bit 5) don't seem to be read / tested at all ...
 #include "sound/ay8910.h"
 
 static UINT8 *poo_vram, *poo_scrolly, *poo_sprites;
+static UINT8 vram_colbank;
 
 VIDEO_START(unclepoo)
 {
@@ -67,11 +66,11 @@ VIDEO_UPDATE(unclepoo)
 		for (y=0;y<32;y++)
 		{
 			int tile = poo_vram[count+0x000] | ((poo_vram[count+0x400] & 3) <<8);
-			int color = (poo_vram[count+0x400] & 0xf8) >> 3;
+			int color = (poo_vram[count+0x400] & 0x38) >> 3;
 			int scrolly = (poo_scrolly[x*4]);
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,256-(y*8)+scrolly);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,0-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+vram_colbank,0,0,x*8,256-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+vram_colbank,0,0,x*8,0-(y*8)+scrolly);
 
 			count++;
 		}
@@ -115,35 +114,36 @@ static READ8_HANDLER( unk_inp3_r )
 #endif
 
 
+#if 0
 static WRITE8_HANDLER( unk_w )
 {
-
+	printf("%02x %02x\n",data,offset);
 }
+#endif
 
 /* soundlatch write */
-static WRITE8_HANDLER( test_w )
+static WRITE8_HANDLER( sound_cmd_w )
 {
 	soundlatch_w(space, 0, (data & 0xff));
 	cputag_set_input_line(space->machine, "subcpu", 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( test2_w )
+static WRITE8_HANDLER( poo_vregs_w )
 {
-	//x[1] = data;
-	//soundlatch2_w(space, 0, (data & 0xff));
-	//cputag_set_input_line(space->machine, "subcpu", 0, HOLD_LINE);
+	// bit 2 used, unknown purpose
+	vram_colbank = data & 0x18;
 }
 
 static ADDRESS_MAP_START( unclepoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
+	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE( unk_w )
+
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE(&poo_sprites)
 	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE(&poo_scrolly)
 
-	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) AM_WRITE( unk_w )
-
-	AM_RANGE(0xb400, 0xb400) AM_WRITE(test_w)
+	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
 
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( unclepoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb503, 0xb503) AM_READ_PORT("P2")
 	AM_RANGE(0xb504, 0xb504) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xb700, 0xb700) AM_WRITE(test2_w)
+	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&poo_vram)
 
@@ -159,29 +159,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unclepoo_main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
 ADDRESS_MAP_END
 
-#if 0
-static WRITE8_HANDLER( mem_w )
-{
 
-}
-#endif
 
 static ADDRESS_MAP_START( unclepoo_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-
 	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* R/C filter ??? */
 ADDRESS_MAP_END
 
-
-
 static ADDRESS_MAP_START( unclepoo_sub_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay", ay8910_address_w)
 ADDRESS_MAP_END
@@ -273,8 +262,6 @@ static INPUT_PORTS_START( unclepoo )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -317,21 +304,6 @@ static PALETTE_INIT( unclepoo )
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
-
-/* ??? */
-#if 0
-
-static READ8_HANDLER( test_r )
-{
-	return 0xf6;
-}
-
-/* soundlatch */
-static READ8_HANDLER( test2_r )
-{
-	return 0x00;
-}
-#endif
 
  static READ8_HANDLER( timer_r )
 {
