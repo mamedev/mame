@@ -237,9 +237,9 @@ int main(int argc, char *argv[])
 	{
 		/* explain what we did */
 		printf("Cleaned up %s:", argv[1]);
-		if (removed_spaces) printf(" removed %d spaces", removed_spaces);
-		if (removed_tabs) printf(" removed %d tabs", removed_tabs);
-		if (hichars) printf(" fixed %d high-ASCII chars", hichars);
+		if (removed_spaces) printf(" removed %d space(s)", removed_spaces);
+		if (removed_tabs) printf(" removed %d tab(s)", removed_tabs);
+		if (hichars) printf(" fixed %d high-ASCII char(s)", hichars);
 		if (fixed_nix_style) printf(" fixed *nix-style line-ends");
 		if (fixed_mac_style) printf(" fixed Mac-style line-ends");
 		printf("\n");

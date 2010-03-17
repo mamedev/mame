@@ -170,7 +170,7 @@ static void winvideo_exit(running_machine *machine)
 
 void winvideo_monitor_refresh(win_monitor_info *monitor)
 {
-	HRESULT result;
+	BOOL result;
 
 	// fetch the latest info about the monitor
 	monitor->info.cbSize = sizeof(monitor->info);

@@ -507,7 +507,7 @@ static void sdl_kill(running_machine *machine)
 {
 	if (initialized_audio)
 	{
-		mame_printf_debug("sdl_kill: closing audio\n");
+		mame_printf_verbose("sdl_kill: closing audio\n");
 
 		SDL_CloseAudio();
 	}

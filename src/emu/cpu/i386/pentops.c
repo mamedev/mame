@@ -30,7 +30,7 @@ static void PENTIUMOP(cmpxchg8b_m64)(i386_state *cpustate)	// Opcode 0x0f c7
 {
 	UINT8 modm = FETCH(cpustate);
 	if( modm >= 0xc0 ) {
-		fatalerror("invalid modm");
+		fatalerror("pentium: cmpxchg8b_m64 - invalid modm");
 	} else {
 		UINT32 ea = GetEA(cpustate,modm);
 		UINT64 value = READ64(cpustate,ea);

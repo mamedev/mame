@@ -2738,7 +2738,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 			{
 				UINT16 address, selector;
 				if( modrm >= 0xc0 ) {
-					fatalerror("NYI");
+					fatalerror("i386: groupFF_16 /%d NYI", (modrm >> 3) & 0x7);
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm);
 					address = READ16(cpustate,ea + 0);
@@ -2773,7 +2773,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 			{
 				UINT16 address, selector;
 				if( modrm >= 0xc0 ) {
-					fatalerror("NYI");
+					fatalerror("i386: groupFF_16 /%d NYI", (modrm >> 3) & 0x7);
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm);
 					address = READ16(cpustate,ea + 0);
@@ -3216,7 +3216,7 @@ static void I386OP(load_far_pointer16)(i386_state *cpustate, int s)
 	UINT8 modrm = FETCH(cpustate);
 
 	if( modrm >= 0xc0 ) {
-		fatalerror("NYI");
+		fatalerror("i386: load_far_pointer16 NYI");
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		STORE_REG16(modrm, READ16(cpustate,ea + 0));

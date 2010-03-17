@@ -50,7 +50,6 @@ static READ8_HANDLER( bankedram_r )
 	{
 	case 2:
 		return cbasebal_textram_r(space, offset);	/* VRAM */
-		break;
 	case 1:
 		if (offset < 0x800)
 			return space->machine->generic.paletteram.u8[offset];
@@ -59,7 +58,6 @@ static READ8_HANDLER( bankedram_r )
 		break;
 	default:
 		return cbasebal_scrollram_r(space, offset);	/* SCROLL */
-		break;
 	}
 }
 

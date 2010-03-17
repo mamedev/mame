@@ -345,7 +345,7 @@ static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader,
 		*fragment_shader=0;
 	}
 
-        return 0;
+        return res;
 }
 
 int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * shader_source, int verbose )

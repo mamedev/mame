@@ -1060,14 +1060,16 @@ WRITE8_DEVICE_HANDLER( ay8910_address_w )
 {
 #if ENABLE_REGISTER_TEST
 	return;
-#endif
+#else
 	ay8910_data_address_w(device, 1, data);
+#endif
 }
 
 WRITE8_DEVICE_HANDLER( ay8910_data_w )
 {
 #if ENABLE_REGISTER_TEST
 	return;
-#endif
+#else
 	ay8910_data_address_w(device, 0, data);
+#endif
 }

@@ -759,15 +759,15 @@ static LRESULT CALLBACK debugwin_window_proc(HWND wnd, UINT message, WPARAM wpar
 			// send the appropriate message to this view's scrollbar
 			if (info->view[viewnum].wnd && info->view[viewnum].vscroll)
 			{
-				int message = SB_LINELEFT;
+				int message_type = SB_LINELEFT;
 				if (delta < 0)
 				{
-					message = SB_LINERIGHT;
+					message_type = SB_LINERIGHT;
 					delta = -delta;
 				}
 				while (delta > 0)
 				{
-					SendMessage(info->view[viewnum].wnd, WM_VSCROLL, message, (LPARAM)info->view[viewnum].vscroll);
+					SendMessage(info->view[viewnum].wnd, WM_VSCROLL, message_type, (LPARAM)info->view[viewnum].vscroll);
 					delta--;
 				}
 			}

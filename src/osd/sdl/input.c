@@ -967,7 +967,7 @@ static kt_table * sdlinput_read_keymap(running_machine *machine)
 				buf[i-1] = 0;
 			mks[0]=0;
 			sks[0]=0;
-			memset(kns, 0, 21);
+			memset(kns, 0, ARRAY_LENGTH(kns));
 			sscanf(buf, "%20s %20s %x %x %20c\n",
 					mks, sks, &vk, &ak, kns);
 

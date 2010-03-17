@@ -9794,8 +9794,9 @@ static void k001005_render_polygons( running_device *device )
 			while ((k001005->_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < k001005->_3d_fifo_ptr)
 			{
 				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
+#if POLY_DEVICE
 				int new_verts = 0;
-
+#endif
 				if (poly_type)
 				{
 					memcpy(&v[0], &k001005->prev_v[2], sizeof(poly_vertex));
@@ -9848,7 +9849,9 @@ static void k001005_render_polygons( running_device *device )
 					v[j].p[1] = u2 * v[j].p[3];
 					v[j].p[2] = v2 * v[j].p[3];
 
+#if POLY_DEVICE
 					++new_verts;
+#endif
 
 					if (end)
 						break;

@@ -2040,11 +2040,14 @@ DRIVER_INIT(calc3_scantables)
 	for (x=0;x<numregions;x++)
 	{
 		UINT8* tmpdstram = auto_alloc_array(machine, UINT8, 0x2000);
-		int length;
+#if CALC3_VERBOSE_OUTPUT
+ 		int length;
+#endif
+
 		memset(tmpdstram, 0x00,0x2000);
-		length = calc3_decompress_table(machine, x, tmpdstram, 0);
 
 #if CALC3_VERBOSE_OUTPUT
+		length = calc3_decompress_table(machine, x, tmpdstram, 0);
 		// dump to file
 		if (length)
 		{

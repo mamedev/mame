@@ -154,7 +154,6 @@ static int planes_enabled[4] = {1,1,1,1}; //all enabled
 VIDEO_UPDATE( test_vcu )
 {
 	mazerbla_state *state = (mazerbla_state *)screen->machine->driver_data;
-	int j;
 	char buf[128];
 
 	UINT32 color_base = 0;

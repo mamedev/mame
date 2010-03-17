@@ -781,7 +781,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 	int ecolmask = 0, ocolmask = 0;
 	int edelay = 0, odelay = 0;
 	int next_copper_x;
-	int p;
+	int pl;
 	pen_t ham_pix;
 	int defbitoffs = 0;
 
@@ -921,8 +921,8 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 				ebitoffs = defbitoffs + edelay;
 			}
 
-			for (p = 0; p < 8; p++)
-				aga_bpldat[p] = 0;
+			for (pl = 0; pl < 8; pl++)
+				aga_bpldat[pl] = 0;
 		}
 
 		/* need to run the sprite engine every pixel to ensure display */
@@ -941,9 +941,9 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 				/* if we need to fetch more data, do it now */
 				if (obitoffs == defbitoffs)
 				{
-					for (p = 0; p < planes; p += 2)
+					for (pl = 0; pl < planes; pl += 2)
 					{
-						fetch_bitplane_data(p);
+						fetch_bitplane_data(pl);
 					}
 				}
 
@@ -959,9 +959,9 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 					{
 						obitoffs = defbitoffs;
 
-						for (p = 0; p < planes; p += 2)
+						for (pl = 0; pl < planes; pl += 2)
 						{
-							fetch_bitplane_data(p);
+							fetch_bitplane_data(pl);
 						}
 					}
 
@@ -982,9 +982,9 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 				/* if we need to fetch more data, do it now */
 				if (ebitoffs == defbitoffs)
 				{
-					for (p = 1; p < planes; p += 2)
+					for (pl = 1; pl < planes; pl += 2)
 					{
-						fetch_bitplane_data(p);
+						fetch_bitplane_data(pl);
 					}
 				}
 
@@ -1000,9 +1000,9 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 					{
 						ebitoffs = defbitoffs;
 
-						for (p = 1; p < planes; p += 2)
+						for (pl = 1; pl < planes; pl += 2)
 						{
-							fetch_bitplane_data(p);
+							fetch_bitplane_data(pl);
 						}
 					}
 
@@ -1144,15 +1144,13 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 	/* end of the line: time to add the modulos */
 	if (scanline >= vstart && scanline < vstop)
 	{
-		int p;
-
 		/* update odd planes */
-		for (p = 0; p < planes; p += 2)
-			CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += CUSTOM_REG_SIGNED(REG_BPL1MOD);
+		for (pl = 0; pl < planes; pl += 2)
+			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL1MOD);
 
 		/* update even planes */
-		for (p = 1; p < planes; p += 2)
-			CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
+		for (pl = 1; pl < planes; pl += 2)
+			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
 	}
 
 	/* restore color00 */

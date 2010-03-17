@@ -623,7 +623,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	int ecolmask = 0, ocolmask = 0;
 	int edelay = 0, odelay = 0;
 	int next_copper_x;
-	int p;
+	int pl;
 
 	last_scanline = scanline;
 
@@ -723,8 +723,8 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 				ebitoffs = 15 + edelay;
 			}
 
-			for (p = 0; p < 6; p++)
-				CUSTOM_REG(REG_BPL1DAT + p) = 0;
+			for (pl = 0; pl < 6; pl++)
+				CUSTOM_REG(REG_BPL1DAT + pl) = 0;
 		}
 
 		/* need to run the sprite engine every pixel to ensure display */
@@ -742,10 +742,10 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 			{
 				/* if we need to fetch more data, do it now */
 				if (obitoffs == 15)
-					for (p = 0; p < planes; p += 2)
+					for (pl = 0; pl < planes; pl += 2)
 					{
-						CUSTOM_REG(REG_BPL1DAT + p) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + p * 2));
-						CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += 2;
+						CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
+						CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
 					}
 
 				/* now assemble the bits */
@@ -760,10 +760,10 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					{
 						obitoffs = 15;
 
-						for (p = 0; p < planes; p += 2)
+						for (pl = 0; pl < planes; pl += 2)
 						{
-							CUSTOM_REG(REG_BPL1DAT + p) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + p * 2));
-							CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += 2;
+							CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
+							CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
 						}
 					}
 
@@ -783,10 +783,10 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 			{
 				/* if we need to fetch more data, do it now */
 				if (ebitoffs == 15)
-					for (p = 1; p < planes; p += 2)
+					for (pl = 1; pl < planes; pl += 2)
 					{
-						CUSTOM_REG(REG_BPL1DAT + p) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + p * 2));
-						CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += 2;
+						CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
+						CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
 					}
 
 				/* now assemble the bits */
@@ -801,10 +801,10 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					{
 						ebitoffs = 15;
 
-						for (p = 1; p < planes; p += 2)
+						for (pl = 1; pl < planes; pl += 2)
 						{
-							CUSTOM_REG(REG_BPL1DAT + p) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + p * 2));
-							CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += 2;
+							CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
+							CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
 						}
 					}
 
@@ -945,15 +945,13 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	/* end of the line: time to add the modulos */
 	if (scanline >= vstart && scanline < vstop)
 	{
-		int p;
-
 		/* update odd planes */
-		for (p = 0; p < planes; p += 2)
-			CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += CUSTOM_REG_SIGNED(REG_BPL1MOD);
+		for (pl = 0; pl < planes; pl += 2)
+			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL1MOD);
 
 		/* update even planes */
-		for (p = 1; p < planes; p += 2)
-			CUSTOM_REG_LONG(REG_BPL1PTH + p * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
+		for (pl = 1; pl < planes; pl += 2)
+			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
 	}
 
 	/* restore color00 */

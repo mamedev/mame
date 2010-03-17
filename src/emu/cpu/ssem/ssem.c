@@ -61,55 +61,6 @@ INLINE UINT32 reverse(UINT32 v)
     return v;
 }
 
-static void unimplemented_opcode(ssem_state *cpustate, UINT32 op)
-{
-    if((cpustate->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-    {
-        char string[200];
-        ssem_dasm_one(string, cpustate->pc-1, op);
-        mame_printf_debug("%08X: %s\n", cpustate->pc-1, string);
-    }
-
-#if SSEM_DISASM_ON_UNIMPL
-    {
-        char string[200] = { 0 };
-        UINT32 i = 0;
-        FILE *disasm = fopen("ssemdasm.txt", "wt");
-
-        if(disasm)
-        {
-            for(i = 0; i < 0x20; i++)
-            {
-                UINT32 opcode = reverse(READ32(i));
-                ssem_dasm_one(string, i, opcode);
-                fprintf(dasm, "%02X: %08X    %s\n", i, opcode, string);
-            }
-
-            fclose(disasm);
-        }
-    }
-#endif
-#if SSEM_DUMP_MEM_ON_UNIMPL
-    {
-        UINT32 i = 0;
-        FILE *store = fopen("ssemmem.bin", "wb");
-
-        if(store)
-        {
-            for( i = 0; i < 0x80; i++ )
-            {
-                fputc(memory_read_byte_32be(cpustate->program, i), store);
-            }
-            fclose(store);
-        }
-    }
-#endif
-
-    fatalerror("SSEM: unknown opcode %d (%08X) at %d\n", reverse(op) & 7, reverse(op), cpustate->pc);
-}
-
-/*****************************************************************************/
-
 INLINE UINT32 READ32(ssem_state *cpustate, UINT32 address)
 {
     UINT32 v = 0;
@@ -140,6 +91,55 @@ INLINE void WRITE32(ssem_state *cpustate, UINT32 address, UINT32 data)
     memory_write_byte(cpustate->program, address + 2, (v >>  8) & 0x000000ff);
     memory_write_byte(cpustate->program, address + 3, (v >>  0) & 0x000000ff);
     return;
+}
+
+/*****************************************************************************/
+
+static void unimplemented_opcode(ssem_state *cpustate, UINT32 op)
+{
+    if((cpustate->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+    {
+        char string[200];
+        ssem_dasm_one(string, cpustate->pc-1, op);
+        mame_printf_debug("%08X: %s\n", cpustate->pc-1, string);
+    }
+
+#if SSEM_DISASM_ON_UNIMPL
+    {
+        char string[200] = { 0 };
+        UINT32 i = 0;
+        FILE *disasm = fopen("ssemdasm.txt", "wt");
+
+        if(disasm)
+        {
+            for(i = 0; i < 0x20; i++)
+            {
+                UINT32 opcode = reverse(READ32(cpustate, i));
+                ssem_dasm_one(string, i, opcode);
+                fprintf(disasm, "%02X: %08X    %s\n", i, opcode, string);
+            }
+
+            fclose(disasm);
+        }
+    }
+#endif
+#if SSEM_DUMP_MEM_ON_UNIMPL
+    {
+        UINT32 i = 0;
+        FILE *store = fopen("ssemmem.bin", "wb");
+
+        if(store)
+        {
+            for( i = 0; i < 0x80; i++ )
+            {
+                fputc(memory_read_byte_32be(cpustate->program, i), store);
+            }
+            fclose(store);
+        }
+    }
+#endif
+
+    fatalerror("SSEM: unknown opcode %d (%08X) at %d\n", reverse(op) & 7, reverse(op), cpustate->pc);
 }
 
 /*****************************************************************************/

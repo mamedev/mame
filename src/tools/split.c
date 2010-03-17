@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
 	else
 		goto usage;
 
-	return 0;
+	return result;
 
 usage:
 	fprintf(stderr,

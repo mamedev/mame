@@ -8,7 +8,7 @@ int dab[0x800];
 
 int main(int ac, char **av)
 {
-	int i, result;
+	int i;
 
 	for (i = 0; i < DF; i++) {
 		if (i & CF) {

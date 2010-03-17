@@ -669,12 +669,12 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 			{
 				switch (devconfig->devclass)
 				{
-					case DEVICE_CLASS_AUDIO:		printf("  Audio: ");	break;
-					case DEVICE_CLASS_VIDEO:		printf("  Video: ");	break;
-					case DEVICE_CLASS_CPU_CHIP:		printf("    CPU: ");	break;
-					case DEVICE_CLASS_SOUND_CHIP:	printf("  Sound: ");	break;
-					case DEVICE_CLASS_TIMER:		printf("  Timer: ");	break;
-					default:						printf("  Other: ");	break;
+					case DEVICE_CLASS_AUDIO:            printf("  Audio: ");	break;
+					case DEVICE_CLASS_VIDEO:            printf("  Video: ");	break;
+					case DEVICE_CLASS_CPU_CHIP:         printf("  CPU:   ");	break;
+					case DEVICE_CLASS_SOUND_CHIP:       printf("  Sound: ");	break;
+					case DEVICE_CLASS_TIMER:            printf("  Timer: ");	break;
+					default:                            printf("  Other: ");	break;
 				}
 				printf("%s ('%s')", devconfig->name(), devconfig->tag());
 				if (devconfig->clock >= 1000000000)

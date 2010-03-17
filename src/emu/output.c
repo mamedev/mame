@@ -186,9 +186,9 @@ static void output_exit(running_machine *machine)
 			/* remove all notifiers */
 			for (notify = item->notifylist; notify != NULL; )
 			{
-				output_notify *next = notify->next;
+				output_notify *next_notify = notify->next;
 				global_free(notify);
-				notify = next;
+				notify = next_notify;
 			}
 
 			/* free the name and the item */

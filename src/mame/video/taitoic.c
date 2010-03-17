@@ -3998,8 +3998,9 @@ void tc0150rod_draw( running_device *device, bitmap_t *bitmap, const rectangle *
 	int screen_width = max_x - min_x + 1;
 
 	int y = min_y;
-
+#if 0
 	int twin_road = 0;
+#endif
 
 	int road_A_address = y_offs * 4 + ((road_ctrl & 0x0300) << 2);	/* Index into roadram for road A */
 	int road_B_address = y_offs * 4 + ((road_ctrl & 0x0c00) << 0);	/* Index into roadram for road B */
@@ -4093,8 +4094,10 @@ void tc0150rod_draw( running_device *device, bitmap_t *bitmap, const rectangle *
 
 		if (priorities[4] == 0)	priorities[4]++;	/* Fixes Aquajack LH edge dropping below background */
 
+#if 0
 		if ((roada_bodyctrl & 0x8000) || (roadb_bodyctrl & 0x8000))
-			twin_road ++;
+			twin_road++;
+#endif
 
 		/********************************************************/
 		/*                        ROAD A                        */

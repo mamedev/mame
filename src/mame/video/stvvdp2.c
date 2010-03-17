@@ -5282,10 +5282,10 @@ static int get_hblank_duration(running_machine *machine)
 {
 	switch( STV_VDP2_HRES & 3 )
 	{
-		case 0: return 80; //400-320
-		case 1: return 104; break; //456-352
-		case 2: return 160; break; //(400-320)*2
-		case 3: return 208; break; //(456-352)*2
+		case 0: return 80;  //400-320
+		case 1: return 104; //456-352
+		case 2: return 160; //(400-320)*2
+		case 3: return 208; //(456-352)*2
 	}
 
 	return 0;

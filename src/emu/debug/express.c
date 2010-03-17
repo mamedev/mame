@@ -1115,7 +1115,7 @@ static EXPRERR infix_to_postfix(parsed_expression *expr)
 		/* If this is an operator, process it */
 		else if (token->type == TOK_OPERATOR)
 		{
-			int exprerr = normalize_operator(expr, tokindex);
+			exprerr = normalize_operator(expr, tokindex);
 			if (exprerr != 0)
 				return exprerr;
 

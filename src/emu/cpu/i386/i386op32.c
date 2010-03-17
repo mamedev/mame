@@ -2579,7 +2579,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				UINT16 selector;
 				UINT32 address;
 				if( modrm >= 0xc0 ) {
-					fatalerror("NYI");
+					fatalerror("i386: groupFF_32 /%d: NYI", (modrm >> 3) & 0x7);
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm);
 					address = READ32(cpustate,ea + 0);
@@ -2615,7 +2615,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				UINT16 selector;
 				UINT32 address;
 				if( modrm >= 0xc0 ) {
-					fatalerror("NYI");
+					fatalerror("i386: groupFF_32 /%d: NYI", (modrm >> 3) & 0x7);
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm);
 					address = READ32(cpustate,ea + 0);
@@ -3026,7 +3026,7 @@ static void I386OP(load_far_pointer32)(i386_state *cpustate, int s)
 	UINT8 modrm = FETCH(cpustate);
 
 	if( modrm >= 0xc0 ) {
-		fatalerror("NYI");
+		fatalerror("i386: load_far_pointer32 NYI");
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		STORE_REG32(modrm, READ32(cpustate,ea + 0));

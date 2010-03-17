@@ -738,7 +738,10 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	// load the layout
 	window->target = render_target_alloc(machine, NULL, FALSE);
 	if (window->target == NULL)
+	{
+		osd_free(wp);
 		goto error;
+	}
 
 	// set the specific view
 	sprintf(option, SDLOPTION_VIEW("%d"), index);

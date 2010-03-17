@@ -582,16 +582,12 @@ static UINT8 sdd1_mmio_read(const address_space *space, UINT32 addr)
 	{
 		case 0x4804:
 			return (snes_sdd1.mmc[0] >> 20) & 7;
-			break;
 		case 0x4805:
 			return (snes_sdd1.mmc[1] >> 20) & 7;
-			break;
 		case 0x4806:
 			return (snes_sdd1.mmc[2] >> 20) & 7;
-			break;
 		case 0x4807:
 			return (snes_sdd1.mmc[3] >> 20) & 7;
-			break;
 	}
 
 	return 0xff;

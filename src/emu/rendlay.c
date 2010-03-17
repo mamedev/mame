@@ -562,14 +562,14 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
 			int effy = bounds->min_y + y;
 			if (effy >= bounds->min_y && effy <= bounds->max_y)
 			{
-				UINT32 *s = BITMAP_ADDR32(tempbitmap, y, 0);
+				UINT32 *src = BITMAP_ADDR32(tempbitmap, y, 0);
 				UINT32 *d = BITMAP_ADDR32(dest, effy, 0);
 				for (x = 0; x < chbounds.max_x - chbounds.min_x; x++)
 				{
 					int effx = curx + x + chbounds.min_x;
 					if (effx >= bounds->min_x && effx <= bounds->max_x)
 					{
-						UINT32 spix = RGB_ALPHA(s[x]);
+						UINT32 spix = RGB_ALPHA(src[x]);
 						if (spix != 0)
 						{
 							UINT32 dpix = d[effx];
@@ -1595,31 +1595,31 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	for (compnode = elemnode->child; compnode; compnode = compnode->next)
 	{
 		/* allocate a new component */
-		element_component *component = load_element_component(config, compnode, dirname);
-		if (component == NULL)
+		element_component *new_component = load_element_component(config, compnode, dirname);
+		if (new_component == NULL)
 			goto error;
 
 		/* link it into the list */
-		*nextcomp = component;
-		nextcomp = &component->next;
+		*nextcomp = new_component;
+		nextcomp = &new_component->next;
 
 		/* accumulate bounds */
 		if (first)
-			bounds = component->bounds;
+			bounds = new_component->bounds;
 		else
-			union_render_bounds(&bounds, &component->bounds);
+			union_render_bounds(&bounds, &new_component->bounds);
 		first = FALSE;
 
 		/* determine the maximum state */
-		if (component->state > element->maxstate)
-			element->maxstate = component->state;
-		if (component->type == COMPONENT_TYPE_LED7SEG)
+		if (new_component->state > element->maxstate)
+			element->maxstate = new_component->state;
+		if (new_component->type == COMPONENT_TYPE_LED7SEG)
 			element->maxstate = 255;
-		if (component->type == COMPONENT_TYPE_LED14SEG)
+		if (new_component->type == COMPONENT_TYPE_LED14SEG)
 			element->maxstate = 16383;
-		if (component->type == COMPONENT_TYPE_LED14SEGSC || component->type == COMPONENT_TYPE_LED16SEG)
+		if (new_component->type == COMPONENT_TYPE_LED14SEGSC || new_component->type == COMPONENT_TYPE_LED16SEG)
 			element->maxstate = 65535;
-		if (component->type == COMPONENT_TYPE_LED16SEGSC)
+		if (new_component->type == COMPONENT_TYPE_LED16SEGSC)
 			element->maxstate = 262143;
 	}
 

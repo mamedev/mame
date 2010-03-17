@@ -487,6 +487,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
 	int i;
 
+#ifdef DEBUG_KEYS
 	const int lay_keys[8] = {KEYCODE_Q, KEYCODE_W, KEYCODE_E, KEYCODE_R};
 	bool lay_debug = false;
 	for (i = 0; i <= 3; i++)
@@ -495,14 +496,14 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 			lay_debug = true;
 		}
 	}
+#endif
 
 	/* 1st-4th layers */
 	for (i = 0; i <= 3; i++)
 	{
 #ifdef DEBUG_KEYS
-		if(lay_debug && !input_code_pressed(machine, lay_keys[i])) {
+		if(lay_debug && !input_code_pressed(machine, lay_keys[i]))
 			continue;
-		}
 #endif
 
 		if (!BG_LAYER_ENABLE(i))

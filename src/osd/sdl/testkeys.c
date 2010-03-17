@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 				quit=1;
 			else
 			{
-				memset(buf, 0, 19);
+				memset(buf, 0, ARRAY_LENGTH(buf));
 				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
 				printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
 #if (SDL_VERSION_ATLEAST(1,3,0))
