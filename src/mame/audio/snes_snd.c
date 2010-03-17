@@ -206,7 +206,7 @@ struct _snes_sound_state
 	voice_state_type        voice_state[8];
 
 	/* Noise stuff */
-	int		            noise_cnt;
+	int                     noise_cnt;
 	int                     noise_lev;
 
 	/* These are for the FIR echo filter */
@@ -1314,6 +1314,7 @@ static DEVICE_START( snes_sound )
 	spc700->channel = stream_create(device, 0, 2, 32000, 0, snes_sh_update);
 
 	spc700->ram = auto_alloc_array_clear(device->machine, UINT8, SNES_SPCRAM_SIZE);
+	state_save_register_device_item_pointer(device, 0, spc700->ram, SNES_SPCRAM_SIZE);
 
 	/* default to ROM visible */
 	spc700->ram[0xf1] = 0x80;
