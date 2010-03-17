@@ -1266,7 +1266,6 @@ static READ16_HANDLER( ddenlovr_gfxrom_r )
 }
 
 
-
 static void copylayer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
@@ -1632,11 +1631,11 @@ static READ8_DEVICE_HANDLER( quiz365_input_r )
 {
 	dynax_state *state = (dynax_state *)device->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))	return input_port_read(device->machine, "DSW1");
-	if (!(state->dsw_sel & 0x02))	return input_port_read(device->machine, "DSW2");
-	if (!(state->dsw_sel & 0x04))	return input_port_read(device->machine, "DSW3");
-	if (!(state->dsw_sel & 0x08))	return 0xff;//mame_rand(device->machine);
-	if (!(state->dsw_sel & 0x10))	return 0xff;//mame_rand(device->machine);
+	if (!BIT(state->dsw_sel, 0))	return input_port_read(device->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 1))	return input_port_read(device->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 2))	return input_port_read(device->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 3))	return 0xff;//mame_rand(device->machine);
+	if (!BIT(state->dsw_sel, 4))	return 0xff;//mame_rand(device->machine);
 	return 0xff;
 }
 
@@ -1924,9 +1923,9 @@ static READ16_HANDLER( nettoqc_input_r )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))	return input_port_read(space->machine, "DSW1");
-	if (!(state->dsw_sel & 0x02))	return input_port_read(space->machine, "DSW2");
-	if (!(state->dsw_sel & 0x04))	return input_port_read(space->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 0))	return input_port_read(space->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 1))	return input_port_read(space->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 2))	return input_port_read(space->machine, "DSW3");
 	return 0xffff;
 }
 
@@ -2006,26 +2005,26 @@ static READ8_HANDLER( rongrong_input_r )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))	return input_port_read(space->machine, "DSW1");
-	if (!(state->dsw_sel & 0x02))	return input_port_read(space->machine, "DSW2");
-	if (!(state->dsw_sel & 0x04))	return 0xff;//mame_rand(space->machine);
-	if (!(state->dsw_sel & 0x08))	return 0xff;//mame_rand(space->machine);
-	if (!(state->dsw_sel & 0x10))	return input_port_read(space->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 0))	return input_port_read(space->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 1))	return input_port_read(space->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 2))	return 0xff;//mame_rand(space->machine);
+	if (!BIT(state->dsw_sel, 3))	return 0xff;//mame_rand(space->machine);
+	if (!BIT(state->dsw_sel, 4))	return input_port_read(space->machine, "DSW3");
 	return 0xff;
 }
 
 static WRITE8_HANDLER( rongrong_select_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 //logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(space->cpu),data);
+
 	/* bits 0-4 = **both** ROM bank **AND** input select */
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x1f)]);
+	memory_set_bank(space->machine, "bank1", data & 0x1f);
 	state->dsw_sel = data;
 
 	/* bits 5-7 = RAM bank */
-	memory_set_bankptr(space->machine, "bank2", &rom[0x110000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bank(space->machine, "bank2", ((data & 0xe0) >> 5));
 }
 
 
@@ -2119,8 +2118,7 @@ static READ8_HANDLER( magic_r )
 
 static WRITE8_HANDLER( mmpanic_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x7)]);
+	memory_set_bank(space->machine, "bank1", data & 0x7);
 	/* Bit 4? */
 }
 
@@ -2283,22 +2281,21 @@ static WRITE8_HANDLER( funkyfig_blitter_w )
 static WRITE8_HANDLER( funkyfig_rombank_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	state->dsw_sel = data;
 
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x0f)]);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 	// bit 4 selects palette ram at 8000?
-	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bank(space->machine, "bank2", ((data & 0xe0) >> 5));
 }
 
 static READ8_HANDLER( funkyfig_dsw_r )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))  return input_port_read(space->machine, "DSW1");
-	if (!(state->dsw_sel & 0x02))  return input_port_read(space->machine, "DSW2");
-	if (!(state->dsw_sel & 0x04))  return input_port_read(space->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 0))  return input_port_read(space->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 1))  return input_port_read(space->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 2))  return input_port_read(space->machine, "DSW3");
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(space->cpu), state->dsw_sel);
 	return 0xff;
 }
@@ -2399,11 +2396,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hanakanz_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x0f)]);
-
-	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * ((data & 0xf0) >> 4)]);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine, "bank2", ((data & 0xf0) >> 4));
 }
 
 static ADDRESS_MAP_START( hanakanz_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2432,11 +2426,11 @@ static READ8_HANDLER( hanakanz_keyb_r )
 
 	UINT8 val = 0xff;
 
-	if      (!(state->keyb & 0x01))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
-	else if (!(state->keyb & 0x02))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
-	else if (!(state->keyb & 0x04))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
-	else if (!(state->keyb & 0x08))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
-	else if (!(state->keyb & 0x10))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
+	if      (!BIT(state->keyb, 0))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!BIT(state->keyb, 1))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!BIT(state->keyb, 2))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!BIT(state->keyb, 3))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!BIT(state->keyb, 4))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
 	val |= input_port_read(space->machine, offset ? "HOPPER" : "BET");
 	return val;
@@ -2446,11 +2440,11 @@ static READ8_HANDLER( hanakanz_dsw_r )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))   return input_port_read(space->machine, "DSW1");
-	if (!(state->dsw_sel & 0x02))   return input_port_read(space->machine, "DSW2");
-	if (!(state->dsw_sel & 0x04))   return input_port_read(space->machine, "DSW3");
-	if (!(state->dsw_sel & 0x08))   return input_port_read(space->machine, "DSW4");
-	if (!(state->dsw_sel & 0x10))   return input_port_read(space->machine, "DSW5");
+	if (!BIT(state->dsw_sel, 0))   return input_port_read(space->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 1))   return input_port_read(space->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 2))   return input_port_read(space->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 3))   return input_port_read(space->machine, "DSW4");
+	if (!BIT(state->dsw_sel, 4))   return input_port_read(space->machine, "DSW5");
 	return 0xff;
 }
 
@@ -2620,11 +2614,11 @@ static READ8_HANDLER( mjchuuka_keyb_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 val = 0xff;
 
-	if      (!(state->keyb & 0x01))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
-	else if (!(state->keyb & 0x02))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
-	else if (!(state->keyb & 0x04))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
-	else if (!(state->keyb & 0x08))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
-	else if (!(state->keyb & 0x10))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
+	if      (!BIT(state->keyb, 0))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!BIT(state->keyb, 1))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!BIT(state->keyb, 2))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!BIT(state->keyb, 3))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!BIT(state->keyb, 4))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
 	val |= input_port_read(space->machine, offset ? "HOPPER" : "BET");
 
@@ -2759,9 +2753,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjmyster_rambank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * (data & 0x07)]);
-//  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
+	memory_set_bank(space->machine, "bank2", data & 0x07);
+	//logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_HANDLER( mjmyster_select2_w )
@@ -2795,11 +2788,11 @@ static READ8_HANDLER( mjmyster_keyb_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 ret = 0xff;
 
-	if      (state->keyb & 0x01)   ret = input_port_read(space->machine, "KEY0");
-	else if (state->keyb & 0x02)   ret = input_port_read(space->machine, "KEY1");
-	else if (state->keyb & 0x04)   ret = input_port_read(space->machine, "KEY2");
-	else if (state->keyb & 0x08)   ret = input_port_read(space->machine, "KEY3");
-	else if (state->keyb & 0x10)   ret = input_port_read(space->machine, "KEY4");
+	if      (BIT(state->keyb, 0))   ret = input_port_read(space->machine, "KEY0");
+	else if (BIT(state->keyb, 1))   ret = input_port_read(space->machine, "KEY1");
+	else if (BIT(state->keyb, 2))   ret = input_port_read(space->machine, "KEY2");
+	else if (BIT(state->keyb, 3))   ret = input_port_read(space->machine, "KEY3");
+	else if (BIT(state->keyb, 4))   ret = input_port_read(space->machine, "KEY4");
 	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", cpu_get_pc(space->cpu), state->keyb);
 
 	state->keyb <<= 1;
@@ -2811,11 +2804,11 @@ static READ8_HANDLER( mjmyster_dsw_r )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))   return input_port_read(space->machine, "DSW4");
-	if (!(state->dsw_sel & 0x02))   return input_port_read(space->machine, "DSW3");
-	if (!(state->dsw_sel & 0x04))   return input_port_read(space->machine, "DSW2");
-	if (!(state->dsw_sel & 0x08))   return input_port_read(space->machine, "DSW1");
-	if (!(state->dsw_sel & 0x10))   return input_port_read(space->machine, "DSW5");
+	if (!BIT(state->dsw_sel, 0))   return input_port_read(space->machine, "DSW4");
+	if (!BIT(state->dsw_sel, 1))   return input_port_read(space->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 2))   return input_port_read(space->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 3))   return input_port_read(space->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 4))   return input_port_read(space->machine, "DSW5");
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(space->cpu), state->dsw_sel);
 	return 0xff;
 }
@@ -2880,8 +2873,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( hginga_rombank_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x7)]);
+	memory_set_bank(space->machine, "bank1", data & 0x7);
 	state->hginga_rombank = data;
 }
 
@@ -2910,11 +2902,11 @@ static READ8_DEVICE_HANDLER( hginga_dsw_r )
 {
 	dynax_state *state = (dynax_state *)device->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))   return input_port_read(device->machine, "DSW4");
-	if (!(state->dsw_sel & 0x02))   return input_port_read(device->machine, "DSW3");
-	if (!(state->dsw_sel & 0x04))   return input_port_read(device->machine, "DSW2");
-	if (!(state->dsw_sel & 0x08))   return input_port_read(device->machine, "DSW1");
-	if (!(state->dsw_sel & 0x10))   return input_port_read(device->machine, "DSW5");
+	if (!BIT(state->dsw_sel, 0))   return input_port_read(device->machine, "DSW4");
+	if (!BIT(state->dsw_sel, 1))   return input_port_read(device->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 2))   return input_port_read(device->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 3))   return input_port_read(device->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 4))   return input_port_read(device->machine, "DSW5");
 
 	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", cpuexec_describe_context(device->machine), state->dsw_sel);
 	return 0xff;
@@ -3062,11 +3054,11 @@ static UINT8 hgokou_player_r( const address_space *space, int player )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 hopper_bit = ((state->hopper && !(video_screen_get_frame_number(space->machine->primary_screen) % 10)) ? 0 : (1 << 6));
 
-	if (!(state->input_sel & 0x01))   return input_port_read(space->machine, player ? "KEY5" : "KEY0") | hopper_bit;
-	if (!(state->input_sel & 0x02))   return input_port_read(space->machine, player ? "KEY6" : "KEY1") | hopper_bit;
-	if (!(state->input_sel & 0x04))   return input_port_read(space->machine, player ? "KEY7" : "KEY2") | hopper_bit;
-	if (!(state->input_sel & 0x08))   return input_port_read(space->machine, player ? "KEY8" : "KEY3") | hopper_bit;
-	if (!(state->input_sel & 0x10))   return input_port_read(space->machine, player ? "KEY9" : "KEY4") | hopper_bit;
+	if (!BIT(state->input_sel, 0))   return input_port_read(space->machine, player ? "KEY5" : "KEY0") | hopper_bit;
+	if (!BIT(state->input_sel, 1))   return input_port_read(space->machine, player ? "KEY6" : "KEY1") | hopper_bit;
+	if (!BIT(state->input_sel, 2))   return input_port_read(space->machine, player ? "KEY7" : "KEY2") | hopper_bit;
+	if (!BIT(state->input_sel, 3))   return input_port_read(space->machine, player ? "KEY8" : "KEY3") | hopper_bit;
+	if (!BIT(state->input_sel, 4))   return input_port_read(space->machine, player ? "KEY9" : "KEY4") | hopper_bit;
 
 	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 }
@@ -3175,13 +3167,12 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( hparadis_select_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	state->dsw_sel = data;
 	state->keyb = 0;
 
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x07)]);
-	memory_set_bankptr(space->machine, "bank2", &rom[0x50000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine, "bank2", ((data & 0xe0) >> 5));
 }
 
 
@@ -3208,11 +3199,11 @@ static READ8_HANDLER( hparadis_dsw_r )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
-	if (!(state->dsw_sel & 0x01))	return input_port_read(space->machine, "DSW1");
-	if (!(state->dsw_sel & 0x02))	return input_port_read(space->machine, "DSW2");
-	if (!(state->dsw_sel & 0x04))	return 0xff;
-	if (!(state->dsw_sel & 0x08))	return 0xff;
-	if (!(state->dsw_sel & 0x10))	return input_port_read(space->machine, "DSW3");
+	if (!BIT(state->dsw_sel, 0))	return input_port_read(space->machine, "DSW1");
+	if (!BIT(state->dsw_sel, 1))	return input_port_read(space->machine, "DSW2");
+	if (!BIT(state->dsw_sel, 2))	return 0xff;
+	if (!BIT(state->dsw_sel, 3))	return 0xff;
+	if (!BIT(state->dsw_sel, 4))	return input_port_read(space->machine, "DSW3");
 	return 0xff;
 }
 
@@ -3413,14 +3404,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjflove_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0xf)]);
+	memory_set_bank(space->machine, "bank1", data & 0xf);
 }
 
 static WRITE8_DEVICE_HANDLER( mjflove_okibank_w )
 {
 	okim6295_set_bank_base(device, (data & 0x07) * 0x40000);
-//  popmessage("SOUND = %02x",data);
+	//popmessage("SOUND = %02x", data);
 }
 
 static READ8_HANDLER( mjflove_protection_r )
@@ -3433,11 +3423,11 @@ static READ8_HANDLER( mjflove_keyb_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 val = 0xff;
 
-	if      (!(state->keyb & 0x01))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
-	else if (!(state->keyb & 0x02))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
-	else if (!(state->keyb & 0x04))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
-	else if (!(state->keyb & 0x08))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
-	else if (!(state->keyb & 0x10))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
+	if      (!BIT(state->keyb, 0))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!BIT(state->keyb, 1))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!BIT(state->keyb, 2))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!BIT(state->keyb, 3))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!BIT(state->keyb, 4))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
 	return val;
 }
@@ -3557,11 +3547,11 @@ static READ8_HANDLER( sryudens_keyb_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 val = 0x3f;
 
-	if      (!(state->keyb & 0x01))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
-	else if (!(state->keyb & 0x02))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
-	else if (!(state->keyb & 0x04))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
-	else if (!(state->keyb & 0x08))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
-	else if (!(state->keyb & 0x10))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
+	if      (!BIT(state->keyb, 0))   val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!BIT(state->keyb, 1))   val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!BIT(state->keyb, 2))   val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!BIT(state->keyb, 3))   val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!BIT(state->keyb, 4))   val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
 	val |= input_port_read(space->machine, offset ? "HOPPER" : "BET");
 	if (offset)
@@ -3589,9 +3579,8 @@ static WRITE8_HANDLER( sryudens_coincounter_w )
 
 static WRITE8_HANDLER( sryudens_rambank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * (data & 0x0f)]);
-//  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
+	memory_set_bank(space->machine, "bank2", data & 0x0f);
+	//logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
 static ADDRESS_MAP_START( sryudens_portmap, ADDRESS_SPACE_IO, 8 )
@@ -3635,11 +3624,11 @@ static READ8_HANDLER( daimyojn_keyb1_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 val = 0x3f;
 
-	if      (!(state->keyb & 0x01))  val = input_port_read(space->machine, "KEY0");
-	else if (!(state->keyb & 0x02))  val = input_port_read(space->machine, "KEY1");
-	else if (!(state->keyb & 0x04))  val = input_port_read(space->machine, "KEY2");
-	else if (!(state->keyb & 0x08))  val = input_port_read(space->machine, "KEY3");
-	else if (!(state->keyb & 0x10))  val = input_port_read(space->machine, "KEY4");
+	if      (!BIT(state->keyb, 0))  val = input_port_read(space->machine, "KEY0");
+	else if (!BIT(state->keyb, 1))  val = input_port_read(space->machine, "KEY1");
+	else if (!BIT(state->keyb, 2))  val = input_port_read(space->machine, "KEY2");
+	else if (!BIT(state->keyb, 3))  val = input_port_read(space->machine, "KEY3");
+	else if (!BIT(state->keyb, 4))  val = input_port_read(space->machine, "KEY4");
 
 	val |= input_port_read(space->machine, "BET");
 	return val;
@@ -3650,11 +3639,11 @@ static READ8_HANDLER( daimyojn_keyb2_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 	UINT8 val = 0x3f;
 
-	if      (!(state->keyb & 0x01))  val = input_port_read(space->machine, "KEY5");
-	else if (!(state->keyb & 0x02))  val = input_port_read(space->machine, "KEY6");
-	else if (!(state->keyb & 0x04))  val = input_port_read(space->machine, "KEY7");
-	else if (!(state->keyb & 0x08))  val = input_port_read(space->machine, "KEY8");
-	else if (!(state->keyb & 0x10))  val = input_port_read(space->machine, "KEY9");
+	if      (!BIT(state->keyb, 0))  val = input_port_read(space->machine, "KEY5");
+	else if (!BIT(state->keyb, 1))  val = input_port_read(space->machine, "KEY6");
+	else if (!BIT(state->keyb, 2))  val = input_port_read(space->machine, "KEY7");
+	else if (!BIT(state->keyb, 3))  val = input_port_read(space->machine, "KEY8");
+	else if (!BIT(state->keyb, 4))  val = input_port_read(space->machine, "KEY9");
 
 	val |= input_port_read(space->machine, "HOPPER");
 	return val;
@@ -7597,6 +7586,7 @@ static MACHINE_START( ddenlovr )
 	state_save_register_global(machine, state->hginga_rombank);
 	state_save_register_global(machine, state->mjflove_irq_cause);
 	state_save_register_global(machine, state->daimyojn_palette_sel);
+	state_save_register_global_array(machine, state->palram);
 
 	state_save_register_global(machine, state->irq_count);
 }
@@ -7627,6 +7617,79 @@ static MACHINE_RESET( ddenlovr )
 	state->quiz365_protection[1] = 0;
 	state->romdata[0] = 0;
 	state->romdata[1] = 0;
+
+	memset(state->palram, 0, ARRAY_LENGTH(state->palram));
+}
+
+static MACHINE_START( rongrong )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x010000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x110000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( mmpanic )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 8,    &ROM[0x10000], 0x8000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( funkyfig )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x90000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( hanakanz )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x90000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( mjmyster )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 8,    &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x90000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( hparadis )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 8,    &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x50000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( mjflove )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x90000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
+}
+
+static MACHINE_START( sryudens )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x90000], 0x1000);
+
+	MACHINE_START_CALL(ddenlovr);
 }
 
 /***************************************************************************
@@ -7775,7 +7838,7 @@ static MACHINE_DRIVER_START( quizchq )
 	MDRV_CPU_IO_MAP(quizchq_portmap)
 	MDRV_CPU_VBLANK_INT("screen", quizchq_irq)
 
-	MDRV_MACHINE_START(ddenlovr)
+	MDRV_MACHINE_START(rongrong)
 	MDRV_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
@@ -7859,7 +7922,7 @@ static MACHINE_DRIVER_START( mmpanic )
 	MDRV_CPU_IO_MAP(mmpanic_sound_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main cpu
 
-	MDRV_MACHINE_START(ddenlovr)
+	MDRV_MACHINE_START(mmpanic)
 	MDRV_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
@@ -7932,7 +7995,7 @@ static MACHINE_DRIVER_START( hanakanz )
 	MDRV_CPU_IO_MAP(hanakanz_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MDRV_MACHINE_START(ddenlovr)
+	MDRV_MACHINE_START(hanakanz)
 	MDRV_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
@@ -8024,6 +8087,8 @@ static MACHINE_DRIVER_START( funkyfig )
 	MDRV_CPU_IO_MAP(funkyfig_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
+	MDRV_MACHINE_START(funkyfig)
+
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_IO_MAP(funkyfig_sound_portmap)
 
@@ -8086,6 +8151,8 @@ static MACHINE_DRIVER_START( mjmyster )
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
+	MDRV_MACHINE_START(mjmyster)
+
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -8134,6 +8201,8 @@ static MACHINE_DRIVER_START( hginga )
 	MDRV_CPU_IO_MAP(hginga_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
+	MDRV_MACHINE_START(mjmyster)
+
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -8146,6 +8215,8 @@ static MACHINE_DRIVER_START( hgokou )
 	MDRV_CPU_PROGRAM_MAP(hgokou_map)
 	MDRV_CPU_IO_MAP(hgokou_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
+
+	MDRV_MACHINE_START(mjmyster)
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -8169,6 +8240,8 @@ static MACHINE_DRIVER_START( mjmyuniv )
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
+	MDRV_MACHINE_START(mjmyster)
+
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -8181,6 +8254,8 @@ static MACHINE_DRIVER_START( mjmyornt )
 	MDRV_CPU_IO_MAP(mjmyster_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
+
+	MDRV_MACHINE_START(mjmyster)
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
@@ -8214,6 +8289,8 @@ static MACHINE_DRIVER_START( mjflove )
 	MDRV_CPU_IO_MAP(mjflove_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
 
+	MDRV_MACHINE_START(mjflove)
+
 	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 28636363/8)
@@ -8234,6 +8311,8 @@ static MACHINE_DRIVER_START( hparadis )
 	MDRV_CPU_PROGRAM_MAP(hparadis_map)
 	MDRV_CPU_IO_MAP(hparadis_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hparadis_irq)
+
+	MDRV_MACHINE_START(hparadis)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jongtei )
@@ -8247,7 +8326,7 @@ static MACHINE_DRIVER_START( jongtei )
 	MDRV_CPU_IO_MAP(jongtei_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MDRV_MACHINE_START(ddenlovr)
+	MDRV_MACHINE_START(hanakanz)
 	MDRV_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
@@ -8293,7 +8372,7 @@ static MACHINE_DRIVER_START( sryudens )
 	MDRV_CPU_IO_MAP(sryudens_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
-	MDRV_MACHINE_START(ddenlovr)
+	MDRV_MACHINE_START(sryudens)
 	MDRV_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
@@ -8342,7 +8421,7 @@ static MACHINE_DRIVER_START( daimyojn )
 	MDRV_CPU_IO_MAP(daimyojn_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MDRV_MACHINE_START(ddenlovr)
+	MDRV_MACHINE_START(mjflove)
 	MDRV_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
@@ -10091,35 +10170,35 @@ ROM_START( daimyojn )
 ROM_END
 
 
-GAME( 1992, mmpanic,  0,        mmpanic,  mmpanic,  0,        ROT0, "Nakanihon + East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         GAME_NO_COCKTAIL )
-GAME( 1993, funkyfig, 0,        funkyfig, funkyfig, 0,        ROT0, "Nakanihon + East Technology (Taito license)", "The First Funky Fighter",                                         GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, quizchq,  0,        quizchq,  quizchq,  0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1993, quizchql, quizchq,  quizchq,  quizchq,  0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1993, animaljr, 0,        mmpanic,  animaljr, 0,        ROT0, "Nakanihon + East Technology (Taito license)", "Animalandia Jr.",                                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1994, hginga,   0,        hginga,   hginga,   0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             GAME_NO_COCKTAIL )
-GAME( 1994, mjmyster, 0,        mjmyster, mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            GAME_NO_COCKTAIL )
-GAME( 1994, mjmywrld, mjmyster, mjmywrld, mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            GAME_NO_COCKTAIL )
-GAME( 1994, mjmyornt, 0,        mjmyornt, mjmyornt, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   GAME_NO_COCKTAIL )
-GAME( 1994, mjmyuniv, 0,        mjmyuniv, mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe",                                 GAME_NO_COCKTAIL )
-GAME( 1994, quiz365,  0,        quiz365,  quiz365,  0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1994, quiz365t, quiz365,  quiz365,  quiz365,  0,        ROT0, "Nakanihon + Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1994, rongrong, 0,        rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Europe)",                                  GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1994, rongrongj,rongrong, rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Japan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1994, rongrongg,rongrong, rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1994, hparadis, 0,        hparadis, hparadis, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     GAME_NO_COCKTAIL )
-GAME( 1995, hgokou,   0,        hgokou,   hgokou,   0,        ROT0, "Dynax (Alba licence)",					       "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL )
-GAME( 1995, mjdchuka, 0,        mjchuuka, mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL )
-GAME( 1995, nettoqc,  0,        nettoqc,  nettoqc,  0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1995, ddenlovj, 0,        ddenlovj, ddenlovj, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL )
-GAME( 1995, ddenlovrk,ddenlovj, ddenlovrk,ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL )
-GAME( 1995, ddenlovrb,ddenlovj, ddenlovr, ddenlovr, 0,        ROT0, "[Dynax] (bootleg)",                           "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL )
-GAME( 1996, ddenlovr, ddenlovj, ddenlovr, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL )
-GAME( 1996, hanakanz, 0,        hanakanz, hanakanz, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           GAME_NO_COCKTAIL )
-GAME( 1996, akamaru,  0,        akamaru,  akamaru,  0,        ROT0, "Dynax (Nakanihon licence)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        GAME_NO_COCKTAIL )
-GAME( 1996, sryudens, 0,        sryudens, sryudens, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, mjflove,  0,        mjflove,  mjflove,  0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   GAME_NO_COCKTAIL )
-GAME( 1997, hkagerou, 0,        hkagerou, hkagerou, 0,        ROT0, "Nakanihon + Dynax",                           "Hana Kagerou [BET] (Japan)",                                      GAME_NO_COCKTAIL )
-GAME( 1998, mjchuuka, 0,        mjchuuka, mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     GAME_NO_COCKTAIL )
-GAME( 1998, mjreach1, 0,        mjreach1, mjreach1, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   GAME_NO_COCKTAIL )
-GAME( 1999, jongtei,  0,        jongtei,  jongtei,  0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, ver. NM532-01)",                         GAME_NO_COCKTAIL )
-GAME( 2002, daimyojn, 0,        daimyojn, daimyojn, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           GAME_NO_COCKTAIL )
+GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  0,        ROT0, "Nakanihon + East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, 0,        ROT0, "Nakanihon + East Technology (Taito license)", "The First Funky Fighter",                                         GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // scrolling, priority?
+GAME( 1993, quizchq,   0,        quizchq,   quizchq,  0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, 0,        ROT0, "Nakanihon + East Technology (Taito license)", "Animalandia Jr.",                                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1994, hginga,    0,        hginga,    hginga,   0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1994, mjmyornt,  0,        mjmyornt,  mjmyornt, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe",                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1994, quiz365,   0,        quiz365,   quiz365,  0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  0,        ROT0, "Nakanihon + Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1994, rongrong,  0,        rongrong,  rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Europe)",                                  GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Japan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1994, hparadis,  0,        hparadis,  hparadis, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, hgokou,    0,        hgokou,    hgokou,   0,        ROT0, "Dynax (Alba licence)",                        "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, 0,        ROT0, "[Dynax] (bootleg)",                           "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, akamaru,   0,        akamaru,   akamaru,  0,        ROT0, "Dynax (Nakanihon licence)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, sryudens,  0,        sryudens,  sryudens, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, mjflove,   0,        mjflove,   mjflove,  0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, 0,        ROT0, "Nakanihon + Dynax",                           "Hana Kagerou [BET] (Japan)",                                      GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, ver. NM532-01)",                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

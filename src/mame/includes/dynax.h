@@ -88,12 +88,11 @@ public:
 	UINT8 soundlatch_full;
 	UINT8 latch;
 	int rombank;
-	UINT8 *romptr;
 	UINT8 tenkai_p5_val;
 	int tenkai_6c, tenkai_70;
 	UINT8 gekisha_val[2];
 	UINT8 gekisha_rom_enable;
-	UINT8 *gekisha_rom;
+	UINT8 *romptr;
 
 	/* ddenlovr misc (TODO: merge with the above, where possible) */
 	UINT8 palram[0x200];

@@ -2636,12 +2636,58 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 	cpustate->internal_registers[offset] = data;
 }
 
+static void state_register( running_device *device )
+{
+	t90_Regs *cpustate = get_safe_token(device);
+
+	state_save_register_device_item(device, 0, cpustate->prvpc.w.l);
+	state_save_register_device_item(device, 0, cpustate->pc.w.l);
+	state_save_register_device_item(device, 0, cpustate->sp.w.l);
+	state_save_register_device_item(device, 0, cpustate->af.w.l);
+	state_save_register_device_item(device, 0, cpustate->bc.w.l);
+	state_save_register_device_item(device, 0, cpustate->de.w.l);
+	state_save_register_device_item(device, 0, cpustate->hl.w.l);
+	state_save_register_device_item(device, 0, cpustate->ix.w.l);
+	state_save_register_device_item(device, 0, cpustate->iy.w.l);
+	state_save_register_device_item(device, 0, cpustate->af2.w.l);
+	state_save_register_device_item(device, 0, cpustate->bc2.w.l);
+	state_save_register_device_item(device, 0, cpustate->de2.w.l);
+	state_save_register_device_item(device, 0, cpustate->hl2.w.l);
+	state_save_register_device_item(device, 0, cpustate->halt);
+	state_save_register_device_item(device, 0, cpustate->after_EI);
+	state_save_register_device_item(device, 0, cpustate->irq_state);
+	state_save_register_device_item(device, 0, cpustate->irq_mask);
+	state_save_register_device_item(device, 0, cpustate->icount);
+	state_save_register_device_item(device, 0, cpustate->extra_cycles);
+
+	state_save_register_device_item_array(device, 0, cpustate->internal_registers);
+	state_save_register_device_item(device, 0, cpustate->ixbase);
+	state_save_register_device_item(device, 0, cpustate->iybase);
+
+	state_save_register_device_item_array(device, 0, cpustate->timer_value);
+	state_save_register_device_item(device, 0, cpustate->timer4_value);
+
+	// Work registers
+	state_save_register_device_item(device, 0, cpustate->op);
+	state_save_register_device_item(device, 0, cpustate->mode1);
+	state_save_register_device_item(device, 0, cpustate->r1);
+	state_save_register_device_item(device, 0, cpustate->r1b);
+	state_save_register_device_item(device, 0, cpustate->mode2);
+	state_save_register_device_item(device, 0, cpustate->r2);
+	state_save_register_device_item(device, 0, cpustate->r2b);
+
+	state_save_register_device_item(device, 0, cpustate->cyc_t);
+	state_save_register_device_item(device, 0, cpustate->cyc_f);
+	state_save_register_device_item(device, 0, cpustate->addr);
+}
+
+
 static CPU_INIT( t90 )
 {
 	t90_Regs *cpustate = get_safe_token(device);
 	int i, p;
 
-//  state_save_register_device_item(device, 0, Z80.prvpc.w.l);
+	state_register(device);
 
 	for (i = 0; i < 256; i++)
 	{

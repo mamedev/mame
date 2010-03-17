@@ -275,23 +275,20 @@ static WRITE8_HANDLER( hanamai_keyboard_w )
 
 static WRITE8_HANDLER( dynax_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank1",&ROM[0x08000+0x8000*(data & 0x0f)]);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "soundcpu");
-	memory_set_bankptr(space->machine, "bank2",&ROM[0x08000+0x8000*data]);
+	memory_set_bank(space->machine, "bank2", data);
 }
 
 
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *ROM = memory_region(space->machine, "maincpu") + 0x10000 + 0x8000*data;
-//logerror("%04x: rom bank = %02x\n",cpu_get_pc(space->cpu),data);
-	memory_set_bankptr(space->machine, "bank1",ROM);
+	//logerror("%04x: rom bank = %02x\n", cpu_get_pc(space->cpu), data);
+	memory_set_bank(space->machine, "bank1", data);
 	state->hnoridur_bank = data;
 }
 
@@ -764,8 +761,7 @@ static READ8_HANDLER( yarunara_input_r )
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000 + 0x8000 * data;
-	memory_set_bankptr(space->machine, "bank1", rom);
+	memory_set_bank(space->machine, "bank1", data);
 
 	state->hnoridur_bank = data;
 }
@@ -982,8 +978,7 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, "bank1",&ROM[0x8000 + 0x8000*(data&0x0f)]);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 	set_led_status(space->machine, 0, data & 0x10);	// maybe
 }
 
@@ -1213,9 +1208,8 @@ static READ8_HANDLER( htengoku_coin_r )
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000 + 0x8000 * (data & 0x7);
-	memory_set_bankptr(space->machine, "bank1", rom);
 
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 	state->hnoridur_bank = data;
 }
 
@@ -1611,7 +1605,7 @@ static void gekisha_set_rombank( running_machine *machine, UINT8 data )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
 	state->rombank = data;
-	state->gekisha_rom = memory_region(machine, "maincpu") + 0x8000 + state->rombank * 0x8000;
+	state->romptr = memory_region(machine, "maincpu") + 0x8000 + state->rombank * 0x8000;
 }
 
 static WRITE8_HANDLER( gekisha_p4_w )
@@ -1626,7 +1620,7 @@ static READ8_HANDLER( gekisha_8000_r )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
 	if (state->gekisha_rom_enable)
-		return state->gekisha_rom[offset];
+		return state->romptr[offset];
 
 	switch (offset + 0x8000)
 	{
@@ -4228,6 +4222,7 @@ static MACHINE_START( dynax )
 	state_save_register_global(machine, state->tenkai_6c);
 	state_save_register_global(machine, state->tenkai_70);
 	state_save_register_global_array(machine, state->gekisha_val);
+	state_save_register_global_array(machine, state->palette_ram);
 	state_save_register_global(machine, state->gekisha_rom_enable);
 }
 
@@ -4267,8 +4262,36 @@ static MACHINE_RESET( dynax )
 	state->gekisha_val[0] = 0;
 	state->gekisha_val[1] = 0;
 	state->gekisha_rom_enable = 0;
+
+	memset(state->palette_ram, 0, ARRAY_LENGTH(state->palette_ram));
 }
 
+static MACHINE_START( hanamai )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x8000], 0x8000);
+
+	MACHINE_START_CALL(dynax);
+}
+
+static MACHINE_START( hnoridur )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	int bank_n = (memory_region_length(machine, "maincpu") - 0x10000) / 0x8000;
+
+	memory_configure_bank(machine, "bank1", 0, bank_n, &ROM[0x10000], 0x8000);
+
+	MACHINE_START_CALL(dynax);
+}
+
+static MACHINE_START( htengoku )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
+
+	MACHINE_START_CALL(dynax);
+}
 
 /***************************************************************************
                                 Hana no Mai
@@ -4306,7 +4329,7 @@ static MACHINE_DRIVER_START( hanamai )
 	MDRV_CPU_IO_MAP(hanamai_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(hanamai)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4367,7 +4390,7 @@ static MACHINE_DRIVER_START( hnoridur )
 	MDRV_CPU_IO_MAP(hnoridur_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(hnoridur)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4416,7 +4439,7 @@ static MACHINE_DRIVER_START( hjingi )
 	MDRV_CPU_IO_MAP(hjingi_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(hnoridur)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4478,7 +4501,7 @@ static MACHINE_DRIVER_START( sprtmtch )
 	MDRV_CPU_IO_MAP(sprtmtch_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(hanamai)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4524,7 +4547,7 @@ static MACHINE_DRIVER_START( mjfriday )
 	MDRV_CPU_IO_MAP(mjfriday_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(hanamai)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4658,13 +4681,17 @@ static const msm5205_interface jantouki_msm5205_interface =
 static MACHINE_START( jantouki )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
+	UINT8 *MAIN = memory_region(machine, "maincpu");
+	UINT8 *SOUND = memory_region(machine, "soundcpu");
+
+	memory_configure_bank(machine, "bank1", 0, 0x10, &MAIN[0x8000],  0x8000);
+	memory_configure_bank(machine, "bank2", 0, 12,   &SOUND[0x8000], 0x8000);
 
 	state->top_scr = devtag_get_device(machine, "top");
 	state->bot_scr = devtag_get_device(machine, "bottom");
 
 	MACHINE_START_CALL(dynax);
 }
-
 
 static MACHINE_DRIVER_START( jantouki )
 
@@ -4858,7 +4885,7 @@ static MACHINE_DRIVER_START( htengoku )
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(htengoku)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4915,6 +4942,18 @@ static const ay8910_interface tenkai_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(tenkai_dswsel_w)	// Write
 };
 
+static STATE_POSTLOAD( tenkai_bank_postload )
+{
+	tenkai_update_rombank(machine);
+}
+
+static MACHINE_START( tenkai )
+{
+	MACHINE_START_CALL(dynax);
+
+	state_save_register_postload(machine, tenkai_bank_postload, NULL);
+}
+
 static MACHINE_DRIVER_START( tenkai )
 
 	/* driver data */
@@ -4926,7 +4965,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_CPU_IO_MAP(tenkai_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(tenkai)
 	MDRV_MACHINE_RESET(dynax)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4968,6 +5007,20 @@ MACHINE_DRIVER_END
                                 Mahjong Gekisha
 ***************************************************************************/
 
+static STATE_POSTLOAD( gekisha_bank_postload )
+{
+	dynax_state *state = (dynax_state *)machine->driver_data;
+
+	gekisha_set_rombank(machine, state->rombank);
+}
+
+static MACHINE_START( gekisha )
+{
+	MACHINE_START_CALL(dynax);
+
+	state_save_register_postload(machine, gekisha_bank_postload, NULL);
+}
+
 static MACHINE_RESET( gekisha )
 {
 	MACHINE_RESET_CALL(dynax);
@@ -4986,7 +5039,7 @@ static MACHINE_DRIVER_START( gekisha )
 	MDRV_CPU_IO_MAP(gekisha_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(dynax)
+	MDRV_MACHINE_START(gekisha)
 	MDRV_MACHINE_RESET(gekisha)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -7147,42 +7200,42 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                     0 )
-GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                          0 )
-GAME( 1990, hjingi,   0,        hjingi,   hjingi,   0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                      0 )
-GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                         0 )
-GAME( 1989, drgpunch, 0,        sprtmtch, sprtmtch, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                         0 )
-GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                 0 )
+GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      GAME_SUPPORTS_SAVE )
+GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           GAME_SUPPORTS_SAVE )
+GAME( 1990, hjingi,   0,        hjingi,   hjingi,   0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          GAME_SUPPORTS_SAVE )
+GAME( 1989, drgpunch, 0,        sprtmtch, sprtmtch, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          GAME_SUPPORTS_SAVE )
+GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  GAME_SUPPORTS_SAVE )
 /* these 4 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
-GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                 0 ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,    maya,     sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                 0 )
-GAME( 199?, inca,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",                "Inca",                                                         0 )
-GAME( 199?, blktouch, 0,        sprtmtch, sprtmtch, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                          0 )
+GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayaa,    maya,     sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  GAME_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",                "Inca",                                                          GAME_SUPPORTS_SAVE )
+GAME( 199?, blktouch, 0,        sprtmtch, sprtmtch, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           GAME_SUPPORTS_SAVE )
 
-GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                       0 )
-GAME( 1989, gekisha,  0,        gekisha,  gekisha,  0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                              0 )
-GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                               0 )
-GAME( 1990, 7jigen,   0,        nanajign, nanajign, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",         GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, jantouki, 0,        jantouki, jantouki, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                          0 )
-GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                      0 )
-GAME( 1991, yarunara, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                     0 )
-GAME( 1991, mjangels, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                 0 )
-GAME( 1992, quiztvqq, 0,        yarunara, quiztvqq, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                              0 )
-GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                   0 )
-GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                   0 )
-GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",             0 )
-GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan, BOOTLEG)",          0 )
-GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)",GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan)",                         GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, hanayara, 0,        yarunara, hanayara, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                    0 )
-GAME( 1991, mjcomv1,  0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                          0 )
-GAME( 1991, tenkai,   0,        tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                            0 )
-GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen Part 2 (bootleg)",                           GAME_NOT_WORKING )
-GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg b)",                                0 )
-GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg c)",                                0 )
-GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                    GAME_NOT_WORKING )
-GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                    0 )
-GAME( 1992, htengoku, 0,        htengoku, htengoku, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                0 )
-GAME( 1994, mjreach,  0,        tenkai,   mjreach,  mjreach,  ROT0,   "Dynax",                    "Mahjong Reach (bootleg)",                                      0 )
-GAME( 1995, shpeng,   0,        sprtmtch, sprtmtch, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                           GAME_WRONG_COLORS ) // not a dynax board. proms?
-GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                         GAME_NOT_WORKING )
+GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        GAME_SUPPORTS_SAVE )
+GAME( 1989, gekisha,  0,        gekisha,  gekisha,  0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               GAME_SUPPORTS_SAVE )
+GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                GAME_SUPPORTS_SAVE )
+GAME( 1990, 7jigen,   0,        nanajign, nanajign, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, jantouki, 0,        jantouki, jantouki, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           GAME_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1991, yarunara, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      GAME_SUPPORTS_SAVE )
+GAME( 1991, mjangels, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  GAME_SUPPORTS_SAVE )
+GAME( 1992, quiztvqq, 0,        yarunara, quiztvqq, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               GAME_SUPPORTS_SAVE )
+GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    GAME_SUPPORTS_SAVE )
+GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    GAME_SUPPORTS_SAVE )
+GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              GAME_SUPPORTS_SAVE )
+GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan, BOOTLEG)",           GAME_SUPPORTS_SAVE )
+GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan)",                          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, hanayara, 0,        yarunara, hanayara, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     GAME_SUPPORTS_SAVE )
+GAME( 1991, mjcomv1,  0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkai,   0,        tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen Part 2 (bootleg)",                            GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg b)",                                 GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg c)",                                 GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     GAME_SUPPORTS_SAVE )
+GAME( 1992, htengoku, 0,        htengoku, htengoku, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                 GAME_SUPPORTS_SAVE )
+GAME( 1994, mjreach,  0,        tenkai,   mjreach,  mjreach,  ROT0,   "Dynax",                    "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1995, shpeng,   0,        sprtmtch, sprtmtch, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
