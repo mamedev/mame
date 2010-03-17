@@ -79,32 +79,20 @@ cleanup
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/es8712.h"
-
-static UINT16 *vmetal_texttileram;
-static UINT16 *vmetal_mid1tileram;
-static UINT16 *vmetal_mid2tileram;
-static UINT16 *vmetal_tlookup;
-static UINT16 *vmetal_videoregs;
-
-
-static tilemap_t *vmetal_texttilemap;
-static tilemap_t *vmetal_mid1tilemap;
-static tilemap_t *vmetal_mid2tilemap;
-
-/* video/metro.c */
-extern UINT16 *metro_videoregs;
-void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+#include "includes/metro.h"
 
 static READ16_HANDLER ( varia_crom_read )
 {
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
+	metro_state *state = (metro_state *)space->machine->driver_data;
 	UINT8 *cgrom = memory_region(space->machine, "gfx1");
 	UINT16 retdat;
+
 	offset = offset << 1;
-	offset |= (vmetal_videoregs[0x0ab/2]&0x7f) << 16;
-	retdat = ((cgrom[offset] <<8)| (cgrom[offset+1]));
-//  popmessage("varia romread offset %06x data %04x",offset, retdat);
+	offset |= (state->vmetal_videoregs[0x0ab / 2] & 0x7f) << 16;
+	retdat = ((cgrom[offset] << 8) | (cgrom[offset + 1]));
+	// popmessage("varia romread offset %06x data %04x", offset, retdat);
 
 	return retdat;
 }
@@ -117,30 +105,36 @@ static READ16_HANDLER ( varia_random )
 
 
 
-static void get_vmetal_tlookup(UINT16 data, UINT16 *tileno, UINT16 *color)
+static void get_vmetal_tlookup(running_machine *machine, UINT16 data, UINT16 *tileno, UINT16 *color)
 {
-	int idx = ((data & 0x7fff) >> 4)*2;
-	UINT32 lookup = (vmetal_tlookup[idx]<<16) | vmetal_tlookup[idx+1];
-	*tileno = (data & 0xf) | ((lookup>>2) & 0xfff0);
-	*color = (lookup>>20) & 0xff;
+	metro_state *state = (metro_state *)machine->driver_data;
+	int idx = ((data & 0x7fff) >> 4) * 2;
+	UINT32 lookup = (state->vmetal_tlookup[idx] << 16) | state->vmetal_tlookup[idx + 1];
+
+	*tileno = (data & 0xf) | ((lookup >> 2) & 0xfff0);
+	*color = (lookup >> 20) & 0xff;
 }
 
 
 static WRITE16_HANDLER( vmetal_texttileram_w )
 {
-	COMBINE_DATA(&vmetal_texttileram[offset]);
-	tilemap_mark_tile_dirty(vmetal_texttilemap,offset);
+	metro_state *state = (metro_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->vmetal_texttileram[offset]);
+	tilemap_mark_tile_dirty(state->vmetal_texttilemap, offset);
 }
 
 static WRITE16_HANDLER( vmetal_mid1tileram_w )
 {
-	COMBINE_DATA(&vmetal_mid1tileram[offset]);
-	tilemap_mark_tile_dirty(vmetal_mid1tilemap,offset);
+	metro_state *state = (metro_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->vmetal_mid1tileram[offset]);
+	tilemap_mark_tile_dirty(state->vmetal_mid1tilemap, offset);
 }
+
 static WRITE16_HANDLER( vmetal_mid2tileram_w )
 {
-	COMBINE_DATA(&vmetal_mid2tileram[offset]);
-	tilemap_mark_tile_dirty(vmetal_mid2tilemap,offset);
+	metro_state *state = (metro_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->vmetal_mid2tileram[offset]);
+	tilemap_mark_tile_dirty(state->vmetal_mid2tilemap, offset);
 }
 
 
@@ -157,10 +151,10 @@ static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 {
 	/* Lower nibble is the coin control bits shown in
        service mode, but in game mode they're different */
-	coin_counter_w(device->machine, 0,data & 0x04);
-	coin_counter_w(device->machine, 1,data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
-//  coin_lockout_w(device->machine, 0,data & 0x01);  /* always on in game mode?? */
-	coin_lockout_w(device->machine, 1,data & 0x02);	/* never activated in game mode?? */
+	coin_counter_w(device->machine, 0, data & 0x04);
+	coin_counter_w(device->machine, 1, data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
+//  coin_lockout_w(device->machine, 0, data & 0x01);  /* always on in game mode?? */
+	coin_lockout_w(device->machine, 1, data & 0x02);	/* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
 		device->reset();
@@ -209,45 +203,45 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
     */
 
 	es8712_w(device, offset, data);
-	logerror("%s:Writing %04x to ES8712 offset %02x\n",cpuexec_describe_context(device->machine),data,offset);
+	logerror("%s:Writing %04x to ES8712 offset %02x\n", cpuexec_describe_context(device->machine), data, offset);
 }
 
 
 static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE(&vmetal_texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE(&vmetal_mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE(&vmetal_mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE_MEMBER(metro_state, vmetal_texttileram)
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE_MEMBER(metro_state, vmetal_mid1tileram)
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE_MEMBER(metro_state, vmetal_mid2tileram)
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 
 	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_MEMBER(metro_state, spriteram, spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(&vmetal_tlookup)
-	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(&vmetal_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE(&metro_videoregs	)	// Video Registers
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(metro_state, vmetal_tlookup)
+	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(metro_state, vmetal_videoregs)
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(metro_state, videoregs)	// Video Registers
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* i have no idea whats meant to be going on here .. it seems to read one bit of the dips from some of them, protection ??? */
-	AM_RANGE(0x30fffe, 0x30ffff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x317ffe, 0x317fff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31bffe, 0x31bfff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31dffe, 0x31dfff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31effe, 0x31efff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31f7fe, 0x31f7ff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31fbfe, 0x31fbff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31fdfe, 0x31fdff) AM_READ(varia_random )  // nothing?
-	AM_RANGE(0x31fefe, 0x31feff) AM_READ(varia_dips_bit8_r )  // 0x40 = dip1-8 , 0x80 = dip2-8
-	AM_RANGE(0x31ff7e, 0x31ff7f) AM_READ(varia_dips_bit7_r )  // 0x40 = dip1-7 , 0x80 = dip2-7
-	AM_RANGE(0x31ffbe, 0x31ffbf) AM_READ(varia_dips_bit6_r )  // 0x40 = dip1-6 , 0x80 = dip2-6
-	AM_RANGE(0x31ffde, 0x31ffdf) AM_READ(varia_dips_bit5_r )  // 0x40 = dip1-5 , 0x80 = dip2-5
-	AM_RANGE(0x31ffee, 0x31ffef) AM_READ(varia_dips_bit4_r )  // 0x40 = dip1-4 , 0x80 = dip2-4
-	AM_RANGE(0x31fff6, 0x31fff7) AM_READ(varia_dips_bit3_r )  // 0x40 = dip1-3 , 0x80 = dip2-3
-	AM_RANGE(0x31fffa, 0x31fffb) AM_READ(varia_dips_bit2_r )  // 0x40 = dip1-2 , 0x80 = dip2-2
-	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r )  // 0x40 = dip1-1 , 0x80 = dip2-1
+	AM_RANGE(0x30fffe, 0x30ffff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x317ffe, 0x317fff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31bffe, 0x31bfff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31dffe, 0x31dfff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31effe, 0x31efff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31f7fe, 0x31f7ff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31fbfe, 0x31fbff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31fdfe, 0x31fdff) AM_READ(varia_random)  // nothing?
+	AM_RANGE(0x31fefe, 0x31feff) AM_READ(varia_dips_bit8_r)  // 0x40 = dip1-8 , 0x80 = dip2-8
+	AM_RANGE(0x31ff7e, 0x31ff7f) AM_READ(varia_dips_bit7_r)  // 0x40 = dip1-7 , 0x80 = dip2-7
+	AM_RANGE(0x31ffbe, 0x31ffbf) AM_READ(varia_dips_bit6_r)  // 0x40 = dip1-6 , 0x80 = dip2-6
+	AM_RANGE(0x31ffde, 0x31ffdf) AM_READ(varia_dips_bit5_r)  // 0x40 = dip1-5 , 0x80 = dip2-5
+	AM_RANGE(0x31ffee, 0x31ffef) AM_READ(varia_dips_bit4_r)  // 0x40 = dip1-4 , 0x80 = dip2-4
+	AM_RANGE(0x31fff6, 0x31fff7) AM_READ(varia_dips_bit3_r)  // 0x40 = dip1-3 , 0x80 = dip2-3
+	AM_RANGE(0x31fffa, 0x31fffb) AM_READ(varia_dips_bit2_r)  // 0x40 = dip1-2 , 0x80 = dip2-2
+	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r)  // 0x40 = dip1-1 , 0x80 = dip2-1
 	AM_RANGE(0x31fffe, 0x31ffff) AM_READ(varia_random )  // nothing?
 
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff )
@@ -260,7 +254,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( varia )
-	PORT_START("P1_P2")	/* IN0 */
+	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -278,7 +272,7 @@ static INPUT_PORTS_START( varia )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("SYSTEM")	/* IN1 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_TILT )
@@ -286,7 +280,7 @@ static INPUT_PORTS_START( varia )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 ) // 'Test'
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
 
-	PORT_START("DSW1")	/* Dips 1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C )  )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C )  )
@@ -312,7 +306,7 @@ static INPUT_PORTS_START( varia )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* Dips 2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -368,68 +362,95 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 {
+	metro_state *state = (metro_state *)machine->driver_data;
 	UINT32 tile;
-	UINT16 color, data = vmetal_texttileram[tile_index];
-	int idx = ((data & 0x7fff) >> 4)*2;
-	UINT32 lookup = (vmetal_tlookup[idx]<<16) | vmetal_tlookup[idx+1];
+	UINT16 color, data = state->vmetal_texttileram[tile_index];
+	int idx = ((data & 0x7fff) >> 4) * 2;
+	UINT32 lookup = (state->vmetal_tlookup[idx] << 16) | state->vmetal_tlookup[idx + 1];
+
 	tile = (data & 0xf) | (lookup & 0x7fff0);
-	color = ((lookup>>20) & 0x1f)+0xe0;
-	if (data & 0x8000) tile = 0;
+	color = ((lookup >> 20) & 0x1f) + 0xe0;
+
+	if (data & 0x8000) 
+		tile = 0;
+
 	SET_TILE_INFO(1, tile, color, TILE_FLIPYX(0x0));
 }
 
 
 static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
 {
-	UINT16 tile, color, data = vmetal_mid1tileram[tile_index];
-	get_vmetal_tlookup(data, &tile, &color);
-	if (data & 0x8000) tile = 0;
+	metro_state *state = (metro_state *)machine->driver_data;
+	UINT16 tile, color, data = state->vmetal_mid1tileram[tile_index];
+
+	get_vmetal_tlookup(machine, data, &tile, &color);
+
+	if (data & 0x8000) 
+		tile = 0;
+
 	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
 }
+
 static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 {
-	UINT16 tile, color, data = vmetal_mid2tileram[tile_index];
-	get_vmetal_tlookup(data, &tile, &color);
-	if (data & 0x8000) tile = 0;
+	metro_state *state = (metro_state *)machine->driver_data;
+	UINT16 tile, color, data = state->vmetal_mid2tileram[tile_index];
+
+	get_vmetal_tlookup(machine, data, &tile, &color);
+
+	if (data & 0x8000) 
+		tile = 0;
+
 	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
 }
 
 static VIDEO_START(varia)
 {
-	vmetal_texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info,tilemap_scan_rows, 8, 8, 256,256);
-	vmetal_mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info,tilemap_scan_rows,16,16, 256,256);
-	vmetal_mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info,tilemap_scan_rows,16,16, 256,256);
-	tilemap_set_transparent_pen(vmetal_texttilemap,15);
-	tilemap_set_transparent_pen(vmetal_mid1tilemap,15);
-	tilemap_set_transparent_pen(vmetal_mid2tilemap,15);
+	metro_state *state = (metro_state *)machine->driver_data;
+
+	state->vmetal_texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info, tilemap_scan_rows,  8,  8, 256, 256);
+	state->vmetal_mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
+	state->vmetal_mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
+
+	tilemap_set_transparent_pen(state->vmetal_texttilemap, 15);
+	tilemap_set_transparent_pen(state->vmetal_mid1tilemap, 15);
+	tilemap_set_transparent_pen(state->vmetal_mid2tilemap, 15);
 }
 
 static VIDEO_UPDATE(varia)
 {
+	metro_state *state = (metro_state *)screen->machine->driver_data;
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	tilemap_set_scrollx(vmetal_mid2tilemap,0, vmetal_videoregs[0x06a/2]-64 /*+ vmetal_videoregs[0x066/2]*/);
-	tilemap_set_scrollx(vmetal_mid1tilemap,0, vmetal_videoregs[0x07a/2]-64 /*+ vmetal_videoregs[0x076/2]*/);
-	tilemap_set_scrollx(vmetal_texttilemap,0, -64 /*+ vmetal_videoregs[0x076/2]*/);
+	tilemap_set_scrollx(state->vmetal_mid2tilemap, 0, state->vmetal_videoregs[0x06a/2]-64 /*+ state->vmetal_videoregs[0x066/2]*/);
+	tilemap_set_scrollx(state->vmetal_mid1tilemap, 0, state->vmetal_videoregs[0x07a/2]-64 /*+ state->vmetal_videoregs[0x076/2]*/);
+	tilemap_set_scrollx(state->vmetal_texttilemap, 0, -64 /*+ state->vmetal_videoregs[0x076/2]*/);
 
-	tilemap_set_scrolly(vmetal_mid2tilemap,0, -64 );
-	tilemap_set_scrolly(vmetal_mid1tilemap,0, -64 );
-	tilemap_set_scrolly(vmetal_texttilemap,0, -64 );
+	tilemap_set_scrolly(state->vmetal_mid2tilemap, 0, -64);
+	tilemap_set_scrolly(state->vmetal_mid1tilemap, 0, -64);
+	tilemap_set_scrolly(state->vmetal_texttilemap, 0, -64);
 
-	tilemap_draw(bitmap,cliprect,vmetal_mid1tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,vmetal_mid2tilemap,0,0);
-	metro_draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,vmetal_texttilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->vmetal_mid1tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->vmetal_mid2tilemap, 0, 0);
+	metro_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->vmetal_texttilemap, 0, 0);
 	return 0;
 }
 
+
 static MACHINE_DRIVER_START( varia )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(metro_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(varia_program_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // also level 3
 
-
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -443,6 +464,7 @@ static MACHINE_DRIVER_START( varia )
 	MDRV_VIDEO_START(varia)
 	MDRV_VIDEO_UPDATE(varia)
 
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1320000)
@@ -494,5 +516,5 @@ ROM_START( vmetaln )
 	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
 ROM_END
 
-GAME( 1995, vmetal,  0,      varia, varia, 0, ROT270, "Excellent System",                        "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, vmetaln, vmetal, varia, varia, 0, ROT270, "[Excellent System] New Ways Trading Co.", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, vmetal,  0,      varia, varia, 0, ROT270, "Excellent System",                        "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, vmetaln, vmetal, varia, varia, 0, ROT270, "[Excellent System] New Ways Trading Co.", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

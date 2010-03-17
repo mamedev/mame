@@ -2658,6 +2658,7 @@ src/mame/includes/megazone.h svneol=native#text/plain
 src/mame/includes/mermaid.h svneol=native#text/plain
 src/mame/includes/metalmx.h svneol=native#text/plain
 src/mame/includes/metlclsh.h svneol=native#text/plain
+src/mame/includes/metro.h svneol=native#text/plain
 src/mame/includes/mexico86.h svneol=native#text/plain
 src/mame/includes/mhavoc.h svneol=native#text/plain
 src/mame/includes/micro3d.h svneol=native#text/plain
