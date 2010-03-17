@@ -833,11 +833,12 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( moonwarp_p1_r )
 {
-	// this seems to be the same type of dial as the later 'moon war 2' set uses
+	// This seems to be the same type of dial as the later 'moon war 2' set uses
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
-	// I.e. a 74ls161 counts from 0 to 16 which is the absolute number of bars passed on the quadrature
-	// one difference is it lacks the strobe input (does it?), which if not active causes the lsb of the dial
-	// and the direction to be left floating (retain old value most likely, for a moment)
+	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
+	// one difference is it lacks the strobe input (does it?), which if not active causes
+	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
+	// and player 2 dials.
 	static int lastdialread = -1;
 	int dialread = input_port_read(space->machine,"P1_DIAL");
 	static int dialoutput = 0;
