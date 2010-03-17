@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
 	/* validate arguments */
     if (argc < 3)
     {
-    	fprintf(stderr, "Usage:\npng2bdf <input.png> [<input2.png> [...]] <output.bdc>\n");
+    	fprintf(stderr, "Usage:\n%s <input.png> [<input2.png> [...]] <output.bdc>\n", argv[0]);
     	return 1;
     }
     bdcname = argv[argc - 1];
