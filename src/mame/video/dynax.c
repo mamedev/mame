@@ -1255,8 +1255,8 @@ static int debug_viewer( running_machine *machine, bitmap_t *bitmap, const recta
 			if (i >= 2) i -= 2;	while (i > 0 && RAM[i]) i--;	i++;
 		}
 
-		dynax_blit_palettes = (c & 0xf) * 0x111;
-		dynax_blit_palbank  = (c >>  4) & 1;
+		state->blit_palettes = (c & 0xf) * 0x111;
+		state->blit_palbank  = (c >>  4) & 1;
 
 		bitmap_fill(bitmap, cliprect, 0);
 		memset(state->pixmap[0][0], 0, sizeof(UINT8) * 0x100 * 0x100);

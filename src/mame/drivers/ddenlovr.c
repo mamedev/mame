@@ -1356,7 +1356,7 @@ VIDEO_UPDATE(ddenlovr)
 
 		mask2 = 0;
 
-		if (extra_layers)
+		if (state->extra_layers)
 		{
 			if (input_code_pressed(screen->machine, KEYCODE_A))	mask2 |= 1;
 			if (input_code_pressed(screen->machine, KEYCODE_S))	mask2 |= 2;
