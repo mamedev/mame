@@ -831,25 +831,29 @@ static INPUT_PORTS_START( frenzy )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
-// this is wrong :/
 static READ8_HANDLER( moonwarp_p1_r )
 {
-	static int lastdial = -1;
-	int dial = input_port_read(space->machine,"P1_DIAL");
+	// this seems to be the same type of dial as the later 'moon war 2' set uses
+	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
+	// I.e. a 74ls161 counts from 0 to 16 which is the absolute number of bars passed on the quadrature
+	// one difference is it lacks the strobe input (does it?), which if not active causes the lsb of the dial
+	// and the direction to be left floating (retain old value most likely, for a moment)
+	static int lastdialread = -1;
+	int dialread = input_port_read(space->machine,"P1_DIAL");
+	static int dialoutput = 0;
+	static int direction = 0;
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(space->machine,"P1")&0xe0);
+	if ((lastdialread - dialread) < 0) direction = 1;
+	else if ((lastdialread - dialread) > 0) direction = 0;
+	// note when lastdialread and dialread are the same direction is left alone.
+	dialoutput += abs(dialread - lastdialread);
+	dialoutput &= 0xf;
+	
+	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
 
-	if (dial>lastdial)	
-		ret=  ((dial&0xf) ^ 0x10)
-			  | buttons;
-	else if (dial<lastdial)
-		ret=  (0xf-(dial&0xf) )
-			  | buttons;
-	else
-		ret = 0x0 | buttons;
-
-	lastdial = dial;
-
+	//fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
+	lastdialread = dialread;
 	return ret;
 }
 
@@ -860,7 +864,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P1_DIAL")
-    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
 
 	PORT_START("SYSTEM")
@@ -1228,4 +1232,4 @@ GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set
 GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 2)", 0 )
 GAME( 1980, berzerkg, berzerk, berzerk, berzerkg,0, ROT0, "Stern", "Berzerk (German Speech)", 0 )
 GAME( 1981, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern", "Frenzy", 0 )
-GAME( 1981, moonwarp, 0,       frenzy,  moonwarp,moonwarp, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", GAME_NOT_WORKING ) // inputs need fixing!
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp,moonwarp, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", 0)
