@@ -102,6 +102,12 @@ WRITE8_HANDLER( threeds_romsel_w )
 	pastelg_gfxrom = (data & 0x3);
 }
 
+WRITE8_HANDLER( threeds_output_w )
+{
+	pastelg_palbank = ((data & 0x10) >> 4);
+
+}
+
 READ8_HANDLER( threeds_rom_readback_r )
 {
 	UINT8 *GFX = memory_region(space->machine, "gfx1");

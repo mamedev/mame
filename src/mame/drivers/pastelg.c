@@ -42,6 +42,7 @@ extern VIDEO_START( pastelg );
 extern WRITE8_HANDLER( pastelg_clut_w );
 extern WRITE8_HANDLER( pastelg_romsel_w );
 extern WRITE8_HANDLER( threeds_romsel_w );
+extern WRITE8_HANDLER( threeds_output_w );
 extern WRITE8_HANDLER( pastelg_blitter_w );
 extern READ8_HANDLER( threeds_rom_readback_r );
 extern int pastelg_blitter_src_addr_r(void);
@@ -128,7 +129,7 @@ static ADDRESS_MAP_START( threeds_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE( threeds_romsel_w )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) //writes: bit 3 is coin lockout, bit 1 is coin counter
+	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
 	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", DAC_WRITE)
