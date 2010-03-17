@@ -1002,7 +1002,7 @@ $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/mario.o $(AUDIO)/mario.o $(VIDEO)/mario.o \
 	$(DRIVERS)/multigam.o \
 	$(DRIVERS)/n8080.o $(AUDIO)/n8080.o $(VIDEO)/n8080.o \
-	$(DRIVERS)/nss.o $(MACHINE)/snes.o $(AUDIO)/snes.o $(VIDEO)/snes.o \
+	$(DRIVERS)/nss.o $(MACHINE)/snes.o $(AUDIO)/snes_snd.o $(VIDEO)/snes.o \
 	$(DRIVERS)/playch10.o $(MACHINE)/playch10.o $(VIDEO)/playch10.o \
 	$(DRIVERS)/popeye.o $(VIDEO)/popeye.o \
 	$(DRIVERS)/punchout.o $(VIDEO)/punchout.o \

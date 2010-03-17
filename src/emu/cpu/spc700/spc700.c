@@ -1247,9 +1247,44 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 /* ================================= API ================================== */
 /* ======================================================================== */
 
+static void state_register( running_device *device )
+{
+	spc700i_cpu *cpustate = get_safe_token(device);
+
+	state_save_register_device_item(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->x);
+	state_save_register_device_item(device, 0, cpustate->y);
+	state_save_register_device_item(device, 0, cpustate->s);
+	state_save_register_device_item(device, 0, cpustate->pc);
+	state_save_register_device_item(device, 0, cpustate->ppc);
+	state_save_register_device_item(device, 0, cpustate->flag_n);
+	state_save_register_device_item(device, 0, cpustate->flag_z);
+	state_save_register_device_item(device, 0, cpustate->flag_v);
+	state_save_register_device_item(device, 0, cpustate->flag_p);
+	state_save_register_device_item(device, 0, cpustate->flag_b);
+	state_save_register_device_item(device, 0, cpustate->flag_h);
+	state_save_register_device_item(device, 0, cpustate->flag_i);
+	state_save_register_device_item(device, 0, cpustate->flag_c);
+	state_save_register_device_item(device, 0, cpustate->line_irq);
+	state_save_register_device_item(device, 0, cpustate->line_nmi);
+	state_save_register_device_item(device, 0, cpustate->line_rst);
+	state_save_register_device_item(device, 0, cpustate->ir);
+	state_save_register_device_item(device, 0, cpustate->stopped);
+	state_save_register_device_item(device, 0, cpustate->ICount);
+	state_save_register_device_item(device, 0, cpustate->source);
+	state_save_register_device_item(device, 0, cpustate->destination);
+	state_save_register_device_item(device, 0, cpustate->temp1);
+	state_save_register_device_item(device, 0, cpustate->temp2);
+	state_save_register_device_item(device, 0, cpustate->temp3);
+	state_save_register_device_item(device, 0, cpustate->spc_int16);
+	state_save_register_device_item(device, 0, cpustate->spc_int32);
+}
+
 static CPU_INIT( spc700 )
 {
 	spc700i_cpu *cpustate = get_safe_token(device);
+
+	state_register(device);
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;

@@ -292,10 +292,12 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
+#include "audio/snes_snd.h"
 
 static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
@@ -308,22 +310,22 @@ static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
 ADDRESS_MAP_END
 
-static READ8_HANDLER( spc_ram_100_r )
+static READ8_DEVICE_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(space, offset + 0x100);
+	return spc_ram_r(device, offset + 0x100);
 }
 
-static WRITE8_HANDLER( spc_ram_100_w )
+static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(space, offset + 0x100, data);
+	spc_ram_w(device, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ef) AM_READWRITE(spc_ram_r, spc_ram_w) AM_BASE(&spc_ram)   	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE(spc_io_r, spc_io_w)   	/* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_WRITE(spc_ram_100_w)
-	AM_RANGE(0x0100, 0xffbf) AM_READ(spc_ram_100_r)
-	AM_RANGE(0xffc0, 0xffff) AM_READ(spc_ipl_r)
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)   	/* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)   	/* spc io */
+	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
+	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
+	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( snes )
@@ -416,8 +418,7 @@ static MACHINE_DRIVER_START( snes )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("snes", SNES, 0)
+	MDRV_SOUND_ADD("spc700", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_DRIVER_END
@@ -574,16 +575,16 @@ ROM_START( nss_sten )
 	ROM_LOAD( "st.ic3", 0x0000, 0x8000, CRC(8880596e) SHA1(ec6d68fc2f51f7d94f496cd72cf898db65324542) )
 ROM_END
 
-GAME( 199?, nss,       0,     snes,	     snes,    snes,		ROT0, "Nintendo",					"Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1992, nss_actr,  nss,	  snes,	     snes,    snes,		ROT0, "Enix",						"Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // time broken (?)
-GAME( 1992, nss_adam,  nss,	  snes,	     snes,    snes,		ROT0, "Ocean",						"The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1992, nss_aten,  nss,	  snes,	     snes,    snes,		ROT0, "Absolute Entertainment Inc.","David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx problems with net
-GAME( 1992, nss_con3,  nss,	  snes,	     snes,    snes,		ROT0, "Konami",						"Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_lwep,  nss,	  snes,	     snes,    snes,		ROT0, "Ocean",						"Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_ncaa,  nss,	  snes,	     snes,    snes,		ROT0, "Sculptured Software Inc.",	"NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_rob3,  nss,	  snes,	     snes,    snes,		ROT0, "Ocean",						"Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // invisible enemy? gameplay prob?
-GAME( 1992, nss_skin,  nss,	  snes,	     snes,    snes,		ROT0, "Irem",						"Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // no controls
-GAME( 1992, nss_ssoc,  nss,	  snes,	     snes,    snes,		ROT0, "Human Inc.",					"Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // some gfx issues
-GAME( 1991, nss_smw,   nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_fzer,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_sten,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 199?, nss,       0,     snes,      snes,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1992, nss_actr,  nss,   snes,      snes,    snes,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // time broken (?)
+GAME( 1992, nss_adam,  nss,   snes,      snes,    snes,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1992, nss_aten,  nss,   snes,      snes,    snes,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx problems with net
+GAME( 1992, nss_con3,  nss,   snes,      snes,    snes,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_lwep,  nss,   snes,      snes,    snes,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_ncaa,  nss,   snes,      snes,    snes,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_rob3,  nss,   snes,      snes,    snes,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // invisible enemy? gameplay prob?
+GAME( 1992, nss_skin,  nss,   snes,      snes,    snes,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // no controls
+GAME( 1992, nss_ssoc,  nss,   snes,      snes,    snes,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // some gfx issues
+GAME( 1991, nss_smw,   nss,   snes,      snes,    snes,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_fzer,  nss,   snes,      snes,    snes,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_sten,  nss,   snes,      snes,    snes,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
