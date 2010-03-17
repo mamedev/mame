@@ -685,11 +685,11 @@ static MACHINE_DRIVER_START( scontra )
 	MDRV_DRIVER_DATA(thunderx_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 052001 */
+	MDRV_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)		/* Verified on pcb, CPU is 052001 */
 	MDRV_CPU_PROGRAM_MAP(scontra_map)
 	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(scontra_sound_map)
 
 	MDRV_MACHINE_START(scontra)
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( scontra )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.17)				/* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -716,11 +716,11 @@ static MACHINE_DRIVER_START( scontra )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
-	MDRV_SOUND_ADD("k007232", K007232, 3579545)
+	MDRV_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
