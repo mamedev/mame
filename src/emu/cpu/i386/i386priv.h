@@ -402,21 +402,19 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 	UINT16 value;
 	UINT32 address = cpustate->pc;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
 	if( address & 0x1 ) {		/* Unaligned read */
-		address &= cpustate->a20_mask;
-		value = (memory_decrypted_read_byte(cpustate->program, address+0) << 0) |
-				(memory_decrypted_read_byte(cpustate->program, address+1) << 8);
+		value = (FETCH(cpustate) << 0) |
+				(FETCH(cpustate) << 8);
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
 		address &= cpustate->a20_mask;
 		value = memory_decrypted_read_word(cpustate->program, address);
+		cpustate->eip += 2;
+		cpustate->pc += 2;
 	}
-	cpustate->eip += 2;
-	cpustate->pc += 2;
 	return value;
 }
 INLINE UINT32 FETCH32(i386_state *cpustate)
@@ -424,23 +422,22 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 	UINT32 value;
 	UINT32 address = cpustate->pc;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
 	if( cpustate->pc & 0x3 ) {		/* Unaligned read */
-		address &= cpustate->a20_mask;
-		value = (memory_decrypted_read_byte(cpustate->program, address+0) << 0) |
-				(memory_decrypted_read_byte(cpustate->program, address+1) << 8) |
-				(memory_decrypted_read_byte(cpustate->program, address+2) << 16) |
-				(memory_decrypted_read_byte(cpustate->program, address+3) << 24);
+		value = (FETCH(cpustate) << 0) |
+				(FETCH(cpustate) << 8) |
+				(FETCH(cpustate) << 16) |
+				(FETCH(cpustate) << 24);
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
 		address &= cpustate->a20_mask;
 		value = memory_decrypted_read_dword(cpustate->program, address);
+		cpustate->eip += 4;
+		cpustate->pc += 4;
 	}
-	cpustate->eip += 4;
-	cpustate->pc += 4;
 	return value;
 }
 
@@ -461,16 +458,16 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 	UINT16 value;
 	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
-	address &= cpustate->a20_mask;
 	if( ea & 0x1 ) {		/* Unaligned read */
-		value = (memory_read_byte_32le( cpustate->program, address+0 ) << 0) |
-				(memory_read_byte_32le( cpustate->program, address+1 ) << 8);
+		value = (READ8( cpustate, address+0 ) << 0) |
+				(READ8( cpustate, address+1 ) << 8);
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
+		address &= cpustate->a20_mask;
 		value = memory_read_word_32le( cpustate->program, address );
 	}
 	return value;
@@ -480,18 +477,18 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 	UINT32 value;
 	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
-	address &= cpustate->a20_mask;
 	if( ea & 0x3 ) {		/* Unaligned read */
-		value = (memory_read_byte_32le( cpustate->program, address+0 ) << 0) |
-				(memory_read_byte_32le( cpustate->program, address+1 ) << 8) |
-				(memory_read_byte_32le( cpustate->program, address+2 ) << 16) |
-				(memory_read_byte_32le( cpustate->program, address+3 ) << 24);
+		value = (READ8( cpustate, address+0 ) << 0) |
+				(READ8( cpustate, address+1 ) << 8) |
+				(READ8( cpustate, address+2 ) << 16) |
+				(READ8( cpustate, address+3 ) << 24);
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
+		address &= cpustate->a20_mask;
 		value = memory_read_dword_32le( cpustate->program, address );
 	}
 	return value;
@@ -502,22 +499,22 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 	UINT64 value;
 	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
-	address &= cpustate->a20_mask;
 	if( ea & 0x7 ) {		/* Unaligned read */
-		value = (((UINT64) memory_read_byte_32le( cpustate->program, address+0 )) << 0) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+1 )) << 8) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+2 )) << 16) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+3 )) << 24) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+4 )) << 32) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+5 )) << 40) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+6 )) << 48) |
-				(((UINT64) memory_read_byte_32le( cpustate->program, address+7 )) << 56);
+		value = (((UINT64) READ8( cpustate, address+0 )) << 0) |
+				(((UINT64) READ8( cpustate, address+1 )) << 8) |
+				(((UINT64) READ8( cpustate, address+2 )) << 16) |
+				(((UINT64) READ8( cpustate, address+3 )) << 24) |
+				(((UINT64) READ8( cpustate, address+4 )) << 32) |
+				(((UINT64) READ8( cpustate, address+5 )) << 40) |
+				(((UINT64) READ8( cpustate, address+6 )) << 48) |
+				(((UINT64) READ8( cpustate, address+7 )) << 56);
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
+		address &= cpustate->a20_mask;
 		value = (((UINT64) memory_read_dword_32le( cpustate->program, address+0 )) << 0) |
 				(((UINT64) memory_read_dword_32le( cpustate->program, address+4 )) << 32);
 	}
@@ -540,16 +537,16 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 {
 	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
-	address &= cpustate->a20_mask;
 	if( ea & 0x1 ) {		/* Unaligned write */
-		memory_write_byte_32le( cpustate->program, address+0, value & 0xff );
-		memory_write_byte_32le( cpustate->program, address+1, (value >> 8) & 0xff );
+		WRITE8( cpustate, address+0, value & 0xff );
+		WRITE8( cpustate, address+1, (value >> 8) & 0xff );
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
+		address &= cpustate->a20_mask;
 		memory_write_word_32le(cpustate->program, address, value);
 	}
 }
@@ -557,18 +554,18 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 {
 	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
-	ea &= cpustate->a20_mask;
 	if( ea & 0x3 ) {		/* Unaligned write */
-		memory_write_byte_32le( cpustate->program, address+0, value & 0xff );
-		memory_write_byte_32le( cpustate->program, address+1, (value >> 8) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+2, (value >> 16) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+3, (value >> 24) & 0xff );
+		WRITE8( cpustate, address+0, value & 0xff );
+		WRITE8( cpustate, address+1, (value >> 8) & 0xff );
+		WRITE8( cpustate, address+2, (value >> 16) & 0xff );
+		WRITE8( cpustate, address+3, (value >> 24) & 0xff );
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
+		ea &= cpustate->a20_mask;
 		memory_write_dword_32le(cpustate->program, address, value);
 	}
 }
@@ -577,22 +574,22 @@ INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 {
 	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
-	{
-		translate_address(cpustate,&address);
-	}
-
-	ea &= cpustate->a20_mask;
 	if( ea & 0x7 ) {		/* Unaligned write */
-		memory_write_byte_32le( cpustate->program, address+0, value & 0xff );
-		memory_write_byte_32le( cpustate->program, address+1, (value >> 8) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+2, (value >> 16) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+3, (value >> 24) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+4, (value >> 32) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+5, (value >> 40) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+6, (value >> 48) & 0xff );
-		memory_write_byte_32le( cpustate->program, address+7, (value >> 56) & 0xff );
+		WRITE8( cpustate, address+0, value & 0xff );
+		WRITE8( cpustate, address+1, (value >> 8) & 0xff );
+		WRITE8( cpustate, address+2, (value >> 16) & 0xff );
+		WRITE8( cpustate, address+3, (value >> 24) & 0xff );
+		WRITE8( cpustate, address+4, (value >> 32) & 0xff );
+		WRITE8( cpustate, address+5, (value >> 40) & 0xff );
+		WRITE8( cpustate, address+6, (value >> 48) & 0xff );
+		WRITE8( cpustate, address+7, (value >> 56) & 0xff );
 	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			translate_address(cpustate,&address);
+		}
+	
+		ea &= cpustate->a20_mask;
 		memory_write_dword_32le(cpustate->program, address+0, value & 0xffffffff);
 		memory_write_dword_32le(cpustate->program, address+4, (value >> 32) & 0xffffffff);
 	}
