@@ -2647,11 +2647,11 @@ static INPUT_PORTS_START( moonwar )
 
 	PORT_START("IN3")      /* IN3/4 - dummy ports for the dial */
 	
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: dial is reversed
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: dial works normally
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_REVERSE PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: dial works normally
 
 	PORT_START("IN4")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
 INPUT_PORTS_END
 
 /* same as above, but coinage is different */
@@ -2671,10 +2671,10 @@ static INPUT_PORTS_START( moonwara )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
 
 	PORT_START("IN3")      /* IN3/4 - dummy ports for the dial */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) // both: p1 dial works normally, p2 dial is reversed, both share same port
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) // both: p1 dial works normally, p2 dial is reversed, both share same port
 
 	PORT_START("IN4")		/* doesn't actually work due to bug in game code */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tdpgal )
