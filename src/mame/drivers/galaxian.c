@@ -1095,9 +1095,6 @@ static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 {
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
-	// one difference is it lacks the strobe input (does it?), which if not active causes
-	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
-	// and player 2 dials, which is emulated here.
 	static int lastdialread = -1;
 	int dialread = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
 	static int dialoutput = 0;
